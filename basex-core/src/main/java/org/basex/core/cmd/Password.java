@@ -33,6 +33,6 @@ public final class Password extends AUser {
   @Override
   protected void build(final CmdBuilder cb) {
     cb.init();
-    if(!cb.conf()) cb.arg(0);
+    if(!cb.password()) cb.arg(0);
   }
 }

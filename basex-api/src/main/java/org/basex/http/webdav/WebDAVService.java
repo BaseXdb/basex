@@ -79,7 +79,7 @@ final class WebDAVService {
    * @throws IOException I/O exception
    */
   boolean dbExists(final String db) throws IOException {
-    final WebDAVQuery query = new WebDAVQuery(_DB_EXISTS.args(" $db")).bind("db", db);
+    final WebDAVQuery query = new WebDAVQuery(_DB_EXISTS.args(" $db")).variable("db", db);
     return query.execute(session()).equals(Text.TRUE);
   }
 
@@ -91,7 +91,7 @@ final class WebDAVService {
    */
   String timestamp(final String db) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(DATA.args(_DB_INFO.args(" $db") +
-        "/descendant::timestamp[1]")).bind("db", db);
+        "/descendant::timestamp[1]")).variable("db", db);
     return query.execute(session());
   }
 
@@ -106,8 +106,8 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(
       "let $a := " + _DB_LIST_DETAILS.args(" $db", " $path") + "[1] " +
       "return string-join(($a, $a/(@raw, @content-type, @modified-date, @size)), out:tab())");
-    query.bind("db", db);
-    query.bind("path", path);
+    query.variable("db", db);
+    query.variable("path", path);
 
     final String[] result = Strings.split(query.execute(session()), '\t');
     final String pth = stripLeadingSlash(result[0]);
@@ -171,10 +171,10 @@ final class WebDAVService {
       " then " + _DB_STORE.args(" $tdb", " $tpath", _DB_RETRIEVE.args(" $db", " $path")) +
       " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"),
       "declare option db:chop 'false';");
-    query.bind("db", db);
-    query.bind("path", path);
-    query.bind("tdb", tdb);
-    query.bind("tpath", tpath);
+    query.variable("db", db);
+    query.variable("path", path);
+    query.variable("tdb", tdb);
+    query.variable("tpath", tpath);
     query.execute(session());
   }
 
@@ -196,10 +196,10 @@ final class WebDAVService {
       "then " + _DB_STORE.args(" $tdb", " $t", _DB_RETRIEVE.args(" $db", " $d")) +
       " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"),
       "declare option db:chop 'false';");
-    query.bind("db", db);
-    query.bind("path", path);
-    query.bind("tdb", tdb);
-    query.bind("tpath", tpath);
+    query.variable("db", db);
+    query.variable("path", path);
+    query.variable("tdb", tdb);
+    query.variable("tpath", tpath);
     query.execute(session());
   }
 
@@ -218,8 +218,8 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(
       (binary ? _DB_RETRIEVE : _DB_OPEN).args(" $db", " $path") + "[1]",
       SerializerOptions.USE_CHARACTER_MAPS.arg(WEBDAV));
-    query.bind("db", db);
-    query.bind("path", path);
+    query.variable("db", db);
+    query.variable("path", path);
     query.execute(session());
   }
 
@@ -275,8 +275,8 @@ final class WebDAVService {
       _DB_DIR.args(" $db", " $path") + " ! (string(), name() = 'dir', " +
       "for $a in ('modified-date', 'raw', 'content-type', 'size') " +
       "return string(@*[name() = $a]))", _OUT_TAB.args()));
-    query.bind("db", db);
-    query.bind("path", path);
+    query.variable("db", db);
+    query.variable("path", path);
 
     final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> ch = new ArrayList<>();
@@ -397,8 +397,8 @@ final class WebDAVService {
    */
   private boolean pathExists(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(EXISTS.args(_DB_LIST.args(" $db", " $path")));
-    query.bind("db", db);
-    query.bind("path", path);
+    query.variable("db", db);
+    query.variable("path", path);
     return query.execute(session()).equals(Text.TRUE);
   }
 
@@ -411,8 +411,8 @@ final class WebDAVService {
    */
   private boolean exists(final String db, final String path) throws IOException {
     final WebDAVQuery query = new WebDAVQuery(_DB_EXISTS.args(" $db", " $path"));
-    query.bind("db", db);
-    query.bind("path", path);
+    query.variable("db", db);
+    query.variable("path", path);
     return query.execute(session()).equals(Text.TRUE);
   }
 

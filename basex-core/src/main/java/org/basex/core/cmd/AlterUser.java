@@ -45,6 +45,6 @@ public final class AlterUser extends AUser {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init(Cmd.ALTER + " " + CmdAlter.USER).arg(0);
-    if(!cb.conf()) cb.arg(1);
+    if(!cb.password()) cb.arg(1);
   }
 }

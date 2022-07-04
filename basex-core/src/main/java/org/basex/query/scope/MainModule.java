@@ -31,8 +31,8 @@ public final class MainModule extends AModule {
    */
   public MainModule(final Expr expr, final VarScope vs) {
     super(vs.sc);
-    this.vs = vs;
     this.expr = expr;
+    this.vs = vs;
   }
 
   @Override

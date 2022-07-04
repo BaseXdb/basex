@@ -36,8 +36,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
-  /** Flag that is turned on during compilation and prevents premature inlining. */
-  private boolean compiling;
 
   /**
    * Function constructor.
@@ -60,25 +58,26 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public void comp(final CompileContext cc) {
-    if(compiled || expr == null) return;
-    compiling = compiled = true;
+    if(!compiled && expr != null) {
+      compiled = dontEnter = true;
 
-    // compile function body, handle return type
-    cc.pushFocus(null);
-    cc.pushScope(vs);
-    try {
-      expr = expr.compile(cc);
-      if(declType != null) expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
-    } catch(final QueryException qe) {
-      expr = cc.error(qe, expr);
-    } finally {
-      cc.removeScope(this);
-      cc.removeFocus();
+      // compile function body, handle return type
+      cc.pushFocus(null);
+      cc.pushScope(vs);
+      try {
+        expr = expr.compile(cc);
+        if(declType != null) expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
+      } catch(final QueryException qe) {
+        expr = cc.error(qe, expr);
+      } finally {
+        cc.removeScope(this);
+        cc.removeFocus();
+      }
+
+      // convert all function calls in tail position to proper tail calls
+      expr.markTailCalls(cc);
+      dontEnter = false;
     }
-
-    // convert all function calls in tail position to proper tail calls
-    expr.markTailCalls(cc);
-    compiling = false;
   }
 
   /**
@@ -87,7 +86,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   public void optimize(final CompileContext cc) {
     // check function calls, drop superfluous type checks
-    final SeqType[] seqTypes = cc.qc.funcs.seqTypes(this);
+    final SeqType[] seqTypes = cc.qc.functions.seqTypes(this);
     if(seqTypes != null) {
       final int pl = arity();
       for(int p = 0; p < pl; p++) {
@@ -260,7 +259,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!inline(cc, anns, expr) || has(Flag.CTX) || compiling || selfRecursive()) return null;
+    if(!inline(cc, anns, expr) || has(Flag.CTX) || dontEnter || selfRecursive()) return null;
     cc.info(OPTINLINE_X, (Supplier<?>) this::id);
 
     // create let bindings for all variables

@@ -48,27 +48,26 @@ public final class StaticVar extends StaticDecl {
   public void comp(final CompileContext cc) throws QueryException {
     if(expr == null) throw VAREMPTY_X.get(info, name());
     if(dontEnter) throw CIRCVAR_X.get(info, name());
-    if(compiled) return;
-    compiled = true;
+    if(!compiled) {
+      compiled = dontEnter = true;
 
-    dontEnter = true;
-    cc.pushScope(vs);
-    try {
-      expr = expr.compile(cc);
-    } catch(final QueryException qe) {
-      declType = null;
-      if(lazy) {
+      cc.pushScope(vs);
+      try {
+        expr = expr.compile(cc);
+      } catch(final QueryException qe) {
+        declType = null;
+        if(!lazy) throw qe.notCatchable();
         expr = cc.error(qe, expr);
-        return;
+      } finally {
+        cc.removeScope(this);
+        dontEnter = false;
       }
-      throw qe.notCatchable();
-    } finally {
-      cc.removeScope(this);
-      dontEnter = false;
-    }
 
-    // by default, pre-evaluate deterministic, non-lazy expressions
-    if(expr instanceof Value || !(lazy || expr.has(Flag.NDT))) cc.replaceWith(expr, value(cc.qc));
+      // eager evaluation: pre-evaluate deterministic expressions
+      if(expr instanceof Value || !(lazy || expr.has(Flag.NDT))) {
+        cc.replaceWith(expr, value(cc.qc));
+      }
+    }
   }
 
   /**
@@ -79,12 +78,7 @@ public final class StaticVar extends StaticDecl {
    */
   Value value(final QueryContext qc) throws QueryException {
     if(dontEnter) throw CIRCVAR_X.get(info, name());
-
-    if(lazy) {
-      if(!compiled) throw Util.notExpected(this + " was not compiled.");
-    } else if(expr == null) {
-      throw VAREMPTY_X.get(info, name());
-    }
+    if(!lazy && expr == null) throw VAREMPTY_X.get(info, name());
 
     if(value != null) return value;
     dontEnter = true;
@@ -123,7 +117,7 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Binds the specified value to the variable.
+   * Binds an external value and casts it to the declared type (if specified).
    * @param val value to be set
    * @param qc query context
    * @return self reference

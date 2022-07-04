@@ -342,10 +342,10 @@ public final class HTTPConnection implements ClientInfo {
     final StringList list = new StringList(4);
     final BiConsumer<String, Long> add = (name, nano) ->
       list.add(name + ";dur=" + Performance.getTime(nano, 1));
-    add.accept("parse", qi.parsing);
-    add.accept("compile", qi.compiling);
-    add.accept("evaluate", qi.evaluating);
-    add.accept("serialize", qi.serializing);
+    add.accept("parse", qi.parsing.get());
+    add.accept("compile", qi.compiling.get());
+    add.accept("evaluate", qi.evaluating.get());
+    add.accept("serialize", qi.serializing.get());
     response.setHeader(SERVER_TIMING, String.join(",", list.finish()));
   }
 

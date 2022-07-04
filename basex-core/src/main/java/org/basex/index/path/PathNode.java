@@ -225,4 +225,9 @@ public final class PathNode {
     for(final PathNode p : children) tb.add(p.info(data, level + 1));
     return tb.finish();
   }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '[' + name + ':' + kind + ']';
+  }
 }

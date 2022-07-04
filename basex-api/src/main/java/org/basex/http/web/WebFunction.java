@@ -137,7 +137,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   }
 
   /**
-   * Binds the specified value to a variable.
+   * Binds a value to a function argument.
    * @param name variable name
    * @param args arguments
    * @param value value to be bound

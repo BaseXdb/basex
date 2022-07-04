@@ -39,7 +39,9 @@ final class PlainDoc extends Inspect {
   FElem context() throws QueryException {
     final FElem root = elem("context", null);
     for(final StaticVar sv : qc.vars) variable(sv, root);
-    for(final StaticFunc sf : qc.funcs.funcs()) function(sf.name, sf, sf.funcType(), sf.anns, root);
+    for(final StaticFunc sf : qc.functions.funcs()) {
+      function(sf.name, sf, sf.funcType(), sf.anns, root);
+    }
     return root;
   }
 

@@ -285,12 +285,12 @@ public class QueryParser extends InputParser {
    */
   private void check(final MainModule mm) throws QueryException {
     // check function calls and variable references
-    qc.funcs.check(qc);
+    qc.functions.check(qc);
     qc.vars.check();
 
     // check updating semantics (skip if updates and values can be mixed)
     if(qc.updating && !sc.mixUpdates) {
-      qc.funcs.checkUp();
+      qc.functions.checkUp();
       qc.vars.checkUp();
       if(mm != null) mm.expr.checkUp();
     }
@@ -922,7 +922,7 @@ public class QueryParser extends InputParser {
     final Expr ex = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope vs = localVars.popContext();
     final String cd = currDoc.toString();
-    final StaticFunc func = qc.funcs.declare(anns, name, args, type, ex, cd, vs, ii);
+    final StaticFunc func = qc.functions.declare(anns, name, args, type, ex, cd, vs, ii);
     funcs.put(func.id(), func);
   }
 
@@ -2334,7 +2334,7 @@ public class QueryParser extends InputParser {
   private Closure undeclaredLiteral(final QNm name, final int arity, final InputInfo ii)
       throws QueryException {
     final Closure ex = Closure.undeclaredLiteral(name, arity, qc, sc, ii);
-    qc.funcs.registerFuncLiteral(ex);
+    qc.functions.registerFuncLiteral(ex);
     return ex;
   }
 

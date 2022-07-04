@@ -23,7 +23,7 @@ public final class InspectFunctions extends StandardFunc {
     // returns all functions from the query context
     if(exprs.length == 0) {
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(final StaticFunc sf : qc.funcs.funcs()) {
+      for(final StaticFunc sf : qc.functions.funcs()) {
         vb.add(Functions.getUser(sf, qc, sf.sc, info));
       }
       return vb.value(this);
@@ -36,18 +36,18 @@ public final class InspectFunctions extends StandardFunc {
 
     // cache existing functions
     final HashSet<StaticFunc> old = new HashSet<>();
-    Collections.addAll(old, qc.funcs.funcs());
+    Collections.addAll(old, qc.functions.funcs());
 
     try {
       qc.parse(content.toString(), content.path());
-      qc.funcs.compileAll(new CompileContext(qc));
+      qc.functions.compileAll(new CompileContext(qc));
     } catch(final QueryException ex) {
       throw INSPECT_PARSE_X.get(info, ex);
     }
 
     // collect new functions
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final StaticFunc sf : qc.funcs.funcs()) {
+    for(final StaticFunc sf : qc.functions.funcs()) {
       if(!old.contains(sf)) vb.add(Functions.getUser(sf, qc, sf.sc, info));
     }
     funcs = vb.value(this);
@@ -57,7 +57,7 @@ public final class InspectFunctions extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    if(exprs.length == 0) cc.qc.funcs.compileAll(cc);
+    if(exprs.length == 0) cc.qc.functions.compileAll(cc);
     return this;
   }
 

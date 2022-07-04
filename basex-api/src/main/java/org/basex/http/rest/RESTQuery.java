@@ -43,7 +43,6 @@ class RESTQuery extends RESTCmd {
    * @throws IOException I/O exception
    */
   private void query() throws IOException {
-    // set base path and serialization parameters
     final HTTPConnection conn = session.conn;
     context.options.set(MainOptions.SERIALIZER, conn.sopts());
     context.setExternal(conn.requestCtx);
@@ -65,7 +64,6 @@ class RESTQuery extends RESTCmd {
         conn.sopts().assign(xq.parameters(context));
         conn.initResponse();
       }
-      // run command
       run(cmd, conn.response.getOutputStream());
     }
   }

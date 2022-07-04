@@ -56,7 +56,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Static variables. */
   public final Variables vars = new Variables();
   /** Functions. */
-  public final StaticFuncs funcs = new StaticFuncs();
+  public final StaticFuncs functions = new StaticFuncs();
   /** Parent query context. */
   public final QueryContext parent;
   /** Query info. */
@@ -114,8 +114,8 @@ public final class QueryContext extends Job implements Closeable {
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
-  /** Root expression of the query. */
-  public MainModule root;
+  /** Main module (root expression). */
+  public MainModule main;
   /** Context value. */
   public MainModule ctxValue;
   /** Flag for binding the context item only once. */
@@ -139,9 +139,8 @@ public final class QueryContext extends Job implements Closeable {
    * @param parent parent context
    */
   public QueryContext(final QueryContext parent) {
-    this(parent.context, parent, parent.info);
+    this(parent.context, parent, parent.resources, parent.info);
     parent.pushJob(this);
-    resources = parent.resources;
     updates = parent.updates;
   }
 
@@ -150,8 +149,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    */
   public QueryContext(final Context context) {
-    this(context, null, null);
-    resources = new QueryResources(this);
+    this(context, null, null, null);
   }
 
   /**
@@ -159,11 +157,14 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    * @param parent parent context (can be {@code null})
    * @param info query info (can be {@code null})
+   * @param resources resources (can be {@code null})
    */
-  private QueryContext(final Context context, final QueryContext parent, final QueryInfo info) {
+  public QueryContext(final Context context, final QueryContext parent,
+      final QueryResources resources, final QueryInfo info) {
     this.context = context;
     this.parent = parent;
-    this.info = info != null ? info : new QueryInfo(this);
+    this.info = info != null ? info : new QueryInfo(context);
+    this.resources = resources != null ? resources : new QueryResources(this);
   }
 
   /**
@@ -217,10 +218,10 @@ public final class QueryContext extends Job implements Closeable {
 
     info.query = query;
     final QueryParser qp = new QueryParser(query, uri, this, sc);
-    root = qp.parseMain();
+    main = qp.parseMain();
     // updating expression: check if an updating expression is left in the expression tree
-    if(updating && !qp.sc.mixUpdates) updating = root.expr.has(Flag.UPD);
-    return root;
+    if(updating && !qp.sc.mixUpdates) updating = main.expr.has(Flag.UPD);
+    return main;
   }
 
   /**
@@ -247,13 +248,13 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public void assign(final StaticFunc func, final Expr... args) throws QueryException {
-    for(final StaticFunc sf : funcs.funcs()) {
+    for(final StaticFunc sf : functions.funcs()) {
       if(func.info.equals(sf.info)) {
         // inline arguments of called function
         sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
         // create and assign function call
         final StaticFuncCall call = new StaticFuncCall(sf.name, args, sf.sc, sf.info).init(sf);
-        root = new MainModule(call, new VarScope(sf.sc));
+        main = new MainModule(call, new VarScope(sf.sc));
         updating = sf.updating();
         return;
       }
@@ -274,21 +275,21 @@ public final class QueryContext extends Job implements Closeable {
     try {
       // bind external variables and context (if not assigned yet by other APIs)
       final MainOptions mopts = context.options;
-      if(root != null && parent == null) {
+      if(main != null && parent == null) {
         for(final Entry<String, String> entry : mopts.toMap(MainOptions.BINDINGS).entrySet()) {
           final String key = entry.getKey();
           final Atm atm = Atm.get(entry.getValue());
           if(key.isEmpty()) {
-            context(atm, root.sc);
+            context(atm, main.sc);
           } else {
-            bind(qname(key, root.sc), atm);
+            bind(qname(key, main.sc), atm);
           }
         }
         final DBNodes nodes = context.current();
         if(nodes != null && !ctxAssigned) {
           final String name = nodes.data().meta.name;
           if(!context.perm(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(null, Perm.READ, name);
-          context(resources.compile(nodes), root.sc);
+          context(resources.compile(nodes), main.sc);
         }
       }
 
@@ -305,8 +306,8 @@ public final class QueryContext extends Job implements Closeable {
         try {
           ctxValue.comp(cc);
           final Value v = ctxValue.value(this);
-          final SeqType st = root.sc.contextType;
-          focus.value = st == null ? v : st.promote(v, null, this, root.sc, null, true);
+          final SeqType st = main.sc.contextType;
+          focus.value = st == null ? v : st.promote(v, null, this, main.sc, null, true);
         } catch(final QueryException ex) {
           // only {@link ParseExpr} instances may lead to a missing context
           throw ex.error() == NOCTX_X ? CIRCCTX.get(ctxValue.info) : ex;
@@ -314,10 +315,7 @@ public final class QueryContext extends Job implements Closeable {
       }
 
       try {
-        // compile the expression
-        if(root != null) QueryCompiler.compile(cc, root);
-        // compile static functions
-        else funcs.compile(cc);
+        QueryCompiler.compile(cc, this);
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         throw BASEX_OVERFLOW.get(null, ex);
@@ -335,7 +333,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public Iter iter() throws QueryException {
     compile();
-    return updating ? update().iter() : root.iter(this);
+    return updating ? update().iter() : main.iter(this);
   }
 
   /**
@@ -345,7 +343,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public Value value() throws QueryException {
     compile();
-    return updating ? update() : root.value(this);
+    return updating ? update() : main.value(this);
   }
 
   /**
@@ -374,7 +372,7 @@ public final class QueryContext extends Job implements Closeable {
     final Locks l = jc().locks;
     final LockList list = updating ? l.writes : l.reads;
 
-    if(root == null || !root.databases(l, this) ||
+    if(main == null || !main.databases(l, this) ||
         ctxValue != null && !ctxValue.databases(l, this)) {
       // use global locking if referenced databases cannot be determined statically
       list.addGlobal();
@@ -410,15 +408,14 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Binds a value to a global variable if no value has been assigned yet.
+   * Binds a value to a global variable or the context value.
+   * The arguments will be ignored if a value has already been assigned.
    * The specified type is interpreted as follows:
    * <ul>
    *   <li> If {@code "json"} is specified, the value is converted according to the rules
    *        specified in {@link JsonXQueryConverter}.</li>
    *   <li> Otherwise, the type is cast to the specified XDM type.</li>
    * </ul>
-   * If the value is an XQuery {@link Value}, it is directly assigned.
-   * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
    * @param name name of variable
    * @param value value to be bound
    * @param type type (may be {@code null})
@@ -468,7 +465,7 @@ public final class QueryContext extends Job implements Closeable {
   public SerializerOptions serParams() {
     if(serParams == null) {
       serParams = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
-      defaultOutput = root != null;
+      defaultOutput = main != null;
     }
     return serParams;
   }
@@ -498,11 +495,11 @@ public final class QueryContext extends Job implements Closeable {
   public FElem toXml(final boolean full) {
     // only show root node if functions or variables exist
     final QueryPlan plan = new QueryPlan(compiled, closed, full);
-    if(root != null) {
-      for(final StaticScope ss : QueryCompiler.usedDecls(root)) ss.toXml(plan);
-      root.toXml(plan);
+    if(main != null) {
+      for(final StaticScope ss : QueryCompiler.usedDecls(main)) ss.toXml(plan);
+      main.toXml(plan);
     } else {
-      funcs.toXml(plan);
+      functions.toXml(plan);
       vars.toXml(plan);
     }
     return plan.root();
@@ -597,7 +594,7 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public String toString() {
-    return root != null ? QueryInfo.usedDecls(root) : info.query;
+    return main != null ? QueryInfo.usedDecls(main) : info.query;
   }
 
   // CLASS METHODS ================================================================================
@@ -611,8 +608,8 @@ public final class QueryContext extends Job implements Closeable {
    */
   void cache(final AQuery cmd, final int max) {
     final ItemList items = new ItemList();
-    final Data data = resources.globalData();
     final IntList pres = new IntList();
+    final Data data = resources.globalData();
 
     try {
       // evaluates the query
@@ -645,7 +642,6 @@ public final class QueryContext extends Job implements Closeable {
     } catch(final JobException ex) {
       cmd.exception = ex;
     }
-
     // collect results
     cmd.result = !items.isEmpty() ? items.value() :
       !pres.isEmpty() ? new DBNodes(data, pres.finish()).ftpos(ftPosData) : Empty.VALUE;
@@ -661,7 +657,7 @@ public final class QueryContext extends Job implements Closeable {
   private Value update() throws QueryException {
     try {
       // retrieve result
-      final Value value = root.value(this);
+      final Value value = main.value(this);
       // only perform updates if no parent context exists
       if(updates == null || parent != null) return value;
 
@@ -693,7 +689,6 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Casts a value to the specified type.
-   * See {@link #bind(String, Object, String, StaticContext)} for more infos.
    * @param value value to be cast
    * @param type type (may be {@code null})
    * @return cast value
@@ -742,7 +737,7 @@ public final class QueryContext extends Job implements Closeable {
     }
 
     // parse target type
-    final StaticContext sc = root != null ? root.sc : new StaticContext(this);
+    final StaticContext sc = main != null ? main.sc : new StaticContext(this);
     final SeqType st = new QueryParser(type, null, this, sc).parseSeqType();
     if(st.eq(SeqType.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
     final Type tp = st.type;

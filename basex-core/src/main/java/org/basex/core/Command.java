@@ -254,11 +254,11 @@ public abstract class Command extends Job {
 
   /**
    * Returns a string representation of the command.
-   * @param conf hide confidential information
+   * @param password password flag
    * @return result of check
    */
-  public final String toString(final boolean conf) {
-    final CmdBuilder cb = new CmdBuilder(this, conf);
+  public final String toString(final boolean password) {
+    final CmdBuilder cb = new CmdBuilder(this, password);
     build(cb);
     return cb.toString();
   }

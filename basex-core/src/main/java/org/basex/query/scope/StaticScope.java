@@ -28,11 +28,10 @@ public abstract class StaticScope extends ExprInfo implements Scope {
 
   /** Variable scope. */
   protected VarScope vs;
-  /** Documentation string. */
-  private byte[] doc = Token.EMPTY;
-
   /** Compilation flag. */
   protected boolean compiled;
+  /** Documentation string. */
+  private byte[] doc = Token.EMPTY;
 
   /**
    * Constructor.

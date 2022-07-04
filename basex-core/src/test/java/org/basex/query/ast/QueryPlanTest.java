@@ -25,9 +25,9 @@ public abstract class QueryPlanTest extends SandboxTest {
    */
   protected static void check(final String query, final Object expected, final String... tests) {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
-      // compile query
-      qp.compile();
+
       // retrieve compiled query plan
+      qp.compile();
       final FDoc plan = new FDoc().add(qp.toXml());
       // compare results
       if(expected != null) {
@@ -36,9 +36,9 @@ public abstract class QueryPlanTest extends SandboxTest {
       }
 
       for(final String test : tests) {
-        if(new QueryProcessor(test, context).context(plan).value() != Bln.TRUE) {
-          fail(NL + "- Query: " + query + NL +
-              "- Optimized: " + qp.qc.root + NL +
+        try(QueryProcessor qp2 = new QueryProcessor(test, context).context(plan)) {
+          if(qp2.value() != Bln.TRUE) fail(NL + "- Query: " + query + NL +
+              "- Optimized: " + qp.qc.main + NL +
               "- Check: " + test + NL +
               "- Plan: " + plan.serialize());
         }

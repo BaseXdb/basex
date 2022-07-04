@@ -262,10 +262,10 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final boolean rt = gui.gopts.get(GUIOptions.FILTERRT);
     if(!qu.isEmpty() && !rt && !root) qu = '.' + qu;
 
-    String simple = all.getText().trim();
-    if(!simple.isEmpty()) {
-      simple = Find.find(simple, gui.context, rt);
-      qu = qu.isEmpty() ? simple : simple + " | " + qu;
+    String query = all.getText().trim();
+    if(!query.isEmpty()) {
+      query = Find.query(query, gui.context, rt);
+      qu = qu.isEmpty() ? query : query + " | " + qu;
     }
 
     if(qu.isEmpty()) qu = rt || root ? "/" : ".";

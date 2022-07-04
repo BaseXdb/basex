@@ -68,10 +68,14 @@ public final class Try extends Single {
     // remove duplicates and too specific catch clauses
     final ArrayList<Catch> list = new ArrayList<>();
     final ArrayList<NameTest> tests = new ArrayList<>();
-    for(final Catch ctch : catches) {
-      if(ctch.simplify(tests, cc)) list.add(ctch);
+
+    final Checks<Catch> global = c -> c.global();
+    if(!global.all(catches)) {
+      for(final Catch ctch : catches) {
+        if(ctch.simplify(tests, cc)) list.add(ctch);
+      }
+      catches = list.toArray(Catch[]::new);
     }
-    catches = list.toArray(Catch[]::new);
 
     // join types of try and catch expressions
     SeqType st = expr.seqType();

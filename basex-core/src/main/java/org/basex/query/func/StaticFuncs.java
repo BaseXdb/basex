@@ -150,7 +150,7 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Compiles all referenced functions.
+   * Compiles and optimizes all referenced functions.
    * @param cc compilation context
    */
   public void compile(final CompileContext cc) {

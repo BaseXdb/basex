@@ -89,13 +89,13 @@ final class RESTPost {
       }
 
       // handle input
-      String val = null;
+      String value = null;
       try(QueryProcessor qp = new QueryProcessor("*/*:context/(*|text()[normalize-space()])", ctx).
           context(doc)) {
         for(final Item item : qp.value()) {
-          if(val != null) throw HTTPCode.MULTIPLE_CONTEXTS.get();
+          if(value != null) throw HTTPCode.MULTIPLE_CONTEXTS.get();
           // create main memory instance of the specified node
-          val = DataBuilder.stripNamespace((ANode) item, REST_URI, ctx).serialize().toString();
+          value = DataBuilder.stripNamespace((ANode) item, REST_URI, ctx).serialize().toString();
         }
       }
 
@@ -104,8 +104,8 @@ final class RESTPost {
 
       // choose evaluation
       if(cmd.equals(COMMAND)) return RESTCommand.get(session, text);
-      if(cmd.equals(RUN)) return RESTRun.get(session, text, vars, val);
-      if(cmd.equals(QUERY)) return RESTQuery.get(session, text, vars, val);
+      if(cmd.equals(RUN)) return RESTRun.get(session, text, vars, value);
+      if(cmd.equals(QUERY)) return RESTQuery.get(session, text, vars, value);
       throw HTTPCode.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
 
     } catch(final QueryException ex) {

@@ -45,7 +45,6 @@ public final class WsResponse extends WebResponse {
 
     qc = function.module.qc(ctx);
     qc.jc().type(WEBSOCKET);
-
     ctx.setExternal(ws);
     ctx.setExternal(new RequestContext(ws.request));
 

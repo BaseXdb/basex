@@ -688,6 +688,8 @@ public interface Text {
   String QUERY = lang("query");
   /** Query info: optimized query. */
   String OPTIMIZED_QUERY = lang("optimized_query");
+  /** Query info: parsing. */
+  String PARSING = lang("parsing");
   /** Query info: compiling. */
   String COMPILING = lang("compiling");
   /** Query info: evaluating. */
@@ -702,11 +704,12 @@ public interface Text {
   /** "Query: ". */
   String QUERY_CC = lang("query") + COLS;
   /** "Parsing: ". */
-  String PARSING_CC = lang("parsing") + COLS;
+  String PARSING_CC = PARSING + COLS;
   /** "Compiling: ". */
-  String COMPILING_CC = lang("compiling") + COLS;
+  String COMPILING_CC = COMPILING + COLS;
+
   /** "Evaluating: ". */
-  String EVALUATING_CC = lang("evaluating") + COLS;
+  String EVALUATING_CC = EVALUATING + COLS;
   /** "Printing: ". */
   String PRINTING_CC = lang("printing") + COLS;
   /** "Total time: ". */
@@ -1206,8 +1209,6 @@ public interface Text {
 
   /** General info. */
   String GENERAL = lang("general");
-  /** General info. */
-  String PARSING = lang("parsing");
   /** Name indexes. */
   String NAMES = lang("names");
   /** Paths. */

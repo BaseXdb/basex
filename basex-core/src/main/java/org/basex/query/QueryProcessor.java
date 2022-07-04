@@ -5,9 +5,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
-import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -109,15 +107,13 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
-   * Binds a value with the specified type to a global variable.
-   * If the value is an {@link Expr} instance, it is directly assigned.
-   * Otherwise, it is first cast to the appropriate XQuery type. If {@code "json"}
-   * is specified as type, the value is interpreted according to the rules
-   * specified in {@link JsonXQueryConverter}.
-   * @param name name of variable
-   * @param value value to be bound
+   * Binds a value to a global variable or the context value.
+   * The arguments will be ignored if a value has already been assigned.
+   * @param name name of variable; context value if empty string or {@code null}
+   * @param value value to be bound (object or XQuery {@link Value})
    * @param type type (may be {@code null})
    * @return self reference
+   * @see QueryContext#bind(String, Object, String, StaticContext)
    * @throws QueryException query exception
    */
   public QueryProcessor bind(final String name, final Object value, final String type)
@@ -231,14 +227,6 @@ public final class QueryProcessor extends Job implements Closeable {
    */
   public void module(final String uri, final String file) {
     qc.modDeclared.put(uri, file);
-  }
-
-  /**
-   * Returns the query string.
-   * @return query
-   */
-  public String query() {
-    return query;
   }
 
   @Override

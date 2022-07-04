@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.util.*;
+import java.util.List;
 import java.util.stream.*;
 
 import org.basex.core.*;
@@ -21,7 +22,7 @@ import org.basex.util.*;
  */
 public class Execute extends Command {
   /** Commands to execute. */
-  final java.util.List<Command> commands;
+  final List<Command> commands;
   /** Error message. */
   String error;
 

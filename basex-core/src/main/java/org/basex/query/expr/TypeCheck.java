@@ -59,7 +59,9 @@ public class TypeCheck extends Single {
     }
 
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
-        st.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
+        st.occ.instanceOf(expr.seqType().occ)) {
+      expr = cc.replaceWith(expr, expr.arg(0));
+    }
 
     final SeqType et = expr.seqType();
     occ = et.type.instanceOf(st.type) && et.kindInstanceOf(st);

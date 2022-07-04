@@ -45,7 +45,7 @@ final class WebDAVQuery {
    * @param value value of variable
    * @return self reference
    */
-  WebDAVQuery bind(final String name, final String value) {
+  WebDAVQuery variable(final String name, final String value) {
     bindings.put(name, value);
     return this;
   }

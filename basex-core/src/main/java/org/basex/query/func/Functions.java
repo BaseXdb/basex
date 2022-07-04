@@ -251,7 +251,7 @@ public final class Functions {
     }
 
     // user-defined function
-    final StaticFunc sf = qc.funcs.get(name, arity);
+    final StaticFunc sf = qc.functions.get(name, arity);
     if(sf != null) {
       final FuncType ft = sf.funcType();
       final VarScope vs = new VarScope(sc);
@@ -262,7 +262,7 @@ public final class Functions {
         args[a] = new VarRef(ii, params[a]);
       }
       final boolean upd = sf.updating;
-      final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, args, sc, ii);
+      final TypedFunc tf = qc.functions.undeclaredFuncCall(sf.name, args, sc, ii);
       final Expr func = closureOrFItem(tf.anns, sf.name, params, ft, tf.func, vs, ii,
           runtime, upd);
       if(upd) qc.updating();
@@ -308,7 +308,7 @@ public final class Functions {
       args[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, ii);
       calls[a] = new VarRef(ii, args[a]);
     }
-    final TypedFunc tf = qc.funcs.undeclaredFuncCall(sf.name, calls, sc, ii);
+    final TypedFunc tf = qc.functions.undeclaredFuncCall(sf.name, calls, sc, ii);
     return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.func, vs.stackSize(), ii);
   }
 
@@ -340,7 +340,7 @@ public final class Functions {
     }
 
     // user-defined function
-    final TypedFunc tf = qc.funcs.funcCall(name, args, sc, ii);
+    final TypedFunc tf = qc.functions.funcCall(name, args, sc, ii);
     if(tf != null) {
       if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
       return tf.func;
@@ -351,7 +351,7 @@ public final class Functions {
     if(jf != null) return jf;
 
     // user-defined function that has not been declared yet
-    return qc.funcs.undeclaredFuncCall(name, args, sc, ii).func;
+    return qc.functions.undeclaredFuncCall(name, args, sc, ii).func;
   }
 
   /**

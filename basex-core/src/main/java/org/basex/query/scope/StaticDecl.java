@@ -20,7 +20,7 @@ public abstract class StaticDecl extends StaticScope {
 
   /** Declared type, {@code null} if not specified. */
   protected SeqType declType;
-  /** Flag that is set during compilation and execution and prevents infinite loops. */
+  /** Indicates if code is currently being compiled or evaluated. */
   protected boolean dontEnter;
 
   /**

@@ -114,7 +114,7 @@ public class XQueryEval extends StandardFunc {
         qctx.parseMain(string(query.read()), null, sctx);
 
         if(updating) {
-          if(!sc.mixUpdates && !qctx.updating && !qctx.root.expr.vacuous())
+          if(!sc.mixUpdates && !qctx.updating && !qctx.main.expr.vacuous())
             throw XQUERY_UPDATE2.get(info);
         } else if(qctx.updating) {
           throw XQUERY_UPDATE1.get(info);
