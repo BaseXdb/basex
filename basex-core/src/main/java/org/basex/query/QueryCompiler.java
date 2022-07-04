@@ -117,7 +117,7 @@ final class QueryCompiler {
       entries.add(circCheck(scps));
     }
     for(final Scope scope : entries) {
-      scope.comp(cc);
+      scope.compile(cc);
       if(scope instanceof StaticFunc) funcs.add((StaticFunc) scope);
     }
 

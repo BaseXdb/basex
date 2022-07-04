@@ -121,7 +121,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Flag for binding the context item only once. */
   public boolean ctxAssigned;
 
-  /** Map with external variables to be bound at compile time. */
+  /** External variables to be bound at compile time. */
   private final QNmMap<Value> bindings = new QNmMap<>();
 
   /** Serialization parameters. */
@@ -304,7 +304,7 @@ public final class QueryContext extends Job implements Closeable {
       // compile context value
       if(ctxValue != null) {
         try {
-          ctxValue.comp(cc);
+          ctxValue.compile(cc);
           final Value v = ctxValue.value(this);
           final SeqType st = main.sc.contextType;
           focus.value = st == null ? v : st.promote(v, null, this, main.sc, null, true);

@@ -45,7 +45,7 @@ public final class StaticVar extends StaticDecl {
   }
 
   @Override
-  public void comp(final CompileContext cc) throws QueryException {
+  public Expr compile(final CompileContext cc) throws QueryException {
     if(expr == null) throw VAREMPTY_X.get(info, name());
     if(dontEnter) throw CIRCVAR_X.get(info, name());
     if(!compiled) {
@@ -68,6 +68,7 @@ public final class StaticVar extends StaticDecl {
         cc.replaceWith(expr, value(cc.qc));
       }
     }
+    return null;
   }
 
   /**
@@ -82,7 +83,6 @@ public final class StaticVar extends StaticDecl {
 
     if(value != null) return value;
     dontEnter = true;
-
     final int fp = vs.enter(qc);
     try {
       return bindValue(expr.value(qc), qc);

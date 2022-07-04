@@ -14,12 +14,7 @@ public final class XQuery extends AQuery {
    * @param query query to evaluate
    */
   public XQuery(final String query) {
-    super(false, query);
-  }
-
-  @Override
-  protected boolean run() {
-    return query(args[0]);
+    super(false, query, query);
   }
 
   /**

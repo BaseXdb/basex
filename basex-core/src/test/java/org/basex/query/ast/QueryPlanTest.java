@@ -25,7 +25,6 @@ public abstract class QueryPlanTest extends SandboxTest {
    */
   protected static void check(final String query, final Object expected, final String... tests) {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
-
       // retrieve compiled query plan
       qp.compile();
       final FDoc plan = new FDoc().add(qp.toXml());

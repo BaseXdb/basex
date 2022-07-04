@@ -115,11 +115,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public void comp(final CompileContext cc) throws QueryException {
-    compile(cc);
-  }
-
-  @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     if(compiled) return this;
     compiled = true;

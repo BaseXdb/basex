@@ -1,6 +1,7 @@
 package org.basex.query.scope;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 
 /**
@@ -20,9 +21,10 @@ public interface Scope {
   /**
    * Compiles the expression contained in this scope.
    * @param cc compilation context
+   * @return compiled expression, or {@code null} if not required
    * @throws QueryException compilation errors
    */
-  void comp(CompileContext cc) throws QueryException;
+  Expr compile(CompileContext cc) throws QueryException;
 
   /**
    * Checks if this scope has already been compiled.

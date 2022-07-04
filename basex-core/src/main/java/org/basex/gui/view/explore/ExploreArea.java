@@ -264,7 +264,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
     String query = all.getText().trim();
     if(!query.isEmpty()) {
-      query = Find.query(query, gui.context, rt);
+      query = Find.query(query);
       qu = qu.isEmpty() ? query : query + " | " + qu;
     }
 

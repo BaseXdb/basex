@@ -44,7 +44,7 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    var.comp(cc);
+    var.compile(cc);
     return optimize(cc);
   }
 

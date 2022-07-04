@@ -1,10 +1,7 @@
 package org.basex.core.cmd;
 
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.*;
-import org.basex.core.locks.*;
 import org.basex.query.expr.path.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -16,63 +13,23 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Find extends AQuery {
-  /** Start from root node. */
-  private final boolean root;
-
   /**
    * Default constructor.
-   * @param query simplified query
+   * @param search search string
    */
-  public Find(final String query) {
-    this(query, false);
-  }
-
-  /**
-   * Default constructor.
-   * @param query simplified query
-   * @param rt start from root node
-   */
-  public Find(final String query, final boolean rt) {
-    super(true, query);
-    root = rt;
-  }
-
-  @Override
-  protected boolean run() {
-    final String query = query(args[0], context, root);
-    final boolean ok = query(query);
-    final StringBuilder sb = new StringBuilder();
-    if(options.get(MainOptions.QUERYINFO)) {
-      sb.append(NL).append(QUERY_CC).append(NL).append(query).append(NL);
-    }
-    sb.append(info());
-    error(sb.toString());
-    return ok;
-  }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    return updates(ctx, query(args[0], ctx, root));
-  }
-
-  @Override
-  public void addLocks() {
-    jc().locks.reads.add(Locking.CONTEXT);
+  public Find(final String search) {
+    super(true, search, query(search));
   }
 
   /**
    * Returns a query for the specified search string.
    * @param search search string
-   * @param ctx database context
-   * @param root start from root node
    * @return query string
    */
-  public static String query(final String search, final Context ctx, final boolean root) {
+  public static String query(final String search) {
     // treat input as XQuery
+    if(search.isEmpty()) return ".";
     if(Strings.startsWith(search, '/')) return search;
-
-    final boolean r = root || ctx.root();
-    if(search.isEmpty()) return r ? "/" : ".";
 
     // parse user input
     final StringBuilder pre = new StringBuilder(), preds = new StringBuilder();
@@ -89,22 +46,19 @@ public final class Find extends AQuery {
         preds.append("[@* contains text \"").append(term.substring(1)).append("\"]");
         term = term.substring(1);
         // add valid name tests
-        if(XMLToken.isName(token(term))) {
-          pre.append(r ? "" : ".").append("//@").append(term).append(" | ");
-        }
+        if(XMLToken.isName(token(term))) pre.append(".//@").append(term).append(" | ");
       } else {
         preds.append("[text() contains text \"").append(term).append("\"]");
         // add valid name tests
         if(XMLToken.isName(token(term))) {
-          if(r) pre.append('/');
           pre.append(Axis.DESCENDANT).append("::*:").append(term).append(" | ");
         }
       }
     }
-    if(pre.length() == 0 && preds.length() == 0) return root ? "/" : ".";
+    if(pre.length() == 0 && preds.length() == 0) return ".";
 
     // create final string
-    return pre + (r ? "/" : "") + Axis.DESCENDANT_OR_SELF + "::*" + preds;
+    return pre.append(Axis.DESCENDANT_OR_SELF).append("::*").append(preds).toString();
   }
 
   /**

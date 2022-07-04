@@ -36,16 +36,14 @@ public final class MainModule extends AModule {
   }
 
   @Override
-  public void comp(final CompileContext cc) throws QueryException {
-    if(compiled) return;
-    compiled = true;
-
+  public Expr compile(final CompileContext cc) throws QueryException {
     cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
     } finally {
       cc.removeScope(this);
     }
+    return null;
   }
 
   /**

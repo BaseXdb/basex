@@ -1,6 +1,7 @@
 package org.basex.query.scope;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 
 /**
@@ -24,7 +25,8 @@ public final class LibraryModule extends AModule {
   }
 
   @Override
-  public void comp(final CompileContext cc) {
+  public Expr compile(final CompileContext cc) {
+    return null;
   }
 
   @Override

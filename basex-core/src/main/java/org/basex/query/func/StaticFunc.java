@@ -57,7 +57,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public void comp(final CompileContext cc) {
+  public Expr compile(final CompileContext cc) {
     if(!compiled && expr != null) {
       compiled = dontEnter = true;
 
@@ -78,6 +78,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       expr.markTailCalls(cc);
       dontEnter = false;
     }
+    return null;
   }
 
   /**
