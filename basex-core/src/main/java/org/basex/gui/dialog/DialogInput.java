@@ -61,7 +61,7 @@ final class DialogInput extends BaseXDialog {
   DialogInput(final String old, final BaseXDialog dialog, final Action action) {
     super(dialog, action.title);
     this.action = action;
-    databases = dialog.gui.context.listDBs();
+    databases = dialog.gui().context.listDBs();
 
     set(new BaseXLabel(action.label + COL, false, true).border(0, 0, 6, 0), BorderLayout.NORTH);
 

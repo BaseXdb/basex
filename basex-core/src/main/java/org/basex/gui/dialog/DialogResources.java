@@ -59,7 +59,8 @@ final class DialogResources extends BaseXBack {
     tree.setCellRenderer(new TreeNodeRenderer());
 
     // add default children to tree
-    final Data data = dialog.gui.context.data();
+    final GUI gui = dialog.gui();
+    final Data data = gui.context.data();
     final String label = data.meta.name + " (/)";
     root = new ResourceRootFolder(token(label), token("/"), tree, data);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
@@ -70,7 +71,7 @@ final class DialogResources extends BaseXBack {
     clear.setEnabled(false);
 
     // popup menu for node interaction
-    new BaseXPopup(tree, dialog.gui, new DeleteCmd(), new RenameCmd());
+    new BaseXPopup(tree, gui, new DeleteCmd(), new RenameCmd());
 
     // button panel
     final BaseXBack buttons = new BaseXBack();
@@ -169,7 +170,7 @@ final class DialogResources extends BaseXBack {
       return;
     }
 
-    final Context context = dialog.gui.context;
+    final Context context = dialog.gui().context;
     final Data data = context.data();
     // clear tree to append filtered nodes
     root.removeAllChildren();
@@ -251,7 +252,7 @@ final class DialogResources extends BaseXBack {
     @Override
     public void execute() {
       final ResourceNode n = selection();
-      if(n == null || !BaseXDialog.confirm(dialog.gui, DELETE_NODES)) return;
+      if(n == null || !BaseXDialog.confirm(dialog.gui(), DELETE_NODES)) return;
 
       final Runnable run = () -> refreshNewFolder(n.path());
       DialogProgress.execute(dialog, run, new Delete(n.path()));

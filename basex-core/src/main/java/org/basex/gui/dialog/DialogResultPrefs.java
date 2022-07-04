@@ -46,7 +46,7 @@ final class DialogResultPrefs extends BaseXBack {
    */
   DialogResultPrefs(final BaseXDialog dialog) {
     border(8).setLayout(new ColumnLayout(40));
-    gui = dialog.gui;
+    gui = dialog.gui();
 
     int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
     maxResults = new BaseXSlider(dialog, 0, MAXRESULTS.length - 1, val);

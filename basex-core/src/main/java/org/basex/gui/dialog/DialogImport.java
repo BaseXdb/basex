@@ -64,7 +64,7 @@ final class DialogImport extends BaseXBack {
   DialogImport(final BaseXDialog dialog, final BaseXBack panel, final DialogParsing parsing) {
     this.dialog = dialog;
     this.parsing = parsing;
-    gui = dialog.gui;
+    gui = dialog.gui();
 
     layout(new RowLayout());
     border(8);

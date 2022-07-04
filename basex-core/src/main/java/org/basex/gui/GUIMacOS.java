@@ -43,8 +43,13 @@ public final class GUIMacOS {
    */
   GUIMacOS(final GUI main) {
     this.main = main;
-    Desktop.getDesktop().setAboutHandler(e -> { DialogAbout.show(main); });
-    Desktop.getDesktop().setPreferencesHandler(e -> { DialogPrefs.show(main); });
-    Taskbar.getTaskbar().setIconImage(BaseXImages.get("logo_large"));
+
+    final Desktop desktop = Desktop.getDesktop();
+    desktop.setAboutHandler(e -> { DialogAbout.show(main); });
+    desktop.setPreferencesHandler(e -> { DialogPrefs.show(main); });
+    desktop.setQuitHandler((e, r) -> { GUIMenuCmd.C_EXIT.execute(main); });
+
+    final Taskbar taskbar = Taskbar.getTaskbar();
+    taskbar.setIconImage(BaseXImages.get("logo_large"));
   }
 }

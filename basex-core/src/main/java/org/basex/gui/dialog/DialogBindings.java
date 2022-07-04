@@ -103,9 +103,8 @@ public final class DialogBindings extends BaseXDialog {
     if(file == null) return;
 
     // close dialog, set context
-    final GUI win = gui;
     close();
-    win.editor.setContext(file);
+    gui.editor.setContext(file);
   }
 
   @Override

@@ -72,7 +72,7 @@ final class DialogXmlParser extends DialogParser {
 
     browsec = new BaseXButton(dialog, BROWSE_D);
     browsec.addActionListener(e -> {
-      final GUIOptions gopts = dialog.gui.gopts;
+      final GUIOptions gopts = dialog.gui().gopts;
       final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR,
           gopts.get(GUIOptions.INPUTPATH)).filter(XML_DOCUMENTS, true, IO.XMLSUFFIX);
 

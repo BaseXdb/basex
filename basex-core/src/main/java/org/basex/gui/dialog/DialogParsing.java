@@ -40,7 +40,7 @@ final class DialogParsing extends BaseXBack {
    */
   DialogParsing(final BaseXDialog dialog, final BaseXTabs tabs) {
     border(8);
-    gui = dialog.gui;
+    gui = dialog.gui();
     this.tabs = tabs;
     label = new BaseXLabel().border(0, 0, 8, 0).large();
 

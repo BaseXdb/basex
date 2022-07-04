@@ -45,7 +45,7 @@ final class DialogGeneralPrefs extends BaseXBack {
    */
   DialogGeneralPrefs(final BaseXDialog dialog) {
     border(8).setLayout(new RowLayout());
-    gui = dialog.gui;
+    gui = dialog.gui();
 
     final StaticOptions opts = gui.context.soptions;
     dbPath = new BaseXTextField(dialog, opts.get(StaticOptions.DBPATH));
