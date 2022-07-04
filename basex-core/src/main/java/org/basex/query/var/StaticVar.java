@@ -83,7 +83,6 @@ public final class StaticVar extends StaticDecl {
 
     if(value != null) return value;
     dontEnter = true;
-
     final int fp = vs.enter(qc);
     try {
       return bindValue(expr.value(qc), qc);

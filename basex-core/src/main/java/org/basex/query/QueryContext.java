@@ -119,7 +119,7 @@ public final class QueryContext extends Job implements Closeable {
   public MainModule ctxValue;
 
   /** External variables to be bound at compile time. */
-  final QNmMap<Value> bindings = new QNmMap<>();
+  private final QNmMap<Value> bindings = new QNmMap<>();
   /** Indicates if context can be assigned. */
   boolean contextAssigned;
 

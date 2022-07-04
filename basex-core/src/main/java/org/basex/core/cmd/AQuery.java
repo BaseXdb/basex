@@ -29,6 +29,8 @@ public abstract class AQuery extends Command {
   /** External variable bindings. */
   protected final HashMap<String, Object> vars = new HashMap<>();
 
+  /** Query string. */
+  private final String query;
   /** Query processor. */
   private QueryProcessor qp;
   /** Query info. */
@@ -43,24 +45,22 @@ public abstract class AQuery extends Command {
   /**
    * Protected constructor.
    * @param openDB requires opened database
-   * @param args arguments
+   * @param arg argument
+   * @param query query string (can be identical to argument)
    */
-  AQuery(final boolean openDB, final String... args) {
-    super(Perm.NONE, openDB, args);
+  AQuery(final boolean openDB, final String arg, final String query) {
+    super(Perm.NONE, openDB, arg);
+    this.query = query;
   }
 
-  /**
-   * Evaluates the specified query.
-   * @param query query
-   * @return success flag
-   */
-  final boolean query(final String query) {
-    String error;
+  @Override
+  protected boolean run() {
+    String error = null;
+    long hits = 0;
     if(exception != null) {
       error = Util.message(exception);
     } else {
       try {
-        long hits = 0;
         final boolean runquery = options.get(MainOptions.RUNQUERY);
         final boolean serialize = options.get(MainOptions.SERIALIZE);
         final boolean compplan = options.get(MainOptions.COMPPLAN);
@@ -71,7 +71,7 @@ public abstract class AQuery extends Command {
             qp = null;
             popJob();
           }
-          init(query, context);
+          init(context);
           if(!compplan) queryPlan();
 
           final Performance perf = new Performance();
@@ -149,13 +149,30 @@ public abstract class AQuery extends Command {
   }
 
   /**
+   * Checks if the query is updating.
+   * @param ctx database context
+   * @return result of check
+   */
+  final boolean updates(final Context ctx) {
+    try {
+      init(ctx);
+      return qp.updating;
+    } catch(final Exception ex) {
+      Util.debug(ex);
+      exception = ex;
+      qp.close();
+      return false;
+    }
+  }
+
+  /**
    * Returns the serialization parameters.
    * @param ctx context
    * @return serialization parameters
    */
   public final String parameters(final Context ctx) {
     try {
-      init(args[0], ctx);
+      init(ctx);
       return qp.qc.serParams().toString();
     } catch(final QueryException ex) {
       error(Util.message(ex));
@@ -165,7 +182,7 @@ public abstract class AQuery extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    return updates(ctx, args[0]);
+    return updates(ctx);
   }
 
   @Override
@@ -174,7 +191,7 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public void addLocks() {
+  public final void addLocks() {
     qp.addLocks();
   }
 
@@ -196,30 +213,13 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Checks if the query is updating.
-   * @param ctx database context
-   * @param query query string
-   * @return result of check
-   */
-  final boolean updates(final Context ctx, final String query) {
-    try {
-      init(query, ctx);
-      return qp.updating;
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      exception = ex;
-      qp.close();
-      return false;
-    }
-  }
-
-  /**
-   * Initializes the query processor, .
-   * @param query query string
+   * Initializes the query processor.
    * @param ctx database context
    * @throws QueryException query exception
    */
-  private void init(final String query, final Context ctx) throws QueryException {
+  private void init(final Context ctx) throws QueryException {
+    if(qp != null) return;
+
     final Performance perf = new Performance();
     if(qp == null) qp = pushJob(new QueryProcessor(query, uri, ctx));
     if(info == null) info = qp.qc.info;

@@ -321,7 +321,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     } else if(gopts.get(GUIOptions.SEARCHMODE) == 1 || Strings.startsWith(in, '/')) {
       simpleQuery(in);
     } else {
-      execute(new Find(in, gopts.get(GUIOptions.FILTERRT)));
+      execute(new Find(in));
     }
   }
 
