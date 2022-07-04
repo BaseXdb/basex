@@ -170,11 +170,21 @@ public abstract class Step extends Preds {
     }
     if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
 
-    // check if step or test will never yield results
-    if(noMatches() || rt != null && test.noMatches(rt.data())) {
+    // check if the step or test will never yield results
+    boolean empty = noMatches();
+    if(rt != null) {
+      final Test t = test.optimize(rt.data());
+      if(t == null) {
+        empty = true;
+      } else {
+        test = t;
+      }
+    }
+    if(empty) {
       cc.info(QueryText.OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
+
     // simplify predicates, choose best implementation
     return simplify(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
   }
@@ -212,7 +222,7 @@ public abstract class Step extends Preds {
   /**
    * Returns the path nodes that are the result of this step.
    * @param nodes initial path nodes
-   * @param stats utilize statistics
+   * @param stats assess database statistics; if {@code true}, return early if step has predicates
    * @param data data reference
    * @return path nodes, or {@code null} if nodes cannot be collected
    */

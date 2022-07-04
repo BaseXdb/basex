@@ -85,7 +85,7 @@ abstract class DbAccess extends StandardFunc {
 
     // return empty sequence if test will yield no results
     final NameTest nt = new NameTest(qName, NamePart.FULL, NodeType.ATTRIBUTE, sc.elemNS);
-    if(nt.noMatches(data)) return Empty.ITER;
+    if(nt.optimize(data) == null) return Empty.ITER;
 
     // wrap iterator with name test
     final Iter iter = ia.iter(qc);

@@ -52,25 +52,25 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean noMatches(final Data data) {
+  public Test optimize(final Data data) {
     // skip optimizations if data reference is not known at compile time
-    if(data == null) return false;
+    if(data == null) return this;
 
     // skip optimizations if more than one namespace is defined in the database
     final byte[] dataNs = data.defaultNs();
-    if(dataNs == null) return false;
+    if(dataNs == null) return this;
 
     // check if test may yield results
     if(part == NamePart.FULL && !qname.hasURI()) {
       // element and db default namespaces are different: no results
-      if(type != NodeType.ATTRIBUTE && !Token.eq(dataNs, defaultNs)) return true;
+      if(type != NodeType.ATTRIBUTE && !Token.eq(dataNs, defaultNs)) return null;
       // namespace is irrelevant/identical: only check local name
       simple = true;
     }
 
     // check existence of local element/attribute names
-    return !(type == NodeType.PROCESSING_INSTRUCTION || part() != NamePart.LOCAL ||
-      (type == NodeType.ELEMENT ? data.elemNames : data.attrNames).contains(local));
+    return type == NodeType.PROCESSING_INSTRUCTION || part() != NamePart.LOCAL ||
+      (type == NodeType.ELEMENT ? data.elemNames : data.attrNames).contains(local) ? this : null;
   }
 
   @Override
