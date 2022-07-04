@@ -83,6 +83,7 @@ public final class SearchBar extends BaseXBack {
     multi = button("f_multi", BaseXLayout.addShortcut(Text.MULTI_LINE, MULTILINE.toString()), al);
 
     rplc  = BaseXButton.get("f_replace", Text.REPLACE_ALL, false, gui);
+    rplc.setFocusable(true);
     cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
         false, gui);
 
