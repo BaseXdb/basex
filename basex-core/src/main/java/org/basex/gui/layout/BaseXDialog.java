@@ -24,7 +24,7 @@ import org.basex.util.*;
  */
 public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   /** Reference to the main window. */
-  public GUI gui;
+  protected final GUI gui;
   /** Used mnemonics. */
   final StringBuilder mnem = new StringBuilder();
 
@@ -130,11 +130,7 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
 
   @Override
   public void dispose() {
-    // modal dialog: save options, remove GUI reference
-    if(gui != null && modal()) {
-      gui.saveOptions();
-      gui = null;
-    }
+    gui.saveOptions();
     super.dispose();
   }
 

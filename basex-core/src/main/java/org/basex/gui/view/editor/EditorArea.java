@@ -198,6 +198,7 @@ public final class EditorArea extends TextPanel {
         io.write(text);
         file(io, true);
         view.project.save(io, rename, xquery, library);
+        view.gui.saveOptions();
         return true;
       } catch(final Exception ex) {
         Util.debug(ex);

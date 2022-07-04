@@ -34,7 +34,7 @@ public class DialogOptions extends BaseXBack {
    * @param data data reference (can be {@code null})
    */
   DialogOptions(final BaseXDialog dialog, final Data data) {
-    gui = dialog.gui;
+    gui = dialog.gui();
     if(data != null) {
       final MetaData meta = data.meta;
       maxlen = new BaseXTextField(dialog, Integer.toString(meta.maxlen));
@@ -43,7 +43,7 @@ public class DialogOptions extends BaseXBack {
       updindex = new BaseXCheckBox(dialog, UPD_INDEX, meta.updindex);
       autooptimize = new BaseXCheckBox(dialog, AUTOOPTIMIZE, meta.autooptimize);
     } else {
-      final MainOptions opts = dialog.gui.context.options;
+      final MainOptions opts = gui.context.options;
       maxlen = new BaseXTextField(dialog, MainOptions.MAXLEN, opts);
       maxcats = new BaseXTextField(dialog, MainOptions.MAXCATS, opts);
       splitsize = new BaseXTextField(dialog, MainOptions.SPLITSIZE, opts);

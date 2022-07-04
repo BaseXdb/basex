@@ -51,9 +51,9 @@ final class DialogVisualPrefs extends BaseXBack {
    */
   DialogVisualPrefs(final BaseXDialog dialog) {
     border(8).setLayout(new ColumnLayout(40));
-    gui = dialog.gui;
+    gui = dialog.gui();
 
-    final GUIOptions gopts = dialog.gui.gopts;
+    final GUIOptions gopts = gui.gopts;
     scrollTabs = new BaseXCheckBox(dialog, SCROLL_TABS, GUIOptions.SCROLLTABS, gopts);
     labels = new BaseXTextField(dialog, GUIOptions.LABELS, gopts);
     mousefocus = new BaseXCheckBox(dialog, RT_FOCUS, GUIOptions.MOUSEFOCUS, gopts);

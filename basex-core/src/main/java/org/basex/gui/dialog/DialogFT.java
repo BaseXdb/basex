@@ -51,7 +51,7 @@ final class DialogFT extends DialogIndex {
     super(dialog);
     layout(new TableLayout(create ? 10 : 16, 1));
 
-    final MainOptions opts = dialog.gui.context.options;
+    final MainOptions opts = dialog.gui().context.options;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
 
     ftinc = new BaseXTextField(dialog, opts.get(MainOptions.FTINCLUDE)).hint(QNAME_INPUT);
@@ -99,7 +99,7 @@ final class DialogFT extends DialogIndex {
     add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new ColumnLayout(8));
     swpath = new BaseXTextField(
-        dialog, sw.isEmpty() ? dialog.gui.gopts.get(GUIOptions.DATAPATH) : sw);
+        dialog, sw.isEmpty() ? dialog.gui().gopts.get(GUIOptions.DATAPATH) : sw);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(dialog, BROWSE_D);
@@ -113,7 +113,7 @@ final class DialogFT extends DialogIndex {
    * Opens a file dialog to choose a stopword list.
    */
   private void chooseStop() {
-    final GUIOptions gopts = dialog.gui.gopts;
+    final GUIOptions gopts = dialog.gui().gopts;
     final BaseXFileChooser fc = new BaseXFileChooser(dialog,
         FILE_OR_DIR, gopts.get(GUIOptions.DATAPATH));
     final IOFile file = fc.select(Mode.FOPEN);
@@ -135,12 +135,12 @@ final class DialogFT extends DialogIndex {
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
     final boolean exists = !sw.isEmpty() && file.exists();
-    if(exists) dialog.gui.gopts.set(GUIOptions.DATAPATH, sw);
+    if(exists) dialog.gui().gopts.set(GUIOptions.DATAPATH, sw);
   }
 
   @Override
   void setOptions() {
-    final GUI gui = dialog.gui;
+    final GUI gui = dialog.gui();
     gui.set(MainOptions.LANGUAGE, check[F_LANG].isSelected() ?
         Language.get(language.getSelectedItem().replaceFirst(" \\(.*", "")).code() : "");
     gui.set(MainOptions.STEMMING, check[F_STEM].isSelected());

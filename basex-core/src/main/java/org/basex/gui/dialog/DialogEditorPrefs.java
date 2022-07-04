@@ -46,7 +46,7 @@ final class DialogEditorPrefs extends BaseXBack {
   DialogEditorPrefs(final BaseXDialog dialog) {
     border(8).setLayout(new ColumnLayout(40));
 
-    final GUIOptions gopts = dialog.gui.gopts;
+    final GUIOptions gopts = dialog.gui().gopts;
     showmargin = new BaseXCheckBox(dialog, SHOW_LINE_MARGIN + COL, GUIOptions.SHOWMARGIN, gopts);
     margin = new BaseXTextField(dialog, GUIOptions.MARGIN, gopts);
     invisible = new BaseXCheckBox(dialog, SHOW_INVISIBLE, GUIOptions.SHOWINVISIBLE, gopts);

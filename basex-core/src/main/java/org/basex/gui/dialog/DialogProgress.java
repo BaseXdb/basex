@@ -147,7 +147,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * @param cmds commands to be run
    */
   static void execute(final BaseXDialog dialog, final Runnable post, final Command... cmds) {
-    execute(dialog.gui, dialog, post, cmds);
+    execute(dialog.gui(), dialog, post, cmds);
   }
 
   /**
