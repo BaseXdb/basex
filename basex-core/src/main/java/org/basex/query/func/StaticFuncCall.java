@@ -124,10 +124,10 @@ public final class StaticFuncCall extends FuncCall {
     // function code: position or context references of expression body have no effect
     if(Flag.POS.in(flags) || Flag.CTX.in(flags)) return false;
     // function code: check for updates
-    if(Flag.UPD.in(flags) && func.updating()) return true;
+    if(Flag.UPD.in(flags) && func != null && func.updating()) return true;
     // check remaining flags
     final Flag[] flgs = Flag.UPD.remove(flags);
-    return flgs.length != 0 && func.has(flgs);
+    return flgs.length != 0 && func != null && func.has(flgs);
   }
 
   @Override

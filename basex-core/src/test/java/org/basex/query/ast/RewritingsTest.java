@@ -2888,6 +2888,11 @@ public final class RewritingsTest extends QueryPlanTest {
     query("x[x/(text() | *)]", "");
   }
 
+  /** Context item declaration, unknown function. */
+  @Test public void gh2122() {
+    error("declare context item external := local:f(); ()", WHICHFUNC_X);
+  }
+
   /** XQFT: distances. */
   @Test public void gh2123() {
     query("'5 28 x x 5 28' contains text '5 28' all words distance at most 1 words", true);
