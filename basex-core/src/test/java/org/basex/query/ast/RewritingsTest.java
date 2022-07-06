@@ -1797,10 +1797,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Atomization of group by expressions. */
   @Test public void gh1907() {
-    query("let $i := 1 group by $n := ([], [$i]) return $n", 1);
-    query("let $i := 1 group by $n := ([], [$i]) return $i", 1);
-    query("let $i := 1 group by $n := ([], [1]) return $i", 1);
-    query("let $i := 1 group by $n := ([], []) return $i", 1);
+    query("let $i := 1 group by $n := ([], [ $i ]) return $n", 1);
+    query("let $i := 1 group by $n := ([], [ $i ]) return $i", 1);
+    query("let $i := 1 group by $n := ([], [ 1 ]) return $i", 1);
+    query("let $i := 1 group by $n := ([], [ ]) return $i", 1);
     query("let $i := 1 group by $n := () return $i", 1);
   }
 
@@ -2031,7 +2031,6 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
     check("for $a in (1, 3) group by $a return $a", "1\n3", root(SmallSeq.class));
     check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
-    check("for $a allowing empty in () group by $a return $a", "", empty());
 
     check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",
         "1\n2", root(DISTINCT_VALUES), exists(DualMap.class));
@@ -2040,6 +2039,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("for $a in (1 to 2)[. >= 0] group by $b := string($a) return $b || 'x'",
         "1x\n2x", count(DualMap.class, 2));
+
+    // do not rewrite group by clauses if value is not a single atomic value
+    check("for $a allowing empty in () group by $a return $a", "", root(GFLWOR.class));
+    check("for $a in (1 to 6) group by $g := [ $a mod 1 ] return $g", 0, root(GFLWOR.class));
+    check("for $a in (1 to 6) group by $g := [] return $g", "", root(GFLWOR.class));
 
     error("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", INVTREAT_X_X_X);
     error("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
@@ -2923,5 +2927,16 @@ public final class RewritingsTest extends QueryPlanTest {
 
     query("'A B C D' contains text 'A B' ftand 'C D' distance exactly 0 words", true);
     query("'A B C D' contains text 'C D' ftand 'A B' distance exactly 0 words", true);
+  }
+
+  /** Optimizations for grouping single values. */
+  @Test public void gh2125() {
+    check("for $b in ('a-1') group by $c := substring-before($b, '-') return $c",
+        "a", root(Str.class));
+    check("for $b in <?_ a-1?> group by $c := substring-before($b, '-') return $c",
+        "a", root(SUBSTRING_BEFORE));
+    check("for $b in <?_ a-1?> group by $c := substring-before($b, '-') " +
+        "return ($c, string-length($c))",
+        "a\n1", root(IterMap.class));
   }
 }
