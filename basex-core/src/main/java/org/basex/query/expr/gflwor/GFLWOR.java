@@ -138,36 +138,50 @@ public final class GFLWOR extends ParseExpr {
    */
   private Expr simplify(final CompileContext cc) throws QueryException {
     // replace with expression of 'return' clause if all clauses were removed
-    if(clauses.isEmpty()) return rtrn;
+    //  return R  ->  R
+    final int cs = clauses.size();
+    if(cs == 0) return rtrn;
 
     // replace with 'if' expression if FLWOR starts with 'where'
+    //   where W return R              ->  if(W) then R else ()
+    //   where W for $f in F return R  ->  if(W) then (for $f in F return R) else ()
     final Expr first = clauses.getFirst();
     if(first instanceof Where) {
-      final Where where = (Where) clauses.removeFirst();
-      final Expr branch = clauses.isEmpty() ? rtrn : this;
-      return new If(info, where.expr, branch).optimize(cc);
+      return new If(info, ((Where) clauses.removeFirst()).expr, cs == 1 ? rtrn : this).optimize(cc);
     }
 
     if(first instanceof For) {
       // replace allowing empty with empty sequence
       //   for $_ allowing empty in () return $_  ->  ()
       final For fr = (For) first;
-      if(clauses.size() == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof VarRef &&
+      if(cs == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof VarRef &&
           ((VarRef) rtrn).var.is(fr.var)) return Empty.VALUE;
 
       // rewrite group by to distinct-values
       //   for $e in E group by $g := G return R
       //   ->  for $g in distinct-values(for $e in E return G)) return R
-      if(clauses.size() == 2 && clauses.get(1) instanceof GroupBy) {
-        final GroupSpec grp = ((GroupBy) clauses.get(1)).group();
-        if(grp != null) {
+      if(cs == 2 && clauses.get(1) instanceof GroupBy) {
+        final GroupSpec spec = ((GroupBy) clauses.get(1)).group();
+        if(spec != null) {
           final LinkedList<Clause> cls = new LinkedList<>();
           cls.add(clauses.removeFirst());
-          final Expr flwor = new GFLWOR(info, cls, grp.expr).optimize(cc);
+          final Expr flwor = new GFLWOR(info, cls, spec.expr).optimize(cc);
           final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
-          clauses.set(0, new For(grp.var, expr).optimize(cc));
+          clauses.set(0, new For(spec.var, expr).optimize(cc));
           return optimize(cc);
         }
+      }
+    }
+
+    // rewrite single group
+    //   group by $g := G return R
+    //   ->  for $g in G return R
+    if(first instanceof GroupBy && cs == 1) {
+      final GroupSpec spec = ((GroupBy) first).group();
+      if(spec != null) {
+        final Expr expr = cc.function(Function.DATA, info, spec.expr);
+        clauses.set(0, new For(spec.var, expr).optimize(cc));
+        return optimize(cc);
       }
     }
 

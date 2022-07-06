@@ -297,13 +297,16 @@ public final class GroupBy extends Clause {
   }
 
   /**
-   * Returns a group specification that can be rewritten to a distinct-values argument.
+   * Returns a group specification that can be further rewritten and simplified.
    * @return group specification
    */
   GroupSpec group() {
     if(specs.length == 1 && post.length == 0) {
       final GroupSpec spec = specs[0];
-      if(spec.coll == null && spec.var.declType == null) return spec;
+      final SeqType st = spec.expr.seqType();
+      if(spec.coll == null && spec.var.declType == null && st.one() && !st.mayBeArray()) {
+        return spec;
+      }
     }
     return null;
   }
