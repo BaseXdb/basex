@@ -279,19 +279,24 @@ public class QueryParser extends InputParser {
 
   /**
    * Checks function calls, variable references and updating semantics.
-   * @param mm main module; {@code null} for library modules
+   * @param main main module; {@code null} for library modules
    * @throws QueryException query exception
    */
-  private void check(final MainModule mm) throws QueryException {
+  private void check(final MainModule main) throws QueryException {
     // check function calls and variable references
     qc.functions.check(qc);
     qc.vars.check();
 
-    // check updating semantics (skip if updates and values can be mixed)
+    // check updating semantics, finalize updating flag
     if(qc.updating && !sc.mixUpdates) {
       qc.functions.checkUp();
       qc.vars.checkUp();
-      if(mm != null) mm.expr.checkUp();
+      if(main != null) {
+        main.expr.checkUp();
+        qc.updating = main.expr.has(Flag.UPD);
+      } else {
+        qc.updating = false;
+      }
     }
   }
 

@@ -26,7 +26,6 @@ import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.hash.*;
@@ -216,10 +215,7 @@ public final class QueryContext extends Job implements Closeable {
       throws QueryException {
 
     info.query = query;
-    final QueryParser qp = new QueryParser(query, uri, this, sc);
-    main = qp.parseMain();
-    // updating expression: check if an updating expression is left in the expression tree
-    if(updating && !qp.sc.mixUpdates) updating = main.expr.has(Flag.UPD);
+    main = new QueryParser(query, uri, this, sc).parseMain();
     return main;
   }
 
@@ -232,12 +228,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   public LibraryModule parseLibrary(final String query, final String uri) throws QueryException {
     info.query = query;
-    try {
-      return new QueryParser(query, uri, this, null).parseLibrary(true);
-    } finally {
-      // library module itself is not updating
-      updating = false;
-    }
+    return new QueryParser(query, uri, this, null).parseLibrary(true);
   }
 
   /**
