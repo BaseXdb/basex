@@ -158,6 +158,9 @@ function dba:log(
   $page   as xs:string,
   $time   as xs:string?
 ) as element()+ {
+  (: check if input is a valid regular expression :)
+  if ($input) then prof:void(analyze-string('', $input)),
+
   let $headers := (
     map { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },
     map { 'key': 'address', 'label': 'Address' },
@@ -168,40 +171,61 @@ function dba:log(
   )
   let $entries := (
     let $ignore-logs := options:get($options:IGNORE-LOGS)
-    let $search := boolean($input)
-    let $highlight := function($string) {
-      for $match in analyze-string($string, $input, 'i')/*
-      let $value := string($match)
-      return if(local-name($match) = 'match') then element b { $value } else $value
-    }
+    let $regex := matches($input, '[+*?^$(){}|\[\]\\]')
+    let $terms := $regex ?? $input !! tokenize($input)
+    let $joined-terms := $regex ?? $input !! string-join($terms, '|')
 
     for $log in reverse(admin:logs($name, true()))
-    let $user := string($log/@user)
-    let $type := string($log/@type)
     let $text := string($log)
-    let $user-hit := $search and matches($user, $input, 'iq')
-    let $type-hit := $search and not($user-hit) and matches($type, $input, 'iq')
-    let $text-hit := $search and not($user-hit or $type-hit) and matches($text, $input, 'i')
-    where (not($search) or $user-hit or $type-hit or $text-hit) and (
-      not($ignore-logs and matches($text, $ignore-logs, 'i'))
+    where not($ignore-logs and matches($text, $ignore-logs, 'i'))
+
+    for $map-results in (
+      let $map := map {
+        'user': string($log/@user),
+        'type': string($log/@type),
+        'text': $text
+      }
+      return if($input) then (
+        if(every $term in $terms satisfies (
+          some $v in $map?* satisfies matches($v, $term, 'i')
+        )) then (
+          map:merge(
+            map:for-each($map, function($k, $v) {
+              map:entry($k, (
+                if (matches($v, $joined-terms)) then function() {
+                  for $match in analyze-string($v, $joined-terms, 'i')/*
+                  let $value := string($match)
+                  return if($match/self::fn:match) then element b { $value } else $value
+                } else (
+                  $v
+                )
+              ))
+            })
+          )
+        )
+      ) else (
+        $map
+      )
     )
+
     let $id := string($log/@time)
-    let $time := if($input or $sort != 'time') then (
-      function() { html:link($id, $dba:CAT || '-jump', map { 'name': $name, 'time': $id }) }
-    ) else if($id = $time) then (
-      element b { $id }
-    ) else (
-      $id
-    )
-    return map {
-      'id': $id,
-      'time': $time,
-      'address': string($log/@address),
-      'user': if($user-hit) then function() { $highlight($user) } else $user,
-      'type': if($type-hit) then function() { $highlight($type) } else $type,
-      'ms': xs:decimal($log/@ms),
-      'text': if($text-hit) then function() { $highlight($text) } else $text
-    }
+    return map:merge((
+      $map-results,
+      map {
+        'id': $id,
+        'address': string($log/@address),
+        'ms': xs:decimal($log/@ms),
+        'time': if($input or $sort != 'time') then (
+          function() {
+            html:link($id, $dba:CAT || '-jump', map { 'name': $name, 'time': $id })
+          }
+        ) else if($id = $time) then (
+          element b { $id }
+        ) else (
+          $id
+        )
+      }
+    ))
   )
   let $params := map { 'name': $name, 'input': $input }
   let $options := map { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
