@@ -140,10 +140,6 @@ public class BaseX extends CLI {
             execute(new Set(MainOptions.XMLPLAN, null), false);
             qp ^= true;
             break;
-          case 'X':
-            // hidden: toggle query plan creation before/after query compilation
-            execute(new Set(MainOptions.COMPPLAN, null), false);
-            break;
           case 'z':
             execute(new Set(MainOptions.SERIALIZE, null), false);
             break;

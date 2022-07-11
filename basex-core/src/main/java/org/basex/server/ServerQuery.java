@@ -186,10 +186,8 @@ public final class ServerQuery extends Job {
 
     try {
       qp().parse();
-      final boolean compplan = ctx.options.get(MainOptions.COMPPLAN);
-      if(!compplan) queryPlan();
       qp.compile();
-      if(compplan) queryPlan();
+      queryPlan();
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
