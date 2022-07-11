@@ -25,7 +25,7 @@ public final class FileResolvePath extends FileFn {
       Path base = toPath(file);
       if(!base.isAbsolute()) throw FILE_IS_RELATIVE_X.get(info, base);
       if(!endsWith(file, '/') && !endsWith(file, '\\')) base = base.getParent();
-      abs = base.resolve(path);
+      abs = base.resolve(path).normalize();
     }
     return get(abs, Files.isDirectory(abs));
   }

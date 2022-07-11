@@ -415,6 +415,10 @@ public final class FileModuleTest extends SandboxTest {
     query("contains(" + func.args(can1, can2) + ", \"" + can1 + "\")", true);
     query("contains(" + func.args("X", can1 + File.separator) + ", \"" +
         can1 + File.separator + "X\")", true);
+
+    query("not(contains(" + func.args("../", can1) + ", '..'))", true);
+    query("not(contains(" + func.args("../X", can1) + ", '..'))", true);
+
     error(func.args(can1, "b"), FILE_IS_RELATIVE_X);
     error(func.args("X", "b"), FILE_IS_RELATIVE_X);
   }
