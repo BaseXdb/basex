@@ -1,6 +1,6 @@
 package org.basex.core.cmd;
 
-import org.basex.query.value.*;
+import java.util.AbstractMap.*;
 
 /**
  * Evaluates the 'xquery' command and processes an XQuery request.
@@ -20,21 +20,10 @@ public final class XQuery extends AQuery {
   /**
    * Binds a variable.
    * @param name name of variable (if {@code null}, value will be bound as context value)
-   * @param value XQuery value to be bound
-   * @return self reference
-   */
-  public XQuery bind(final String name, final Value value) {
-    vars.put(name, value);
-    return this;
-  }
-
-  /**
-   * Binds a variable.
-   * @param name name of variable (if {@code null}, value will be bound as context value)
    * @param value value to be bound (XQuery value; any other value will be converted to a string)
    * @return self reference
    */
-  public XQuery bind(final String name, final String value) {
+  public XQuery bind(final String name, final Object value) {
     return bind(name, value, null);
   }
 
@@ -45,8 +34,8 @@ public final class XQuery extends AQuery {
    * @param type type (can be {@code null})
    * @return self reference
    */
-  public XQuery bind(final String name, final String value, final String type) {
-    vars.put(name, new String[] { value, type });
+  public XQuery bind(final String name, final Object value, final String type) {
+    bindings.put(name, new SimpleEntry<>(value, type));
     return this;
   }
 }

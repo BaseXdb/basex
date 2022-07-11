@@ -5,17 +5,13 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.Parser;
-import org.basex.build.xml.*;
-import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
-import org.xml.sax.*;
+import org.basex.util.*;
 
 /**
  * Parse functions.
@@ -24,6 +20,18 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public abstract class Parse extends StandardFunc {
+  /** Input reference. */
+  IO input;
+
+  /**
+   * Converts the specified URI to a IO reference.
+   * @param uri URI
+   * @return io reference, or {@code null} if the URI is invalid
+   */
+  protected IO input(final byte[] uri) {
+    return input != null ? input : Uri.uri(uri).isValid() ? sc.resolve(string(uri)) : null;
+  }
+
   /**
    * Performs the unparsed-text function.
    * @param qc query context
@@ -36,28 +44,26 @@ public abstract class Parse extends StandardFunc {
   final Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
       throws QueryException {
 
-    final byte[] token = toTokenOrNull(exprs[0], qc);
-    if(token == null) return check ? Bln.FALSE : Empty.VALUE;
-    final String path = string(token);
-
-    String enc;
-    IO io;
     try {
-      enc = encoding ? toEncodingOrNull(1, ENCODING_X, qc) : null;
+      IO io = input;
+      if(io == null) {
+        final Item item = exprs[0].atomItem(qc, info);
+        if(item == Empty.VALUE) return check ? Bln.FALSE : Empty.VALUE;
+        io = input(toToken(item));
+        if(io == null) throw INVURL_X.get(info, item);
+      }
+      if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
 
-      if(contains(token, '#')) throw FRAGID_X.get(info, path);
-      if(sc.baseURI() == Uri.EMPTY) throw STBASEURI.get(info);
-      if(!Uri.uri(path).isValid()) throw INVURL_X.get(info, path);
-      io = sc.resolve(path);
+      String enc = encoding ? toEncodingOrNull(1, ENCODING_X, qc) : null;
 
-      // overwrite path with global resource files
-      String[] rp = qc.resources.text(path);
-      if(rp == null) rp = qc.resources.text(io.path());
-      if(rp != null && rp.length > 0) {
-        io = IO.get(rp[0]);
-        if(rp.length > 1) enc = rp[1];
+      // only required for test APIs
+      final String[] pathEnc = qc.resources.text(io);
+      if(pathEnc != null) {
+        io = IO.get(pathEnc[0]);
+        enc = pathEnc[1];
       }
 
+      // parse text
       try(InputStream is = io.inputStream(); TextInput ti = new TextInput(io)) {
         ti.encoding(enc).validate(true);
         if(!check) return Str.get(ti.content());
@@ -74,28 +80,6 @@ public abstract class Parse extends StandardFunc {
     } catch(final QueryException ex) {
       if(check && !ex.error().toString().startsWith(ErrType.XPTY.name())) return Bln.FALSE;
       throw ex;
-    }
-  }
-
-  /**
-   * Returns a document node for the parsed XML input.
-   * @param qc query context
-   * @param frag parse fragments
-   * @return result or {@link Empty#VALUE}
-   * @throws QueryException query exception
-   */
-  final Item parseXml(final QueryContext qc, final boolean frag) throws QueryException {
-    final byte[] token = toTokenOrNull(exprs[0], qc);
-    if(token == null) return Empty.VALUE;
-
-    final IO io = new IOContent(token, string(sc.baseURI().string()));
-    try {
-      return new DBNode(frag ? new XMLParser(io, MainOptions.get(), true) : Parser.xmlParser(io));
-    } catch(final IOException ex) {
-      final QueryException qe = SAXERR_X.get(info, ex);
-      final Throwable th = ex.getCause();
-      if(th instanceof SAXException) qe.value(Str.get(th.toString()));
-      throw qe;
     }
   }
 }

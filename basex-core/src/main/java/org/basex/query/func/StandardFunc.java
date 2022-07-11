@@ -241,7 +241,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Expr compileData(final CompileContext cc) throws QueryException {
-    if(exprs.length > 0 && exprs[0] instanceof Value) {
+    if(cc.dynamic && exprs.length > 0 && exprs[0] instanceof Value) {
       data = toData(cc.qc);
       cc.info(OPTOPEN_X, data.meta.name);
     }

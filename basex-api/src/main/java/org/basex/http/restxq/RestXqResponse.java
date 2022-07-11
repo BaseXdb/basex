@@ -19,7 +19,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.http.*;
 
 /**
@@ -52,11 +51,8 @@ final class RestXqResponse extends WebResponse {
   protected Expr[] init(final WebFunction function, final Object data)
       throws QueryException, IOException {
 
-    final Performance perf = new Performance();
     qc = function.module.qc(ctx);
     qc.jc().type(RESTXQ);
-    qc.info.parsing.set(perf.ns());
-
     ctx.setExternal(conn.requestCtx);
 
     func = new RestXqFunction(function.function, function.module, qc);
@@ -75,15 +71,11 @@ final class RestXqResponse extends WebResponse {
     boolean response;
 
     qc.register(ctx);
-    final Performance perf = qc.jc().performance;
-    final QueryInfo qi = qc.info;
     try {
-      qc.compile();
-      qi.compiling.set(perf.ns());
+      qc.optimize();
 
       // evaluate query
       final Iter iter = qc.iter();
-      qi.evaluating.set(perf.ns());
       Item item = iter.next();
       response = item != null;
 
@@ -112,7 +104,7 @@ final class RestXqResponse extends WebResponse {
       // initialize serializer
       conn.sopts(so);
       conn.initResponse();
-      if(cache == null) conn.timing(qi);
+      if(cache == null) conn.timing(qc.info);
 
       if(status != null) {
         final int s = status;
@@ -136,8 +128,7 @@ final class RestXqResponse extends WebResponse {
 
     } finally {
       qc.close();
-      qi.serializing.set(perf.ns());
-      if(cache != null) conn.timing(qi);
+      if(cache != null) conn.timing(qc.info);
 
       qc.unregister(ctx);
       if(singleton != null) singleton.unregister();

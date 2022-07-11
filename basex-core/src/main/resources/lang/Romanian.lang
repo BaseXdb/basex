@@ -252,6 +252,7 @@ open_manage          = Deschide & administreaza
 optimize             = Optimizaţi
 optimize_all         = Optimize All
 optimized_query      = Interogare
+optimizing           = Optimizing
 options              = Opţiuni
 out_of_date          = Data insuficiente.
 out_of_mem           = Memorie insuficientă.

@@ -23,7 +23,7 @@ public final class LockList implements Iterable<String> {
    * @return self reference
    */
   public LockList add(final String lock) {
-    if(!global) list.add(lock);
+    if(!global) list.addUnique(lock);
     return this;
   }
 
@@ -76,7 +76,7 @@ public final class LockList implements Iterable<String> {
       if(locks.global) {
         addGlobal();
       } else {
-        list.add(locks.list);
+        for(final String lock : locks.list) list.addUnique(lock);
       }
     }
   }
@@ -123,14 +123,14 @@ public final class LockList implements Iterable<String> {
    * @param name name of currently opened database
    */
   public void finish(final String name) {
-    for(int s = 0; s < list.size(); s++) {
-      final String lock = list.get(s);
+    for(int l = 0; l < list.size(); l++) {
+      final String lock = list.get(l);
       if(Strings.eq(lock, Locking.COLLECTION, Locking.CONTEXT)) {
-        if(name == null) list.remove(s--);
-        else list.set(s, name);
+        if(name != null) list.set(l, name);
+        else list.remove(l--);
       }
     }
-    list.sort().unique();
+    list.sort();
   }
 
   @Override

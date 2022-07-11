@@ -344,6 +344,7 @@ public final class HTTPConnection implements ClientInfo {
       list.add(name + ";dur=" + Performance.getTime(nano, 1));
     add.accept("parse", qi.parsing.get());
     add.accept("compile", qi.compiling.get());
+    add.accept("optimize", qi.optimizing.get());
     add.accept("evaluate", qi.evaluating.get());
     add.accept("serialize", qi.serializing.get());
     response.setHeader(SERVER_TIMING, String.join(",", list.finish()));

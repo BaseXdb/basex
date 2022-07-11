@@ -161,8 +161,9 @@ public final class XQueryModuleTest extends QueryPlanTest {
     query(func.args("1", " map { 'compile': true() }") + "/QueryPlan/@compiled/string()", true);
     query(func.args("1", " map { 'plan': false() }") + "/QueryPlan", "");
 
-    query(func.args("module namespace x='x'; "
-        + "declare function x:x() { 1 };") + "/name()", "LibraryModule");
+    final String lib = "module namespace x='x'; declare function x:x() { 1 + 2 };";
+    query(func.args(lib) + "/name()", "LibraryModule");
+    query(func.args(lib, " map { 'compile': true() }") + "/name()", "LibraryModule");
 
     query(func.args("delete node <a/>") + "/name()", "MainModule");
     query(func.args("delete node <a/>") + "/@updating/string()", true);

@@ -755,8 +755,6 @@ public enum QueryError {
   /** Error code. */
   INVURL_X(FOUT, 1170, "URI is invalid: %"),
   /** Error code. */
-  STBASEURI(FOUT, 1170, "Static Base URI is undefined."),
-  /** Error code. */
   ENCODING_X(FOUT, 1190, "Unknown encoding '%'."),
   /** Error code. */
   INVCHARS_X(FOUT, 1190, "%."),

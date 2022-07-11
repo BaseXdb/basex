@@ -193,7 +193,7 @@ public final class QueryJob extends Job implements Runnable {
     final JobsOptions opts = job.options;
     log(LogType.REQUEST, opts.get(JobsOptions.LOG));
 
-    qp = new QueryProcessor(job.query, opts.get(JobsOptions.BASE_URI), ctx);
+    qp = new QueryProcessor(job.query, opts.get(JobsOptions.BASE_URI), ctx, null);
     try {
       // parse, push and register query. order is important!
       final Performance perf = new Performance();
@@ -201,7 +201,7 @@ public final class QueryJob extends Job implements Runnable {
         final String key = binding.getKey();
         final Value value = binding.getValue();
         if(key.isEmpty()) qp.context(value);
-        else qp.bind(key, value);
+        else qp.variable(key, value);
       }
       qp.parse();
       updating = qp.updating;

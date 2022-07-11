@@ -1,7 +1,11 @@
 package org.basex.query.func.fn;
 
+import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -10,9 +14,23 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class FnUnparsedTextAvailable extends Parse {
+public class FnUnparsedTextAvailable extends Parse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return unparsedText(qc, true, true);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // pre-evaluate if target is empty
+    final Expr expr = exprs[0];
+    if(expr == Empty.VALUE) return value(cc.qc);
+
+    // pre-evaluate during dynamic compilation if target is not a remote URL
+    if(cc.dynamic && expr instanceof Value) {
+      input = input(toToken(expr.atomItem(cc.qc, info)));
+      if(input == null || !(input instanceof IOUrl)) return value(cc.qc);
+    }
+    return this;
   }
 }

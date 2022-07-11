@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -11,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class FnImplicitTimezone extends StandardFunc {
+public final class FnImplicitTimezone extends DynamicFn {
   @Override
   public DTDur item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return qc.dateTime().zone;

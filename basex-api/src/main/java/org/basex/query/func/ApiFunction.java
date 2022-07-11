@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Flag.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.util.*;
@@ -163,10 +162,10 @@ public enum ApiFunction implements AFunction {
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE(RequestAttribute::new, "attribute(name)",
-      params(STRING_O), ITEM_ZM, flag(NDT), REQUEST_URI),
+      params(STRING_O), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames::new, "attribute-names()",
-      params(), STRING_ZM, flag(NDT), REQUEST_URI),
+      params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_CONTEXT_PATH(RequestContextPath::new, "context-path()",
       params(), STRING_O, REQUEST_URI),
@@ -190,10 +189,10 @@ public enum ApiFunction implements AFunction {
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER(RequestParameter::new, "parameter(name[,default])",
-      params(STRING_O, ITEM_ZM), ITEM_ZM, flag(NDT), REQUEST_URI),
+      params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER_NAMES(RequestParameterNames::new, "parameter-names()",
-      params(), STRING_ZM, flag(NDT), REQUEST_URI),
+      params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PATH(RequestPath::new, "path()",
       params(), STRING_O, REQUEST_URI),
@@ -217,7 +216,7 @@ public enum ApiFunction implements AFunction {
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_SET_ATTRIBUTE(RequestSetAttribute::new, "set-attribute(name,value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), REQUEST_URI, Perm.ADMIN),
+      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, REQUEST_URI, Perm.ADMIN),
   /** XQuery function. */
   _REQUEST_URI(RequestUri::new, "uri()",
       params(), ANY_URI_O, REQUEST_URI),
@@ -241,107 +240,107 @@ public enum ApiFunction implements AFunction {
 
   /** XQuery function. */
   _SESSION_ACCESSED(SessionAccessed::new, "accessed()",
-      params(), DATE_TIME_O, flag(NDT), SESSION_URI),
+      params(), DATE_TIME_O, SESSION_URI),
   /** XQuery function. */
   _SESSION_CLOSE(SessionClose::new, "close()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), SESSION_URI),
+      params(), EMPTY_SEQUENCE_Z, SESSION_URI),
   /** XQuery function. */
   _SESSION_CREATED(SessionCreated::new, "created()",
-      params(), DATE_TIME_O, flag(NDT), SESSION_URI),
+      params(), DATE_TIME_O, SESSION_URI),
   /** XQuery function. */
   _SESSION_DELETE(SessionDelete::new, "delete(key)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SESSION_URI),
+      params(STRING_O), EMPTY_SEQUENCE_Z, SESSION_URI),
   /** XQuery function. */
   _SESSION_GET(SessionGet::new, "get(key[,default])",
-      params(STRING_O, ITEM_ZM), ITEM_ZM, flag(NDT), SESSION_URI),
+      params(STRING_O, ITEM_ZM), ITEM_ZM, SESSION_URI),
   /** XQuery function. */
   _SESSION_ID(SessionId::new, "id()",
-      params(), STRING_O, flag(NDT), SESSION_URI),
+      params(), STRING_O, SESSION_URI),
   /** XQuery function. */
   _SESSION_NAMES(SessionNames::new, "names()",
-      params(), STRING_ZM, flag(NDT), SESSION_URI),
+      params(), STRING_ZM, SESSION_URI),
   /** XQuery function. */
   _SESSION_SET(SessionSet::new, "set(key,value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), SESSION_URI),
+      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSION_URI),
 
   // Sessions Module
 
   /** XQuery function. */
   _SESSIONS_ACCESSED(SessionsAccessed::new, "accessed(id)",
-      params(STRING_O), DATE_TIME_O, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(STRING_O), DATE_TIME_O, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_CLOSE(SessionsClose::new, "close(id,)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(STRING_O), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_CREATED(SessionsCreated::new, "created(id)",
-      params(STRING_O), DATE_TIME_O, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(STRING_O), DATE_TIME_O, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_DELETE(SessionsDelete::new, "delete(id,key)",
-      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_GET(SessionsGet::new, "get(id,key[,default])",
-      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_IDS(SessionsIds::new, "ids()",
-      params(), STRING_ZM, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(), STRING_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_NAMES(SessionsNames::new, "names(id)",
-      params(STRING_O), STRING_ZM, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(STRING_O), STRING_ZM, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_SET(SessionsSet::new, "set(id,key,value)",
-      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), SESSIONS_URI, Perm.ADMIN),
+      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
 
   // WebSocket Module
 
   /** XQuery function. */
   _WS_BROADCAST(WsBroadcast::new, "broadcast(message)",
-      params(ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), WS_URI),
+      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_CLOSE(WsClose::new, "close(id)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), WS_URI),
+      params(STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_DELETE(WsDelete::new, "delete(id,key)",
-      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), WS_URI),
+      params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_EMIT(WsEmit::new, "emit(message)",
-      params(ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), WS_URI),
+      params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_EVAL(WsEval::new, "eval(string[,bindings[,options]])",
-      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), WS_URI),
+      params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, WS_URI),
   /** XQuery function. */
   _WS_GET(WsGet::new, "get(id,key[,default])",
-      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, flag(NDT), WS_URI),
+      params(STRING_O, STRING_O, ITEM_ZM), ITEM_ZM, WS_URI),
   /** XQuery function. */
   _WS_ID(WsId::new, "id()",
-      params(), STRING_O, flag(NDT), WS_URI),
+      params(), STRING_O, WS_URI),
   /** XQuery function. */
   _WS_IDS(WsIds::new, "ids()",
-      params(), STRING_ZM, flag(NDT), WS_URI),
+      params(), STRING_ZM, WS_URI),
   /** XQuery function. */
   _WS_PATH(WsPath::new, "path(id)",
-      params(STRING_O), STRING_O, flag(NDT), WS_URI),
+      params(STRING_O), STRING_O, WS_URI),
   /** XQuery function. */
   _WS_SEND(WsSend::new, "send(message[,ids])",
-      params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, flag(NDT), WS_URI),
+      params(ITEM_O, STRING_ZM), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
   _WS_SET(WsSet::new, "set(id,key,value)",
-      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), WS_URI);
+      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, WS_URI);
 
   /** Function definition. */
   private final FuncDefinition definition;
 
   /**
    * Constructs a function signature; calls
-   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, EnumSet, byte[])}.
+   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, byte[])}.
    * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param params parameter types
-   * @param type return type
+   * @param seqType return type
    * @param uri uri
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
-      final SeqType[] params, final SeqType type, final byte[] uri) {
-    this(supplier, desc, params, type, EnumSet.noneOf(Flag.class), uri);
+      final SeqType[] params, final SeqType seqType, final byte[] uri) {
+    this(supplier, desc, params, seqType, uri, Perm.NONE);
   }
 
   /**
@@ -352,30 +351,12 @@ public enum ApiFunction implements AFunction {
    *   indicate that the number of parameters of a function is not limited.
    * @param params parameter types
    * @param seqType return type
-   * @param flags static function properties
-   * @param uri uri
-   */
-  ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
-      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
-    this(supplier, desc, params, seqType, flags, uri, Perm.NONE);
-  }
-
-  /**
-   * Constructs a function signature.
-   * @param supplier function implementation constructor
-   * @param desc descriptive function string, containing the function name and its parameters in
-   *   parentheses. Optional parameters are represented in nested square brackets; three dots
-   *   indicate that the number of parameters of a function is not limited.
-   * @param params parameter types
-   * @param seqType return type
-   * @param flags static function properties
    * @param perm minimum permission
    * @param uri uri
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
-      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
-      final Perm perm) {
-    definition = new FuncDefinition(supplier, desc, params, seqType, flags, uri, perm);
+      final SeqType[] params, final SeqType seqType, final byte[] uri, final Perm perm) {
+    definition = new FuncDefinition(supplier, desc, params, seqType, flag(Flag.NDT), uri, perm);
   }
 
   @Override

@@ -252,6 +252,7 @@ open_manage          = Открыть и Администрировать
 optimize             = Оптимизировать
 optimize_all         = Оптимизировать полностью
 optimized_query      = Оптимизированный запрос
+optimizing           = Оптимизировать
 options              = Параметры
 out_of_date          = не актуальное состояние
 out_of_mem           = Закончилась память

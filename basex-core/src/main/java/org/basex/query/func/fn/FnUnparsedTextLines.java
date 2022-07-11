@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  * @author BaseX Team 2005-22, BSD License
  */
-public final class FnUnparsedTextLines extends Parse {
+public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Item item = unparsedText(qc, false, true);
@@ -46,9 +46,9 @@ public final class FnUnparsedTextLines extends Parse {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = exprs[0];
-    return expr.seqType().zero() ? expr : this;
+    return expr.seqType().zero() ? expr : super.opt(cc);
   }
 
   /**

@@ -40,7 +40,7 @@ public final class InspectFunctions extends StandardFunc {
 
     try {
       qc.parse(content.toString(), content.path());
-      qc.functions.compileAll(new CompileContext(qc));
+      qc.functions.compileAll(new CompileContext(qc, true));
     } catch(final QueryException ex) {
       throw INSPECT_PARSE_X.get(info, ex);
     }
@@ -59,12 +59,6 @@ public final class InspectFunctions extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     if(exprs.length == 0) cc.qc.functions.compileAll(cc);
     return this;
-  }
-
-  @Override
-  public boolean has(final Flag... flags) {
-    // do not relocate function, as it introduces new code
-    return Flag.NDT.in(flags) && exprs.length == 1 || super.has(flags);
   }
 
   @Override

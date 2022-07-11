@@ -53,7 +53,7 @@ public final class ServerQuery extends Job {
    */
   public void bind(final String name, final Object value, final String type) throws IOException {
     try {
-      qp().bind(name, value, type);
+      qp().variable(name, value, type);
     } catch(final QueryException ex) {
       Util.stack(ex);
       throw new BaseXException(ex);
@@ -113,25 +113,16 @@ public final class ServerQuery extends Job {
   public void execute(final OutputStream out, final boolean iterative, final boolean encode,
       final boolean full) throws IOException {
 
-    final boolean compplan = ctx.options.get(MainOptions.COMPPLAN);
-
     try {
       // parses the query and registers the process
       parse();
       qp.register(ctx);
 
-      final Performance perf = jc().performance;
-
-      if(!compplan) queryPlan();
-      qp.compile();
-      if(compplan) queryPlan();
-
       final QueryContext qc = qp.qc;
       final QueryInfo qi = qc.info;
 
-      qi.compiling.set(perf.ns());
+      qp.optimize();
       final Iter iter = qp.iter();
-      qi.evaluating.set(perf.ns());
 
       // iterate through results
       int hits = 0;
@@ -152,7 +143,6 @@ public final class ServerQuery extends Job {
           hits++;
         }
       }
-      qi.serializing.set(perf.ns());
 
       // generate query info
       info.append(qi.toString(qp, po.size(), hits, jc().locks, true));
@@ -194,13 +184,15 @@ public final class ServerQuery extends Job {
   private void parse() throws IOException {
     if(parsed) return;
 
-    final Performance perf = new Performance();
     try {
       qp().parse();
+      final boolean compplan = ctx.options.get(MainOptions.COMPPLAN);
+      if(!compplan) queryPlan();
+      qp.compile();
+      if(compplan) queryPlan();
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
-    qp.qc.info.parsing.set(perf.ns());
     parsed = true;
   }
 

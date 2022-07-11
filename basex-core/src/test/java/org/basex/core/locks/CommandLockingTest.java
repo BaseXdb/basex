@@ -351,9 +351,7 @@ public final class CommandLockingTest extends SandboxTest {
     cmd.updating(DUMMY_CONTEXT);
     cmd.addLocks();
 
-    final Locks locks = cmd.jc().locks;
-    cmd.jc().locks.finish(context);
-
+    final Locks locks = cmd.jc().locks.finish(context);
     for(final LockList list : new LockList[] { reqRd, allowRd, reqWt, allowWt }) {
       if(list != null) list.finish(null);
     }

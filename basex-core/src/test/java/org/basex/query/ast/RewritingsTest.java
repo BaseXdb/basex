@@ -1843,10 +1843,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // database nodes
     execute(new CreateDB(NAME, "<x>A</x>"));
-    check("function() as element(x)* { x }()[text() = 'A']",
-        "<x>A</x>", exists(ValueAccess.class));
-    check("function() as element(x)* { /x }()[text() = 'A']",
-        "<x>A</x>", exists(ValueAccess.class));
+    error("function() as element(x)* { x }()[text() = 'A']", NOCTX_X);
+    error("function() as element(x)* { /x }()[text() = 'A']", NOCTX_X);
     check("function() as element(x)* { db:open('" + NAME + "')/x }()[text() = 'A']",
         "<x>A</x>", exists(ValueAccess.class));
     check("function() as element(x) { db:open('" + NAME + "')/x }()[text() = 'A']",
@@ -2317,7 +2315,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("zero-or-one((1 to 2)[. = 3]) promote to empty-sequence()", "", empty(ZERO_OR_ONE));
     check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(ZERO_OR_ONE));
     check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal?", 2, empty(ZERO_OR_ONE));
-    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal+", 2, exists(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal+", 2, empty(ZERO_OR_ONE));
     check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(ZERO_OR_ONE));
 
     check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(EXACTLY_ONE));
@@ -2326,7 +2324,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(EXACTLY_ONE));
 
     check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(ONE_OR_MORE));
-    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal?", 2, exists(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal?", 2, empty(ONE_OR_MORE));
     check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal+", 2, empty(ONE_OR_MORE));
     check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(ONE_OR_MORE));
   }

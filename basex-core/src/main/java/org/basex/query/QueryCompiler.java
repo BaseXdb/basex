@@ -19,9 +19,6 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 final class QueryCompiler {
-  /** Compilation context. */
-  private final CompileContext cc;
-
   /** Node stack. */
   private final IntList stack = new IntList();
   /** Index and lowlink list. */
@@ -35,28 +32,6 @@ final class QueryCompiler {
   private final ArrayList<Scope> scopes = new ArrayList<>();
   /** Declaration list. */
   private final IdentityHashMap<Scope, Integer> ids = new IdentityHashMap<>();
-
-  /**
-   * Constructor.
-   * @param cc compilation context
-   */
-  private QueryCompiler(final CompileContext cc) {
-    this.cc = cc;
-  }
-
-  /**
-   * Compiles the code.
-   * @param cc compilation context
-   * @param qc query context
-   * @throws QueryException compilation errors
-   */
-  static void compile(final CompileContext cc, final QueryContext qc) throws QueryException {
-    if(qc.main != null) {
-      new QueryCompiler(cc).compile();
-    } else {
-      qc.functions.compile(cc);
-    }
-  }
 
   /**
    * Gathers all declarations (functions and static variables) used by the given main module.
@@ -103,9 +78,10 @@ final class QueryCompiler {
 
   /**
    * Compiles the main module.
+   * @param cc compilation context
    * @throws QueryException compilation errors
    */
-  private void compile() throws QueryException {
+  void compile(final CompileContext cc) throws QueryException {
     add(cc.qc.main);
 
     // compile the used scopes only, collect static functions
@@ -115,6 +91,9 @@ final class QueryCompiler {
 
     for(final ArrayList<Scope> scps : iter) {
       entries.add(circCheck(scps));
+    }
+    for(final ArrayList<Scope> scps : iter) {
+      for(final Scope scope : scps) scope.reset();
     }
     for(final Scope scope : entries) {
       scope.compile(cc);

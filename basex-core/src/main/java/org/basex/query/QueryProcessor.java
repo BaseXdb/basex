@@ -34,7 +34,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @param ctx database context
    */
   public QueryProcessor(final String query, final Context ctx) {
-    this(query, null, ctx);
+    this(query, null, ctx, null);
   }
 
   /**
@@ -42,11 +42,12 @@ public final class QueryProcessor extends Job implements Closeable {
    * @param query query string
    * @param uri base uri (can be {@code null})
    * @param ctx database context
+   * @param info query info (can be {@code null})
    */
-
-  public QueryProcessor(final String query, final String uri, final Context ctx) {
+  public QueryProcessor(final String query, final String uri, final Context ctx,
+      final QueryInfo info) {
     this.query = query;
-    qc = pushJob(new QueryContext(ctx));
+    qc = pushJob(new QueryContext(ctx, null, null, info));
     sc = new StaticContext(qc);
     sc.baseURI(uri != null && uri.isEmpty() ? "./" : uri);
   }
@@ -72,6 +73,15 @@ public final class QueryProcessor extends Job implements Closeable {
   public void compile() throws QueryException {
     parse();
     qc.compile();
+  }
+
+  /**
+   * Optimizes the query.
+   * @throws QueryException query exception
+   */
+  public void optimize() throws QueryException {
+    compile();
+    qc.optimize();
   }
 
   /**
@@ -116,7 +126,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @see QueryContext#bind(String, Object, String, StaticContext)
    * @throws QueryException query exception
    */
-  public QueryProcessor bind(final String name, final Object value, final String type)
+  public QueryProcessor variable(final String name, final Object value, final String type)
       throws QueryException {
     qc.bind(name, value, type, sc);
     return this;
@@ -129,20 +139,8 @@ public final class QueryProcessor extends Job implements Closeable {
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor bind(final String name, final Object value) throws QueryException {
-    return bind(name, value, null);
-  }
-
-  /**
-   * Binds an XQuery value to a global variable.
-   * @param name name of variable
-   * @param value value to be bound
-   * @return self reference
-   * @throws QueryException query exception
-   */
-  public QueryProcessor bind(final String name, final Value value) throws QueryException {
-    qc.bind(name, value, sc);
-    return this;
+  public QueryProcessor variable(final String name, final Object value) throws QueryException {
+    return variable(name, value, null);
   }
 
   /**
@@ -156,25 +154,15 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
-   * Binds the context value.
-   * @param value XQuery value to be bound
-   * @return self reference
-   */
-  public QueryProcessor context(final Value value) {
-    qc.context(value, sc);
-    return this;
-  }
-
-  /**
    * Binds the context value with a specified type,
-   * using the same rules as for {@link #bind binding variables}.
+   * using the same rules as for {@link #variable binding variables}.
    * @param value value to be bound
    * @param type type (may be {@code null})
    * @return self reference
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value, final String type) throws QueryException {
-    qc.context(value, type, sc);
+    qc.bind(null, value, type, sc);
     return this;
   }
 
@@ -212,7 +200,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
-    compile();
+    optimize();
     try {
       return Serializer.get(os, qc.serParams()).sc(sc);
     } catch(final QueryIOException ex) {

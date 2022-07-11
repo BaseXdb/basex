@@ -104,6 +104,9 @@ public final class CompileContext {
 
   /** Query context. */
   public final QueryContext qc;
+  /** Dynamic compilation. */
+  public final boolean dynamic;
+
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();
   /** Query focus list. */
@@ -112,9 +115,11 @@ public final class CompileContext {
   /**
    * Constructor.
    * @param qc query context
+   * @param dynamic dynamic compilation
    */
-  public CompileContext(final QueryContext qc) {
+  public CompileContext(final QueryContext qc, final boolean dynamic) {
     this.qc = qc;
+    this.dynamic = dynamic;
   }
 
   /**
@@ -123,7 +128,7 @@ public final class CompileContext {
    * @param ext text text extensions
    */
   public void info(final String string, final Object... ext) {
-    if(qc.parent == null) qc.info.compInfo(string, ext);
+    if(qc.parent == null) qc.info.compInfo(dynamic, string, ext);
   }
 
   /**

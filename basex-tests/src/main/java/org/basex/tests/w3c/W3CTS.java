@@ -283,7 +283,7 @@ public abstract class W3CTS extends Main {
         curr = DBNodeSeq.get(d.resources.docs(), d, true, true);
       }
 
-      try(QueryProcessor qp = new QueryProcessor(in, query.path(), context)) {
+      try(QueryProcessor qp = new QueryProcessor(in, query.path(), context, null)) {
         if(curr != null) qp.context(curr);
         context.options.set(MainOptions.QUERYINFO, false);
 
@@ -543,7 +543,7 @@ public abstract class W3CTS extends Main {
       }
 
       final Value value = qp.qc.resources.doc(new QueryInput(src, qp.sc), null);
-      qp.bind(string(vars.itemAt(n).string(null)), value);
+      qp.variable(string(vars.itemAt(n).string(null)), value);
     }
     return tb.finish();
   }
@@ -563,7 +563,7 @@ public abstract class W3CTS extends Main {
       final String nm = string(nodes.itemAt(n).string(null));
       final String src = srcs.get(nm);
       final Item item = src == null ? coll(nm, qp) : Str.get(src);
-      qp.bind(string(vars.itemAt(n).string(null)), item);
+      qp.variable(string(vars.itemAt(n).string(null)), item);
     }
   }
 
@@ -595,8 +595,8 @@ public abstract class W3CTS extends Main {
     for(int n = 0; n < ns; ++n) {
       final String file = pth + string(nodes.itemAt(n).string(null)) + IO.XQSUFFIX;
       final IO io = new IOFile(queries, file);
-      try(QueryProcessor xq = new QueryProcessor(io.string(), io.path(), context)) {
-        qp.bind(string(vars.itemAt(n).string(null)), xq.value());
+      try(QueryProcessor xq = new QueryProcessor(io.string(), io.path(), context, null)) {
+        qp.variable(string(vars.itemAt(n).string(null)), xq.value());
       }
     }
   }

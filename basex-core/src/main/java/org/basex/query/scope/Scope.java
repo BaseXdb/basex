@@ -19,6 +19,11 @@ public interface Scope {
   boolean visit(ASTVisitor visitor);
 
   /**
+   * Prepares the scope for compilation.
+   */
+  default void reset() { }
+
+  /**
    * Compiles the expression contained in this scope.
    * @param cc compilation context
    * @return compiled expression, or {@code null} if not required

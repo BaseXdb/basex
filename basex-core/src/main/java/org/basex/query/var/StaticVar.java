@@ -24,9 +24,6 @@ public final class StaticVar extends StaticDecl {
   /** Flag for lazy evaluation. */
   private final boolean lazy;
 
-  /** Bound value. */
-  Value value;
-
   /**
    * Constructor for a variable declared in a query.
    * @param vs variable scope
@@ -51,48 +48,50 @@ public final class StaticVar extends StaticDecl {
     if(!compiled) {
       compiled = dontEnter = true;
 
+      final QueryFocus focus = pushFocus(cc.qc);
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
       } catch(final QueryException qe) {
-        declType = null;
         if(!lazy) throw qe.notCatchable();
         expr = cc.error(qe, expr);
       } finally {
         cc.removeScope(this);
-        dontEnter = false;
+        cc.qc.focus = focus;
       }
+      dontEnter = false;
 
-      // eager evaluation: pre-evaluate deterministic expressions
-      if(expr instanceof Value || !(lazy || expr.has(Flag.NDT))) {
-        cc.replaceWith(expr, value(cc.qc));
+      // dynamic compilation, eager evaluation: pre-evaluate expressions
+      if(expr instanceof Value || cc.dynamic && !lazy) {
+        try {
+          cc.replaceWith(expr, value(cc.qc));
+        } catch(final QueryException ex) {
+          if(ex.error() != NOCTX_X) throw ex;
+        }
       }
     }
     return null;
   }
 
-  /**
-   * Evaluates this variable.
-   * @param qc query context
-   * @return value of this variable
-   * @throws QueryException query exception
-   */
-  Value value(final QueryContext qc) throws QueryException {
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
     if(dontEnter) throw CIRCVAR_X.get(info, name());
     if(!lazy && expr == null) throw VAREMPTY_X.get(info, name());
 
-    if(value != null) return value;
-    dontEnter = true;
-    final int fp = vs.enter(qc);
-    try {
-      return bindValue(expr.value(qc), qc);
-    } catch(final QueryException qe) {
-      if(lazy) qe.notCatchable();
-      throw qe;
-    } finally {
-      VarScope.exit(fp, qc);
-      dontEnter = false;
+    if(value == null) {
+      dontEnter = true;
+      final QueryFocus focus = pushFocus(qc);
+      try {
+        super.value(qc);
+      } catch(final QueryException qe) {
+        if(lazy) qe.notCatchable();
+        throw qe;
+      } finally {
+        qc.focus = focus;
+        dontEnter = false;
+      }
     }
+    return value;
   }
 
   /**
@@ -111,23 +110,10 @@ public final class StaticVar extends StaticDecl {
    */
   void bind(final Value val, final QueryContext qc) throws QueryException {
     if(external && !compiled) {
-      bindValue(declType == null || declType.instance(val) ? val :
-        declType.cast(val, true, qc, sc, info), qc);
+      value = declType == null || declType.instance(val) ? val :
+        declType.cast(val, true, qc, sc, info);
+      expr = value;
     }
-  }
-
-  /**
-   * Binds an external value and casts it to the declared type (if specified).
-   * @param val value to be set
-   * @param qc query context
-   * @return self reference
-   * @throws QueryException query exception
-   */
-  private Value bindValue(final Value val, final QueryContext qc) throws QueryException {
-    expr = val;
-    value = val;
-    if(declType != null) declType.treat(val, name, qc, info);
-    return value;
   }
 
   @Override
@@ -158,9 +144,21 @@ public final class StaticVar extends StaticDecl {
   boolean has(final Flag... flags) {
     if(dontEnter || expr == null) return false;
     dontEnter = true;
-    final boolean res = expr.has(flags);
+    final boolean has = expr.has(flags);
     dontEnter = false;
-    return res;
+    return has;
+  }
+
+  /**
+   * Assigns a new query focus with the global context value.
+   * @param qc query context
+   * @return old focus
+   */
+  private static QueryFocus pushFocus(final QueryContext qc) {
+    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+    qf.value = qc.finalContext ? qc.contextScope.value : null;
+    qc.focus = qf;
+    return focus;
   }
 
   @Override

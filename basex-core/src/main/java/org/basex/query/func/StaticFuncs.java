@@ -150,19 +150,6 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Compiles and optimizes all referenced functions.
-   * @param cc compilation context
-   */
-  public void compile(final CompileContext cc) {
-    for(final FuncCache fc : funcs.values()) {
-      if(!fc.calls.isEmpty()) {
-        fc.func.compile(cc);
-        fc.func.optimize(cc);
-      }
-    }
-  }
-
-  /**
    * Returns the function with the given name and arity.
    * @param qname function name
    * @param arity function arity

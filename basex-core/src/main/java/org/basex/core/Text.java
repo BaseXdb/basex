@@ -692,6 +692,8 @@ public interface Text {
   String PARSING = lang("parsing");
   /** Query info: compiling. */
   String COMPILING = lang("compiling");
+  /** Query info: optimizing. */
+  String OPTIMIZING = lang("optimizing");
   /** Query info: evaluating. */
   String EVALUATING = lang("evaluating");
   /** Query info: querying. */
@@ -707,7 +709,8 @@ public interface Text {
   String PARSING_CC = PARSING + COLS;
   /** "Compiling: ". */
   String COMPILING_CC = COMPILING + COLS;
-
+  /** "Optimizing: ". */
+  String OPTIMIZING_CC = OPTIMIZING + COLS;
   /** "Evaluating: ". */
   String EVALUATING_CC = EVALUATING + COLS;
   /** "Printing: ". */

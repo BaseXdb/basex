@@ -252,6 +252,7 @@ open_manage          = Buka & Kelola
 optimize             = Optimalkan
 optimize_all         = Optimalkan Semua
 optimized_query      = Kueri teroptimal
+optimizing           = Optimizing
 options              = Opsi
 out_of_date          = ketinggalan jaman
 out_of_mem           = Keluar dari Memori utama.

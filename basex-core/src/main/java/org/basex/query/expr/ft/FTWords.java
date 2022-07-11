@@ -42,8 +42,6 @@ public final class FTWords extends FTExpr {
 
   /** Simple evaluation. */
   boolean simple;
-  /** Compilation flag. */
-  private boolean compiled;
   /** Input database (can be {@code null}). */
   private IndexDb db;
   /** Pre-evaluated query tokens. */
@@ -87,16 +85,13 @@ public final class FTWords extends FTExpr {
 
   @Override
   public FTWords compile(final CompileContext cc) throws QueryException {
-    if(compiled) return this;
-    compiled = true;
-
     if(occ != null) {
       final int ol = occ.length;
       for(int o = 0; o < ol; o++) occ[o] = occ[o].compile(cc);
     }
     query = query.compile(cc);
-    ftOpt = cc.qc.ftOpt().copy();
     if(db != null) db.compile(cc);
+    if(ftOpt == null) ftOpt = cc.qc.ftOpt().copy();
 
     return optimize(cc);
   }
@@ -119,7 +114,7 @@ public final class FTWords extends FTExpr {
    */
   public FTWords optimize(final QueryContext qc) throws QueryException {
     // pre-evaluate tokens, choose fast evaluation for default search options
-    if(query instanceof Value) {
+    if(query instanceof Value && inputs == null) {
       inputs = inputs(qc);
       simple = mode == FTMode.ANY && occ == null;
     }
@@ -502,7 +497,6 @@ public final class FTWords extends FTExpr {
     final FTWords ftw = new FTWords(info, query.copy(cc, vm), mode,
         occ == null ? null : Arr.copyAll(cc, vm, occ));
     ftw.simple = simple;
-    ftw.compiled = compiled;
     ftw.inputs = inputs;
     ftw.ftOpt = ftOpt;
     if(db != null) ftw.db = db.copy(cc, vm);

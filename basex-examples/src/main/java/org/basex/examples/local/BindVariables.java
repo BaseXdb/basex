@@ -40,8 +40,8 @@ public final class BindVariables {
       String number = "123";
 
       // Bind the variables
-      proc.bind("var1", string);
-      proc.bind("var2", number, "xs:integer");
+      proc.variable("var1", string);
+      proc.variable("var2", number, "xs:integer");
 
       // Execute the query
       Value result = proc.value();

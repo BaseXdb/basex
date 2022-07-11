@@ -295,7 +295,7 @@ final class XMLParser extends CommandParser {
 
     // run query
     try(QueryProcessor qp = new QueryProcessor(tb.toString(), ctx).context(root)) {
-      qp.bind("A", StrSeq.get(mand.toArray())).bind("O", StrSeq.get(opt.toArray()));
+      qp.variable("A", StrSeq.get(mand.toArray())).variable("O", StrSeq.get(opt.toArray()));
       if(!qp.value().isEmpty()) return true;
     }
     // build error string

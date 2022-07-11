@@ -133,7 +133,7 @@ public final class FuncItem extends FItem implements Scope {
     if(optimize ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
     // create new compilation context and variable scope
-    final CompileContext cc = new CompileContext(qc);
+    final CompileContext cc = new CompileContext(qc, true);
     final VarScope vs = new VarScope(sc);
     final Var[] vars = new Var[pl];
     final Expr[] args = new Expr[pl];

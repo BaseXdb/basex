@@ -84,12 +84,9 @@ public final class Locking {
   public void acquire(final Job job, final Context ctx) {
     // collect lock strings
     job.addLocks();
-
     // prepare lock strings and acquire locks
-    final Locks locks = job.jc().locks;
-    locks.finish(ctx);
     try {
-      acquire(locks);
+      acquire(job.jc().locks.finish(ctx));
     } catch(final InterruptedException ex) {
       throw Util.notExpected("Thread was interrupted: %", ex);
     }

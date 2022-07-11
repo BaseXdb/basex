@@ -128,7 +128,7 @@ public abstract class Job {
    * Sends a new job state.
    * @param js new state
    */
-  public void state(final JobState js) {
+  public final void state(final JobState js) {
     for(final Job job : children) job.state(js);
     state = js;
     if(js == JobState.STOPPED || js == JobState.TIMEOUT || js == JobState.MEMORY) {

@@ -26,7 +26,7 @@ import org.basex.util.list.*;
 public final class InfoView extends View implements LinkListener, QueryTracer {
   /** Categories. */
   private static final String[] CATEGORIES = { ALL, COMMAND, Text.ERROR, EVALUATING, COMPILING,
-      OPTIMIZED_QUERY, QUERY, RESULT, TIMING, QUERY_PLAN
+      OPTIMIZING, OPTIMIZED_QUERY, QUERY, RESULT, TIMING, QUERY_PLAN
   };
 
   /** Searchable editor. */
@@ -184,6 +184,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     final TokenBuilder tb = new TokenBuilder().add(all);
     final StringList eval = new StringList(1);
     final StringList comp = new StringList(1);
+    final StringList opt = new StringList(1);
     final StringList plan = new StringList(1);
     final StringList result = new StringList(1);
     final StringList error = new StringList(1);
@@ -200,8 +201,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     for(int s = 0; s < sl; s++) {
       final String line = split[s];
       if(line.startsWith(PARSING_CC) || line.startsWith(COMPILING_CC) ||
-          line.startsWith(EVALUATING_CC) || line.startsWith(PRINTING_CC) ||
-          line.startsWith(TOTAL_TIME_CC)) {
+          line.startsWith(OPTIMIZING_CC) || line.startsWith(EVALUATING_CC) ||
+          line.startsWith(PRINTING_CC) || line.startsWith(TOTAL_TIME_CC)) {
         final int t = line.indexOf(" ms");
         final int d = line.indexOf(':');
         final int tm = (int) (Double.parseDouble(line.substring(d + 1, t)) * 100);
@@ -215,6 +216,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
         result.add(LI + line);
       } else if(line.equals(COMPILING + COL)) {
         while(++s < sl && !split[s].isEmpty()) comp.add(split[s]);
+      } else if(line.equals(OPTIMIZING + COL)) {
+        while(++s < sl && !split[s].isEmpty()) opt.add(split[s]);
       } else if(line.equals(QUERY + COL)) {
         while(++s < sl && !split[s].isEmpty()) origqu.add(split[s]);
       } else if(line.equals(OPTIMIZED_QUERY + COL)) {
@@ -285,6 +288,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     add(Text.ERROR, error, tb, list);
     add(EVALUATING, eval, tb, list);
     add(COMPILING, comp, tb, list);
+    add(OPTIMIZING, opt, tb, list);
     add(OPTIMIZED_QUERY, optqu, tb, list);
     add(QUERY, origqu, tb, list);
     add(RESULT, result, tb, list);
@@ -363,7 +367,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     if(l != 0) {
       h = header.getHeight();
       w = getWidth() - header.getWidth() - 16;
-      bw = 80;
+      bw = 100;
       bs = bw / (l - 1);
 
       // find maximum value

@@ -847,18 +847,18 @@ public class QueryParser extends InputParser {
       if(!wsConsumeWs(ASSIGN)) return;
     } else {
       wsCheck(ASSIGN);
-      qc.ctxAssigned = true;
+      qc.finalContext = true;
     }
 
     localVars.pushContext(null);
     final Expr expr = check(single(), NOCIDECL);
     final VarScope vs = localVars.popContext();
 
-    final MainModule main = new MainModule(expr, vs);
-    main.declType = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
-    main.info = info();
-    main.doc(currDoc.toString());
-    qc.ctxValue = main;
+    final SeqType st = sc.contextType;
+    qc.contextScope = new ContextScope(expr, st != null ? st : SeqType.ITEM_O, vs);
+    final StaticScope cs =  qc.contextScope;
+    cs.info = info();
+    cs.doc(currDoc.toString());
 
     if(sc.module != null) throw error(DECITEM);
     if(!sc.mixUpdates && expr.has(Flag.UPD)) throw error(UPCTX, expr);

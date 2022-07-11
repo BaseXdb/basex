@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -78,13 +79,13 @@ final class RESTPost {
       }
 
       // handle variables
-      final Map<String, String[]> vars = new HashMap<>();
+      final Map<String, String[]> bindings = new HashMap<>();
       try(QueryProcessor qp = new QueryProcessor("*/*:variable", ctx).context(doc)) {
         for(final Item item : qp.value()) {
           final String name = value("@name", item, ctx);
           final String value = value("@value", item, ctx);
           final String type = value("@type", item, ctx);
-          vars.put(name, new String[] { value, type });
+          bindings.put(name, new String[] { value, type });
         }
       }
 
@@ -98,14 +99,17 @@ final class RESTPost {
           value = DataBuilder.stripNamespace((ANode) item, REST_URI, ctx).serialize().toString();
         }
       }
+      if(value != null) {
+        bindings.put(null, new String[] { value, NodeType.DOCUMENT_NODE.toString() });
+      }
 
       // command body
       final String text = value("*/*:text/text()", doc, ctx);
 
       // choose evaluation
       if(cmd.equals(COMMAND)) return RESTCommand.get(session, text);
-      if(cmd.equals(RUN)) return RESTRun.get(session, text, vars, value);
-      if(cmd.equals(QUERY)) return RESTQuery.get(session, text, vars, value);
+      if(cmd.equals(RUN)) return RESTRun.get(session, text, bindings);
+      if(cmd.equals(QUERY)) return RESTQuery.get(session, text, bindings);
       throw HTTPCode.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
 
     } catch(final QueryException ex) {

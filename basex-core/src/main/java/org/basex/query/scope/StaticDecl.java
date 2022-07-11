@@ -15,11 +15,7 @@ import org.basex.util.*;
 public abstract class StaticDecl extends StaticScope {
   /** Annotations. */
   public final AnnList anns;
-  /** Name of the declaration. */
-  public final QNm name;
 
-  /** Declared type, {@code null} if not specified. */
-  protected SeqType declType;
   /** Indicates if code is currently being compiled or evaluated. */
   protected boolean dontEnter;
 
@@ -41,6 +37,11 @@ public abstract class StaticDecl extends StaticScope {
     this.vs = vs;
     this.info = info;
     doc(doc);
+  }
+
+  @Override
+  public final void reset() {
+    compiled = false;
   }
 
   /**

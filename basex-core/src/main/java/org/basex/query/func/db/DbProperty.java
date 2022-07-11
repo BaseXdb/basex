@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -26,5 +27,10 @@ public final class DbProperty extends DbAccess {
     if(value instanceof Integer) return Int.get((Integer) value);
     if(value instanceof Long)    return Int.get((Long)    value);
     return Str.get(value.toString());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    return cc.dynamic && allAreValues(true) ? value(cc.qc) : compileData(cc);
   }
 }

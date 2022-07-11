@@ -252,6 +252,7 @@ open_manage          = 打开 & 管理
 optimize             = 优化
 optimize_all         = 优化全部
 optimized_query      = 优化的查询
+optimizing           = 优化
 options              = 选项
 out_of_date          = 过时
 out_of_mem           = 主内存溢出

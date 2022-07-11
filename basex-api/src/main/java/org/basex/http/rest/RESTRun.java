@@ -23,24 +23,22 @@ final class RESTRun extends RESTQuery {
   /**
    * Constructor.
    * @param session REST session
-   * @param vars external variables
-   * @param val context value
+   * @param bindings external bindings
    */
-  private RESTRun(final RESTSession session, final Map<String, String[]> vars, final String val) {
-    super(session, vars, val);
+  private RESTRun(final RESTSession session, final Map<String, String[]> bindings) {
+    super(session, bindings);
   }
 
   /**
    * Creates a new instance of this command.
    * @param session REST session
    * @param path relative path to query input
-   * @param vars external variables
-   * @param val context value
+   * @param bindings external bindings
    * @return command
    * @throws IOException I/O exception
    */
   static RESTQuery get(final RESTSession session, final String path,
-      final Map<String, String[]> vars, final String val) throws IOException {
+      final Map<String, String[]> bindings) throws IOException {
 
     // get root directory for files
     final Context context = session.conn.context;
@@ -70,6 +68,6 @@ final class RESTRun extends RESTQuery {
     }
 
     // perform query
-    return new RESTRun(session, vars, val);
+    return new RESTRun(session, bindings);
   }
 }

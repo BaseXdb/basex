@@ -45,8 +45,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * @throws XQueryException exception
    */
   public XQuery context(final XdmValue value) {
-    qp.context(value.internal());
-    return this;
+    return variable("", value);
   }
 
   /**
@@ -56,9 +55,9 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    * @return self reference
    * @throws XQueryException exception
    */
-  public XQuery bind(final String key, final XdmValue value) {
+  public XQuery variable(final String key, final XdmValue value) {
     try {
-      qp.bind(key, value.internal());
+      qp.variable(key, value.internal());
       return this;
     } catch(final QueryException ex) {
       throw new XQueryException(ex);

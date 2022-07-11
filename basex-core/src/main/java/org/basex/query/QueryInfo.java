@@ -33,19 +33,24 @@ public final class QueryInfo {
   public final AtomicLong parsing = new AtomicLong();
   /** Compilation time (nano seconds). */
   public final AtomicLong compiling = new AtomicLong();
-
+  /** Optimization time (nano seconds). */
+  public final AtomicLong optimizing = new AtomicLong();
   /** Evaluation time (nano seconds). */
   public final AtomicLong evaluating = new AtomicLong();
   /** Serialization time (nano seconds). */
   public final AtomicLong serializing = new AtomicLong();
 
-  /** Verbose info. */
-  private final boolean verbose;
-
   /** Compilation info. */
   private final TokenBuilder compile = new TokenBuilder();
+  /** Optimization info. */
+  private final TokenBuilder optimize = new TokenBuilder();
   /** Evaluation info. */
   private final TokenBuilder evaluate = new TokenBuilder();
+
+  /** Verbose info. */
+  private final boolean queryinfo;
+  /** Number of runs. */
+  private final int runs;
 
   /** Runtime flag. */
   boolean runtime;
@@ -57,17 +62,29 @@ public final class QueryInfo {
    * @param context database context
    */
   public QueryInfo(final Context context) {
-    verbose = context.options.get(MainOptions.QUERYINFO) || Prop.debug;
+    final MainOptions mopts = context.options;
+    queryinfo = mopts.get(MainOptions.QUERYINFO);
+    runs = Math.max(1, mopts.get(MainOptions.RUNS));
+  }
+
+  /**
+   * Resets info strings.
+   */
+  public void reset() {
+    compile.reset();
+    optimize.reset();
+    evaluate.reset();
   }
 
   /**
    * Adds some compilation info.
+   * @param dynamic dynamic compilation
    * @param string evaluation info
    * @param ext text text extensions
    */
-  void compInfo(final String string, final Object... ext) {
-    final TokenBuilder tb = compile;
-    if(verbose && tb.size() < MAX) {
+  void compInfo(final boolean dynamic, final String string, final Object... ext) {
+    final TokenBuilder tb = dynamic ? optimize : compile;
+    if(queryinfo && tb.size() < MAX) {
       final TokenList list = new TokenList(ext.length);
       for(final Object e : ext) list.add(QueryError.normalize(e, null));
       String info = Util.info(string, (Object[]) list.finish());
@@ -87,7 +104,7 @@ public final class QueryInfo {
    * @param string evaluation info
    */
   void evalInfo(final String string) {
-    if(verbose) {
+    if(queryinfo) {
       synchronized(evaluate) {
         if(evaluate.size() < MAX) {
           evaluate.add(LI).add(chop(token(string.replaceAll("\r?\n", "|")), MAX_LINE)).add(NL);
@@ -110,9 +127,9 @@ public final class QueryInfo {
       final Locks locks, final boolean success) {
 
     final TokenBuilder tb = new TokenBuilder();
-    final int runs = Math.max(1, qp.qc.context.options.get(MainOptions.RUNS));
-    final long total = parsing.get() + compiling.get() + evaluating.get() + serializing.get();
-    if(qp.qc.context.options.get(MainOptions.QUERYINFO)) {
+    final String total = Performance.getTime(parsing.get() + compiling.get() + optimizing.get() +
+        evaluating.get() + serializing.get(), runs);
+    if(queryinfo) {
       tb.add(NL);
       if(query != null) {
         tb.add(QUERY).add(COL).add(NL);
@@ -121,6 +138,10 @@ public final class QueryInfo {
       if(!compile.isEmpty()) {
         tb.add(COMPILING).add(COL).add(NL);
         tb.add(compile).add(NL);
+      }
+      if(!optimize.isEmpty()) {
+        tb.add(OPTIMIZING).add(COL).add(NL);
+        tb.add(optimize).add(NL);
       }
       tb.add(OPTIMIZED_QUERY).add(COL).add(NL);
       tb.add(qp.qc.main == null ? qp.qc.functions : usedDecls(qp.qc.main)).add(NL);
@@ -131,9 +152,10 @@ public final class QueryInfo {
       }
       tb.add(PARSING_CC).add(Performance.getTime(parsing.get(), runs)).add(NL);
       tb.add(COMPILING_CC).add(Performance.getTime(compiling.get(), runs)).add(NL);
+      tb.add(OPTIMIZING_CC).add(Performance.getTime(optimizing.get(), runs)).add(NL);
       tb.add(EVALUATING_CC).add(Performance.getTime(evaluating.get(), runs)).add(NL);
       tb.add(PRINTING_CC).add(Performance.getTime(serializing.get(), runs)).add(NL);
-      tb.add(TOTAL_TIME_CC).add(Performance.getTime(total, runs)).add(NL).add(NL);
+      tb.add(TOTAL_TIME_CC).add(total).add(NL).add(NL);
       tb.add(HITS_X_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
       final int up = qp.updates();
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
@@ -146,7 +168,7 @@ public final class QueryInfo {
     if(success) {
       final IO baseIO = qp.sc.baseIO();
       final String name = baseIO == null ? "" : " \"" + baseIO.name() + '"';
-      tb.add(NL).addExt(QUERY_EXECUTED_X_X, name, Performance.getTime(total, runs));
+      tb.add(NL).addExt(QUERY_EXECUTED_X_X, name, total);
     }
     return tb.toString();
   }

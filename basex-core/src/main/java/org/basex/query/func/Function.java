@@ -106,7 +106,7 @@ public enum Function implements AFunction {
       params(INTEGER_ZM), STRING_O),
   /** XQuery function. */
   COLLECTION(FnCollection::new, "collection([uri])",
-      params(STRING_ZO), DOCUMENT_NODE_ZM),
+      params(STRING_ZO), DOCUMENT_NODE_ZM, flag(NDT)),
   /** XQuery function. */
   COMPARE(FnCompare::new, "compare(first,second[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), INTEGER_ZO),
@@ -124,13 +124,13 @@ public enum Function implements AFunction {
       params(ITEM_ZM), INTEGER_O),
   /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
-      params(), DATE_O),
+      params(), DATE_O, flag(NDT)),
   /** XQuery function. */
   CURRENT_DATETIME(FnCurrentDateTime::new, "current-dateTime()",
-      params(), DATE_TIME_O),
+      params(), DATE_TIME_O, flag(NDT)),
   /** XQuery function. */
   CURRENT_TIME(FnCurrentTime::new, "current-time()",
-      params(), TIME_O),
+      params(), TIME_O, flag(NDT)),
   /** XQuery function. */
   DATA(FnData::new, "data([items])",
       params(ITEM_ZM), ANY_ATOMIC_TYPE_ZM),
@@ -160,10 +160,10 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
   DOC(FnDoc::new, "doc(uri)",
-      params(STRING_ZO), DOCUMENT_NODE_ZO),
+      params(STRING_ZO), DOCUMENT_NODE_ZO, flag(NDT)),
   /** XQuery function. */
   DOC_AVAILABLE(FnDocAvailable::new, "doc-available(uri)",
-      params(STRING_ZO), BOOLEAN_O),
+      params(STRING_ZO), BOOLEAN_O, flag(NDT)),
   /** XQuery function. */
   DOCUMENT_URI(FnDocumentUri::new, "document-uri([node])",
       params(NODE_ZO), ANY_URI_ZO),
@@ -269,7 +269,7 @@ public enum Function implements AFunction {
       params(STRING_ZM, NODE_O), NODE_ZM),
   /** XQuery function. */
   IMPLICIT_TIMEZONE(FnImplicitTimezone::new, "implicit-timezone()",
-      params(), DAY_TIME_DURATION_O),
+      params(), DAY_TIME_DURATION_O, flag(NDT)),
   /** XQuery function. */
   IN_SCOPE_PREFIXES(FnInScopePrefixes::new, "in-scope-prefixes(element)",
       params(ELEMENT_O), STRING_ZM),
@@ -500,19 +500,19 @@ public enum Function implements AFunction {
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(uri[,encoding])",
-      params(STRING_ZO, STRING_O), STRING_ZO, flag(), FN_URI, Perm.CREATE),
+      params(STRING_ZO, STRING_O), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(uri[,encoding])",
-      params(STRING_ZO, STRING_O), BOOLEAN_O, flag(), FN_URI, Perm.CREATE),
+      params(STRING_ZO, STRING_O), BOOLEAN_O, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(uri[,encoding])",
-      params(STRING_ZO, STRING_O), STRING_ZM, flag(), FN_URI, Perm.CREATE),
+      params(STRING_ZO, STRING_O), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   UPPER_CASE(FnUpperCase::new, "upper-case(string)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
   URI_COLLECTION(FnUriCollection::new, "uri-collection([uri])",
-      params(STRING_ZO), ANY_URI_ZM),
+      params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
       params(NODE_ZO, MAP_O), STRING_ZO),
@@ -941,7 +941,7 @@ public enum Function implements AFunction {
       params(ITEM_O), ELEMENT_ZM, flag(NDT), DB_URI, Perm.CREATE),
   /** XQuery function. */
   _DB_CONTENT_TYPE(DbContentType::new, "content-type(database,path)",
-      params(STRING_O, STRING_O), STRING_O, DB_URI),
+      params(STRING_O, STRING_O), STRING_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_COPY(DbCopy::new, "copy(database, new-name)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -965,7 +965,7 @@ public enum Function implements AFunction {
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_EXISTS(DbExists::new, "exists(database[,path])",
-      params(STRING_O, STRING_O), BOOLEAN_O, DB_URI),
+      params(STRING_O, STRING_O), BOOLEAN_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_EXPORT(DbExport::new, "export(database,path[,param]])",
       params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), DB_URI, Perm.CREATE),
@@ -995,13 +995,13 @@ public enum Function implements AFunction {
       params(NODE_ZM), INTEGER_ZM, DB_URI),
   /** XQuery function. */
   _DB_OPEN(DbOpen::new, "open(database[,path])",
-      params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, DB_URI),
+      params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_OPEN_ID(DbOpenId::new, "open-id(database,ids)",
-      params(STRING_O, INTEGER_ZM), NODE_ZM, DB_URI),
+      params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_OPEN_PRE(DbOpenPre::new, "open-pre(database,pres)",
-      params(STRING_O, INTEGER_ZM), NODE_ZM, DB_URI),
+      params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize::new, "optimize(database[,all[,options]])",
       params(STRING_O, BOOLEAN_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1013,7 +1013,7 @@ public enum Function implements AFunction {
       params(NODE_O), STRING_O, DB_URI),
   /** XQuery function. */
   _DB_PROPERTY(DbProperty::new, "property(database,name)",
-      params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, DB_URI),
+      params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_PUT(DbPut::new, "put(database,name,input)",
       params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),

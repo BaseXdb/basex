@@ -411,7 +411,7 @@ public interface QueryText {
   /** Optimization info. */ String OPTREWRITE_X_X = "rewrite %: %";
   /** Optimization info. */ String OPTMERGE_X = "merge: %";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
-  /** Optimization info. */ String OPTTYPE_X_X = "remove type check: % -> %";
+  /** Optimization info. */ String OPTTYPE_X_X = "remove % type check: %";
   /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";
   /** Optimization info. */ String OPTTCE_X = "mark as tail call: %";
   /** Optimization info. */ String OPTLET_X = "hoist let clause: %";

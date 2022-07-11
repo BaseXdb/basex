@@ -12,7 +12,7 @@ import org.basex.query.value.node.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class FnUriCollection extends Docs {
+public final class FnUriCollection extends FnCollection {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter iter = collection(qc).iter();

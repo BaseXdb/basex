@@ -54,7 +54,7 @@ public abstract class WebResponse {
       final Expr[] args = init(function, data);
       qc.assign(sf, args);
       qc.jc().description("(: " + sf.info + " :) " + qc.main);
-
+      qc.compile();
       return serialize(body);
     } catch(final QueryException ex) {
       if(ex.file() == null) ex.info(sf.info);

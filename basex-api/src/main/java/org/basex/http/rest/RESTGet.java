@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.basex.http.*;
 import org.basex.io.serial.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -27,7 +28,7 @@ final class RESTGet {
    * @throws IOException I/O exception
    */
   public static RESTCmd get(final RESTSession session) throws IOException {
-    final Map<String, String[]> variables = new HashMap<>();
+    final Map<String, String[]> bindings = new HashMap<>();
 
     // parse query string
     String op = null, input = null, value = null;
@@ -50,13 +51,16 @@ final class RESTGet {
         for(final String val : values) sopts.assign(key, val);
       } else if(!RESTCmd.parseOption(session, param, false)) {
         // options or (if not found) external variables
-        variables.put(key, new String[] { values[0] });
+        bindings.put(key, new String[] { values[0], null });
       }
+    }
+    if(value != null) {
+      bindings.put(null, new String[] { value, NodeType.DOCUMENT_NODE.toString() });
     }
 
     if(op == null) return RESTRetrieve.get(session);
-    if(op.equals(QUERY)) return RESTQuery.get(session, input, variables, value);
-    if(op.equals(RUN)) return RESTRun.get(session, input, variables, value);
+    if(op.equals(QUERY)) return RESTQuery.get(session, input, bindings);
+    if(op.equals(RUN)) return RESTRun.get(session, input, bindings);
     return RESTCommand.get(session, input);
   }
 }

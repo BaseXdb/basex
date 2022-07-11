@@ -105,11 +105,8 @@ public class XQueryEval extends StandardFunc {
       try {
         final StaticContext sctx = new StaticContext(qctx);
         sctx.baseURI(toBaseUri(query.url(), opts));
-        for(final Entry<String, Value> it : bindings.entrySet()) {
-          final String key = it.getKey();
-          final Value value = it.getValue();
-          if(key.isEmpty()) qctx.context(value, sctx);
-          else qctx.bind(key, value, sctx);
+        for(final Entry<String, Value> binding : bindings.entrySet()) {
+          qctx.bind(binding.getKey(), binding.getValue(), null, sctx);
         }
         qctx.parseMain(string(query.read()), null, sctx);
 

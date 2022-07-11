@@ -15,7 +15,6 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -27,7 +26,7 @@ import org.basex.util.*;
  */
 public abstract class AQuery extends Command {
   /** External variable bindings. */
-  protected final HashMap<String, Object> vars = new HashMap<>();
+  protected final HashMap<String, Entry<Object, String>> bindings = new HashMap<>();
 
   /** Query string. */
   private final String query;
@@ -71,26 +70,9 @@ public abstract class AQuery extends Command {
             popJob();
           }
           init(context);
+
           if(!compplan) queryPlan();
-
-          final Performance perf = new Performance();
-          for(final Entry<String, Object> entry : vars.entrySet()) {
-            final String name = entry.getKey();
-            final Object value = entry.getValue();
-            if(value instanceof Value) {
-              final Value val = (Value) value;
-              if(name == null) qp.context(val);
-              else qp.bind(name, val);
-            } else {
-              // will always be a string array
-              final String[] strings = (String[]) value;
-              if(name == null) qp.context(strings[0], strings[1]);
-              else qp.bind(name, strings[0], strings[1]);
-            }
-          }
-
-          qp.compile();
-          info.compiling.addAndGet(perf.ns());
+          qp.optimize();
           if(compplan) queryPlan();
           if(!runquery) continue;
 
@@ -98,7 +80,6 @@ public abstract class AQuery extends Command {
           try(Serializer ser = qp.getSerializer(po)) {
             if(maxResults >= 0) {
               qp.cache(this, maxResults);
-              info.evaluating.addAndGet(perf.ns());
               hits = result.size();
               result.serialize(ser);
               if(exception instanceof QueryException) throw (QueryException) exception;
@@ -106,7 +87,6 @@ public abstract class AQuery extends Command {
             } else {
               hits = 0;
               final Iter iter = qp.iter();
-              info.evaluating.addAndGet(perf.ns());
               for(Item item; (item = iter.next()) != null;) {
                 ser.serialize(item);
                 ++hits;
@@ -115,7 +95,6 @@ public abstract class AQuery extends Command {
             }
           }
           qp.close();
-          info.serializing.addAndGet(perf.ns());
         }
       } catch(final QueryException | IOException ex) {
         exception = ex;
@@ -154,23 +133,6 @@ public abstract class AQuery extends Command {
   }
 
   /**
-   * Checks if the query is updating.
-   * @param ctx database context
-   * @return result of check
-   */
-  final boolean updates(final Context ctx) {
-    try {
-      init(ctx);
-      return qp.updating;
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      exception = ex;
-      qp.close();
-      return false;
-    }
-  }
-
-  /**
    * Returns the serialization parameters.
    * @param ctx context
    * @return serialization parameters
@@ -186,8 +148,16 @@ public abstract class AQuery extends Command {
   }
 
   @Override
-  public boolean updating(final Context ctx) {
-    return updates(ctx);
+  public final boolean updating(final Context ctx) {
+    try {
+      init(ctx);
+      return qp.updating;
+    } catch(final Exception ex) {
+      Util.debug(ex);
+      exception = ex;
+      qp.close();
+      return false;
+    }
   }
 
   @Override
@@ -218,11 +188,17 @@ public abstract class AQuery extends Command {
   private void init(final Context ctx) throws QueryException {
     if(qp != null) return;
 
-    final Performance perf = new Performance();
-    if(qp == null) qp = pushJob(new QueryProcessor(query, uri, ctx));
-    if(info == null) info = qp.qc.info;
+    if(info == null) info = new QueryInfo(ctx);
+    else info.reset();
+
+    qp = pushJob(new QueryProcessor(query, uri, ctx, info));
+
+    for(final Entry<String, Entry<Object, String>> entry : bindings.entrySet()) {
+      final Entry<Object, String> value = entry.getValue();
+      qp.variable(entry.getKey(), value.getKey(), value.getValue());
+    }
     qp.parse();
-    info.parsing.addAndGet(perf.ns());
+    qp.compile();
   }
 
   /**

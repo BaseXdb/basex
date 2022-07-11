@@ -19,8 +19,9 @@ public final class Locks {
    * Finalizes locks. Replaces context references with current database, sorts entries,
    * removes duplicates, assigns global read lock if global write lock exists.
    * @param ctx database context
+   * @return self reference
    */
-  public void finish(final Context ctx) {
+  public Locks finish(final Context ctx) {
     // global write lock: no read locks required
     if(writes.global()) reads.reset();
 
@@ -32,6 +33,7 @@ public final class Locks {
 
     // remove read locks that are also defined as write locks
     reads.remove(writes);
+    return this;
   }
 
   @Override

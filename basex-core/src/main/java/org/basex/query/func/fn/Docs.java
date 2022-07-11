@@ -1,6 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -9,7 +8,6 @@ import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,44 +19,32 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public abstract class Docs extends StandardFunc {
+public abstract class Docs extends DynamicFn {
   /** Query input. */
-  private QueryInput queryInput;
+  QueryInput queryInput;
 
   /**
-   * Returns a collection.
-   * @param qc query context
-   * @return collection
-   * @throws QueryException query exception
+   * Converts the specified URI to a query input reference.
+   * @param uri URI
+   * @return query input, or {@code null} if the URI is invalid
    */
-  final Value collection(final QueryContext qc) throws QueryException {
-    // return default collection or parse specified collection
-    QueryInput qi = queryInput;
-    if(qi == null) {
-      final Item item = exprs.length == 0 ? Empty.VALUE : exprs[0].atomItem(qc, info);
-      if(item != Empty.VALUE) {
-        qi = queryInput(toToken(item));
-        if(qi == null) throw INVCOLL_X.get(info, item);
-      }
-    }
-    return qc.resources.collection(qi, info);
+  QueryInput queryInput(final byte[] uri) {
+    return queryInput != null ? queryInput :
+      Uri.uri(uri).isValid() ? new QueryInput(string(uri), sc) : null;
   }
 
-  /**
-   * Performs the doc function.
-   * @param qc query context
-   * @return document or {@link Empty#VALUE}
-   * @throws QueryException query exception
-   */
-  final Item doc(final QueryContext qc) throws QueryException {
-    QueryInput qi = queryInput;
-    if(qi == null) {
-      final Item item = exprs[0].atomItem(qc, info);
-      if(item == Empty.VALUE) return Empty.VALUE;
-      qi = queryInput(toToken(item, qc));
-      if(qi == null) throw INVDOC_X.get(info, item);
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // pre-evaluate if target is empty
+    final Expr expr = exprs.length > 0 ? exprs[0] : null;
+    if(expr == null || expr == Empty.VALUE) return value(cc.qc);
+
+    // pre-evaluate during dynamic compilation if target is not a remote URL
+    if(cc.dynamic && expr instanceof Value) {
+      queryInput = queryInput(toToken(expr.atomItem(cc.qc, info)));
+      if(queryInput == null || !(queryInput.io instanceof IOUrl)) return value(cc.qc);
     }
-    return qc.resources.doc(qi, info);
+    return this;
   }
 
   @Override
@@ -86,28 +72,5 @@ public abstract class Docs extends StandardFunc {
       }
       return list;
     }) && super.accept(visitor);
-  }
-
-  @Override
-  public final boolean has(final Flag... flags) {
-    // remote URLs: return non-deterministic flag to suppress pre-evaluation
-    if(Flag.NDT.in(flags) && exprs.length > 0) {
-      final Expr expr = exprs[0];
-      if(expr instanceof Str) {
-        queryInput = queryInput(((Str) expr).string());
-        if(queryInput != null && queryInput.io instanceof IOUrl) return true;
-      }
-    }
-    return super.has(flags);
-  }
-
-  /**
-   * Converts the specified URI to a query input reference.
-   * @param uri URI
-   * @return query input, or {@code null} if the URI is invalid
-   */
-  private QueryInput queryInput(final byte[] uri) {
-    return queryInput != null ? queryInput :
-      Uri.uri(uri).isValid() ? new QueryInput(string(uri), sc) : null;
   }
 }

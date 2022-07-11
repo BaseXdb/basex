@@ -252,6 +252,7 @@ open_manage          = Gestisci
 optimize             = Ottimizza
 optimize_all         = Ottimizza tutto
 optimized_query      = Interrogazione ottimizzata
+optimizing           = Ottimizzando
 options              = Opzioni
 out_of_date          = non aggiornato
 out_of_mem           = Spazio in memoria principale insufficiente.

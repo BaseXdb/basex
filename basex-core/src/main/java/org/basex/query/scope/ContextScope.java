@@ -1,0 +1,24 @@
+package org.basex.query.scope;
+
+import org.basex.query.expr.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
+
+/**
+ * The scope of an XQuery context value.
+ *
+ * @author BaseX Team 2005-22, BSD License
+ * @author Christian Gruen
+ */
+public final class ContextScope extends MainModule {
+  /**
+   * Constructor.
+   * @param expr root expression
+   * @param declType declare type (can be {@code null})
+   * @param vs variable scope
+   */
+  public ContextScope(final Expr expr, final SeqType declType, final VarScope vs) {
+    super(expr, vs);
+    this.declType = declType;
+  }
+}

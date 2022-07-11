@@ -252,6 +252,7 @@ open_manage          = Beheren
 optimize             = Optimaliseer
 optimize_all         = Optimaliseer alles
 optimized_query      = Geoptimaliseerde Query
+optimizing           = Optimaliseer
 options              = Opties
 out_of_date          = verouderd
 out_of_mem           = Niet genoeg geheugen.

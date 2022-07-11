@@ -305,11 +305,14 @@ public final class QueryResources {
 
   /**
    * Returns the document path of a textual resource and its encoding. Only required for test APIs.
-   * @param uri resource uri
+   * @param io resource
    * @return path and encoding or {@code null}
    */
-  public String[] text(final String uri) {
-    return texts == null ? null : texts.get(uri);
+  public String[] text(final IO io) {
+    if(texts == null) return null;
+    String[] pathEnc = texts.get(io.path());
+    if(pathEnc == null) pathEnc = texts.get(io.name());
+    return pathEnc;
   }
 
   /**

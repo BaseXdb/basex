@@ -252,6 +252,7 @@ open_manage          = 管理
 optimize             = 最適化
 optimize_all         = 全て最適化
 optimized_query      = クエリー
+optimizing           = 最適化中
 options              = オプション
 out_of_date          = 期限切れ
 out_of_mem           = メモリー不足。

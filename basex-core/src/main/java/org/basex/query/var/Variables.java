@@ -100,8 +100,10 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       throws QueryException {
 
     for(final QNm qnm : bindings) {
-      final VarEntry ve = vars.get(qnm);
-      if(ve != null) ve.var.bind(bindings.get(qnm), qc);
+      if(qnm != QNm.EMPTY) {
+        final VarEntry ve = vars.get(qnm);
+        if(ve != null) ve.var.bind(bindings.get(qnm), qc);
+      }
     }
   }
 

@@ -27,6 +27,6 @@ public final class DbOpen extends DbAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return compileData(cc);
+    return cc.dynamic && allAreValues(true) ? value(cc.qc) : compileData(cc);
   }
 }

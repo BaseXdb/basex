@@ -6,6 +6,9 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.inspect.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -21,15 +24,24 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   /** Static context. */
   public final StaticContext sc;
 
-  /** Root expression of this declaration ({@code null} if this is an external function). */
+  /** Expression of this declaration ({@code null} if this is an external function). */
   public Expr expr;
+  /** Resulting value (can be {@code null}). */
+  public Value value;
+
   /** Input info. */
   public InputInfo info;
+  /** Name of the declaration (can be {@code null}). */
+  public QNm name;
 
   /** Variable scope. */
   protected VarScope vs;
   /** Compilation flag. */
   protected boolean compiled;
+
+  /** Declared type, {@code null} if not specified. */
+  protected SeqType declType;
+
   /** Documentation string. */
   private byte[] doc = Token.EMPTY;
 
@@ -55,6 +67,26 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   }
 
   /**
+   * Evaluates the expression and returns the resulting value.
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  public Value value(final QueryContext qc) throws QueryException {
+    if(value == null) {
+      final int fp = vs.enter(qc);
+      try {
+        final Value val = expr.value(qc);
+        if(declType != null) declType.treat(val, name, qc, info);
+        value = val;
+      } finally {
+        VarScope.exit(fp, qc);
+      }
+    }
+    return value;
+  }
+
+  /**
    * Returns a map with all documentation tags found for this scope or {@code null} if
    * no documentation exists. The main description is flagged with the "description" key.
    * The supported tags are defined in {@link Inspect#DOC_TAGS} (other tags will be
@@ -65,10 +97,10 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     if(doc.length == 0) return null;
 
     final TokenObjMap<TokenList> map = new TokenObjMap<>();
-    final TokenBuilder key = new TokenBuilder(), value = new TokenBuilder();
+    final TokenBuilder key = new TokenBuilder(), tb = new TokenBuilder();
     final Runnable add = () -> {
       final byte[] k = key.isEmpty() ? Inspect.DOC_TAGS[0] : key.next();
-      map.computeIfAbsent(k, TokenList::new).add(value.trim().next());
+      map.computeIfAbsent(k, TokenList::new).add(tb.trim().next());
     };
 
     final TokenBuilder input = new TokenBuilder();
@@ -80,7 +112,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
           key.add(line.replaceAll("^@|\\s+.*", ""));
           line = line.replaceAll("^@\\w+\\s+", "");
         }
-        value.add(line).add('\n');
+        tb.add(line).add('\n');
       }
     } catch(final IOException ex) {
       throw Util.notExpected(ex);

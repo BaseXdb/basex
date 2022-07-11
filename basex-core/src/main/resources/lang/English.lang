@@ -252,6 +252,7 @@ open_manage          = Open & Manage
 optimize             = Optimize
 optimize_all         = Optimize All
 optimized_query      = Optimized Query
+optimizing           = Optimizing
 options              = Options
 out_of_date          = out-of-date
 out_of_mem           = Out of Main Memory.
