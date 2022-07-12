@@ -10,7 +10,6 @@ import javax.xml.transform.stream.*;
 
 import org.basex.io.*;
 import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -126,7 +125,7 @@ public class XsltTransform extends XsltFn {
     final Item item = toNodeOrAtomItem(i, qc);
     if(item instanceof ANode) {
       try {
-        final IO io = new IOContent(item.serialize(SerializerMode.NOINDENT.get()).finish());
+        final IO io = new IOContent(item.serialize().finish());
         io.name(string(((ANode) item).baseURI()));
         return io;
       } catch(final QueryIOException ex) {

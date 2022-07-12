@@ -34,19 +34,19 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{}", "", "<json type=\"object\"/>");
     parse("{ } ", "", "<json type=\"object\"/>");
     parse("{ \"\\t\" : 0 }", "",
-        "<json type=\"object\">\n<_0009 type=\"number\">0</_0009>\n</json>");
-    parse("{ \"a\" :0 }", "", "<json type=\"object\">\n<a type=\"number\">0</a>\n</json>");
-    parse("{ \"\" : 0 }", "", "<json type=\"object\">\n<_ type=\"number\">0</_>\n</json>");
+        "<json type=\"object\"><_0009 type=\"number\">0</_0009></json>");
+    parse("{ \"a\" :0 }", "", "<json type=\"object\"><a type=\"number\">0</a></json>");
+    parse("{ \"\" : 0 }", "", "<json type=\"object\"><_ type=\"number\">0</_></json>");
     parse("{ \"\" : 0.0e0 }", "", "...<_ type=\"number\">0.0e0</_>");
     parse("{ \"\" : null }", "", "...<_ type=\"null\"/>");
     parse("{ \"\" : true }", "", "...<_ type=\"boolean\">true</_>");
-    parse("{ \"\" : {} }", "", "... type=\"object\">\n<_ type=\"object\"/>");
-    parse("{ \"\" : [] }", "", "... type=\"object\">\n<_ type=\"array\"/>");
+    parse("{ \"\" : {} }", "", "... type=\"object\"><_ type=\"object\"/>");
+    parse("{ \"\" : [] }", "", "... type=\"object\"><_ type=\"array\"/>");
     parse("{ \"\" : 0, \"\": 1 }", "",
-        "... type=\"object\">\n<_ type=\"number\">0</_>\n<_ type=\"number\">1</_>");
-    parse("{ \"O\" : [ 1 ] }", "", "...<O type=\"array\">\n<_ type=\"number\">1</_>\n</O>");
+        "... type=\"object\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
+    parse("{ \"O\" : [ 1 ] }", "", "...<O type=\"array\"><_ type=\"number\">1</_></O>");
     parse("{ \"A\" : [ 0, 1 ] }", "",
-        "...<A type=\"array\">\n<_ type=\"number\">0</_>\n<_ type=\"number\">1</_>");
+        "...<A type=\"array\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
     parse("{ \"\" : 0.0 }", "", "...0.0");
 
     // merging data types
@@ -54,22 +54,22 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{}", "'merge': true()", "<json objects=\"json\"/>");
     parse("{ } ", "'merge': true()", "<json objects=\"json\"/>");
     parse("{ \"\\t\" : 0 }", "'merge': true()",
-        "<json objects=\"json\" numbers=\"_0009\">\n<_0009>0</_0009>\n</json>");
+        "<json objects=\"json\" numbers=\"_0009\"><_0009>0</_0009></json>");
     parse("{ \"a\" :0 }", "'merge': true()",
-        "<json objects=\"json\" numbers=\"a\">\n<a>0</a>\n</json>");
+        "<json objects=\"json\" numbers=\"a\"><a>0</a></json>");
     parse("{ \"\" : 0 }", "'merge': true()",
-        "<json objects=\"json\" numbers=\"_\">\n<_>0</_>\n</json>");
+        "<json objects=\"json\" numbers=\"_\"><_>0</_></json>");
     parse("{ \"\" : 0.0e0 }", "'merge': true()", "...<_>0.0e0</_>");
     parse("{ \"\" : null }", "'merge': true()", "...<_/>");
     parse("{ \"\" : true }", "'merge': true()", "...<_>true</_>");
-    parse("{ \"\" : {} }", "'merge': true()", "... objects=\"json _\">\n<_/>");
-    parse("{ \"\" : [] }", "'merge': true()", "... objects=\"json\" arrays=\"_\">\n<_/>");
+    parse("{ \"\" : {} }", "'merge': true()", "... objects=\"json _\"><_/>");
+    parse("{ \"\" : [] }", "'merge': true()", "... objects=\"json\" arrays=\"_\"><_/>");
     parse("{ \"\" : 0, \"\": 1 }", "'merge': true()",
-        "... objects=\"json\" numbers=\"_\">\n<_>0</_>\n<_>1</_>");
+        "... objects=\"json\" numbers=\"_\"><_>0</_><_>1</_>");
     parse("{ \"O\" : [ 1 ] }", "'merge': true()",
-        "... objects=\"json\" arrays=\"O\" numbers=\"_\">\n<O>\n<_>1</_>\n</O>");
+        "... objects=\"json\" arrays=\"O\" numbers=\"_\"><O><_>1</_></O>");
     parse("{ \"A\" : [ 0, 1 ] }", "'merge': true()",
-        "... objects=\"json\" arrays=\"A\" numbers=\"_\">\n<A>\n<_>0</_>\n<_>1</_>");
+        "... objects=\"json\" arrays=\"A\" numbers=\"_\"><A><_>0</_><_>1</_>");
 
     // errors
     parseError("", "");
@@ -101,13 +101,13 @@ public final class JsonModuleTest extends SandboxTest {
     final Function func = _JSON_PARSE;
     // queries
     final String map = " map { 'format': 'xquery' }";
-    query(func.args("{}", map), "map {\n}");
-    query(func.args("{\"A\":1}", map), "map {\n\"A\": 1.0e0\n}");
-    query(func.args("{\"\":null}", map), "map {\n\"\": ()\n}");
+    query(func.args("{}", map), "map{}");
+    query(func.args("{\"A\":1}", map), "map{\"A\":1.0e0}");
+    query(func.args("{\"\":null}", map), "map{\"\":()}");
 
     query(func.args("[]", map), "[]");
     query(func.args("[\"A\"]", map), "[\"A\"]");
-    query(func.args("[1,true]", map), "[1.0e0, true()]");
+    query(func.args("[1,true]", map), "[1.0e0,true()]");
 
     query(func.args("1", map), 1);
     query(func.args("\"f\"", map), "f");
@@ -137,16 +137,16 @@ public final class JsonModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void serialize() {
-    serial("<json type='object'/>", "", "{\n}");
-    serial("<json objects='json'/>", "", "{\n}");
-    serial("<json type='array'/>", "", "[\n]");
-    serial("<json arrays='json'/>", "", "[\n]");
+    serial("<json type='object'/>", "", "{}");
+    serial("<json objects='json'/>", "", "{}");
+    serial("<json type='array'/>", "", "[]");
+    serial("<json arrays='json'/>", "", "[]");
     serial("<json type='number'>1</json>", "", 1);
-    serial("<json type='array'><_ type='null'/></json>", "", "[\nnull\n]");
-    serial("<json type='array'><_ type='string'/></json>", "", "[\n\"\"\n]");
-    serial("<json type='array'><_ type='string'>x</_></json>", "", "[\n\"x\"\n]");
-    serial("<json type='array'><_ type='number'>1</_></json>", "", "[\n1\n]");
-    serial("<json numbers=\"_\" type='array'><_>1</_></json>", "", "[\n1\n]");
+    serial("<json type='array'><_ type='null'/></json>", "", "[null]");
+    serial("<json type='array'><_ type='string'/></json>", "", "[\"\"]");
+    serial("<json type='array'><_ type='string'>x</_></json>", "", "[\"x\"]");
+    serial("<json type='array'><_ type='number'>1</_></json>", "", "[1]");
+    serial("<json numbers=\"_\" type='array'><_>1</_></json>", "", "[1]");
 
     serialError("<json type='o'/>", ""); // invalid type
     serialError("<json type='array'><_ type='number'/></json>", ""); // value needed
@@ -156,7 +156,7 @@ public final class JsonModuleTest extends SandboxTest {
 
   /** Bidirectional tests. */
   @Test public void serializeParse() {
-    query("json:serialize(<x xmlns='X'>{ json:parse('{}') }</x>/*)", "{\n}");
+    query("json:serialize(<x xmlns='X'>{ json:parse('{}') }</x>/*)", "{}");
   }
 
   /**

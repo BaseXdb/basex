@@ -48,11 +48,11 @@ public final class OptionsTest extends SandboxTest {
 
   /** Tests the effect of setting system properties. */
   @Test public void systemProperty() {
-    final BooleanOption name = MainOptions.CHOP;
-    final boolean value = false;
+    final BooleanOption name = MainOptions.STRIPWS;
+    final boolean value = true;
     System.setProperty(Prop.DBPREFIX + name.name(), Boolean.toString(value));
     try {
-      assertEquals(false, new MainOptions().get(name));
+      assertEquals(true, new MainOptions().get(name));
     } finally {
       System.clearProperty(Prop.DBPREFIX + name.name());
     }

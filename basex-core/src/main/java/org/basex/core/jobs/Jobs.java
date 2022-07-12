@@ -10,6 +10,7 @@ import java.util.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -148,7 +149,7 @@ public final class Jobs {
       }
       // write jobs file
       file.parent().md();
-      file.write(toXML().serialize().finish());
+      file.write(toXML().serialize(SerializerMode.INDENT.get()).finish());
     }
   }
 

@@ -58,7 +58,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
       new DeleteNode(4, d, null),
       new DeleteNode(2, d, null)
     });
-    query(transform(doc, "delete node ($input//b, $input//d)"), "<a>\n<c/>\n</a>");
+    query(transform(doc, "delete node ($input//b, $input//d)"), "<a><c/></a>");
   }
 
   /**
@@ -89,7 +89,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
     });
     query(transform(doc,
       "insert node <before/> before $input/b, insert node <after/> after $input/b"),
-      "<a>\n<before/>\n<b/>\n<after/>\n</a>");
+      "<a><before/><b/><after/></a>");
   }
 
   /**
@@ -108,7 +108,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
     });
     query(transform(doc,
       "insert node <smallerpre/> into $input/b, insert node <largerpre/> into $input"),
-      "<a>\n<b>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
+      "<a><b><smallerpre/></b><largerpre/></a>");
   }
 
   /**
@@ -126,7 +126,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
     });
     query(transform(doc,
       "insert node <smallerpre/> after $input/b, insert node <largerpre/> into $input"),
-      "<a>\n<b/>\n<smallerpre/>\n<largerpre/>\n</a>");
+      "<a><b/><smallerpre/><largerpre/></a>");
   }
 
   /**
@@ -147,7 +147,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
     query(transform(doc,
       "insert node <smallerpre/> into $input/b," +
       "insert node <largerpre/> after $input/b"),
-      "<a>\n<b>\n<c/>\n<smallerpre/>\n</b>\n<largerpre/>\n</a>");
+      "<a><b><c/><smallerpre/></b><largerpre/></a>");
   }
 
   /**

@@ -23,14 +23,14 @@ import org.basex.util.list.*;
 public class XMLParser extends SingleParser {
   /** Strip namespaces. */
   private final boolean stripNS;
+  /** Strip whitespaces. */
+  private final boolean stripWS;
+  /** Whitespace handling. */
+  private final BoolList strips = new BoolList();
   /** Scanner reference. */
   private final XMLScanner scanner;
   /** Names of opened elements. */
   private final TokenList elms = new TokenList();
-  /** Whitespace handling. */
-  private final BoolList chops = new BoolList();
-  /** Chop whitespaces. */
-  private final boolean chop;
   /** Allow document fragment as input. */
   private final boolean fragment;
   /** Closed root element. */
@@ -39,26 +39,27 @@ public class XMLParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param opts database options
+   * @param options database options
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final MainOptions opts) throws IOException {
-    this(source, opts, false);
+  public XMLParser(final IO source, final MainOptions options) throws IOException {
+    this(source, options, false);
   }
 
   /**
    * Constructor.
    * @param source document source
-   * @param opts database options
+   * @param options database options
    * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final MainOptions opts, final boolean frag) throws IOException {
-    super(source, opts);
-    scanner = new XMLScanner(source, opts, frag);
-    stripNS = opts.get(MainOptions.STRIPNS);
-    chop = opts.get(MainOptions.CHOP);
-    chops.push(chop);
+  public XMLParser(final IO source, final MainOptions options, final boolean frag)
+      throws IOException {
+    super(source, options);
+    scanner = new XMLScanner(source, options, frag);
+    stripNS = options.get(MainOptions.STRIPNS);
+    stripWS = options.get(MainOptions.STRIPWS);
+    strips.push(stripWS);
     fragment = frag;
   }
 
@@ -70,7 +71,7 @@ public class XMLParser extends SingleParser {
       if(scanner.type == Type.TEXT) {
         final byte[] text = scanner.token.toArray();
         if(!elms.isEmpty() || fragment || !ws(text)) {
-          if(chops.peek()) scanner.token.trim();
+          if(strips.peek()) scanner.token.trim();
           builder.text(scanner.token.toArray());
         }
       } else if(scanner.type == Type.COMMENT) {
@@ -114,7 +115,7 @@ public class XMLParser extends SingleParser {
       if(elms.isEmpty()) throw new BuildException(OPEN, detailedInfo(), name);
       final byte[] open = elms.pop();
       if(!eq(open, name)) throw new BuildException(CLOSINGELEM, detailedInfo(), name, open);
-      chops.pop();
+      strips.pop();
 
       builder.closeElem();
       if(elms.isEmpty()) closed = true;
@@ -170,16 +171,16 @@ public class XMLParser extends SingleParser {
     // send start element
     builder.openElem(en, atts, nsp);
     elms.push(en);
-    boolean c = chops.peek();
-    if(chop) {
+    boolean strip = strips.peek();
+    if(stripWS) {
       final int a = atts.get(DataText.XML_SPACE);
       if(a != -1) {
         final byte[] s = atts.value(a);
-        if(eq(s, DataText.DEFAULT)) c = true;
-        else if(eq(s, DataText.PRESERVE)) c = false;
+        if(eq(s, DataText.DEFAULT)) strip = true;
+        else if(eq(s, DataText.PRESERVE)) strip = false;
       }
     }
-    chops.push(c);
+    strips.push(strip);
     return consume(Type.R_BR);
   }
 

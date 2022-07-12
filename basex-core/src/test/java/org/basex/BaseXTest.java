@@ -159,13 +159,13 @@ public abstract class BaseXTest extends MainTest {
   }
 
   /**
-   * Turn off whitespace chopping.
+   * Turn on whitespace stripping.
    * @throws IOException I/O exception
    */
-  @Test public void chop() throws IOException {
-    final String in = "<a> CHOP </a>";
+  @Test public void stripws() throws IOException {
+    final String in = "<a> </a>";
     INPUT.write(in);
-    equals(in, "-w", "-i" + INPUT, "-q.");
+    equals("<a/>", "-w", "-i" + INPUT, "-q.");
   }
 
   /**

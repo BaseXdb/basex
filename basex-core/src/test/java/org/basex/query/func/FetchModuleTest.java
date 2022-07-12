@@ -54,9 +54,9 @@ public final class FetchModuleTest extends SandboxTest {
     final Function func = _FETCH_DOC;
     // successful queries
     query(func.args(XML));
-    query("exists(" + func.args(XML, " map { 'chop': true() }") +
+    query("exists(" + func.args(XML, " map { 'stripws': true() }") +
         "//text()[not(normalize-space())])", false);
-    query("exists(" + func.args(XML, " map { 'chop': false() }") +
+    query("exists(" + func.args(XML, " map { 'stripws': false() }") +
         "//text()[not(normalize-space())])", true);
     query(COUNT.args(func.args(CSV,
         " map { 'parser': 'csv', 'csvparser': 'header=true' }") + "//City"), 3);

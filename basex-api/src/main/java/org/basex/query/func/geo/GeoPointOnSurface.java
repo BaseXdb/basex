@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoPointOnSurface extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toElement(toGeometry(0, qc).getInteriorPoint(), qc);
+    return toElement(toGeometry(0, qc).getInteriorPoint());
   }
 }

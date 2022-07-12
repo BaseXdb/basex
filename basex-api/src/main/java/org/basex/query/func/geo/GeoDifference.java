@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoDifference extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toElement(toGeometry(0, qc).difference(toGeometry(1, qc)), qc);
+    return toElement(toGeometry(0, qc).difference(toGeometry(1, qc)));
   }
 }

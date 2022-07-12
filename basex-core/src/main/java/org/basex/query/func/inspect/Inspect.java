@@ -130,9 +130,9 @@ public abstract class Inspect {
    */
   public static void add(final byte[] value, final FElem elem) throws QueryException {
     try {
-      final MainOptions mopts = MainOptions.get();
       if(contains(value, '<')) {
         // contains angle brackets: add as XML structure
+        final MainOptions mopts = new MainOptions();
         final ANode node = new DBNode(new XMLParser(new IOContent(value), mopts, true));
         for(final ANode child : node.childIter()) {
           elem.add(child.copy(mopts, null));

@@ -597,7 +597,7 @@ public final class RewritingsTest extends QueryPlanTest {
       "let $b := $xml/* " +
       "return ($b, $b/..)";
 
-    query(query, "<b/>\n<a>\n<b/>\n</a>");
+    query(query, "<b/>\n<a><b/></a>");
   }
 
   /** Test. */
@@ -1001,7 +1001,7 @@ public final class RewritingsTest extends QueryPlanTest {
         root(ItemMap.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
-    check("<a><b/></a>[b ! ..]", "<a>\n<b/>\n</a>", exists(CachedPath.class));
+    check("<a><b/></a>[b ! ..]", "<a><b/></a>", exists(CachedPath.class));
 
     // absolute paths
     check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
@@ -2017,7 +2017,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Ancestor steps on database and fragment nodes. */
   @Test public void gh1931() {
-    query("<a>{ (<b><c/></b> update {})/c }</a>/c/ancestor::*", "<a>\n<c/>\n</a>");
+    query("<a>{ (<b><c/></b> update {})/c }</a>/c/ancestor::*", "<a><c/></a>");
   }
 
   /** Rewrite group by to distinct-values(). */
@@ -2057,7 +2057,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Iterative path traversal, positional access. */
   @Test public void gh1935() {
-    query("declare variable $x := <x><a><_/></a></x>; $x/a ! (_[$x/_ ! 1], .)", "<a>\n<_/>\n</a>");
+    query("declare variable $x := <x><a><_/></a></x>; $x/a ! (_[$x/_ ! 1], .)", "<a><_/></a>");
   }
 
   /** Positional checks. */
@@ -2866,7 +2866,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("a[/a/util:root(.)/b]", "", empty());
     check("a[util:root(.)/a/util:root(.)/b]", "", empty());
 
-    check("a[/a]", "<a>\n<b/>\n</a>", root(IterPath.class), exists(DBNode.class));
+    check("a[/a]", "<a><b/></a>", root(IterPath.class), exists(DBNode.class));
   }
 
   /** Full-text search, enforceindex enabled, AIOOB. */

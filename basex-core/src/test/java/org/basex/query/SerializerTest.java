@@ -26,7 +26,7 @@ public final class SerializerTest extends SandboxTest {
         "link", "meta", "basefont", "frame", "isindex", "param" };
     for(final String e : empties) {
       query(option + "<html xmlns='http://www.w3.org/1999/xhtml'><" + e + "/></html>",
-          "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<" + e + " />\n</html>");
+          "<html xmlns=\"http://www.w3.org/1999/xhtml\"><" + e + " /></html>");
     }
   }
 
@@ -50,9 +50,9 @@ public final class SerializerTest extends SandboxTest {
     for(final String e : empties) query(option + '<' + e + "/>", '<' + e + '>');
 
     query(option + "<html><script>&lt;</script></html>",
-        "<html>\n<script><</script>\n</html>");
+        "<html><script><</script></html>");
     query(option + "<html><style>{ serialize(<a/>) }</style></html>",
-        "<html>\n<style><a/></style>\n</html>");
+        "<html><style><a/></style></html>");
     query(option + "<a b='&lt;'/>", "<a b=\"<\"></a>");
     error(option + "<a>&#x90;</a>", SERILL_X);
 
@@ -66,14 +66,14 @@ public final class SerializerTest extends SandboxTest {
   @Test public void version50() {
     final String option = SerializerOptions.METHOD.arg("html") +
         SerializerOptions.VERSION.arg("5.0");
-    query(option + "<html/>", "<!DOCTYPE html>\n<html></html>");
+    query(option + "<html/>", "<!DOCTYPE html><html></html>");
     final String[] empties = { "area", "base", "br", "col", "command", "embed", "hr",
         "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr" };
     for(final String e : empties) {
-      query(option + '<' + e + "/>", "<!DOCTYPE html>\n<" + e + '>');
+      query(option + '<' + e + "/>", "<!DOCTYPE html><" + e + '>');
     }
-    query(option + "<a>&#x90;</a>", "<!DOCTYPE html>\n<a>&#x90;</a>");
-    query(option + "<html/>", "<!DOCTYPE html>\n<html></html>");
+    query(option + "<a>&#x90;</a>", "<!DOCTYPE html><a>&#x90;</a>");
+    query(option + "<html/>", "<!DOCTYPE html><html></html>");
   }
 
   /** Test: method=text. */
@@ -99,8 +99,8 @@ public final class SerializerTest extends SandboxTest {
   /** Test: xml:space='preserve'. */
   @Test public void preserve() {
     query("<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
-    query("<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/>\n</a>");
-    query("<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/>\n</a>");
+    query("<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/></a>");
+    query("<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/></a>");
 
     String option = SerializerOptions.INDENT.arg("yes");
     query(option + "<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");

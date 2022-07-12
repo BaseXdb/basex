@@ -63,6 +63,7 @@ public abstract class DataUpdateTest extends SandboxTest {
    */
   public final void setUp(final boolean mainmem) {
     set(MainOptions.MAINMEM, mainmem);
+    set(MainOptions.STRIPWS, true);
     execute(new CreateDB(NAME, TESTFILE));
     size = context.data().meta.size;
   }

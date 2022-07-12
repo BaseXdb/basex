@@ -10,7 +10,6 @@ import java.util.List;
 import org.basex.api.client.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.in.*;
 import org.basex.io.serial.*;
@@ -169,8 +168,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(
       "if(" + _DB_TYPE.args(" $db", " $path") + " = 'binary')" +
       " then " + _DB_STORE.args(" $tdb", " $tpath", _DB_RETRIEVE.args(" $db", " $path")) +
-      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"),
-      "declare option db:chop 'false';");
+      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"));
     query.variable("db", db);
     query.variable("path", path);
     query.variable("tdb", tdb);
@@ -194,8 +192,7 @@ final class WebDAVService {
       "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
       "if(" + _DB_TYPE.args(" $db", " $d") + " = 'binary') " +
       "then " + _DB_STORE.args(" $tdb", " $t", _DB_RETRIEVE.args(" $db", " $d")) +
-      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"),
-      "declare option db:chop 'false';");
+      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"));
     query.variable("db", db);
     query.variable("path", path);
     query.variable("tdb", tdb);
@@ -440,7 +437,6 @@ final class WebDAVService {
       throws IOException {
 
     final LocalSession session = session();
-    session.execute(new Set(MainOptions.CHOP, false));
     session.execute(new Open(db));
     session.replace(path, in);
     return WebDAVFactory.file(this, new WebDAVMetaData(db, path, timestamp(db), false,

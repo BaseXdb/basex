@@ -55,11 +55,11 @@ public final class GUIOptions extends Options {
   public static final BooleanOption ONLYMONO = new BooleanOption("ONLYMONO", false);
 
   /** Red GUI color factor. */
-  public static final NumberOption COLORRED = new NumberOption("COLORRED", 15);
+  public static final NumberOption COLORRED = new NumberOption("COLORRED", 21);
   /** Green GUI color factor. */
-  public static final NumberOption COLORGREEN = new NumberOption("COLORGREEN", 11);
+  public static final NumberOption COLORGREEN = new NumberOption("COLORGREEN", 14);
   /** Blue GUI color factor. */
-  public static final NumberOption COLORBLUE = new NumberOption("COLORBLUE", 6);
+  public static final NumberOption COLORBLUE = new NumberOption("COLORBLUE", 7);
 
   /** Comment: written to options file. */
   public static final Comment C_WINDOWS = new Comment("Windows");

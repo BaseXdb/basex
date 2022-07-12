@@ -21,7 +21,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.Options.YesNo;
 
 /**
  * XQuery Test Suite wrapper.
@@ -123,7 +122,6 @@ public abstract class W3CTS extends Main {
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
     context.options.set(MainOptions.SERIALIZER, sopts);
   }
 
@@ -140,16 +138,14 @@ public abstract class W3CTS extends Main {
       System.exit(1);
     }
 
+    final Performance perf = new Performance();
+
     if(!new IOFile(path).isAbsolute()) path = new IOFile(".", path + '/').path();
     queries = path + "Queries/XQuery/";
     expected = path + "ExpectedTestResults/";
     results = path + "ReportingResults/Results/";
     final String report = path + "ReportingResults/";
     final String sources = path + "TestSources/";
-
-    final Performance perf = new Performance();
-    context.options.set(MainOptions.CHOP, false);
-
     data = new DBNode(new IOFile(path + input)).data();
 
     final DBNode root = new DBNode(data, 0);

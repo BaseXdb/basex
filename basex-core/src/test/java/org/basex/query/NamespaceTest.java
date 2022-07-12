@@ -12,7 +12,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
 import org.junit.jupiter.api.*;
@@ -762,14 +761,6 @@ public final class NamespaceTest extends SandboxTest {
         "<w:g xmlns:w='X' xml:y=''/>) into <w:h xmlns:w='X' xml:z=''/>");
     query("insert node (<w:a xmlns:w='X' xmlns:a='a' a:x=''><w:b/><w:c/><w:d/><w:e/><w:f/></w:a>," +
         "<w:g xmlns:w='X' xmlns:a='a' a:y=''/>) into <w:h xmlns:w='X' xmlns:a='a' a:z=''/>");
-  }
-
-  /**
-   * Creates the database context.
-   */
-  @BeforeAll public static void start() {
-    // turn off pretty printing
-    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
   }
 
   /**

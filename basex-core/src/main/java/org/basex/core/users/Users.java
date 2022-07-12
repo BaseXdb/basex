@@ -12,6 +12,7 @@ import java.util.regex.*;
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -98,7 +99,7 @@ public final class Users {
           root.add(info);
           info.parent(null);
         }
-        file.write(root.serialize().finish());
+        file.write(root.serialize(SerializerMode.INDENT.get()).finish());
       } catch(final IOException | QueryException ex) {
         Util.errln(ex);
       }

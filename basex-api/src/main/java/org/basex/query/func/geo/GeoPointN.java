@@ -21,6 +21,6 @@ public final class GeoPointN extends GeoFn {
     final int max = geo.getNumPoints();
     final long n = toLong(exprs[1], qc);
     if(n < 1 || n > max) throw GEO_RANGE.get(info, n);
-    return toElement(((LineString) geo).getPointN((int) n - 1), qc);
+    return toElement(((LineString) geo).getPointN((int) n - 1));
   }
 }

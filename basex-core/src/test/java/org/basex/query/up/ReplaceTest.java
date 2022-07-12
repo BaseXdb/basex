@@ -30,9 +30,9 @@ public final class ReplaceTest extends SandboxTest {
   @Test public void rapidReplace() {
     prepare("<a/>", "<c/>");
     query(_DB_REPLACE.args(NAME, "a.xml", " <a><b/></a>"));
-    query("a, c", "<a>\n<b/>\n</a>\n<c/>");
-    query(_DB_REPLACE.args(NAME, "c.xml", " <c>\n<d/>\n</c>"));
-    query("a, c", "<a>\n<b/>\n</a>\n<c>\n<d/>\n</c>");
+    query("a, c", "<a><b/></a>\n<c/>");
+    query(_DB_REPLACE.args(NAME, "c.xml", " <c><d/></c>"));
+    query("a, c", "<a><b/></a>\n<c><d/></c>");
   }
 
   /**

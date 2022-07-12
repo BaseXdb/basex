@@ -15,11 +15,11 @@ public enum SerializerMode {
     void init(final SerializerOptions options) {
     }
   },
-  /** Default serialization, but no indentation. */
-  NOINDENT {
+  /** Default serialization with indentation. */
+  INDENT {
     @Override
     void init(final SerializerOptions options) {
-      options.set(SerializerOptions.INDENT, YesNo.NO);
+      options.set(SerializerOptions.INDENT, YesNo.YES);
     }
   },
   /** Debugging (adaptive method). */

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.math.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
@@ -24,9 +25,7 @@ public abstract class QueryTest extends SandboxTest {
   /** Queries. */
   protected static Object[][] queries;
 
-  /**
-   * Tests the specified instance.
-   */
+  /** Tests the specified instance. */
   @Test public void test() {
     final StringBuilder sb = new StringBuilder();
     int fail = 0;
@@ -126,6 +125,7 @@ public abstract class QueryTest extends SandboxTest {
    * @param doc document
    */
   protected static void create(final String doc) {
+    set(MainOptions.STRIPWS, true);
     execute(new CreateDB(Util.className(SandboxTest.class), doc));
   }
 

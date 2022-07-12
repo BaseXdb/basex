@@ -84,7 +84,7 @@ public final class ValidateModuleTest extends SandboxTest {
   @Test public void dtdReport() {
     final Function func = _VALIDATE_DTD_REPORT;
     // check XML result
-    query(func.args(FILE, DTD), "<report>\n<status>valid</status>\n</report>");
+    query(func.args(FILE, DTD), "<report><status>valid</status></report>");
     // specify arguments as file paths
     query(func.args(FILE, DTD) + "//status/string()", "valid");
     // specify document as document nodes
@@ -114,9 +114,7 @@ public final class ValidateModuleTest extends SandboxTest {
       "  delete node .//message/text()," +
       "  for $a in .//@* return replace value of node $a with ''" +
         '}',
-      "<report>\n<status>invalid</status>\n" +
-      "<message level=\"\" line=\"\" column=\"\"/>\n" +
-      "</report>");
+      "<report><status>invalid</status><message level=\"\" line=\"\" column=\"\"/></report>");
     // check URL attribute
     query("exists(" + func.args(INPUT, DTD) + "//@url)", true);
 
@@ -197,7 +195,7 @@ public final class ValidateModuleTest extends SandboxTest {
   @Test public void xsdReport() {
     final Function func = _VALIDATE_XSD_REPORT;
     // check XML result
-    query(func.args(FILE, XSD), "<report>\n<status>valid</status>\n</report>");
+    query(func.args(FILE, XSD), "<report><status>valid</status></report>");
     // specify arguments as file paths
     query(func.args(FILE, XSD) + "//status/string()", "valid");
     // specify arguments as document nodes
@@ -234,9 +232,7 @@ public final class ValidateModuleTest extends SandboxTest {
       "  delete node .//message/text()," +
       "  for $a in .//@* return replace value of node $a with ''" +
         '}',
-      "<report>\n<status>invalid</status>\n" +
-      "<message level=\"\" line=\"\" column=\"\"/>\n" +
-      "</report>");
+      "<report><status>invalid</status><message level=\"\" line=\"\" column=\"\"/></report>");
     // check URL attribute
     query("exists(" + func.args(INPUT, XSD) + "//@url)", true);
 

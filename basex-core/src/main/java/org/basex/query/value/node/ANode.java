@@ -52,7 +52,7 @@ public abstract class ANode extends Item {
   @Override
   public final void write(final DataOutput out) throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    Serializer.get(ao, SerializerMode.NOINDENT.get()).serialize(this);
+    Serializer.get(ao).serialize(this);
     out.writeToken(ao.finish());
   }
 

@@ -819,8 +819,7 @@ public final class GeoModuleTest extends SandboxTest {
    * @param result result
    */
   private static void run(final String query, final Object result) {
-    final String qu = "declare namespace gml='http://www.opengis.net/gml';" + query;
-    assertEquals(result.toString(), query(qu).replaceAll(Prop.NL + "\\s*", ""));
+    query("declare namespace gml='http://www.opengis.net/gml';" + query, result);
   }
 
   /**

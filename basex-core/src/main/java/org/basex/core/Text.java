@@ -102,7 +102,7 @@ public interface Text {
     "  -u         Toggle updates in original files" + NL +
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
-    "  -w         Toggle whitespace chopping" + NL +
+    "  -w         Toggle whitespace stripping" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
@@ -128,7 +128,7 @@ public interface Text {
     "  -U<name>   Specify user name" + NL +
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
-    "  -w         Toggle whitespace chopping" + NL +
+    "  -w         Toggle whitespace stripping" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
@@ -1129,8 +1129,8 @@ public interface Text {
 
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");
-  /** Chop whitespaces. */
-  String CHOP_WS = lang("chop_ws");
+  /** Strip whitespaces. */
+  String STRIP_WS = lang("strip_ws");
   /** Strip namespaces. */
   String STRIP_NS = lang("strip_ns");
   /** DTD information. */
@@ -1409,8 +1409,8 @@ public interface Text {
   /** Out of memory error due to database creation. */
   String H_OUT_OF_MEM = NL + lang("h_out_of_mem");
 
-  /** Information on chopping whitespaces. */
-  String H_CHOP_WS = lang("h_chop_ws");
+  /** Information on stripping whitespaces. */
+  String H_STRIP_WS = lang("h_strip_ws");
   /** Internal parser information. */
   String H_INT_PARSER = lang("h_int_parser");
 

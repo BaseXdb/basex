@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.build.xml.*;
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -93,12 +94,11 @@ abstract class GeoFn extends StandardFunc {
 
   /**
    * Writes an geometry and returns a new element.
-   * @param qc query context
    * @param geometry geometry
    * @return DBNode database node
    * @throws QueryException exception
    */
-  final ANode toElement(final Geometry geometry, final QueryContext qc) throws QueryException {
+  final ANode toElement(final Geometry geometry) throws QueryException {
     final String geo;
     try {
       // write geometry and add namespace declaration
@@ -109,7 +109,9 @@ abstract class GeoFn extends StandardFunc {
     }
 
     try {
-      final XMLParser parser = new XMLParser(new IOContent(geo), qc.context.options);
+      final MainOptions mopts = new MainOptions();
+      mopts.set(MainOptions.STRIPWS, true);
+      final XMLParser parser = new XMLParser(new IOContent(geo), mopts);
       return new DBNode(MemBuilder.build(parser)).childIter().next();
     } catch(final IOException ex) {
       throw IOERR_X.get(null, ex);

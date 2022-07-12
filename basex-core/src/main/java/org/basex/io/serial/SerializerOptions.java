@@ -50,7 +50,7 @@ public final class SerializerOptions extends Options {
       new EnumOption<>("include-content-type", YesNo.YES);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> INDENT =
-      new EnumOption<>("indent", YesNo.YES);
+      new EnumOption<>("indent", YesNo.NO);
   /** Serialization parameter. */
   public static final StringOption SUPPRESS_INDENTATION =
       new StringOption("suppress-indentation", "");

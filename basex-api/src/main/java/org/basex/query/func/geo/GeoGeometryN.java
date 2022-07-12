@@ -20,6 +20,6 @@ public final class GeoGeometryN extends GeoFn {
     final Geometry geo = toGeometry(0, qc);
     final long n = toLong(exprs[1], qc);
     if(n < 1 || n > geo.getNumGeometries()) throw GEO_RANGE.get(info, n);
-    return toElement(geo.getGeometryN((int) n - 1), qc);
+    return toElement(geo.getGeometryN((int) n - 1));
   }
 }

@@ -99,7 +99,7 @@ public final class BXXMLResource implements XMLResource {
       try {
         // serialize and cache content
         final ArrayOutput ao = new ArrayOutput();
-        try(Serializer ser = Serializer.get(ao, SerializerMode.NOINDENT.get())) {
+        try(Serializer ser = Serializer.get(ao)) {
           if(data != null) {
             ser.serialize(new DBNode(data, pre));
           } else if(item != null) {
@@ -203,8 +203,7 @@ public final class BXXMLResource implements XMLResource {
     @Override
     public void endDocument() throws SAXException {
       try {
-        resource.content = new DBNode(((MemBuilder) builder).data()).serialize(
-            SerializerMode.NOINDENT.get()).finish();
+        resource.content = new DBNode(((MemBuilder) builder).data()).serialize().finish();
       } catch(final QueryIOException ex) {
         error(new BaseXException(ex));
       }

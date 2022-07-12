@@ -17,15 +17,15 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class XMLParserTest extends SandboxTest {
-  /** Prepares the tests. */
+  /** Prepares a test. */
   @BeforeEach public void before() {
     set(MainOptions.MAINMEM, true);
   }
 
-  /** Finishes the tests. */
+  /** Finishes a test. */
   @AfterEach public void after() {
     set(MainOptions.MAINMEM, false);
-    set(MainOptions.CHOP, true);
+    set(MainOptions.STRIPWS, false);
     set(MainOptions.STRIPNS, false);
     set(MainOptions.SERIALIZER, new SerializerOptions());
     set(MainOptions.INTPARSE, true);
@@ -33,10 +33,7 @@ public final class XMLParserTest extends SandboxTest {
 
   /** Tests the internal parser (Option {@link MainOptions#INTPARSE}). */
   @Test public void intParse() {
-    set(MainOptions.CHOP, false);
-
     final StringBuilder sb = new StringBuilder();
-
     final String[] docs = {
         "<x/>", " <x/> ", "<x></x>", "<x>A</x>", "<x><x>", "<x/><x/>", "<x></x><x/>",
         "<x>", "</x>", "<x></x></x>", "x<x>", "<x>x", "<x><![CDATA[ ]]></x>",
@@ -91,7 +88,6 @@ public final class XMLParserTest extends SandboxTest {
   /** Tests the namespace stripping option (Option {@link MainOptions#STRIPNS}). */
   @Test public void parse() {
     set(MainOptions.STRIPNS, true);
-    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
 
     final String doc = "<e xmlns='A'><b:f xmlns:b='B'/></e>";
     for(final boolean b : new boolean[] { false, true }) {
@@ -102,22 +98,19 @@ public final class XMLParserTest extends SandboxTest {
     }
   }
 
-  /**
-   * Tests the xml:space attribute.
-   */
+  /** Tests the xml:space attribute. */
   @Test public void xmlSpace() {
-    set(MainOptions.SERIALIZER, SerializerMode.NOINDENT.get());
+    final String input = "<x><a> </a>"
+        + "<a xml:space=\"default\"> </a>"
+        + "<a xml:space=\"preserve\"> </a></x>";
 
-    final String in = "<x><a xml:space='default'> </a><a> </a>" +
-        "<a xml:space='preserve'> </a></x>";
-    final String out = "<x><a xml:space=\"default\"/><a/>" +
-        "<a xml:space=\"preserve\"> </a></x>";
+    set(MainOptions.INTPARSE, false);
+    execute(new CreateDB(NAME, input));
+    query(".", input);
 
-    for(final boolean b : new boolean[] { true, false }) {
-      set(MainOptions.INTPARSE, b);
-      execute(new CreateDB(NAME, in));
-      assertEquals(out, query("."), "Internal parser: " + b);
-    }
+    set(MainOptions.INTPARSE, true);
+    execute(new CreateDB(NAME, input));
+    query(".", input);
   }
 
   /** STRIPNS option with identical attribute names. */

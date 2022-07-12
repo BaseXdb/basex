@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ public final class IndexModuleTest extends SandboxTest {
 
   /** Initializes a test. */
   @BeforeEach public void initTest() {
+    set(MainOptions.STRIPWS, true);
     execute(new CreateDB(NAME, FILE));
   }
 

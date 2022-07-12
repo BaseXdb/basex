@@ -60,33 +60,33 @@ public final class HtmlParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param opts database options
+   * @param options database options
    * @throws IOException I/O exception
    */
-  public HtmlParser(final IO source, final MainOptions opts) throws IOException {
-    this(source, opts, opts.get(MainOptions.HTMLPARSER));
+  public HtmlParser(final IO source, final MainOptions options) throws IOException {
+    this(source, options, options.get(MainOptions.HTMLPARSER));
   }
 
   /**
    * Constructor.
    * @param source document source
-   * @param opts database options
+   * @param options database options
    * @param hopts html options
    * @throws IOException I/O exception
    */
-  public HtmlParser(final IO source, final MainOptions opts, final HtmlOptions hopts)
+  public HtmlParser(final IO source, final MainOptions options, final HtmlOptions hopts)
       throws IOException {
-    super(toXML(source, hopts), opts);
+    super(toXML(source, hopts), options);
   }
 
   /**
    * Converts an HTML document to XML.
    * @param io io reference
-   * @param opts html options
+   * @param hopts html options
    * @return parser
    * @throws IOException I/O exception
    */
-  private static IO toXML(final IO io, final HtmlOptions opts) throws IOException {
+  private static IO toXML(final IO io, final HtmlOptions hopts) throws IOException {
     // reader could not be initialized; fall back to XML
     if(READER == null) return io;
 
@@ -117,43 +117,43 @@ public final class HtmlParser extends XMLParser {
       set(writer, HtmlOptions.ENCODING, Strings.UTF8);
 
       // set TagSoup options
-      if(opts.get(HtmlOptions.HTML)) {
+      if(hopts.get(HtmlOptions.HTML)) {
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
         set(writer, HtmlOptions.METHOD, "html");
         set(writer, HtmlOptions.OMIT_XML_DECLARATION, "yes");
       }
-      if(opts.get(HtmlOptions.NONS))
+      if(hopts.get(HtmlOptions.NONS))
         reader.setFeature("http://xml.org/sax/features/namespaces", false);
-      if(opts.get(HtmlOptions.OMIT_XML_DECLARATION))
+      if(hopts.get(HtmlOptions.OMIT_XML_DECLARATION))
         set(writer, HtmlOptions.OMIT_XML_DECLARATION, "yes");
-      if(opts.get(HtmlOptions.NOBOGONS))
+      if(hopts.get(HtmlOptions.NOBOGONS))
         reader.setFeature(FEATURES + "ignore-bogons", true);
-      if(opts.get(HtmlOptions.NODEFAULTS))
+      if(hopts.get(HtmlOptions.NODEFAULTS))
         reader.setFeature(FEATURES + "default-attributes", false);
-      if(opts.get(HtmlOptions.NOCOLONS))
+      if(hopts.get(HtmlOptions.NOCOLONS))
         reader.setFeature(FEATURES + "translate-colons", true);
-      if(opts.get(HtmlOptions.NORESTART))
+      if(hopts.get(HtmlOptions.NORESTART))
         reader.setFeature(FEATURES + "restart-elements", false);
-      if(opts.get(HtmlOptions.IGNORABLE))
+      if(hopts.get(HtmlOptions.IGNORABLE))
         reader.setFeature(FEATURES + "ignorable-whitespace", true);
-      if(opts.get(HtmlOptions.EMPTYBOGONS))
+      if(hopts.get(HtmlOptions.EMPTYBOGONS))
         reader.setFeature(FEATURES + "bogons-empty", true);
-      if(opts.get(HtmlOptions.ANY))
+      if(hopts.get(HtmlOptions.ANY))
         reader.setFeature(FEATURES + "bogons-empty", false);
-      if(opts.get(HtmlOptions.NOROOTBOGONS))
+      if(hopts.get(HtmlOptions.NOROOTBOGONS))
         reader.setFeature(FEATURES + "root-bogons", false);
-      if(opts.get(HtmlOptions.NOCDATA))
+      if(hopts.get(HtmlOptions.NOCDATA))
         reader.setFeature(FEATURES + "cdata-elements", false);
-      if(opts.get(HtmlOptions.LEXICAL))
+      if(hopts.get(HtmlOptions.LEXICAL))
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
-      if(opts.contains(HtmlOptions.METHOD))
-        set(writer, HtmlOptions.METHOD, opts.get(HtmlOptions.METHOD));
-      if(opts.contains(HtmlOptions.DOCTYPE_SYSTEM))
-        set(writer, HtmlOptions.DOCTYPE_SYSTEM, opts.get(HtmlOptions.DOCTYPE_SYSTEM));
-      if(opts.contains(HtmlOptions.DOCTYPE_PUBLIC))
-        set(writer, HtmlOptions.DOCTYPE_PUBLIC, opts.get(HtmlOptions.DOCTYPE_PUBLIC));
-      if(opts.contains(HtmlOptions.ENCODING))
-        is.setEncoding(opts.get(HtmlOptions.ENCODING));
+      if(hopts.contains(HtmlOptions.METHOD))
+        set(writer, HtmlOptions.METHOD, hopts.get(HtmlOptions.METHOD));
+      if(hopts.contains(HtmlOptions.DOCTYPE_SYSTEM))
+        set(writer, HtmlOptions.DOCTYPE_SYSTEM, hopts.get(HtmlOptions.DOCTYPE_SYSTEM));
+      if(hopts.contains(HtmlOptions.DOCTYPE_PUBLIC))
+        set(writer, HtmlOptions.DOCTYPE_PUBLIC, hopts.get(HtmlOptions.DOCTYPE_PUBLIC));
+      if(hopts.contains(HtmlOptions.ENCODING))
+        is.setEncoding(hopts.get(HtmlOptions.ENCODING));
       // end TagSoup options
 
       reader.setContentHandler((ContentHandler) writer);

@@ -21,6 +21,6 @@ public final class GeoInteriorRingN extends GeoFn {
     final long n = toLong(exprs[1], qc);
     final int max = ((Polygon) geo).getNumInteriorRing();
     if(n < 1 || n > max) throw GEO_RANGE.get(info, n);
-    return toElement(((Polygon) geo).getInteriorRingN((int) n - 1), qc);
+    return toElement(((Polygon) geo).getInteriorRingN((int) n - 1));
   }
 }

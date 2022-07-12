@@ -5,7 +5,6 @@ import java.io.*;
 import org.basex.api.dom.*;
 import org.basex.core.*;
 import org.basex.io.in.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -74,7 +73,7 @@ public class ClientQuery extends Query {
         for(final Item item : val) {
           if(!tb.isEmpty()) tb.addByte((byte) 1);
           if(item instanceof ANode) {
-            tb.add(item.serialize(SerializerMode.NOINDENT.get()).finish());
+            tb.add(item.serialize().finish());
           } else {
             tb.add(item.string(null));
           }

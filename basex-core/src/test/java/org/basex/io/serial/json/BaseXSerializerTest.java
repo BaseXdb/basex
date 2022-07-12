@@ -3,10 +3,8 @@ package org.basex.io.serial.json;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.util.options.Options.YesNo;
 import org.junit.jupiter.api.*;
 
 /**
@@ -67,12 +65,8 @@ public final class BaseXSerializerTest extends SandboxTest {
    */
   private static void serialize(final String query, final String expected) {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
-      final SerializerOptions sopts = new SerializerOptions();
-      sopts.set(SerializerOptions.INDENT, YesNo.NO);
-
-      final ArrayOutput ao = qp.value().serialize(sopts);
-      final String actual = normNL(ao.toString().replace("\"", "'"));
-      assertEquals(expected, actual, "\n[E] " + expected + "\n[F] " + actual + '\n');
+      final String result = normNL(qp.value().serialize().toString().replace("\"", "'"));
+      assertEquals(expected, result, "\n[E] " + expected + "\n[F] " + result + '\n');
     } catch(final Exception ex) {
       fail(ex.toString());
     }

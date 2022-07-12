@@ -67,9 +67,9 @@ public final class RESTPutTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void putOption() throws IOException {
-    put(NAME + '?' + MainOptions.CHOP.name() + "=true", new FileInputStream(FILE));
+    put(NAME + '?' + MainOptions.STRIPWS.name() + "=true", new FileInputStream(FILE));
     assertEquals("5", get(NAME + "?query=count(//text())"));
-    put(NAME + '?' + MainOptions.CHOP.name() + "=false", new FileInputStream(FILE));
+    put(NAME + '?' + MainOptions.STRIPWS.name() + "=false", new FileInputStream(FILE));
     assertEquals("22", get(NAME + "?query=count(//text())"));
 
     try(FileInputStream fis = new FileInputStream(FILE)) {

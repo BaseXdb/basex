@@ -25,8 +25,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" [ () ]"), "[()]");
     query(func.args(" [ 1 ]"), "[1]");
     query(func.args(" [ 1, 2 ]"), "[1]\n[2]");
-    query(func.args(" [ (1, 2) ]"), "[(1, 2)]");
-    query(func.args(" [ (1, 2), 3 ]"), "[(1, 2)]\n[3]");
+    query(func.args(" [ (1, 2) ]"), "[(1,2)]");
+    query(func.args(" [ (1, 2), 3 ]"), "[(1,2)]\n[3]");
     query(func.args(" array { <_>1</_> to 100000 }") + " => util:last()", "[100000]");
   }
 
@@ -237,11 +237,11 @@ public final class UtilModuleTest extends QueryPlanTest {
         exists(_UTIL_REPLICATE));
 
     check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
-        "<a>\n<b/>\n</a>\n<b/>", empty(REVERSE));
+        "<a><b/></a>\n<b/>", empty(REVERSE));
     check("(<a><b/></a> ! (., *)) => sort() => " + func.args(),
-        "<a>\n<b/>\n</a>\n<b/>", empty(SORT));
+        "<a><b/></a>\n<b/>", empty(SORT));
     check("(<a><b/></a> ! (., *)) => sort() => reverse() => sort() => " + func.args(),
-        "<a>\n<b/>\n</a>\n<b/>", empty(SORT), empty(REVERSE));
+        "<a><b/></a>\n<b/>", empty(SORT), empty(REVERSE));
 
     error(func.args(1), INVCONVERT_X_X_X);
   }
@@ -667,8 +667,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" <l:x xmlns='G' xmlns:l='L'/>"), "<x/>");
     query(func.args(" <l:x xmlns='G' xmlns:l='L'/>", "l"), "<x/>");
 
-    query(func.args(" <x xmlns=''><y xmlns=''/></x>", ""), "<x>\n<y/>\n</x>");
-    query(func.args(" <x xmlns=''><l:y xmlns:l='L'/></x>", ""), "<x>\n<l:y xmlns:l=\"L\"/>\n</x>");
+    query(func.args(" <x xmlns=''><y xmlns=''/></x>", ""), "<x><y/></x>");
+    query(func.args(" <x xmlns=''><l:y xmlns:l='L'/></x>", ""), "<x><l:y xmlns:l=\"L\"/></x>");
     query(func.args(" <x xmlns:x='L' x:a=''><y x:a=''/></x>") + "/y", "<y a=\"\"/>");
 
     error(func.args(" <_ xmlns:l='L' l:a='' a=''/>"), BASEX_STRIP_X);

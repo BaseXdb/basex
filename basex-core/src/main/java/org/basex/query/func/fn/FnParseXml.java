@@ -48,7 +48,7 @@ public class FnParseXml extends StandardFunc {
 
     final IO io = new IOContent(token, string(sc.baseURI().string()));
     try {
-      return new DBNode(frag ? new XMLParser(io, MainOptions.get(), true) : Parser.xmlParser(io));
+      return new DBNode(frag ? new XMLParser(io, new MainOptions(), true) : Parser.xmlParser(io));
     } catch(final IOException ex) {
       final QueryException qe = SAXERR_X.get(info, ex);
       final Throwable th = ex.getCause();

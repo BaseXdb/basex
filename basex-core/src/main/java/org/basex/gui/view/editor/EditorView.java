@@ -143,7 +143,7 @@ public final class EditorView extends View {
     buttons.addSeparator();
     buttons.add(find);
 
-    context = new BaseXLabel("").resize(1.2f);
+    context = new BaseXLabel("").resize(1.25f);
     context.setForeground(dgray);
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0)).border(0, 0, 4, 0);
@@ -154,8 +154,9 @@ public final class EditorView extends View {
     // status and query pane
     search.editor(addTab(), false);
 
-    info = new BaseXLabel().setText(OK, Msg.SUCCESS).resize(1.2f);
-    pos = new BaseXLabel(" ").resize(1.2f);
+    info = new BaseXLabel().setText(OK, Msg.SUCCESS).resize(1.25f);
+    pos = new BaseXLabel(" ").resize(1.25f);
+    System.out.println(info.getFont().getSize());
 
     posCode.invokeLater();
 

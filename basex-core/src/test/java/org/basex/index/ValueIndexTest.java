@@ -128,6 +128,7 @@ public final class ValueIndexTest extends SandboxTest {
     Integer> tokens, final Collection<Set> options) {
     // set up environment
     for(final Set option : options) execute(option);
+    set(MainOptions.STRIPWS, true);
     execute(new CreateDB(NAME, FILE));
 
     // fetch index reference to be tested

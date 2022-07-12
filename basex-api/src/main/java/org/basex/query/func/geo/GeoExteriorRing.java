@@ -16,6 +16,6 @@ public final class GeoExteriorRing extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Geometry geo = toGeometry(0, qc, POLYGON, Q_GML_POLYGON);
-    return toElement(((Polygon) geo).getExteriorRing(), qc);
+    return toElement(((Polygon) geo).getExteriorRing());
   }
 }

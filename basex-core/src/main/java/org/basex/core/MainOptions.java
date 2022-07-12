@@ -54,11 +54,11 @@ public final class MainOptions extends Options {
 
   // XML Parsing
 
-  /** Flag for whitespace chopping. */
-  public static final BooleanOption CHOP = new BooleanOption("CHOP", true);
   /** Use internal XML parser. */
   public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
-  /** Strips namespaces. */
+  /** Strip whitespaces. */
+  public static final BooleanOption STRIPWS = new BooleanOption("STRIPWS", false);
+  /** Strip namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
   /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
@@ -183,7 +183,8 @@ public final class MainOptions extends Options {
     STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
 
   /** XML Parsing options. */
-  private static final Option<?>[] XMLPARSING = { CHOP, INTPARSE, STRIPNS, DTD, XINCLUDE, CATFILE };
+  private static final Option<?>[] XMLPARSING = { INTPARSE, STRIPWS, STRIPNS, DTD, XINCLUDE,
+      CATFILE };
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
       SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, TEXTPARSER, JSONPARSER, HTMLPARSER, PARSER };
@@ -251,15 +252,5 @@ public final class MainOptions extends Options {
   public MainOptions(final MainOptions options, final boolean xml) {
     this(false);
     for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
-  }
-
-  /**
-   * Creates a new options instance with whitespace chopping turned off.
-   * @return main options
-   */
-  public static MainOptions get() {
-    final MainOptions mopts = new MainOptions(false);
-    mopts.set(CHOP, false);
-    return mopts;
   }
 }

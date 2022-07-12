@@ -1,8 +1,5 @@
 import module namespace qt3ts='http://www.basex.org/modules/qt3ts' at 'qt3ts/qt3ts.xqm';
 
-declare option db:chop "off";
-declare option db:intparse "off";
-
 declare variable $QT3TS external;
 
 qt3ts:to-junit(

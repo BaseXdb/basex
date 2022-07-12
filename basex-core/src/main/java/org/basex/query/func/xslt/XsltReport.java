@@ -133,7 +133,7 @@ final class XsltReport {
     } catch(final IOException ex) {
       Util.debug(ex);
       try {
-        node = new DBNode(new XMLParser(content, MainOptions.get(), true));
+        node = new DBNode(new XMLParser(content, new MainOptions(), true));
       } catch(final IOException ex2) {
         Util.debug(ex2);
         return Str.get(content.read());

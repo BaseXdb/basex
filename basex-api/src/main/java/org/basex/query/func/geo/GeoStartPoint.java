@@ -16,6 +16,6 @@ public final class GeoStartPoint extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Geometry geo = toGeometry(0, qc, LINE, Q_GML_LINEARRING, Q_GML_LINESTRING);
-    return toElement(((LineString) geo).getStartPoint(), qc);
+    return toElement(((LineString) geo).getStartPoint());
   }
 }

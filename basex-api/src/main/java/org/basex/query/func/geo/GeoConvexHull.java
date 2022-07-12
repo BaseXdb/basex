@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class GeoConvexHull extends GeoFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toElement(toGeometry(0, qc).convexHull(), qc);
+    return toElement(toGeometry(0, qc).convexHull());
   }
 }

@@ -57,7 +57,7 @@ public final class SAXWrapper extends SingleParser {
       final EntityResolver er = Resolver.entities(options);
       if(er != null) reader.setEntityResolver(er);
 
-      saxh = new SAXHandler(builder, options.get(MainOptions.CHOP),
+      saxh = new SAXHandler(builder, options.get(MainOptions.STRIPWS),
           options.get(MainOptions.STRIPNS));
       reader.setDTDHandler(saxh);
       reader.setContentHandler(saxh);

@@ -300,7 +300,7 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test public final void get() {
     ok(new Get());
-    ok(new Get(MainOptions.CHOP));
+    ok(new Get(MainOptions.STRIPWS));
     ok(new Get(MainOptions.TOKENINCLUDE));
     no(new Get(NAME2));
   }
@@ -562,9 +562,9 @@ public class CommandTest extends SandboxTest {
 
   /** Command test. */
   @Test public final void set() {
-    ok(new Set(MainOptions.CHOP, false));
-    ok(new Set(MainOptions.CHOP, true));
-    ok(new Set("chop", true));
+    ok(new Set(MainOptions.STRIPWS, true));
+    ok(new Set(MainOptions.STRIPWS, false));
+    ok(new Set("stripws", false));
     ok(new Set("runs", 1));
     ok(new Set(MainOptions.TOKENINCLUDE, "id"));
     ok(new Set(MainOptions.TOKENINCLUDE, ""));

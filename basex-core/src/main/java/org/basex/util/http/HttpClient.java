@@ -25,7 +25,6 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
 import org.basex.util.http.HttpRequest.*;
-import org.basex.util.options.Options.*;
 
 /**
  * HTTP Client.
@@ -325,7 +324,6 @@ public final class HttpClient {
 
     // choose serialization parameters
     final SerializerOptions sopts = new SerializerOptions();
-    sopts.set(SerializerOptions.INDENT, YesNo.NO);
     sopts.set(SerializerOptions.NEWLINE, Newline.NL);
 
     String method = null, type = null;

@@ -31,15 +31,15 @@ public final class CsvModuleTest extends SandboxTest {
     parse(" ()", "", "");
     parse(" []", "", "");
     parse("", "", "<csv/>");
-    parse("X", "", "<csv>\n<record>\n<entry>X</entry>\n</record>\n</csv>");
+    parse("X", "", "<csv><record><entry>X</entry></record></csv>");
     parse(" '\"X\"\"Y\"'", "", "...<entry>X\"Y</entry>");
-    parse(" '\"X\",Y'", "", "...<entry>X</entry>\n<entry>Y</entry>");
+    parse(" '\"X\",Y'", "", "...<entry>X</entry><entry>Y</entry>");
 
-    parse("X;Y", "'separator': ';'", "...<entry>X</entry>\n<entry>Y</entry>");
-    parse("X,Y", "", "...<entry>X</entry>\n<entry>Y</entry>");
+    parse("X;Y", "'separator': ';'", "...<entry>X</entry><entry>Y</entry>");
+    parse("X,Y", "", "...<entry>X</entry><entry>Y</entry>");
 
-    parse("X\nY", "'header': true()", "<csv>\n<record>\n<X>Y</X>\n</record>\n</csv>");
-    parse("A,B,C\nX,Y,Z", "'header': true()", "...<A>X</A>\n<B>Y</B>\n<C>Z</C>");
+    parse("X\nY", "'header': true()", "<csv><record><X>Y</X></record></csv>");
+    parse("A,B,C\nX,Y,Z", "'header': true()", "...<A>X</A><B>Y</B><C>Z</C>");
 
     parse("X\nY", "'format': 'attributes', 'header': true()", "...<entry name=\"X\">Y</entry>");
 
@@ -51,9 +51,9 @@ public final class CsvModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void parseXQuery() {
-    parse("X\nY", "'header': false(), 'format': 'xquery'", "...[\"X\"], [\"Y\"]");
-    parse("X\nY", "'header': false(), 'format': 'xquery'", "...\"records\": ([\"X\"], [\"Y\"])");
-    parse("X\nY", "'header': true(), 'format': 'xquery'", "...\"names\": [\"X\"]");
+    parse("X\nY", "'header': false(), 'format': 'xquery'", "...[\"X\"],[\"Y\"]");
+    parse("X\nY", "'header': false(), 'format': 'xquery'", "...\"records\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': true(), 'format': 'xquery'", "...\"names\":[\"X\"]");
   }
 
   /** Test method. */

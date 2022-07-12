@@ -11,7 +11,6 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.options.Options.YesNo;
 import org.junit.jupiter.api.*;
 
 /**
@@ -196,7 +195,6 @@ public final class JsonSerializerTest extends SandboxTest {
 
       final SerializerOptions sopts = new SerializerOptions();
       sopts.set(SerializerOptions.METHOD, SerialMethod.JSON);
-      sopts.set(SerializerOptions.INDENT, YesNo.NO);
       sopts.set(SerializerOptions.JSON, jopts);
 
       try(Serializer ser = Serializer.get(ao, sopts)) {

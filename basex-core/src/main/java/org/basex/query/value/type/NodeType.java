@@ -75,7 +75,7 @@ public enum NodeType implements Type {
       if(value instanceof BXDoc) return ((BXNode) value).getNode();
       try {
         if(value instanceof Document) {
-          final DOMWrapper dom = new DOMWrapper((Document) value, "", MainOptions.get());
+          final DOMWrapper dom = new DOMWrapper((Document) value, "", new MainOptions());
           return new DBNode(MemBuilder.build(dom));
         }
         if(value instanceof DocumentFragment) {

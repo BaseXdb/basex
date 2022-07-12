@@ -7,6 +7,7 @@ import java.util.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -19,9 +20,12 @@ public final class SelectiveIndexTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/selective.xml";
 
-  /**
-   * Tests the text index.
-   */
+  /** Prepares a test. */
+  @BeforeEach public void before() {
+    set(MainOptions.STRIPWS, true);
+  }
+
+  /** Tests the text index. */
   @Test public void textIndex() {
     map().forEach((key, value) -> {
       set(MainOptions.TEXTINCLUDE, key);
@@ -31,9 +35,7 @@ public final class SelectiveIndexTest extends SandboxTest {
     });
   }
 
-  /**
-   * Tests the attribute index.
-   */
+  /** Tests the attribute index. */
   @Test public void attrIndex() {
     try {
       map().forEach((key, value) -> {
@@ -47,9 +49,7 @@ public final class SelectiveIndexTest extends SandboxTest {
     }
   }
 
-  /**
-   * Tests the token index.
-   */
+  /** Tests the token index. */
   @Test public void tokenIndex() {
     set(MainOptions.TOKENINDEX, true);
     try {
@@ -65,9 +65,7 @@ public final class SelectiveIndexTest extends SandboxTest {
     }
   }
 
-  /**
-   * Tests the full-text index.
-   */
+  /** Tests the full-text index. */
   @Test public void ftIndex() {
     set(MainOptions.FTINDEX, true);
     try {
@@ -82,9 +80,7 @@ public final class SelectiveIndexTest extends SandboxTest {
     }
   }
 
-  /**
-   * Tests the id functions.
-   */
+  /** Tests the id functions. */
   @Test public void id() {
     set(MainOptions.TOKENINDEX, true);
     try {

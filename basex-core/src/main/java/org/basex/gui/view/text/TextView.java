@@ -57,7 +57,7 @@ public final class TextView extends View {
     text = new TextPanel(gui, false);
     text.setSyntax(new SyntaxXML());
     editor = new SearchEditor(gui, text);
-    label = new BaseXLabel(" ").resize(1.2f);
+    label = new BaseXLabel(" ").resize(1.25f);
 
     final AbstractButton save = BaseXButton.get("c_save", SAVE, false, gui);
     save.addActionListener(e -> save());
@@ -91,8 +91,9 @@ public final class TextView extends View {
 
   @Override
   public void refreshMark() {
-    final DBNodes nodes = gui.context.marked;
-    setText(nodes != null && nodes.isEmpty() ? gui.context.current() : nodes);
+    final Context context = gui.context;
+    final DBNodes nodes = context.marked;
+    setText(nodes != null && nodes.isEmpty() ? context.current() : nodes);
   }
 
   @Override
@@ -131,19 +132,25 @@ public final class TextView extends View {
    * @param nodes nodes to display (can be {@code null})
    */
   private void setText(final DBNodes nodes) {
+    final Context context = gui.context;
     if(visible()) {
       try {
         final ArrayOutput ao = new ArrayOutput();
-        ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
-        if(nodes != null) nodes.serialize(Serializer.get(ao));
-        setText(ao, nodes != null ? nodes.size() : 0, null);
-        cachedCmd = null;
+        long size = 0;
+        if(nodes != null) {
+          ao.setLimit(gui.gopts.get(GUIOptions.MAXTEXT));
+          nodes.serialize(Serializer.get(ao, context.options.get(MainOptions.SERIALIZER)));
+          size = nodes.size();
+        } else {
+        }
+        setText(ao, size, null);
         cachedNodes = ao.finished() ? nodes : null;
+        cachedCmd = null;
       } catch(final IOException ex) {
         Util.debug(ex);
       }
     } else {
-      home.setEnabled(gui.context.data() != null);
+      home.setEnabled(context.data() != null);
     }
   }
 
@@ -219,10 +226,11 @@ public final class TextView extends View {
 
     gui.cursor(CURSORWAIT, true);
     try(PrintOutput out = new PrintOutput(file)) {
+      final Context context = gui.context;
       if(cachedCmd != null) {
-        cachedCmd.execute(gui.context, out);
+        cachedCmd.execute(context, out);
       } else if(cachedNodes != null) {
-        cachedNodes.serialize(Serializer.get(out));
+        cachedNodes.serialize(Serializer.get(out, context.options.get(MainOptions.SERIALIZER)));
       } else {
         out.write(text.getText());
       }

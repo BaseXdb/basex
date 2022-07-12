@@ -37,7 +37,7 @@ public class FetchDoc extends StandardFunc {
   protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
     final Options opts = toOptions(1, new Options(), qc);
     final DBOptions dbopts = new DBOptions(opts, MainOptions.PARSING, info);
-    final MainOptions mopts = dbopts.assignTo(MainOptions.get());
+    final MainOptions mopts = dbopts.assignTo(new MainOptions());
     try {
       return new DBNode(Parser.singleParser(io, mopts, ""));
     } catch(final IOException ex) {

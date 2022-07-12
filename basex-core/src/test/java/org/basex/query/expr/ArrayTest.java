@@ -18,10 +18,10 @@ public final class ArrayTest extends SandboxTest {
     query("[]", "[]");
     query("[()]", "[()]");
     query("[ 1 ]", "[1]");
-    query("[ 1, 2 ]", "[1, 2]");
-    query("[ 1 to 2 ]", "[(1, 2)]");
+    query("[ 1, 2 ]", "[1,2]");
+    query("[ 1 to 2 ]", "[(1,2)]");
     query("[[[[[ 1 ]]]]]", "[[[[[1]]]]]");
-    query("[[[[[ 1 ], 2 ], 3 ], 4 ], 5 ]", "[[[[[1], 2], 3], 4], 5]");
+    query("[[[[[ 1 ], 2 ], 3 ], 4 ], 5 ]", "[[[[[1],2],3],4],5]");
   }
 
   /** Constructor. */
@@ -29,10 +29,10 @@ public final class ArrayTest extends SandboxTest {
     query("array {}", "[]");
     query("array { () }", "[]");
     query("array { 1 }", "[1]");
-    query("array { 1, 2 }", "[1, 2]");
-    query("array { 1, 2 }", "[1, 2]");
+    query("array { 1, 2 }", "[1,2]");
+    query("array { 1, 2 }", "[1,2]");
     query("array { array { 1 } }", "[[1]]");
-    query("array { array { 1, 2 }, array {} }", "[[1, 2], []]");
+    query("array { array { 1, 2 }, array {} }", "[[1,2],[]]");
   }
 
   /** Constructor. */
@@ -125,8 +125,8 @@ public final class ArrayTest extends SandboxTest {
     query("element a { [] }", "<a/>");
     query("element a { [()] }", "<a/>");
     query("element a { [ 1 ] }", "<a>1</a>");
-    query("element a { [ <b>c</b> ] }", "<a>\n<b>c</b>\n</a>");
-    query("element a { [ <b>c</b>, <b>d</b> ] }", "<a>\n<b>c</b>\n<b>d</b>\n</a>");
+    query("element a { [ <b>c</b> ] }", "<a><b>c</b></a>");
+    query("element a { [ <b>c</b>, <b>d</b> ] }", "<a><b>c</b><b>d</b></a>");
 
     query("element { [ 'a' ] } { }", "<a/>");
 

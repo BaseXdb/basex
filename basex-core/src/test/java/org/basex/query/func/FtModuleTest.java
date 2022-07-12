@@ -84,11 +84,11 @@ public final class FtModuleTest extends SandboxTest {
   @Test public void extract() {
     final Function func = _FT_EXTRACT;
     query(func.args(" //*[text() contains text '1']"),
-      "<li>Exercise <mark>1</mark>\n</li>");
+      "<li>Exercise <mark>1</mark></li>");
     query(func.args(" //*[text() contains text '2'], 'b', 20"),
-      "<li>Exercise <b>2</b>\n</li>");
+      "<li>Exercise <b>2</b></li>");
     query(func.args(" //*[text() contains text '2'], '_o_', 1"),
-      "<li>...<_o_>2</_o_>\n</li>");
+      "<li>...<_o_>2</_o_></li>");
     contains(func.args(" //*[text() contains text 'Exercise'], 'b', 1"),
       "<li>...</li>");
   }
@@ -97,11 +97,11 @@ public final class FtModuleTest extends SandboxTest {
   @Test public void mark() {
     final Function func = _FT_MARK;
     query(func.args(" //*[text() contains text '1']"),
-      "<li>Exercise <mark>1</mark>\n</li>");
+      "<li>Exercise <mark>1</mark></li>");
     query(func.args(" //*[text() contains text '2'], 'b'"),
-      "<li>Exercise <b>2</b>\n</li>");
+      "<li>Exercise <b>2</b></li>");
     contains(func.args(" //*[text() contains text 'Exercise']"),
-      "<li>\n<mark>Exercise</mark> 1</li>");
+      "<li><mark>Exercise</mark> 1</li>");
     query("copy $a := text { 'a b' } modify () return " +
         func.args(" $a[. contains text 'a']", "b"), "<b>a</b>\nb");
     query("copy $a := text { 'ab' } modify () return " +
@@ -113,7 +113,7 @@ public final class FtModuleTest extends SandboxTest {
 
     execute(new CreateDB(NAME, "<a:a xmlns:a='A'>C</a:a>"));
     query(func.args(" /descendant::*[text() contains text 'C']", "b"),
-        "<a:a xmlns:a=\"A\">\n<b>C</b>\n</a:a>");
+        "<a:a xmlns:a=\"A\"><b>C</b></a:a>");
     execute(new DropDB(NAME));
     query("copy $c := <A xmlns='A'>A</A> modify () return <X>{ " +
         func.args(" $c[text() contains text 'A']") + " }</X>/*");

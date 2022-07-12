@@ -20,7 +20,6 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.basex.util.options.Options.*;
 
 /**
  * This class serializes items as JSON. The input must conform to the rules
@@ -230,8 +229,6 @@ public final class JsonNodeSerializer extends JsonSerializer {
     if(nodeSerializer == null) {
       final SerializerOptions so = new SerializerOptions();
       so.set(SerializerOptions.METHOD, sopts.get(SerializerOptions.JSON_NODE_OUTPUT_METHOD));
-      so.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
-      so.set(SerializerOptions.INDENT, YesNo.NO);
       nodeSerializer = Serializer.get(cache, so);
     }
     return nodeSerializer;

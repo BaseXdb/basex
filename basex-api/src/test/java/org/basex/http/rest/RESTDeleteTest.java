@@ -65,7 +65,8 @@ public final class RESTDeleteTest extends RESTTest {
    */
   @Test public void deleteOption() throws IOException {
     put(NAME, null);
-    delete(NAME + "/a?" + MainOptions.CHOP.name() + "=true");
+    delete(NAME + "/a?" + MainOptions.STRIPWS.name() + "=true");
+
     try {
       delete(NAME + "/a?xxx=true");
       fail("Error expected.");

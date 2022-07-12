@@ -134,7 +134,7 @@ public class BaseX extends CLI {
             execute(new Set(MainOptions.QUERYINFO, null), false);
             break;
           case 'w':
-            execute(new Set(MainOptions.CHOP, null), false);
+            execute(new Set(MainOptions.STRIPWS, null), false);
             break;
           case 'x':
             execute(new Set(MainOptions.XMLPLAN, null), false);

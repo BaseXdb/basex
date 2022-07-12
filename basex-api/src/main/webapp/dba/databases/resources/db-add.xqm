@@ -38,7 +38,7 @@ function dba:db-add(
   $binary  as xs:string?,
   $error   as xs:string?
 ) as element(html) {
-  let $opts := if($opts = 'x') then $opts else 'chop'
+  let $opts := if($opts = 'x') then $opts else ''
   return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
@@ -74,7 +74,7 @@ function dba:db-add(
                 html:option('intparse', 'Use internal XML parser', $opts),
                 html:option('dtd', 'Parse DTDs and entities', $opts),
                 html:option('stripns', 'Strip namespaces', $opts),
-                html:option('chop', 'Chop whitespaces', $opts),
+                html:option('stripws', 'Strip whitespaces', $opts),
                 html:option('xinclude', 'Use XInclude', $opts)
               }</td>
             </tr>
@@ -123,7 +123,7 @@ function dba:db-add-post(
         db:store($name, $path, $input)
       ) else (
         db:add($name, fetch:binary-doc($input), $path, map:merge(
-          ('intparse', 'dtd', 'stripns', 'chop', 'xinclude') ! map:entry(., $opts = .))
+          ('intparse', 'dtd', 'stripns', 'stripws', 'xinclude') ! map:entry(., $opts = .))
         )
       ),
       util:redirect($dba:SUB,

@@ -95,12 +95,12 @@ public final class DbModuleTest extends QueryPlanTest {
         COLLECTION.args(" '" + NAME + "/doc' || $i") + ")", 3);
 
     // specify parsing options
-    query(func.args(NAME, " '<a> </a>'", "chop.xml",
-        " map { '" + lc(MainOptions.CHOP) + "': true() }"));
-    query(_DB_OPEN.args(NAME, "chop.xml"), "<a/>");
-    query(func.args(NAME, " '<a> </a>'", "nochop.xml",
-        " map { '" + lc(MainOptions.CHOP) + "': false() }"));
-    query(_DB_OPEN.args(NAME, "nochop.xml"), "<a> </a>");
+    query(func.args(NAME, " '<a> </a>'", "strip.xml",
+        " map { '" + lc(MainOptions.STRIPWS) + "': true() }"));
+    query(_DB_OPEN.args(NAME, "strip.xml"), "<a/>");
+    query(func.args(NAME, " '<a> </a>'", "nostrip.xml",
+        " map { '" + lc(MainOptions.STRIPWS) + "': false() }"));
+    query(_DB_OPEN.args(NAME, "nostrip.xml"), "<a> </a>");
 
     // specify parsing options
     query(func.args(NAME, CSV, "csv.xml",
@@ -357,14 +357,14 @@ public final class DbModuleTest extends QueryPlanTest {
 
     // specify parsing options
     query(func.args(NAME, " '<a> </a>'", "a.xml",
-        " map { '" + lc(MainOptions.CHOP) + "': true() }"));
+        " map { '" + lc(MainOptions.STRIPWS) + "': true() }"));
     query(_DB_OPEN.args(NAME), "<a/>");
     query(func.args(NAME, " '<a> </a>'", "a.xml",
-        " map { '" + lc(MainOptions.CHOP) + "': false() }"));
+        " map { '" + lc(MainOptions.STRIPWS) + "': false() }"));
     query(_DB_OPEN.args(NAME), "<a> </a>");
 
-    query("(# db:chop false #) { " + func.args(NAME, " '<a> </a>'", "a.xml") + " }");
-    query(_DB_OPEN.args(NAME), "<a> </a>");
+    query("(# db:stripws true #) { " + func.args(NAME, " '<a> </a>'", "a.xml") + " }");
+    query(_DB_OPEN.args(NAME), "<a/>");
 
     final String path = "src/test/resources/example.json";
     query("(# db:parser json #) { " + func.args(NAME, path, "a.json") + " }");

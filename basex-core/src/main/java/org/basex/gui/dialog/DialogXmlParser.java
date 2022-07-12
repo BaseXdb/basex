@@ -18,12 +18,12 @@ import org.basex.io.*;
 final class DialogXmlParser extends DialogParser {
   /** Internal XML parsing. */
   private final BaseXCheckBox intparse;
-  /** DTD mode. */
-  private final BaseXCheckBox dtd;
-  /** Whitespace chopping. */
-  private final BaseXCheckBox chopWS;
+  /** Whitespace stripping. */
+  private final BaseXCheckBox stripWS;
   /** Namespace stripping. */
   private final BaseXCheckBox stripNS;
+  /** DTD mode. */
+  private final BaseXCheckBox dtd;
   /** Use XML Catalog. */
   private final BaseXCheckBox usecat;
   /** Use XInclude. */
@@ -45,16 +45,15 @@ final class DialogXmlParser extends DialogParser {
     pp.add(intparse);
     pp.add(new BaseXLabel(H_INT_PARSER, true, false));
 
-    dtd = new BaseXCheckBox(dialog, PARSE_DTDS, MainOptions.DTD, opts).bold();
-    pp.add(dtd);
+    stripWS = new BaseXCheckBox(dialog, STRIP_WS, MainOptions.STRIPWS, opts).bold();
+    pp.add(stripWS);
+    pp.add(new BaseXLabel(H_STRIP_WS, false, false).border(0, 0, 8, 0));
 
     stripNS = new BaseXCheckBox(dialog, STRIP_NS, MainOptions.STRIPNS, opts).bold();
     pp.add(stripNS);
 
-    chopWS = new BaseXCheckBox(dialog, CHOP_WS, MainOptions.CHOP, opts).bold();
-    pp.add(chopWS);
-    pp.add(new BaseXLabel(H_CHOP_WS, false, false).border(0, 0, 8, 0));
-    pp.add(new BaseXLabel());
+    dtd = new BaseXCheckBox(dialog, PARSE_DTDS, MainOptions.DTD, opts).bold();
+    pp.add(dtd);
 
     // XInclude
     xinclude = new BaseXCheckBox(dialog, USE_XINCLUDE, MainOptions.XINCLUDE, opts).bold();
@@ -88,8 +87,7 @@ final class DialogXmlParser extends DialogParser {
 
   @Override
   boolean action(final boolean active) {
-    final boolean ip = intparse.isSelected();
-    final boolean uc = usecat.isSelected();
+    final boolean ip = intparse.isSelected(), uc = usecat.isSelected();
     intparse.setEnabled(!uc);
     xinclude.setEnabled(!ip);
     usecat.setEnabled(!ip);
@@ -104,10 +102,10 @@ final class DialogXmlParser extends DialogParser {
 
   @Override
   void setOptions(final GUI gui) {
-    gui.set(MainOptions.CHOP, chopWS.isSelected());
+    gui.set(MainOptions.INTPARSE, intparse.isSelected());
+    gui.set(MainOptions.STRIPWS, stripWS.isSelected());
     gui.set(MainOptions.STRIPNS, stripNS.isSelected());
     gui.set(MainOptions.DTD, dtd.isSelected());
-    gui.set(MainOptions.INTPARSE, intparse.isSelected());
     gui.set(MainOptions.XINCLUDE, xinclude.isSelected());
     gui.set(MainOptions.CATFILE, usecat.isSelected() ? cfile.getText() : "");
   }

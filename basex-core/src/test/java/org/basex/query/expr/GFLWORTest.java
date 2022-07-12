@@ -318,7 +318,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "  let $y := <y>{ $i }</y>" +
         "  return insert node $y into $x" +
         ") return $x",
-        "<x>\n<y>1</y>\n<y>2</y>\n<y>3</y>\n<y>4</y>\n<y>5</y>\n<y>6</y>\n</x>",
+        "<x><y>1</y><y>2</y><y>3</y><y>4</y><y>5</y><y>6</y></x>",
         empty(GFLWOR.class),
         exists(DualMap.class),
         exists(Insert.class)

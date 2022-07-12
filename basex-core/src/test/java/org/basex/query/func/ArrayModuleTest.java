@@ -17,10 +17,10 @@ public final class ArrayModuleTest extends QueryPlanTest {
   @Test public void append() {
     final Function func = _ARRAY_APPEND;
     query(func.args(" [ ]", " ()"), "[()]");
-    query(func.args(" [ () ]", " ()"), "[(), ()]");
+    query(func.args(" [ () ]", " ()"), "[(),()]");
     query(func.args(" [ ]", 1), "[1]");
-    query(func.args(" [ 1 ]", 2), "[1, 2]");
-    query(func.args(" [ 1, 2, 3 ]", " (4, 5)"), "[1, 2, 3, (4, 5)]");
+    query(func.args(" [ 1 ]", 2), "[1,2]");
+    query(func.args(" [ 1, 2, 3 ]", " (4, 5)"), "[1,2,3,(4,5)]");
   }
 
   /** Test method. */
@@ -114,8 +114,8 @@ public final class ArrayModuleTest extends QueryPlanTest {
 
     query(func.args(" [ ]", " function($a) { $a }"), "[]");
     query(func.args(" [ 1 ]", " function($a) { $a }"), "[1]");
-    query(func.args(" [ 1, 2 ]", " function($a) { $a + 1 }"), "[2, 3]");
-    query(func.args(" [ 1, 2, 3 ]", " function($a) { () }"), "[(), (), ()]");
+    query(func.args(" [ 1, 2 ]", " function($a) { $a + 1 }"), "[2,3]");
+    query(func.args(" [ 1, 2, 3 ]", " function($a) { () }"), "[(),(),()]");
   }
 
   /** Test method. */
@@ -150,8 +150,8 @@ public final class ArrayModuleTest extends QueryPlanTest {
   @Test public void insertBefore() {
     final Function func = _ARRAY_INSERT_BEFORE;
     query(func.args(" [ ]", 1, 1), "[1]");
-    query(func.args(" [ 1 ]", 1, 2), "[2, 1]");
-    query(func.args(" [ 1 ]", 2, 2), "[1, 2]");
+    query(func.args(" [ 1 ]", 1, 2), "[2,1]");
+    query(func.args(" [ 1 ]", 2, 2), "[1,2]");
 
     error(func.args(" [ ]", 0, 1), ARRAYBOUNDS_X_X);
     error(func.args(" [ ]", 2, 1), ARRAYBOUNDS_X_X);
@@ -162,9 +162,9 @@ public final class ArrayModuleTest extends QueryPlanTest {
     final Function func = _ARRAY_JOIN;
     query(func.args(" [ ]"), "[]");
     query(func.args(" [ 1 ]"), "[1]");
-    query(func.args(" ([ 1], [ 2 ])"), "[1, 2]");
-    query(func.args(" ([ 1], [ 2 ], [ 3 ])"), "[1, 2, 3]");
-    query(func.args(" ([ 1], [ () ], [ 2 to 3 ])"), "[1, (), (2, 3)]");
+    query(func.args(" ([ 1], [ 2 ])"), "[1,2]");
+    query(func.args(" ([ 1], [ 2 ], [ 3 ])"), "[1,2,3]");
+    query(func.args(" ([ 1], [ () ], [ 2 to 3 ])"), "[1,(),(2,3)]");
 
     check(func.args(" [ <a/> ]") + "?1", "<a/>", empty(func));
     check(func.args(" ([ <a/> ], [ ])") + "?1", "<a/>", empty(func));
@@ -188,9 +188,9 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" [ 1]", 1), "[]");
     query(func.args(" [ 1, 2 ]", 1), "[2]");
     query(func.args(" [ 1, 2 ]", 2), "[1]");
-    query(func.args(" array { 1 to 5 }", 1), "[2, 3, 4, 5]");
-    query(func.args(" array { 1 to 5 }", 3), "[1, 2, 4, 5]");
-    query(func.args(" array { 1 to 5 }", 5), "[1, 2, 3, 4]");
+    query(func.args(" array { 1 to 5 }", 1), "[2,3,4,5]");
+    query(func.args(" array { 1 to 5 }", 3), "[1,2,4,5]");
+    query(func.args(" array { 1 to 5 }", 5), "[1,2,3,4]");
 
     error(func.args(" [ ]", 0), ARRAYEMPTY);
     error(func.args(" [ 1 ]", 0), ARRAYBOUNDS_X_X);
@@ -202,9 +202,9 @@ public final class ArrayModuleTest extends QueryPlanTest {
     final Function func = _ARRAY_REVERSE;
     query(func.args(" [ ]"), "[]");
     query(func.args(" [ 1 ]"), "[1]");
-    query(func.args(" [ 1, 2 ]"), "[2, 1]");
-    query(func.args(" [ 1 to 2 ]"), "[(1, 2)]");
-    query(func.args(" array { 1 to 3 }"), "[3, 2, 1]");
+    query(func.args(" [ 1, 2 ]"), "[2,1]");
+    query(func.args(" [ 1 to 2 ]"), "[(1,2)]");
+    query(func.args(" array { 1 to 3 }"), "[3,2,1]");
   }
 
   /** Test method. */
@@ -224,17 +224,17 @@ public final class ArrayModuleTest extends QueryPlanTest {
   @Test public void sort() {
     final Function func = _ARRAY_SORT;
     query("([ 2, 1 ], 1)[. instance of array(*)] ! " + func.args(" .", " ()", " hof:id#1"),
-        "[1, 2]");
+        "[1,2]");
 
-    query(func.args(" [ 1, 4, 6, 5, 3 ]"), "[1, 3, 4, 5, 6]");
-    query(func.args(" [ (1, 0), (1, 1), (0, 1), (0, 0) ]"), "[(0, 0), (0, 1), (1, 0), (1, 1)]");
+    query(func.args(" [ 1, 4, 6, 5, 3 ]"), "[1,3,4,5,6]");
+    query(func.args(" [ (1, 0), (1, 1), (0, 1), (0, 0) ]"), "[(0,0),(0,1),(1,0),(1,1)]");
     query(func.args(" [ 3, 2, 1 ]", "http://www.w3.org/2005/xpath-functions/collation/codepoint"),
-        "[1, 2, 3]");
+        "[1,2,3]");
     query(func.args(" [ 1, -2, 5, 10, -10, 10, 8 ]", " ()", " abs#1"),
-        "[1, -2, 5, 8, 10, -10, 10]");
+        "[1,-2,5,8,10,-10,10]");
 
-    check(func.args(" [ 1, 2 ]", " ()", " function($a) { -$a }"), "[2, 1]",
-        type(func, "array(xs:integer)"));
+    check(func.args(" [ 1, 2 ]", " ()", " function($a) { -$a }"),
+        "[2,1]", type(func, "array(xs:integer)"));
   }
 
   /** Test method. */
@@ -249,7 +249,7 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" array { 1 to 5 }", 5), "[5]");
     query(func.args(" array { 1 to 5 }", 6), "[]");
     query(func.args(" array { 1 to 5 }", 1, 1), "[1]");
-    query(func.args(" array { 1 to 5 }", 2, 3), "[2, 3, 4]");
+    query(func.args(" array { 1 to 5 }", 2, 3), "[2,3,4]");
 
     error(func.args(" [ 1 ]", 0, 0), ARRAYBOUNDS_X_X);
     error(func.args(" [ 1 ]", 1, " -1"), ARRAYNEG_X);
@@ -261,7 +261,7 @@ public final class ArrayModuleTest extends QueryPlanTest {
   @Test public void tail() {
     final Function func = _ARRAY_TAIL;
     query(func.args(" [ 1 ]"), "[]");
-    query(func.args(" array { 1 to 5 }"), "[2, 3, 4, 5]");
+    query(func.args(" array { 1 to 5 }"), "[2,3,4,5]");
     query(func.args(" [ 1 to 2, 3 ]"), "[3]");
 
     error(func.args(" [ ]"), ARRAYEMPTY);

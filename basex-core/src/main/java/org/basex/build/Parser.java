@@ -102,7 +102,7 @@ public abstract class Parser extends Job {
    * @return xml parser
    */
   public static SAXWrapper xmlParser(final IO source) {
-    return new SAXWrapper(source, MainOptions.get());
+    return new SAXWrapper(source, new MainOptions());
   }
 
   /**
