@@ -3,11 +3,12 @@ package org.basex.http.rest;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.net.http.*;
+import java.net.http.HttpResponse;
 
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.util.*;
 import org.basex.util.http.*;
 import org.junit.jupiter.api.*;
 
@@ -27,10 +28,11 @@ public final class RESTGetTest extends RESTTest {
     assertEquals("a,b", get("?query=string-join(('a','b'),',')"));
 
     put(NAME, new ArrayInput("<a/>"));
-    put(NAME + "/binary", new ArrayInput("XXX"), MediaType.APPLICATION_OCTET_STREAM);
+    send(NAME + "/binary", HttpMethod.PUT.name(), new ArrayInput("XXX"),
+        MediaType.APPLICATION_OCTET_STREAM, 201);
     assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
     assertEquals("XXX", get(NAME + "/binary"));
-    delete(NAME);
+    delete(NAME, 200);
   }
 
   /**
@@ -39,14 +41,7 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test public void input() throws Exception {
     assertEquals("<a/>", get("?query=.&context=<a/>"));
-
-    try {
-      assertEquals("<a/>", get("?query=.&context=<"));
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      // expected
-      Util.debug(ex);
-    }
+    get("?query=.&context=<", 500);
   }
 
   /**
@@ -64,24 +59,13 @@ public final class RESTGetTest extends RESTTest {
         + "declare+variable+$c+as+xs:integer+external;$a*$b*$c&$a=1&$b=2&$c=3"));
   }
 
-  /** Error. */
-  @Test public void error1() {
-    try {
-      get("?query=(");
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[XPST0003]");
-    }
-  }
-
-  /** Error. */
-  @Test public void error2() {
-    try {
-      get("?query=()&method=xxx");
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      Util.debug(ex);
-    }
+  /**
+   * Errors.
+   * @throws Exception exception
+   */
+  @Test public void errors() throws Exception {
+    get("?query=(", 500);
+    get("?query=()&method=xxx", 400);
   }
 
   /**
@@ -89,21 +73,33 @@ public final class RESTGetTest extends RESTTest {
    * @throws Exception exception
    */
   @Test public void contentType() throws Exception {
-    assertMediaType(mediaType("?query=1"), MediaType.APPLICATION_XML);
-    assertMediaType(mediaType("?command=info"), MediaType.TEXT_PLAIN);
+    check("?query=1", MediaType.APPLICATION_XML);
+    check("?command=info", MediaType.TEXT_PLAIN);
 
-    assertMediaType(mediaType("?query=1&method=xml"), MediaType.APPLICATION_XML);
-    assertMediaType(mediaType("?query=1&method=xhtml"), MediaType.TEXT_HTML);
-    assertMediaType(mediaType("?query=1&method=html"), MediaType.TEXT_HTML);
-    assertMediaType(mediaType("?query=1&method=text"), MediaType.TEXT_PLAIN);
-    assertMediaType(mediaType("?query=<json+type='object'/>&method=json"),
-        MediaType.APPLICATION_JSON);
+    check("?query=1&method=xml", MediaType.APPLICATION_XML);
+    check("?query=1&method=xhtml", MediaType.TEXT_HTML);
+    check("?query=1&method=html", MediaType.TEXT_HTML);
+    check("?query=1&method=text", MediaType.TEXT_PLAIN);
+    check("?query=1&method=json", MediaType.APPLICATION_JSON);
 
-    assertMediaType(mediaType("?query=1&media-type=application/octet-stream"),
-        MediaType.APPLICATION_OCTET_STREAM);
-    assertMediaType(mediaType("?query=1&media-type=application/xml"), MediaType.APPLICATION_XML);
-    assertMediaType(mediaType("?query=1&media-type=text/html"), MediaType.TEXT_HTML);
-    assertMediaType(mediaType("?query=1&media-type=xxx"), new MediaType("xxx"));
+    check("?query=1&media-type=application/octet-stream", MediaType.APPLICATION_OCTET_STREAM);
+    check("?query=1&media-type=application/xml", MediaType.APPLICATION_XML);
+    check("?query=1&media-type=text/html", MediaType.TEXT_HTML);
+    check("?query=1&media-type=xxx", new MediaType("xxx"));
+  }
+
+  /**
+   * Executes the specified GET request and checks the media type of the response.
+   * @param query request
+   * @param type expected media type
+   * @throws IOException I/O exception
+   */
+  private static void check(final String query, final MediaType type)
+      throws IOException {
+    final HttpHeaders headers = new IOUrl(REST_ROOT + query).response(
+        HttpResponse.BodyHandlers.discarding()).headers();
+    final MediaType mt = new MediaType(headers.firstValue(HttpText.CONTENT_TYPE).get());
+    if(!mt.is(type)) fail("Wrong media type: " + mt + " returned, " + type + " expected.");
   }
 
   /**
@@ -112,12 +108,7 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test public void queryOption() throws IOException {
     assertEquals("2", get("?query=2,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=true"));
-    try {
-      get("?query=1,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=false");
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[XUST0001]");
-    }
+    get("?query=1,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=false", 500);
   }
 
   /**
@@ -141,19 +132,9 @@ public final class RESTGetTest extends RESTTest {
     new IOFile(path, "x.bxs").write("<set option='maxlen'>123</set>");
     assertEquals("", get("?run=x.bxs"));
 
-    try {
-      get("?run=unknown.abc");
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      Util.debug(ex);
-    }
+    get("?run=unknown.abc", 404);
 
-    try {
-      new IOFile(path, "x.bxs").write("<set option='unknown'>123</set>");
-      assertEquals("", get("?run=x.bxs"));
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      Util.debug(ex);
-    }
+    new IOFile(path, "x.bxs").write("<set option='unknown'>123</set>");
+    get("?run=x.bxs", 500);
   }
 }

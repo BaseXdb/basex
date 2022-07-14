@@ -3,10 +3,11 @@ package org.basex.http.auth;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.*;
+import java.net.http.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
@@ -62,16 +63,12 @@ public abstract class AuthTest extends HTTPTest {
   /**
    * Calls the specified URL and checks the error message.
    * @param url URL
-   * @param error expected error, or {@code null} if no error is expected
+   * @param status status code to check
+   * @throws Exception Exception
    */
-  protected static void test(final String url, final String error) {
-    try {
-      final String request = request(url, "", "GET");
-      if(error != null) fail("Error expected:\n" + request);
-    } catch(final IOException ex) {
-      if(error == null) fail("No error expected:\n" + ex);
-      assertEquals(error, ex.getMessage());
-    }
+  protected static void test(final String url, final int status) throws Exception {
+    final IOUrl io = new IOUrl(url);
+    assertEquals(status, io.response(HttpResponse.BodyHandlers.discarding()).statusCode());
   }
 
   /**

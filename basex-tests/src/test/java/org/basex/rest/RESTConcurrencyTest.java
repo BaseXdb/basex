@@ -6,6 +6,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
+import java.net.http.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -33,7 +38,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   /** Socket time-out in (ms). */
   private static final int SOCKET_TIMEOUT = 3000;
   /** BaseX HTTP base URL. */
-  private static final String BASE_URL = REST_ROOT + NAME;
+  private static final String REST_URL = REST_ROOT + NAME;
 
   /**
    * Creates a test database and starts BaseXHTTP.
@@ -81,7 +86,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
 
     try {
       final HTTPResponse result = fast.get();
-      assertEquals(HTTPCode.OK, result.status);
+      assertEquals(200, result.status);
       assertEquals(number, result.data);
     } finally {
       slowAction.stop = true;
@@ -118,11 +123,12 @@ public final class RESTConcurrencyTest extends SandboxTest {
 
     try {
       final HTTPResponse result = writer.get(TIMEOUT, TimeUnit.MILLISECONDS);
-      if(result.status.isSuccess()) fail("Database modified while a reader is running");
+      if(result.status >= 200 && result.status < 300)
+        fail("Database modified while a reader is running");
       throw new Exception(result.toString());
     } catch(final TimeoutException ex) {
       // writer is blocked by the reader: stop it
-      Util.debug(ex);
+      Util.errln(ex);
       writerAction.stop = true;
     }
 
@@ -131,7 +137,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
 
     // start the writer again
     writer = exec.submit(writerAction);
-    assertEquals(HTTPCode.CREATED, writer.get().status);
+    assertEquals(201, writer.get().status);
   }
 
   /**
@@ -162,11 +168,11 @@ public final class RESTConcurrencyTest extends SandboxTest {
 
     // check if all have finished successfully
     for(final Future<HTTPResponse> task : tasks) {
-      assertEquals(HTTPCode.OK, task.get(TIMEOUT, TimeUnit.MILLISECONDS).status);
+      assertEquals(200, task.get(TIMEOUT, TimeUnit.MILLISECONDS).status);
     }
   }
 
-  // REST API:
+  // REST API
 
   /** REST GET request. */
   private static class Get implements Callable<HTTPResponse> {
@@ -180,31 +186,24 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @param request request string without the base URI
      */
     Get(final String request) {
-      uri = URI.create(BASE_URL + request);
+      uri = URI.create(REST_URL + request);
     }
 
     @Override
     public HTTPResponse call() throws Exception {
-      final HttpURLConnection hc = (HttpURLConnection) uri.toURL().openConnection();
-      hc.setReadTimeout(SOCKET_TIMEOUT);
-      try {
-        while(!stop) {
-          try {
-            final int code = hc.getResponseCode();
+      final HttpRequest request = HttpRequest.newBuilder(uri).
+          timeout(Duration.ofMillis(SOCKET_TIMEOUT)).build();
 
-            final InputStream input = hc.getInputStream();
-            final ByteList bl = new ByteList();
-            for(int i; (i = input.read()) != -1;) bl.add(i);
-
-            return new HTTPResponse(code, bl.toString());
-          } catch(final SocketTimeoutException ex) {
-            Util.debug(ex);
-          }
+      while(!stop) {
+        try {
+          final HttpResponse<String> response = HttpClient.newHttpClient().send(request,
+              HttpResponse.BodyHandlers.ofString());
+          return new HTTPResponse(response.statusCode(), response.body());
+        } catch(final HttpTimeoutException ex) {
+          Util.errln(ex);
         }
-        return null;
-      } finally {
-        hc.disconnect();
       }
+      return null;
     }
   }
 
@@ -237,31 +236,24 @@ public final class RESTConcurrencyTest extends SandboxTest {
     protected Put(final String request, final byte[] data, final HttpMethod method) {
       this.data = data;
       this.method = method;
-      uri = URI.create(BASE_URL + request);
+      uri = URI.create(REST_URL + request);
     }
 
     @Override
     public HTTPResponse call() throws Exception {
-      final HttpURLConnection hc = (HttpURLConnection) uri.toURL().openConnection();
-      try {
-        hc.setDoOutput(true);
-        hc.setRequestMethod(method.name());
-        hc.setRequestProperty(HttpText.CONTENT_TYPE, MediaType.APPLICATION_XML.toString());
-        hc.getOutputStream().write(data);
-        hc.getOutputStream().close();
-
-        hc.setReadTimeout(SOCKET_TIMEOUT);
-        while(!stop) {
-          try {
-            return new HTTPResponse(hc.getResponseCode());
-          } catch(final SocketTimeoutException ex) {
-            Util.debug(ex);
-          }
+      final HttpRequest request = HttpRequest.newBuilder(uri).
+          method(method.name(), HttpRequest.BodyPublishers.ofByteArray(data)).
+          setHeader(HttpText.CONTENT_TYPE, MediaType.APPLICATION_XML.toString()).
+          timeout(Duration.ofMillis(SOCKET_TIMEOUT)).build();
+      while(!stop) {
+        try {
+          return new HTTPResponse(HttpClient.newHttpClient().send(request,
+              HttpResponse.BodyHandlers.discarding()).statusCode());
+        } catch(final HttpTimeoutException ex) {
+          Util.errln(ex);
         }
-        return null;
-      } finally {
-        hc.disconnect();
       }
+      return null;
     }
   }
 
@@ -282,7 +274,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   /** Simple HTTP response. */
   private static class HTTPResponse {
     /** Status code. */
-    public final HTTPCode status;
+    public final int status;
     /** Response data or {@code null} if no data was returned. */
     public final String data;
 
@@ -296,70 +288,12 @@ public final class RESTConcurrencyTest extends SandboxTest {
 
     /**
      * Constructor.
-     * @param code HTTP response status code
+     * @param status HTTP response status code
      * @param data data
      */
-    HTTPResponse(final int code, final String data) {
+    HTTPResponse(final int status, final String data) {
       this.data = data;
-      status = HTTPCode.valueOf(code);
-    }
-  }
-
-  /** HTTP response codes. */
-  private enum HTTPCode {
-    /** 100: Continue. */
-    CONTINUE(100, "Continue"),
-    /** 200: OK. */
-    OK(200, "OK"),
-    /** 201: Created. */
-    CREATED(201, "Created"),
-    /** 400: Bad Request. */
-    BAD_REQUEST(400, "Bad Request"),
-    /** 401: Unauthorized. */
-    UNAUTHORIZED(401, "Unauthorized"),
-    /** 403: Forbidden. */
-    FORBIDDEN(403, "Forbidden"),
-    /** 404: Not Found. */
-    NOT_FOUND(403, "Not Found");
-
-    /** HTTP response code. */
-    private final int code;
-    /** HTTP response message. */
-    private final String message;
-
-    /**
-     * Constructor.
-     * @param code code
-     * @param message message
-     */
-    HTTPCode(final int code, final String message) {
-      this.code = code;
-      this.message = message;
-    }
-
-    /**
-     * Is the current code a "Success" code?
-     * @return {@code true} if the current code is a "Success" code
-     */
-    public boolean isSuccess() {
-      return code >= 200 && code < 300;
-    }
-
-    @Override
-    public String toString() {
-      return code + ": " + message;
-    }
-
-    /**
-     * Get the enum value given the numeric code.
-     * @param code HTTP response code
-     * @return enum value
-     */
-    public static HTTPCode valueOf(final int code) {
-      for(final HTTPCode h : HTTPCode.values()) {
-        if(h.code == code) return h;
-      }
-      return null;
+      this.status = status;
     }
   }
 }

@@ -22,7 +22,7 @@ final class RESTDelete {
    * @throws IOException I/O exception
    */
   static RESTExec get(final RESTSession session) throws IOException {
-    RESTCmd.parseOptions(session);
+    RESTCmd.assignOptions(session);
 
     final HTTPConnection conn = session.conn;
     final String db = conn.db();

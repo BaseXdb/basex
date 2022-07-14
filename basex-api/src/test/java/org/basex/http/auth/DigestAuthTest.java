@@ -1,7 +1,5 @@
 package org.basex.http.auth;
 
-import org.basex.http.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -21,15 +19,17 @@ public final class DigestAuthTest extends AuthTest {
 
   /**
    * Missing authentication method.
+   * @throws Exception exception
    */
-  @Test public void missingAuth() {
-    test(REST_ROOT + "?query=1", Util.info(HTTPText.WRONGAUTH_X, method));
+  @Test public void missing() throws Exception {
+    test(REST_ROOT + "?query=1", 401);
   }
 
   /**
    * Wrong authentication method.
+   * @throws Exception exception
    */
-  @Test public void wrongAuth() {
-    test(REST_ROOT.replace("://", "://user:unknown@"), Util.info(HTTPText.WRONGAUTH_X, method));
+  @Test public void wrong() throws Exception {
+    test(REST_ROOT.replace("://", "://user:unknown@"), 401);
   }
 }

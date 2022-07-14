@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -24,7 +23,7 @@ public final class RESTPutTest extends RESTTest {
   @Test public void put1() throws IOException {
     put(NAME, null);
     assertEquals("0", get(NAME + "?query=count(/)"));
-    delete(NAME);
+    delete(NAME, 200);
   }
 
   /**
@@ -34,7 +33,7 @@ public final class RESTPutTest extends RESTTest {
   @Test public void put2() throws IOException {
     put(NAME, new ArrayInput(token("<a>A</a>")));
     assertEquals("A", get(NAME + "?query=/*/text()"));
-    delete(NAME);
+    delete(NAME, 200);
   }
 
   /**
@@ -45,7 +44,7 @@ public final class RESTPutTest extends RESTTest {
     put(NAME, new FileInputStream(FILE));
     put(NAME, new FileInputStream(FILE));
     assertEquals("XML", get(NAME + "?query=//title/text()"));
-    delete(NAME);
+    delete(NAME, 200);
   }
 
   /**
@@ -59,7 +58,7 @@ public final class RESTPutTest extends RESTTest {
     assertEquals("2", get(NAME + "?query=count(//text())"));
     assertEquals("2", get("?query=count(db:open('" + NAME + "')//text())"));
     assertEquals("1", get("?query=count(db:open('" + NAME + "','b')/*)"));
-    delete(NAME);
+    delete(NAME, 200);
   }
 
   /**
@@ -73,10 +72,7 @@ public final class RESTPutTest extends RESTTest {
     assertEquals("22", get(NAME + "?query=count(//text())"));
 
     try(FileInputStream fis = new FileInputStream(FILE)) {
-      put(NAME + "?xxx=yyy", fis);
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      Util.debug(ex);
+      put(NAME + "?xxx=yyy", fis, 400);
     }
   }
 }

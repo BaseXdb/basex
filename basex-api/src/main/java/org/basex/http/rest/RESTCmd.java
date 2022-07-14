@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -16,6 +16,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * Abstract class for performing REST operations.
@@ -136,32 +137,41 @@ abstract class RESTCmd extends Command {
   }
 
   /**
-   * Parses and sets database options.
+   * Assigns database options.
    * Throws an exception if an option is unknown.
    * @param session REST session
    * @throws IOException I/O exception
    */
-  static void parseOptions(final RESTSession session) throws IOException {
-    for(final Entry<String, String[]> param : session.conn.requestCtx.queryStrings().entrySet()) {
-      parseOption(session, param, true);
+  static void assignOptions(final RESTSession session) throws IOException {
+    final HTTPConnection conn = session.conn;
+    for(final Entry<String, String[]> entry : conn.requestCtx.queryStrings().entrySet()) {
+      assign(conn.context.options, entry, true);
     }
   }
 
   /**
-   * Parses and sets a single database option.
-   * @param session REST session
-   * @param param current parameter
-   * @param force force execution
-   * @return success flag, indicates if value was found
-   * @throws BaseXException database exception
+   * Assigns an option.
+   * @param options options
+   * @param entry current parameter
+   * @param enforce force assignment
+   * @return success flag
+   * @throws HTTPException HTTP exception
    */
-  static boolean parseOption(final RESTSession session, final Entry<String, String[]> param,
-      final boolean force) throws BaseXException {
+  static boolean assign(final Options options, final Entry<String, String[]> entry,
+      final boolean enforce) throws HTTPException {
 
-    final String key = param.getKey().toUpperCase(Locale.ENGLISH);
-    final MainOptions options = session.conn.context.options;
-    final boolean found = options.option(key) != null;
-    if(found || force) options.assign(key, param.getValue()[0]);
-    return found;
+    String key = entry.getKey();
+    if(options instanceof MainOptions) key = key.toUpperCase(Locale.ENGLISH);
+    if(options.option(key) == null) {
+      if(enforce) throw HTTPCode.UNKNOWN_PARAM_X.get(key);
+      return false;
+    }
+
+    try {
+      options.assign(key, entry.getValue()[0]);
+      return true;
+    } catch(final BaseXException ex) {
+      throw HTTPCode.BAD_REQUEST_X.get(ex);
+    }
   }
 }

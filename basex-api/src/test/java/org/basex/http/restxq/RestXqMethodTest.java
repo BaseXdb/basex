@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
-import org.basex.core.*;
-import org.basex.util.*;
+import org.basex.io.in.*;
 import org.basex.util.http.*;
 import org.junit.jupiter.api.*;
 
@@ -44,39 +43,30 @@ public final class RestXqMethodTest extends RestXqTest {
     // standard HTTP method without body
     get("declare %R:method('GET') %R:path('') function m:f() {'x'};", "", "x");
     // standard HTTP method specified twice
-    getE("declare %R:method('GET') %R:GET %R:path('') function m:f() {'x'};", "");
+    getError("declare %R:method('GET') %R:GET %R:path('') function m:f() {'x'};", "");
     // standard HTTP method without body, body provided in request
-    getE("declare %R:method('GET', '{$b}') %R:path('') function m:f($b) {$b};", "");
+    getError("declare %R:method('GET', '{$b}') %R:path('') function m:f($b) {$b};", "");
     // standard HTTP method with body, body provided in request
     post("declare %R:method('POST', '{$b}') %R:path('') function m:f($b) {$b};", "12", "12",
         MediaType.TEXT_PLAIN);
 
     // ignore case
     get("declare %R:method('get') %R:path('') function m:f() {'x'};", "", "x");
-    getE("declare %R:method('get') declare %R:method('GET') %R:path('') "
+    getError("declare %R:method('get') declare %R:method('GET') %R:path('') "
         + "function m:f() {'x'};", "");
 
     // custom HTTP method without body
     install("declare %R:method('RETRIEVE') %R:path('') function m:f() {'x'};");
-    // java.net.HttpUrlConnection does not support custom HTTP methods
-    // assertEquals("x", request("", "RETRIEVE"));
+    assertEquals("x", send("", "RETRIEVE", null, null, 200));
 
     // custom HTTP method with body
     install("declare %R:method('RETRIEVE', '{$b}') %R:path('') function m:f($b) {$b};");
-    // java.net.HttpUrlConnection does not support custom HTTP methods
-    // assertEquals("12", request("", "RETRIEVE", "12", MediaType.TEXT_PLAIN));
+    assertEquals("12", send("", "RETRIEVE", new ArrayInput("12"), MediaType.TEXT_PLAIN, 200));
 
     // custom HTTP method specified twice
-    final String q = "declare %R:method('RETRIEVE') %R:method('RETRIEVE') %R:path('') "
-        + "function m:f() {'x'};";
-    install(q);
-    try {
-      // java.net.HttpUrlConnection does not support custom HTTP methods
-      request("", "RETRIEVE");
-      fail("Error expected: " + q);
-    } catch (final BaseXException ex) {
-      Util.debug(ex);
-    }
+    install("declare %R:method('RETRIEVE') %R:method('RETRIEVE') %R:path('') "
+        + "function m:f() {'x'};");
+    send("", "RETRIEVE", null, null, 500);
   }
 
   /**
@@ -85,16 +75,16 @@ public final class RestXqMethodTest extends RestXqTest {
    */
   @Test public void head() throws Exception {
     // correct return type
-    headR("declare %R:HEAD %R:path('') function m:f() { <R:response/> };");
-    headR("declare %R:HEAD %R:path('') function m:f() as element(R:response) { <R:response/> };");
+    head("declare %R:HEAD %R:path('') function m:f() { <R:response/> };");
+    head("declare %R:HEAD %R:path('') function m:f() as element(R:response) { <R:response/> };");
     // wrong type
-    headE("declare %R:HEAD %R:path('') function m:f() { () };");
-    headE("declare %R:HEAD %R:path('') function m:f() { <response/> };");
-    headE("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {()};");
+    headError("declare %R:HEAD %R:path('') function m:f() { () };");
+    headError("declare %R:HEAD %R:path('') function m:f() { <response/> };");
+    headError("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {()};");
 
     // correct return type
-    headR("declare %R:GET %R:path('') function m:f() { () };");
-    headR("declare %R:GET %R:path('') function m:f() { 1 to 5 };");
+    head("declare %R:GET %R:path('') function m:f() { () };");
+    head("declare %R:GET %R:path('') function m:f() { 1 to 5 };");
   }
 
   /**
@@ -137,25 +127,20 @@ public final class RestXqMethodTest extends RestXqTest {
   /**
    * Executes the specified HEAD request and tests the result.
    * @param function function to test
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  private static void headR(final String function) throws IOException {
+  private static void head(final String function) throws Exception {
     install(function);
-    assertEquals("", head(""));
+    assertEquals("", head("", 200));
   }
 
   /**
    * Executes the specified HEAD request and tests for an error.
    * @param function function to test
-   * @throws IOException I/O exception
+   * @throws Exception exception
    */
-  private static void headE(final String function) throws IOException {
+  private static void headError(final String function) throws Exception {
     install(function);
-    try {
-      head("");
-      fail("Error expected: " + "");
-    } catch(final BaseXException ex) {
-      Util.debug(ex);
-    }
+    head("", 500);
   }
 }

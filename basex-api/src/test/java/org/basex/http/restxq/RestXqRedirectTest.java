@@ -13,19 +13,15 @@ public final class RestXqRedirectTest extends RestXqTest {
    * Redirect request.
    * @throws Exception exception */
   @Test public void redirect() throws Exception {
-    final String f =
-      "declare %R:path('')  function m:a() { web:redirect('a') };" +
-      "declare %R:path('a') function m:b() { 'R' };";
-    get(f, "", "R");
+    get("declare %R:path('')  function m:a() { web:redirect('a') };" +
+        "declare %R:path('a') function m:b() { 'R' };", "", "R");
   }
 
   /**
    * Forward request.
    * @throws Exception exception */
   @Test public void forward() throws Exception {
-    final String f =
-      "declare %R:path('')  function m:a() { web:forward('a') };" +
-      "declare %R:path('a') function m:b() { 'F' };";
-    get(f, "", "F");
+    get("declare %R:path('')  function m:a() { web:forward('a') };" +
+        "declare %R:path('a') function m:b() { 'F' };", "", "F");
   }
 }

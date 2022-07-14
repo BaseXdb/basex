@@ -93,15 +93,10 @@ public final class RESTPostTest extends RESTTest {
         "<option name='" + MainOptions.MIXUPDATES.name() + "' value='true'/></query>",
         MediaType.APPLICATION_XML));
 
-    try {
-      post("", "<query xmlns=\"" + URI + "\">" +
-          "<text>1, delete node &lt;a/&gt;</text>" +
-        "<option name='" + MainOptions.MIXUPDATES.name() + "' value='false'/></query>",
-        MediaType.APPLICATION_XML);
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[XUST0001]");
-    }
+    post("", "<query xmlns=\"" + URI + "\">" +
+        "<text>1, delete node &lt;a/&gt;</text>" +
+      "<option name='" + MainOptions.MIXUPDATES.name() + "' value='false'/></query>",
+      MediaType.APPLICATION_XML, 500);
   }
 
   /**
@@ -116,19 +111,12 @@ public final class RESTPostTest extends RESTTest {
             MediaType.APPLICATION_XML));
   }
 
-  /** POST Test: execute buggy query. */
-  @Test public void postErr() {
-    try {
-      assertEquals("", post("", "<query xmlns=\"" + URI + "\"><text>(</text></query>",
-          MediaType.APPLICATION_XML));
-    } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "[XPST0003]");
-    }
-
-    try {
-      assertEquals("", post("", "<abcde/>", MediaType.APPLICATION_XML));
-    } catch(final IOException ex) {
-      assertContains(ex.getMessage(), "abcde");
-    }
-}
+  /**
+   * POST Test: execute buggy query.
+   * @throws IOException I/O exception
+   */
+  @Test public void postErr() throws IOException {
+    post("", "<query xmlns=\"" + URI + "\"><text>(</text></query>",
+          MediaType.APPLICATION_XML, 500);
+  }
 }

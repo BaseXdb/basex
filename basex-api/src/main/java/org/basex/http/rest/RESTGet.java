@@ -4,12 +4,12 @@ import static org.basex.http.rest.RESTText.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.http.*;
-import org.basex.io.serial.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This class processes GET requests sent to the REST server.
@@ -33,7 +33,7 @@ final class RESTGet {
     // parse query string
     String op = null, input = null, value = null;
     final HTTPConnection conn = session.conn;
-    final SerializerOptions sopts = conn.sopts();
+    final Options sopts = conn.sopts(), mopts = conn.context.options;
     for(final Entry<String, String[]> param : conn.requestCtx.queryStrings().entrySet()) {
       final String key = param.getKey();
       final String[] values = param.getValue();
@@ -46,11 +46,8 @@ final class RESTGet {
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         value = values[0];
-      } else if(sopts.option(key) != null) {
-        // serialization parameters
-        for(final String val : values) sopts.assign(key, val);
-      } else if(!RESTCmd.parseOption(session, param, false)) {
-        // options or (if not found) external variables
+      } else if(!RESTCmd.assign(sopts, param, false) && !RESTCmd.assign(mopts, param, false)) {
+        // assign database option, serialization parameter or external variable
         bindings.put(key, new String[] { values[0], null });
       }
     }

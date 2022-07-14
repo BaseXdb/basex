@@ -38,13 +38,13 @@ public abstract class RestXqTest extends HTTPTest {
    * Executes the specified GET request and tests the result.
    * @param function function to test
    * @param query request
-   * @param exp expected result
+   * @param expected expected result
    * @throws IOException I/O exception
    */
-  protected static void get(final String function, final String query, final String exp)
+  protected static void get(final String function, final String query, final String expected)
       throws IOException {
     install(function);
-    assertEquals(exp, get(query));
+    assertEquals(expected, get(query));
   }
 
   /**
@@ -53,14 +53,21 @@ public abstract class RestXqTest extends HTTPTest {
    * @param query request
    * @throws IOException I/O exception
    */
-  protected static void getE(final String function, final String query) throws IOException {
+  protected static void getError(final String function, final String query) throws IOException {
+    getStatus(function, query, 500);
+  }
+
+  /**
+   * Executes the specified GET request and tests for a status code.
+   * @param function function to test
+   * @param query request
+   * @param status status code to check
+   * @throws IOException I/O exception
+   */
+  protected static void getStatus(final String function, final String query, final int status)
+      throws IOException {
     install(function);
-    try {
-      get(query);
-      fail("Error expected: " + query);
-    } catch(final BaseXException ex) {
-      Util.debug(ex);
-    }
+    get(query, status);
   }
 
   /**
@@ -69,13 +76,13 @@ public abstract class RestXqTest extends HTTPTest {
    * @param query request
    * @param request request
    * @param type media type
-   * @param exp expected result
+   * @param expected expected result
    * @throws IOException I/O exception
    */
   protected static void post(final String function, final String query, final String request,
-      final MediaType type, final String exp) throws IOException {
+      final MediaType type, final String expected) throws IOException {
     install(function);
-    assertEquals(exp, post(query, request, type));
+    assertEquals(expected, post(query, request, type));
   }
 
   /**

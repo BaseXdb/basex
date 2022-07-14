@@ -35,7 +35,7 @@ final class RESTPut {
     final String db = conn.db();
     if(db.isEmpty()) throw HTTPCode.NO_DATABASE_SPECIFIED.get();
 
-    RESTCmd.parseOptions(session);
+    RESTCmd.assignOptions(session);
 
     final MainOptions options = conn.context.options;
     final InputStream is = conn.request.getInputStream();

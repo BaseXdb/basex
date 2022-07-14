@@ -49,7 +49,7 @@ public final class RESTParallelPutTest extends HTTPTest {
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();
 
-    delete(NAME);
+    delete(NAME, 200);
     if(failed != null) fail(failed);
   }
 

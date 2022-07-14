@@ -170,7 +170,13 @@ public final class HttpClient {
   private HttpURLConnection connect(final String url, final HttpRequest request)
       throws QueryException, IOException {
 
-    final URLConnection uc = new IOUrl(url).connection();
+    final URL u = new URL(url);
+    final URLConnection uc = u.openConnection();
+    uc.setConnectTimeout(10000);
+    // use basic authentication if credentials are contained in the url
+    final String ui = u.getUserInfo();
+    if(ui != null) uc.setRequestProperty(HttpText.AUTHORIZATION,
+        AuthMethod.BASIC + " " + Base64.encode(ui));
     if(!(uc instanceof HttpURLConnection)) throw HC_ERROR_X.get(info, "Invalid URL: " + url);
 
     HttpURLConnection conn = (HttpURLConnection) uc;

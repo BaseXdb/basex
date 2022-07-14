@@ -15,9 +15,10 @@ public final class RestXqFilterTest extends RestXqTest {
    */
   @Test public void consumes() throws Exception {
     // correct syntax
-    getE("declare %R:path('') %R:consumes('text/plain') function m:f() { 1 };", "");
+    getStatus("declare %R:path('') %R:consumes('text/plain') function m:f() { 1 };", "", 404);
     get("declare %R:path('') %R:consumes('*/*') function m:f() { 1 };", "", "1");
-    getE("declare %R:path('') %R:consumes('text/plain;bla=blu') function m:f() { 1 };", "");
+    getStatus("declare %R:path('') %R:consumes('text/plain;bla=blu') function m:f() { 1 };",
+        "", 404);
 
     // multiple types
     get("declare %R:path('') %R:consumes('text/plain', '*/*') function m:f() { 1 };", "", "1");
@@ -28,7 +29,7 @@ public final class RestXqFilterTest extends RestXqTest {
         "", "2");
 
     // invalid content type: ignored as no content type has been specified by user
-    getE("declare %R:path('') %R:consumes('X') function m:f() { 1 };", "");
+    getStatus("declare %R:path('') %R:consumes('X') function m:f() { 1 };", "", 404);
   }
 
   /**
@@ -62,15 +63,15 @@ public final class RestXqFilterTest extends RestXqTest {
         "<R:response><http:response status='200' message='OK'/></R:response>, 'OK'};", "", "OK");
 
     // wrong syntax
-    getE("declare %R:path('') function m:f() { " +
+    getError("declare %R:path('') function m:f() { " +
         "<R:response abc='x'/> };", "");
-    getE("declare %R:path('') function m:f() { " +
+    getError("declare %R:path('') function m:f() { " +
         "<R:response>X</R:response> };", "");
-    getE("declare %R:path('') function m:f() { " +
+    getError("declare %R:path('') function m:f() { " +
         "<R:response><X/></R:response> };", "");
-    getE("declare %R:path('') function m:f() { " +
+    getError("declare %R:path('') function m:f() { " +
         "<R:response><http:response stat='200'/></R:response> };", "");
-    getE("declare %R:path('') function m:f() { " +
+    getError("declare %R:path('') function m:f() { " +
         "<R:response><http:response>X</http:response></R:response> };", "");
   }
 }

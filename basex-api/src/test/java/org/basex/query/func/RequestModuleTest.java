@@ -60,7 +60,7 @@ public final class RequestModuleTest extends HTTPTest {
     put(NAME, null);
     assertEquals("/rest/", get(queryString(func.args())));
     assertEquals("/rest/" + NAME, get(NAME + queryString(func.args())));
-    delete(NAME);
+    delete(NAME, 200);
   }
 
   /**
@@ -120,9 +120,9 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void headerNames() throws Exception {
     final ApiFunction func = _REQUEST_HEADER_NAMES;
-    final String result = get(queryString("string-join(" + func.args() + ", ',')"));
-    assertEquals("Accept,Connection,Host,User-Agent",
-        query("``[" + result + "]`` => tokenize(',') => sort() => string-join(',')"));
+    final String result = get(queryString(func.args()));
+    assertEquals("true", query("let $names := tokenize(``[" + result + "]``)" +
+        "return every $n in ('Connection', 'Host', 'User-Agent') satisfies $n = $names"));
   }
 
   /**

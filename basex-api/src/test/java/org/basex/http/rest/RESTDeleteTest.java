@@ -24,14 +24,9 @@ public final class RESTDeleteTest extends RESTTest {
   @Test public void delete1() throws IOException {
     put(NAME, new FileInputStream(FILE));
     // delete database
-    assertEquals(delete(NAME).trim(), Util.info(Text.DB_DROPPED_X, NAME));
-    try {
-      // no database left
-      delete(NAME);
-      fail("Error expected.");
-    } catch(final BaseXException ex) {
-      Util.debug(ex);
-    }
+    assertEquals(delete(NAME, 200).trim(), Util.info(Text.DB_DROPPED_X, NAME));
+    // no database left
+    delete(NAME, 404);
   }
 
   /**
@@ -43,20 +38,15 @@ public final class RESTDeleteTest extends RESTTest {
     put(NAME + "/a", new ArrayInput(token("<a/>")));
     put(NAME + "/b", new ArrayInput(token("<b/>")));
     // delete 'a' directory
-    assertStartsWith(delete(NAME + "/a"), "1 ");
+    assertStartsWith(delete(NAME + "/a", 200), "1 ");
     // delete 'b' directory
-    assertStartsWith(delete(NAME + "/b"), "1 ");
+    assertStartsWith(delete(NAME + "/b", 200), "1 ");
     // no 'b' directory left
-    assertStartsWith(delete(NAME + "/b"), "0 ");
+    assertStartsWith(delete(NAME + "/b", 200), "0 ");
     // delete database
-    assertEquals(delete(NAME).trim(), Util.info(Text.DB_DROPPED_X, NAME));
-    try {
-      // no database left
-      delete(NAME);
-      fail("Error expected.");
-    } catch(final BaseXException ex) {
-      Util.debug(ex);
-    }
+    assertEquals(delete(NAME, 200).trim(), Util.info(Text.DB_DROPPED_X, NAME));
+    // no database left
+    delete(NAME, 404);
   }
 
   /**
@@ -65,14 +55,8 @@ public final class RESTDeleteTest extends RESTTest {
    */
   @Test public void deleteOption() throws IOException {
     put(NAME, null);
-    delete(NAME + "/a?" + MainOptions.STRIPWS.name() + "=true");
-
-    try {
-      delete(NAME + "/a?xxx=true");
-      fail("Error expected.");
-    } catch(final IOException ex) {
-      Util.debug(ex);
-    }
+    delete(NAME + "/a?" + MainOptions.STRIPWS.name() + "=true", 200);
+    // unknown option
+    delete(NAME + "/a?xxx=true", 400);
   }
-
 }

@@ -1,9 +1,5 @@
 package org.basex.http.restxq;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.*;
-
 import org.junit.jupiter.api.*;
 
 /**
@@ -28,7 +24,7 @@ public final class RestXqPathTest extends RestXqTest {
     // explicit GET method
     get("declare %R:GET %R:path('') function m:f() { 'root' };", "", "root");
     // duplicate GET method
-    getE("declare %R:GET %R:GET %R:path('') function m:f() { 'root' };", "");
+    getError("declare %R:GET %R:GET %R:path('') function m:f() { 'root' };", "");
   }
 
   /**
@@ -66,8 +62,7 @@ public final class RestXqPathTest extends RestXqTest {
   @Test public void getRootVariable() throws Exception {
     final String f = "declare %R:path('{$x}/a/b/c') function m:f($x) {$x};";
     get(f, "x/a/b/c", "x");
-    // wrong path
-    getE(f, "x/a/b/d");
+    getStatus(f, "x/a/b/d", 404);
   }
 
   /**
@@ -77,7 +72,7 @@ public final class RestXqPathTest extends RestXqTest {
   @Test public void getInteger() throws Exception {
     final String f = "declare %R:path('/{$x}') function m:f($x as xs:int) {$x};";
     get(f, "2", "2");
-    getE(f, "StRiNg");
+    getError(f, "StRiNg");
   }
 
   /**
@@ -88,7 +83,7 @@ public final class RestXqPathTest extends RestXqTest {
     final String f = "declare %R:path('{$x}/{$y}') function " +
         "m:f($x as xs:integer,$y as xs:integer) {$x*$y};";
     get(f, "2/3", "6");
-    getE(f, "2/x");
+    getError(f, "2/x");
   }
 
   /**
@@ -104,20 +99,16 @@ public final class RestXqPathTest extends RestXqTest {
     get("declare %R:path(' ') function m:f() {1};", "%20", "1");
     get("declare %R:path('%2b') function m:f() {1};", "+", "1");
     get("declare %R:path('%20') function m:f() {1};", "%20", "1");
-    getE("declare %R:path('%F') function m:f() {1};", "");
-    getE("declare %R:path('%') function m:f() {1};", "");
+    getError("declare %R:path('%F') function m:f() {1};", "");
+    getError("declare %R:path('%') function m:f() {1};", "");
   }
 
   /**
    * Checks if undeclared functions are reported.
+   * @throws Exception exception
    */
-  @Test public void unknownFunction() {
-    try {
-      get("declare %R:path('') function m:f() { m:foo() };", "", "");
-      fail("Error expected (Unknown function: m:foo.)");
-    } catch(final IOException ex) {
-      assertTrue(ex.getMessage().contains("m:foo"));
-    }
+  @Test public void unknownFunction() throws Exception {
+    getStatus("declare %R:path('') function m:f() { m:foo() };", "", 500);
   }
 
   /**
@@ -128,17 +119,17 @@ public final class RestXqPathTest extends RestXqTest {
     // correct syntax
     get("declare %R:path('') function m:f() {()};", "", "");
     // no path annotation
-    getE("declare %R:GET function m:f() {()};", "");
+    getError("declare %R:GET function m:f() {()};", "");
     // no path argument
-    getE("declare %R:path function m:f() {()};", "");
+    getError("declare %R:path function m:f() {()};", "");
     // empty path argument
-    getE("declare %R:path() function m:f() {()};", "");
+    getError("declare %R:path() function m:f() {()};", "");
     // two path arguments
-    getE("declare %R:path('a', 'b') function m:f() {()};", "a");
-    getE("declare %R:path('a') %R:path('b') function m:f() {()};", "a");
+    getError("declare %R:path('a', 'b') function m:f() {()};", "a");
+    getError("declare %R:path('a') %R:path('b') function m:f() {()};", "a");
     // path not found
-    getE("declare %R:path('') function m:f() { 1 };", "X");
-    getE("declare %R:path('a') function m:f() { 1 };", "");
+    getStatus("declare %R:path('') function m:f() { 1 };", "X", 404);
+    getStatus("declare %R:path('a') function m:f() { 1 };", "", 404);
   }
 
   /**
@@ -149,19 +140,19 @@ public final class RestXqPathTest extends RestXqTest {
     // correct syntax
     get("declare %R:path('{$x}') function m:f($x) {$x};", "1", "1");
     // invalid variable definitions
-    getE("declare %R:path('{a}') function m:f() {()};", "a");
-    getE("declare %R:path('{ $a }') function m:f() {()};", "a");
+    getError("declare %R:path('{a}') function m:f() {()};", "a");
+    getError("declare %R:path('{ $a }') function m:f() {()};", "a");
     // invalid variable name
-    getE("declare %R:path('{$x::x}') function m:f() {()};", "a");
-    getE("declare %R:path('{$x x}') function m:f() {()};", "a");
+    getError("declare %R:path('{$x::x}') function m:f() {()};", "a");
+    getError("declare %R:path('{$x x}') function m:f() {()};", "a");
     // missing argument
-    getE("declare %R:path('{$x}') function m:f() {()};", "a");
+    getError("declare %R:path('{$x}') function m:f() {()};", "a");
     // variable in template specified twice
-    getE("declare %R:path('{$x}/{$x}') function m:f($x) {()};", "a");
+    getError("declare %R:path('{$x}/{$x}') function m:f($x) {()};", "a");
     // variable in template missing
-    getE("declare %R:path('') function m:f($x) {()};", "");
+    getError("declare %R:path('') function m:f($x) {()};", "");
     // variable must inherit xs:anyAtomicType
-    getE("declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
+    getError("declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
   }
 
   /**
@@ -171,13 +162,13 @@ public final class RestXqPathTest extends RestXqTest {
   @Test public void regex() throws Exception {
     get("declare %R:path('p/{$x=.+}') function m:f($x) { $x };", "p/a/b/c", "a/b/c");
     get("declare %R:path('p/{$x=[0-9]+}') function m:f($x) { $x };", "p/123", "123");
-    getE("declare %R:path('p/{$x=[0-9]+}') function m:f($x) { $x };", "p/123a");
+    getStatus("declare %R:path('p/{$x=[0-9]+}') function m:f($x) { $x };", "p/123a", 404);
     get("declare %R:path('{$a=\\d+}{$b=\\w+}{$c=\\d}') " +
         "function m:f($a, $b, $c) { $c || $b || $a };",
         "12ab3", "3ab12");
-    getE("declare %R:path('{$a=\\d+}{$b=\\w+}{$c=\\d}') " +
+    getStatus("declare %R:path('{$a=\\d+}{$b=\\w+}{$c=\\d}') " +
         "function m:f($a, $b, $c) { $c || $b || $a };",
-        "12ab3x");
+        "12ab3x", 404);
 
     get("declare %R:path('{$p=.+}') function m:f1($p) { 1 }; " +
         "declare %R:path('{$p=.+}/x') function m:f2($p) { 2 };",
@@ -195,6 +186,6 @@ public final class RestXqPathTest extends RestXqTest {
     // correct syntax
     get("declare %R:path('') function m:f() {'x'};", "", "x");
     // invalid annotation
-    getE("declare %R:path('') %R:xyz function m:f() {'x'};", "");
+    getError("declare %R:path('') %R:xyz function m:f() {'x'};", "");
   }
 }

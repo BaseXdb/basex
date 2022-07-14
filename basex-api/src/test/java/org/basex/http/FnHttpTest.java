@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  */
 public class FnHttpTest extends HTTPTest {
   /** Example url. */
-  static final String RESTURL = REST_ROOT + NAME;
+  static final String REST_URL = REST_ROOT + NAME;
 
   /** Books document. */
   private static final String BOOKS = "<books>" + "<book id='1'>"
@@ -60,7 +60,7 @@ public class FnHttpTest extends HTTPTest {
    * @throws Exception exception
    */
   @BeforeAll public static void start() throws Exception {
-    init(RESTURL, true);
+    init(REST_URL, true);
     ctx = new Context();
   }
 
@@ -72,8 +72,8 @@ public class FnHttpTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
-        + "</http:request>", RESTURL), ctx)) {
-      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_CREATED);
+        + "</http:request>", REST_URL), ctx)) {
+      checkResponse(qp.value(), 1, 201);
     }
   }
 
@@ -86,8 +86,8 @@ public class FnHttpTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
-        + "</http:request>", RESTURL), ctx)) {
-      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_CREATED);
+        + "</http:request>", REST_URL), ctx)) {
+      checkResponse(qp.value(), 1, 201);
     }
 
     // POST - query
@@ -98,8 +98,8 @@ public class FnHttpTest extends HTTPTest {
         + "<text><![CDATA[<x>1</x>]]></text>"
         + "</query>"
         + "</http:body>"
-        + "</http:request>", RESTURL), ctx)) {
-        checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
+        + "</http:request>", REST_URL), ctx)) {
+        checkResponse(qp.value(), 2, 200);
     }
 
     // Execute the same query but with content set from $bodies
@@ -107,11 +107,11 @@ public class FnHttpTest extends HTTPTest {
        " <http:request method='post'>"
         + "<http:body media-type='application/xml'/>"
         + "</http:request>",
-        RESTURL,
+        REST_URL,
         " <query xmlns='" + QueryText.BASEX_URL + "/rest'>"
         + "<text><![CDATA[<x>1</x>]]></text>"
         + "</query>"), ctx)) {
-      checkResponse(qp.value(), 2, HttpURLConnection.HTTP_OK);
+      checkResponse(qp.value(), 2, 200);
     }
   }
 
@@ -124,7 +124,7 @@ public class FnHttpTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
       final Value value = qp.value();
-      checkResponse(value, 2, HttpURLConnection.HTTP_OK);
+      checkResponse(value, 2, 200);
 
       assertEquals(NodeType.DOCUMENT_NODE, value.itemAt(1).type);
     }
@@ -133,7 +133,7 @@ public class FnHttpTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='get' override-media-type='text/plain'/>", REST_ROOT), ctx)) {
       final Value value = qp.value();
-      checkResponse(value, 2, HttpURLConnection.HTTP_OK);
+      checkResponse(value, 2, 200);
 
       assertEquals(AtomType.STRING, value.itemAt(1).type);
     }
@@ -141,7 +141,7 @@ public class FnHttpTest extends HTTPTest {
     // Get3 - with status-only='true'
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='get' status-only='true'/>", REST_ROOT), ctx)) {
-      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_OK);
+      checkResponse(qp.value(), 1, 200);
     }
   }
 
@@ -154,19 +154,19 @@ public class FnHttpTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='put'>"
         + "<http:body media-type='text/xml'><ToBeDeleted/></http:body>"
-        + "</http:request>", RESTURL), ctx)) {
+        + "</http:request>", REST_URL), ctx)) {
       qp.value();
     }
 
     // DELETE
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        " <http:request method='delete' status-only='true'/>", RESTURL), ctx)) {
-      checkResponse(qp.value(), 1, HttpURLConnection.HTTP_OK);
+        " <http:request method='delete' status-only='true'/>", REST_URL), ctx)) {
+      checkResponse(qp.value(), 1, 200);
     }
 
     // DELETE (same resource, empty sequence as body, 404 expected)
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        " <http:request method='delete'/>", RESTURL, " ()") + "[1]/@status/data()", ctx)) {
+        " <http:request method='delete'/>", REST_URL, " ()") + "[1]/@status/data()", ctx)) {
       assertEquals("404", qp.value().serialize().toString());
     }
   }
@@ -203,7 +203,7 @@ public class FnHttpTest extends HTTPTest {
    */
   @Test public void unknown() throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-        " <http:request method='get'/>", RESTURL + "unknown") + "[1]/@status/data()", ctx)) {
+        " <http:request method='get'/>", REST_URL + "unknown") + "[1]/@status/data()", ctx)) {
       assertEquals("404", qp.value().serialize().toString());
     }
   }

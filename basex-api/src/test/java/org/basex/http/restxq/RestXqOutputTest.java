@@ -17,10 +17,10 @@ public final class RestXqOutputTest extends RestXqTest {
     // correct syntax
     get("declare %R:path('') %output:method('text') function m:f() {'9'};", "", "9");
     // unknown serialization parameter
-    getE("declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
+    getError("declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
     // parameter must contain single string
-    getE("declare %R:path('') %output:method function m:f() {'9'};", "");
-    getE("declare %R:path('') %output:method('xml', 'html') function m:f() {'9'};", "");
+    getError("declare %R:path('') %output:method function m:f() {'9'};", "");
+    getError("declare %R:path('') %output:method('xml', 'html') function m:f() {'9'};", "");
 
     get("declare %R:path('') function m:f() { <R:response>" +
         "  <output:serialization-parameters>" +
@@ -37,7 +37,7 @@ public final class RestXqOutputTest extends RestXqTest {
         "  <http:response status='200'/>" +
         "</R:response>," +
         "<X>1</X> };", "", "<X>1</X>");
-    getE("declare %R:path('') %output:method('text') function m:f() {" +
+    getError("declare %R:path('') %output:method('text') function m:f() {" +
         "<R:response>" +
         "  <output:serialization-parameters>" +
         "    <output:method value='xml'/>" +

@@ -1,8 +1,5 @@
 package org.basex.http.auth;
 
-import org.basex.core.*;
-import org.basex.http.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -22,22 +19,25 @@ public final class BasicAuthTest extends AuthTest {
 
   /**
    * Successful response.
+   * @throws Exception exception
    */
-  @Test public void simple() {
-    test(REST_ROOT.replace("://", "://admin:admin@") + "?query=1", null);
+  @Test public void ok() throws Exception {
+    test(REST_ROOT.replace("://", "://admin:admin@") + "?query=1", 200);
   }
 
   /**
    * Missing authentication method.
+   * @throws Exception exception
    */
-  @Test public void missingAuth() {
-    test(REST_ROOT, Util.info(HTTPText.WRONGAUTH_X, method));
+  @Test public void missing() throws Exception {
+    test(REST_ROOT, 401);
   }
 
   /**
    * Access denied.
+   * @throws Exception exception
    */
-  @Test public void accessDenied() {
-    test(REST_ROOT.replace("://", "://user:unknown@"), Util.info(Text.ACCESS_DENIED_X, "user"));
+  @Test public void wrong() throws Exception {
+    test(REST_ROOT.replace("://", "://user:unknown@"), 401);
   }
 }

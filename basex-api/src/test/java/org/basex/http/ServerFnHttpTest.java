@@ -15,7 +15,7 @@ public final class ServerFnHttpTest extends FnHttpTest {
    * @throws Exception exception
    */
   @BeforeAll public static void start() throws Exception {
-    init(RESTURL, false);
+    init(REST_URL, false);
     ctx = new Context();
   }
 }
