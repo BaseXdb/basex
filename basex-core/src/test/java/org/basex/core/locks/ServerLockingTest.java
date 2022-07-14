@@ -49,8 +49,8 @@ public final class ServerLockingTest extends SandboxTest {
   @BeforeAll public static void start() throws Exception {
     server = createServer();
     final CountDownLatch latch = new CountDownLatch(2);
-    new Client(new CreateDB(NAME, DOC), null, latch);
-    new Client(new CreateDB(NAME + '1', DOC), null, latch);
+    new SandboxClient(new CreateDB(NAME, DOC), null, latch);
+    new SandboxClient(new CreateDB(NAME + '1', DOC), null, latch);
     // wait for both databases being created
     latch.await();
   }
@@ -90,8 +90,8 @@ public final class ServerLockingTest extends SandboxTest {
 
     sync = new CountDownLatch(2);
     test = new CountDownLatch(2);
-    final Client cl1 = new Client(new XQuery(query1), null, null);
-    final Client cl2 = new Client(new XQuery(query2), null, null);
+    final SandboxClient cl1 = new SandboxClient(new XQuery(query1), null, null);
+    final SandboxClient cl2 = new SandboxClient(new XQuery(query2), null, null);
     final boolean await = test.await(2 * SLEEP + SYNC, TimeUnit.MILLISECONDS);
     assertNull(cl1.error, cl1.error);
     assertNull(cl2.error, cl2.error);
@@ -237,18 +237,18 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void loadTests() throws Exception {
     final int totalQueries = RUN_COUNT * QUERIES.length;
-    final ArrayList<Client> clients = new ArrayList<>(totalQueries);
+    final ArrayList<SandboxClient> sandboxClients = new ArrayList<>(totalQueries);
     final CountDownLatch allDone = new CountDownLatch(totalQueries);
 
     for(int i = 0; i < RUN_COUNT; i++) {
       for(final String query : QUERIES) {
-        clients.add(new Client(new XQuery(f(query, NAME, "1")), null, allDone));
+        sandboxClients.add(new SandboxClient(new XQuery(f(query, NAME, "1")), null, allDone));
       }
     }
 
     assertTrue(allDone.await(totalQueries * SLEEP, TimeUnit.MILLISECONDS));
-    for(final Client client : clients) {
-      assertNull(client.error, client.error);
+    for(final SandboxClient sandboxClient : sandboxClients) {
+      assertNull(sandboxClient.error, sandboxClient.error);
     }
   }
 }

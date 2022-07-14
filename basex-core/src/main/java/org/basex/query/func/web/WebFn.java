@@ -22,9 +22,9 @@ abstract class WebFn extends StandardFunc {
   /** Response options. */
   public static class ResponseOptions extends Options {
     /** Status. */
-    public static final NumberOption STATUS = new NumberOption(HttpText.STATUS);
+    public static final NumberOption STATUS = new NumberOption(HTTPText.STATUS);
     /** Message. */
-    public static final StringOption MESSAGE = new StringOption(HttpText.MESSAGE);
+    public static final StringOption MESSAGE = new StringOption(HTTPText.MESSAGE);
   }
 
   /**
@@ -63,17 +63,17 @@ abstract class WebFn extends StandardFunc {
       final HashMap<String, String> output) throws QueryException {
 
     // root element
-    final FElem rrest = new FElem(HttpText.Q_REST_RESPONSE).declareNS();
+    final FElem rrest = new FElem(HTTPText.Q_REST_RESPONSE).declareNS();
 
     // HTTP response
-    final FElem hresp = new FElem(HttpText.Q_HTTP_RESPONSE).declareNS();
+    final FElem hresp = new FElem(HTTPText.Q_HTTP_RESPONSE).declareNS();
     for(final Option<?> o : response) {
       if(response.contains(o)) hresp.add(o.name(), response.get(o).toString());
     }
     headers.forEach((name, value) -> {
       if(!value.isEmpty()) {
-        final FElem hheader = new FElem(HttpText.Q_HTTP_HEADER);
-        hresp.add(hheader.add(HttpText.NAME, name).add(HttpText.VALUE, value));
+        final FElem hheader = new FElem(HTTPText.Q_HTTP_HEADER);
+        hresp.add(hheader.add(HTTPText.NAME, name).add(HTTPText.VALUE, value));
       }
     });
     rrest.add(hresp);
@@ -88,7 +88,7 @@ abstract class WebFn extends StandardFunc {
       output.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final FElem out = new FElem(new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI));
-          param.add(out.add(HttpText.VALUE, value));
+          param.add(out.add(HTTPText.VALUE, value));
         }
       });
       rrest.add(param);

@@ -40,7 +40,7 @@ final class RESTGet {
 
       if(Strings.eqic(key, COMMAND, QUERY, RUN)) {
         if(op != null || values.length > 1)
-          throw HTTPCode.MULTIPLE_OPS_X.get(String.join(", ", values));
+          throw HTTPStatus.MULTIPLE_OPS_X.get(String.join(", ", values));
         op = key;
         input = values[0];
       } else if(key.equalsIgnoreCase(CONTEXT)) {

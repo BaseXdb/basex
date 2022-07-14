@@ -43,7 +43,7 @@ final class RESTPost {
     try(NewlineInput ni = new NewlineInput(conn.request.getInputStream())) {
       doc = new DBNode(new IOContent(ni.encoding(encoding).content()));
     } catch(final IOException ex) {
-      throw HTTPCode.BAD_REQUEST_X.get(ex);
+      throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }
 
     try {
@@ -64,7 +64,7 @@ final class RESTPost {
           if(sopts.option(name) != null) {
             sopts.assign(name, value);
           } else {
-            throw HTTPCode.UNKNOWN_PARAM_X.get(name);
+            throw HTTPStatus.UNKNOWN_PARAM_X.get(name);
           }
         }
       }
@@ -94,7 +94,7 @@ final class RESTPost {
       try(QueryProcessor qp = new QueryProcessor("*/*:context/(*|text()[normalize-space()])", ctx).
           context(doc)) {
         for(final Item item : qp.value()) {
-          if(value != null) throw HTTPCode.MULTIPLE_CONTEXTS.get();
+          if(value != null) throw HTTPStatus.MULTIPLE_CONTEXTS.get();
           // create main memory instance of the specified node
           value = DataBuilder.stripNamespace((ANode) item, REST_URI, ctx).serialize().toString();
         }
@@ -110,10 +110,10 @@ final class RESTPost {
       if(cmd.equals(COMMAND)) return RESTCommand.get(session, text);
       if(cmd.equals(RUN)) return RESTRun.get(session, text, bindings);
       if(cmd.equals(QUERY)) return RESTQuery.get(session, text, bindings);
-      throw HTTPCode.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
+      throw HTTPStatus.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
 
     } catch(final QueryException ex) {
-      throw HTTPCode.BAD_REQUEST_X.get(ex);
+      throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }
   }
 

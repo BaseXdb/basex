@@ -28,7 +28,7 @@ public final class RESTGetTest extends RESTTest {
     assertEquals("a,b", get("?query=string-join(('a','b'),',')"));
 
     put(NAME, new ArrayInput("<a/>"));
-    send(NAME + "/binary", HttpMethod.PUT.name(), new ArrayInput("XXX"),
+    send(NAME + "/binary", Method.PUT.name(), new ArrayInput("XXX"),
         MediaType.APPLICATION_OCTET_STREAM, 201);
     assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
     assertEquals("XXX", get(NAME + "/binary"));
@@ -98,7 +98,7 @@ public final class RESTGetTest extends RESTTest {
       throws IOException {
     final HttpHeaders headers = new IOUrl(REST_ROOT + query).response(
         HttpResponse.BodyHandlers.discarding()).headers();
-    final MediaType mt = new MediaType(headers.firstValue(HttpText.CONTENT_TYPE).get());
+    final MediaType mt = new MediaType(headers.firstValue(HTTPText.CONTENT_TYPE).get());
     if(!mt.is(type)) fail("Wrong media type: " + mt + " returned, " + type + " expected.");
   }
 

@@ -1,7 +1,6 @@
 package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.http.HTTPText.*;
 
 import java.io.*;
 import java.util.*;
@@ -17,6 +16,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * Base class for various servlets.
@@ -89,7 +89,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } catch(final Exception ex) {
       final String message = Util.bug(ex);
       Util.errln(message);
-      conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_X, message));
+      conn.error(SC_INTERNAL_SERVER_ERROR, Util.info(HTTPText.UNEXPECTED_X, message));
     } finally {
       if(Prop.debug) {
         Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());

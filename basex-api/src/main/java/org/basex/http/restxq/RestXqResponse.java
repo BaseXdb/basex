@@ -98,7 +98,7 @@ final class RestXqResponse extends WebResponse {
           head = item != null;
         }
       }
-      if(head && func.methods.size() == 1 && func.methods.contains(HttpMethod.HEAD.name()))
+      if(head && func.methods.size() == 1 && func.methods.contains(Method.HEAD.name()))
         throw func.error(HEAD_METHOD);
 
       // initialize serializer
@@ -112,7 +112,7 @@ final class RestXqResponse extends WebResponse {
         if(message != null) msg.append(message);
         if(s == 302) {
           if(msg.length() != 0) msg.append("; ");
-          msg.append(HttpText.LOCATION + ": ").append(conn.response.getHeader(HttpText.LOCATION));
+          msg.append(HTTPText.LOCATION + ": ").append(conn.response.getHeader(HTTPText.LOCATION));
         }
         conn.log(s, msg.toString());
         conn.status(s, message, null);
@@ -188,10 +188,10 @@ final class RestXqResponse extends WebResponse {
             final byte[] val = c.attribute(Q_VALUE);
             if(nam != null && val != null) {
               final String key = string(nam), value = string(val);
-              if(key.equalsIgnoreCase(HttpText.CONTENT_TYPE)) {
+              if(key.equalsIgnoreCase(HTTPText.CONTENT_TYPE)) {
                 cType = value;
               } else {
-                conn.response.setHeader(key, key.equalsIgnoreCase(HttpText.LOCATION) ?
+                conn.response.setHeader(key, key.equalsIgnoreCase(HTTPText.LOCATION) ?
                   conn.resolve(value) : value);
               }
             }

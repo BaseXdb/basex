@@ -26,7 +26,7 @@ final class RESTDelete {
 
     final HTTPConnection conn = session.conn;
     final String db = conn.db();
-    if(db.isEmpty()) throw HTTPCode.NO_DATABASE_SPECIFIED.get();
+    if(db.isEmpty()) throw HTTPStatus.NO_DATABASE_SPECIFIED.get();
 
     // open database to ensure it exists
     final String path = conn.dbpath();

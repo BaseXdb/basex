@@ -33,7 +33,7 @@ final class RESTPut {
     // create new database or update resource
     final HTTPConnection conn = session.conn;
     final String db = conn.db();
-    if(db.isEmpty()) throw HTTPCode.NO_DATABASE_SPECIFIED.get();
+    if(db.isEmpty()) throw HTTPStatus.NO_DATABASE_SPECIFIED.get();
 
     RESTCmd.assignOptions(session);
 

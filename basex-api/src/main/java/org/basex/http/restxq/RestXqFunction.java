@@ -212,7 +212,7 @@ public final class RestXqFunction extends WebFunction {
       final byte[] body = conn.requestCtx.body().read();
       final Value value;
       try {
-        value = HttpPayload.value(body, type, mopts);
+        value = Payload.value(body, type, mopts);
       } catch(final IOException ex) {
         throw error(BODY_TYPE_X_X, type, ex);
       }
@@ -358,7 +358,7 @@ public final class RestXqFunction extends WebFunction {
       final InputInfo ii) throws QueryException {
 
     if(body != null) {
-      final HttpMethod m = HttpMethod.get(method);
+      final Method m = Method.get(method);
       if(m != null && !m.body) throw error(ii, METHOD_VALUE_X, m);
       if(requestBody != null) throw error(ii, ANN_BODYVAR);
       requestBody = checkVariable(toString(body), declared);

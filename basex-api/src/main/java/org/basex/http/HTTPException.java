@@ -2,8 +2,6 @@ package org.basex.http;
 
 import java.io.*;
 
-import org.basex.util.*;
-
 /**
  * HTTP exception. Also thrown to pass on correct status codes.
  *
@@ -16,12 +14,12 @@ public final class HTTPException extends IOException {
 
   /**
    * Constructs an exception with the specified message and extension.
-   * @param err error
-   * @param ext message extension
+   * @param description description
+   * @param status status code
    */
-  HTTPException(final HTTPCode err, final Object... ext) {
-    super(Util.info(err.desc, ext));
-    status = err.code;
+  HTTPException(final String description, final int status) {
+    super(description);
+    this.status = status;
   }
 
   /**

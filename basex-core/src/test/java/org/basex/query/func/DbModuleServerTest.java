@@ -100,13 +100,13 @@ public final class DbModuleServerTest extends SandboxTest {
   private static void runClients(final Command cmd) throws IOException, InterruptedException {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
-    final Client[] clients = new Client[NUM];
+    final SandboxClient[] clients = new SandboxClient[NUM];
     for(int i = 0; i < NUM; i++) {
-      clients[i] = new Client(cmd, start, stop);
+      clients[i] = new SandboxClient(cmd, start, stop);
     }
     start.countDown();
     stop.await();
-    for(final Client c : clients) {
+    for(final SandboxClient c : clients) {
       if(c.error != null) fail(c.error);
     }
   }

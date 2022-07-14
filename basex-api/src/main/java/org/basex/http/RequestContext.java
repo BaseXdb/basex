@@ -134,8 +134,8 @@ public final class RequestContext {
       final Map<String, Value> map) throws QueryException, IOException {
 
     try(InputStream is = body().inputStream()) {
-      final HttpPayload hp = new HttpPayload(is, true, null, options);
-      hp.multiForm(type).forEach(map::put);
+      final Payload payload = new Payload(is, true, null, options);
+      payload.multiForm(type).forEach(map::put);
     }
   }
 

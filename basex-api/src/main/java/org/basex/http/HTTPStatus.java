@@ -2,13 +2,15 @@ package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
 
+import org.basex.util.*;
+
 /**
  * Enumeration with HTTP codes and error messages.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public enum HTTPCode {
+public enum HTTPStatus {
   /** Error: 201 (created). */
   CREATED_X(SC_CREATED, "%"),
 
@@ -36,16 +38,16 @@ public enum HTTPCode {
   /** Status code. */
   final int code;
   /** Error description. */
-  final String desc;
+  final String description;
 
   /**
    * Constructor.
    * @param code status code
    * @param desc description
    */
-  HTTPCode(final int code, final String desc) {
+  HTTPStatus(final int code, final String desc) {
     this.code = code;
-    this.desc = desc;
+    this.description = desc;
   }
 
   /**
@@ -54,6 +56,6 @@ public enum HTTPCode {
    * @return HTTP exception
    */
   public HTTPException get(final Object... ext) {
-    return new HTTPException(this, ext);
+    return new HTTPException(Util.info(description, ext), code);
   }
 }

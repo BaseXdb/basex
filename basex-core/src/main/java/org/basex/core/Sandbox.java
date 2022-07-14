@@ -346,7 +346,7 @@ public abstract class Sandbox {
   }
 
   /** Client. */
-  public static final class Client extends Thread {
+  public static final class SandboxClient extends Thread {
     /** Start signal. */
     private final CountDownLatch startSignal;
     /** Stop signal. */
@@ -365,7 +365,7 @@ public abstract class Sandbox {
      * @param stop stop signal
      * @throws IOException I/O exception while establishing the session
      */
-    public Client(final Command c, final CountDownLatch start, final CountDownLatch stop)
+    public SandboxClient(final Command c, final CountDownLatch start, final CountDownLatch stop)
         throws IOException {
 
       session = createClient();

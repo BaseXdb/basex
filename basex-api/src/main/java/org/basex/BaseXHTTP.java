@@ -1,7 +1,7 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
-import static org.basex.http.HTTPText.*;
+import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;

@@ -6,7 +6,7 @@ import java.util.stream.*;
 
 import org.basex.http.*;
 import org.basex.http.web.*;
-import org.basex.http.web.WebResponse.*;
+import org.basex.http.web.WebResponse.Response;
 import org.basex.query.*;
 import org.basex.util.http.*;
 
@@ -47,18 +47,18 @@ public final class RestXqServlet extends BaseXServlet {
     // no function found? check alternatives
     if(func == null) {
       // OPTIONS: no custom response required
-      if(conn.method.equals(HttpMethod.OPTIONS.name())) {
-        conn.response.setHeader(HttpText.ALLOW, Stream.of(HttpMethod.values()).map(Enum::name).
+      if(conn.method.equals(Method.OPTIONS.name())) {
+        conn.response.setHeader(HTTPText.ALLOW, Stream.of(Method.values()).map(Enum::name).
             collect(Collectors.joining(",")));
         return;
       }
       // HEAD: evaluate GET, discard body
-      if(conn.method.equals(HttpMethod.HEAD.name())) {
-        conn.method = HttpMethod.GET.name();
+      if(conn.method.equals(Method.HEAD.name())) {
+        conn.method = Method.GET.name();
         func = modules.restxq(conn, null);
         body = false;
       }
-      if(func == null) throw HTTPCode.SERVICE_NOT_FOUND.get();
+      if(func == null) throw HTTPStatus.SERVICE_NOT_FOUND.get();
     }
 
     // create response

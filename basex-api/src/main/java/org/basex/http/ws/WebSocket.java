@@ -1,7 +1,5 @@
 package org.basex.http.ws;
 
-import static org.basex.http.HTTPText.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -19,6 +17,7 @@ import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.eclipse.jetty.websocket.api.*;
 
@@ -139,8 +138,8 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientName() {
-    Object value = atts.get(CLIENT_ID);
-    if(value == null && session != null) value = session.getAttribute(CLIENT_ID);
+    Object value = atts.get(HTTPText.CLIENT_ID);
+    if(value == null && session != null) value = session.getAttribute(HTTPText.CLIENT_ID);
     return clientName(value, context);
   }
 

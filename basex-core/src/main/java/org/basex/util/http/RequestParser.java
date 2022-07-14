@@ -2,8 +2,8 @@ package org.basex.util.http;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.http.HttpText.*;
-import static org.basex.util.http.HttpText.VALUE;
+import static org.basex.util.http.HTTPText.*;
+import static org.basex.util.http.HTTPText.VALUE;
 
 import java.util.*;
 
@@ -18,7 +18,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.http.HttpRequest.*;
 
 /**
  * Request parser.
@@ -26,7 +25,7 @@ import org.basex.util.http.HttpRequest.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
-public final class HttpRequestParser {
+public final class RequestParser {
   /** Input information. */
   private final InputInfo info;
 
@@ -34,7 +33,7 @@ public final class HttpRequestParser {
    * Constructor.
    * @param info input info
    */
-  public HttpRequestParser(final InputInfo info) {
+  public RequestParser(final InputInfo info) {
     this.info = info;
   }
 
@@ -45,13 +44,13 @@ public final class HttpRequestParser {
    * @return parsed request
    * @throws QueryException query exception
    */
-  public HttpRequest parse(final ANode request, final Value bodies) throws QueryException {
-    final HttpRequest hr = new HttpRequest();
+  public Request parse(final ANode request, final Value bodies) throws QueryException {
+    final Request hr = new Request();
 
     if(request != null) {
       for(final ANode attr : request.attributeIter()) {
         final String key = string(attr.name());
-        final Request r = Request.get(key);
+        final RequestAttribute r = RequestAttribute.get(key);
         if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
         hr.attributes.put(r, string(attr.string()));
       }
@@ -159,7 +158,7 @@ public final class HttpRequestParser {
       if(payload == null) break;
       // content is set from <http:body/> children or from $bodies parameter
       final Item body = bodies.next();
-      parseBody(payload, body == null ? Empty.VALUE : body, part.bodyAtts, part.bodyContents);
+      parseBody(payload, body == null ? Empty.VALUE : body, part.attributes, part.contents);
       parts.add(part);
     }
   }
@@ -169,20 +168,20 @@ public final class HttpRequestParser {
    * @param request request
    * @throws QueryException query exception
    */
-  private void checkRequest(final HttpRequest request) throws QueryException {
+  private void checkRequest(final Request request) throws QueryException {
     // method denotes the HTTP verb and is mandatory
-    final String mth = request.attribute(Request.METHOD);
-    if(mth == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.METHOD);
-    request.attributes.put(Request.METHOD, mth.toUpperCase(Locale.ENGLISH));
+    final String mth = request.attribute(RequestAttribute.METHOD);
+    if(mth == null) throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.METHOD);
+    request.attributes.put(RequestAttribute.METHOD, mth.toUpperCase(Locale.ENGLISH));
 
     // check parameters needed in case of authorization
-    final String us = request.attribute(Request.USERNAME);
+    final String us = request.attribute(RequestAttribute.USERNAME);
     if(us != null) {
       // check if password is supplied
-      final String pw = request.attribute(Request.PASSWORD);
-      if(pw == null) throw HC_REQ_X.get(info, "Missing attribute: " + Request.PASSWORD);
+      final String pw = request.attribute(RequestAttribute.PASSWORD);
+      if(pw == null) throw HC_REQ_X.get(info, "Missing attribute: " + RequestAttribute.PASSWORD);
       // check if authorization method is supplied (default is 'Basic')
-      final String am = request.attribute(Request.AUTH_METHOD);
+      final String am = request.attribute(RequestAttribute.AUTH_METHOD);
       if(am != null) {
         final AuthMethod method = StaticOptions.AUTHMETHOD.get(am);
         if(method == null) throw HC_REQ_X.get(info, "Invalid authentication method: " + am);
@@ -191,12 +190,13 @@ public final class HttpRequestParser {
     }
 
     // check other parameters
-    final String timeout = request.attribute(Request.TIMEOUT);
+    final String timeout = request.attribute(RequestAttribute.TIMEOUT);
     if(timeout != null && Strings.toInt(timeout) < 0)
       throw HC_REQ_X.get(info, "Invalid timeout: " + timeout);
 
-    for(final Request r : new Request[] {
-      Request.FOLLOW_REDIRECT, Request.STATUS_ONLY, Request.SEND_AUTHORIZATION
+    for(final RequestAttribute r : new RequestAttribute[] {
+      RequestAttribute.FOLLOW_REDIRECT, RequestAttribute.STATUS_ONLY,
+      RequestAttribute.SEND_AUTHORIZATION
     }) {
       final String s = request.attribute(r);
       if(s != null && !Strings.eq(s, Text.TRUE, Text.FALSE))

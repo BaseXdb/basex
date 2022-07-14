@@ -19,7 +19,7 @@ public final class WebRedirect extends WebFn {
     final String location = createUrl(qc);
 
     final HashMap<String, String> headers = new HashMap<>();
-    headers.put(HttpText.LOCATION, location);
+    headers.put(HTTPText.LOCATION, location);
     final ResponseOptions response = new ResponseOptions();
     response.set(ResponseOptions.STATUS, 302);
     return createResponse(response, headers, null);

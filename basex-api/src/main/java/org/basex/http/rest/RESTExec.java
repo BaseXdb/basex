@@ -30,6 +30,6 @@ final class RESTExec extends RESTCmd {
   protected void run0() throws IOException {
     for(final Command cmd : session) run(cmd);
     session.conn.response.getOutputStream().write(Token.token(info()));
-    if(create) code = HTTPCode.CREATED_X;
+    if(create) status = HTTPStatus.CREATED_X;
   }
 }

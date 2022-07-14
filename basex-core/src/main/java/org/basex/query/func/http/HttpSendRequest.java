@@ -29,6 +29,6 @@ public final class HttpSendRequest extends StandardFunc {
       for(Item item; (item = qc.next(iter)) != null;) vb.add(item);
     }
     // send HTTP request
-    return new HttpClient(info, qc.context.options).sendRequest(href, request, vb.value());
+    return new Client(info, qc.context.options).sendRequest(href, request, vb.value());
   }
 }

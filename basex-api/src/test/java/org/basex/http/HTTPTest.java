@@ -1,7 +1,7 @@
 package org.basex.http;
 
 import static org.basex.core.users.UserText.*;
-import static org.basex.util.http.HttpMethod.*;
+import static org.basex.util.http.Method.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
@@ -163,7 +163,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static String post(final String query, final String payload, final MediaType type,
       final int status) throws IOException {
-    return send(query, HttpMethod.POST.name(), new ArrayInput(payload), type, status);
+    return send(query, Method.POST.name(), new ArrayInput(payload), type, status);
   }
 
   /**
@@ -185,7 +185,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static void put(final String query, final InputStream is, final int status)
       throws IOException {
-    send(query, HttpMethod.PUT.name(), is, null, status);
+    send(query, Method.PUT.name(), is, null, status);
   }
 
   /**
@@ -205,7 +205,7 @@ public abstract class HTTPTest extends SandboxTest {
       HttpRequest.BodyPublishers.noBody();
     final URI uri = URI.create(rootUrl + query.replace("<", "%3C").replace(">", "%3E"));
     final HttpRequest.Builder builder = HttpRequest.newBuilder(uri).method(method, pub);
-    if(type != null) builder.setHeader(HttpText.CONTENT_TYPE, type.toString());
+    if(type != null) builder.setHeader(HTTPText.CONTENT_TYPE, type.toString());
 
     try {
       final HttpClient client = HttpClient.newBuilder().followRedirects(Redirect.ALWAYS).build();

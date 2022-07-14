@@ -330,7 +330,7 @@ public final class WebModules {
       cache = modules;
     } else {
       // module cache needs to be updated
-      if(!path.exists()) throw HTTPCode.NO_RESTXQ_DIRECTORY.get();
+      if(!path.exists()) throw HTTPStatus.NO_RESTXQ_DIRECTORY.get();
 
       cache = new HashMap<>();
       parse(ctx, path, cache, modules);

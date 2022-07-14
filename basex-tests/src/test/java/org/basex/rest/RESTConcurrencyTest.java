@@ -1,7 +1,7 @@
 package org.basex.rest;
 
 import static org.basex.core.users.UserText.*;
-import static org.basex.util.http.HttpMethod.*;
+import static org.basex.util.http.Method.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
@@ -214,7 +214,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
     /** Content to send to the server. */
     private final byte[] data;
     /** HTTP method. */
-    protected final HttpMethod method;
+    protected final Method method;
     /** Stop signal. */
     public volatile boolean stop;
 
@@ -233,7 +233,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
      * @param data data to send to the server
      * @param method HTTP method
      */
-    protected Put(final String request, final byte[] data, final HttpMethod method) {
+    protected Put(final String request, final byte[] data, final Method method) {
       this.data = data;
       this.method = method;
       uri = URI.create(REST_URL + request);
@@ -243,7 +243,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
     public HTTPResponse call() throws Exception {
       final HttpRequest request = HttpRequest.newBuilder(uri).
           method(method.name(), HttpRequest.BodyPublishers.ofByteArray(data)).
-          setHeader(HttpText.CONTENT_TYPE, MediaType.APPLICATION_XML.toString()).
+          setHeader(HTTPText.CONTENT_TYPE, MediaType.APPLICATION_XML.toString()).
           timeout(Duration.ofMillis(SOCKET_TIMEOUT)).build();
       while(!stop) {
         try {

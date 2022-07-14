@@ -73,7 +73,7 @@ public final class IOUrl extends IO {
       final HttpRequest.Builder hb = HttpRequest.newBuilder(uri).timeout(Duration.ofMinutes(1));
       // credentials in the url: use basic authentication
       final String ui = uri.getUserInfo();
-      if(ui != null) hb.header(HttpText.AUTHORIZATION, AuthMethod.BASIC + " " + Base64.encode(ui));
+      if(ui != null) hb.header(HTTPText.AUTHORIZATION, AuthMethod.BASIC + " " + Base64.encode(ui));
       final HttpClient.Builder cb = HttpClient.newBuilder();
       if(ssl != null) cb.sslContext(ssl);
       return cb.followRedirects(Redirect.ALWAYS).build().send(hb.build(), handler);

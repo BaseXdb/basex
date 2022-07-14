@@ -29,7 +29,7 @@ public final class FetchContentType extends FetchDoc {
       try {
         final HttpHeaders headers = ((IOUrl) io).response(
             HttpResponse.BodyHandlers.discarding()).headers();
-        final Optional<String> value = headers.firstValue(HttpText.CONTENT_TYPE);
+        final Optional<String> value = headers.firstValue(HTTPText.CONTENT_TYPE);
         if(value.isPresent()) mt = new MediaType(value.get());
       } catch(final IOException ex) {
         throw FETCH_OPEN_X.get(info, ex);

@@ -3,8 +3,6 @@ package org.basex.util.http;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.query.value.item.*;
 
 /**
@@ -13,7 +11,27 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
-public interface HttpText {
+public interface HTTPText {
+  /** HTTP string. */
+  String HTTP = "HTTP";
+
+  /** WEB-INF directory. */
+  String WEB_INF = "WEB-INF/";
+  /** Path to jetty configuration file. */
+  String JETTYCONF = WEB_INF + "jetty.xml";
+  /** Path to web configuration file. */
+  String WEBCONF = WEB_INF + "web.xml";
+
+  /** Authentication error. */
+  String WRONGAUTH_X = "% authentication expected.";
+  /** Unexpected error. */
+  String UNEXPECTED_X = "Unexpected error: %";
+
+  /** DBA client id. */
+  String DBA_CLIENT_ID = "dba";
+  /** Client id. */
+  String CLIENT_ID = "id";
+
   /** HTTP header string. */
   String WWW_AUTHENTICATE = "WWW-Authenticate";
   /** HTTP header string. */
@@ -97,47 +115,4 @@ public interface HttpText {
   String BINARY = "binary";
   /** Base64 string. */
   String BASE64 = "base64";
-
-  /** Request attributes. */
-  enum Request {
-    /** NC. */ NC,
-    /** QOP. */ QOP,
-    /** URI. */ URI,
-    /** Href. */ HREF,
-    /** Nonce. */ NONCE,
-    /** Realm. */ REALM,
-    /** Opaque. */ OPAQUE,
-    /** Cnonce. */ CNONCE,
-    /** Method. */ METHOD,
-    /** Timeout. */ TIMEOUT,
-    /** Response. */ RESPONSE,
-    /** Password. */ PASSWORD,
-    /** Username. */ USERNAME,
-    /** Algorithm. */ ALGORITHM,
-    /** Auth-method. */ AUTH_METHOD,
-    /** Status-only. */ STATUS_ONLY,
-    /** Follow-redirect. */ FOLLOW_REDIRECT,
-    /** Send-authorization. */ SEND_AUTHORIZATION,
-    /** Override-media-type. */ OVERRIDE_MEDIA_TYPE;
-
-    /** Cached enums (faster). */
-    public static final Request[] VALUES = values();
-
-    /**
-     * Returns an enum for the specified string.
-     * @param key key
-     * @return enum or {@code null}
-     */
-    public static Request get(final String key) {
-      for(final Request r : VALUES) {
-        if(key.equals(r.toString())) return r;
-      }
-      return null;
-    }
-
-    @Override
-    public String toString() {
-      return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
-    }
-  }
 }

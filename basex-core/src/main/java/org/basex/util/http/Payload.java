@@ -2,8 +2,8 @@ package org.basex.util.http;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.http.HttpText.*;
-import static org.basex.util.http.HttpText.VALUE;
+import static org.basex.util.http.HTTPText.*;
+import static org.basex.util.http.HTTPText.VALUE;
 
 import java.io.*;
 import java.util.*;
@@ -35,7 +35,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class HttpPayload {
+public final class Payload {
   /** XML declaration (start). */
   private static final byte[] DECLSTART = token("<?xml");
   /** XML declaration (end). */
@@ -57,7 +57,7 @@ public final class HttpPayload {
    * @param info input info
    * @param options database options
    */
-  public HttpPayload(final InputStream input, final boolean body, final InputInfo info,
+  public Payload(final InputStream input, final boolean body, final InputInfo info,
       final MainOptions options) {
 
     this.input = input;
@@ -347,9 +347,9 @@ public final class HttpPayload {
       }
     } else if(type.isMultipart()) {
       try(InputStream is = io.inputStream()) {
-        final HttpPayload hp = new HttpPayload(is, true, null, options);
-        hp.extractParts(concat(DASHES, hp.boundary(type)), null);
-        return hp.payloads();
+        final Payload payload = new Payload(is, true, null, options);
+        payload.extractParts(concat(DASHES, payload.boundary(type)), null);
+        return payload.payloads();
       }
     } else {
       return B64.get(io.read());

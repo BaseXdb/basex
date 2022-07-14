@@ -2,7 +2,7 @@ package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.http.HttpText.*;
+import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
 import java.util.*;
@@ -89,7 +89,7 @@ public final class HTTPConnection implements ClientInfo {
    */
   public void authenticate(final String username) throws IOException {
     // choose admin user for OPTIONS requests, servlet-specific user, or global user (can be empty)
-    String name = method.equals(HttpMethod.OPTIONS.name()) ? UserText.ADMIN : username;
+    String name = method.equals(Method.OPTIONS.name()) ? UserText.ADMIN : username;
     if(name == null) name = context.soptions.get(StaticOptions.USER);
 
     // look for existing user. if it does not exist, try to authenticate
@@ -306,12 +306,12 @@ public final class HTTPConnection implements ClientInfo {
     try {
       response.resetBuffer();
       if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
-        final TokenBuilder header = new TokenBuilder();
-        header.add(authMethod).add(' ').add(Request.REALM).add("=\"").add(Prop.NAME).add('"');
+        final TokenBuilder header = new TokenBuilder().add(authMethod);
+        header.add(' ').add(RequestAttribute.REALM).add("=\"").add(Prop.NAME).add('"');
         if(authMethod == AuthMethod.DIGEST) {
           final String nonce = Strings.md5(Long.toString(System.nanoTime()));
-          header.add(",").add(Request.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
-          header.add('"').add(',').add(Request.NONCE).add("=\"").add(nonce).add('"');
+          header.add(",").add(RequestAttribute.QOP).add("=\"").add(AUTH).add(',').add(AUTH_INT);
+          header.add('"').add(',').add(RequestAttribute.NONCE).add("=\"").add(nonce).add('"');
         }
         response.setHeader(WWW_AUTHENTICATE, header.toString());
       }
@@ -445,17 +445,18 @@ public final class HTTPConnection implements ClientInfo {
           if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException(user.name());
 
         } else {
-          final EnumMap<Request, String> auth = HttpClient.authHeaders(header);
-          user = user(auth.get(Request.USERNAME));
+          final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header);
+          user = user(auth.get(RequestAttribute.USERNAME));
 
-          final String nonce = auth.get(Request.NONCE), cnonce = auth.get(Request.CNONCE);
+          final String nonce = auth.get(RequestAttribute.NONCE);
+          final String cnonce = auth.get(RequestAttribute.CNONCE);
           String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
-          if(Strings.eq(auth.get(Request.ALGORITHM), MD5_SESS))
+          if(Strings.eq(auth.get(RequestAttribute.ALGORITHM), MD5_SESS))
             ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 
           final StringBuilder h2 = new StringBuilder().append(method).append(':').
-              append(auth.get(Request.URI));
-          final String qop = auth.get(Request.QOP);
+              append(auth.get(RequestAttribute.URI));
+          final String qop = auth.get(RequestAttribute.QOP);
           if(Strings.eq(qop, AUTH_INT)) {
             h2.append(':').append(Strings.md5(requestCtx.body().toString()));
           }
@@ -463,12 +464,12 @@ public final class HTTPConnection implements ClientInfo {
 
           final StringBuilder sb = new StringBuilder(ha1).append(':').append(nonce);
           if(Strings.eq(qop, AUTH, AUTH_INT)) {
-            sb.append(':').append(auth.get(Request.NC));
+            sb.append(':').append(auth.get(RequestAttribute.NC));
             sb.append(':').append(cnonce).append(':').append(qop);
           }
           sb.append(':').append(ha2);
 
-          if(!Strings.md5(sb.toString()).equals(auth.get(Request.RESPONSE)))
+          if(!Strings.md5(sb.toString()).equals(auth.get(RequestAttribute.RESPONSE)))
             throw new LoginException(user.name());
         }
       }

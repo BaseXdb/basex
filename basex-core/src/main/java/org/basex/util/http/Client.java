@@ -1,8 +1,8 @@
 package org.basex.util.http;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.http.HttpText.*;
-import static org.basex.util.http.HttpText.Request.*;
+import static org.basex.util.http.HTTPText.*;
+import static org.basex.util.http.RequestAttribute.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -24,7 +24,6 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
-import org.basex.util.http.HttpRequest.*;
 
 /**
  * HTTP Client.
@@ -33,7 +32,7 @@ import org.basex.util.http.HttpRequest.*;
  * @author Rositsa Shadura
  * @author Michael Seiferle
  */
-public final class HttpClient {
+public final class Client {
   /** Input information. */
   private final InputInfo info;
   /** Database options. */
@@ -44,7 +43,7 @@ public final class HttpClient {
    * @param info input info
    * @param options database options
    */
-  public HttpClient(final InputInfo info, final MainOptions options) {
+  public Client(final InputInfo info, final MainOptions options) {
     this.info = info;
     this.options = options;
   }
@@ -60,7 +59,7 @@ public final class HttpClient {
   public Value sendRequest(final byte[] href, final ANode request, final Value bodies)
       throws QueryException {
 
-    final HttpRequest req = new HttpRequestParser(info).parse(request, bodies);
+    final Request req = new RequestParser(info).parse(request, bodies);
     HttpURLConnection conn = null;
     try {
       final String url = href == null || href.length == 0 ? req.attribute(HREF) :
@@ -72,7 +71,7 @@ public final class HttpClient {
       final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
       final String status = req.attribute(STATUS_ONLY);
       final boolean body = status == null || !Strings.toBoolean(status);
-      return new HttpResponse(info, options).getResponse(conn, body, mediaType);
+      return new Response(info, options).getResponse(conn, body, mediaType);
 
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);
@@ -90,7 +89,7 @@ public final class HttpClient {
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection send(final String url, final HttpRequest request)
+  private HttpURLConnection send(final String url, final Request request)
       throws QueryException, IOException {
 
     // create connection, check if authorization is required
@@ -98,7 +97,7 @@ public final class HttpClient {
     final String user = request.attribute(USERNAME);
     if(user != null) {
       final AuthMethod am = request.authMethod;
-      EnumMap<Request, String> auth = null;
+      EnumMap<RequestAttribute, String> auth = null;
       // check if client wants to send authorization data without challenge
       final boolean sendAuth = Strings.toBoolean(request.attribute(SEND_AUTHORIZATION));
       if(!sendAuth) {
@@ -167,7 +166,7 @@ public final class HttpClient {
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection connect(final String url, final HttpRequest request)
+  private HttpURLConnection connect(final String url, final Request request)
       throws QueryException, IOException {
 
     final URL u = new URL(url);
@@ -175,7 +174,7 @@ public final class HttpClient {
     uc.setConnectTimeout(10000);
     // use basic authentication if credentials are contained in the url
     final String ui = u.getUserInfo();
-    if(ui != null) uc.setRequestProperty(HttpText.AUTHORIZATION,
+    if(ui != null) uc.setRequestProperty(HTTPText.AUTHORIZATION,
         AuthMethod.BASIC + " " + Base64.encode(ui));
     if(!(uc instanceof HttpURLConnection)) throw HC_ERROR_X.get(info, "Invalid URL: " + url);
 
@@ -232,7 +231,7 @@ public final class HttpClient {
    * @param conn HTTP connection
    * @param request request data
    */
-  private static void setContentType(final HttpURLConnection conn, final HttpRequest request) {
+  private static void setContentType(final HttpURLConnection conn, final Request request) {
     String ct;
     final String contType = request.headers.get(CONTENT_TYPE.toLowerCase(Locale.ENGLISH));
     if(contType != null) {
@@ -251,8 +250,8 @@ public final class HttpClient {
    * @param auth authorization string
    * @return values values
    */
-  public static EnumMap<Request, String> authHeaders(final String auth) {
-    final EnumMap<Request, String> values = new EnumMap<>(Request.class);
+  public static EnumMap<RequestAttribute, String> authHeaders(final String auth) {
+    final EnumMap<RequestAttribute, String> values = new EnumMap<>(RequestAttribute.class);
     if(auth != null) {
       final String[] parts = Strings.split(auth, ' ', 2);
       values.put(AUTH_METHOD, parts[0]);
@@ -261,7 +260,7 @@ public final class HttpClient {
           final String[] kv = Strings.split(header, '=', 2);
           final String key = kv[0].trim();
           if(!key.isEmpty() && kv.length == 2) {
-            final Request r = Request.get(key);
+            final RequestAttribute r = RequestAttribute.get(key);
             if(r != null) values.put(r, Strings.delete(kv[1], '"').trim());
           }
         }
@@ -276,7 +275,7 @@ public final class HttpClient {
    * @param request request data
    * @throws IOException I/O exception
    */
-  public static void writePayload(final OutputStream out, final HttpRequest request)
+  public static void writePayload(final OutputStream out, final Request request)
       throws IOException {
 
     if(request.isMultipart) {
@@ -284,7 +283,7 @@ public final class HttpClient {
       for(final Part part : request.parts) {
         // write content to cache
         final ArrayOutput ao = new ArrayOutput();
-        writePayload(part.bodyContents, part.bodyAtts, ao);
+        writePayload(part.contents, part.attributes, ao);
 
         // write boundary preceded by "--"
         out.write(Token.concat("--", boundary, CRLF));
@@ -293,7 +292,7 @@ public final class HttpClient {
         for(final Entry<String, String> header : part.headers.entrySet())
           writeHeader(header.getKey(), header.getValue(), out);
         if(!part.headers.containsKey(CONTENT_TYPE))
-          writeHeader(CONTENT_TYPE, part.bodyAtts.get(SerializerOptions.MEDIA_TYPE.name()), out);
+          writeHeader(CONTENT_TYPE, part.attributes.get(SerializerOptions.MEDIA_TYPE.name()), out);
 
         out.write(CRLF);
         out.write(ao.finish());

@@ -49,7 +49,7 @@ final class RESTRun extends RESTQuery {
     // check if file is not found, is a folder or points to parent folder
     final IOFile file = new IOFile(root, path);
     if(!file.exists() || file.isDir() || !file.path().startsWith(root.path()))
-      throw HTTPCode.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, path));
+      throw HTTPStatus.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, path));
 
     // retrieve file contents
     final String input = file.string();

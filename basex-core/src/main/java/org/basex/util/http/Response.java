@@ -1,6 +1,6 @@
 package org.basex.util.http;
 
-import static org.basex.util.http.HttpText.*;
+import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;
@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Rositsa Shadura
  */
-public final class HttpResponse {
+public final class Response {
   /** Input information. */
   private final InputInfo info;
   /** Database options. */
@@ -32,7 +32,7 @@ public final class HttpResponse {
    * @param info input info
    * @param options database options
    */
-  public HttpResponse(final InputInfo info, final MainOptions options) {
+  public Response(final InputInfo info, final MainOptions options) {
     this.info = info;
     this.options = options;
   }
@@ -87,10 +87,10 @@ public final class HttpResponse {
       final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
         new MediaType(ctype) : new MediaType(mtype);
 
-      final HttpPayload hp = new HttpPayload(is, body, info, options);
+      final Payload payload = new Payload(is, body, info, options);
       try {
-        response.add(hp.parse(type, error, conn.getHeaderField(CONTENT_ENCODING)));
-        if(body) items.add(hp.payloads());
+        response.add(payload.parse(type, error, conn.getHeaderField(CONTENT_ENCODING)));
+        if(body) items.add(payload.payloads());
       } finally {
         is.close();
       }

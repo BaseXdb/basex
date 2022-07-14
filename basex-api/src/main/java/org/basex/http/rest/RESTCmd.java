@@ -28,8 +28,8 @@ abstract class RESTCmd extends Command {
   /** REST session. */
   final RESTSession session;
 
-  /** Return code (may be {@code null}). */
-  HTTPCode code;
+  /** Response status (may be {@code null}). */
+  HTTPStatus status;
 
   /**
    * Constructor.
@@ -108,8 +108,8 @@ abstract class RESTCmd extends Command {
       final String info = cmd.info();
       error(info);
       if(!ok) {
-        if(cmd instanceof Open) code = HTTPCode.NOT_FOUND_X;
-        throw HTTPCode.BAD_REQUEST_X.get(info);
+        if(cmd instanceof Open) status = HTTPStatus.NOT_FOUND_X;
+        throw HTTPStatus.BAD_REQUEST_X.get(info);
       }
     } finally {
       popJob();
@@ -163,7 +163,7 @@ abstract class RESTCmd extends Command {
     String key = entry.getKey();
     if(options instanceof MainOptions) key = key.toUpperCase(Locale.ENGLISH);
     if(options.option(key) == null) {
-      if(enforce) throw HTTPCode.UNKNOWN_PARAM_X.get(key);
+      if(enforce) throw HTTPStatus.UNKNOWN_PARAM_X.get(key);
       return false;
     }
 
@@ -171,7 +171,7 @@ abstract class RESTCmd extends Command {
       options.assign(key, entry.getValue()[0]);
       return true;
     } catch(final BaseXException ex) {
-      throw HTTPCode.BAD_REQUEST_X.get(ex);
+      throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }
   }
 }

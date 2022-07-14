@@ -30,11 +30,11 @@ public final class RESTServlet extends BaseXServlet {
       conn.log(SC_OK, "");
     } catch(final BaseXException ex) {
       // ignore error if code was assigned (same error message)
-      if(cmd.code == null) throw ex;
+      if(cmd.status == null) throw ex;
     }
 
-    final HTTPCode code = cmd.code;
-    if(code != null) throw code.get(cmd.info());
+    final HTTPStatus status = cmd.status;
+    if(status != null) throw status.get(cmd.info());
   }
 
   /**
@@ -45,10 +45,10 @@ public final class RESTServlet extends BaseXServlet {
    */
   private static RESTCmd command(final RESTSession session) throws IOException {
     final String mth = session.conn.method;
-    if(mth.equals(HttpMethod.GET.name()))    return RESTGet.get(session);
-    if(mth.equals(HttpMethod.POST.name()))   return RESTPost.get(session);
-    if(mth.equals(HttpMethod.PUT.name()))    return RESTPut.get(session);
-    if(mth.equals(HttpMethod.DELETE.name())) return RESTDelete.get(session);
-    throw HTTPCode.METHOD_NOT_SUPPORTED_X.get(session.conn.request.getMethod());
+    if(mth.equals(Method.GET.name()))    return RESTGet.get(session);
+    if(mth.equals(Method.POST.name()))   return RESTPost.get(session);
+    if(mth.equals(Method.PUT.name()))    return RESTPut.get(session);
+    if(mth.equals(Method.DELETE.name())) return RESTDelete.get(session);
+    throw HTTPStatus.METHOD_NOT_SUPPORTED_X.get(session.conn.request.getMethod());
   }
 }

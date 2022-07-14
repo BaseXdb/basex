@@ -6,7 +6,7 @@ package org.basex.util.http;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public enum HttpMethod {
+public enum Method {
   /** GET method. */
   GET,
   /** POST method. */
@@ -24,7 +24,7 @@ public enum HttpMethod {
   public final boolean body;
 
   /** Default constructor. */
-  HttpMethod() {
+  Method() {
     this(false);
   }
 
@@ -32,7 +32,7 @@ public enum HttpMethod {
    * Constructor, specifying a body flag.
    * @param body body flag
    */
-  HttpMethod(final boolean body) {
+  Method(final boolean body) {
     this.body = body;
   }
 
@@ -41,8 +41,8 @@ public enum HttpMethod {
    * @param name method name
    * @return enum or {@code null}
    */
-  public static HttpMethod get(final String name) {
-    for(final HttpMethod method : values()) {
+  public static Method get(final String name) {
+    for(final Method method : values()) {
       if(method.name().equals(name)) return method;
     }
     return null;
