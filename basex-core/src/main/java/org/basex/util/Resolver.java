@@ -12,7 +12,7 @@ import org.xml.sax.*;
 
 /**
  * Catalog resolver: Convenience methods for retrieving resolver instances of the standard
- * JDK 11 implementation of Norman Walsh’s enhanced XML resolver.
+ * JDK 11 implementation or Norman Walsh’s enhanced XML resolver.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -59,20 +59,19 @@ public final class Resolver {
    * @return catalog resolver (can be {@code null})
    */
   private static Object resolver(final MainOptions mopts) {
-    String catfile = mopts.get(MainOptions.CATFILE);
-    if(!catfile.isEmpty()) {
+    String catalog = mopts.get(MainOptions.CATALOG);
+    if(!catalog.isEmpty()) {
       if(Reflect.available(RESOLVER)) {
         // return enhanced XML resolver
         final Class<?> resolver = Reflect.find(RESOLVER);
         final Class<?> configuration = Reflect.find(CONFIGURATION);
-        final Object conf = Reflect.get(Reflect.find(configuration, String.class), catfile);
+        final Object conf = Reflect.get(Reflect.find(configuration, String.class), catalog);
         return Reflect.get(Reflect.find(resolver, configuration), conf);
       }
       // return JDK 11 resolver
-      final URI uri = URI.create(IO.get(catfile).url());
+      final URI uri = URI.create(IO.get(catalog).url());
       final CatalogFeatures cf = CatalogFeatures.defaults();
-      final Catalog catalog = CatalogManager.catalog(cf, uri);
-      return CatalogManager.catalogResolver(catalog);
+      return CatalogManager.catalogResolver(CatalogManager.catalog(cf, uri));
     }
     return null;
   }

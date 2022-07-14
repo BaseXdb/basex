@@ -60,13 +60,13 @@ final class DialogXmlParser extends DialogParser {
     pp.add(xinclude);
 
     // catalog resolver
-    final boolean cat = !opts.get(MainOptions.CATFILE).isEmpty();
+    final boolean cat = !opts.get(MainOptions.CATALOG).isEmpty();
     usecat = new BaseXCheckBox(dialog, USE_CATALOG_FILE, cat).bold();
     final BaseXBack cr = new BaseXBack(new TableLayout(2, 2, 8, 0));
     cr.add(usecat);
     cr.add(new BaseXLabel());
 
-    cfile = new BaseXTextField(dialog, opts.get(MainOptions.CATFILE));
+    cfile = new BaseXTextField(dialog, opts.get(MainOptions.CATALOG));
     cr.add(cfile);
 
     browsec = new BaseXButton(dialog, BROWSE_D);
@@ -107,6 +107,6 @@ final class DialogXmlParser extends DialogParser {
     gui.set(MainOptions.STRIPNS, stripNS.isSelected());
     gui.set(MainOptions.DTD, dtd.isSelected());
     gui.set(MainOptions.XINCLUDE, xinclude.isSelected());
-    gui.set(MainOptions.CATFILE, usecat.isSelected() ? cfile.getText() : "");
+    gui.set(MainOptions.CATALOG, usecat.isSelected() ? cfile.getText() : "");
   }
 }

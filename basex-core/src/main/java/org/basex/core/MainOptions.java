@@ -65,7 +65,7 @@ public final class MainOptions extends Options {
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */
-  public static final StringOption CATFILE = new StringOption("CATFILE", "");
+  public static final StringOption CATALOG = new StringOption("CATALOG", "");
 
   // Adding documents
 
@@ -184,7 +184,7 @@ public final class MainOptions extends Options {
 
   /** XML Parsing options. */
   private static final Option<?>[] XMLPARSING = { INTPARSE, STRIPWS, STRIPNS, DTD, XINCLUDE,
-      CATFILE };
+      CATALOG };
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
       SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, TEXTPARSER, JSONPARSER, HTMLPARSER, PARSER };

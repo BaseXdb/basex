@@ -19,23 +19,23 @@ public class CatalogTest extends SandboxTest {
   /** Test folder. */
   private static final String DIR = "src/test/resources/catalog/";
   /** Catalog file. */
-  private static final String CAT = DIR + "catalog.xml";
+  private static final String CATALOG = DIR + "catalog.xml";
 
   /** Query string: Option declaration. */
-  private static final String OPTION = "declare option db:catfile '" + CAT + "'; ";
+  private static final String OPTION = "declare option db:catalog '" + CATALOG + "'; ";
   /** Query string: Pragma. */
-  private static final String PRAGMA = "(# db:catfile " + CAT + " #) ";
+  private static final String PRAGMA = "(# db:catalog " + CATALOG + " #) ";
 
   /** Before.*/
   @BeforeEach public void before() {
-    set(MainOptions.CATFILE, "");
+    set(MainOptions.CATALOG, "");
     set(MainOptions.DTD, false);
   }
 
   /** Test method.*/
   @Test public void createDB() {
     set(MainOptions.DTD, true);
-    set(MainOptions.CATFILE, CAT);
+    set(MainOptions.CATALOG, CATALOG);
     execute(new CreateDB("document", DIR + "doc.xml"));
     query("db:open('document')", "<doc>X</doc>");
   }
@@ -88,7 +88,7 @@ public class CatalogTest extends SandboxTest {
   @Test public void dbCreate() {
     final Function func = _DB_CREATE;
     query(func.args("document", DIR + "doc.xml", " ()",
-      " map { 'catfile': '" + CAT + "', 'dtd': true() }"));
+      " map { 'catalog': '" + CATALOG + "', 'dtd': true() }"));
     query("db:open('document')", "<doc>X</doc>");
   }
 
@@ -96,7 +96,7 @@ public class CatalogTest extends SandboxTest {
   @Test public void fetchXml() {
     final Function func = _FETCH_DOC;
     query(func.args(DIR + "doc.xml",
-      " map { 'catfile': '" + CAT + "', 'dtd': true() }"), "<doc>X</doc>");
+      " map { 'catalog': '" + CATALOG + "', 'dtd': true() }"), "<doc>X</doc>");
   }
 
   /** Test method.*/
@@ -104,7 +104,7 @@ public class CatalogTest extends SandboxTest {
     final Function func = DOC;
 
     set(MainOptions.DTD, true);
-    set(MainOptions.CATFILE, CAT);
+    set(MainOptions.CATALOG, CATALOG);
     query(func.args("http://doc.xml"), "<doc>X</doc>");
   }
 }

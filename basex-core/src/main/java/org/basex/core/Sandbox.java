@@ -161,6 +161,7 @@ public abstract class Sandbox {
     } catch(final QueryException ex) {
       error(query, ex, error);
     } catch(final Exception ex) {
+      Util.stack(ex);
       throw Util.notExpected(ex);
     }
   }
