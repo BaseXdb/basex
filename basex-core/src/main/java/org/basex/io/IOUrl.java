@@ -26,6 +26,8 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
+  /** Optional SSL context for ignoring certificates. */
+  private static SSLContext ssl;
   /** Timeout for connecting to a resource (seconds). */
   private static final int TIMEOUT = 10;
 
@@ -136,33 +138,26 @@ public final class IOUrl extends IO {
   }
 
   /**
-   * Ignore Hostname verification.
+   * Ignore SSL certificates.
    */
-  public static void ignoreHostname() {
-    // http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
-    HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-  }
+  public static void ignoreCertificates() {
+    System.getProperties().setProperty("jdk.internal.httpclient.disableHostnameVerification",
+        Boolean.TRUE.toString());
 
-  /**
-   * Ignore certificates.
-   */
-  public static void ignoreCert() {
-    ignoreHostname();
-
-    final TrustManager[] tm = { new X509TrustManager() {
-      @Override
-      public X509Certificate[] getAcceptedIssuers() { return null; }
-      @Override
-      public void checkClientTrusted(final X509Certificate[] certs, final String authType) { }
-      @Override
-      public void checkServerTrusted(final X509Certificate[] certs, final String authType) { }
-    }};
     try {
-      final SSLContext sc = SSLContext.getInstance("SSL");
-      sc.init(null, tm, new SecureRandom());
-      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-    } catch(final Exception ex) {
-      Util.errln(ex);
+      ssl = SSLContext.getInstance("TLS");
+      ssl.init(null, new TrustManager[] {
+        new X509TrustManager() {
+          @Override
+          public X509Certificate[] getAcceptedIssuers() { return null; }
+          @Override
+          public void checkClientTrusted(final X509Certificate[] x509, final String type) { }
+          @Override
+          public void checkServerTrusted(final X509Certificate[] x509, final String type) { }
+        }
+      }, new SecureRandom());
+    } catch(NoSuchAlgorithmException | KeyManagementException ex) {
+      Util.stack(ex);
     }
   }
 
