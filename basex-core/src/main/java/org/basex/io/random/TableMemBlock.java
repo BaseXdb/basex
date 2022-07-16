@@ -25,7 +25,7 @@ final class TableMemBlock {
    * @return new blocks
    */
   static ArrayList<TableMemBlock> get(final int count) {
-    final int bs = (IO.BLOCKSIZE + count - 1) >>> IO.BLOCKPOWER;
+    final int bs = IO.BLOCKSIZE + count - 1 >>> IO.BLOCKPOWER;
     final ArrayList<TableMemBlock> list = new ArrayList<>(bs);
     for(int b = 0; b < bs; b++) list.add(new TableMemBlock());
     return list;
@@ -86,7 +86,7 @@ final class TableMemBlock {
   int delete(final int pre, final int count, final int nextPre) {
     final int first = pre - firstPre, last = first + count, filled = nextPre - firstPre;
     if(last >= filled) return filled - first;
-    System.arraycopy(data, last << 1, data, first << 1, (filled - last) << 1);
+    System.arraycopy(data, last << 1, data, first << 1, filled - last << 1);
     return count;
   }
 
@@ -165,7 +165,7 @@ final class TableMemBlock {
    * @return table index
    */
   private int index(final int pre, final int offset) {
-    final int p = (pre - firstPre) << 1;
+    final int p = pre - firstPre << 1;
     return offset < 8 ? p : p + 1;
   }
 }

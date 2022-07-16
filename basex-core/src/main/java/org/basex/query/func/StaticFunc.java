@@ -240,7 +240,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       for(final Ann ann : anns) {
         if(ann.definition == Annotation._BASEX_LOCK) {
           for(final Item arg : ann.value()) {
-            for(final String lock : Locking.queryLocks(((Str) arg).string())) list.add(lock);
+            Collections.addAll(list, Locking.queryLocks(((Str) arg).string()));
           }
         }
       }

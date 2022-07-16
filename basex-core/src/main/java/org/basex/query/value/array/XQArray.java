@@ -358,7 +358,7 @@ public abstract class XQArray extends XQData {
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    if(!(funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
+    if(!funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       for(final Value value : members()) {
         if(!value.materialized(test, ii)) return false;
       }

@@ -52,7 +52,7 @@ public final class ModuleLoader {
     if(loader instanceof URLClassLoader) {
       try {
         ((URLClassLoader) loader).close();
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         Util.stack(ex);
       }
     }

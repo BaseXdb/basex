@@ -157,7 +157,7 @@ public final class StaticContext {
         final InputSource is = s instanceof SAXSource ? ((SAXSource) s).getInputSource() : null;
         final String id = is != null ? is.getSystemId() : null;
         if(id != null) return IO.get(id);
-      } catch(TransformerException ex) {
+      } catch(final TransformerException ex) {
         Util.debug(ex);
       }
     }

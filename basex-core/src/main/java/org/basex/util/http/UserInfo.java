@@ -82,14 +82,10 @@ public final class UserInfo {
     if(request.authMethod == AuthMethod.BASIC) {
       value = Base64.encode(username + ':' + password);
     } else {
-      // no username known: skip
-      if(username == null || password == null) return false;
-      // server sends unexpected status code: skip
-      if(response.statusCode() != 401) return false;
       // server provides no authentication data: skip
       final Optional<String> header = response.headers().firstValue(WWW_AUTHENTICATE);
       if(!header.isPresent()) return false;
-      // server returns other authentication method
+      // server returns other authentication method: skip
       final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header.get());
       if(!auth.get(AUTH_METHOD).toString().equals(request.authMethod.toString())) return false;
 

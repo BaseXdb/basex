@@ -65,7 +65,7 @@ public class XsltTransform extends XsltFn {
 
       // retrieve new or cached templates object
       Templates templates = key != null ? MAP.get(key) : null;
-      URIResolver ur = Resolver.uris(qc.context.options);
+      final URIResolver ur = Resolver.uris(qc.context.options);
       if(templates == null) {
         // no templates object cached: create new instance
         final TransformerFactory tf = TransformerFactory.newInstance();

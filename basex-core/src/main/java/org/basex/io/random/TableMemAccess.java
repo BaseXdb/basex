@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class TableMemAccess extends TableAccess {
   /** Table blocks. */
-  private ArrayList<TableMemBlock> blocks = new ArrayList<>();
+  private final ArrayList<TableMemBlock> blocks = new ArrayList<>();
   /** Dense flag (blocks contain no gaps). */
   private boolean dense = true;
   /** Current block index. */

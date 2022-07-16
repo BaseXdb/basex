@@ -59,7 +59,7 @@ public final class Resolver {
    * @return catalog resolver (can be {@code null})
    */
   private static Object resolver(final MainOptions mopts) {
-    String catalog = mopts.get(MainOptions.CATALOG);
+    final String catalog = mopts.get(MainOptions.CATALOG);
     if(!catalog.isEmpty()) {
       if(Reflect.available(RESOLVER)) {
         // return enhanced XML resolver

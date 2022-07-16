@@ -37,7 +37,7 @@ final class DataUpdates {
 
   /** Mapping between pre values of the target nodes and all node updates
    * which operate on this target. */
-  private IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<>();
+  private final IntObjMap<NodeUpdates> nodeUpdates = new IntObjMap<>();
   /** Database updates. */
   private final List<DBUpdate> dbUpdates = new LinkedList<>();
   /** Put operations which reflect all changes made during the snapshot, hence executed

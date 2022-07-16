@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.atomic.*;
-import java.util.function.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -611,7 +610,7 @@ public final class QueryContext extends Job implements Closeable {
             if(item == null || pres.size() == mx) break;
 
             // otherwise, add nodes to standard iterator
-            for(int pre : pres.finish()) items.add(new DBNode(data, pre));
+            for(final int pre : pres.finish()) items.add(new DBNode(data, pre));
             items.add(item);
           }
 
@@ -623,9 +622,7 @@ public final class QueryContext extends Job implements Closeable {
         } while(false);
         return null;
       });
-    } catch(final QueryException ex) {
-      cmd.exception = ex;
-    } catch(final JobException ex) {
+    } catch(final QueryException | JobException ex) {
       cmd.exception = ex;
     }
     // collect results
@@ -653,10 +650,8 @@ public final class QueryContext extends Job implements Closeable {
 
       final ValueBuilder vb = new ValueBuilder(this);
       final QueryConsumer<Value> materialize = val -> {
-        final Predicate<Data> test = d -> {
-          return d != null && (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name));
-        };
-        vb.add(val.materialize(test, null, this));
+        vb.add(val.materialize(d -> d != null && (datas.contains(d) ||
+            !d.inMemory() && dbs.contains(d.meta.name)), null, this));
       };
       materialize.accept(value);
       materialize.accept(updates.output(true));

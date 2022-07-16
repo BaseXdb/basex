@@ -68,7 +68,7 @@ public final class BaseXImages {
         if(url == null) throw Util.notExpected("Image missing: " + path);
         try {
           images[i] = ImageIO.read(url);
-        } catch(IOException ex) {
+        } catch(final IOException ex) {
           throw Util.notExpected(ex);
         }
       }

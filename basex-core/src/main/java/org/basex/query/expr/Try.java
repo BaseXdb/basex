@@ -69,7 +69,7 @@ public final class Try extends Single {
     final ArrayList<Catch> list = new ArrayList<>();
     final ArrayList<NameTest> tests = new ArrayList<>();
 
-    final Checks<Catch> global = c -> c.global();
+    final Checks<Catch> global = Catch::global;
     if(!global.all(catches)) {
       for(final Catch ctch : catches) {
         if(ctch.simplify(tests, cc)) list.add(ctch);

@@ -266,8 +266,8 @@ public abstract class Step extends Preds {
       for(final Test t : ((UnionTest) test).tests) {
         if(!addNodes.test(t)) return null;
       }
-    } else {
-      if(!addNodes.test(test)) return null;
+    } else if(!addNodes.test(test)) {
+      return null;
     }
     return tmp;
   }
