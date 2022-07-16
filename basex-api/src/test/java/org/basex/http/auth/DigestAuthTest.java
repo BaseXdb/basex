@@ -17,19 +17,13 @@ public final class DigestAuthTest extends AuthTest {
     init("Digest");
   }
 
-  /**
-   * Missing authentication method.
-   * @throws Exception exception
-   */
-  @Test public void missing() throws Exception {
-    test(REST_ROOT + "?query=1", 401);
+  /** Missing authentication method. */
+  @Test public void missing() {
+    responseFail(REST_ROOT + "?query=1");
   }
 
-  /**
-   * Wrong authentication method.
-   * @throws Exception exception
-   */
-  @Test public void wrong() throws Exception {
-    test(REST_ROOT.replace("://", "://user:unknown@"), 401);
+  /** Wrong authentication method. */
+  @Test public void wrong() {
+    responseFail(REST_ROOT.replace("://", "://user:unknown@"));
   }
 }

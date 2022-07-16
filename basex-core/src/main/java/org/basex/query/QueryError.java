@@ -312,6 +312,8 @@ public enum QueryError {
 
   // HTTP Module
 
+  /** Invalid URI. */
+  HC_URI_X(HC, 1, "Invalid URI: %"),
   /** Error code. */
   HC_ERROR_X(HC, 1, "%"),
   /** Error code. */

@@ -22,22 +22,16 @@ public final class BasicAuthTest extends AuthTest {
    * @throws Exception exception
    */
   @Test public void ok() throws Exception {
-    test(REST_ROOT.replace("://", "://admin:admin@") + "?query=1", 200);
+    responseOk(REST_ROOT.replace("://", "://admin:admin@") + "?query=1");
   }
 
-  /**
-   * Missing authentication method.
-   * @throws Exception exception
-   */
-  @Test public void missing() throws Exception {
-    test(REST_ROOT, 401);
+  /** Missing authentication method. */
+  @Test public void missing() {
+    responseFail(REST_ROOT);
   }
 
-  /**
-   * Access denied.
-   * @throws Exception exception
-   */
-  @Test public void wrong() throws Exception {
-    test(REST_ROOT.replace("://", "://user:unknown@"), 401);
+  /** Access denied. */
+  @Test public void wrong() {
+    responseFail(REST_ROOT.replace("://", "://user:unknown@"));
   }
 }

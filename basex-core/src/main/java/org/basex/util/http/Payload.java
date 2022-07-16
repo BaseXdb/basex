@@ -69,13 +69,12 @@ public final class Payload {
   /**
    * Parses the HTTP payload and returns a result body element.
    * @param type media type
-   * @param error error flag
    * @param encoding content encoding
    * @return body element
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FElem parse(final MediaType type, final boolean error, final String encoding)
+  FElem parse(final MediaType type, final String encoding)
       throws IOException, QueryException {
 
     final FElem body;
@@ -91,16 +90,7 @@ public final class Payload {
       body = new FElem(Q_HTTP_BODY);
       if(payloads != null) {
         final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
-        Value value = Empty.VALUE;
-        try {
-          // if something goes wrong, input streams will be closed outside the function
-          value = parse(BufferInput.get(in).content(), type);
-        } catch(final QueryException ex) {
-          // ignore errors if response was triggered by an error anyway
-          if(!error) throw ex;
-          Util.debug(ex);
-        }
-        payloads.add(value);
+        payloads.add(parse(BufferInput.get(in).content(), type));
       }
     }
     return body.add(SerializerOptions.MEDIA_TYPE.name(), type.type());
@@ -110,7 +100,7 @@ public final class Payload {
    * Returns all payloads.
    * @return payloads
    */
-  Value payloads() {
+  Value value() {
     return payloads.value();
   }
 
@@ -139,18 +129,14 @@ public final class Payload {
   private void extractParts(final byte[] sep, final ANodeList parts)
       throws IOException, QueryException {
 
-    try {
-      // RFC 1341: Preamble is to be ignored: read till 1st boundary
-      while(true) {
-        final byte[] l = readLine();
-        if(l == null) throw HC_REQ_X.get(info, "No body specified for http:part");
-        if(eq(sep, l)) break;
-      }
-      // parse part
-      while(extractPart(sep, concat(sep, DASHES), parts));
-    } finally {
-      input.close();
+    // RFC 1341: Preamble is to be ignored: read till 1st boundary
+    while(true) {
+      final byte[] l = readLine();
+      if(l == null) throw HC_REQ_X.get(info, "No body specified for http:part");
+      if(eq(sep, l)) break;
     }
+    // parse part
+    while(extractPart(sep, concat(sep, DASHES), parts));
   }
 
   /**
@@ -349,7 +335,7 @@ public final class Payload {
       try(InputStream is = io.inputStream()) {
         final Payload payload = new Payload(is, true, null, options);
         payload.extractParts(concat(DASHES, payload.boundary(type)), null);
-        return payload.payloads();
+        return payload.value();
       }
     } else {
       return B64.get(io.read());
@@ -364,12 +350,11 @@ public final class Payload {
    * @throws IOException I/O exception
    */
   private static IOContent prepare(final byte[] body, final MediaType type) throws IOException {
-    final String encoding = type.parameter(CHARSET);
     byte[] data = body;
     final boolean xml = type.isXML(), text = type.isText();
     if(xml || text) {
       // convert text to UTF8; skip redundant XML declaration
-      data = new NewlineInput(body).encoding(encoding).content();
+      data = new NewlineInput(body).encoding(type.parameter(CHARSET)).content();
       if(xml && startsWith(data, DECLSTART)) {
         final int d = indexOf(data, DECLEND, DECLSTART.length);
         if(d != -1) data = substring(data, d + DECLEND.length);

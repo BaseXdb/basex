@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.http.*;
-import java.net.http.HttpResponse;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -96,8 +95,7 @@ public final class RESTGetTest extends RESTTest {
    */
   private static void check(final String query, final MediaType type)
       throws IOException {
-    final HttpHeaders headers = new IOUrl(REST_ROOT + query).response(
-        HttpResponse.BodyHandlers.discarding()).headers();
+    final HttpHeaders headers = new IOUrl(REST_ROOT + query).response().headers();
     final MediaType mt = new MediaType(headers.firstValue(HTTPText.CONTENT_TYPE).get());
     if(!mt.is(type)) fail("Wrong media type: " + mt + " returned, " + type + " expected.");
   }

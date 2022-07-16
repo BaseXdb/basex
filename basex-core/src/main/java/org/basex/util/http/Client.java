@@ -5,8 +5,11 @@ import static org.basex.util.http.HTTPText.*;
 import static org.basex.util.http.RequestAttribute.*;
 
 import java.io.*;
-import java.lang.reflect.*;
 import java.net.*;
+import java.net.http.*;
+import java.net.http.HttpRequest.*;
+import java.net.http.HttpResponse.*;
+import java.time.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -23,7 +26,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.Base64;
 
 /**
  * HTTP Client.
@@ -60,178 +62,90 @@ public final class Client {
       throws QueryException {
 
     final Request req = new RequestParser(info).parse(request, bodies);
-    HttpURLConnection conn = null;
+    final URI uri = uri(href, req);
+    final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
+    final String status = req.attribute(STATUS_ONLY);
+    final boolean body = status == null || !Strings.toBoolean(status);
     try {
-      final String url = href == null || href.length == 0 ? req.attribute(HREF) :
-        Token.string(href);
-      if(url == null || url.isEmpty()) throw HC_URL.get(info);
-      conn = send(url, req);
-
-      // parse request data, set properties
-      final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
-      final String status = req.attribute(STATUS_ONLY);
-      final boolean body = status == null || !Strings.toBoolean(status);
-      return new Response(info, options).getResponse(conn, body, mediaType);
-
+      return new Response(info, options).getResponse(send(uri, req), body, mediaType);
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);
-    } finally {
-      if(conn != null) conn.disconnect();
     }
   }
 
   /**
-   * Opens an HTTP connection and sends the payload.
-   * @param url HTTP URL to open connection to
+   * Returns a URI.
+   * @param href URL to send the request to
    * @param request request
-   * @return HTTP connection
+   * @return URI
    * @throws QueryException query exception
-   * @throws IOException I/O Exception
-   * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection send(final String url, final Request request)
-      throws QueryException, IOException {
-
-    // create connection, check if authorization is required
-    HttpURLConnection conn = connect(url, request);
-    final String user = request.attribute(USERNAME);
-    if(user != null) {
-      final AuthMethod am = request.authMethod;
-      EnumMap<RequestAttribute, String> auth = null;
-      // check if client wants to send authorization data without challenge
-      final boolean sendAuth = Strings.toBoolean(request.attribute(SEND_AUTHORIZATION));
-      if(!sendAuth) {
-        // enforce creation of Content-Length header by requesting output stream
-        if(!Strings.eq(conn.getRequestMethod(), "GET", "TRACE")) conn.getOutputStream();
-        final int code = conn.getResponseCode();
-        if(code == 401) {
-          auth = authHeaders(conn.getHeaderField(WWW_AUTHENTICATE));
-          // authentication method in request and response differs: discard authentication data
-          if(!auth.get(AUTH_METHOD).toString().equals(am.toString())) auth = null;
-        } else if(code >= 400) {
-          // unexpected error: skip second request and payload
-          return conn;
-        }
-        conn.disconnect();
-        conn = connect(url, request);
-      }
-
-      // send request with authorization data
-      final String pass = request.attribute(PASSWORD);
-      if(am == AuthMethod.BASIC) {
-        if(auth != null || sendAuth) {
-          conn.setRequestProperty(AUTHORIZATION, am + " " + Base64.encode(user + ':' + pass));
-        }
-      } else if(am == AuthMethod.DIGEST) {
-        if(auth != null) {
-          final String
-            realm = auth.get(REALM),
-            nonce = auth.get(NONCE),
-            uri = conn.getURL().getPath(),
-            qop = auth.get(QOP),
-            nc = "00000001",
-            cnonce = Strings.md5(Long.toString(System.nanoTime())),
-            ha1 = Strings.md5(user + ':' + realm + ':' + pass),
-            ha2 = Strings.md5(request.attribute(METHOD) + ':' + uri),
-            rsp = Strings.md5(ha1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + ha2);
-          conn.setRequestProperty(AUTHORIZATION, am + " " +
-            USERNAME + "=\"" + user + "\","
-            + REALM + "=\"" + realm + "\","
-            + NONCE + "=\"" + nonce + "\","
-            + URI + "=\"" + uri + "\","
-            + QOP + '=' + qop + ','
-            + NC + '=' + nc + ','
-            + CNONCE + "=\"" + cnonce + "\","
-            + RESPONSE + "=\"" + rsp + "\","
-            + ALGORITHM + '=' + MD5 + ','
-            + OPAQUE + "=\"" + auth.get(OPAQUE) + '"');
-        }
-      }
+  private URI uri(final byte[] href, final Request request) throws QueryException {
+    final String uri = href == null || href.length == 0 ? request.attribute(HREF) :
+      Token.string(href);
+    if(uri == null || uri.isEmpty()) throw HC_URL.get(info);
+    try {
+      return new URI(uri);
+    } catch(final URISyntaxException ex) {
+      Util.debug(ex);
+      throw HC_URI_X.get(info, uri);
     }
-
-    // attach payload
-    if(!request.payload.isEmpty() || !request.parts.isEmpty()) {
-      setContentType(conn, request);
-      writePayload(conn.getOutputStream(), request);
-    }
-    return conn;
   }
 
   /**
-   * Returns a new HTTP connection.
-   * @param url HTTP URL to open connection to
+   * Returns an HTTP response for the specified request.
+   * @param uri target URI
    * @param request request
    * @return HTTP connection
-   * @throws QueryException query exception
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpURLConnection connect(final String url, final Request request)
-      throws QueryException, IOException {
+  private HttpResponse<InputStream> send(final URI uri, final Request request)
+      throws IOException {
 
-    final URL u = new URL(url);
-    final URLConnection uc = u.openConnection();
-    uc.setConnectTimeout(10000);
-    // use basic authentication if credentials are contained in the url
-    final String ui = u.getUserInfo();
-    if(ui != null) uc.setRequestProperty(HTTPText.AUTHORIZATION,
-        AuthMethod.BASIC + " " + Base64.encode(ui));
-    if(!(uc instanceof HttpURLConnection)) throw HC_ERROR_X.get(info, "Invalid URL: " + url);
+    final HttpRequest.Builder rb = HttpRequest.newBuilder(uri);
+    final String timeout = request.attribute(TIMEOUT);
+    if(timeout != null) rb.timeout(Duration.ofSeconds(Strings.toInt(timeout)));
 
-    HttpURLConnection conn = (HttpURLConnection) uc;
+    // set method, attach payload
     final String method = request.attribute(METHOD);
     if(method != null) {
-      try {
-        conn.setRequestMethod(method);
-      } catch(final ProtocolException ex) {
-        // method is not supported: try to inject method to circumvent check
-        try {
-          Class<?> clzz = conn.getClass();
-          try {
-            // implementation with delegator (sun.net.www.protocol.https.HttpsURLConnectionImpl)
-            // get actual connection
-            final Field f = clzz.getDeclaredField("delegate");
-            f.setAccessible(true);
-            conn = (HttpURLConnection) f.get(conn);
-            clzz = conn.getClass();
-          } catch(final Throwable e) {
-            // ignore error: dump exception if debug is enabled
-            Util.debug(e);
-          }
-
-          // assign request method
-          while(clzz != HttpURLConnection.class) clzz = clzz.getSuperclass();
-          final Field f = clzz.getDeclaredField("method");
-          f.setAccessible(true);
-          f.set(conn, method);
-        } catch(final Throwable e) {
-          // ignore error: dump exception if debug is enabled, return original exception
-          Util.debug(e);
-          throw ex;
-        }
+      final BodyPublisher publisher;
+      if(request.payload.isEmpty() && request.parts.isEmpty()) {
+        publisher = HttpRequest.BodyPublishers.noBody();
+      } else {
+        setContentType(rb, request);
+        publisher = HttpRequest.BodyPublishers.ofByteArray(payload(request));
       }
-      conn.setDoOutput(true);
-
-      final String timeout = request.attribute(TIMEOUT);
-      if(timeout != null) {
-        // timeouts may occur while waiting for the connection or the response
-        conn.setConnectTimeout(Strings.toInt(timeout) * 1000);
-        conn.setReadTimeout(Strings.toInt(timeout) * 1000);
-      }
-      final String redirect = request.attribute(FOLLOW_REDIRECT);
-      if(redirect != null) HttpURLConnection.setFollowRedirects(Strings.toBoolean(redirect));
-
-      request.headers.forEach(conn::addRequestProperty);
+      rb.method(method, publisher);
     }
-    return conn;
+
+    final String fw = request.attribute(FOLLOW_REDIRECT);
+    final HttpClient client = IOUrl.clientBuilder(fw == null || Strings.toBoolean(fw)).build();
+    final BodyHandler<InputStream> handler = HttpResponse.BodyHandlers.ofInputStream();
+
+    try {
+      final UserInfo ui = new UserInfo(uri, request);
+      final boolean sa = Strings.toBoolean(request.attribute(SEND_AUTHORIZATION));
+      if(sa && request.authMethod == AuthMethod.BASIC) {
+        ui.basic(rb);
+      } else {
+        final HttpResponse<InputStream> response = client.send(rb.build(), handler);
+        if(!ui.assign(rb, response)) return response;
+      }
+      return client.send(rb.build(), handler);
+    } catch(final InterruptedException ex) {
+      Util.debug(ex);
+      throw new IOException(ex.getMessage());
+    }
   }
 
   /**
    * Sets the content type of the HTTP request.
-   * @param conn HTTP connection
+   * @param rb HTTP request builder
    * @param request request data
    */
-  private static void setContentType(final HttpURLConnection conn, final Request request) {
+  private static void setContentType(final HttpRequest.Builder rb, final Request request) {
     String ct;
     final String contType = request.headers.get(CONTENT_TYPE.toLowerCase(Locale.ENGLISH));
     if(contType != null) {
@@ -242,7 +156,7 @@ public final class Client {
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
       if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
     }
-    conn.setRequestProperty(CONTENT_TYPE, ct);
+    rb.header(CONTENT_TYPE, ct);
   }
 
   /**
@@ -270,14 +184,13 @@ public final class Client {
   }
 
   /**
-   * Writes the HTTP request payload.
-   * @param out output stream
+   * Returns the payload.
    * @param request request data
+   * @return input stream
    * @throws IOException I/O exception
    */
-  public static void writePayload(final OutputStream out, final Request request)
-      throws IOException {
-
+  public static byte[] payload(final Request request) throws IOException {
+    final ArrayOutput out = new ArrayOutput();
     if(request.isMultipart) {
       final String boundary = request.boundary();
       for(final Part part : request.parts) {
@@ -302,7 +215,7 @@ public final class Client {
     } else {
       writePayload(request.payload, request.payloadAtts, out);
     }
-    out.close();
+    return out.finish();
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.http.auth;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.net.http.*;
 
 import org.basex.core.*;
@@ -63,12 +64,23 @@ public abstract class AuthTest extends HTTPTest {
   /**
    * Calls the specified URL and checks the error message.
    * @param url URL
-   * @param status status code to check
-   * @throws Exception Exception
+   * @throws IOException I/O exception
    */
-  protected static void test(final String url, final int status) throws Exception {
-    final IOUrl io = new IOUrl(url);
-    assertEquals(status, io.response(HttpResponse.BodyHandlers.discarding()).statusCode());
+  protected static void responseOk(final String url) throws IOException {
+    new IOUrl(url).response();
+  }
+
+  /**
+   * Calls the specified URL and checks the error message.
+   * @param url URL
+   */
+  protected static void responseFail(final String url) {
+    try {
+      final HttpResponse<InputStream> request = new IOUrl(url).response();
+      fail("Error expected:\n" + request);
+    } catch(final IOException ex) {
+      assertEquals("401", ex.getMessage().replaceAll(":.*", ""));
+    }
   }
 
   /**

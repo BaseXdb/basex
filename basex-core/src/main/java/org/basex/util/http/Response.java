@@ -3,11 +3,12 @@ package org.basex.util.http;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
-import java.net.*;
+import java.net.http.*;
 import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -39,62 +40,47 @@ public final class Response {
 
   /**
    * Constructs http:response element and reads HTTP response content.
-   * @param conn HTTP connection
+   * @param response HTTP response
    * @param body also return body
    * @param mtype media type provided by the user (can be {@code null})
    * @return result sequence of http:response and content items
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  @SuppressWarnings("resource")
-  public Value getResponse(final HttpURLConnection conn, final boolean body, final String mtype)
-      throws IOException, QueryException {
-
-    // result
-    final ItemList items = new ItemList();
+  public Value getResponse(final HttpResponse<InputStream> response, final boolean body,
+      final String mtype) throws IOException, QueryException {
 
     // construct <http:response/>
-    final FElem response = new FElem(Q_HTTP_RESPONSE).declareNS();
-    items.add(response);
+    final int status = response.statusCode();
+    final FElem root = new FElem(Q_HTTP_RESPONSE).declareNS();
+    root.add(STATUS, Token.token(status));
+    root.add(MESSAGE, IOUrl.reason(status));
 
-    final String msg = conn.getResponseMessage();
-    response.add(STATUS, Token.token(conn.getResponseCode()));
-    response.add(MESSAGE, msg == null ? "" : msg);
-    // add <http:header/> elements
-    for(final Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
+    // add headers
+    for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
       final String name = entry.getKey();
       if(name != null) {
         for(final String value : entry.getValue()) {
-          response.add(new FElem(Q_HTTP_HEADER).add(NAME, name).add(VALUE, value));
+          root.add(new FElem(Q_HTTP_HEADER).add(NAME, name).add(VALUE, value));
         }
       }
     }
 
-    // construct <http:body/>
-    boolean error = false;
-    InputStream is;
-    try {
-      is = conn.getInputStream();
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      is = conn.getErrorStream();
-      error = true;
-    }
-
-    if(is != null) {
-      final String ctype = conn.getContentType();
-      // error: adopt original type as content type
-      final MediaType type = error || mtype == null ? ctype == null ? MediaType.TEXT_PLAIN :
-        new MediaType(ctype) : new MediaType(mtype);
+    // add payload elements and contents
+    final ItemList items = new ItemList().add(root);
+    try(InputStream is = response.body()) {
+      final HttpHeaders headers = response.headers();
+      final Optional<String> optCt = headers.firstValue(CONTENT_TYPE);
+      final MediaType type = mtype != null ? new MediaType(mtype) :
+        optCt.isPresent() ? new MediaType(optCt.get()) : MediaType.TEXT_PLAIN;
+      final Optional<String> optCe = headers.firstValue(CONTENT_ENCODING);
+      final String encoding = optCe.isPresent() ? optCe.get() : "";
 
       final Payload payload = new Payload(is, body, info, options);
-      try {
-        response.add(payload.parse(type, error, conn.getHeaderField(CONTENT_ENCODING)));
-        if(body) items.add(payload.payloads());
-      } finally {
-        is.close();
-      }
+      root.add(payload.parse(type, encoding));
+      if(body) items.add(payload.value());
     }
+
     return items.value();
   }
 }
