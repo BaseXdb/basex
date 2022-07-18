@@ -34,8 +34,13 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test public void databases() throws Exception {
     final String result = get(200, "");
-    query(result + " ! local-name()", "databases");
+    query(result + " ! name()", "databases");
+    query(result + " ! namespace-uri()", "http://basex.org/rest");
     query(result + "/node()", "");
+
+    put(null, NAME);
+    query(get(200, "") + "/*/text()", NAME);
+    delete(200, NAME);
   }
 
   /**

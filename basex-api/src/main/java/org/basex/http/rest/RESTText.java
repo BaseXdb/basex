@@ -17,16 +17,14 @@ interface RESTText {
   /** REST. */
   String REST = "REST";
   /** Attribute. */
-  String RESOURCES = "resources";
-  /** Attribute. */
   String NAME = "name";
 
   /** Name. */
-  QNm Q_DATABASES = new QNm(QueryText.REST_PREFIX, "databases", REST_URI);
+  QNm Q_DATABASES = new QNm("databases", REST_URI);
   /** Name. */
-  QNm Q_DATABASE = new QNm(QueryText.REST_PREFIX, "database", REST_URI);
+  QNm Q_DATABASE = new QNm("database", REST_URI);
   /** Name. */
-  QNm Q_RESOURCE = new QNm(QueryText.REST_PREFIX, "resource", REST_URI);
+  QNm Q_RESOURCE = new QNm("resource", REST_URI);
 
   /** Commands operation. */
   String COMMANDS = "commands";
