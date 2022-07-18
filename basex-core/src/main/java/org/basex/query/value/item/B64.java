@@ -86,12 +86,12 @@ public class B64 extends Bin {
   }
 
   @Override
-  public void write(final DataOutput out) throws IOException {
-    out.writeToken(data);
+  public final void write(final DataOutput out) throws IOException, QueryException {
+    out.writeToken(binary(null));
   }
 
   @Override
-  public byte[] string(final InputInfo ii) throws QueryException {
+  public final byte[] string(final InputInfo ii) throws QueryException {
     return Base64.encode(binary(ii));
   }
 
