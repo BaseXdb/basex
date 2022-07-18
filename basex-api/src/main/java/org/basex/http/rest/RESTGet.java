@@ -58,6 +58,6 @@ final class RESTGet {
     if(op == null) return RESTRetrieve.get(session);
     if(op.equals(QUERY)) return RESTQuery.get(session, input, bindings);
     if(op.equals(RUN)) return RESTRun.get(session, input, bindings);
-    return RESTCommand.get(session, input);
+    return RESTCommands.get(session, input, true);
   }
 }

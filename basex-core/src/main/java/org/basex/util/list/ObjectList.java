@@ -132,18 +132,20 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * Inserts the given elements at the specified position.
    * @param index inserting position
    * @param elements elements to insert
+   * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public final void insert(final int index, final E... elements) {
+  public final L insert(final int index, final E... elements) {
     final int l = elements.length;
-    if(l == 0) return;
-
-    E[] lst = list;
-    final int sz = size;
-    if(sz + l > lst.length) lst = Array.copy(lst, newArray(newCapacity(sz + l)));
-    Array.insert(lst, index, l, sz, elements);
-    list = lst;
-    size = sz + l;
+    if(l != 0) {
+      E[] lst = list;
+      final int sz = size;
+      if(sz + l > lst.length) lst = Array.copy(lst, newArray(newCapacity(sz + l)));
+      Array.insert(lst, index, l, sz, elements);
+      list = lst;
+      size = sz + l;
+    }
+    return (L) this;
   }
 
   /**

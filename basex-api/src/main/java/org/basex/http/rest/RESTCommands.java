@@ -14,12 +14,12 @@ import org.basex.query.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-final class RESTCommand extends RESTCmd {
+final class RESTCommands extends RESTCmd {
   /**
    * Constructor.
    * @param session REST session
    */
-  private RESTCommand(final RESTSession session) {
+  private RESTCommands(final RESTSession session) {
     super(session);
   }
 
@@ -30,20 +30,28 @@ final class RESTCommand extends RESTCmd {
     conn.sopts().set(SerializerOptions.METHOD, SerialMethod.TEXT);
     conn.initResponse();
 
-    for(final Command cmd : session) run(cmd, conn.response.getOutputStream());
+    final OutputStream os = conn.response.getOutputStream();
+    for(final Command cmd : session) run(cmd, os);
   }
 
   /**
    * Creates a new instance of this command.
    * @param session REST session
    * @param input string input
+   * @param single single command
    * @return command
    * @throws BaseXException database exception
    */
-  static RESTCommand get(final RESTSession session, final String input) throws BaseXException {
+  static RESTCommands get(final RESTSession session, final String input, final boolean single)
+      throws BaseXException {
     try {
-      session.add(CommandParser.get(input, session.conn.context).parseSingle());
-      return new RESTCommand(session);
+      final CommandParser cp = CommandParser.get(input, session.conn.context);
+      if(single) {
+        session.add(cp.parseSingle());
+      } else {
+        for(final Command cmd : cp.parse()) session.add(cmd);
+      }
+      return new RESTCommands(session);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }

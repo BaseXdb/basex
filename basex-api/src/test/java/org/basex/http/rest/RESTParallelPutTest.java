@@ -40,7 +40,7 @@ public final class RESTParallelPutTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void test() throws Exception {
-    put(NAME, new ArrayInput(""));
+    put(new ArrayInput(""), NAME);
 
     // start and join concurrent clients
     final Client[] clients = new Client[CLIENTS];
@@ -49,7 +49,7 @@ public final class RESTParallelPutTest extends HTTPTest {
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();
 
-    delete(NAME, 200);
+    delete(200, NAME);
     if(failed != null) fail(failed);
   }
 
@@ -59,7 +59,7 @@ public final class RESTParallelPutTest extends HTTPTest {
     public void run() {
       try {
         for(int i = 0; i < RUNS && failed == null; i++) {
-          put(NAME + '/' + i + ".xml", new ArrayInput("<x/>"));
+          put(new ArrayInput("<x/>"), NAME + '/' + i + ".xml");
         }
       } catch(final IOException ex) {
         failed = ex.getMessage();

@@ -44,11 +44,11 @@ public final class RESTServlet extends BaseXServlet {
    * @throws IOException I/O exception
    */
   private static RESTCmd command(final RESTSession session) throws IOException {
-    final String mth = session.conn.method;
-    if(mth.equals(Method.GET.name()))    return RESTGet.get(session);
-    if(mth.equals(Method.POST.name()))   return RESTPost.get(session);
-    if(mth.equals(Method.PUT.name()))    return RESTPut.get(session);
-    if(mth.equals(Method.DELETE.name())) return RESTDelete.get(session);
+    final String method = session.conn.method;
+    if(method.equals(Method.GET.name()))    return RESTGet.get(session);
+    if(method.equals(Method.POST.name()))   return RESTPost.get(session);
+    if(method.equals(Method.PUT.name()))    return RESTPut.get(session);
+    if(method.equals(Method.DELETE.name())) return RESTDelete.get(session);
     throw HTTPStatus.METHOD_NOT_SUPPORTED_X.get(session.conn.request.getMethod());
   }
 }

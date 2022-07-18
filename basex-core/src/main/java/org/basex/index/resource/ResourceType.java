@@ -58,7 +58,7 @@ public enum ResourceType {
 
     @Override
     public MediaType contentType(final String path) {
-      return MediaType.get(path);
+      return MediaType.get(path(path));
     }
 
     @Override

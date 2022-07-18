@@ -6,6 +6,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.io.serial.*;
 
 /**
  * Evaluate queries via REST.
@@ -41,16 +42,18 @@ class RESTQuery extends RESTCmd {
    */
   private void query() throws IOException {
     final HTTPConnection conn = session.conn;
-    context.options.set(MainOptions.SERIALIZER, conn.sopts());
+    final SerializerOptions sopts = conn.sopts();
+    context.options.set(MainOptions.SERIALIZER, sopts);
     context.setExternal(conn.requestCtx);
     conn.initResponse();
 
+    final OutputStream os = conn.response.getOutputStream();
     for(final Command cmd : session) {
       if(cmd instanceof XQuery) {
-        conn.sopts().assign(((XQuery) cmd).parameters(context));
+        sopts.assign(((XQuery) cmd).parameters(context));
         conn.initResponse();
       }
-      run(cmd, conn.response.getOutputStream());
+      run(cmd, os);
     }
   }
 
@@ -67,7 +70,6 @@ class RESTQuery extends RESTCmd {
       final Map<String, String[]> bindings) throws IOException {
 
     final String uri = session.conn.context.soptions.get(StaticOptions.WEBPATH);
-    session.add(new XQuery(query).baseURI(uri));
-    return new RESTQuery(session, bindings);
+    return new RESTQuery(session.add(new XQuery(query).baseURI(uri)), bindings);
   }
 }

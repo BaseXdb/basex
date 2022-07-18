@@ -1015,7 +1015,7 @@ public enum Function implements AFunction {
   _DB_PROPERTY(DbProperty::new, "property(database,name)",
       params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_PUT(DbPut::new, "put(database,name,input)",
+  _DB_PUT(DbPut::new, "put(database,path,input)",
       params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database,path,new-path)",

@@ -37,7 +37,7 @@ final class RESTRun extends RESTQuery {
    * @return command
    * @throws IOException I/O exception
    */
-  static RESTQuery get(final RESTSession session, final String path,
+  static RESTRun get(final RESTSession session, final String path,
       final Map<String, String[]> bindings) throws IOException {
 
     // get root directory for files

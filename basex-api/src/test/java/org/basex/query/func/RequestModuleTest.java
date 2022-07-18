@@ -3,10 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.ApiFunction.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.net.*;
-
 import org.basex.http.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -30,7 +27,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void method() throws Exception {
     final ApiFunction func = _REQUEST_METHOD;
-    assertEquals("GET", get(queryString(func.args())));
+    get("GET", "", "query", func.args());
   }
 
   /**
@@ -39,7 +36,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void scheme() throws Exception {
     final ApiFunction func = _REQUEST_SCHEME;
-    assertEquals("http", get(queryString(func.args())));
+    get("http", "", "query", func.args());
   }
 
   /**
@@ -48,7 +45,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void port() throws Exception {
     final ApiFunction func = _REQUEST_PORT;
-    assertEquals(String.valueOf(HTTP_PORT), get(queryString(func.args())));
+    get(String.valueOf(HTTP_PORT), "", "query", func.args());
   }
 
   /**
@@ -57,10 +54,10 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void path() throws Exception {
     final ApiFunction func = _REQUEST_PATH;
-    put(NAME, null);
-    assertEquals("/rest/", get(queryString(func.args())));
-    assertEquals("/rest/" + NAME, get(NAME + queryString(func.args())));
-    delete(NAME, 200);
+    put(null, NAME);
+    get("/rest/", "", "query", func.args());
+    get("/rest/" + NAME, NAME + "", "query", func.args());
+    delete(200, NAME);
   }
 
   /**
@@ -69,7 +66,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void query() throws Exception {
     final ApiFunction func = _REQUEST_QUERY;
-    assertEquals("true", get(queryString("starts-with(" + func.args() + ", 'query')")));
+    get("true", "", "query", "starts-with(" + func.args() + ", 'query')");
   }
 
   /**
@@ -78,7 +75,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void uri() throws Exception {
     final ApiFunction func = _REQUEST_URI;
-    assertEquals("true", get(queryString("starts-with(" + func.args() + ", 'http')")));
+    get("true", "", "query", "starts-with(" + func.args() + ", 'http')");
   }
 
   /**
@@ -87,7 +84,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void contextPath() throws Exception {
     final ApiFunction func = _REQUEST_CONTEXT_PATH;
-    assertEquals("", get(queryString(func.args())));
+    get("", "", "query", func.args());
   }
 
   /**
@@ -97,9 +94,9 @@ public final class RequestModuleTest extends HTTPTest {
   @Test public void parameterNames() throws Exception {
     final ApiFunction func = _REQUEST_PARAMETER_NAMES;
     final String query = "count(" + func.args() + ")";
-    assertEquals("1", get(queryString(query)));
-    assertEquals("2", get(queryString(query) + "&a=b"));
-    assertEquals("2", get(queryString(query) + "&a=b&a=b"));
+    get("1", "", "query", query);
+    get("2", "", "query", query, "a", "b");
+    get("2", "", "query", query, "a", "b", "a", "b");
   }
 
   /**
@@ -108,10 +105,10 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void parameter() throws Exception {
     final ApiFunction func = _REQUEST_PARAMETER;
-    assertEquals("b", get(queryString(func.args("a")) + "&a=b"));
-    assertEquals("b,c", get(queryString("string-join(" + func.args("a") + ", ',')") + "&a=b&a=c"));
-    assertEquals("b", get(queryString(func.args("a", "c")) + "&a=b"));
-    assertEquals("c", get(queryString(func.args("x", "c")) + "&a=b"));
+    get("b", "", "query", func.args("a"), "a", "b");
+    get("b,c", "", "query", "string-join(" + func.args("a") + ", ',')", "a", "b", "a", "c");
+    get("b", "", "query", func.args("a", "c"), "a", "b");
+    get("c", "", "query", func.args("x", "c"), "a", "b");
   }
 
   /**
@@ -120,7 +117,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void headerNames() throws Exception {
     final ApiFunction func = _REQUEST_HEADER_NAMES;
-    final String result = get(queryString(func.args()));
+    final String result = get(200, "", "query", func.args());
     assertEquals("true", query("let $names := tokenize(``[" + result + "]``)" +
         "return every $n in ('Connection', 'Host', 'User-Agent') satisfies $n = $names"));
   }
@@ -131,8 +128,8 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void header() throws Exception {
     final ApiFunction func = _REQUEST_HEADER;
-    assertEquals("localhost:" + HTTP_PORT, get(queryString(func.args("Host"))));
-    assertEquals("def", get(queryString(func.args("ABC", "def"))));
+    get("localhost:" + HTTP_PORT, "", "query", func.args("Host"));
+    get("def", "", "query", func.args("ABC", "def"));
   }
 
   /**
@@ -141,7 +138,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void cookieNames() throws Exception {
     final ApiFunction func = _REQUEST_COOKIE_NAMES;
-    assertEquals("0", get(queryString("count(" + func.args() + ")")));
+    get("0", "", "query", "count(" + func.args() + ")");
   }
 
   /**
@@ -150,7 +147,7 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void cookie() throws Exception {
     final ApiFunction func = _REQUEST_COOKIE;
-    assertEquals("0", get(queryString("count(" + func.args("X") + ")")));
+    get("0", "", "query", "count(" + func.args("X") + ")");
   }
 
   /**
@@ -159,8 +156,8 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void attribute() throws Exception {
     final ApiFunction func = _REQUEST_ATTRIBUTE;
-    assertEquals("", get(queryString(func.args("A"))));
-    assertEquals("B", get(queryString("request:set-attribute('A', 'B')," + func.args("A"))));
+    get("", "", "query", func.args("A"));
+    get("B", "", "query", "request:set-attribute('A', 'B')," + func.args("A"));
   }
 
   /**
@@ -169,8 +166,8 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void attributeNames() throws Exception {
     final ApiFunction func = _REQUEST_ATTRIBUTE_NAMES;
-    assertEquals("", get(queryString(func.args())));
-    assertEquals("A", get(queryString("request:set-attribute('A', 1)," + func.args())));
+    get("", "", "query", func.args());
+    get("A", "", "query", "request:set-attribute('A', 1)," + func.args());
   }
 
   /**
@@ -179,19 +176,6 @@ public final class RequestModuleTest extends HTTPTest {
    */
   @Test public void setAttribute() throws Exception {
     final ApiFunction func = _REQUEST_SET_ATTRIBUTE;
-    assertEquals("1", get(queryString(func.args("A", 1) + "," +
-        "request:attribute('A')")));
-  }
-
-  // PRIVATE METHODS ==============================================================================
-
-  /**
-   * Returns an encoded query string.
-   * @param string query string
-   * @return prepared query
-   * @throws Exception exception
-   */
-  private static String queryString(final String string) throws Exception {
-    return "?query=" + URLEncoder.encode(string, Strings.UTF8);
+    get("1", "", "query", func.args("A", 1) + "," + "request:attribute('A')");
   }
 }

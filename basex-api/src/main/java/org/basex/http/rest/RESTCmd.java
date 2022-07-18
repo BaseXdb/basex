@@ -1,7 +1,5 @@
 package org.basex.http.rest;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.Map.*;
@@ -12,10 +10,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.io.out.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
-import org.basex.util.*;
-import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -113,26 +107,6 @@ abstract class RESTCmd extends Command {
       }
     } finally {
       popJob();
-    }
-  }
-
-  /**
-   * Lists the table contents.
-   * @param table table reference
-   * @param root root node
-   * @param header table header
-   * @param skip number of columns to skip
-   */
-  static void list(final Table table, final FElem root, final QNm header, final int skip) {
-    for(final TokenList list : table.contents) {
-      final FElem elem = new FElem(header);
-      // don't show last attribute (input path)
-      final int ll = list.size() - skip;
-      for(int l = 1; l < ll; l++) {
-        elem.add(new QNm(lc(table.header.get(l))), list.get(l));
-      }
-      elem.add(list.get(0));
-      root.add(elem);
     }
   }
 

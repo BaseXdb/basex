@@ -36,53 +36,43 @@ public abstract class RestXqTest extends HTTPTest {
 
   /**
    * Executes the specified GET request and tests the result.
-   * @param function function to test
-   * @param query request
    * @param expected expected result
-   * @throws IOException I/O exception
-   */
-  protected static void get(final String function, final String query, final String expected)
-      throws IOException {
-    install(function);
-    assertEquals(expected, get(query));
-  }
-
-  /**
-   * Executes the specified GET request and tests for an error.
    * @param function function to test
    * @param query request
    * @throws IOException I/O exception
    */
-  protected static void getError(final String function, final String query) throws IOException {
-    getStatus(function, query, 500);
+  protected static void get(final String expected, final String function, final String query)
+      throws IOException {
+    register(function);
+    get(expected, query);
   }
 
   /**
    * Executes the specified GET request and tests for a status code.
+   * @param status status code to check
    * @param function function to test
    * @param query request
-   * @param status status code to check
    * @throws IOException I/O exception
    */
-  protected static void getStatus(final String function, final String query, final int status)
+  protected static void get(final int status, final String function, final String query)
       throws IOException {
-    install(function);
-    get(query, status);
+    register(function);
+    get(status, query);
   }
 
   /**
    * Executes the specified POST request and tests the result.
+   * @param expected expected result
    * @param function function to test
    * @param query request
-   * @param request request
+   * @param payload payload
    * @param type media type
-   * @param expected expected result
    * @throws IOException I/O exception
    */
-  protected static void post(final String function, final String query, final String request,
-      final MediaType type, final String expected) throws IOException {
-    install(function);
-    assertEquals(expected, post(query, request, type));
+  protected static void post(final String expected, final String function, final String query,
+      final String payload, final MediaType type) throws IOException {
+    register(function);
+    assertEquals(expected, post(payload, type, query));
   }
 
   /**
@@ -90,7 +80,7 @@ public abstract class RestXqTest extends HTTPTest {
    * @param function function to be tested
    * @throws IOException I/O exception
    */
-  protected static void install(final String function) throws IOException {
+  protected static void register(final String function) throws IOException {
     // delete old module
     final String path = context.soptions.get(StaticOptions.WEBPATH);
     for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());

@@ -22,11 +22,11 @@ public final class RESTDeleteTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void delete1() throws IOException {
-    put(NAME, new FileInputStream(FILE));
+    put(new FileInputStream(FILE), NAME);
     // delete database
-    assertEquals(delete(NAME, 200).trim(), Util.info(Text.DB_DROPPED_X, NAME));
+    assertEquals(Util.info(Text.DB_DROPPED_X, NAME), delete(200, NAME).trim());
     // no database left
-    delete(NAME, 404);
+    delete(404, NAME);
   }
 
   /**
@@ -34,19 +34,19 @@ public final class RESTDeleteTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void delete2() throws IOException {
-    put(NAME, null);
-    put(NAME + "/a", new ArrayInput(token("<a/>")));
-    put(NAME + "/b", new ArrayInput(token("<b/>")));
+    put(null, NAME);
+    put(new ArrayInput(token("<a/>")), NAME + "/a");
+    put(new ArrayInput(token("<b/>")), NAME + "/b");
     // delete 'a' directory
-    assertStartsWith(delete(NAME + "/a", 200), "1 ");
+    assertStartsWith(delete(200, NAME + "/a"), "1 ");
     // delete 'b' directory
-    assertStartsWith(delete(NAME + "/b", 200), "1 ");
+    assertStartsWith(delete(200, NAME + "/b"), "1 ");
     // no 'b' directory left
-    assertStartsWith(delete(NAME + "/b", 200), "0 ");
+    assertStartsWith(delete(200, NAME + "/b"), "0 ");
     // delete database
-    assertEquals(delete(NAME, 200).trim(), Util.info(Text.DB_DROPPED_X, NAME));
+    assertEquals(Util.info(Text.DB_DROPPED_X, NAME), delete(200, NAME).trim());
     // no database left
-    delete(NAME, 404);
+    delete(404, NAME);
   }
 
   /**
@@ -54,9 +54,9 @@ public final class RESTDeleteTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void deleteOption() throws IOException {
-    put(NAME, null);
-    delete(NAME + "/a?" + MainOptions.STRIPWS.name() + "=true", 200);
+    put(null, NAME);
+    delete(200, NAME + "/a?" + MainOptions.STRIPWS.name() + "=true");
     // unknown option
-    delete(NAME + "/a?xxx=true", 400);
+    delete(400, NAME + "/a?xxx=true");
   }
 }

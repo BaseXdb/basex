@@ -52,7 +52,7 @@ final class RESTPost {
       final String cmd = value("local-name(*)", doc, ctx);
       if(cmd.equals(COMMANDS)) {
         final String script = DataBuilder.stripNamespace(doc, REST_URI, ctx).serialize().toString();
-        return RESTScript.get(session, script);
+        return RESTCommands.get(session, script, false);
       }
 
       // handle serialization parameters
@@ -107,7 +107,7 @@ final class RESTPost {
       final String text = value("*/*:text/text()", doc, ctx);
 
       // choose evaluation
-      if(cmd.equals(COMMAND)) return RESTCommand.get(session, text);
+      if(cmd.equals(COMMAND)) return RESTCommands.get(session, text, true);
       if(cmd.equals(RUN)) return RESTRun.get(session, text, bindings);
       if(cmd.equals(QUERY)) return RESTQuery.get(session, text, bindings);
       throw HTTPStatus.BAD_REQUEST_X.get("Invalid POST command: " + cmd);

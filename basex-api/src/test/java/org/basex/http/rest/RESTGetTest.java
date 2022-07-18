@@ -8,6 +8,7 @@ import java.net.http.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.query.func.*;
 import org.basex.util.http.*;
 import org.junit.jupiter.api.*;
 
@@ -19,19 +20,42 @@ import org.junit.jupiter.api.*;
  */
 public final class RESTGetTest extends RESTTest {
   /**
-   * GET Test.
+   * Run queries.
    * @throws Exception exception
    */
-  @Test public void basic() throws Exception {
-    assertEquals("1", get("?query=1"));
-    assertEquals("a,b", get("?query=string-join(('a','b'),',')"));
+  @Test public void queries() throws Exception {
+    get("1", "", "query", 1);
+    get("a,b", "", "query", "string-join(('a','b'),',')");
+  }
 
-    put(NAME, new ArrayInput("<a/>"));
-    send(NAME + "/binary", Method.PUT.name(), new ArrayInput("XXX"),
-        MediaType.APPLICATION_OCTET_STREAM, 201);
-    assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
-    assertEquals("XXX", get(NAME + "/binary"));
-    delete(NAME, 200);
+  /**
+   * List databases.
+   * @throws Exception exception
+   */
+  @Test public void databases() throws Exception {
+    final String result = get(200, "");
+    query(result + " ! local-name()", "databases");
+    query(result + "/node()", "");
+  }
+
+  /**
+   * List resources.
+   * @throws Exception exception
+   */
+  @Test public void resources() throws Exception {
+    final String xml = NAME + ".xml", bin = "binary.data", value = "data.xquery";
+    put(null, NAME);
+    put(new ArrayInput("<a/>"), NAME + '/' + xml);
+    send(201, Method.PUT.name(), new ArrayInput("XXX"),
+        MediaType.APPLICATION_OCTET_STREAM, NAME + '/' + bin);
+    get(200, "", "query", Function._DB_PUT.args(NAME, value, "DATA"));
+
+    query(get(200, NAME) + "/*/text() => sort()", xml + "\n" + bin + "\n" + value);
+    get("<a/>", NAME + '/' + xml);
+    get("XXX", NAME + '/' + bin);
+    get("DATA", NAME + '/' + value);
+
+    delete(200, NAME);
   }
 
   /**
@@ -39,8 +63,8 @@ public final class RESTGetTest extends RESTTest {
    * @throws Exception exception
    */
   @Test public void input() throws Exception {
-    assertEquals("<a/>", get("?query=.&context=<a/>"));
-    get("?query=.&context=<", 500);
+    get("<a/>", "", "query", ".", "context", "<a/>");
+    get(500, "", "query", ".", "context", "<");
   }
 
   /**
@@ -48,14 +72,14 @@ public final class RESTGetTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void bind() throws IOException {
-    assertEquals("123", get('?'
-        + "query=declare+variable+$x+as+xs:integer+external;$x&$x=123"));
-    assertEquals("124", get("?$x=123&"
-        + "query=declare+variable+$x+as+xs:integer+external;$x%2b1"));
-    assertEquals("6", get('?'
-        + "query=declare+variable+$a++as+xs:integer+external;"
-        + "declare+variable+$b+as+xs:integer+external;"
-        + "declare+variable+$c+as+xs:integer+external;$a*$b*$c&$a=1&$b=2&$c=3"));
+    get("123", "", "x", 123, "query",
+        "declare variable $x as xs:integer external; $x");
+    get("124", "", "x", 123, "query",
+        "declare variable $x as xs:integer external; $x + 1");
+    get("6", "", "a", 1, "b", 2, "c", 3, "query",
+        "declare variable $a as xs:integer external;"
+        + "declare variable $b as xs:integer external;"
+        + "declare variable $c as xs:integer external; $a * $b * $c");
   }
 
   /**
@@ -63,8 +87,8 @@ public final class RESTGetTest extends RESTTest {
    * @throws Exception exception
    */
   @Test public void errors() throws Exception {
-    get("?query=(", 500);
-    get("?query=()&method=xxx", 400);
+    get(500, "", "query", "(");
+    get(400, "", "query", "()", "method", "xxx");
   }
 
   /**
@@ -72,29 +96,28 @@ public final class RESTGetTest extends RESTTest {
    * @throws Exception exception
    */
   @Test public void contentType() throws Exception {
-    check("?query=1", MediaType.APPLICATION_XML);
-    check("?command=info", MediaType.TEXT_PLAIN);
+    check(MediaType.APPLICATION_XML, "?query=1");
+    check(MediaType.TEXT_PLAIN, "?command=info");
 
-    check("?query=1&method=xml", MediaType.APPLICATION_XML);
-    check("?query=1&method=xhtml", MediaType.TEXT_HTML);
-    check("?query=1&method=html", MediaType.TEXT_HTML);
-    check("?query=1&method=text", MediaType.TEXT_PLAIN);
-    check("?query=1&method=json", MediaType.APPLICATION_JSON);
+    check(MediaType.APPLICATION_XML, "?query=1&method=xml");
+    check(MediaType.TEXT_HTML, "?query=1&method=xhtml");
+    check(MediaType.TEXT_HTML, "?query=1&method=html");
+    check(MediaType.TEXT_PLAIN, "?query=1&method=text");
+    check(MediaType.APPLICATION_JSON, "?query=1&method=json");
 
-    check("?query=1&media-type=application/octet-stream", MediaType.APPLICATION_OCTET_STREAM);
-    check("?query=1&media-type=application/xml", MediaType.APPLICATION_XML);
-    check("?query=1&media-type=text/html", MediaType.TEXT_HTML);
-    check("?query=1&media-type=xxx", new MediaType("xxx"));
+    check(MediaType.APPLICATION_OCTET_STREAM, "?query=1&media-type=application/octet-stream");
+    check(MediaType.APPLICATION_XML, "?query=1&media-type=application/xml");
+    check(MediaType.TEXT_HTML, "?query=1&media-type=text/html");
+    check(new MediaType("xxx"), "?query=1&media-type=xxx");
   }
 
   /**
    * Executes the specified GET request and checks the media type of the response.
-   * @param query request
    * @param type expected media type
+   * @param query request
    * @throws IOException I/O exception
    */
-  private static void check(final String query, final MediaType type)
-      throws IOException {
+  private static void check(final MediaType type, final String query) throws IOException {
     final HttpHeaders headers = new IOUrl(REST_ROOT + query).response().headers();
     final MediaType mt = new MediaType(headers.firstValue(HTTPText.CONTENT_TYPE).get());
     if(!mt.is(type)) fail("Wrong media type: " + mt + " returned, " + type + " expected.");
@@ -105,8 +128,8 @@ public final class RESTGetTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void queryOption() throws IOException {
-    assertEquals("2", get("?query=2,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=true"));
-    get("?query=1,delete+node+<a/>&" + MainOptions.MIXUPDATES.name() + "=false", 500);
+    get(200, "", "query", "2, delete node <a/>", MainOptions.MIXUPDATES.name(), true);
+    get(500, "", "query", "2, delete node <a/>", MainOptions.MIXUPDATES.name(), false);
   }
 
   /**
@@ -116,23 +139,23 @@ public final class RESTGetTest extends RESTTest {
   @Test public void runOption() throws IOException {
     final String path = context.soptions.get(StaticOptions.WEBPATH);
     new IOFile(path, "x.xq").write("1");
-    assertEquals("1", get("?run=x.xq"));
+    get("1", "", "run", "x.xq");
 
     new IOFile(path, "x.bxs").write("xquery 2");
-    assertEquals("2", get("?run=x.bxs"));
+    get("2", "", "run", "x.bxs");
 
     new IOFile(path, "x.bxs").write("xquery 3\nxquery 4");
-    assertEquals("34", get("?run=x.bxs"));
+    get("34", "", "run", "x.bxs");
 
     new IOFile(path, "x.bxs").write("<commands><xquery>5</xquery></commands>");
-    assertEquals("5", get("?run=x.bxs"));
+    get("5", "", "run", "x.bxs");
 
     new IOFile(path, "x.bxs").write("<set option='maxlen'>123</set>");
-    assertEquals("", get("?run=x.bxs"));
+    get(200, "", "run", "x.bxs");
 
-    get("?run=unknown.abc", 404);
+    get(404, "", "run", "unknown.abc");
 
     new IOFile(path, "x.bxs").write("<set option='unknown'>123</set>");
-    get("?run=x.bxs", 500);
+    get(500, "", "run", "x.bxs");
   }
 }

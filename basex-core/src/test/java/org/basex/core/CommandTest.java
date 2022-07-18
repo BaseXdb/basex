@@ -225,6 +225,25 @@ public class CommandTest extends SandboxTest {
     ok(new Delete(FN));
   }
 
+  /**
+   * Dropping backups.
+   */
+  @Test public final void dropBackup() {
+    // dropping a backup with db name as argument
+    ok(new CreateDB(NAME));
+    ok(new CreateBackup(NAME));
+    ok(new DropBackup(NAME));
+
+    /* Creates 2 dbs: one with a short name (1), the other with a
+     * longer name (2). (1) is a prefix of (2). Tests then, whether
+     * backups of both dbs are deleted, when we drop backups of (1). */
+    ok(new CreateDB(NAME));
+    ok(new CreateDB(NAME2));
+    ok(new CreateBackup(NAME));
+    ok(new CreateBackup(NAME2));
+    ok(new DropBackup(NAME));
+  }
+
   /** Command test. */
   @Test public final void dropDB() {
     ok(new DropDB(NAME));
@@ -479,25 +498,6 @@ public class CommandTest extends SandboxTest {
     ok(new Restore(Databases.DBCHARS));
     ok(new DropBackup(Databases.DBCHARS));
     ok(new DropDB(Databases.DBCHARS));
-  }
-
-  /**
-   * Dropping backups.
-   */
-  @Test public final void dropBackup() {
-    // dropping a backup with db name as argument
-    ok(new CreateDB(NAME));
-    ok(new CreateBackup(NAME));
-    ok(new DropBackup(NAME));
-
-    /* Creates 2 dbs: one with a short name (1), the other with a
-     * longer name (2). (1) is a prefix of (2). Tests then, whether
-     * backups of both dbs are deleted, when we drop backups of (1). */
-    ok(new CreateDB(NAME));
-    ok(new CreateDB(NAME2));
-    ok(new CreateBackup(NAME));
-    ok(new CreateBackup(NAME2));
-    ok(new DropBackup(NAME));
   }
 
   /** Retrieves binary data. */

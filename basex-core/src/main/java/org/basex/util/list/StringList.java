@@ -58,7 +58,7 @@ public class StringList extends ObjectList<String, StringList> {
    * @return self reference
    */
   public final StringList sort(final boolean cs) {
-    return sort(cs, true, 0);
+    return sort(cs, true);
   }
 
   /**
@@ -68,19 +68,8 @@ public class StringList extends ObjectList<String, StringList> {
    * @return self reference
    */
   public final StringList sort(final boolean cs, final boolean asc) {
-    return sort(cs, asc, 0);
-  }
-
-  /**
-   * Sorts the elements.
-   * @param cs respect case sensitivity
-   * @param ascending ascending/descending order
-   * @param index index of element from which sorting starts
-   * @return self reference
-   */
-  public final StringList sort(final boolean cs, final boolean ascending, final int index) {
     final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
-    Arrays.sort(list, index, size, ascending ? comp : Collections.reverseOrder(comp));
+    Arrays.sort(list, 0, size, asc ? comp : Collections.reverseOrder(comp));
     return this;
   }
 

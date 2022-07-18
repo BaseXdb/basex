@@ -41,32 +41,32 @@ public final class RestXqMethodTest extends RestXqTest {
    * @throws Exception exception */
   @Test public void method() throws Exception {
     // standard HTTP method without body
-    get("declare %R:method('GET') %R:path('') function m:f() {'x'};", "", "x");
+    get("x", "declare %R:method('GET') %R:path('') function m:f() {'x'};", "");
     // standard HTTP method specified twice
-    getError("declare %R:method('GET') %R:GET %R:path('') function m:f() {'x'};", "");
+    get(500, "declare %R:method('GET') %R:GET %R:path('') function m:f() {'x'};", "");
     // standard HTTP method without body, body provided in request
-    getError("declare %R:method('GET', '{$b}') %R:path('') function m:f($b) {$b};", "");
+    get(500, "declare %R:method('GET', '{$b}') %R:path('') function m:f($b) {$b};", "");
     // standard HTTP method with body, body provided in request
     post("declare %R:method('POST', '{$b}') %R:path('') function m:f($b) {$b};", "12", "12",
         MediaType.TEXT_PLAIN);
 
     // ignore case
-    get("declare %R:method('get') %R:path('') function m:f() {'x'};", "", "x");
-    getError("declare %R:method('get') declare %R:method('GET') %R:path('') "
+    get("x", "declare %R:method('get') %R:path('') function m:f() {'x'};", "");
+    get(500, "declare %R:method('get') declare %R:method('GET') %R:path('') "
         + "function m:f() {'x'};", "");
 
     // custom HTTP method without body
-    install("declare %R:method('RETRIEVE') %R:path('') function m:f() {'x'};");
-    assertEquals("x", send("", "RETRIEVE", null, null, 200));
+    register("declare %R:method('RETRIEVE') %R:path('') function m:f() {'x'};");
+    assertEquals("x", send(200, "RETRIEVE", null, null, ""));
 
     // custom HTTP method with body
-    install("declare %R:method('RETRIEVE', '{$b}') %R:path('') function m:f($b) {$b};");
-    assertEquals("12", send("", "RETRIEVE", new ArrayInput("12"), MediaType.TEXT_PLAIN, 200));
+    register("declare %R:method('RETRIEVE', '{$b}') %R:path('') function m:f($b) {$b};");
+    assertEquals("12", send(200, "RETRIEVE", new ArrayInput("12"), MediaType.TEXT_PLAIN, ""));
 
     // custom HTTP method specified twice
-    install("declare %R:method('RETRIEVE') %R:method('RETRIEVE') %R:path('') "
+    register("declare %R:method('RETRIEVE') %R:method('RETRIEVE') %R:path('') "
         + "function m:f() {'x'};");
-    send("", "RETRIEVE", null, null, 500);
+    send(500, "RETRIEVE", null, null, "");
   }
 
   /**
@@ -106,7 +106,7 @@ public final class RestXqMethodTest extends RestXqTest {
    * @throws IOException I/O exception
    */
   private static void options(final String function, final String exp) throws IOException {
-    install(function);
+    register(function);
     assertEquals(exp, options(""));
   }
 
@@ -120,8 +120,8 @@ public final class RestXqMethodTest extends RestXqTest {
    */
   private static void post(final String function, final String exp, final String request,
       final MediaType type) throws IOException {
-    install(function);
-    assertEquals(exp, post("", request, type));
+    register(function);
+    assertEquals(exp, post(request, type, ""));
   }
 
   /**
@@ -130,8 +130,8 @@ public final class RestXqMethodTest extends RestXqTest {
    * @throws Exception exception
    */
   private static void head(final String function) throws Exception {
-    install(function);
-    assertEquals("", head("", 200));
+    register(function);
+    assertEquals("", head(200, ""));
   }
 
   /**
@@ -140,7 +140,7 @@ public final class RestXqMethodTest extends RestXqTest {
    * @throws Exception exception
    */
   private static void headError(final String function) throws Exception {
-    install(function);
-    head("", 500);
+    register(function);
+    head(500, "");
   }
 }

@@ -277,14 +277,13 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
   /**
    * Returns the combo box selections and the keys of the specified set.
-   * @param names keys
-   * @return key array
+   * @param keys keys
+   * @return sorted key array
    */
-  private static String[] entries(final TokenList names) {
-    final int ns = names.size();
-    final StringList entries = new StringList(ns);
-    entries.add(Util.info(ENTRIES_X, ns));
-    for(final byte[] name : names) entries.add(name);
-    return entries.sort(true, true, 1).finish();
+  private static String[] entries(final TokenList keys) {
+    final int ks = keys.size();
+    final StringList entries = new StringList(ks + 1);
+    for(final byte[] key : keys) entries.add(key);
+    return entries.sort().insert(0, Util.info('(' + ENTRIES_X + ')', ks)).finish();
   }
 }

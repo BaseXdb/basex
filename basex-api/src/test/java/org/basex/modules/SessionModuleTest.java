@@ -1,11 +1,6 @@
 package org.basex.modules;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.net.*;
-
 import org.basex.http.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -28,7 +23,7 @@ public final class SessionModuleTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void id() throws Exception {
-    assertEquals("1", get("?query=" + request("count(S:id())")));
+    get("1", "", "query", "count(session:id())");
   }
 
   /**
@@ -36,7 +31,7 @@ public final class SessionModuleTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void names() throws Exception {
-    assertEquals("a", get("?query=" + request("S:set('a', 'b'), S:names()")));
+    get("a", "", "query", "session:set('a', 'b'), session:names()");
   }
 
   /**
@@ -44,7 +39,7 @@ public final class SessionModuleTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void get() throws Exception {
-    assertEquals("", get("?query=" + request("S:get('a')")));
+    get("", "", "query", "session:get('a')");
   }
 
   /**
@@ -52,8 +47,8 @@ public final class SessionModuleTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void set() throws Exception {
-    final String query = "S:set('a', 'b'), S:get('a')";
-    assertEquals("b", get("?query=" + request(query)));
+    final String query = "session:set('a', 'b'), session:get('a')";
+    get("b", "", "query", query);
   }
 
   /**
@@ -61,19 +56,6 @@ public final class SessionModuleTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void close() throws Exception {
-    assertEquals("", get("?query=" + request("S:close()")));
-  }
-
-  // PRIVATE METHODS ==============================================================================
-
-  /**
-   * Returns an encoded version of the query, including a Request module import.
-   * @param query query string
-   * @return prepared query
-   * @throws Exception exception
-   */
-  private static String request(final String query) throws Exception {
-    return URLEncoder.encode("import module namespace " +
-        "S='http://basex.org/modules/session';" + query, Strings.UTF8);
+    get("", "", "query", "session:close()");
   }
 }

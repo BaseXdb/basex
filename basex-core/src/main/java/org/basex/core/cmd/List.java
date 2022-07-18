@@ -66,9 +66,7 @@ public final class List extends Command {
     table.description = DATABASES_X;
 
     final boolean create = context.user().has(Perm.CREATE);
-    table.header.add(NAME);
-    table.header.add(RESOURCES);
-    table.header.add(SIZE);
+    table.header.add(NAME).add(RESOURCES).add(SIZE);
     if(create) table.header.add(INPUT_PATH);
 
     for(final String name : context.listDBs()) {
@@ -106,32 +104,31 @@ public final class List extends Command {
    * @throws IOException I/O exception
    */
   private boolean listDB() throws IOException {
-    final String db = args[0], path = args[1];
+    final String db = args[0], root = args[1];
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
     final Table table = new Table();
     table.description = RESOURCES_X;
-    table.header.add(INPUT_PATH);
-    table.header.add(TYPE);
-    table.header.add(DataText.CONTENT_TYPE);
-    table.header.add(SIZE);
+    table.header.add(INPUT_PATH).add(TYPE).add(DataText.CONTENT_TYPE).add(SIZE);
 
     try {
-      // list XML documents
       final Data data = Open.open(db, context, options);
       final Resources resources = data.resources;
-      final IntList docs = resources.docs(path);
+
+      // list XML documents
+      final IntList docs = resources.docs(root);
       final int ds = docs.size();
       for(int d = 0; d < ds; d++) {
         final int pre = docs.get(d);
         final ResourceType type = ResourceType.XML;
-        add(table, type, Token.string(data.text(pre, true)), data.size(pre, Data.DOC));
+        final String string = Token.string(data.text(pre, true));
+        add(table, type, string, data.size(pre, Data.DOC));
       }
       // list file resources
       for(final ResourceType type : Resources.BINARIES) {
         final IOFile bin = data.meta.dir(type);
-        for(final byte[] pt : resources.paths(path, type)) {
-          final String string = Token.string(pt);
+        for(final byte[] path : resources.paths(root, type)) {
+          final String string = Token.string(path);
           add(table, type, string, new IOFile(bin, string).length());
         }
       }
@@ -151,11 +148,7 @@ public final class List extends Command {
    * @param size size of resource
    */
   private void add(final Table table, final ResourceType type, final String path, final long size) {
-    final TokenList tl = new TokenList(4);
-    tl.add(type.path(path));
-    tl.add(type.toString());
-    tl.add(type.contentType(path).toString());
-    tl.add(size);
-    table.contents.add(tl);
+    table.contents.add(new TokenList(4).add(type.path(path)).add(type.toString()).
+        add(type.contentType(path).toString()).add(size));
   }
 }

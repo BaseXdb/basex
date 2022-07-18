@@ -747,8 +747,10 @@ public interface Text {
   String PACKAGES_X = lang("packages_%");
   /** Show jobs. */
   String JOBS_X = lang("jobs_%");
-  /** Show packages. */
+  /** Show resources. */
   String RESOURCES_X = lang("resources_%");
+  /** Show entries. */
+  String ENTRIES_X = lang("entries_%");
   /** Permission required. */
   String PERM_REQUIRED_X = lang("perm_required_%");
   /** Invalid permissions. */
@@ -905,8 +907,6 @@ public interface Text {
   /** "Local Options". */
   String LOCAL_OPTIONS = lang("local_options");
 
-  /** "(% entries)". */
-  String ENTRIES_X = '(' + lang("entries_%") + ')';
   /** "Error". */
   String ERROR = lang("error");
 

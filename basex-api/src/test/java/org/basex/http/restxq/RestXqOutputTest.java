@@ -14,36 +14,42 @@ public final class RestXqOutputTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void output() throws Exception {
-    // correct syntax
-    get("declare %R:path('') %output:method('text') function m:f() {'9'};", "", "9");
-    // unknown serialization parameter
-    getError("declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
-    // parameter must contain single string
-    getError("declare %R:path('') %output:method function m:f() {'9'};", "");
-    getError("declare %R:path('') %output:method('xml', 'html') function m:f() {'9'};", "");
+    get("9", "declare %R:path('') %output:method('text') function m:f() {'9'};", "");
 
-    get("declare %R:path('') function m:f() { <R:response>" +
-        "  <output:serialization-parameters>" +
-        "    <output:method value='text'/>" +
-        "  </output:serialization-parameters>" +
-        "  <http:response status='200'/>" +
-        "</R:response>," +
-        "<X>1</X> };", "", "1");
-    get("declare %R:path('') %output:method('text') function m:f() {" +
+    get("1", "declare %R:path('') function m:f() { <R:response>" +
+            "  <output:serialization-parameters>" +
+            "    <output:method value='text'/>" +
+            "  </output:serialization-parameters>" +
+            "  <http:response status='200'/>" +
+            "</R:response>," +
+            "<X>1</X> };", "");
+    get("<X>1</X>", "declare %R:path('') %output:method('text') function m:f() {" +
+            "<R:response>" +
+            "  <output:serialization-parameters>" +
+            "    <output:method value='xml'/>" +
+            "  </output:serialization-parameters>" +
+            "  <http:response status='200'/>" +
+            "</R:response>," +
+            "<X>1</X> };", "");
+  }
+  /**
+   * Erroneous serialization parameters and elements.
+   * @throws Exception exception
+   */
+  @Test public void outputErrors() throws Exception {
+    // unknown serialization parameter
+    get(500, "declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
+    // parameter must contain single string
+    get(500, "declare %R:path('') %output:method function m:f() {'9'};", "");
+    get(500, "declare %R:path('') %output:method('xml', 'html') function m:f() {'9'};", "");
+
+    get(500, "declare %R:path('') %output:method('text') function m:f() {" +
         "<R:response>" +
         "  <output:serialization-parameters>" +
         "    <output:method value='xml'/>" +
         "  </output:serialization-parameters>" +
         "  <http:response status='200'/>" +
         "</R:response>," +
-        "<X>1</X> };", "", "<X>1</X>");
-    getError("declare %R:path('') %output:method('text') function m:f() {" +
-        "<R:response>" +
-        "  <output:serialization-parameters>" +
-        "    <output:method value='xml'/>" +
-        "  </output:serialization-parameters>" +
-        "  <http:response status='200'/>" +
-        "</R:response>," +
-        "1+<a/> };", "");
+        "1 + <a/> };", "");
   }
 }
