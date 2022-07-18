@@ -379,6 +379,10 @@ public interface Text {
     "([" + S_NAME + "] ([" + S_PATH + "]))", lang("c_list1"), lang("c_list2", S_NAME, S_PATH)
   };
   /** Command help. */
+  String[] HELPDIR = {
+    '[' + S_PATH  + ']', lang("c_dir1"), lang("c_dir2")
+  };
+  /** Command help. */
   String[] HELPDROP = {
     "[" + CmdDrop.BACKUP + '|' + CmdDrop.DATABASE + '|' +
       CmdDrop.INDEX + '|' + CmdDrop.USER + "] [...]",

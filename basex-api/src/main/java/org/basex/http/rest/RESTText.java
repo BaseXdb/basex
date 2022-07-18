@@ -18,6 +18,8 @@ interface RESTText {
   String REST = "REST";
   /** Attribute. */
   String NAME = "name";
+  /** Directory token. */
+  byte[] DIR = Token.token("dir");
 
   /** Name. */
   QNm Q_DATABASES = new QNm("databases", REST_URI);
@@ -25,6 +27,8 @@ interface RESTText {
   QNm Q_DATABASE = new QNm("database", REST_URI);
   /** Name. */
   QNm Q_RESOURCE = new QNm("resource", REST_URI);
+  /** Dir. */
+  QNm Q_DIR = new QNm(DIR, REST_URI);
 
   /** Commands operation. */
   String COMMANDS = "commands";

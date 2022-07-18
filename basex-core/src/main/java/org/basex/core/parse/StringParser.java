@@ -125,6 +125,8 @@ final class StringParser extends CommandParser {
         return new Close();
       case LIST:
         return new List(name(null), string(null));
+      case DIR:
+        return new Dir(string(null));
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:

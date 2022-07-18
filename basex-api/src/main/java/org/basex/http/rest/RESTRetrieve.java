@@ -52,13 +52,17 @@ final class RESTRetrieve extends RESTCmd {
         cmd = new List();
       } else {
         root = new FElem(RESTText.Q_DATABASE).declareNS().add(RESTText.NAME, database);
-        cmd = new List(database, path);
+        cmd = new Dir(path);
       }
       final Table table = new Table(run(cmd));
       for(final TokenList list : table.contents) {
-        final FElem elem = new FElem(db ? RESTText.Q_DATABASE : RESTText.Q_RESOURCE);
-        final int ll = list.size() - (db ? 1 : 0);
-        for(int l = 1; l < ll; l++) elem.add(lc(table.header.get(l)), list.get(l));
+        final boolean dir = !db && eq(RESTText.DIR, list.get(1));
+        final FElem elem = new FElem(db ? RESTText.Q_DATABASE : dir ? RESTText.Q_DIR :
+          RESTText.Q_RESOURCE);
+        if(!dir) {
+          final int ll = list.size() - (db ? 1 : 0);
+          for(int l = 1; l < ll; l++) elem.add(lc(table.header.get(l)), list.get(l));
+        }
         root.add(elem.add(list.get(0)));
       }
 

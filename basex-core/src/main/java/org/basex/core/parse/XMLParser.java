@@ -89,6 +89,8 @@ final class XMLParser extends CommandParser {
       return new CreateUser(value(root, NAME), password(root));
     if(e.equals(DELETE) && check(root, PATH))
       return new Delete(value(root, PATH));
+    if(e.equals(DIR) && check(root, PATH))
+      return new Dir(value(root, PATH));
     if(e.equals(DROP_BACKUP) && check(root, NAME + '?'))
       return new DropBackup(value(root, NAME));
     if(e.equals(DROP_DB) && check(root, NAME))

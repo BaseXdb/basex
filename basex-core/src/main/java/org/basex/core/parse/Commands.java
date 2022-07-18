@@ -39,6 +39,8 @@ public interface Commands {
   String CREATE_USER = "create-user";
   /** Command string: "delete". */
   String DELETE = "delete";
+  /** Command string: "dir". */
+  String DIR = "dir";
   /** Command string: "drop-backup". */
   String DROP_BACKUP = "drop-backup";
   /** Command string: "drop-db". */
@@ -189,7 +191,7 @@ public interface Commands {
   /** Command definitions. */
   enum Cmd {
     ADD(HELPADD), ALTER(HELPALTER), CHECK(HELPCHECK), CLOSE(HELPCLOSE), COPY(HELPCOPY),
-    CREATE(HELPCREATE), DELETE(HELPDELETE), DROP(HELPDROP), EXIT(HELPEXIT),
+    CREATE(HELPCREATE), DELETE(HELPDELETE), DIR(HELPDIR), DROP(HELPDROP), EXIT(HELPEXIT),
     EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH), GET(HELPGET), GRANT(HELPGRANT),
     HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT), JOBS(HELPJOBS), KILL(HELPKILL),
     LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD),

@@ -65,6 +65,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new CreateIndex(IndexType.TEXT), true, CTX_LIST);
     ckDBs(new CreateUser(NAME, NAME), true, USER_LIST);
     ckDBs(new Delete(FILE), true, CTX_LIST);
+    ckDBs(new Dir(FILE), false, CTX_LIST);
     ckDBs(new DropBackup(NAME), true, NAME_LIST);
     ckDBs(new DropDB(NAME + '*'), true, null); // Drop using globbing
     ckDBs(new DropDB(NAME), true, NAME_LIST);

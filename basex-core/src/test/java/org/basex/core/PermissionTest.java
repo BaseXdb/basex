@@ -140,6 +140,8 @@ public final class PermissionTest extends SandboxTest {
 
     ok(new Open(NAME), testSession);
     ok(new List(NAME), testSession);
+    ok(new List(NAME, "path"), testSession);
+    ok(new Dir("path"), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
     no(new Get("DBPATH"), testSession);

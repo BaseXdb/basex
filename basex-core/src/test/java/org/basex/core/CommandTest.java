@@ -225,6 +225,13 @@ public class CommandTest extends SandboxTest {
     ok(new Delete(FN));
   }
 
+  /** Command test. */
+  @Test public final void dir() {
+    no(new Dir(FILE));
+    ok(new CreateDB(NAME, FILE));
+    ok(new Dir(FILE));
+  }
+
   /**
    * Dropping backups.
    */
