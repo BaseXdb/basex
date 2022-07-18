@@ -167,7 +167,7 @@ final class WebDAVService {
 
     final WebDAVQuery query = new WebDAVQuery(
       "if(" + _DB_TYPE.args(" $db", " $path") + " = 'binary')" +
-      " then " + _DB_STORE.args(" $tdb", " $tpath", _DB_RETRIEVE.args(" $db", " $path")) +
+      " then " + _DB_PUT_BINARY.args(" $tdb", _DB_GET_BINARY.args(" $db", " $path"), " $tpath") +
       " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"));
     query.variable("db", db);
     query.variable("path", path);
@@ -191,7 +191,7 @@ final class WebDAVService {
       "for $d in " + _DB_LIST.args(" $db", " $path") +
       "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
       "if(" + _DB_TYPE.args(" $db", " $d") + " = 'binary') " +
-      "then " + _DB_STORE.args(" $tdb", " $t", _DB_RETRIEVE.args(" $db", " $d")) +
+      "then " + _DB_PUT_BINARY.args(" $tdb", _DB_GET_BINARY.args(" $db", " $d"), " $t") +
       " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"));
     query.variable("db", db);
     query.variable("path", path);
@@ -213,7 +213,7 @@ final class WebDAVService {
 
     session().setOutputStream(out);
     final WebDAVQuery query = new WebDAVQuery(
-      (binary ? _DB_RETRIEVE : _DB_OPEN).args(" $db", " $path") + "[1]",
+      (binary ? _DB_GET_BINARY : _DB_OPEN).args(" $db", " $path") + "[1]",
       SerializerOptions.USE_CHARACTER_MAPS.arg(WEBDAV));
     query.variable("db", db);
     query.variable("path", path);

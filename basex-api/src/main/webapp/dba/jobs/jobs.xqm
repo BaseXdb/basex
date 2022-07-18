@@ -50,8 +50,8 @@ function dba:jobs(
             map { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
           )
           let $entries :=
-            let $curr := jobs:current()
-            for $details in jobs:list-details()
+            let $curr := job:current()
+            for $details in job:list-details()
             let $id := $details/@id
             let $sec := (
               let $dur := xs:dayTimeDuration($details/@duration)
@@ -86,7 +86,7 @@ function dba:jobs(
       </td>,
 
       if($job) then (
-        let $details := jobs:list-details($job)
+        let $details := job:list-details($job)
         let $cached := $details/@state = 'cached'
         return (
           <td class='vertical'/>,
@@ -113,7 +113,7 @@ function dba:jobs(
                   <td>{ string($value) }</td>
                 </tr>
               }</table>,
-              let $bindings := jobs:bindings($job)
+              let $bindings := job:bindings($job)
               where map:size($bindings) > 0
               return (
                 <h3>Query Bindings</h3>,

@@ -120,7 +120,7 @@ function dba:db-add-post(
     ) else (
       let $input := $file($key)
       return if($binary) then (
-        db:store($name, $path, $input)
+        db:put-binary($name, $input, $path)
       ) else (
         db:add($name, fetch:binary-doc($input), $path, map:merge(
           ('intparse', 'dtd', 'stripns', 'stripws', 'xinclude') ! map:entry(., $opts = .))

@@ -18,7 +18,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Update primitive for the {@link Function#_DB_STORE} function.
+ * Update primitive for the {@link Function#_DB_PUT} function.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -30,11 +30,11 @@ public final class DBPut extends DBUpdate {
   /**
    * Constructor.
    * @param data data
-   * @param path target path
    * @param value value to be stored
+   * @param path target path
    * @param info input info
    */
-  public DBPut(final Data data, final String path, final Value value, final InputInfo info) {
+  public DBPut(final Data data, final Value value, final String path, final InputInfo info) {
     super(UpdateType.DBPUT, data, info);
     paths.put(token(path), value);
   }

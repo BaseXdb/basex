@@ -22,12 +22,12 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbReplace extends DbNew {
+public final class DbUpdate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final String path = toDbPath(1, qc);
-    final Item item = toNodeOrAtomItem(2, qc);
+    final Item item = toNodeOrAtomItem(1, qc);
+    final String path = toDbPath(2, qc);
     final Options opts = toOptions(3, new Options(), qc);
 
     final Updates updates = qc.updates();
@@ -37,7 +37,7 @@ public final class DbReplace extends DbNew {
     if(item instanceof Bin) {
       // store binary resource
       if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-      updates.add(new DBStore(data, path, item, info), qc);
+      updates.add(new DBPutBinary(data, item, path, info), qc);
     } else {
       // store XML document: replace existing document or add new one
       final NewInput input = toNewInput(item, path);

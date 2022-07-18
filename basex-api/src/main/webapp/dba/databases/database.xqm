@@ -62,7 +62,7 @@ function dba:database(
             if($db-exists) then (
               let $headers := (
                 map { 'key': 'resource' , 'label': 'Name' },
-                map { 'key': 'content-type' , 'label': 'Content type' },
+                map { 'key': 'type' , 'label': 'Type' },
                 map { 'key': 'binary' , 'label': 'Binary' },
                 map { 'key': 'size' , 'label': 'Size', 'type': 'number', 'order': 'desc' }
               )
@@ -72,7 +72,7 @@ function dba:database(
                 for $res in db:list-details($name)[position() = $start to $end]
                 return map {
                   'resource': $res,
-                  'content-type': $res/@content-type,
+                  'type': $res/@type,
                   'binary': if($res/@raw = 'true') then '✓' else '–',
                   'size': $res/@size
                 }
@@ -142,7 +142,7 @@ function dba:database(
             {
               html:button('db-rename', 'Rename…'), ' ',
               html:button('db-download', 'Download'), ' ',
-              html:button('db-replace', 'Replace…')
+              html:button('db-update', 'Update…')
             }
           </form>,
           <b>Enter your query…</b>,

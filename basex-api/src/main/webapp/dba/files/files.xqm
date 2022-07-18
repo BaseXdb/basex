@@ -77,7 +77,7 @@ function dba:files(
             map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
           )
           let $entries :=
-            let $jobs := jobs:list-details()
+            let $jobs := job:list-details()
             let $parent := if(file:parent($dir)) then ($dir || '..') else ()
             for $file in ($parent, file:children($dir))
             let $dir := file:is-dir($file)

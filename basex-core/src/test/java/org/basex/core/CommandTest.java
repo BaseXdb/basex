@@ -470,10 +470,10 @@ public class CommandTest extends SandboxTest {
     no(new Replace("..", "<a/>"));
     no(new Replace("/", "<a/>"));
     // create and replace binary file
-    ok(new XQuery(_DB_STORE.args(NAME, "a", "a")));
-    ok(new Replace("a", "<b/>"));
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, "DATA", "path")));
+    ok(new Replace("path", "<b/>"));
     assertFalse(ok(new XQuery(_DB_OPEN.args(NAME))).isEmpty());
-    ok(new XQuery(_DB_RETRIEVE.args(NAME, "a")));
+    ok(new XQuery(_DB_GET_BINARY.args(NAME, "path")));
     // a failing replace should not remove existing documents
     no(new Replace(FN, "<a>"));
     assertEquals("1", ok(new XQuery(count)));

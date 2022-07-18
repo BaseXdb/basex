@@ -232,7 +232,7 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void contentType() {
     final Function func = _DB_CONTENT_TYPE;
     query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_STORE.args(NAME, "binary", "bla"));
+    query(_DB_PUT_BINARY.args(NAME, "bla", "binary"));
     query(func.args(NAME, "xml"), MediaType.APPLICATION_XML.toString());
     query(func.args(NAME, "binary"), MediaType.APPLICATION_OCTET_STREAM.toString());
     error(func.args(NAME, "test"), WHICHRES_X);
@@ -437,8 +437,8 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void dir() {
     final Function func = _DB_DIR;
     query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
-    query(_DB_STORE.args(NAME, "binary/binary.data", "bla"));
-    query(_DB_PUT.args(NAME, "value/value.data", " 1 to 5"));
+    query(_DB_PUT_BINARY.args(NAME, "bla", "binary/binary.data"));
+    query(_DB_PUT.args(NAME, " 1 to 5", "value/value.data"));
 
     String call = func.args(NAME, "xml");
     query(call + "/@type/data()", "xml");
@@ -510,7 +510,7 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void exists() {
     final Function func = _DB_EXISTS;
     query(_DB_ADD.args(NAME, " <a/>", "x/xml"));
-    query(_DB_STORE.args(NAME, "x/binary", "bla"));
+    query(_DB_PUT_BINARY.args(NAME, "bla", "x/binary"));
     // checks if the specified resources exist (false expected for directories)
     query(func.args(NAME), true);
     query(func.args(NAME, "x/xml"), true);
@@ -548,8 +548,18 @@ public final class DbModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void get() {
     final Function func = _DB_GET;
-    query("(0 to 5) !" + _DB_PUT.args(NAME, " 'value' || .", " ."), "");
-    query("(0 to 5) !" + func.args(NAME, " 'value' || ."), "0\n1\n2\n3\n4\n5");
+    query("(0 to 5) !" + _DB_PUT.args(NAME, " .", " 'path' || ."), "");
+    query("(0 to 5) !" + func.args(NAME, " 'path' || ."), "0\n1\n2\n3\n4\n5");
+  }
+
+  /** Test method. */
+  @Test public void getBinary() {
+    final Function func = _DB_GET_BINARY;
+    error(func.args(NAME, "binary"), WHICHRES_X);
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "binary"));
+    query("xs:hexBinary(" + func.args(NAME, "binary") + ')', "A");
+    query(_DB_DELETE.args(NAME, "binary"));
+    error(func.args(NAME, "binary"), WHICHRES_X);
   }
 
   /** Test method. */
@@ -568,11 +578,11 @@ public final class DbModuleTest extends QueryPlanTest {
     contains(func.args(NAME, "test/"), "test/docs");
     contains(func.args(NAME, "test/docs/input.xml"), "input.xml");
 
-    query(_DB_STORE.args(NAME, "bin/b", "b"));
+    query(_DB_PUT_BINARY.args(NAME, "b", "bin/b"));
     query(func.args(NAME, "bin/"), "bin/b");
     query(func.args(NAME, "bin/b"), "bin/b");
 
-    query(_DB_PUT.args(NAME, "value/value.data", " 1 to 5"));
+    query(_DB_PUT.args(NAME, " 1 to 5", "value/value.data"));
     query(func.args(NAME, "value/"), "value/value.data");
 
     // create two other database and compare substring
@@ -589,8 +599,8 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args() + "/@resources/string()", 1);
 
     query(_DB_ADD.args(NAME, " <a/>", "xml/xml.xml"));
-    query(_DB_STORE.args(NAME, "binary/binary.data", "bla"));
-    query(_DB_PUT.args(NAME, "value/value.data", " 1 to 5"));
+    query(_DB_PUT_BINARY.args(NAME, "bla", "binary/binary.data"));
+    query(_DB_PUT.args(NAME, " 1 to 5", "value/value.data"));
 
     String call = func.args(NAME, "xml/");
     query(call + "/@type/data()", "xml");
@@ -789,6 +799,33 @@ public final class DbModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void put() {
+    final Function func = _DB_PUT;
+    query(func.args(NAME, "a", "value1"));
+    query(func.args(NAME, " 1 to 2", "value2"));
+    query(_DB_GET.args(NAME, "value1"), "a");
+    query(_DB_GET.args(NAME, "value2"), "1\n2");
+    query(func.args(NAME, 1, "value2"));
+    query(_DB_GET.args(NAME, "value2"), 1);
+
+    error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
+        DB_CONFLICT5_X);
+    error(_DB_PUT.args(NAME, "VALUE", ".."), RESINV_X);
+  }
+
+  /** Test method. */
+  @Test public void putBinary() {
+    final Function func = _DB_PUT_BINARY;
+    query(func.args(NAME, "xs:hexBinary('41')", "binary1"));
+    query(func.args(NAME, "b", "binary2"));
+    query(_DB_GET_BINARY.args(NAME, "binary2"), "b");
+    query(func.args(NAME, 123, "binary3"));
+    query(_DB_GET_BINARY.args(NAME, "binary3"), 123);
+
+    error(func.args(NAME, "bin/x", "x") + ", " + func.args(NAME, "bin//x", "x"), DB_CONFLICT5_X);
+  }
+
+  /** Test method. */
   @Test public void rename() {
     final Function func = _DB_RENAME;
 
@@ -810,71 +847,27 @@ public final class DbModuleTest extends QueryPlanTest {
     query("count(" + COLLECTION.args(NAME + "/x/newtest") + ")", XMLFILES);
 
     // rename binary file
-    query(_DB_STORE.args(NAME, "file1", ""));
+    query(_DB_PUT_BINARY.args(NAME, "", "file1"));
     query(func.args(NAME, "file1", "file2"));
-    query(_DB_RETRIEVE.args(NAME, "file2"));
-    error(_DB_RETRIEVE.args(NAME, "file1"), WHICHRES_X);
+    query(_DB_GET_BINARY.args(NAME, "file2"));
+    error(_DB_GET_BINARY.args(NAME, "file1"), WHICHRES_X);
 
     query(func.args(NAME, "file2", "dir1/file3"));
-    query(_DB_RETRIEVE.args(NAME, "dir1/file3"));
+    query(_DB_GET_BINARY.args(NAME, "dir1/file3"));
     query(func.args(NAME, "dir1", "dir2"));
-    query(_DB_RETRIEVE.args(NAME, "dir2/file3"));
-    error(_DB_RETRIEVE.args(NAME, "dir1"), WHICHRES_X);
+    query(_DB_GET_BINARY.args(NAME, "dir2/file3"));
+    error(_DB_GET_BINARY.args(NAME, "dir1"), WHICHRES_X);
 
-    query(_DB_STORE.args(NAME, "file4", ""));
-    query(_DB_STORE.args(NAME, "dir3/file5", ""));
+    query(_DB_PUT_BINARY.args(NAME, "", "file4"));
+    query(_DB_PUT_BINARY.args(NAME, "", "dir3/file5"));
 
     error(func.args(NAME, "dir2", "file4"), DB_PATH_X);
     error(func.args(NAME, "file4", "dir2"), DB_PATH_X);
 
     // move files in directories
     query(func.args(NAME, "dir2", "dir3"));
-    query(_DB_RETRIEVE.args(NAME, "dir3/file3"));
-    query(_DB_RETRIEVE.args(NAME, "dir3/file5"));
-  }
-
-  /** Test method. */
-  @Test public void replace() {
-    final Function func = _DB_REPLACE;
-
-    execute(new Add("test", XML));
-
-    query(func.args(NAME, XML, " <R1/>"));
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 1);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
-
-    query(func.args(NAME, XML, " document { <R2/> }"));
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 1);
-
-    query(func.args(NAME, XML, XML));
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/html)", 1);
-
-    final String addcache = " map { 'addcache': true() }";
-    query(func.args(NAME, "1.xml", " <cache/>", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "1.xml") + ")", true);
-    query(func.args(NAME, "2.xml", " <cache/>", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "2.xml") + ")", true);
-    query(func.args(NAME, "3.xml", XML, addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "3.xml") + ")", true);
-
-    // GH-1302: replace same target more than once
-    error("(1 to 2) ! " + func.args(NAME, "3.xml", XML), UPMULTDOC_X_X);
-    error("(1 to 2) ! " + func.args(NAME, "X.xml", XML), UPMULTDOC_X_X);
-    error(_DB_ADD.args(NAME, XML, "X.xml") + ',' + func.args(NAME, "X.xml", XML),
-        UPMULTDOC_X_X);
-    error(func.args(NAME, "X.xml", XML) + ',' + _DB_ADD.args(NAME, XML, "X.xml"),
-        UPMULTDOC_X_X);
-
-    // GH-1302: check replacements of existing and new paths
-    query(func.args(NAME, "3.xml", XML) + ',' + func.args(NAME, "4.xml", XML));
-    query(func.args(NAME, "3.xml", " <a/>") + ',' + func.args(NAME, "5.xml", " <a/>"));
-
-    // GH-1302: check replacements of new paths
-    query(func.args(NAME, "6.xml", XML) + ',' + func.args(NAME, "7.xml", XML));
-    query(func.args(NAME, "8.xml", " <a/>") + ',' + func.args(NAME, "9.xml", " <a/>"));
+    query(_DB_GET_BINARY.args(NAME, "dir3/file3"));
+    query(_DB_GET_BINARY.args(NAME, "dir3/file5"));
   }
 
   /** Test method. */
@@ -897,42 +890,6 @@ public final class DbModuleTest extends QueryPlanTest {
 
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
-  }
-
-  /** Test method. */
-  @Test public void retrieve() {
-    final Function func = _DB_RETRIEVE;
-    error(func.args(NAME, "binary"), WHICHRES_X);
-    query(_DB_STORE.args(NAME, "binary", " xs:hexBinary('41')"));
-    query("xs:hexBinary(" + func.args(NAME, "binary") + ')', "A");
-    query(_DB_DELETE.args(NAME, "binary"));
-    error(func.args(NAME, "binary"), WHICHRES_X);
-  }
-
-  /** Test method. */
-  @Test public void put() {
-    final Function func = _DB_PUT;
-    query(func.args(NAME, "value1", "a"));
-    query(func.args(NAME, "value2", " 1 to 2"));
-    query(_DB_GET.args(NAME, "value1"), "a");
-    query(_DB_GET.args(NAME, "value2"), "1\n2");
-    query(func.args(NAME, "value2", 1));
-    query(_DB_GET.args(NAME, "value2"), 1);
-
-    error(func.args(NAME, "value/x", "x") + ", " + func.args(NAME, "value//x", "x"),
-        DB_CONFLICT5_X);
-  }
-
-  /** Test method. */
-  @Test public void store() {
-    final Function func = _DB_STORE;
-    query(func.args(NAME, "binary1", "xs:hexBinary('41')"));
-    query(func.args(NAME, "binary2", "b"));
-    query(_DB_RETRIEVE.args(NAME, "binary2"), "b");
-    query(func.args(NAME, "binary3", 123));
-    query(_DB_RETRIEVE.args(NAME, "binary3"), 123);
-
-    error(func.args(NAME, "bin/x", "x") + ", " + func.args(NAME, "bin//x", "x"), DB_CONFLICT5_X);
   }
 
   /** Test method. */
@@ -983,9 +940,51 @@ public final class DbModuleTest extends QueryPlanTest {
   @Test public void type() {
     final Function func = _DB_TYPE;
     query(_DB_ADD.args(NAME, " <a/>", "xml.xml"));
-    query(_DB_STORE.args(NAME, "bla.bin", "bla"));
+    query(_DB_PUT_BINARY.args(NAME, "bla", "bla.bin"));
     query(func.args(NAME, "xml.xml"), "xml");
     query(func.args(NAME, "bla.bin"), "binary");
+  }
+
+  /** Test method. */
+  @Test public void update() {
+    final Function func = _DB_UPDATE;
+
+    execute(new Add("test", XML));
+
+    query(func.args(NAME, " <R1/>", XML));
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 1);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
+
+    query(func.args(NAME, " document { <R2/> }", XML));
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 1);
+
+    query(func.args(NAME, XML, XML));
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/html)", 1);
+
+    final String addcache = " map { 'addcache': true() }";
+    query(func.args(NAME, " <cache/>", "1.xml", addcache));
+    query("exists(" + _DB_OPEN.args(NAME, "1.xml") + ")", true);
+    query(func.args(NAME, " <cache/>", "2.xml", addcache));
+    query("exists(" + _DB_OPEN.args(NAME, "2.xml") + ")", true);
+    query(func.args(NAME, XML, "3.xml", addcache));
+    query("exists(" + _DB_OPEN.args(NAME, "3.xml") + ")", true);
+
+    // GH-1302: replace same target more than once
+    error("(1 to 2) ! " + func.args(NAME, XML, "3.xml"), UPMULTDOC_X_X);
+    error("(1 to 2) ! " + func.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
+    error(_DB_ADD.args(NAME, XML, "X.xml") + ',' + func.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
+    error(func.args(NAME, XML, "X.xml") + ',' + _DB_ADD.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
+
+    // GH-1302: check replacements of existing and new paths
+    query(func.args(NAME, XML, "3.xml") + ',' + func.args(NAME, XML, "4.xml"));
+    query(func.args(NAME, " <a/>", "3.xml") + ',' + func.args(NAME, " <a/>", "5.xml"));
+
+    // GH-1302: check replacements of new paths
+    query(func.args(NAME, XML, "6.xml") + ',' + func.args(NAME, XML, "7.xml"));
+    query(func.args(NAME, " <a/>", "8.xml") + ',' + func.args(NAME, " <a/>", "9.xml"));
   }
 
   /**

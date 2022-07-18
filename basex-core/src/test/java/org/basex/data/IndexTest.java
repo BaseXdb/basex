@@ -213,7 +213,7 @@ public final class IndexTest extends SandboxTest {
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);
     execute(new Replace("x.xml", "<a>A</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);
-    query(_DB_REPLACE.args(NAME, "x.xml", " <a>B</a>"));
+    query(_DB_UPDATE.args(NAME, " <a>B</a>", "x.xml"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);
 
     set(MainOptions.AUTOOPTIMIZE, false);
@@ -223,7 +223,7 @@ public final class IndexTest extends SandboxTest {
 
     execute(new Optimize());
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);
-    query(_DB_REPLACE.args(NAME, "x.xml", " <a>D</a>"));
+    query(_DB_UPDATE.args(NAME, " <a>D</a>", "x.xml"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", false);
   }
 }

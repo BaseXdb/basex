@@ -79,7 +79,7 @@ final class RESTRetrieve extends RESTCmd {
       } else {
         sopts.set(SerializerOptions.MEDIA_TYPE, run(_DB_CONTENT_TYPE));
         context.options.set(MainOptions.SERIALIZER, sopts);
-        function = type == ResourceType.BINARY ? _DB_RETRIEVE : _DB_GET;
+        function = type == ResourceType.BINARY ? _DB_GET_BINARY : _DB_GET;
       }
       conn.initResponse();
       run(query(function), os);

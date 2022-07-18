@@ -25,10 +25,13 @@ function dba:db-download(
       map { 'media-type': db:content-type($name, $resource) },
       map { 'Content-Disposition': 'attachment; filename=' || $resource }
     ),
-    if(db:is-raw($name, $resource)) then (
-      db:retrieve($name, $resource)
-    ) else (
+    let $type := db:type($name, $resource)
+    return if($type = 'xml') then (
       db:open($name, $resource)
+    ) else if($type = 'binary') then (
+      db:get-binary($name, $resource)
+    ) else (
+      db:get($name, $resource)
     )
   } catch * {
     <rest:response>

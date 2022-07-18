@@ -162,9 +162,9 @@ public abstract class SessionTest extends SandboxTest {
     session.store("X", new ArrayInput("!"));
     assertEqual("binary", session.query(_DB_TYPE.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(""));
-    assertEqual("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
+    assertEqual("", session.query(_DB_GET_BINARY.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
-    assertEqual("AAH/", session.query("string(" + _DB_RETRIEVE.args(NAME, "X") + ')').execute());
+    assertEqual("AAH/", session.query("string(" + _DB_GET_BINARY.args(NAME, "X") + ')').execute());
     session.execute("drop db " + NAME);
   }
 
@@ -173,7 +173,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test public void storeBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
-    final Query query = session.query(_CONVERT_BINARY_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X")));
+
+    final Query query = session.query(_CONVERT_BINARY_TO_BYTES.args(
+        _DB_GET_BINARY.args(NAME, "X")));
     assertEqual("-128\n-2\n-1\n0\n1\n127", query.execute());
   }
 
@@ -261,9 +263,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test public void queryNullBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput("\0"));
-    assertEqual("\0", session.execute("xquery " + _DB_RETRIEVE.args(NAME, "X")));
-    assertEqual("\0", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
-    final Query q = session.query(_DB_RETRIEVE.args(NAME, "X"));
+    assertEqual("\0", session.execute("xquery " + _DB_GET_BINARY.args(NAME, "X")));
+    assertEqual("\0", session.query(_DB_GET_BINARY.args(NAME, "X")).execute());
+    final Query q = session.query(_DB_GET_BINARY.args(NAME, "X"));
     assertTrue(q.more());
     assertEqual("\0", q.next());
     assertFalse(q.more());
@@ -274,9 +276,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test public void queryEmptyBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(""));
-    assertEqual("", session.execute("xquery " + _DB_RETRIEVE.args(NAME, "X")));
-    assertEqual("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
-    final Query q = session.query(_DB_RETRIEVE.args(NAME, "X"));
+    assertEqual("", session.execute("xquery " + _DB_GET_BINARY.args(NAME, "X")));
+    assertEqual("", session.query(_DB_GET_BINARY.args(NAME, "X")).execute());
+    final Query q = session.query(_DB_GET_BINARY.args(NAME, "X"));
     assertTrue(q.more());
     assertEqual("", q.next());
     assertNull(q.next());
@@ -300,7 +302,7 @@ public abstract class SessionTest extends SandboxTest {
     session.execute("create db " + NAME);
     final byte[] tmp = { 0, 1, 2, 127, 0, -1, -2, -128 };
     session.store("X", new ArrayInput(tmp));
-    final String retr = _DB_RETRIEVE.args(NAME, "X");
+    final String retr = _DB_GET_BINARY.args(NAME, "X");
     // check command
     session.execute("xquery " + retr + ',' + retr);
     assertArrayEquals(concat(tmp, token(Prop.NL), tmp), out.next());

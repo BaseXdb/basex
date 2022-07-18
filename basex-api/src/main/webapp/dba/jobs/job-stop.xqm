@@ -51,7 +51,7 @@ declare %private function dba:job-stop(
   $action  as xs:string
 ) as element(rest:response) {
   let $params := try {
-    $ids ! jobs:stop(.),
+    $ids ! job:stop(.),
     map { 'info': util:info($ids, 'job', $action) }
   } catch * {
     map { 'error': $err:description }

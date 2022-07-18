@@ -130,7 +130,7 @@ public final class StoreTest extends SandboxTest {
    */
   @Test public void gh1711() {
     query(_DB_CREATE.args(NAME, GH1711));
-    query(_DB_REPLACE.args(NAME, "/", GH1711));
+    query(_DB_UPDATE.args(NAME, GH1711, "/"));
     query(_DB_OPEN.args(NAME));
   }
 }

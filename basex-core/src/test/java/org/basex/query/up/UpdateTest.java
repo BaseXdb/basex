@@ -1266,8 +1266,9 @@ public final class UpdateTest extends SandboxTest {
   /** db:replace, ADDCACHE option. */
   @Test public void gh1989() {
     createDB("<a/>");
-    query("db:replace('" + NAME + "', 'Sandbox.xml', '" + DOC + "', map { 'addcache': true() })");
-    query("db:exists('" + NAME + ".0')", false);
+    query(_DB_UPDATE.args(NAME, DOC, "Sandbox.xml", " map { 'addcache': true() }"));
+    query(_DB_EXISTS.args(NAME), true);
+    query(_DB_EXISTS.args(NAME + ".0"), false);
   }
 
   /** Update expression, context position. */

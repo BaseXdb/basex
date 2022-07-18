@@ -16,24 +16,24 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Update primitive for the {@link Function#_DB_STORE} function.
+ * Update primitive for the {@link Function#_DB_PUT_BINARY} function.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DBStore extends DBUpdate {
+public final class DBPutBinary extends DBUpdate {
   /** Paths. */
   private final TokenObjMap<Item> paths = new TokenObjMap<>();
 
   /**
    * Constructor.
    * @param data data
-   * @param path target path
    * @param item item to be stored
+   * @param path target path
    * @param info input info
    */
-  public DBStore(final Data data, final String path, final Item item, final InputInfo info) {
-    super(UpdateType.DBSTORE, data, info);
+  public DBPutBinary(final Data data, final Item item, final String path, final InputInfo info) {
+    super(UpdateType.DBPUTBINARY, data, info);
     paths.put(token(path), item);
   }
 
@@ -58,7 +58,7 @@ public final class DBStore extends DBUpdate {
 
   @Override
   public void merge(final Update update) throws QueryException {
-    final TokenObjMap<Item> store = ((DBStore) update).paths;
+    final TokenObjMap<Item> store = ((DBPutBinary) update).paths;
     for(final byte[] path : store) {
       if(paths.contains(path)) throw DB_CONFLICT5_X.get(info, path);
       paths.put(path, store.get(path));

@@ -20,14 +20,14 @@ declare
 function dba:job-result(
   $id  as xs:string
 ) as item()+ {
-  let $details := jobs:list-details($id)
+  let $details := job:list-details($id)
   return if(empty($details)) then (
     dba:job-result($id, false(), 'Job is defunct.')
   ) else if($details/@state != 'cached') then (
     dba:job-result($id, false(), 'Result is not available yet.')
   ) else (
     try {
-      dba:job-result($id, true(), jobs:result($id))
+      dba:job-result($id, true(), job:result($id))
     } catch * {
       dba:job-result($id, false(),
         'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||

@@ -27,7 +27,7 @@ public enum UpdateType {
   /** Create backup.        */ BACKUPCREATE,
 
   /** Add value resource .  */ DBPUT,
-  /** Add binary resource.  */ DBSTORE,
+  /** Add binary resource.  */ DBPUTBINARY,
 
   // Operations on nodes of existing databases
 

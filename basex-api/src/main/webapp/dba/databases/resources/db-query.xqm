@@ -26,5 +26,15 @@ function dba:db-query(
   $resource  as xs:string,
   $query     as xs:string?
 ) as xs:string {
-  util:query(if($query) then $query else '.', head(db:open($name, $resource)))
+  util:query(
+    if($query) then $query else '.',
+    let $type := db:type($name, $resource)
+    return head(if($type = 'xml') then (
+      db:open($name, $resource)
+    ) else if($type = 'binary') then (
+      db:get-binary($name, $resource)
+    ) else (
+      db:get($name, $resource)
+    ))
+  )
 };

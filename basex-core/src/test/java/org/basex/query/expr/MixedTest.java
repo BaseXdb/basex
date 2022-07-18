@@ -165,7 +165,7 @@ public final class MixedTest extends SandboxTest {
   /** Optimizations of nested path expressions. */
   @Test public void gh1587() {
     execute(new CreateDB(NAME, "<a id='0'><b id='1'/></a>"));
-    final String query = "let $id := '0' return db:attribute('" + NAME + "', '1')/..";
+    final String query = "let $id := '0' return " + _DB_ATTRIBUTE.args(NAME, " '1'") + "/..";
     query(query, "<b id=\"1\"/>");
     query(query + "[../@id = $id]", "<b id=\"1\"/>");
     query(query + "[..[@id = $id]]", "<b id=\"1\"/>");
@@ -198,7 +198,7 @@ public final class MixedTest extends SandboxTest {
     execute(new CreateDB(NAME, file1.path()));
     execute(new CreateDB(NAME + '2', file2.path()));
     execute(new Close());
-    query("db:open('" + NAME + "')/*/* union db:open('" + NAME + "2')/*/*",
+    query(_DB_OPEN.args(NAME) + "/*/* union " + _DB_OPEN.args(NAME + '2') + "/*/*",
         "<n1a/>\n<n1b/>\n<n2a/>\n<n2b/>");
   }
 
@@ -265,26 +265,28 @@ public final class MixedTest extends SandboxTest {
 
   /** JSON documents, node ids. */
   public void gh1983() {
-    query("tail(json:parse('{}')/*/ancestor-or-self::node()) instance of element()", true);
-    query("tail(csv:parse('')/*/ancestor-or-self::node()) instance of element()", true);
+    query("tail(" + _JSON_PARSE.args("{}") +  "/*/ancestor-or-self::node()) instance of element()",
+        true);
+    query("tail(" + _CSV_PARSE.args("{}") +  "/*/ancestor-or-self::node()) instance of element()",
+        true);
   }
 
   /** fn:json-to-xml, namespaces. */
   @Test public void gh1997() {
     execute(new Close());
-    query("db:create('" + NAME + "', analyze-string('a', 'a')/*, '" + NAME + "')");
-    query("db:open('" + NAME + "')/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
-    query("db:create('" + NAME + "', json-to-xml('[1]')/*/*, '" + NAME + "')");
-    query("db:open('" + NAME + "')/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
+    query(_DB_CREATE.args(NAME, " analyze-string('a', 'a')/*", NAME));
+    query(_DB_OPEN.args(NAME) + "/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
+    query(_DB_CREATE.args(NAME, " json-to-xml('[1]')/*/*", NAME));
+    query(_DB_OPEN.args(NAME) + "/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
   }
 
-  /** db:store: out of bounds. */
+  /** Binary storage: out of bounds. */
   @Test public void gh2100() {
-    query("db:create('x', <x>A</x>, 'x.xml')");
-    query("db:open('x') ! (delete node x, db:store('x', 'x.bin', x))");
-    query("db:retrieve('x', 'x.bin')", "A");
+    query(_DB_CREATE.args("x", " <x>A</x>", "x.xml"));
+    query(_DB_OPEN.args("x") + " ! (delete node x, " + _DB_PUT_BINARY.args("x", " x", "pth") + ')');
+    query(_DB_GET_BINARY.args("x", "pth"), "A");
 
-    query("db:create('x', <x>A</x>, 'x.xml')");
-    query("db:open('x') ! (delete node x, db:add('x', x, 'y.xml'))");
+    query(_DB_CREATE.args("x", " <x>A</x>", "x.xml"));
+    query(_DB_OPEN.args("x") + " ! (delete node x, " + _DB_ADD.args("x", " x", "pth") + ')');
   }
 }

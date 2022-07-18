@@ -20,12 +20,12 @@ public final class DbPut extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final String path = toDbPath(1, qc);
-    final Value value = exprs[2].value(qc);
+    final Value value = exprs[1].value(qc);
+    final String path = toDbPath(2, qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw RESINV_X.get(info, path);
 
-    qc.updates().add(new DBPut(data, path, value, info), qc);
+    qc.updates().add(new DBPut(data, value, path, info), qc);
     return Empty.VALUE;
   }
 }
