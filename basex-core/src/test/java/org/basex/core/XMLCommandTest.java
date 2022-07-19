@@ -33,6 +33,12 @@ public final class XMLCommandTest extends SandboxTest {
 
     ok("<alter-user name='X' newname='Y'/>");
 
+    ok("<binary-get path='X'/>");
+
+    ok("<binary-put>X</binary-put>");
+    ok("<binary-put path='X'>X</binary-put>");
+    ok("<binary-put path='X'><X/></binary-put>");
+
     ok("<check input='X'/>");
 
     ok("<close/>");
@@ -118,8 +124,6 @@ public final class XMLCommandTest extends SandboxTest {
 
     ok("<restore name='X'/>");
 
-    ok("<retrieve path='X'/>");
-
     ok("<run file='X'/>");
 
     ok("<set option='X'/>");
@@ -134,10 +138,6 @@ public final class XMLCommandTest extends SandboxTest {
 
     ok("<show-users/>");
     ok("<show-users database='X'/>");
-
-    ok("<store>X</store>");
-    ok("<store path='X'>X</store>");
-    ok("<store path='X'><X/></store>");
 
     ok("<xquery>X</xquery>");
   }

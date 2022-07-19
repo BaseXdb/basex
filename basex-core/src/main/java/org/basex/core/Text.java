@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Lang.*;
 
 import org.basex.core.parse.Commands.CmdAlter;
+import org.basex.core.parse.Commands.CmdBinary;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.core.parse.Commands.CmdDrop;
 import org.basex.core.parse.Commands.CmdIndex;
@@ -343,13 +344,17 @@ public interface Text {
     lang("c_add1"), lang("c_add2", S_INPUT, S_PATH)
   };
   /** Command help. */
-  String[] HELPSTORE = {
-    '(' + S_TO + " [" + S_PATH + "]) [" + S_INPUT + ']',
-    lang("c_store1"), lang("c_store2", S_PATH)
+  String[] HELPBINARY = {
+      "[" + CmdBinary.GET + '|' + CmdBinary.PUT + ']',
+    lang("c_binary1"),
+    lang("c_binary2") + NL +
+    LI + CmdBinary.GET + " [" + S_PATH + "]" + COLS + lang("c_binary21", S_PATH) + NL +
+    LI + CmdBinary.PUT + " (" + S_TO + " [" + S_PATH + "]) [" + S_INPUT + ']' + COLS +
+      lang("c_binary22", S_PATH)
   };
   /** Command help. */
-  String[] HELPRETRIEVE = {
-    '[' + S_PATH + ']', lang("c_retrieve1"), lang("c_retrieve2", S_PATH)
+  String[] HELPGET = {
+    '[' + S_PATH + ']', lang("c_get1"), lang("c_get2", S_PATH)
   };
   /** Command help. */
   String[] HELPDELETE = {

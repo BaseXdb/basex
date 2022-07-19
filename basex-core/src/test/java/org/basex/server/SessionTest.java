@@ -196,30 +196,34 @@ public abstract class SessionTest extends SandboxTest {
     assertThrows(BaseXException.class, () -> session.putBinary("..", new ArrayInput("!")));
   }
 
-  /** Retrieves binary content.
+  /**
+   * Retrieves binary content.
    * @throws IOException I/O exception */
-  @Test public void retrieve() throws IOException {
+  @Test public void getBinary() throws IOException {
     session.execute("CREATE DB " + NAME);
     session.putBinary("X", new ArrayInput("\0"));
-    assertEqual("\0", session.execute("RETRIEVE X"));
+    assertEqual("\0", session.execute("BINARY GET X"));
   }
 
-  /** Retrieves empty content.
+  /**
+   * Retrieves empty content.
    * @throws IOException I/O exception */
   @Test public void retrieveEmpty() throws IOException {
     session.execute("CREATE DB " + NAME);
     session.putBinary("X", new ArrayInput(""));
-    assertEqual("", session.execute("RETRIEVE X"));
+    assertEqual("", session.execute("BINARY GET X"));
   }
 
-  /** Runs a query and retrieves the result as string.
+  /**
+   * Runs a query and retrieves the result as string.
    * @throws IOException I/O exception */
   @Test public void query() throws IOException {
     final Query query = session.query("1");
     assertEqual("1", query.execute());
   }
 
-  /** Runs a query and retrieves the result as string.
+  /**
+   * Runs a query and retrieves the result as string.
    * @throws IOException I/O exception */
   @Test public void query2() throws IOException {
     final Query query = session.query("1");
@@ -227,7 +231,8 @@ public abstract class SessionTest extends SandboxTest {
     assertEqual("1", query.next());
   }
 
-  /** Runs a query and retrieves the empty result as string.
+  /**
+   * Runs a query and retrieves the empty result as string.
    * @throws IOException I/O exception */
   @Test public void queryNoResult() throws IOException {
     try(Query query = session.query("()")) {
@@ -235,7 +240,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Tolerate multiple close calls.
+  /**
+   * Tolerate multiple close calls.
    * @throws IOException I/O exception */
   @Test public void queryClose() throws IOException {
     try(Query query = session.query("()")) {
@@ -243,14 +249,16 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query, using more().
+  /**
+   * Runs a query, using more().
    * @throws IOException I/O exception */
   @Test public void queryInit() throws IOException {
     final Query query = session.query("()");
     assertFalse(query.more(), "No result was expected.");
   }
 
-  /** Runs a query and retrieves multiple results as string.
+  /**
+   * Runs a query and retrieves multiple results as string.
    * @throws IOException I/O exception */
   @Test public void queryMore() throws IOException {
     try(Query query = session.query("1 to 3")) {
@@ -259,7 +267,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Queries binary content.
+  /**
+   * Queries binary content.
    * @throws IOException I/O exception */
   @Test public void queryNullBinary() throws IOException {
     session.execute("CREATE DB " + NAME);
@@ -272,7 +281,8 @@ public abstract class SessionTest extends SandboxTest {
     assertFalse(q.more());
   }
 
-  /** Queries empty content.
+  /**
+   * Queries empty content.
    * @throws IOException I/O exception */
   @Test public void queryEmptyBinary() throws IOException {
     session.execute("CREATE DB " + NAME);
@@ -285,7 +295,8 @@ public abstract class SessionTest extends SandboxTest {
     assertNull(q.next());
   }
 
-  /** Queries empty content.
+  /**
+   * Queries empty content.
    * @throws IOException I/O exception */
   @Test public void queryEmptyString() throws IOException {
     final Query q = session.query("'',1");
@@ -296,7 +307,8 @@ public abstract class SessionTest extends SandboxTest {
     assertNull(q.next());
   }
 
-  /** Queries binary content (works only if output stream is specified).
+  /**
+   * Queries binary content (works only if output stream is specified).
    * @throws IOException I/O exception */
   @Test public void queryBinary() throws IOException {
     if(out == null) return;
@@ -319,7 +331,8 @@ public abstract class SessionTest extends SandboxTest {
     assertNull(q.next());
   }
 
-  /** Runs a query, omitting more().
+  /**
+   * Runs a query, omitting more().
    * @throws IOException I/O exception */
   @Test public void queryNoMore() throws IOException {
     try(Query query = session.query("1 to 2")) {
@@ -329,7 +342,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with an external variable declaration.
+  /**
+   * Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test public void queryBind() throws IOException {
     try(Query query = session.query("declare variable $a external; $a")) {
@@ -348,7 +362,8 @@ public abstract class SessionTest extends SandboxTest {
       () -> session.query("declare variable $a external; $a").next());
   }
 
-  /** Runs a query with an external variable declaration.
+  /**
+   * Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test public void queryBindURI() throws IOException {
     try(Query query = session.query("declare variable $a external; $a")) {
@@ -357,7 +372,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with an external variable declaration.
+  /**
+   * Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test public void queryBindEmptySequence() throws IOException {
     try(Query query = session.query("declare variable $a external; $a")) {
@@ -366,7 +382,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with an external variable declaration.
+  /**
+   * Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test public void queryBindInt() throws IOException {
     try(Query query = session.query("declare variable $a as xs:integer external; $a")) {
@@ -380,7 +397,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with an external variable declaration.
+  /**
+   * Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test public void queryBindSequence() throws IOException {
     try(Query query = session.query("declare variable $a external; $a")) {
@@ -414,7 +432,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with an external variable declaration.
+  /**
+   * Runs a query with an external variable declaration.
    * @throws IOException I/O exception */
   @Test public void queryBindDynamic() throws IOException {
     try(Query query = session.query("declare variable $a as xs:integer external; $a")) {
@@ -423,7 +442,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Binds a document node to an external variable.
+  /**
+   * Binds a document node to an external variable.
    * @throws IOException I/O exception */
   @Test public void queryBindDoc() throws IOException {
     try(Query query = session.query("declare variable $a external; $a//text()")) {
@@ -432,7 +452,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Binds a node to an external variable.
+  /**
+   * Binds a node to an external variable.
    * @throws IOException I/O exception */
   @Test public void queryBindBXNode() throws IOException {
     try(Query query = session.query("declare variable $a as element() external; $a")) {
@@ -467,7 +488,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with a bound context value.
+  /**
+   * Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test public void queryContext() throws IOException {
     try(Query query = session.query(".")) {
@@ -476,7 +498,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with a bound context value.
+  /**
+   * Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test public void queryContextInt() throws IOException {
     try(Query query = session.query(". * 2")) {
@@ -485,7 +508,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query with a bound context value.
+  /**
+   * Runs a query with a bound context value.
    * @throws IOException I/O exception */
   @Test public void queryContextVar() throws IOException {
     try(Query query = session.query("declare variable $a := .; $a")) {
@@ -494,7 +518,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query, omitting more().
+  /**
+   * Runs a query, omitting more().
    * @throws IOException I/O exception */
   @Test public void queryInfo() throws IOException {
     try(Query query = session.query("1 to 2")) {
@@ -502,7 +527,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query and checks the serialization parameters.
+  /**
+   * Runs a query and checks the serialization parameters.
    * @throws IOException I/O exception */
   @Test public void queryOptions() throws IOException {
     try(Query query = session.query(SerializerOptions.ENCODING.arg("US-ASCII") + "()")) {
@@ -513,7 +539,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query and checks the updating flag.
+  /**
+   * Runs a query and checks the updating flag.
    * @throws IOException I/O exception */
   @Test public void queryUpdating() throws IOException {
     // test non-updating query
@@ -541,14 +568,16 @@ public abstract class SessionTest extends SandboxTest {
     assertThrows(BaseXException.class, () -> session.query("(1,'a')[. eq 1]").execute());
   }
 
-  /** Runs an erroneous query.
+  /**
+   * Runs an erroneous query.
    * @throws IOException I/O exception */
   @Test public void queryError3() throws IOException {
     final Query query = session.query("(1,'a')[. eq 1]");
     assertThrows(BaseXException.class, query::next);
   }
 
-  /** Runs two queries in parallel.
+  /**
+   * Runs two queries in parallel.
    * @throws IOException I/O exception */
   @Test public void queryParallel() throws IOException {
     try(Query query1 = session.query("1 to 2"); Query query2 = session.query("reverse(3 to 4)")) {
@@ -561,7 +590,8 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs 5 queries in parallel.
+  /**
+   * Runs 5 queries in parallel.
    * @throws IOException I/O exception */
   @Test public void queryParallel2() throws IOException {
     final int size = 8;
@@ -571,7 +601,8 @@ public abstract class SessionTest extends SandboxTest {
     for(final Query query : cqs) query.close();
   }
 
-  /** Binds maps to external variables via JSON.
+  /**
+   * Binds maps to external variables via JSON.
    * @throws IOException I/O exception */
   @Test public void queryBindJson() throws IOException {
     final String var = "declare variable $x external;",
@@ -589,14 +620,16 @@ public abstract class SessionTest extends SandboxTest {
     }
   }
 
-  /** Runs a query and retrieves XML entities as string.
+  /**
+   * Runs a query and retrieves XML entities as string.
    * @throws IOException I/O exception */
   @Test public void queryEntities() throws IOException {
     final Query query = session.query("'&amp;&lt;&gt;&apos;&quot;'");
     assertEqual("&<>'\"", query.next());
   }
 
-  /** Runs a query and retrieves a map.
+  /**
+   * Runs a query and retrieves a map.
    * @throws IOException I/O exception */
   @Test public void queryJSON() throws IOException {
     final Query query = session.query(SerializerOptions.INDENT.arg("no") + "map { 'a': '&amp;' }");

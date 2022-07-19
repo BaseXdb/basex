@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Store;
+import org.basex.core.cmd.BinaryPut;
 import org.basex.index.*;
 import org.basex.query.func.*;
 import org.basex.util.list.*;
@@ -57,6 +57,8 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new AlterDB(NAME, NAME2), true, new LockList().add(NAME).add(NAME2));
     ckDBs(new AlterPassword(NAME, NAME), true, USER_LIST);
     ckDBs(new AlterUser(NAME, NAME), true, USER_LIST);
+    ckDBs(new BinaryGet(FILE), false, CTX_LIST);
+    ckDBs(new BinaryPut(FILE), true, CTX_LIST);
     ckDBs(new Check(NAME), false, NAME_CTX);
     ckDBs(new Close(), false, CTX_LIST);
     ckDBs(new Copy(NAME2, NAME), new LockList().add(NAME2), NAME_LIST);
@@ -75,6 +77,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Export(FILE), false, CTX_LIST);
     ckDBs(new Find("token"), false, CTX_LIST);
     ckDBs(new Flush(), true, CTX_LIST);
+    ckDBs(new Get(FILE), false, CTX_LIST);
     ckDBs(new Grant("all", NAME), true, USER_LIST);
     ckDBs(new Grant("all", NAME, NAME), true, USER_LIST);
     ckDBs(new Grant("all", NAME, NAME + '*'), true, USER_LIST);
@@ -100,7 +103,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new RepoList(), false, REPO_LIST);
     ckDBs(new RepoDelete("http://www.pkg3.com", null), true, REPO_LIST);
     ckDBs(new Restore(NAME), true, BACKUP_NAME);
-    ckDBs(new Retrieve(FILE), false, CTX_LIST);
     ckDBs(new Run(FILE), false, null);
     ckDBs(new Set(NAME, NAME), false, NONE);
     ckDBs(new ShowBackups(), false, null);
@@ -108,7 +110,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new ShowSessions(), false, NONE);
     ckDBs(new ShowUsers(), false, NONE);
     ckDBs(new ShowUsers(NAME), false, NONE);
-    ckDBs(new Store(FILE), true, CTX_LIST);
   }
 
   /** Tests locked databases in XQuery queries. */

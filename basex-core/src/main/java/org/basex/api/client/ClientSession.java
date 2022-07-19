@@ -135,12 +135,12 @@ public class ClientSession extends Session {
 
   @Override
   public void put(final String path, final InputStream input) throws IOException {
-    send(ServerCmd.REPLACE, input, path);
+    send(ServerCmd.PUT, input, path);
   }
 
   @Override
   public void putBinary(final String path, final InputStream input) throws IOException {
-    send(ServerCmd.STORE, input, path);
+    send(ServerCmd.PUTBINARY, input, path);
   }
 
   @Override

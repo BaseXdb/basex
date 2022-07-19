@@ -23,6 +23,10 @@ public interface Commands {
   String ALTER_PASSWORD = "alter-password";
   /** Command string: "alter-user". */
   String ALTER_USER = "alter-user";
+  /** Command string: "binary-get". */
+  String BINARY_GET = "binary-get";
+  /** Command string: "binary-put". */
+  String BINARY_PUT = "binary-put";
   /** Command string: "check". */
   String CHECK = "check";
   /** Command string: "close". */
@@ -107,8 +111,6 @@ public interface Commands {
   String REPO_LIST = "repo-list";
   /** Command string: "restore". */
   String RESTORE = "restore";
-  /** Command string: "retrieve". */
-  String RETRIEVE = "retrieve";
   /** Command string: "run". */
   String RUN = "run";
   /** Command string: "set". */
@@ -121,8 +123,6 @@ public interface Commands {
   String SHOW_SESSIONS = "show-sessions";
   /** Command string: "show-users". */
   String SHOW_USERS = "show-users";
-  /** Command string: "store". */
-  String STORE = "store";
   /** Command string: "test". */
   String TEST = "test";
   /** Command string: "xquery". */
@@ -177,6 +177,8 @@ public interface Commands {
   enum CmdOptimize { NULL, ALL }
   /** Show commands. */
   enum CmdShow { SESSIONS, USERS, BACKUPS, OPTIONS }
+  /** Binary commands. */
+  enum CmdBinary { GET, PUT }
   /** Jobs commands. */
   enum CmdJobs { LIST, STOP, RESULT }
   /** Permission commands. */
@@ -192,14 +194,14 @@ public interface Commands {
 
   /** Command definitions. */
   enum Cmd {
-    ADD(HELPADD), ALTER(HELPALTER), CHECK(HELPCHECK), CLOSE(HELPCLOSE), COPY(HELPCOPY),
-    CREATE(HELPCREATE), DELETE(HELPDELETE), DIR(HELPDIR), DROP(HELPDROP), EXECUTE(HELPEXECUTE),
-    EXIT(HELPEXIT), EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH),
-    GRANT(HELPGRANT), HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT), JOBS(HELPJOBS),
-    KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD),
-    PUT(HELPPUT), QUIT(HELPEXIT), RENAME(HELPRENAME), REPO(HELPREPO), RESTORE(HELPRESTORE),
-    RETRIEVE(HELPRETRIEVE), RUN(HELPRUN), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
-    TEST(HELPTEST), XQUERY(HELPXQUERY);
+    ADD(HELPADD), ALTER(HELPALTER), BINARY(HELPBINARY), CHECK(HELPCHECK), CLOSE(HELPCLOSE),
+    COPY(HELPCOPY), CREATE(HELPCREATE), DELETE(HELPDELETE), DIR(HELPDIR), DROP(HELPDROP),
+    EXECUTE(HELPEXECUTE), EXIT(HELPEXIT), EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH),
+    GET(HELPGET), GRANT(HELPGRANT), HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT),
+    JOBS(HELPJOBS), KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE),
+    PASSWORD(HELPPASSWORD), PUT(HELPPUT), QUIT(HELPEXIT), RENAME(HELPRENAME), REPO(HELPREPO),
+    RESTORE(HELPRESTORE), RUN(HELPRUN), SET(HELPSET), SHOW(HELPSHOW), TEST(HELPTEST),
+    XQUERY(HELPXQUERY);
 
     /** Help texts. */
     private final String[] help;

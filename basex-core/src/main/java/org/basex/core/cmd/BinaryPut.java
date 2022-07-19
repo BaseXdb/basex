@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
@@ -15,18 +16,18 @@ import org.basex.util.*;
 import org.xml.sax.*;
 
 /**
- * Evaluates the 'store' command and stores binary content into the database.
+ * Evaluates the 'binary put' command and stores binary resources in the database.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class Store extends ACreate {
+public final class BinaryPut extends ACreate {
   /**
    * Constructor, specifying a target path.
    * The input needs to be set via {@link #setInput(InputStream)}.
    * @param path target path
    */
-  public Store(final String path) {
+  public BinaryPut(final String path) {
     this(path, null);
   }
 
@@ -35,7 +36,7 @@ public final class Store extends ACreate {
    * @param path target path
    * @param input input file
    */
-  public Store(final String path, final String input) {
+  public BinaryPut(final String path, final String input) {
     super(Perm.WRITE, true, path == null ? "" : path, input);
   }
 
@@ -62,18 +63,18 @@ public final class Store extends ACreate {
 
     final IOFile bin = data.meta.file(path, ResourceType.BINARY);
     return update(data, () -> {
-      store(in, bin);
+      put(in, bin);
       return info(QUERY_EXECUTED_X_X, "", jc().performance);
     });
   }
 
   /**
-   * Stores the specified source to the specified file.
+   * Writes the specified source to the specified file.
    * @param in input source
    * @param file target file
    * @throws IOException I/O exception
    */
-  public static void store(final InputSource in, final IOFile file) throws IOException {
+  public static void put(final InputSource in, final IOFile file) throws IOException {
     // add directory if it does not exist anyway
     if(file.isDir()) file.delete();
     file.parent().md();
@@ -96,6 +97,6 @@ public final class Store extends ACreate {
 
   @Override
   public void build(final CmdBuilder cb) {
-    cb.init().arg(S_TO, 0).add(1);
+    cb.init(Cmd.BINARY + " " + CmdBinary.PUT).arg(S_TO, 0).add(1);
   }
 }

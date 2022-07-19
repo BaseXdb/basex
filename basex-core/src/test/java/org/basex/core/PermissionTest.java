@@ -113,8 +113,9 @@ public final class PermissionTest extends SandboxTest {
     no(new Optimize(), testSession);
     // XQuery update
     no(new XQuery("Q{java.lang.String}new('x')"), testSession);
-    no(new XQuery("for $item in doc('" + NAME + "')//xml " +
-      "return rename node $item as 'null'"), testSession);
+    no(new XQuery("doc('" + NAME + "')//xml ! (rename node . as 'null')"), testSession);
+    no(new Get(NAME + ".xml"), testSession);
+
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new Rename(NAME2, NAME2 + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
@@ -150,6 +151,7 @@ public final class PermissionTest extends SandboxTest {
     // XQuery read
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);
+    ok(new Get(NAME + ".xml"), testSession);
 
     // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
@@ -204,8 +206,7 @@ public final class PermissionTest extends SandboxTest {
 
     // XQuery Update
     no(new XQuery("Q{java.lang.String}new('x')"), testSession);
-    ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
-        "return rename node $item as 'null'"), testSession);
+    ok(new XQuery("doc('" + NAME + "')//xml ! (rename node . as 'null')"), testSession);
     no(new XQuery(_DB_CREATE.args(NAME)), testSession);
 
     ok(new Optimize(), testSession);

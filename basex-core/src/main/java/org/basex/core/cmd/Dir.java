@@ -88,7 +88,7 @@ public final class Dir extends Command {
     if(set.add(string)) {
       final TokenList tl = new TokenList(4);
       if(dir) {
-        tl.add(string).add(S_DIR).add("").add(0);
+        tl.add(string).add(S_DIR).add("").add("");
       } else {
         tl.add(type.path(string)).add(type.toString());
         tl.add(type.contentType(string).toString()).add(size.apply(string));

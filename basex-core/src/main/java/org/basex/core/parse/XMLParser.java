@@ -10,7 +10,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
-import org.basex.core.cmd.Store;
+import org.basex.core.cmd.BinaryPut;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -73,6 +73,10 @@ final class XMLParser extends CommandParser {
       return new AlterPassword(value(root, NAME), password(root));
     if(e.equals(ALTER_USER) && check(root, NAME, NEWNAME))
       return new AlterUser(value(root, NAME), value(root, NEWNAME));
+    if(e.equals(BINARY_GET) && check(root, PATH))
+      return new BinaryGet(value(root, PATH));
+    if(e.equals(BINARY_PUT) && check(root, PATH + '?', '<' + INPUT))
+      return new BinaryPut(value(root, PATH), xml(root));
     if(e.equals(CHECK) && check(root, INPUT))
       return new Check(value(root, INPUT));
     if(e.equals(CLOSE) && check(root))
@@ -109,6 +113,8 @@ final class XMLParser extends CommandParser {
       return new Find(value(root));
     if(e.equals(FLUSH) && check(root))
       return new Flush();
+    if(e.equals(GET) && check(root, PATH))
+      return new Get(value(root, PATH));
     if(e.equals(GRANT) && check(root, NAME, PERMISSION, PATTERN + '?'))
       return new Grant(value(root, PERMISSION), value(root, NAME), value(root, PATTERN));
     if(e.equals(HELP) && check(root, '#' + COMMAND + '?'))
@@ -155,8 +161,6 @@ final class XMLParser extends CommandParser {
       return new RepoList();
     if(e.equals(RESTORE) && check(root, NAME + '?'))
       return new Restore(value(root, NAME));
-    if(e.equals(RETRIEVE) && check(root, PATH))
-      return new Retrieve(value(root, PATH));
     if(e.equals(RUN) && check(root, FILE))
       return new Run(value(root, FILE));
     if(e.equals(SET) && check(root, OPTION, '#' + VALUE + '?'))
@@ -169,8 +173,6 @@ final class XMLParser extends CommandParser {
       return new ShowSessions();
     if(e.equals(SHOW_USERS) && check(root, DATABASE + '?'))
       return new ShowUsers(value(root, DATABASE));
-    if(e.equals(STORE) && check(root, PATH + '?', '<' + INPUT))
-      return new Store(value(root, PATH), xml(root));
     if(e.equals(TEST) && check(root, PATH))
       return new Test(value(root, PATH));
     if(e.equals(XQUERY) && check(root, '#' + QUERY))

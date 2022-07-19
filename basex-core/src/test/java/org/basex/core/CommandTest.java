@@ -8,7 +8,7 @@ import java.io.*;
 import org.basex.*;
 import org.basex.api.client.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Store;
+import org.basex.core.cmd.BinaryPut;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
@@ -135,6 +135,29 @@ public class CommandTest extends SandboxTest {
     no(new AlterUser(NAME, NAME2));
   }
 
+  /** Retrieves binary data. */
+  @Test public final void binaryGet() {
+    ok(new CreateDB(NAME));
+    // retrieve non-existing resource
+    no(new BinaryGet(NAME2));
+    // retrieve existing resource
+    ok(new BinaryPut(NAME2, FILE));
+    ok(new BinaryGet(NAME2));
+  }
+
+  /** Stores binary data. */
+  @Test public final void binaryPut() {
+    ok(new CreateDB(NAME));
+    ok(new BinaryPut(NAME2, FILE));
+    // file can be overwritten
+    ok(new BinaryPut(NAME2, FILE));
+    // adopt name from specified file
+    ok(new BinaryPut("", FILE));
+    // reject invalid or missing names
+    no(new BinaryPut("", "</a>"));
+    no(new BinaryPut("../x", FILE));
+  }
+
   /** Command test. */
   @Test public final void close() {
     // close is successful, even if no database is opened
@@ -220,7 +243,7 @@ public class CommandTest extends SandboxTest {
     // target need not exist
     ok(new Delete(FILE));
     // delete binary file
-    ok(new Store(FN, FILE));
+    ok(new BinaryPut(FN, FILE));
     ok(new Delete(FN));
     ok(new Delete(FN));
   }
@@ -321,6 +344,16 @@ public class CommandTest extends SandboxTest {
     ok(new Flush());
     ok(new Close());
     no(new Flush());
+  }
+
+  /** Command test. */
+  @Test public final void get() {
+    ok(new CreateDB(NAME));
+    // retrieve non-existing resource
+    no(new Get(NAME2));
+    // retrieve existing resource
+    ok(new Add(NAME2, "<x/>"));
+    ok(new Get(NAME2));
   }
 
   /** Command test. */
@@ -497,29 +530,6 @@ public class CommandTest extends SandboxTest {
     ok(new Restore(Databases.DBCHARS));
     ok(new DropBackup(Databases.DBCHARS));
     ok(new DropDB(Databases.DBCHARS));
-  }
-
-  /** Retrieves binary data. */
-  @Test public final void retrieve() {
-    ok(new CreateDB(NAME));
-    // retrieve non-existing file
-    no(new Retrieve(NAME2));
-    // retrieve existing file
-    ok(new Store(NAME2, FILE));
-    ok(new Retrieve(NAME2));
-  }
-
-  /** Stores binary data. */
-  @Test public final void store() {
-    ok(new CreateDB(NAME));
-    ok(new Store(NAME2, FILE));
-    // file can be overwritten
-    ok(new Store(NAME2, FILE));
-    // adopt name from specified file
-    ok(new Store("", FILE));
-    // reject invalid or missing names
-    no(new Store("", "</a>"));
-    no(new Store("../x", FILE));
   }
 
   /**

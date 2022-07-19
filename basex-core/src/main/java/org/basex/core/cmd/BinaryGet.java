@@ -5,6 +5,8 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.locks.*;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
@@ -12,17 +14,17 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 
 /**
- * Evaluates the 'retrieve' command and retrieves binary content.
+ * Evaluates the 'binary get' command and retrieves binary resources.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class Retrieve extends ACreate {
+public final class BinaryGet extends ACreate {
   /**
    * Default constructor.
    * @param path source path
    */
-  public Retrieve(final String path) {
+  public BinaryGet(final String path) {
     super(Perm.NONE, true, path);
   }
 
@@ -48,5 +50,10 @@ public final class Retrieve extends ACreate {
   @Override
   public void addLocks() {
     jc().locks.reads.add(Locking.CONTEXT);
+  }
+
+  @Override
+  public void build(final CmdBuilder cb) {
+    cb.init(Cmd.BINARY + " " + CmdBinary.GET).add(0);
   }
 }

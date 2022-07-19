@@ -9,7 +9,7 @@ import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Store;
+import org.basex.core.cmd.BinaryPut;
 import org.basex.http.*;
 import org.basex.util.http.*;
 
@@ -75,12 +75,12 @@ final class RESTPut {
       if(xml) {
         session.add(new CreateDB(db), is);
       } else {
-        session.add(new CreateDB(db)).add(new Store(db), is);
+        session.add(new CreateDB(db)).add(new BinaryPut(db), is);
       }
     } else if(xml) {
       session.add(new Put(path), is);
     } else {
-      session.add(new Delete(path)).add(new Store(path), is);
+      session.add(new Delete(path)).add(new BinaryPut(path), is);
     }
     return new RESTExec(session, true);
   }

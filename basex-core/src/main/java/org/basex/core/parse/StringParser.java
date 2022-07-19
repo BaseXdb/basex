@@ -10,7 +10,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
-import org.basex.core.cmd.Store;
+import org.basex.core.cmd.BinaryPut;
 import org.basex.core.parse.Commands.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -94,11 +94,17 @@ final class StringParser extends CommandParser {
       case ADD:
         final String aa = key(S_TO, null) ? string(cmd) : null;
         return new Add(aa, remaining(cmd, true));
-      case STORE:
-        final String sa = key(S_TO, null) ? string(cmd) : null;
-        return new Store(sa, remaining(cmd, true));
-      case RETRIEVE:
-        return new Retrieve(string(cmd));
+      case GET:
+        return new Get(string(cmd));
+      case BINARY:
+        switch(consume(CmdBinary.class, cmd)) {
+          case GET:
+            return new BinaryGet(string(cmd));
+          case PUT:
+            final String sa = key(S_TO, null) ? string(cmd) : null;
+            return new BinaryPut(sa, remaining(cmd, true));
+        }
+        break;
       case DELETE:
         return new Delete(string(cmd));
       case RENAME:

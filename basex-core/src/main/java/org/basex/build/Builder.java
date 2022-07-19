@@ -199,7 +199,7 @@ public abstract class Builder extends Job {
    * @throws IOException I/O exception
    */
   public final void binary(final String target, final IO data) throws IOException {
-    Store.store(data.inputSource(), new IOFile(binariesDir, target));
+    BinaryPut.put(data.inputSource(), new IOFile(binariesDir, target));
   }
 
   // PROGRESS INFORMATION =========================================================================

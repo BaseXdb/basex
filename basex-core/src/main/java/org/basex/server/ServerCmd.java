@@ -27,10 +27,10 @@ public enum ServerCmd {
   CREATE(8),
   /** Code for adding a document to a database: {path}0{input}0. */
   ADD(9),
-  /** Code for replacing a document in a database: {path}0{input}0. */
-  REPLACE(12),
-  /** Code for storing binary data in a database: {path}0{input}0. */
-  STORE(13),
+  /** Code for putting a document in a database: {path}0{input}0. */
+  PUT(12),
+  /** Code for putting a binary resource in a database: {path}0{input}0. */
+  PUTBINARY(13),
   /** Code for binding a context value: {id}0{val}0{type}0. */
   CONTEXT(14),
   /** Code for returning the update flag: {id}0. */

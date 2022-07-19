@@ -4,7 +4,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Store;
+import org.basex.core.cmd.BinaryPut;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
@@ -94,7 +94,7 @@ public class LocalSession extends Session {
 
   @Override
   public void putBinary(final String path, final InputStream input) throws BaseXException {
-    execute(new Store(path), input);
+    execute(new BinaryPut(path), input);
   }
 
   /**

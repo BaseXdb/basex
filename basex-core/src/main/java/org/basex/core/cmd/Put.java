@@ -78,10 +78,10 @@ public final class Put extends ACreate {
     int bs = 0;
     if(bin != null && bin.exists()) {
       // replace binary file if it already exists
-      final Store store = new Store(path);
-      store.setInput(in);
-      store.lock = false;
-      if(!store.run(context)) return error(store.info());
+      final BinaryPut put = new BinaryPut(path);
+      put.setInput(in);
+      put.lock = false;
+      if(!put.run(context)) return error(put.info());
       bs = 1;
       exec.accept(0);
     } else {

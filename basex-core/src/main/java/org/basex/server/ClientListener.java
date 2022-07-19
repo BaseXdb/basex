@@ -9,7 +9,7 @@ import java.util.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.Store;
+import org.basex.core.cmd.BinaryPut;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.io.in.*;
@@ -97,9 +97,9 @@ public final class ClientListener extends Thread implements ClientInfo {
             create();
           } else if(sc == ServerCmd.ADD) {
             add();
-          } else if(sc == ServerCmd.REPLACE) {
+          } else if(sc == ServerCmd.PUT) {
             put();
-          } else if(sc == ServerCmd.STORE) {
+          } else if(sc == ServerCmd.PUTBINARY) {
             putBinary();
           } else if(sc != ServerCmd.COMMAND) {
             query(sc);
@@ -329,7 +329,7 @@ public final class ClientListener extends Thread implements ClientInfo {
    * @throws IOException I/O exception
    */
   private void putBinary() throws IOException {
-    execute(new Store(in.readString()));
+    execute(new BinaryPut(in.readString()));
   }
 
   /**
