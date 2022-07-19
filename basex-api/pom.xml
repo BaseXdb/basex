@@ -114,7 +114,7 @@
         <configuration>
           <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
           <stopKey>keyToStopJetty</stopKey>
-          <stopPort>8985</stopPort>
+          <stopPort>8081</stopPort>
           <supportedPackagings>
             <supportedPackaging>jar</supportedPackaging>
           </supportedPackagings>

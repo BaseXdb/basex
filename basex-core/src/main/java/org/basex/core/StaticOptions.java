@@ -91,7 +91,7 @@ public final class StaticOptions extends Options {
   /** Local (embedded) mode. */
   public static final BooleanOption HTTPLOCAL = new BooleanOption("HTTPLOCAL", false);
   /** Port for stopping the web server. */
-  public static final NumberOption STOPPORT = new NumberOption("STOPPORT", 8985);
+  public static final NumberOption STOPPORT = new NumberOption("STOPPORT", 8081);
   /** Default authentication method. */
   public static final EnumOption<AuthMethod> AUTHMETHOD =
       new EnumOption<>("AUTHMETHOD", AuthMethod.BASIC);
