@@ -312,7 +312,7 @@ public final class FilterTest extends QueryPlanTest {
     execute(new Add("two", "<two/>"));
     execute(new Close());
     query(COLLECTION.args(NAME) + "[2]", "<two/>");
-    query(_DB_OPEN.args(NAME) + "[2]", "<two/>");
+    query(_DB_GET.args(NAME) + "[2]", "<two/>");
   }
 
   /** Start position. */

@@ -75,7 +75,7 @@ final class RESTRetrieve extends RESTCmd {
       final ResourceType type = ResourceType.valueOf(run(_DB_TYPE).toUpperCase(Locale.ENGLISH));
       final Function function;
       if(type == ResourceType.XML) {
-        function = _DB_OPEN;
+        function = _DB_GET;
       } else {
         sopts.set(SerializerOptions.MEDIA_TYPE, run(_DB_CONTENT_TYPE));
         context.options.set(MainOptions.SERIALIZER, sopts);

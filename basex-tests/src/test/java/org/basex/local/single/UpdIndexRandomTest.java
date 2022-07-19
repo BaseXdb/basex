@@ -69,7 +69,7 @@ public final class UpdIndexRandomTest extends SandboxTest {
 
       for(int d = 0; d < DOCS; d++) {
         final String word = words.get(offset + d);
-        final String query = _DB_OPEN.args(NAME, path) + "//a[text() = '" + word + "']";
+        final String query = _DB_GET.args(NAME, path) + "//a[text() = '" + word + "']";
         final String expected = "<a>" + word + "</a>";
         final String result = query(query);
         if(!result.startsWith(expected)) {

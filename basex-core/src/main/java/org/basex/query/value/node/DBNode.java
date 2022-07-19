@@ -489,7 +489,7 @@ public class DBNode extends ANode {
           break;
       }
     } else {
-      qs.function(Function._DB_OPEN_PRE, data.meta.name, pre);
+      qs.function(Function._DB_GET_PRE, data.meta.name, pre);
     }
   }
 }

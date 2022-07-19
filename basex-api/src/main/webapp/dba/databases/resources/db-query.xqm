@@ -30,11 +30,11 @@ function dba:db-query(
     if($query) then $query else '.',
     let $type := db:type($name, $resource)
     return head(if($type = 'xml') then (
-      db:open($name, $resource)
+      db:get($name, $resource)
     ) else if($type = 'binary') then (
       db:get-binary($name, $resource)
     ) else (
-      db:get($name, $resource)
+      db:get-value($name, $resource)
     ))
   )
 };

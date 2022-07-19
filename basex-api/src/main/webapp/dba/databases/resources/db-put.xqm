@@ -1,5 +1,5 @@
 (:~
- : Add resources.
+ : Put resources.
  :
  : @author Christian Grün, BaseX Team 2005-22, BSD License
  :)
@@ -14,7 +14,7 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Form for adding a new resource.
+ : Form for putting a new resource.
  : @param  $name    entered name
  : @param  $opts    chosen parsing options
  : @param  $path    database path
@@ -24,14 +24,14 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
-  %rest:path('/dba/db-add')
+  %rest:path('/dba/db-put')
   %rest:query-param('name',   '{$name}')
   %rest:query-param('opts',   '{$opts}')
   %rest:query-param('path',   '{$path}')
   %rest:query-param('binary', '{$binary}')
   %rest:query-param('error',  '{$error}')
   %output:method('html')
-function dba:db-add(
+function dba:db-put(
   $name    as xs:string,
   $opts    as xs:string*,
   $path    as xs:string?,
@@ -42,11 +42,11 @@ function dba:db-add(
   return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action='db-add' method='post' enctype='multipart/form-data' autocomplete='off'>
+        <form action='db-put' method='post' enctype='multipart/form-data' autocomplete='off'>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:button('db-add', 'Add')
+            html:button('db-put', 'Put')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
           <input type='hidden' name='opts' value='x'/>
@@ -86,7 +86,7 @@ function dba:db-add(
 };
 
 (:~
- : Adds a resource.
+ : Puts a resource.
  : @param  $name    database
  : @param  $opts    chosen parsing options
  : @param  $path    database path
@@ -97,13 +97,13 @@ function dba:db-add(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/db-add')
+  %rest:path('/dba/db-put')
   %rest:form-param('name',   '{$name}')
   %rest:form-param('opts',   '{$opts}')
   %rest:form-param('path',   '{$path}')
   %rest:form-param('file',   '{$file}')
   %rest:form-param('binary', '{$binary}')
-function dba:db-add-post(
+function dba:db-put-post(
   $name    as xs:string,
   $opts    as xs:string*,
   $path    as xs:string,
@@ -115,23 +115,21 @@ function dba:db-add-post(
     let $path := if(not($path) or ends-with($path, '/')) then ($path || $key) else $path
     return if($key = '') then (
       error((), 'No input specified.')
-    ) else if(db:exists($name, $path)) then (
-      error((), 'Resource already exists: ' || $path)
     ) else (
       let $input := $file($key)
       return if($binary) then (
         db:put-binary($name, $input, $path)
       ) else (
-        db:add($name, fetch:binary-doc($input), $path, map:merge(
+        db:put($name, fetch:binary-doc($input), $path, map:merge(
           ('intparse', 'dtd', 'stripns', 'stripws', 'xinclude') ! map:entry(., $opts = .))
         )
       ),
       util:redirect($dba:SUB,
-        map { 'name': $name, 'path': $path, 'info': 'Resource was added.' }
+        map { 'name': $name, 'path': $path, 'info': 'Resource was put.' }
       )
     )
   } catch * {
-    util:redirect('db-add', map {
+    util:redirect('db-put', map {
       'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary, 'error': $err:description
     })
   }

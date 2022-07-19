@@ -89,7 +89,7 @@ public final class UpdateTest extends SandboxTest {
     try {
       execute(new CreateDB("DBtransform", "<instance><data><vocable hits='1'/></data></instance>"));
       query("for $voc in 1 to 2 "
-          + "let $xml :=" + _DB_OPEN.args("DBTransform")
+          + "let $xml :=" + _DB_GET.args("DBTransform")
           + "return $xml update {"
           + "  for $i in 1 to 2 return "
           + "    insert node $xml/instance/data/vocable[@hits = '1'] into ./instance"
@@ -455,7 +455,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void emptyInsert3() {
     createDB("<a/>");
     query("delete node /a");
-    query("insert nodes <X/> into" + _DB_OPEN.args(NAME));
+    query("insert nodes <X/> into" + _DB_GET.args(NAME));
     query("/", "<X/>");
   }
 

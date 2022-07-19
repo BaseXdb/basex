@@ -48,9 +48,9 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void eval2() {
     // database creation
     final Function func = _JOB_EVAL;
-    error(_DB_OPEN.args("db"), DB_OPEN2_X);
-    query(_PROF_VOID.args(func.args("db:open('db')")) + ',' + _DB_CREATE.args("db"));
-    query(func.args("db:drop('db')") + ',' + _PROF_VOID.args(_DB_OPEN.args("db")));
+    error(_DB_GET.args("db"), DB_OPEN2_X);
+    query(_PROF_VOID.args(func.args("db:get('db')")) + ',' + _DB_CREATE.args("db"));
+    query(func.args("db:drop('db')") + ',' + _PROF_VOID.args(_DB_GET.args("db")));
     query(func.args("delete node <a/>"));
   }
 
@@ -58,7 +58,7 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void eval3() {
     // errors (will not be raised before runtime)
     final Function func = _JOB_EVAL;
-    query(func.args("db:open('db')"));
+    query(func.args("db:get('db')"));
     query(func.args("1+"));
     query(func.args("1, delete node <a/>"));
 
@@ -235,7 +235,7 @@ public final class JobModuleTest extends SandboxTest {
     }
 
     // receive cached error
-    id = query(_JOB_EVAL.args("db:open('db')", " ()", " map { 'cache': true() }"));
+    id = query(_JOB_EVAL.args("db:get('db')", " ()", " map { 'cache': true() }"));
     query(_JOB_WAIT.args(id));
     error(func.args(id), DB_OPEN2_X);
   }

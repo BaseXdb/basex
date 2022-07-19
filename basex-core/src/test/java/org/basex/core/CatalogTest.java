@@ -37,7 +37,7 @@ public class CatalogTest extends SandboxTest {
     set(MainOptions.DTD, true);
     set(MainOptions.CATALOG, CATALOG);
     execute(new CreateDB("document", DIR + "doc.xml"));
-    query(_DB_OPEN.args("document"), "<doc>X</doc>");
+    query(_DB_GET.args("document"), "<doc>X</doc>");
   }
 
   /** Test method. */
@@ -89,7 +89,7 @@ public class CatalogTest extends SandboxTest {
     final Function func = _DB_CREATE;
     query(func.args("document", DIR + "doc.xml", " ()",
       " map { 'catalog': '" + CATALOG + "', 'dtd': true() }"));
-    query(_DB_OPEN.args("document"), "<doc>X</doc>");
+    query(_DB_GET.args("document"), "<doc>X</doc>");
   }
 
   /** Test method.*/

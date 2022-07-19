@@ -339,7 +339,7 @@ public final class EditorView extends View {
     // check if database is opened
     if(value == null) {
       final Data data = gui.context.data();
-      if(data != null) value = Function._DB_OPEN.args(data.meta.name);
+      if(data != null) value = Function._DB_GET.args(data.meta.name);
     }
     // check if main-memory document exists
     if(value == null) {

@@ -988,6 +988,6 @@ public enum GUIMenuCmd implements GUICommand {
    * @return function string
    */
   private static String openPre(final DBNodes nodes, final int index) {
-    return Function._DB_OPEN_PRE.args(nodes.data().meta.name, nodes.pre(index)).trim();
+    return Function._DB_GET_PRE.args(nodes.data().meta.name, nodes.pre(index)).trim();
   }
 }

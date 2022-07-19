@@ -98,7 +98,7 @@ public final class ServerReadWriteTest extends SandboxTest {
       try {
         // Perform some queries
         for(int i = 0; i < runs; ++i) {
-          final String qu = read ? "count(db:open('test'))" :
+          final String qu = read ? "count(db:get('test'))" :
             "db:add('test', <a/>, 'test.xml', map { 'intparse': true() })";
           session.execute("xquery " + qu);
         }

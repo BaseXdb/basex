@@ -313,7 +313,7 @@ public abstract class SimpleMap extends Arr {
     if(e == 1) return null;
 
     // all operands are steps
-    //   db:open('animals') ! xml  ->  db:open('animals')/xml
+    //   db:get('animals') ! xml  ->  db:get('animals')/xml
     //   a ! b ! c  ->  /a/b/c
     final Expr path = Path.get(cc, info, root, steps.finish());
     if(e == el) return path;

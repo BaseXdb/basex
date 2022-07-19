@@ -27,11 +27,11 @@ function dba:db-download(
     ),
     let $type := db:type($name, $resource)
     return if($type = 'xml') then (
-      db:open($name, $resource)
+      db:get($name, $resource)
     ) else if($type = 'binary') then (
       db:get-binary($name, $resource)
     ) else (
-      db:get($name, $resource)
+      db:get-value($name, $resource)
     )
   } catch * {
     <rest:response>

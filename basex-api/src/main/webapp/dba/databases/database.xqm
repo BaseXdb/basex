@@ -77,7 +77,7 @@ function dba:database(
                   'size': $res/@size
                 }
               let $buttons := (
-                html:button('db-add', 'Add…'),
+                html:button('db-put', 'Put…'),
                 html:button('db-delete', 'Delete', true()),
                 html:button('db-copy', 'Copy…', false()),
                 html:button('db-alter', 'Rename…', false()),
@@ -142,7 +142,7 @@ function dba:database(
             {
               html:button('db-rename', 'Rename…'), ' ',
               html:button('db-download', 'Download'), ' ',
-              html:button('db-update', 'Update…')
+              html:button('db-replace', 'Replace…')
             }
           </form>,
           <b>Enter your query…</b>,

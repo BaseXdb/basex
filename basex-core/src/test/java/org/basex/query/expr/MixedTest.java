@@ -86,8 +86,8 @@ public final class MixedTest extends SandboxTest {
     execute(new Add("a", "<a/>"));
     execute(new Add("b", "<a/>"));
     execute(new Optimize());
-    query(COUNT.args(_DB_OPEN.args(NAME, "a") + "/a"), 1);
-    query(COUNT.args(_DB_OPEN.args(NAME) + "/a"), 2);
+    query(COUNT.args(_DB_GET.args(NAME, "a") + "/a"), 1);
+    query(COUNT.args(_DB_GET.args(NAME) + "/a"), 2);
   }
 
   /**
@@ -198,7 +198,7 @@ public final class MixedTest extends SandboxTest {
     execute(new CreateDB(NAME, file1.path()));
     execute(new CreateDB(NAME + '2', file2.path()));
     execute(new Close());
-    query(_DB_OPEN.args(NAME) + "/*/* union " + _DB_OPEN.args(NAME + '2') + "/*/*",
+    query(_DB_GET.args(NAME) + "/*/* union " + _DB_GET.args(NAME + '2') + "/*/*",
         "<n1a/>\n<n1b/>\n<n2a/>\n<n2b/>");
   }
 
@@ -275,18 +275,18 @@ public final class MixedTest extends SandboxTest {
   @Test public void gh1997() {
     execute(new Close());
     query(_DB_CREATE.args(NAME, " analyze-string('a', 'a')/*", NAME));
-    query(_DB_OPEN.args(NAME) + "/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
+    query(_DB_GET.args(NAME) + "/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
     query(_DB_CREATE.args(NAME, " json-to-xml('[1]')/*/*", NAME));
-    query(_DB_OPEN.args(NAME) + "/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
+    query(_DB_GET.args(NAME) + "/* => namespace-uri()", "http://www.w3.org/2005/xpath-functions");
   }
 
   /** Binary storage: out of bounds. */
   @Test public void gh2100() {
     query(_DB_CREATE.args("x", " <x>A</x>", "x.xml"));
-    query(_DB_OPEN.args("x") + " ! (delete node x, " + _DB_PUT_BINARY.args("x", " x", "pth") + ')');
+    query(_DB_GET.args("x") + " ! (delete node x, " + _DB_PUT_BINARY.args("x", " x", "pth") + ')');
     query(_DB_GET_BINARY.args("x", "pth"), "A");
 
     query(_DB_CREATE.args("x", " <x>A</x>", "x.xml"));
-    query(_DB_OPEN.args("x") + " ! (delete node x, " + _DB_ADD.args("x", " x", "pth") + ')');
+    query(_DB_GET.args("x") + " ! (delete node x, " + _DB_ADD.args("x", " x", "pth") + ')');
   }
 }

@@ -71,9 +71,9 @@ public abstract class SessionTest extends SandboxTest {
    */
   @Test public final void create() throws IOException {
     session.create(NAME, new ArrayInput(""));
-    assertEqual("", session.query(_DB_OPEN.args(NAME)).execute());
+    assertEqual("", session.query(_DB_GET.args(NAME)).execute());
     session.create(NAME, new ArrayInput("<X/>"));
-    assertEqual("<X/>", session.query(_DB_OPEN.args(NAME)).execute());
+    assertEqual("<X/>", session.query(_DB_GET.args(NAME)).execute());
   }
 
   /**
@@ -97,9 +97,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test public final void add() throws IOException {
     session.execute("CREATE DB " + NAME);
     session.add(NAME, new ArrayInput("<X/>"));
-    assertEqual("1", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("1", session.query("count(" + _DB_GET.args(NAME) + ')').execute());
     for(int i = 0; i < 9; i++) session.add(NAME, new ArrayInput("<X/>"));
-    assertEqual("10", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("10", session.query("count(" + _DB_GET.args(NAME) + ')').execute());
   }
 
   /**
@@ -126,13 +126,13 @@ public abstract class SessionTest extends SandboxTest {
    */
   @Test public final void update() throws IOException {
     session.execute("CREATE DB " + NAME);
-    assertEqual("0", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("0", session.query("count(" + _DB_GET.args(NAME) + ')').execute());
     session.put(NAME, new ArrayInput("<X/>"));
-    assertEqual("1", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("1", session.query("count(" + _DB_GET.args(NAME) + ')').execute());
     session.put(NAME + '2', new ArrayInput("<X/>"));
-    assertEqual("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("2", session.query("count(" + _DB_GET.args(NAME) + ')').execute());
     session.put(NAME + '2', new ArrayInput("<X/>"));
-    assertEqual("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("2", session.query("count(" + _DB_GET.args(NAME) + ')').execute());
   }
 
   /**

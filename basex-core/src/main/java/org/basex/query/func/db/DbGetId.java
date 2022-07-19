@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public class DbOpenId extends DbAccess {
+public class DbGetId extends DbAccess {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);

@@ -56,8 +56,8 @@ public final class RESTPutTest extends RESTTest {
     put(new ArrayInput(token("<a>A</a>")), NAME + "/a");
     put(new ArrayInput(token("<b>B</b>")), NAME + "/b");
     get("2", NAME, "query", "count(//text())");
-    get("2", "", "query", "count(" + _DB_OPEN.args(NAME) + "//text())");
-    get("1", "", "query", "count(" + _DB_OPEN.args(NAME, "b") + "/*)");
+    get("2", "", "query", "count(" + _DB_GET.args(NAME) + "//text())");
+    get("1", "", "query", "count(" + _DB_GET.args(NAME, "b") + "/*)");
     delete(200, NAME);
   }
 

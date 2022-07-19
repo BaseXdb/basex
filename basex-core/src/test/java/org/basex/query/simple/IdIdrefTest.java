@@ -27,11 +27,11 @@ public final class IdIdrefTest extends QueryTest {
    */
   private static Stream<Arguments> testQueries() {
     return Stream.of(
-      Arguments.of(new int[] { 1 }, _DB_OPEN.args(NAME, "1.xml") + "/id('foo')"),
-      Arguments.of(new int[] { 1 }, _DB_OPEN.args(NAME, "1.xml") + "/id('foo')"),
-      Arguments.of(new int[] { 5 }, _DB_OPEN.args(NAME, "2.xml") + "/id('batz')"),
-      Arguments.of(new int[] { 3 }, _DB_OPEN.args(NAME, "1.xml") + "/idref('bar')"),
-      Arguments.of(new int[] { 7 }, _DB_OPEN.args(NAME, "2.xml") + "/idref('quix')"),
+      Arguments.of(new int[] { 1 }, _DB_GET.args(NAME, "1.xml") + "/id('foo')"),
+      Arguments.of(new int[] { 1 }, _DB_GET.args(NAME, "1.xml") + "/id('foo')"),
+      Arguments.of(new int[] { 5 }, _DB_GET.args(NAME, "2.xml") + "/id('batz')"),
+      Arguments.of(new int[] { 3 }, _DB_GET.args(NAME, "1.xml") + "/idref('bar')"),
+      Arguments.of(new int[] { 7 }, _DB_GET.args(NAME, "2.xml") + "/idref('quix')"),
       Arguments.of(new int[] { 3, 7 }, "collection('" + NAME + "')/idref('quix', .)")
     );
   }

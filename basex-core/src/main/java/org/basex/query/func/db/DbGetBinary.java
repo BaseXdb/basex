@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbRetrieve extends DbAccess {
+public final class DbGetBinary extends DbAccess {
   @Override
   public B64Lazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);

@@ -476,7 +476,7 @@ public class CommandTest extends SandboxTest {
   /** Command test. */
   @Test public final void put() {
     // query to count number of documents
-    final String count = COUNT.args(_DB_OPEN.args(NAME));
+    final String count = COUNT.args(_DB_GET.args(NAME));
     // database must be opened to replace resources
     no(new Put(FILE, "xxx"));
     ok(new CreateDB(NAME, FILE));
@@ -497,7 +497,7 @@ public class CommandTest extends SandboxTest {
     // create and replace binary file
     ok(new XQuery(_DB_PUT_BINARY.args(NAME, "DATA", "path")));
     ok(new Put("path", "<b/>"));
-    assertFalse(ok(new XQuery(_DB_OPEN.args(NAME))).isEmpty());
+    assertFalse(ok(new XQuery(_DB_GET.args(NAME))).isEmpty());
     ok(new XQuery(_DB_GET_BINARY.args(NAME, "path")));
     // a failing replace should not remove existing documents
     no(new Put(FN, "<a>"));

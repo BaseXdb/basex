@@ -85,10 +85,10 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         + "return " + func + "//*[text() = $s]", "");
   }
 
-  /** Checks the XQuery db:open() function. */
-  @Test public void dbOpenTest() {
+  /** Checks the XQuery db:get() function. */
+  @Test public void dbGetTest() {
     createColl();
-    final String func = _DB_OPEN.args(NAME);
+    final String func = _DB_GET.args(NAME);
     indexCheck(func + "//*[text() = '1']");
     indexCheck(func + "//*[text() contains text '2']");
     indexCheck(func + "//a[. = '1']");
@@ -97,10 +97,10 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         + "return " + func + "//*[text() = $s]", "");
   }
 
-  /** Checks the XQuery db:open() function, using a specific path. */
-  @Test public void dbOpenExtTest() {
+  /** Checks the XQuery db:get() function, using a specific path. */
+  @Test public void dbGetExtTest() {
     createColl();
-    final String func = _DB_OPEN.args(NAME, "two");
+    final String func = _DB_GET.args(NAME, "two");
     indexCheck(func + "//*[text() = '1']", "");
     indexCheck(func + "//*[text() contains text '2']", "");
     indexCheck(func + "//a[. = '1']", "");
@@ -160,7 +160,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
         + "db:b('" + NAME + "', '1')", 1);
 
     // text: search term must be string
-    final String db = _DB_OPEN.args(NAME);
+    final String db = _DB_GET.args(NAME);
     indexCheck("declare function db:c() {" + db + "//text()[. = '1'] }; "
         + "db:c()", 1);
     indexCheck("declare function db:d($x as xs:string) {" + db + "//text()[. = $x] }; "
@@ -176,7 +176,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void gh1553() {
     createColl();
 
-    indexCheck("declare function db:a() { " + _DB_OPEN.args(NAME) + "//a[text() = '1'] }; "
+    indexCheck("declare function db:a() { " + _DB_GET.args(NAME) + "//a[text() = '1'] }; "
         + "db:a()", "<a>1</a>");
     indexCheck("declare function db:b() { collection('" + NAME + "')//text()[. = '1'] }; "
         + "db:b()", 1);
@@ -260,7 +260,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void pragma() {
     createDoc();
     final String pragma = "(# db:enforceindex #) { ";
-    final String db = _DB_OPEN.args(wrap(NAME));
+    final String db = _DB_GET.args(wrap(NAME));
 
     indexCheck(pragma + db + "//a[text() = '1']/text() }", 1);
     indexCheck(pragma + db + "//a/text()[. = '1'] }", 1);
@@ -281,7 +281,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   @Test public void gh1738() {
     execute(new CreateDB(NAME, "<x a='A'/>"));
     check("(# db:enforceindex #) { "
-        + "<_>" + NAME + "</_> ! " + _DB_OPEN.args(" .") + "//*[comment() = 'A'] }", "",
+        + "<_>" + NAME + "</_> ! " + _DB_GET.args(" .") + "//*[comment() = 'A'] }", "",
         empty(ValueAccess.class));
   }
 
@@ -293,7 +293,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     execute(new Add("b/doc.xml", doc));
     execute(new Optimize());
     execute(new Close());
-    indexCheck("let $db :=" + _DB_OPEN.args(NAME, "a") + " return $db/a[@b = 'c']", doc);
+    indexCheck("let $db :=" + _DB_GET.args(NAME, "a") + " return $db/a[@b = 'c']", doc);
   }
 
   /**

@@ -973,10 +973,19 @@ public enum Function implements AFunction {
   _DB_FLUSH(DbFlush::new, "flush(database)",
       params(ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_GET_BINARY(DbRetrieve::new, "get-binary(database,path)",
+  _DB_GET(DbGet::new, "get(database[,path])",
+      params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
+  _DB_GET_BINARY(DbGetBinary::new, "get-binary(database,path)",
       params(STRING_O, STRING_O), BASE64_BINARY_O, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_GET_VALUE(DbGetValue::new, "get(database,path)",
+  _DB_GET_ID(DbGetId::new, "get-id(database,ids)",
+      params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
+  _DB_GET_PRE(DbGetPre::new, "get-pre(database,pres)",
+      params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
+  /** XQuery function. */
+  _DB_GET_VALUE(DbGetValue::new, "get-value(database,path)",
       params(STRING_O, STRING_O), ITEM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_INFO(DbInfo::new, "info(database)",
@@ -997,15 +1006,6 @@ public enum Function implements AFunction {
   _DB_NODE_PRE(DbNodePre::new, "node-pre(nodes)",
       params(NODE_ZM), INTEGER_ZM, DB_URI),
   /** XQuery function. */
-  _DB_OPEN(DbOpen::new, "open(database[,path])",
-      params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, flag(NDT), DB_URI),
-  /** XQuery function. */
-  _DB_OPEN_ID(DbOpenId::new, "open-id(database,ids)",
-      params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
-  /** XQuery function. */
-  _DB_OPEN_PRE(DbOpenPre::new, "open-pre(database,pres)",
-      params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
-  /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize::new, "optimize(database[,all[,options]])",
       params(STRING_O, BOOLEAN_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
@@ -1018,13 +1018,13 @@ public enum Function implements AFunction {
   _DB_PROPERTY(DbProperty::new, "property(database,name)",
       params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_PUT(DbUpdate::new, "put(database,input,path[,options])",
+  _DB_PUT(DbPut::new, "put(database,input,path[,options])",
       params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,path,input)",
+  _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,input,path)",
       params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_PUT_VALUE(DbPutValue::new, "put-value(database,path,input)",
+  _DB_PUT_VALUE(DbPutValue::new, "put-value(database,input,path)",
       params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database,path,new-path)",

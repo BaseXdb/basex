@@ -48,7 +48,7 @@ public final class XQueryModuleTest extends QueryPlanTest {
     query(_DB_CREATE.args(NAME));
     error(func.args(DOC.args(NAME).trim(), " map { }",
       " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
-    error(func.args(_DB_OPEN.args(NAME).trim(), " map { }",
+    error(func.args(_DB_GET.args(NAME).trim(), " map { }",
       " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
     error(func.args(_FILE_EXISTS.args("x").trim(), " map { }",
       " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);

@@ -578,8 +578,8 @@ public final class RewritingsTest extends QueryPlanTest {
     final String query =
       "declare function local:b($e) as xs:string { $e };\n" +
       "declare function local:a($db) {\n" +
-      "  let $ids := local:b(" + _DB_OPEN.args(" $db ") + ")\n" +
-      "  return " + _DB_OPEN.args(NAME) + "[*[1] = $ids]\n" +
+      "  let $ids := local:b(" + _DB_GET.args(" $db ") + ")\n" +
+      "  return " + _DB_GET.args(NAME) + "[*[1] = $ids]\n" +
       "};\n" +
       "local:a('" + NAME + "')";
 
@@ -1524,7 +1524,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query("(# db:enforceindex #) {\n" +
       "  let $t := 'a'\n" +
       "  for $db in '" + NAME + "'\n" +
-      "  return" + _DB_OPEN.args(" $db") + "/_[text() contains text { $t }]\n" +
+      "  return" + _DB_GET.args(" $db") + "/_[text() contains text { $t }]\n" +
       "}",
       "<_>a</_>");
   }
@@ -1850,11 +1850,11 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<x>A</x>"));
     error("function() as element(x)* { x }()[text() = 'A']", NOCTX_X);
     error("function() as element(x)* { /x }()[text() = 'A']", NOCTX_X);
-    check("function() as element(x)* {" + _DB_OPEN.args(NAME) + "/x }()[text() = 'A']",
+    check("function() as element(x)* {" + _DB_GET.args(NAME) + "/x }()[text() = 'A']",
         "<x>A</x>", exists(ValueAccess.class));
-    check("function() as element(x) {" + _DB_OPEN.args(NAME) + "/x }()[text() = 'A']",
+    check("function() as element(x) {" + _DB_GET.args(NAME) + "/x }()[text() = 'A']",
         "<x>A</x>", exists(ValueAccess.class));
-    check("function() as document-node() {" + _DB_OPEN.args(NAME) + " }()/x[text() = 'A']",
+    check("function() as document-node() {" + _DB_GET.args(NAME) + " }()/x[text() = 'A']",
         "<x>A</x>", exists(ValueAccess.class));
 
     // no rewriting allowed
@@ -2684,7 +2684,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // whitespaces will be preserved in categories, but numbers will still be detected
     query(_DB_CREATE.args(NAME, " <a><b>1</b><b>3 </b><b> 5</b></a>", NAME));
-    final String query = _DB_OPEN.args(NAME) + "//b => ";
+    final String query = _DB_GET.args(NAME) + "//b => ";
     check(query + "count()", 3, root(Int.class));
     check(query + "min()", 1, root(Dbl.class));
     check(query + "max()", 5, root(Dbl.class));
@@ -2882,11 +2882,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
     query("declare option db:enforceindex 'true';"
         + "let $db := '" + NAME + "' "
-        + "let $rs := " + _DB_OPEN.args(" $db") + "/descendant::text()[. contains text 'A'] "
+        + "let $rs := " + _DB_GET.args(" $db") + "/descendant::text()[. contains text 'A'] "
         + "return $rs", "a");
     query("let $db := '" + NAME + "' "
         + "let $rs := (# db:enforceindex #) { "
-        + _DB_OPEN.args(" $db") + "//text()[. contains text 'A'] "
+        + _DB_GET.args(" $db") + "//text()[. contains text 'A'] "
         + "} "
         + "return $rs", "a");
   }

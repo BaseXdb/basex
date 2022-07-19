@@ -31,10 +31,10 @@ public final class ServerLockingTest extends SandboxTest {
   /** Queries to run in load test. */
   private static final String[] QUERIES = {
     "%2$s",
-    "(db:open('%1$s'), %2$s)",
-    "insert nodes %2$s into db:open('%1$s')",
-    "for $i in ('%1$s') return insert nodes %2$s into db:open($i)",
-    "for $i in ('%1$s') return (db:open($i), %2$s)"
+    "(db:get('%1$s'), %2$s)",
+    "insert nodes %2$s into db:get('%1$s')",
+    "for $i in ('%1$s') return insert nodes %2$s into db:get($i)",
+    "for $i in ('%1$s') return (db:get($i), %2$s)"
   };
   /** XQuery code for handling latches. */
   private static final String Q = "Q{" + ServerLockingTest.class.getName() + "}countDownAndWait()";
@@ -125,8 +125,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void readDatabase() throws Exception {
     testQueries(
-        f("(db:open('%s'), %s)", NAME, Q),
-        f("(db:open('%s'), %s)", NAME, Q),
+        f("(db:get('%s'), %s)", NAME, Q),
+        f("(db:get('%s'), %s)", NAME, Q),
         true);
   }
 
@@ -136,8 +136,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void readDatabases() throws Exception {
     testQueries(
-        f("(db:open('%s'), %s)", NAME, Q),
-        f("(db:open('%s1'), %s)", NAME, Q),
+        f("(db:get('%s'), %s)", NAME, Q),
+        f("(db:get('%s1'), %s)", NAME, Q),
         true);
   }
 
@@ -147,8 +147,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void writeDatabase() throws Exception {
     testQueries(
-        f("insert nodes %s into db:open('%s')", Q, NAME),
-        f("insert nodes %s into db:open('%s')", Q, NAME),
+        f("insert nodes %s into db:get('%s')", Q, NAME),
+        f("insert nodes %s into db:get('%s')", Q, NAME),
         false);
   }
 
@@ -158,8 +158,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void writeDatabases() throws Exception {
     testQueries(
-        f("insert nodes %s into db:open('%s')", Q, NAME),
-        f("insert nodes %s into db:open('%s1')", Q, NAME),
+        f("insert nodes %s into db:get('%s')", Q, NAME),
+        f("insert nodes %s into db:get('%s1')", Q, NAME),
         true);
   }
 
@@ -169,8 +169,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void readWriteDatabase() throws Exception {
     testQueries(
-        f("(db:open('%s'), %s)", NAME, Q),
-        f("insert nodes %s into db:open('%s')", Q, NAME),
+        f("(db:get('%s'), %s)", NAME, Q),
+        f("insert nodes %s into db:get('%s')", Q, NAME),
         false);
   }
 
@@ -180,8 +180,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void readWriteDatabases() throws Exception {
     testQueries(
-        f("(db:open('%s'), %s)", NAME, Q),
-        f("insert nodes %s into db:open('%s1')", Q, NAME),
+        f("(db:get('%s'), %s)", NAME, Q),
+        f("insert nodes %s into db:get('%s1')", Q, NAME),
         true);
   }
 
@@ -191,8 +191,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void readDatabasesGlobalWrite() throws Exception {
     testQueries(
-        f("(db:open('%s'), %s)", NAME, Q),
-        f("for $i in ('%s') return insert nodes %s into db:open($i)", NAME, Q),
+        f("(db:get('%s'), %s)", NAME, Q),
+        f("for $i in ('%s') return insert nodes %s into db:get($i)", NAME, Q),
         false);
   }
 
@@ -202,8 +202,8 @@ public final class ServerLockingTest extends SandboxTest {
    */
   @Test public void globalWrites() throws Exception {
     testQueries(
-        f("for $i in ('%s') return insert nodes %s into db:open($i)", NAME, Q),
-        f("for $i in ('%s') return insert nodes %s into db:open($i)", NAME, Q),
+        f("for $i in ('%s') return insert nodes %s into db:get($i)", NAME, Q),
+        f("for $i in ('%s') return insert nodes %s into db:get($i)", NAME, Q),
         false);
   }
 

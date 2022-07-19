@@ -86,7 +86,7 @@ public final class StoreTest extends SandboxTest {
           execute(new CreateDB(NAME));
           final String input = "<a>0</a>";
           execute(new Add("a.xml", input));
-          final String query = _DB_OPEN.args(NAME) + "//*[text()='0']";
+          final String query = _DB_GET.args(NAME) + "//*[text()='0']";
           assertEquals(input, query(query));
           execute(new Close());
           assertEquals(input, query(query));
@@ -131,6 +131,6 @@ public final class StoreTest extends SandboxTest {
   @Test public void gh1711() {
     query(_DB_CREATE.args(NAME, GH1711));
     query(_DB_PUT.args(NAME, GH1711, "/"));
-    query(_DB_OPEN.args(NAME));
+    query(_DB_GET.args(NAME));
   }
 }

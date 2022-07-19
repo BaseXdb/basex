@@ -97,29 +97,29 @@ public final class DbModuleTest extends QueryPlanTest {
     // specify parsing options
     query(func.args(NAME, " '<a> </a>'", "strip.xml",
         " map { '" + lc(MainOptions.STRIPWS) + "': true() }"));
-    query(_DB_OPEN.args(NAME, "strip.xml"), "<a/>");
+    query(_DB_GET.args(NAME, "strip.xml"), "<a/>");
     query(func.args(NAME, " '<a> </a>'", "nostrip.xml",
         " map { '" + lc(MainOptions.STRIPWS) + "': false() }"));
-    query(_DB_OPEN.args(NAME, "nostrip.xml"), "<a> </a>");
+    query(_DB_GET.args(NAME, "nostrip.xml"), "<a> </a>");
 
     // specify parsing options
     query(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': 'header=true' }"));
-    query("exists(" + _DB_OPEN.args(NAME, "csv.xml") + "//City)", true);
+    query("exists(" + _DB_GET.args(NAME, "csv.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }"));
-    query("exists(" + _DB_OPEN.args(NAME, "csv.xml") + "//City)", true);
+    query("exists(" + _DB_GET.args(NAME, "csv.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'header': true() } }"));
-    query("exists(" + _DB_OPEN.args(NAME, "csv.xml") + "//City)", true);
+    query("exists(" + _DB_GET.args(NAME, "csv.xml") + "//City)", true);
 
     final String addcache = " map { 'addcache': true() }";
     query(func.args(NAME, " <cache/>", "C1.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "C1.xml") + ")", true);
+    query("exists(" + _DB_GET.args(NAME, "C1.xml") + ")", true);
     query(func.args(NAME, " <cache/>", "C2.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "C2.xml") + ")", true);
+    query("exists(" + _DB_GET.args(NAME, "C2.xml") + ")", true);
     query(func.args(NAME, XML, "C3.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "C3.xml") + ")", true);
+    query("exists(" + _DB_GET.args(NAME, "C3.xml") + ")", true);
 
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X_X);
@@ -273,20 +273,20 @@ public final class DbModuleTest extends QueryPlanTest {
 
     // create DB w/ initial content
     query(func.args(NAME, " <dummy/>", "t1.xml"));
-    query(_DB_OPEN.args(NAME) + "/root()", "<dummy/>");
+    query(_DB_GET.args(NAME) + "/root()", "<dummy/>");
 
     // create DB w/ initial content via document constructor
     query(func.args(NAME, " document { <dummy/> }", "t2.xml"));
-    query(_DB_OPEN.args(NAME) + "/root()", "<dummy/>");
+    query(_DB_GET.args(NAME) + "/root()", "<dummy/>");
 
     // create DB w/ initial content given as string
     query(func.args(NAME, " <dummy/>", "t1.xml"));
-    query(_DB_OPEN.args(NAME) + "/root()", "<dummy/>");
+    query(_DB_GET.args(NAME) + "/root()", "<dummy/>");
 
     // create DB w/ initial content multiple times
     query(func.args(NAME, " <dummy/>", "t1.xml"));
     query(func.args(NAME, " <dummy/>", "t1.xml"));
-    query(_DB_OPEN.args(NAME) + "/root()", "<dummy/>");
+    query(_DB_GET.args(NAME) + "/root()", "<dummy/>");
 
     // try to create DB twice during same query
     error(func.args(NAME) + ',' + func.args(NAME), DB_CONFLICT1_X_X);
@@ -319,11 +319,11 @@ public final class DbModuleTest extends QueryPlanTest {
 
     // run update on existing DB then drop it and create a new one
     query(func.args(NAME, " <a/>", "a.xml"));
-    query("insert node <dummy/> into " + _DB_OPEN.args(NAME));
+    query("insert node <dummy/> into " + _DB_GET.args(NAME));
     query(func.args(NAME, " <dummy/>", "t1.xml") +
-        ", insert node <dummy/> into " + _DB_OPEN.args(NAME) + ',' +
+        ", insert node <dummy/> into " + _DB_GET.args(NAME) + ',' +
         _DB_DROP.args(NAME));
-    query(_DB_OPEN.args(NAME) + "/root()", "<dummy/>");
+    query(_DB_GET.args(NAME) + "/root()", "<dummy/>");
 
     // eventually drop database
     query(_DB_DROP.args(NAME));
@@ -358,17 +358,17 @@ public final class DbModuleTest extends QueryPlanTest {
     // specify parsing options
     query(func.args(NAME, " '<a> </a>'", "a.xml",
         " map { '" + lc(MainOptions.STRIPWS) + "': true() }"));
-    query(_DB_OPEN.args(NAME), "<a/>");
+    query(_DB_GET.args(NAME), "<a/>");
     query(func.args(NAME, " '<a> </a>'", "a.xml",
         " map { '" + lc(MainOptions.STRIPWS) + "': false() }"));
-    query(_DB_OPEN.args(NAME), "<a> </a>");
+    query(_DB_GET.args(NAME), "<a> </a>");
 
     query("(# db:stripws true #) { " + func.args(NAME, " '<a> </a>'", "a.xml") + " }");
-    query(_DB_OPEN.args(NAME), "<a/>");
+    query(_DB_GET.args(NAME), "<a/>");
 
     final String path = "src/test/resources/example.json";
     query("(# db:parser json #) { " + func.args(NAME, path, "a.json") + " }");
-    query(_DB_OPEN.args(NAME) + "/* ! name()", "json");
+    query(_DB_GET.args(NAME) + "/* ! name()", "json");
 
     // specify unknown or invalid options
     error(func.args(NAME, " ()", " ()", " map { 'xyz': 'abc' }"),
@@ -546,6 +546,26 @@ public final class DbModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void get() {
+    final Function func = _DB_GET;
+    query("count(" + func.args(NAME) + ")", 1);
+    query("count(" + func.args(NAME, "") + ")", 1);
+    query("count(" + func.args(NAME, "unknown") + ")", 0);
+
+    // close database instance
+    execute(new Close());
+    query("count(" + func.args(NAME, "unknown") + ")", 0);
+    query(func.args(NAME) + "//title/text()", "XML");
+
+    // reference invalid path
+    if(Prop.WIN) error(func.args(NAME, "*"), RESINV_X);
+
+    // run function on non-existing database
+    execute(new DropDB(NAME));
+    error(func.args(NAME), DB_OPEN2_X);
+  }
+
+  /** Test method. */
   @Test public void getBinary() {
     final Function func = _DB_GET_BINARY;
     error(func.args(NAME, "binary"), WHICHRES_X);
@@ -553,6 +573,26 @@ public final class DbModuleTest extends QueryPlanTest {
     query("xs:hexBinary(" + func.args(NAME, "binary") + ')', "A");
     query(_DB_DELETE.args(NAME, "binary"));
     error(func.args(NAME, "binary"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test public void getId() {
+    final Function func = _DB_GET_ID;
+    query(func.args(NAME, " ()"), "");
+    query(func.args(NAME, 0) + "//title/text()", "XML");
+    query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
+    error(func.args(NAME, -1), DB_RANGE_X_X);
+    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
+  }
+
+  /** Test method. */
+  @Test public void getPre() {
+    final Function func = _DB_GET_PRE;
+    query(func.args(NAME, " ()"), "");
+    query(func.args(NAME, 0) + "//title/text()", "XML");
+    query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
+    error(func.args(NAME, -1), DB_RANGE_X_X);
+    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
   }
 
   /** Test method. */
@@ -630,8 +670,8 @@ public final class DbModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void name() {
     final Function func = _DB_NAME;
-    query(func.args(_DB_OPEN.args(NAME)), NAME);
-    query(func.args(_DB_OPEN.args(NAME) + "/*"), NAME);
+    query(func.args(_DB_GET.args(NAME)), NAME);
+    query(func.args(_DB_GET.args(NAME) + "/*"), NAME);
   }
 
   /** Test method. */
@@ -646,46 +686,6 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_NODE_PRE;
     query(func.args(" /html"), 1);
     query(func.args(" / | /html"), "0\n1");
-  }
-
-  /** Test method. */
-  @Test public void open() {
-    final Function func = _DB_OPEN;
-    query("count(" + func.args(NAME) + ")", 1);
-    query("count(" + func.args(NAME, "") + ")", 1);
-    query("count(" + func.args(NAME, "unknown") + ")", 0);
-
-    // close database instance
-    execute(new Close());
-    query("count(" + func.args(NAME, "unknown") + ")", 0);
-    query(func.args(NAME) + "//title/text()", "XML");
-
-    // reference invalid path
-    if(Prop.WIN) error(func.args(NAME, "*"), RESINV_X);
-
-    // run function on non-existing database
-    execute(new DropDB(NAME));
-    error(func.args(NAME), DB_OPEN2_X);
-  }
-
-  /** Test method. */
-  @Test public void openId() {
-    final Function func = _DB_OPEN_ID;
-    query(func.args(NAME, " ()"), "");
-    query(func.args(NAME, 0) + "//title/text()", "XML");
-    query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
-    error(func.args(NAME, -1), DB_RANGE_X_X);
-    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
-  }
-
-  /** Test method. */
-  @Test public void openPre() {
-    final Function func = _DB_OPEN_PRE;
-    query(func.args(NAME, " ()"), "");
-    query(func.args(NAME, 0) + "//title/text()", "XML");
-    query(func.args(NAME, " (0, 1)") + "//title/text()", "XML");
-    error(func.args(NAME, -1), DB_RANGE_X_X);
-    error(func.args(NAME, Integer.MAX_VALUE), DB_RANGE_X_X);
   }
 
   /** Test method. */
@@ -786,8 +786,8 @@ public final class DbModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void path() {
     final Function func = _DB_PATH;
-    query(func.args(_DB_OPEN.args(NAME)), XML.replaceAll(".*/", ""));
-    query(func.args(_DB_OPEN.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
+    query(func.args(_DB_GET.args(NAME)), XML.replaceAll(".*/", ""));
+    query(func.args(_DB_GET.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
     query(func.args(" <x/> update { }"), "");
   }
 
@@ -819,11 +819,11 @@ public final class DbModuleTest extends QueryPlanTest {
 
     final String addcache = " map { 'addcache': true() }";
     query(func.args(NAME, " <cache/>", "1.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "1.xml") + ")", true);
+    query("exists(" + _DB_GET.args(NAME, "1.xml") + ")", true);
     query(func.args(NAME, " <cache/>", "2.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "2.xml") + ")", true);
+    query("exists(" + _DB_GET.args(NAME, "2.xml") + ")", true);
     query(func.args(NAME, XML, "3.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "3.xml") + ")", true);
+    query("exists(" + _DB_GET.args(NAME, "3.xml") + ")", true);
 
     // GH-1302: replace same target more than once
     error("(1 to 2) ! " + func.args(NAME, XML, "3.xml"), UPMULTDOC_X_X);
