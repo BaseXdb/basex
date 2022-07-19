@@ -204,7 +204,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check(wrap("1.1") + "= 1.1", true, empty(cmpr));
 
     // suppressed rewritings
-    check("random:double() = 2", false, empty(cmpr));
+    check(_RANDOM_DOUBLE.args() + " = 2", false, empty(cmpr));
     check("(0.1, 1.1)[. != 0] = 1.3", false, empty(cmpr));
     check("('x', 'y')[. = 'x'] = 'x'", true, empty(cmpr));
     check("('x', 'x')[. != 'x'] = 1.3", false, empty(cmpr));
@@ -578,8 +578,8 @@ public final class RewritingsTest extends QueryPlanTest {
     final String query =
       "declare function local:b($e) as xs:string { $e };\n" +
       "declare function local:a($db) {\n" +
-      "  let $ids := local:b(db:open($db))\n" +
-      "  return db:open('" + NAME + "')[*[1] = $ids]\n" +
+      "  let $ids := local:b(" + _DB_OPEN.args(" $db ") + ")\n" +
+      "  return " + _DB_OPEN.args(NAME) + "[*[1] = $ids]\n" +
       "};\n" +
       "local:a('" + NAME + "')";
 
@@ -722,10 +722,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(false(), true()) ! (.  = true())", "false\ntrue", root(BlnSeq.class));
     check("(false(), true()) ! (. != false())", "false\ntrue", root(BlnSeq.class));
 
-    check("(false(), true())[random:double() < 2] ! (.  = false())", "true\nfalse", exists(NOT));
-    check("(false(), true())[random:double() < 2] ! (. != true())", "true\nfalse", exists(NOT));
+    check("(false(), true())[" + _RANDOM_DOUBLE.args() + " < 2] ! (.  = false())",
+        "true\nfalse", exists(NOT));
+    check("(false(), true())[" + _RANDOM_DOUBLE.args() + " < 2] ! (. != true())",
+        "true\nfalse", exists(NOT));
 
-    check("(if(random:double() + 1) then true() else ()) = true()", true, root(BOOLEAN));
+    check("(if(" + _RANDOM_DOUBLE.args() + " + 1) then true() else ()) = true()",
+        true, root(BOOLEAN));
   }
 
   /** Merge predicates. */
@@ -862,8 +865,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[path() instance of xs:string]", "<a/>", root(CElem.class));
     check("<a/>[name() = 'a']", "<a/>", exists(CmpSimpleG.class));
 
-    check("node-name(prof:void(()))", "", root(_PROF_VOID));
-    check("prefix-from-QName(prof:void(()))", "", root(_PROF_VOID));
+    check("node-name(" + _PROF_VOID.args(" ()") + ")", "", root(_PROF_VOID));
+    check("prefix-from-QName(" + _PROF_VOID.args(" ()") + ")", "", root(_PROF_VOID));
   }
 
   /** Rewrite name tests to self steps. */
@@ -897,8 +900,8 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Functions with database access. */
   @Test public void gh1788() {
     execute(new CreateDB(NAME, "<x>A</x>"));
-    check("db:text('" + NAME + "', 'A')/parent::x", "<x>A</x>", exists(_DB_TEXT));
-    check("db:text('" + NAME + "', 'A')/parent::unknown", "", empty());
+    check(_DB_TEXT.args(NAME, "A") + "/parent::x", "<x>A</x>", exists(_DB_TEXT));
+    check(_DB_TEXT.args(NAME, "A") + "/parent::unknown", "", empty());
   }
 
   /** Inline context in filter expressions. */
@@ -1028,8 +1031,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** If expression with empty branches. */
   @Test public void gh1809() {
-    check("if(" + wrap(1) + "[. = 1]) then () else ()", "", empty());
-    check("if(prof:void(1)) then () else ()", "", root(_PROF_VOID), count(_PROF_VOID, 1));
+    check("if(" + wrap(1) + "[. = 1]) then () else ()",
+        "", empty());
+    check("if(" + _PROF_VOID.args(1) + ") then () else ()", "",
+        root(_PROF_VOID), count(_PROF_VOID, 1));
   }
 
   /** Redundant predicates in paths. */
@@ -1046,7 +1051,7 @@ public final class RewritingsTest extends QueryPlanTest {
     // if expression
     check("(1, 2) ! boolean(if(.) then 'a' else <a/>)", "true\ntrue", root(SingletonSeq.class));
     check("(1 to 2) ! boolean(if(.) then '' else ())", "false\nfalse", root(SingletonSeq.class));
-    check("boolean(if(random:double()) then '' else 0)", "false",
+    check("boolean(if(" + _RANDOM_DOUBLE.args() + ") then '' else 0)", "false",
         root(List.class), exists(_PROF_VOID));
 
     check("(1, 2)[if(.) then 0.0e0 else 0.0]", "", empty());
@@ -1085,17 +1090,17 @@ public final class RewritingsTest extends QueryPlanTest {
     check("x/z", "", empty());
     check("(x, y)/z", "", empty());
     check("(x | y)/z", "", empty());
-    check("(if(random:double()) then x else y)/z", "", empty());
-    check("(let $_ := random:double() return x)/z", "", empty());
+    check("(if(" + _RANDOM_DOUBLE.args() + ") then x else y)/z", "", empty());
+    check("(let $_ := " + _RANDOM_DOUBLE.args() + " return x)/z", "", empty());
     check("((# bla #) { x })/z", "", empty());
-    check("(switch (random:double())\n" +
+    check("(switch (" + _RANDOM_DOUBLE.args() + ")\n" +
       "  case 1 return ()\n" +
       "  default return x\n" +
       ")/z", "", empty());
 
-    check("(x, prof:void(()))/z", "", empty());
-    check("(x | prof:void(()))/z", "", empty());
-    check("(if(random:double()) then x)/z", "", empty());
+    check("(x," + _PROF_VOID.args(" ()") + ")/z", "", empty());
+    check("(x |" + _PROF_VOID.args(" ()") + ")/z", "", empty());
+    check("(if(" + _RANDOM_DOUBLE.args() + ") then x)/z", "", empty());
   }
 
   /** List to union in root of path expression. */
@@ -1120,17 +1125,17 @@ public final class RewritingsTest extends QueryPlanTest {
   /** FLWOR, no results, non-deterministic expressions. */
   @Test public void gh1819() {
     check("for $_ in () return <x/>", "", empty());
-    check("for $_ in prof:void(1) return 1", "", root(_PROF_VOID));
+    check("for $_ in" + _PROF_VOID.args(1) + " return 1", "", root(_PROF_VOID));
     check("let $_ := 1 return <x/>", "<x/>", root(CElem.class));
-    check("let $_ := prof:void(1) return 1", 1, root(List.class), exists(_PROF_VOID));
+    check("let $_ :=" + _PROF_VOID.args(1) + " return 1", 1, root(List.class), exists(_PROF_VOID));
     check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
     check("for $_ in 1 to 2 return ()", "", empty());
 
-    check("let $_ := prof:void(1) return 1", 1, root(List.class), exists(_PROF_VOID));
+    check("let $_ :=" + _PROF_VOID.args(1) + " return 1", 1, root(List.class), exists(_PROF_VOID));
 
     // rewrite to simple map
     check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check("for $_ in 1 to 2 return prof:void(1)", "", root(_UTIL_REPLICATE));
+    check("for $_ in 1 to 2 return" + _PROF_VOID.args(1) + "", "", root(_UTIL_REPLICATE));
   }
 
   /** Merge and/or expressions. */
@@ -1211,11 +1216,10 @@ public final class RewritingsTest extends QueryPlanTest {
         true, empty(STRING_TO_CODEPOINTS), empty(EXISTS), exists(BOOLEAN), exists(STRING));
     check("empty(string-to-codepoints(<?_ x?>))",
         false, empty(STRING_TO_CODEPOINTS), empty(EMPTY), exists(NOT), exists(STRING));
-    check("exists(util:chars(<?_ x?>))",
+    check("exists(" + _UTIL_CHARS.args(" <?_ x?> ") + ')',
         true, empty(_UTIL_CHARS), empty(EXISTS), exists(BOOLEAN), exists(STRING));
-    check("empty(util:chars(<?_ x?>))",
+    check("empty(" + _UTIL_CHARS.args(" <?_ x?> ") + ')',
         false, empty(_UTIL_CHARS), empty(EMPTY), exists(NOT), exists(STRING));
-
 
     check("exists(map:keys(map:entry(1, <_/>)))",
         true, empty(_MAP_KEYS), empty(EXISTS), exists(_MAP_SIZE), exists(CmpSimpleG.class));
@@ -1520,7 +1524,7 @@ public final class RewritingsTest extends QueryPlanTest {
     query("(# db:enforceindex #) {\n" +
       "  let $t := 'a'\n" +
       "  for $db in '" + NAME + "'\n" +
-      "  return db:open($db)/_[text() contains text { $t }]\n" +
+      "  return" + _DB_OPEN.args(" $db") + "/_[text() contains text { $t }]\n" +
       "}",
       "<_>a</_>");
   }
@@ -1602,7 +1606,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Singleton sequences in predicates. */
   @Test public void gh1878() {
-    error("<a/>[util:replicate(1, 2)]", ARGTYPE_X_X_X);
+    error("<a/>[" + _UTIL_REPLICATE.args(1, 2) + ']', ARGTYPE_X_X_X);
   }
 
   /** Lacking filter rewriting. */
@@ -1672,14 +1676,14 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Distinct document order. */
   @Test public void gh1888() {
-    check("let $a := <a/> return util:ddo(($a, $a))", "<a/>", root(CElem.class));
+    check("let $a := <a/> return" + _UTIL_DDO.args(" ($a, $a)"), "<a/>", root(CElem.class));
     check("let $a := <a/> return ($a, $a)/.", "<a/>", root(CElem.class));
   }
 
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
     check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check("(3 to 13) ! prof:void(.)", "", root(DualMap.class));
+    check("(3 to 13) !" + _PROF_VOID.args(" ."), "", root(DualMap.class));
   }
 
   /** Rewrite FLWOR to simple map. */
@@ -1758,7 +1762,8 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Size of type check results. */
   @Test public void gh1902() {
     inline(true);
-    check("function() as xs:string+ { util:replicate(<x/>, 10000000000) }() => count()",
+    check("function() as xs:string+ {" + _UTIL_REPLICATE.args(" <x/>", 10000000000L) + " }() "
+        + "=> count()",
       "10000000000", root(Int.class));
     check("function() as xs:double+ { 1 to 100000000000000 }() => count()",
       "100000000000000", root(Int.class));
@@ -1845,11 +1850,11 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<x>A</x>"));
     error("function() as element(x)* { x }()[text() = 'A']", NOCTX_X);
     error("function() as element(x)* { /x }()[text() = 'A']", NOCTX_X);
-    check("function() as element(x)* { db:open('" + NAME + "')/x }()[text() = 'A']",
+    check("function() as element(x)* {" + _DB_OPEN.args(NAME) + "/x }()[text() = 'A']",
         "<x>A</x>", exists(ValueAccess.class));
-    check("function() as element(x) { db:open('" + NAME + "')/x }()[text() = 'A']",
+    check("function() as element(x) {" + _DB_OPEN.args(NAME) + "/x }()[text() = 'A']",
         "<x>A</x>", exists(ValueAccess.class));
-    check("function() as document-node() { db:open('" + NAME + "') }()/x[text() = 'A']",
+    check("function() as document-node() {" + _DB_OPEN.args(NAME) + " }()/x[text() = 'A']",
         "<x>A</x>", exists(ValueAccess.class));
 
     // no rewriting allowed
@@ -2119,11 +2124,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Inline arguments of replicated items and singleton sequences. */
   @Test public void gh1963() {
-    check("util:replicate('x', 2) ! (. = 'x')", "true\ntrue", root(SingletonSeq.class));
-    check("util:replicate(<a/>, 2) ! (. = 'x')", "false\nfalse", root(_UTIL_REPLICATE));
+    check(_UTIL_REPLICATE.args("x", 2) + " ! (. = 'x')", "true\ntrue", root(SingletonSeq.class));
+    check(_UTIL_REPLICATE.args(" <a/>", 2) + " ! (. = 'x')", "false\nfalse", root(_UTIL_REPLICATE));
 
     check("(10, 10) ! .[. = 5]", "", root(IterFilter.class));
-    check("util:replicate(<a/>, 2) ! .[data()]", "", root(_UTIL_REPLICATE));
+    check(_UTIL_REPLICATE.args(" <a/>", 2) + " ! .[data()]", "", root(_UTIL_REPLICATE));
   }
 
   /** Inlining context item expression. */
@@ -2206,7 +2211,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Parallel execution. */
   @Test public void gh1329() {
-    query("xquery:fork-join(util:replicate(function() { <x/>[@a] }, 10000))", "");
+    query(_XQUERY_FORK_JOIN.args(_UTIL_REPLICATE.args(" function() { <x/>[@a] }", 10000)), "");
     query("1 ! fn:last#0()", 1);
   }
 
@@ -2353,7 +2358,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("declare context item := <a/>; (.|.)/self::a", "<a/>", empty(Union.class));
 
     check("<a/> ! (., .)/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
-    check("util:replicate(<a/>, 2)/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
+    check(_UTIL_REPLICATE.args(" <a/>", 2) + "/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
     check("declare context item := <a/>; (., .)/<b/>", "<b/>\n<b/>", exists(SingletonSeq.class));
   }
 
@@ -2366,9 +2371,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("((1 to 1000000000000) ! string())[position() = last() - 999999999999]", 1,
         root(Str.class));
 
-    check("util:replicate(<x/>, <c>200000000000</c>)[last()]", "<x/>",
+    check(_UTIL_REPLICATE.args(" <x/>", " <c>200000000000</c>") + "[last()]", "<x/>",
         root(_UTIL_LAST));
-    check("util:replicate(<x/>, <c>200000000000</c>, true())[last()]", "<x/>",
+    check(_UTIL_REPLICATE.args(" <x/>", " <c>200000000000</c>", true) + "[last()]", "<x/>",
         root(_UTIL_LAST));
 
     check("for-each-pair((1 to 10000000000), (1 to 9999999999), "
@@ -2408,10 +2413,10 @@ public final class RewritingsTest extends QueryPlanTest {
         "false\nfalse\nfalse\ntrue\nfalse\nfalse\nfalse",
         empty(CElem.class), exists(Str.class));
 
-    check("declare variable $x := util:replicate(<a>a</a>, 2); data($x)",
-        "a\na", exists(SingletonSeq.class), exists(Atm.class));
-    check("declare variable $x := util:replicate(<a>a</a>, 2); distinct-values($x)",
-        "a", root(Atm.class));
+    check("declare variable $x :=" + _UTIL_REPLICATE.args(" <a>a</a>", 2) +
+        "; data($x)", "a\na", exists(SingletonSeq.class), exists(Atm.class));
+    check("declare variable $x :=" + _UTIL_REPLICATE.args(" <a>a</a>", 2) +
+        "; distinct-values($x)", "a", root(Atm.class));
   }
 
   /** Steps with zero or one results. */
@@ -2778,8 +2783,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** where false(). */
   @Test public void gh2080() {
-    check("let $_ := prof:void(1) where false() return ()", "", root(_PROF_VOID));
-    check("let $_ := prof:void(1) where false() return prof:void(2)", "", root(_PROF_VOID));
+    check("let $_ :=" + _PROF_VOID.args(1) + " where false() return ()",
+        "", root(_PROF_VOID));
+    check("let $_ :=" + _PROF_VOID.args(1) + " where false() return" + _PROF_VOID.args(2),
+        "", root(_PROF_VOID));
   }
 
   /** Rewrite value to general comparison. */
@@ -2795,7 +2802,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Predicates: further optimize rewritings of 'if' expressions. */
   @Test public void gh2096() {
-    check("<x/>[if(random:double() + 1) then . = '1' else ()]", "",
+    check("<x/>[if(" + _RANDOM_DOUBLE.args() + " + 1) then . = '1' else ()]", "",
         empty(If.class), empty(And.class));
     check("<x>1</x>[if(. castable as xs:integer) then . = 1 else false()]", "<x>1</x>",
         empty(If.class), empty(And.class));
@@ -2847,9 +2854,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("reverse((1 to 2) ! <_>{ . }</_>)", "<_>2</_>\n<_>1</_>", root(DualMap.class));
     check("subsequence((1 to 6) ! (. * 2), 2, 2)", "4\n6", root(DualMap.class));
 
-    check("util:init((1 to 10)[. > 7] ! (. * .))", "64\n81", root(DualMap.class));
-    check("util:item((1 to 10)[. > 6] ! (. * .), 2)", 64, root(ItemMap.class));
-    check("util:last((1 to 10)[. > 5] ! (. * .))", 100, root(ItemMap.class));
+    check(_UTIL_INIT.args(" (1 to 10)[. > 7] ! (. * .)"), "64\n81", root(DualMap.class));
+    check(_UTIL_ITEM.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(ItemMap.class));
+    check(_UTIL_LAST.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(ItemMap.class));
   }
 
   /** Check existence of paths in predicates. */
@@ -2863,8 +2870,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("a[/b]", "", empty());
     check("a[/a/a]", "", empty());
     check("a[/a[/b]]", "", empty());
-    check("a[/a/util:root(.)/b]", "", empty());
-    check("a[util:root(.)/a/util:root(.)/b]", "", empty());
+    check("a[/a/" + _UTIL_ROOT.args(" .") + "/b]", "", empty());
+    check("a[" + _UTIL_ROOT.args(" .") + "/a/" + _UTIL_ROOT.args(" .") + "/b]", "", empty());
 
     check("a[/a]", "<a><b/></a>", root(IterPath.class), exists(DBNode.class));
   }
@@ -2875,11 +2882,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
     query("declare option db:enforceindex 'true';"
         + "let $db := '" + NAME + "' "
-        + "let $rs := db:open($db)/descendant::text()[. contains text 'A'] "
+        + "let $rs := " + _DB_OPEN.args(" $db") + "/descendant::text()[. contains text 'A'] "
         + "return $rs", "a");
     query("let $db := '" + NAME + "' "
         + "let $rs := (# db:enforceindex #) { "
-        + "  db:open($db)//text()[. contains text 'A'] "
+        + _DB_OPEN.args(" $db") + "//text()[. contains text 'A'] "
         + "} "
         + "return $rs", "a");
   }

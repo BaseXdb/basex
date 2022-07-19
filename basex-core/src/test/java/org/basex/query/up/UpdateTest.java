@@ -88,13 +88,12 @@ public final class UpdateTest extends SandboxTest {
     set(MainOptions.MAINMEM, true);
     try {
       execute(new CreateDB("DBtransform", "<instance><data><vocable hits='1'/></data></instance>"));
-      query(
-          "for $voc in 1 to 2 " +
-          "let $xml := db:open('DBtransform') " +
-          "return $xml update {" +
-          "  for $i in 1 to 2 return " +
-          "    insert node $xml/instance/data/vocable[@hits = '1'] into ./instance" +
-          "}",
+      query("for $voc in 1 to 2 "
+          + "let $xml :=" + _DB_OPEN.args("DBTransform")
+          + "return $xml update {"
+          + "  for $i in 1 to 2 return "
+          + "    insert node $xml/instance/data/vocable[@hits = '1'] into ./instance"
+          + "}",
           "<instance>"
           + "<data><vocable hits=\"1\"/></data>"
           + "<vocable hits=\"1\"/>"
@@ -456,7 +455,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void emptyInsert3() {
     createDB("<a/>");
     query("delete node /a");
-    query("insert nodes <X/> into db:open('" + NAME + "')");
+    query("insert nodes <X/> into" + _DB_OPEN.args(NAME));
     query("/", "<X/>");
   }
 
@@ -479,7 +478,7 @@ public final class UpdateTest extends SandboxTest {
     createDB(null);
     query("let $w := //item[@id = 'item0'] " +
       "return (if($w/@id) " +
-      "then (delete node $w/@id, db:optimize('" + NAME + "')) else ())");
+      "then (delete node $w/@id," + _DB_OPTIMIZE.args(NAME) + ") else ())");
   }
 
   /** Variable from the inner scope shouldn't be visible. */
@@ -984,8 +983,8 @@ public final class UpdateTest extends SandboxTest {
    * Also includes update:output() and fn:put().
    */
   @Test public void dbUpdateTransform() {
-    error("copy $c := <a/> modify update:output('x') return $c", BASEX_UPDATE);
-    error("copy $c := <a/> modify db:add('" + NAME + "', '<x/>', 'x.xml') return $c",
+    error("copy $c := <a/> modify" + _UPDATE_OUTPUT.args("x") + " return $c", BASEX_UPDATE);
+    error("copy $c := <a/> modify" + _DB_ADD.args(NAME, " <x/>", "x.xml") + " return $c",
         BASEX_UPDATE);
     error("copy $c := <a/> modify put(<a/>, 'x.txt') return $c", BASEX_UPDATE);
   }
@@ -1040,14 +1039,14 @@ public final class UpdateTest extends SandboxTest {
     query("<x/> update { } update { }", "<x/>");
     query("<x/> update { }", "<x/>");
     query("(<x/>, <y/>) update { }", "<x/>\n<y/>");
-    error("update:output('a') update { }", UPNOT_X);
+    error(_UPDATE_OUTPUT.args("a") + " update { }", UPNOT_X);
     error("<x/> update { 1 }", UPMODIFY);
 
     query("(<a>X</a>/text() update { })/..", "");
 
     query("<x/> transform with { }", "<x/>");
     query("<x/> transform with { insert node <y/> into . }", "<x><y/></x>");
-    error("update:output('a') transform with {}", UPNOT_X);
+    error(_UPDATE_OUTPUT.args("a") + " transform with {}", UPNOT_X);
     error("<x/> transform with { 1 }", UPMODIFY);
   }
 
@@ -1070,14 +1069,15 @@ public final class UpdateTest extends SandboxTest {
 
   /** Reject updating function items. */
   @Test public void updatingFuncItems() {
-    query("update:output(?)", "(anonymous-function)#1");
+    query(_UPDATE_OUTPUT.args(" ?"), "(anonymous-function)#1");
     query("update:output#1", "update:output#1");
     query("update:output#1, update:output#1", "update:output#1\nupdate:output#1");
 
     query("function() { () }()", "");
     query("declare updating function local:a() { () }; local:a#0", "local:a#0");
     query("declare function local:a() { local:a#0 };"
-        + "declare updating function local:b() { update:output('1') }; local:a()", "local:a#0");
+        + "declare updating function local:b() {" + _UPDATE_OUTPUT.args(1) + " }; local:a()",
+        "local:a#0");
     query("updating function() { delete node <a/> }()");
 
     query("let $f := %updating function() {} return updating $f()", "");
@@ -1088,15 +1088,17 @@ public final class UpdateTest extends SandboxTest {
     error("updating %updating function() { 1 }()", UPEXPECTF);
     error("%updating function() { 1 }()", UPEXPECTF);
 
-    error("update:output(?)(<a/>)", FUNCUP_X);
+    error(_UPDATE_OUTPUT.args(" ?") + "(<a/>)", FUNCUP_X);
     error("update:output#1(<a/>)", FUNCUP_X);
-    error("%updating function($a) { update:output($a) }(1)", FUNCUP_X);
+    error("%updating function($a) {" + _UPDATE_OUTPUT.args("a") + " }(1)", FUNCUP_X);
     error("declare updating function local:a() { () }; local:a#0()", FUNCUP_X);
 
     query("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { update:output('1') }; updating local:a()()", 1);
+        + "declare updating function local:b() {" + _UPDATE_OUTPUT.args(1) + " }; "
+        + "updating local:a()()", 1);
     error("declare function local:a() { local:b#0 };"
-        + "declare updating function local:b() { update:output('1') }; local:a()()", FUNCUP_X);
+        + "declare updating function local:b() {" + _UPDATE_OUTPUT.args(1) + " }; "
+        + "local:a()()", FUNCUP_X);
 
     error("updating count(?)(1)", FUNCNOTUP_X);
     error("updating count#1(1)", FUNCNOTUP_X);
@@ -1109,7 +1111,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh1430() {
     query("let $f := "
         + "function($arg as %updating function(item()*) as empty-sequence()) { $arg } "
-        + "return prof:void($f(function($e) { $e ! (delete node .) }))", "");
+        + "return" + _PROF_VOID.args(" $f(function($e) { $e ! (delete node .) })"), "");
   }
 
   /** Test method. */
@@ -1132,32 +1134,36 @@ public final class UpdateTest extends SandboxTest {
 
   /** Window clauses. */
   @Test public void window() {
-    query("for tumbling window $w in 1 start when true() return update:output($w)", 1);
+    query("for tumbling window $w in 1 start when true() "
+        + "return" + _UPDATE_OUTPUT.args(" $w"), 1);
     query("for sliding window $w in 1 start when true() end when true() "
-        + "return update:output($w)", 1);
-    error("for tumbling window $w in 1 start when delete node <a/> return ()", UPNOT_X);
-    error("for tumbling window $w in 1 start when () end when delete node <a/> return ()", UPNOT_X);
-    error("for tumbling window $w in update:output(1) start when () return ()", UPNOT_X);
+        + "return" + _UPDATE_OUTPUT.args(" $w"), 1);
+    error("for tumbling window $w in 1 start when delete node <a/> return ()",
+        UPNOT_X);
+    error("for tumbling window $w in 1 start when () end when delete node <a/> return ()",
+        UPNOT_X);
+    error("for tumbling window $w in" + _UPDATE_OUTPUT.args(1) + " start when () return ()",
+        UPNOT_X);
   }
 
   /** Checks if updating expressions are treated like non-deterministic code. */
   @Test public void noOptimization() {
     query("<a/> update { . ! (insert node text { '1' } into .) }", "<a>1</a>");
     query("<a/> update { for $a in (1, 2) return insert node text { '1' } into . }", "<a>11</a>");
-    query("(update:output('1'), update:output('2'))", "1\n2");
+    query(_UPDATE_OUTPUT.args(1) + ',' + _UPDATE_OUTPUT.args(2), "1\n2");
   }
 
   /** Test. */
   @Test public void gh1576() {
-    query("update:output([ ])", "[]");
-    query("update:output([ 1, (2, [ 3, 4 ]) ])", "[1,(2,[3,4])]");
-    query("update:output(map { })", "map{}");
-    query("update:output(map { 1: map { 2: 3 }})", "map{1:map{2:3}}");
+    query(_UPDATE_OUTPUT.args(" [ ]"), "[]");
+    query(_UPDATE_OUTPUT.args(" [ 1, (2, [ 3, 4 ]) ]"), "[1,(2,[3,4])]");
+    query(_UPDATE_OUTPUT.args(" map { }"), "map{}");
+    query(_UPDATE_OUTPUT.args(" map { 1: map { 2: 3 }}"), "map{1:map{2:3}}");
 
-    error("update:output(true#0)", BASEX_STORE_X);
-    error("update:output([ true#0 ])", BASEX_STORE_X);
-    error("update:output([1, (2, [ 3, true#0 ])])", BASEX_STORE_X);
-    error("update:output(map { 1: map { 2: true#0 }})", BASEX_STORE_X);
+    error(_UPDATE_OUTPUT.args(" true#0"), BASEX_STORE_X);
+    error(_UPDATE_OUTPUT.args(" [ true#0 ]"), BASEX_STORE_X);
+    error(_UPDATE_OUTPUT.args(" [1, (2, [ 3, true#0 ])]"), BASEX_STORE_X);
+    error(_UPDATE_OUTPUT.args(" map { 1: map { 2: true#0 }}"), BASEX_STORE_X);
   }
 
   /** Test. */
@@ -1179,7 +1185,8 @@ public final class UpdateTest extends SandboxTest {
 
   /** Simple map, update checks. */
   @Test public void gh1957() {
-    query("declare %updating function local:f() { (1, 2) ! prof:void(.) }; local:f()", "");
+    query("declare %updating function local:f() { (1, 2) !" + _PROF_VOID.args(" .") + " }; "
+        + "local:f()", "");
   }
 
   /** Simple map, update checks. */
@@ -1263,7 +1270,7 @@ public final class UpdateTest extends SandboxTest {
     }
   }
 
-  /** db:replace, ADDCACHE option. */
+  /** Update document, ADDCACHE option. */
   @Test public void gh1989() {
     createDB("<a/>");
     query(_DB_UPDATE.args(NAME, DOC, "Sandbox.xml", " map { 'addcache': true() }"));

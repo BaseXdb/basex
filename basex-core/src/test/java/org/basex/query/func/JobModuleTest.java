@@ -63,9 +63,9 @@ public final class JobModuleTest extends SandboxTest {
     query(func.args("1, delete node <a/>"));
 
     // error in List implementation
-    query("trace(true()) and (prof:void(" +
-      func.args("prof:sleep(100)", " ()", " map { 'id': 'eval4' }") +
-    "), true())", "true");
+    query("trace(true()) and (" + _PROF_VOID.args(
+        func.args("prof:sleep(100)", " ()", " map { 'id': 'eval4' }"))  + ", true())",
+        "true");
   }
 
   /** Test method. */
@@ -142,7 +142,7 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void evalService() {
     final Function func = _JOB_EVAL;
     query(func.args("1", " ()", " map { 'id': 'ID', 'service': true() }"));
-    query("file:exists(db:option('dbpath') || '/jobs.xml')", true);
+    query(_FILE_EXISTS.args(_DB_OPTION.args("dbpath") + "|| '/jobs.xml'"), true);
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", true);
     query(_JOB_STOP.args("id"));
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", true);

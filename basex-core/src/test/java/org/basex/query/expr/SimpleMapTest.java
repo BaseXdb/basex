@@ -40,11 +40,11 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("1 ! ()", "", empty());
     check("() ! 1", "", empty());
     check("1 ! () ! 1", "", empty());
-    check("1 ! prof:void('x')", "", empty(Int.class));
-    check("1 ! prof:void(.) ! 1", "", count(Int.class, 1));
+    check("1 !" + _PROF_VOID.args("x"), "", empty(Int.class));
+    check("1 !" + _PROF_VOID.args(" .") + " ! 1", "", count(Int.class, 1));
     check("<a/> ! <b/> ! ()", "", empty());
 
-    check("prof:void('x') ! 1", "", empty(Int.class));
+    check(_PROF_VOID.args("x") + " ! 1", "", empty(Int.class));
     check("() ! 'a'[.]", "", empty());
     check("() ! ('a', 'b')[.]", "", empty());
     check("() ! <_>a</_>[.]", "", empty());
@@ -108,7 +108,7 @@ public final class SimpleMapTest extends QueryPlanTest {
     check("(1 to 2) ! ('a', '')[.]", "a\na", exists(_UTIL_REPLICATE));
     check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(_UTIL_REPLICATE));
 
-    check("(1 to 2) ! prof:void(.)", "", empty(_UTIL_REPLICATE));
+    check("(1 to 2) !" + _PROF_VOID.args(" ."), "", empty(_UTIL_REPLICATE));
 
     // replace first or both expressions with singleton sequence
     check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), root(SingletonSeq.class));
@@ -116,14 +116,14 @@ public final class SimpleMapTest extends QueryPlanTest {
 
     // combine identical values in singleton sequence
     check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
-    check("(1 to 2) ! util:replicate('a', 2) ! util:replicate('a', 2)", "a\na\na\na\na\na\na\na",
-        exists(SingletonSeq.class) + " and .//@size = 8");
+    check("(1 to 2) !" + _UTIL_REPLICATE.args("a", 2) + " !" + _UTIL_REPLICATE.args("a", 2),
+        "a\na\na\na\na\na\na\na", exists(SingletonSeq.class) + " and .//@size = 8");
   }
 
   /** Positional access. */
   @Test public void positional() {
     check("for $i in 2 to 3 return (1 to 4)[$i]", "2\n3", root(RangeSeq.class));
-    check("(2 to 3) ! util:item((1 to 4), .)", "2\n3", root(RangeSeq.class));
+    check("(2 to 3) !" + _UTIL_ITEM.args(" 1 to 4", " ."), "2\n3", root(RangeSeq.class));
   }
 
   /** Inline sequences. */

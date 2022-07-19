@@ -280,7 +280,8 @@ public final class IndexOptimizeTest extends QueryPlanTest {
   /** Optimizations of predicates that are changed by optimizations. */
   @Test public void gh1738() {
     execute(new CreateDB(NAME, "<x a='A'/>"));
-    check("(# db:enforceindex #) { <_>" + NAME + "</_> ! db:open(.)//*[comment() = 'A'] }", "",
+    check("(# db:enforceindex #) { "
+        + "<_>" + NAME + "</_> ! " + _DB_OPEN.args(" .") + "//*[comment() = 'A'] }", "",
         empty(ValueAccess.class));
   }
 
@@ -292,7 +293,7 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     execute(new Add("b/doc.xml", doc));
     execute(new Optimize());
     execute(new Close());
-    indexCheck("let $db := db:open('" + NAME + "', 'a') return $db/a[@b = 'c']", doc);
+    indexCheck("let $db :=" + _DB_OPEN.args(NAME, "a") + " return $db/a[@b = 'c']", doc);
   }
 
   /**

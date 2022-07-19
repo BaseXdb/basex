@@ -135,10 +135,10 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(""), "");
     query(func.args("a!b:c"), "a!b:c");
 
-    query("ft:normalize('&#778;', map { 'stemming': true(), 'language': 'de' })", "");
+    query(_FT_NORMALIZE.args("&#778;", " map { 'stemming': true(), 'language': 'de' }"), "");
     query("'/' ! " + func.args(" ."), "/");
 
-    query("ft:normalize('a*', map { 'stemming': true(), 'language': 'de' })", "a*");
+    query(_FT_NORMALIZE.args("a*", " map { 'stemming': true(), 'language': 'de' }"), "a*");
   }
 
   /** Test method. */

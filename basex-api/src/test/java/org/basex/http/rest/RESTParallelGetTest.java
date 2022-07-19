@@ -1,5 +1,6 @@
 package org.basex.http.rest;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
@@ -39,7 +40,7 @@ public final class RESTParallelGetTest extends HTTPTest {
    * @throws Exception exception
    */
   @Test public void test() throws Exception {
-    get(200, "", "command", "create db " + REST + " <a/>");
+    get(200, "", "command", "CREATE DB " + REST + " <a/>");
 
     // start and join concurrent clients
     final Client[] clients = new Client[CLIENTS];
@@ -48,7 +49,7 @@ public final class RESTParallelGetTest extends HTTPTest {
     for(final Client c : clients) c.start();
     for(final Client c : clients) c.join();
 
-    get(200, "", "command", "drop db " + REST);
+    get(200, "", "command", "DROP DB " + REST);
     if(failed != null) fail(failed);
   }
 
@@ -61,8 +62,8 @@ public final class RESTParallelGetTest extends HTTPTest {
           final double rnd = Math.random();
           final boolean query = rnd < 1 / 3.0d, delete = rnd > 2 / 3.0d;
           if(query) get(200, '/' + REST, "query", "count(.)");
-          else if(delete) get(200, '/' + REST, "query", "db:delete('rest', '/')");
-          else get(200, '/' + REST, "query", "db:add('rest', <a/>, 'x')");
+          else if(delete) get(200, '/' + REST, "query", _DB_DELETE.args("rest", "/"));
+          else get(200, '/' + REST, "query", _DB_ADD.args("rest", " <a/>", "x"));
         }
       } catch(final IOException ex) {
         failed = ex.getMessage();

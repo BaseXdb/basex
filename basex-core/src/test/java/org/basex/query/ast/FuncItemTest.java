@@ -78,7 +78,7 @@ public final class FuncItemTest extends QueryPlanTest {
   /** Checks if statically unused functions are compiled at runtime. */
   @Test public void compStatUnusedTest() {
     check("declare function local:foo() { abs(?) };" +
-        "function-lookup(xs:QName(('local:foo')[random:double() < 1]), 0)()(-42)",
+        "function-lookup(xs:QName(('local:foo')[" + _RANDOM_DOUBLE.args() + " < 1]), 0)()(-42)",
         42,
         empty(Util.className(StaticFuncs.class) + "/*")
     );

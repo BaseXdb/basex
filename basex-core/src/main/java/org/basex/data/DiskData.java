@@ -236,7 +236,7 @@ public final class DiskData extends Data {
 
   @Override
   public synchronized void finishUpdate(final MainOptions opts) {
-    // OPTIMIZE ALL / db:optimize(..., true) will close the database before this function is called
+    // OPTIMIZE ALL will close the database before this function is called
     if(closed) return;
 
     // remove updating file

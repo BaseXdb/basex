@@ -60,7 +60,7 @@ public final class HofModuleTest extends QueryPlanTest {
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 5", " function($a, $b) { 0 * random:double() + $b }"),
+    check(func.args(" 1 to 5", " function($a, $b) { 0 * " + _RANDOM_DOUBLE.args() + " + $b }"),
         5,
         exists(Int.class),
         empty(func),

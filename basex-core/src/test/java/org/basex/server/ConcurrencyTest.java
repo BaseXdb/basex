@@ -1,5 +1,6 @@
 package org.basex.server;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
@@ -24,7 +25,7 @@ public final class ConcurrencyTest extends SandboxTest {
   private static final String FILE = "src/test/resources/factbook.zip";
   /** Test queries. */
   private static final String [] QUERIES = {
-    "(db:open('" + NAME + "')//province)[position() < 10] ! (insert node <test/> into .)",
+   _DB_OPEN.args(NAME) + "//province)[position() < 10] ! (insert node <test/> into .)",
     "(1 to 100000)[. = 0]"
   };
 

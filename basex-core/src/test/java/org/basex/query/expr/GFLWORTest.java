@@ -158,7 +158,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if multiple successive where clauses are merged into one. */
   @Test public void mergeWheresTest() {
-    check("let $rnd := random:double() where $rnd div 2 >= 0.2 where $rnd < 0.5 " +
+    check("let $rnd := " + _RANDOM_DOUBLE.args() + " where $rnd div 2 >= 0.2 where $rnd < 0.5 " +
         "where round(2 * $rnd) eq 1 return $rnd",
         null,
         root(IterFilter.class)
@@ -245,7 +245,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if where clauses containing non-deterministic expressions are left alone. */
   @Test public void dontSlideWhereNDT() {
-    check("for $x in 1 to 100 where random:double() gt 0.5 return $x",
+    check("for $x in 1 to 100 where " + _RANDOM_DOUBLE.args() + " gt 0.5 return $x",
         null,
         "exactly-one(//Where) >> exactly-one(//For)"
     );
@@ -253,7 +253,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Tests if let clauses containing non-deterministic expressions are left alone. */
   @Test public void dontSlideLetNDT() {
-    check("for $i in 1 to 10 let $rnd := random:double() return $i * $rnd",
+    check("for $i in 1 to 10 let $rnd := " + _RANDOM_DOUBLE.args() + " return $i * $rnd",
         null,
         empty(Let.class),
         exists(ItemMap.class)
@@ -359,7 +359,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Ensures that non-deterministic expressions are rewritten to a simple map. */
   @Test public void inlineNDTTest() {
-    check("let $rnd := random:double() return (1 to 10) ! $rnd",
+    check("let $rnd := " + _RANDOM_DOUBLE.args() + " return (1 to 10) ! $rnd",
         null,
         empty(Let.class),
         root(IterMap.class),
@@ -369,7 +369,7 @@ public final class GFLWORTest extends QueryPlanTest {
 
   /** Checks that clauses can be removed during inlining. */
   @Test public void gh1150() {
-    check("for $i in 1 to xs:integer(random:double()) "
+    check("for $i in 1 to xs:integer(" + _RANDOM_DOUBLE.args() + ") "
         + "let $x := 'does-not-exist.xml' "
         + "for $x in try { doc($x) } catch * { 1 }"
         + "let $x := count($x) "
@@ -432,7 +432,7 @@ public final class GFLWORTest extends QueryPlanTest {
   /** Allowing empty. */
   @Test public void allowingEmpty() {
     check("for $x allowing empty in () return $x", "", empty());
-    check("for $x allowing empty in prof:void(1) return $x", "", exists(GFLWOR.class));
+    check("for $x allowing empty in" + _PROF_VOID.args(1) + " return $x", "", exists(GFLWOR.class));
   }
 
   /** Merge for/let clauses. */
@@ -452,6 +452,6 @@ public final class GFLWORTest extends QueryPlanTest {
   /** Remove clauses that will never be executed. */
   @Test public void gh1999() {
     check("for $a in () return delete node a", "", empty());
-    check("for $a in prof:void(1) return delete node a", "", root(_PROF_VOID));
+    check("for $a in" + _PROF_VOID.args(1) + " return delete node a", "", root(_PROF_VOID));
   }
 }

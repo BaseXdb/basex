@@ -1,5 +1,7 @@
 package org.basex.query.simple;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 
 /**
@@ -228,8 +230,9 @@ public final class SimpleTest extends QueryTest {
       { "Limits 11", "0 to 9223372036854775807" },
       { "Limits 11", "-9223372036854775807 to 9223372036854775807" },
 
-      { "Empty 1", strings(""), "format-integer(let $x := random:integer() return (), '0')" },
-      { "Empty 2", empty(), "math:sin(let $x := random:integer() return ())" },
+      { "Empty 1", strings(""), "format-integer(let $x := " + _RANDOM_INTEGER.args() +
+        " return (), '0')" },
+      { "Empty 2", empty(), "math:sin(let $x := " + _RANDOM_INTEGER.args() + " return ())" },
       { "Empty 3", booleans(true), "let $a := () return empty($a)" },
       { "Empty 4", booleans(false), "let $a := () return exists($a)" },
       { "Empty 5", booleans(true), "declare function local:foo($x as empty-sequence())"

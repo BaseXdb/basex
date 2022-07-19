@@ -75,7 +75,7 @@ public abstract class Session implements Closeable {
   public abstract void add(String path, InputStream input) throws IOException;
 
   /**
-   * Replaces a document in an open database.
+   * Replaces a document in the opened database.
    * @param path document(s) to replace
    * @param input new content
    * @throws IOException I/O exception
@@ -83,7 +83,7 @@ public abstract class Session implements Closeable {
   public abstract void replace(String path, InputStream input) throws IOException;
 
   /**
-   * Stores binary data in an open database.
+   * Stores binary data in the opened database.
    * @param path target path
    * @param input binary input
    * @throws IOException I/O exception

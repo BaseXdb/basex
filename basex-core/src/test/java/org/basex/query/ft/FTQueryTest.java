@@ -70,16 +70,17 @@ public final class FTQueryTest extends SandboxTest {
   /** Removal of scoring propagation. */
   @Test public void gh1981() {
     // scoring
-    query("('a b' ! ft:score(. contains text 'a' ftand 'b')) > 0", true);
+    query("('a b' !" + _FT_SCORE.args(" . contains text 'a' ftand 'b'") + ") > 0", true);
     query("let score $s := 'a' contains text 'a' return $s > 0", true);
     query("let score $s := 'a b' contains text 'a' ftand 'b' return $s > 0", true);
 
     // no scoring
-    query("('a b' ! ft:score(. contains text 'a' and . contains text 'b')) > 0", false);
+    query("('a b' !" + _FT_SCORE.args(" . contains text 'a' and . contains text 'b'") + ") > 0",
+        false);
     query("let score $s := 'a b' contains text 'a' and 'a' contains text 'b' return $s > 0", false);
   }
 
-  /** XQuery, ft:search: Levenshtein errors. */
+  /** XQuery, full-text search: Levenshtein errors. */
   @Test public void gh1673() {
     query(_DB_CREATE.args(NAME, " <x>1</x>", NAME, " map { 'ftindex': true() }"));
 

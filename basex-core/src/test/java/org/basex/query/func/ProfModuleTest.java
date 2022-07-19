@@ -78,7 +78,7 @@ public final class ProfModuleTest extends SandboxTest {
   @Test public void variables() {
     final Function func = _PROF_VARIABLES;
     query("for $x in 1 to 2 return " + func.args(), "");
-    query(func.args() + ", let $x := random:double() return floor($x * $x)", 0);
+    query(func.args() + ", let $x := " + _RANDOM_DOUBLE.args() + " return floor($x * $x)", 0);
   }
 
   /** Test method. */

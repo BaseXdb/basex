@@ -208,7 +208,7 @@ final class WebDAVService {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  void retrieve(final String db, final String path, final boolean binary, final OutputStream out)
+  void get(final String db, final String path, final boolean binary, final OutputStream out)
       throws IOException {
 
     session().setOutputStream(out);

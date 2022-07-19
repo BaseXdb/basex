@@ -56,7 +56,7 @@ public final class RequestModuleTest extends HTTPTest {
     final ApiFunction func = _REQUEST_PATH;
     put(null, NAME);
     get("/rest/", "", "query", func.args());
-    get("/rest/" + NAME, NAME + "", "query", func.args());
+    get("/rest/" + NAME, NAME, "query", func.args());
     delete(200, NAME);
   }
 

@@ -85,7 +85,7 @@ public final class ArrayModuleTest extends QueryPlanTest {
         + nested
         + "return deep-equal("
         + "  for $it in " + func.args(" $nested")
-        + "  where random:double() le 1"
+        + "  where " + _RANDOM_DOUBLE.args() + " le 1"
         + "  return $it,"
         + "  local:flatten($nested)"
         + ")",

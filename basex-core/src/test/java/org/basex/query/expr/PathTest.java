@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.path.*;
@@ -35,7 +37,7 @@ public final class PathTest extends QueryPlanTest {
   @Test public void onePredicate() {
     query("//ul/li['']", "");
     query("//ul/li['x']", LI1 + '\n' + LI2);
-    query("//ul/li[<a b='{ random:integer() }'/>]", LI1 + '\n' + LI2);
+    query("//ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>]", LI1 + '\n' + LI2);
 
     query("//ul/li[0]", "");
     query("//ul/li[1]", LI1);
@@ -65,7 +67,7 @@ public final class PathTest extends QueryPlanTest {
     // return first
     query("//ul/li[''][1]", "");
     query("//ul/li['x'][1]", LI1);
-    query("//ul/li[<a b='{ random:integer() }'/>][1]", LI1);
+    query("//ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>][1]", LI1);
 
     query("//ul/li[0][1]", "");
     query("//ul/li[1][1]", LI1);
@@ -75,7 +77,7 @@ public final class PathTest extends QueryPlanTest {
     // return second
     query("//ul/li[''][2]", "");
     query("//ul/li['x'][2]", LI2);
-    query("//ul/li[<a b='{ random:integer() }'/>][2]", LI2);
+    query("//ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>][2]", LI2);
 
     query("//ul/li[0][2]", "");
     query("//ul/li[1][2]", "");
@@ -85,7 +87,7 @@ public final class PathTest extends QueryPlanTest {
     // return last
     query("//ul/li[''][last()]", "");
     query("//ul/li['x'][last()]", LI2);
-    query("//ul/li[<a b='{ random:integer() }'/>][last()]", LI2);
+    query("//ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>][last()]", LI2);
 
     query("//ul/li[0][last()]", "");
     query("//ul/li[1][last()]", LI1);
@@ -95,7 +97,8 @@ public final class PathTest extends QueryPlanTest {
     // multiple positions
     query("//ul/li[''][position() = 1 to 2]", "");
     query("//ul/li['x'][position() = 1 to 2]", LI1 + '\n' + LI2);
-    query("//ul/li[<a b='{ random:integer() }'/>][position() = 1 to 2]", LI1 + '\n' + LI2);
+    query("//ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>]"
+        + "[position() = 1 to 2]", LI1 + '\n' + LI2);
 
     query("//ul/li[0][position() = 1 to 2]", "");
     query("//ul/li[1][position() = 1 to 2]", LI1);
@@ -106,7 +109,8 @@ public final class PathTest extends QueryPlanTest {
     // variable position
     query("for $i in 1 to 2 return //ul/li[''][$i]", "");
     query("for $i in 1 to 2 return //ul/li['x'][$i]", LI1 + '\n' + LI2);
-    query("for $i in 1 to 2 return //ul/li[<a b='{ random:integer() }'/>][$i]", LI1 + '\n' + LI2);
+    query("for $i in 1 to 2 return //ul/li"
+        + "[<a b='{" + _RANDOM_INTEGER.args() + " }'/>][$i]", LI1 + '\n' + LI2);
 
     query("for $i in 1 to 2 return //ul/li[0][$i]", "");
     query("for $i in 1 to 2 return //ul/li[1][$i]", LI1);
@@ -117,7 +121,7 @@ public final class PathTest extends QueryPlanTest {
     // variable predicates
     query("for $i in (1, 'a') return //ul/li[''][$i]", "");
     query("for $i in (1, 'a') return //ul/li['x'][$i]", LI1 + '\n' + LI1 + '\n' + LI2);
-    query("for $i in (1, 'a') return //ul/li[<a b='{ random:integer() }'/>][$i]",
+    query("for $i in (1, 'a') return //ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>][$i]",
         LI1 + '\n' + LI1 + '\n' + LI2);
 
     query("for $i in (1, 'a') return //ul/li[0][$i]", "");
@@ -132,7 +136,7 @@ public final class PathTest extends QueryPlanTest {
     // return first
     query("//ul/li[1]['']", "");
     query("//ul/li[1]['x']", LI1);
-    query("//ul/li[1][<a b='{ random:integer() }'/>]", LI1);
+    query("//ul/li[1][<a b='{" + _RANDOM_INTEGER.args() + " }'/>]", LI1);
 
     query("//ul/li[1][0]", "");
     query("//ul/li[1][1]", LI1);
@@ -142,7 +146,7 @@ public final class PathTest extends QueryPlanTest {
     // return second
     query("//ul/li[2]['']", "");
     query("//ul/li[2]['x']", LI2);
-    query("//ul/li[2][<a b='{ random:integer() }'/>]", LI2);
+    query("//ul/li[2][<a b='{" + _RANDOM_INTEGER.args() + " }'/>]", LI2);
 
     query("//ul/li[2][0]", "");
     query("//ul/li[2][1]", LI2);
@@ -152,7 +156,7 @@ public final class PathTest extends QueryPlanTest {
     // return second
     query("//ul/li[3]['']", "");
     query("//ul/li[3]['x']", "");
-    query("//ul/li[3][<a b='{ random:integer() }'/>]", "");
+    query("//ul/li[3][<a b='{" + _RANDOM_INTEGER.args() + " }'/>]", "");
 
     query("//ul/li[3][0]", "");
     query("//ul/li[3][1]", "");
@@ -162,7 +166,7 @@ public final class PathTest extends QueryPlanTest {
     // return last
     query("//ul/li[last()]['']", "");
     query("//ul/li[last()]['x']", LI2);
-    query("//ul/li[last()][<a b='{ random:integer() }'/>]", LI2);
+    query("//ul/li[last()][<a b='{" + _RANDOM_INTEGER.args() + " }'/>]", LI2);
 
     query("//ul/li[last()][0]", "");
     query("//ul/li[last()][1]", LI2);
@@ -172,7 +176,8 @@ public final class PathTest extends QueryPlanTest {
     // multiple positions
     query("//ul/li[position() = 1 to 2]['']", "");
     query("//ul/li[position() = 1 to 2]['x']", LI1 + '\n' + LI2);
-    query("//ul/li[position() = 1 to 2][<a b='{ random:integer() }'/>]", LI1 + '\n' + LI2);
+    query("//ul/li[position() = 1 to 2]"
+        + "[<a b='{" + _RANDOM_INTEGER.args() + " }'/>]", LI1 + '\n' + LI2);
 
     query("//ul/li[position() = 1 to 2][0]", "");
     query("//ul/li[position() = 1 to 2][1]", LI1);
@@ -183,7 +188,8 @@ public final class PathTest extends QueryPlanTest {
     // variable position
     query("for $i in 1 to 2 return //ul/li[$i]['']", "");
     query("for $i in 1 to 2 return //ul/li[$i]['x']", LI1 + '\n' + LI2);
-    query("for $i in 1 to 2 return //ul/li[$i][<a b='{ random:integer() }'/>]", LI1 + '\n' + LI2);
+    query("for $i in 1 to 2 return //ul/li[$i]"
+        + "[<a b='{" + _RANDOM_INTEGER.args() + " }'/>]", LI1 + '\n' + LI2);
 
     query("for $i in 1 to 2 return //ul/li[$i][0]", "");
     query("for $i in 1 to 2 return //ul/li[$i][1]", LI1 + '\n' + LI2);
@@ -193,7 +199,7 @@ public final class PathTest extends QueryPlanTest {
     // variable predicates
     query("for $i in (1, 'a') return //ul/li[$i]['']", "");
     query("for $i in (1, 'a') return //ul/li[$i]['x']", LI1 + '\n' + LI1 + '\n' + LI2);
-    query("for $i in (1, 'a') return //ul/li[$i][<a b='{ random:integer() }'/>]",
+    query("for $i in (1, 'a') return //ul/li[$i][<a b='{" + _RANDOM_INTEGER.args() + " }'/>]",
         LI1 + '\n' + LI1 + '\n' + LI2);
 
     query("for $i in (1, 'a') return //ul/li[$i][0]", "");

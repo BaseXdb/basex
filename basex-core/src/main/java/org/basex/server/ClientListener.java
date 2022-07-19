@@ -317,7 +317,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   /**
-   * Replace a document in a database.
+   * Replace a document in the opened database.
    * @throws IOException I/O exception
    */
   private void replace() throws IOException {
@@ -325,7 +325,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   /**
-   * Stores binary data in a database.
+   * Stores a binary resource in the opened database.
    * @throws IOException I/O exception
    */
   private void store() throws IOException {

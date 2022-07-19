@@ -50,7 +50,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(1), 1, empty(func));
 
     // function is replaced by its argument (argument yields no result)
-    check(func.args(" prof:void(())"), "", empty(func));
+    check(func.args(_PROF_VOID.args(" ()")), "", empty(func));
     // check adjusted type
     check(func.args(wrap(1)), 1, type(func, "xs:double"));
     check(func.args(wrap(1) + "! array { . }"), 1, type(func, "xs:double"));
@@ -99,7 +99,7 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = AVG;
 
     check(func.args(" ()"), "", empty());
-    check(func.args(" prof:void('x')"), "", empty(func));
+    check(func.args(_PROF_VOID.args("X")), "", empty(func));
 
     check(func.args(" 1"), 1, empty(func));
     check(func.args(" 1.0"), 1, empty(func));
@@ -125,11 +125,11 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1 to 3) ! 1"), 1, empty(func));
     check(func.args(" (1 to 3) ! xs:untypedAtomic(1)"), 1, empty(func));
 
-    check(func.args(" util:replicate(1.0, 3)"), 1, empty(func));
-    check(func.args(" util:replicate(" + wrap(1) + ", 3)"), 1, type(func, "xs:double"));
+    check(func.args(_UTIL_REPLICATE.args(1.0, 3)), 1, empty(func));
+    check(func.args(_UTIL_REPLICATE.args(wrap(1), 3)), 1, type(func, "xs:double"));
 
     error(func.args(" true#0"), FIATOM_X_X);
-    error(func.args(" util:replicate(true#0, 2)"), FIATOM_X_X);
+    error(func.args(_UTIL_REPLICATE.args(" true#0", 2)), FIATOM_X_X);
     error(func.args(" (1 to 999999) ! true#0"), FIATOM_X_X);
   }
 
@@ -194,7 +194,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
-    check(func.args(" prof:void(1)"), "", root(_PROF_VOID));
+    check(func.args(_PROF_VOID.args(1)), "", root(_PROF_VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
 
     // remove duplicate expressions
@@ -275,7 +275,7 @@ public final class FnModuleTest extends QueryPlanTest {
         func.args("A", 1, " ."), "A");
 
     query(func.args(" ()", 1, " function($a, $b) { $b }"), 1);
-    query(func.args(" prof:void(1)", 1, " function($a, $b) { $b }"), 1);
+    query(func.args(_PROF_VOID.args(1), 1, " function($a, $b) { $b }"), 1);
     query(func.args(2, 1, " function($a, $b) { $b }"), 2);
     query("sort(" + func.args(" <a/>", "a", " compare#2") + ")", 1);
 
@@ -312,7 +312,7 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 2 to 5", 1, " function($a, $b) { $b[random:double()] }"), "",
+    check(func.args(" 2 to 5", 1, " function($a, $b) { $b[" + _RANDOM_DOUBLE.args() + "] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
   }
@@ -333,7 +333,7 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(func),
         exists(Int.class));
     // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 4", 10, " function($a, $b) { $b[random:double()] }"), "",
+    check(func.args(" 1 to 4", 10, " function($a, $b) { $b[" + _RANDOM_DOUBLE.args() + "] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
   }
@@ -357,7 +357,7 @@ public final class FnModuleTest extends QueryPlanTest {
         "1\n2\n3\n4\n5\n6\n7\n8\n9",
         empty(func),
         root(RangeSeq.class), exists(RangeSeq.class));
-    check(func.args(" 1 to 9", " function($x) { $x[random:double()] }"), "",
+    check(func.args(" 1 to 9", " function($x) { $x[" + _RANDOM_DOUBLE.args() + "] }"), "",
         empty(func),
         exists(DualMap.class), exists(_RANDOM_DOUBLE));
     check(func.args(" 0 to 10", " function($x) { $x idiv 2 }"),
@@ -433,24 +433,29 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1, error())"), 1, exists(Int.class));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 3, exists(_UTIL_LAST));
 
-    check(func.args(" util:init((<a/>, <b/>, <c/>))"), "<a/>", empty(_UTIL_INIT));
-    check(func.args(" util:init((<a/>, <b/>))"), "<a/>", empty(_UTIL_INIT));
-    check(func.args(" util:init((<a/>))"), "", empty());
-    check(func.args(" util:init((1, 2)[. = 0])"), "", exists(_UTIL_INIT));
+    check(func.args(_UTIL_INIT.args(" (<a/>, <b/>, <c/>)")), "<a/>", empty(_UTIL_INIT));
+    check(func.args(_UTIL_INIT.args(" (<a/>, <b/>) ")), "<a/>", empty(_UTIL_INIT));
+    check(func.args(_UTIL_INIT.args(" <a/>")), "", empty());
+    check(func.args(_UTIL_INIT.args(" (1, 2)[. = 0]")), "", exists(_UTIL_INIT));
 
     check(func.args(" tail((<a/>, <b/>, <c/>[. = '']))"), "<b/>", root(CElem.class));
     check(func.args(" tail((<a/>, <b/>, <c/>))"), "<b/>", root(CElem.class));
 
-    check(func.args(" subsequence((<a/>, <b/>)," + wrap(1) + ")"), "<a/>", exists(SUBSEQUENCE));
-    check(func.args(" subsequence((<a/>, <b/>, <c/>, <d/>), 2, 2)"), "<b/>", root(CElem.class));
-    check(func.args(" util:range((<a/>, <b/>, <c/>, <d/>), 2, 3)"), "<b/>", root(CElem.class));
+    check(func.args(" subsequence((<a/>, <b/>)," + wrap(1) + ")"), "<a/>",
+        exists(SUBSEQUENCE));
+    check(func.args(" subsequence((<a/>, <b/>, <c/>, <d/>), 2, 2)"), "<b/>",
+        root(CElem.class));
+    check(func.args(_UTIL_RANGE.args(" (<a/>, <b/>, <c/>, <d/>)", 2, 3)), "<b/>",
+        root(CElem.class));
 
-    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
-    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>",
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
         root(IterFilter.class), empty(_UTIL_REPLICATE));
-    check(func.args(" util:replicate((<a/>, <b/>)[. = ''], 2)"), "<a/>",
+
+    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<a/>",
         root(HEAD), empty(_UTIL_REPLICATE));
-    check(func.args(" util:replicate(<a/>, <_>2</_>)"), "<a/>", exists(_UTIL_REPLICATE));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>",
+        exists(_UTIL_REPLICATE));
 
     check(func.args(" (1, <a/>)"), 1, root(Int.class));
     check(func.args(" (1 to 2, <a/>)"), 1, root(Int.class));
@@ -573,7 +578,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // query plan checks
     check(func.args(" ()"), "", empty());
-    check(func.args(" prof:void(123)"), "", empty(func));
+    check(func.args(_PROF_VOID.args(123)), "", empty(func));
     check(func.args(" 123"), 123, empty(func));
     check(func.args(wrap(1)), 1, exists(func));
     check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Int.class));
@@ -735,7 +740,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // known result size
     query(func.args(wrap(1) + "+ 1", 1), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3), 1"), 3);
-    query(func.args(" prof:void(())", 1), "");
+    query(func.args(_PROF_VOID.args(" ()"), 1), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]", 1), "");
@@ -758,7 +763,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // known result size, dynamic position
     query(func.args(wrap(1) + "+ 1", wrap(1)), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3), 1"), 3);
-    query(func.args(" prof:void(())", wrap(1)), "");
+    query(func.args(_PROF_VOID.args(" ()"), wrap(1)), "");
 
     // unknown result size, dynamic position
     query(func.args(wrap(1) + "[. = 0]", wrap(1)), "");
@@ -831,9 +836,9 @@ public final class FnModuleTest extends QueryPlanTest {
         1, exists(_UTIL_INIT));
     check(func.args(" (" + func.args(" (1 to 2)[. > 0]") + ")[position() < last()]"),
         2, exists(TAIL));
-    check(func.args(" util:replicate(<a/>, 2)"),
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)),
         "<a/>\n<a/>", empty(func));
-    check(func.args(" util:replicate((<a/>, <b/>), 2)"),
+    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)", 2)),
         null, exists(func));
     check(func.args(" (1, <a/>[. = ''])"),
         "<a/>\n1", root(List.class));
@@ -895,10 +900,10 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func));
     check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func));
 
-    check("(random:double() => util:replicate(10) => " + func.args() + ")[. > 1]", "",
-        empty(func));
-    check("(random:double() => util:replicate(10, true()) => " + func.args() + ")[. > 1]", "",
-        exists(func));
+    check("(" + _RANDOM_DOUBLE.args() + " =>" + _UTIL_REPLICATE.args(10) + " => " +
+        func.args() + ")[. > 1]", "", empty(func));
+    check("(" + _RANDOM_DOUBLE.args() + " => " + _UTIL_REPLICATE.args(10, true) + " => " +
+        func.args() + ")[. > 1]", "", exists(func));
 
     error(func.args(" true#0"), FIATOM_X_X);
     error(func.args(" (1 to 2) ! true#0"), FIATOM_X_X);
@@ -934,7 +939,7 @@ public final class FnModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void stringJoin() {
     final Function func = STRING_JOIN;
-    check(func.args(" util:chars(" + wrap("ABC") + ")"), "ABC", root(STRING));
+    check(func.args(_UTIL_CHARS.args(wrap("ABC"))), "ABC", root(STRING));
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ") ! codepoints-to-string(.)"),
         "ABC", root(STRING));
   }
@@ -1001,8 +1006,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (" + wrap(1) + "+ 1, 2)", 2), 2);
     query(func.args(" (" + wrap(1) + "+ 1, 2)", 3), "");
     query(func.args(" (" + wrap(1) + "+ 1, 2, 3)", 2) + "[2]", 3);
-    query(func.args(" prof:void(())", 1), "");
-    query(func.args(" prof:void(())", 2), "");
+    query(func.args(_PROF_VOID.args(" ()"), 1), "");
+    query(func.args(_PROF_VOID.args(" ()"), 2), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]", 1), "");
@@ -1069,9 +1074,12 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (<_/>, <_/>, <_/>)", 4, 0), "");
     query(func.args(" (<_/>, <_/>, <_/>)", 4, 1), "");
 
-    check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2, 2), "<b/>\n<c/>", root(List.class));
-    check(func.args(" util:replicate(<a/>, 5)", 2, 2), "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check(func.args(" util:replicate(<a/>, 5)", 2, 3), "<a/>\n<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2, 2), "<b/>\n<c/>",
+        root(List.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 5), 2, 2), "<a/>\n<a/>",
+        root(_UTIL_REPLICATE));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 5), 2, 3), "<a/>\n<a/>\n<a/>",
+        root(_UTIL_REPLICATE));
 
     query("sort(" + func.args(" tokenize(<_/>)", 3) + ')', "");
   }
@@ -1159,14 +1167,14 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ()", "A"), "A");
     query(func.args(" ()", " 1"), 1);
     query(func.args(" ()", " ()"), "");
-    query(func.args(" ()", " prof:void('x')"), "");
+    query(func.args(" ()", _PROF_VOID.args("x")), "");
 
-    query("for $i in 1 to 2 return " + func.args(" prof:void('x')", " $i"), "1\n2");
-    query(func.args(" prof:void('x')", wrap(0)), 0);
-    query(func.args(" prof:void('x')", "A"), "A");
-    query(func.args(" prof:void('x')", " 1"), 1);
-    query(func.args(" prof:void('x')", " ()"), "");
-    query(func.args(" prof:void('x')", " prof:void('x')"), "");
+    query("for $i in 1 to 2 return " + func.args(_PROF_VOID.args("x"), " $i"), "1\n2");
+    query(func.args(_PROF_VOID.args("x"), wrap(0)), 0);
+    query(func.args(_PROF_VOID.args("x"), "A"), "A");
+    query(func.args(_PROF_VOID.args("x"), " 1"), 1);
+    query(func.args(_PROF_VOID.args("x"), " ()"), "");
+    query(func.args(_PROF_VOID.args("x"), _PROF_VOID.args("x")), "");
 
     query(func.args(" 2 to 10"), 54);
     query(func.args(" 9 to 10"), 19);
@@ -1206,7 +1214,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // known result size
     query(func.args(wrap(1) + "+ 1"), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3)"), 3);
-    query(func.args(" prof:void(())"), "");
+    query(func.args(_PROF_VOID.args(" ()")), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]"), "");
@@ -1224,12 +1232,12 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(func.args(" tokenize(<_>X Y Z</_>)")), "Z");
     query(func.args(" subsequence(tokenize(<_>W X Y Z</_>), 3)"), "Z");
     query(func.args(" subsequence(tokenize(<_/>)," + wrap(1) + ")"), "");
-    query(func.args(" util:range(tokenize(<_>W X Y Z</_>), 3, 4)"), "Z");
-    query(func.args(" util:range(tokenize(<_/>)," + wrap(1) + ", 1)"), "");
+    query(func.args(_UTIL_RANGE.args(" tokenize(<_>W X Y Z</_>)", 3, 4)), "Z");
+    query(func.args(_UTIL_RANGE.args(" tokenize(<_/>)," + wrap(1), 1)), "");
 
-    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
-    check(func.args(" util:replicate(<a/>, 3)"), "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>", root(IterFilter.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 3)), "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>", root(IterFilter.class));
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class), empty(TAIL));
     check(func.args(" (<a/>, <b/>, <c/>)"), "<b/>\n<c/>", root(List.class), empty(TAIL));

@@ -1,5 +1,6 @@
 package org.basex.http.rest;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -55,8 +56,8 @@ public final class RESTPutTest extends RESTTest {
     put(new ArrayInput(token("<a>A</a>")), NAME + "/a");
     put(new ArrayInput(token("<b>B</b>")), NAME + "/b");
     get("2", NAME, "query", "count(//text())");
-    get("2", "", "query", "count(db:open('" + NAME + "')//text())");
-    get("1", "", "query", "count(db:open('" + NAME + "','b')/*)");
+    get("2", "", "query", "count(" + _DB_OPEN.args(NAME) + "//text())");
+    get("1", "", "query", "count(" + _DB_OPEN.args(NAME, "b") + "/*)");
     delete(200, NAME);
   }
 

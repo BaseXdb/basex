@@ -2,6 +2,7 @@ package org.basex.query;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,7 +58,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void insertIntoShiftPreValues() {
     create(12);
-    query("insert node <b xmlns:ns='A'/> into db:open('d12')/*:a/*:b");
+    query("insert node <b xmlns:ns='A'/> into" + _DB_OPEN.args("d12") + "/*:a/*:b");
     assertEquals(NL +
         "  Pre[3] xmlns:ns=\"A\"" + NL +
         "  Pre[4] xmlns=\"B\"",
@@ -70,7 +71,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void insertIntoShiftPreValues2() {
     create(13);
-    query("insert node <c/> as first into db:open('d13')/a");
+    query("insert node <c/> as first into" + _DB_OPEN.args("d13") + "/a");
     assertEquals(NL +
         "  Pre[3] xmlns=\"A\"",
         context.data().nspaces.toString());
@@ -82,7 +83,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void insertIntoShiftPreValues3() {
     create(14);
-    query("insert node <n xmlns='D'/> into db:open('d14')/*:a/*:b");
+    query("insert node <n xmlns='D'/> into" + _DB_OPEN.args("d14") + "/*:a/*:b");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[2] xmlns=\"B\"" + NL +
@@ -97,7 +98,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void deleteShiftPreValues() {
     create(12);
-    query("delete node db:open('d12')/a/b");
+    query("delete node" + _DB_OPEN.args("d12") + "/a/b");
     assertEquals(NL +
         "  Pre[2] xmlns=\"B\"",
         context.data().nspaces.toString());
@@ -109,7 +110,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void deleteShiftPreValues2() {
     create(14);
-    query("delete node db:open('d14')/*:a/*:b");
+    query("delete node" + _DB_OPEN.args("d14") + "/*:a/*:b");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[2] xmlns=\"C\"",
@@ -122,7 +123,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void deleteShiftPreValues3() {
     create(15);
-    query("delete node db:open('d15')/*:a/*:c");
+    query("delete node" + _DB_OPEN.args("d15") + "/*:a/*:c");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[2] xmlns=\"B\"" + NL +
@@ -136,7 +137,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void deleteShiftPreValues4() {
     create(16);
-    query("delete node db:open('d16')/a/b");
+    query("delete node" + _DB_OPEN.args("d16") + "/a/b");
     assertTrue(context.data().nspaces.toString().isEmpty());
   }
 
@@ -162,8 +163,8 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void delete1() {
     create(11);
-    query("delete node db:open('d11')/*:a/*:b",
-        "db:open('d11')/*:a",
+    query("delete node" + _DB_OPEN.args("d11") + "/*:a/*:b",
+        _DB_OPEN.args("d11") + "/*:a",
         "<a xmlns='A'><c xmlns:ns1='AA'><d/></c></a>");
   }
 
@@ -192,7 +193,7 @@ public final class NamespaceTest extends SandboxTest {
     create(4);
     query(
         "declare namespace a='aa';" +
-        "copy $c:=db:open('d4') modify () return $c//a:y",
+        "copy $c := " + _DB_OPEN.args("d4") + " modify () return $c//a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -203,7 +204,7 @@ public final class NamespaceTest extends SandboxTest {
     create(4);
     query(
         "declare namespace a='aa';" +
-        "copy $c:=db:open('d4')//a:y modify () return $c",
+        "copy $c := " + _DB_OPEN.args("d4") + "//a:y modify () return $c",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -222,8 +223,8 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void bogusDetector() {
     create(1);
     query(
-        "insert node <a xmlns='test'><b><c/></b><d/></a> into db:open('d1')/x",
-        "declare namespace na = 'test';db:open('d1')/x/na:a",
+        "insert node <a xmlns='test'><b><c/></b><d/></a> into" + _DB_OPEN.args("d1") + "/x",
+        "declare namespace na = 'test'; " + _DB_OPEN.args("d1") + "/x/na:a",
         "<a xmlns='test'><b><c/></b><d/></a>");
   }
 
@@ -248,7 +249,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void nsHierarchy() {
     create(9);
-    query("insert node <f xmlns='F'/> into db:open('d9')//*:e");
+    query("insert node <f xmlns='F'/> into" + _DB_OPEN.args("d9") + "//*:e");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[4] xmlns=\"D\"" + NL +
@@ -261,7 +262,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void nsHierarchy2() {
     create(10);
-    query("insert node <f xmlns='F'/> into db:open('d10')//*:e");
+    query("insert node <f xmlns='F'/> into" + _DB_OPEN.args("d10") + "//*:e");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\"" + NL +
         "    Pre[4] xmlns=\"D\"" + NL +
@@ -281,7 +282,7 @@ public final class NamespaceTest extends SandboxTest {
 
     // in-depth test
     create(2);
-    query("insert node <a xmlns='y'/> into db:open('d2')//*:x");
+    query("insert node <a xmlns='y'/> into" + _DB_OPEN.args("d2") + "//*:x");
     assertEquals(NL +
         "  Pre[1] xmlns=\"xx\"" + NL +
         "    Pre[2] xmlns=\"y\"",
@@ -311,8 +312,8 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void insertD2intoD1() {
     create(1, 2);
     query(
-        "insert node db:open('d2') into db:open('d1')/x",
-        "db:open('d1')",
+        "insert node" + _DB_OPEN.args("d2") + " into" + _DB_OPEN.args("d1") + "/x",
+        _DB_OPEN.args("d1"),
         "<x><x xmlns='xx'/></x>");
   }
 
@@ -322,8 +323,8 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void insertD3intoD1() {
     create(1, 3);
     query(
-        "insert node db:open('d3') into db:open('d1')/x",
-        "db:open('d1')/x/*",
+        "insert node" + _DB_OPEN.args("d3") + " into" + _DB_OPEN.args("d1") + "/x",
+        _DB_OPEN.args("d1") + "/x/*",
         "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>");
   }
 
@@ -333,8 +334,8 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void insertD3intoD1b() {
     create(1, 3);
     query(
-        "insert node db:open('d3') into db:open('d1')/x",
-        "db:open('d1')/x/*/*",
+        "insert node" + _DB_OPEN.args("d3") + " into" + _DB_OPEN.args("d1") + "/x",
+        _DB_OPEN.args("d1") + "/x/*/*",
         "<b:y xmlns:b='bb' xmlns:a='aa'/>");
   }
 
@@ -344,9 +345,9 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void insertD4intoD1() {
     create(1, 4);
     query(
-        "declare namespace a='aa'; insert node db:open('d4')/a:x/a:y " +
-        "into db:open('d1')/x",
-        "db:open('d1')/x",
+        "declare namespace a='aa'; insert node" + _DB_OPEN.args("d4") + "/a:x/a:y " +
+        "into" + _DB_OPEN.args("d1") + "/x",
+        _DB_OPEN.args("d1") + "/x",
         "<x><a:y xmlns:a='aa' xmlns:b='bb'/></x>");
   }
 
@@ -358,9 +359,9 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void insertD4intoD5() {
     create(4, 5);
     query(
-        "declare namespace a='aa';insert node db:open('d4')//a:y " +
-        "into db:open('d5')/a:x",
-        "declare namespace a='aa';db:open('d5')//a:y",
+        "declare namespace a='aa';insert node" + _DB_OPEN.args("d4") + "//a:y " +
+        "into" + _DB_OPEN.args("d5") + "/a:x",
+        "declare namespace a = 'aa'; " + _DB_OPEN.args("d5") + "//a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -370,8 +371,9 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void insertD7intoD1() {
     create(1, 7);
     query(
-        "declare namespace x='xx';insert node db:open('d7')/x:x into db:open('d1')/x",
-        "db:open('d1')/x",
+        "declare namespace x='xx';insert node" + _DB_OPEN.args("d7") + "/x:x into" +
+            _DB_OPEN.args("d1") + "/x",
+        _DB_OPEN.args("d1") + "/x",
         "<x><x xmlns='xx'><y/></x></x>");
   }
 
@@ -381,8 +383,9 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void insertD6intoD4() {
     create(4, 6);
     query(
-        "declare namespace a='aa';insert node db:open('d6') into db:open('d4')/a:x",
-        "declare namespace a='aa';db:open('d4')/a:x/a:y",
+        "declare namespace a = 'aa'; insert node" + _DB_OPEN.args("d6") + " into" +
+            _DB_OPEN.args("d4") + "/a:x",
+        "declare namespace a = 'aa'; " + _DB_OPEN.args("d4") + "/a:x/a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -423,7 +426,7 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void uriStack() {
     create(8);
     query(
-        "db:open('d8')",
+        _DB_OPEN.args("d8"),
         "<a><b xmlns='B'/><c/></a>");
   }
 
@@ -448,7 +451,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void queryPathOpt() {
     create(17);
-    query("db:open('d17')/descendant::*:b", "<b xmlns:ns='NS'/>");
+    query(_DB_OPEN.args("d17") + "/descendant::*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**
@@ -456,7 +459,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void queryPathOpt2() {
     create(17);
-    query("db:open('d17')/*:a/*:b", "<b xmlns:ns='NS'/>");
+    query(_DB_OPEN.args("d17") + "/*:a/*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**
@@ -695,12 +698,11 @@ public final class NamespaceTest extends SandboxTest {
   public void copyPreserveNoInheritPersistent() {
     query("declare copy-namespaces preserve, no-inherit;" +
         "declare namespace my = 'ns';" +
-        "let $v :=" +
-        "(copy $c := <my:n><my:a/></my:n>" +
+        "let $v := (copy $c := <my:n><my:a/></my:n>" +
         "modify insert node <new/> into $c " +
         "return $c)" +
-        "return insert node $v into db:open('d2')/n",
-        "namespace-uri-for-prefix('my', db:open('d2')//*:new)",
+        "return insert node $v into" + _DB_OPEN.args("d2") + "/n",
+        "namespace-uri-for-prefix('my'," + _DB_OPEN.args("d2") + "//*:new)",
         "");
   }
 
@@ -709,7 +711,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void defaultNS() {
     create(1);
-    query("<h xmlns='U'>{ db:open('d1')/x }</h>/*", "");
+    query("<h xmlns='U'>{" + _DB_OPEN.args("d1") + "/x }</h>/*", "");
   }
 
   /**

@@ -27,7 +27,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" [ 1, 2 ]"), "[1]\n[2]");
     query(func.args(" [ (1, 2) ]"), "[(1,2)]");
     query(func.args(" [ (1, 2), 3 ]"), "[(1,2)]\n[3]");
-    query(func.args(" array { <_>1</_> to 100000 }") + " => util:last()", "[100000]");
+    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + _UTIL_LAST.args(), "[100000]");
   }
 
   /** Test method. */
@@ -40,7 +40,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" [ 1, 2 ]"), "1\n2");
     query(func.args(" [ (1, 2) ]"), "1\n2");
     query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
-    query(func.args(" array { <_>1</_> to 100000 }") + " => util:last()", "100000");
+    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + _UTIL_LAST.args(), "100000");
   }
 
   /** Test method. */
@@ -52,9 +52,11 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" ()"), "", empty());
     query(func.args(""), "");
     query(func.args("abc"), "a\nb\nc");
-    query("count(" + func.args(" string-join(util:replicate('A', 100000))") + ')', 100000);
-    check("count(" + func.args(" string-join(util:replicate('A', 100000))") + ')', 100000,
-        empty(func), empty(STRING_LENGTH));
+
+    query("count(" + func.args(" string-join(" + _UTIL_REPLICATE.args("A", 100000) + ')') + ')',
+        100000);
+    check("count(" + func.args(" string-join(" + _UTIL_REPLICATE.args("A", 100000) + ')') + ')',
+        100000, empty(func), empty(STRING_LENGTH));
 
     // test iterative evaluation
     query(func.args(wrap("")), "");
@@ -67,10 +69,10 @@ public final class UtilModuleTest extends QueryPlanTest {
     query("subsequence(" + func.args(wrap("aeiou")) + ", 3)", "i\no\nu");
     query("subsequence(" + func.args(wrap("äeiöü")) + ", 3)", "i\nö\nü");
 
-    check("count(" + func.args(" string-join(util:replicate(" + wrap("A") + ", 100000))") + ')',
-        100000, exists(STRING_LENGTH));
-    check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)", "A\nB",
-        root(func));
+    check("count(" + func.args(" string-join(" +
+        _UTIL_REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));
+    check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)",
+        "A\nB", root(func));
   }
 
   /** Test method. */
@@ -231,9 +233,9 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" <a/>"), "<a/>");
     query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
 
-    check(func.args(" util:replicate((<a/>, <b/>), 10)"), "<a/>\n<b/>",
+    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)", 10)), "<a/>\n<b/>",
         empty(_UTIL_REPLICATE));
-    check(func.args(" util:replicate(<a/>, 2, true())"), "<a/>\n<a/>",
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2, true)), "<a/>\n<a/>",
         exists(_UTIL_REPLICATE));
 
     check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
@@ -335,7 +337,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     // known result size
     query(func.args(wrap(1) + "+ 1"), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3)"), 2);
-    query(func.args(" prof:void(())"), "");
+    query(func.args(_PROF_VOID.args(" ()")), "");
 
     // unknown result size
     query(func.args(" 1[. = 0]"), "");
@@ -364,9 +366,9 @@ public final class UtilModuleTest extends QueryPlanTest {
         "<a>1</a>\n<a>2</a>\n<a>3</a>\n<a>4</a>\n<a>5</a>\n<a>6</a>\n<a>7</a>\n<a>8</a>",
         root(DualMap.class));
 
-    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
-    check(func.args(" util:replicate(<a/>, 3)"), "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>", root(IterFilter.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 3)), "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>", root(IterFilter.class));
 
     check(func.args(" (<a/>, <b/>)"), "<a/>", root(CElem.class), empty(_UTIL_INIT));
     check(func.args(" (<a/>, <b/>, <c/>)"), "<a/>\n<b/>", root(List.class), empty(_UTIL_INIT));
@@ -437,7 +439,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" 1[. = 1]", wrap(1)), 1);
     query(func.args(" 1[. = 1]", wrap(2)), "");
 
-    check(func.args(" prof:void(())", 0), "", empty(func));
+    check(func.args(_PROF_VOID.args(" ()"), 0), "", empty(func));
     check(func.args(" (7 to 9)[. = 8]", -1), "", empty());
     check(func.args(" (7 to 9)[. = 8]", 0), "", empty());
     check(func.args(" (7 to 9)[. = 8]", 1.5), "", empty());
@@ -450,7 +452,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" tail((1, 2, 3, <_/>))", 2), 3, empty(TAIL));
     check(func.args(" tail((<_/>[data()], <_/>, <_/>))", 2), "", empty(TAIL), root(_UTIL_ITEM));
 
-    check(func.args(" util:init((1, 2, 3, <_/>))", 2), 2, empty(_UTIL_INIT));
+    check(func.args(_UTIL_INIT.args(" (1, 2, 3, <_/>)"), 2), 2, empty(_UTIL_INIT));
 
     check(func.args(" (7 to 9)[. = 8]", 1), 8, exists(HEAD), type(HEAD, "xs:integer?"));
 
@@ -460,9 +462,9 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" (<a/>, <b/>[data()], <c/>, <d/>)", 2), "<c/>", root(_UTIL_OR));
     check(func.args(" (<a/>[data()], <b/>, <c/>)", 2), "<c/>", root(_UTIL_ITEM));
 
-    check(func.args(" util:replicate(<a/>, 2)", 1), "<a/>", root(CElem.class));
-    check(func.args(" util:replicate(<a/>, 2)", 2), "<a/>", root(CElem.class));
-    check(func.args(" util:replicate(<a/>, 2)", 3), "", empty());
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2), 1), "<a/>", root(CElem.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2), 2), "<a/>", root(CElem.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2), 3), "", empty());
   }
 
   /** Test method. */
@@ -480,7 +482,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
     query(func.args(" (<a/>, <b/>)"), "<b/>");
 
-    check(func.args(" prof:void(())"), "", empty(func));
+    check(func.args(_PROF_VOID.args(" ()")), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
     check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(func, "element(a)|element(b)?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
@@ -494,15 +496,15 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" tail((1 to 2) ! <_>{.}</_>)"), "<_>2</_>", empty(TAIL));
     check(func.args(" tail((1 to 3) ! <_>{.}</_>)"), "<_>3</_>", empty(TAIL));
 
-    check(func.args(" util:init((1 to 3) ! <_>{.}</_>)"), "<_>2</_>", empty(_UTIL_INIT));
-    check(func.args(" util:init(tokenize(<a/>))"), "", exists(_UTIL_INIT));
+    check(func.args(_UTIL_INIT.args(" (1 to 3) ! <_>{.}</_>")), "<_>2</_>", empty(_UTIL_INIT));
+    check(func.args(_UTIL_INIT.args(" tokenize(<a/>)")), "", exists(_UTIL_INIT));
 
-    check(func.args(" util:replicate(<a/>, 2)"), "<a/>", root(CElem.class));
-    check(func.args(" util:replicate(<a/>[. = ''], 2)"), "<a/>",
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
         root(IterFilter.class), empty(_UTIL_REPLICATE));
-    check(func.args(" util:replicate((<a/>, <b/>)[. = ''], 2)"), "<b/>",
+    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<b/>",
         root(_UTIL_LAST), empty(_UTIL_REPLICATE));
-    check(func.args(" util:replicate(<a/>, <_>2</_>)"), "<a/>", exists(_UTIL_REPLICATE));
+    check(func.args(_UTIL_REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>", exists(_UTIL_REPLICATE));
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));
     check(func.args(" (<a/>, 1 to 2)"), 2, root(Int.class));
@@ -567,8 +569,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" (3, <_>4</_>)[. = 3]", " ()"), 3, root(IterFilter.class));
     check(func.args(" (4, <_>5</_>)[. = 4]", "<z/>"), 4, root(_UTIL_OR));
 
-    check(func.args(" prof:void(1)", 2), 2, root(List.class));
-    check(func.args(" prof:void(2)", " prof:void(3)"), "", root(List.class));
+    check(func.args(_PROF_VOID.args(1), 2), 2, root(List.class));
+    check(func.args(_PROF_VOID.args(2), _PROF_VOID.args(3)), "", root(List.class));
 
     check(func.args(" <_>6</_>[. = 6]", 7), "<_>6</_>", root(_UTIL_OR));
   }

@@ -36,7 +36,7 @@ public final class StoreTest extends SandboxTest {
     execute(new CreateDB(NAME, "<X><A>q</A><A>q</A></X>"));
     final long size = context.data().meta.dbFile(DataText.DATATXT).length();
     for(int n = 0; n < 500; n++) {
-      query("for $a in //text() return replace node $a with random:double()");
+      query("for $a in //text() return replace node $a with " + _RANDOM_DOUBLE.args());
     }
     assertEquals(size, context.data().meta.dbFile(DataText.DATATXT).length());
   }
@@ -52,7 +52,7 @@ public final class StoreTest extends SandboxTest {
       String qu = "for $a in //text() return delete node $a";
       query(qu);
       qu = "for $a in //text() " +
-          "let $d := random:integer(" + Integer.MAX_VALUE + ") " +
+          "let $d := " + _RANDOM_INTEGER.args(Integer.MAX_VALUE) +
           "return insert node $a into $d";
       query(qu);
     }

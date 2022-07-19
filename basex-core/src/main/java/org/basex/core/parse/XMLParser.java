@@ -99,6 +99,8 @@ final class XMLParser extends CommandParser {
       return new DropIndex(value(root, TYPE));
     if(e.equals(DROP_USER) && check(root, NAME, PATTERN + '?'))
       return new DropUser(value(root, NAME), value(root, PATTERN));
+    if(e.equals(EXECUTE) && check(root, '<' + INPUT))
+      return new Execute(xml(root));
     if(e.equals(EXIT) && check(root))
       return new Exit();
     if(e.equals(EXPORT) && check(root, PATH))
@@ -121,6 +123,8 @@ final class XMLParser extends CommandParser {
       return new InfoIndex(value(root, TYPE));
     if(e.equals(INFO_STORAGE) && check(root, START + '?', END + '?'))
       return new InfoStorage(value(root, START), value(root, END));
+    if(e.equals(INSPECT) && check(root))
+      return new Inspect();
     if(e.equals(JOBS_LIST))
       return new JobsList();
     if(e.equals(JOBS_STOP) && check(root, ID))
@@ -157,10 +161,6 @@ final class XMLParser extends CommandParser {
       return new Retrieve(value(root, PATH));
     if(e.equals(RUN) && check(root, FILE))
       return new Run(value(root, FILE));
-    if(e.equals(EXECUTE) && check(root, '<' + INPUT))
-      return new Execute(xml(root));
-    if(e.equals(INSPECT) && check(root))
-      return new Inspect();
     if(e.equals(SET) && check(root, OPTION, '#' + VALUE + '?'))
       return new Set(value(root, OPTION), value(root));
     if(e.equals(SHOW_BACKUPS) && check(root))
