@@ -18,7 +18,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Update primitive for the {@link Function#_DB_PUT} function.
+ * Update primitive for the {@link Function#_DB_PUT_VALUE} function.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

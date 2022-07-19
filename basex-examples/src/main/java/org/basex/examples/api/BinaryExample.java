@@ -31,7 +31,7 @@ public final class BinaryExample {
       final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
       // add document
-      session.store("test.bin", bais);
+      session.putBinary("test.bin", bais);
       System.out.println(session.info());
 
       // receive data

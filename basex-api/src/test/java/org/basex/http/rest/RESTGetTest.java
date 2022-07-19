@@ -53,7 +53,7 @@ public final class RESTGetTest extends RESTTest {
     put(new ArrayInput("<a/>"), NAME + '/' + xml);
     send(201, Method.PUT.name(), new ArrayInput("XXX"),
         MediaType.APPLICATION_OCTET_STREAM, NAME + '/' + bin);
-    get(200, "", "query", Function._DB_PUT.args(NAME, "DATA", value));
+    get(200, "", "query", Function._DB_PUT_VALUE.args(NAME, "DATA", value));
 
     query(get(200, NAME) + "/*/text() => sort()", xml + "\n" + bin + "\n" + value);
     get("<a/>", NAME + '/' + xml);

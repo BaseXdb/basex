@@ -973,11 +973,11 @@ public enum Function implements AFunction {
   _DB_FLUSH(DbFlush::new, "flush(database)",
       params(ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_GET(DbGet::new, "get(database,path)",
-      params(STRING_O, STRING_O), ITEM_ZM, flag(NDT), DB_URI),
-  /** XQuery function. */
   _DB_GET_BINARY(DbRetrieve::new, "get-binary(database,path)",
       params(STRING_O, STRING_O), BASE64_BINARY_O, flag(NDT), DB_URI),
+  /** XQuery function. */
+  _DB_GET_VALUE(DbGetValue::new, "get(database,path)",
+      params(STRING_O, STRING_O), ITEM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_INFO(DbInfo::new, "info(database)",
       params(STRING_O), ELEMENT_O, flag(NDT, CNS), DB_URI),
@@ -1018,11 +1018,14 @@ public enum Function implements AFunction {
   _DB_PROPERTY(DbProperty::new, "property(database,name)",
       params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_PUT(DbPut::new, "put(database,path,input)",
-      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_PUT(DbUpdate::new, "put(database,input,path[,options])",
+      params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,path,input)",
       params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  /** XQuery function. */
+  _DB_PUT_VALUE(DbPutValue::new, "put-value(database,path,input)",
+      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database,path,new-path)",
       params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1044,9 +1047,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _DB_TYPE(DbType::new, "type(database,path)",
       params(STRING_O, STRING_O), STRING_O, flag(NDT), DB_URI),
-  /** XQuery function. */
-  _DB_UPDATE(DbUpdate::new, "update(database,input,path[,options])",
-      params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
 
   // Fetch Module
 

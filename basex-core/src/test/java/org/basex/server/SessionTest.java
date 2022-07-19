@@ -157,13 +157,13 @@ public abstract class SessionTest extends SandboxTest {
    * Stores binary content in the database.
    * @throws IOException I/O exception
    */
-  @Test public final void store() throws IOException {
+  @Test public final void putBinary() throws IOException {
     session.execute("CREATE db " + NAME);
-    session.store("X", new ArrayInput("!"));
+    session.putBinary("X", new ArrayInput("!"));
     assertEqual("binary", session.query(_DB_TYPE.args(NAME, "X")).execute());
-    session.store("X", new ArrayInput(""));
+    session.putBinary("X", new ArrayInput(""));
     assertEqual("", session.query(_DB_GET_BINARY.args(NAME, "X")).execute());
-    session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
+    session.putBinary("X", new ArrayInput(new byte[] { 0, 1, -1 }));
     assertEqual("AAH/", session.query("string(" + _DB_GET_BINARY.args(NAME, "X") + ')').execute());
     session.execute("DROP DB " + NAME);
   }
@@ -171,9 +171,9 @@ public abstract class SessionTest extends SandboxTest {
   /**
    * Stores binary content in the database.
    * @throws IOException I/O exception */
-  @Test public void store2() throws IOException {
+  @Test public void putBinary2() throws IOException {
     session.execute("CREATE DB " + NAME);
-    session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
+    session.putBinary("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
 
     final Query query = session.query(_CONVERT_BINARY_TO_BYTES.args(
         _DB_GET_BINARY.args(NAME, "X")));
@@ -183,24 +183,24 @@ public abstract class SessionTest extends SandboxTest {
   /**
    * Stores binary content in the database.
    */
-  @Test public final void storeNoDB() {
-    assertThrows(BaseXException.class, () -> session.store("X", new ArrayInput("!")));
+  @Test public final void putBinaryNoDB() {
+    assertThrows(BaseXException.class, () -> session.putBinary("X", new ArrayInput("!")));
   }
 
   /**
    * Stores binary content in the database.
    * @throws IOException I/O exception
    */
-  @Test public final void storeInvalid() throws IOException {
+  @Test public final void putBinaryInvalid() throws IOException {
     session.execute("CREATE DB " + NAME);
-    assertThrows(BaseXException.class, () -> session.store("..", new ArrayInput("!")));
+    assertThrows(BaseXException.class, () -> session.putBinary("..", new ArrayInput("!")));
   }
 
   /** Retrieves binary content.
    * @throws IOException I/O exception */
   @Test public void retrieve() throws IOException {
     session.execute("CREATE DB " + NAME);
-    session.store("X", new ArrayInput("\0"));
+    session.putBinary("X", new ArrayInput("\0"));
     assertEqual("\0", session.execute("RETRIEVE X"));
   }
 
@@ -208,7 +208,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test public void retrieveEmpty() throws IOException {
     session.execute("CREATE DB " + NAME);
-    session.store("X", new ArrayInput(""));
+    session.putBinary("X", new ArrayInput(""));
     assertEqual("", session.execute("RETRIEVE X"));
   }
 
@@ -263,7 +263,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test public void queryNullBinary() throws IOException {
     session.execute("CREATE DB " + NAME);
-    session.store("X", new ArrayInput("\0"));
+    session.putBinary("X", new ArrayInput("\0"));
     assertEqual("\0", session.execute("XQUERY " + _DB_GET_BINARY.args(NAME, "X")));
     assertEqual("\0", session.query(_DB_GET_BINARY.args(NAME, "X")).execute());
     final Query q = session.query(_DB_GET_BINARY.args(NAME, "X"));
@@ -276,7 +276,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test public void queryEmptyBinary() throws IOException {
     session.execute("CREATE DB " + NAME);
-    session.store("X", new ArrayInput(""));
+    session.putBinary("X", new ArrayInput(""));
     assertEqual("", session.execute("XQUERY " + _DB_GET_BINARY.args(NAME, "X")));
     assertEqual("", session.query(_DB_GET_BINARY.args(NAME, "X")).execute());
     final Query q = session.query(_DB_GET_BINARY.args(NAME, "X"));
@@ -302,7 +302,7 @@ public abstract class SessionTest extends SandboxTest {
     if(out == null) return;
     session.execute("CREATE DB " + NAME);
     final byte[] tmp = { 0, 1, 2, 127, 0, -1, -2, -128 };
-    session.store("X", new ArrayInput(tmp));
+    session.putBinary("X", new ArrayInput(tmp));
     final String retr = _DB_GET_BINARY.args(NAME, "X");
     // check command
     session.execute("XQUERY " + retr + ',' + retr);

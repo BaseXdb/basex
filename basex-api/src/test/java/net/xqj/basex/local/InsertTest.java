@@ -81,10 +81,10 @@ public final class InsertTest extends XQJBaseTest {
   }
 
   /**
-   * Testing insert via STORE strategy.
+   * Testing insert via PUT BINARY strategy.
    * @throws XQException query exception
    **/
-  @Test public void testStore() throws XQException {
+  @Test public void testPutBinary() throws XQException {
     final XQConnection2 xqc2 = (XQConnection2) xqc;
     xqc2.insertItem(URI, createDocument("<e>a</e>"), options(STORE));
     assertTrue(dbExists(DB, URI));

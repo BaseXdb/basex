@@ -168,7 +168,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(
       "if(" + _DB_TYPE.args(" $db", " $path") + " = 'binary')" +
       " then " + _DB_PUT_BINARY.args(" $tdb", _DB_GET_BINARY.args(" $db", " $path"), " $tpath") +
-      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"));
+      " else " + _DB_PUT.args(" $tdb", _DB_OPEN.args(" $db", " $path"), " $tpath"));
     query.variable("db", db);
     query.variable("path", path);
     query.variable("tdb", tdb);
@@ -192,7 +192,7 @@ final class WebDAVService {
       "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) return " +
       "if(" + _DB_TYPE.args(" $db", " $d") + " = 'binary') " +
       "then " + _DB_PUT_BINARY.args(" $tdb", _DB_GET_BINARY.args(" $db", " $d"), " $t") +
-      " else " + _DB_ADD.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"));
+      " else " + _DB_PUT.args(" $tdb", _DB_OPEN.args(" $db", " $d"), " $t"));
     query.variable("db", db);
     query.variable("path", path);
     query.variable("tdb", tdb);
@@ -451,12 +451,12 @@ final class WebDAVService {
    * @return object representing the newly added file
    * @throws IOException I/O exception
    */
-  private WebDAVResource store(final String db, final String path, final InputStream in)
+  private WebDAVResource putBinary(final String db, final String path, final InputStream in)
       throws IOException {
 
     final LocalSession session = session();
     session.execute(new Open(db));
-    session.store(path, in);
+    session.putBinary(path, in);
     return WebDAVFactory.file(this, metaData(db, path));
   }
 
@@ -499,7 +499,7 @@ final class WebDAVService {
       } else {
         d = db;
       }
-      return store(d, path, bi);
+      return putBinary(d, path, bi);
     }
   }
 
@@ -515,7 +515,7 @@ final class WebDAVService {
 
     final LocalSession session = session();
     session.execute(new Open(db));
-    session.store(path + SEP + DUMMY, new ArrayInput(Token.EMPTY));
+    session.putBinary(path + SEP + DUMMY, new ArrayInput(Token.EMPTY));
   }
 
   /**

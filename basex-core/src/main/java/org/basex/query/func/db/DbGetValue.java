@@ -18,7 +18,7 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbGet extends DbAccess {
+public final class DbGetValue extends DbAccess {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);

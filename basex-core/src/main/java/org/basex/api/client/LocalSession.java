@@ -93,7 +93,7 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public void store(final String path, final InputStream input) throws BaseXException {
+  public void putBinary(final String path, final InputStream input) throws BaseXException {
     execute(new Store(path), input);
   }
 

@@ -100,7 +100,7 @@ public final class ClientListener extends Thread implements ClientInfo {
           } else if(sc == ServerCmd.REPLACE) {
             put();
           } else if(sc == ServerCmd.STORE) {
-            store();
+            putBinary();
           } else if(sc != ServerCmd.COMMAND) {
             query(sc);
           } else {
@@ -317,7 +317,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   /**
-   * Replace a document in the opened database.
+   * Puts (adds or replaces) a document in the opened database.
    * @throws IOException I/O exception
    */
   private void put() throws IOException {
@@ -325,10 +325,10 @@ public final class ClientListener extends Thread implements ClientInfo {
   }
 
   /**
-   * Stores a binary resource in the opened database.
+   * Puts (adds or replaces) a binary resource in the opened database.
    * @throws IOException I/O exception
    */
-  private void store() throws IOException {
+  private void putBinary() throws IOException {
     execute(new Store(in.readString()));
   }
 

@@ -67,7 +67,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Delete(FILE), true, CTX_LIST);
     ckDBs(new Dir(FILE), false, CTX_LIST);
     ckDBs(new DropBackup(NAME), true, NAME_LIST);
-    ckDBs(new DropDB(NAME + '*'), true, null); // Drop using globbing
+    ckDBs(new DropDB(NAME + '*'), true, null);
     ckDBs(new DropDB(NAME), true, NAME_LIST);
     ckDBs(new DropIndex(IndexType.TEXT), true, CTX_LIST);
     ckDBs(new DropUser(NAME), true, USER_LIST);
@@ -223,6 +223,8 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_OPEN.args(NAME)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_OPEN_ID.args(NAME, 0)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_OPEN_PRE.args(NAME, 0)), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_GET_BINARY.args(NAME, "path")), false, NAME_LIST);
+    ckDBs(new XQuery(_DB_GET_VALUE.args(NAME, "path")), false, NAME_LIST);
     ckDBs(new XQuery(_DB_SYSTEM.args()), false, NONE);
 
     // Read Operations
@@ -230,8 +232,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_ATTRIBUTE.args(NAME, 23, 42)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_NODE_ID.args(" .")), false, CTX_LIST);
     ckDBs(new XQuery(_DB_NODE_PRE.args(" .")), false, CTX_LIST);
-    ckDBs(new XQuery(_DB_GET.args(NAME, "path")), false, NAME_LIST);
-    ckDBs(new XQuery(_DB_GET_BINARY.args(NAME, "path")), false, NAME_LIST);
     ckDBs(new XQuery(_DB_TEXT.args(NAME, "foo")), false, NAME_LIST);
     ckDBs(new XQuery(_DB_TEXT_RANGE.args(NAME, 23, 42)), false, NAME_LIST);
     ckDBs(new XQuery(_DB_TOKEN.args(NAME, "foo")), false, NAME_LIST);
@@ -250,10 +250,10 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_DB_FLUSH.args(NAME)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_OPTIMIZE.args(NAME)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_OPTIMIZE.args(NAME, "true()")), true, NAME_LIST);
-    ckDBs(new XQuery(_DB_PUT.args(NAME, "value", "path")), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_PUT.args(NAME, FILE + '2', FILE)), true, NAME_LIST);
     ckDBs(new XQuery(_DB_PUT_BINARY.args(NAME, "binary", "path")), true, NAME_LIST);
+    ckDBs(new XQuery(_DB_PUT_VALUE.args(NAME, "value", "path")), true, NAME_LIST);
     ckDBs(new XQuery(_DB_RENAME.args(NAME, FILE, FILE + '2')), true, NAME_LIST);
-    ckDBs(new XQuery(_DB_UPDATE.args(NAME, FILE + '2', FILE)), true, NAME_LIST);
 
     // Helper Functions
     ckDBs(new XQuery(_DB_EXISTS.args(NAME)), false, NAME_LIST);

@@ -139,7 +139,7 @@ public class ClientSession extends Session {
   }
 
   @Override
-  public void store(final String path, final InputStream input) throws IOException {
+  public void putBinary(final String path, final InputStream input) throws IOException {
     send(ServerCmd.STORE, input, path);
   }
 

@@ -45,7 +45,7 @@ public final class AddExample {
       bais = new ByteArrayInputStream("<x>Hello Replacement!</x>".getBytes());
 
       // add document
-      session.replace("universe.xml", bais);
+      session.put("universe.xml", bais);
       System.out.println(session.info());
 
       // run query on database

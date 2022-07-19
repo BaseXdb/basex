@@ -438,7 +438,7 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_DIR;
     query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
     query(_DB_PUT_BINARY.args(NAME, "bla", "binary/binary.data"));
-    query(_DB_PUT.args(NAME, " 1 to 5", "value/value.data"));
+    query(_DB_PUT_VALUE.args(NAME, " 1 to 5", "value/value.data"));
 
     String call = func.args(NAME, "xml");
     query(call + "/@type/data()", "xml");
@@ -546,13 +546,6 @@ public final class DbModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void get() {
-    final Function func = _DB_GET;
-    query("(0 to 5) !" + _DB_PUT.args(NAME, " .", " 'path' || ."), "");
-    query("(0 to 5) !" + func.args(NAME, " 'path' || ."), "0\n1\n2\n3\n4\n5");
-  }
-
-  /** Test method. */
   @Test public void getBinary() {
     final Function func = _DB_GET_BINARY;
     error(func.args(NAME, "binary"), WHICHRES_X);
@@ -560,6 +553,13 @@ public final class DbModuleTest extends QueryPlanTest {
     query("xs:hexBinary(" + func.args(NAME, "binary") + ')', "A");
     query(_DB_DELETE.args(NAME, "binary"));
     error(func.args(NAME, "binary"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test public void getValue() {
+    final Function func = _DB_GET_VALUE;
+    query("(0 to 5) !" + _DB_PUT_VALUE.args(NAME, " .", " 'path' || ."), "");
+    query("(0 to 5) !" + func.args(NAME, " 'path' || ."), "0\n1\n2\n3\n4\n5");
   }
 
   /** Test method. */
@@ -582,7 +582,7 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(NAME, "bin/"), "bin/b");
     query(func.args(NAME, "bin/b"), "bin/b");
 
-    query(_DB_PUT.args(NAME, " 1 to 5", "value/value.data"));
+    query(_DB_PUT_VALUE.args(NAME, " 1 to 5", "value/value.data"));
     query(func.args(NAME, "value/"), "value/value.data");
 
     // create two other database and compare substring
@@ -600,7 +600,7 @@ public final class DbModuleTest extends QueryPlanTest {
 
     query(_DB_ADD.args(NAME, " <a/>", "xml/xml.xml"));
     query(_DB_PUT_BINARY.args(NAME, "bla", "binary/binary.data"));
-    query(_DB_PUT.args(NAME, " 1 to 5", "value/value.data"));
+    query(_DB_PUT_VALUE.args(NAME, " 1 to 5", "value/value.data"));
 
     String call = func.args(NAME, "xml/");
     query(call + "/@type/data()", "xml");
@@ -801,16 +801,43 @@ public final class DbModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void put() {
     final Function func = _DB_PUT;
-    query(func.args(NAME, "a", "value1"));
-    query(func.args(NAME, " 1 to 2", "value2"));
-    query(_DB_GET.args(NAME, "value1"), "a");
-    query(_DB_GET.args(NAME, "value2"), "1\n2");
-    query(func.args(NAME, 1, "value2"));
-    query(_DB_GET.args(NAME, "value2"), 1);
 
-    error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
-        DB_CONFLICT5_X);
-    error(_DB_PUT.args(NAME, "VALUE", ".."), RESINV_X);
+    execute(new Add("test", XML));
+
+    query(func.args(NAME, " <R1/>", XML));
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 1);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
+
+    query(func.args(NAME, " document { <R2/> }", XML));
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 1);
+
+    query(func.args(NAME, XML, XML));
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
+    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/html)", 1);
+
+    final String addcache = " map { 'addcache': true() }";
+    query(func.args(NAME, " <cache/>", "1.xml", addcache));
+    query("exists(" + _DB_OPEN.args(NAME, "1.xml") + ")", true);
+    query(func.args(NAME, " <cache/>", "2.xml", addcache));
+    query("exists(" + _DB_OPEN.args(NAME, "2.xml") + ")", true);
+    query(func.args(NAME, XML, "3.xml", addcache));
+    query("exists(" + _DB_OPEN.args(NAME, "3.xml") + ")", true);
+
+    // GH-1302: replace same target more than once
+    error("(1 to 2) ! " + func.args(NAME, XML, "3.xml"), UPMULTDOC_X_X);
+    error("(1 to 2) ! " + func.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
+    error(_DB_ADD.args(NAME, XML, "X.xml") + ',' + func.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
+    error(func.args(NAME, XML, "X.xml") + ',' + _DB_ADD.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
+
+    // GH-1302: check replacements of existing and new paths
+    query(func.args(NAME, XML, "3.xml") + ',' + func.args(NAME, XML, "4.xml"));
+    query(func.args(NAME, " <a/>", "3.xml") + ',' + func.args(NAME, " <a/>", "5.xml"));
+
+    // GH-1302: check replacements of new paths
+    query(func.args(NAME, XML, "6.xml") + ',' + func.args(NAME, XML, "7.xml"));
+    query(func.args(NAME, " <a/>", "8.xml") + ',' + func.args(NAME, " <a/>", "9.xml"));
   }
 
   /** Test method. */
@@ -823,6 +850,21 @@ public final class DbModuleTest extends QueryPlanTest {
     query(_DB_GET_BINARY.args(NAME, "binary3"), 123);
 
     error(func.args(NAME, "bin/x", "x") + ", " + func.args(NAME, "bin//x", "x"), DB_CONFLICT5_X);
+  }
+
+  /** Test method. */
+  @Test public void putValue() {
+    final Function func = _DB_PUT_VALUE;
+    query(func.args(NAME, "a", "value1"));
+    query(func.args(NAME, " 1 to 2", "value2"));
+    query(_DB_GET_VALUE.args(NAME, "value1"), "a");
+    query(_DB_GET_VALUE.args(NAME, "value2"), "1\n2");
+    query(func.args(NAME, 1, "value2"));
+    query(_DB_GET_VALUE.args(NAME, "value2"), 1);
+
+    error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
+        DB_CONFLICT5_X);
+    error(_DB_PUT_VALUE.args(NAME, "VALUE", ".."), RESINV_X);
   }
 
   /** Test method. */
@@ -943,48 +985,6 @@ public final class DbModuleTest extends QueryPlanTest {
     query(_DB_PUT_BINARY.args(NAME, "bla", "bla.bin"));
     query(func.args(NAME, "xml.xml"), "xml");
     query(func.args(NAME, "bla.bin"), "binary");
-  }
-
-  /** Test method. */
-  @Test public void update() {
-    final Function func = _DB_UPDATE;
-
-    execute(new Add("test", XML));
-
-    query(func.args(NAME, " <R1/>", XML));
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 1);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
-
-    query(func.args(NAME, " document { <R2/> }", XML));
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 1);
-
-    query(func.args(NAME, XML, XML));
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R1)", 0);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
-    query("count(" + COLLECTION.args(NAME + '/' + XML) + "/html)", 1);
-
-    final String addcache = " map { 'addcache': true() }";
-    query(func.args(NAME, " <cache/>", "1.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "1.xml") + ")", true);
-    query(func.args(NAME, " <cache/>", "2.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "2.xml") + ")", true);
-    query(func.args(NAME, XML, "3.xml", addcache));
-    query("exists(" + _DB_OPEN.args(NAME, "3.xml") + ")", true);
-
-    // GH-1302: replace same target more than once
-    error("(1 to 2) ! " + func.args(NAME, XML, "3.xml"), UPMULTDOC_X_X);
-    error("(1 to 2) ! " + func.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
-    error(_DB_ADD.args(NAME, XML, "X.xml") + ',' + func.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
-    error(func.args(NAME, XML, "X.xml") + ',' + _DB_ADD.args(NAME, XML, "X.xml"), UPMULTDOC_X_X);
-
-    // GH-1302: check replacements of existing and new paths
-    query(func.args(NAME, XML, "3.xml") + ',' + func.args(NAME, XML, "4.xml"));
-    query(func.args(NAME, " <a/>", "3.xml") + ',' + func.args(NAME, " <a/>", "5.xml"));
-
-    // GH-1302: check replacements of new paths
-    query(func.args(NAME, XML, "6.xml") + ',' + func.args(NAME, XML, "7.xml"));
-    query(func.args(NAME, " <a/>", "8.xml") + ',' + func.args(NAME, " <a/>", "9.xml"));
   }
 
   /**

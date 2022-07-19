@@ -83,12 +83,12 @@ public abstract class Session implements Closeable {
   public abstract void put(String path, InputStream input) throws IOException;
 
   /**
-   * Stores binary data in the opened database.
+   * Puts (adds or replaces) a binary resource in the opened database.
    * @param path target path
    * @param input binary input
    * @throws IOException I/O exception
    */
-  public abstract void store(String path, InputStream input) throws IOException;
+  public abstract void putBinary(String path, InputStream input) throws IOException;
 
   /**
    * Returns command info as a string, regardless of whether an output stream
