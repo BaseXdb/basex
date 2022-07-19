@@ -14,6 +14,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
+import org.basex.query.up.primitives.db.Put;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;

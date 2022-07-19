@@ -65,7 +65,7 @@ public final class UpdIndexRandomTest extends SandboxTest {
       final int offset = rnd.nextInt(cap - DOCS);
       for(int i = 0; i < DOCS; i++) doc.add("<a>").add(words.get(offset + i)).add("</a>");
       doc.add("</xml>");
-      execute(new Replace(path, doc.toString()));
+      execute(new Put(path, doc.toString()));
 
       for(int d = 0; d < DOCS; d++) {
         final String word = words.get(offset + d);

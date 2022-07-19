@@ -88,8 +88,8 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public void replace(final String path, final InputStream input) throws BaseXException {
-    execute(new Replace(path), input);
+  public void put(final String path, final InputStream input) throws BaseXException {
+    execute(new Put(path), input);
   }
 
   @Override

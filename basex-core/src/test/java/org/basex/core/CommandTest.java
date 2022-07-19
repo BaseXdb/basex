@@ -324,14 +324,6 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test public final void get() {
-    ok(new Get());
-    ok(new Get(MainOptions.STRIPWS));
-    ok(new Get(MainOptions.TOKENINCLUDE));
-    no(new Get(NAME2));
-  }
-
-  /** Command test. */
   @Test public final void grant() {
     ok(new CreateUser(NAME2, "test"));
     ok(new CreateUser(NAME, "test"));
@@ -449,33 +441,33 @@ public class CommandTest extends SandboxTest {
   }
 
   /** Command test. */
-  @Test public final void replace() {
+  @Test public final void put() {
     // query to count number of documents
     final String count = COUNT.args(_DB_OPEN.args(NAME));
     // database must be opened to replace resources
-    no(new Replace(FILE, "xxx"));
+    no(new Put(FILE, "xxx"));
     ok(new CreateDB(NAME, FILE));
     assertEquals("1", ok(new XQuery(count)));
     // replace existing document
-    ok(new Replace(FN, "<a/>"));
+    ok(new Put(FN, "<a/>"));
     assertEquals("1", ok(new XQuery(count)));
     // replace existing document (again)
-    ok(new Replace(FN, "<a/>"));
+    ok(new Put(FN, "<a/>"));
     assertEquals("1", ok(new XQuery(count)));
     // invalid content
-    no(new Replace(FN, ""));
+    no(new Put(FN, ""));
     assertEquals("1", ok(new XQuery(count)));
     // invalid paths
-    no(new Replace(".", "<a/>"));
-    no(new Replace("..", "<a/>"));
-    no(new Replace("/", "<a/>"));
+    no(new Put(".", "<a/>"));
+    no(new Put("..", "<a/>"));
+    no(new Put("/", "<a/>"));
     // create and replace binary file
     ok(new XQuery(_DB_PUT_BINARY.args(NAME, "DATA", "path")));
-    ok(new Replace("path", "<b/>"));
+    ok(new Put("path", "<b/>"));
     assertFalse(ok(new XQuery(_DB_OPEN.args(NAME))).isEmpty());
     ok(new XQuery(_DB_GET_BINARY.args(NAME, "path")));
     // a failing replace should not remove existing documents
-    no(new Replace(FN, "<a>"));
+    no(new Put(FN, "<a>"));
     assertEquals("1", ok(new XQuery(count)));
   }
 
@@ -577,6 +569,14 @@ public class CommandTest extends SandboxTest {
     ok(new Set(MainOptions.TOKENINCLUDE, ""));
     no(new Set("runs", true));
     no(new Set(NAME2, NAME2));
+  }
+
+  /** Command test. */
+  @Test public final void showOptions() {
+    ok(new ShowOptions());
+    ok(new ShowOptions(MainOptions.STRIPWS));
+    ok(new ShowOptions(MainOptions.TOKENINCLUDE));
+    no(new ShowOptions(NAME2));
   }
 
   /** Command test. */

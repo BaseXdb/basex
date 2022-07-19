@@ -6,6 +6,8 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.parse.*;
+import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.util.options.*;
 
@@ -15,11 +17,11 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class Get extends AGet {
+public final class ShowOptions extends Command {
   /**
    * Empty constructor.
    */
-  public Get() {
+  public ShowOptions() {
     this((String) null);
   }
 
@@ -27,7 +29,7 @@ public final class Get extends AGet {
    * Default constructor.
    * @param option option to be found
    */
-  public Get(final Option<?> option) {
+  public ShowOptions(final Option<?> option) {
     this(option.name());
   }
 
@@ -35,8 +37,8 @@ public final class Get extends AGet {
    * Default constructor.
    * @param key key to be found (can be {@code null})
    */
-  public Get(final String key) {
-    super(key == null ? "" : key);
+  public ShowOptions(final String key) {
+    super(Perm.NONE, key != null ? key : "");
   }
 
   @Override
@@ -73,5 +75,15 @@ public final class Get extends AGet {
       opt = opts.option(name);
     }
     return opt == null ? null : opts.get(opt);
+  }
+
+  @Override
+  public void addLocks() {
+    // no locks needed
+  }
+
+  @Override
+  public void build(final CmdBuilder cb) {
+    cb.init(Cmd.SHOW + " " + CmdShow.OPTIONS).arg(0);
   }
 }

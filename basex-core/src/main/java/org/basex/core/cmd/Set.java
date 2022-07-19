@@ -15,7 +15,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class Set extends AGet {
+public final class Set extends Command {
   /**
    * Default constructor.
    * @param <O> option type
@@ -33,7 +33,7 @@ public final class Set extends AGet {
    * @param value value to set (optional, depending on the option)
    */
   public Set(final String name, final Object value) {
-    super(name, value == null ? "" : value.toString());
+    super(Perm.NONE, name, value == null ? "" : value.toString());
   }
 
   @Override
@@ -63,5 +63,10 @@ public final class Set extends AGet {
       Util.debug(ex);
       return error(Util.message(ex));
     }
+  }
+
+  @Override
+  public void addLocks() {
+    // no locks needed
   }
 }

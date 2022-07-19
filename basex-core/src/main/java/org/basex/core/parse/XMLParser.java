@@ -109,8 +109,6 @@ final class XMLParser extends CommandParser {
       return new Find(value(root));
     if(e.equals(FLUSH) && check(root))
       return new Flush();
-    if(e.equals(GET) && check(root, OPTION + '?'))
-      return new Get(value(root, OPTION));
     if(e.equals(GRANT) && check(root, NAME, PERMISSION, PATTERN + '?'))
       return new Grant(value(root, PERMISSION), value(root, NAME), value(root, PATTERN));
     if(e.equals(HELP) && check(root, '#' + COMMAND + '?'))
@@ -143,12 +141,12 @@ final class XMLParser extends CommandParser {
       return new OptimizeAll();
     if(e.equals(PASSWORD) && check(root, '#' + PASSWORD + '?'))
       return new Password(password(root));
+    if(e.equals(PUT) && check(root, PATH, '<' + INPUT))
+      return new Put(value(root, PATH), xml(root));
     if(e.equals(QUIT) && check(root))
       return new Exit();
     if(e.equals(RENAME) && check(root, PATH, NEWPATH))
       return new Rename(value(root, PATH), value(root, NEWPATH));
-    if(e.equals(REPLACE) && check(root, PATH, '<' + INPUT))
-      return new Replace(value(root, PATH), xml(root));
     if(e.equals(REPO_DELETE) && check(root, NAME))
       return new RepoDelete(value(root, NAME), null);
     if(e.equals(REPO_INSTALL) && check(root, PATH))
@@ -165,6 +163,8 @@ final class XMLParser extends CommandParser {
       return new Set(value(root, OPTION), value(root));
     if(e.equals(SHOW_BACKUPS) && check(root))
       return new ShowBackups();
+    if(e.equals(SHOW_OPTIONS) && check(root, NAME + '?'))
+      return new ShowOptions(value(root, NAME));
     if(e.equals(SHOW_SESSIONS) && check(root))
       return new ShowSessions();
     if(e.equals(SHOW_USERS) && check(root, DATABASE + '?'))

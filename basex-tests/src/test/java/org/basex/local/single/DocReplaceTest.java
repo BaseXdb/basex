@@ -31,7 +31,7 @@ public final class DocReplaceTest extends SandboxTest {
     execute(new Flush());
 
     // replace documents with same content
-    for(int i = 0; i < NQUERIES; i++) execute(new Replace(i + IO.XMLSUFFIX, "<a/>"));
+    for(int i = 0; i < NQUERIES; i++) execute(new Put(i + IO.XMLSUFFIX, "<a/>"));
 
     // Drop database
     execute(new DropDB(NAME));

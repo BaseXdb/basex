@@ -75,7 +75,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Export(FILE), false, CTX_LIST);
     ckDBs(new Find("token"), false, CTX_LIST);
     ckDBs(new Flush(), true, CTX_LIST);
-    ckDBs(new Get("DBPATH"), false, NONE);
     ckDBs(new Grant("all", NAME), true, USER_LIST);
     ckDBs(new Grant("all", NAME, NAME), true, USER_LIST);
     ckDBs(new Grant("all", NAME, NAME + '*'), true, USER_LIST);
@@ -95,8 +94,8 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Optimize(), true, CTX_LIST);
     ckDBs(new OptimizeAll(), true, CTX_LIST);
     ckDBs(new Password(NAME), true, USER_LIST);
+    ckDBs(new Put(FILE, FILE), true, CTX_LIST);
     ckDBs(new Rename(FILE, FILE), true, CTX_LIST);
-    ckDBs(new Replace(FILE, FILE), true, CTX_LIST);
     ckDBs(new RepoInstall(REPO + "/pkg3.xar", null), true, REPO_LIST);
     ckDBs(new RepoList(), false, REPO_LIST);
     ckDBs(new RepoDelete("http://www.pkg3.com", null), true, REPO_LIST);
@@ -105,6 +104,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new Run(FILE), false, null);
     ckDBs(new Set(NAME, NAME), false, NONE);
     ckDBs(new ShowBackups(), false, null);
+    ckDBs(new ShowOptions("DBPATH"), false, NONE);
     ckDBs(new ShowSessions(), false, NONE);
     ckDBs(new ShowUsers(), false, NONE);
     ckDBs(new ShowUsers(NAME), false, NONE);

@@ -433,12 +433,12 @@ final class WebDAVService {
    * @return object representing the newly added XML
    * @throws IOException I/O exception
    */
-  private WebDAVResource replace(final String db, final String path, final InputStream in)
+  private WebDAVResource put(final String db, final String path, final InputStream in)
       throws IOException {
 
     final LocalSession session = session();
     session.execute(new Open(db));
-    session.replace(path, in);
+    session.put(path, in);
     return WebDAVFactory.file(this, new WebDAVMetaData(db, path, timestamp(db), false,
       MediaType.APPLICATION_XML, null));
   }
@@ -477,7 +477,7 @@ final class WebDAVService {
       if(peek(bi) == '<') {
         try {
           // add input as XML document
-          return db == null ? createDb(dbName(path), bi) : replace(db, path, bi);
+          return db == null ? createDb(dbName(path), bi) : put(db, path, bi);
         } catch(final IOException ex) {
           // reset stream if it did not work out
           Util.debug(ex);

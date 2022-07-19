@@ -134,7 +134,7 @@ public class ClientSession extends Session {
   }
 
   @Override
-  public void replace(final String path, final InputStream input) throws IOException {
+  public void put(final String path, final InputStream input) throws IOException {
     send(ServerCmd.REPLACE, input, path);
   }
 

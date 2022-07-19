@@ -78,7 +78,7 @@ final class RESTPut {
         session.add(new CreateDB(db)).add(new Store(db), is);
       }
     } else if(xml) {
-      session.add(new Replace(path), is);
+      session.add(new Put(path), is);
     } else {
       session.add(new Delete(path)).add(new Store(path), is);
     }

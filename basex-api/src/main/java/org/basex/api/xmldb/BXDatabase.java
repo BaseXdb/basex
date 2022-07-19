@@ -49,7 +49,7 @@ public final class BXDatabase implements Database {
 
   @Override
   public String getProperty(final String name) {
-    final Object value = Get.get(name.toUpperCase(Locale.ENGLISH), ctx);
+    final Object value = ShowOptions.get(name.toUpperCase(Locale.ENGLISH), ctx);
     return value == null ? null : value.toString();
   }
 

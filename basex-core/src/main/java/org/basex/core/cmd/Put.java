@@ -14,18 +14,18 @@ import org.basex.query.up.atomic.*;
 import org.basex.util.list.*;
 
 /**
- * Evaluates the 'replace' command and replaces documents in a collection.
+ * Evaluates the 'put' command and replaces documents in a collection.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class Replace extends ACreate {
+public final class Put extends ACreate {
   /**
    * Constructor.
    * The input needs to be set via {@link #setInput(InputStream)}.
    * @param path resource path
    */
-  public Replace(final String path) {
+  public Put(final String path) {
     this(path, null);
   }
 
@@ -34,7 +34,7 @@ public final class Replace extends ACreate {
    * @param path resource path
    * @param input input reference (local/remote file path or XML string; can be {@code null})
    */
-  public Replace(final String path, final String input) {
+  public Put(final String path, final String input) {
     super(Perm.WRITE, true, path, input);
   }
 
@@ -53,17 +53,17 @@ public final class Replace extends ACreate {
     final Data data = context.data();
     final IOFile bin = data.meta.file(path, ResourceType.BINARY);
 
-    return update(data, () -> replace(data, bin, path));
+    return update(data, () -> put(data, bin, path));
   }
 
   /**
-   * Replaces resources in the specified database.
+   * Puts (adds or replaces) resources in the specified database.
    * @param data database
    * @param bin binary file (can be {@code null})
    * @param path target path
    * @return success flag
    */
-  private boolean replace(final Data data, final IOFile bin, final String path) {
+  private boolean put(final Data data, final IOFile bin, final String path) {
     context.invalidate();
 
     // retrieve old list of resources

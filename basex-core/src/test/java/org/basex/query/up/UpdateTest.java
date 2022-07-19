@@ -1263,7 +1263,7 @@ public final class UpdateTest extends SandboxTest {
           + "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
           + "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
           + "qqqqqqqqqqqqqqqqqqq</_>";
-      execute(new Replace("x.xml", doc));
+      execute(new Put("x.xml", doc));
       query("string-length(_)", 4099);
     } finally {
       set(MainOptions.ADDCACHE, false);

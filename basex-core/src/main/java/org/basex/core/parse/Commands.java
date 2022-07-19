@@ -93,12 +93,12 @@ public interface Commands {
   String OPTIMIZE_ALL = "optimize-all";
   /** Command string: "password". */
   String PASSWORD = "password";
+  /** Command string: "put". */
+  String PUT = "put";
   /** Command string: "quit". */
   String QUIT = "quit";
   /** Command string: "rename". */
   String RENAME = "rename";
-  /** Command string: "replace". */
-  String REPLACE = "replace";
   /** Command string: "repo-delete". */
   String REPO_DELETE = "repo-delete";
   /** Command string: "repo-install". */
@@ -115,6 +115,8 @@ public interface Commands {
   String SET = "set";
   /** Command string: "show-backups". */
   String SHOW_BACKUPS = "show-backups";
+  /** Command string: "show-options". */
+  String SHOW_OPTIONS = "show-options";
   /** Command string: "show-sessions". */
   String SHOW_SESSIONS = "show-sessions";
   /** Command string: "show-users". */
@@ -174,7 +176,7 @@ public interface Commands {
   /** Optimize commands. */
   enum CmdOptimize { NULL, ALL }
   /** Show commands. */
-  enum CmdShow { SESSIONS, USERS, BACKUPS }
+  enum CmdShow { SESSIONS, USERS, BACKUPS, OPTIONS }
   /** Jobs commands. */
   enum CmdJobs { LIST, STOP, RESULT }
   /** Permission commands. */
@@ -192,10 +194,10 @@ public interface Commands {
   enum Cmd {
     ADD(HELPADD), ALTER(HELPALTER), CHECK(HELPCHECK), CLOSE(HELPCLOSE), COPY(HELPCOPY),
     CREATE(HELPCREATE), DELETE(HELPDELETE), DIR(HELPDIR), DROP(HELPDROP), EXECUTE(HELPEXECUTE),
-    EXIT(HELPEXIT), EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH), GET(HELPGET),
+    EXIT(HELPEXIT), EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH),
     GRANT(HELPGRANT), HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT), JOBS(HELPJOBS),
     KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE), PASSWORD(HELPPASSWORD),
-    QUIT(HELPEXIT), RENAME(HELPRENAME), REPLACE(HELPREPLACE), REPO(HELPREPO), RESTORE(HELPRESTORE),
+    PUT(HELPPUT), QUIT(HELPEXIT), RENAME(HELPRENAME), REPO(HELPREPO), RESTORE(HELPRESTORE),
     RETRIEVE(HELPRETRIEVE), RUN(HELPRUN), SET(HELPSET), SHOW(HELPSHOW), STORE(HELPSTORE),
     TEST(HELPTEST), XQUERY(HELPXQUERY);
 

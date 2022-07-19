@@ -444,9 +444,9 @@ public interface Text {
     '[' + S_PATH  + "] [newpath]", lang("c_rename1"), lang("c_rename2")
   };
   /** Command help. */
-  String[] HELPREPLACE = {
+  String[] HELPPUT = {
     '[' + S_PATH  + "] [" + S_INPUT + ']',
-    lang("c_replace1"), lang("c_replace2")
+    lang("c_put1"), lang("c_put2")
   };
   /** Command help. */
   String[] HELPRESTORE = {
@@ -457,8 +457,9 @@ public interface Text {
     "[" + CmdShow.BACKUPS + '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS + ']',
     lang("c_show1"),
     lang("c_show21") + NL +
+    LI + CmdShow.OPTIONS + " ([name])" + COLS + lang("c_show22") + NL +
     LI + CmdShow.SESSIONS + COLS + lang("c_show23") + NL +
-    LI + CmdShow.USERS + " (" + ON + " [database]): " + lang("c_show24") + NL +
+    LI + CmdShow.USERS + " (" + ON + " [database])" + COLS + lang("c_show24") + NL +
     LI + CmdShow.BACKUPS + COLS + lang("c_show25")
   };
   /** Command help. */
@@ -488,10 +489,6 @@ public interface Text {
   /** Command help. */
   String[] HELPSET = {
     "[option] ([value])", lang("c_set1"), lang("c_set2")
-  };
-  /** Command help. */
-  String[] HELPGET = {
-    "[option]", lang("c_get1"), lang("c_get2")
   };
   /** Command help. */
   String[] HELPPASSWORD = {

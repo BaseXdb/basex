@@ -73,9 +73,6 @@ public final class XMLCommandTest extends SandboxTest {
 
     ok("<flush/>");
 
-    ok("<get/>");
-    ok("<get option='X'/>");
-
     ok("<grant name='X' permission='X' pattern='X'/>");
     ok("<grant name='X' permission='X'/>");
 
@@ -108,10 +105,10 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<password/>");
     ok("<password>X</password>");
 
-    ok("<rename path='X' newpath='X'/>");
+    ok("<put path='X'>X</put>");
+    ok("<put path='X'><X/></put>");
 
-    ok("<replace path='X'>X</replace>");
-    ok("<replace path='X'><X/></replace>");
+    ok("<rename path='X' newpath='X'/>");
 
     ok("<repo-delete name='X'/>");
 
@@ -129,6 +126,9 @@ public final class XMLCommandTest extends SandboxTest {
     ok("<set option='X'>X</set>");
 
     ok("<show-backups/>");
+
+    ok("<show-options/>");
+    ok("<show-options name='X'/>");
 
     ok("<show-sessions/>");
 

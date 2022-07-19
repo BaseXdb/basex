@@ -103,8 +103,8 @@ final class StringParser extends CommandParser {
         return new Delete(string(cmd));
       case RENAME:
         return new Rename(string(cmd), string(cmd));
-      case REPLACE:
-        return new Replace(string(cmd), remaining(cmd, true));
+      case PUT:
+        return new Put(string(cmd), remaining(cmd, true));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -159,8 +159,6 @@ final class StringParser extends CommandParser {
         return new Execute(remaining(cmd, true));
       case FIND:
         return new Find(remaining(cmd, true));
-      case GET:
-        return new Get(name(null));
       case SET:
         return new Set(name(cmd), remaining(null, true));
       case PASSWORD:
@@ -194,6 +192,8 @@ final class StringParser extends CommandParser {
             return new ShowUsers(key(ON, null) ? name(cmd) : null);
           case BACKUPS:
             return new ShowBackups();
+          case OPTIONS:
+            return new ShowOptions(name(null));
         }
         break;
       case GRANT:

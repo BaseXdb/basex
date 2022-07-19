@@ -98,7 +98,7 @@ public final class ClientListener extends Thread implements ClientInfo {
           } else if(sc == ServerCmd.ADD) {
             add();
           } else if(sc == ServerCmd.REPLACE) {
-            replace();
+            put();
           } else if(sc == ServerCmd.STORE) {
             store();
           } else if(sc != ServerCmd.COMMAND) {
@@ -320,8 +320,8 @@ public final class ClientListener extends Thread implements ClientInfo {
    * Replace a document in the opened database.
    * @throws IOException I/O exception
    */
-  private void replace() throws IOException {
-    execute(new Replace(in.readString()));
+  private void put() throws IOException {
+    execute(new Put(in.readString()));
   }
 
   /**

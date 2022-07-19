@@ -127,11 +127,11 @@ public abstract class SessionTest extends SandboxTest {
   @Test public final void update() throws IOException {
     session.execute("CREATE DB " + NAME);
     assertEqual("0", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
-    session.replace(NAME, new ArrayInput("<X/>"));
+    session.put(NAME, new ArrayInput("<X/>"));
     assertEqual("1", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
-    session.replace(NAME + '2', new ArrayInput("<X/>"));
+    session.put(NAME + '2', new ArrayInput("<X/>"));
     assertEqual("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
-    session.replace(NAME + '2', new ArrayInput("<X/>"));
+    session.put(NAME + '2', new ArrayInput("<X/>"));
     assertEqual("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
   }
 
@@ -139,18 +139,18 @@ public abstract class SessionTest extends SandboxTest {
    * Replaces a file with an invalid file name.
    * @throws IOException I/O exception
    */
-  @Test public final void replaceNameErr() throws IOException {
+  @Test public final void putNameErr() throws IOException {
     session.execute("CREATE DB " + NAME);
-    assertThrows(BaseXException.class, () -> session.replace("", new ArrayInput("<X/>")));
+    assertThrows(BaseXException.class, () -> session.put("", new ArrayInput("<X/>")));
   }
 
   /**
    * Adds a file with missing input.
    * @throws IOException I/O exception
    */
-  @Test public final void replaceNoInput() throws IOException {
+  @Test public final void putNoInput() throws IOException {
     session.execute("CREATE DB " + NAME);
-    assertThrows(BaseXException.class, () -> session.replace("", new ArrayInput("")));
+    assertThrows(BaseXException.class, () -> session.put("", new ArrayInput("")));
   }
 
   /**

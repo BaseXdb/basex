@@ -98,8 +98,8 @@ public final class PermissionTest extends SandboxTest {
     no(new InfoDB(), testSession);
     no(new InfoIndex(), testSession);
     no(new InfoStorage(), testSession);
-    no(new Get("DBPATH"), testSession);
-    ok(new Get(MainOptions.QUERYINFO), testSession);
+    no(new ShowOptions("DBPATH"), testSession);
+    ok(new ShowOptions(MainOptions.QUERYINFO), testSession);
     ok(new Set(MainOptions.QUERYINFO, false), testSession);
 
     // repo stuff
@@ -144,8 +144,8 @@ public final class PermissionTest extends SandboxTest {
     ok(new Dir("path"), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
-    no(new Get("DBPATH"), testSession);
-    ok(new Get(MainOptions.QUERYINFO), testSession);
+    no(new ShowOptions("DBPATH"), testSession);
+    ok(new ShowOptions(MainOptions.QUERYINFO), testSession);
     ok(new Set(MainOptions.QUERYINFO, false), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
@@ -162,7 +162,7 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery(_DB_CREATE.args(NAME)), testSession);
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new Replace(NAME2, "<xml />"), testSession);
+    no(new Put(NAME2, "<xml />"), testSession);
     no(new Rename(NAME2, NAME2 + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
@@ -195,7 +195,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new Open(NAME2), testSession);
     ok(new Add(NAME + ".xml", "<xml>1</xml>"), testSession);
     ok(new Optimize(), testSession);
-    ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
+    ok(new Put(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
 
     // repo stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);

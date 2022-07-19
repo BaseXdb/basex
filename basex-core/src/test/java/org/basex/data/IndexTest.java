@@ -39,7 +39,7 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
-      execute(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
+      execute(new Put("x.xml", "<x><a>A</a><a>B</a></x>"));
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
     query(_DB_TEXT.args(NAME, "B"), "B");
@@ -57,8 +57,8 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
-      execute(new Replace("x.xml", "<x><a>A</a><a>B</a></x>"));
-      execute(new Replace("x.xml", "<x><a>A</a><a>C</a></x>"));
+      execute(new Put("x.xml", "<x><a>A</a><a>B</a></x>"));
+      execute(new Put("x.xml", "<x><a>A</a><a>C</a></x>"));
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
     query(_DB_TEXT.args(NAME, "C"), "C");
@@ -76,7 +76,7 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
-      execute(new Replace("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
+      execute(new Put("x.xml", "<x><a>A</a><a>BC</a><a>DEF</a></x>"));
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
     query(_DB_TEXT.args(NAME, "BC"), "BC");
@@ -96,7 +96,7 @@ public final class IndexTest extends SandboxTest {
     for(int i = 0; i < 5; i++) {
       execute(new Add("a", "<x c='c'/>"));
       execute(new Add("a", "<x a='a' b='b'/>"));
-      execute(new Replace("a", "<x/>"));
+      execute(new Put("a", "<x/>"));
     }
     query(_DB_ATTRIBUTE.args(NAME, "a"), "");
     query(_DB_ATTRIBUTE.args(NAME, "b"), "");
@@ -122,7 +122,7 @@ public final class IndexTest extends SandboxTest {
     for(int i = 0; i < 5; i++) {
       execute(new Add("a", "<x c='c'/>"));
       execute(new Add("a", "<x a='a' b='b'/>"));
-      execute(new Replace("a", "<x/>"));
+      execute(new Put("a", "<x/>"));
     }
     query(_DB_TOKEN.args(NAME, "a"), "");
     query(_DB_TOKEN.args(NAME, "b"), "");
@@ -153,9 +153,9 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.MAINMEM, mainmem);
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
-    execute(new Replace("A", "<X a='?' b='a' c='1'/>"));
-    execute(new Replace("A", "<X a='?' b='b' c='2'/>"));
-    execute(new Replace("A", "<X/>"));
+    execute(new Put("A", "<X a='?' b='a' c='1'/>"));
+    execute(new Put("A", "<X a='?' b='b' c='2'/>"));
+    execute(new Put("A", "<X/>"));
   }
 
   /**
@@ -171,7 +171,7 @@ public final class IndexTest extends SandboxTest {
     execute(new CreateDB(NAME));
     for(int i = 0; i < 5; i++) {
       if(openClose) execute(new Open(NAME));
-      execute(new Replace("x.xml", "<x><a>A</a><a>BC</a></x>"));
+      execute(new Put("x.xml", "<x><a>A</a><a>BC</a></x>"));
       if(openClose) execute(new Close());
     }
     query(_DB_TEXT.args(NAME, "A"), "A");
@@ -189,10 +189,10 @@ public final class IndexTest extends SandboxTest {
     final boolean openClose = !mainmem;
     set(MainOptions.UPDINDEX, true);
     execute(new CreateDB(NAME));
-    execute(new Replace("A", "<a/>"));
-    execute(new Replace("B", "<a a='1'/>"));
-    execute(new Replace("C", "<a a='1'/>"));
-    execute(new Replace("A", "<a a='1'/>"));
+    execute(new Put("A", "<a/>"));
+    execute(new Put("B", "<a a='1'/>"));
+    execute(new Put("C", "<a a='1'/>"));
+    execute(new Put("A", "<a a='1'/>"));
     if(openClose) {
       execute(new Close());
       execute(new Open(NAME));
@@ -211,14 +211,14 @@ public final class IndexTest extends SandboxTest {
     set(MainOptions.AUTOOPTIMIZE, true);
     execute(new CreateDB(NAME));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);
-    execute(new Replace("x.xml", "<a>A</a>"));
+    execute(new Put("x.xml", "<a>A</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);
     query(_DB_UPDATE.args(NAME, " <a>B</a>", "x.xml"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", true);
 
     set(MainOptions.AUTOOPTIMIZE, false);
     execute(new Optimize());
-    execute(new Replace("x.xml", "<a>C</a>"));
+    execute(new Put("x.xml", "<a>C</a>"));
     query(_DB_INFO.args(NAME) + "//textindex/text()", false);
 
     execute(new Optimize());
