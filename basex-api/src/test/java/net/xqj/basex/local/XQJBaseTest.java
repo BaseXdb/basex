@@ -21,7 +21,6 @@ public abstract class XQJBaseTest {
    * Initializes a test.
    * @throws XQException query exception
    */
-  @SuppressWarnings("unused")
   @BeforeEach public void setUp() throws XQException {
     xqds = new BaseXXQDataSource();
     xqc = xqds.getConnection();

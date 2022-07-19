@@ -31,7 +31,7 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
   /** Total number of documents to insert when writing. */
   private static final int DOCS_TO_INSERT = CONCURRENT_WRITE_THREADS * 30;
   /** BaseX insert strategy for inserting documents. */
-  private static final BaseXXQInsertOptions INSERT_STRATEGY = options(REPLACE);
+  private static final BaseXXQInsertOptions INSERT_STRATEGY = options(PUT);
 
   /**
    * Runs read concurrency test.

@@ -71,12 +71,12 @@ public final class InsertTest extends XQJBaseTest {
    **/
   @Test public void testPut() throws XQException {
     final XQConnection2 xqc2 = (XQConnection2) xqc;
-    xqc2.insertItem(URI, createDocument("<e>a</e>"), options(REPLACE));
+    xqc2.insertItem(URI, createDocument("<e>a</e>"), options(PUT));
 
     assertTrue(docAvailable(URI));
     assertTrue(dbExists(DB, URI));
 
-    xqc2.insertItem(URI, createDocument("<e>b</e>"), options(REPLACE));
+    xqc2.insertItem(URI, createDocument("<e>b</e>"), options(PUT));
     assertEquals(1, countUris(DB, URI));
   }
 
@@ -86,10 +86,10 @@ public final class InsertTest extends XQJBaseTest {
    **/
   @Test public void testPutBinary() throws XQException {
     final XQConnection2 xqc2 = (XQConnection2) xqc;
-    xqc2.insertItem(URI, createDocument("<e>a</e>"), options(STORE));
+    xqc2.insertItem(URI, createDocument("<e>a</e>"), options(BINARYPUT));
     assertTrue(dbExists(DB, URI));
 
-    xqc2.insertItem(URI, createDocument("<e>b</e>"), options(STORE));
+    xqc2.insertItem(URI, createDocument("<e>b</e>"), options(BINARYPUT));
     assertEquals(1, countUris(DB, URI));
   }
 
