@@ -29,7 +29,7 @@ public final class StringFormat extends StandardFunc {
     try {
       return Str.get(String.format(form, args));
     } catch(final IllegalArgumentException ex) {
-      throw OUTPUT_FORMAT_X_X.get(info, Util.className(ex), ex);
+      throw STRING_FORMAT_X_X.get(info, Util.className(ex), ex);
     }
   }
 }

@@ -368,11 +368,6 @@ public enum QueryError {
   /** Error code. */
   JSON_OPTIONS_X(JSON, "options", "'%':'%' is not supported by the target format."),
 
-  // Output Module
-
-  /** Error code. */
-  OUTPUT_FORMAT_X_X(OUTPUT, "format", "%: %."),
-
   // Process Module
 
   /** Error code. */
@@ -453,6 +448,11 @@ public enum QueryError {
   STORE_NAME_X(STORE, "name", "Invalid name: %."),
   /** Error code. */
   STORE_NOTFOUND_X(STORE, "not-found", "Cache '%' not found."),
+
+  // String Module
+
+  /** Error code. */
+  STRING_FORMAT_X_X(STRING, "format", "%: %."),
 
   // Unit Module
 
@@ -1488,13 +1488,14 @@ public enum QueryError {
     /** Error type. */ REQUEST(REQUEST_PREFIX,   REQUEST_URI),
     /** Error type. */ SESSION(SESSION_PREFIX,   SESSION_URI),
     /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
-    /** Error type. */ WS(WS_PREFIX,             WS_URI),
     /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
     /** Error type. */ STORE(STORE_PREFIX,       STORE_URI),
+    /** Error type. */ STRING(STRING_PREFIX,     STRING_URI),
     /** Error type. */ UNIT(UNIT_PREFIX,         UNIT_URI),
     /** Error type. */ USER(USER_PREFIX,         USER_URI),
     /** Error type. */ VALIDATE(VALIDATE_PREFIX, VALIDATE_URI),
     /** Error type. */ WEB(WEB_PREFIX,           WEB_URI),
+    /** Error type. */ WS(WS_PREFIX,             WS_URI),
     /** Error type. */ XQUERY(XQUERY_PREFIX,     XQUERY_URI),
     /** Error type. */ XSLT(XSLT_PREFIX,         XSLT_URI),
 
