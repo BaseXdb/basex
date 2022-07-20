@@ -156,8 +156,6 @@ public final class EditorView extends View {
 
     info = new BaseXLabel().setText(OK, Msg.SUCCESS).resize(1.25f);
     pos = new BaseXLabel(" ").resize(1.25f);
-    System.out.println(info.getFont().getSize());
-
     posCode.invokeLater();
 
     final BaseXBack south = new BaseXBack(false).border(8, 0, 0, 0);
