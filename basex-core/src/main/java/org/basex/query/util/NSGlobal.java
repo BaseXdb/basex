@@ -71,7 +71,6 @@ public final class NSGlobal {
     NS.add(JOB_PREFIX, JOB_URI);
     NS.add(JSON_PREFIX, JSON_URI);
     NS.add(LAZY_PREFIX, LAZY_URI);
-    NS.add(OUT_PREFIX, OUT_URI);
     NS.add(PERM_PREFIX, PERM_URI);
     NS.add(PROC_PREFIX, PROC_URI);
     NS.add(PROF_PREFIX, PROF_URI);

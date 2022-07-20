@@ -1557,22 +1557,22 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_CR(StringCr::new, "cr()",
-      params(), STRING_O, OUT_URI),
+      params(), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_FORMAT(StringFormat::new, "format(format,item1[,...])",
-      params(STRING_O, ITEM_O), STRING_O, OUT_URI),
+      params(STRING_O, ITEM_O), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(string1,string2)",
       params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
   /** XQuery function. */
   _STRING_NL(StringNl::new, "nl()",
-      params(), STRING_O, OUT_URI),
+      params(), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_SOUNDEX(StringSoundex::new, "soundex(string)",
       params(STRING_O), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_TAB(StringTab::new, "tab()",
-      params(), STRING_O, OUT_URI),
+      params(), STRING_O, STRING_URI),
 
 
   // Unit Module
