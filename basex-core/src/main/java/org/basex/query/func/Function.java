@@ -975,8 +975,8 @@ public enum Function implements AFunction {
   _DB_GET(DbGet::new, "get(database[,path])",
       params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_GET_BINARY(DbGetBinary::new, "get-binary(database,path)",
-      params(STRING_O, STRING_O), BASE64_BINARY_O, flag(NDT), DB_URI),
+  _DB_GET_BINARY(DbGetBinary::new, "get-binary(database[,path])",
+      params(STRING_O, STRING_O), ITEM_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_GET_ID(DbGetId::new, "get-id(database,ids)",
       params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
@@ -984,7 +984,7 @@ public enum Function implements AFunction {
   _DB_GET_PRE(DbGetPre::new, "get-pre(database,pres)",
       params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_GET_VALUE(DbGetValue::new, "get-value(database,path)",
+  _DB_GET_VALUE(DbGetValue::new, "get-value(database[,path])",
       params(STRING_O, STRING_O), ITEM_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_INFO(DbInfo::new, "info(database)",

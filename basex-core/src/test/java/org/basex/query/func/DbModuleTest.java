@@ -567,12 +567,19 @@ public final class DbModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void getBinary() {
-    final Function func = _DB_GET_BINARY;
-    error(func.args(NAME, "binary"), WHICHRES_X);
-    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", "binary"));
-    query("xs:hexBinary(" + func.args(NAME, "binary") + ')', "A");
-    query(_DB_DELETE.args(NAME, "binary"));
-    error(func.args(NAME, "binary"), WHICHRES_X);
+    final Function func = _DB_GET_BINARY, put = _DB_PUT_BINARY;
+    error(func.args(NAME, "unknown"), WHICHRES_X);
+    query(put.args(NAME, " xs:hexBinary('41')", "path"));
+    query("xs:hexBinary(" + func.args(NAME, "path") + ')', "A");
+    query(_DB_DELETE.args(NAME, "path"));
+
+    query("(0 to 5) !" + put.args(NAME, " .", " 'path' || ."), "");
+    query("(0 to 5) !" + func.args(NAME, " 'path' || ."), "0\n1\n2\n3\n4\n5");
+    query(func.args(NAME) + " => map:keys() => count()", 6);
+
+    query(func.args(NAME, "path0"), 0);
+    query("(0 to 5) !" + _DB_DELETE.args(NAME, " 'path' || ."));
+    error(func.args(NAME, "path0"), WHICHRES_X);
   }
 
   /** Test method. */
@@ -597,9 +604,14 @@ public final class DbModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void getValue() {
-    final Function func = _DB_GET_VALUE;
-    query("(0 to 5) !" + _DB_PUT_VALUE.args(NAME, " .", " 'path' || ."), "");
+    final Function func = _DB_GET_VALUE, put = _DB_PUT_VALUE;
+    query("(0 to 5) !" + put.args(NAME, " .", " 'path' || ."), "");
     query("(0 to 5) !" + func.args(NAME, " 'path' || ."), "0\n1\n2\n3\n4\n5");
+    query(func.args(NAME) + " => map:keys() => count()", 6);
+
+    query(func.args(NAME, "path0"), 0);
+    query("(0 to 5) !" + _DB_DELETE.args(NAME, " 'path' || ."));
+    error(func.args(NAME, "path0"), WHICHRES_X);
   }
 
   /** Test method. */

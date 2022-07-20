@@ -82,6 +82,7 @@ public final class DbListDetails extends DbList {
     final TokenList binaries = data.resources.paths(path, ResourceType.BINARY);
     final TokenList values = data.resources.paths(path, ResourceType.VALUE);
     final int ds = docs.size(), bs = ds + binaries.size(), size = bs + values.size();
+
     return new BasicIter<FNode>(size) {
       @Override
       public FNode get(final long i) {

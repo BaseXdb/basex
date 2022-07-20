@@ -2,12 +2,13 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -15,15 +16,24 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class DbGetBinary extends DbAccess {
+public class DbGetBinary extends DbGetValue {
   @Override
-  public B64Lazy item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Data data = toData(qc);
-    final String path = toDbPath(1, qc);
-    if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
+  public Value value(final QueryContext qc) throws QueryException {
+    return value(ResourceType.BINARY, qc);
+  }
 
-    final IOFile bin = data.meta.file(path, ResourceType.BINARY);
-    if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
-    return new B64Lazy(bin, IOERR_X);
+  @Override
+  Value resource(final IOFile path, final QueryContext qc) {
+    return new B64Lazy(path, IOERR_X);
+  }
+
+  @Override
+  protected final Expr opt(final CompileContext cc) throws QueryException {
+    if(exprs.length == 1) {
+      super.opt(cc);
+    } else {
+      exprType.assign(SeqType.BASE64_BINARY_O);
+    }
+    return this;
   }
 }
