@@ -32,7 +32,6 @@ import org.basex.query.func.json.*;
 import org.basex.query.func.lazy.*;
 import org.basex.query.func.map.*;
 import org.basex.query.func.math.*;
-import org.basex.query.func.out.*;
 import org.basex.query.func.proc.*;
 import org.basex.query.func.prof.*;
 import org.basex.query.func.random.*;
@@ -1395,21 +1394,6 @@ public enum Function implements AFunction {
   _LAZY_IS_LAZY(LazyIsLazy::new, "is-lazy(item)",
       params(ITEM_O), BOOLEAN_O, LAZY_URI),
 
-  // Output Module
-
-  /** XQuery function. */
-  _OUT_CR(OutCr::new, "cr()",
-      params(), STRING_O, OUT_URI),
-  /** XQuery function. */
-  _OUT_FORMAT(OutFormat::new, "format(format,item1[,...])",
-      params(STRING_O, ITEM_O), STRING_O, OUT_URI),
-  /** XQuery function. */
-  _OUT_NL(OutNl::new, "nl()",
-      params(), STRING_O, OUT_URI),
-  /** XQuery function. */
-  _OUT_TAB(OutTab::new, "tab()",
-      params(), STRING_O, OUT_URI),
-
   // Process Module
 
   /** XQuery function. */
@@ -1572,11 +1556,24 @@ public enum Function implements AFunction {
   _STRING_COLOGNE_PHONETIC(StringColognePhonetic::new, "cologne-phonetic(string)",
       params(STRING_O), STRING_O, STRING_URI),
   /** XQuery function. */
+  _STRING_CR(StringCr::new, "cr()",
+      params(), STRING_O, OUT_URI),
+  /** XQuery function. */
+  _STRING_FORMAT(StringFormat::new, "format(format,item1[,...])",
+      params(STRING_O, ITEM_O), STRING_O, OUT_URI),
+  /** XQuery function. */
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(string1,string2)",
       params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
   /** XQuery function. */
+  _STRING_NL(StringNl::new, "nl()",
+      params(), STRING_O, OUT_URI),
+  /** XQuery function. */
   _STRING_SOUNDEX(StringSoundex::new, "soundex(string)",
       params(STRING_O), STRING_O, STRING_URI),
+  /** XQuery function. */
+  _STRING_TAB(StringTab::new, "tab()",
+      params(), STRING_O, OUT_URI),
+
 
   // Unit Module
 

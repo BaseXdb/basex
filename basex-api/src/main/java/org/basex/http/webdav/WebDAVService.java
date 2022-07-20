@@ -271,7 +271,7 @@ final class WebDAVService {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
       _DB_DIR.args(" $db", " $path") + " ! (string(), name() = 'dir', " +
       "for $a in ('modified-date', 'raw', 'content-type', 'size') " +
-      "return string(@*[name() = $a]))", _OUT_TAB.args()));
+      "return string(@*[name() = $a]))", _STRING_TAB.args()));
     query.variable("db", db);
     query.variable("path", path);
 
@@ -303,7 +303,7 @@ final class WebDAVService {
    */
   List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-        _DB_LIST_DETAILS.args() + " ! (string(), @modified-date)", _OUT_TAB.args()));
+        _DB_LIST_DETAILS.args() + " ! (string(), @modified-date)", _STRING_TAB.args()));
 
     final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> dbs = new ArrayList<>();

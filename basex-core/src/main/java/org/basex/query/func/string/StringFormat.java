@@ -1,4 +1,4 @@
-package org.basex.query.func.out;
+package org.basex.query.func.string;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class OutFormat extends StandardFunc {
+public final class StringFormat extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String form = toString(exprs[0], qc);
