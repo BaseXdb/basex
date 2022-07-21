@@ -39,7 +39,7 @@ public final class IndexInfo {
   public NameTest test;
   /** Index expression. */
   public Expr expr;
-  /** Costs of index access ({@code null}) if no index access is possible). */
+  /** Costs of index access ({@code null} if no index access is possible). */
   public IndexCosts costs;
   /** Indicates if the last step addresses a text node. */
   boolean text;

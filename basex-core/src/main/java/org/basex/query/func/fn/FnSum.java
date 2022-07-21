@@ -40,7 +40,7 @@ public class FnSum extends StandardFunc {
     final Expr expr1 = exprs[0], expr2 = exprs.length == 2 ? exprs[1] : null;
     final SeqType st1 = expr1.seqType(), st2 = expr2 != null ? expr2.seqType() : null;
     if(st1.zero()) {
-      // sequence is empty: check if it also deterministic
+      // sequence is empty: check if it is also deterministic
       if(!expr1.has(Flag.NDT)) {
         if(expr2 == null) return Int.ZERO;
         if(expr2 == Empty.VALUE) return expr1;
@@ -109,7 +109,7 @@ public class FnSum extends StandardFunc {
    * @return result, or {@code null} if sequence is empty
    * @throws QueryException query exception
    */
-  final Item range(final Value value, final boolean avg) throws QueryException {
+  private Item range(final Value value, final boolean avg) throws QueryException {
     if(value.isEmpty()) return null;
 
     long min = value.itemAt(0).itr(info), max = value.itemAt(value.size() - 1).itr(info);

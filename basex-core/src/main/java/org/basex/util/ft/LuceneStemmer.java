@@ -40,7 +40,7 @@ final class LuceneStemmer extends Stemmer {
   }
 
   /**
-   * Check if a stemmer class is available, and add it the the list of stemmers.
+   * Check if a stemmer class is available, and add it the list of stemmers.
    * @param lang language
    */
   private static void add(final String... lang) {
@@ -51,7 +51,7 @@ final class LuceneStemmer extends Stemmer {
   }
 
   /**
-   * Check if a stemmer class is available, and add it the the list of stemmers.
+   * Check if a stemmer class is available, and add it the list of stemmers.
    * @param lang language
    * @param name name of language
    */

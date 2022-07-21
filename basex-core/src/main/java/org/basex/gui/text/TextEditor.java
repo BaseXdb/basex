@@ -709,7 +709,7 @@ public final class TextEditor {
     // stable sort: before custom sort, apply default sort
     if(!unicode || column > 0) tokens.sort(true, true);
 
-    // choose cheapest comparator
+    // choose the cheapest comparator
     final Comparator<byte[]> cc;
     if(!unicode) {
       final Collator coll = Collator.getInstance();

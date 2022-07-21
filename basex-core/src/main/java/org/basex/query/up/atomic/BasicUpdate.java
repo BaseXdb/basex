@@ -46,7 +46,7 @@ public abstract class BasicUpdate {
   abstract DataClip getInsertionData();
 
   /**
-   * Returns whether this updates destroys the target nodes identity. Used to determine
+   * Returns whether this update destroys the target nodes identity. Used to determine
    * superfluous operations on the subtree of the target.
    * @return {@code true} if target node identity destroyed
    */

@@ -50,6 +50,89 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
     final int h = getFontMetrics(getFont()).getHeight();
     if(h > 16) setRowHeight(Math.max(32, h));
 
+    /** Commands for editing nodes. */
+    // delete file or show error dialog
+    // choose free name
+    final GUIPopupCmd[] edit = {
+      new GUIPopupCmd(DELETE + DOTS, BaseXKeys.DELNEXT) {
+        @Override
+        public void execute() {
+          final ProjectNode node = selectedNode();
+          final GUI gui = view.gui;
+          if (BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
+            final ProjectNode parent = (ProjectNode) node.getParent();
+            // delete file or show error dialog
+            if (gui.editor.delete(node.file)) {
+              parent.refresh();
+              setSelectionPath(parent.path());
+              view.refresh();
+            } else {
+              BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
+            }
+          }
+        }
+
+        @Override
+        public boolean enabled(final GUI main) {
+          final ProjectNode node = selectedNode();
+          return node != null && !node.root();
+        }
+      },
+
+      new GUIPopupCmd(RENAME, BaseXKeys.RENAME) {
+        @Override
+        public void execute() {
+          startEditingAtPath(selectedNode().path());
+          view.refresh();
+        }
+
+        @Override
+        public boolean enabled(final GUI main) {
+          final ProjectNode node = selectedNode();
+          return node != null && !node.root();
+        }
+      },
+
+      new GUIPopupCmd(NEW_DIR, BaseXKeys.NEWDIR) {
+        @Override
+        public void execute() {
+          final ProjectNode node = selectedNode(), dir = node instanceof ProjectDir ? node :
+            (ProjectNode) node.getParent();
+
+          // choose free name
+          String name = '(' + NEW_DIR + ')';
+          IOFile file = new IOFile(dir.file, name);
+          int c = 1;
+          while (file.exists()) {
+            name = '(' + NEW_DIR + ' ' + ++c + ')';
+            file = new IOFile(dir.file, name);
+          }
+          if (file.md()) {
+            dir.expand();
+
+            final String fn = name;
+            new Thread(() -> {
+              final Enumeration<?> children = dir.children();
+              while (children.hasMoreElements()) {
+                final ProjectNode child = (ProjectNode) children.nextElement();
+                if (child.file != null && child.file.name().equals(fn)) {
+                  final TreePath tp = child.path();
+                  setSelectionPath(tp);
+                  startEditingAtPath(tp);
+                  break;
+                }
+              }
+            }).start();
+          }
+        }
+
+        @Override
+        public boolean enabled(final GUI main) {
+          return selectedNode() != null;
+        }
+      },
+      null
+    };
     new BaseXPopup(this, view.gui, commands(edit));
   }
 
@@ -169,77 +252,4 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
     final TreePath[] tps = getSelectionPaths();
     return tps == null || tps.length > 1 ? null : tps[0];
   }
-
-  /** Commands for editing nodes. */
-  private final GUIPopupCmd[] edit = {
-    new GUIPopupCmd(DELETE + DOTS, BaseXKeys.DELNEXT) {
-      @Override public void execute() {
-        final ProjectNode node = selectedNode();
-        final GUI gui = view.gui;
-        if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
-          final ProjectNode parent = (ProjectNode) node.getParent();
-          // delete file or show error dialog
-          if(gui.editor.delete(node.file)) {
-            parent.refresh();
-            setSelectionPath(parent.path());
-            view.refresh();
-          } else {
-            BaseXDialog.error(gui, Util.info(FILE_NOT_DELETED_X, node.file));
-          }
-        }
-      }
-      @Override public boolean enabled(final GUI main) {
-        final ProjectNode node = selectedNode();
-        return node != null && !node.root();
-      }
-    },
-
-    new GUIPopupCmd(RENAME, BaseXKeys.RENAME) {
-      @Override public void execute() {
-        startEditingAtPath(selectedNode().path());
-        view.refresh();
-      }
-      @Override public boolean enabled(final GUI main) {
-        final ProjectNode node = selectedNode();
-        return node != null && !node.root();
-      }
-    },
-
-    new GUIPopupCmd(NEW_DIR, BaseXKeys.NEWDIR) {
-      @Override public void execute() {
-        final ProjectNode node = selectedNode();
-        final ProjectNode dir = node instanceof ProjectDir ? node : (ProjectNode) node.getParent();
-
-        // choose free name
-        String name = '(' + NEW_DIR + ')';
-        IOFile file = new IOFile(dir.file, name);
-        int c = 1;
-        while(file.exists()) {
-          name = '(' + NEW_DIR + ' ' + ++c + ')';
-          file = new IOFile(dir.file, name);
-        }
-        if(file.md()) {
-          dir.expand();
-
-          final String fn = name;
-          new Thread(() -> {
-            final Enumeration<?> children = dir.children();
-            while(children.hasMoreElements()) {
-              final ProjectNode child = (ProjectNode) children.nextElement();
-              if(child.file != null && child.file.name().equals(fn)) {
-                final TreePath tp = child.path();
-                setSelectionPath(tp);
-                startEditingAtPath(tp);
-                break;
-              }
-            }
-          }).start();
-        }
-      }
-      @Override public boolean enabled(final GUI main) {
-        return selectedNode() != null;
-      }
-    },
-    null
-  };
 }

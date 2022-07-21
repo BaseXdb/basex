@@ -103,7 +103,7 @@ public final class ReplaceValue extends NodeUpdate {
       final List<NodeUpdate> l = new LinkedList<>();
       // add the primitive to catch forbidden primitive merges (same target node)
       l.add(this);
-      // add the delete primitives for the child nodes of the target
+      // add the DELETE primitives for the child nodes of the target
       // ... child axis boundaries
       final int firstChild = pre + data.attSize(pre, k);
       final int followingNode = pre + data.size(pre, k);

@@ -161,7 +161,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   /**
    * Displays the specified info string.
    * @param info string to be displayed
-   * @param cmd command that created the output (may be {@code null})
+   * @param cmd command that created the output (can be {@code null})
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time
    */
@@ -172,7 +172,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   /**
    * Displays the specified info string.
    * @param info string to be displayed
-   * @param cmd command that created the output (may be {@code null})
+   * @param cmd command that created the output (can be {@code null})
    * @param time time required for running the command
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 
 /**
  * This class serves as a central database context.
- * It references the currently opened database, options, client sessions, users and other meta data.
+ * It references the currently opened database, options, client sessions, users and other metadata.
  * Next, the instance of this class will be passed on to all operations, as it organizes concurrent
  * data access, ensuring that no job will concurrently write to the same data instances.
  *

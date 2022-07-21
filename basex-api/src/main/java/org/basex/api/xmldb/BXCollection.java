@@ -139,7 +139,7 @@ public final class BXCollection implements Collection {
   public void removeResource(final Resource resource) throws XMLDBException {
     check();
 
-    // check if the resource is an xml resource
+    // check if the resource is an XML resource
     final BXXMLResource del = checkXML(resource);
 
     // check if data instance refers to another database

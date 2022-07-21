@@ -10,7 +10,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This collations is based on a standard Java collator.
+ * This collation is based on a standard Java collator.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

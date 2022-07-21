@@ -384,7 +384,7 @@ public final class MetaData {
   // CLASS METHODS ================================================================================
 
   /**
-   * Reads in meta data from the specified stream.
+   * Reads in metadata from the specified stream.
    * @param in input stream
    * @throws IOException I/O exception
    */
@@ -439,7 +439,7 @@ public final class MetaData {
   }
 
   /**
-   * Writes the meta data to the specified output stream.
+   * Writes the metadata to the specified output stream.
    * @param out output stream
    * @throws IOException I/O Exception
    */

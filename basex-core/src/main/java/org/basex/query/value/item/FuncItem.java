@@ -47,7 +47,7 @@ public final class FuncItem extends FItem implements Scope {
    * Constructor.
    * @param sc static context
    * @param anns function annotations
-   * @param name function name (may be {@code null})
+   * @param name function name (can be {@code null})
    * @param params formal parameters
    * @param type function type
    * @param expr function body
@@ -63,11 +63,11 @@ public final class FuncItem extends FItem implements Scope {
    * Constructor.
    * @param sc static context
    * @param anns function annotations
-   * @param name function name (may be {@code null})
+   * @param name function name (can be {@code null})
    * @param params formal parameters
    * @param type function type
    * @param expr function body
-   * @param focus query focus (may be {@code null})
+   * @param focus query focus (can be {@code null})
    * @param stackSize stack-frame size
    * @param info input info
    */

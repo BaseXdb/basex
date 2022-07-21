@@ -190,7 +190,7 @@ public abstract class Path extends ParseExpr {
     // return optimized expression
     if(expr != this) return expr;
 
-    // choose best path implementation (dummy will be used for type checking)
+    // choose the best path implementation (dummy will be used for type checking)
     return copyType(get(info, root == null && rt instanceof Dummy ? rt : root, steps));
   }
 
@@ -353,7 +353,7 @@ public abstract class Path extends ParseExpr {
    * @param stats assess database statistics
    * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
-  public final ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
+  private ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
     // ensure that path starts with document nodes
     return rt != null && rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) && data != null &&
         data.meta.uptodate ? pathNodes(data.paths.root(), stats) : null;
@@ -425,7 +425,7 @@ public abstract class Path extends ParseExpr {
    * @param rt root at compile time (can be {@code null})
    * @return result of check
    */
-  public final boolean emptySteps(final Expr rt) {
+  private boolean emptySteps(final Expr rt) {
     if(rt != null) {
       Expr prev = rt;
       for(final Expr step : steps) {
@@ -751,7 +751,7 @@ public abstract class Path extends ParseExpr {
           new IndexStaticDb(data, info) :
           new IndexDynDb(root == null ? new ContextValue(info) : root, info);
 
-        // choose cheapest index access
+        // choose the cheapest index access
         for(int e = 0; e < el; e++) {
           final IndexInfo ii = new IndexInfo(db, cc, step);
           if(!step.exprs[e].indexAccessible(ii)) continue;

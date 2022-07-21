@@ -201,7 +201,7 @@ public interface QueryText {
 
   // PARSER KEYWORDS (IGNORED BY THE SYNTAX HIGHLIGHTER) ==========================================
 
-  /** Skip flag for the syntax highlighter (don't remove!). */
+  /** Parsed by the syntax highlighter (don't remove!). */
   String IGNORE = null;
 
   /** Parser token. */ String CONCAT = "||";

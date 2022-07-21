@@ -66,7 +66,7 @@ public abstract class Docs extends DynamicFn {
             if(queryInput != null && queryInput.dbName != null) list.add(queryInput.dbName);
           } else if(!expr.seqType().zero()) {
             // otherwise, database cannot be locked statically
-            list.add((String) null);
+            list.add(null);
           }
         }
       }

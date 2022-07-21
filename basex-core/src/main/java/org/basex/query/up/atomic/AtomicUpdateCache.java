@@ -46,7 +46,7 @@ import org.basex.util.hash.*;
  * @author Lukas Kircher
  */
 public final class AtomicUpdateCache {
-  /** List of structural updates (nodes are inserted to / deleted from the table. */
+  /** List of structural updates (nodes are inserted to / deleted from the table). */
   private final List<StructuralUpdate> structUpdates = new ArrayList<>(1);
   /** Value / non-structural updates like rename. */
   private final List<BasicUpdate> valueUpdates = new ArrayList<>(1);
@@ -68,7 +68,7 @@ public final class AtomicUpdateCache {
   }
 
   /**
-   * Adds a delete atomic to the list.
+   * Adds a DELETE atomic to the list.
    * @param pre PRE value of the target node/update location
    */
   public void addDelete(final int pre) {
@@ -76,7 +76,7 @@ public final class AtomicUpdateCache {
   }
 
   /**
-   * Adds an insert atomic to the list.
+   * Adds an INSERT atomic to the list.
    * @param pre PRE value of the target node/update location
    * @param par new parent of the inserted nodes
    * @param clip insertion sequence data clip
@@ -87,7 +87,7 @@ public final class AtomicUpdateCache {
   }
 
   /**
-   * Adds a replace atomic to the list.
+   * Adds a REPLACE atomic to the list.
    * @param pre PRE value of the target node/update location
    * @param clip insertion sequence data clip
    */
@@ -96,7 +96,7 @@ public final class AtomicUpdateCache {
   }
 
   /**
-   * Adds a rename atomic to the list.
+   * Adds a RENAME atomic to the list.
    * @param pre PRE value of the target node/update location
    * @param name new name for the target node
    * @param uri new uri for the target node
@@ -106,7 +106,7 @@ public final class AtomicUpdateCache {
   }
 
   /**
-   * Adds an updateValue atomic to the list.
+   * Adds an UPDATEVALUE atomic to the list.
    * @param pre PRE value of the target node/update location
    * @param value new value for the target node
    */

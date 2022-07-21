@@ -56,7 +56,7 @@ public final class BaseXList extends BaseXBack {
     values = choice.clone();
 
     // checks if list is purely numeric
-    for(final String v : values) num = num && v.matches("[0-9]+");
+    for(final String v : values) num = num && v.matches("\\d+");
 
     layout(new RowLayout());
     text = new BaseXTextField(dialog);

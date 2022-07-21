@@ -33,7 +33,7 @@ public final class IntObjMap<E> extends IntSet {
    */
   @SuppressWarnings("unchecked")
   public E put(final int key, final E value) {
-    // array bounds are checked before array is resized..
+    // array bounds are checked before array is resized
     final int i = put(key);
     final Object v = values[i];
     values[i] = value;

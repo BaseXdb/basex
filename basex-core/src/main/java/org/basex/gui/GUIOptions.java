@@ -18,7 +18,7 @@ import org.basex.util.options.*;
 public final class GUIOptions extends Options {
   // DATABASE & PROGRAM PATHS =====================================================================
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_VERSION = new Comment("Version");
 
   /** Latest released version. */
@@ -27,7 +27,7 @@ public final class GUIOptions extends Options {
   /** Check for updates. */
   public static final BooleanOption CHECKUPDATES = new BooleanOption("CHECKUPDATES", false);
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_PATHS = new Comment("Paths");
 
   /** Current path to database input. */
@@ -39,7 +39,7 @@ public final class GUIOptions extends Options {
   /** Current path to database project. */
   public static final StringOption PROJECTPATH = new StringOption("PROJECTPATH", "");
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_LAYOUT = new Comment("Layout");
 
   /** Default GUI Font. */
@@ -61,7 +61,7 @@ public final class GUIOptions extends Options {
   /** Blue GUI color factor. */
   public static final NumberOption COLORBLUE = new NumberOption("COLORBLUE", 7);
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_WINDOWS = new Comment("Windows");
 
   /** GUI layout. */
@@ -118,7 +118,7 @@ public final class GUIOptions extends Options {
 
   /** Sort ascending. */
   public static final BooleanOption ASCSORT = new BooleanOption("ASCSORT", true);
-  /** Case sensitive sorting. */
+  /** Case-sensitive sorting. */
   public static final BooleanOption CASESORT = new BooleanOption("CASESORT", true);
   /** Merge duplicate lines. */
   public static final BooleanOption MERGEDUPL = new BooleanOption("MERGEDUPL", false);
@@ -166,7 +166,7 @@ public final class GUIOptions extends Options {
   /** Last insertion type. */
   public static final NumberOption LASTINSERT = new NumberOption("LASTINSERT", 1);
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_VISUALIZATIONS = new Comment("Visualizations");
 
   /** Show attributes in treemap. */
@@ -195,7 +195,7 @@ public final class GUIOptions extends Options {
   /** Maximum number of items to be displayed. */
   public static final NumberOption MAXRESULTS = new NumberOption("MAXRESULTS", 500000);
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_SEARCH = new Comment("Search");
 
   /** Last searched strings. */
@@ -203,7 +203,7 @@ public final class GUIOptions extends Options {
   /** Last replaced strings. */
   public static final StringsOption REPLACED = new StringsOption("REPLACED");
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_HISTORY = new Comment("History");
 
   /** Last command inputs. */

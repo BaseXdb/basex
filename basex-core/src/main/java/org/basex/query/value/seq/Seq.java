@@ -117,7 +117,7 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Returns a sub sequence of this value with the given start and length.
+   * Returns a subsequence of this value with the given start and length.
    * @param pos position of first item (ge 0)
    * @param length number of items (1 lt length lt size())
    * @param qc query context

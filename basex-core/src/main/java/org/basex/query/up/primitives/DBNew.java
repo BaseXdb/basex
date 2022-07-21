@@ -14,7 +14,6 @@ import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
-import org.basex.index.resource.ResourceType;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
@@ -140,12 +139,12 @@ public final class DBNew {
    */
   private boolean cache(final boolean create) {
     for(final MainOptions dbopts : options) {
-      Object v = dbopts.get(MainOptions.ADDCACHE);
-      if(v instanceof Boolean && (Boolean) v) return true;
+      Boolean v = dbopts.get(MainOptions.ADDCACHE);
+      if(v != null && v) return true;
       if(create) {
         if(dbopts.get(MainOptions.PARSER) == MainParser.RAW) return true;
         v = dbopts.get(MainOptions.ADDRAW);
-        if(v instanceof Boolean && (Boolean) v) return true;
+        if(v != null && v) return true;
       }
     }
     return false;

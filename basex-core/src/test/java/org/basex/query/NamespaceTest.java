@@ -353,8 +353,7 @@ public final class NamespaceTest extends SandboxTest {
 
   /**
    * Detects duplicate prefix declaration at pre=0 in MemData instance after insert.
-   * Though result correct, prefix
-   * a is declared twice. -> Solution?
+   * Though result correct, prefix a is declared twice. -> Solution?
    */
   @Test public void insertD4intoD5() {
     create(4, 5);
@@ -692,7 +691,7 @@ public final class NamespaceTest extends SandboxTest {
    * The resulting fragment is inserted into a database. The
    * namespaces in scope with prefix 'ns' are finally checked for the
    * inserted <new/> tag. If the result is non-empty we may have a problem -
-   * being not able propagate the no-inherit flag to our table.
+   * being not able to propagate the no-inherit flag to our table.
    */
   @Test @Disabled
   public void copyPreserveNoInheritPersistent() {

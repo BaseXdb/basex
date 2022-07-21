@@ -123,8 +123,9 @@ final class TrieList extends TrieNode {
   Value get(final int hs, final Item key, final int level, final InputInfo ii)
       throws QueryException {
     if(hs == hash) {
-      for(int k = keys.length; k-- != 0;)
-      if(key.sameKey(keys[k], ii)) return values[k];
+      for(int k = keys.length; k-- != 0;) {
+        if(key.sameKey(keys[k], ii)) return values[k];
+      }
     }
     return null;
   }

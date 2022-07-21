@@ -3,7 +3,7 @@ package org.basex.gui.layout;
 import javax.swing.*;
 
 /**
- * Project specific tool bar implementation.
+ * Project specific toolbar implementation.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

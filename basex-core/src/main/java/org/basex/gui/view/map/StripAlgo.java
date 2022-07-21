@@ -60,7 +60,7 @@ final class StripAlgo extends MapAlgo {
         start = ni;
         sumweight -= weight - ml.weight[ni];
         weight = 0;
-        // sometimes there has to be one rectangles to fill the left space
+        // sometimes there has to be one rectangle to fill the left space
         if(ne == ni) {
           row.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh, ml.get(ni), r.level));
           break;

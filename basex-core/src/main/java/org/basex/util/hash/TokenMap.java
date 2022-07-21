@@ -29,7 +29,7 @@ public class TokenMap extends TokenSet {
    * @param value value
    */
   public final void put(final byte[] key, final byte[] value) {
-    // array bounds are checked before array is resized..
+    // array bounds are checked before array is resized
     final int i = put(key);
     values[i] = value;
   }

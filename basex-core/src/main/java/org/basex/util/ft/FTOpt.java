@@ -53,7 +53,7 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
-   * Assigns the full-text options from the specified database meta data.
+   * Assigns the full-text options from the specified database metadata.
    * @param md meta data
    * @return self reference
    */

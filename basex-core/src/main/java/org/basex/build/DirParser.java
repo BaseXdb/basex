@@ -113,7 +113,7 @@ public final class DirParser extends Parser {
       } else if(name.endsWith(IO.GZSUFFIX)) {
         // process GZIP archive
         try(GZIPInputStream is = new GZIPInputStream(in)) {
-          // generate filename (the optional filename cannot be retrieve from the input stream):
+          // generate filename (the optional filename cannot be retrieved from the input stream):
           // drop archive suffix, add .xml if no suffix remains
           name = input.name().replaceAll("\\.[^.]+$", "");
           if(!Strings.contains(name, '.')) name += IO.XMLSUFFIX;

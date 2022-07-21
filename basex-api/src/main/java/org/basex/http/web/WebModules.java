@@ -257,7 +257,7 @@ public final class WebModules {
    * @param conn HTTP connection
    */
   private static void bestQf(final List<RestXqFunction> funcs, final HTTPConnection conn) {
-    // find highest matching quality factors
+    // find the highest matching quality factors
     final ArrayList<MediaType> accepts = conn.accepts();
     double cQf = 0, sQf = 0;
     for(final RestXqFunction func : funcs) {

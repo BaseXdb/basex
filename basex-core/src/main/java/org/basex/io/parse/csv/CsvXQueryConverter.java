@@ -16,9 +16,7 @@ import org.basex.query.value.type.*;
  */
 public final class CsvXQueryConverter extends CsvConverter {
   /** String array type. */
-  public static final ArrayType STRING_ARRAY = ArrayType.get(SeqType.STRING_O);
-  /** Map with String array type. */
-  //public static final ArrayType STRING_MAP = MapType.get(SeqType.STRING_O);
+  private static final ArrayType STRING_ARRAY = ArrayType.get(SeqType.STRING_O);
 
   /** Field names. */
   public static final Str NAMES = Str.get("names");

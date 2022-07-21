@@ -19,7 +19,7 @@ import org.basex.query.up.primitives.node.*;
  */
 public final class TransformModifier extends ContextModifier {
   /** Holds all data references created by the copy clause of a transform
-   * expression. Adding an update primitive that is declared within the modify
+   * expression. Adding an update primitive that is declared within the MODIFY
    * clause of this transform expression will cause a query exception
    * (XUDY0014) if the data reference of the corresponding target node is not
    * part of this set, hence the target node has not been copied. */

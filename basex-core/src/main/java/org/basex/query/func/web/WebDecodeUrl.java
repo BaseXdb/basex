@@ -3,8 +3,8 @@ package org.basex.query.func.web;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -23,10 +23,7 @@ public final class WebDecodeUrl extends WebFn {
 
     final byte[] decoded;
     try {
-      decoded = token(URLDecoder.decode(string(uri), Strings.UTF8));
-    } catch(final UnsupportedEncodingException ex) {
-      // UTF8 is always supported
-      throw Util.notExpected(ex);
+      decoded = token(URLDecoder.decode(string(uri), StandardCharsets.UTF_8));
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
       throw WEB_INVALID2_X.get(info, ex.getLocalizedMessage());

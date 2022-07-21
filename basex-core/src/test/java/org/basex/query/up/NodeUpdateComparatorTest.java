@@ -449,7 +449,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
       new InsertInto(8, d, null, null),
       new InsertInto(7, d, null, null),
     });
-    // first sibling has attribute, second one is empty
+    // first sibling has an attribute, second one is empty
     compare(new NodeUpdate[] {
       new DeleteNode(35, d, null),
       new InsertIntoAsFirst(33, d, null, null),

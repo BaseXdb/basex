@@ -1346,10 +1346,10 @@ public final class RewritingsTest extends QueryPlanTest {
     }
 
     // generate query string with FLWOR expression
-    final StringBuilder sb = new StringBuilder();
-    sb.append("string-join(\n");
+    final StringBuilder sb = new StringBuilder().append("string-join(\n");
     for(final String var : vars) {
-      sb.append("  for $").append(var).append(" in (0, 1) !" + wrapContext() + "! xs:boolean(.)\n");
+      sb.append("  for $").append(var).append(" in (0, 1) !");
+      sb.append(wrapContext()).append("! xs:boolean(.)\n");
     }
     sb.append("  return if(").append(query).append(") then 't' else 'f'\n");
     return sb.append(")").toString();
@@ -2179,9 +2179,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** distinct-values: simplify arguments. */
   @Test public void gh1967() {
-    final java.util.function.BiConsumer<String, Integer> check = (query, result) -> {
+    final java.util.function.BiConsumer<String, Integer> check = (query, result) ->
       check("count(distinct-values((" + query + ")))", result, root(Int.class));
-    };
 
     // values will not be pre-evaluated as range is larger than CompileContext#MAX_PREEVAL
     check.accept("1 to 10000000, 1 to 10000000", 10000000);

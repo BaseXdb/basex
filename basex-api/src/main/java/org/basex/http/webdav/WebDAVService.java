@@ -95,7 +95,7 @@ final class WebDAVService {
   }
 
   /**
-   * Retrieves meta data about the resource at the given path.
+   * Retrieves metadata about the resource at the given path.
    * @param db database
    * @param path resource path
    * @return resource meta data

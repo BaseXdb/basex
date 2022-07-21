@@ -122,7 +122,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
         while(++min < splits && vm[min].values.length == 0);
         if(min == splits) break;
 
-        // find index entry with smallest key
+        // find index entry with the smallest key
         ml.reset();
         for(int i = min; i < splits; ++i) {
           if(vm[i].values.length == 0) continue;

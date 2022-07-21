@@ -381,7 +381,7 @@ public final class DecFormatter extends FormatUtil {
     final double d = item.dbl(ii);
     if(Double.isNaN(d)) return nan;
 
-    // Rule 2: check if value if negative (smaller than zero or -0)
+    // Rule 2: check if value is negative (smaller than zero or -0)
     final boolean neg = d < 0 || d == 0 && Double.doubleToLongBits(d) == Long.MIN_VALUE;
     final Picture pic = pics[neg && pics.length == 2 ? 1 : 0];
     final IntList res = new IntList(), intgr = new IntList(), fract = new IntList();

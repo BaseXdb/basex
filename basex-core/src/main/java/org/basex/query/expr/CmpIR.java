@@ -56,7 +56,7 @@ public final class CmpIR extends Single {
    * @return expression
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
+  static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final long min, final long max) throws QueryException {
     return min > max ? Bln.FALSE : min == MIN_VALUE && max == MAX_VALUE ? Bln.TRUE :
       new CmpIR(expr, min, max, info).optimize(cc);
@@ -83,7 +83,7 @@ public final class CmpIR extends Single {
     final boolean cmpEq = cmp.op == OpG.EQ;
     if(!(type1.instanceOf(AtomType.INTEGER) || cmpEq && type1.isUntyped())) return cmp;
 
-    long mn = MAX_VALUE, mx = MIN_VALUE;
+    long mn, mx;
     if(expr2 instanceof RangeSeq) {
       final long[] range = ((RangeSeq) expr2).range(false);
       mn = range[0];

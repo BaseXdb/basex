@@ -17,11 +17,11 @@ public final class MediaType implements Comparable<MediaType> {
   private static final String MULTIPART = "multipart";
   /** Text type. */
   private static final String TEXT = "text";
-  /** XQuery sub type. */
+  /** XQuery subtype. */
   private static final String XQUERY = "xquery";
-  /** CSV sub type. */
+  /** CSV subtype. */
   private static final String CSV = "csv";
-  /** CSV sub type. */
+  /** CSV subtype. */
   private static final String COMMA_SEPARATED_VALUES = "comma-separated-values";
   /** XML media type suffix. */
   private static final String XML_SUFFIX = "+xml";
@@ -63,7 +63,7 @@ public final class MediaType implements Comparable<MediaType> {
 
   /** Main type. */
   private final String main;
-  /** Sub type. */
+  /** Subtype. */
   private final String sub;
   /** Parameters. */
   private final HashMap<String, String> parameters = new HashMap<>();
@@ -76,7 +76,7 @@ public final class MediaType implements Comparable<MediaType> {
     final int p = string.indexOf(';');
     final String type = p == -1 ? string : string.substring(0, p);
 
-    // set main and sub type
+    // set main and subtype
     final int s = type.indexOf('/');
     main = s == -1 ? type : type.substring(0, s);
     sub  = s == -1 ? "" : type.substring(s + 1);
@@ -104,7 +104,7 @@ public final class MediaType implements Comparable<MediaType> {
   }
 
   /**
-   * Returns the sub type.
+   * Returns the subtype.
    * @return type
    */
   public String sub() {
@@ -112,7 +112,7 @@ public final class MediaType implements Comparable<MediaType> {
   }
 
   /**
-   * Returns the media type, composed from the main and sub type.
+   * Returns the media type, composed of the main and subtype.
    * @return type without parameters
    */
   public String type() {
@@ -195,7 +195,7 @@ public final class MediaType implements Comparable<MediaType> {
   }
 
   /**
-   * Checks if the main and sub type of this and the specified type are equal.
+   * Checks if the main and subtype of this and the specified type are equal.
    * @param type type
    * @return result of check
    */
@@ -210,7 +210,7 @@ public final class MediaType implements Comparable<MediaType> {
   }
 
   /**
-   * Compares the specified main or sub types.
+   * Compares the specified main or subtypes.
    * @param type1 first type
    * @param type2 second type
    * @return result of check

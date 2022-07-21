@@ -26,7 +26,7 @@ public interface ClientInfo {
   String clientName();
 
   /**
-   * Returns the name of a client, taken from the specified object or from the logged in user.
+   * Returns the name of a client, taken from the specified object or from the logged-in user.
    * @param id object with user id (can be {@code null})
    * @param ctx database context
    * @return name of client or {@code null}

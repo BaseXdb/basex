@@ -46,17 +46,7 @@ public class XQueryParse extends StandardFunc {
 
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parse(qc, toContent(0, qc));
-  }
-
-  /**
-   * Parses the specified query and returns the resulting query plan.
-   * @param qc query context
-   * @param query query
-   * @return query plan
-   * @throws QueryException query exception
-   */
-  protected final FElem parse(final QueryContext qc, final IO query) throws QueryException {
+    final IO query = toContent(0, qc);
     final XQueryOptions opts = toOptions(1, new XQueryOptions(), qc);
 
     // base-uri: choose uri specified in options, file path, or base-uri from parent query

@@ -355,8 +355,8 @@ public enum Calc {
 
       checkNum(ii, item1, item2);
       final Type type = numType(item1.type, item2.type);
-      boolean inv = false, range = false, zero = false;
-      long l = 0;
+      boolean inv = false, range, zero;
+      long l;
 
       if(type == FLOAT) {
         final float n1 = item1.flt(ii), n2 = item2.flt(ii), n = n1 / n2;

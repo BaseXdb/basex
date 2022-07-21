@@ -12,7 +12,7 @@ import module namespace util = 'dba/util' at '../lib/util.xqm';
 declare variable $dba:CAT := 'files';
 
 (:~
- : Upploads files.
+ : Uploads files.
  : @param  $files  map with uploaded files
  : @return redirection
  :)

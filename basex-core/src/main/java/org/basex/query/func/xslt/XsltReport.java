@@ -127,7 +127,7 @@ final class XsltReport {
    * @return item or empty sequence
    */
   private Value convert(final IOContent content, final boolean result) {
-    ANode node = null;
+    ANode node;
     try {
       node = new DBNode(content);
     } catch(final IOException ex) {

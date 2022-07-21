@@ -41,7 +41,7 @@ public abstract class TableAccess {
   public abstract void close() throws IOException;
 
   /**
-   * Tries to acquires a lock on the table. If a lock exists, it is first released.
+   * Tries to acquire a lock on the table. If a lock exists, it is first released.
    * @param write write/read lock
    * @return success flag
    */

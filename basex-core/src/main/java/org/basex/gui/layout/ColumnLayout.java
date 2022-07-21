@@ -3,7 +3,7 @@ package org.basex.gui.layout;
 import java.awt.*;
 
 /**
- * This LayoutManager is a simplified version of the the TableLayout. The added components
+ * This LayoutManager is a simplified version of the TableLayout. The added components
  * will be rendered as columns.
  *
  * @author BaseX Team 2005-22, BSD License

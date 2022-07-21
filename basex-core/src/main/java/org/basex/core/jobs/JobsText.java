@@ -3,7 +3,7 @@ package org.basex.core.jobs;
 import static org.basex.util.Token.*;
 
 /**
- * This class assembles texts which are used in the jobs management.
+ * This class assembles texts which are used for the job management.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

@@ -143,7 +143,7 @@ public final class DialogFonts extends BaseXDialog {
   }
 
   /**
-   * Creates a list of mono-spaced fonts in a separate thread.
+   * Creates a list of monospaced fonts in a separate thread.
    */
   private void monoFonts() {
     new GUIWorker<Boolean>() {

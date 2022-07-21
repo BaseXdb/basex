@@ -66,7 +66,7 @@ public final class FTOr extends FTExpr {
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
-        // find item with smallest pre value
+        // find item with the smallest pre value
         int p = -1;
         for(int e = 0; e < el; ++e) {
           if(nodes[e] != null && (p == -1 || nodes[p].pre() > nodes[e].pre())) p = e;

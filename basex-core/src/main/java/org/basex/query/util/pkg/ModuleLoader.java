@@ -231,7 +231,7 @@ public final class ModuleLoader {
   private void addURL(final IOFile jar) {
     try {
       urls.add(new URL(jar.url()));
-      // parse files of extracted sub directory
+      // parse files of extracted subdirectory
       final IOFile extDir = new IOFile(jar.parent(), '.' + jar.dbName());
       if(extDir.exists()) {
         for(final IOFile file : extDir.children()) urls.add(new URL(file.url()));

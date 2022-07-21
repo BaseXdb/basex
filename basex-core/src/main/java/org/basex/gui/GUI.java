@@ -116,7 +116,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     this.context = context;
     this.gopts = gopts;
 
-    if(Prop.MAC) GUIMacOS.init(this);
+    if(Prop.MAC) BaseXLayout.initMac(this);
     setIconImage(BaseXImages.get("logo_small"));
     setTitle();
 
@@ -690,7 +690,7 @@ public final class GUI extends JFrame implements BaseXWindow {
    * Checks for new versions.
    * @param ask ask for automatic update checks
    */
-  public void checkVersion(final boolean ask) {
+  void checkVersion(final boolean ask) {
     // retrieve latest version
     final Version version = new Version(gopts.get(GUIOptions.UPDATEVERSION));
     Version latest = version;
@@ -717,7 +717,7 @@ public final class GUI extends JFrame implements BaseXWindow {
       }
       saveOptions();
     } else if(ask) {
-      // version is up to date: ask for automatic check
+      // version is up-to-date: ask for automatic check
       chk = BaseXDialog.confirm(this, Util.info(H_VERSION_LATEST_X, Prop.NAME) + '\n' +
           H_VERSION_CHECK);
       gopts.set(GUIOptions.CHECKUPDATES, chk);

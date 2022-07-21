@@ -96,7 +96,7 @@ public final class Util {
    * @return password or empty string
    */
   public static String password() {
-    // use standard input if no console if defined (such as in Eclipse)
+    // use standard input if no console is defined (such as in Eclipse)
     if(NOCONSOLE) return input();
     // hide password
     final char[] pw = System.console().readPassword();
@@ -264,7 +264,7 @@ public final class Util {
   }
 
   /**
-   * Returns an string array representation of the specified throwable.
+   * Returns a string array representation of the specified throwable.
    * @param throwable throwable
    * @return string array
    */

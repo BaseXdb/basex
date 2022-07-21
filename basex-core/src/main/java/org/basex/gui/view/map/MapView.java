@@ -246,7 +246,7 @@ public final class MapView extends View {
     if(gui.updating || mainRects == null) return false;
 
     /*
-     * Loop through all rectangles. As the rectangles are sorted by pre order
+     * Loop through all rectangles. As the rectangles are sorted by PRE order
      * and small rectangles are descendants of bigger ones, the focused
      * rectangle can be found by simply parsing the array backwards.
      */

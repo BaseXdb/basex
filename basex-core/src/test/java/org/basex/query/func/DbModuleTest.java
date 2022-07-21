@@ -421,7 +421,7 @@ public final class DbModuleTest extends QueryPlanTest {
 
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
-    // try to backup non-existing database
+    // try to back up non-existing database
     error(func.args(NAME + "backup"), DB_OPEN1_X);
   }
 

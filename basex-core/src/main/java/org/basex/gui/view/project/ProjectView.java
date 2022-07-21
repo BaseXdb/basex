@@ -250,7 +250,7 @@ public final class ProjectView extends BaseXPanel {
 
   /**
    * Refreshes the rendering of the specified file, and its parents, in the tree.
-   * It may possibly be hidden in the current tree.
+   * It may, possibly, be hidden in the current tree.
    * @param file file to be refreshed
    */
   private void refreshTree(final IOFile file) {

@@ -44,7 +44,7 @@ public abstract class Query implements Closeable {
    * Binds a value with an optional type to an external variable.
    * @param name name of variable
    * @param value value to be bound
-   * @param type value type (may be {@code null})
+   * @param type value type (can be {@code null})
    * @throws IOException I/O exception
    */
   public abstract void bind(String name, Object value, String type) throws IOException;
@@ -61,7 +61,7 @@ public abstract class Query implements Closeable {
   /**
    * Binds a value with an optional type to an external variable.
    * @param value value to be bound
-   * @param type value type (may be {@code null})
+   * @param type value type (can be {@code null})
    * @throws IOException I/O exception
    */
   public abstract void context(Object value, String type) throws IOException;
@@ -102,7 +102,7 @@ public abstract class Query implements Closeable {
   }
 
   /**
-   * Returns the XQuery type of the current item (must be called after {@link #next()}.
+   * Returns the XQuery type of the current item (must be called after {@link #next()}).
    * @return item type
    */
   public final Type type() {

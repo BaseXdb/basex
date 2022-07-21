@@ -47,12 +47,12 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class EditorView extends View {
-  /** Delay for showing the please wait info. */
+  /** Delay for showing the "please wait" info. */
   private static final int WAIT_DELAY = 250;
   /** Delay for highlighting an error. */
   private static final int SEARCH_DELAY = 100;
   /** Link pattern. */
-  private static final Pattern LINK = Pattern.compile("(.*?), ([0-9]+)/([0-9]+)");
+  private static final Pattern LINK = Pattern.compile("(.*?), (\\d+)/(\\d+)");
 
   /** Project files. */
   final ProjectView project;
@@ -928,12 +928,12 @@ public final class EditorView extends View {
 
   /**
    * Updates the references to renamed files.
-   * @param old old file file reference
+   * @param old old file reference
    * @param renamed updated file reference
    */
   public void rename(final IOFile old, final IOFile renamed) {
     try {
-      // use canonical representation and add slash to names of directories
+      // use canonical representation and add slash to the directory names
       final boolean dir = renamed.isDir();
       final String oldPath = old.file().getCanonicalPath() + (dir ? File.separator : "");
       // iterate through all tabs

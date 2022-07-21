@@ -60,7 +60,7 @@ public final class StaticContext {
   /** Sets a custom URI resolver. */
   UriResolver resolver;
   /** Sets an XML catalog URI resolver. */
-  final URIResolver uriResolver;
+  private final URIResolver uriResolver;
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;

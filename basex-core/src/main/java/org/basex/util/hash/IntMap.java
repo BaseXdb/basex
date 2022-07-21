@@ -42,7 +42,7 @@ public final class IntMap extends IntSet {
    * @return old value
    */
   public int put(final int key, final int value) {
-    // array bounds are checked before array is resized..
+    // array bounds are checked before array is resized
     final int i = put(key);
     final int v = values[i];
     values[i] = value;

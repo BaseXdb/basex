@@ -17,7 +17,7 @@ import org.basex.server.*;
  */
 public final class AdminSessions extends AdminFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final ClientListener cl : qc.context.sessions) {
       final Context ctx = cl.context();

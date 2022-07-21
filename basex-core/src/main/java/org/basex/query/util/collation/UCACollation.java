@@ -8,7 +8,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * This collations is based on the ICU collator.
+ * This collation is based on the ICU collator.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

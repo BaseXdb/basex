@@ -440,7 +440,7 @@ final class MapRenderer {
   }
 
   /**
-   * Calculates a the tooltip text for the thumbnail visualization.
+   * Calculates the tooltip text for the thumbnail visualization.
    * @param rect rectangle
    * @param data full-text to be drawn
    * @param x mouseX

@@ -389,7 +389,7 @@ public final class JsonParser extends InputParser {
 
   /**
    * Tries to consume the given character. If successful, following whitespace is skipped.
-   * Otherwise if the error flag is set a parse error is thrown.
+   * Otherwise, if the error flag is set, a parse error is thrown.
    * @param ch character to be consumed
    * @param err error flag
    * @return if the character was consumed

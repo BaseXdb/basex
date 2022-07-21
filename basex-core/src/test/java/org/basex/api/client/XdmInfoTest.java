@@ -85,7 +85,7 @@ public final class XdmInfoTest extends SandboxTest {
      * Constructor.
      * @param host host name
      * @param port port
-     * @param user user name
+     * @param user username
      * @param pass password
      * @throws IOException I/O exception
      */

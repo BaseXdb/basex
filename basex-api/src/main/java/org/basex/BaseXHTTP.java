@@ -233,7 +233,7 @@ public final class BaseXHTTP extends CLI {
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // gather up database commands
+          case 'c': // gather database commands
             commands.add(input(arg.string()));
             break;
           case 'd': // activate debug mode
@@ -271,7 +271,7 @@ public final class BaseXHTTP extends CLI {
           case 'S': // set service flag
             service = daemon;
             break;
-          case 'U': // specify user name
+          case 'U': // specify username
             Prop.put(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging

@@ -233,8 +233,8 @@ public abstract class XQArray extends XQData {
    * If {@code to > arr.length} then the last {@code to - arr.length} entries are {@code null}.
    * If {@code from == 0 && to == arr.length}, the original array is returned.
    * @param values input values
-   * @param from first index, inclusive (may be negative)
-   * @param to last index, exclusive (may be greater than {@code arr.length})
+   * @param from first index, inclusive (can be negative)
+   * @param to last index, exclusive (can be greater than {@code arr.length})
    * @return resulting array
    */
   static Value[] slice(final Value[] values, final int from, final int to) {

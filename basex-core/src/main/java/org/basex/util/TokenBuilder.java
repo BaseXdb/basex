@@ -311,9 +311,9 @@ public final class TokenBuilder {
 
   /**
    * Adds the string representation of an object.
-   * The specified string may contain {@code %} characters as place holders.
-   * All place holders will be replaced by the specified extensions. If a digit is specified
-   * after the place holder character, it will be interpreted as insertion position.
+   * The specified string may contain {@code %} characters as placeholders.
+   * All placeholders will be replaced by the specified extensions. If a digit is specified
+   * after the placeholder character, it will be interpreted as insertion position.
    *
    * @param object object to be extended
    * @param extensions optional extension strings

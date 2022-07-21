@@ -261,7 +261,7 @@ public final class Namespaces {
   }
 
   /**
-   * Recursively adds namespace nodes to the a list, starting with the children of a node.
+   * Recursively adds namespace nodes to a list, starting with the children of a node.
    * @param node current namespace node
    * @param list list with namespace nodes
    * @param pre pre value

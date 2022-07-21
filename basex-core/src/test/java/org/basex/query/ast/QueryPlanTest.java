@@ -168,7 +168,7 @@ public abstract class QueryPlanTest extends SandboxTest {
   }
 
   /**
-   * Returns a test to check the type of an expression.
+   * Returns a test to check the expression type.
    * @param name name of expression
    * @param type type
    * @return test string
@@ -178,7 +178,7 @@ public abstract class QueryPlanTest extends SandboxTest {
   }
 
   /**
-   * Returns a test to check the type of an expression.
+   * Returns a test to check the expression type.
    * @param clazz expression class
    * @param type type
    * @return test string
@@ -188,7 +188,7 @@ public abstract class QueryPlanTest extends SandboxTest {
   }
 
   /**
-   * Returns a test to check the type of a function.
+   * Returns a test to check the function type.
    * @param func function
    * @param type type
    * @return test string

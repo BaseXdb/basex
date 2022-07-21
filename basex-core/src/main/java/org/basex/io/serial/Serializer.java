@@ -66,7 +66,7 @@ public abstract class Serializer implements Closeable {
   /**
    * Returns a specific serializer.
    * @param os output stream reference
-   * @param sopts serialization parameters (may be {@code null})
+   * @param sopts serialization parameters (can be {@code null})
    * @return serializer
    * @throws IOException I/O exception
    */

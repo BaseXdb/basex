@@ -29,7 +29,7 @@ public final class QNmMap<E> extends QNmSet {
    * @param val value
    */
   public void put(final QNm qnm, final E val) {
-    // array bounds are checked before array is resized..
+    // array bounds are checked before array is resized
     final int i = put(qnm);
     values[i] = val;
   }

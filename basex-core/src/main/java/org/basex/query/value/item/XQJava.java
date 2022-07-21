@@ -67,7 +67,7 @@ public final class XQJava extends FItem {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
+  public Expr inline(final Expr[] exprs, final CompileContext cc) {
     return null;
   }
 

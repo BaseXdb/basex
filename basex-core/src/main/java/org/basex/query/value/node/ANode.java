@@ -269,7 +269,7 @@ public abstract class ANode extends Item {
       if(n == node2) return 1;
       nl.add(n);
     }
-    // find lowest common ancestor
+    // find the lowest common ancestor
     ANode c2 = node2;
     LOOP:
     for(ANode n = node2; (n = n.parent()) != null;) {

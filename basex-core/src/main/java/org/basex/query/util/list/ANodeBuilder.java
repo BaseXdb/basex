@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 
 /**
  * Resizable-array implementation for nodes. The stored nodes will be sorted and duplicates will
- * before removed before they are returned as value or via an iterator.
+ * removed before they are returned as value or via an iterator.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

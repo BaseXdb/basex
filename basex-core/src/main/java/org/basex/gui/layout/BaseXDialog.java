@@ -151,7 +151,7 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   }
 
   /**
-   * Creates a OK and CANCEL button.
+   * Creates an OK and CANCEL button.
    * @return button list
    */
   protected final BaseXBack okCancel() {

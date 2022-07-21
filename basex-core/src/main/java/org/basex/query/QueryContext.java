@@ -55,12 +55,14 @@ public final class QueryContext extends Job implements Closeable {
   public final Variables vars = new Variables();
   /** Functions. */
   public final StaticFuncs functions = new StaticFuncs();
+  /** Query resources. */
+  public final QueryResources resources;
   /** Parent query context. */
   public final QueryContext parent;
-  /** Query info. */
-  public final QueryInfo info;
   /** Database context. */
   public final Context context;
+  /** Query info. */
+  public final QueryInfo info;
 
   /** Global database options (will be reassigned after query execution). */
   final QueryOptions options = new QueryOptions(this);
@@ -72,10 +74,8 @@ public final class QueryContext extends Job implements Closeable {
   /** Current query focus. */
   public QueryFocus focus = new QueryFocus();
   /** Date/time values. */
-  public QueryDateTime dateTime;
+  private QueryDateTime dateTime;
 
-  /** Query resources. */
-  public QueryResources resources;
   /** Update container; will be created if the first update is evaluated. */
   public Updates updates;
 
@@ -170,7 +170,7 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Parses the specified query.
    * @param query query string
-   * @param uri base URI (may be {@code null})
+   * @param uri base URI (can be {@code null})
    * @return module
    * @throws QueryException query exception
    */
@@ -197,7 +197,7 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Parses the specified query.
    * @param query query string
-   * @param uri base URI (may be {@code null})
+   * @param uri base URI (can be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
@@ -208,8 +208,8 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Parses the specified query and assigns the root expression.
    * @param query query string
-   * @param uri base URI (may be {@code null})
-   * @param sc static context (may be {@code null})
+   * @param uri base URI (can be {@code null})
+   * @param sc static context (can be {@code null})
    * @return main module
    * @throws QueryException query exception
    */
@@ -226,7 +226,7 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Parses the specified module.
    * @param query query string
-   * @param uri base URI (may be {@code null})
+   * @param uri base URI (can be {@code null})
    * @return library module
    * @throws QueryException query exception
    */
@@ -376,7 +376,7 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
-   * Returns a reference to the updates container.
+   * Returns the updates container.
    * @return updates container
    */
   public synchronized Updates updates() {
@@ -390,7 +390,7 @@ public final class QueryContext extends Job implements Closeable {
     final Locks l = jc().locks;
     final LockList list = updating ? l.writes : l.reads;
 
-    // locks in main module (may be null if parsing failed)
+    // locks in main module (can be null if parsing failed)
     boolean local = main == null || main.databases(new LockVisitor(list, contextScope == null));
     // locks in context expression
     if(local && contextScope != null) {
@@ -650,10 +650,8 @@ public final class QueryContext extends Job implements Closeable {
       final StringList dbs = updates.databases();
 
       final ValueBuilder vb = new ValueBuilder(this);
-      final QueryConsumer<Value> materialize = val -> {
-        vb.add(val.materialize(d -> d != null && (datas.contains(d) ||
-            !d.inMemory() && dbs.contains(d.meta.name)), null, this));
-      };
+      final QueryConsumer<Value> materialize = val -> vb.add(val.materialize(d -> d != null &&
+          (datas.contains(d) || !d.inMemory() && dbs.contains(d.meta.name)), null, this));
       materialize.accept(value);
       materialize.accept(updates.output(true));
 
@@ -689,7 +687,7 @@ public final class QueryContext extends Job implements Closeable {
         object = strings.add(string.split("\1")).toArray();
       }
 
-      // sub types overriding the global value (value \2 type)
+      // subtypes overriding the global value (value \2 type)
       if(string.indexOf('\2') != -1) {
         final ValueBuilder vb = new ValueBuilder(this);
         for(final String str : strings) {

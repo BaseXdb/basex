@@ -4,7 +4,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * A <i>deep</i> node containing elements in the left and right digit and a sub-tree in
+ * A <i>deep</i> node containing elements in the left and right digit and a subtree in
  * the middle.
  *
  * @author BaseX Team 2005-22, BSD License
@@ -67,7 +67,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param <N> node type
    * @param <E> element type
    * @param left left digit
-   * @param leftSize size of the left sub-tree
+   * @param leftSize size of the left subtree
    * @param right right digit
    * @param size size of this tree
    * @return the deep node
@@ -96,7 +96,7 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param <N> node type
    * @param <E> element type
    * @param left left digit
-   * @param middle middle sub-tree
+   * @param middle middle subtree
    * @param right right digit
    * @return the deep node
    */
@@ -873,8 +873,8 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
    * @param <N> node type
    * @param <E> element type
    * @param arr input array
-   * @param from first index, inclusive (may be negative)
-   * @param to last index, exclusive (may be greater than {@code arr.length})
+   * @param from first index, inclusive (can be negative)
+   * @param to last index, exclusive (can be greater than {@code arr.length})
    * @return resulting array
    */
   static <N, E> Node<N, E>[] slice(final NodeLike<N, E>[] arr, final int from, final int to) {

@@ -54,7 +54,7 @@ public abstract class JsonConverter {
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
-   * @param path input path (can be empty string}
+   * @param path input path (can be empty string)
    * @throws QueryIOException query I/O exception
    * @return result
    */

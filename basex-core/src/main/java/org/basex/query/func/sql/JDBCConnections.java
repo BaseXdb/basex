@@ -68,7 +68,7 @@ public final class JDBCConnections implements QueryResource {
    * @param ac connection or prepared statement
    * @return id or {@code null}
    */
-  synchronized byte[] get(final AutoCloseable ac) {
+  private byte[] get(final AutoCloseable ac) {
     for(final byte[] id : conns) {
       if(conns.get(id) == ac) return id;
     }

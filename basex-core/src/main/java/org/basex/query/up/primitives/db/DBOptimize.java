@@ -10,7 +10,6 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
-import org.basex.query.up.primitives.Update;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.options.*;

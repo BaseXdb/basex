@@ -140,8 +140,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
-      throws QueryException {
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
     return true;
   }
 

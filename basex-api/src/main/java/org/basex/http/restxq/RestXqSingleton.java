@@ -16,7 +16,7 @@ final class RestXqSingleton {
   /** Mutex. */
   private static final Object MUTEX = new Object();
 
-  /** Id of singleton function. */
+  /** ID of singleton function. */
   private final String id;
   /** Query context. */
   private final QueryContext qc;

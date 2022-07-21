@@ -87,9 +87,7 @@ public abstract class Sandbox {
       return "";
     } catch(final QueryException | IOException ex) {
       Util.stack(ex);
-      final AssertionError err = new AssertionError("Query failed:\n" + query);
-      err.initCause(ex);
-      throw err;
+      throw new AssertionError("Query failed:\n" + query, ex);
     }
   }
 

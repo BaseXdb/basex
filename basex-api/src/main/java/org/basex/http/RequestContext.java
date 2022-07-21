@@ -2,6 +2,7 @@ package org.basex.http;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import javax.servlet.http.*;
@@ -134,8 +135,7 @@ public final class RequestContext {
       final Map<String, Value> map) throws QueryException, IOException {
 
     try(InputStream is = body().inputStream()) {
-      final Payload payload = new Payload(is, true, null, options);
-      payload.multiForm(type).forEach(map::put);
+      map.putAll(new Payload(is, true, null, options).multiForm(type));
     }
   }
 
@@ -148,7 +148,7 @@ public final class RequestContext {
     for(final String param : Strings.split(body().toString(), '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
-        final Atm atm = Atm.get(URLDecoder.decode(parts[1], Strings.UTF8));
+        final Atm atm = Atm.get(URLDecoder.decode(parts[1], StandardCharsets.UTF_8));
         map.merge(parts[0], atm, (value1, value2) -> {
           final ItemList items = new ItemList();
           for(final Item item : value1) items.add(item);

@@ -44,7 +44,7 @@ public enum VarUsage {
   }
 
   /**
-   * Checks how often a variable or context reference is accessed in all of the given expressions.
+   * Checks how often a variable or context reference is accessed in all given expressions.
    * @param var variable ({@link Var} reference) or context ({@code null}) to inline
    * @param exprs expressions
    * @return number of accesses to the variable in all expressions combined

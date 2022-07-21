@@ -116,7 +116,7 @@ public class FnSubsequence extends StandardFunc {
   }
 
   /**
-   * Returns the start position and length of the requested sub sequence.
+   * Returns the start position and length of the requested subsequence.
    * @param cc compilation context
    * @return range or {@code null}
    * @throws QueryException query exception
@@ -127,7 +127,7 @@ public class FnSubsequence extends StandardFunc {
   }
 
   /**
-   * Returns the start position and length of the requested sub sequence.
+   * Returns the start position and length of the requested subsequence.
    * @param qc query context
    * @return range (start, end, length)
    * @throws QueryException query exception

@@ -198,7 +198,7 @@ final class ProjectFiles {
     for(final boolean onlyName : new boolean[] { true, false }) {
       for(int mode = 0; mode < 5; mode++) {
         for(final String path : cache) {
-          // check if file has already been added, or it its contents have been scanned
+          // check if file has already been added, or if its contents have been scanned
           if(exclude.contains(path)) continue;
           // check if current file matches the pattern
           final String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;

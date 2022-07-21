@@ -4,6 +4,7 @@ import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import javax.servlet.http.*;
@@ -174,11 +175,7 @@ final class WebDAVRequest extends AbstractRequest {
       final String key = parts[0];
       String val = null;
       if(parts.length > 1) {
-        try {
-          val = URLDecoder.decode(parts[1], Strings.UTF8);
-        } catch(final UnsupportedEncodingException ex) {
-          throw new RuntimeException(ex);
-        }
+        val = URLDecoder.decode(parts[1], StandardCharsets.UTF_8);
       }
       map.put(key, val);
     }
@@ -196,8 +193,8 @@ final class WebDAVRequest extends AbstractRequest {
   }
 
   /**
-   * Is the content type of the request a multi-part?
-   * @return {@code true} if the request is multi-part
+   * Is the content type of the request a multipart?
+   * @return {@code true} if the request is multipart
    */
   private boolean isMultiPart() {
     return getRequestContentType() == ContentType.MULTIPART;

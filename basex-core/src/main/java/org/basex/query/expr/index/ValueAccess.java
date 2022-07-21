@@ -59,7 +59,7 @@ public final class ValueAccess extends IndexAccess {
    * @param info input info
    * @param expr search expression
    * @param type index type
-   * @param test test test (can be {@code null})
+   * @param test test (can be {@code null})
    * @param db index database
    */
   public ValueAccess(final InputInfo info, final Expr expr, final IndexType type,
@@ -72,7 +72,7 @@ public final class ValueAccess extends IndexAccess {
    * @param info input info
    * @param type index type ({@link IndexType#TEXT}, {@link IndexType#TOKEN},
    *   {@link IndexType#ATTRIBUTE})
-   * @param test test test (can be {@code null})
+   * @param test test (can be {@code null})
    * @param db index database
    * @param expr search expression
    * @param tokens tokens (can be {@code null})

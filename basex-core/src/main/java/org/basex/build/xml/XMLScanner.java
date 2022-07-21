@@ -721,7 +721,7 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Scans an public ID literal. [12]
+   * Scans a public ID literal. [12]
    * @throws IOException I/O exception
    */
   private void pubidLit() throws IOException {

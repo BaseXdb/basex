@@ -24,7 +24,7 @@ public final class LockingTest extends SandboxTest {
   private static final int FUZZING_THREADS = 5;
   /** Repeated locking events each thread should trigger. */
   private static final int FUZZING_REPEATS = 10;
-  /** How long each lock should be hold before releasing it and fetching the next. */
+  /** How long each lock should be held before releasing it and fetching the next. */
   private static final int HOLD_TIME = 10;
 
   /** Locking instance used for testing. */

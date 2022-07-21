@@ -71,13 +71,13 @@ public abstract class ANum extends Item {
   public abstract long itr();
 
   /**
-   * Returns an double representation of the value.
+   * Returns a double representation of the value.
    * @return double value
    */
   public abstract double dbl();
 
   /**
-   * Returns an float representation of the value.
+   * Returns a float representation of the value.
    * @return float value
    */
   protected abstract float flt();

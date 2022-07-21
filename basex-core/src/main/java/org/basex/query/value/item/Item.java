@@ -237,7 +237,7 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns an text input stream for the string representation of the item.
+   * Returns a text input stream for the string representation of the item.
    * @param ii input info (can be {@code null})
    * @return input stream
    * @throws IOException I/O exception

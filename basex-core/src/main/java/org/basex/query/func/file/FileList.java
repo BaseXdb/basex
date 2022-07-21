@@ -64,7 +64,7 @@ public class FileList extends FileFn {
   }
 
   /**
-   * Collects the sub-directories and files of the specified directory.
+   * Collects the subdirectories and files of the specified directory.
    * @param root root path
    * @param recursive recursive flag
    * @param pattern file name pattern; ignored if {@code null}

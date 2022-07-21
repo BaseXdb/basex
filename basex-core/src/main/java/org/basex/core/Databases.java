@@ -127,7 +127,7 @@ public final class Databases {
 
   /**
    * Returns the name of a specific backup, or all backups found for a specific database,
-   * in a descending order.
+   * in descending order.
    * @param name name of backup with or without date suffix (empty string for general data)
    * @return names of the backups
    */

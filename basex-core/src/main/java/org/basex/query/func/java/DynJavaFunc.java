@@ -116,7 +116,7 @@ final class DynJavaFunc extends DynJavaCall {
   private Object[] method(final QueryContext qc) throws QueryException {
     final Value[] values = values(qc);
 
-    // find best candidate with matching parameters
+    // find the best candidate with matching parameters
     final ArrayList<JavaCandidate> candidates = new ArrayList<>(1);
     for(final Method method : methods) {
       final JavaCandidate jc = candidate(values, method.getParameterTypes(), isStatic(method));

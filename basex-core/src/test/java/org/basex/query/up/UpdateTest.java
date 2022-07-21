@@ -285,8 +285,8 @@ public final class UpdateTest extends SandboxTest {
    * multiple operations of the same type on the same node. Deleting a PRE value twice
    * would lead to deleting another node due to PRE shifts after the first delete.
    *
-   * If another {@link NodeUpdate} leads to the deletion of a node (i.e.
-   * {@link ReplaceValue} it must be substituted first by a sequence of other
+   * If another {@link NodeUpdate} leads to the deletion of a node (i.e.,
+   * {@link ReplaceValue}), it must be substituted first by a sequence of other
    * {@link NodeUpdate} that contains the {@link DeleteNode} primitive.
    *
    */
@@ -360,10 +360,9 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * ReplaceElementContent on a target T with a text node and rename on a child of
-   * T. As a rename does not introduce any new node identities the rename is lost and T
-   * is expected to have no children after the end of the snapshot (except the new text
-   * node).
+   * ReplaceElementContent on a target T with a text node and rename on a child of T.
+   * As a RENAME does not introduce any new node identities, the RENAME is lost and T is
+   * expected to have no children after the end of the snapshot (except the new text node).
    */
   @Test public void replaceelementcontent6() {
     testBothSequences("<n><A/></n>", "<n>newText</n>",
@@ -422,10 +421,9 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Replaces the value of the documents root node. Related to
-   * github issue #141.
+   * Replaces the value of the documents root node.
    */
-  @Test public void replaceValueOfEmptyRoot() {
+  @Test public void gh141() {
     createDB("<a/>");
     query("replace value of node /a with 'a'");
     query("/", "<a>a</a>");
@@ -965,8 +963,8 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Tests if pre value shifts are accumulated correctly for a mixture of structural and non-
-   * structural updates.
+   * Tests if pre value shifts are accumulated correctly for a mixture of structural and
+   * non-structural updates.
    */
   @Test public void delayedDistanceAdjustment26() {
     query(

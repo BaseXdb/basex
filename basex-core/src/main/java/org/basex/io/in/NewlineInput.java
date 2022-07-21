@@ -6,7 +6,7 @@ import org.basex.io.*;
 import org.basex.util.*;
 
 /**
- * This class provides a convenient access to text input. System dependent
+ * This class provides convenient access to text input. System dependent
  * line breaks ({@code \r\n}, {@code \n}, {@code \r}) will be normalized to
  * newline characters {@code \n}, and the input encoding will be guessed by
  * analyzing the first bytes.

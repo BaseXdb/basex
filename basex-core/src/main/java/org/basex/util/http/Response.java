@@ -70,11 +70,9 @@ public final class Response {
     final ItemList items = new ItemList().add(root);
     try(InputStream is = response.body()) {
       final HttpHeaders headers = response.headers();
-      final Optional<String> optCt = headers.firstValue(CONTENT_TYPE);
       final MediaType type = mtype != null ? new MediaType(mtype) :
-        optCt.isPresent() ? new MediaType(optCt.get()) : MediaType.TEXT_PLAIN;
-      final Optional<String> optCe = headers.firstValue(CONTENT_ENCODING);
-      final String encoding = optCe.isPresent() ? optCe.get() : "";
+        headers.firstValue(CONTENT_TYPE).map(MediaType::new).orElse(MediaType.TEXT_PLAIN);
+      final String encoding = headers.firstValue(CONTENT_ENCODING).orElse("");
 
       final Payload payload = new Payload(is, body, info, options);
       root.add(payload.parse(type, encoding));

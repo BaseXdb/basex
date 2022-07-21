@@ -74,7 +74,7 @@ public class IntSet extends ASet {
 
   /**
    * Returns the key with the specified id.
-   * All ids starts with {@code 1} instead of {@code 0}.
+   * All ids start with {@code 1} instead of {@code 0}.
    * @param id id of the key to return
    * @return key
    */

@@ -72,7 +72,7 @@ public final class TarEntry {
   }
 
   /**
-   * Checks if the the current entry is a directory.
+   * Checks if the current entry is a directory.
    * @return result of check
    */
   public boolean isDirectory() {

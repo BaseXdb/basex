@@ -168,7 +168,7 @@ public abstract class JavaCall extends Arr {
       return new Object[0];
     }
 
-    // convert empty number to smallest type
+    // convert empty number to the smallest type
     if(arg instanceof ANum) {
       final double d = ((ANum) arg).dbl();
       if((param == byte.class  || param == Byte.class)      && (byte)  d == d) return (byte)   d;
@@ -176,7 +176,7 @@ public abstract class JavaCall extends Arr {
       if((param == char.class  || param == Character.class) && (char)  d == d) return (char)   d;
       if((param == int.class   || param == Integer.class)   && (int)   d == d) return (int)    d;
       if((param == float.class || param == Float.class)     && (float) d == d) return (float)  d;
-      if(param == double.class || param == Double.class)                       return (double) d;
+      if(param == double.class || param == Double.class)                       return d;
     }
 
     // convert to Java object
@@ -187,7 +187,7 @@ public abstract class JavaCall extends Arr {
 
     // return value
     // - if argument is an instance of the function parameter, or
-    // - if value is null and and parameter is not primitive
+    // - if value is null and parameter is not primitive
     if(param.isInstance(value) || value == null && !param.isPrimitive()) return value;
 
     // give up

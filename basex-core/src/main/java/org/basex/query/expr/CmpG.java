@@ -199,7 +199,7 @@ public class CmpG extends Cmp {
       final Expr expr1 = exprs[0], expr2 = exprs[1];
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
-      // skip type check if types are identical (and a child instance of of any atomic type)
+      // skip type check if types are identical (and a child instance of any atomic type)
       check = !(type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
           (type1.isSortable() || op != OpG.EQ && op != OpG.NE) || comparable(type1, type2));
 

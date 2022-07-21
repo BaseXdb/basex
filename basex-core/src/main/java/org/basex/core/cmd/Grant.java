@@ -19,7 +19,7 @@ public final class Grant extends AUser {
   /**
    * Default constructor.
    * @param permission permission
-   * @param user user name
+   * @param user username
    */
   public Grant(final Object permission, final String user) {
     this(permission, user, null);
@@ -28,7 +28,7 @@ public final class Grant extends AUser {
   /**
    * Constructor, specifying a database.
    * @param permission permission
-   * @param user user name
+   * @param user username
    * @param pattern database pattern (may be {@code null})
    */
   public Grant(final Object permission, final String user, final String pattern) {

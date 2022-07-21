@@ -247,7 +247,6 @@ final class FingerTreeIterator<E> implements ListIterator<E> {
         } else {
           // backtrack one level
           trees[tTop] = null;
-          deepPos = 0;
           tTop--;
           start = trees[tTop].right[0];
           deepPos = 1;

@@ -620,7 +620,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Assures that the specified item item is an array.
+   * Assures that the specified item is an array.
    * @param item item to check
    * @return the array
    * @throws QueryException if the item is not an array

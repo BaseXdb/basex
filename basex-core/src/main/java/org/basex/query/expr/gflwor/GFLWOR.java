@@ -159,7 +159,7 @@ public final class GFLWOR extends ParseExpr {
 
       // rewrite group by to distinct-values
       //   for $e in E group by $g := G return R
-      //   ->  for $g in distinct-values(for $e in E return G)) return R
+      //   ->  for $g in distinct-values(for $e in E return G) return R
       if(cs == 2 && clauses.get(1) instanceof GroupBy) {
         final GroupSpec spec = ((GroupBy) clauses.get(1)).group();
         if(spec != null) {
@@ -619,7 +619,7 @@ public final class GFLWOR extends ParseExpr {
           clauses.remove(c--);
         } else {
           // otherwise, remove remaining clauses
-          for(int d = clauses.size() - 1; d >= c; d--) clauses.remove(d);
+          clauses.subList(c, clauses.size()).clear();
           rtrn = Empty.VALUE;
         }
       } else if(!clause.has(Flag.NDT)) {
@@ -1060,7 +1060,7 @@ public final class GFLWOR extends ParseExpr {
    * @return rewritten expression or {@code null}
    * @throws QueryException query exception
    */
-  public Expr removeOrderBy(final CompileContext cc) throws QueryException {
+  private Expr removeOrderBy(final CompileContext cc) throws QueryException {
     return clauses.removeIf(clause -> clause instanceof OrderBy) ? optimize(cc) : null;
   }
 

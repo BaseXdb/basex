@@ -9,7 +9,6 @@ import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.BinaryPut;
 import org.basex.http.*;
 import org.basex.util.http.*;
 

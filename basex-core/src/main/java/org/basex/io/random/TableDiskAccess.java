@@ -600,7 +600,7 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Calculates the occupied space in a page.
    * @param index page index
-   * @return occupied space in number of records
+   * @return occupied space
    */
   private int occSpace(final int index) {
     return (index + 1 < used ? fPreIndex[index + 1] : meta.size) - fPreIndex[index];

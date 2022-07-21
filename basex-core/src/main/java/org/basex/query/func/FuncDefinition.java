@@ -135,7 +135,7 @@ public final class FuncDefinition {
   }
 
   /**
-   * Returns the the parameter names for an instance of this function with the given arity.
+   * Returns the parameter names for an instance of this function with the given arity.
    * @param arity number of arguments
    * @return names of parameters
    */

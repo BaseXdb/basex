@@ -6,9 +6,8 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class indexes full-text tokens in a balanced binary tree, including
- * their pre and pos values. An iterator returns all compressed pre and pos
- * values in a sorted manner.
+ * This class indexes full-text tokens in a balanced binary tree, including their pre and pos
+ * values. An iterator returns all compressed pre and pos values in a sorted manner.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -32,9 +31,8 @@ final class FTIndexTree extends IndexTree {
   }
 
   /**
-   * Checks if the specified token was already indexed. If yes, its pre
-   * value is added to the existing values. Otherwise a new index entry
-   * is created.
+   * Checks if the specified token was already indexed. If yes, its pre value is added to the
+   * existing values. Otherwise, a new index entry is created.
    * @param token token to be indexed
    * @param id id value of the token
    * @param pos pos value of the token

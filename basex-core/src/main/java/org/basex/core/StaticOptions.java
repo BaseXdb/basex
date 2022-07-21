@@ -15,7 +15,7 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class StaticOptions extends Options {
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_GENERAL = new Comment("General Options");
 
   /** Debug mode. */
@@ -35,7 +35,7 @@ public final class StaticOptions extends Options {
   /** Timeout (seconds) for remembering result of asynchronous queries. */
   public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
 
   /** Server: host, used for connecting new clients. */
@@ -69,10 +69,10 @@ public final class StaticOptions extends Options {
   public static final BooleanOption LOG = new BooleanOption("LOG", true);
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
-  /** Write trace output to logs. */
+  /** Write trace output to the logs. */
   public static final BooleanOption LOGTRACE = new BooleanOption("LOGTRACE", true);
 
-  /** Comment: written to options file. */
+  /** Comment: written to the options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");
 
   /** Web path (cannot be specified in web.xml). */

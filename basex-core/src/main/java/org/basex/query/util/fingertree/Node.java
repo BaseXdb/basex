@@ -77,12 +77,12 @@ public interface Node<N, E> extends NodeLike<N, E> {
   NodeLike<N, E>[] remove(Node<N, E> l, Node<N, E> r, long pos);
 
   /**
-   * Extracts a sub-tree containing the elements at positions {@code off .. off + len - 1}
+   * Extracts a subtree containing the elements at positions {@code off .. off + len - 1}
    * from the tree rooted at this node.
    * This method is only called if {@code len < this.size()} holds.
    * @param off offset of first element
    * @param len number of elements
-   * @return the sub-tree, possibly under-full
+   * @return the subtree, possibly under-full
    */
   NodeLike<N, E> slice(long off, long len);
 

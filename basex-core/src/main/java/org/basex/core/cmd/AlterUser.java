@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class AlterUser extends AUser {
   /**
    * Default constructor.
-   * @param name user name
+   * @param name username
    * @param newname new name
    */
   public AlterUser(final String name, final String newname) {

@@ -66,7 +66,7 @@ public abstract class QueryModule {
   /**
    * Java functions can only be executed by users with {@code ADMIN} permissions.
    * You may annotate a function with {@link Requires}({@link Permission}) to
-   * also make it accessible to other users with less permissions.
+   * also make it accessible to other users with fewer permissions.
    */
   @Retention(RetentionPolicy.RUNTIME)
   @Target(ElementType.METHOD)

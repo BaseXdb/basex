@@ -4,7 +4,6 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.BinaryPut;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
@@ -40,7 +39,7 @@ public class LocalSession extends Session {
   /**
    * Constructor, specifying login data.
    * @param context context
-   * @param username user name
+   * @param username username
    * @param password password (plain text)
    * @throws LoginException login exception
    */
@@ -52,7 +51,7 @@ public class LocalSession extends Session {
   /**
    * Constructor, specifying login data and an output stream.
    * @param context context
-   * @param username user name
+   * @param username username
    * @param password password (plain text)
    * @param output client output; if set to {@code null}, results will be returned as strings
    * @throws LoginException login exception

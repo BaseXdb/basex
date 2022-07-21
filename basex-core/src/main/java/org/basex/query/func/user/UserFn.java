@@ -53,10 +53,10 @@ abstract class UserFn extends StandardFunc {
   }
 
   /**
-   * Checks if the specified expression is a valid user name.
+   * Checks if the specified expression is a valid username.
    * @param i index of argument
    * @param qc query context
-   * @return user name
+   * @return username
    * @throws QueryException query exception
    */
   protected final String toName(final int i, final QueryContext qc) throws QueryException {

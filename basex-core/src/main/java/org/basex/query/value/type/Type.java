@@ -248,7 +248,7 @@ public interface Type {
 
   /**
    * Computes the intersection between this type and the given one, i.e. the least specific type
-   * that is sub-type of both types. If no such type exists, {@code null} is returned.
+   * that is subtype of both types. If no such type exists, {@code null} is returned.
    * @param type other type
    * @return intersection type or {@code null}
    */

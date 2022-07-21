@@ -119,7 +119,7 @@ public class IdPreMap {
    */
   public void insert(final int pre, final int id, final int c) {
     if(rows == 0 && pre == id && id == baseid + 1) {
-      // no mapping and we append at the end => nothing to do
+      // no mapping, and we append at the end => nothing to do
       baseid += c;
       return;
     }
@@ -176,7 +176,7 @@ public class IdPreMap {
    */
   public void delete(final int pre, final int id, final int c) {
     if(rows == 0 && pre == id && id - c == baseid + 1) {
-      // no mapping and we delete at the end => nothing to do
+      // no mapping, and we delete at the end => nothing to do
       baseid += c;
       return;
     }

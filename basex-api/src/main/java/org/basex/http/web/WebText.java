@@ -84,7 +84,7 @@ public interface WebText {
   /** Error message. */
   String VAR_UNDEFINED_X = "No binding defined for $%.";
   /** Error message. */
-  String UNKNOWN_SER_X = "Unknown serialization parameter: %.";
+  String UNKNOWN_PARAMETER_X = "%";
   /** Error message. */
   String UNEXP_NODE_X = "Unexpected node: %.";
   /** Error message. */

@@ -20,6 +20,7 @@ import javax.swing.border.*;
 
 import org.basex.core.*;
 import org.basex.gui.*;
+import org.basex.gui.dialog.*;
 import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
@@ -141,7 +142,7 @@ public final class BaseXLayout {
       @Override
       public synchronized void drop(final DropTargetDropEvent dtde) {
         dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-        for(final Object clip : fromClipboard(() -> dtde.getTransferable())) {
+        for(final Object clip : fromClipboard(dtde::getTransferable)) {
           dnd.drop(clip);
         }
         comp.requestFocusInWindow();
@@ -360,7 +361,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Adds human readable shortcuts to the specified string.
+   * Adds human-readable shortcuts to the specified string.
    * @param string tooltip string
    * @param sc shortcut (can be {@code null})
    * @return tooltip
@@ -423,7 +424,7 @@ public final class BaseXLayout {
    * @param x horizontal position
    * @param y vertical position
    * @param w width
-   * @param c color color depth
+   * @param c color depth
    */
   public static void drawTooltip(final Graphics g, final String tt, final int x, final int y,
       final int w, final int c) {
@@ -577,5 +578,28 @@ public final class BaseXLayout {
       }
     }
     return sb.length() > 0 ? sb.toString() : " ";
+  }
+
+  /**
+   * Assigns macOS-specific interface GUI properties.
+   * @param gui GUI reference
+   */
+  public static void initMac(final GUI gui) {
+    try {
+      // show menu in the screen menu instead of inside the application window
+      System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+      final Desktop desktop = Desktop.getDesktop();
+      desktop.setAboutHandler(e -> DialogAbout.show(gui));
+      desktop.setPreferencesHandler(e -> DialogPrefs.show(gui));
+      desktop.setQuitHandler((e, r) -> GUIMenuCmd.C_EXIT.execute(gui));
+
+      final Taskbar taskbar = Taskbar.getTaskbar();
+      taskbar.setIconImage(BaseXImages.get("logo_large"));
+
+    } catch(final Exception ex) {
+      Util.errln("Failed to initialize native Mac OS X interface:");
+      Util.stack(ex);
+    }
   }
 }

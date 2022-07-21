@@ -212,7 +212,7 @@ final class Unit {
    * Adds an error element to the specified test case.
    * @param ex exception
    * @param testcase testcase element
-   * @param code error code (may be {@code null})
+   * @param code error code (can be {@code null})
    */
   private void addError(final QueryException ex, final FElem testcase, final QNm code) {
     final QNm name = ex.qname();

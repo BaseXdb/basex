@@ -84,10 +84,10 @@ public final class UserInfo {
     } else {
       // server provides no authentication data: skip
       final Optional<String> header = response.headers().firstValue(WWW_AUTHENTICATE);
-      if(!header.isPresent()) return false;
+      if(header.isEmpty()) return false;
       // server returns other authentication method: skip
       final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header.get());
-      if(!auth.get(AUTH_METHOD).toString().equals(request.authMethod.toString())) return false;
+      if(!auth.get(AUTH_METHOD).equals(request.authMethod.toString())) return false;
 
       final String realm =
           auth.get(REALM),

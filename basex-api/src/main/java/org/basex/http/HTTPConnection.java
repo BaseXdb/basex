@@ -87,7 +87,7 @@ public final class HTTPConnection implements ClientInfo {
    * @param username name of default servlet user (can be {@code null})
    * @throws IOException I/O exception
    */
-  public void authenticate(final String username) throws IOException {
+  void authenticate(final String username) throws IOException {
     // choose admin user for OPTIONS requests, servlet-specific user, or global user (can be empty)
     String name = method.equals(Method.OPTIONS.name()) ? UserText.ADMIN : username;
     if(name == null) name = context.soptions.get(StaticOptions.USER);
@@ -127,7 +127,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Returns the URL path. The path always starts with a slash.
-   * @return path path
+   * @return path
    */
   public String path() {
     return path;
@@ -275,7 +275,7 @@ public final class HTTPConnection implements ClientInfo {
    * @param ex job exception
    * @throws IOException I/O exception
    */
-  public void stop(final JobException ex) throws IOException {
+  void stop(final JobException ex) throws IOException {
     final int code = 460;
     final String info = ex.getMessage();
     log(code, info);
@@ -487,7 +487,7 @@ public final class HTTPConnection implements ClientInfo {
 
   /**
    * Returns a user for the specified string, or an error.
-   * @param name user name (can be {@code null})
+   * @param name username (can be {@code null})
    * @return user reference
    * @throws LoginException login exception
    */

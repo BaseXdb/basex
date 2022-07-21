@@ -228,7 +228,7 @@ public final class BaseXServer extends CLI implements Runnable {
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // gather up database commands
+          case 'c': // gather database commands
             // evaluate commands
             commands.add(input(arg.string()));
             break;

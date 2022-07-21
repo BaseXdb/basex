@@ -41,7 +41,7 @@ public final class IdPreMapTest {
     deletedpres = new IntList(ITERATIONS);
   }
 
-  /** Insert correctness: insert values at at the end. */
+  /** Insert correctness: insert values at the end. */
   @Test public void appendCorrectness() {
     final int n = BASEID + ITERATIONS;
     for(int id = BASEID + 1; id <= n; ++id) {
@@ -50,7 +50,7 @@ public final class IdPreMapTest {
     }
   }
 
-  /** Insert correctness: insert values at at the end. */
+  /** Insert correctness: insert values at the end. */
   @Test public void deleteFromEndCorrectness() {
     for(int id = BASEID; id >= 0; --id) {
       delete(id);

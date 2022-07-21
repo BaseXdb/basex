@@ -6,7 +6,7 @@ import org.basex.build.json.*;
 import org.basex.query.value.node.*;
 
 /**
- * This class converts a JSON document to a XML structure. JSON keys will be stored in attributes.
+ * This class converts a JSON document to an XML structure. JSON keys will be stored in attributes.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen

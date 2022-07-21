@@ -220,7 +220,7 @@ public final class List extends Arr {
       @Override
       public long size() throws QueryException {
         if(offsets == null) {
-          // first call: sum up sizes
+          // first call: add up sizes
           offsets = new long[el];
           for(int o = 0; o < el && size != -1; o++) {
             // cache offsets for direct access

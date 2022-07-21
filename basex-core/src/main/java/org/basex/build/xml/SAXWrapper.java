@@ -13,7 +13,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.xml.*;
 import org.basex.util.*;
-import org.basex.util.Util;
 import org.xml.sax.*;
 
 /**

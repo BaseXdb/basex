@@ -9,7 +9,6 @@ import java.util.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.cmd.BinaryPut;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.io.in.*;

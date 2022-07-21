@@ -74,7 +74,6 @@ public final class PathTest extends SandboxTest {
 
   /**
    * #905: Ensure that parser options will not affect doc() and collection().
-   * May be moved to a separate test class in future.
    */
   @Test public void docParsing() {
     final IOFile path = new IOFile(sandbox(), "doc.xml");

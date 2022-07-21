@@ -47,8 +47,7 @@ public final class JsonMLSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void namespace(final byte[] prefix, final byte[] uri, final boolean standalone)
-      throws IOException { }
+  protected void namespace(final byte[] prefix, final byte[] uri, final boolean standalone) { }
 
   @Override
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)

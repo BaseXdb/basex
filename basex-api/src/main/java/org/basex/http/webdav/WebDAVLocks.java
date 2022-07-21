@@ -14,7 +14,7 @@ public final class WebDAVLocks {
   private static final WebDAVLocks INSTANCE = new WebDAVLocks();
   /** Registered locks. */
   private final HashMap<String, WebDAVLock> locks = new HashMap<>();
-  /** Id counter. */
+  /** ID counter. */
   private long lockId;
 
   /** Private constructor. */

@@ -1422,7 +1422,7 @@ public enum QueryError {
    */
   QueryError(final ErrType type, final int number, final String message) {
     final String n = Integer.toString(number);
-    code = new StringBuilder().append(type).append("0".repeat(4 - n.length())).append(n).toString();
+    code = type + "0".repeat(4 - n.length()) + n;
     uri = type.uri;
     prefix = type.prefix;
     this.message = message;
@@ -1480,13 +1480,11 @@ public enum QueryError {
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
     /** Error type. */ JOB(JOB_PREFIX,           JOB_URI),
     /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
-    /** Error type. */ OUTPUT(OUTPUT_PREFIX,     OUTPUT_URI),
     /** Error type. */ PROC(PROC_PREFIX,         PROC_URI),
     /** Error type. */ PROF(PROF_PREFIX,         PROF_URI),
     /** Error type. */ RANDOM(RANDOM_PREFIX,     RANDOM_URI),
     /** Error type. */ REPO(REPO_PREFIX,         REPO_URI),
     /** Error type. */ REQUEST(REQUEST_PREFIX,   REQUEST_URI),
-    /** Error type. */ SESSION(SESSION_PREFIX,   SESSION_URI),
     /** Error type. */ SESSIONS(SESSIONS_PREFIX, SESSIONS_URI),
     /** Error type. */ SQL(SQL_PREFIX,           SQL_URI),
     /** Error type. */ STORE(STORE_PREFIX,       STORE_URI),

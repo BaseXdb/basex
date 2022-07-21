@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class QuerySuggest extends QueryParser {
+final class QuerySuggest extends QueryParser {
   /** Data reference. */
   private final Data data;
 
@@ -48,7 +48,7 @@ public final class QuerySuggest extends QueryParser {
    * @param index of valid input
    * @return list of suggestions, followed by valid input string
    */
-  public StringList complete(final int index) {
+  StringList complete(final int index) {
     final StringList list = new StringList();
     if(show) {
       for(final PathNode node : current) {

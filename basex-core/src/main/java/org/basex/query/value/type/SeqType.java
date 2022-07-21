@@ -479,7 +479,7 @@ public final class SeqType {
 
   /**
    * Computes the intersection of two sequence types, i.e. the most general type that is
-   * sub-type of both types. If no such type exists, {@code null} is returned.
+   * subtype of both types. If no such type exists, {@code null} is returned.
    * @param st second type
    * @return resulting type or {@code null}
    */

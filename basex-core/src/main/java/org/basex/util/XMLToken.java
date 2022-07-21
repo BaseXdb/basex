@@ -146,7 +146,7 @@ public final class XMLToken {
   /**
    * Checks if the specified name is an id/idref attribute ({@code idref}: local name must contain
    * 'idref'; {@code id}: local name must contain 'if', but not 'idref').
-   * The correct approach would be to gather all id/idref attributes and store them as meta data.
+   * The correct approach would be to gather all id/idref attributes and store them as metadata.
    * @param name name
    * @param idref id/idref flag
    * @return result of check

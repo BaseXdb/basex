@@ -399,9 +399,9 @@ public final class FTWords extends FTExpr {
     if(data == null && !ii.enforce() || occ != null) return false;
 
     if(data != null) {
-      /* index will be applied if no explicit match options have been set
-       * that conflict with the index options. As a consequence, though, index-
-       * based querying might yield other results than sequential scanning. */
+      /* index will be applied if no explicit match options have been set that
+       * conflict with the index options. As a consequence, though, index-based
+       * querying might yield other results than sequential scanning. */
       final MetaData md = data.meta;
       if(ftOpt.cs != null && md.casesens == (ftOpt.cs == FTCase.INSENSITIVE) ||
           ftOpt.isSet(DC) && md.diacritics != ftOpt.is(DC) ||

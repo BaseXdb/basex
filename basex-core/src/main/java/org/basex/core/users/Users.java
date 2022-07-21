@@ -142,8 +142,8 @@ public final class Users {
 
   /**
    * Returns user with the specified name.
-   * @param name user name
-   * @return user name or {@code null}
+   * @param name username
+   * @return username or {@code null}
    */
   public User get(final String name) {
     synchronized(users) {
@@ -152,7 +152,7 @@ public final class Users {
   }
 
   /**
-   * Returns all user names that match the specified pattern.
+   * Returns all usernames that match the specified pattern.
    * @param pattern glob pattern
    * @return user list
    */

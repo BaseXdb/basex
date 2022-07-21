@@ -30,12 +30,12 @@ public final class DeleteNode extends NodeUpdate {
   }
 
   /**
-   * Constructor for a delete primitive that is a product of a replaceElementContent
+   * Constructor for a DELETE primitive that is a product of a replaceElementContent
    * substitution.
    * @param pre target node PRE value
    * @param data target data reference
    * @param ii input info
-   * @param rec this delete is a product of a replaceElementContent substitution
+   * @param rec this DELETE is a product of a replaceElementContent substitution
    */
   DeleteNode(final int pre, final Data data, final InputInfo ii, final boolean rec) {
     super(UpdateType.DELETENODE, pre, data, ii);

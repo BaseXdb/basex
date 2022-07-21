@@ -26,7 +26,7 @@ public final class TokenBoolMap extends TokenSet {
    * @param value value
    */
   public void put(final byte[] key, final boolean value) {
-    // array bounds are checked before array is resized..
+    // array bounds are checked before array is resized
     final int i = put(key);
     values[i] = value;
   }

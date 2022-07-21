@@ -35,7 +35,7 @@ public final class User {
 
   /**
    * Constructor.
-   * @param name user name
+   * @param name username
    * @param password password
    */
   public User(final String name, final String password) {
@@ -125,7 +125,7 @@ public final class User {
   }
 
   /**
-   * Sets the user name.
+   * Sets the username.
    * @param nm name
    */
   public synchronized void name(final String nm) {
@@ -141,7 +141,7 @@ public final class User {
   }
 
   /**
-   * Returns the user name.
+   * Returns the username.
    * @return name
    */
   public synchronized String name() {
@@ -269,7 +269,7 @@ public final class User {
 
   /**
    * Returns the digest hash value.
-   * @param name user name
+   * @param name username
    * @param password password
    * @return digest digest hash
    */

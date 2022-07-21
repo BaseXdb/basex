@@ -67,7 +67,7 @@ final class RestXqPath extends WebPath implements Comparable<RestXqPath> {
 
   @Override
   public int compareTo(final RestXqPath rxp) {
-    // compare number of path segments: path with less segments is less specific
+    // compare number of path segments: path with fewer segments is less specific
     final int sl = matcher.segments, d = rxp.matcher.segments - sl;
     if(d != 0) return d;
 

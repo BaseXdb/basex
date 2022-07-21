@@ -62,7 +62,7 @@ public final class FTTokenizer {
       }
 
       return
-        // skip stop words, i. e. if the current query token is a stop word,
+        // skip stop words, i.e., if the current query token is a stop word,
         // it is always equal to the corresponding input token:
         opt.sw != null && opt.sw.contains(qu) ||
         // fuzzy search:

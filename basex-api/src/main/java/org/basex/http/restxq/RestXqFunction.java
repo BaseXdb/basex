@@ -154,11 +154,11 @@ public final class RestXqFunction extends WebFunction {
         options.set(MainOptions.TEXTPARSER, parse(opts, ann));
       } else if(eq(def.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
+        final String name = string(def.local()), val = toString(value.itemAt(0));
         try {
-          sopts.assign(string(def.local()), toString(value.itemAt(0)));
+          sopts.assign(name, val);
         } catch(final BaseXException ex) {
-          Util.debug(ex);
-          throw error(ann.info, UNKNOWN_SER_X, def.local());
+          throw error(ann.info, UNKNOWN_PARAMETER_X, ex);
         }
       } else if(def == _PERM_ALLOW) {
         for(final Item arg : value) allows.add(toString(arg));
@@ -191,7 +191,7 @@ public final class RestXqFunction extends WebFunction {
    * @throws QueryException exception
    * @throws IOException I/O exception
    */
-  public Expr[] bind(final Object ext, final HTTPConnection conn,
+  Expr[] bind(final Object ext, final HTTPConnection conn,
       final QueryContext qc) throws QueryException, IOException {
 
     // bind variables from segments

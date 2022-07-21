@@ -3,7 +3,6 @@ package org.basex.util.http;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
-import static org.basex.util.http.HTTPText.VALUE;
 
 import java.io.*;
 import java.util.*;
@@ -122,7 +121,7 @@ public final class Payload {
   /**
    * Extracts the parts from a multipart message.
    * @param sep separation boundary
-   * @param parts list with all parts (may be {@code null})
+   * @param parts list with all parts (can be {@code null})
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
@@ -143,7 +142,7 @@ public final class Payload {
    * Extracts a part from a multipart message.
    * @param sep separation boundary
    * @param end closing boundary
-   * @param parts list with all parts (may be {@code null})
+   * @param parts list with all parts (can be {@code null})
    * @return success flag
    * @throws IOException I/O Exception
    * @throws QueryException query exception

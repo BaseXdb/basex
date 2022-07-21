@@ -123,7 +123,7 @@ public final class Updates {
    * which has a fragment as a target node. If an ancestor of the given target
    * node has already been added to the pending update list, the corresponding
    * data reference and the pre value of the given target node within this
-   * database table are calculated. Otherwise a new data instance is created.
+   * database table are calculated. Otherwise, a new data instance is created.
    * This function is called during query evaluation.
    *
    * @param target target fragment

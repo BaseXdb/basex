@@ -201,7 +201,7 @@ public enum ApiFunction implements AFunction {
 
   /**
    * Constructs a function signature; calls
-   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, byte[])}.
+   * {@link #ApiFunction(Supplier, String, SeqType[], SeqType, byte[], Perm)}.
    * @param supplier function implementation constructor
    * @param desc descriptive function string
    * @param params parameter types

@@ -19,7 +19,7 @@ abstract class XsltFn extends StandardFunc {
   static final ConcurrentHashMap<String, Templates> MAP = new ConcurrentHashMap<>();
 
   /** Saxon implementations. */
-  static final String[] SAXON = {
+  private static final String[] SAXON = {
     "com.saxonica.config.EnterpriseTransformerFactory",
     "com.saxonica.config.ProfessionalTransformerFactory",
     "net.sf.saxon.TransformerFactoryImpl"

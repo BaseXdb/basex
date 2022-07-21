@@ -20,9 +20,9 @@ import org.basex.util.list.*;
 final class PlotData {
   /** Database context. */
   final Context context;
-  /** The x axis of the plot. */
+  /** The x-axis of the plot. */
   final PlotAxis xAxis;
-  /** The y axis of the plot. */
+  /** The y-axis of the plot. */
   final PlotAxis yAxis;
   /** Items pre values. */
   int[] pres;

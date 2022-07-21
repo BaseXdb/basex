@@ -154,7 +154,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * Runs the specified commands, decorated by a progress dialog, and calls
    * {@link BaseXDialog#action} if the dialog is closed.
    * @param gui reference to the main window
-   * @param dialog reference to the dialog window (may be {@code null})
+   * @param dialog reference to the dialog window (can be {@code null})
    * @param post post-processing step (may be {@code null})
    * @param cmds commands to be run
    */

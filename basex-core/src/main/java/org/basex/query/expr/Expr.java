@@ -197,7 +197,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if the variable is used
    */
   public final boolean uses(final Var var) {
-    // return true iff the the search was aborted, i.e. the variable is used
+    // return true iff the search was aborted, i.e. the variable is used
     return !accept(new ASTVisitor() {
       @Override
       public boolean used(final VarRef ref) {
@@ -247,7 +247,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Inlines an expression into this one, replacing all variable or context references.
-   * This function is called by {@link InlineContext#inline(Expr)} (see invocations of this
+   * This function is called by {@link InlineContext#inline(Expr)} (see invocations of these
    * functions for further inlinings).
    *
    * The variable reference is replaced in:
@@ -430,7 +430,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Counts the number of expressions in this expression's sub-tree.
+   * Counts the number of expressions in this expression's subtree.
    * This method is e.g. called by {@link StaticFunc#inline} to check if an expression
    * is small enough to be inlined.
    * @return number of expressions

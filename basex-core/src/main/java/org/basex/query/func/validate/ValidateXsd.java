@@ -40,9 +40,9 @@ public class ValidateXsd extends ValidateFn {
   /** Implementation offset. */
   static final int OFFSET;
   /** Saxon flag. */
-  static final boolean SAXON;
+  private static final boolean SAXON;
   /** Java flag. */
-  static final boolean JAVA;
+  private static final boolean JAVA;
 
   static {
     int i = 0;

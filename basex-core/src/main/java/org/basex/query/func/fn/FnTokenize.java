@@ -39,7 +39,7 @@ public final class FnTokenize extends RegEx {
           int start;
 
           @Override
-          public Item next() throws QueryException {
+          public Item next() {
             if(start == -1) return null;
             final int e = indexOf(input[0], ch, start);
             return e != -1 ? next(e, e + sl) : next(vl, -1);
@@ -61,7 +61,7 @@ public final class FnTokenize extends RegEx {
       int start;
 
       @Override
-      public Item next() throws QueryException {
+      public Item next() {
         return start == -1 ? null : matcher.find() ?
           next(matcher.start(), matcher.end()) : next(string.length(), -1);
       }

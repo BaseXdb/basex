@@ -18,9 +18,9 @@ import org.basex.util.*;
  */
 public final class BackupCreate extends NameUpdate {
   /** Comment string. */
-  final String comment;
+  private final String comment;
   /** Compress flag. */
-  final boolean compress;
+  private final boolean compress;
 
   /**
    * Constructor.

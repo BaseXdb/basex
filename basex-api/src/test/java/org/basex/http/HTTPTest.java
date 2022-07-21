@@ -177,7 +177,7 @@ public abstract class HTTPTest extends SandboxTest {
 
   /**
    * Executes the specified PUT request.
-   * @param is input stream (may be {@code null})
+   * @param is input stream (can be {@code null})
    * @param request query
    * @throws IOException I/O exception
    */
@@ -188,7 +188,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Executes the specified PUT request.
    * @param status status code to check
-   * @param is input stream (may be {@code null})
+   * @param is input stream (can be {@code null})
    * @param request query
    * @param params query parameters
    * @throws IOException I/O exception
@@ -202,7 +202,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified PUT request.
    * @param status status code to check
    * @param method HTTP method
-   * @param is input stream (may be {@code null})
+   * @param is input stream (can be {@code null})
    * @param type media type (optional, may be {@code null})
    * @param request query
    * @param params TODO
@@ -219,7 +219,7 @@ public abstract class HTTPTest extends SandboxTest {
     final int pl = params.length;
     for(int p = 0; p < pl; p += 2) {
       sb.append(p == 0 ? '?' : '&').append(params[p]).append('=').
-        append(URLEncoder.encode(params[p + 1].toString(), Charset.forName("UTF-8")));
+        append(URLEncoder.encode(params[p + 1].toString(), StandardCharsets.UTF_8));
     }
     final URI uri = URI.create(sb.toString());
     final HttpRequest.Builder builder = HttpRequest.newBuilder(uri).method(method, pub);

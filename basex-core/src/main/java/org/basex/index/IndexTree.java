@@ -64,7 +64,7 @@ public class IndexTree {
    * @return int node
    */
   protected final int add(final byte[] key, final int id, final int pos, final boolean exist) {
-    // index is empty.. create root node
+    // index is empty: create root node
     if(root == -1) {
       root = newNode(key, id, pos, -1, exist);
       return root;

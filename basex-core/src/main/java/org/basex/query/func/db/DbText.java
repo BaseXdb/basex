@@ -77,7 +77,7 @@ public class DbText extends DbAccess {
    * @return index accessor
    * @throws QueryException query exception
    */
-  final TokenSet tokens(final QueryContext qc) throws QueryException {
+  private TokenSet tokens(final QueryContext qc) throws QueryException {
     final TokenSet set = new TokenSet();
     final Iter iter = exprs[1].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) set.put(toToken(item));

@@ -17,7 +17,7 @@ import org.basex.core.users.*;
 public final class AlterPassword extends AUser {
   /**
    * Default constructor.
-   * @param name user name
+   * @param name username
    * @param pw password
    */
   public AlterPassword(final String name, final String pw) {

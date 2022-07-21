@@ -31,7 +31,7 @@ public final class TokenObjMap<E> extends TokenSet {
    * @param val value
    */
   public void put(final byte[] key, final E val) {
-    // array bounds are checked before array is resized..
+    // array bounds are checked before array is resized
     final int i = put(key);
     values[i] = val;
   }

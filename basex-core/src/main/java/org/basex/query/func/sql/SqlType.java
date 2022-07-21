@@ -9,7 +9,7 @@ import java.sql.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public enum SqlType {
+enum SqlType {
   /** Big decimal. */
   BIGDECIMAL(Types.NUMERIC) {
     @Override

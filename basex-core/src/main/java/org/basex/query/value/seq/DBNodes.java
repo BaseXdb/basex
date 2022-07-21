@@ -9,7 +9,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
- * This class stores full-text positions and database nodes in an ascending order.
+ * This class stores full-text positions and database nodes in ascending order.
  * Instances of this class are processed in the GUI to reference currently opened, marked,
  * and copied database nodes.
  *

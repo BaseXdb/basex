@@ -30,7 +30,7 @@ public final class UtilArrayMembers extends StandardFunc {
         return members.hasNext() ? XQArray.member(members.next()) : null;
       }
       @Override
-      public Item get(final long i) throws QueryException {
+      public Item get(final long i) {
         return XQArray.member(array.get(i));
       }
       @Override

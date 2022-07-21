@@ -66,7 +66,7 @@ public final class FTAnd extends FTExpr {
     return new FTIter() {
       @Override
       public FTNode next() throws QueryException {
-        // find item with lowest pre value
+        // find item with the lowest pre value
         final int il = nodes.length;
         for(int i = 0; i < il; ++i) {
           if(nodes[i] == null) return null;

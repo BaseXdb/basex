@@ -49,8 +49,8 @@ public final class SqlExecutePrepared extends SqlExecute {
       // already handled
       throw ex;
     } catch(final Exception ex) {
-      // assume other then SQLException related to SQL Processing also
-      // Eg. java.lang.ArrayIndexOutOfBoundsException in case of SQLite
+      // catch all kinds of exceptions
+      // e.g., java.lang.ArrayIndexOutOfBoundsException in case of SQLite
       throw SQL_ERROR_X.get(info, ex);
     }
   }

@@ -60,7 +60,7 @@ public final class Num {
    * returns the resulting array.
    * @param array input array
    * @param value value to be added
-   * @return resulting array (may be the same as input array)
+   * @return resulting array (can be the same as input array)
    */
   public static byte[] add(final byte[] array, final int value) {
     final int len = length(value);

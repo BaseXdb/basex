@@ -224,7 +224,7 @@ public class BaseX extends CLI {
             case 'p': context.soptions.set(StaticOptions.PORT, arg.number()); break;
             // specify password
             case 'P': context.soptions.set(StaticOptions.PASSWORD, arg.string()); break;
-            // specify user name
+            // specify username
             case 'U': context.soptions.set(StaticOptions.USER, arg.string()); break;
             default: throw arg.usage();
           }

@@ -511,7 +511,7 @@ final class JapaneseTokenizer extends Tokenizer {
     }
 
     /**
-     * Returns whether the avoid token.
+     * Checks for a mark.
      * @return result
      */
     public boolean isMark() {

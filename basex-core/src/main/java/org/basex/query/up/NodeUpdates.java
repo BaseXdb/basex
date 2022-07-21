@@ -71,7 +71,7 @@ final class NodeUpdates {
   /**
    * Prepares the updates. Makes sure that ...
    * - replaceElementContent has the desired effect.
-   * - a replace and a delete on a target T result in replacing the node.
+   * - a REPLACE and a DELETE on a target T result in replacing the node.
    * @return list with update primitives
    * This method can only be once, as the internal update list will eventually be removed.
    */

@@ -24,7 +24,7 @@ public final class FnPath extends ContextFn {
   private static final byte[] ROOT = QNm.eqName(QueryText.FN_URI, Token.token("root()"));
   /** Path cache. Caches the 1000 last accessed elements. */
   private final Map<ANode, byte[]> paths = Collections.synchronizedMap(
-    new LinkedHashMap<ANode, byte[]>(16, 0.75f, true) {
+    new LinkedHashMap<>(16, 0.75f, true) {
       @Override
       protected boolean removeEldestEntry(final Map.Entry<ANode, byte[]> eldest) {
         return size() > 1000;
@@ -100,7 +100,7 @@ public final class FnPath extends ContextFn {
   }
 
   /**
-   * Returns the child index of an text or comment.
+   * Returns the child index of a text or comment.
    * @param node node
    * @param qc query context
    * @return index

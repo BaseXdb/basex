@@ -22,10 +22,6 @@ public final class Token {
   public static final byte[] EMPTY = {};
   /** XML token. */
   public static final byte[] XML = token("xml");
-  /** Binary token. */
-  public static final byte[] BINARY = token("binary");
-  /** Value token. */
-  public static final byte[] VALUE = token("value");
   /** XML token with colon. */
   public static final byte[] XML_COLON = token("xml:");
   /** XMLNS token. */
@@ -579,7 +575,7 @@ public final class Token {
   }
 
   /**
-   * Converts the specified token into an long value.
+   * Converts the specified token into a long value.
    * {@link Long#MIN_VALUE} is returned if the input is invalid.
    * Note that this may also be the actual value ({@link #MIN_LONG}).
    * @param token token to be converted
@@ -590,7 +586,7 @@ public final class Token {
   }
 
   /**
-   * Converts the specified token into an long value.
+   * Converts the specified token into a long value.
    * {@link Long#MIN_VALUE} is returned if the input is invalid.
    * Note that this may also be the actual value ({@link #MIN_LONG}).
    * @param token token to be converted

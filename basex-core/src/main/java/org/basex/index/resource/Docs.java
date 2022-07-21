@@ -27,13 +27,13 @@ import org.basex.util.list.*;
 final class Docs {
   /** Data reference. */
   private final Data data;
-  /** Pre values of document nodes (may be {@code null}).
+  /** Pre values of document nodes (can be {@code null}).
    * This variable should always be requested via {@link #docs()}. */
   private IntList docList;
-  /** Document paths (may be {@code null}).
+  /** Document paths (can be {@code null}).
    * This variable should always be requested via {@link #paths()}. */
   private TokenList pathList;
-  /** Mapping for path order (may be {@code null}).
+  /** Mapping for path order (can be {@code null}).
    * This variable should always be requested via {@link #order()}. */
   private int[] pathOrder;
   /** Dirty flag. */
