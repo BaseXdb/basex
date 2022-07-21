@@ -206,7 +206,7 @@ public abstract class AQuery extends Command {
     if(!plan && options.get(MainOptions.XMLPLAN)) {
       try {
         info(NL + QUERY_PLAN + COL);
-        info(qp.toXml().serialize().toString());
+        info(qp.toXml().serialize(SerializerMode.INDENT.get()).toString());
         plan = true;
       } catch(final QueryIOException ex) {
         Util.stack(ex);
