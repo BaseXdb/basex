@@ -42,8 +42,8 @@ final class Binaries {
       final IOFile bin = data.meta.dir(type), root = new IOFile(bin, norm);
       if(root.exists()) {
         final String exact = Prop.CASE ? norm : norm.toLowerCase(Locale.ENGLISH);
-        final String dir = root.isDir() ? (
-            exact.isEmpty() || Strings.endsWith(exact, '/') ? exact : exact + '/') : null;
+        final String dir = root.isDir() ? exact.isEmpty() || Strings.endsWith(exact, '/') ? exact :
+          exact + '/' : null;
         for(final String relative : bin.descendants()) {
           final String rel = Prop.CASE ? relative : relative.toLowerCase(Locale.ENGLISH);
           if(dir != null ? rel.startsWith(dir) : rel.equals(exact)) paths.add(relative);

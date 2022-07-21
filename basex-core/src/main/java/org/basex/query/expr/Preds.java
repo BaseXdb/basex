@@ -266,11 +266,10 @@ public abstract class Preds extends Arr {
     final Expr pred = exprs[el - 1];
     final QueryFunction<Expr, Expr> createRoot = r ->
       el == 1 ? r : Filter.get(cc, info, r, Arrays.copyOfRange(exprs, 0, el - 1));
-    final QueryBiFunction<Expr, Boolean, Expr> createExpr = (e, cmp) -> {
-      return e instanceof ContextValue ? createRoot.apply(root) :
-             e instanceof Path ? Path.get(cc, info, createRoot.apply(root), e) :
-             cmp ? SimpleMap.get(cc, info, createRoot.apply(root), e) : null;
-    };
+    final QueryBiFunction<Expr, Boolean, Expr> createExpr = (e, cmp) ->
+        e instanceof ContextValue ? createRoot.apply(root) :
+        e instanceof Path         ? Path.get(cc, info, createRoot.apply(root), e) :
+        cmp                       ? SimpleMap.get(cc, info, createRoot.apply(root), e) : null;
 
     // rewrite to general comparison
     // a[. = 'x']           ->  a = 'x'
