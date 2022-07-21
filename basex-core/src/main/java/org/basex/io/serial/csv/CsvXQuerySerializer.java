@@ -23,12 +23,12 @@ public final class CsvXQuerySerializer extends CsvSerializer {
   /**
    * Constructor.
    * @param os output stream
-   * @param opts serialization parameters
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvXQuerySerializer(final OutputStream os, final SerializerOptions opts)
+  public CsvXQuerySerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
-    super(os, opts);
+    super(os, sopts);
   }
 
   @Override

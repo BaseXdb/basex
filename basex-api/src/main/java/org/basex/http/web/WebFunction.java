@@ -35,7 +35,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   /** Web module. Only required if used as function template */
   public final WebModule module;
   /** Serialization parameters. */
-  public final SerializerOptions output;
+  public final SerializerOptions sopts;
   /** Header Parameters. */
   public final ArrayList<WebParam> headerParams = new ArrayList<>();
 
@@ -48,7 +48,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   protected WebFunction(final StaticFunc function, final WebModule module, final QueryContext qc) {
     this.function = function;
     this.module = module;
-    output = qc.serParams();
+    sopts = qc.parameters();
   }
 
   /**

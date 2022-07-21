@@ -533,9 +533,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test public void queryOptions() throws IOException {
     try(Query query = session.query(SerializerOptions.ENCODING.arg("US-ASCII") + "()")) {
       query.execute();
-      final SerializerOptions sp = new SerializerOptions();
-      sp.assign(query.options());
-      assertEquals("US-ASCII", sp.get(SerializerOptions.ENCODING));
+      final SerializerOptions sopts = new SerializerOptions();
+      sopts.assign(query.options());
+      assertEquals("US-ASCII", sopts.get(SerializerOptions.ENCODING));
     }
   }
 

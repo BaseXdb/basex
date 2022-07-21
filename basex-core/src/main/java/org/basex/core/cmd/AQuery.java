@@ -75,7 +75,7 @@ public abstract class AQuery extends Command {
           if(!runquery) continue;
 
           final PrintOutput po = r == 0 && serialize ? out : new NullOutput();
-          try(Serializer ser = qp.getSerializer(po)) {
+          try(Serializer ser = qp.serializer(po)) {
             if(maxResults >= 0) {
               qp.cache(this, maxResults);
               hits = result.size();
@@ -138,7 +138,7 @@ public abstract class AQuery extends Command {
   public final String parameters(final Context ctx) {
     try {
       init(ctx);
-      return qp.qc.serParams().toString();
+      return qp.qc.parameters().toString();
     } catch(final QueryException ex) {
       error(Util.message(ex));
     }

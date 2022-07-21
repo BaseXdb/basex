@@ -35,14 +35,14 @@ public abstract class JsonSerializer extends StandardSerializer {
   /**
    * Constructor.
    * @param os output stream
-   * @param opts serialization parameters
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  JsonSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
-    super(os, opts);
-    jopts = opts.get(SerializerOptions.JSON);
+  JsonSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts);
+    jopts = sopts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
-    nodups = opts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
+    nodups = sopts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
     final Boolean ji = jopts.get(JsonSerialOptions.INDENT);
     if(ji != null) indent = ji;
   }

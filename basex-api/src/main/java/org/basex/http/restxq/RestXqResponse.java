@@ -79,7 +79,7 @@ final class RestXqResponse extends WebResponse {
       Item item = iter.next();
       response = item != null;
 
-      SerializerOptions so = func.output;
+      SerializerOptions so = func.sopts;
       boolean head = true;
 
       // handle special cases
@@ -163,7 +163,7 @@ final class RestXqResponse extends WebResponse {
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
-    SerializerOptions sp = func.output;
+    SerializerOptions sp = func.sopts;
     String cType = null;
     for(final ANode node : response.childIter()) {
       // process http:response element
@@ -201,7 +201,7 @@ final class RestXqResponse extends WebResponse {
         }
       } else if(OUTPUT_SERIAL.matches(node)) {
         // parse output:serialization-parameters
-        sp = FuncOptions.serializer(node, func.output, func.function.info);
+        sp = FuncOptions.serializer(node, func.sopts, func.function.info);
       } else {
         throw func.error(UNEXP_NODE_X, node);
       }

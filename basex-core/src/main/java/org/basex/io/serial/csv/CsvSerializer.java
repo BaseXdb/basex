@@ -36,12 +36,12 @@ abstract class CsvSerializer extends StandardSerializer {
   /**
    * Constructor.
    * @param os output stream
-   * @param opts serialization parameters
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  CsvSerializer(final OutputStream os, final SerializerOptions opts) throws IOException {
-    super(os, opts);
-    copts = opts.get(SerializerOptions.CSV);
+  CsvSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts);
+    copts = sopts.get(SerializerOptions.CSV);
     quotes = copts.get(CsvOptions.QUOTES);
     backslashes = copts.get(CsvOptions.BACKSLASHES);
     header = copts.get(CsvOptions.HEADER);

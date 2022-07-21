@@ -206,9 +206,9 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item item, final InputInfo ii)
       throws QueryException {
-    final SerializerOptions so = new SerializerOptions();
-    so.set(SerializerOptions.METHOD, SerialMethod.XML);
-    return serializer(item, so, ii);
+    final SerializerOptions sopts = new SerializerOptions();
+    sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
+    return serializer(item, sopts, ii);
   }
 
   /**

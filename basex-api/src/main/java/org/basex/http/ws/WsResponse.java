@@ -57,7 +57,7 @@ public final class WsResponse extends WebResponse {
   public Response serialize(final boolean body) throws QueryException, IOException {
     qc.register(ctx);
     try {
-      final ArrayList<Object> values = serialize(qc.iter(), func.output);
+      final ArrayList<Object> values = serialize(qc.iter(), func.sopts);
       // don't send anything if the WebSocket connection has been closed
       if(!func.matches(Annotation._WS_CLOSE, null) &&
          !func.matches(Annotation._WS_ERROR, null)) {
@@ -80,22 +80,22 @@ public final class WsResponse extends WebResponse {
   /**
    * Serializes an XQuery value.
    * @param iter value iterator
-   * @param opts serializer options
+   * @param sopts serializer options
    * @return serialized values (byte arrays and strings)
    * @throws QueryException query exception
    * @throws QueryIOException query I/O exception
    */
-  static ArrayList<Object> serialize(final Iter iter, final SerializerOptions opts)
+  static ArrayList<Object> serialize(final Iter iter, final SerializerOptions sopts)
       throws QueryException, QueryIOException {
 
     final ArrayList<Object> list = new ArrayList<>();
-    final SerialMethod method = opts.get(SerializerOptions.METHOD);
+    final SerialMethod method = sopts.get(SerializerOptions.METHOD);
     for(Item item; (item = iter.next()) != null;) {
       // serialize maps and arrays as JSON
       final boolean json = method == SerialMethod.BASEX && item instanceof XQData;
-      opts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
+      sopts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
       // interpret result as binary or string
-      final ArrayOutput ao = item.serialize(opts);
+      final ArrayOutput ao = item.serialize(sopts);
       list.add(item instanceof Bin ? ByteBuffer.wrap(ao.toArray()) : ao.toString());
     }
     return list;

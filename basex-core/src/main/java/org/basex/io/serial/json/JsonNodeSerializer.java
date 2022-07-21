@@ -52,13 +52,13 @@ public final class JsonNodeSerializer extends JsonSerializer {
   /**
    * Constructor.
    * @param os output stream
-   * @param opts serialization parameters
+   * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  public JsonNodeSerializer(final OutputStream os, final SerializerOptions opts)
+  public JsonNodeSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
 
-    super(os, opts);
+    super(os, sopts);
     final int tl = typeCache.length;
     for(int t = 0; t < tl; t++) typeCache[t] = new TokenMap();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;

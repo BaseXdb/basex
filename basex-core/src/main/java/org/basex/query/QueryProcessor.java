@@ -111,8 +111,10 @@ public final class QueryProcessor extends Job implements Closeable {
    * instance, the cached value will be of type {@link DBNodes}.
    * @param cmd query command
    * @param max maximum number of items to cache (negative: return full result)
+   * @throws QueryException query exception
    */
-  public void cache(final AQuery cmd, final int max) {
+  public void cache(final AQuery cmd, final int max) throws QueryException {
+    parse();
     qc.cache(cmd, max);
   }
 
@@ -192,17 +194,16 @@ public final class QueryProcessor extends Job implements Closeable {
 
   /**
    * Returns a serializer for the given output stream.
-   * Optional output declarations within the query will be included in the
-   * serializer instance.
+   * Optional output declarations within the query will be included in the serializer instance.
    * @param os output stream
    * @return serializer instance
    * @throws IOException query exception
    * @throws QueryException query exception
    */
-  public Serializer getSerializer(final OutputStream os) throws IOException, QueryException {
-    optimize();
+  public Serializer serializer(final OutputStream os) throws IOException, QueryException {
+    compile();
     try {
-      return Serializer.get(os, qc.serParams()).sc(sc);
+      return Serializer.get(os, qc.parameters()).sc(sc);
     } catch(final QueryIOException ex) {
       throw ex.getCause();
     }

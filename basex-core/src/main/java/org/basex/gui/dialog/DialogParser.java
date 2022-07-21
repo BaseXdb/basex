@@ -9,6 +9,9 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -47,13 +50,16 @@ abstract class DialogParser extends BaseXBack {
    * Builds a parsing example string.
    * @param format format
    * @param input input string
-   * @param output output string
+   * @param item example item
    * @return example string
+   * @throws QueryIOException query I/O exception
    */
-  static String example(final String format, final String input, final String output) {
+  static String example(final String format, final String input, final Item item)
+      throws QueryIOException {
     final TokenBuilder text = new TokenBuilder();
     text.bold().add(format).add(COL).norm().nline().add(input).nline().nline();
-    return text.bold().add("XML").add(COL).norm().nline().add(output).toString();
+    final String string = item.serialize(SerializerMode.INDENT.get()).toString();
+    return text.bold().add("XML").add(COL).norm().nline().add(string).toString();
   }
 
   /**

@@ -14,6 +14,7 @@ import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.io.parse.csv.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -120,8 +121,8 @@ final class DialogCsvParser extends DialogParser {
       format.setEnabled(head);
       lax.setEnabled(head && copts.get(CsvOptions.FORMAT) == CsvFormat.DIRECT);
 
-      example.setText(example(MainParser.CSV.name(), EXAMPLE,
-          CsvConverter.get(copts).convert(new IOContent(EXAMPLE)).serialize().toString()));
+      final Item item = CsvConverter.get(copts).convert(new IOContent(EXAMPLE));
+      example.setText(example(MainParser.CSV.name(), EXAMPLE, item));
     } catch(final IOException ex) {
       example.setText(error(ex));
     }

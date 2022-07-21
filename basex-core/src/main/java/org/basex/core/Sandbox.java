@@ -221,9 +221,9 @@ public abstract class Sandbox {
   protected static String eval(final String query) throws QueryException, IOException {
     final ArrayOutput ao = new ArrayOutput();
     try(QueryProcessor qp = new QueryProcessor(query, BASEURI, context, null)) {
-      qp.parse();
+      qp.compile();
       qp.register(context);
-      try(Serializer ser = qp.getSerializer(ao)) {
+      try(Serializer ser = qp.serializer(ao)) {
         qp.value().serialize(ser);
       } finally {
         qp.close();

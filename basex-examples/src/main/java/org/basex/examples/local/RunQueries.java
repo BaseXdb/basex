@@ -80,9 +80,9 @@ public final class RunQueries {
    */
   static void process(final String query) throws QueryException {
     // Create a query processor
-    try(QueryProcessor proc = new QueryProcessor(query, context)) {
+    try(QueryProcessor processor = new QueryProcessor(query, context)) {
       // Execute the query
-      Value result = proc.value();
+      Value result = processor.value();
 
       // Print result as string.
       System.out.println(result);
@@ -99,9 +99,9 @@ public final class RunQueries {
    */
   static void iterate(final String query) throws QueryException {
     // Create a query processor
-    try(QueryProcessor proc = new QueryProcessor(query, context)) {
+    try(QueryProcessor processor = new QueryProcessor(query, context)) {
       // Store the pointer to the result in an iterator:
-      Iter iter = proc.iter();
+      Iter iter = processor.iter();
 
       // Iterate through all items and serialize
       for(Item item; (item = iter.next()) != null;) {
@@ -120,13 +120,13 @@ public final class RunQueries {
    */
   static void serialize(final String query) throws QueryException, IOException {
     // Create a query processor
-    try(QueryProcessor proc = new QueryProcessor(query, context)) {
+    try(QueryProcessor processor = new QueryProcessor(query, context)) {
 
       // Store the pointer to the result in an iterator:
-      Iter iter = proc.iter();
+      Iter iter = processor.iter();
 
       // Create a serializer instance
-      try(Serializer ser = proc.getSerializer(System.out)) {
+      try(Serializer ser = processor.serializer(System.out)) {
         // Iterate through all items and serialize contents
         for(Item item; (item = iter.next()) != null;) {
           ser.serialize(item);

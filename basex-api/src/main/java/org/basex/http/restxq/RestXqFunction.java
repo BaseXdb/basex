@@ -155,7 +155,7 @@ public final class RestXqFunction extends WebFunction {
       } else if(eq(def.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         try {
-          output.assign(string(def.local()), toString(value.itemAt(0)));
+          sopts.assign(string(def.local()), toString(value.itemAt(0)));
         } catch(final BaseXException ex) {
           Util.debug(ex);
           throw error(ann.info, UNKNOWN_SER_X, def.local());

@@ -795,7 +795,7 @@ public final class QT3TS extends Main {
   private static String serialize(final QT3Result result) throws QueryException, IOException {
     try {
       final ArrayOutput ao = new ArrayOutput();
-      try(Serializer ser = result.query.qp().getSerializer(ao)) {
+      try(Serializer ser = result.query.qp().serializer(ao)) {
         for(final Item item : result.value.internal()) ser.serialize(item);
       }
       return ao.toString();

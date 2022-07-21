@@ -84,7 +84,7 @@ public final class RestXqWadl {
         // create response
         final FElem response = elem("response", method);
         final FElem representation = elem("representation", response);
-        representation.add("mediaType", HTTPConnection.mediaType(func.output).toString());
+        representation.add("mediaType", HTTPConnection.mediaType(func.sopts).toString());
       }
     }
     // add resources in sorted order

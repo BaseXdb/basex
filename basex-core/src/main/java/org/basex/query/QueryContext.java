@@ -122,8 +122,8 @@ public final class QueryContext extends Job implements Closeable {
   /** External variables and context to be bound at compile time. */
   private final QNmMap<Value> bindings = new QNmMap<>();
 
-  /** Serialization parameters. */
-  private SerializerOptions serParams;
+  /** Serialization options. */
+  private SerializerOptions sopts;
   /** Indicates if the default serialization parameters are used. */
   private boolean defaultOutput;
 
@@ -441,12 +441,12 @@ public final class QueryContext extends Job implements Closeable {
    * Returns query-specific or default serialization parameters.
    * @return serialization parameters
    */
-  public SerializerOptions serParams() {
-    if(serParams == null) {
-      serParams = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
+  public SerializerOptions parameters() {
+    if(sopts == null) {
+      sopts = new SerializerOptions(context.options.get(MainOptions.SERIALIZER));
       defaultOutput = main != null;
     }
-    return serParams;
+    return sopts;
   }
 
   /**
@@ -594,6 +594,7 @@ public final class QueryContext extends Job implements Closeable {
     final IntList pres = new IntList();
     final Data data = resources.globalData();
     try {
+      optimize();
       run(info.evaluating, () -> {
         // evaluates the query
         final int mx = max >= 0 ? max : Integer.MAX_VALUE;

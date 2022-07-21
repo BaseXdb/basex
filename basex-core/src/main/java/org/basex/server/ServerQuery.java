@@ -89,7 +89,7 @@ public final class ServerQuery extends Job {
    */
   public String parameters() throws IOException {
     parse();
-    return qp.qc.serParams().toString();
+    return qp.qc.parameters().toString();
   }
 
   /**
@@ -127,7 +127,7 @@ public final class ServerQuery extends Job {
       // iterate through results
       int hits = 0;
       final PrintOutput po = PrintOutput.get(encode ? new ServerOutput(out) : out);
-      final SerializerOptions sopts = full ? SerializerMode.API.get() : qc.serParams();
+      final SerializerOptions sopts = full ? SerializerMode.API.get() : qc.parameters();
       try(Serializer ser = Serializer.get(po, sopts)) {
         for(Item item; (item = qc.next(iter)) != null;) {
           if(iterative) {
@@ -173,7 +173,7 @@ public final class ServerQuery extends Job {
   private void queryPlan() throws QueryIOException {
     if(ctx.options.get(MainOptions.XMLPLAN)) {
       info.append(NL).append(QUERY_PLAN).append(COL).append(NL);
-      info.append(qp.toXml().serialize()).append(NL);
+      info.append(qp.toXml().serialize(SerializerMode.INDENT.get())).append(NL);
     }
   }
 

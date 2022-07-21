@@ -161,18 +161,18 @@ public abstract class StandardFunc extends Arr {
   /**
    * Serializes the data from the specified iterator.
    * @param iter data to serialize
-   * @param opts serialization parameters
+   * @param sopts serialization parameters
    * @param err error to raise
    * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  protected final byte[] serialize(final Iter iter, final SerializerOptions opts,
+  protected final byte[] serialize(final Iter iter, final SerializerOptions sopts,
       final QueryError err, final QueryContext qc) throws QueryException {
 
     try {
       final ArrayOutput ao = new ArrayOutput();
-      try(Serializer ser = Serializer.get(ao, opts)) {
+      try(Serializer ser = Serializer.get(ao, sopts)) {
         for(Item item; (item = qc.next(iter)) != null;) ser.serialize(item);
       }
       return new TokenBuilder(ao.finish()).normalize().finish();

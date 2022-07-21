@@ -30,7 +30,7 @@ public class FnXmlToJson extends FnParseJson {
     final Boolean indent = jopts.get(JsonSerialOptions.INDENT);
     // no indentation specified: adopt module indentation
     if(indent == null) jopts.set(JsonSerialOptions.INDENT,
-        qc.serParams().get(SerializerOptions.INDENT) == YesNo.YES);
+        qc.parameters().get(SerializerOptions.INDENT) == YesNo.YES);
 
     return Str.get(serialize(node.iter(), JsonSerialize.options(jopts), INVALIDOPT_X, qc));
   }
