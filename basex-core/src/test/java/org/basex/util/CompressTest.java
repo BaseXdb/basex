@@ -46,7 +46,7 @@ public final class CompressTest extends SandboxTest {
   @Test public void test5() {
     final int bl = 256;
     final byte[] bytes = new byte[bl];
-    for(int b = 0; b < bytes.length; b++) bytes[b] = (byte) b;
+    for(int b = 0; b < bl; b++) bytes[b] = (byte) b;
     run(bytes);
   }
 
@@ -54,7 +54,7 @@ public final class CompressTest extends SandboxTest {
   @Test public void test6() {
     final int bl = 4096;
     final byte[] bytes = new byte[bl];
-    for(int b = 0; b < bytes.length; b++) bytes[b] = (byte) (b & 0xFF);
+    for(int b = 0; b < bl; b++) bytes[b] = (byte) (b & 0xFF);
     run(bytes);
   }
 

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -14,7 +15,10 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public abstract class BaseXTest extends MainTest {
+public abstract class BaseXTest extends SandboxTest {
+  /** Input file. */
+  static final IOFile INPUT = new IOFile(Prop.TEMPDIR + NAME + ".in");
+
   /**
    * Deletes the test files.
    * @throws IOException I/O exception
@@ -174,5 +178,34 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test public void noSerialization() throws IOException {
     equals("", "-z", "-q1");
+  }
+  /**
+   * Runs a request with the specified arguments.
+   * @param args command-line arguments
+   * @return result
+   * @throws IOException I/O exception
+   */
+  protected abstract String run(String... args) throws IOException;
+
+  /**
+   * Runs a request and compares the result with the expected result.
+   * @param expected expected result
+   * @param args command-line arguments
+   * @throws IOException I/O exception
+   */
+  final void equals(final String expected, final String... args) throws IOException {
+    assertEquals(expected, run(args));
+  }
+
+  /**
+   * Runs a request and checks if the expected string is contained in the
+   * result.
+   * @param expected expected result
+   * @param args command-line arguments
+   * @throws IOException I/O exception
+   */
+  final void contains(final String expected, final String... args) throws IOException {
+    final String result = run(args);
+    if(!result.contains(expected)) fail('\'' + expected + "' not contained in '" + result + "'.");
   }
 }

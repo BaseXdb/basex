@@ -70,8 +70,9 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
       // check if index is in left digit
       if(pos < deep.leftSize) {
         Node<?, E> nd = null;
-        for(int i = 0; i < deep.left.length; i++) {
-          nd = deep.left[i];
+        final int ll = deep.left.length;
+        for(int l = 0; l < ll; l++) {
+          nd = deep.left[l];
           final long sz = nd.size();
           if(pos < sz) break;
           pos -= sz;
@@ -87,8 +88,9 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
         // index is in right digit
         pos -= mSize;
         Node<?, E> nd = null;
-        for(int i = 0; i < deep.right.length; i++) {
-          nd = deep.right[i];
+        final int rl = deep.right.length;
+        for(int r = 0; r < rl; r++) {
+          nd = deep.right[r];
           final long sz = nd.size();
           if(pos < sz) break;
           pos -= sz;

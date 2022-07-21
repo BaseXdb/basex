@@ -139,7 +139,8 @@ final class TableMemBlock {
     final StringBuilder sb = new StringBuilder(Util.className(this) + '[' + firstPre + ": ");
     final IntList ints = new IntList();
     int first = -1, last = 0;
-    for(int d = 0; d < data.length; d++) {
+    final int dl = data.length;
+    for(int d = 0; d < dl; d++) {
       if(data[d] != 0) {
         if(first == -1) first = d;
         last = d;

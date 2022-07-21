@@ -147,7 +147,8 @@ public final class List extends Command {
    * @param path path to resource
    * @param size size of resource
    */
-  private void add(final Table table, final ResourceType type, final String path, final long size) {
+  private static void add(final Table table, final ResourceType type, final String path,
+      final long size) {
     table.contents.add(new TokenList(4).add(type.path(path)).add(type.toString()).
         add(type.contentType(path).toString()).add(size));
   }

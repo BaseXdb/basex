@@ -86,7 +86,8 @@ public final class DataBuilder {
    * @param message error message
    * @throws QueryException query exception
    */
-  private void limit(final int value, final int limit, final String message) throws QueryException {
+  private static void limit(final int value, final int limit, final String message)
+      throws QueryException {
     if(value >= limit) throw QueryError.BASEX_LIMIT_X_X.get(null, message, limit);
   }
 

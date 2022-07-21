@@ -44,7 +44,7 @@ abstract class SessionFn extends ApiFunc {
    * @param qc query context
    * @return session instance or {@code null}
    */
-  private HttpSession wsSession(final QueryContext qc) {
+  private static HttpSession wsSession(final QueryContext qc) {
     final Class<?> wsClass = Reflect.find("org.basex.http.ws.WebSocket");
     if(wsClass != null) {
       final Object ws = qc.context.getExternal(wsClass);

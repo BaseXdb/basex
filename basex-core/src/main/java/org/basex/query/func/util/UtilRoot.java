@@ -52,7 +52,7 @@ public final class UtilRoot extends StandardFunc {
    * @param nodes path nodes
    * @return root, or {@code null} if node cannot be detected
    */
-  public ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes) {
+  public static ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes) {
     final ArrayList<PathNode> list = new ArrayList<>();
     for(final PathNode pn : nodes) {
       PathNode node = pn;

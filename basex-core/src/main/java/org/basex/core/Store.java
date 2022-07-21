@@ -224,7 +224,7 @@ public final class Store implements Closeable {
    * @param store name (empty for standard store)
    * @return result of check
    */
-  private boolean standard(final String store) {
+  private static boolean standard(final String store) {
     return store.isEmpty();
   }
 

@@ -193,7 +193,7 @@ public final class MetaData {
   private static boolean addToPath(final StringBuilder sb, final StringList list) {
     if(sb.length() != 0) {
       final String segment = sb.toString();
-      if(segment.endsWith(".")) {
+      if(Strings.endsWith(segment, '.')) {
         if(!segment.equals(".")) return false;
       } else if(segment.equals("..")) {
         if(list.isEmpty()) return false;

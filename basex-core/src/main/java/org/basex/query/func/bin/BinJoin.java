@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.Value;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -22,7 +23,7 @@ public final class BinJoin extends StandardFunc {
 
     final ByteList bl;
     if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
-      final byte[] bytes = toB64(((SingletonSeq) expr).itemAt(0), false).binary(info);
+      final byte[] bytes = toB64(((Value) expr).itemAt(0), false).binary(info);
       final long bs = expr.size();
       bl = new ByteList(bs * bytes.length);
       for(int b = 0; b < bs; b++) bl.add(bytes);

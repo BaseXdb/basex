@@ -430,7 +430,7 @@ public final class FTWords extends FTExpr {
           // don't use index if token starts with a wildcard
           if(ftOpt.is(WC) && token[0] == '.') return false;
           // favor full-text index requests over exact queries
-          final IndexCosts ic = ii.costs(data, lexer);
+          final IndexCosts ic = IndexInfo.costs(data, lexer);
           if(ic == null) return false;
           final int r = ic.results();
           if(r != 0) ii.costs = IndexCosts.add(ii.costs, IndexCosts.get(Math.max(2, r / 100)));

@@ -81,7 +81,7 @@ abstract class RegEx extends StandardFunc {
    * @param pattern pattern
    * @return character
    */
-  int patternChar(final byte[] pattern) {
+  static int patternChar(final byte[] pattern) {
     final int sl = pattern.length, separator = sl > 0 && cl(pattern, 0) == sl ? cp(pattern, 0) : -1;
     return separator == -1 || contains(REGEX_CHARS, separator) ? -1 : separator;
   }

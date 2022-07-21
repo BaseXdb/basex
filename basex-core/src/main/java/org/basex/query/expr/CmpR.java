@@ -211,7 +211,7 @@ public final class CmpR extends Single {
     }
 
     // estimate costs
-    ii.costs = ii.costs(data, nr);
+    ii.costs = IndexInfo.costs(data, nr);
     if(ii.costs == null) return false;
 
     // skip if numbers are negative, doubles, or of different string length

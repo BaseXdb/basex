@@ -52,14 +52,14 @@ public final class Dir extends Command {
     final int ds = docs.size();
     for(int d = 0; d < ds; d++) {
       final int pre = docs.get(d);
-      add(data.text(pre, true), ResourceType.XML, s -> (long) data.size(pre, Data.DOC), table,
+      add(data.text(pre, true), s -> (long) data.size(pre, Data.DOC), ResourceType.XML, table,
           root, set);
     }
     // list file resources
     for(final ResourceType type : Resources.BINARIES) {
       final IOFile bin = data.meta.dir(type);
       for(final byte[] pt : resources.paths(root, type)) {
-        add(pt, type, s -> new IOFile(bin, s).length(), table, root, set);
+        add(pt, s -> new IOFile(bin, s).length(), type, table, root, set);
       }
     }
 
@@ -70,14 +70,14 @@ public final class Dir extends Command {
   /**
    * Adds a table entry.
    * @param path path to resource
-   * @param type resource type
    * @param size function for computing size
+   * @param type resource type
    * @param table table
    * @param root root path
    * @param set set with known resources
    */
-  private void add(final byte[] path, final ResourceType type, final Function<String, Long> size,
-      final Table table, final String root, final HashSet<String> set) {
+  private static void add(final byte[] path, final Function<String, Long> size,
+      final ResourceType type, final Table table, final String root, final HashSet<String> set) {
 
     String string = string(path);
     boolean dir;

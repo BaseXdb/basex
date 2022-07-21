@@ -39,7 +39,7 @@ public abstract class StoreFn extends StandardFunc {
    * @param qc query context
    * @return state map
    */
-  final Store store(final QueryContext qc) {
+  static Store store(final QueryContext qc) {
     return qc.context.store;
   }
 }

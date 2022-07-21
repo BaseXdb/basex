@@ -223,7 +223,7 @@ public final class IndexInfo {
    * @param search index search definition
    * @return costs costs, or {@code null} if index access is not possible
    */
-  public IndexCosts costs(final Data data, final IndexSearch search) {
+  public static IndexCosts costs(final Data data, final IndexSearch search) {
     return data != null ? data.costs(search) : IndexCosts.ENFORCE_STATIC;
   }
 

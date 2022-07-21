@@ -100,7 +100,7 @@ public final class Client {
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private HttpResponse<InputStream> send(final URI uri, final Request request)
+  private static HttpResponse<InputStream> send(final URI uri, final Request request)
       throws IOException {
 
     final HttpRequest.Builder rb = HttpRequest.newBuilder(uri);

@@ -264,7 +264,7 @@ public final class MixedTest extends SandboxTest {
   }
 
   /** JSON documents, node ids. */
-  public void gh1983() {
+  @Test public void gh1983() {
     query("tail(" + _JSON_PARSE.args("{}") +  "/*/ancestor-or-self::node()) instance of element()",
         true);
     query("tail(" + _CSV_PARSE.args("{}") +  "/*/ancestor-or-self::node()) instance of element()",

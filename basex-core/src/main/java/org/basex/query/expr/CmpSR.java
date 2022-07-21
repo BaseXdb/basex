@@ -177,7 +177,7 @@ public final class CmpSR extends Single {
 
     // create range access
     final StringRange sr = new StringRange(type, min, mni, max, mxi);
-    ii.costs = ii.costs(data, sr);
+    ii.costs = IndexInfo.costs(data, sr);
     if(ii.costs == null) return false;
 
     final TokenBuilder tb = new TokenBuilder();

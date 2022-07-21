@@ -181,27 +181,27 @@ public final class GroupBy extends Clause {
         // we're finished, copy the array so the list can be garbage-collected
         return grps.toArray(Group[]::new);
       }
+
+      /**
+       * Checks two keys for equality.
+       * @param items1 first keys
+       * @param items2 second keys
+       * @param coll collations
+       * @return {@code true} if the compare as equal, {@code false} otherwise
+       * @throws QueryException query exception
+       */
+      private boolean eq(final Item[] items1, final Item[] items2, final Collation[] coll)
+          throws QueryException {
+
+        final int il = items1.length;
+        for(int i = 0; i < il; i++) {
+          final Item item1 = items1[i], item2 = items2[i];
+          if(item1 == Empty.VALUE ^ item2 == Empty.VALUE ||
+             item1 != Empty.VALUE && !item1.equiv(item2, coll[i], info)) return false;
+        }
+        return true;
+      }
     };
-  }
-
-  /**
-   * Checks two keys for equality.
-   * @param items1 first keys
-   * @param items2 second keys
-   * @param coll collations
-   * @return {@code true} if the compare as equal, {@code false} otherwise
-   * @throws QueryException query exception
-   */
-  private boolean eq(final Item[] items1, final Item[] items2, final Collation[] coll)
-      throws QueryException {
-
-    final int il = items1.length;
-    for(int i = 0; i < il; i++) {
-      final Item item1 = items1[i], item2 = items2[i];
-      if(item1 == Empty.VALUE ^ item2 == Empty.VALUE ||
-         item1 != Empty.VALUE && !item1.equiv(item2, coll[i], info)) return false;
-    }
-    return true;
   }
 
   @Override

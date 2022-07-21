@@ -18,7 +18,7 @@ public final class ArrayConcatTest extends ArrayTest {
   /** Generates and concatenates random arrays of a given size. */
   @Test public void fuzzyTest() {
     final Random rng = new Random();
-    for(int n = 0; n < 1_00; n++) {
+    for(int n = 0; n < 100; n++) {
       for(int k = 0; k < 10; k++) {
         rng.setSeed(10L * n + k);
         final int l = rng.nextInt(n + 1), r = n - l;

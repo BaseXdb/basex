@@ -369,7 +369,7 @@ public abstract class Path extends ParseExpr {
     ArrayList<PathNode> pn = nodes;
     for(final Expr expr : steps) {
       if(expr instanceof UtilRoot) {
-        pn = ((UtilRoot) expr).nodes(pn);
+        pn = UtilRoot.nodes(pn);
       } else if(expr instanceof Step) {
         final Step step = (Step) expr;
         pn = step.nodes(pn, data, stats);

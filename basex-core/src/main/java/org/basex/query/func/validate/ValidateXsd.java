@@ -46,7 +46,8 @@ public class ValidateXsd extends ValidateFn {
 
   static {
     int i = 0;
-    while(i + 3 < IMPL.length && Reflect.find(IMPL[i]) == null) i += 3;
+    final int il = IMPL.length;
+    while(i + 3 < il && Reflect.find(IMPL[i]) == null) i += 3;
     OFFSET = i;
     SAXON = i == 0;
     JAVA = i == 9;

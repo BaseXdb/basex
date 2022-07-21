@@ -1135,7 +1135,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // rewrite to simple map
     check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check("for $_ in 1 to 2 return" + _PROF_VOID.args(1) + "", "", root(_UTIL_REPLICATE));
+    check("for $_ in 1 to 2 return" + _PROF_VOID.args(1), "", root(_UTIL_REPLICATE));
   }
 
   /** Merge and/or expressions. */
