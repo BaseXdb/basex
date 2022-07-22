@@ -24,10 +24,10 @@ public abstract class XMLDBBaseTest extends SandboxTest {
   static final String COLL = "XMLDB";
   /** Database/document path. */
   static final String PATH = URL + COLL;
-  /** Optional login. */
-  static final String LOGIN = UserText.ADMIN;
+  /** Optional username. */
+  static final String USERNAME = UserText.ADMIN;
   /** Optional password. */
-  static final String PW = UserText.ADMIN;
+  static final String PASSWORD = UserText.ADMIN;
   /** Test document. */
   static final String DOC1 = "first.xml";
   /** Test document. */

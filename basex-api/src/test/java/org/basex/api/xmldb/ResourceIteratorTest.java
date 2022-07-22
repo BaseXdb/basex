@@ -26,7 +26,7 @@ public final class ResourceIteratorTest extends XMLDBBaseTest {
     createDB();
     final Class<?> clzz = Class.forName(DRIVER);
     final Database database = (Database) clzz.getDeclaredConstructor().newInstance();
-    collection = database.getCollection(PATH, LOGIN, PW);
+    collection = database.getCollection(PATH, USERNAME, PASSWORD);
     service = (XPathQueryService) collection.getService("XPathQueryService", "1.0");
   }
 

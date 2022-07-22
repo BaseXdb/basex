@@ -28,7 +28,7 @@ public final class XPathQueryServiceTest extends XMLDBBaseTest {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.getDeclaredConstructor().newInstance();
-    collection = database.getCollection(PATH, LOGIN, PW);
+    collection = database.getCollection(PATH, USERNAME, PASSWORD);
     service = (XPathQueryService) collection.getService("XPathQueryService", "1.0");
   }
 

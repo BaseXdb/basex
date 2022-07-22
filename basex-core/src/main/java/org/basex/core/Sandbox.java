@@ -321,9 +321,9 @@ public abstract class Sandbox {
    * @throws IOException I/O exception
    */
   public static ClientSession createClient(final String... login) throws IOException {
-    final String user = login.length > 0 ? login[0] : UserText.ADMIN;
-    final String pass = login.length > 1 ? login[1] : UserText.ADMIN;
-    return new ClientSession(S_LOCALHOST, DB_PORT, user, pass);
+    final String username = login.length > 0 ? login[0] : UserText.ADMIN;
+    final String password = login.length > 1 ? login[1] : UserText.ADMIN;
+    return new ClientSession(S_LOCALHOST, DB_PORT, username, password);
   }
 
   /**

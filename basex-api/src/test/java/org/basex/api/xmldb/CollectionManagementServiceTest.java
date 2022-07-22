@@ -34,7 +34,7 @@ public final class CollectionManagementServiceTest extends XMLDBBaseTest {
     createDB();
     final Class<?> c = Class.forName(DRIVER);
     db = (Database) c.getDeclaredConstructor().newInstance();
-    collection = db.getCollection(PATH, LOGIN, PW);
+    collection = db.getCollection(PATH, USERNAME, PASSWORD);
     service = (CollectionManagementService) collection.getService(CMS, "1.0");
   }
 
