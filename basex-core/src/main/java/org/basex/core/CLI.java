@@ -115,21 +115,21 @@ public abstract class CLI extends Main {
     if(local()) return new LocalSession(context, out);
 
     // user/password input
-    String user = context.soptions.get(StaticOptions.USER);
-    String pass = context.soptions.get(StaticOptions.PASSWORD);
-    while(user.isEmpty()) {
+    String username = context.soptions.get(StaticOptions.USER);
+    String password = context.soptions.get(StaticOptions.PASSWORD);
+    while(username.isEmpty()) {
       Util.out(USERNAME + COLS);
-      user = Util.input();
+      username = Util.input();
     }
-    while(pass.isEmpty()) {
+    while(password.isEmpty()) {
       Util.out(PASSWORD + COLS);
-      pass = Util.password();
+      password = Util.password();
     }
 
     final String host = context.soptions.get(StaticOptions.HOST);
     final int port = context.soptions.get(StaticOptions.PORT);
     try {
-      return new ClientSession(host, port, user, pass, out);
+      return new ClientSession(host, port, username, password, out);
     } catch(final ConnectException ex) {
       Util.debug(ex);
       throw new BaseXException(CONNECTION_ERROR_X, port);

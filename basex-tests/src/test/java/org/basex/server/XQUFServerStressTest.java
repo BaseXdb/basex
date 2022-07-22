@@ -131,7 +131,7 @@ public final class XQUFServerStressTest extends SandboxTest {
       try {
         for(int i = 0; i < runs; ++i) {
           Performance.sleep(100);
-          session.execute("xquery " + query);
+          session.execute("XQUERY " + query);
         }
         session.close();
       } catch(final Exception ex) {

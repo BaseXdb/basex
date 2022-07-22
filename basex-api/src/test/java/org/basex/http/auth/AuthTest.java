@@ -50,7 +50,7 @@ public abstract class AuthTest extends HTTPTest {
    * @throws Exception Exception
    */
   @Test public void sendRequestOk() throws Exception {
-    assertEquals("200", sendRequest("admin", "admin"));
+    assertEquals("200", sendRequest("admin", NAME));
   }
 
   /**

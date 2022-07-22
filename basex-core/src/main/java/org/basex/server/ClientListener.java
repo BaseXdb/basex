@@ -170,7 +170,7 @@ public final class ClientListener extends Thread implements ClientInfo {
    * @return success flag
    */
   private boolean authenticate() {
-    boolean auth = false;
+    boolean ok = false;
     try {
       final String nonce = Long.toString(System.nanoTime());
       final byte[] address = socket.getInetAddress().getAddress();
@@ -185,11 +185,11 @@ public final class ClientListener extends Thread implements ClientInfo {
       // receive {USER}0{DIGEST-HASH}0
       final String name = in.readString(), hash = in.readString();
       final User user = context.users.get(name);
-      auth = user != null &&
+      ok = user != null && user.enabled() &&
           Strings.md5(user.code(Algorithm.DIGEST, Code.HASH) + nonce).equals(hash);
 
       // write log information
-      if(auth) {
+      if(ok) {
         context.user(user);
         // send {OK}
         send(true);
@@ -202,16 +202,16 @@ public final class ClientListener extends Thread implements ClientInfo {
         send(false);
       }
     } catch(final IOException ex) {
-      if(auth) {
+      if(ok) {
         Util.stack(ex);
         log(LogType.ERROR, Util.message(ex));
-        auth = false;
+        ok = false;
       }
     }
 
     server.remove(this);
-    authenticated = auth;
-    return auth;
+    authenticated = ok;
+    return ok;
   }
 
   /**

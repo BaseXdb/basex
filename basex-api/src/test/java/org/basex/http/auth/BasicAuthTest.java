@@ -22,7 +22,7 @@ public final class BasicAuthTest extends AuthTest {
    * @throws Exception exception
    */
   @Test public void ok() throws Exception {
-    responseOk(REST_ROOT.replace("://", "://admin:admin@") + "?query=1");
+    responseOk(REST_ROOT.replace("://", "://admin:" + NAME + "@") + "?query=1");
   }
 
   /** Missing authentication method. */

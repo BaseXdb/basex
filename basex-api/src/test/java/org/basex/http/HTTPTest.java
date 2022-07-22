@@ -9,13 +9,11 @@ import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpRequest.*;
 import java.nio.charset.*;
-import java.util.*;
 
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
@@ -54,11 +52,11 @@ public abstract class HTTPTest extends SandboxTest {
   protected static void init(final String url, final boolean local, final boolean auth)
       throws Exception {
 
-    final StringList sl = new StringList();
-    sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z", "-q");
+    final StringList sl = new StringList("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT,
+        "-P" + NAME, "-z", "-q");
     if(local) sl.add("-l");
     if(!auth) sl.add("-U" + ADMIN);
-    http = new BaseXHTTP(sl.toArray());
+    http = new BaseXHTTP(sl.finish());
     rootUrl = url;
 
     final StaticOptions sopts = HTTPContext.get().context().soptions;
@@ -71,15 +69,6 @@ public abstract class HTTPTest extends SandboxTest {
    */
   @AfterAll public static void stop() throws IOException {
     http.stop();
-
-    // cleanup: remove project specific system properties
-    final StringList keys = new StringList();
-    final Properties props = System.getProperties();
-    for(final Object key : props.keySet()) {
-      final String path = key.toString();
-      if(path.startsWith(Prop.DBPREFIX)) keys.add(path);
-    }
-    for(final String key : keys) props.remove(key);
   }
 
   // PROTECTED METHODS ============================================================================

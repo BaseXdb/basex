@@ -67,7 +67,7 @@ public final class ServerMemTest extends SandboxTest {
     public void run() {
       try {
         // Perform query
-        session.execute("xquery " + QUERY);
+        session.execute("XQUERY " + QUERY);
         session.close();
       } catch(final Exception ex) {
         ex.printStackTrace();

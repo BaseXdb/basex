@@ -64,14 +64,14 @@ public final class ServerAddTest extends SandboxTest {
     server = createServer();
     // create test database
     try(ClientSession cs = createClient()) {
-      cs.execute("create db " + NAME + ' ' + INPUT);
+      cs.execute("CREATE DB " + NAME + ' ' + INPUT);
       // run clients
       final Client[] cl = new Client[clients];
       for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
       for(final Client c : cl) c.start();
       for(final Client c : cl) c.join();
       // drop database and stop server
-      cs.execute("drop db test");
+      cs.execute("DROP DB test");
     }
     stopServer(server);
   }
@@ -96,10 +96,10 @@ public final class ServerAddTest extends SandboxTest {
     @Override
     public void run() {
       try {
-        session.execute("set " + MainOptions.AUTOFLUSH.name() + " false");
-        session.execute("set " + MainOptions.INTPARSE.name() + " true");
-        session.execute("open " + NAME);
-        for(int i = 0; i < runs; ++i) session.execute("add " + INPUT);
+        session.execute("SET " + MainOptions.AUTOFLUSH.name() + " false");
+        session.execute("SET " + MainOptions.INTPARSE.name() + " true");
+        session.execute("OPEN " + NAME);
+        for(int r = 0; r < runs; ++r) session.execute("ADD " + INPUT);
         session.close();
       } catch(final Exception ex) {
         ex.printStackTrace();

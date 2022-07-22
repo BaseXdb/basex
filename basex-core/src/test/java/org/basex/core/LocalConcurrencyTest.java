@@ -42,7 +42,7 @@ public final class LocalConcurrencyTest extends SandboxTest {
     } finally {
       while(counter.get() < runs) Performance.sleep(1);
       if(error[0] != null) {
-        error[0].printStackTrace();
+        Util.stack(error[0]);
         fail(error[0].toString());
       }
       execute(new DropDB("store"));

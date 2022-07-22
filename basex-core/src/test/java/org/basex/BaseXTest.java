@@ -25,7 +25,7 @@ public abstract class BaseXTest extends SandboxTest {
    */
   @AfterEach public void clean() throws IOException {
     assertTrue(!INPUT.exists() || INPUT.delete(), "Could not delete input file.");
-    run("-cdrop db " + NAME);
+    run("-cDROP DB " + NAME);
   }
 
   /**
@@ -93,8 +93,8 @@ public abstract class BaseXTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void command() throws IOException {
-    equals("1", "-cxquery 1");
-    equals("\t", "-cxquery '&#x9;'");
+    equals("1", "-cXQUERY 1");
+    equals("\t", "-cXQUERY '&#x9;'");
   }
 
   /**

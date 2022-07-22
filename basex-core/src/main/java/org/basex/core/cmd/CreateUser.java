@@ -26,12 +26,12 @@ public final class CreateUser extends AUser {
 
   @Override
   protected boolean run() {
-    final String name = args[0], pw = args[1];
+    final String name = args[0], password = args[1];
     if(!Databases.validName(name)) return error(NAME_INVALID_X, name);
     if(name.equals(UserText.ADMIN)) return error(ADMIN_STATIC);
 
     final Users users = context.users;
-    users.add(new User(name, pw));
+    users.add(new User(name, password));
     users.write();
     return info(USER_CREATED_X, args[0]);
   }

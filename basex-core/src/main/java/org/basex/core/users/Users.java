@@ -40,7 +40,7 @@ public final class Users {
     file = sopts.dbPath(string(USERS) + IO.XMLSUFFIX);
     read();
     // ensure that default admin user exists
-    if(get(ADMIN) == null) add(new User(ADMIN, ADMIN).perm(Perm.ADMIN));
+    if(get(ADMIN) == null) add(new User(ADMIN).perm(Perm.ADMIN));
   }
 
   /**
@@ -141,7 +141,7 @@ public final class Users {
   }
 
   /**
-   * Returns user with the specified name.
+   * Returns a user with the specified name.
    * @param name username
    * @return username or {@code null}
    */
@@ -152,7 +152,7 @@ public final class Users {
   }
 
   /**
-   * Returns all usernames that match the specified pattern.
+   * Returns the names of all users that match the specified pattern.
    * @param pattern glob pattern
    * @return user list
    */

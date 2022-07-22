@@ -72,14 +72,14 @@ public final class ServerQueryTest extends SandboxTest {
     server = createServer();
     // create test database
     try(ClientSession cs = createClient()) {
-      cs.execute("create db test " + INPUT);
+      cs.execute("CREATE DB test " + INPUT);
       // run clients
       final Client[] cl = new Client[clients];
       for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
       for(final Client c : cl) c.start();
       for(final Client c : cl) c.join();
       // drop database and stop server
-      cs.execute("drop db test");
+      cs.execute("DROP DB test");
     }
     stopServer(server);
   }
@@ -105,13 +105,10 @@ public final class ServerQueryTest extends SandboxTest {
     public void run() {
       try {
         // Perform some queries
-        for(int i = 0; i < runs; ++i) {
+        for(int r = 0; r < runs; ++r) {
           Performance.sleep((long) (50 * RND.nextDouble()));
-
           // Return nth text of the database
-          final int n = RND.nextInt() % MAX + 1;
-          final String qu = Util.info(QUERY, n);
-          session.execute("xquery " + qu);
+          session.execute("XQUERY " + Util.info(QUERY, RND.nextInt() % MAX + 1));
         }
         session.close();
       } catch(final Exception ex) {

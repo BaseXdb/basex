@@ -45,7 +45,7 @@ public final class XQJTest extends SandboxTest {
     xqds.setProperty("serverName", "localhost");
     xqds.setProperty("port", String.valueOf(DB_PORT));
 
-    final XQConnection conn = xqds.getConnection("admin", "admin");
+    final XQConnection conn = xqds.getConnection("admin", NAME);
     try {
       final XQPreparedExpression xqpe =
           conn.prepareExpression("declare variable $x as xs:string external; $x");
@@ -68,7 +68,7 @@ public final class XQJTest extends SandboxTest {
     xqds.setProperty("serverName", "localhost");
     xqds.setProperty("port", String.valueOf(DB_PORT));
 
-    final XQConnection conn = xqds.getConnection("admin", "admin");
+    final XQConnection conn = xqds.getConnection("admin", NAME);
     try {
       final XQPreparedExpression xqpe =
           conn.prepareExpression("declare variable $x as xs:string external; $x");

@@ -32,7 +32,7 @@ public final class XdmInfoTest extends SandboxTest {
    */
   @BeforeAll public static void start() throws Exception {
     server = createServer();
-    session = new TestSession(Text.S_LOCALHOST, DB_PORT, UserText.ADMIN, UserText.ADMIN);
+    session = new TestSession(Text.S_LOCALHOST, DB_PORT, UserText.ADMIN, NAME);
   }
 
   /**
@@ -85,13 +85,13 @@ public final class XdmInfoTest extends SandboxTest {
      * Constructor.
      * @param host host name
      * @param port port
-     * @param user username
-     * @param pass password
+     * @param username username
+     * @param password password
      * @throws IOException I/O exception
      */
-    TestSession(final String host, final int port, final String user, final String pass)
+    TestSession(final String host, final int port, final String username, final String password)
         throws IOException {
-      super(host, port, user, pass);
+      super(host, port, username, password);
     }
 
     @Override

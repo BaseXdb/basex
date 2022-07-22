@@ -26,25 +26,37 @@ public final class User {
       new EnumMap<>(Algorithm.class);
   /** Database patterns for local permissions. */
   private final LinkedHashMap<String, Perm> patterns = new LinkedHashMap<>();
+  /** Permission. */
+  private Perm perm = Perm.NONE;
   /** User name. */
   private String name;
-  /** Permission. */
-  private Perm perm;
   /** Info node (can be {@code null}). */
   private ANode info;
 
   /**
    * Constructor.
    * @param name username
+   */
+  public User(final String name) {
+    this.name = name;
+  }
+
+  /**
+   * Constructor with password.
+   * @param name username
    * @param password password
    */
   public User(final String name, final String password) {
-    this.name = name;
-    perm = Perm.NONE;
-    for(final Algorithm algo : Algorithm.values()) {
-      passwords.put(algo, new EnumMap<>(Code.class));
-    }
+    this(name);
     password(password);
+  }
+
+  /**
+   * Indicates if a passwords are stored for a user.
+   * @return result of check
+   */
+  public boolean enabled() {
+    return !passwords.isEmpty();
   }
 
   /**
@@ -59,20 +71,20 @@ public final class User {
     for(final ANode child : children(user)) {
       if(eq(child.qname().id(), PASSWORD)) {
         final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
-        final Algorithm algo = attribute(name, child, ALGORITHM, Algorithm.values());
-        if(passwords.containsKey(algo)) throw new BaseXException(
-            name + ": Algorithm \"" + algo + "\" supplied more than once.");
-        passwords.put(algo, ec);
+        final Algorithm algorithm = attribute(name, child, ALGORITHM, Algorithm.values());
+        if(passwords.containsKey(algorithm)) throw new BaseXException(
+            name + ": Algorithm \"" + algorithm + "\" supplied more than once.");
+        passwords.put(algorithm, ec);
 
         for(final ANode code : children(child)) {
-          final Code cd = value(name, code.qname().id(), algo.codes);
+          final Code cd = value(name, code.qname().id(), algorithm.codes);
           if(ec.containsKey(cd)) throw new BaseXException(
-              name + ", " + algo + ": Code \"" + code + "\" supplied more than once.");
+              name + ", " + algorithm + ": Code \"" + code + "\" supplied more than once.");
           ec.put(cd, string(code.string()));
         }
-        for(final Code code : algo.codes) {
+        for(final Code code : algorithm.codes) {
           if(ec.get(code) == null)
-            throw new BaseXException(name + ", " + algo + ": Code \"" + code + "\" missing.");
+            throw new BaseXException(name + ", " + algorithm + ": Code \"" + code + "\" missing.");
         }
       } else if(eq(child.qname().id(), DATABASE)) {
         // parse local permissions
@@ -84,12 +96,6 @@ public final class User {
       } else {
         throw new BaseXException(name + ": invalid element: <" + child.qname() + "/>.");
       }
-    }
-
-    // create missing entries
-    for(final Algorithm algo : Algorithm.values()) {
-      if(passwords.get(algo) == null) throw new BaseXException(
-          name + ": Algorithm \"" + algo + "\" missing.");
     }
   }
 
@@ -153,23 +159,29 @@ public final class User {
    * @param password password (plain text)
    */
   public synchronized void password(final String password) {
-    EnumMap<Code, String> codes = passwords.get(Algorithm.DIGEST);
-    codes.put(Code.HASH, digest(name, password));
-
-    codes = passwords.get(Algorithm.SALTED_SHA256);
-    final String salt = Long.toString(System.nanoTime());
-    codes.put(Code.SALT, salt);
-    codes.put(Code.HASH, sha256(salt + password));
+    for(final Algorithm algorithm : Algorithm.values()) {
+      final EnumMap<Code, String> codes =
+          passwords.computeIfAbsent(algorithm, k -> new EnumMap<>(Code.class));
+      switch(algorithm) {
+        case DIGEST:
+          codes.put(Code.HASH, digest(name, password));
+          break;
+        default:
+          final String salt = Long.toString(System.nanoTime());
+          codes.put(Code.SALT, salt);
+          codes.put(Code.HASH, sha256(salt + password));
+      }
+    }
   }
 
   /**
    * Returns the specified code.
-   * @param alg used algorithm
+   * @param algorithm used algorithm
    * @param code code to be returned
    * @return code, or {@code null} if code does not exist
    */
-  public synchronized String code(final Algorithm alg, final Code code) {
-    return passwords.get(alg).get(code);
+  public synchronized String code(final Algorithm algorithm, final Code code) {
+    return passwords.get(algorithm).get(code);
   }
 
   /**
@@ -247,8 +259,9 @@ public final class User {
    * @return name
    */
   public synchronized boolean matches(final String password) {
-    final EnumMap<Code, String> alg = passwords.get(Algorithm.SALTED_SHA256);
-    return sha256(alg.get(Code.SALT) + password).equals(alg.get(Code.HASH));
+    if(!enabled()) return false;
+    final EnumMap<Code, String> algorithm = passwords.get(Algorithm.SALTED_SHA256);
+    return sha256(algorithm.get(Code.SALT) + password).equals(algorithm.get(Code.HASH));
   }
 
   /**

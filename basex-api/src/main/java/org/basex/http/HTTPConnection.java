@@ -493,7 +493,7 @@ public final class HTTPConnection implements ClientInfo {
    */
   private User user(final String name) throws LoginException {
     final User user = context.users.get(name);
-    if(user == null) throw new LoginException(name);
+    if(user == null || !user.enabled()) throw new LoginException(name);
     return user;
   }
 

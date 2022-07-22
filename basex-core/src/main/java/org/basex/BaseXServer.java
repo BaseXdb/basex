@@ -244,6 +244,9 @@ public final class BaseXServer extends CLI implements Runnable {
           case 'p': // parse server port
             context.soptions.set(StaticOptions.SERVERPORT, arg.number());
             break;
+          case 'P': // default admin password
+            context.user().password(arg.string());
+            break;
           case 'q': // quiet flag (hidden)
             quiet = true;
             break;

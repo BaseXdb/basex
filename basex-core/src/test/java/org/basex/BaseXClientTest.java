@@ -48,10 +48,10 @@ public final class BaseXClientTest extends BaseXTest {
    * @throws IOException I/O exception
    */
   @Test public void user() throws IOException {
-    run("-cexit", "-cdrop user " + NAME);
+    run("-cEXIT", "-cDROP USER " + NAME);
     equals("5", new String[] { "-U" + NAME, "-P" + NAME, "-q5" },
-        new String[] { "-ccreate user " + NAME + ' ' + NAME });
-    run("-cexit", "-cdrop user " + NAME);
+        new String[] { "-cCREATE USER " + NAME + ' ' + NAME });
+    run("-cEXIT", "-cDROP USER " + NAME);
   }
 
   /**
@@ -75,11 +75,10 @@ public final class BaseXClientTest extends BaseXTest {
    */
   private static String run(final String[] args, final String[] sargs) throws IOException {
     final BaseXServer server = createServer(sargs);
-    final StringList sl = new StringList(
-        "-p" + DB_PORT, "-U" + UserText.ADMIN, "-P" + UserText.ADMIN).add(args);
+    final StringList sl = new StringList("-p" + DB_PORT, "-U" + UserText.ADMIN, "-P" + NAME);
     try(ArrayOutput ao = new ArrayOutput()) {
       System.setOut(new PrintStream(ao));
-      new BaseXClient(sl.finish());
+      new BaseXClient(sl.add(args).finish());
       return ao.toString();
     } finally {
       stopServer(server);

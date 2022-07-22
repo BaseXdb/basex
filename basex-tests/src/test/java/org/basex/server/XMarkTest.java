@@ -1,7 +1,5 @@
 package org.basex.server;
 
-import static org.basex.core.Text.*;
-
 import java.io.*;
 import java.math.*;
 
@@ -22,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class XMarkTest {
+public final class XMarkTest extends SandboxTest {
   /** Test user. */
   private static final String USER = "xmark";
   /** Name of database. */
@@ -124,12 +122,12 @@ public final class XMarkTest {
   @BeforeAll public static void init() throws Exception {
     // only start server if it is not already running
     if(!BaseXServer.ping(StaticOptions.HOST.value(), StaticOptions.PORT.value()))
-      server = new BaseXServer();
+      server = createServer();
 
-    try(ClientSession cs = createClient(true)) {
-      cs.execute("create db " + DB + " " + DBFILE);
-      cs.execute("create user xmark xmark");
-      cs.execute("grant read on " + DB + " to xmark");
+    try(ClientSession cs = createClient(UserText.ADMIN, NAME)) {
+      cs.execute("CREATE DB " + DB + " " + DBFILE);
+      cs.execute("CREATE USER xmark xmark");
+      cs.execute("GRANT read ON " + DB + " TO xmark");
     }
   }
 
@@ -150,7 +148,7 @@ public final class XMarkTest {
     final IntList exclude = new IntList(new int[] { 11, 12 });
     final TokenBuilder tb = new TokenBuilder().add(DB).add(Prop.NL);
 
-    try(ClientSession cs = createClient(false)) {
+    try(ClientSession cs = createClient(USER, USER)) {
       cs.execute(new Open(DB));
 
       // ignore first run
@@ -198,16 +196,5 @@ public final class XMarkTest {
 
     DIR.md();
     FILE.write(tb.finish());
-  }
-
-  /**
-   * Creates a client instance.
-   * @param admin admin user
-   * @return client instance
-   * @throws IOException I/O exception
-   */
-  private static ClientSession createClient(final boolean admin) throws IOException {
-    final String user = admin ? UserText.ADMIN : USER;
-    return new ClientSession(S_LOCALHOST, StaticOptions.PORT.value(), user, user);
   }
 }

@@ -23,11 +23,11 @@ public final class UserCreate extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toInactiveName(0, qc);
-    final String pw = toString(exprs[1], qc);
+    final String password = toString(exprs[1], qc);
     final ArrayList<Perm> perms = toPermissions(2, qc);
     final StringList patterns = toPatterns(3, qc);
 
-    final User user = new User(name, pw);
+    final User user = new User(name, password);
     if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
 
     if(exprs.length > 4) {

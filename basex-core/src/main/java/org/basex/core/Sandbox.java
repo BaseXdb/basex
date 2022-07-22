@@ -3,11 +3,12 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
 import org.basex.api.client.*;
-import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
 import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
@@ -182,9 +183,9 @@ public abstract class Sandbox {
       if(query != null) tb.add("Query: ").add(query).add('\n');
       tb.add("Error(s): ");
       if(err != null) {
+        Util.stack(ex);
         int c = 0;
         for(final QueryError er : errors) tb.add(c++ == 0 ? "" : "/").add(er.name());
-        ex.printStackTrace();
         tb.add("\nResult: ").add(err.name() + " (" + ex.getLocalizedMessage() + ')');
       } else {
         int c = 0;
@@ -272,6 +273,12 @@ public abstract class Sandbox {
   public static void finishSandbox() {
     context.close();
     Prop.clear();
+    // cleanup: remove project specific system properties
+    final Properties props = System.getProperties();
+    for(final Object key : props.keySet()) {
+      final String path = key.toString();
+      if(path.startsWith(Prop.DBPREFIX)) props.remove(key);
+    }
     if(!sandbox().delete()) throw Util.notExpected("Sandbox could not be deleted.");
   }
 
@@ -298,8 +305,7 @@ public abstract class Sandbox {
    * @throws IOException I/O exception
    */
   public static BaseXServer createServer(final String... args) throws IOException {
-    final StringList sl = new StringList("-z", "-p" + DB_PORT, "-q");
-    for(final String arg : args) sl.add(arg);
+    final StringList sl = new StringList("-z", "-p" + DB_PORT, "-P" + NAME, "-q").add(args);
     final BaseXServer server = new BaseXServer(sl.finish());
     server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
     return server;
@@ -322,7 +328,7 @@ public abstract class Sandbox {
    */
   public static ClientSession createClient(final String... login) throws IOException {
     final String username = login.length > 0 ? login[0] : UserText.ADMIN;
-    final String password = login.length > 1 ? login[1] : UserText.ADMIN;
+    final String password = login.length > 1 ? login[1] : NAME;
     return new ClientSession(S_LOCALHOST, DB_PORT, username, password);
   }
 

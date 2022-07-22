@@ -45,10 +45,9 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * @throws Exception if database cannot be created or server cannot be started
    */
   @BeforeEach public void setUp() throws Exception {
-    final StringList sl = new StringList();
-    sl.add("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT, "-z").add("-U" + ADMIN);
-
-    http = new BaseXHTTP(sl.toArray());
+    final StringList sl = new StringList("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT,
+        "-U" + ADMIN, "-P" + NAME, "-z");
+    http = new BaseXHTTP(sl.finish());
     try(ClientSession cs = createClient()) {
       cs.execute(new CreateDB(NAME));
     }

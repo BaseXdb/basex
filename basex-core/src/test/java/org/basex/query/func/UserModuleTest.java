@@ -63,10 +63,15 @@ public final class UserModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void check() {
     final Function func = _USER_CHECK;
-    query(func.args(UserText.ADMIN, UserText.ADMIN));
+    error(func.args(UserText.ADMIN, UserText.ADMIN), USER_PASSWORD_X);
+    error(func.args(UserText.ADMIN, ""), USER_PASSWORD_X);
+
+    query(_USER_PASSWORD.args(UserText.ADMIN, NAME));
+    query(func.args(UserText.ADMIN, NAME));
     error(func.args("", "x"), USER_NAME_X);
     error(func.args("x", "x"), USER_UNKNOWN_X);
     error(func.args(UserText.ADMIN, "x"), USER_PASSWORD_X);
+    error(func.args(UserText.ADMIN, ""), USER_PASSWORD_X);
   }
 
   /** Test method. */

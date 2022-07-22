@@ -51,9 +51,11 @@ public final class UpdIndexRandomTest extends SandboxTest {
     final int cap = 1000;
     final StringList words = new StringList(cap);
     for(int w = 0; w < cap; w++) {
-      final int r = 1 + rnd.nextInt(10);
-      final TokenBuilder tmp = new TokenBuilder(r);
-      for(int i = 0; i < r; i++) tmp.add('A' + rnd.nextInt(26));
+      final int size = 1 + rnd.nextInt(10);
+      final TokenBuilder tmp = new TokenBuilder(size);
+      for(int s = 0; s < size; s++) {
+        tmp.add('A' + rnd.nextInt(26));
+      }
       words.add(tmp.toString());
     }
 
@@ -63,7 +65,9 @@ public final class UpdIndexRandomTest extends SandboxTest {
       final TokenBuilder doc = new TokenBuilder().add("<xml>");
 
       final int offset = rnd.nextInt(cap - DOCS);
-      for(int i = 0; i < DOCS; i++) doc.add("<a>").add(words.get(offset + i)).add("</a>");
+      for(int d = 0; d < DOCS; d++) {
+        doc.add("<a>").add(words.get(offset + d)).add("</a>");
+      }
       doc.add("</xml>");
       execute(new Put(path, doc.toString()));
 

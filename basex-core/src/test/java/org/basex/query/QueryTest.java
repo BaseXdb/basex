@@ -57,7 +57,7 @@ public abstract class QueryTest extends SandboxTest {
           sb.append('[').append(qu[0]).append("] ").append(query).append("\n[E] ");
           sb.append(cp).append("\n[F] ").append(msg == null ? Util.className(ex) : normNL(msg));
           sb.append(' ').append(details()).append('\n');
-          ex.printStackTrace();
+          Util.stack(ex);
           ++fail;
         }
       }

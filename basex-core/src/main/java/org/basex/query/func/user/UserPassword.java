@@ -17,32 +17,32 @@ public final class UserPassword extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final User user = toUser(0, qc);
-    final String pw = toString(exprs[1], qc);
-    qc.updates().add(new Password(user, pw, qc, info), qc);
+    final String password = toString(exprs[1], qc);
+    qc.updates().add(new Password(user, password, qc, info), qc);
     return Empty.VALUE;
   }
 
   /** Update primitive. */
   private static final class Password extends UserUpdate {
     /** Password. */
-    private final String pw;
+    private final String password;
 
     /**
      * Constructor.
      * @param user user
-     * @param pw password
+     * @param password password
      * @param qc query context
      * @param info input info
      */
-    private Password(final User user, final String pw, final QueryContext qc,
+    private Password(final User user, final String password, final QueryContext qc,
         final InputInfo info) {
       super(UpdateType.USERPASSWORD, user, qc, info);
-      this.pw = pw;
+      this.password = password;
     }
 
     @Override
     public void apply() {
-      user.password(pw);
+      user.password(password);
     }
 
     @Override

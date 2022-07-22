@@ -58,7 +58,7 @@ public final class ClientModuleTest extends SandboxTest {
     query(connection());
     query("exists(" + connection() + ")", true);
     // BXCL0001: connection errors
-    error(func.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ""), CLIENT_CONNECT_X);
+    error(func.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ADMIN), CLIENT_CONNECT_X);
     error(func.args("x\\o//x", DB_PORT, ADMIN, ADMIN), CLIENT_CONNECT_X);
   }
 
@@ -132,6 +132,6 @@ public final class ClientModuleTest extends SandboxTest {
    * @return connect string
    */
   private static String connection() {
-    return _CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, ADMIN);
+    return _CLIENT_CONNECT.args(Text.S_LOCALHOST, DB_PORT, ADMIN, NAME);
   }
 }

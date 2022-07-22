@@ -72,15 +72,15 @@ public final class CollAddTest extends SandboxTest {
 
   /**
    * Creates a database.
-   * @param n number of documents to be added
+   * @param size number of documents to be added
    * @param flush force flush of updates
    */
-  private static void add(final int n, final boolean flush) {
+  private static void add(final int size, final boolean flush) {
     set(MainOptions.AUTOFLUSH, flush);
     // Create test database
     execute(new CreateDB(NAME));
     // Add documents
-    for(int i = 0; i < n; i++) execute(new Add(Integer.toString(i), "<xml/>"));
+    for(int s = 0; s < size; s++) execute(new Add(Integer.toString(s), "<xml/>"));
     // Close database
     execute(new DropDB(NAME));
   }

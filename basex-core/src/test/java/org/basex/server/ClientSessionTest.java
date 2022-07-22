@@ -40,6 +40,7 @@ public class ClientSessionTest extends SessionTest {
       session = createClient();
       session.setOutputStream(out);
     } catch(final IOException ex) {
+      Util.stack(ex);
       fail(Util.message(ex));
     }
   }
