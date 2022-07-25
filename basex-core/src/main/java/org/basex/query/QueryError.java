@@ -482,7 +482,7 @@ public enum QueryError {
   /** Error code. */
   USER_LOGGEDIN_X(USER, "logged-in", "User '%' is currently logged in."),
   /** Error code. */
-  USER_NAME_X(USER, "name", "Invalid user name: '%'."),
+  USER_NAME_X(USER, "name", "Invalid username: '%'."),
   /** Error code. */
   USER_PASSWORD_X(USER, "password", "Wrong password supplied for user '%'."),
   /** Error code. */

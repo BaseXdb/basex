@@ -17,7 +17,7 @@ import org.basex.util.*;
  * <ul>
  *   <li><b>Time</b>: timestamp (format: {@code xs:time})</li>
  *   <li><b>Address</b>: host name and port of the requesting client</li>
- *   <li><b>User</b>: user name</li>
+ *   <li><b>User</b>: username</li>
  *   <li><b>Type</b>: Type of log message: REQUEST, OK or ERROR</li>
  *   <li><b>Info</b>: Log message</li>
  *   <li><b>Performance</b>: Measured time in milliseconds</li>

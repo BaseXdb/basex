@@ -23,7 +23,7 @@ public final class UserInfo {
   /** Request information (can be {@code null}). */
   private final Request request;
 
-  /** User name. */
+  /** Username. */
   private String username;
   /** Password. */
   private String password;

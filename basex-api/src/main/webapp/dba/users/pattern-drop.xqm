@@ -12,7 +12,7 @@ declare variable $dba:SUB := 'user';
 
 (:~
  : Drops a pattern.
- : @param  $name      user name
+ : @param  $name      username
  : @param  $patterns  database patterns
  : @return redirection
  :)

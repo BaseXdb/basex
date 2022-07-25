@@ -28,7 +28,7 @@ public final class User {
   private final LinkedHashMap<String, Perm> patterns = new LinkedHashMap<>();
   /** Permission. */
   private Perm perm = Perm.NONE;
-  /** User name. */
+  /** Name. */
   private String name;
   /** Info node (can be {@code null}). */
   private ANode info;

@@ -273,7 +273,7 @@ public final class Context {
 
   /**
    * Returns the name of the current client or user.
-   * @return user name (or {@code null})
+   * @return username (or {@code null})
    */
   public String clientName() {
     return client != null ? client.clientName() : user != null ? user.name() : null;

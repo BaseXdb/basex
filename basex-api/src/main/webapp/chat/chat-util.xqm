@@ -45,7 +45,7 @@ declare function chat-util:message(
 
 (:~
  : Closes all WebSocket connections from the specified user.
- : @param  $name  user name
+ : @param  $name  username
  :)
 declare function chat-util:close(
   $name  as  xs:string

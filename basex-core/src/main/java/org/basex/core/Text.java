@@ -126,7 +126,7 @@ public interface Text {
     "  -r<num>    Run query multiple times" + NL +
     "  -R         Toggle query execution" + NL +
     "  -s<args>   Set serialization parameters" + NL +
-    "  -U<name>   Specify user name" + NL +
+    "  -U<name>   Specify username" + NL +
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
     "  -w         Toggle whitespace stripping" + NL +
@@ -169,7 +169,7 @@ public interface Text {
     "  -p<port>   Set port of database server" + NL +
     "  -s<port>   Specify port to stop HTTP server" + NL +
     "  -S         Start as service" + NL +
-    "  -U<name>   Specify user name" + NL +
+    "  -U<name>   Specify username" + NL +
     "  -z         Suppress logging";
 
   /** Bug info. */
@@ -294,7 +294,7 @@ public interface Text {
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
   /** Access denied. */
   String ACCESS_DENIED_X = lang("access_denied_%");
-  /** User name. */
+  /** Username. */
   String USERNAME = lang("username");
   /** Password. */
   String PASSWORD = lang("password");

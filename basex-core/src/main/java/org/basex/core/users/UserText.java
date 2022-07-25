@@ -9,7 +9,7 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface UserText {
-  /** User name. */
+  /** Username, permission. */
   String[] S_USERINFO = { "Username", "Permission" };
   /** Default user and password. */
   String ADMIN = "admin";

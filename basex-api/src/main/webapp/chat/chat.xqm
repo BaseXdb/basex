@@ -23,7 +23,7 @@ function chat:chat() as element() {
 
 (:~
  : Checks the user input, registers the user and reloads the chat.
- : @param  $name  user name
+ : @param  $name  username
  : @param  $pass  password
  : @return redirection
  :)  

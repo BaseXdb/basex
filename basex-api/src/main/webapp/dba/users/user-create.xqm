@@ -14,7 +14,7 @@ declare variable $dba:CAT := 'users';
 
 (:~
  : Form for creating a new user.
- : @param  $name   entered user name
+ : @param  $name   entered username
  : @param  $pw     entered password
  : @param  $perm   chosen permission
  : @param  $error  error string
@@ -83,7 +83,7 @@ function dba:user-create(
 
 (:~
  : Creates a user.
- : @param  $name  user name
+ : @param  $name  username
  : @param  $pw    password
  : @param  $perm  permission
  : @return redirection

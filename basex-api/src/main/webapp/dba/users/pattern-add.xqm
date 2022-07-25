@@ -16,7 +16,7 @@ declare variable $dba:SUB := 'user';
 
 (:~
  : Form for adding a new pattern.
- : @param  $name     user name
+ : @param  $name     username
  : @param  $pattern  entered pattern
  : @param  $perm     chosen permission
  : @param  $error    error string
@@ -76,7 +76,7 @@ function dba:pattern-add(
 
 (:~
  : Creates a pattern.
- : @param  $name     user name
+ : @param  $name     username
  : @param  $perm     permission
  : @param  $pattern  pattern
  : @return redirection

@@ -15,7 +15,7 @@ declare variable $dba:SUB := 'user';
 
 (:~
  : Returns a single user page.
- : @param  $name     user name
+ : @param  $name     username
  : @param  $newname  new name
  : @param  $pw       password
  : @param  $perm     permission
@@ -148,7 +148,7 @@ function dba:user(
 (:~
  : Redirects to the specified action.
  : @param  $action    action to perform
- : @param  $name      user name
+ : @param  $name      username
  : @param  $patterns  patterns
  : @return redirection
  :)

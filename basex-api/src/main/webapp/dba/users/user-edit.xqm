@@ -12,7 +12,7 @@ declare variable $dba:SUB := 'user';
 
 (:~
  : Edits a user.
- : @param  $name     user name
+ : @param  $name     username
  : @param  $newname  new name
  : @param  $pw       password
  : @param  $perm     permission

@@ -37,7 +37,7 @@ function dba:check(
 
 (:~
  : Login page.
- : @param  $name   user name (optional)
+ : @param  $name   username (optional)
  : @param  $error  error string (optional)
  : @param  $page   page to redirect to (optional)
  : @return login page or redirection to main page
@@ -93,7 +93,7 @@ function dba:login(
 
 (:~
  : Checks the user input and redirects to the main page, or back to the login page.
- : @param  $name  user name
+ : @param  $name  username
  : @param  $pass  password
  : @param  $page  page to redirect to (optional)
  : @return redirection
@@ -142,7 +142,7 @@ function dba:logout(
 
 (:~
  : Registers a user and redirects to the main page.
- : @param  $name  entered user name
+ : @param  $name  entered username
  : @param  $page  page to redirect to (optional)
  : @return redirection
  :)
@@ -160,7 +160,7 @@ declare %private function dba:accept(
 
 (:~
  : Rejects a user and redirects to the login page.
- : @param  $name   entered user name
+ : @param  $name   entered username
  : @param  $error  error message
  : @param  $page   page to redirect to (optional)
  : @return redirection
