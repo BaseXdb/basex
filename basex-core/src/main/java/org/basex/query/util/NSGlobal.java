@@ -91,6 +91,11 @@ public final class NSGlobal {
     NS.add(XSLT_PREFIX, XSLT_URI);
     NS.add(XQUERY_PREFIX, XQUERY_URI);
 
+    // obsolete prefixes
+    NS.add(JOBS_PREFIX, BASEX_URI);
+    NS.add(OUT_PREFIX, BASEX_URI);
+    NS.add(STRINGS_PREFIX, BASEX_URI);
+
     for(int s = NS.size() - 1; s >= 0; s--) {
       final byte[] prefix = NS.name(s), uri = NS.value(s);
       URIS.put(prefix, uri);

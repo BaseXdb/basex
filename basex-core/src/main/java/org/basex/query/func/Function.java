@@ -1004,7 +1004,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _DB_NODE_PRE(DbNodePre::new, "node-pre(nodes)",
       params(NODE_ZM), INTEGER_ZM, DB_URI),
-  /** XQuery function. */
+  /** XQuery function (deprecated). */
   _DB_OPEN(DbOpen::new, "open(database[,path])",
       params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */

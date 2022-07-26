@@ -40,8 +40,7 @@ public final class BaseXLayout {
   /** Flag for adding rendering hints. */
   private static boolean hints = true;
 
-  /** Shortcut string for meta key. */
-  // will raise a warning (Java function returns deprecated value that is deprecated in Java 9)
+  /** Shortcut string for meta key (deprecated since Java 9). */
   @SuppressWarnings("deprecation")
   private static final String META = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
       InputEvent.CTRL_MASK ? "ctrl" : "meta";
