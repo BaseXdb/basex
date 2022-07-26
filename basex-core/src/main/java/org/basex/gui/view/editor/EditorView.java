@@ -57,9 +57,11 @@ public final class EditorView extends View {
   /** Project files. */
   final ProjectView project;
   /** Go button. */
-  final AbstractButton exec;
+  final AbstractButton go;
+  /** Indent button. */
+  final AbstractButton indent;
   /** Test button. */
-  final AbstractButton tests;
+  final AbstractButton test;
 
   /** History Button. */
   private final AbstractButton history;
@@ -123,11 +125,12 @@ public final class EditorView extends View {
 
     history = BaseXButton.get("c_history", BaseXLayout.addShortcut(RECENTLY_OPENED,
         BaseXKeys.HISTORY.toString()), false, gui);
-    exec = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
+    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
         BaseXKeys.EXEC.toString()), false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
-    tests = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
+    indent = BaseXButton.command(GUIMenuCmd.C_INDENT_RESULT, gui);
+    test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
         BaseXKeys.TESTS.toString()), false, gui);
 
     final BaseXToolBar buttons = new BaseXToolBar();
@@ -136,10 +139,11 @@ public final class EditorView extends View {
     buttons.add(saveB);
     buttons.add(history);
     buttons.addSeparator();
-    buttons.add(exec);
+    buttons.add(go);
     buttons.add(stop);
     buttons.add(vars);
-    buttons.add(tests);
+    buttons.add(indent);
+    buttons.add(test);
     buttons.addSeparator();
     buttons.add(find);
 
@@ -202,8 +206,8 @@ public final class EditorView extends View {
       stop.setEnabled(false);
       gui.stop();
     });
-    exec.addActionListener(e -> run(getEditor(), Action.EXECUTE));
-    tests.addActionListener(e -> run(getEditor(), Action.TEST));
+    go.addActionListener(e -> run(getEditor(), Action.EXECUTE));
+    test.addActionListener(e -> run(getEditor(), Action.TEST));
     tabs.addChangeListener(e -> {
       final EditorArea ea = getEditor();
       if(ea == null) return;
@@ -228,7 +232,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    tests.setEnabled(getEditor().file().hasSuffix(IO.XQSUFFIXES));
+    test.setEnabled(getEditor().file().hasSuffix(IO.XQSUFFIXES));
   }
 
   @Override
@@ -239,6 +243,7 @@ public final class EditorView extends View {
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     project.refreshLayout();
     search.refreshLayout();
+    indent.setSelected(GUIMenuCmd.C_INDENT_RESULT.selected(gui));
   }
 
   @Override

@@ -86,12 +86,12 @@ final class DialogResultPrefs extends BaseXBack {
    * @return success flag
    */
   boolean action() {
-    gui.gopts.set(GUIOptions.MAXTEXT, MAXTEXT[maxText.getValue()]);
-    gui.gopts.set(GUIOptions.MAXRESULTS, MAXRESULTS[maxResults.getValue()]);
+    final int mt = MAXTEXT[maxText.getValue()], mr = MAXRESULTS[maxResults.getValue()];
+    final GUIOptions gopts = gui.gopts;
+    gopts.set(GUIOptions.MAXTEXT, mt);
+    gopts.set(GUIOptions.MAXRESULTS, mr);
 
-    final int mr = MAXRESULTS[maxResults.getValue()];
     labelResults.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
-    final int mt = MAXTEXT[maxText.getValue()];
     labelText.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt));
     return true;
   }

@@ -852,6 +852,8 @@ public interface Text {
   String TIME = lang("time");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
+  /** Indent result. */
+  String INDENT_RESULT = lang("indent_result");
 
   /** Command info. */
   String RECENTLY_OPENED = lang("recently_opened");

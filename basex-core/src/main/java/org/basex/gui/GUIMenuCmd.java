@@ -13,12 +13,14 @@ import org.basex.gui.text.TextEditor.*;
 import org.basex.gui.view.*;
 import org.basex.gui.view.editor.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.query.func.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.Options.*;
 
 /**
  * This enumeration encapsulates all commands that are triggered by GUI operations.
@@ -198,6 +200,22 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public boolean enabled(final GUI gui) {
       return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
+  /** Indent result. */
+  C_INDENT_RESULT(INDENT_RESULT, "% shift I", false, true) {
+    @Override
+    public void execute(final GUI gui) {
+      final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
+      sopts.put(SerializerOptions.INDENT, selected(gui) ? YesNo.NO : YesNo.YES);
+      gui.editor.refreshLayout();
+    }
+
+    @Override
+    public boolean selected(final GUI gui) {
+      final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
+      return sopts.get(SerializerOptions.INDENT) == YesNo.YES;
     }
   },
 

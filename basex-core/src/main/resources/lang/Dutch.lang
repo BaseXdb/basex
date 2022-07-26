@@ -166,6 +166,7 @@ green                = Groen
 help                 = Help
 hit_s                = Hit(s)
 include_strings      = Inclusief string type
+indent_result        = Indent result
 indentation_size     = Inspringgrootte
 index_attributes     = Attributen indexeren
 index_created_%_%    = Index '%' in % seconden gemaakt.

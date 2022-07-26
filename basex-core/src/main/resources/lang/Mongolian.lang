@@ -166,6 +166,7 @@ green                = Ногоон
 help                 = Тусламж
 hit_s                = Амжилттай
 include_strings      = Include string type
+indent_result        = Indent result
 indentation_size     = Indentation size
 index_attributes     = Атрибут индексжүүлэлт
 index_created_%_%    = Индекс '%' нь %-нд үүссэн.

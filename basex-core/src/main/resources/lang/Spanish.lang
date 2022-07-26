@@ -166,6 +166,7 @@ green                = Verde
 help                 = Ayuda
 hit_s                = Impacto(s)
 include_strings      = Incluir tipo de String
+indent_result        = Indent result
 indentation_size     = Tamaño de Indentación
 index_attributes     = Indizando valores del atributos
 index_created_%_%    = Índice '%' creado en %.

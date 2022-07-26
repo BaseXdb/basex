@@ -166,6 +166,7 @@ green                = Verde
 help                 = Ajutor
 hit_s                = Afisari
 include_strings      = Include tipul stringului
+indent_result        = Indent result
 indentation_size     = Marimea identarii
 index_attributes     = Indexare Valori Attribute
 index_created_%_%    = Index '%' creat în %.

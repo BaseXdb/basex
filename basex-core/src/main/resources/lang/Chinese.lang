@@ -166,6 +166,7 @@ green                = 绿色
 help                 = 帮助
 hit_s                = 命中
 include_strings      = 包含字符串类型
+indent_result        = Indent result
 indentation_size     = 缩进大小
 index_attributes     = 为属性值建索引
 index_created_%_%    = 索引 '%' 在 % 里建立了

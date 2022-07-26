@@ -166,6 +166,7 @@ green                = Grün
 help                 = Hilfe
 hit_s                = Treffer
 include_strings      = Berücksichtige String-Typ
+indent_result        = Ergebnis einrücken
 indentation_size     = Einrückungsgröße
 index_attributes     = Indiziere Attributwerte
 index_created_%_%    = Index '%' erzeugt (%).

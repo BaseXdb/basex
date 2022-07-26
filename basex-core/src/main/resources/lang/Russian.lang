@@ -166,6 +166,7 @@ green                = Зеленый
 help                 = Помощь
 hit_s                = Попаданий
 include_strings      = Добавлять строковый тип
+indent_result        = Indent result
 indentation_size     = Отступ
 index_attributes     = Индексируются значения атрибутов
 index_created_%_%    = Индекс '%' создан за %

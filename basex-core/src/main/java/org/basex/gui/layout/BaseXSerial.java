@@ -77,6 +77,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
   public void init(final SerializerOptions so) {
     sopts = new SerializerOptions(so);
     params.setSelectedItem(SerializerOptions.METHOD.name());
+    update();
   }
 
   // PRIVATE FUNCTIONS ============================================================================

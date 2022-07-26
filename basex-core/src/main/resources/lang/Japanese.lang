@@ -166,6 +166,7 @@ green                = 緑
 help                 = ヘルプ
 hit_s                = ヒット
 include_strings      = 文字列タイプを含む
+indent_result        = Indent result
 indentation_size     = インデントサイズ
 index_attributes     = 属性インデックスを作成中です。
 index_created_%_%    = インデックス % が % に作成されました。

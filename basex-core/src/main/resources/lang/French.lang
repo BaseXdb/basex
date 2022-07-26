@@ -166,6 +166,7 @@ green                = Vert
 help                 = Aide
 hit_s                = Hit(s)
 include_strings      = Inclure le type de chaîne de caractères
+indent_result        = Indent result
 indentation_size     = Taille d'indentation
 index_attributes     = Indexation des attributs en cours
 index_created_%_%    = Index '%' créé dans %.

@@ -166,6 +166,7 @@ green                = Hujau
 help                 = Bantuan
 hit_s                = Temuan
 include_strings      = Ikutkan tipe string
+indent_result        = Indent result
 indentation_size     = Ukuran dekik
 index_attributes     = Mengindeks atribut nilai
 index_created_%_%    = Indeks '%' dibuat dalam %.

@@ -166,6 +166,7 @@ green                = Zöld
 help                 = Súgó
 hit_s                = Találat(ok)
 include_strings      = Karakterlánc típust is tartalmazza
+indent_result        = Indent result
 indentation_size     = Behúzás mértéke
 index_attributes     = Attribútum értékek indexelése folyamatban
 index_created_%_%    = '%' index létrejött % alatt.
