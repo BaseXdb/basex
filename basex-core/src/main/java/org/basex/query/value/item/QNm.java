@@ -177,8 +177,9 @@ public final class QNm extends Item {
       if(i == -1) {
         uri = def;
       } else {
-        if(sc != null) uri = sc.ns.uri(substring(nm, 0, i));
-        if(uri == null) throw NOURI_X.get(ii, name);
+        final byte[] prefix = substring(nm, 0, i);
+        if(sc != null) uri = sc.ns.uri(prefix);
+        if(uri == null) throw NOURI_X.get(ii, prefix);
       }
     }
     if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(ii, name);
@@ -231,7 +232,7 @@ public final class QNm extends Item {
       nm = (QNm) item;
     } else if(item.type.isUntyped() && sc != null) {
       nm = new QNm(item.string(ii), sc);
-      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(ii, nm.string());
+      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(ii, nm.prefix());
     } else {
       throw diffError(this, item, ii);
     }

@@ -139,7 +139,7 @@ public final class CElem extends CName {
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CEXML.get(info, nmPrefix, nmUri);
       if(eq(nmUri, XMLNS_URI)) throw CEINV_X.get(info, nmUri);
       if(eq(nmPrefix, XMLNS)) throw CEINV_X.get(info, nmPrefix);
-      if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nm);
+      if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 
       // create node
       final Constr constr = new Constr(info, sc);

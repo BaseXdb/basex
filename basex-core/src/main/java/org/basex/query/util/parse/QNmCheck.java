@@ -44,7 +44,7 @@ final class QNmCheck {
 
     if(name.hasPrefix()) {
       name.uri(parser.sc.ns.uri(name.prefix()));
-      if(check && !name.hasURI()) throw parser.error(NOURI_X, info, name.string());
+      if(check && !name.hasURI()) throw parser.error(NOURI_X, info, name.prefix());
     } else if(nsElem) {
       name.uri(parser.sc.elemNS);
     }

@@ -55,8 +55,6 @@ public class QueryParser extends InputParser {
   /** Pattern for detecting library modules. */
   private static final Pattern LIBMOD_PATTERN = Pattern.compile(
       "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module .*");
-  /** QName check: URI is mandatory. */
-  private static final byte[] URICHECK = {};
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
   /** Reserved function names. */
@@ -3856,7 +3854,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "EQName" rule.
    * @param error optional error message. If not {@code null}, will be raised if no EQName is found
-   * @param ns default namespace, or operation mode ({@link #URICHECK}, {@link #SKIPCHECK})
+   * @param ns default namespace, or operation mode ({@link #SKIPCHECK})
    * @return QName or {@code null}
    * @throws QueryException query exception
    */
@@ -3864,13 +3862,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     if(consume(EQNAME)) {
       final byte[] uri = bracedURILiteral(), name = ncName(null);
-      if(name.length != 0) {
-        if(ns == URICHECK && uri.length == 0) {
-          pos = p;
-          throw error(NOURI_X, name);
-        }
-        return new QNm(name, uri);
-      }
+      if(name.length != 0) return new QNm(name, uri);
       pos = p;
     }
 
@@ -3882,13 +3874,9 @@ public class QueryParser extends InputParser {
     // create new EQName and set namespace
     final QNm name = new QNm(nm, sc);
     if(!name.hasURI()) {
-      if(ns == URICHECK) {
-        pos = p;
-        throw error(NSMISS_X, name);
-      }
       if(name.hasPrefix()) {
         pos = p;
-        throw error(NOURI_X, name.string());
+        throw error(NOURI_X, name.prefix());
       }
       name.uri(ns);
     }

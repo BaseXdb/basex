@@ -57,22 +57,21 @@ public final class CAttr extends CName {
   @Override
   public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     QNm nm = qname(false, qc, sc);
-    final byte[] cp = nm.prefix();
+    final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
     if(computed) {
-      final byte[] cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XML_URI)) throw CAXML.get(info);
-      if(eq(cu, XMLNS_URI)) throw CAINV_.get(info, cu);
-      if(eq(cp, XMLNS) || cp.length == 0 && eq(nm.string(), XMLNS))
+      if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CAXML.get(info);
+      if(eq(nmUri, XMLNS_URI)) throw CAINV_.get(info, nmUri);
+      if(eq(nmPrefix, XMLNS) || nmPrefix.length == 0 && eq(nm.string(), XMLNS))
         throw CAINV_.get(info, nm.string());
 
       // create new standard namespace to cover most frequent cases
-      if(eq(cp, EMPTY) && !eq(cu, EMPTY))
-        nm = new QNm(concat(NS0, nm.string()), cu);
+      if(eq(nmPrefix, EMPTY) && !eq(nmUri, EMPTY))
+        nm = new QNm(concat(NS0, nm.string()), nmUri);
     }
-    if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nm);
+    if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 
     byte[] value = atomValue(qc, true);
-    if(eq(cp, XML) && eq(nm.local(), ID)) value = normalize(value);
+    if(eq(nmPrefix, XML) && eq(nm.local(), ID)) value = normalize(value);
 
     return new FAttr(nm, value);
   }

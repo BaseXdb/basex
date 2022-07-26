@@ -678,7 +678,7 @@ public enum QueryError {
   ESCAPE_JSON_X(FOJS, 7, "Invalid escape sequence: %."),
 
   /** Error code. */
-  NSDECL_X(FONS, 4, "No namespace declared for prefix '%'."),
+  NSDECL_X(FONS, 4, "Namespace prefix not declared: %."),
 
   /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
@@ -1033,7 +1033,7 @@ public enum QueryError {
   /** Error code. */
   INVALIDCAST_X(XPST, 80, "Invalid cast type: %."),
   /** Error code. */
-  NOURI_X(XPST, 81, "No namespace declared for QName '%'."),
+  NOURI_X(XPST, 81, "Namespace prefix not declared: %."),
   /** Error code. */
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
@@ -1155,7 +1155,7 @@ public enum QueryError {
   /** Error code. */
   INVQNAME_X(XQDY, 74, "Invalid QName: %."),
   /** Error code. */
-  NOQNNAMENS_X(XQDY, 74, "No namespace declared for QName '%'."),
+  NOQNNAMENS_X(XQDY, 74, "Namespace prefix not declared: %."),
   /** Error code. */
   CEXML(XQDY, 96, "XML prefix or namespace cannot be rebound: %/%."),
   /** Error code. */
