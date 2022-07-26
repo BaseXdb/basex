@@ -32,53 +32,50 @@ final class DialogResultPrefs extends BaseXBack {
   private final BaseXSerial serial;
 
   /** Number of hits. */
-  private final BaseXSlider maxResults;
+  private final BaseXSlider resultsMax;
   /** Result cache. */
-  private final BaseXSlider maxText;
+  private final BaseXSlider textMax;
   /** Label for number of hits. */
-  private final BaseXLabel labelResults;
+  private final BaseXLabel resultsLabel;
   /** Label for text size. */
-  private final BaseXLabel labelText;
+  private final BaseXLabel textLabel;
 
   /**
    * Default constructor.
    * @param dialog dialog reference
    */
   DialogResultPrefs(final BaseXDialog dialog) {
-    border(8).setLayout(new ColumnLayout(40));
+    border(8).setLayout(new RowLayout(0));
     gui = dialog.gui();
 
     int val = sliderIndex(gui.gopts.get(GUIOptions.MAXRESULTS), MAXRESULTS);
-    maxResults = new BaseXSlider(dialog, 0, MAXRESULTS.length - 1, val);
-    maxResults.addActionListener(e -> action());
-    labelResults = new BaseXLabel(" ");
+    resultsMax = new BaseXSlider(dialog, 0, MAXRESULTS.length - 1, val);
+    resultsMax.addActionListener(e -> action());
+    resultsLabel = new BaseXLabel(" ");
 
     val = sliderIndex(gui.gopts.get(GUIOptions.MAXTEXT), MAXTEXT);
-    maxText = new BaseXSlider(dialog, 0, MAXTEXT.length - 1, val);
-    maxText.addActionListener(e -> action());
-    labelText = new BaseXLabel(" ");
+    textMax = new BaseXSlider(dialog, 0, MAXTEXT.length - 1, val);
+    textMax.addActionListener(e -> action());
+    textLabel = new BaseXLabel(" ");
 
     serial = new BaseXSerial(dialog, gui.context.options.get(MainOptions.SERIALIZER));
 
-    final BaseXBack p = new BaseXBack().layout(new RowLayout());
-    BaseXBack pp, ppp;
-    p.add(new BaseXLabel(LIMITS + COL, true, true));
-
-    pp = new BaseXBack(new RowLayout());
-    ppp = new BaseXBack(new ColumnLayout(12));
-    ppp.add(maxResults);
-    ppp.add(labelResults);
-    pp.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
-    pp.add(ppp);
-    ppp = new BaseXBack(new ColumnLayout(12));
-    ppp.add(maxText);
-    ppp.add(labelText);
-    pp.add(new BaseXLabel(SIZE_TEXT_RESULTS + COL));
-    pp.add(ppp);
+    BaseXBack p, pp;
+    p = new BaseXBack(new RowLayout());
+    pp = new BaseXBack(new ColumnLayout(12));
+    pp.add(resultsMax);
+    pp.add(resultsLabel);
+    p.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
     p.add(pp);
-    add(p);
+    pp = new BaseXBack(new ColumnLayout(12));
+    pp.add(textMax);
+    pp.add(textLabel);
+    p.add(new BaseXLabel(SIZE_TEXT_RESULTS + COL));
+    p.add(pp);
 
-    add(serial);
+    add(new BaseXLabel(LIMITS + COL, true, true));
+    add(p);
+    add(serial.border(16, 0, 0, 0));
   }
 
   /**
@@ -86,20 +83,20 @@ final class DialogResultPrefs extends BaseXBack {
    * @return success flag
    */
   boolean action() {
-    final int mt = MAXTEXT[maxText.getValue()], mr = MAXRESULTS[maxResults.getValue()];
+    final int mt = MAXTEXT[textMax.getValue()], mr = MAXRESULTS[resultsMax.getValue()];
     final GUIOptions gopts = gui.gopts;
     gopts.set(GUIOptions.MAXTEXT, mt);
     gopts.set(GUIOptions.MAXRESULTS, mr);
 
-    labelResults.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
-    labelText.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt));
+    resultsLabel.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
+    textLabel.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt));
     return true;
   }
 
   /**
-   * Updates the panel.
+   * Initializes the panel.
    */
-  void update() {
+  void init() {
     serial.init(gui.context.options.get(MainOptions.SERIALIZER));
   }
 

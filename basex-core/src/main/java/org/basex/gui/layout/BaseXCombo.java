@@ -246,14 +246,15 @@ public class BaseXCombo extends JComboBox<Object> {
   public void setSelectedItem(final Object object) {
     if(object == null) return;
 
+    final String value = object.toString();
     if(isEditable()) {
-      getEditor().setItem(object);
+      getEditor().setItem(value);
     } else {
       final ComboBoxModel<Object> model = getModel();
       final int ms = model.getSize();
       for(int m = 0; m < ms; m++) {
-        if(model.getElementAt(m).equals(object)) {
-          super.setSelectedItem(object);
+        if(model.getElementAt(m).equals(value)) {
+          super.setSelectedItem(value);
           return;
         }
       }

@@ -76,8 +76,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
    */
   public void init(final SerializerOptions so) {
     sopts = new SerializerOptions(so);
-    params.setSelectedItem(SerializerOptions.METHOD.name());
-    update();
+    actionPerformed(null);
   }
 
   // PRIVATE FUNCTIONS ============================================================================
@@ -156,7 +155,6 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
   private Component addOption(final OptionsOption<?> option, final Options options) {
     final BaseXBack p = new BaseXBack(new ColumnLayout(8));
     final Options opts = options.get(option);
-    options.put(option, opts);
     final BaseXCombo combo = new BaseXCombo(dialog, opts.names());
     combo.addActionListener(e -> update(opts.option(combo.getSelectedItem()), opts, p));
     p.add(combo);

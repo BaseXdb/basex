@@ -58,7 +58,7 @@ public final class DialogPrefs extends BaseXDialog {
    */
   public static void show(final GUI gui) {
     if(dialog == null) dialog = new DialogPrefs(gui);
-    dialog.result.update();
+    dialog.result.init();
     dialog.setVisible(true);
   }
 
