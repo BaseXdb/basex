@@ -88,7 +88,7 @@ public final class GUIConstants {
     C_CREATE, C_OPEN_MANAGE, C_PROPERTIES, C_CLOSE, null,
     C_SHOW_EDITOR, C_SHOW_RESULT, C_SHOW_INFO, null,
     C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE, null,
-    C_GO_HOME, C_GO_BACK, C_GO_UP, C_GO_FORWARD, C_FILTER_NODES
+    C_GO_HOME, C_GO_BACK, C_GO_UP, C_GO_FORWARD, C_FILTER_NODES, null, C_PREFERENCES
   };
 
   // MENUBARS =====================================================================================
