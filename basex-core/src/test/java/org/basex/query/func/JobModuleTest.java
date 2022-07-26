@@ -34,6 +34,17 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void bindings() {
+    final Function func = _JOB_BINDINGS;
+
+    final int ms = 500;
+    final String id = query(_JOB_EVAL.args("declare variable $ms external;"
+        + "prof:sleep($ms)", " map { 'ms': " + ms + " }"));
+    Performance.sleep(ms / 2);
+    query(func.args(id) + "?ms", ms);
+  }
+
+  /** Test method. */
   @Test public void eval1() {
     final Function func = _JOB_EVAL;
     query(func.args("1"));
@@ -112,7 +123,7 @@ public final class JobModuleTest extends SandboxTest {
     Performance.sleep(200);
     query(_JOB_FINISHED.args(id), false);
     // stop query, wait
-    query(_JOB_STOP.args(id));
+    query(_JOB_REMOVE.args(id));
     Performance.sleep(400);
     // ensure that query is not run again
     query(_JOB_FINISHED.args(id), true);
@@ -144,9 +155,9 @@ public final class JobModuleTest extends SandboxTest {
     query(func.args("1", " ()", " map { 'id': 'ID', 'service': true() }"));
     query(_FILE_EXISTS.args(_DB_OPTION.args("dbpath") + "|| '/jobs.xml'"), true);
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", true);
-    query(_JOB_STOP.args("id"));
+    query(_JOB_REMOVE.args("id"));
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", true);
-    query(_JOB_STOP.args("ID", " map { 'service': true() }"));
+    query(_JOB_REMOVE.args("ID", " map { 'service': true() }"));
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", false);
   }
 
@@ -177,7 +188,7 @@ public final class JobModuleTest extends SandboxTest {
     try {
       query(_JOB_FINISHED.args(id), false);
     } finally {
-      query(_JOB_STOP.args(id));
+      query(_JOB_REMOVE.args(id));
     }
     query(_JOB_WAIT.args(id));
     query(_JOB_FINISHED.args("12345"), true);
@@ -189,7 +200,7 @@ public final class JobModuleTest extends SandboxTest {
     try {
       query(_JOB_LIST.args() + " = '" + id + '\'', true);
     } finally {
-      query(_JOB_STOP.args(id));
+      query(_JOB_REMOVE.args(id));
     }
   }
 
@@ -202,8 +213,29 @@ public final class JobModuleTest extends SandboxTest {
       query(list + "/@state/string() = ('running', 'queued')", true);
       query(list + "/@duration/string() castable as xs:dayTimeDuration", true);
     } finally {
-      query(_JOB_STOP.args(id));
+      query(_JOB_REMOVE.args(id));
     }
+  }
+
+  /**
+   * Test method.
+   * @throws Exception exception */
+  @Test public void remove() throws Exception {
+    final Function func = _JOB_REMOVE;
+
+    final String id = verySlowQuery();
+    try {
+      eval(_JOB_RESULT.args(id));
+    } catch(final QueryException ex) {
+      // query is still running: check error code
+      assertSame(JOBS_RUNNING_X, ex.error());
+    }
+
+    query(func.args(id));
+    Performance.sleep(100);
+
+    // check if query was successfully stopped
+    assertEquals(eval(_JOB_RESULT.args(id)), "");
   }
 
   /**
@@ -246,26 +278,6 @@ public final class JobModuleTest extends SandboxTest {
     query(_JOB_WAIT.args(id));
     query(_JOB_LIST.args() + " = '" + id + "'", false);
     query(_JOB_RESULT.args(id), "");
-  }
-
-  /**
-   * Test method.
-   * @throws Exception exception */
-  @Test public void stop() throws Exception {
-    final String id = verySlowQuery();
-    try {
-      eval(_JOB_RESULT.args(id));
-    } catch(final QueryException ex) {
-      // query is still running: check error code
-      assertSame(JOBS_RUNNING_X, ex.error());
-    }
-
-    final Function func = _JOB_STOP;
-    query(func.args(id));
-    Performance.sleep(100);
-
-    // check if query was successfully stopped
-    assertEquals(eval(_JOB_RESULT.args(id)), "");
   }
 
   /** Test method. */

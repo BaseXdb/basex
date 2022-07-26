@@ -37,7 +37,7 @@ public final class NonLockingTest extends SandboxTest {
       query("let $db := <a>" + NAME + "</a> return " + _DB_ADD.args(" $db", " <a/>", "a.xml"));
 
       // stop sleeping process, wait for its completion
-      query(_JOB_STOP.args(id));
+      query(_JOB_REMOVE.args(id));
       query(_JOB_WAIT.args(id));
 
     } finally {
@@ -68,7 +68,7 @@ public final class NonLockingTest extends SandboxTest {
       assertEquals("1", query("1"));
 
       // stop sleeping jobs
-      query(LIST_JOBS + '!' + _JOB_STOP.args(" ."));
+      query(LIST_JOBS + '!' + _JOB_REMOVE.args(" ."));
 
     } finally {
       execute(new DropDB(NAME));

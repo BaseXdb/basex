@@ -18,9 +18,9 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class JobStop extends StandardFunc {
+public final class JobRemove extends StandardFunc {
   /** Stop options. */
-  public static final class StopOptions extends Options {
+  public static final class RemoveOptions extends Options {
     /** Stop service. */
     public static final BooleanOption SERVICE = new BooleanOption("service");
   }
@@ -28,13 +28,13 @@ public final class JobStop extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String id = toString(exprs[0], qc);
-    final StopOptions opts = toOptions(1, new StopOptions(), qc);
+    final RemoveOptions opts = toOptions(1, new RemoveOptions(), qc);
 
     // stop job
     org.basex.core.cmd.JobsStop.stop(qc.context, id);
 
     // remove service
-    if(opts.contains(StopOptions.SERVICE) && opts.get(StopOptions.SERVICE)) {
+    if(opts.contains(RemoveOptions.SERVICE) && opts.get(RemoveOptions.SERVICE)) {
       try {
         final Jobs jobs = new Jobs(qc.context);
         jobs.remove(id);
