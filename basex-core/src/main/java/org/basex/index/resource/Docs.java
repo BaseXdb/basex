@@ -217,17 +217,17 @@ final class Docs {
   /**
    * Returns the pre values of all document nodes matching the specified path.
    * @param path input path
-   * @param desc descendant traversal
+   * @param dir directory view
    * @return pre values (can be internal representation!)
    */
-  synchronized IntList docs(final String path, final boolean desc) {
+  synchronized IntList docs(final String path, final boolean dir) {
     // invalid path, or no documents: return empty list
     final String pth = MetaData.normPath(path);
     if(pth == null) return new IntList(0);
 
     // empty path: return all documents
     final IntList docs = docs();
-    if(desc && pth.isEmpty()) return docs;
+    if(!dir && pth.isEmpty()) return docs;
 
     // normalize paths, check for explicit directory indicator
     byte[] exact = EMPTY, prefix = normalize(token(pth));
@@ -246,7 +246,7 @@ final class Docs {
       boolean add = eq(pt, exact);
       if(!add) {
         add = startsWith(pt, prefix);
-        if(add && !desc) {
+        if(add && dir) {
           final int i = indexOf(pt, SLASH, prefix.length + 1);
           if(i != -1) add = set.add(substring(pt, prefix.length, i));
         }

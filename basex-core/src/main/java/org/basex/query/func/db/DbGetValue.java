@@ -15,7 +15,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -50,9 +49,8 @@ public class DbGetValue extends DbAccess {
 
       XQMap map = XQMap.empty();
       final IOFile bin = data.meta.dir(type);
-      for(final byte[] path : data.resources.paths("", type)) {
-        final String string = Token.string(path);
-        map = map.put(Str.get(type.path(string)), resource(new IOFile(bin, string), qc), info);
+      for(final String path : data.resources.paths("", type)) {
+        map = map.put(Str.get(path), resource(type.filePath(bin, path), qc), info);
       }
       return map;
     } catch(final IOException ex) {

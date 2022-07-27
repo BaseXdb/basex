@@ -2,8 +2,6 @@ package org.basex.index.resource;
 
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -30,24 +28,22 @@ final class Binaries {
 
   /**
    * Returns the database paths to all file resources that match the specified path.
-   * All paths are relative to the filesystem.
    * @param type resource type
    * @param path input path
    * @return paths
    */
-  synchronized TokenList paths(final String path, final ResourceType type) {
-    final TokenList paths = new TokenList();
-    final String norm = MetaData.normPath(path);
+  synchronized StringList paths(final String path, final ResourceType type) {
+    final StringList paths = new StringList();
+    String norm = MetaData.normPath(path);
     if(norm != null && !data.inMemory()) {
       final IOFile bin = data.meta.dir(type), root = new IOFile(bin, norm);
-      if(root.exists()) {
-        final String exact = Prop.CASE ? norm : norm.toLowerCase(Locale.ENGLISH);
-        final String dir = root.isDir() ? exact.isEmpty() || Strings.endsWith(exact, '/') ? exact :
-          exact + '/' : null;
-        for(final String relative : bin.descendants()) {
-          final String rel = Prop.CASE ? relative : relative.toLowerCase(Locale.ENGLISH);
-          if(dir != null ? rel.startsWith(dir) : rel.equals(exact)) paths.add(relative);
+      if(root.isDir()) {
+        if(!(norm.isEmpty() || norm.endsWith("/"))) norm += '/';
+        for(final String relative : root.descendants()) {
+          paths.add(type.dbPath(norm + relative));
         }
+      } else if(type.filePath(bin, norm).exists()) {
+        paths.add(norm);
       }
     }
     return paths.sort(Prop.CASE);
@@ -68,7 +64,7 @@ final class Binaries {
         final boolean value = type == ResourceType.VALUE;
         for(final IOFile child : bin.children()) {
           if(dir == child.isDir()) {
-            map.put(token(value && !dir ? type.path(child.name()) : child.name()), type);
+            map.put(token(value && !dir ? type.dbPath(child.name()) : child.name()), type);
           }
         }
       }

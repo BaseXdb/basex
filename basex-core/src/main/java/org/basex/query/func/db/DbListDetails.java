@@ -79,8 +79,8 @@ public final class DbListDetails extends DbList {
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
 
     final IntList docs = data.resources.docs(path);
-    final TokenList binaries = data.resources.paths(path, ResourceType.BINARY);
-    final TokenList values = data.resources.paths(path, ResourceType.VALUE);
+    final StringList binaries = data.resources.paths(path, ResourceType.BINARY);
+    final StringList values = data.resources.paths(path, ResourceType.VALUE);
     final int ds = docs.size(), bs = ds + binaries.size(), size = bs + values.size();
 
     return new BasicIter<FNode>(size) {
@@ -98,9 +98,8 @@ public final class DbListDetails extends DbList {
           sz = data.size(pre, Data.DOC);
         } else {
           type = i >= bs ? ResourceType.VALUE : ResourceType.BINARY;
-          pt = string(type == ResourceType.VALUE ? values.get((int) i - bs) :
-            binaries.get((int) i - ds));
-          final IOFile bin = new IOFile(data.meta.dir(type), pt);
+          pt = type == ResourceType.VALUE ? values.get((int) i - bs) : binaries.get((int) i - ds);
+          final IOFile bin = type.filePath(data.meta.dir(type), pt);
           mdate = bin.timeStamp();
           sz = bin.length();
         }

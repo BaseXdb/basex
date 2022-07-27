@@ -79,8 +79,8 @@ public class DbList extends StandardFunc {
     final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
 
     final IntList docs = data.resources.docs(path);
-    final TokenList binaries = data.resources.paths(path, ResourceType.BINARY);
-    final TokenList values = data.resources.paths(path, ResourceType.VALUE);
+    final StringList binaries = data.resources.paths(path, ResourceType.BINARY);
+    final StringList values = data.resources.paths(path, ResourceType.VALUE);
     final int ds = docs.size(), bs = ds + binaries.size(), size = bs + values.size();
 
     return new BasicIter<Str>(size) {
@@ -98,8 +98,7 @@ public class DbList extends StandardFunc {
 
       private byte[] path(final int i) {
         return i < ds ? data.text(docs.get(i), true) :
-               i < bs ? binaries.get(i - ds) :
-               Token.token(ResourceType.VALUE.path(Token.string(values.get(i - bs))));
+          Token.token(i < bs ? binaries.get(i - ds) : values.get(i - bs));
       }
     };
   }
@@ -122,20 +121,20 @@ public class DbList extends StandardFunc {
 
   /**
    * Creates a resource element.
-   * @param path path
+   * @param path path to resource
    * @param mdate modified date
-   * @param size size (can be {@code null})
+   * @param size size
    * @param type resource type
    * @return resource node
    */
-  static FElem resource(final String path, final long mdate, final Long size,
+  static FElem resource(final String path, final long mdate, final long size,
       final ResourceType type) {
 
-    final FElem resource = new FElem(RESOURCE).add(type.path(path));
-    resource.add(TYPE, type.toString());
-    resource.add(CONTENT_TYPE, type.contentType(path).toString());
-    resource.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
-    if(size != null) resource.add(SIZE, token(size));
-    return resource;
+    final FElem elem = new FElem(RESOURCE).add(path);
+    elem.add(TYPE, type.toString());
+    elem.add(CONTENT_TYPE, type.contentType(path).toString());
+    elem.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
+    elem.add(SIZE, token(size));
+    return elem;
   }
 }

@@ -5,12 +5,9 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
-import org.basex.core.parse.*;
-import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
@@ -36,74 +33,66 @@ public final class Dir extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    String root = MetaData.normPath(args[0]);
-    if(!root.isEmpty() && !Strings.endsWith(root, '/')) root += '/';
+    String path = MetaData.normPath(args[0]);
+    if(path == null) return error(PATH_INVALID_X, args[0]);
+    if(!path.isEmpty() && !Strings.endsWith(path, '/')) path += '/';
 
     final Table table = new Table();
     table.description = ENTRIES_X;
     table.header.add(INPUT_PATH).add(TYPE).add(DataText.CONTENT_TYPE).add(SIZE);
+    final ArrayList<TokenList> contents = table.contents;
 
-    final HashSet<String> set = new HashSet<>();
     final Data data = context.data();
+    final HashSet<String> set = new HashSet<>();
     final Resources resources = data.resources;
 
-    // list XML documents
-    final IntList docs = resources.docs(root, false);
-    final int ds = docs.size();
+    // list XML resources
+    final IntList docs = resources.docs(path, true);
+    final long ds = docs.size();
     for(int d = 0; d < ds; d++) {
       final int pre = docs.get(d);
-      add(data.text(pre, true), s -> (long) data.size(pre, Data.DOC), ResourceType.XML, table,
-          root, set);
+      String name = string(substring(data.text(pre, true), path.length()));
+      final int i = name.indexOf('/');
+      final boolean dir = i >= 0;
+      if(dir) name = name.substring(0, i);
+      if(set.add(name)) contents.add(entry(dir, name, data.size(pre, Data.DOC), ResourceType.XML));
     }
     // list file resources
-    for(final ResourceType type : Resources.BINARIES) {
-      final IOFile bin = data.meta.dir(type);
-      for(final byte[] pt : resources.paths(root, type)) {
-        add(pt, s -> new IOFile(bin, s).length(), type, table, root, set);
+    if(!data.inMemory()) {
+      for(final ResourceType type : Resources.BINARIES) {
+        final IOFile bin = data.meta.file(path, type);
+        for(final IOFile file : bin.children()) {
+          final boolean dir = file.isDir();
+          final String name = dir ? file.name() : type.dbPath(file.name());
+          if(set.add(name)) contents.add(entry(dir, name, file.length(), type));
+        }
       }
     }
-
     out.println(table.sort().finish());
     return true;
   }
 
   /**
-   * Adds a table entry.
-   * @param path path to resource
-   * @param size function for computing size
+   * Creates a table entry.
+   * @param dir directory flag
+   * @param name name of resource
+   * @param size file size (can be {@code null})
    * @param type resource type
-   * @param table table
-   * @param root root path
-   * @param set set with known resources
+   * @return table entry
    */
-  private static void add(final byte[] path, final Function<String, Long> size,
-      final ResourceType type, final Table table, final String root, final HashSet<String> set) {
-
-    String string = string(path);
-    boolean dir;
-    string = string.substring(root.length());
-    final int i = string.indexOf('/');
-    dir = i >= 0;
-    if(dir) string = string.substring(0, i);
-    if(set.add(string)) {
-      final TokenList tl = new TokenList(4);
-      if(dir) {
-        tl.add(string).add(S_DIR).add("").add("");
-      } else {
-        tl.add(type.path(string)).add(type.toString());
-        tl.add(type.contentType(string).toString()).add(size.apply(string));
-      }
-      table.contents.add(tl);
+  private TokenList entry(final boolean dir, final String name, final long size,
+      final ResourceType type) {
+    final TokenList tl = new TokenList(4).add(name);
+    if(dir) {
+      tl.add(S_DIR).add("").add("");
+    } else {
+      tl.add(type.toString()).add(type.contentType(name).toString()).add(size);
     }
+    return tl;
   }
 
   @Override
   public void addLocks() {
     jc().locks.reads.add(Locking.CONTEXT);
-  }
-
-  @Override
-  public void build(final CmdBuilder cb) {
-    cb.init(Cmd.INFO + " " + CmdInfo.DB);
   }
 }

@@ -46,7 +46,7 @@ public final class List extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    return args[0].isEmpty() ? list() : listDB();
+    return args[0].isEmpty() ? list() : listResources();
   }
 
   @Override
@@ -103,7 +103,7 @@ public final class List extends Command {
    * @return success flag
    * @throws IOException I/O exception
    */
-  private boolean listDB() throws IOException {
+  private boolean listResources() throws IOException {
     final String db = args[0], root = args[1];
     if(!Databases.validName(db)) return error(NAME_INVALID_X, db);
 
@@ -120,16 +120,14 @@ public final class List extends Command {
       final int ds = docs.size();
       for(int d = 0; d < ds; d++) {
         final int pre = docs.get(d);
-        final ResourceType type = ResourceType.XML;
         final String string = Token.string(data.text(pre, true));
-        add(table, type, string, data.size(pre, Data.DOC));
+        add(table, string, data.size(pre, Data.DOC), ResourceType.XML);
       }
       // list file resources
       for(final ResourceType type : Resources.BINARIES) {
         final IOFile bin = data.meta.dir(type);
-        for(final byte[] path : resources.paths(root, type)) {
-          final String string = Token.string(path);
-          add(table, type, string, new IOFile(bin, string).length());
+        for(final String path : resources.paths(root, type)) {
+          add(table, path, type.filePath(bin, path).length(), type);
         }
       }
       Close.close(data, context);
@@ -143,13 +141,13 @@ public final class List extends Command {
   /**
    * Adds a table entry.
    * @param table table
-   * @param type resource type
    * @param path path to resource
    * @param size size of resource
+   * @param type resource type
    */
-  private static void add(final Table table, final ResourceType type, final String path,
-      final long size) {
-    table.contents.add(new TokenList(4).add(type.path(path)).add(type.toString()).
+  private static void add(final Table table, final String path, final long size,
+      final ResourceType type) {
+    table.contents.add(new TokenList(4).add(path).add(type.toString()).
         add(type.contentType(path).toString()).add(size));
   }
 }

@@ -27,22 +27,23 @@ public final class Delete extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    final String target = args[0];
+    String path = MetaData.normPath(args[0]);
+    if(path == null) return error(PATH_INVALID_X, args[0]);
+
     return update(data, () -> {
       context.invalidate();
 
       // delete XML documents
-      final IntList docs = data.resources.docs(target);
+      final IntList docs = data.resources.docs(path);
       int size = docs.size();
       if(size != 0) {
         final AtomicUpdateCache auc = new AtomicUpdateCache(data);
         for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
         auc.execute(false);
       }
-
       // delete file resources
       for(final ResourceType type : Resources.BINARIES) {
-        final IOFile bin = data.meta.file(target, type);
+        final IOFile bin = data.meta.file(path, type);
         if(bin != null && bin.exists()) {
           size += bin.isDir() ? bin.descendants().size() : 1;
           bin.delete();

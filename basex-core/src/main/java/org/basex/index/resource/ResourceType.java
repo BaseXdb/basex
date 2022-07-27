@@ -24,11 +24,6 @@ public enum ResourceType {
       final MediaType ct = MediaType.get(path);
       return !ct.isXML() ? MediaType.APPLICATION_XML : ct;
     }
-
-    @Override
-    public String path(final String path) {
-      return path;
-    }
   },
 
   /** Binary resource. */
@@ -42,11 +37,6 @@ public enum ResourceType {
     public MediaType contentType(final String path) {
       return MediaType.get(path);
     }
-
-    @Override
-    public String path(final String path) {
-      return path;
-    }
   },
 
   /** Value resource. */
@@ -58,12 +48,17 @@ public enum ResourceType {
 
     @Override
     public MediaType contentType(final String path) {
-      return MediaType.get(path(path));
+      return MediaType.get(path);
     }
 
     @Override
-    public String path(final String path) {
+    public String dbPath(final String path) {
       return path.substring(0, path.length() - IO.BASEXSUFFIX.length());
+    }
+
+    @Override
+    public IOFile filePath(final IOFile root, final String path) {
+      return new IOFile(root, path + IO.BASEXSUFFIX);
     }
   };
 
@@ -75,15 +70,27 @@ public enum ResourceType {
   public abstract IOFile dir(IOFile dbpath);
 
   /**
-   * Returns the path to a resource.
+   * Returns the database path to a resource.
    * @param path original file path
    * @return path
    */
-  public abstract String path(String path);
+  public String dbPath(final String path) {
+    return path;
+  }
+
+  /**
+   * Returns the file path to a resource.
+   * @param root database root
+   * @param path original file path
+   * @return path
+   */
+  public IOFile filePath(final IOFile root, final String path) {
+    return new IOFile(root, path);
+  }
 
   /**
    * Returns the content type of a resource.
-   * @param path path
+   * @param path path to resource
    * @return content type
    */
   public abstract MediaType contentType(String path);

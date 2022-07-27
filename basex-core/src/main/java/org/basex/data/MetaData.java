@@ -277,7 +277,7 @@ public final class MetaData {
   }
 
   /**
-   * Returns a path to the specified binary resource.
+   * Returns the resource with the specified path.
    * @param path internal file path
    * @param type resource type
    * @return path, or {@code null} if this is a main-memory database
@@ -285,10 +285,7 @@ public final class MetaData {
   public IOFile file(final String path, final ResourceType type) {
     if(dir != null) {
       final IOFile bin = dir(type), file = new IOFile(bin, path);
-      if(file.path().startsWith(bin.path())) {
-        return type == ResourceType.VALUE && !file.isDir() ?
-          new IOFile(bin, path + IO.BASEXSUFFIX) : file;
-      }
+      return file.isDir() ? file : type.filePath(bin, path);
     }
     return null;
   }

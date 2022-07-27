@@ -444,7 +444,7 @@ public final class DbModuleTest extends QueryPlanTest {
     query(call + "/@type/data()", "xml");
     query(call + "/@content-type/data()", MediaType.APPLICATION_XML.toString());
     query(call + "/@modified-date/xs:dateTime(.)");
-    query(call + "/@size/data()", "");
+    query(call + "/@size/data()", 2);
     query(call + "/text()", "doc.xml");
 
     call = func.args(NAME, "binary/");

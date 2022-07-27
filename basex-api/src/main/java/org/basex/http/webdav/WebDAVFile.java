@@ -48,7 +48,7 @@ final class WebDAVFile extends WebDAVResource implements FileResource {
 
   @Override
   public String getContentType(final String accepts) {
-    return meta.type.toString();
+    return meta.contentType.toString();
   }
 
   @Override
@@ -58,7 +58,7 @@ final class WebDAVFile extends WebDAVResource implements FileResource {
     new WebDAVCode<>(this) {
       @Override
       public void run() throws IOException {
-        service.get(meta.db, meta.path, meta.binary, out);
+        service.get(meta.db, meta.path, meta.type, out);
       }
     }.eval();
   }
