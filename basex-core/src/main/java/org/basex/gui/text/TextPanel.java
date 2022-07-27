@@ -451,12 +451,12 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mouseDragged(final MouseEvent e) {
-    if(!SwingUtilities.isLeftMouseButton(e)) return;
-
-    // selection mode
-    select(e.getPoint(), false);
-    final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
-    if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
+    if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1) {
+      // selection mode
+      select(e.getPoint(), false);
+      final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
+      if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
+    }
   }
 
   @Override
