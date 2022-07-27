@@ -71,7 +71,7 @@ function dba:jobs(
               'start': $start ?: $time
             }
           let $buttons := (
-            html:button('job-stop', 'Stop', true())
+            html:button('job-remove', 'Remove', true())
           )
           let $options := map { 'sort': $sort, 'presort': 'duration' }
           return html:table($headers, $entries, $buttons, map { }, $options) update {
@@ -96,12 +96,9 @@ function dba:jobs(
               <form action='jobs' method='post' id='jobs'>
                 <input type='hidden' name='id' value='{ $job }'/>
                 {
-                  let $disabled := map { 'disabled': '' }
-                  return (
-                    html:button('job-stop', 'Stop', true(), $disabled[$cached]), ' ',
-                    html:button('job-result', 'Download', false(), $disabled[not($cached)]), ' ',
-                    html:button('job-discard', 'Discard', false(), $disabled[not($cached)]), ' '
-                  )
+                  html:button('job-result', 'Download', false(),
+                    if($cached) then () else map { 'disabled': '' }), ' ',
+                  html:button('job-remove', 'Remove', false())
                 }
               </form>,
               <h3>General Information</h3>,
