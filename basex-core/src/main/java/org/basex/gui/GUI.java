@@ -57,6 +57,8 @@ public final class GUI extends JFrame implements BaseXWindow {
   public final GUIInput input;
   /** Search view. */
   public final EditorView editor;
+  /** Text view. */
+  public final TextView text;
   /** Info view. */
   public final InfoView info;
 
@@ -81,8 +83,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   /** Current input Mode. */
   private final BaseXCombo mode;
 
-  /** Text view. */
-  private final TextView text;
   /** Top panel. */
   private final BaseXBack top;
   /** Control panel. */

@@ -80,6 +80,13 @@ public final class TextView extends View {
     refreshLayout();
   }
 
+  /**
+   * Focuses the text.
+   */
+  public void focusText() {
+    text.requestFocusInWindow();
+  }
+
   @Override
   public void refreshInit() {
     refreshContext(true, true);

@@ -339,7 +339,9 @@ public final class BaseXLayout {
       // focus input bar
       if(FOCUSINPUT.is(e)) gui.input.requestFocusInWindow();
       // focus editor
-      if(FOCUSEDITOR.is(e)) gui.editor.focusEditor();
+      else if(FOCUSEDITOR.is(e)) gui.editor.focusEditor();
+      // focus text
+      else if(FOCUSTEXT.is(e)) gui.text.focusText();
 
       // change font size
       final int fs = gui.gopts.get(GUIOptions.FONTSIZE);

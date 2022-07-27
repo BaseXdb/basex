@@ -69,8 +69,9 @@ public enum BaseXKeys {
 
   // Navigation
 
-  /** Jump to input bar.     */ FOCUSINPUT(MAC ? META : NO_MOD, VK_F6),
+  /** Jump to input bar.     */ FOCUSINPUT(MAC ? META : NO_MOD, VK_F8),
   /** Jump to editor.        */ FOCUSEDITOR(MAC ? META : NO_MOD, VK_F12),
+  /** Jump to text.          */ FOCUSTEXT(MAC ? META | SHIFT : SHIFT, VK_F12),
 
   /** Next tab.              */ NEXTTAB(CTRL, VK_TAB),
   /** Previous tab.          */ PREVTAB(CTRL | SHIFT, VK_TAB),
