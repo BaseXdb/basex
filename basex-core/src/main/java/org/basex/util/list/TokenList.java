@@ -110,4 +110,14 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
   protected byte[][] newArray(final int s) {
     return new byte[s][];
   }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder().add('[');
+    for(final byte[] token : this) {
+      if(tb.size() > 1) tb.add(", ");
+      tb.add(token);
+    }
+    return tb.add(']').toString();
+  }
 }

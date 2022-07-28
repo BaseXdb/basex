@@ -1,10 +1,13 @@
 package org.basex.core.jobs;
 
+import static org.basex.util.Token.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.core.*;
-import org.basex.util.Performance;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Job pool.
@@ -74,5 +77,24 @@ public final class JobPool {
         results.remove(job.jc().id());
       }
     }, timeout);
+  }
+
+  /**
+   * Returns all registered IDs.
+   * @return sorted id list
+   */
+  public TokenList ids() {
+    final Set<String> set = new HashSet<>();
+    set.addAll(results.keySet());
+    set.addAll(active.keySet());
+    set.addAll(tasks.keySet());
+    final TokenList ids = new TokenList(set.size());
+    for(final String id : set) ids.add(id);
+
+    // compare default job counter, or compare custom ids as strings
+    final byte[] prefix = token(JobContext.PREFIX);
+    final int pl = prefix.length;
+    return ids.sort((id1, id2) -> startsWith(id1, prefix) && startsWith(id2, prefix) ?
+        toInt(substring(id1, pl)) - toInt(substring(id2, pl)) : diff(id1, id2), true);
   }
 }

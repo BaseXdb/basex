@@ -86,9 +86,6 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new InfoIndex(), false, CTX_LIST);
     ckDBs(new InfoStorage(), false, CTX_LIST);
     ckDBs(new Inspect(), false, CTX_LIST);
-    ckDBs(new JobsList(), false, NONE);
-    ckDBs(new JobsResult("job0"), false, NONE);
-    ckDBs(new JobsStop("job0"), false, NONE);
     ckDBs(new Kill(NAME), true, USER_LIST);
     ckDBs(new List(), false, null);
     ckDBs(new List(NAME), false, NAME_LIST);

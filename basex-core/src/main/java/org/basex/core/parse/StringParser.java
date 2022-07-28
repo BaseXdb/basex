@@ -179,16 +179,6 @@ final class StringParser extends CommandParser {
         return new Kill(string(cmd));
       case RESTORE:
         return new Restore(name(null));
-      case JOBS:
-        switch(consume(CmdJobs.class, cmd)) {
-          case LIST:
-            return new JobsList();
-          case STOP:
-            return new JobsStop(name(cmd));
-          case RESULT:
-            return new JobsResult(name(cmd));
-        }
-        break;
       case SHOW:
         switch(consume(CmdShow.class, cmd)) {
           case SESSIONS:

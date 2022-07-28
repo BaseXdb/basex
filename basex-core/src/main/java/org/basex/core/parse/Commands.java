@@ -79,12 +79,6 @@ public interface Commands {
   String INFO_STORAGE = "info-storage";
   /** Command string: "inspect". */
   String INSPECT = "inspect";
-  /** Command string: "jobs-list". */
-  String JOBS_LIST = "jobs-list";
-  /** Command string: "jobs-stop". */
-  String JOBS_STOP = "jobs-stop";
-  /** Command string: "jobs-result". */
-  String JOBS_RESULT = "jobs-result";
   /** Command string: "kill". */
   String KILL = "kill";
   /** Command string: "list". */
@@ -179,8 +173,6 @@ public interface Commands {
   enum CmdShow { SESSIONS, USERS, BACKUPS, OPTIONS }
   /** Binary commands. */
   enum CmdBinary { GET, PUT }
-  /** Jobs commands. */
-  enum CmdJobs { LIST, STOP, RESULT }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Index types. */
@@ -198,7 +190,7 @@ public interface Commands {
     COPY(HELPCOPY), CREATE(HELPCREATE), DELETE(HELPDELETE), DIR(HELPDIR), DROP(HELPDROP),
     EXECUTE(HELPEXECUTE), EXIT(HELPEXIT), EXPORT(HELPEXPORT), FIND(HELPFIND), FLUSH(HELPFLUSH),
     GET(HELPGET), GRANT(HELPGRANT), HELP(HELPHELP), INFO(HELPINFO), INSPECT(HELPINSPECT),
-    JOBS(HELPJOBS), KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE),
+    KILL(HELPKILL), LIST(HELPLIST), OPEN(HELPOPEN), OPTIMIZE(HELPOPTIMIZE),
     PASSWORD(HELPPASSWORD), PUT(HELPPUT), QUIT(HELPEXIT), RENAME(HELPRENAME), REPO(HELPREPO),
     RESTORE(HELPRESTORE), RUN(HELPRUN), SET(HELPSET), SHOW(HELPSHOW), TEST(HELPTEST),
     XQUERY(HELPXQUERY);
