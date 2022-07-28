@@ -97,4 +97,22 @@ public final class JobPool {
     return ids.sort((id1, id2) -> startsWith(id1, prefix) && startsWith(id2, prefix) ?
         toInt(substring(id1, pl)) - toInt(substring(id2, pl)) : diff(id1, id2), true);
   }
+
+  /**
+   * Removes a job.
+   * @param id id
+   * @return return success flag
+   */
+  public boolean remove(final String id) {
+    // stop scheduled task
+    final TimerTask task = tasks.remove(id);
+    if(task != null) task.cancel();
+    // send stop signal to job
+    final Job job = active.get(id);
+    if(job != null) job.stop();
+    // remove potentially cached result
+    results.remove(id);
+
+    return job != null || task != null;
+  }
 }

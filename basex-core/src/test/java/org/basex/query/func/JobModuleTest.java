@@ -240,8 +240,9 @@ public final class JobModuleTest extends SandboxTest {
 
   /**
    * Test method.
-   * @throws Exception exception */
-  @Test public void result1() throws Exception {
+   * @throws Exception exception
+   */
+  @Test public void result() throws Exception {
     // receive result of asynchronous execution
     final Function func = _JOB_RESULT;
     query("let $q := " + _JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
@@ -251,7 +252,7 @@ public final class JobModuleTest extends SandboxTest {
 
     // ensure that the result will not be cached
     String id = query(_JOB_EVAL.args(SLOW_QUERY));
-    assertEquals(eval(func.args(id)), "");
+    assertEquals(query(func.args(id)), "");
 
     // receive cached result
     id = query(_JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }"));
@@ -263,21 +264,42 @@ public final class JobModuleTest extends SandboxTest {
         // query is still running: check error code
         assertSame(JOBS_RUNNING_X, ex.error());
       }
-      Performance.sleep(1);
+      Performance.sleep(10);
     }
-
-    // receive cached error
-    id = query(_JOB_EVAL.args("db:get('db')", " ()", " map { 'cache': true() }"));
-    query(_JOB_WAIT.args(id));
-    error(func.args(id), DB_OPEN2_X);
   }
 
   /** Test method. */
-  @Test public void result2() {
+  @Test public void resultEmpty() {
+    final Function func = _JOB_RESULT;
     final String id = query(_JOB_EVAL.args("()", " ()", " map { 'cache': true() }"));
     query(_JOB_WAIT.args(id));
-    query(_JOB_LIST.args() + " = '" + id + "'", false);
-    query(_JOB_RESULT.args(id), "");
+    query(_JOB_LIST_DETAILS.args(id), "");
+    query(func.args(id), "");
+  }
+
+  /** Test method. */
+  @Test public void resultRemove() {
+    final Function func = _JOB_RESULT;
+    final String id = query(_JOB_EVAL.args("1", " ()", " map { 'cache': true() }"));
+    query(_JOB_WAIT.args(id));
+    query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', true);
+    query(func.args(id, " map { 'keep': true () }"), 1);
+    query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', true);
+    query(func.args(id, " map { 'keep': true () }"), 1);
+    query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', true);
+
+    query(func.args(id, " map { 'keep': false() }"), 1);
+    query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', false);
+    query(func.args(id, " map { 'keep': false() }"), "");
+    query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', false);
+  }
+
+  /** Test method. */
+  @Test public void resultError() {
+    final Function func = _JOB_RESULT;
+    final String id = query(_JOB_EVAL.args("db:get('db')", " ()", " map { 'cache': true() }"));
+    query(_JOB_WAIT.args(id));
+    error(func.args(id), DB_OPEN2_X);
   }
 
   /** Test method. */

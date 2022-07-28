@@ -15,7 +15,7 @@ declare
   %rest:POST
   %rest:path('/dba/query-close')
   %rest:query-param('name', '{$name}')
-function dba:query-save(
+function dba:query-close(
   $name  as xs:string
 ) as empty-sequence() {
   config:query('')

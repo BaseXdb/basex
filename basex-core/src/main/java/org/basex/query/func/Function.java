@@ -1361,8 +1361,8 @@ public enum Function implements AFunction {
   _JOB_REMOVE(JobRemove::new, "remove(id[,options])",
       params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
-  _JOB_RESULT(JobResult::new, "result(id)",
-      params(STRING_O), ITEM_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
+  _JOB_RESULT(JobResult::new, "result(id[,options])",
+      params(STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_SERVICES(JobServices::new, "services()",
       params(), ELEMENT_ZM, flag(NDT), JOB_URI, Perm.ADMIN),

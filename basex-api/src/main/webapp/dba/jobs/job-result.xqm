@@ -22,7 +22,7 @@ function dba:job-result(
 ) as item()+ {
   let $details := job:list-details($id)
   return if(empty($details)) then (
-    dba:job-result($id, false(), 'Job is defunct.')
+    dba:job-result($id, false(), 'Job has expired.')
   ) else if($details/@state != 'cached') then (
     dba:job-result($id, false(), 'Result is not available yet.')
   ) else (

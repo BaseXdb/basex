@@ -33,7 +33,11 @@ function dba:jobs(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  html:wrap(map {
+    'header': $dba:CAT, 'info': $info, 'error': $error,
+    'css': 'codemirror/lib/codemirror.css',
+    'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
+  },
     <tr>{
       <td>
         <form action='{ $dba:CAT }' method='post' class='update'>
@@ -41,7 +45,6 @@ function dba:jobs(
         {
           let $headers := (
             map { 'key': 'id', 'label': 'ID' },
-            map { 'key': 'type', 'label': 'Type' },
             map { 'key': 'state', 'label': 'State' },
             map { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
             map { 'key': 'user', 'label': 'User' },
@@ -62,7 +65,6 @@ function dba:jobs(
             order by $sec descending, $start descending
             return map {
               'id': $id,
-              'type': $details/@type,
               'state': $details/@state,
               'duration': html:duration($sec),
               'user': $details/@user,
@@ -90,50 +92,72 @@ function dba:jobs(
         let $cached := $details/@state = 'cached'
         return (
           <td class='vertical'/>,
-          <td>{
-            <h2>Job: { $job }</h2>,
-            if($details) then (
-              <form action='jobs' method='post' id='jobs'>
-                <input type='hidden' name='id' value='{ $job }'/>
-                {
-                  html:button('job-result', 'Download', false(),
-                    if($cached) then () else map { 'disabled': '' }), ' ',
-                  html:button('job-remove', 'Remove', false())
-                }
-              </form>,
-              <h3>General Information</h3>,
-              <table>{
-                for $value in $details/@*
-                for $name in name($value)[. != 'id']
-                return <tr>
-                  <td><b>{ util:capitalize($name) }</b></td>
-                  <td>{ string($value) }</td>
-                </tr>
-              }</table>,
-              let $bindings := job:bindings($job)
-              where map:size($bindings) > 0
-              return (
-                <h3>Query Bindings</h3>,
+          <td>
+            <form action='jobs' method='post' id='jobs'>{
+              <input type='hidden' name='id' value='{ $job }'/>,
+              <h2>{
+                'Job: ', $job, '&#xa0;',
+                if($details) then html:button('job-remove', 'Remove', false())
+              }</h2>,
+
+              if($details) then (
+                <h3>General Information</h3>,
                 <table>{
-                  map:for-each($bindings, function($key, $value) {
-                    <tr>
-                      <td><b>{ $key ?? '$' || $key !! 'Context' }</b></td>
-                      <td><code>{
-                        util:chop(serialize($value, map { 'method': 'basex' }), 1000)
-                      }</code></td>
-                    </tr>
+                  for $value in $details/@*
+                  for $name in name($value)[. != 'id']
+                  return <tr>
+                    <td><b>{ util:capitalize($name) }</b></td>
+                    <td>{ string($value) }</td>
+                  </tr>
+                }</table>,
+  
+                let $bindings := job:bindings($job)
+                where map:size($bindings) > 0
+                return (
+                  <h3>Query Bindings</h3>,
+                  <table>{
+                    map:for-each($bindings, function($key, $value) {
+                      <tr>
+                        <td><b>{ $key ?? '$' || $key !! 'Context' }</b></td>
+                        <td><code>{
+                          util:chop(serialize($value, map { 'method': 'basex' }), 1000)
+                        }</code></td>
+                      </tr>
+                    })
+                  }
+                  </table>
+                ),
+  
+                <h3>Query</h3>,
+                <textarea readonly='' spellcheck='false' rows='5'>{
+                  string($details)
+                }</textarea>,
+  
+                if($cached) then (
+                  let $result := util:serialize(try {
+                    job:result($job, map { 'keep': true() })
+                  } catch * {
+                    'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
+                      $err:column-number || ':' || string:nl() || $err:description
                   })
-                }
-                </table>
-              ),
-              <h3>Job String</h3>,
-              <textarea readonly='' rows='10'>{
-                string($details)
-              }</textarea>
-            ) else (
-              'Job is defunct.'
-            )
-          }</td>
+                  where $result
+                  return (
+                    <h3>{
+                      'Result', '&#xa0;',
+                      html:button('job-result', 'Download')
+                    }
+                    </h3>,
+                    <textarea name='output' id='output' readonly='' spellcheck='false'>{
+                      $result
+                    }</textarea>,
+                    html:js('loadCodeMirror("xml");')
+                  )
+                )
+              ) else (
+                'Job has expired.'
+              )
+            }</form>
+          </td>
         )
       ) else()
     }</tr>

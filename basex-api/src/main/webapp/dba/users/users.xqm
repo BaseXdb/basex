@@ -70,7 +70,7 @@ function dba:users(
       <td>
         <form action='users-info' method='post'>{
           <h2>User Information</h2>,
-          html:button('save', 'Save'),
+          html:button('update', 'Update'),
           <div class='small'/>,
           <textarea name='info' id='editor' spellcheck='false'>{
             serialize(user:info())

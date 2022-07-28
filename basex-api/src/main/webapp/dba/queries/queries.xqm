@@ -76,7 +76,7 @@ function dba:queries(
       <td width='50%'>{
         <h2 class='right'>Result</h2>,
         <textarea name='output' id='output' readonly=''/>,
-        html:js('loadCodeMirror("xquery", true);'),
+        html:js('loadCodeMirror("xquery", true, true);'),
         for $name in head(($file, config:query())[.])
         return html:js('openQuery("' || $name || '");')
       }</td>

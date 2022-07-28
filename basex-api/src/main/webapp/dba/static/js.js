@@ -34,7 +34,7 @@ function buttons(source) {
 
       var values = [
         "backup", "backup-drop", "backup-restore", "backup-create-all", "backup-restore-all",
-        "db-drop", "db-optimize", "db-optimize-all", "delete",
+        "db-drop", "db-optimize", "db-optimize-all", "delete", "job-remove",
         "file-delete", "job-stop", "log-delete", "session-kill",
         "pattern-drop", "user-drop"
       ];
@@ -264,8 +264,9 @@ var _edit;
  * Loads the code mirror editor extension.
  * @param {string}  language programming language (syntax highlighting)
  * @param {boolean}  edit editor flag (vs. read-only view)
+ * @param {boolean}  resize text areas to full height
  */
-function loadCodeMirror(language, edit) {
+function loadCodeMirror(language, edit, resize) {
   _edit = edit;
   if (CodeMirror && dispatchEvent) {
     if(edit) {
@@ -273,6 +274,7 @@ function loadCodeMirror(language, edit) {
       _editorMirror = CodeMirror.fromTextArea(editorArea, {
         mode: language,
         lineNumbers: true,
+        lineWrapping: true,
         extraKeys: {
           "Ctrl-Enter"      : function(cm) { runQuery(); },
           "Cmd-Enter"       : function(cm) { runQuery(); },
@@ -285,14 +287,19 @@ function loadCodeMirror(language, edit) {
     }
 
     var outputArea = document.getElementById("output");
-    _outputMirror = CodeMirror.fromTextArea(outputArea, {
-      mode: "xml",
-      readOnly: true
-    });
-    _outputMirror.display.wrapper.style.border = "solid 1px grey";
+    if(outputArea != null) {
+      _outputMirror = CodeMirror.fromTextArea(outputArea, {
+        mode: "xml",
+        lineWrapping: true,
+        readOnly: true
+      });
+      _outputMirror.display.wrapper.style.border = "solid 1px grey";
+    }
 
-    window.addEventListener("load", setDisplayHeight);
-    window.addEventListener("resize", setDisplayHeight);
+    if(resize) {
+      window.addEventListener("load", setDisplayHeight);
+      window.addEventListener("resize", setDisplayHeight);
+    }
   }
 }
 

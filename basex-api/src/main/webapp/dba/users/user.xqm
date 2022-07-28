@@ -51,14 +51,14 @@ function dba:user(
     },
     <tr>
       <td>
-        <form action='user-edit' method='post' autocomplete='off'>
+        <form action='user-update' method='post' autocomplete='off'>
           <!--  force chrome not to autocomplete form -->
           <input style='display:none' type='text' name='fake1'/>
           <input style='display:none' type='password' name='fake2'/>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             $name, ' » ',
-            html:button('save', 'Save')
+            html:button('update', 'Update')
           }</h2>
           <input type='hidden' name='name' value='{ $name }'/>
           <table>{

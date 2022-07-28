@@ -1,5 +1,5 @@
 (:~
- : Save users information.
+ : Updates users information.
  :
  : @author Christian Grün, BaseX Team 2005-22, BSD License
  :)
@@ -11,7 +11,7 @@ import module namespace util = 'dba/util' at '../lib/util.xqm';
 declare variable $dba:CAT := 'users';
 
 (:~
- : Saves users information.
+ : Updates users information.
  : @param  $info  users information
  : @return redirection
  :)
@@ -33,9 +33,9 @@ function dba:users-info(
     where not(deep-equal(user:info(), $xml))
     return user:update-info($xml),
 
-    util:redirect($dba:CAT, map { 'info': 'User was saved.' })
+    util:redirect($dba:CAT, map { 'info': 'User information was updated.' })
   } catch err:FODC0006 {
-    util:redirect($dba:CAT, map { 'error': 'Information must be XML with an info root element.' })
+    util:redirect($dba:CAT, map { 'error': 'XML with "info" root element expected.' })
   } catch * {
     util:redirect($dba:CAT, map { 'error': $err:description })
   }

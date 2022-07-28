@@ -25,7 +25,7 @@ declare function util:query(
 ) as xs:string {
   let $bindings := $context ! map { '': $context }
   let $result := xquery:eval($query, $bindings, util:query-options())
-  return util:finalize($result)
+  return util:serialize($result)
 };
 
 (:~
@@ -39,16 +39,16 @@ declare %updating function util:update-query(
   xquery:eval-update($query, (), util:query-options()),
   
   let $result := update:cache(true())
-  return update:output(util:finalize($result))
+  return update:output(util:serialize($result))
 };
 
 (:~
  : Finalizes the result of an evaluated query.
- : @param  $result   query result
+ : @param  $result  query result
  : @return empty sequence
  :)
-declare %private function util:finalize(
-  $result   as item()*
+declare function util:serialize(
+  $result  as item()*
 ) as xs:string {
   (: serialize more characters than requested, because limit represents number of bytes :)
   let $limit := options:get($options:MAXCHARS)

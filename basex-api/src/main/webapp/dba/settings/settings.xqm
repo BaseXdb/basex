@@ -49,7 +49,7 @@ function dba:settings(
     <tr>
       <td width='33%'>
         <form action='settings' method='post'>
-          <h2>Settings » { html:button('save', 'Save') }</h2>
+          <h2>Settings » { html:button('update', 'Update') }</h2>
           <h3>Queries</h3>
           <table>
             {
@@ -101,14 +101,14 @@ function dba:settings(
 };
 
 (:~
- : Saves the settings.
+ : Updates the settings.
  : @return redirection
  :)
 declare
   %rest:POST
   %rest:path('/dba/settings')
-function dba:settings-save(
+function dba:settings-update(
 ) as element(rest:response) {
   options:save(html:parameters()),
-  web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
+  web:redirect($dba:CAT, map { 'info': 'Settings were updated.' })
 };

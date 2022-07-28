@@ -151,7 +151,7 @@ function dba:database(
           <div class='small'/>,
           <textarea name='output' id='output' readonly='' spellcheck='false'/>,
           html:focus('input'),
-          html:js('loadCodeMirror("xml", false); queryResource(true);')
+          html:js('loadCodeMirror("xml", false, true); queryResource(true);')
         ) else if($db-exists) then (
           <h2>Information</h2>,
           html:properties(db:info($name))

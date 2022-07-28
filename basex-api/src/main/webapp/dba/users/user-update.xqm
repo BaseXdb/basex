@@ -1,5 +1,5 @@
 (:~
- : Edit user.
+ : Updates user information.
  :
  : @author Christian Grün, BaseX Team 2005-22, BSD License
  :)
@@ -11,7 +11,7 @@ import module namespace util = 'dba/util' at '../lib/util.xqm';
 declare variable $dba:SUB := 'user';
 
 (:~
- : Edits a user.
+ : Updates a user.
  : @param  $name     username
  : @param  $newname  new name
  : @param  $pw       password
@@ -21,13 +21,13 @@ declare variable $dba:SUB := 'user';
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/user-edit')
+  %rest:path('/dba/user-update')
   %rest:form-param('name',    '{$name}')
   %rest:form-param('newname', '{$newname}')
   %rest:form-param('pw',      '{$pw}')
   %rest:form-param('perm',    '{$perm}')
   %rest:form-param('info',    '{$info}')
-function dba:user-edit(
+function dba:user-update(
   $name     as xs:string,
   $newname  as xs:string,
   $pw       as xs:string,
@@ -58,10 +58,10 @@ function dba:user-edit(
       where not(deep-equal(user:info($name), $xml))
       return user:update-info($xml, $name)
     ),
-    util:redirect($dba:SUB, map { 'name': $newname, 'info': 'User was saved.' })
+    util:redirect($dba:SUB, map { 'name': $newname, 'info': 'User was updated.' })
   } catch * {
     let $error := if ($err:code != xs:QName('err:FODC0006')) then $err:description else
-      'Information must be XML with an info root element.'
+      'XML with "info" root element expected.'
     return util:redirect($dba:SUB, map {
       'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm, 'error': $error
     })
