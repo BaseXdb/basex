@@ -1135,12 +1135,13 @@ public abstract class Path extends ParseExpr {
     final CompileContext cc = ic.cc;
     final int sl = steps.length;
     final Expr rt = root != null ? root : cc.qc.focus.value;
-    if(changed) {
+    if(changed) cc.get(rt, () -> {
       for(int s = 0; s < sl; s++) {
-        final Expr step = steps[s];
-        steps[s] = step instanceof Step ? ((Step) step).optimize(rt, cc) : step.optimize(cc);
+        steps[s] = steps[s].optimize(cc);
+        cc.updateFocus(steps[s]);
       }
-    }
+      return null;
+    });
 
     changed |= ic.var != null && cc.ok(rt, () -> {
       boolean chngd = false;
