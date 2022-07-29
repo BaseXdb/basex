@@ -342,10 +342,8 @@ public class BaseXCombo extends JComboBox<Object> {
     private BaseXEditor(final GUI gui, final BaseXCombo combo) {
       tf = new BaseXTextField(gui);
       // adopt border of original editor
-      if(Prop.JAVA8) {
-        final Component comp = combo.getEditor().getEditorComponent();
-        if(comp instanceof JTextField) tf.setBorder(((JTextField) comp).getBorder());
-      }
+      final Component comp = combo.getEditor().getEditorComponent();
+      if(comp instanceof JTextField) tf.setBorder(((JTextField) comp).getBorder());
     }
 
     @Override

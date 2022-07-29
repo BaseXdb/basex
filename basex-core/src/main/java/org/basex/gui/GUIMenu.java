@@ -5,7 +5,6 @@ import static org.basex.gui.GUIConstants.*;
 import javax.swing.*;
 
 import org.basex.gui.layout.*;
-import org.basex.util.*;
 
 /**
  * This is the menu bar of the main window.
@@ -68,8 +67,7 @@ public final class GUIMenu extends JMenuBar {
    */
   public static JMenuItem newItem(final GUICommand cmd, final GUI gui, final StringBuilder mnem) {
     final String label = cmd.label();
-    final JMenuItem item = cmd.toggle() && (!Prop.MAC || Prop.JAVA8) ?
-      new JCheckBoxMenuItem(label) : new JMenuItem(label);
+    final JMenuItem item = cmd.toggle() ? new JCheckBoxMenuItem(label) : new JMenuItem(label);
     item.addActionListener(e -> {
       if(!gui.updating) cmd.execute(gui);
     });
