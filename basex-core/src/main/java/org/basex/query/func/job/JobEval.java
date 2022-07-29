@@ -35,14 +35,14 @@ public class JobEval extends StandardFunc {
    */
   private Str eval(final IOContent query, final QueryContext qc) throws QueryException {
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final JobsOptions opts = toOptions(2, new JobsOptions(), qc);
-    opts.set(JobsOptions.BASE_URI, toBaseUri(query.url(), opts));
+    final JobOptions opts = toOptions(2, new JobOptions(), qc);
+    opts.set(JobOptions.BASE_URI, toBaseUri(query.url(), opts, JobOptions.BASE_URI));
 
-    final boolean service = Boolean.TRUE.equals(opts.get(JobsOptions.SERVICE));
+    final boolean service = Boolean.TRUE.equals(opts.get(JobOptions.SERVICE));
     if(service) {
       if(!bindings.isEmpty()) throw JOBS_SERVICE.get(info);
       // invalidate option (not relevant for next steps, i.e., if services are written to disk)
-      opts.put(JobsOptions.SERVICE, null);
+      opts.put(JobOptions.SERVICE, null);
     }
 
     // copy variable values

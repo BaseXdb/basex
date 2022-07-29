@@ -24,9 +24,9 @@ public final class WsEval extends WsFn {
     final HashMap<String, Value> bindings = toBindings(1, qc);
     final WsOptions wo = toOptions(2, new WsOptions(), qc);
 
-    final JobsOptions opts = new JobsOptions();
-    opts.set(JobsOptions.BASE_URI, toBaseUri(query.url(), wo));
-    opts.set(JobsOptions.ID, wo.get(WsOptions.ID));
+    final JobOptions opts = new JobOptions();
+    opts.set(JobOptions.BASE_URI, toBaseUri(query.url(), wo, WsOptions.BASE_URI));
+    opts.set(JobOptions.ID, wo.get(WsOptions.ID));
 
     final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query);
     final WebSocket ws = ws(qc);

@@ -16,7 +16,7 @@ public final class QueryJobSpec {
   /** Variable bindings. */
   final HashMap<String, Value> bindings;
   /** Options. */
-  final JobsOptions options;
+  final JobOptions options;
   /** Query. */
   final String query;
   /** Simple query without URI. */
@@ -28,7 +28,7 @@ public final class QueryJobSpec {
    * @param bindings variable bindings
    * @param content query content
    */
-  public QueryJobSpec(final JobsOptions options, final HashMap<String, Value> bindings,
+  public QueryJobSpec(final JobOptions options, final HashMap<String, Value> bindings,
       final IOContent content) {
     this.options = options;
     this.bindings = bindings;

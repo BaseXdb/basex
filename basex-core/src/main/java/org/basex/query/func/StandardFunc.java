@@ -19,7 +19,6 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.xquery.XQueryEval.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -401,11 +400,13 @@ public abstract class StandardFunc extends Arr {
   /**
    * Evaluates the specified URI.
    * @param path custom path (can be {@code null})
-   * @param options options with base-uri property
+   * @param options options
+   * @param option base-uri option
    * @return base URI
    */
-  protected final String toBaseUri(final String path, final Options options) {
-    final String base = options.get(XQueryOptions.BASE_URI);
+  protected final String toBaseUri(final String path, final Options options,
+      final StringOption option) {
+    final String base = options.get(option);
     return base != null && !base.isEmpty() ? base :
       path != null && !path.isEmpty() ? path : string(sc.baseURI().string());
   }

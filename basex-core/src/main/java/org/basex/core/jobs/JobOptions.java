@@ -8,7 +8,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class JobsOptions extends Options {
+public final class JobOptions extends Options {
   /** Query base-uri. */
   public static final StringOption BASE_URI = new StringOption("base-uri");
   /** Cache result. */

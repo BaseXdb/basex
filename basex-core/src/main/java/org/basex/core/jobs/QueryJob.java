@@ -51,13 +51,13 @@ public final class QueryJob extends Job implements Runnable {
     jc().context = context;
 
     // check when job is to be started
-    final JobsOptions opts = job.options;
-    final Item start = time(opts.get(JobsOptions.START), ii);
+    final JobOptions opts = job.options;
+    final Item start = time(opts.get(JobOptions.START), ii);
     long delay = start == null ? 0 : delay(start, 0, ii);
 
     // check when job is to be repeated
     long interval = 0;
-    final String inter = opts.get(JobsOptions.INTERVAL);
+    final String inter = opts.get(JobOptions.INTERVAL);
     if(inter != null && !inter.isEmpty()) {
       interval = ms(new DTDur(token(inter), ii));
       if(interval < 1000) throw JOBS_RANGE_X.get(ii, inter);
@@ -66,12 +66,12 @@ public final class QueryJob extends Job implements Runnable {
     if(delay < 0) throw JOBS_RANGE_X.get(ii, start);
 
     // check when job is to be stopped
-    final Item end = time(opts.get(JobsOptions.END), ii);
+    final Item end = time(opts.get(JobOptions.END), ii);
     final long duration = end == null ? Long.MAX_VALUE : delay(end, delay, ii);
     if(duration <= delay) throw JOBS_RANGE_X.get(ii, end);
 
     // check job results are to be cached
-    final boolean cache = opts.contains(JobsOptions.CACHE) && opts.get(JobsOptions.CACHE);
+    final boolean cache = opts.contains(JobOptions.CACHE) && opts.get(JobOptions.CACHE);
     if(cache && interval > 0) throw JOBS_OPTIONS.get(ii);
 
     // number of scheduled and active tasks must not exceed limit
@@ -83,7 +83,7 @@ public final class QueryJob extends Job implements Runnable {
 
     synchronized(jobs.tasks) {
       // custom job id: check if it is invalid or has already been assigned
-      String id = opts.get(JobsOptions.ID);
+      String id = opts.get(JobOptions.ID);
       if(id != null) {
         if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(ii, id);
         if(jobs.tasks.containsKey(id) || jobs.active.containsKey(id) ||
@@ -190,10 +190,10 @@ public final class QueryJob extends Job implements Runnable {
     final JobContext jc = jc();
     final String id = jc.id();
     final Context ctx = jc.context;
-    final JobsOptions opts = job.options;
-    log(LogType.REQUEST, opts.get(JobsOptions.LOG));
+    final JobOptions opts = job.options;
+    log(LogType.REQUEST, opts.get(JobOptions.LOG));
 
-    qp = new QueryProcessor(job.query, opts.get(JobsOptions.BASE_URI), ctx, null);
+    qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
     try {
       // parse, push and register query. order is important!
       final Performance perf = new Performance();
@@ -225,7 +225,7 @@ public final class QueryJob extends Job implements Runnable {
       result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
     } finally {
       // close and invalidate query after result has been assigned. order is important!
-      if(Boolean.TRUE.equals(opts.get(JobsOptions.CACHE))) {
+      if(Boolean.TRUE.equals(opts.get(JobOptions.CACHE))) {
         ctx.jobs.scheduleResult(this);
         state(JobState.CACHED);
       } else {
@@ -260,7 +260,7 @@ public final class QueryJob extends Job implements Runnable {
    * @param info info string (can be {@code null})
    */
   private void log(final LogType type, final String info) {
-    final String log = job.options.get(JobsOptions.LOG);
+    final String log = job.options.get(JobOptions.LOG);
     if(log == null || log.isEmpty()) return;
 
     final JobContext jc = jc();
@@ -275,6 +275,6 @@ public final class QueryJob extends Job implements Runnable {
 
   @Override
   public String toString() {
-    return job.simple ? job.query : job.options.get(JobsOptions.BASE_URI);
+    return job.simple ? job.query : job.options.get(JobOptions.BASE_URI);
   }
 }

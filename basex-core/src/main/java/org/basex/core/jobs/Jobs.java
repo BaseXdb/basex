@@ -55,7 +55,7 @@ public final class Jobs {
         for(final ANode child : children(root)) {
           final byte[] qname = child.qname().id();
           if(eq(qname, JOB)) {
-            final JobsOptions opts = options(child);
+            final JobOptions opts = options(child);
             if(opts != null) {
               add(new QueryJobSpec(opts, new HashMap<>(), new IOContent(child.string())));
             }
@@ -115,7 +115,7 @@ public final class Jobs {
    * @param id job id
    */
   public void remove(final String id) {
-    list.removeIf(job -> id.equals(job.options.get(JobsOptions.ID)));
+    list.removeIf(job -> id.equals(job.options.get(JobOptions.ID)));
   }
 
   /**
@@ -123,8 +123,8 @@ public final class Jobs {
    * @param job job element
    * @return jobs options, or {@code null} if an error occurred
    */
-  private JobsOptions options(final ANode job) {
-    final JobsOptions opts = new JobsOptions();
+  private JobOptions options(final ANode job) {
+    final JobOptions opts = new JobOptions();
     for(final ANode attr : job.attributeIter()) {
       try {
         opts.assign(string(attr.name()), string(attr.string()));

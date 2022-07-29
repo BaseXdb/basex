@@ -199,8 +199,6 @@ public interface Text {
   /** Command keyword. */
   String S_DIR = "dir";
   /** Command keyword. */
-  String S_LIST = "list";
-  /** Command keyword. */
   String S_STOP = "stop";
 
   /** Index info. */
@@ -703,8 +701,6 @@ public interface Text {
   /** Query info: plan. */
   String QUERY_PLAN = lang("query_plan");
 
-  /** "Query: ". */
-  String QUERY_CC = lang("query") + COLS;
   /** "Parsing: ". */
   String PARSING_CC = PARSING + COLS;
   /** "Compiling: ". */
@@ -745,8 +741,6 @@ public interface Text {
   String SESSIONS_X = lang("sessions_%");
   /** Show packages. */
   String PACKAGES_X = lang("packages_%");
-  /** Show jobs. */
-  String JOBS_X = lang("jobs_%");
   /** Show resources. */
   String RESOURCES_X = lang("resources_%");
   /** Show entries. */
@@ -787,8 +781,6 @@ public interface Text {
   String PKG_INSTALLED_X_X = lang("pkg_installed_%_%");
   /** Package replaced. */
   String PKG_REPLACED_X_X = lang("pkg_replaced_%_%");
-  /** Jobs stopped. */
-  String JOBS_STOPPED_X = lang("jobs_stopped_%");
 
   // GENERAL COMMANDS =============================================================================
 
@@ -816,8 +808,6 @@ public interface Text {
   String TYPE = lang("type");
   /** "Input path". */
   String INPUT_PATH = lang("input_path");
-  /** "Timestamp". */
-  String TIMESTAMP = lang("timestamp");
   /** "Resources". */
   String RESOURCES = lang("resources");
   /** "Encoding". */
@@ -826,24 +816,10 @@ public interface Text {
   String PARAMETERS = lang("parameters");
   /** "Path". */
   String PATH = lang("path");
-  /** "Duration". */
-  String DURATION = lang("duration");
-  /** "State". */
-  String STATE = lang("state");
-  /** "Start". */
-  String START = lang("start");
-  /** "End". */
-  String END = lang("end");
-  /** "Interval". */
-  String INTERVAL = lang("interval");
-  /** "User". */
-  String USER = lang("user");
   /** "Reads". */
   String READS = lang("reads");
   /** "Writes". */
   String WRITES = lang("writes");
-  /** "Time". */
-  String TIME = lang("time");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
   /** Indent result. */
