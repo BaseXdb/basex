@@ -80,7 +80,7 @@
       <dependency>
         <groupId>org.relaxng</groupId>
         <artifactId>jing</artifactId>
-        <version>20181222</version>
+        <version>20220510</version>
         <scope>runtime</scope>
         <optional>true</optional>
         <exclusions>

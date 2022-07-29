@@ -24,6 +24,6 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache:lucene-stemmers:3.4.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.ccil.cowan.tagsoup:tagsoup:1.2.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: jline:jline:2.14.6" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.relaxng:jing:20181222" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.relaxng:jing:20220510" level="project" />
   </component>
 </module>
