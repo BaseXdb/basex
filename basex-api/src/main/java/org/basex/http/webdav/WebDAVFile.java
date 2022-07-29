@@ -48,7 +48,7 @@ final class WebDAVFile extends WebDAVResource implements FileResource {
 
   @Override
   public String getContentType(final String accepts) {
-    return meta.contentType.toString();
+    return meta.contentType;
   }
 
   @Override

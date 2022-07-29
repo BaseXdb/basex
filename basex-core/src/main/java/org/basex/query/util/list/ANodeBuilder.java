@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 
 /**
  * Resizable-array implementation for nodes. The stored nodes will be sorted and duplicates will
- * removed before they are returned as value or via an iterator.
+ * be removed before they are returned as value or via an iterator.
  *
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
@@ -33,7 +33,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   @Override
   public ANodeBuilder add(final ANode node) {
     if(isEmpty()) {
-      // empty list: assign initial database reference (may be null)
+      // empty list: assign initial database reference (can be null)
       data = node.data();
     } else {
       // check if new node is in same database

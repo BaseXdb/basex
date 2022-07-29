@@ -50,7 +50,8 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
     final int h = getFontMetrics(getFont()).getHeight();
     if(h > 16) setRowHeight(Math.max(32, h));
 
-    /** Commands for editing nodes. */
+    /* Commands for editing nodes. */
+
     // delete file or show error dialog
     // choose free name
     final GUIPopupCmd[] edit = {

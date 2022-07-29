@@ -283,7 +283,7 @@ public final class GUI extends JFrame implements BaseXWindow {
   }
 
   /**
-   * Sets a cursor, enforcing a new look if necessary.
+   * Sets a cursor.
    * @param cursor cursor to be set
    * @param enforce enforce new cursor
    */

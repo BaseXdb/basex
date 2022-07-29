@@ -160,16 +160,14 @@ public final class User {
    */
   public synchronized void password(final String password) {
     for(final Algorithm algorithm : Algorithm.values()) {
-      final EnumMap<Code, String> codes =
-          passwords.computeIfAbsent(algorithm, k -> new EnumMap<>(Code.class));
-      switch(algorithm) {
-        case DIGEST:
-          codes.put(Code.HASH, digest(name, password));
-          break;
-        default:
-          final String salt = Long.toString(System.nanoTime());
-          codes.put(Code.SALT, salt);
-          codes.put(Code.HASH, sha256(salt + password));
+      final EnumMap<Code, String> codes = passwords.computeIfAbsent(algorithm,
+          k -> new EnumMap<>(Code.class));
+      if(algorithm == Algorithm.SALTED_SHA256) {
+        final String salt = Long.toString(System.nanoTime());
+        codes.put(Code.SALT, salt);
+        codes.put(Code.HASH, sha256(salt + password));
+      } else {
+        codes.put(Code.HASH, digest(name, password));
       }
     }
   }
