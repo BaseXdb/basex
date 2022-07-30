@@ -306,7 +306,7 @@ public abstract class Seq extends Value {
 
   @Override
   public String description() {
-    return type + " " + SEQUENCE;
+    return type == AtomType.ITEM ? SEQUENCE : type + " " + SEQUENCE;
   }
 
   @Override

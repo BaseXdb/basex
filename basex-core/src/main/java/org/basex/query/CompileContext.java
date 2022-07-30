@@ -319,15 +319,16 @@ public final class CompileContext {
     final Expr res = result.seqType().zero() && !result.has(Flag.NDT) ? Empty.VALUE : result;
     if(res != expr) {
       info("%", (Supplier<String>) () -> {
-        final TokenBuilder tb = new TokenBuilder();
         final String exprDesc = expr.description(), resDesc = res.description();
-        tb.add(QueryText.OPTREWRITE).add(' ').add(exprDesc);
-        if(!exprDesc.equals(resDesc)) tb.add(" to ").add(resDesc);
-
         final byte[] exprString = QueryError.normalize(expr, null);
         final byte[] resString = QueryError.normalize(res, null);
+        final boolean eqDesc = exprDesc.equals(resDesc), eqString = Token.eq(exprString, resString);
+
+        final TokenBuilder tb = new TokenBuilder();
+        tb.add(QueryText.OPTREWRITE).add(' ').add(exprDesc);
+        if(eqString && !eqDesc) tb.add(" to ").add(resDesc);
         tb.add(": ").add(exprString);
-        if(!Token.eq(exprString, resString)) tb.add(" -> ").add(resString);
+        if(!eqString) tb.add(" -> ").add(resString);
         return tb.toString();
       });
       if(refine) res.refineType(expr);
