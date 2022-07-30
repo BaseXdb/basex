@@ -469,15 +469,15 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdAlter.DATABASE + '|' + CmdAlter.PASSWORD + '|' + CmdAlter.USER + "] [...]",
+    "[" + CmdAlter.DATABASE + '|' + CmdAlter.USER + '|' + CmdAlter.PASSWORD + "] [...]",
     lang("c_alter1"),
     lang("c_alter2") + NL  +
     LI + CmdAlter.DATABASE + " [" + S_NAME + "] [newname]" + NL +
     "  " + lang("c_alterdb") + NL +
-    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + ']' + NL +
-    "  " + lang("c_alterpw") + NL +
     LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
-    "  " + lang("c_alteruser")
+    "  " + lang("c_alteruser") + NL +
+    LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + ']' + NL +
+    "  " + lang("c_alterpw")
   };
   /** Command help. */
   String[] HELPINSPECT = {
@@ -509,7 +509,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPEXIT = {
-    "", lang("c_exit1"), lang("c_exit2")
+    "", lang("c_exit1"), lang("c_exit2", Prop.NAME)
   };
 
   // COMMAND INFOS ================================================================================
@@ -717,8 +717,8 @@ public interface Text {
   String READ_LOCKING_CC = lang("read_locking") + COLS;
   /** "Write locking: ". */
   String WRITE_LOCKING_CC = lang("write_locking") + COLS;
-  /** "Hit(s): ". */
-  String HITS_X_CC = lang("hit_s") + COLS;
+  /** "Number: ". */
+  String NUMBER_CC = lang("number") + COLS;
   /** "Updated: ". */
   String UPDATED_CC = lang("updated") + COLS;
   /** "Printed: ". */

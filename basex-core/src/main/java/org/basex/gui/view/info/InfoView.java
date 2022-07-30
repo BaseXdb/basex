@@ -210,7 +210,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
         final String key = line.substring(0, d).trim();
         final String val = Performance.getTime(tm * 10000L * runs, runs);
         strings.add(LI + key + COLS + val);
-      } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC) ||
+      } else if(line.startsWith(NUMBER_CC) || line.startsWith(UPDATED_CC) ||
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
           line.startsWith(WRITE_LOCKING_CC)) {
         result.add(LI + line);

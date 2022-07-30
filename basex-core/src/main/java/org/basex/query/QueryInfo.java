@@ -156,7 +156,7 @@ public final class QueryInfo {
       tb.add(EVALUATING_CC).add(Performance.getTime(evaluating.get(), runs)).add(NL);
       tb.add(PRINTING_CC).add(Performance.getTime(serializing.get(), runs)).add(NL);
       tb.add(TOTAL_TIME_CC).add(total).add(NL).add(NL);
-      tb.add(HITS_X_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
+      tb.add(NUMBER_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
       final int up = qp.updates();
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
       tb.add(PRINTED_CC).add(Performance.format(printed)).add(NL);
