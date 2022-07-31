@@ -30,7 +30,7 @@ all:		lib example
 lib:		$(DBCLIB)
 
 example:
-		$(CC) -L. -l$(LIBNAME) example.c -o $@
+		$(CC) -L. example.c -o $@ -l$(LIBNAME) -lcrypto -lssl
 
 $(DBCLIB):	md5.o basexdbc.o readstring.o
 		$(CC) $(LIBS) $(LDFLAGS) -shared -o $@ $+
