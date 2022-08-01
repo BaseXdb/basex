@@ -266,7 +266,7 @@ public final class User {
    * Returns the info element.
    * @return info element (can be {@code null})
    */
-  public ANode info() {
+  public synchronized ANode info() {
     return info;
   }
 
@@ -274,7 +274,7 @@ public final class User {
    * Sets the info element.
    * @param elem info element
    */
-  public void info(final ANode elem) {
+  public synchronized void info(final ANode elem) {
     info = elem.hasChildren() || elem.attributeIter().size() != 0 ? elem : null;
   }
 

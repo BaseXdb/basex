@@ -56,7 +56,6 @@ public final class DualMap extends SimpleMap {
         final QueryFocus qf = qc.focus;
         final Value value = qf.value;
         try {
-          qf.value = value;
           qf.value = iter.get(i);
           return exprs[1].item(qc, info);
         } finally {

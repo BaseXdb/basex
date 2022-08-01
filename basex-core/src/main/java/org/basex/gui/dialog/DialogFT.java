@@ -7,7 +7,7 @@ import javax.swing.*;
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.layout.BaseXFileChooser.*;
 import org.basex.io.*;
 import org.basex.util.ft.*;
 
@@ -80,10 +80,9 @@ final class DialogFT extends DialogIndex {
     b1.add(check[F_LANG]);
     final String[] langs = FTLexer.languages().finish();
     language = new BaseXCombo(dialog, langs);
-    final Language ln = Language.get(opts);
-    for(final String l : langs) {
-      final String s = l.replaceFirst(" \\(.*", "");
-      if(s.equals(ln.toString())) language.setSelectedItem(l);
+    final String ln = Language.get(opts).toString();
+    for(final String lang : langs) {
+      if(lang.replaceFirst(" \\(.*", "").equals(ln)) language.setSelectedItem(lang);
     }
 
     b1.add(language);

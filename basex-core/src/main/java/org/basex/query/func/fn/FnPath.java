@@ -23,14 +23,7 @@ public final class FnPath extends ContextFn {
   /** Root function string. */
   private static final byte[] ROOT = QNm.eqName(QueryText.FN_URI, Token.token("root()"));
   /** Path cache. Caches the 1000 last accessed elements. */
-  private final Map<ANode, byte[]> paths = Collections.synchronizedMap(
-    new LinkedHashMap<>(16, 0.75f, true) {
-      @Override
-      protected boolean removeEldestEntry(final Map.Entry<ANode, byte[]> eldest) {
-        return size() > 1000;
-      }
-    }
-  );
+  private final Map<ANode, byte[]> paths = Collections.synchronizedMap(new PathMap());
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -135,5 +128,23 @@ public final class FnPath extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     return optFirst(true, false, cc.qc.focus.value);
+  }
+
+  /**
+   * Path cache.
+   *
+   * @author BaseX Team 2005-22, BSD License
+   * @author Christian Gruen
+   */
+  private static final class PathMap extends LinkedHashMap<ANode, byte[]> {
+    /** Constructor. */
+    private PathMap() {
+      super(16, 0.75f, true);
+    }
+
+    @Override
+    protected boolean removeEldestEntry(final Map.Entry<ANode, byte[]> eldest) {
+      return size() > 1000;
+    }
   }
 }

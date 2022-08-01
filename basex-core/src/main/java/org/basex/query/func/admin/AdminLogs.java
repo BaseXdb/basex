@@ -6,6 +6,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
+import java.util.regex.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -67,6 +68,7 @@ public final class AdminLogs extends AdminFn {
         map.computeIfAbsent(entry.address, address -> new LinkedList<>()).add(entry);
       }
     }
+    final Pattern digits = Pattern.compile("\\d+");
     return new Iter() {
       @Override
       public Item next() {
@@ -83,11 +85,12 @@ public final class AdminLogs extends AdminFn {
               final Iterator<LogEntry> iter = entries.iterator();
               while(iter.hasNext()) {
                 final LogEntry next = iter.next();
-                final String t = next.type;
+                final String type = next.type;
                 // REQUEST entry with identical address: no concluding entry exists
-                if(t.equals(LogType.REQUEST.name())) break;
-                if(t.matches("^\\d+$") || Strings.eq(t, LogType.OK.name(), LogType.ERROR.name())) {
-                  entry.type = t;
+                if(type.equals(LogType.REQUEST.name())) break;
+                if(digits.matcher(type).matches() ||
+                    Strings.eq(type, LogType.OK.name(), LogType.ERROR.name())) {
+                  entry.type = type;
                   entry.user = next.user;
                   entry.ms = entry.ms.add(next.ms);
                   final String msg1 = entry.message, msg2 = next.message;

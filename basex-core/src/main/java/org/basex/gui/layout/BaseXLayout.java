@@ -224,7 +224,7 @@ public final class BaseXLayout {
         break;
       } catch(final Exception ex) {
         Util.stack(ex);
-        Performance.sleep(i * 200);
+        Performance.sleep(i * 200L);
       }
     }
     return list;
@@ -248,7 +248,7 @@ public final class BaseXLayout {
           Util.stack(ex);
         } else {
           Util.debug(ex);
-          Performance.sleep(i * 200);
+          Performance.sleep(i * 200L);
         }
       }
     }

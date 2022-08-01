@@ -149,7 +149,7 @@ public final class Jobs {
       }
       // write jobs file
       file.parent().md();
-      file.write(toXML().serialize(SerializerMode.INDENT.get()).finish());
+      file.write(toXml().serialize(SerializerMode.INDENT.get()).finish());
     }
   }
 
@@ -157,7 +157,7 @@ public final class Jobs {
    * Returns an XML representation of all jobs.
    * @return root element
    */
-  public FElem toXML() {
+  public FElem toXml() {
     final FElem root = new FElem(JOBS);
     for(final QueryJobSpec spec : list) {
       final FElem elem = new FElem(JOB);
