@@ -66,18 +66,19 @@ public class ValidateRng extends ValidateFn {
             vdClass  = Class.forName("com.thaiopensource.validate.ValidationDriver"),
             rpClass  = Class.forName("com.thaiopensource.validate.prop.rng.RngProperty"),
             csrClass = Class.forName("com.thaiopensource.validate.rng.CompactSchemaReader");
+
           final Method
-            piPut = piClass.getMethod("put", pmbClass, Object.class),
+            pmbPut = pmbClass.getMethod("put", piClass, Object.class),
             vdLoadSchema = vdClass.getMethod("loadSchema", InputSource.class),
             vdValidate = vdClass.getMethod("validate", InputSource.class);
 
           // assign error handler
           final Object pmb = pmbClass.getConstructor().newInstance();
-          piPut.invoke(vpClass.getField("ERROR_HANDLER").get(null), pmb, handler);
+          pmbPut.invoke(pmb, vpClass.getField("ERROR_HANDLER").get(null), handler);
 
           // enable ID/IDREF checks
           final Object present = flClass.getField("PRESENT").get(null);
-          piPut.invoke(rpClass.getField("CHECK_ID_IDREF").get(null), pmb, present);
+          pmbPut.invoke(pmb, rpClass.getField("CHECK_ID_IDREF").get(null), present);
 
           // create driver
           final Object sr = compact ? csrClass.getMethod("getInstance").invoke(null) : null;
