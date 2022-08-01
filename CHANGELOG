@@ -1,3 +1,65 @@
+VERSION 10.0 (August 1, 2022) ------------------------------------------
+
+ STORAGE
+ - Three resources types: XML, binary, XQuery Values
+ - When importing XML, whitespaces are now preserved
+ - Backups enhanced for general data (users, services, store)
+
+ XQUERY
+ - Multiple compilation steps for improved locking!
+ - New Store Module: persistent main-memory key-value storage
+ - Database Module: store values (db:put-value, db:get-value)
+ - When serializing XML, indentation is now turned off
+
+ GENERAL
+ - GUI revised: HiDPI support, new icons, improved consistency
+ - All HTTP requests based on new Java HTTP client
+ - Universal catalog support, based on new XML Catalog API
+ - Responses of standard REST API use default namespace
+ - Default ports for web applications: 8984/8985 -> 8080/8081
+ - Default admin password was removed
+
+VERSION 9.7.3 (June 30, 2022) ------------------------------------------
+
+ - DBA: Improved support for database backups
+ - Performance tweaks and bug fixes
+ - BaseX 10 preview: Store Module (before: Caching Module)
+ - BaseX 10 preview: Backup of general data (users, jobs, stores)
+
+VERSION 9.7.2 (May 14, 2022) -------------------------------------------
+
+ - English Stemmer: dictionary for irregular forms added
+ - Preview implementations of BaseX 10 features
+ - Performance tweaks, minor fixes
+
+VERSION 9.7.1 (April 26, 2022) -----------------------------------------
+
+ - RESTXQ: improved caching for unmodified modules
+ - GUI: improved support for middle mouse button
+ - GUI, editor: list opened files (Ctrl-F6)
+ - Backups: support for comments added
+ - XQuery: inspect:functions: parse modules only once
+ - XQuery: db:delete: Faster deletion of binary resources
+ - XQuery: jobs:eval: handling of large job numbers revised
+ - XQuery optimizations: rewrite value to general comparisons
+
+VERSION 9.7 (March 23, 2022) -------------------------------------------
+
+ XQUERY
+ - numerous performance tweaks and optimizations
+ - support for formatting integers and dates in French
+ - xslt:transform-report: support for xsl:messages
+ - util:strip-namespaces: remove namespaces from elements
+ - XSD validation: improved support for XML catalogs
+
+VERSION 9.6.4 (December 17, 2021) --------------------------------------
+
+ - Performance tweaks, minor fixes
+
+VERSION 9.6.3 (October 21, 2021) ---------------------------------------
+
+ - Minor fixes, Performance tweaks
+
 VERSION 9.6.2 (September 30, 2021) -------------------------------------
 
  - Performance tweaks, minor bug fixes
