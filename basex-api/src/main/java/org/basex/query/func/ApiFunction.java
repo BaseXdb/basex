@@ -112,6 +112,9 @@ public enum ApiFunction implements AFunction {
   _SESSION_ACCESSED(SessionAccessed::new, "accessed()",
       params(), DATE_TIME_O, SESSION_URI),
   /** XQuery function. */
+  _SESSION_CLIENT_ID(SessionClientId::new, "client-id()",
+      params(), STRING_ZO, SESSION_URI),
+  /** XQuery function. */
   _SESSION_CLOSE(SessionClose::new, "close()",
       params(), EMPTY_SEQUENCE_Z, SESSION_URI),
   /** XQuery function. */
