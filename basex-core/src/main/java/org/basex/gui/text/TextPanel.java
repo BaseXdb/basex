@@ -66,6 +66,9 @@ public class TextPanel extends BaseXPanel {
   /** Link listener. */
   private LinkListener linkListener;
 
+  /** Last number of mouse clicks. */
+  private int clicks;
+
   /**
    * Default constructor.
    * @param win parent window
@@ -451,8 +454,7 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public final void mouseDragged(final MouseEvent e) {
-    if(SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1) {
-      // selection mode
+    if(SwingUtilities.isLeftMouseButton(e) && clicks == 1) {
       select(e.getPoint(), false);
       final int y = Math.max(20, Math.min(e.getY(), getHeight() - 20));
       if(y != e.getY()) scroll.pos(scroll.pos() + e.getY() - y);
@@ -479,15 +481,14 @@ public class TextPanel extends BaseXPanel {
     requestFocusInWindow();
     caret(true);
 
-    final boolean shift = e.isShiftDown();
-    final boolean selected = editor.isSelected();
+    final boolean shift = e.isShiftDown(), selected = editor.isSelected();
     if(SwingUtilities.isLeftMouseButton(e)) {
-      final int c = e.getClickCount();
-      if(c == 1) {
+      clicks = e.getClickCount();
+      if(clicks == 1) {
         // selection mode
         if(shift) editor.startSelection(true);
         select(e.getPoint(), !shift);
-      } else if(c == 2) {
+      } else if(clicks == 2) {
         editor.selectWord();
       } else {
         editor.selectLine();
