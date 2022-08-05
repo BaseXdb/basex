@@ -140,6 +140,7 @@ public final class IOUrl extends IO {
     try {
       final URI uri = new URI(pth);
       final HttpRequest.Builder rb = HttpRequest.newBuilder(uri).timeout(Duration.ofMinutes(1));
+      rb.header(HTTPText.ACCEPT, MediaType.ALL_ALL.toString());
       new UserInfo(uri).basic(rb);
       response = client.send(rb.build(), HttpResponse.BodyHandlers.ofInputStream());
     } catch(final IOException ex) {
