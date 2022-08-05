@@ -1105,6 +1105,8 @@ public enum QueryError {
   /** Error code. */
   BINARY_X(XPTY, 4, "Binary expected, % found."),
   /** Error code. */
+  STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
+  /** Error code. */
   STRNOD_X_X(XPTY, 4, "String or node expected, % found: %."),
   /** Error code. */
   MAP_X_X(XPTY, 4, "Map expected, % found: %."),
@@ -1114,8 +1116,6 @@ public enum QueryError {
   ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
   /** Error code. */
   ELM_X_X(XPTY, 4, "element(%) expected: %."),
-  /** Error code. */
-  STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
   /** Error code. */
   INVALIDOPTION_X(XPTY, 4, "Unknown option '%'."),
   /** Error code. */
