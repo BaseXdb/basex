@@ -104,26 +104,40 @@ public final class Client {
       throws IOException {
 
     final HttpRequest.Builder rb = HttpRequest.newBuilder(uri);
-    final String timeout = request.attribute(TIMEOUT);
-    if(timeout != null) rb.timeout(Duration.ofSeconds(Strings.toInt(timeout)));
 
-    // set method, attach payload
-    final String method = request.attribute(METHOD);
-    if(method != null) {
-      final BodyPublisher publisher;
-      if(request.payload.isEmpty() && request.parts.isEmpty()) {
-        publisher = HttpRequest.BodyPublishers.noBody();
-      } else {
-        setContentType(rb, request);
-        publisher = HttpRequest.BodyPublishers.ofByteArray(payload(request));
+    try {
+      // set timeout
+      final String timeout = request.attribute(TIMEOUT);
+      if(timeout != null) rb.timeout(Duration.ofSeconds(Strings.toInt(timeout)));
+
+      // set method, attach payload
+      final String method = request.attribute(METHOD);
+      if(method != null) {
+        final BodyPublisher publisher;
+        if(request.payload.isEmpty() && request.parts.isEmpty()) {
+          publisher = HttpRequest.BodyPublishers.noBody();
+        } else {
+          setContentType(rb, request);
+          publisher = HttpRequest.BodyPublishers.ofByteArray(payload(request));
+        }
+        rb.method(method, publisher);
       }
-      rb.method(method, publisher);
+
+      // assign headers to request; ensure that Accept header is sent; catch illegal header names
+      request.headers.forEach(rb::header);
+      if(((Checks<String>) name -> !name.equalsIgnoreCase(ACCEPT)).all(request.headers.keySet())) {
+        rb.header(ACCEPT, MediaType.ALL_ALL.toString());
+      }
+    } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
+      throw new IOException(ex.getMessage());
     }
 
     final String fw = request.attribute(FOLLOW_REDIRECT);
     final HttpClient client = IOUrl.clientBuilder(fw == null || Strings.toBoolean(fw)).build();
     final BodyHandler<InputStream> handler = HttpResponse.BodyHandlers.ofInputStream();
 
+    // send request (with optional authorization)
     try {
       final UserInfo ui = new UserInfo(uri, request);
       final boolean sa = Strings.toBoolean(request.attribute(SEND_AUTHORIZATION));
