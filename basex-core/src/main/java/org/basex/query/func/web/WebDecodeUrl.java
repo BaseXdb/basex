@@ -19,11 +19,11 @@ import org.basex.util.*;
 public final class WebDecodeUrl extends WebFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] uri = toToken(exprs[0], qc);
+    final String uri = toString(exprs[0], qc);
 
     final byte[] decoded;
     try {
-      decoded = token(URLDecoder.decode(string(uri), StandardCharsets.UTF_8));
+      decoded = token(URLDecoder.decode(uri, StandardCharsets.UTF_8));
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
       throw WEB_INVALID2_X.get(info, ex.getLocalizedMessage());

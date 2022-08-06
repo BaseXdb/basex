@@ -20,12 +20,12 @@ import org.basex.util.*;
 public final class FnNormalizeUnicode extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] str = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(exprs[0], qc);
 
     Form form = Form.NFC;
     if(exprs.length == 2) {
       final byte[] n = uc(trim(toToken(exprs[1], qc)));
-      if(n.length == 0) return Str.get(str);
+      if(n.length == 0) return Str.get(value);
       try {
         form = Form.valueOf(string(n));
       } catch(final IllegalArgumentException ex) {
@@ -33,6 +33,6 @@ public final class FnNormalizeUnicode extends StandardFunc {
         throw NORMUNI_X.get(info, n);
       }
     }
-    return ascii(str) ? Str.get(str) : Str.get(Normalizer.normalize(string(str), form));
+    return ascii(value) ? Str.get(value) : Str.get(Normalizer.normalize(string(value), form));
   }
 }

@@ -14,7 +14,7 @@ import org.basex.util.*;
 public class JsonDoc extends JsonParse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] uri = toTokenOrNull(exprs[0], qc);
+    final String uri = toStringOrNull(exprs[0], qc);
     return uri != null ? parse(toIO(uri), qc) : Empty.VALUE;
   }
 }

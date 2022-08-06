@@ -27,7 +27,7 @@ public final class DbCreate extends DbNew {
     final StringList paths = new StringList();
     if(exprs.length > 2) {
       final Iter iter = exprs[2].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) paths.add(toDbPath(toToken(item)));
+      for(Item item; (item = qc.next(iter)) != null;) paths.add(toDbPath(toString(item)));
     }
 
     final NewInput[] inputs;

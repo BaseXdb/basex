@@ -35,13 +35,13 @@ public abstract class ContextFn extends StandardFunc {
 
   /**
    * Returns the specified argument, or the context value if it does not exist.
-   * @param i index of argument
+   * @param i index of optional argument
    * @param qc query context
    * @return expression
    * @throws QueryException query exception
    */
   protected final Expr ctxArg(final int i, final QueryContext qc) throws QueryException {
-    return exprs.length == i ? ctxValue(qc) : exprs[i];
+    return i < exprs.length ? exprs[i] : ctxValue(qc);
   }
 
   @Override

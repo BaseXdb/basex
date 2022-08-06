@@ -16,10 +16,10 @@ import org.basex.util.*;
 public final class ProfRuntime extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] name = toToken(exprs[0], qc);
+    final String name = toString(exprs[0], qc);
 
     final Runtime rt = Runtime.getRuntime();
-    switch(Token.string(name)) {
+    switch(name) {
       case "max":        return Int.get(rt.maxMemory());
       case "total":      return Int.get(rt.totalMemory());
       case "used":       return Int.get(rt.totalMemory() - rt.freeMemory());

@@ -22,7 +22,7 @@ public final class FnFormatInteger extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] pic = toToken(exprs[1], qc);
+    final byte[] picture = toToken(exprs[1], qc);
     final byte[] language = exprs.length == 2 ? EMPTY : toToken(exprs[2], qc);
 
     final Item item = exprs[0].atomItem(qc, info);
@@ -31,10 +31,10 @@ public final class FnFormatInteger extends StandardFunc {
 
     IntFormat format;
     synchronized(formats) {
-      format = formats.get(pic);
+      format = formats.get(picture);
       if(format == null) {
-        format = new IntFormat(pic, info);
-        formats.put(pic, format);
+        format = new IntFormat(picture, info);
+        formats.put(picture, format);
       }
     }
     return Str.get(Formatter.get(language).formatInt(number, format));

@@ -143,7 +143,7 @@ abstract class ValidateFn extends StandardFunc {
     }
 
     if(item.type.isStringOrUntyped()) {
-      IO io = toIO(toToken(item));
+      IO io = toIO(toString(item));
       if(sopts != null) {
         // add doctype declaration if specified
         io = new IOContent(new DBNode(io).serialize(sopts).finish());

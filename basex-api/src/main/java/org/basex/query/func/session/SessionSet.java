@@ -16,7 +16,7 @@ public final class SessionSet extends SessionFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ASession session = session(qc, true);
-    final byte[] name = toToken(exprs[0], qc);
+    final String name = toString(exprs[0], qc);
     final Value value = exprs[1].value(qc);
 
     session.set(name, value.materialize(n -> false, ii, qc));

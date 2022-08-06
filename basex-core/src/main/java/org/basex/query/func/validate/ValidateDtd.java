@@ -34,7 +34,7 @@ public class ValidateDtd extends ValidateFn {
         final Item input = toNodeOrAtomItem(0, qc);
         IO schema = null;
         if(exprs.length > 1) {
-          final byte[] path = toTokenOrNull(exprs[1], qc);
+          final String path = toStringOrNull(exprs[1], qc);
           if(path != null) schema = toIO(path);
         }
 

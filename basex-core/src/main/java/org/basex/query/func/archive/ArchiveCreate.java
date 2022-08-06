@@ -122,7 +122,7 @@ public class ArchiveCreate extends ArchiveFn {
       final byte[] mod = el.attribute(LAST_MODIFIED);
       if(mod != null) {
         try {
-          ze.setTime(toMilliseconds(new Dtm(mod, info), qc));
+          ze.setTime(toMs(new Dtm(mod, info), qc));
         } catch(final QueryException qe) {
           Util.debug(qe);
           throw ARCHIVE_DESCRIPTOR3_X.get(info, mod);

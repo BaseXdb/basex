@@ -39,11 +39,10 @@ abstract class ProcFn extends StandardFunc {
    */
   final ProcResult exec(final QueryContext qc, final boolean fork) throws QueryException {
     // arguments
-    final StringList sl = new StringList();
-    sl.add(toToken(exprs[0], qc));
+    final StringList sl = new StringList().add(toString(exprs[0], qc));
     if(exprs.length > 1) {
       final Iter iter = exprs[1].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) sl.add(toToken(item));
+      for(Item item; (item = qc.next(iter)) != null;) sl.add(toString(item));
     }
     final String[] args = sl.finish();
 
@@ -64,7 +63,7 @@ abstract class ProcFn extends StandardFunc {
     final ProcResult result = new ProcResult();
     final Process proc;
     final ProcessBuilder pb = new ProcessBuilder(args);
-    if(dir != null) pb.directory(toPath(token(dir)).toFile());
+    if(dir != null) pb.directory(toPath(dir).toFile());
     try {
       proc = pb.start();
     } catch(final IOException ex) {

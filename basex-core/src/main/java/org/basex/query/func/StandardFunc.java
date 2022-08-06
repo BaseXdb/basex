@@ -278,10 +278,9 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Checks if the specified item has the specified Date type.
-   * If it is item, the specified Date is returned.
-   * @param item item to be checked
-   * @param type target type
+   * Evaluates an expression to a date of the specified type.
+   * @param item item
+   * @param type expected type
    * @param qc query context
    * @return date
    * @throws QueryException query exception
@@ -292,10 +291,9 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Checks if the specified expression is a database node.
-   * Returns the node or an exception.
-   * @param item item to be checked
-   * @return item
+   * Converts an item to a database node.
+   * @param item item
+   * @return database node
    * @throws QueryException query exception
    */
   protected final DBNode toDBNode(final Item item) throws QueryException {
@@ -304,38 +302,37 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Checks if the specified collation is supported.
-   * @param i index of argument
+   * Evaluates an expression to a collation.
+   * @param i index of optional argument
    * @param qc query context
-   * @return collator or {@code null} (default collation)
+   * @return collation, or {@code null} for default collation
    * @throws QueryException query exception
    */
   protected final Collation toCollation(final int i, final QueryContext qc) throws QueryException {
-    final byte[] coll = i >= exprs.length ? null : toToken(exprs[i], qc);
-    return Collation.get(coll, qc, sc, info, WHICHCOLL_X);
+    final byte[] uri = i < exprs.length ? toToken(exprs[i], qc) : null;
+    return Collation.get(uri, qc, sc, info, WHICHCOLL_X);
   }
 
   /**
-   * Converts the specified argument to a file path.
+   * Evaluates an expression to a file path.
    * @param i index of argument
    * @param qc query context
-   * @return file instance
+   * @return file path
    * @throws QueryException query exception
    */
   protected final Path toPath(final int i, final QueryContext qc) throws QueryException {
-    return toPath(toToken(exprs[i], qc));
+    return toPath(toString(exprs[i], qc));
   }
 
   /**
-   * Converts the specified string to a file path.
+   * Converts a path to a file path.
    * @param path path string
-   * @return file instance
+   * @return file path
    * @throws QueryException query exception
    */
-  protected final Path toPath(final byte[] path) throws QueryException {
+  protected final Path toPath(final String path) throws QueryException {
     try {
-      final String p = string(path);
-      return p.startsWith(IO.FILEPREF) ? Paths.get(new URI(p)) : Paths.get(p);
+      return path.startsWith(IO.FILEPREF) ? Paths.get(new URI(path)) : Paths.get(path);
     } catch(final InvalidPathException | URISyntaxException ex) {
       Util.debug(ex);
       throw FILE_INVALID_PATH_X.get(info, path);
@@ -343,50 +340,50 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a valid reference if a file is found at the specified path or the static base uri.
-   * Otherwise, returns an error.
+   * Evaluates an expression to a reference to an existing input resource.
    * @param i index of URI argument
    * @param qc query context
-   * @return input source, or exception
+   * @return input resource
    * @throws QueryException query exception
    */
   protected final IO toIO(final int i, final QueryContext qc) throws QueryException {
-    return toIO(toToken(exprs[i], qc));
+    return toIO(toString(exprs[i], qc));
   }
 
   /**
-   * Converts the specified URI to a reference to a resource.
-   * @param uri file URI
+   * Returns a reference to an existing input resource.
+   * @param uri URI string
    * @return io reference
    * @throws QueryException query exception
    */
-  protected final IO toIO(final byte[] uri) throws QueryException {
-    final IO io = sc.resolve(string(uri));
+  protected final IO toIO(final String uri) throws QueryException {
+    final IO io = sc.resolve(uri);
     if(!io.exists()) throw WHICHRES_X.get(info, io);
     if(io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io);
     return io;
   }
 
   /**
-   * Returns the content of the specified input.
-   * @param i index of input argument (xs:anyURI with URI or xs:string with content)
+   * Evaluates an expression to an input resource.
+   * @param i index of argument (xs:anyURI with URI or xs:string with content)
    * @param qc query context
-   * @return input content (UTF-8) with optional base URI
+   * @return input resource
    * @throws QueryException query exception
    */
   protected final IOContent toContent(final int i, final QueryContext qc) throws QueryException {
     final Item item = toItem(exprs[i], qc);
-    return item instanceof Uri ? toContent(item.string(info), qc) : new IOContent(toToken(item));
+    return item instanceof Uri ? toContent(string(item.string(info)), qc) :
+      new IOContent(toToken(item));
   }
 
   /**
-   * Returns the content of the specified input.
+   * Returns an input resource.
    * @param uri URI
    * @param qc query context
-   * @return input content (UTF-8) with attached base URI
+   * @return input resource
    * @throws QueryException query exception
    */
-  protected final IOContent toContent(final byte[] uri, final QueryContext qc)
+  protected final IOContent toContent(final String uri, final QueryContext qc)
       throws QueryException {
     checkPerm(qc, Perm.ADMIN);
     final IO io = toIO(uri);
@@ -398,7 +395,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates the specified URI.
+   * Returns a base URI for the given path and the associated option.
    * @param path custom path (can be {@code null})
    * @param options options
    * @param option base-uri option
@@ -412,32 +409,30 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a normalized encoding representation.
-   * @param i index of encoding argument
+   * Evaluates an expression to an encoding string.
+   * @param i index of optional argument
    * @param err error to raise
    * @param qc query context
-   * @return string or {@code null}
+   * @return normalized encoding string or {@code null}
    * @throws QueryException query exception
    */
   protected final String toEncodingOrNull(final int i, final QueryError err, final QueryContext qc)
       throws QueryException {
 
     if(i >= exprs.length) return null;
-    final byte[] encoding = toToken(exprs[i], qc);
+    final String encoding = toString(exprs[i], qc);
     try {
-      final String enc = toString(exprs[i], qc);
-      if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
+      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
     } catch(final IllegalArgumentException ex) {
       // character set is invalid or unknown (e.g. empty string)
       Util.debug(ex);
     }
     throw err.get(info, QueryError.similar(encoding,
-        Levenshtein.similar(encoding, Strings.encodings())));
+        Levenshtein.similar(token(encoding), Strings.encodings())));
   }
 
   /**
-   * Returns the expression at the specified index as node or atomized item.
-   * Returns the item or throws an exception.
+   * Converts an item to a node or an atomized item.
    * @param i index of argument
    * @param qc query context
    * @return node or atomized item
@@ -449,32 +444,31 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Parses the options at the specified index.
+   * Evaluates an expression to options.
    * @param <E> options type
-   * @param i index of argument (can exceed length of argument, or may yield an empty sequence)
+   * @param i index of optional argument
    * @param opts options
    * @param qc query context
-   * @return passed on options
+   * @return options
    * @throws QueryException query exception
    */
   protected final <E extends Options> E toOptions(final int i, final E opts, final QueryContext qc)
       throws QueryException {
-    return i >= exprs.length ? opts : new FuncOptions(info).assign(exprs[i].item(qc, info), opts);
+    return i < exprs.length ? new FuncOptions(info).assign(exprs[i].item(qc, info), opts) : opts;
   }
 
   /**
-   * Returns all keys and values of the specified binding argument.
-   * @param i index of argument
+   * Evaluates an expression to variable bindings.
+   * @param i index of optional argument
    * @param qc query context
-   * @return resulting map
+   * @return variable bindings
    * @throws QueryException query exception
    */
   protected final HashMap<String, Value> toBindings(final int i, final QueryContext qc)
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<>();
-    final int el = exprs.length;
-    if(i < el) {
+    if(i < exprs.length) {
       final Item item = exprs[i].item(qc, info);
       final XQMap map = item == Empty.VALUE ? XQMap.empty() : toMap(item);
       map.apply((it, v) -> {
@@ -494,10 +488,9 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a database instance for the first string argument of the function.
-   * This method assumes that the function has at least one argument.
+   * Evaluates the first expression to a database instance.
    * @param qc query context
-   * @return data instance
+   * @return database instance
    * @throws QueryException query exception
    */
   protected final Data toData(final QueryContext qc) throws QueryException {
@@ -505,8 +498,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Checks if the current user has given permissions. If negative, an
-   * exception is thrown.
+   * Checks if the current user has given permissions. If negative, an exception is thrown.
    * @param qc query context
    * @param perm permission
    * @throws QueryException query exception
@@ -517,62 +509,61 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Casts and checks the function item for its arity.
+   * Evaluates an expression to a function item.
    * @param expr expression
-   * @param nargs number of arguments (arity)
+   * @param arity required number of arguments (arity)
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem toFunction(final Expr expr, final int nargs, final QueryContext qc)
+  protected final FItem toFunction(final Expr expr, final int arity, final QueryContext qc)
       throws QueryException {
-    return toFunction(expr, nargs, false, qc);
+    return toFunction(expr, arity, false, qc);
   }
 
   /**
-   * Casts and checks the function item for its arity.
+   * Evaluates an expression to a function item.
    * @param expr expression
-   * @param nargs number of arguments (arity)
+   * @param arity number of arguments (arity)
    * @param qc query context
    * @param updating updating flag
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem toFunction(final Expr expr, final int nargs, final boolean updating,
+  protected final FItem toFunction(final Expr expr, final int arity, final boolean updating,
       final QueryContext qc) throws QueryException {
 
     final FItem func = checkUp(toFunction(expr, qc), updating, sc);
-    final int fargs = func.arity();
-    if(fargs == nargs) return func;
-    throw FUNARITY_X_X.get(info, arguments(fargs), nargs);
+    final int farity = func.arity();
+    if(farity == arity) return func;
+    throw FUNARITY_X_X.get(info, arguments(farity), arity);
   }
 
   /**
-   * Checks if the specified expression is a valid name.
+   * Evaluates an expression to a name.
    * @param i index of argument
-   * @param empty allow empty string
-   * @param err error to raise
+   * @param empty allow empty name
+   * @param error error to raise
    * @param qc query context
    * @return name
    * @throws QueryException query exception
    */
-  protected final String toName(final int i, final boolean empty, final QueryError err,
+  protected final String toName(final int i, final boolean empty, final QueryError error,
       final QueryContext qc) throws QueryException {
     final String name = toString(exprs[i], qc);
     if(empty && name.length() == 0 || Databases.validName(name)) return name;
-    throw err.get(info, name);
+    throw error.get(info, name);
   }
 
   /**
-   * Converts the specified dateTime to milliseconds.
+   * Evaluates an expression to a number of milliseconds.
    * @param expr expression
    * @param qc query context
-   * @return resulting value
+   * @return number of milliseconds
    * @throws QueryException query exception
    */
-  protected final long toMilliseconds(final Expr expr, final QueryContext qc)
-      throws QueryException {
-    final Dtm dtm = (Dtm) checkType(expr, qc, AtomType.DATE_TIME);
+  protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
+    final Dtm dtm = (Dtm) checkType(expr, AtomType.DATE_TIME, qc);
     if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }

@@ -20,7 +20,7 @@ public final class WsSend extends WsFn {
     final Item message = toItem(exprs[0], qc);
     final StringList ids = new StringList();
     final Iter iter = exprs[1].iter(qc);
-    for(Item it; (it = qc.next(iter)) != null;) ids.add(toToken(it));
+    for(Item it; (it = qc.next(iter)) != null;) ids.add(toString(it));
     WsPool.send(message, ids.finish());
     return Empty.VALUE;
   }

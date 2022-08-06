@@ -26,7 +26,7 @@ public final class FnFormatNumber extends StandardFunc {
     else if(!item.type.isNumberOrUntyped()) throw numberError(this, item);
 
     // retrieve picture
-    final byte[] pic = toToken(exprs[1], qc);
+    final byte[] picture = toToken(exprs[1], qc);
     // retrieve format declaration
     QNm form = QNm.EMPTY;
     if(exprs.length == 3) {
@@ -43,6 +43,6 @@ public final class FnFormatNumber extends StandardFunc {
     final DecFormatter df = sc.decFormat(form.id());
     if(df == null) throw FORMNUM_X.get(info, form.prefixId(XML));
 
-    return Str.get(df.format((ANum) item, pic, info));
+    return Str.get(df.format((ANum) item, picture, info));
   }
 }

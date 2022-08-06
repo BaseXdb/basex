@@ -42,10 +42,10 @@ public final class DbDir extends DbList {
    */
   private Value resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final byte[] token = toToken(exprs[1], qc);
+    final String string = toString(exprs[1], qc);
 
-    String path = MetaData.normPath(string(token));
-    if(path == null) throw DB_PATH_X.get(info, token);
+    String path = MetaData.normPath(string);
+    if(path == null) throw DB_PATH_X.get(info, string);
     if(!path.isEmpty() && !Strings.endsWith(path, '/')) path += '/';
 
     final ValueBuilder vb = new ValueBuilder(qc);

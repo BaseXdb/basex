@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.util.*;
 
 /**
  * WebSocket function.
@@ -33,8 +32,8 @@ abstract class WsFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final WebSocket client(final QueryContext qc) throws QueryException {
-    final byte[] id = toToken(exprs[0], qc);
-    final WebSocket ws = WsPool.get(Token.string(id));
+    final String id = toString(exprs[0], qc);
+    final WebSocket ws = WsPool.get(id);
     if(ws == null) throw WS_NOTFOUND_X.get(null, id);
     return ws;
   }

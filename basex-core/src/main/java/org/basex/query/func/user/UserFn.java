@@ -14,7 +14,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.server.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -41,7 +40,7 @@ abstract class UserFn extends StandardFunc {
     if(exprs.length > i) {
       final Iter iter = exprs[i].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
-        final String pattern = Token.string(toToken(item));
+        final String pattern = toString(item);
         if(!pattern.isEmpty() && !Databases.validPattern(pattern))
           throw USER_PATTERN_X.get(info, pattern);
         patterns.add(pattern);
@@ -53,7 +52,7 @@ abstract class UserFn extends StandardFunc {
   }
 
   /**
-   * Checks if the specified expression is a valid username.
+   * Evaluates an expression to a username.
    * @param i index of argument
    * @param qc query context
    * @return username
@@ -92,7 +91,7 @@ abstract class UserFn extends StandardFunc {
     if(exprs.length > i) {
       final Iter iter = exprs[i].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
-        final String perm = Token.string(toToken(item));
+        final String perm = toString(item);
         final Perm p = Perm.get(perm);
         if(p == null) throw USER_PERMISSION_X.get(info, perm);
         perms.add(p);

@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class FnLocalNameFromQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final QNm qname = toQNm(exprs[0], qc, true);
+    final QNm qname = toQNm(exprs[0], true, qc);
     return qname == null ? Empty.VALUE : AtomType.NCNAME.cast(Str.get(qname.local()), qc, sc, info);
   }
 

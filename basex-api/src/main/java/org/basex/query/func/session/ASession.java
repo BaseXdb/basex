@@ -7,7 +7,6 @@ import javax.servlet.http.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -68,8 +67,8 @@ public final class ASession {
    * @param key key to be requested
    * @return session attribute or {@code null}
    */
-  public Object get(final byte[] key) {
-    return session.getAttribute(Token.string(key));
+  public Object get(final String key) {
+    return session.getAttribute(key);
   }
 
   /**
@@ -77,16 +76,16 @@ public final class ASession {
    * @param name name of the attribute
    * @param value value to be stored
    */
-  public void set(final byte[] name, final Value value) {
-    session.setAttribute(Token.string(name), value);
+  public void set(final String name, final Value value) {
+    session.setAttribute(name, value);
   }
 
   /**
    * Removes a session attribute.
    * @param key key of the attribute
    */
-  public void delete(final byte[] key) {
-    session.removeAttribute(Token.string(key));
+  public void delete(final String key) {
+    session.removeAttribute(key);
   }
 
   /**

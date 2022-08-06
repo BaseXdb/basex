@@ -21,7 +21,7 @@ public final class DbAdd extends DbNew {
     final Data data = toData(qc);
     String path = "";
     if(exprs.length > 2) {
-      final byte[] token = toTokenOrNull(exprs[2], qc);
+      final String token = toStringOrNull(exprs[2], qc);
       if(token != null) path = toDbPath(token);
     }
     final NewInput input = toNewInput(toNodeOrAtomItem(1, qc), path);

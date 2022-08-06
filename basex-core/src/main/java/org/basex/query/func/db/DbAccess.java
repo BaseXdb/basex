@@ -22,34 +22,32 @@ import org.basex.query.value.type.*;
  */
 abstract class DbAccess extends StandardFunc {
   /**
-   * Returns the specified expression as normalized database path.
-   * Throws an exception if the path is invalid.
+   * Evaluates an expression to a normalized database path.
    * @param i index of argument
    * @param qc query context
    * @return normalized path
    * @throws QueryException query exception
    */
   final String toDbPath(final int i, final QueryContext qc) throws QueryException {
-    return toDbPath(toToken(exprs[i], qc));
+    return toDbPath(toString(exprs[i], qc));
   }
 
   /**
-   * Converts the specified path to a normalized database path.
-   * Throws an exception if the path is invalid.
+   * Converts a path to a normalized database path.
    * @param path input path
    * @return normalized path
    * @throws QueryException query exception
    */
-  final String toDbPath(final byte[] path) throws QueryException {
-    final String norm = MetaData.normPath(string(path));
+  final String toDbPath(final String path) throws QueryException {
+    final String norm = MetaData.normPath(path);
     if(norm == null) throw RESINV_X.get(info, path);
     return norm;
   }
 
   /**
-   * Checks if the specified expression is a valid database name.
+   * Evaluates an expression to a database name.
    * @param i index of argument
-   * @param empty allow empty string
+   * @param empty allow empty name
    * @param qc query context
    * @return database name (empty string for general data)
    * @throws QueryException query exception

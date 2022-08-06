@@ -24,10 +24,10 @@ public abstract class StoreFn extends StandardFunc {
   }
 
   /**
-   * Checks if the specified expression is a valid store name.
+   * Evaluates an expression to a store name.
    * @param i expression index
    * @param qc query context
-   * @return name
+   * @return store name
    * @throws QueryException query exception
    */
   final String toName(final int i, final QueryContext qc) throws QueryException {

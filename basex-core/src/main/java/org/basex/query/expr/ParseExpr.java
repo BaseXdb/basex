@@ -228,8 +228,8 @@ public abstract class ParseExpr extends Expr {
   // CONVERSIONS ==================================================================================
 
   /**
-   * Checks if the specified expression yields a string.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a token.
+   * @param expr expression
    * @param qc query context
    * @return token
    * @throws QueryException query exception
@@ -241,8 +241,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a string or an empty sequence.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a token.
+   * @param expr expression
    * @param qc query context
    * @return token (zero-length if result is an empty sequence)
    * @throws QueryException query exception
@@ -253,10 +253,10 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a string or an empty sequence.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a token.
+   * @param expr expression
    * @param qc query context
-   * @return token, or {@code null} if result is an empty sequence
+   * @return token, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
   protected final byte[] toTokenOrNull(final Expr expr, final QueryContext qc)
@@ -266,8 +266,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified non-empty item is a string.
-   * @param item item to be checked
+   * Converts an item to a token.
+   * @param item item to be converted
    * @return token
    * @throws QueryException query exception
    */
@@ -279,8 +279,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a string.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a string.
+   * @param expr expression
    * @param qc query context
    * @return string
    * @throws QueryException query exception
@@ -290,8 +290,31 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a boolean.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a string.
+   * @param item item to be converted
+   * @return string
+   * @throws QueryException query exception
+   */
+  protected final String toString(final Item item) throws QueryException {
+    return Token.string(toToken(item));
+  }
+
+  /**
+   * Evaluates an expression to a string.
+   * @param expr expression
+   * @param qc query context
+   * @return string, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final String toStringOrNull(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item != Empty.VALUE ? toString(item) : null;
+  }
+
+  /**
+   * Evaluates an expression to a boolean.
+   * @param expr expression
    * @param qc query context
    * @return boolean
    * @throws QueryException query exception
@@ -301,8 +324,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a boolean.
-   * @param item item be checked
+   * Converts an item to a boolean.
+   * @param item item to be converted
    * @return boolean
    * @throws QueryException query exception
    */
@@ -314,8 +337,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a double.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a double number.
+   * @param expr expression
    * @param qc query context
    * @return double
    * @throws QueryException query exception
@@ -325,7 +348,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a double.
+   * Converts an item to a double number.
    * @param item item
    * @return double
    * @throws QueryException query exception
@@ -336,10 +359,10 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a number or {@code null}.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a number.
+   * @param expr expression
    * @param qc query context
-   * @return double or {@code null}
+   * @return number, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
   protected final ANum toNumberOrNull(final Expr expr, final QueryContext qc)
@@ -349,8 +372,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified, non-empty item is a double.
-   * @param item item to be checked
+   * Converts an item to a number.
+   * @param item item to be converted
    * @return number
    * @throws QueryException query exception
    */
@@ -361,8 +384,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a float.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a float number.
+   * @param expr expression
    * @param qc query context
    * @return float
    * @throws QueryException query exception
@@ -374,8 +397,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields an integer.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a long number.
+   * @param expr expression
    * @param qc query context
    * @return integer value
    * @throws QueryException query exception
@@ -385,8 +408,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is an integer.
-   * @param item item to be checked
+   * Converts an item to an integer number.
+   * @param item item to be converted
    * @return number
    * @throws QueryException query exception
    */
@@ -397,8 +420,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a node.
-   * @param expr expression to be evaluated
+   * Converts an item to a node.
+   * @param expr expression
    * @param qc query context
    * @return node
    * @throws QueryException query exception
@@ -408,10 +431,10 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a node or {@code null}.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a node.
+   * @param expr expression
    * @param qc query context
-   * @return node or {@code null}
+   * @return node, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
   protected final ANode toNodeOrNull(final Expr expr, final QueryContext qc) throws QueryException {
@@ -420,8 +443,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified non-empty item is a node.
-   * @param item item to be checked
+   * Converts an item to a node.
+   * @param item item to be converted
    * @return node
    * @throws QueryException query exception
    */
@@ -431,8 +454,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the evaluated expression yields a non-empty item.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to an item.
+   * @param expr expression
    * @param qc query context
    * @return item
    * @throws QueryException query exception
@@ -442,8 +465,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a non-empty item.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to an item of the given type.
+   * @param expr expression
    * @param qc query context
    * @param type expected type
    * @return item
@@ -455,8 +478,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the evaluated expression yields a non-empty item.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to an atomized item of the given type.
+   * @param expr expression
    * @param qc query context
    * @return atomized item
    * @throws QueryException query exception
@@ -466,8 +489,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields an element.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to an element.
+   * @param expr expression
    * @param qc query context
    * @return element
    * @throws QueryException query exception
@@ -477,8 +500,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a binary item.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a binary item.
+   * @param expr expression
    * @param qc query context
    * @return binary item
    * @throws QueryException query exception
@@ -488,8 +511,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a binary item.
-   * @param item item to be checked
+   * Converts an item to a binary item.
+   * @param item item to be converted
    * @return binary item
    * @throws QueryException query exception
    */
@@ -499,8 +522,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a string or binary item.
-   * @param expr expression to be evaluated
+   * Evaluates an expression (token, binary item) to a byte array.
+   * @param expr expression
    * @param qc query context
    * @return byte array
    * @throws QueryException query exception
@@ -510,9 +533,9 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a Base64 item.
+   * Evaluates an expression to a Base64 item.
    * @param empty allow empty result
-   * @param expr expression to be evaluated
+   * @param expr expression
    * @param qc query context
    * @return Base64 item
    * @throws QueryException query exception
@@ -523,11 +546,10 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a Base64 item.
-   * @param empty allow empty result
+   * Converts an item to a base64 item.
+   * @param empty return {@code null} if the given item is empty
    * @param item item
-   * @return Base64 item, or {@code null} if the argument is an empty sequence and if
-   *   {@code empty} is true
+   * @return Base64 item or {@code null}
    * @throws QueryException query exception
    */
   protected final B64 toB64(final Item item, final boolean empty) throws QueryException {
@@ -536,8 +558,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a string or binary item.
-   * @param item item to be checked
+   * Converts an item (token, binary item) to a byte array.
+   * @param item item to be converted
    * @return byte array
    * @throws QueryException query exception
    */
@@ -548,23 +570,23 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a QName.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a QName.
+   * @param expr expression
+   * @param empty return {@code null} if the given item is empty
    * @param qc query context
-   * @param empty allow empty result
-   * @return QName
+   * @return QName or {@code null}
    * @throws QueryException query exception
    */
-  protected final QNm toQNm(final Expr expr, final QueryContext qc, final boolean empty)
+  protected final QNm toQNm(final Expr expr, final boolean empty, final QueryContext qc)
       throws QueryException {
     return toQNm(expr.atomItem(qc, info), empty);
   }
 
   /**
-   * Checks if the specified item is a QName.
+   * Converts an item to a QName.
    * @param item item
-   * @param empty allow empty result
-   * @return QName, or {@code null} if the item is {@code null} and {@code empty} is true
+   * @param empty return {@code null} if the given item is empty
+   * @return QName or {@code null}
    * @throws QueryException query exception
    */
   protected final QNm toQNm(final Item item, final boolean empty) throws QueryException {
@@ -576,8 +598,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a function.
-   * @param expr expression to be evaluated
+   * Evaluates an expression to a function item.
+   * @param expr expression
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
@@ -587,7 +609,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a map.
+   * Evaluates an expression to a map.
    * @param expr expression
    * @param qc query context
    * @return map
@@ -598,10 +620,10 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a map.
+   * Converts an item to a map.
    * @param item item to check
    * @return map
-   * @throws QueryException if the item is not a map
+   * @throws QueryException query exception
    */
   protected final XQMap toMap(final Item item) throws QueryException {
     if(item instanceof XQMap) return (XQMap) item;
@@ -609,7 +631,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields an array.
+   * Evaluates an expression to an array.
    * @param expr expression
    * @param qc query context
    * @return array
@@ -620,7 +642,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Assures that the specified item is an array.
+   * Converts an item to an array.
    * @param item item to check
    * @return the array
    * @throws QueryException if the item is not an array
@@ -631,24 +653,23 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields an item of the specified atomic type.
-   * @param expr expression to be evaluated
+   * Evaluates an expression and returns an item if it has the specified type.
+   * @param expr expression
+   * @param type expected type
    * @param qc query context
-   * @param type type to be checked
    * @return item
    * @throws QueryException query exception
    */
-  protected final Item checkType(final Expr expr, final QueryContext qc, final AtomType type)
+  protected final Item checkType(final Expr expr, final AtomType type, final QueryContext qc)
       throws QueryException {
     return checkType(expr.atomItem(qc, info), type);
   }
 
   /**
-   * Checks if the specified expression is an empty sequence; if yes, throws
-   * an exception.
-   * @param item item to be checked
-   * @param type type to be checked
-   * @return specified item
+   * Returns an item if it has the specified type.
+   * @param item item
+   * @param type expected type
+   * @return item
    * @throws QueryException query exception
    */
   protected final Item checkType(final Item item, final Type type) throws QueryException {
@@ -657,8 +678,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is no empty sequence.
-   * @param item item to be checked
+   * Returns an item if it is not empty.
+   * @param item item
    * @return specified item
    * @throws QueryException query exception
    */
@@ -668,8 +689,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is no empty sequence.
-   * @param item item to be checked
+   * Returns an item if it is not empty.
+   * @param item item
    * @param type expected type
    * @return specified item
    * @throws QueryException query exception

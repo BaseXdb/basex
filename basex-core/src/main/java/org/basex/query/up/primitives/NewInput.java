@@ -11,11 +11,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NewInput {
-  /** Target path. */
+  /** Database path. */
   public String path;
-  /** Node to be added (can be {@code null}). */
+  /** Node to be added ({@code null} if input reference exists). */
   public ANode node;
-  /** Input reference (can be {@code null}). */
+  /** Input to be added ({@code null} if node exists). */
   public IO io;
 
   @Override

@@ -76,7 +76,7 @@ public class DbList extends StandardFunc {
    */
   private Iter resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final String path = string(exprs.length == 1 ? EMPTY : toToken(exprs[1], qc));
+    final String path = exprs.length == 1 ? "" : toString(exprs[1], qc);
 
     final IntList docs = data.resources.docs(path);
     final StringList binaries = data.resources.paths(path, ResourceType.BINARY);

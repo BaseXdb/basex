@@ -16,7 +16,7 @@ public final class SessionsGet extends SessionsFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ASession session = session(qc);
-    final byte[] name = toToken(exprs[1], qc);
+    final String name = toString(exprs[1], qc);
     final Value dflt = exprs.length == 2 ? Empty.VALUE : exprs[2].value(qc);
 
     final Object object = session.get(name);

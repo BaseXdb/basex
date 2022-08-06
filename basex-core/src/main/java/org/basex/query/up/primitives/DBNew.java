@@ -44,19 +44,19 @@ public final class DBNew {
    * @param qc query context
    * @param opts main options
    * @param info input info
-   * @param list list of inputs
+   * @param inputs list of inputs
    */
   public DBNew(final QueryContext qc, final MainOptions opts, final InputInfo info,
-      final NewInput... list) {
+      final NewInput... inputs) {
 
     this.qc = qc;
     this.info = info;
 
-    final int ll = list.length;
-    inputs = new ArrayList<>(ll);
-    options = new ArrayList<>(ll);
-    for(final NewInput input : list) {
-      inputs.add(input);
+    final int il = inputs.length;
+    this.inputs = new ArrayList<>(il);
+    options = new ArrayList<>(il);
+    for(final NewInput input : inputs) {
+      this.inputs.add(input);
       options.add(opts);
     }
   }
@@ -139,12 +139,12 @@ public final class DBNew {
    */
   private boolean cache(final boolean create) {
     for(final MainOptions dbopts : options) {
-      Boolean v = dbopts.get(MainOptions.ADDCACHE);
-      if(v != null && v) return true;
+      Boolean b = dbopts.get(MainOptions.ADDCACHE);
+      if(b != null && b) return true;
       if(create) {
         if(dbopts.get(MainOptions.PARSER) == MainParser.RAW) return true;
-        v = dbopts.get(MainOptions.ADDRAW);
-        if(v != null && v) return true;
+        b = dbopts.get(MainOptions.ADDRAW);
+        if(b != null && b) return true;
       }
     }
     return false;

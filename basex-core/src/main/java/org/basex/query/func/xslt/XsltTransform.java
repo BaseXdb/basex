@@ -114,7 +114,7 @@ public class XsltTransform extends XsltFn {
   }
 
   /**
-   * Returns an input reference (possibly cached) to the specified input.
+   * Evaluates an expression (node, URI string) to a input reference.
    * @param i index of argument
    * @param qc query context
    * @return item
@@ -131,7 +131,7 @@ public class XsltTransform extends XsltFn {
         throw ex.getCause(info);
       }
     }
-    if(item.type.isStringOrUntyped()) return toIO(toToken(item));
+    if(item.type.isStringOrUntyped()) return toIO(toString(item));
     throw STRNOD_X_X.get(info, item.type, item);
   }
 }
