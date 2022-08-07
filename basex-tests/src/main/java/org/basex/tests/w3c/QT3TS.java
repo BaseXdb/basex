@@ -5,7 +5,6 @@ import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.*;
@@ -114,7 +113,6 @@ public final class QT3TS extends Main {
     final IOFile sandbox = new IOFile(TEMPDIR, "tests");
     ctx.soptions.set(StaticOptions.DBPATH, sandbox + "/data");
     parseArgs();
-    init();
 
     final Performance perf = new Performance();
 
@@ -950,42 +948,6 @@ public final class QT3TS extends Main {
         single = arg.string();
         maxout = Integer.MAX_VALUE;
       }
-    }
-  }
-
-  /**
-   * Adds an environment variable required for function tests. Reference:
-   *http://stackoverflow.com/questions/318239/how-do-i-set-environment-variables-from-java
-   */
-  @SuppressWarnings("unchecked")
-  private static void init() {
-    final Map<String, String> ne = new HashMap<>();
-    ne.put("QTTEST", "42");
-    ne.put("QTTEST2", "other");
-    ne.put("QTTESTEMPTY", "");
-    try {
-      final Class<?> pe = Class.forName("java.lang.ProcessEnvironment");
-      final Field f = pe.getDeclaredField("theEnvironment");
-      f.setAccessible(true);
-      ((Map<String, String>) f.get(null)).putAll(ne);
-      final Field f2 = pe.getDeclaredField("theCaseInsensitiveEnvironment");
-      f2.setAccessible(true);
-      ((Map<String, String>) f2.get(null)).putAll(ne);
-    } catch(final NoSuchFieldException ex) {
-      Util.debug(ex);
-      try {
-        for(final Class<?> cl : Collections.class.getDeclaredClasses()) {
-          if("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
-            final Field f = cl.getDeclaredField("m");
-            f.setAccessible(true);
-            ((Map<String, String>) f.get(System.getenv())).putAll(ne);
-          }
-        }
-      } catch(final Exception ex2) {
-        Util.errln("Test environment variable could not be set:" + ex2);
-      }
-    } catch(final Exception ex1) {
-      Util.errln("Test environment variable could not be set: " + ex1);
     }
   }
 
