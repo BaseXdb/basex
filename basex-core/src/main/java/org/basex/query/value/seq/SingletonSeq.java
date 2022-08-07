@@ -144,7 +144,7 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.function(_UTIL_REPLICATE, value, size / value.size());
+    qs.function(REPLICATE, value, size / value.size());
   }
 
   /**

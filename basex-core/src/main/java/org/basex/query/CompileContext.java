@@ -384,7 +384,7 @@ public final class CompileContext {
       throws QueryException {
     final ExprList args = new ExprList().add(expr).add(count);
     if(expr.has(Flag.NDT, Flag.CNS)) args.add(Bln.TRUE);
-    return function(Function._UTIL_REPLICATE, ii, args.finish());
+    return function(Function.REPLICATE, ii, args.finish());
   }
 
   /**

@@ -47,7 +47,7 @@ public final class GFLWORTest extends QueryPlanTest {
         empty(Let.class),
         empty(For.class),
         root(IterMap.class),
-        exists(_UTIL_REPLICATE)
+        exists(REPLICATE)
     );
   }
 
@@ -99,7 +99,7 @@ public final class GFLWORTest extends QueryPlanTest {
         empty(Let.class),
         empty(For.class),
         root(IterMap.class),
-        exists(_UTIL_REPLICATE)
+        exists(REPLICATE)
     );
 
     check("let $x := <x/> " +
@@ -110,7 +110,7 @@ public final class GFLWORTest extends QueryPlanTest {
         empty(Let.class),
         empty(For.class),
         root(IterMap.class),
-        exists(_UTIL_REPLICATE)
+        exists(REPLICATE)
     );
   }
 
@@ -216,12 +216,12 @@ public final class GFLWORTest extends QueryPlanTest {
     check("for $r in 1 to 2 return (3, 4)[. = 5]",
         "",
         empty(For.class),
-        exists(_UTIL_REPLICATE)
+        exists(REPLICATE)
     );
     check("let $n := for $r in 1 to 2 return <_>3</_> return $n[1] is $n[2]",
         false,
         empty(For.class),
-        exists(_UTIL_REPLICATE)
+        exists(REPLICATE)
     );
     check("for $r in 1 to 2 return 3[. = 4]",
         "",
@@ -325,7 +325,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
     check("for $i in 1 to 3 let $x := $i * $i return error()",
         null,
-        root(_UTIL_REPLICATE)
+        root(REPLICATE)
     );
   }
 
@@ -363,7 +363,7 @@ public final class GFLWORTest extends QueryPlanTest {
         null,
         empty(Let.class),
         root(IterMap.class),
-        exists(_UTIL_REPLICATE)
+        exists(REPLICATE)
     );
   }
 

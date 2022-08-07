@@ -211,11 +211,11 @@ public class FnSubsequence extends StandardFunc {
         return cc.function(TAIL, info, expr);
       if(_FILE_READ_TEXT_LINES.is(expr))
         return FileReadTextLines.opt(this, sr.start, sr.length, cc);
-      if(_UTIL_REPLICATE.is(expr)) {
+      if(REPLICATE.is(expr)) {
         final Expr[] args = expr.args();
         if(args[0].size() == 1 && args[1] instanceof Int) {
           args[1] = Int.get(sr.length);
-          return cc.function(_UTIL_REPLICATE, info, args);
+          return cc.function(REPLICATE, info, args);
         }
       }
       if(expr instanceof List) {

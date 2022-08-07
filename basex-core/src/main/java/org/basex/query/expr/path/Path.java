@@ -16,6 +16,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
@@ -880,9 +881,9 @@ public abstract class Path extends ParseExpr {
           if(st != filter.root) return Filter.get(cc, filter.info(), st, filter.exprs);
         }
       }
-      // util:replicate(a, 2)/b  ->  a/b
+      // replicate(a, 2)/b  ->  a/b
       if(step.seqType().type instanceof NodeType) {
-        if(_UTIL_REPLICATE.is(step) && ((UtilReplicate) step).singleEval(false)) return step.arg(0);
+        if(REPLICATE.is(step) && ((FnReplicate) step).singleEval(false)) return step.arg(0);
         if(step instanceof SingletonSeq) return ((SingletonSeq) step).itemAt(0);
       }
       return step;

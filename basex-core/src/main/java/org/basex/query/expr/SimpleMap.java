@@ -12,7 +12,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.func.util.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -156,24 +155,24 @@ public abstract class SimpleMap extends Arr {
             expr.arg(1).seqType().instanceOf(SeqType.INTEGER_O)) {
           count = expr.arg(1);
         }
-        // (1 to 2) ! <x/>  ->  util:replicate(<x/>, 2, true())
-        // (1 to $c) ! 'A'  ->  util:replicate('A', $c, false())
+        // (1 to 2) ! <x/>  ->  replicate(<x/>, 2, true())
+        // (1 to $c) ! 'A'  ->  replicate('A', $c, false())
         if(count != null) return cc.replicate(next, count, info);
       }
 
       if(next instanceof StandardFunc && !next.has(Flag.NDT)) {
         // next operand relies on context and is a deterministic function call
         final Expr[] args = next.args();
-        if(_UTIL_REPLICATE.is(next) && ((UtilReplicate) next).singleEval(true) &&
+        if(REPLICATE.is(next) && ((FnReplicate) next).singleEval(true) &&
             args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
-          if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval(true)) {
-            // util:replicate(E, C) ! util:replicate(., D)  ->  util:replicate(E, C * D)
+          if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(true)) {
+            // replicate(E, C) ! replicate(., D)  ->  replicate(E, C * D)
             final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
-            return cc.function(_UTIL_REPLICATE, info, expr.arg(0), cnt);
+            return cc.function(REPLICATE, info, expr.arg(0), cnt);
           }
           if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
-            // SINGLETONSEQ ! util:replicate(., C)  ->  util:replicate(SINGLETONSEQ, C)
-            return cc.function(_UTIL_REPLICATE, info, expr, args[1]);
+            // SINGLETONSEQ ! replicate(., C)  ->  replicate(SINGLETONSEQ, C)
+            return cc.function(REPLICATE, info, expr, args[1]);
           }
         } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
             args[1] instanceof ContextValue) {
@@ -214,7 +213,7 @@ public abstract class SimpleMap extends Arr {
 
       // try to merge deterministic expressions
       Expr input = expr;
-      if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval(true)) {
+      if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(true)) {
         input = expr.arg(0);
       } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
         input = ((SingletonSeq) expr).itemAt(0);
@@ -242,7 +241,7 @@ public abstract class SimpleMap extends Arr {
             // replace original expression with error
             ex = cc.error(qe, next);
           }
-          // util:replicate(1, 2) ! (. = 1)  ->  util:replicate(1 = 1, 2)
+          // replicate(1, 2) ! (. = 1)  ->  replicate(1 = 1, 2)
           return expr == input ? ex : cc.replicate(ex, Int.get(size), info);
         }
       }

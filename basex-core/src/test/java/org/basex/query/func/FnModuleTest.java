@@ -125,11 +125,11 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1 to 3) ! 1"), 1, empty(func));
     check(func.args(" (1 to 3) ! xs:untypedAtomic(1)"), 1, empty(func));
 
-    check(func.args(_UTIL_REPLICATE.args(1.0, 3)), 1, empty(func));
-    check(func.args(_UTIL_REPLICATE.args(wrap(1), 3)), 1, type(func, "xs:double"));
+    check(func.args(REPLICATE.args(1.0, 3)), 1, empty(func));
+    check(func.args(REPLICATE.args(wrap(1), 3)), 1, type(func, "xs:double"));
 
     error(func.args(" true#0"), FIATOM_X_X);
-    error(func.args(_UTIL_REPLICATE.args(" true#0", 2)), FIATOM_X_X);
+    error(func.args(REPLICATE.args(" true#0", 2)), FIATOM_X_X);
     error(func.args(" (1 to 999999) ! true#0"), FIATOM_X_X);
   }
 
@@ -201,7 +201,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1, <_/>, 1)"), "1\n", count(Int.class, 1));
     check(func.args(" (1, 1)[. = 1]"), 1, root(Int.class));
     check(func.args(" (" + wrap(1) + "," + wrap(1) + ")[. = 1]"), 1,
-        empty(List.class), empty(_UTIL_REPLICATE));
+        empty(List.class), empty(REPLICATE));
     // remove reverse function call
     check(func.args(" reverse((<a>A</a>, <b>A</b>))"), "A", empty(REVERSE));
     check(func.args(" reverse((<a>A</a>, <b>A</b>)[data()])"), "A", empty(REVERSE));
@@ -448,14 +448,14 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(_UTIL_RANGE.args(" (<a/>, <b/>, <c/>, <d/>)", 2, 3)), "<b/>",
         root(CElem.class));
 
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
-        root(IterFilter.class), empty(_UTIL_REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
+        root(IterFilter.class), empty(REPLICATE));
 
-    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<a/>",
-        root(HEAD), empty(_UTIL_REPLICATE));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>",
-        exists(_UTIL_REPLICATE));
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<a/>",
+        root(HEAD), empty(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>",
+        exists(REPLICATE));
 
     check(func.args(" (1, <a/>)"), 1, root(Int.class));
     check(func.args(" (1 to 2, <a/>)"), 1, root(Int.class));
@@ -836,9 +836,9 @@ public final class FnModuleTest extends QueryPlanTest {
         1, exists(_UTIL_INIT));
     check(func.args(" (" + func.args(" (1 to 2)[. > 0]") + ")[position() < last()]"),
         2, exists(TAIL));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)),
+    check(func.args(REPLICATE.args(" <a/>", 2)),
         "<a/>\n<a/>", empty(func));
-    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)", 2)),
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)", 2)),
         null, exists(func));
     check(func.args(" (1, <a/>[. = ''])"),
         "<a/>\n1", root(List.class));
@@ -900,9 +900,9 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func));
     check(func.args(" reverse((1 to 100000000) ! 1)") + "[1]", 1, empty(func));
 
-    check("(" + _RANDOM_DOUBLE.args() + " =>" + _UTIL_REPLICATE.args(10) + " => " +
+    check("(" + _RANDOM_DOUBLE.args() + " =>" + REPLICATE.args(10) + " => " +
         func.args() + ")[. > 1]", "", empty(func));
-    check("(" + _RANDOM_DOUBLE.args() + " => " + _UTIL_REPLICATE.args(10, true) + " => " +
+    check("(" + _RANDOM_DOUBLE.args() + " => " + REPLICATE.args(10, true) + " => " +
         func.args() + ")[. > 1]", "", exists(func));
 
     error(func.args(" true#0"), FIATOM_X_X);
@@ -1076,10 +1076,10 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2, 2), "<b/>\n<c/>",
         root(List.class));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 5), 2, 2), "<a/>\n<a/>",
-        root(_UTIL_REPLICATE));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 5), 2, 3), "<a/>\n<a/>\n<a/>",
-        root(_UTIL_REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 5), 2, 2), "<a/>\n<a/>",
+        root(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 5), 2, 3), "<a/>\n<a/>\n<a/>",
+        root(REPLICATE));
 
     query("sort(" + func.args(" tokenize(<_/>)", 3) + ')', "");
   }
@@ -1235,9 +1235,9 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(_UTIL_RANGE.args(" tokenize(<_>W X Y Z</_>)", 3, 4)), "Z");
     query(func.args(_UTIL_RANGE.args(" tokenize(<_/>)," + wrap(1), 1)), "");
 
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 3)), "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>", root(IterFilter.class));
+    check(func.args(REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>", 3)), "<a/>\n<a/>", root(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>[. = '']", 2)), "<a/>", root(IterFilter.class));
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class), empty(TAIL));
     check(func.args(" (<a/>, <b/>, <c/>)"), "<b/>\n<c/>", root(List.class), empty(TAIL));

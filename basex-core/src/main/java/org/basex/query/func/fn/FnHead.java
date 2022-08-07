@@ -47,7 +47,7 @@ public final class FnHead extends StandardFunc {
     }
     if(REVERSE.is(expr))
       return cc.function(_UTIL_LAST, info, expr.args());
-    if(_UTIL_REPLICATE.is(expr)) {
+    if(REPLICATE.is(expr)) {
       // static integer will always be greater than 1
       if(expr.arg(1) instanceof Int) return cc.function(HEAD, info, expr.arg(0));
     }

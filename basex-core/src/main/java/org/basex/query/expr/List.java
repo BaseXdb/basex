@@ -123,7 +123,7 @@ public final class List extends Arr {
   }
 
   /**
-   * Tries to rewrite identical expressions to util:replicate.
+   * Tries to rewrite identical expressions to replicate.
    * @param cc compilation context
    * @throws QueryException query exception
    */

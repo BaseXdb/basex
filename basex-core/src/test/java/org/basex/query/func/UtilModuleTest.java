@@ -53,9 +53,9 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(""), "");
     query(func.args("abc"), "a\nb\nc");
 
-    query("count(" + func.args(" string-join(" + _UTIL_REPLICATE.args("A", 100000) + ')') + ')',
+    query("count(" + func.args(" string-join(" + REPLICATE.args("A", 100000) + ')') + ')',
         100000);
-    check("count(" + func.args(" string-join(" + _UTIL_REPLICATE.args("A", 100000) + ')') + ')',
+    check("count(" + func.args(" string-join(" + REPLICATE.args("A", 100000) + ')') + ')',
         100000, empty(func), empty(STRING_LENGTH));
 
     // test iterative evaluation
@@ -70,7 +70,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     query("subsequence(" + func.args(wrap("äeiöü")) + ", 3)", "i\nö\nü");
 
     check("count(" + func.args(" string-join(" +
-        _UTIL_REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));
+        REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));
     check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)",
         "A\nB", root(func));
   }
@@ -233,10 +233,10 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" <a/>"), "<a/>");
     query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
 
-    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)", 10)), "<a/>\n<b/>",
-        empty(_UTIL_REPLICATE));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2, true)), "<a/>\n<a/>",
-        exists(_UTIL_REPLICATE));
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)", 10)), "<a/>\n<b/>",
+        empty(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 2, true)), "<a/>\n<a/>",
+        exists(REPLICATE));
 
     check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
         "<a><b/></a>\n<b/>", empty(REVERSE));
@@ -366,9 +366,9 @@ public final class UtilModuleTest extends QueryPlanTest {
         "<a>1</a>\n<a>2</a>\n<a>3</a>\n<a>4</a>\n<a>5</a>\n<a>6</a>\n<a>7</a>\n<a>8</a>",
         root(DualMap.class));
 
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 3)), "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>", root(IterFilter.class));
+    check(func.args(REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>", 3)), "<a/>\n<a/>", root(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>[. = '']", 2)), "<a/>", root(IterFilter.class));
 
     check(func.args(" (<a/>, <b/>)"), "<a/>", root(CElem.class), empty(_UTIL_INIT));
     check(func.args(" (<a/>, <b/>, <c/>)"), "<a/>\n<b/>", root(List.class), empty(_UTIL_INIT));
@@ -462,9 +462,9 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" (<a/>, <b/>[data()], <c/>, <d/>)", 2), "<c/>", root(_UTIL_OR));
     check(func.args(" (<a/>[data()], <b/>, <c/>)", 2), "<c/>", root(_UTIL_ITEM));
 
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2), 1), "<a/>", root(CElem.class));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2), 2), "<a/>", root(CElem.class));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2), 3), "", empty());
+    check(func.args(REPLICATE.args(" <a/>", 2), 1), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>", 2), 2), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>", 2), 3), "", empty());
   }
 
   /** Test method. */
@@ -499,12 +499,12 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(_UTIL_INIT.args(" (1 to 3) ! <_>{.}</_>")), "<_>2</_>", empty(_UTIL_INIT));
     check(func.args(_UTIL_INIT.args(" tokenize(<a/>)")), "", exists(_UTIL_INIT));
 
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
-        root(IterFilter.class), empty(_UTIL_REPLICATE));
-    check(func.args(_UTIL_REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<b/>",
-        root(_UTIL_LAST), empty(_UTIL_REPLICATE));
-    check(func.args(_UTIL_REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>", exists(_UTIL_REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
+        root(IterFilter.class), empty(REPLICATE));
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<b/>",
+        root(_UTIL_LAST), empty(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>", exists(REPLICATE));
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));
     check(func.args(" (<a/>, 1 to 2)"), 2, root(Int.class));
@@ -597,46 +597,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (<a/>, <b/>)[name()]", 1, 9223372036854775807L), "<a/>\n<b/>");
   }
 
-  /** Test method. */
+  /** Test method: see {@link Fn4ModuleTest}. */
   @Test public void replicate() {
-    final Function func = _UTIL_REPLICATE;
-
-    query(func.args(" ()", 0), "");
-    query(func.args(" ()", 1), "");
-    query(func.args(1, 0), "");
-    query(func.args("A", 1), "A");
-    query(func.args("A", 2), "A\nA");
-    query(func.args(" (0, 'A')", 1), "0\nA");
-    query(func.args(" (0, 'A')", 2), "0\nA\n0\nA");
-    query(func.args(" 1 to 10000", 10000) + "[last()]", "10000");
-    query(func.args(" 1 to 10000", 10000) + "[1]", "1");
-    query(func.args(" 1 to 10000", 10000) + "[10000]", "10000");
-    query(func.args(" 1 to 10000", 10000) + "[10001]", "1");
-    query("count(" + func.args(" 1 to 1000000", 1000000) + ")", 1000000000000L);
-    query("count(" + func.args(func.args(" 1 to 3", 3), 3) + ")", 27);
-
-    query("for $i in 1 to 2 return " + func.args(1, " $i"), "1\n1\n1");
-    query(func.args(" <a/>", 2), "<a/>\n<a/>");
-    query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");
-
-    query(func.args(" 1[. = 1]", 2), "1\n1");
-
-    check(func.args(" <a/>", -1), "", empty());
-    check(func.args(" <a/>", 0), "", empty());
-    check(func.args(" ()", wrap(2)), "", empty());
-    check(func.args(" <a/>", 1), "<a/>", empty(func));
-    check(func.args(" <a/>", 2), "<a/>\n<a/>", type(func, "element(a)+"));
-    check(func.args(" <a/>", wrap(2)), "<a/>\n<a/>", type(func, "element(a)*"));
-
-    check(func.args(func.args(" <a/>", 2), 2),
-        "<a/>\n<a/>\n<a/>\n<a/>", count(_UTIL_REPLICATE, 1));
-    check(func.args(" <_/>", 2) + " ! " + func.args(" .", 2),
-        "<_/>\n<_/>\n<_/>\n<_/>", count(_UTIL_REPLICATE, 1));
-    check("(1, 1) ! " + func.args(" .", 2),
-        "1\n1\n1\n1", empty(_UTIL_REPLICATE));
-
-    check("(1, 1) ! " + func.args(" .", 2),
-        "1\n1\n1\n1", empty(_UTIL_REPLICATE));
   }
 
   /** Test method. */

@@ -45,7 +45,7 @@ public final class UtilLast extends StandardFunc {
       return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(size));
     if(REVERSE.is(expr))
       return cc.function(HEAD, info, expr.args());
-    if(_UTIL_REPLICATE.is(expr)) {
+    if(REPLICATE.is(expr)) {
       // static integer will always be greater than 1
       if(expr.arg(1) instanceof Int) return cc.function(_UTIL_LAST, info, expr.arg(0));
     }

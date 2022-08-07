@@ -103,12 +103,12 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Replicate results. */
   @Test public void replicate() {
     check("<x/> ! (2, 3)[. = 2]", "2", empty(CElem.class));
-    check("(1 to 2) ! ('a', 'a')[.]", "a\na\na\na", exists(_UTIL_REPLICATE));
-    check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(_UTIL_REPLICATE));
-    check("(1 to 2) ! ('a', '')[.]", "a\na", exists(_UTIL_REPLICATE));
-    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(_UTIL_REPLICATE));
+    check("(1 to 2) ! ('a', 'a')[.]", "a\na\na\na", exists(REPLICATE));
+    check("(1 to 2) ! (4, 5)[. = 4]", "4\n4", exists(REPLICATE));
+    check("(1 to 2) ! ('a', '')[.]", "a\na", exists(REPLICATE));
+    check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(REPLICATE));
 
-    check("(1 to 2) !" + _PROF_VOID.args(" ."), "", empty(_UTIL_REPLICATE));
+    check("(1 to 2) !" + _PROF_VOID.args(" ."), "", empty(REPLICATE));
 
     // replace first or both expressions with singleton sequence
     check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), root(SingletonSeq.class));
@@ -116,7 +116,7 @@ public final class SimpleMapTest extends QueryPlanTest {
 
     // combine identical values in singleton sequence
     check("(1 to 2) ! ('a', 'a')", "a\na\na\na", exists(SingletonSeq.class) + " and .//@size = 4");
-    check("(1 to 2) !" + _UTIL_REPLICATE.args("a", 2) + " !" + _UTIL_REPLICATE.args("a", 2),
+    check("(1 to 2) !" + REPLICATE.args("a", 2) + " !" + REPLICATE.args("a", 2),
         "a\na\na\na\na\na\na\na", exists(SingletonSeq.class) + " and .//@size = 8");
   }
 

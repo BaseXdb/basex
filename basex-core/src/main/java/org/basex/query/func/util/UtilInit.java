@@ -97,11 +97,11 @@ public final class UtilInit extends StandardFunc {
       if(r != null) return cc.function(SUBSEQUENCE, info, expr.arg(0),
           Int.get(r.start + 1), Int.get(r.length - 1));
     }
-    if(_UTIL_REPLICATE.is(expr)) {
+    if(REPLICATE.is(expr)) {
       final Expr[] args = expr.args();
       if(args[1] instanceof Int && args[0].seqType().zeroOrOne()) {
         args[1] = Int.get(((Int) args[1]).itr() - 1);
-        return cc.function(_UTIL_REPLICATE, info, args);
+        return cc.function(REPLICATE, info, args);
       }
     }
 

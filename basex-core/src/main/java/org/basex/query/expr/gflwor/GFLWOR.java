@@ -206,7 +206,7 @@ public final class GFLWOR extends ParseExpr {
       } else if(!varrefs.any(clauses) && !ndt.any(clauses)) {
         // no referenced variables in return clause
         //   let $_ := 1 return <x/>  ->  <x/>
-        //   for $_ in 1 to 2 return 3  ->  util:replicate(3, 2)
+        //   for $_ in 1 to 2 return 3  ->  replicate(3, 2)
         return min == 1 ? rtrn : cc.replicate(rtrn, Int.get(min), info);
       }
     }
@@ -309,7 +309,7 @@ public final class GFLWOR extends ParseExpr {
             fr.remove(cc, fr.pos);
           } else {
             // replace with singleton sequence (will never be accessed)
-            //   for $i in 1 to 3 return <a/>  ->  for $i in util:replicate('', 3) return $i
+            //   for $i in 1 to 3 return <a/>  ->  for $i in replicate('', 3) return $i
             fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.EMPTY, fs));
             fr.exprType.assign(AtomType.STRING);
           }

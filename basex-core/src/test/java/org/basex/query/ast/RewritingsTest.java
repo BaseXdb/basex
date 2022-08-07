@@ -1134,8 +1134,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $_ :=" + _PROF_VOID.args(1) + " return 1", 1, root(List.class), exists(_PROF_VOID));
 
     // rewrite to simple map
-    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
-    check("for $_ in 1 to 2 return" + _PROF_VOID.args(1), "", root(_UTIL_REPLICATE));
+    check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(REPLICATE));
+    check("for $_ in 1 to 2 return" + _PROF_VOID.args(1), "", root(REPLICATE));
   }
 
   /** Merge and/or expressions. */
@@ -1606,7 +1606,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Singleton sequences in predicates. */
   @Test public void gh1878() {
-    error("<a/>[" + _UTIL_REPLICATE.args(1, 2) + ']', ARGTYPE_X_X_X);
+    error("<a/>[" + REPLICATE.args(1, 2) + ']', ARGTYPE_X_X_X);
   }
 
   /** Lacking filter rewriting. */
@@ -1682,7 +1682,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
-    check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(_UTIL_REPLICATE));
+    check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(REPLICATE));
     check("(3 to 13) !" + _PROF_VOID.args(" ."), "", root(DualMap.class));
   }
 
@@ -1690,7 +1690,7 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1890() {
     check("for $i in (1 to 2)[. >= 0] return ($i + $i)", "2\n4", root(DualMap.class));
     check("for $a in (1 to 2)[. >= 0] for $b in (1 to 2) return ($a * 2)", "2\n2\n4\n4",
-        root(IterMap.class), exists(_UTIL_REPLICATE));
+        root(IterMap.class), exists(REPLICATE));
   }
 
   /** Inlining in update expression. */
@@ -1762,7 +1762,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Size of type check results. */
   @Test public void gh1902() {
     inline(true);
-    check("function() as xs:string+ {" + _UTIL_REPLICATE.args(" <x/>", 10000000000L) + " }() "
+    check("function() as xs:string+ {" + REPLICATE.args(" <x/>", 10000000000L) + " }() "
         + "=> count()",
       "10000000000", root(Int.class));
     check("function() as xs:double+ { 1 to 100000000000000 }() => count()",
@@ -1884,7 +1884,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("if(trace(<a/>)) then trace(<a/>) else 0", "<a/>", root(If.class));
 
     check("let $x := <x/> for $a in 1 to 2 for $b in $x return ($b, $b)[1]", "<x/>\n<x/>",
-        root(_UTIL_REPLICATE)
+        root(REPLICATE)
     );
   }
 
@@ -1924,10 +1924,10 @@ public final class RewritingsTest extends QueryPlanTest {
         "a", root(ItemMap.class));
   }
 
-  /** Rewrite list to util:replicate. */
+  /** Rewrite list to replicate. */
   @Test public void gh1918() {
     check("(1, 1)", "1\n1", root(SingletonSeq.class));
-    check("let $a := (<a/>, <a/>) return $a[1] is $a[2]", false, exists(_UTIL_REPLICATE));
+    check("let $a := (<a/>, <a/>) return $a[1] is $a[2]", false, exists(REPLICATE));
 
     // partial rewrites
     check("1, 1, <a/>", "1\n1\n<a/>", exists(SingletonSeq.class));
@@ -2052,12 +2052,12 @@ public final class RewritingsTest extends QueryPlanTest {
     error("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
   }
 
-  /** Rewrite expression range to util:replicate. */
+  /** Rewrite expression range to replicate. */
   @Test public void gh1934() {
     check("for $i in (1 to 2)[. >= 0] return (1 to $i) ! $i", "1\n2\n2",
-        root(IterMap.class), exists(_UTIL_REPLICATE));
+        root(IterMap.class), exists(REPLICATE));
     check("for $i in (1 to 2)[. >= 0] for $j in 1 to $i return $i", "1\n2\n2",
-        root(IterMap.class), exists(_UTIL_REPLICATE));
+        root(IterMap.class), exists(REPLICATE));
   }
 
   /** Iterative path traversal, positional access. */
@@ -2124,11 +2124,11 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Inline arguments of replicated items and singleton sequences. */
   @Test public void gh1963() {
-    check(_UTIL_REPLICATE.args("x", 2) + " ! (. = 'x')", "true\ntrue", root(SingletonSeq.class));
-    check(_UTIL_REPLICATE.args(" <a/>", 2) + " ! (. = 'x')", "false\nfalse", root(_UTIL_REPLICATE));
+    check(REPLICATE.args("x", 2) + " ! (. = 'x')", "true\ntrue", root(SingletonSeq.class));
+    check(REPLICATE.args(" <a/>", 2) + " ! (. = 'x')", "false\nfalse", root(REPLICATE));
 
     check("(10, 10) ! .[. = 5]", "", root(IterFilter.class));
-    check(_UTIL_REPLICATE.args(" <a/>", 2) + " ! .[data()]", "", root(_UTIL_REPLICATE));
+    check(REPLICATE.args(" <a/>", 2) + " ! .[data()]", "", root(REPLICATE));
   }
 
   /** Inlining context item expression. */
@@ -2210,7 +2210,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Parallel execution. */
   @Test public void gh1329() {
-    query(_XQUERY_FORK_JOIN.args(_UTIL_REPLICATE.args(" function() { <x/>[@a] }", 10000)), "");
+    query(_XQUERY_FORK_JOIN.args(REPLICATE.args(" function() { <x/>[@a] }", 10000)), "");
     query("1 ! fn:last#0()", 1);
   }
 
@@ -2356,8 +2356,8 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh2005() {
     check("declare context item := <a/>; (.|.)/self::a", "<a/>", empty(Union.class));
 
-    check("<a/> ! (., .)/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
-    check(_UTIL_REPLICATE.args(" <a/>", 2) + "/<b/>", "<b/>\n<b/>", exists(_UTIL_REPLICATE));
+    check("<a/> ! (., .)/<b/>", "<b/>\n<b/>", exists(REPLICATE));
+    check(REPLICATE.args(" <a/>", 2) + "/<b/>", "<b/>\n<b/>", exists(REPLICATE));
     check("declare context item := <a/>; (., .)/<b/>", "<b/>\n<b/>", exists(SingletonSeq.class));
   }
 
@@ -2370,9 +2370,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("((1 to 1000000000000) ! string())[position() = last() - 999999999999]", 1,
         root(Str.class));
 
-    check(_UTIL_REPLICATE.args(" <x/>", " <c>200000000000</c>") + "[last()]", "<x/>",
+    check(REPLICATE.args(" <x/>", " <c>200000000000</c>") + "[last()]", "<x/>",
         root(_UTIL_LAST));
-    check(_UTIL_REPLICATE.args(" <x/>", " <c>200000000000</c>", true) + "[last()]", "<x/>",
+    check(REPLICATE.args(" <x/>", " <c>200000000000</c>", true) + "[last()]", "<x/>",
         root(_UTIL_LAST));
 
     check("for-each-pair((1 to 10000000000), (1 to 9999999999), "
@@ -2412,9 +2412,9 @@ public final class RewritingsTest extends QueryPlanTest {
         "false\nfalse\nfalse\ntrue\nfalse\nfalse\nfalse",
         empty(CElem.class), exists(Str.class));
 
-    check("declare variable $x :=" + _UTIL_REPLICATE.args(" <a>a</a>", 2) +
+    check("declare variable $x :=" + REPLICATE.args(" <a>a</a>", 2) +
         "; data($x)", "a\na", exists(SingletonSeq.class), exists(Atm.class));
-    check("declare variable $x :=" + _UTIL_REPLICATE.args(" <a>a</a>", 2) +
+    check("declare variable $x :=" + REPLICATE.args(" <a>a</a>", 2) +
         "; distinct-values($x)", "a", root(Atm.class));
   }
 

@@ -74,7 +74,7 @@ public final class UtilItem extends StandardFunc {
       // rewrite nested function calls
       if(TAIL.is(expr))
         return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(pos + 2));
-      if(_UTIL_REPLICATE.is(expr)) {
+      if(REPLICATE.is(expr)) {
         // static integer will always be greater than 1
         final Expr[] args = expr.args();
         if(args[0].size() == 1 && args[1] instanceof Int) {

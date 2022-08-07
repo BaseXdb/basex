@@ -67,12 +67,8 @@ public final class HofModuleTest extends QueryPlanTest {
         count(Util.className(Arith.class) + "[@op = '+']", 4));
   }
 
-  /** Test method. */
+  /** Test method: see {@link Fn4ModuleTest}. */
   @Test public void id() {
-    final Function func = _HOF_ID;
-    query(func.args(" ()"), "");
-    query(func.args(" <x/>"), "<x/>");
-    query(func.args(" 1 to 10"), "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
   }
 
   /** Test method. */

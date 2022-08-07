@@ -43,7 +43,7 @@ public class FnEmpty extends StandardFunc {
     }
 
     // static integer will always be greater than 1
-    if(_UTIL_REPLICATE.is(expr) && expr.arg(1) instanceof Int) {
+    if(REPLICATE.is(expr) && expr.arg(1) instanceof Int) {
       expr = expr.arg(0);
     }
     // rewrite list to union expression:  exists((a, b))  ->  exists(a | b)

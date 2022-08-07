@@ -32,7 +32,7 @@ public final class ArithTest extends QueryPlanTest {
 
     // counts
     check("let $n := " + wrap(1) + "[. = 1] return count($n) + count($n)",
-        2, count(Function.COUNT, 1), exists(Function._UTIL_REPLICATE));
+        2, count(Function.COUNT, 1), exists(Function.REPLICATE));
     check("let $n := " + wrap(1) + "[. = 1] return count($n) + count($n) > 0",
         true, root(CmpSimpleG.class));
 

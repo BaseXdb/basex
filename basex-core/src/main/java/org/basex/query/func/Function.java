@@ -532,6 +532,9 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   IDENTITY(FnIdentity::new, "identity(value)", params(ITEM_ZM), ITEM_ZM),
+  /** XQuery function. */
+  REPLICATE(FnReplicate::new, "replicate(input,count[,multiple])",
+      params(ITEM_ZM, INTEGER_O, BOOLEAN_O), ITEM_ZM),
 
   // Map Module
 

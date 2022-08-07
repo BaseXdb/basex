@@ -84,8 +84,8 @@ public final class FnReverse extends StandardFunc {
     // reverse(util:init(reverse(E))  ->  tail(E)
     if(_UTIL_INIT.is(expr) && REVERSE.is(expr.arg(0)))
       return cc.function(TAIL, info, expr.arg(0).args());
-    // reverse(util:replicate(ITEM, COUNT))  ->  util:replicate(ITEM, COUNT)
-    if(_UTIL_REPLICATE.is(expr) && !expr.has(Flag.NDT))
+    // reverse(replicate(ITEM, COUNT))  ->  replicate(ITEM, COUNT)
+    if(REPLICATE.is(expr) && !expr.has(Flag.NDT))
       if(expr.arg(0).seqType().zeroOrOne()) return expr;
 
     // rewrite list

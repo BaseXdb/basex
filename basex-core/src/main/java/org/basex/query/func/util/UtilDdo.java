@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -44,8 +45,8 @@ public final class UtilDdo extends StandardFunc {
 
     final Type type = expr.seqType().type;
     if(type instanceof NodeType) {
-      // util:ddo(util:replicate(*, 2))  ->  util:ddo(*)
-      if(_UTIL_REPLICATE.is(expr) && ((UtilReplicate) expr).singleEval(false)) return expr.arg(0);
+      // util:ddo(replicate(*, 2))  ->  util:ddo(*)
+      if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(false)) return expr.arg(0);
       // util:ddo(reverse(*))  ->  util:ddo(*)
       if(REVERSE.is(expr) || SORT.is(expr)) return cc.function(_UTIL_DDO, info, expr.arg(0));
       // util:ddo(/a/b/c)  ->  /a/b/c
