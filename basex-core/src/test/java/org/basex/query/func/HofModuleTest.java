@@ -23,7 +23,7 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void constTest() {
+  @Test public void constant() {
     final Function func = _HOF_CONST;
     query(func.args(" (), error()"), "");
     query(func.args(" <x/>, 123"), "<x/>");
@@ -43,7 +43,7 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void foldLeft1Test() {
+  @Test public void foldLeft1() {
     final Function func = _HOF_FOLD_LEFT1;
     query(func.args(" 1 to 10", " function($x, $y) { $x + $y }"), 55);
     error(func.args(" ()", " function($x, $y) { $x + $y }"), EMPTYFOUND);
@@ -68,7 +68,7 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void idTest() {
+  @Test public void id() {
     final Function func = _HOF_ID;
     query(func.args(" ()"), "");
     query(func.args(" <x/>"), "<x/>");
@@ -76,7 +76,7 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void sortWithTest() {
+  @Test public void sortWith() {
     final Function func = _HOF_SORT_WITH;
     query(func.args(" ()", " function($a, $b) { $a < $b }"), "");
     query(func.args(" 1 to 5", " function($a, $b) { $a > $b }"), "5\n4\n3\n2\n1");
@@ -85,7 +85,7 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void topKByTest() {
+  @Test public void topKBy() {
     final Function func = _HOF_TOP_K_BY;
     query(func.args(" 1 to 1000", " function($x) { -$x }, 0"), "");
     query(func.args(" ()", " function($x) { -$x }", 5), "");
@@ -105,7 +105,7 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void topKWithTest() {
+  @Test public void topKWith() {
     final Function func = _HOF_TOP_K_WITH;
     query(func.args(" 1 to 1000", " function($x, $y) { $x > $y }", 0), "");
     query(func.args(" ()", " function($x, $y) { $x > $y }", 5), "");
@@ -113,7 +113,7 @@ public final class HofModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void untilTest() {
+  @Test public void until() {
     final Function func = _HOF_UNTIL;
     query(func.args(" function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1"), 1024);
     query(func.args(" function($xs) { count($xs) > 3 }, function($x) { $x, $x }, 1"), "1\n1\n1\n1");

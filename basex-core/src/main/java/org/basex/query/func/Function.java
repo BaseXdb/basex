@@ -528,6 +528,11 @@ public enum Function implements AFunction {
   ZERO_OR_ONE(FnZeroOrOne::new, "zero-or-one(input)",
       params(ITEM_ZM), ITEM_ZO),
 
+  // XQuery 4 functions
+
+  /** XQuery function. */
+  IDENTITY(FnIdentity::new, "identity(value)", params(ITEM_ZM), ITEM_ZM),
+
   // Map Module
 
   /** XQuery function. */

@@ -14,10 +14,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
- * XQuery functions: AST tests.
+ * This class tests standard functions.
  *
  * @author BaseX Team 2005-22, BSD License
- * @author Leo Woerteler
+ * @author Christian Gruen
  */
 public final class FnModuleTest extends QueryPlanTest {
   /** Text file. */
