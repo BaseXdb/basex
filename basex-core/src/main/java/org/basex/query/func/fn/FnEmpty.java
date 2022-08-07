@@ -64,7 +64,7 @@ public class FnEmpty extends StandardFunc {
           CmpG.compatible(args[0].seqType(), args[1].seqType(), true)) {
         expr = new CmpG(args[0], args[1], OpG.EQ, null, sc, info).optimize(cc);
       }
-    } else if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr)) {
+    } else if(STRING_TO_CODEPOINTS.is(expr) || CHARACTERS.is(expr)) {
       // exists(string-to-codepoints(...))  ->  boolean(string(...))
       expr = cc.function(STRING, info, expr.args());
     }

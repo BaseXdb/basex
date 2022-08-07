@@ -531,6 +531,8 @@ public enum Function implements AFunction {
   // XQuery 4 functions
 
   /** XQuery function. */
+  CHARACTERS(FnCharacters::new, "characters(value)", params(STRING_ZO), STRING_ZM),
+  /** XQuery function. */
   IDENTITY(FnIdentity::new, "identity(value)", params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   IS_NAN(FnIsNaN::new, "is-NaN(value)", params(ANY_ATOMIC_TYPE_O), BOOLEAN_O),

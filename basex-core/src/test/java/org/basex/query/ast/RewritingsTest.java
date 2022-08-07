@@ -1216,10 +1216,10 @@ public final class RewritingsTest extends QueryPlanTest {
         true, empty(STRING_TO_CODEPOINTS), empty(EXISTS), exists(BOOLEAN), exists(STRING));
     check("empty(string-to-codepoints(<?_ x?>))",
         false, empty(STRING_TO_CODEPOINTS), empty(EMPTY), exists(NOT), exists(STRING));
-    check("exists(" + _UTIL_CHARS.args(" <?_ x?> ") + ')',
-        true, empty(_UTIL_CHARS), empty(EXISTS), exists(BOOLEAN), exists(STRING));
-    check("empty(" + _UTIL_CHARS.args(" <?_ x?> ") + ')',
-        false, empty(_UTIL_CHARS), empty(EMPTY), exists(NOT), exists(STRING));
+    check("exists(" + CHARACTERS.args(" <?_ x?> ") + ')',
+        true, empty(CHARACTERS), empty(EXISTS), exists(BOOLEAN), exists(STRING));
+    check("empty(" + CHARACTERS.args(" <?_ x?> ") + ')',
+        false, empty(CHARACTERS), empty(EMPTY), exists(NOT), exists(STRING));
 
     check("exists(map:keys(map:entry(1, <_/>)))",
         true, empty(_MAP_KEYS), empty(EXISTS), exists(_MAP_SIZE), exists(CmpSimpleG.class));

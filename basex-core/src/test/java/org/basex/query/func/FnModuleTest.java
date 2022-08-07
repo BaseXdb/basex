@@ -939,7 +939,7 @@ public final class FnModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void stringJoin() {
     final Function func = STRING_JOIN;
-    check(func.args(_UTIL_CHARS.args(wrap("ABC"))), "ABC", root(STRING));
+    check(func.args(CHARACTERS.args(wrap("ABC"))), "ABC", root(STRING));
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ") ! codepoints-to-string(.)"),
         "ABC", root(STRING));
   }

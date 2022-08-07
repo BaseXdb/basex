@@ -195,8 +195,8 @@ public abstract class SimpleMap extends Arr {
           return cc.function(DATA, info, expr);
         } else if(STRING_TO_CODEPOINTS.is(expr) && CODEPOINTS_TO_STRING.is(next) &&
             args[0] instanceof ContextValue) {
-          // string-to-codepoints(STRING) ! codepoints-to-string(.)  ->  util:chars(STRING)
-          return cc.function(_UTIL_CHARS, info, expr.args());
+          // string-to-codepoints(STRING) ! codepoints-to-string(.)  ->  characters(STRING)
+          return cc.function(CHARACTERS, info, expr.args());
         }
       }
 

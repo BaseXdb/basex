@@ -46,7 +46,7 @@ public final class FnCount extends StandardFunc {
     if(_MAP_KEYS.is(expr))
       return cc.function(_MAP_SIZE, info, expr.args());
     // rewrite count(string-to-codepoints(...)) to string-length(...)
-    if(STRING_TO_CODEPOINTS.is(expr) || _UTIL_CHARS.is(expr))
+    if(STRING_TO_CODEPOINTS.is(expr) || CHARACTERS.is(expr))
       return cc.function(STRING_LENGTH, info, expr.args());
 
     final Expr embedded = embed(cc, true);

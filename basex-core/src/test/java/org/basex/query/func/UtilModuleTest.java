@@ -43,36 +43,8 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" array { <_>1</_> to 100000 }") + " =>" + _UTIL_LAST.args(), "100000");
   }
 
-  /** Test method. */
+  /** Test method: see {@link Fn4ModuleTest}. */
   @Test public void chars() {
-    final Function func = _UTIL_CHARS;
-
-    // test pre-evaluation
-    query(func.args(" ()"), "");
-    check(func.args(" ()"), "", empty());
-    query(func.args(""), "");
-    query(func.args("abc"), "a\nb\nc");
-
-    query("count(" + func.args(" string-join(" + REPLICATE.args("A", 100000) + ')') + ')',
-        100000);
-    check("count(" + func.args(" string-join(" + REPLICATE.args("A", 100000) + ')') + ')',
-        100000, empty(func), empty(STRING_LENGTH));
-
-    // test iterative evaluation
-    query(func.args(wrap("")), "");
-    query(func.args(wrap("abc")), "a\nb\nc");
-    query(func.args(wrap("abc")) + "[2]", "b");
-    query(func.args(wrap("abc")) + "[last()]", "c");
-
-    query(func.args(wrap("äöü")), "ä\nö\nü");
-    query("subsequence(" + func.args(wrap("")) + ", 3)", "");
-    query("subsequence(" + func.args(wrap("aeiou")) + ", 3)", "i\no\nu");
-    query("subsequence(" + func.args(wrap("äeiöü")) + ", 3)", "i\nö\nü");
-
-    check("count(" + func.args(" string-join(" +
-        REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));
-    check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)",
-        "A\nB", root(func));
   }
 
   /** Test method. */

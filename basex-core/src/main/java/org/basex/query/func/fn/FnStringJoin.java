@@ -42,8 +42,8 @@ public final class FnStringJoin extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs.length > 1 ? exprs[1] : Str.EMPTY;
 
-    // string-join(util:chars(A))  ->  string(A)
-    if(_UTIL_CHARS.is(expr1) && expr2 == Str.EMPTY) return cc.function(STRING, info, expr1.args());
+    // string-join(characters(A))  ->  string(A)
+    if(CHARACTERS.is(expr1) && expr2 == Str.EMPTY) return cc.function(STRING, info, expr1.args());
 
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return (st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
