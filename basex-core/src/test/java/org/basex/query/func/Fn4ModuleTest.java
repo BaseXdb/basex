@@ -22,6 +22,25 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void isNaN() {
+    final Function func = IS_NAN;
+    query(func.args(" xs:double('NaN')"), true);
+    query(func.args(" xs:float('NaN')"), true);
+    query(func.args(" number('twenty-three')"), true);
+    query(func.args(" math:sqrt(-1)"), true);
+
+    query(func.args(23), false);
+    query(func.args("NaN"), false);
+    query(func.args(" <_/>"), false);
+    query(func.args(" <?_ ?>"), false);
+    query(func.args(" number('1')"), false);
+    query(func.args(" xs:double('INF')"), false);
+    query(func.args(" xs:decimal(<?_ 1?>)"), false);
+    query(func.args(" xs:integer(<?_ 1?>)"), false);
+    query(func.args(" xs:byte(<?_ 1?>)"), false);
+  }
+
+  /** Test method. */
   @Test public void replicate() {
     final Function func = REPLICATE;
 
