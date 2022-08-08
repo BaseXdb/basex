@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -40,16 +38,13 @@ public class FnForEach extends StandardFunc {
     if(st.zero()) return items;
 
     // create FLWOR expression
-    final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjMap<Var> vm = new IntObjMap<>();
-    final Var var = cc.copy(new Var(new QNm("each"), null, false, cc.qc, sc, info), vm);
-    clauses.add(new For(var, items).optimize(cc));
+    final Var var = cc.copy(new Var(new QNm("each"), null, cc.qc, sc, info), new IntObjMap<>());
+    final For fr = new For(var, items).optimize(cc);
 
     final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
     final boolean updating = this instanceof UpdateForEach, ndt = func.has(Flag.NDT);
-    final ParseExpr ref = new VarRef(info, var).optimize(cc);
+    final Expr ref = new VarRef(info, var).optimize(cc);
     final Expr rtrn = new DynFuncCall(info, sc, updating, ndt, func, ref).optimize(cc);
-
-    return new GFLWOR(info, clauses, rtrn).optimize(cc);
+    return new GFLWOR(info, fr, rtrn).optimize(cc);
   }
 }

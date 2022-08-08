@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.*;
@@ -41,18 +39,16 @@ public class FnAll extends StandardFunc {
     if(st.zero()) return cc.merge(items, Bln.TRUE, info);
 
     // create FLWOR expression
-    final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjMap<Var> vm = new IntObjMap<>();
-    final Var var = cc.copy(new Var(new QNm("item"), null, false, cc.qc, sc, info), vm);
-    clauses.add(new For(var, items).optimize(cc));
+    final Var var = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), new IntObjMap<>());
+    final For fr = new For(var, items).optimize(cc);
 
     final Expr func = coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE));
-    final ParseExpr ref = new VarRef(info, var).optimize(cc);
+    final Expr ref = new VarRef(info, var).optimize(cc);
     final Expr rtrn = new DynFuncCall(info, sc, func, ref).optimize(cc);
-    final Expr flwor = new GFLWOR(info, clauses, rtrn).optimize(cc);
+    final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);
 
     final boolean some = some();
-    final CmpG cmp = new CmpG(flwor, Bln.get(some), OpG.EQ, null, sc, info);
+    final Expr cmp = new CmpG(flwor, Bln.get(some), OpG.EQ, null, sc, info).optimize(cc);
     return some ? cmp : Function.NOT.get(sc, info, cmp);
   }
 

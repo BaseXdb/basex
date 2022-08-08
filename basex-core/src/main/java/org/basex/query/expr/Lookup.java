@@ -2,8 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
@@ -110,12 +108,11 @@ public final class Lookup extends Arr {
       }
       // multiple inputs:
       //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
-      final LinkedList<Clause> clauses = new LinkedList<>();
       final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
-      clauses.add(new For(var, inputs).optimize(cc));
+      final For fr = new For(var, inputs).optimize(cc);
       final Expr ex = cc.get(keys, () ->
         rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));
-      return new GFLWOR(info, clauses, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
+      return new GFLWOR(info, fr, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
     }
     return this;
   }

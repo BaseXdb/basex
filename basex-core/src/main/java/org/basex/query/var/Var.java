@@ -68,6 +68,19 @@ public final class Var extends ExprInfo {
    * Constructor.
    * @param name variable name
    * @param declType declared sequence type, {@code null} for no check
+   * @param qc query context, used for generating a variable ID
+   * @param sc static context
+   * @param info input info
+   */
+  public Var(final QNm name, final SeqType declType, final QueryContext qc, final StaticContext sc,
+      final InputInfo info) {
+    this(name, declType, false, -1, qc, sc, info);
+  }
+
+  /**
+   * Constructor.
+   * @param name variable name
+   * @param declType declared sequence type, {@code null} for no check
    * @param param function parameter flag
    * @param qc query context, used for generating a variable ID
    * @param sc static context

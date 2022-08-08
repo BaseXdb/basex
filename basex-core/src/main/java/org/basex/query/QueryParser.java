@@ -1068,7 +1068,7 @@ public class QueryParser extends InputParser {
           final VarRef ref = ng.get(i);
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
-          final Var nv = localVars.add(new Var(ref.var.name, null, false, qc, sc, ref.var.info));
+          final Var nv = localVars.add(new Var(ref.var.name, null, qc, sc, ref.var.info));
           ngrp[i] = nv;
           curr.put(nv.name.id(), nv);
         }
@@ -2471,7 +2471,7 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     final QNm name = varName();
     final SeqType st = type != null ? type : optAsType();
-    return new Var(name, st, false, qc, sc, ii);
+    return new Var(name, st, qc, sc, ii);
   }
 
   /**
@@ -3292,7 +3292,7 @@ public class QueryParser extends InputParser {
       final Var[] vs = new Var[cl];
       final InputInfo ii = info();
       for(int i = 0; i < cl; i++) {
-        vs[i] = localVars.add(new Var(Catch.NAMES[i], Catch.TYPES[i], false, qc, sc, ii));
+        vs[i] = localVars.add(new Var(Catch.NAMES[i], Catch.TYPES[i], qc, sc, ii));
       }
       final Catch c = new Catch(ii, codes, vs);
       c.expr = enclosedExpr();

@@ -45,6 +45,17 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
+   * Constructor.
+   * @param info input info
+   * @param clause single clause
+   * @param rtrn return expression
+   */
+  public GFLWOR(final InputInfo info, final Clause clause, final Expr rtrn) {
+    this(info, new LinkedList<>(), rtrn);
+    clauses.add(clause);
+  }
+
+  /**
    * Creates a new evaluator for this FLWOR expression.
    * @return the evaluator
    */
@@ -163,9 +174,7 @@ public final class GFLWOR extends ParseExpr {
       if(cs == 2 && clauses.get(1) instanceof GroupBy) {
         final GroupSpec spec = ((GroupBy) clauses.get(1)).group();
         if(spec != null) {
-          final LinkedList<Clause> cls = new LinkedList<>();
-          cls.add(clauses.removeFirst());
-          final Expr flwor = new GFLWOR(info, cls, spec.expr).optimize(cc);
+          final Expr flwor = new GFLWOR(info, clauses.removeFirst(), spec.expr).optimize(cc);
           final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
           clauses.set(0, new For(spec.var, expr).optimize(cc));
           return optimize(cc);

@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
+import org.basex.query.expr.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -23,6 +24,8 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(func.args(" -5 to 5", " function($_) { $_ ge 0 }"), false);
     query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
         + "'November', 'December')", " contains(?, 'r')"), true);
+    check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
+        exists(CmpG.class), empty(ALL), exists(NOT));
 
     final String lookup = "function-lookup(xs:QName(<?_ fn:all?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);
@@ -145,6 +148,8 @@ public class Fn4ModuleTest extends QueryPlanTest {
         + "'November', 'December')", " contains(?, 'r')"), true);
     query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
         + "'November', 'December')", " contains(?, 'z')"), false);
+    check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
+        exists(CmpG.class), empty(ALL));
 
     final String lookup = "function-lookup(xs:QName(<?_ fn:some?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);
