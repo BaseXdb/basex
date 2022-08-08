@@ -76,6 +76,9 @@ public enum Function implements AFunction {
   ADJUST_TIME_TO_TIMEZONE(FnAdjustTimeToTimezone::new, "adjust-time-to-timezone(value[,timezone])",
       params(TIME_ZO, DAY_TIME_DURATION_ZO), TIME_ZO),
   /** XQuery function. */
+  ALL(FnAll::new, "all(input,predicate)",
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_O).seqType()), BOOLEAN_O, flag(HOF)),
+  /** XQuery function. */
   ANALYZE_STRING(FnAnalyzeString::new, "analyze-string(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_O), ELEMENT_O, flag(CNS)),
   /** XQuery function. */
@@ -434,6 +437,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   SERIALIZE(FnSerialize::new, "serialize(input[,options])",
       params(ITEM_ZM, ITEM_ZO), STRING_O),
+  /** XQuery function. */
+  SOME(FnSome::new, "some(input,predicate)",
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_O).seqType()), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   SORT(FnSort::new, "sort(input[,collation[,key]])",
       params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()), ITEM_ZM),

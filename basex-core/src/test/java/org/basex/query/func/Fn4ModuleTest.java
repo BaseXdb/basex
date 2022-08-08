@@ -13,6 +13,25 @@ import org.junit.jupiter.api.*;
  */
 public class Fn4ModuleTest extends QueryPlanTest {
   /** Test method. */
+  @Test public void all() {
+    final Function func = ALL;
+
+    query(func.args(" ()", " boolean#1"), true);
+    query(func.args(1, " boolean#1"), true);
+    query(func.args(" 0 to 1", " boolean#1"), false);
+    query(func.args(" (1, 3, 7)", " function($_) { $_ mod 2 = 1 }"), true);
+    query(func.args(" -5 to 5", " function($_) { $_ ge 0 }"), false);
+    query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
+        + "'November', 'December')", " contains(?, 'r')"), true);
+
+    final String lookup = "function-lookup(xs:QName(<?_ fn:all?>), 2)";
+    query(lookup + "(1 to 9, boolean#1)", true);
+    query(lookup + "(1 to 9, not#1)", false);
+    query(lookup + "(0 to 9, boolean#1)", false);
+    query(lookup + "(0 to 9, not#1)", false);
+  }
+
+  /** Test method. */
   @Test public void characters() {
     final Function func = CHARACTERS;
 
@@ -111,5 +130,26 @@ public class Fn4ModuleTest extends QueryPlanTest {
 
     check("(1, 1) ! " + func.args(" .", 2),
         "1\n1\n1\n1", empty(REPLICATE));
+  }
+
+  /** Test method. */
+  @Test public void some() {
+    final Function func = SOME;
+
+    query(func.args(" ()", " boolean#1"), true);
+    query(func.args(1, " boolean#1"), true);
+    query(func.args(" 0 to 1", " boolean#1"), true);
+    query(func.args(" (1, 3, 7)", " function($_) { $_ mod 2 = 1 }"), true);
+    query(func.args(" -5 to 5", " function($_) { $_ ge 0 }"), true);
+    query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
+        + "'November', 'December')", " contains(?, 'r')"), true);
+    query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
+        + "'November', 'December')", " contains(?, 'z')"), false);
+
+    final String lookup = "function-lookup(xs:QName(<?_ fn:some?>), 2)";
+    query(lookup + "(1 to 9, boolean#1)", true);
+    query(lookup + "(1 to 9, not#1)", false);
+    query(lookup + "(0 to 9, boolean#1)", true);
+    query(lookup + "(0 to 9, not#1)", true);
   }
 }
