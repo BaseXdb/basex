@@ -24,8 +24,6 @@ abstract class SessionsFn extends ApiFunc {
    * @throws QueryException query exception
    */
   final ASession session(final QueryContext qc) throws QueryException {
-    request(qc);
-
     // retrieve session from global listener
     final byte[] id = toToken(exprs[0], qc);
     final HttpSession session = SessionListener.get(Token.string(id));

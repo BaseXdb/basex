@@ -14,7 +14,6 @@ import org.basex.query.value.seq.*;
 public final class SessionsIds extends SessionsFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    request(qc);
     return StrSeq.get(SessionListener.ids());
   }
 }
