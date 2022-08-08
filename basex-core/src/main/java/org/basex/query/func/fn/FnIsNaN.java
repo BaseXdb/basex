@@ -23,9 +23,7 @@ public final class FnIsNaN extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final SeqType st = exprs[0].seqType();
-    if(st.one() && !st.mayBeArray() && (!st.mayBeNumber() || st.type.instanceOf(AtomType.DECIMAL)))
-      return Bln.FALSE;
-
-    return this;
+    final Type type = st.type;
+    return st.one() && !st.mayBeArray() && type.instanceOf(AtomType.DECIMAL) ? Bln.FALSE : this;
   }
 }
