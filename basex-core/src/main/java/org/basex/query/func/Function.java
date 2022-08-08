@@ -1791,11 +1791,11 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _XQUERY_EVAL(XQueryEval::new, "eval(input[,bindings[,options]])",
-      params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI, Perm.ADMIN),
+      params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_EVAL_UPDATE(XQueryEvalUpdate::new, "eval-update(input[,bindings[,options]])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), EMPTY_SEQUENCE_Z,
-      flag(UPD), XQUERY_URI, Perm.ADMIN),
+      flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions)",
       params(FUNCTION_ZM), ITEM_ZM, flag(HOF), XQUERY_URI),
