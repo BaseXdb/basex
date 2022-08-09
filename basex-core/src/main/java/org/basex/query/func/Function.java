@@ -255,6 +255,9 @@ public enum Function implements AFunction {
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),
   /** XQuery function. */
+  HIGHEST(FnHighest::new, "highest(input[,collation[,key]])",
+      params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()), ITEM_ZM),
+  /** XQuery function. */
   HOURS_FROM_DATETIME(FnHoursFromDateTime::new, "hours-from-dateTime(value)",
       params(DATE_TIME_ZO), INTEGER_ZO),
   /** XQuery function. */
@@ -308,6 +311,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   LOWER_CASE(FnLowerCase::new, "lower-case(value)",
       params(STRING_ZO), STRING_O),
+  /** XQuery function. */
+  LOWEST(FnLowest::new, "lowest(input[,collation[,key]])",
+      params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()), ITEM_ZM),
   /** XQuery function. */
   MATCHES(FnMatches::new, "matches(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_O), BOOLEAN_O),

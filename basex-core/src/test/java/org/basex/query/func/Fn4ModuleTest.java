@@ -1,9 +1,11 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -91,6 +93,74 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(func.args(" xs:decimal(<?_ 1?>)"), false);
     query(func.args(" xs:integer(<?_ 1?>)"), false);
     query(func.args(" xs:byte(<?_ 1?>)"), false);
+  }
+
+  /** Test method. */
+  @Test public void highest() {
+    final Function func = HIGHEST;
+    query(func.args(" ()"), "");
+    check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'f']"), "f");
+    check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'g']"), "");
+    query(func.args(" 'x'"), "x");
+    query(func.args(" (1e0, 2e0)"), 2);
+    query(func.args(" (8 to 11)"), 11);
+    query(func.args(" reverse(8 to 11)"), 11);
+    query(func.args(" (8 to 11)", " ()", " string#1"), 9);
+    query(func.args(" reverse(8 to 11)", " ()", " string#1"), 9);
+    query(func.args(" (3, 2, 1)", " ()", " function($k) { true() }"), "3\n2\n1");
+    query(func.args(" (8 to 11)", " ()",
+        " function($k) { string-length(string($k)) }"), "10\n11");
+    query(func.args(" reverse(8 to 11)", " ()",
+        " function($k) { string-length(string($k)) }"), "11\n10");
+    query(func.args(" (<a _='1'/>, <b _='2'/>)", " ()",
+        " function($k) { $k/@* }") + " ! name()", "b");
+    query(func.args(" <_ _='1'/>", " ()",
+        " function($a) { $a/@* }"), "<_ _=\"1\"/>");
+    query(func.args(" (<_ _='9'/>, <_ _='10'/>)", " ()",
+        " function($a) { $a/@* }"), "<_ _=\"10\"/>");
+    query(func.args(" (<_ _='9'/>, <_ _='10'/>)", " ()",
+        " function($a) { string($a/@*) }"), "<_ _=\"9\"/>");
+    check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
+    check(func.args(" replicate(<_/>, 2)"), "<_/>\n<_/>", root(REPLICATE));
+    check(func.args(" reverse( (1 to 6)[. > 3] )"), 6, empty(REVERSE));
+
+    error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
+    error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
+    error(func.args(" true#0"), FIATOM_X_X);
+  }
+
+  /** Test method. */
+  @Test public void lowest() {
+    final Function func = LOWEST;
+    query(func.args(" ()"), "");
+    check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'f']"), "f");
+    check(func.args(" ('a', 'b', 'c', 'd', 'e', 'f')[. = 'g']"), "");
+    query(func.args(" 'x'"), "x");
+    query(func.args(" (1e0, 2e0)"), 1);
+    query(func.args(" (8 to 11)"), 8);
+    query(func.args(" reverse(8 to 11)"), 8);
+    query(func.args(" (8 to 11)", " ()", " string#1"), 10);
+    query(func.args(" reverse(8 to 11)", " ()", " string#1"), 10);
+    query(func.args(" (3, 2, 1)", " ()", " function($k) { true() }"), "3\n2\n1");
+    query(func.args(" (8 to 11)", " ()",
+        " function($k) { string-length(string($k)) }"), "8\n9");
+    query(func.args(" reverse(8 to 11)", " ()",
+        " function($k) { string-length(string($k)) }"), "9\n8");
+    query(func.args(" (<a _='1'/>, <b _='2'/>)", " ()",
+        " function($k) { $k/@* }") + " ! name()", "a");
+    query(func.args(" <_ _='1'/>", " ()",
+        " function($a) { $a/@* }"), "<_ _=\"1\"/>");
+    query(func.args(" (<_ _='9'/>, <_ _='10'/>)", " ()",
+        " function($a) { $a/@* }"), "<_ _=\"9\"/>");
+    query(func.args(" (<_ _='9'/>, <_ _='10'/>)", " ()",
+        " function($a) { string($a/@*) }"), "<_ _=\"10\"/>");
+    check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
+    check(func.args(" replicate(<_/>, 2)"), "<_/>\n<_/>", root(REPLICATE));
+    check(func.args(" reverse( (1 to 6)[. > 3] )"), 4, empty(REVERSE));
+
+    error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
+    error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
+    error(func.args(" true#0"), FIATOM_X_X);
   }
 
   /** Test method. */
