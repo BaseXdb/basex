@@ -309,7 +309,24 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Collation toCollation(final int i, final QueryContext qc) throws QueryException {
-    final byte[] uri = i < exprs.length ? toToken(exprs[i], qc) : null;
+    return toCollation(i, false, qc);
+  }
+
+  /**
+   * Evaluates an expression to a collation.
+   * @param i index of optional argument
+   * @param empty allow empty argument
+   * @param qc query context
+   * @return collation, or {@code null} for default collation
+   * @throws QueryException query exception
+   */
+  protected final Collation toCollation(final int i, final boolean empty, final QueryContext qc)
+      throws QueryException {
+    byte[] uri = null;
+    if(i < exprs.length) {
+      final Item item = exprs[i].atomItem(qc, info);
+      if(!empty && item != Empty.VALUE) uri = toToken(item);
+    }
     return Collation.get(uri, qc, sc, info, WHICHCOLL_X);
   }
 

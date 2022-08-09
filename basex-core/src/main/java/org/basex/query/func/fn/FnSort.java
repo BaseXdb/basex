@@ -17,6 +17,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -45,11 +46,7 @@ public final class FnSort extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter iter(final Value input, final QueryContext qc) throws QueryException {
-    Collation coll = sc.collation;
-    if(exprs.length > 1) {
-      final byte[] token = toTokenOrNull(exprs[1], qc);
-      if(token != null) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
-    }
+    final Collation coll = toCollation(1, false, qc);
     final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
 
     final long size = input.size();
@@ -83,24 +80,12 @@ public final class FnSort extends StandardFunc {
     final int al = values.size();
     final Integer[] order = new Integer[al];
     for(int o = 0; o < al; o++) order[o] = o;
+    final InputInfo info = sf.info();
     try {
       Arrays.sort(order, (i1, i2) -> {
         qc.checkStop();
         try {
-          final Value value1 = values.get(i1), value2 = values.get(i2);
-          final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
-          for(int i = 0; i < il; i++) {
-            Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
-            if(item1 == Dbl.NAN || item1 == Flt.NAN) item1 = null;
-            if(item2 == Dbl.NAN || item2 == Flt.NAN) item2 = null;
-            if(item1 != null && item2 != null && !item1.comparable(item2))
-              throw diffError(item1, item2, sf.info());
-
-            final int diff = item1 == null ? item2 == null ? 0 : -1 : item2 == null ? 1 :
-              item1.diff(item2, coll, sf.info());
-            if(diff != 0 && diff != Item.UNDEF) return diff;
-          }
-          return (int) (size1 - size2);
+          return compare(values.get(i1), values.get(i2), coll, info);
         } catch(final QueryException ex) {
           throw new QueryRTException(ex);
         }
@@ -109,6 +94,33 @@ public final class FnSort extends StandardFunc {
       throw ex.getCause();
     }
     return order;
+  }
+
+  /**
+   * Compares two values.
+   * @param value1 first value
+   * @param value2 second value
+   * @param coll collation
+   * @param info input info
+   * @return result of comparison
+   * @throws QueryException query exception
+   */
+  static int compare(final Value value1, final Value value2, final Collation coll,
+      final InputInfo info) throws QueryException {
+    final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
+    for(int i = 0; i < il; i++) {
+      Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
+      if(item1 == Dbl.NAN || item1 == Flt.NAN) item1 = null;
+      if(item2 == Dbl.NAN || item2 == Flt.NAN) item2 = null;
+      if(item1 != null && item2 != null && !item1.comparable(item2))
+        throw diffError(item1, item2, info);
+
+      final int diff = item1 == null ? item2 == null ? 0 : -1 : item2 == null ? 1 :
+        item1.diff(item2, coll, info);
+      if(diff != 0 && diff != Item.UNDEF) return diff;
+    }
+    final long diff = size1 - size2;
+    return diff < 0 ? -1 : diff > 0 ? 1 : 0;
   }
 
   @Override
@@ -125,21 +137,23 @@ public final class FnSort extends StandardFunc {
     final SeqType st1 = expr1.seqType();
     if(st1.zero()) return expr1;
 
-    // enforce pre-evaluation as remaining arguments may not be values
-    if(expr1 instanceof Value) {
-      final Value value = quickValue((Value) expr1);
-      if(value != null) return value;
-    }
-    if(REPLICATE.is(expr1) && ((FnReplicate) expr1).singleEval(false)) {
-      final SeqType st = expr1.arg(0).seqType();
-      if(st.zeroOrOne() && st.type.isSortable()) return expr1;
-    }
-    if(REVERSE.is(expr1) || SORT.is(expr1)) {
-      final Expr[] args = exprs.clone();
-      args[0] = args[0].arg(0);
-      return cc.function(SORT, info, args);
-    }
-    if(exprs.length == 3) {
+    if(exprs.length < 2) {
+      if(st1.zeroOrOne() && st1.type.isSortable()) return expr1;
+      // enforce pre-evaluation as remaining arguments may not be values
+      if(expr1 instanceof Value) {
+        final Value value = quickValue((Value) expr1);
+        if(value != null) return value;
+      }
+      if(REPLICATE.is(expr1) && ((FnReplicate) expr1).singleEval(false)) {
+        final SeqType st = expr1.arg(0).seqType();
+        if(st.zeroOrOne() && st.type.isSortable()) return expr1;
+      }
+      if(REVERSE.is(expr1) || SORT.is(expr1)) {
+        final Expr[] args = exprs.clone();
+        args[0] = args[0].arg(0);
+        return cc.function(SORT, info, args);
+      }
+    } else if(exprs.length == 3) {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st1.with(Occ.EXACTLY_ONE));
     }
     return adoptType(expr1);

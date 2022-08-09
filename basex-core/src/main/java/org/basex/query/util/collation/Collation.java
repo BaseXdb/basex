@@ -41,7 +41,7 @@ public abstract class Collation {
 
   /**
    * Returns a collation instance for the specified uri.
-   * @param uri collation uri
+   * @param uri collation uri (can be {@code null})
    * @param qc query context
    * @param sc static context
    * @param ii input info

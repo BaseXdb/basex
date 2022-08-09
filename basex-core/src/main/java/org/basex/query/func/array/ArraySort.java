@@ -1,7 +1,5 @@
 package org.basex.query.func.array;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -25,11 +23,7 @@ public final class ArraySort extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
-    Collation coll = sc.collation;
-    if(exprs.length > 1) {
-      final byte[] token = toTokenOrNull(exprs[1], qc);
-      if(token != null) coll = Collation.get(token, qc, sc, info, WHICHCOLL_X);
-    }
+    final Collation coll = toCollation(1, false, qc);
     final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
 
     final ValueList values = new ValueList(array.arraySize());
