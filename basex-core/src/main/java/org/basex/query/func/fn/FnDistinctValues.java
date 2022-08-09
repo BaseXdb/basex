@@ -68,6 +68,8 @@ public final class FnDistinctValues extends StandardFunc {
       list.set(0, cc.function(DISTINCT_VALUES, info, expr.arg(0)));
       return cc.function(SORT, info, list.finish());
     }
+    // distinct-values(distinct-values($data))  ->  distinct-values($data)
+    if(DISTINCT_VALUES.is(expr)) return expr;
 
     final Expr opt = optStats(cc);
     if(opt != null) return opt;

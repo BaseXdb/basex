@@ -360,16 +360,16 @@ public final class CompileContext {
   }
 
   /**
-   * Creates a list expression from a condition and a return expression.
-   * @param cond condition (an optional result will be swallowed)
-   * @param rtrn return expression
+   * Creates a list expression from an expression to be swallowed and a result expression.
+   * @param expr expression to be swallowed
+   * @param result result expression
    * @param ii input info
    * @return function
    * @throws QueryException query exception
    */
-  public Expr merge(final Expr cond, final Expr rtrn, final InputInfo ii) throws QueryException {
-    return cond.has(Flag.NDT) ?
-      List.get(this, ii, function(Function._PROF_VOID, ii, cond), rtrn) : rtrn;
+  public Expr merge(final Expr expr, final Expr result, final InputInfo ii) throws QueryException {
+    return expr.has(Flag.NDT) ?
+      List.get(this, ii, function(Function._PROF_VOID, ii, expr), result) : result;
   }
 
   /**

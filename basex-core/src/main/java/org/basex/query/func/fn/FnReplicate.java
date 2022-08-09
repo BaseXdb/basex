@@ -146,7 +146,7 @@ public class FnReplicate extends StandardFunc {
   }
 
   /**
-   * Indicates if the input argument will be evaluated at zero times or once.
+   * Indicates if the input argument will be evaluated once or (if requested) zero times.
    * @param zero allow zero evaluations
    * @return result of check
    */
