@@ -507,6 +507,12 @@ public enum Function implements AFunction {
   TRUE(FnTrue::new, "true()",
       params(), BOOLEAN_O),
   /** XQuery function. */
+  UNIFORM(FnUniform::new, "uniform(values[,collation])",
+      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
+  /** XQuery function. */
+  UNIQUE(FnUnique::new, "unique(values[,collation])",
+      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
+  /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
