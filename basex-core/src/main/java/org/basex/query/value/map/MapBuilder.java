@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * A convenience class for building new maps.
@@ -12,8 +13,25 @@ import org.basex.query.value.seq.*;
  * @author Christian Gruen
  */
 public final class MapBuilder {
+  /** Input info (can be {@code null}). */
+  private final InputInfo info;
   /** Map. */
   private XQMap map = XQMap.empty();
+
+  /**
+   * Constructor.
+   */
+  public MapBuilder() {
+    this(null);
+  }
+
+  /**
+   * Constructor.
+   * @param info input info
+   */
+  public MapBuilder(final InputInfo info) {
+    this.info = info;
+  }
 
   /**
    * Adds a key/value pair to the map.
@@ -22,7 +40,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public void put(final Item key, final Value value) throws QueryException {
-    map = map.put(key, value, null);
+    map = map.put(key, value, info);
   }
 
   /**

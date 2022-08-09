@@ -35,6 +35,34 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void filter() {
+    final Function func = _MAP_FILTER;
+    query(func.args(" map { }", " function($k, $v) { true() } "), "map{}");
+    query(func.args(" map { }", " function($k, $v) { false() } "), "map{}");
+
+    query(func.args(" map { 1: 2 }", " function($k, $v) { true() } "), "map{1:2}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { false() } "), "map{}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 1 } "), "map{1:2}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 2 } "), "map{}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 1 } "), "map{}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 2 } "), "map{1:2}");
+
+    query(func.args(" map:merge((1 to 10) ! map:entry(., string()))",
+        " function($k, $v) { $k < 2 } ") + " => map:keys()", 1);
+    query(func.args(" map:merge((1 to 10) ! map:entry(., string()))",
+        " function($k, $v) { $v < '2' } ") + "?* => sort()", "1\n10");
+    query(func.args(" map { 'abc': 'a', 'def': 'g' }", " contains#2") + "?*", "a");
+    query("map { 'aba': 'a', 'abc': 'a', 'cba': 'a' }" +
+        " =>" + func.args(" contains#2") +
+        " =>" + func.args(" starts-with#2") +
+        " =>" + func.args(" ends-with#2") +
+        " => map:keys()", "aba");
+
+    error(func.args(" map { 'abc': 'a', 'def': 'g' }", " true#0"), FUNARITY_X_X);
+    error(func.args(" map { 'abc': 'a', 'def': 'g' }", " substring#2"), INVPROMOTE_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void forEach() {
     final Function func = _MAP_FOR_EACH;
 
