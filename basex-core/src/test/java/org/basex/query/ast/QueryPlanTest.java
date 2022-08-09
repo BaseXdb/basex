@@ -25,15 +25,11 @@ public abstract class QueryPlanTest extends SandboxTest {
    */
   protected static void check(final String query, final Object expected, final String... tests) {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
-      // retrieve optimized query plan
       qp.optimize();
+      // compare result
+      if(expected != null) compare(query, qp.value().serialize().toString(), expected);
+      // check syntax tree
       final FDoc plan = new FDoc().add(qp.toXml());
-      // compare results
-      if(expected != null) {
-        final String result = normNL(qp.value().serialize().toString());
-        assertEquals(expected.toString(), result, "\nQuery: " + query + '\n');
-      }
-
       for(final String test : tests) {
         try(QueryProcessor qp2 = new QueryProcessor(test, context).context(plan)) {
           if(qp2.value() != Bln.TRUE) fail(NL + "- Query: " + query + NL +

@@ -26,6 +26,8 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class Sandbox {
+  /** Flag for writing queries and results to STDERR. */
+  private static final boolean OUTPUT = false;
   /** Base uri. */
   private static final String BASEURI = new File(".").getAbsolutePath();
 
@@ -98,8 +100,21 @@ public abstract class Sandbox {
    * @param expected expected result
    */
   protected static void query(final String query, final Object expected) {
-    final String res = query(query).replaceAll("(\r?\n|\r) *", "\n");
-    final String exp = expected.toString();
+    compare(query, query(query), expected);
+  }
+
+  /**
+   * Checks if a query yields the specified string.
+   * @param query query string
+   * @param result query result
+   * @param expected expected result
+   */
+  protected static void compare(final String query, final String result, final Object expected) {
+    final String res = normNL(result), exp = expected.toString();
+    if(OUTPUT) {
+      Util.errln(query.strip());
+      Util.errln(res.replaceAll("\n", ","));
+    }
     if(!res.equals(exp)) throw Util.notExpected(
         "Wrong result:\n[Q] " + query + "\n[E] \u00bb" + exp +
         "\u00ab\n[F] \u00bb" + res + "\u00ab\n");
@@ -149,6 +164,10 @@ public abstract class Sandbox {
    * @param error allowed errors
    */
   protected static void error(final String query, final QueryError... error) {
+    if(OUTPUT) {
+      Util.errln(query.strip());
+      if(error.length > 0) Util.errln(error[0]);
+    }
     try {
       final String res = eval(query);
       final TokenBuilder tb = new TokenBuilder().add("Query did not fail:\n");
