@@ -359,4 +359,29 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(func.args(" ('A', 'a')", c), false);
     query(func.args(" ('A', 'b')", c), true);
   }
+
+  /** Test method. */
+  @Test public void mapGroupBy() {
+    final Function func = _MAP_GROUP_BY;
+
+    query(func.args(" ()", " boolean#1"), "map{}");
+    query(func.args(" 0", " boolean#1"), "map{false():0}");
+    query(func.args(" 1", " boolean#1"), "map{true():1}");
+    query(func.args(" (0, 1)", " boolean#1") + " => map:size()", 2);
+    query(func.args(" (0, 1)", " function($i) { boolean($i)[.] }"), "map{true():1}");
+
+    query(func.args(" (1 to 100)", " function($i) { }"), "map{}");
+    query(func.args(" (1 to 100)", " boolean#1") + " => map:size()", 1);
+    query(func.args(" (1 to 100)", " string#1") + " => map:size()", 100);
+    query(func.args(" (1 to 100)", " function($i) { $i mod 10 }") + " => map:size()", 10);
+
+    query(func.args(MONTHS, " string-length#1") + " => map:size()", 7);
+    query(func.args(" (1 to 100)", " function($i) { $i mod 10 }") + " => map:size()", 10);
+    query(func.args(" <xml>{ (1 to 9) ! <sub>{ . }</sub> }</xml>/*", " string-length#1")
+        + " => map:keys()", 1);
+    query("for $f in (true#0, false#0, concat#2, substring#2, contains#2, identity#1)"
+        + "[function-arity(.) = 1] return " + func.args(5, " $f"), "map{5:5}");
+    query("for $f in (1, 2, 3, 4, string#1, 6)"
+        + "[. instance of function(*)] return " + func.args(8, " $f"), "map{\"8\":8}");
+  }
 }
