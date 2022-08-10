@@ -109,15 +109,16 @@ public final class FnSort extends StandardFunc {
       final InputInfo info) throws QueryException {
     final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
     for(int i = 0; i < il; i++) {
-      Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
-      if(item1 == Dbl.NAN || item1 == Flt.NAN) item1 = null;
-      if(item2 == Dbl.NAN || item2 == Flt.NAN) item2 = null;
-      if(item1 != null && item2 != null && !item1.comparable(item2))
-        throw diffError(item1, item2, info);
+      final Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
+      if(!item1.comparable(item2)) throw diffError(item1, item2, info);
 
-      final int diff = item1 == null ? item2 == null ? 0 : -1 : item2 == null ? 1 :
-        item1.diff(item2, coll, info);
-      if(diff != 0 && diff != Item.UNDEF) return diff;
+      int diff = item1.diff(item2, coll, info);
+      if(diff == Item.UNDEF) {
+        final boolean nan1 = item1 == Dbl.NAN || item1 == Flt.NAN;
+        final boolean nan2 = item2 == Dbl.NAN || item2 == Flt.NAN;
+        diff = nan1 ? nan2 ? 0 : -1 : 1;
+      }
+      if(diff != 0) return diff;
     }
     final long diff = size1 - size2;
     return diff < 0 ? -1 : diff > 0 ? 1 : 0;
