@@ -48,6 +48,7 @@ public class FnRangeFrom extends StandardFunc {
 
     exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
     exprType.assign(st.union(Occ.ZERO));
+    data(input.data());
     return this;
   }
 }
