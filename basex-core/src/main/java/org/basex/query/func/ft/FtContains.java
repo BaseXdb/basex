@@ -19,7 +19,7 @@ import org.basex.util.ft.*;
 public final class FtContains extends FtAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Value input = exprs[0].value(qc), query = exprs[1].value(qc);
+    final Value input = exprs[0].value(qc), terms = exprs[1].value(qc);
     final FtContainsOptions opts = toOptions(2, new FtContainsOptions(), qc);
 
     final FTMode mode = opts.get(FtIndexOptions.MODE);
@@ -34,7 +34,7 @@ public final class FtContains extends FtAccess {
     final FTCase cs = opts.get(FtContainsOptions.CASE);
     if(cs != null) opt.cs = cs;
 
-    final FTWords ftw = new FTWords(info, query, mode, null).ftOpt(opt).optimize(qc);
+    final FTWords ftw = new FTWords(info, terms, mode, null).ftOpt(opt).optimize(qc);
     return new FTContains(input, ftExpr(ftw, opts), info).item(qc, info);
   }
 

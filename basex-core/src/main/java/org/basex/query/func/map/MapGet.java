@@ -26,11 +26,11 @@ public final class MapGet extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0];
-    if(expr1 == XQMap.empty()) return Empty.VALUE;
+    final Expr map = exprs[0];
+    if(map == XQMap.empty()) return Empty.VALUE;
 
     // lookup may result in empty sequence
-    final Type type = expr1.seqType().type;
+    final Type type = map.seqType().type;
     if(type instanceof MapType) exprType.assign(((MapType) type).declType.occ.union(Occ.ZERO));
 
     return this;

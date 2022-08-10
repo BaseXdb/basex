@@ -427,10 +427,10 @@ public class Options implements Iterable<Option<?>> {
       for(final Item key : map.keys()) {
         if(!tb.isEmpty()) tb.add(',');
         tb.add(key.string(ii)).add('=');
-        final Value vl = map.get(key, ii);
-        if(!vl.isItem()) throw new BaseXException(
-            Text.OPT_EXPECT_X_X_X, AtomType.STRING, vl.seqType(), vl);
-        tb.add(string(((Item) vl).string(ii)).replace(",", ",,"));
+        final Value val = map.get(key, ii);
+        if(!val.isItem()) throw new BaseXException(
+            Text.OPT_EXPECT_X_X_X, AtomType.STRING, val.seqType(), val);
+        tb.add(string(((Item) val).string(ii)).replace(",", ",,"));
       }
     } else if(item instanceof QNm) {
       tb.add(((QNm) item).id());

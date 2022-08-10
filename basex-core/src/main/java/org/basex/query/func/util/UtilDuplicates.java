@@ -20,16 +20,15 @@ import org.basex.query.value.type.*;
 public final class UtilDuplicates extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter values = exprs[0].atomIter(qc, info);
     final Collation coll = toCollation(1, qc);
-    final Expr expr = exprs[0];
-    final Iter iter = expr.atomIter(qc, info);
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     final ItemSet dupl = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(iter)) != null;) {
+        for(Item item; (item = qc.next(values)) != null;) {
           if(!set.add(item, info) && dupl.add(item, info)) return item;
         }
         return null;
@@ -44,9 +43,9 @@ public final class UtilDuplicates extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr values = exprs[0];
+    final SeqType st = values.seqType();
+    if(st.zero()) return values;
 
     final AtomType type = st.type.atomic();
     if(type != null) {
@@ -55,10 +54,11 @@ public final class UtilDuplicates extends StandardFunc {
 
       if(exprs.length == 1) {
         // util:duplicates(1 to 10)  ->  ()
-        if(expr instanceof RangeSeq || expr instanceof Range || st.zeroOrOne()) return Empty.VALUE;
+        if(values instanceof RangeSeq || values instanceof Range ||
+            st.zeroOrOne()) return Empty.VALUE;
         // util:duplicates((1 to 3) ! 1)  ->  1
-        if(expr instanceof SingletonSeq && !st.mayBeArray()) {
-          final SingletonSeq ss = (SingletonSeq) expr;
+        if(values instanceof SingletonSeq && !st.mayBeArray()) {
+          final SingletonSeq ss = (SingletonSeq) values;
           if(ss.singleItem()) {
             return type == st.type ? ss.itemAt(0) : cc.function(Function.DATA, info, ss.itemAt(0));
           }

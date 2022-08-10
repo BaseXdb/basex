@@ -19,9 +19,9 @@ import org.basex.util.*;
 public final class FnSubstring extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] string = toZeroToken(exprs[0], qc);
-    final boolean ascii = Token.ascii(string);
-    int length = ascii ? string.length : Token.length(string);
+    final byte[] value = toZeroToken(exprs[0], qc);
+    final boolean ascii = Token.ascii(value);
+    int length = ascii ? value.length : Token.length(value);
     int start = start(qc), end = exprs.length == 3 ? length(qc) : length;
 
     if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
@@ -31,26 +31,26 @@ public final class FnSubstring extends StandardFunc {
     }
     end = Math.min(length, exprs.length == 3 ? start + end : Integer.MAX_VALUE);
     if(start >= end) return Str.EMPTY;
-    if(ascii) return Str.get(Token.substring(string, start, end));
+    if(ascii) return Str.get(Token.substring(value, start, end));
 
     // process strings with non-ascii characters
     int ss = start, ee = end, p = 0;
-    final int sl = string.length;
-    for(length = 0; length < sl; length += Token.cl(string, length), ++p) {
+    final int sl = value.length;
+    for(length = 0; length < sl; length += Token.cl(value, length), ++p) {
       if(p == start) ss = length;
       if(p == end) ee = length;
     }
     if(p == end) ee = length;
-    return Str.get(Arrays.copyOfRange(string, ss, ee));
+    return Str.get(Arrays.copyOfRange(value, ss, ee));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
     // empty argument: return empty string
-    if(expr1 == Empty.VALUE || expr1 == Str.EMPTY) return Str.EMPTY;
+    final Expr value = exprs[0];
+    if(value == Empty.VALUE || value == Str.EMPTY) return Str.EMPTY;
 
-    final int start = expr2 instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
+    final int start = exprs[1] instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
     final int length = exprs.length < 3 ? Integer.MAX_VALUE :
       exprs[2] instanceof Value ? length(cc.qc) : Integer.MIN_VALUE;
 
@@ -59,8 +59,8 @@ public final class FnSubstring extends StandardFunc {
 
     // return full string or original expression
     return start <= 0 && length == Integer.MAX_VALUE &&
-      expr1.seqType().type.isStringOrUntyped() ?
-      cc.function(Function.STRING, info, expr1) : this;
+      value.seqType().type.isStringOrUntyped() ?
+      cc.function(Function.STRING, info, value) : this;
   }
 
   /**
@@ -70,9 +70,9 @@ public final class FnSubstring extends StandardFunc {
    * @throws QueryException query exception
    */
   private int start(final QueryContext qc) throws QueryException {
-    final Item item = toAtomItem(exprs[1], qc);
-    if(item instanceof Int) return limit(item.itr(info) - 1);
-    final double dbl = item.dbl(info);
+    final Item start = toAtomItem(exprs[1], qc);
+    if(start instanceof Int) return limit(start.itr(info) - 1);
+    final double dbl = start.dbl(info);
     return Double.isNaN(dbl) ? Integer.MIN_VALUE : subPos(dbl);
   }
 
@@ -83,8 +83,8 @@ public final class FnSubstring extends StandardFunc {
    * @throws QueryException query exception
    */
   private int length(final QueryContext qc) throws QueryException {
-    final Item item = toAtomItem(exprs[2], qc);
-    return item instanceof Int ? (int) item.itr(info) : subPos(item.dbl(info) + 1);
+    final Item length = toAtomItem(exprs[2], qc);
+    return length instanceof Int ? (int) length.itr(info) : subPos(length.dbl(info) + 1);
   }
 
   /**

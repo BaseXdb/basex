@@ -43,10 +43,10 @@ public class FnParseXml extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item parseXml(final QueryContext qc, final boolean frag) throws QueryException {
-    final byte[] token = toTokenOrNull(exprs[0], qc);
-    if(token == null) return Empty.VALUE;
+    final byte[] value = toTokenOrNull(exprs[0], qc);
+    if(value == null) return Empty.VALUE;
 
-    final IO io = new IOContent(token, string(sc.baseURI().string()));
+    final IO io = new IOContent(value, string(sc.baseURI().string()));
     try {
       return new DBNode(frag ? new XMLParser(io, new MainOptions(), true) : Parser.xmlParser(io));
     } catch(final IOException ex) {

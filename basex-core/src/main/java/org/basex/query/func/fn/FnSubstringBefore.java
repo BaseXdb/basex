@@ -20,26 +20,26 @@ import org.basex.util.*;
 public final class FnSubstringBefore extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] string = toZeroToken(exprs[0], qc), sub = toZeroToken(exprs[1], qc);
+    final byte[] value = toZeroToken(exprs[0], qc), sub = toZeroToken(exprs[1], qc);
     final Collation coll = toCollation(2, qc);
-    if(string.length == 0 || sub.length == 0) return Str.EMPTY;
+    if(value.length == 0 || sub.length == 0) return Str.EMPTY;
 
     if(coll == null) {
-      final int pos = indexOf(string, sub);
-      return pos == -1 ? Str.EMPTY : Str.get(substring(string, 0, pos));
+      final int pos = indexOf(value, sub);
+      return pos == -1 ? Str.EMPTY : Str.get(substring(value, 0, pos));
     }
-    return Str.get(coll.before(string, sub, info));
+    return Str.get(coll.before(value, sub, info));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
+    final Expr value = exprs[0], sub = exprs[1];
+    final SeqType st = value.seqType(), stSub = sub.seqType();
 
-    if((st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
-       (st2.zero() || st2.one() && st2.type.isStringOrUntyped()) && exprs.length < 3) {
-      if(expr1 == Empty.VALUE || expr1 == Str.EMPTY || expr2 == Empty.VALUE || expr2 == Str.EMPTY ||
-          expr1.equals(expr2)) return Str.EMPTY;
+    if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
+       (stSub.zero() || stSub.one() && stSub.type.isStringOrUntyped()) && exprs.length < 3) {
+      if(value == Empty.VALUE || value == Str.EMPTY || sub == Empty.VALUE || sub == Str.EMPTY ||
+          value.equals(sub)) return Str.EMPTY;
     }
     return this;
   }

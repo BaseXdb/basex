@@ -29,21 +29,21 @@ public final class MapPut extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
-    if(expr1 == XQMap.empty()) return cc.function(_MAP_ENTRY, info, expr2, expr3);
+    final Expr map = exprs[0], key = exprs[1], value = exprs[2];
+    if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
-    final Type type1 = expr1.seqType().type;
-    if(type1 instanceof MapType) {
-      AtomType type2 = expr2.seqType().type.atomic();
-      if(type2 != null) {
-        SeqType st = expr3.seqType();
+    final Type type = map.seqType().type;
+    if(type instanceof MapType) {
+      AtomType typeKey = key.seqType().type.atomic();
+      if(typeKey != null) {
+        SeqType st = value.seqType();
         // merge types if input is expected to have at least one entry
-        if(!(expr1 instanceof XQMap && ((XQMap) expr1).mapSize() == 0)) {
-          final MapType mt = (MapType) type1;
-          type2 = (AtomType) mt.keyType().union(type2);
-          st = mt.declType.union(expr3.seqType());
+        if(!(map instanceof XQMap && ((XQMap) map).mapSize() == 0)) {
+          final MapType mt = (MapType) type;
+          typeKey = (AtomType) mt.keyType().union(typeKey);
+          st = mt.declType.union(value.seqType());
         }
-        exprType.assign(MapType.get(type2, st));
+        exprType.assign(MapType.get(typeKey, st));
       }
     }
     return this;

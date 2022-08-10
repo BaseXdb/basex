@@ -34,26 +34,26 @@ public final class FnString extends ContextFn {
     simplifyAll(Simplify.STRING, cc);
 
     final boolean context = contextAccess();
-    final Expr expr = context ? cc.qc.focus.value : exprs[0];
-    if(expr != null && expr.seqType().eq(SeqType.STRING_O)) {
+    final Expr item = context ? cc.qc.focus.value : exprs[0];
+    if(item != null && item.seqType().eq(SeqType.STRING_O)) {
       // string('x')  ->  'x'
       // $string[string() = 'a']  ->  $string[. = 'a']
-      return context && cc.nestedFocus() ? ContextValue.get(cc, info) : expr;
+      return context && cc.nestedFocus() ? ContextValue.get(cc, info) : item;
     }
     return this;
   }
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    final Expr item = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
+    final SeqType st = item.seqType();
     Expr expr = null;
-    final Expr expr1 = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
-    final SeqType st1 = expr1.seqType();
-    if(mode == Simplify.STRING && st1.type.isStringOrUntyped() && st1.one()) {
+    if(mode == Simplify.STRING && st.type.isStringOrUntyped() && st.one()) {
       // $node[string() = 'x']  ->  $node[. = 'x']
-      expr = expr1;
+      expr = item;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // boolean(string($node))  ->  boolean($node/descendant::text())
-      expr = simplifyEbv(expr1, cc);
+      expr = simplifyEbv(item, cc);
     }
     return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }

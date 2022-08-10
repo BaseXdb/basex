@@ -17,21 +17,21 @@ public final class FtThesaurus extends FtAccess {
   /** Most recently used thesaurus. */
   private Thesaurus thesaurus;
   /** Most recently supplied root node. */
-  private ANode node;
+  private ANode nd;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ANode root = toNode(exprs[0], qc);
+    final ANode node = toNode(exprs[0], qc);
     final byte[] term = toToken(exprs[1], qc);
     final FtThesaurusOptions opts = toOptions(2, new FtThesaurusOptions(), qc);
 
-    if(root != node) {
-      thesaurus = new Thesaurus(root);
-      node = root;
+    if(node != nd) {
+      thesaurus = new Thesaurus(node);
+      nd = node;
     }
-    final byte[] rel = Token.token(opts.get(FtThesaurusOptions.RELATIONSHIP));
+    final byte[] relation = Token.token(opts.get(FtThesaurusOptions.RELATIONSHIP));
     final long levels = opts.get(FtThesaurusOptions.LEVELS);
 
-    return StrSeq.get(new ThesAccessor(thesaurus, rel, levels, info).find(term));
+    return StrSeq.get(new ThesAccessor(thesaurus, relation, levels, info).find(term));
   }
 }

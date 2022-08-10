@@ -16,24 +16,24 @@ import org.basex.util.*;
 public final class FnDateTime extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs[0].atomItem(qc, info);
-    final Item zone = exprs.length == 2 ? exprs[1].atomItem(qc, info) : null;
-    if(item == Empty.VALUE || zone == Empty.VALUE) return Empty.VALUE;
+    final Item date = exprs[0].atomItem(qc, info);
+    final Item time = exprs.length == 2 ? exprs[1].atomItem(qc, info) : null;
+    if(date == Empty.VALUE || time == Empty.VALUE) return Empty.VALUE;
 
-    final Dat date = item.type.isUntyped() ? new Dat(item.string(info), info) :
-      (Dat) checkType(item, AtomType.DATE);
-    final Tim time = zone.type.isUntyped() ? new Tim(zone.string(info), info) :
-      (Tim) checkType(zone, AtomType.TIME);
-    return new Dtm(date, time, info);
+    final Dat dat = date.type.isUntyped() ? new Dat(date.string(info), info) :
+      (Dat) checkType(date, AtomType.DATE);
+    final Tim tim = time.type.isUntyped() ? new Tim(time.string(info), info) :
+      (Tim) checkType(time, AtomType.TIME);
+    return new Dtm(dat, tim, info);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs.length == 2 ? exprs[1] : Str.EMPTY;
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    if(st1.zero()) return expr1;
-    if(st2.zero()) return expr2;
-    if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray())
+    final Expr date = exprs[0], time = exprs.length == 2 ? exprs[1] : Str.EMPTY;
+    final SeqType stDate = date.seqType(), stTime = time.seqType();
+    if(stDate.zero()) return date;
+    if(stTime.zero()) return time;
+    if(stDate.oneOrMore() && !stDate.mayBeArray() && stTime.oneOrMore() && !stTime.mayBeArray())
       exprType.assign(Occ.EXACTLY_ONE);
     return this;
   }

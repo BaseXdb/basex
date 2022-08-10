@@ -37,10 +37,10 @@ public class FnNodeName extends ContextFn {
    * @return result of check
    */
   final boolean empty(final CompileContext cc, final boolean occ) {
-    final Expr expr = contextAccess() ? cc.qc.focus.value : exprs[0];
-    if(expr == null) return false;
+    final Expr node = contextAccess() ? cc.qc.focus.value : exprs[0];
+    if(node == null) return false;
 
-    final SeqType st = expr.seqType();
+    final SeqType st = node.seqType();
     final Type type = st.type;
     if(occ && st.oneOrMore() && type.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION)) {
       exprType.assign(Occ.EXACTLY_ONE);

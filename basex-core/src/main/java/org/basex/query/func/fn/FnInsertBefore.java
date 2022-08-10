@@ -19,12 +19,11 @@ import org.basex.query.value.type.*;
 public final class FnInsertBefore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter original = exprs[0].iter(qc), insert = exprs[2].iter(qc);
-    final long osize = original.size(), isize = insert.size();
-    final long size = osize != -1 && isize != -1 ? osize + isize : -1;
-    final long ps = pos(qc), pos = osize != -1 ? Math.min(ps, osize) : ps;
-
     return new Iter() {
+      final Iter input = exprs[0].iter(qc), insert = exprs[2].iter(qc);
+      final long osize = input.size(), isize = insert.size();
+      final long size = osize != -1 && isize != -1 ? osize + isize : -1;
+      final long ps = pos(qc), pos = osize != -1 ? Math.min(ps, osize) : ps;
       long p = pos;
       boolean last;
 
@@ -32,7 +31,7 @@ public final class FnInsertBefore extends StandardFunc {
       public Item next() throws QueryException {
         while(!last) {
           final boolean sub = p == -1 || --p == -1;
-          final Item item = qc.next(sub ? insert : original);
+          final Item item = qc.next(sub ? insert : input);
           if(item != null) return item;
           if(sub) --p;
           else last = true;
@@ -42,7 +41,7 @@ public final class FnInsertBefore extends StandardFunc {
       @Override
       public Item get(final long i) throws QueryException {
         final long off = i - pos;
-        return off < 0 ? original.get(i) : off < isize ? insert.get(off) : original.get(i - isize);
+        return off < 0 ? input.get(i) : off < isize ? insert.get(off) : input.get(i - isize);
       }
       @Override
       public long size() {
@@ -53,13 +52,13 @@ public final class FnInsertBefore extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value original = exprs[0].value(qc), insert = exprs[2].value(qc);
-    final long osize = original.size(), pos = Math.min(pos(qc), osize);
+    final Value input = exprs[0].value(qc), insert = exprs[2].value(qc);
+    final long osize = input.size(), pos = Math.min(pos(qc), osize);
 
     // prepend, append or insert new value
-    return pos == 0 ? ValueBuilder.concat(insert, original, qc) :
-           pos == osize ? ValueBuilder.concat(original, insert, qc) :
-           ((Seq) original).insertBefore(pos, insert, qc);
+    return pos == 0 ? ValueBuilder.concat(insert, input, qc) :
+           pos == osize ? ValueBuilder.concat(input, insert, qc) :
+           ((Seq) input).insertBefore(pos, insert, qc);
   }
 
   /**
@@ -74,23 +73,23 @@ public final class FnInsertBefore extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
-    if(expr1 == Empty.VALUE) return expr3;
-    if(expr3 == Empty.VALUE) return expr1;
+    final Expr input = exprs[0], pos = exprs[1], insert = exprs[2];
+    if(input == Empty.VALUE) return insert;
+    if(insert == Empty.VALUE) return input;
 
-    final SeqType st1 = expr1.seqType(), st3 = expr3.seqType();
-    final long size1 = expr1.size(), size3 = expr3.size();
+    final SeqType st = input.seqType(), stInsert = insert.seqType();
+    final long size = input.size(), sizeInsert = insert.size();
 
-    if(expr2 instanceof Value) {
-      final long pos = pos(cc.qc);
-      if(pos == 0) return List.get(cc, info, expr3, expr1);
-      if(size1 != -1 && pos >= size1) return List.get(cc, info, expr1, expr3);
+    if(pos instanceof Value) {
+      final long ps = pos(cc.qc);
+      if(ps == 0) return List.get(cc, info, insert, input);
+      if(size != -1 && ps >= size) return List.get(cc, info, input, insert);
     }
 
-    final long sz = size1 != -1 && size3 != -1 ? size1 + size3 : -1;
-    exprType.assign(st1.union(st3), st1.occ.add(st3.occ), sz);
-    final Data data = expr1.data();
-    if(data != null && expr3.data() == data) data(data);
+    final long sz = size != -1 && sizeInsert != -1 ? size + sizeInsert : -1;
+    exprType.assign(st.union(stInsert), st.occ.add(stInsert.occ), sz);
+    final Data data = input.data();
+    if(data != null && insert.data() == data) data(data);
 
     return this;
   }

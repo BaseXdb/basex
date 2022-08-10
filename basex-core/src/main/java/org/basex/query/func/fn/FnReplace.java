@@ -19,27 +19,27 @@ public final class FnReplace extends RegEx {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(exprs[0], qc);
-    final byte[] pttrn = toToken(exprs[1], qc), rplc = toToken(exprs[2], qc);
+    final byte[] pattern = toToken(exprs[1], qc), replacement = toToken(exprs[2], qc);
 
     if(exprs.length < 4) {
-      final int sp = patternChar(pttrn), rp = patternChar(rplc);
+      final int sp = patternChar(pattern), rp = patternChar(replacement);
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
 
-    final RegExpr regExpr = regExpr(pttrn, exprs.length == 4 ? exprs[3] : null, qc, true);
+    final RegExpr regExpr = regExpr(pattern, exprs.length == 4 ? exprs[3] : null, qc, true);
     final String input = string(value);
-    String replace = string(rplc);
+    String replace = string(replacement);
 
     if((regExpr.pattern.flags() & Pattern.LITERAL) == 0) {
       // standard parsing: raise errors for some special cases
-      final int rl = rplc.length;
+      final int rl = replacement.length;
       for(int r = 0; r < rl; ++r) {
-        final int n = r + 1 == rl ? 0 : rplc[r + 1];
-        if(rplc[r] == '\\') {
-          if(n != '\\' && n != '$') throw FUNREPBS_X.get(info, rplc);
+        final int n = r + 1 == rl ? 0 : replacement[r + 1];
+        if(replacement[r] == '\\') {
+          if(n != '\\' && n != '$') throw FUNREPBS_X.get(info, replacement);
           ++r;
-        } else if(rplc[r] == '$' && (r == 0 || rplc[r - 1] != '\\') && !digit(n)) {
-          throw FUNREPDOL_X.get(info, rplc);
+        } else if(replacement[r] == '$' && (r == 0 || replacement[r - 1] != '\\') && !digit(n)) {
+          throw FUNREPDOL_X.get(info, replacement);
         }
       }
 
@@ -76,7 +76,7 @@ public final class FnReplace extends RegEx {
     } catch(final Exception ex) {
       if(ex.getMessage().contains("No group")) {
         Util.debug(ex);
-        throw REGROUP_X.get(info, pttrn);
+        throw REGROUP_X.get(info, pattern);
       }
       throw REGPAT_X.get(info, ex);
     }

@@ -28,14 +28,14 @@ import org.basex.util.*;
 public final class FnSort extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc), v = quickValue(value);
-    return v != null ? v.iter() : iter(value, qc);
+    final Value input = exprs[0].value(qc), value = quickValue(input);
+    return value != null ? value.iter() : iter(input, qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc), v = quickValue(value);
-    return v != null ? v : iter(value, qc).value(qc, this);
+    final Value input = exprs[0].value(qc), value = quickValue(input);
+    return value != null ? value : iter(input, qc).value(qc, this);
   }
 
   /**
@@ -133,30 +133,30 @@ public final class FnSort extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // optimize sort on sequences
-    final Expr expr1 = exprs[0];
-    final SeqType st1 = expr1.seqType();
-    if(st1.zero()) return expr1;
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     if(exprs.length < 2) {
-      if(st1.zeroOrOne() && st1.type.isSortable()) return expr1;
+      if(st.zeroOrOne() && st.type.isSortable()) return input;
       // enforce pre-evaluation as remaining arguments may not be values
-      if(expr1 instanceof Value) {
-        final Value value = quickValue((Value) expr1);
+      if(input instanceof Value) {
+        final Value value = quickValue((Value) input);
         if(value != null) return value;
       }
-      if(REPLICATE.is(expr1) && ((FnReplicate) expr1).singleEval(false)) {
-        final SeqType st = expr1.arg(0).seqType();
-        if(st.zeroOrOne() && st.type.isSortable()) return expr1;
+      if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
+        final SeqType rst = input.arg(0).seqType();
+        if(rst.zeroOrOne() && rst.type.isSortable()) return input;
       }
-      if(REVERSE.is(expr1) || SORT.is(expr1)) {
+      if(REVERSE.is(input) || SORT.is(input)) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
         return cc.function(SORT, info, args);
       }
     } else if(exprs.length == 3) {
-      exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st1.with(Occ.EXACTLY_ONE));
+      exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE));
     }
-    return adoptType(expr1);
+    return adoptType(input);
   }
 
   @Override
@@ -166,20 +166,20 @@ public final class FnSort extends StandardFunc {
 
   /**
    * Evaluates value arguments.
-   * @param value value
+   * @param input input value
    * @return sorted value or {@code null}
    */
-  private Value quickValue(final Value value) {
+  private Value quickValue(final Value input) {
     if(exprs.length < 2) {
       // range values
-      if(value instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) value;
+      if(input instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) input;
         return seq.asc ? seq : seq.reverse(null);
       }
       // sortable single or singleton values
-      final SeqType st = value.seqType();
-      if(st.type.isSortable() && (st.one() || value instanceof SingletonSeq &&
-          ((SingletonSeq) value).singleItem())) return value;
+      final SeqType st = input.seqType();
+      if(st.type.isSortable() && (st.one() || input instanceof SingletonSeq &&
+          ((SingletonSeq) input).singleItem())) return input;
     }
     // no quick evaluation possible
     return null;

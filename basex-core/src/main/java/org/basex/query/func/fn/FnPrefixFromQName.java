@@ -17,9 +17,9 @@ import org.basex.util.*;
 public final class FnPrefixFromQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final QNm qname = toQNm(exprs[0], true, qc);
-    return qname == null || !qname.hasPrefix() ? Empty.VALUE :
-      AtomType.NCNAME.cast(Str.get(qname.prefix()), qc, sc, info);
+    final QNm value = toQNm(exprs[0], true, qc);
+    return value == null || !value.hasPrefix() ? Empty.VALUE :
+      AtomType.NCNAME.cast(Str.get(value.prefix()), qc, sc, info);
   }
 
   @Override

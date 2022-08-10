@@ -19,12 +19,12 @@ import org.basex.util.*;
 public final class FnResolveUri extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] item = toTokenOrNull(exprs[0], qc);
+    final byte[] relative = toTokenOrNull(exprs[0], qc);
     final byte[] base = exprs.length > 1 ? toToken(exprs[1], qc) : null;
-    if(item == null) return Empty.VALUE;
+    if(relative == null) return Empty.VALUE;
 
     // check relative uri
-    final Uri rel = Uri.uri(item);
+    final Uri rel = Uri.uri(relative);
     if(!rel.isValid()) throw URIARG_X.get(info, rel);
     if(rel.isAbsolute()) return rel;
 

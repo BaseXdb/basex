@@ -20,7 +20,7 @@ import org.basex.query.value.type.*;
 public class FnOutermost extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return most(qc, true);
+    return iter(true, qc);
   }
 
   @Override
@@ -31,15 +31,16 @@ public class FnOutermost extends StandardFunc {
   /**
    * Returns the outermost/innermost nodes of a node sequence, i.e. a node is
    * only contained if none of its ancestors/descendants are.
-   * @param qc query context
    * @param outer outermost flag
+   * @param qc query context
    * @return outermost/innermost nodes
    * @throws QueryException exception
    */
-  Iter most(final QueryContext qc, final boolean outer) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
+  Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
+    final Iter nodes = exprs[0].iter(qc);
+
     final ANodeBuilder list = new ANodeBuilder();
-    for(Item item; (item = qc.next(iter)) != null;) list.add(toNode(item));
+    for(Item item; (item = qc.next(nodes)) != null;) list.add(toNode(item));
     list.ddo();
 
     // only go further if there are at least two nodes
@@ -47,7 +48,7 @@ public class FnOutermost extends StandardFunc {
     if(len < 2) return list.value(this).iter();
 
     // after this, the iterator is sorted and duplicate free
-    final ANodeBuilder nodes = new ANodeBuilder();
+    final ANodeBuilder builder = new ANodeBuilder();
     final Data data = list.data();
     if(data != null) {
       // nodes are sorted, so ancestors always come before their descendants
@@ -62,17 +63,17 @@ public class FnOutermost extends StandardFunc {
           final int pre = nd.pre();
           dummy.pre(pre + data.size(pre, data.kind(pre)));
           p = list.binarySearch(dummy, next + 1, len - next - 1);
-          nodes.add(nd);
+          builder.add(nd);
         }
       } else {
         // skip ancestors of the last added node
-        nodes.add(fst);
+        builder.add(fst);
         int before = fst.pre();
         for(int l = len - 1; l-- != 0;) {
           final DBNode nd = (DBNode) list.get(l);
           final int pre = nd.pre();
           if(pre + data.size(pre, data.kind(pre)) <= before) {
-            nodes.add(nd);
+            builder.add(nd);
             before = pre;
           }
         }
@@ -86,16 +87,16 @@ public class FnOutermost extends StandardFunc {
           qc.checkStop();
           if(list.contains(a)) continue OUTER;
         }
-        nodes.add(nd);
+        builder.add(nd);
       }
     }
-    return nodes.value(this).iter();
+    return builder.value(this).iter();
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final SeqType st1 = exprs[0].seqType();
-    return st1.zeroOrOne() && st1.type instanceof NodeType ? exprs[0] : this;
+    final SeqType st = exprs[0].seqType();
+    return st.zeroOrOne() && st.type instanceof NodeType ? exprs[0] : this;
   }
 
   @Override

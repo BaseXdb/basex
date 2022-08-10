@@ -14,23 +14,23 @@ import org.basex.util.*;
 public final class BinInsertBefore extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 b64 = toB64(exprs[0], qc, true);
-    final Long off = toLong(exprs[1], qc);
-    final B64 xtr = toB64(exprs[2], qc, true);
-    if(b64 == null) return Empty.VALUE;
+    final B64 binary = toB64(exprs[0], qc, true);
+    final Long offset = toLong(exprs[1], qc);
+    final B64 extra = toB64(exprs[2], qc, true);
+    if(binary == null) return Empty.VALUE;
 
-    final byte[] bytes = b64.binary(info);
+    final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(off, null, bl);
+    final int[] bounds = bounds(offset, null, bl);
 
-    if(xtr == null) return b64;
-    final byte[] extra = xtr.binary(info);
-    final int xl = extra.length;
+    if(extra == null) return binary;
+    final byte[] xtr = extra.binary(info);
+    final int xl = xtr.length;
 
     final byte[] tmp = new byte[bl + xl];
     final int o = bounds[0];
     Array.copy(bytes, o, tmp);
-    Array.copyFromStart(extra, xl, tmp, o);
+    Array.copyFromStart(xtr, xl, tmp, o);
     Array.copy(bytes, o, bl - o, tmp, o + xl);
     return B64.get(tmp);
   }

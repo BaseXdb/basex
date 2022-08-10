@@ -15,8 +15,9 @@ import org.basex.util.similarity.*;
 public final class StringLevenshtein extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int[] cps1 = new TokenParser(toToken(exprs[0], qc)).toArray();
-    final int[] cps2 = new TokenParser(toToken(exprs[1], qc)).toArray();
+    final byte[] value1 = toToken(exprs[0], qc), value2 = toToken(exprs[1], qc);
+
+    final int[] cps1 = new TokenParser(value1).toArray(), cps2 = new TokenParser(value2).toArray();
     return Dbl.get(Levenshtein.distance(cps1, cps2));
   }
 }

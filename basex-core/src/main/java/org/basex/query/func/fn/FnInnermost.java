@@ -12,6 +12,6 @@ import org.basex.query.iter.*;
 public final class FnInnermost extends FnOutermost {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return most(qc, false);
+    return iter(false, qc);
   }
 }

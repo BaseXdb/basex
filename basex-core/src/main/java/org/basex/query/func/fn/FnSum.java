@@ -37,24 +37,24 @@ public class FnSum extends StandardFunc {
     final Expr expr = opt(false);
     if(expr != null) return expr;
 
-    final Expr expr1 = exprs[0], expr2 = exprs.length == 2 ? exprs[1] : null;
-    final SeqType st1 = expr1.seqType(), st2 = expr2 != null ? expr2.seqType() : null;
-    if(st1.zero()) {
+    final Expr values = exprs[0], zero = exprs.length == 2 ? exprs[1] : null;
+    final SeqType st = values.seqType(), stZero = zero != null ? zero.seqType() : null;
+    if(st.zero()) {
       // sequence is empty: check if it is also deterministic
-      if(!expr1.has(Flag.NDT)) {
-        if(expr2 == null) return Int.ZERO;
-        if(expr2 == Empty.VALUE) return expr1;
-        if(st2.instanceOf(SeqType.INTEGER_O)) return expr2;
+      if(!values.has(Flag.NDT)) {
+        if(zero == null) return Int.ZERO;
+        if(zero == Empty.VALUE) return values;
+        if(stZero.instanceOf(SeqType.INTEGER_O)) return zero;
       }
-    } else if(st1.oneOrMore() && !st1.mayBeArray()) {
+    } else if(st.oneOrMore() && !st.mayBeArray()) {
       // sequence is not empty: assign result type
-      final Type type1 = st1.type;
-      if(type1.isNumber()) exprType.assign(type1.seqType());
-      else if(type1.isUntyped()) exprType.assign(SeqType.DOUBLE_O);
-    } else if(st2 != null && !st2.zero() && !st2.mayBeArray()) {
+      final Type type = st.type;
+      if(type.isNumber()) exprType.assign(type.seqType());
+      else if(type.isUntyped()) exprType.assign(SeqType.DOUBLE_O);
+    } else if(stZero != null && !stZero.zero() && !stZero.mayBeArray()) {
       // if input may be empty: consider default argument in static type
-      final Occ occ = st2.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
-      exprType.assign(Calc.PLUS.type(st1.type, st2.type), occ);
+      final Occ occ = stZero.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+      exprType.assign(Calc.PLUS.type(st.type, stZero.type), occ);
     }
     return this;
   }
@@ -66,19 +66,19 @@ public class FnSum extends StandardFunc {
    * @throws QueryException query exception
    */
   final Expr opt(final boolean avg) throws QueryException {
-    final Expr expr = exprs[0];
-    if(expr instanceof RangeSeq) {
-      return range((RangeSeq) expr, avg);
-    } else if(expr instanceof SingletonSeq) {
-      final SingletonSeq seq = (SingletonSeq) expr;
+    final Expr values = exprs[0];
+    if(values instanceof RangeSeq) {
+      return range((RangeSeq) values, avg);
+    } else if(values instanceof SingletonSeq) {
+      final SingletonSeq seq = (SingletonSeq) values;
       if(seq.singleItem()) {
         Item item = seq.itemAt(0);
         final Type type = item.type;
         if(type.isUntyped()) item = Dbl.get(item.dbl(info));
         if(type.isNumber()) return avg ? item : Calc.MULT.eval(item, Int.get(seq.size()), info);
       }
-    } else if(expr instanceof Path) {
-      final ArrayList<Stats> list = ((Path) expr).pathStats();
+    } else if(values instanceof Path) {
+      final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         double sum = 0;
         long count = 0;
@@ -146,10 +146,10 @@ public class FnSum extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item sum(final boolean avg, final QueryContext qc) throws QueryException {
-    final Expr expr = exprs[0];
-    if(expr instanceof Range) return range(expr.value(qc), avg);
+    final Expr values = exprs[0];
+    if(values instanceof Range) return range(values.value(qc), avg);
 
-    final Iter iter = expr.atomIter(qc, info);
+    final Iter iter = values.atomIter(qc, info);
     final Item item = iter.next();
     if(item == null) return null;
 

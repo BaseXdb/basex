@@ -18,14 +18,14 @@ import org.basex.query.value.seq.*;
 public final class FnStringToCodepoints extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] token = toZeroToken(exprs[0], qc);
-    final int tl = token.length;
+    final byte[] value = toZeroToken(exprs[0], qc);
+    final int tl = value.length;
 
-    if(ascii(token)) {
+    if(ascii(value)) {
       return new BasicIter<Int>(tl) {
         @Override
         public Int get(final long i) {
-          return Int.get(token[(int) i]);
+          return Int.get(value[(int) i]);
         }
       };
     }
@@ -36,8 +36,8 @@ public final class FnStringToCodepoints extends StandardFunc {
       @Override
       public Int next() {
         if(t == tl) return null;
-        final int cp = cp(token, t);
-        t += cl(token, t);
+        final int cp = cp(value, t);
+        t += cl(value, t);
         return Int.get(cp);
       }
     };

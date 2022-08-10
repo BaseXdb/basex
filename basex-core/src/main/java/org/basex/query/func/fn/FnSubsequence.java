@@ -36,17 +36,17 @@ public class FnSubsequence extends StandardFunc {
     if(sr == EMPTY) return Empty.ITER;
 
     // return iterator if all results are returned, of it iterator yields no items
-    final Iter iter = exprs[0].iter(qc);
-    if(sr == ALL) return iter;
+    final Iter input = exprs[0].iter(qc);
+    if(sr == ALL) return input;
 
     // return subsequence iterator if iterator is value-based
-    final long size = sr.adjust(iter.size());
+    final long size = sr.adjust(input.size());
     if(sr.length == 0) return Empty.ITER;
 
     if(size != -1) {
-      final Value value = iter.iterValue();
+      final Value value = input.iterValue();
       if(value != null) return value.subsequence(sr.start, sr.length, qc).iter();
-      if(sr.length == size) return iter;
+      if(sr.length == size) return input;
 
       return new Iter() {
         long c = sr.start;
@@ -54,11 +54,11 @@ public class FnSubsequence extends StandardFunc {
         @Override
         public Item next() throws QueryException {
           qc.checkStop();
-          return c < sr.end ? iter.get(c++) : null;
+          return c < sr.end ? input.get(c++) : null;
         }
         @Override
         public Item get(final long i) throws QueryException {
-          return iter.get(sr.start + i);
+          return input.get(sr.start + i);
         }
         @Override
         public long size() {
@@ -73,7 +73,7 @@ public class FnSubsequence extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        for(Item item; c < sr.end && (item = qc.next(iter)) != null;) {
+        for(Item item; c < sr.end && (item = qc.next(input)) != null;) {
           if(++c > sr.start) return item;
         }
         return null;
@@ -86,9 +86,9 @@ public class FnSubsequence extends StandardFunc {
     final SeqRange sr = range(qc);
     if(sr == EMPTY) return Empty.VALUE;
 
-    final Expr expr = exprs[0];
-    if(sr == ALL) return expr.value(qc);
-    final Iter iter = expr.iter(qc);
+    final Expr input = exprs[0];
+    if(sr == ALL) return input.value(qc);
+    final Iter iter = input.iter(qc);
 
     final long size = sr.adjust(iter.size());
     if(sr.length == 0) return Empty.VALUE;
@@ -174,9 +174,9 @@ public class FnSubsequence extends StandardFunc {
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     long sz = -1;
     final SeqRange sr = range(cc);
@@ -184,52 +184,52 @@ public class FnSubsequence extends StandardFunc {
       // no results
       if(sr == EMPTY) return Empty.VALUE;
       // all values?
-      if(sr == ALL) return expr;
+      if(sr == ALL) return input;
       // ignore standard limitation for large values to speed up evaluation of result
-      if(expr instanceof Value) return value(cc.qc);
+      if(input instanceof Value) return value(cc.qc);
 
       // check if result size is statically known
-      final long size = sr.adjust(expr.size());
+      final long size = sr.adjust(input.size());
       if(size != -1) {
-        if(sr.length == size) return expr;
+        if(sr.length == size) return input;
         // rewrite nested function calls
-        if(sr.start == size - 1) return cc.function(_UTIL_LAST, info, expr);
-        if(sr.start == 1 && sr.end == size) return cc.function(TAIL, info, expr);
-        if(sr.start == 0 && sr.end == size - 1) return cc.function(_UTIL_INIT, info, expr);
+        if(sr.start == size - 1) return cc.function(_UTIL_LAST, info, input);
+        if(sr.start == 1 && sr.end == size) return cc.function(TAIL, info, input);
+        if(sr.start == 0 && sr.end == size - 1) return cc.function(_UTIL_INIT, info, input);
         sz = sr.length;
       } else if(st.zeroOrOne()) {
         // sr.length is always larger than 0 at this point
-        return sr.start == 0 ? expr : Empty.VALUE;
+        return sr.start == 0 ? input : Empty.VALUE;
       }
 
       // rewrite nested function calls
       if(sr.length == 1) {
-        return sr.start == 0 ? cc.function(HEAD, info, expr) :
-          cc.function(_UTIL_ITEM, info, expr, Int.get(sr.start + 1));
+        return sr.start == 0 ? cc.function(HEAD, info, input) :
+          cc.function(_UTIL_ITEM, info, input, Int.get(sr.start + 1));
       }
       if(sr.length == Long.MAX_VALUE && sr.start == 1)
-        return cc.function(TAIL, info, expr);
-      if(_FILE_READ_TEXT_LINES.is(expr))
+        return cc.function(TAIL, info, input);
+      if(_FILE_READ_TEXT_LINES.is(input))
         return FileReadTextLines.opt(this, sr.start, sr.length, cc);
-      if(REPLICATE.is(expr)) {
-        final Expr[] args = expr.args();
+      if(REPLICATE.is(input)) {
+        final Expr[] args = input.args();
         if(args[0].size() == 1 && args[1] instanceof Int) {
           args[1] = Int.get(sr.length);
           return cc.function(REPLICATE, info, args);
         }
       }
-      if(expr instanceof List) {
-        final Expr[] args = expr.args();
+      if(input instanceof List) {
+        final Expr[] args = input.args();
         if(((Checks<Expr>) ex -> ex.seqType().one()).all(args)) {
           return List.get(cc, info, Arrays.copyOfRange(args, (int) sr.start, (int) sr.end));
         }
       }
-    } else if(exprs[1] == Int.ONE && exprs[2] instanceof Arith && !exprs[0].has(Flag.NDT)) {
+    } else if(exprs[1] == Int.ONE && exprs[2] instanceof Arith && !input.has(Flag.NDT)) {
       // subsequence(expr, 1, count(expr) - 1)  ->  util:init(expr)
-      final Arith ar = (Arith) exprs[2];
-      if(COUNT.is(ar.exprs[0]) && ar.calc == Calc.MINUS && ar.exprs[1] == Int.ONE &&
-          exprs[0].equals(ar.exprs[0].arg(0))) {
-        return cc.function(_UTIL_INIT, info, expr);
+      final Arith arith = (Arith) exprs[2];
+      if(COUNT.is(arith.exprs[0]) && arith.calc == Calc.MINUS && arith.exprs[1] == Int.ONE &&
+          input.equals(arith.exprs[0].arg(0))) {
+        return cc.function(_UTIL_INIT, info, input);
       }
     }
 
@@ -237,7 +237,7 @@ public class FnSubsequence extends StandardFunc {
     if(embedded != null) return embedded;
 
     exprType.assign(st.union(Occ.ZERO), sz);
-    data(expr.data());
+    data(input.data());
     return this;
   }
 

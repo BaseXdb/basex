@@ -22,12 +22,12 @@ public final class ArrayAppend extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1 == XQArray.empty()) return new CArray(info, true, expr2).optimize(cc);
+    final Expr array = exprs[0], add = exprs[1];
+    if(array == XQArray.empty()) return new CArray(info, true, add).optimize(cc);
 
-    final Type type1 = expr1.seqType().type;
-    if(type1 instanceof ArrayType) {
-      final SeqType dt = ((ArrayType) type1).declType.union(expr2.seqType());
+    final Type type = array.seqType().type;
+    if(type instanceof ArrayType) {
+      final SeqType dt = ((ArrayType) type).declType.union(add.seqType());
       exprType.assign(ArrayType.get(dt));
     }
     return this;

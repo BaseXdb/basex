@@ -34,7 +34,7 @@ public final class SqlConnect extends SqlFn {
       final Connection conn;
       if(exprs.length > 2) {
         // credentials
-        final String user = toString(exprs[1], qc), pass = toString(exprs[2], qc);
+        final String username = toString(exprs[1], qc), password = toString(exprs[2], qc);
         if(exprs.length == 4) {
           // parse connection options
           final HashMap<String, String> options = toOptions(3, new Options(), qc).free();
@@ -44,8 +44,8 @@ public final class SqlConnect extends SqlFn {
           options.forEach((key, value) -> {
             if(!key.equals(AUTOCOMMIT)) props.setProperty(key, value);
           });
-          props.setProperty(USER, user);
-          props.setProperty(PASS, pass);
+          props.setProperty(USER, username);
+          props.setProperty(PASS, password);
 
           // open connection and set auto-commit mode
           conn = DriverManager.getConnection(url, props);
@@ -53,7 +53,7 @@ public final class SqlConnect extends SqlFn {
             conn.setAutoCommit(Strings.toBoolean(options.get(AUTOCOMMIT)));
           }
         } else {
-          conn = DriverManager.getConnection(url, user, pass);
+          conn = DriverManager.getConnection(url, username, password);
         }
       } else {
         conn = DriverManager.getConnection(url);

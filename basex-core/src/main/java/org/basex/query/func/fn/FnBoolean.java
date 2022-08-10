@@ -23,12 +23,12 @@ public final class FnBoolean extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // boolean(true()))  ->  true()
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.eq(SeqType.BOOLEAN_O)) return expr;
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.eq(SeqType.BOOLEAN_O)) return input;
 
     // boolean($node/text())  ->  exists($node/text())
-    if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, expr);
+    if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, input);
 
     return this;
   }
@@ -43,8 +43,8 @@ public final class FnBoolean extends StandardFunc {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
     // if(boolean(number))  ->  if(number)
     // E[boolean(nodes)]  ->  E[nodes]
-    final Expr expr = exprs[0];
-    return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && !expr.seqType().mayBeNumber() ?
-      cc.simplify(this, expr) : this;
+    final Expr input = exprs[0];
+    return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && !input.seqType().mayBeNumber() ?
+      cc.simplify(this, input) : this;
   }
 }

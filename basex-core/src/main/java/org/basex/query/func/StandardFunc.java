@@ -202,7 +202,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Refines the type of a function item argument.
-   * @param expr expression
+   * @param expr function
    * @param cc compilation context
    * @param declType declared return type
    * @param argTypes argument types
@@ -278,7 +278,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression to a date of the specified type.
+   * Converts an item to a date of the specified type.
    * @param item item
    * @param type expected type
    * @param qc query context

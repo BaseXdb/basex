@@ -20,26 +20,26 @@ import org.basex.query.value.type.*;
 public final class HofFoldLeft1 extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final FItem func = toFunction(exprs[1], 2, qc);
+    final Iter input = exprs[0].iter(qc);
+    final FItem action = toFunction(exprs[1], 2, qc);
 
-    Value sum = checkNoEmpty(iter.next());
-    for(Item item; (item = qc.next(iter)) != null;) {
-      sum = func.invoke(qc, info, sum, item);
+    Value sum = checkNoEmpty(input.next());
+    for(Item item; (item = qc.next(input)) != null;) {
+      sum = action.invoke(qc, info, sum, item);
     }
     return sum;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1.seqType().zero()) throw EMPTYFOUND.get(info);
+    final Expr input = exprs[0], action = exprs[1];
+    if(input.seqType().zero()) throw EMPTYFOUND.get(info);
 
     // unroll fold
-    if(expr2 instanceof Value) {
-      final ExprList unroll = cc.unroll(expr1, true);
+    if(action instanceof Value) {
+      final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final FItem func = toFunction(expr2, 2, cc.qc);
+        final FItem func = toFunction(action, 2, cc.qc);
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {
@@ -49,7 +49,7 @@ public final class HofFoldLeft1 extends StandardFunc {
       }
     }
 
-    final FuncType ft = expr2.funcType();
+    final FuncType ft = action.funcType();
     if(ft != null) exprType.assign(ft.declType);
     return this;
   }

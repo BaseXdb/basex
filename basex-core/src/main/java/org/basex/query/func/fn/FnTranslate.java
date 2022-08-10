@@ -18,19 +18,19 @@ import org.basex.util.*;
 public final class FnTranslate extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] token = toZeroToken(exprs[0], qc);
-    final int[] search = cps(toToken(exprs[1], qc)), replace = cps(toToken(exprs[2], qc));
-    if(token.length == 0 || search.length == 0) return Str.get(token);
+    final byte[] value = toZeroToken(exprs[0], qc);
+    final int[] replace = cps(toToken(exprs[1], qc)), with = cps(toToken(exprs[2], qc));
+    if(value.length == 0 || replace.length == 0) return Str.get(value);
 
-    final TokenBuilder tb = new TokenBuilder(token.length);
-    final int sl = search.length, rl = replace.length;
-    for(final int cp : cps(token)) {
+    final TokenBuilder tb = new TokenBuilder(value.length);
+    final int sl = replace.length, rl = with.length;
+    for(final int cp : cps(value)) {
       int s = -1;
-      while(++s < sl && cp != search[s]);
+      while(++s < sl && cp != replace[s]);
       if(s == sl) {
         tb.add(cp);
       } else if(s < rl) {
-        tb.add(replace[s]);
+        tb.add(with[s]);
       }
     }
     return Str.get(tb.finish());
@@ -38,12 +38,12 @@ public final class FnTranslate extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1], expr3 = exprs[2];
-    final SeqType st1 = expr1.seqType(), st3 = expr3.seqType();
+    final Expr value = exprs[0], replace = exprs[1], with = exprs[2];
+    final SeqType st = value.seqType(), withSt = with.seqType();
 
-    if((st1.zero() || st1.one() && st1.type.isStringOrUntyped()) && expr2 == Str.EMPTY &&
-       st3.one() && st3.type.isStringOrUntyped()) {
-      return cc.function(Function.STRING, info, expr1);
+    if((st.zero() || st.one() && st.type.isStringOrUntyped()) && replace == Str.EMPTY &&
+       withSt.one() && withSt.type.isStringOrUntyped()) {
+      return cc.function(Function.STRING, info, value);
     }
     return this;
   }

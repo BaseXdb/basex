@@ -23,56 +23,56 @@ import org.basex.query.value.type.*;
 public class FnReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Expr expr = exprs[0];
+    final Expr input = exprs[0];
     final long count = toLong(exprs[1], qc);
     if(count <= 0) return Empty.VALUE;
-    if(count == 1) return expr.value(qc);
+    if(count == 1) return input.value(qc);
 
     // check if expression must be evaluated only once
-    final boolean once = expr instanceof Value || exprs.length < 3 || !toBoolean(exprs[2], qc);
-    if(once) return SingletonSeq.get(expr.value(qc), count);
+    final boolean once = input instanceof Value || exprs.length < 3 || !toBoolean(exprs[2], qc);
+    if(once) return SingletonSeq.get(input.value(qc), count);
 
     // repeated evaluations
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long c = 0; c < count; c++) vb.add(expr.value(qc));
+    for(long c = 0; c < count; c++) vb.add(input.value(qc));
     return vb.value(this);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Expr expr = exprs[0];
-    final long size = toLong(exprs[1], qc);
-    if(size <= 0) return Empty.ITER;
-    if(size == 1) return expr.iter(qc);
+    final Expr input = exprs[0];
+    final long count = toLong(exprs[1], qc);
+    if(count <= 0) return Empty.ITER;
+    if(count == 1) return input.iter(qc);
 
     // check if expression must be evaluated only once
     final boolean once = exprs.length < 3 || !toBoolean(exprs[2], qc);
-    if(once) return SingletonSeq.get(expr.value(qc), size).iter();
+    if(once) return SingletonSeq.get(input.value(qc), count).iter();
 
     // repeated evaluations
-    if(expr.seqType().one()) {
+    if(input.seqType().one()) {
       // replication of single item
       return new Iter() {
-        long c = size;
+        long c = count;
 
         @Override
         public Item next() throws QueryException {
-          return --c >= 0 ? expr.item(qc, info) : null;
+          return --c >= 0 ? input.item(qc, info) : null;
         }
         @Override
         public Item get(final long i) throws QueryException {
-          return expr.item(qc, info);
+          return input.item(qc, info);
         }
         @Override
         public long size() {
-          return size;
+          return count;
         }
       };
     }
 
     // standard evaluation
     return new Iter() {
-      long c = size;
+      long c = count;
       Iter iter;
 
       @Override
@@ -80,7 +80,7 @@ public class FnReplicate extends StandardFunc {
         while(true) {
           if(iter == null) {
             if(--c < 0) return null;
-            iter = expr.iter(qc);
+            iter = input.iter(qc);
           }
           final Item item = iter.next();
           if(item != null) return item;
@@ -92,13 +92,13 @@ public class FnReplicate extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0], count = exprs[1];
+    final Expr input = exprs[0], count = exprs[1];
     final boolean single = singleEval(true);
 
     // merge replicate functions
-    if(REPLICATE.is(expr) && single == ((FnReplicate) expr).singleEval(true)) {
-      final ExprList args = new ExprList(2).add(expr.arg(0));
-      args.add(new Arith(info, count, expr.arg(1), Calc.MULT).optimize(cc));
+    if(REPLICATE.is(input) && single == ((FnReplicate) input).singleEval(true)) {
+      final ExprList args = new ExprList(2).add(input.arg(0));
+      args.add(new Arith(info, count, input.arg(1), Calc.MULT).optimize(cc));
       if(!single) args.add(Bln.TRUE);
       return cc.function(REPLICATE, info, args.finish());
     }
@@ -110,16 +110,16 @@ public class FnReplicate extends StandardFunc {
       // replicate(<a/>, 0)  ->  ()
       if(c <= 0) return Empty.VALUE;
       // replicate(<a/>, 1)  ->  <a/>
-      if(c == 1) return expr;
-      sz = expr.size();
+      if(c == 1) return input;
+      sz = input.size();
       if(sz != -1) sz *= c;
     }
     // replicate(prof:void(<a/>), 2)  ->  prof:void(<a/>)
-    if(expr == Empty.VALUE || sz == 0 && single) return expr;
+    if(input == Empty.VALUE || sz == 0 && single) return input;
 
     // adopt sequence type
-    exprType.assign(expr.seqType().union(c > 0 ? Occ.ONE_OR_MORE : Occ.ZERO_OR_MORE), sz);
-    data(expr.data());
+    exprType.assign(input.seqType().union(c > 0 ? Occ.ONE_OR_MORE : Occ.ZERO_OR_MORE), sz);
+    data(input.data());
     return this;
   }
 
@@ -129,10 +129,10 @@ public class FnReplicate extends StandardFunc {
 
     if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT)) {
       // data(replicate(<a>1</a>, 2))  ->  data(replicate(xs:untypedAtomic('1'), 2))
-      final Expr arg = exprs[0].simplifyFor(mode, cc);
-      if(arg != exprs[0]) {
+      final Expr input = exprs[0].simplifyFor(mode, cc);
+      if(input != exprs[0]) {
         final Expr[] args = exprs.clone();
-        args[0] = arg;
+        args[0] = input;
         expr = cc.function(REPLICATE, info, args);
       }
     } else if(mode == Simplify.DISTINCT) {

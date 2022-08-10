@@ -23,16 +23,16 @@ import org.basex.util.list.*;
 public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Item item = unparsedText(qc, false, true);
-    return item == Empty.VALUE ? Empty.ITER : new LinesIter(item.string(info));
+    final Item text = unparsedText(qc, false, true);
+    return text == Empty.VALUE ? Empty.ITER : new LinesIter(text.string(info));
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item item = unparsedText(qc, false, true);
-    if(item == Empty.VALUE) return Empty.VALUE;
+    final Item text = unparsedText(qc, false, true);
+    if(text == Empty.VALUE) return Empty.VALUE;
 
-    try(NewlineInput ni = new NewlineInput(item.string(info))) {
+    try(NewlineInput ni = new NewlineInput(text.string(info))) {
       final TokenList tl = new TokenList();
       final TokenBuilder tb = new TokenBuilder();
       while(ni.readLine(tb)) {
@@ -47,8 +47,8 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
-    return expr.seqType().zero() ? expr : super.opt(cc);
+    final Expr href = exprs[0];
+    return href.seqType().zero() ? href : super.opt(cc);
   }
 
   /**

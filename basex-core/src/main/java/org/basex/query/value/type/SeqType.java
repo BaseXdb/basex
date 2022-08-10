@@ -55,6 +55,8 @@ public final class SeqType {
   public static final SeqType DOUBLE_ZM = DOUBLE.seqType(ZERO_OR_MORE);
   /** Float number. */
   public static final SeqType FLOAT_O = FLOAT.seqType();
+  /** Decimal number. */
+  public static final SeqType DECIMAL_O = DECIMAL.seqType();
   /** Zero or one decimal number. */
   public static final SeqType DECIMAL_ZO = DECIMAL.seqType(ZERO_OR_ONE);
   /** Single integer. */
@@ -178,6 +180,8 @@ public final class SeqType {
   public static final SeqType FUNCTION_ZO = FUNCTION.seqType(ZERO_OR_ONE);
   /** Zero of more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
+  /** Predicate function. */
+  public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O).seqType();
   /** Single map. */
   public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */

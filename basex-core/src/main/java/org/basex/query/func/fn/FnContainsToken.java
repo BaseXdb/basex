@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.index.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
@@ -23,8 +24,8 @@ public final class FnContainsToken extends StandardFunc {
     final byte[] token = trim(toToken(exprs[1], qc));
     final Collation coll = toCollation(2, qc);
     if(token.length != 0) {
-      final Iter iter = exprs[0].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) {
+      final Iter value = exprs[0].iter(qc);
+      for(Item item; (item = qc.next(value)) != null;) {
         for(final byte[] distinct : distinctTokens(toToken(item))) {
           if(coll == null ? eq(token, distinct) : coll.compare(token, distinct) == 0) {
             return Bln.TRUE;
@@ -38,7 +39,8 @@ public final class FnContainsToken extends StandardFunc {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // support limited to default collation
-    return exprs.length == 2 && exprs[1].seqType().zeroOrOne() &&
-      ii.create(exprs[1], ii.type(exprs[0], IndexType.TOKEN), true, info);
+    final Expr value = exprs[0], token = exprs[1];
+    return exprs.length == 2 && token.seqType().zeroOrOne() &&
+      ii.create(token, ii.type(value, IndexType.TOKEN), true, info);
   }
 }

@@ -14,10 +14,10 @@ import org.basex.util.*;
 public final class CryptoHmac extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] data = toBytes(exprs[0], qc);
+    final byte[] value = toBytes(exprs[0], qc);
     final byte[] key = toBytes(exprs[1], qc);
     final String algorithm = toString(exprs[2], qc);
     final String encoding = exprs.length == 4 ? toString(exprs[3], qc) : null;
-    return new Encryption(info).hmac(data, key, algorithm, encoding);
+    return new Encryption(info).hmac(value, key, algorithm, encoding);
   }
 }

@@ -19,30 +19,30 @@ import org.basex.query.value.type.*;
 public final class UtilIntersperse extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
+    final Iter values = exprs[0].iter(qc);
     final Value sep = exprs[1].value(qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    Item item = iter.next();
+    Item item = values.next();
     if(item != null) {
       vb.add(item);
-      while((item = iter.next()) != null) vb.add(sep).add(item);
+      while((item = values.next()) != null) vb.add(sep).add(item);
     }
     return vb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    if(st1.zeroOrOne() || expr2 == Empty.VALUE) return expr1;
+    final Expr values = exprs[0], sep = exprs[1];
+    final SeqType st = values.seqType(), stSep = sep.seqType();
+    if(st.zeroOrOne() || sep == Empty.VALUE) return values;
 
-    final long size1 = expr1.size(), size2 = expr2.size();
-    final long sz = size1 != -1 && size2 != -1 ? size1 + size2 * (size1 - 1) : -1;
-    exprType.assign(st1.union(st2), st1.occ, sz);
+    final long size = values.size(), sizeSep = sep.size();
+    final long sz = size != -1 && sizeSep != -1 ? size + sizeSep * (size - 1) : -1;
+    exprType.assign(st.union(stSep), st.occ, sz);
 
-    final Data data1 = expr1.data(), data2 = expr2.data();
-    if(data1 != null && data1 == data2) data(data1);
+    final Data data = values.data(), dataSep = sep.data();
+    if(data != null && data == dataSep) data(data);
 
     return this;
   }

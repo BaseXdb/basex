@@ -15,9 +15,9 @@ import org.basex.util.similarity.*;
 public final class StringColognePhonetic extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int[] cps = new TokenParser(toToken(exprs[0], qc)).toArray();
-    final int[] encoded = ColognePhonetic.encode(cps);
+    final byte[] value = toToken(exprs[0], qc);
 
+    final int[] encoded = ColognePhonetic.encode(new TokenParser(value).toArray());
     final TokenBuilder tb = new TokenBuilder(encoded.length);
     for(final int cp : encoded) tb.add(cp);
     return Str.get(tb.finish());

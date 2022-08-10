@@ -39,27 +39,28 @@ abstract class DateTime extends StandardFunc {
   }
 
   /**
-   * Adjusts a Time item to the specified time zone.
+   * Adjusts a date/time item to the specified time zone.
    * @param item item
    * @param type target type
    * @param qc query context
-   * @return duration
+   * @return adjusted item
    * @throws QueryException query exception
    */
   final ADate adjust(final Item item, final AtomType type, final QueryContext qc)
       throws QueryException {
 
     // clone item
-    ADate ad = toDate(item, type, qc);
+    ADate date = toDate(item, type, qc);
     if(!item.type.isUntyped()) {
-      ad = type == AtomType.TIME ? new Tim(ad) : type == AtomType.DATE ? new Dat(ad) : new Dtm(ad);
+      date = type == AtomType.TIME ? new Tim(date) :
+             type == AtomType.DATE ? new Dat(date) : new Dtm(date);
     }
     final boolean spec = exprs.length == 2;
     final Item zon = spec ? exprs[1].atomItem(qc, info) : Empty.VALUE;
     final DTDur dur = zon == Empty.VALUE ? null :
       (DTDur) checkType(zon, AtomType.DAY_TIME_DURATION);
-    ad.timeZone(dur, spec, info);
-    return ad;
+    date.timeZone(dur, spec, info);
+    return date;
   }
 
   @Override

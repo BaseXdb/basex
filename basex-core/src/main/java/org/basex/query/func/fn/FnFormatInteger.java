@@ -22,14 +22,14 @@ public final class FnFormatInteger extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item value = exprs[0].atomItem(qc, info);
     final byte[] picture = toToken(exprs[1], qc);
     final byte[] language = exprs.length == 2 ? EMPTY : toToken(exprs[2], qc);
+    if(value == Empty.VALUE) return Str.EMPTY;
 
-    final Item item = exprs[0].atomItem(qc, info);
-    if(item == Empty.VALUE) return Str.EMPTY;
-    final long number = toLong(item);
-
+    final long number = toLong(value);
     IntFormat format;
+
     synchronized(formats) {
       format = formats.get(picture);
       if(format == null) {

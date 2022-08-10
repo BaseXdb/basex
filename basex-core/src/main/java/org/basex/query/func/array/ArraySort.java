@@ -38,18 +38,18 @@ public final class ArraySort extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0];
-    if(expr1 == XQArray.empty()) return expr1;
+    final Expr array = exprs[0];
+    if(array == XQArray.empty()) return array;
 
-    final SeqType st1 = exprs[0].seqType();
-    final Type type1 = st1.type;
+    final SeqType st = exprs[0].seqType();
+    final Type type = st.type;
 
-    if(type1 instanceof ArrayType) {
+    if(type instanceof ArrayType) {
       if(exprs.length == 3) {
         exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM,
-            ((ArrayType) type1).declType);
+            ((ArrayType) type).declType);
       }
-      exprType.assign(type1);
+      exprType.assign(type);
     }
     return this;
   }

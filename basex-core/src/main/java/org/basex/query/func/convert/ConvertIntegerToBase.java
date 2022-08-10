@@ -29,15 +29,15 @@ public final class ConvertIntegerToBase extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final long num = toLong(exprs[0], qc), base = toLong(exprs[1], qc);
+    final long value = toLong(exprs[0], qc), base = toLong(exprs[1], qc);
     if(base < 2 || base > 36) throw CONVERT_BASE_X.get(info, base);
 
     // use fast variant for powers of two
     for(int i = 1, p = 2; i < 6; i++, p <<= 1)
-      if(base == p) return toBaseFast(num, i);
+      if(base == p) return toBaseFast(value, i);
 
     final ByteList bl = new ByteList();
-    long n = num;
+    long n = value;
     if(n < 0) {
       // unsigned value doesn't fit in any native type...
       final BigInteger[] dr = BigInteger.valueOf(n).add(MAX_ULONG).divideAndRemainder(

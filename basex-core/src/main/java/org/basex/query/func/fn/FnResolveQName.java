@@ -20,18 +20,18 @@ import org.basex.util.*;
 public final class FnResolveQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] name = toTokenOrNull(exprs[0], qc);
-    final ANode base = toElem(exprs[1], qc);
-    if(name == null) return Empty.VALUE;
-    if(!XMLToken.isQName(name)) throw valueError(AtomType.QNAME, name, info);
+    final byte[] qname = toTokenOrNull(exprs[0], qc);
+    final ANode element = toElem(exprs[1], qc);
+    if(qname == null) return Empty.VALUE;
+    if(!XMLToken.isQName(qname)) throw valueError(AtomType.QNAME, qname, info);
 
-    final QNm qname = new QNm(name);
-    final byte[] pref = qname.prefix();
-    byte[] uri = base.uri(pref);
+    final QNm qnm = new QNm(qname);
+    final byte[] pref = qnm.prefix();
+    byte[] uri = element.uri(pref);
     if(uri == null) uri = sc.ns.uri(pref);
     if(uri == null) throw NSDECL_X.get(info, pref);
-    qname.uri(uri);
-    return qname;
+    qnm.uri(uri);
+    return qnm;
   }
 
   @Override

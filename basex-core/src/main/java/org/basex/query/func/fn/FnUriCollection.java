@@ -15,18 +15,18 @@ import org.basex.query.value.node.*;
 public final class FnUriCollection extends FnCollection {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = collection(qc).iter();
-    final long size = iter.size();
+    final Iter uri = collection(qc).iter();
+    final long size = uri.size();
 
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Item item = qc.next(iter);
+        final Item item = qc.next(uri);
         return item != null ? toUri(item) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return toUri(iter.get(i));
+        return toUri(uri.get(i));
       }
       @Override
       public long size() {

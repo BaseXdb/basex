@@ -22,35 +22,35 @@ import org.basex.query.value.type.*;
 public final class UtilDdo extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final Value value = iter.iterValue();
+    final Iter nodes = exprs[0].iter(qc);
+    final Value value = nodes.iterValue();
     if(value instanceof DBNodeSeq) return value;
 
     final ANodeBuilder nb = new ANodeBuilder();
-    for(Item item; (item = qc.next(iter)) != null;) nb.add(toNode(item));
+    for(Item item; (item = qc.next(nodes)) != null;) nb.add(toNode(item));
     return nb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = exprs[0];
+    Expr nodes = exprs[0];
 
     // replace list with union:
     // util:ddo((<a/>, <b/>))  ->  <a/> | <b/>
     // util:ddo(($a, $a))  ->  $a
-    if(expr instanceof List) {
-      expr = ((List) expr).toUnion(cc);
-      if(expr != exprs[0]) return expr;
+    if(nodes instanceof List) {
+      nodes = ((List) nodes).toUnion(cc);
+      if(nodes != exprs[0]) return nodes;
     }
 
-    final Type type = expr.seqType().type;
+    final Type type = nodes.seqType().type;
     if(type instanceof NodeType) {
       // util:ddo(replicate(*, 2))  ->  util:ddo(*)
-      if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(false)) return expr.arg(0);
+      if(REPLICATE.is(nodes) && ((FnReplicate) nodes).singleEval(false)) return nodes.arg(0);
       // util:ddo(reverse(*))  ->  util:ddo(*)
-      if(REVERSE.is(expr) || SORT.is(expr)) return cc.function(_UTIL_DDO, info, expr.arg(0));
+      if(REVERSE.is(nodes) || SORT.is(nodes)) return cc.function(_UTIL_DDO, info, nodes.arg(0));
       // util:ddo(/a/b/c)  ->  /a/b/c
-      if(expr.ddo()) return expr;
+      if(nodes.ddo()) return nodes;
       // adopt type of argument
       exprType.assign(type);
     }

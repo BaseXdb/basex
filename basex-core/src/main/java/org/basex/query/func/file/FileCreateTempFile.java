@@ -33,8 +33,8 @@ public class FileCreateTempFile extends FileFn {
   final synchronized Item createTemp(final boolean dir, final QueryContext qc)
       throws QueryException, IOException {
 
-    final String pref = toString(exprs[0], qc);
-    final String suf = exprs.length > 1 ? toString(exprs[1], qc) : "";
+    final String prefix = toString(exprs[0], qc);
+    final String suffix = exprs.length > 1 ? toString(exprs[1], qc) : "";
     final Path root;
     if(exprs.length > 2) {
       root = toPath(2, qc);
@@ -47,7 +47,7 @@ public class FileCreateTempFile extends FileFn {
     final Random rnd = new Random();
     Path file;
     do {
-      file = root.resolve(pref + rnd.nextLong() + suf);
+      file = root.resolve(prefix + rnd.nextLong() + suffix);
     } while(Files.exists(file));
 
     // create directory or file

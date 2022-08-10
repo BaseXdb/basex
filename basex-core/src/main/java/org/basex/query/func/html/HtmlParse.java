@@ -24,8 +24,8 @@ import org.basex.util.*;
 public class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs[0].atomItem(qc, info);
-    return item != Empty.VALUE ? parse(new IOContent(toBytes(item)), qc) : Empty.VALUE;
+    final Item value = exprs[0].atomItem(qc, info);
+    return value != Empty.VALUE ? parse(new IOContent(toBytes(value)), qc) : Empty.VALUE;
   }
 
   @Override

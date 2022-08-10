@@ -16,14 +16,12 @@ import org.basex.util.*;
 public final class FnIsNaN extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = toAtomItem(exprs[0], qc);
-    return Bln.get(item == Flt.NAN || item == Dbl.NAN);
+    final Item value = toAtomItem(exprs[0], qc);
+    return Bln.get(value == Flt.NAN || value == Dbl.NAN);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType st = exprs[0].seqType();
-    final Type type = st.type;
-    return st.one() && !st.mayBeArray() && type.instanceOf(AtomType.DECIMAL) ? Bln.FALSE : this;
+    return exprs[0].seqType().instanceOf(SeqType.DECIMAL_O) ? Bln.FALSE : this;
   }
 }

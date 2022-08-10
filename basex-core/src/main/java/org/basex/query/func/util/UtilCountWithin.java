@@ -26,15 +26,15 @@ public final class UtilCountWithin extends StandardFunc {
     final long min = minMax[0], max = minMax[1];
 
     // iterative access: if the iterator size is unknown, iterate through results
-    final Iter iter = exprs[0].iter(qc);
-    long size = iter.size();
+    final Iter input = exprs[0].iter(qc);
+    long size = input.size();
     if(size == -1) {
       if(max == Long.MAX_VALUE) {
         // >= min: skip if minimum is reached
-        do ++size; while(size < min && qc.next(iter) != null);
+        do ++size; while(size < min && qc.next(input) != null);
       } else {
         // min - max: skip if maximum is reached
-        do ++size; while(size <= max && qc.next(iter) != null);
+        do ++size; while(size <= max && qc.next(input) != null);
       }
     }
     return Bln.get(size >= min && size <= max);
@@ -47,7 +47,7 @@ public final class UtilCountWithin extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0];
+    final Expr input = exprs[0];
 
     // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
     final long[] minMax = minMaxValues(cc.qc);
@@ -57,13 +57,13 @@ public final class UtilCountWithin extends StandardFunc {
       if(min <= 0 && max == Long.MAX_VALUE) return Bln.TRUE;
 
       // evaluate static result size
-      final long size = expr1.size();
-      if(size >= 0 && !expr1.has(Flag.NDT)) return Bln.get(size >= min && size <= max);
+      final long size = input.size();
+      if(size >= 0 && !input.has(Flag.NDT)) return Bln.get(size >= min && size <= max);
 
-      if(max == 0) return cc.function(EMPTY, info, expr1);
-      if(min == 1 && max == Long.MAX_VALUE) return cc.function(EXISTS, info, expr1);
+      if(max == 0) return cc.function(EMPTY, info, input);
+      if(min == 1 && max == Long.MAX_VALUE) return cc.function(EXISTS, info, input);
 
-      if(expr1.seqType().zeroOrOne()) {
+      if(input.seqType().zeroOrOne()) {
         if(min < 1 && max <= 1) return Bln.TRUE;
         if(min >= 2) return Bln.FALSE;
       }

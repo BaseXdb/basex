@@ -24,21 +24,21 @@ import org.basex.util.*;
 public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc);
-    final long size = value.size();
+    final Value funcs = exprs[0].value(qc);
+    final long size = funcs.size();
     if(size == 0) return Empty.VALUE;
 
-    final ArrayList<FItem> funcs = new ArrayList<>((int) size);
-    for(final Item func : value) {
+    final ArrayList<FItem> list = new ArrayList<>((int) size);
+    for(final Item func : funcs) {
       if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
         throw ZEROFUNCS_X_X.get(info, func.type, func);
-      funcs.add(checkUp((FItem) func, false, sc));
+      list.add(checkUp((FItem) func, false, sc));
     }
     // single function: invoke directly
-    if(size == 1) return funcs.get(0).invoke(qc, info);
+    if(size == 1) return list.get(0).invoke(qc, info);
 
     final ForkJoinPool pool = new ForkJoinPool();
-    final XQueryTask task = new XQueryTask(funcs, qc, info);
+    final XQueryTask task = new XQueryTask(list, qc, info);
     try {
       return pool.invoke(task).value(this);
     } catch(final Exception ex) {

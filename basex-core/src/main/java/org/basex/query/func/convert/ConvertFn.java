@@ -27,14 +27,14 @@ public abstract class ConvertFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final byte[] stringToBinary(final QueryContext qc) throws QueryException {
-    final byte[] token = toToken(exprs[0], qc);
+    final byte[] value = toToken(exprs[0], qc);
     final String encoding = toEncodingOrNull(1, CONVERT_ENCODING_X, qc);
-    if(encoding == null || encoding == Strings.UTF8) return token;
+    if(encoding == null || encoding == Strings.UTF8) return value;
     try {
-      return toBinary(token, encoding);
+      return toBinary(value, encoding);
     } catch(final CharacterCodingException ex) {
       Util.debug(ex);
-      throw CONVERT_BINARY_X_X.get(info, token, encoding);
+      throw CONVERT_BINARY_X_X.get(info, value, encoding);
     }
   }
 

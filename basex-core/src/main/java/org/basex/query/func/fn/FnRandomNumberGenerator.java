@@ -48,9 +48,9 @@ public final class FnRandomNumberGenerator extends StandardFunc {
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs.length > 0 ? exprs[0].atomItem(qc, info) : Empty.VALUE;
-    final long seed = item != Empty.VALUE ? item.hash(info) : qc.dateTime().nano;
-    return result(seed, qc);
+    final Item seed = exprs.length > 0 ? exprs[0].atomItem(qc, info) : Empty.VALUE;
+    final long s = seed != Empty.VALUE ? seed.hash(info) : qc.dateTime().nano;
+    return result(s, qc);
   }
 
   /**

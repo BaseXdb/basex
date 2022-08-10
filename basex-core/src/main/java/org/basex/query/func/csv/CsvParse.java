@@ -23,8 +23,8 @@ import org.basex.util.*;
 public class CsvParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] token = toTokenOrNull(exprs[0], qc);
-    return token != null ? parse(new IOContent(token), qc) : Empty.VALUE;
+    final byte[] value = toTokenOrNull(exprs[0], qc);
+    return value != null ? parse(new IOContent(value), qc) : Empty.VALUE;
   }
 
   @Override

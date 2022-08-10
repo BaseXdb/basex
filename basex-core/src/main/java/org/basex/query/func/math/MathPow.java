@@ -19,9 +19,9 @@ import org.basex.util.*;
 public final class MathPow extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item base = exprs[0].atomItem(qc, info);
-    final double exp = toDouble(exprs[1], qc);
-    return base == Empty.VALUE ? Empty.VALUE : Dbl.get(power(toDouble(base), exp));
+    final Item x = exprs[0].atomItem(qc, info);
+    final double y = toDouble(exprs[1], qc);
+    return x == Empty.VALUE ? Empty.VALUE : Dbl.get(power(toDouble(x), y));
   }
 
   @Override

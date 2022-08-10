@@ -35,13 +35,13 @@ public class ArchiveExtractBinary extends ArchiveFn {
    */
   final TokenList extract(final QueryContext qc) throws QueryException {
     final B64 archive = toB64(exprs[0], qc, false);
-    final TokenSet hs = entries(1, qc);
+    final TokenSet entries = entries(1, qc);
 
     final TokenList tl = new TokenList();
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
-        if(!ze.isDirectory() && (hs == null || hs.remove(token(ze.getName())) != 0)) {
+        if(!ze.isDirectory() && (entries == null || entries.remove(token(ze.getName())) != 0)) {
           final ArrayOutput out = new ArrayOutput();
           in.write(out);
           tl.add(out.finish());

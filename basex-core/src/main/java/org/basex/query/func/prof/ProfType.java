@@ -33,8 +33,8 @@ public final class ProfType extends StandardFunc {
    * @param qc query context
    */
   private void type(final QueryContext qc) {
-    final Expr expr = exprs[0];
-    FnTrace.trace(Util.inf("%, size: %, exprSize: %", expr.seqType(), expr.size(),
-        expr.exprSize()), token(expr + ": "), qc);
+    final Expr value = exprs[0];
+    FnTrace.trace(Util.inf("%, size: %, exprSize: %", value.seqType(), value.size(),
+        value.exprSize()), token(value + ": "), qc);
   }
 }

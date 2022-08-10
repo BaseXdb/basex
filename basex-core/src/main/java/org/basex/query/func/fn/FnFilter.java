@@ -18,28 +18,27 @@ public final class FnFilter extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    final Iter iter = exprs[0].iter(qc);
-    final FItem func = toFunction(exprs[1], 1, qc);
+    final Iter input = exprs[0].iter(qc);
+    final FItem predicate = toFunction(exprs[1], 1, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = iter.next()) != null;) {
-      if(toBoolean(func.invoke(qc, info, item).item(qc, info))) vb.add(item);
+    for(Item item; (item = input.next()) != null;) {
+      if(toBoolean(predicate.invoke(qc, info, item).item(qc, info))) vb.add(item);
     }
     return vb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr items = exprs[0];
-    final SeqType st = items.seqType();
-    if(st.zero()) return items;
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     // create filter expression
-    final Expr pred = cc.get(items, () -> {
-      Expr p = ContextValue.get(cc, info);
-      p = new DynFuncCall(info, sc, exprs[1], p).optimize(cc);
-      return new TypeCheck(sc, info, p, SeqType.BOOLEAN_O, true).optimize(cc);
+    final Expr predicate = cc.get(input, () -> {
+      final Expr dfc = new DynFuncCall(info, sc, exprs[1], ContextValue.get(cc, info)).optimize(cc);
+      return new TypeCheck(sc, info, dfc, SeqType.BOOLEAN_O, true).optimize(cc);
     });
-    return Filter.get(cc, info, items, cc.function(Function.BOOLEAN, info, pred));
+    return Filter.get(cc, info, input, cc.function(Function.BOOLEAN, info, predicate));
   }
 }

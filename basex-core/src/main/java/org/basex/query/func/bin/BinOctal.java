@@ -19,13 +19,13 @@ import org.basex.util.*;
 public final class BinOctal extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] token = token(0, qc);
-    if(token == null) return Empty.VALUE;
-    final int tl = token.length;
+    final byte[] string = token(0, qc);
+    if(string == null) return Empty.VALUE;
+    final int tl = string.length;
     if(tl == 0) return B64.EMPTY;
 
     try {
-      byte[] bin = Token.token(new BigInteger(Token.string(token), 8).toString(2));
+      byte[] bin = Token.token(new BigInteger(Token.string(string), 8).toString(2));
       final int expl = tl * 3, binl = bin.length;
       if(binl != expl) {
         // add leading zeroes

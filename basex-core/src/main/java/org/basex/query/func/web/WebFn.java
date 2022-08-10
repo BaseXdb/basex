@@ -34,11 +34,11 @@ abstract class WebFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final String createUrl(final QueryContext qc) throws QueryException {
-    final byte[] path = toToken(exprs[0], qc);
+    final byte[] url = toToken(exprs[0], qc);
     final XQMap map = exprs.length < 2 ? XQMap.empty() : toMap(exprs[1], qc);
     final byte[] anchor = exprs.length < 3 ? Token.EMPTY : toToken(exprs[2], qc);
 
-    final TokenBuilder tb = new TokenBuilder().add(path);
+    final TokenBuilder tb = new TokenBuilder().add(url);
     int c = 0;
     for(final Item key : map.keys()) {
       final byte[] name = key.string(info);

@@ -19,12 +19,12 @@ import org.basex.util.*;
 public final class CsvSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
+    final Iter input = exprs[0].iter(qc);
     final CsvSerialOptions copts = toOptions(1, new CsvSerialOptions(), qc);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.CSV);
     sopts.set(SerializerOptions.CSV, copts);
-    return Str.get(serialize(iter, sopts, INVALIDOPT_X, qc));
+    return Str.get(serialize(input, sopts, INVALIDOPT_X, qc));
   }
 }

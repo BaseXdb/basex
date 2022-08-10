@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class StringFormat extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String form = toString(exprs[0], qc);
+    final String format = toString(exprs[0], qc);
     final int el = exprs.length;
     final Object[] args = new Object[el - 1];
     for(int e = 1; e < el; e++) {
@@ -27,7 +27,7 @@ public final class StringFormat extends StandardFunc {
         item.toJava();
     }
     try {
-      return Str.get(String.format(form, args));
+      return Str.get(String.format(format, args));
     } catch(final IllegalArgumentException ex) {
       throw STRING_FORMAT_X_X.get(info, Util.className(ex), ex);
     }

@@ -14,7 +14,7 @@ import org.basex.util.*;
 public class FnParseJson extends FnJsonDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = exprs[0].atomItem(qc, info);
-    return item == Empty.VALUE ? Empty.VALUE : parse(toToken(item), false, qc);
+    final Item json = exprs[0].atomItem(qc, info);
+    return json == Empty.VALUE ? Empty.VALUE : parse(toToken(json), false, qc);
   }
 }

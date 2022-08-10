@@ -18,8 +18,8 @@ import org.basex.query.value.type.*;
 public final class HofScanLeft extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter outer = exprs[0].iter(qc);
-    final FItem func = toFunction(exprs[2], 2, qc);
+    final Iter input = exprs[0].iter(qc);
+    final FItem action = toFunction(exprs[2], 2, qc);
 
     return new Iter() {
       private Value acc = exprs[1].value(qc);
@@ -30,10 +30,10 @@ public final class HofScanLeft extends StandardFunc {
         while(true) {
           final Item in = qc.next(inner);
           if(in != null) return in;
-          final Item out = outer.next();
+          final Item out = input.next();
           if(out == null) return null;
 
-          acc = func.invoke(qc, info, acc, out);
+          acc = action.invoke(qc, info, acc, out);
           inner = acc.iter();
         }
       }
@@ -47,11 +47,11 @@ public final class HofScanLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1 == Empty.VALUE) return expr2;
+    final Expr input = exprs[0], zero = exprs[1];
+    if(input == Empty.VALUE) return zero;
 
-    exprType.assign(expr1.seqType().union(Occ.ZERO));
-    data(expr1.data());
+    exprType.assign(input.seqType().union(Occ.ZERO));
+    data(input.data());
     return this;
   }
 }

@@ -18,13 +18,13 @@ public class FnRangeFrom extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter iter = exprs[0].iter(qc);
+      final Iter input = exprs[0].iter(qc);
       final FItem start = toFunction(exprs[1], 1, qc);
       boolean started;
 
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(iter)) != null;) {
+        for(Item item; (item = qc.next(input)) != null;) {
           if(started || toBoolean(start.invoke(qc, info, item).item(qc, info))) {
             started = true;
             return item;

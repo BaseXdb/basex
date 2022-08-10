@@ -19,21 +19,21 @@ import org.basex.util.*;
 public final class ProfVoid extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
+    final Iter value = exprs[0].iter(qc);
 
-    // caches items; ensures that lazy items will be evaluated
-    final Value value = iter.iterValue();
-    if(value == null) {
-      for(Item item; (item = qc.next(iter)) != null;) item.cache(false, info);
+    // cache items; ensure that lazy items will be evaluated
+    final Value val = value.iterValue();
+    if(val == null) {
+      for(Item item; (item = qc.next(value)) != null;) item.cache(false, info);
     } else {
-      value.cache(false, ii);
+      val.cache(false, ii);
     }
     return Empty.VALUE;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr = exprs[0];
-    return expr.has(Flag.NDT) && expr.size() == 0 ? expr : this;
+    final Expr value = exprs[0];
+    return value.has(Flag.NDT) && value.size() == 0 ? value : this;
   }
 }

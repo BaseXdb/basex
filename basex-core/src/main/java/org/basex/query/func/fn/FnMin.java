@@ -42,14 +42,14 @@ public class FnMin extends StandardFunc {
    */
   final Item minmax(final boolean min, final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, qc);
-    final Expr expr = exprs[0];
+    final Expr values = exprs[0];
 
-    if(expr instanceof Range) {
-      final Value value = expr.value(qc);
+    if(values instanceof Range) {
+      final Value value = values.value(qc);
       return value.isEmpty() ? Empty.VALUE : value.itemAt(min ? 0 : value.size() - 1);
     }
 
-    final Iter iter = expr.atomIter(qc, info);
+    final Iter iter = values.atomIter(qc, info);
     Item item = iter.next();
     if(item == null) return Empty.VALUE;
 
@@ -125,23 +125,23 @@ public class FnMin extends StandardFunc {
   final Expr opt(final boolean min, final CompileContext cc) throws QueryException {
     exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc);
 
-    Expr expr = optFirst();
+    final Expr expr = optFirst();
     if(expr != this) return expr;
 
     final boolean noColl = exprs.length == 1;
-    expr = exprs[0];
-    final SeqType st = expr.seqType();
+    final Expr values = exprs[0];
+    final SeqType st = values.seqType();
     Type type = st.type;
     if(type.isSortable()) {
       if(type.isUntyped()) {
         type = DOUBLE;
       } else if(st.one() && noColl) {
-        return expr;
+        return values;
       }
       exprType.assign(type);
-      if(expr instanceof Value && noColl) {
+      if(values instanceof Value && noColl) {
         Item item = null;
-        final Value value = (Value) expr;
+        final Value value = (Value) values;
         final long size = value.size();
         if(value instanceof RangeSeq) {
           final RangeSeq seq = (RangeSeq) value;
@@ -158,17 +158,17 @@ public class FnMin extends StandardFunc {
       }
     }
 
-    if(noColl && expr instanceof Path) {
-      final ArrayList<Stats> list = ((Path) expr).pathStats();
+    if(noColl && values instanceof Path) {
+      final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         double v = min ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         for(final Stats stats : list) {
           if(!StatsType.isNumeric(stats.type)) return this;
-          final TokenIntMap values = stats.values;
-          if(values == null) {
+          final TokenIntMap map = stats.values;
+          if(map == null) {
             v = min ? Math.min(v, stats.min) : Math.max(v, stats.max);
           } else {
-            for(final byte[] value : values) {
+            for(final byte[] value : map) {
               if(value.length == 0) return this;
               final double d = Token.toDouble(value);
               v = min ? Math.min(v, d) : Math.max(v, d);

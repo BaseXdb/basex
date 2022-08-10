@@ -28,13 +28,13 @@ public final class FnCodepointsToString extends StandardFunc {
     if(singleInt) return toStr(exprs[0].item(qc, info).itr(info), info);
 
     // current input is single item
-    final Iter iter = exprs[0].atomIter(qc, info);
-    final long size = iter.size();
-    if(size == 1) return toStr(toLong(iter.next()), info);
+    final Iter values = exprs[0].atomIter(qc, info);
+    final long size = values.size();
+    if(size == 1) return toStr(toLong(values.next()), info);
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Seq.initialCapacity(size));
-    for(Item item; (item = qc.next(iter)) != null;) {
+    for(Item item; (item = qc.next(values)) != null;) {
       tb.add(toCodepoint(toLong(item), info));
     }
     return Str.get(tb.finish());
@@ -42,10 +42,10 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
+    final Expr values = exprs[0];
 
     // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
-    if(STRING_TO_CODEPOINTS.is(expr)) return cc.function(STRING, info, expr.args());
+    if(STRING_TO_CODEPOINTS.is(values)) return cc.function(STRING, info, values.args());
 
     singleInt = exprs[0].seqType().instanceOf(SeqType.INTEGER_O);
     return this;

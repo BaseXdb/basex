@@ -14,10 +14,10 @@ import org.basex.util.*;
 public final class CryptoEncrypt extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] data = toBytes(exprs[0], qc);
+    final byte[] value = toBytes(exprs[0], qc);
     final String type = toString(exprs[1], qc);
     final byte[] key = toBytes(exprs[2], qc);
     final String algorithm = toString(exprs[3], qc);
-    return new Encryption(info).encryption(data, type, key, algorithm, true);
+    return new Encryption(info).encryption(value, type, key, algorithm, true);
   }
 }

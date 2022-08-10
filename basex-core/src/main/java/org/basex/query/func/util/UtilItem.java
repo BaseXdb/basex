@@ -25,16 +25,16 @@ import org.basex.util.*;
 public final class UtilItem extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // retrieve (possibly invalid) position
+    final Expr input = exprs[0];
     final long pos = pos(qc);
-    if(pos < 0) return Empty.VALUE;
 
+    // retrieve (possibly invalid) position
+    if(pos < 0) return Empty.VALUE;
     // if possible, retrieve single item
-    final Expr expr = exprs[0];
-    if(expr.seqType().zeroOrOne()) return pos == 0 ? expr.item(qc, info) : Empty.VALUE;
+    if(input.seqType().zeroOrOne()) return pos == 0 ? input.item(qc, info) : Empty.VALUE;
 
     // fast route if the size is known
-    final Iter iter = expr.iter(qc);
+    final Iter iter = input.iter(qc);
     final long size = iter.size();
     if(size >= 0) return pos < size ? iter.get(pos) : Empty.VALUE;
 
@@ -48,49 +48,49 @@ public final class UtilItem extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0], position = exprs[1];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr input = exprs[0], pos = exprs[1];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     Occ occ = Occ.ZERO_OR_ONE;
-    if(position instanceof Value) {
+    if(pos instanceof Value) {
       // retrieve (possibly invalid) position
-      final long pos = pos(cc.qc);
-      if(pos < 0) return Empty.VALUE;
+      final long ps = pos(cc.qc);
+      if(ps < 0) return Empty.VALUE;
 
       // pre-evaluate single expression with static position
-      if(st.zeroOrOne()) return pos == 0 ? expr : Empty.VALUE;
+      if(st.zeroOrOne()) return ps == 0 ? input : Empty.VALUE;
       // pre-evaluate values
-      final long size = expr.size();
+      final long size = input.size();
       if(size != -1) {
-        if(pos + 1 == size) return cc.function(_UTIL_LAST, info, expr);
-        if(pos + 1 > size) return Empty.VALUE;
-        if(REVERSE.is(expr))
-          return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(size - pos));
+        if(ps + 1 == size) return cc.function(_UTIL_LAST, info, input);
+        if(ps + 1 > size) return Empty.VALUE;
+        if(REVERSE.is(input))
+          return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(size - ps));
         occ = Occ.EXACTLY_ONE;
       }
-      if(pos == 0) return cc.function(HEAD, info, expr);
+      if(ps == 0) return cc.function(HEAD, info, input);
 
       // rewrite nested function calls
-      if(TAIL.is(expr))
-        return cc.function(_UTIL_ITEM, info, expr.arg(0), Int.get(pos + 2));
-      if(REPLICATE.is(expr)) {
+      if(TAIL.is(input))
+        return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(ps + 2));
+      if(REPLICATE.is(input)) {
         // static integer will always be greater than 1
-        final Expr[] args = expr.args();
+        final Expr[] args = input.args();
         if(args[0].size() == 1 && args[1] instanceof Int) {
           final long count = ((Int) args[1]).itr();
-          return pos > count ? Empty.VALUE : args[0];
+          return ps > count ? Empty.VALUE : args[0];
         }
       }
-      if(_FILE_READ_TEXT_LINES.is(expr))
-        return FileReadTextLines.opt(this, pos, 1, cc);
+      if(_FILE_READ_TEXT_LINES.is(input))
+        return FileReadTextLines.opt(this, ps, 1, cc);
 
       // rewrite to head function
-      if(expr instanceof List) {
-        final Expr[] args = expr.args();
+      if(input instanceof List) {
+        final Expr[] args = input.args();
         final int al = args.length;
         for(int a = 0; a < al; a++) {
-          if(a == pos) {
+          if(a == ps) {
             final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
             return cc.function(HEAD, info, list);
           }
@@ -99,14 +99,14 @@ public final class UtilItem extends StandardFunc {
       }
     }
 
-    if(_UTIL_INIT.is(expr))
-      return cc.function(_UTIL_ITEM, info, expr.arg(0), position);
+    if(_UTIL_INIT.is(input))
+      return cc.function(_UTIL_ITEM, info, input.arg(0), pos);
 
     final Expr embedded = embed(cc, false);
     if(embedded != null) return embedded;
 
     exprType.assign(st.with(occ));
-    data(expr.data());
+    data(input.data());
     return this;
   }
 

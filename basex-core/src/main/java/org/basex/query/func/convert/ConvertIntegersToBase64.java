@@ -27,22 +27,22 @@ public class ConvertIntegersToBase64 extends ConvertFn {
    * @throws QueryException query exception
    */
   final B64 bytesToB64(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].atomValue(qc, info);
+    final Value values = exprs[0].atomValue(qc, info);
 
     // return internal byte array
-    if(value instanceof BytSeq) return B64.get(((BytSeq) value).toJava());
+    if(values instanceof BytSeq) return B64.get(((BytSeq) values).toJava());
 
     // single integer
-    final long size = value.size();
-    if(size == 1 && value instanceof Int) return B64.get((byte) ((Int) value).itr());
+    final long size = values.size();
+    if(size == 1 && values instanceof Int) return B64.get((byte) ((Int) values).itr());
 
     final ByteList bl = new ByteList(Seq.initialCapacity(size));
-    if(value instanceof IntSeq) {
+    if(values instanceof IntSeq) {
       // integer sequence
-      for(final long l : ((IntSeq) value).values()) bl.add((byte) l);
+      for(final long l : ((IntSeq) values).values()) bl.add((byte) l);
     } else {
       // other types
-      final Iter iter = value.iter();
+      final Iter iter = values.iter();
       for(Item item; (item = qc.next(iter)) != null;) bl.add((int) toLong(item));
     }
     return B64.get(bl.finish());

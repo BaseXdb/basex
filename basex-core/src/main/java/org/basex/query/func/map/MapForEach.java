@@ -20,23 +20,23 @@ public class MapForEach extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(exprs[0], qc);
-    final FItem func = toFunction(exprs[1], 2, this instanceof UpdateMapForEach, qc);
+    final FItem action = toFunction(exprs[1], 2, this instanceof UpdateMapForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((i, v) -> vb.add(func.invoke(qc, info, i, v)));
+    map.apply((i, v) -> vb.add(action.invoke(qc, info, i, v)));
     return vb.value(this);
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0];
-    if(expr1 == XQMap.empty()) return Empty.VALUE;
+    final Expr map = exprs[0];
+    if(map == XQMap.empty()) return Empty.VALUE;
 
-    final Type type1 = expr1.seqType().type;
-    if(type1 instanceof MapType) {
-      final MapType mtype1 = (MapType) type1;
-      final SeqType declType1 = mtype1.argTypes[0].with(Occ.EXACTLY_ONE);
-      exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, declType1, mtype1.declType);
+    final Type type = map.seqType().type;
+    if(type instanceof MapType) {
+      final MapType mtype = (MapType) type;
+      final SeqType declType = mtype.argTypes[0].with(Occ.EXACTLY_ONE);
+      exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, declType, mtype.declType);
     }
 
     final boolean updating = this instanceof UpdateMapForEach;

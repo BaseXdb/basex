@@ -14,7 +14,7 @@ import org.basex.util.*;
 public class HtmlDoc extends HtmlParse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String uri = toStringOrNull(exprs[0], qc);
-    return uri != null ? parse(toIO(uri), qc) : Empty.VALUE;
+    final String href = toStringOrNull(exprs[0], qc);
+    return href != null ? parse(toIO(href), qc) : Empty.VALUE;
   }
 }

@@ -25,12 +25,12 @@ public final class FnIndexWhere extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    final Iter iter = exprs[0].iter(qc);
+    final Iter input = exprs[0].iter(qc);
     final FItem predicate = toFunction(exprs[1], 1, qc);
     int c = 0;
 
     final LongList list = new LongList();
-    for(Item item; (item = qc.next(iter)) != null;) {
+    for(Item item; (item = qc.next(input)) != null;) {
       ++c;
       if(toBoolean(predicate.invoke(qc, info, item).item(qc, info))) list.add(c);
     }

@@ -19,17 +19,17 @@ import org.basex.util.*;
 public final class FnCodepointEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item1 = exprs[0].atomItem(qc, info), item2 = exprs[1].atomItem(qc, info);
-    return item1 == Empty.VALUE || item2 == Empty.VALUE ? Empty.VALUE :
-      Bln.get(eq(toToken(item1), toToken(item2)));
+    final Item value1 = exprs[0].atomItem(qc, info), value2 = exprs[1].atomItem(qc, info);
+    return value1 == Empty.VALUE || value2 == Empty.VALUE ? Empty.VALUE :
+      Bln.get(eq(toToken(value1), toToken(value2)));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    if(st1.zero()) return expr1;
-    if(st2.zero()) return expr2;
+    final Expr value1 = exprs[0], value2 = exprs[1];
+    final SeqType st1 = value1.seqType(), st2 = value2.seqType();
+    if(st1.zero()) return value1;
+    if(st2.zero()) return value2;
     if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray())
       exprType.assign(Occ.EXACTLY_ONE);
     return this;

@@ -38,19 +38,19 @@ public class FileWriteText extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toParent(toPath(0, qc));
-    Item text = toItem(exprs[1], qc);
-    if(!(text instanceof AStr)) text = Str.get(toToken(text));
+    Item value = toItem(exprs[1], qc);
+    if(!(value instanceof AStr)) value = Str.get(toToken(value));
     final String encoding = toEncodingOrNull(2, FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       if(cs == null) {
-        try(TextInput in = text.stringInput(info)) {
+        try(TextInput in = value.stringInput(info)) {
           for(int cp; (cp = in.read()) != -1;) out.print(cp);
         }
       } else {
-        out.write(string(text.string(info)).getBytes(cs));
+        out.write(string(value.string(info)).getBytes(cs));
       }
     }
   }

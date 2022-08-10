@@ -26,7 +26,7 @@ public final class DbPut extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final Item item = toNodeOrAtomItem(1, qc);
+    final Item input = toNodeOrAtomItem(1, qc);
     final String path = toDbPath(2, qc);
     final Options opts = toOptions(3, new Options(), qc);
 
@@ -34,16 +34,16 @@ public final class DbPut extends DbNew {
     final IntList docs = data.resources.docs(path);
     int d = 0;
 
-    if(item instanceof Bin) {
+    if(input instanceof Bin) {
       // store binary resource
       if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-      updates.add(new DBPutBinary(data, item, path, info), qc);
+      updates.add(new DBPutBinary(data, input, path, info), qc);
     } else {
       // store XML document: replace existing document or add new one
-      final NewInput input = toNewInput(item, path);
+      final NewInput ni = toNewInput(input, path);
       final Update update = docs.isEmpty() ?
-        new DBAdd(data, input, opts, true, qc, info) :
-        new ReplaceDoc(docs.get(d++), data, input, opts, qc, info);
+        new DBAdd(data, ni, opts, true, qc, info) :
+        new ReplaceDoc(docs.get(d++), data, ni, opts, qc, info);
       updates.add(update, qc);
 
       // delete file resources

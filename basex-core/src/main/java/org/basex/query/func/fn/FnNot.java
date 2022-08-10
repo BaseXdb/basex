@@ -24,29 +24,29 @@ public final class FnNot extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
+    final Expr input = exprs[0];
 
     // not(empty(A))  ->  exists(A)
-    if(EMPTY.is(expr)) return cc.function(EXISTS, info, expr.args());
+    if(EMPTY.is(input)) return cc.function(EXISTS, info, input.args());
     // not(exists(A))  ->  empty(A)
-    if(EXISTS.is(expr)) return cc.function(EMPTY, info, expr.args());
+    if(EXISTS.is(input)) return cc.function(EMPTY, info, input.args());
     // not(not(A))  ->  boolean(A)
-    if(NOT.is(expr)) return cc.function(BOOLEAN, info, expr.args());
+    if(NOT.is(input)) return cc.function(BOOLEAN, info, input.args());
 
     // not('a' = 'b')  ->  'a' != 'b'
-    if(expr instanceof Cmp) {
-      final Expr ex = ((Cmp) expr).invert(cc);
-      if(ex != expr) return ex;
+    if(input instanceof Cmp) {
+      final Expr ex = ((Cmp) input).invert(cc);
+      if(ex != input) return ex;
     }
     // not(position() = 1)  ->  position() != 1
     // not(position() = <_>3</_>)  ->  position() != 3
-    if(expr instanceof CmpPos) {
-      final Expr ex = ((CmpPos) expr).invert(cc);
-      if(ex != expr) return ex;
+    if(input instanceof CmpPos) {
+      final Expr ex = ((CmpPos) input).invert(cc);
+      if(ex != input) return ex;
     }
     // not($node/text())  ->  empty($node/text())
-    final SeqType st = expr.seqType();
-    if(st.type instanceof NodeType) return cc.function(EMPTY, info, expr);
+    final SeqType st = input.seqType();
+    if(st.type instanceof NodeType) return cc.function(EMPTY, info, input);
 
     return this;
   }

@@ -32,15 +32,15 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final ByteBuffer unpack(final QueryContext qc, final long len) throws QueryException {
-    final B64 b64 = toB64(exprs[0], qc, false);
-    final Long off = toLong(exprs[1], qc);
-    final ByteOrder bo = order(2, qc);
+    final B64 binary = toB64(exprs[0], qc, false);
+    final Long offset = toLong(exprs[1], qc);
+    final ByteOrder order = order(2, qc);
 
-    final byte[] bytes = b64.binary(info);
+    final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(off, len, bl);
+    final int[] bounds = bounds(offset, len, bl);
 
-    final ByteBuffer bb = ByteBuffer.allocate(bounds[1]).order(bo);
+    final ByteBuffer bb = ByteBuffer.allocate(bounds[1]).order(order);
     bb.put(bytes, bounds[0], bounds[1]).position(0);
     return bb;
   }
@@ -53,21 +53,21 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Int unpackInteger(final QueryContext qc, final boolean signed) throws QueryException {
-    final B64 b64 = toB64(exprs[0], qc, false);
-    final Long off = toLong(exprs[1], qc);
+    final B64 binary = toB64(exprs[0], qc, false);
+    final Long offset = toLong(exprs[1], qc);
     final Long size = toLong(exprs[2], qc);
-    final ByteOrder bo = order(3, qc);
+    final ByteOrder order = order(3, qc);
 
-    final byte[] bytes = b64.binary(info);
+    final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(off, size, bl);
+    final int[] bounds = bounds(offset, size, bl);
     final int o = bounds[0], l = Math.min(8, bounds[1]);
     if(l == 0) return Int.ZERO;
 
     // place input data in long byte array, consider sign
     final byte[] tmp = new byte[8];
     final boolean neg = signed && (bytes[0] & 0x80) != 0;
-    if(bo == ByteOrder.BIG_ENDIAN) {
+    if(order == ByteOrder.BIG_ENDIAN) {
       final int s = 8 - l;
       if(neg) for(int i = 0; i < s; i++) tmp[i] = (byte) 0xFF;
       Array.copy(bytes, o, l, tmp, s);
@@ -75,7 +75,7 @@ abstract class BinFn extends StandardFunc {
       Array.copyToStart(bytes, o, l, tmp);
       if(neg) for(int i = l; i < 8; i++) tmp[i] = (byte) 0xFF;
     }
-    return Int.get(ByteBuffer.wrap(tmp).order(bo).getLong());
+    return Int.get(ByteBuffer.wrap(tmp).order(order).getLong());
   }
 
   /**
@@ -86,14 +86,11 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item bit(final Bit op, final QueryContext qc) throws QueryException {
-    final B64 b1 = toB64(exprs[0], qc, true);
-    final B64 b2 = toB64(exprs[1], qc, true);
-    if(b1 == null || b2 == null) return Empty.VALUE;
+    final B64 binary1 = toB64(exprs[0], qc, true), binary2 = toB64(exprs[1], qc, true);
+    if(binary1 == null || binary2 == null) return Empty.VALUE;
 
-    final byte[] bytes1 = b1.binary(info);
-    final byte[] bytes2 = b2.binary(info);
-    final int bl1 = bytes1.length;
-    final int bl2 = bytes2.length;
+    final byte[] bytes1 = binary1.binary(info), bytes2 = binary2.binary(info);
+    final int bl1 = bytes1.length, bl2 = bytes2.length;
     if(bl1 != bl2) throw BIN_DLA_X_X.get(info, bl1, bl2);
 
     // single byte
@@ -112,12 +109,12 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item pad(final QueryContext qc, final boolean left) throws QueryException {
-    final B64 b64 = toB64(exprs[0], qc, true);
+    final B64 binary = toB64(exprs[0], qc, true);
     final long size = toLong(exprs[1], qc);
     final long octet = exprs.length > 2 ? toLong(exprs[2], qc) : 0;
-    if(b64 == null) return Empty.VALUE;
+    if(binary == null) return Empty.VALUE;
 
-    final byte[] bytes = b64.binary(info);
+    final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
 
     if(size < 0) throw BIN_NS_X.get(info, size);

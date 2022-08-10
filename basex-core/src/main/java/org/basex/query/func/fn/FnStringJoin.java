@@ -19,34 +19,34 @@ import org.basex.util.*;
 public final class FnStringJoin extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].atomIter(qc, info);
-    final byte[] token = exprs.length == 2 ? toToken(exprs[1], qc) : Token.EMPTY;
+    final Iter values = exprs[0].atomIter(qc, info);
+    final byte[] sep = exprs.length == 2 ? toToken(exprs[1], qc) : Token.EMPTY;
 
     // no results: empty string
-    Item item = iter.next();
+    Item item = values.next();
     if(item == null) return Str.EMPTY;
 
     // single result
     final byte[] first = item.string(info);
-    if((item = iter.next()) == null) return Str.get(first);
+    if((item = values.next()) == null) return Str.get(first);
 
     // join multiple strings
     final TokenBuilder tb = new TokenBuilder().add(first);
     do {
-      tb.add(token).add(item.string(info));
-    } while((item = qc.next(iter)) != null);
+      tb.add(sep).add(item.string(info));
+    } while((item = qc.next(values)) != null);
     return Str.get(tb.finish());
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs.length > 1 ? exprs[1] : Str.EMPTY;
+    final Expr values = exprs[0], sep = exprs.length > 1 ? exprs[1] : Str.EMPTY;
 
     // string-join(characters(A))  ->  string(A)
-    if(CHARACTERS.is(expr1) && expr2 == Str.EMPTY) return cc.function(STRING, info, expr1.args());
+    if(CHARACTERS.is(values) && sep == Str.EMPTY) return cc.function(STRING, info, values.args());
 
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return (st1.zero() || st1.one() && st1.type.isStringOrUntyped()) &&
-        st2.type.isStringOrUntyped() ? cc.function(Function.STRING, info, expr1) : this;
+    final SeqType st = values.seqType(), stSep = sep.seqType();
+    return (st.zero() || st.one() && st.type.isStringOrUntyped()) &&
+        stSep.type.isStringOrUntyped() ? cc.function(Function.STRING, info, values) : this;
   }
 }

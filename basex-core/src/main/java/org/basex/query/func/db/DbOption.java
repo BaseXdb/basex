@@ -21,6 +21,7 @@ public final class DbOption extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] name = toToken(exprs[0], qc);
+
     final Object value = ShowOptions.get(Token.string(Token.uc(name)), qc.context);
     if(value == null) throw DB_OPTION_X.get(info, name);
     return item(value);

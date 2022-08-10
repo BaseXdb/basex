@@ -22,47 +22,47 @@ public class FnApply extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final FItem func = toFunction(exprs[0], qc);
-    final XQArray array = toArray(exprs[1], qc);
+    final XQArray args = toArray(exprs[1], qc);
 
-    final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = array.arraySize();
-    if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, array);
+    final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = args.arraySize();
+    if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, args);
 
     final ValueList values = new ValueList(as);
-    for(final Value value : array.members()) values.add(value);
+    for(final Value value : args.members()) values.add(value);
     return func.invoke(qc, info, values.finish());
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    FuncType ft1 = expr1.funcType();
-    final FuncType ft2 = expr2.funcType();
+    final Expr func = exprs[0], args = exprs[1];
+    FuncType ft = func.funcType();
+    final FuncType ftArgs = args.funcType();
 
     // try to pass on types of array argument to function item
-    if(ft2 instanceof ArrayType) {
-      if(expr2 instanceof XQArray) {
+    if(ftArgs instanceof ArrayType) {
+      if(args instanceof XQArray) {
         // argument is a value: final types are known
-        final XQArray arr = (XQArray) expr2;
-        final int as = Math.max(0, (int) arr.arraySize());
-        final SeqType[] args = new SeqType[as];
-        for(int a = 0; a < as; a++) args[a] = arr.get(a).seqType();
-        exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, args);
-      } else if(ft1 != null) {
+        final XQArray array = (XQArray) args;
+        final int as = Math.max(0, (int) array.arraySize());
+        final SeqType[] ast = new SeqType[as];
+        for(int a = 0; a < as; a++) ast[a] = array.get(a).seqType();
+        exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, ast);
+      } else if(ft != null) {
         // argument will be of type array: assign generic array return type to all arguments
-        final SeqType[] args1 = ft1.argTypes;
-        if(args1 != null) {
-          final int as = args1.length;
-          final SeqType[] args2 = new SeqType[as];
-          final ArrayType at2 = (ArrayType) ft2;
-          for(int a = 0; a < as; a++) args2[a] = at2.declType;
-          exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, args2);
+        final SeqType[] at = ft.argTypes;
+        if(at != null) {
+          final int al = at.length;
+          final SeqType[] ast = new SeqType[al];
+          final ArrayType at2 = (ArrayType) ftArgs;
+          for(int a = 0; a < al; a++) ast[a] = at2.declType;
+          exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, ast);
         }
       }
     }
 
     final boolean updating = this instanceof UpdateApply;
-    ft1 = exprs[0].funcType();
-    if(ft1 != null && !updating) exprType.assign(ft1.declType);
+    ft = exprs[0].funcType();
+    if(ft != null && !updating) exprType.assign(ft.declType);
     return this;
   }
 }

@@ -29,15 +29,14 @@ import org.basex.query.value.type.*;
 public final class FnDistinctValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter values = exprs[0].atomIter(qc, info);
     final Collation coll = toCollation(1, qc);
-    final Expr expr = exprs[0];
-    final Iter iter = expr.atomIter(qc, info);
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(iter)) != null;) {
+        for(Item item; (item = qc.next(values)) != null;) {
           if(set.add(item, info)) return item;
         }
         return null;
@@ -57,19 +56,19 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr values = exprs[0];
+    final SeqType st = values.seqType();
+    if(st.zero()) return values;
 
     // X => sort() => distinct-values()  ->  X => distinct-values() => sort()
-    if(SORT.is(expr) && (expr.args().length == 1 ||
-        expr.arg(0).seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
-      final ExprList list = new ExprList().add(expr.args());
-      list.set(0, cc.function(DISTINCT_VALUES, info, expr.arg(0)));
+    if(SORT.is(values) && (values.args().length == 1 ||
+        values.arg(0).seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
+      final ExprList list = new ExprList().add(values.args());
+      list.set(0, cc.function(DISTINCT_VALUES, info, values.arg(0)));
       return cc.function(SORT, info, list.finish());
     }
     // distinct-values(distinct-values($data))  ->  distinct-values($data)
-    if(DISTINCT_VALUES.is(expr)) return expr;
+    if(DISTINCT_VALUES.is(values)) return values;
 
     final Expr opt = optStats(cc);
     if(opt != null) return opt;
@@ -81,11 +80,11 @@ public final class FnDistinctValues extends StandardFunc {
 
       if(exprs.length == 1) {
         // distinct-values(1 to 10)  ->  1 to 10
-        if(expr instanceof Range || expr instanceof RangeSeq) return expr;
+        if(values instanceof Range || values instanceof RangeSeq) return values;
         // distinct-values($string)  ->  $string
         // distinct-values($node)  ->  data($node)
         if(st.zeroOrOne() && !st.mayBeArray())
-          return type == st.type ? expr : cc.function(Function.DATA, info, exprs);
+          return type == st.type ? values : cc.function(Function.DATA, info, exprs);
       }
     }
     return this;
@@ -113,8 +112,9 @@ public final class FnDistinctValues extends StandardFunc {
    * @throws QueryException query exception
    */
   private Expr optStats(final CompileContext cc) throws QueryException {
-    if(exprs.length == 1 && exprs[0] instanceof Path) {
-      final ArrayList<Stats> list = ((Path) exprs[0]).pathStats();
+    final Expr values = exprs[0];
+    if(exprs.length == 1 && values instanceof Path) {
+      final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
         final HashItemSet set = new HashItemSet(false);

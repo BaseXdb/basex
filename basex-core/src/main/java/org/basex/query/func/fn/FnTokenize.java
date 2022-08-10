@@ -54,10 +54,10 @@ public final class FnTokenize extends RegEx {
       }
     }
 
-    final Pattern pattern = pattern(input[1], exprs.length == 3 ? exprs[2] : null, qc, true);
+    final Pattern p = pattern(input[1], exprs.length == 3 ? exprs[2] : null, qc, true);
     return vl == 0 ? Empty.ITER : new Iter() {
       final String string = string(input[0]);
-      final Matcher matcher = pattern.matcher(string);
+      final Matcher matcher = p.matcher(string);
       int start;
 
       @Override
@@ -84,13 +84,13 @@ public final class FnTokenize extends RegEx {
       if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(split(input[0], ch, true));
     }
 
-    final Pattern pattern = pattern(input[1], exprs.length == 3 ? exprs[2] : null, qc, true);
+    final Pattern p = pattern(input[1], exprs.length == 3 ? exprs[2] : null, qc, true);
     if(vl == 0) return Empty.VALUE;
 
     final TokenList tl = new TokenList();
     final String string = string(input[0]);
     int start = 0;
-    for(final Matcher matcher = pattern.matcher(string); matcher.find();) {
+    for(final Matcher matcher = p.matcher(string); matcher.find();) {
       tl.add(string.substring(start, matcher.start()));
       start = matcher.end();
     }
@@ -104,21 +104,21 @@ public final class FnTokenize extends RegEx {
    * @throws QueryException query exception
    */
   private byte[][] input(final QueryContext qc) throws QueryException {
-    final byte[] token = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(exprs[0], qc);
     final boolean pattern = exprs.length > 1;
     return new byte[][] {
-      pattern ? token : normalize(token),
+      pattern ? value : normalize(value),
       pattern ? toToken(exprs[1], qc) : Token.SPACE
     };
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0], ptrn = exprs.length == 2 ? exprs[1] : null;
+    final Expr value = exprs[0], pattern = exprs.length == 2 ? exprs[1] : null;
 
     // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
-    if(NORMALIZE_SPACE.is(expr) && ptrn instanceof Str && eq(((Str) ptrn).string(), SPACE)) {
-      final Expr arg = expr.args().length == 1 ? expr.arg(0) : ContextValue.get(cc, info);
+    if(NORMALIZE_SPACE.is(value) && pattern instanceof Str && eq(((Str) pattern).string(), SPACE)) {
+      final Expr arg = value.args().length == 1 ? value.arg(0) : ContextValue.get(cc, info);
       return cc.function(TOKENIZE, info, arg);
     }
     return this;

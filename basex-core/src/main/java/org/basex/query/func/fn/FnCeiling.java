@@ -16,8 +16,8 @@ import org.basex.util.*;
 public final class FnCeiling extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANum num = toNumberOrNull(exprs[0], qc);
-    return num == null ? Empty.VALUE : num.ceiling();
+    final ANum value = toNumberOrNull(exprs[0], qc);
+    return value == null ? Empty.VALUE : value.ceiling();
   }
 
   @Override

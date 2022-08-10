@@ -59,22 +59,22 @@ public class FtMark extends StandardFunc {
 
     return new Iter() {
       final FTPosData ftd = new FTPosData();
-      Iter iter;
-      BasicIter<Item> ir;
+      BasicIter<Item> iter;
+      Iter nodes;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          if(ir != null) {
-            final Item item = ir.next();
+          if(iter != null) {
+            final Item item = iter.next();
             if(item != null) return item;
-            ir = null;
+            iter = null;
           }
           final FTPosData tmp = qc.ftPosData;
           try {
             qc.ftPosData = ftd;
-            if(iter == null) iter = exprs[0].iter(qc);
-            final Item item = iter.next();
+            if(nodes == null) nodes = exprs[0].iter(qc);
+            final Item item = nodes.next();
             if(item == null) return null;
 
             // copy node to main memory data instance
@@ -85,7 +85,7 @@ public class FtMark extends StandardFunc {
             final IntList il = new IntList();
             final int s = md.meta.size;
             for(int p = 0; p < s; p += md.size(p, md.kind(p))) il.add(p);
-            ir = DBNodeSeq.get(il.finish(), md, FtMark.this).iter();
+            iter = DBNodeSeq.get(il.finish(), md, FtMark.this).iter();
           } finally {
             qc.ftPosData = tmp;
           }

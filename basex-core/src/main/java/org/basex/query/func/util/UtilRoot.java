@@ -24,14 +24,14 @@ import org.basex.query.value.type.*;
 public final class UtilRoot extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc);
-    if(value.seqType().type == NodeType.DOCUMENT_NODE) return value;
+    final Value nodes = exprs[0].value(qc);
+    if(nodes.seqType().type == NodeType.DOCUMENT_NODE) return nodes;
 
-    final Iter iter = value.iter();
+    final Iter iter = nodes.iter();
     final ANodeBuilder list = new ANodeBuilder();
     for(Item item; (item = qc.next(iter)) != null;) {
       final ANode node = item instanceof ANode ? ((ANode) item).root() : null;
-      if(node == null || node.type != NodeType.DOCUMENT_NODE) throw NODOC_X.get(info, value);
+      if(node == null || node.type != NodeType.DOCUMENT_NODE) throw NODOC_X.get(info, nodes);
       list.add(node);
     }
     return list.value(this);
@@ -39,11 +39,11 @@ public final class UtilRoot extends StandardFunc {
 
   @Override
   public Expr opt(final CompileContext cc) {
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.instanceOf(SeqType.DOCUMENT_NODE_ZM)) return expr;
+    final Expr nodes = exprs[0];
+    final SeqType st = nodes.seqType();
+    if(st.instanceOf(SeqType.DOCUMENT_NODE_ZM)) return nodes;
     if(st.zeroOrOne()) exprType.assign(st.occ);
-    data(expr.data());
+    data(nodes.data());
     return this;
   }
 

@@ -39,10 +39,10 @@ public class FnDocAvailable extends Docs {
   final Item doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item item = exprs[0].atomItem(qc, info);
-      if(item == Empty.VALUE) return Empty.VALUE;
-      qi = queryInput(toToken(item));
-      if(qi == null) throw INVDOC_X.get(info, item);
+      final Item href = exprs[0].atomItem(qc, info);
+      if(href == Empty.VALUE) return Empty.VALUE;
+      qi = queryInput(toToken(href));
+      if(qi == null) throw INVDOC_X.get(info, href);
     }
     return qc.resources.doc(qi, info);
   }

@@ -57,10 +57,10 @@ public final class AdminLogs extends AdminFn {
    */
   private Iter logs(final QueryContext qc) throws QueryException {
     // return content of single log file
-    final String name = toString(exprs[0], qc);
+    final String date = toString(exprs[0], qc);
     final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
 
-    final LinkedList<LogEntry> list = logs(name, qc);
+    final LinkedList<LogEntry> list = logs(date, qc);
     final HashMap<String, LinkedList<LogEntry>> map = new HashMap<>();
     if(merge) {
       // group entries by address

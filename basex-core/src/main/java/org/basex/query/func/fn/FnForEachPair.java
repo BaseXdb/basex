@@ -19,9 +19,10 @@ import org.basex.query.value.type.*;
 public class FnForEachPair extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
-    final FItem func = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
-    final long size = func.funcType().declType.one() ? Math.min(iter1.size(), iter2.size()) : -1;
+    final Iter input1 = exprs[0].iter(qc), input2 = exprs[1].iter(qc);
+    final FItem action = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
+    final long size = action.funcType().declType.one()
+        ? Math.min(input1.size(), input2.size()) : -1;
 
     return new Iter() {
       Iter iter = Empty.ITER;
@@ -31,15 +32,15 @@ public class FnForEachPair extends StandardFunc {
         do {
           final Item item = qc.next(iter);
           if(item != null) return item;
-          final Item item1 = iter1.next(), item2 = iter2.next();
+          final Item item1 = input1.next(), item2 = input2.next();
           if(item1 == null || item2 == null) return null;
-          iter = func.invoke(qc, info, item1, item2).iter();
+          iter = action.invoke(qc, info, item1, item2).iter();
         } while(true);
       }
 
       @Override
       public Item get(final long i) throws QueryException {
-        return func.invoke(qc, info, iter1.get(i), iter2.get(i)).item(qc, info);
+        return action.invoke(qc, info, input1.get(i), input2.get(i)).item(qc, info);
       }
 
       @Override
@@ -51,22 +52,22 @@ public class FnForEachPair extends StandardFunc {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
-    final FItem func = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
+    final Iter input1 = exprs[0].iter(qc), input2 = exprs[1].iter(qc);
+    final FItem action = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item1, item2; (item1 = iter1.next()) != null && (item2 = iter2.next()) != null;) {
-      vb.add(func.invoke(qc, info, item1, item2));
+    for(Item item1, item2; (item1 = input1.next()) != null && (item2 = input2.next()) != null;) {
+      vb.add(action.invoke(qc, info, item1, item2));
     }
     return vb.value(this);
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    if(st1.zero()) return expr1;
-    if(st2.zero()) return expr2;
+    final Expr input1 = exprs[0], input2 = exprs[1];
+    final SeqType st1 = input1.seqType(), st2 = input2.seqType();
+    if(st1.zero()) return input1;
+    if(st2.zero()) return input2;
 
     exprs[2] = coerceFunc(exprs[2], cc, SeqType.ITEM_ZM, st1.with(Occ.EXACTLY_ONE),
         st2.with(Occ.EXACTLY_ONE));
@@ -78,7 +79,7 @@ public class FnForEachPair extends StandardFunc {
       final SeqType declType = ft.declType;
       final boolean oneOrMore = st1.oneOrMore() && st2.oneOrMore() && declType.oneOrMore();
       final long size = declType.zero() ? 0 : declType.one() ?
-        Math.min(expr1.size(), expr2.size()) : -1;
+        Math.min(input1.size(), input2.size()) : -1;
       exprType.assign(declType, oneOrMore ? Occ.ONE_OR_MORE : Occ.ZERO_OR_MORE, size);
     }
 

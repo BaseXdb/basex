@@ -16,6 +16,7 @@ import org.basex.util.*;
 public final class WebEncodeUrl extends WebFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-      return Str.get(URLEncoder.encode(toString(exprs[0], qc), StandardCharsets.UTF_8));
+    final String value = toString(exprs[0], qc);
+    return Str.get(URLEncoder.encode(value, StandardCharsets.UTF_8));
   }
 }

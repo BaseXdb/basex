@@ -22,17 +22,17 @@ public final class FnNormalizeUnicode extends StandardFunc {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(exprs[0], qc);
 
-    Form form = Form.NFC;
+    Form frm = Form.NFC;
     if(exprs.length == 2) {
-      final byte[] n = uc(trim(toToken(exprs[1], qc)));
-      if(n.length == 0) return Str.get(value);
+      final byte[] form = uc(trim(toToken(exprs[1], qc)));
+      if(form.length == 0) return Str.get(value);
       try {
-        form = Form.valueOf(string(n));
+        frm = Form.valueOf(string(form));
       } catch(final IllegalArgumentException ex) {
         Util.debug(ex);
-        throw NORMUNI_X.get(info, n);
+        throw NORMUNI_X.get(info, form);
       }
     }
-    return ascii(value) ? Str.get(value) : Str.get(Normalizer.normalize(string(value), form));
+    return ascii(value) ? Str.get(value) : Str.get(Normalizer.normalize(string(value), frm));
   }
 }

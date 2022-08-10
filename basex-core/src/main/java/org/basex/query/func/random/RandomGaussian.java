@@ -22,9 +22,9 @@ public final class RandomGaussian extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final long num = toLong(exprs[0], qc);
+    final long count = toLong(exprs[0], qc);
     return new Iter() {
-      long c = num;
+      long c = count;
 
       @Override
       public Item next() {
@@ -35,9 +35,9 @@ public final class RandomGaussian extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final long num = toLong(exprs[0], qc);
-    final DoubleList values = new DoubleList(Seq.initialCapacity(num));
-    for(long n = 0; n < num; n++) values.add(RND.nextGaussian());
+    final long count = toLong(exprs[0], qc);
+    final DoubleList values = new DoubleList(Seq.initialCapacity(count));
+    for(long c = 0; c < count; c++) values.add(RND.nextGaussian());
     return DblSeq.get(values.finish());
   }
 }

@@ -23,12 +23,12 @@ public class FnUnparsedTextAvailable extends Parse {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate if target is empty
-    final Expr expr = exprs[0];
-    if(expr == Empty.VALUE) return value(cc.qc);
+    final Expr href = exprs[0];
+    if(href == Empty.VALUE) return value(cc.qc);
 
     // pre-evaluate during dynamic compilation if target is not a remote URL
-    if(cc.dynamic && expr instanceof Value) {
-      input = input(toToken(expr.atomItem(cc.qc, info)));
+    if(cc.dynamic && href instanceof Value) {
+      input = input(toToken(href.atomItem(cc.qc, info)));
       if(input == null || !(input instanceof IOUrl)) return value(cc.qc);
     }
     return this;

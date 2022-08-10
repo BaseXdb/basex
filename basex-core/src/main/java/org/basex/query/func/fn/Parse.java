@@ -43,14 +43,13 @@ public abstract class Parse extends StandardFunc {
    */
   final Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
       throws QueryException {
-
     try {
       IO io = input;
       if(io == null) {
-        final Item item = exprs[0].atomItem(qc, info);
-        if(item == Empty.VALUE) return check ? Bln.FALSE : Empty.VALUE;
-        io = input(toToken(item));
-        if(io == null) throw INVURL_X.get(info, item);
+        final Item href = exprs[0].atomItem(qc, info);
+        if(href == Empty.VALUE) return check ? Bln.FALSE : Empty.VALUE;
+        io = input(toToken(href));
+        if(io == null) throw INVURL_X.get(info, href);
       }
       if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
 

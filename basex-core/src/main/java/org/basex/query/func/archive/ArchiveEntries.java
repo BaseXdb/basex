@@ -23,6 +23,7 @@ public final class ArchiveEntries extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final B64 archive = toB64(exprs[0], qc, false);
+
     final ValueBuilder vb = new ValueBuilder(qc);
     try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
       while(in.more()) {

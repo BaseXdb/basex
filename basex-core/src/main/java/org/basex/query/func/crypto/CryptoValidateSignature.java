@@ -3,6 +3,7 @@ package org.basex.query.func.crypto;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -14,6 +15,7 @@ import org.basex.util.*;
 public final class CryptoValidateSignature extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new DigitalSignature(info).validateSignature(toNode(exprs[0], qc));
+    final ANode node = toNode(exprs[0], qc);
+    return new DigitalSignature(info).validateSignature(node);
   }
 }

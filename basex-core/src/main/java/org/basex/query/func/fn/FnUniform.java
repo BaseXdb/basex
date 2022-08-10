@@ -22,13 +22,12 @@ import org.basex.util.*;
 public final class FnUniform extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter values = exprs[0].atomIter(qc, info);
     final Collation coll = toCollation(1, qc);
-    final Expr expr = exprs[0];
-    final Iter iter = expr.atomIter(qc, info);
 
-    final Item first = iter.next();
+    final Item first = values.next();
     if(first != null) {
-      for(Item item; (item = iter.next()) != null;) {
+      for(Item item; (item = values.next()) != null;) {
         if(!item.equiv(first, coll, info)) return Bln.FALSE;
       }
     }
@@ -42,17 +41,18 @@ public final class FnUniform extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr expr = exprs[0];
+    final Expr values = exprs[0];
     if(exprs.length == 1) {
-      final SeqType st = expr.seqType();
+      final SeqType st = values.seqType();
       final AtomType type = st.type.atomic();
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
-        return cc.merge(expr, Bln.TRUE, info);
+        return cc.merge(values, Bln.TRUE, info);
 
       // uniform(1 to 10)  ->  false
-      if(expr instanceof RangeSeq) return Bln.FALSE;
+      if(values instanceof RangeSeq) return Bln.FALSE;
       // uniform(reverse($data))  ->  uniform($data)
-      if(REVERSE.is(expr) || SORT.is(expr) || REPLICATE.is(expr) && expr.arg(1) instanceof Int) {
+      if(REVERSE.is(values) || SORT.is(values) ||
+          REPLICATE.is(values) && values.arg(1) instanceof Int) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
         return cc.function(UNIFORM, info, args);

@@ -34,20 +34,20 @@ public final class FnData extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final boolean context = contextAccess();
-    final Expr expr = context ? cc.qc.focus.value : exprs[0];
+    final Expr input = context ? cc.qc.focus.value : exprs[0];
 
-    if(expr != null) {
-      final SeqType st = expr.seqType();
-      if(st.zero()) return expr;
+    if(input != null) {
+      final SeqType st = input.seqType();
+      if(st.zero()) return input;
       final AtomType type = st.type.atomic();
       if(type == st.type) {
         // data('x')  ->  'x'
         // $string[data() = 'a']  ->  $string[. = 'a']
-        return context && cc.nestedFocus() ? ContextValue.get(cc, info) : expr;
+        return context && cc.nestedFocus() ? ContextValue.get(cc, info) : input;
       }
       // ignore arrays: data((1 to 6) ! [ ., . ])
       if(type != null) {
-        exprType.assign(SeqType.get(type, st.occ), st.mayBeArray() ? -1 : expr.size());
+        exprType.assign(SeqType.get(type, st.occ), st.mayBeArray() ? -1 : input.size());
       }
     }
     return this;
@@ -62,14 +62,14 @@ public final class FnData extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = null;
-    final Expr expr1 = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
+    final Expr input = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
     if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT)) {
       // data(<a/>) = ''  ->  <a/> = ''
       // A[B ! data() = '']  ->  A[B ! . = '']
-      expr = expr1;
+      expr = input;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // if(data($node))  ->  if($node/descendant::text())
-      expr = simplifyEbv(expr1, cc);
+      expr = simplifyEbv(input, cc);
     }
     return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }

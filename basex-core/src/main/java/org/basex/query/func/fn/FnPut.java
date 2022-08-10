@@ -23,18 +23,18 @@ import org.basex.util.*;
 public final class FnPut extends StandardFunc {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode nd = toNode(exprs[0], qc);
-    final byte[] file = toZeroToken(exprs[1], qc);
-    final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
-    final SerializerOptions sopts = FuncOptions.serializer(so, info);
+    final ANode node = toNode(exprs[0], qc);
+    final byte[] href = toZeroToken(exprs[1], qc);
+    final Item options = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
+    final SerializerOptions sopts = FuncOptions.serializer(options, info);
 
-    if(!nd.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
+    if(!node.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
       throw UPFOTYPE_X.get(info, exprs[0]);
 
-    final Uri uri = Uri.uri(file);
-    if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, file);
+    final Uri uri = Uri.uri(href);
+    if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, href);
     final Updates updates = qc.updates();
-    final DBNode target = updates.determineDataRef(nd, qc);
+    final DBNode target = updates.determineDataRef(node, qc);
 
     final String path = sc.resolve(string(uri.string())).path();
     // check if all target paths are unique

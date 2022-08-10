@@ -14,13 +14,13 @@ public final class FnRangeTo extends FnRangeFrom {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter iter = exprs[0].iter(qc);
+      final Iter input = exprs[0].iter(qc);
       final FItem end = toFunction(exprs[1], 1, qc);
       boolean ended;
 
       @Override
       public Item next() throws QueryException {
-        final Item item = ended ? null : qc.next(iter);
+        final Item item = ended ? null : qc.next(input);
         if(item != null && toBoolean(end.invoke(qc, info, item).item(qc, info))) {
           ended  = true;
         }

@@ -34,6 +34,7 @@ public class FnLowest extends StandardFunc {
    * @throws QueryException query exception
    */
   Value value(final boolean min, final QueryContext qc) throws QueryException {
+    final Iter input = exprs[0].iter(qc);
     final Collation coll = toCollation(1, false, qc);
     final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
 
@@ -47,13 +48,12 @@ public class FnLowest extends StandardFunc {
     };
 
     final ItemList result = new ItemList();
-    final Iter iter = exprs[0].iter(qc);
-    Item item = qc.next(iter);
+    Item item = qc.next(input);
     Value lowest;
     if(item != null) {
       result.add(item);
       lowest = modify.apply(item);
-      while((item = qc.next(iter)) != null) {
+      while((item = qc.next(input)) != null) {
         final Value low = modify.apply(item);
         int diff = FnSort.compare(lowest, low, coll, info);
         if(min) diff = -diff;
@@ -82,36 +82,35 @@ public class FnLowest extends StandardFunc {
    */
   final Expr opt(final boolean min, final CompileContext cc) throws QueryException {
     // optimize sort on sequences
-    final Expr expr1 = exprs[0];
-    final SeqType st1 = expr1.seqType();
-    if(st1.zero()) return expr1;
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     if(exprs.length < 2) {
-      if(st1.zeroOrOne() && st1.type.isSortable()) return expr1;
+      if(st.zeroOrOne() && st.type.isSortable()) return input;
 
       // range values
-      if(expr1 instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) expr1;
+      if(input instanceof RangeSeq) {
+        final RangeSeq seq = (RangeSeq) input;
         return (seq.asc ? seq : seq.reverse(null)).itemAt(min ? 0 : seq.size() - 1);
       }
       // sortable single or singleton values
-      final SeqType st = expr1.seqType();
-      if(st.type.isSortable() && (st.one() || expr1 instanceof SingletonSeq &&
-          ((SingletonSeq) expr1).singleItem())) return expr1;
+      if(st.type.isSortable() && (st.one() || input instanceof SingletonSeq &&
+          ((SingletonSeq) input).singleItem())) return input;
 
-      if(REPLICATE.is(expr1) && ((FnReplicate) expr1).singleEval(false)) {
-        final SeqType ast = expr1.arg(0).seqType();
-        if(ast.zeroOrOne() && ast.type.isSortable()) return expr1;
+      if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
+        final SeqType ast = input.arg(0).seqType();
+        if(ast.zeroOrOne() && ast.type.isSortable()) return input;
       }
-      if(REVERSE.is(expr1) || SORT.is(expr1)) {
+      if(REVERSE.is(input) || SORT.is(input)) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
         return cc.function(min ? LOWEST : HIGHEST, info, args);
       }
     } else if(exprs.length == 3) {
-      exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st1.with(Occ.EXACTLY_ONE));
+      exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE));
     }
-    return adoptType(expr1);
+    return adoptType(input);
   }
 
   @Override

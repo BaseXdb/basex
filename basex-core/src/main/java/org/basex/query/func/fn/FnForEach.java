@@ -23,23 +23,23 @@ public class FnForEach extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    final Iter iter = exprs[0].iter(qc);
-    final FItem func = toFunction(exprs[1], 1, this instanceof UpdateForEach, qc);
+    final Iter input = exprs[0].iter(qc);
+    final FItem action = toFunction(exprs[1], 1, this instanceof UpdateForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null;) vb.add(func.invoke(qc, info, item));
+    for(Item item; (item = qc.next(input)) != null;) vb.add(action.invoke(qc, info, item));
     return vb.value(this);
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr items = exprs[0];
-    final SeqType st = items.seqType();
-    if(st.zero()) return items;
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     // create FLWOR expression
     final Var var = cc.copy(new Var(new QNm("each"), null, cc.qc, sc, info), new IntObjMap<>());
-    final For fr = new For(var, items).optimize(cc);
+    final For fr = new For(var, input).optimize(cc);
 
     final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
     final boolean updating = this instanceof UpdateForEach, ndt = func.has(Flag.NDT);

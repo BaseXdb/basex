@@ -33,47 +33,47 @@ public class FnEmpty extends StandardFunc {
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final boolean exists = this instanceof FnExists;
-    Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
+    Expr input = exprs[0];
+    final SeqType st = input.seqType();
 
     // ignore non-deterministic expressions (e.g.: empty(error()))
-    if(!expr.has(Flag.NDT)) {
+    if(!input.has(Flag.NDT)) {
       if(st.zero()) return Bln.get(!exists);
       if(st.oneOrMore()) return Bln.get(exists);
     }
 
     // static integer will always be greater than 1
-    if(REPLICATE.is(expr) && expr.arg(1) instanceof Int) {
-      expr = expr.arg(0);
+    if(REPLICATE.is(input) && input.arg(1) instanceof Int) {
+      input = input.arg(0);
     }
     // rewrite list to union expression:  exists((a, b))  ->  exists(a | b)
-    if(expr instanceof List && expr.seqType().type instanceof NodeType) {
-      expr = new Union(info, expr.args()).optimize(cc);
+    if(input instanceof List && input.seqType().type instanceof NodeType) {
+      input = new Union(info, input.args()).optimize(cc);
     }
-    if(expr != exprs[0]) return cc.function(exists ? EXISTS : EMPTY, info, expr);
+    if(input != exprs[0]) return cc.function(exists ? EXISTS : EMPTY, info, input);
 
     // replace optimized expression by boolean function
-    if(expr instanceof Filter) {
+    if(input instanceof Filter) {
       // rewrite filter:  exists($a[text() = 'Ukraine'])  ->  $a/text() = 'Ukraine'
-      final Filter filter = (Filter) expr;
-      expr = filter.flattenEbv(filter.root, false, cc);
-    } else if(INDEX_OF.is(expr)) {
+      final Filter filter = (Filter) input;
+      input = filter.flattenEbv(filter.root, false, cc);
+    } else if(INDEX_OF.is(input)) {
       // rewrite index-of:  exists(index-of($texts, 'Ukraine'))  ->  $texts = 'Ukraine'
-      final Expr[] args = expr.args();
+      final Expr[] args = input.args();
       if(args.length == 2 && args[1].seqType().one() &&
           CmpG.compatible(args[0].seqType(), args[1].seqType(), true)) {
-        expr = new CmpG(args[0], args[1], OpG.EQ, null, sc, info).optimize(cc);
+        input = new CmpG(args[0], args[1], OpG.EQ, null, sc, info).optimize(cc);
       }
-    } else if(STRING_TO_CODEPOINTS.is(expr) || CHARACTERS.is(expr)) {
+    } else if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input)) {
       // exists(string-to-codepoints(...))  ->  boolean(string(...))
-      expr = cc.function(STRING, info, expr.args());
+      input = cc.function(STRING, info, input.args());
     }
-    if(expr != exprs[0]) return cc.function(exists ? BOOLEAN : NOT, info, expr);
+    if(input != exprs[0]) return cc.function(exists ? BOOLEAN : NOT, info, input);
 
     // exists(map:keys(...))  ->  map:size(...) > 0
-    if(_MAP_KEYS.is(expr)) {
-      expr = cc.function(_MAP_SIZE, info, expr.args());
-      return new CmpG(expr, Int.ZERO, exists ? OpG.NE : OpG.EQ, null, sc, info).optimize(cc);
+    if(_MAP_KEYS.is(input)) {
+      input = cc.function(_MAP_SIZE, info, input.args());
+      return new CmpG(input, Int.ZERO, exists ? OpG.NE : OpG.EQ, null, sc, info).optimize(cc);
     }
 
     final Expr embedded = embed(cc, true);
@@ -88,8 +88,7 @@ public class FnEmpty extends StandardFunc {
 
     final Function func = this instanceof FnExists ? EXISTS : EMPTY;
     if(!or && func.is(expr)) {
-      final Expr args = List.get(cc, info, exprs[0], expr.arg(0));
-      return cc.function(func, info, args);
+      return cc.function(func, info, List.get(cc, info, exprs[0], expr.arg(0)));
     }
     if(_UTIL_COUNT_WITHIN.is(expr)) {
       return expr.mergeEbv(this, or, cc);
@@ -104,9 +103,9 @@ public class FnEmpty extends StandardFunc {
    * @throws QueryException query exception
    */
   final boolean empty(final QueryContext qc) throws QueryException {
-    final Expr expr = exprs[0];
-    return expr.seqType().zeroOrOne() ?
-      expr.item(qc, info) == Empty.VALUE :
-      expr.iter(qc).next() == null;
+    final Expr input = exprs[0];
+    return input.seqType().zeroOrOne() ?
+      input.item(qc, info) == Empty.VALUE :
+      input.iter(qc).next() == null;
   }
 }

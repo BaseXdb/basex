@@ -19,16 +19,16 @@ import org.basex.query.value.seq.*;
 public final class HofSortWith extends HofFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc);
-    final Comparator<Item> comp = getComp(1, qc);
-    if(value.size() < 2) return value;
+    final Value input = exprs[0].value(qc);
+    final Comparator<Item> comparator = comparator(qc);
+    if(input.size() < 2) return input;
 
-    final ItemList items = new ItemList(Seq.initialCapacity(value.size()));
-    final Iter iter = value.iter();
+    final ItemList items = new ItemList(Seq.initialCapacity(input.size()));
+    final Iter iter = input.iter();
     for(Item item; (item = qc.next(iter)) != null;) items.add(item);
 
     try {
-      Arrays.sort(items.list, 0, items.size(), comp);
+      Arrays.sort(items.list, 0, items.size(), comparator);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }
@@ -37,7 +37,8 @@ public final class HofSortWith extends HofFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr = exprs[0];
-    return expr.seqType().zero() ? expr : adoptType(expr);
+    // even single items must be sorted, as the input might be invalid
+    final Expr input = exprs[0];
+    return input.seqType().zero() ? input : adoptType(input);
   }
 }

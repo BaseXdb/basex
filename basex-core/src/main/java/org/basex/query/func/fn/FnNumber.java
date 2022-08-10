@@ -19,12 +19,12 @@ import org.basex.util.*;
 public final class FnNumber extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = ctxArg(0, qc).atomItem(qc, info);
-    if(item == Empty.VALUE) return Dbl.NAN;
-    if(item.type == DOUBLE) return item;
+    final Item value = ctxArg(0, qc).atomItem(qc, info);
+    if(value == Empty.VALUE) return Dbl.NAN;
+    if(value.type == DOUBLE) return value;
     try {
       if(info != null) info.internal(true);
-      return DOUBLE.cast(item, qc, sc, info);
+      return DOUBLE.cast(value, qc, sc, info);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return Dbl.NAN;
@@ -36,18 +36,18 @@ public final class FnNumber extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final boolean context = contextAccess();
-    final Expr expr = context ? cc.qc.focus.value : exprs[0];
+    final Expr value = context ? cc.qc.focus.value : exprs[0];
     final Type type = argType(cc);
 
     // number(1e1)  ->  1e1
     // $double[number() = 1]  ->  $double[. = 1]
-    if(type == DOUBLE) return context && cc.nestedFocus() ? ContextValue.get(cc, info) : expr;
+    if(type == DOUBLE) return context && cc.nestedFocus() ? ContextValue.get(cc, info) : value;
 
     // number(string(ITEM))
     // number(xs:untypedAtomic(ITEM))
     // number(ITEM promote to xs:untypedAtomic)  ->  number(ITEM)
     if(type != null) {
-      final Expr arg = simplify(expr, cc);
+      final Expr arg = simplify(value, cc);
       if(arg != null) return cc.function(Function.NUMBER, info, arg);
     }
     return this;
@@ -59,9 +59,9 @@ public final class FnNumber extends ContextFn {
    * @return argument type or {@code null}
    */
   private Type argType(final CompileContext cc) {
-    final Expr expr = contextAccess() ? cc.qc.focus.value : exprs[0];
-    if(expr != null) {
-      final SeqType st = expr.seqType();
+    final Expr value = contextAccess() ? cc.qc.focus.value : exprs[0];
+    if(value != null) {
+      final SeqType st = value.seqType();
       if(st.one()) return st.type.atomic();
     }
     return null;

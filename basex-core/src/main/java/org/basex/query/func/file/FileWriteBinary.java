@@ -44,22 +44,22 @@ public class FileWriteBinary extends FileFn {
           // optimization: stream archive to disk (no support for ArchiveCreateFrom)
           ((ArchiveCreate) exprs[1]).create(out, qc);
         } else {
-          final Bin bin = toBin(exprs[1], qc);
-          try(BufferInput in = bin.input(info)) {
+          final Bin value = toBin(exprs[1], qc);
+          try(BufferInput in = value.input(info)) {
             for(int b; (b = in.read()) != -1;) out.write(b);
           }
         }
       }
     } else {
       // write file chunk
-      final Bin bin = toBin(exprs[1], qc);
+      final Bin binary = toBin(exprs[1], qc);
       final long offset = toLong(exprs[2], qc);
 
       try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
         final long length = raf.length();
         if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
         raf.seek(offset);
-        raf.write(bin.binary(info));
+        raf.write(binary.binary(info));
       }
     }
   }

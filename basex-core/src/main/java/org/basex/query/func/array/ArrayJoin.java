@@ -20,13 +20,13 @@ public final class ArrayJoin extends ArrayFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
-    final Expr expr = exprs[0];
-    if(expr.seqType().zeroOrOne()) {
-      final Item item = expr.item(qc, info);
+    final Expr arrays = exprs[0];
+    if(arrays.seqType().zeroOrOne()) {
+      final Item item = arrays.item(qc, info);
       return item == Empty.VALUE ? XQArray.empty() : toArray(item);
     }
 
-    final Iter iter = expr.iter(qc);
+    final Iter iter = arrays.iter(qc);
     Item item = iter.next();
     if(item == null) return XQArray.empty();
     final XQArray first = toArray(item);
@@ -45,12 +45,15 @@ public final class ArrayJoin extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs[0].seqType().type instanceof ArrayType) {
+    final Expr arrays = exprs[0];
+    if(arrays.seqType().type instanceof ArrayType) {
       // remove empty entries
-      if(exprs[0] instanceof List &&
-          ((Checks<Expr>) arg -> arg == XQArray.empty()).any(exprs[0].args())) {
+      final Expr[] args = arrays.args();
+      if(arrays instanceof List && ((Checks<Expr>) arg -> arg == XQArray.empty()).any(args)) {
         final ExprList list = new ExprList();
-        for(final Expr arg : exprs[0].args()) if(arg != XQArray.empty()) list.add(arg);
+        for(final Expr arg : args) {
+          if(arg != XQArray.empty()) list.add(arg);
+        }
         exprs[0] = List.get(cc, info, list.finish());
       }
       // return simple arguments

@@ -34,12 +34,12 @@ public final class FnError extends StandardFunc {
     final int al = exprs.length;
     if(al == 0) throw FUNERR1.get(info);
 
-    QNm name = toQNm(exprs[0], true, qc);
-    if(name == null) name = FUNERR1.qname();
+    QNm code = toQNm(exprs[0], true, qc);
+    if(code == null) code = FUNERR1.qname();
 
-    final String msg = al > 1 ? toString(exprs[1], qc) : FUNERR1.message;
-    final Value value = al > 2 ? exprs[2].value(qc) : null;
-    throw new QueryException(info, name, msg).value(value);
+    final String desc = al > 1 ? toString(exprs[1], qc) : FUNERR1.message;
+    final Value object = al > 2 ? exprs[2].value(qc) : null;
+    throw new QueryException(info, code, desc).value(object);
   }
 
   @Override
@@ -62,8 +62,8 @@ public final class FnError extends StandardFunc {
   public static StandardFunc get(final QueryException ex, final SeqType st,
       final StaticContext sc) {
     Util.debug(ex);
-    final Str msg = Str.get(ex.getLocalizedMessage());
-    final StandardFunc sf = ERROR.get(sc, ex.info(), ex.qname(), msg);
+    final Str desc = Str.get(ex.getLocalizedMessage());
+    final StandardFunc sf = ERROR.get(sc, ex.info(), ex.qname(), desc);
     sf.exprType.assign(st);
     return sf;
   }

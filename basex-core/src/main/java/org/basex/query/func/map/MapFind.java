@@ -19,17 +19,17 @@ import org.basex.query.value.seq.*;
 public final class MapFind extends StandardFunc {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final Item item = toAtomItem(exprs[1], qc);
+    final Iter input = exprs[0].iter(qc);
+    final Item key = toAtomItem(exprs[1], qc);
 
     final ArrayBuilder builder = new ArrayBuilder();
-    find(iter, item, builder, qc);
+    find(input, key, builder, qc);
     return builder.array(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return exprs[0] == XQMap.empty()  ? XQArray.empty() : this;
+    return exprs[0] == XQMap.empty() ? XQArray.empty() : this;
   }
 
   /**

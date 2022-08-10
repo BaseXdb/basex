@@ -17,18 +17,18 @@ import org.basex.query.value.type.*;
 public class HofTakeWhile extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final FItem pred = toFunction(exprs[1], 1, qc);
+    final Iter input = exprs[0].iter(qc);
+    final FItem predicate = toFunction(exprs[1], 1, qc);
 
     // check if iterator is value-based
-    final Value value = value(iter, pred, qc);
+    final Value value = value(input, predicate, qc);
     if(value != null) return value.iter();
 
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        final Item item = qc.next(iter);
-        if(item != null && test(pred, item, qc)) return item;
+        final Item item = qc.next(input);
+        if(item != null && test(item, predicate, qc)) return item;
         return null;
       }
     };
@@ -36,59 +36,59 @@ public class HofTakeWhile extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final FItem pred = toFunction(exprs[1], 1, qc);
+    final Iter input = exprs[0].iter(qc);
+    final FItem predicate = toFunction(exprs[1], 1, qc);
 
     // check if iterator is value-based
-    final Value value = value(iter, pred, qc);
+    final Value value = value(input, predicate, qc);
     if(value != null) return value;
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(iter)) != null && test(pred, item, qc);) vb.add(item);
+    for(Item item; (item = qc.next(input)) != null && test(item, predicate, qc);) vb.add(item);
     return vb.value(this);
   }
 
   /**
    * Returns the result value if the iterator is value-based.
-   * @param iter iterator
-   * @param pred predicate
+   * @param input iterator
+   * @param predicate predicate
    * @param qc query context
    * @return resulting value or {@code null}
    * @throws QueryException query exception
    */
-  private Value value(final Iter iter, final FItem pred, final QueryContext qc)
+  private Value value(final Iter input, final FItem predicate, final QueryContext qc)
       throws QueryException {
 
-    final Value value = iter.iterValue();
+    final Value value = input.iterValue();
     if(value == null) return null;
 
     final long size = value.size();
     long c = -1;
-    while(++c < size && test(pred, value.itemAt(c), qc));
+    while(++c < size && test(value.itemAt(c), predicate, qc));
     return value.subsequence(0, c, qc);
   }
 
   /**
    * Tests if the specified predicate is successful.
-   * @param pred predicate
    * @param item item
+   * @param predicate predicate
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  final boolean test(final FItem pred, final Item item, final QueryContext qc)
+  final boolean test(final Item item, final FItem predicate, final QueryContext qc)
       throws QueryException {
-    return toBoolean(pred.invoke(qc, info, item), qc);
+    return toBoolean(predicate.invoke(qc, info, item), qc);
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final Expr expr = exprs[0];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     exprType.assign(st.union(Occ.ZERO));
-    data(expr.data());
+    data(input.data());
     return this;
   }
 }

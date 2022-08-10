@@ -18,14 +18,14 @@ import org.basex.query.value.type.*;
 public final class FnRemove extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final long pos = toLong(exprs[1], qc), size = iter.size();
+    final Iter input = exprs[0].iter(qc);
+    final long pos = toLong(exprs[1], qc), size = input.size();
 
     // position out of bounds: return original value
-    if(pos <= 0 || size != -1 && pos > size) return iter;
+    if(pos <= 0 || size != -1 && pos > size) return input;
 
     // check if iterator is value-based
-    final Value value = iter.iterValue();
+    final Value value = input.iterValue();
     if(value != null) return value(value, pos, qc).iter();
 
     return new Iter() {
@@ -33,11 +33,11 @@ public final class FnRemove extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        return ++c != pos || iter.next() != null ? qc.next(iter) : null;
+        return ++c != pos || input.next() != null ? qc.next(input) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return iter.get(i + 1 < pos ? i : i + 1);
+        return input.get(i + 1 < pos ? i : i + 1);
       }
       @Override
       public long size() {
@@ -73,27 +73,27 @@ public final class FnRemove extends StandardFunc {
     // ignore standard limitation for large values to speed up evaluation of result
     if(allAreValues(false)) return value(cc.qc);
 
-    final Expr expr = exprs[0], pos = exprs[1];
-    final SeqType st = expr.seqType();
-    if(st.zero()) return expr;
+    final Expr input = exprs[0], pos = exprs[1];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
 
     long sz = -1;
     if(pos instanceof Value) {
       // position is static...
       final long p = toLong(pos, cc.qc);
       // return all items
-      final long size = expr.size();
-      if(p < 1 || size > 0 && p > size) return expr;
+      final long size = input.size();
+      if(p < 1 || size > 0 && p > size) return input;
       // skip first item
-      if(p == 1) return cc.function(Function.TAIL, info, expr);
+      if(p == 1) return cc.function(Function.TAIL, info, input);
       // skip last item
-      if(p == size) return cc.function(Function._UTIL_INIT, info, expr);
+      if(p == size) return cc.function(Function._UTIL_INIT, info, input);
       // decrement result size
       sz--;
     }
 
     exprType.assign(st.union(Occ.ZERO), sz);
-    data(expr.data());
+    data(input.data());
     return this;
   }
 
