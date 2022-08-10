@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.gflwor.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
@@ -15,6 +16,10 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public class Fn4ModuleTest extends QueryPlanTest {
+  /** Months. */
+  private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
+      + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";
+
   /** Test method. */
   @Test public void all() {
     final Function func = ALL;
@@ -111,6 +116,25 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void indexWhere() {
+    final Function func = INDEX_WHERE;
+    query(func.args(" ()", " boolean#1"), "");
+    query(func.args(0, " boolean#1"), "");
+    query(func.args(1, " boolean#1"), 1);
+    query(func.args(" (0, 4, 9)", " boolean#1"), "2\n3");
+    query(func.args(" 1 to 9", " function($n) { $n mod 5 = 0 }"), 5);
+    query(func.args(MONTHS, " contains(?, 'z')"), "");
+    query(func.args(MONTHS, " contains(?, 'v')"), 11);
+    query(func.args(MONTHS, " starts-with(?, 'J')"), "1\n6\n7");
+
+    check(func.args(" (0 to 5)[. = 0]", " not#1"), 1, root(GFLWOR.class));
+    check(func.args(" (0 to 5)[. = 6]", " not#1"), "", root(GFLWOR.class));
+
+    query("function-lookup(xs:QName('fn:index-where'), <_>2</_>/text())(0, not#1)", 1);
+    query("function-lookup(xs:QName('fn:index-where'), <_>2</_>/text())(1, not#1)", "");
+  }
+
+  /** Test method. */
   @Test public void isNaN() {
     final Function func = IS_NAN;
     query(func.args(" xs:double('NaN')"), true);
@@ -161,6 +185,34 @@ public class Fn4ModuleTest extends QueryPlanTest {
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOM_X_X);
+  }
+
+  /** Test method. */
+  @Test public void rangeFrom() {
+    final Function func = RANGE_FROM;
+
+    query(func.args(" ()", " boolean#1"), "");
+    query(func.args(0, " boolean#1"), "");
+    query(func.args(1, " boolean#1"), 1);
+    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "1\n2\n3\n0");
+    query(func.args(" 1 to 3", " not#1"), "");
+    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "2\n3");
+    query(func.args(MONTHS, " contains(?, 'z')"), "");
+    query(func.args(MONTHS, " starts-with(?, 'Nov')"), "November\nDecember");
+  }
+
+  /** Test method. */
+  @Test public void rangeTo() {
+    final Function func = RANGE_TO;
+
+    query(func.args(" ()", " boolean#1"), "");
+    query(func.args(0, " boolean#1"), 0);
+    query(func.args(1, " boolean#1"), 1);
+    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "0\n1");
+    query(func.args(" 1 to 3", " not#1"), "1\n2\n3");
+    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "1\n2");
+    query(func.args(MONTHS, " contains(?, '')"), "January");
+    query(func.args(MONTHS, " starts-with(?, 'Feb')"), "January\nFebruary");
   }
 
   /** Test method. */

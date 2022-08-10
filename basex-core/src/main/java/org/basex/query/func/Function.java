@@ -282,6 +282,9 @@ public enum Function implements AFunction {
   INDEX_OF(FnIndexOf::new, "index-of(input,search[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_O, STRING_O), INTEGER_ZM),
   /** XQuery function. */
+  INDEX_WHERE(FnIndexWhere::new, "index-where(input,predicate)",
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_O).seqType()), INTEGER_ZM, flag(HOF)),
+  /** XQuery function. */
   INNERMOST(FnInnermost::new, "innermost(nodes)",
       params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
@@ -407,6 +410,12 @@ public enum Function implements AFunction {
   /** XQuery function. */
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator::new, "random-number-generator([seed])",
       params(ANY_ATOMIC_TYPE_O), MAP_O, flag(HOF, NDT)),
+  /** XQuery function. */
+  RANGE_FROM(FnRangeFrom::new, "range-from(input,start)",
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  RANGE_TO(FnRangeTo::new, "range-to(input,end)",
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   REMOVE(FnRemove::new, "remove(input,position)",
       params(ITEM_ZM, INTEGER_O), ITEM_ZM),
