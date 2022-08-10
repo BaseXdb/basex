@@ -23,11 +23,12 @@ public final class FnIndexOf extends StandardFunc {
       final Iter iter = exprs[0].atomIter(qc, info);
       final Item srch = toAtomItem(exprs[1], qc);
       final Collation coll = toCollation(2, qc);
-      int c = 1;
+      int c;
 
       @Override
       public Int next() throws QueryException {
-        for(Item item; (item = qc.next(iter)) != null; ++c) {
+        for(Item item; (item = qc.next(iter)) != null;) {
+          ++c;
           if(item.comparable(srch) && OpV.EQ.eval(item, srch, coll, sc, info)) return Int.get(c);
         }
         return null;
