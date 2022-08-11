@@ -5,10 +5,9 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.value.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -16,19 +15,19 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public class FnInScopePrefixes extends StandardFunc {
+public final class FnInScopeNamespaces extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Atts atts = toElem(exprs[0], qc).nsScope(sc).add(XML, XML_URI);
 
+    final MapBuilder builder = new MapBuilder(info);
     final int as = atts.size();
-    final TokenList tl = new TokenList();
     for(int a = 0; a < as; ++a) {
       final byte[] key = atts.name(a);
       if(key.length + atts.value(a).length != 0) {
-        tl.add(key);
+        builder.put(Str.get(key), Uri.uri(atts.value(a)));
       }
     }
-    return StrSeq.get(tl);
+    return builder.finish();
   }
 }

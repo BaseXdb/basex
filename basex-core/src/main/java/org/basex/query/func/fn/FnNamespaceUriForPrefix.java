@@ -21,9 +21,10 @@ public final class FnNamespaceUriForPrefix extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] prefix = toZeroToken(exprs[0], qc);
     final ANode element = toElem(exprs[1], qc);
+
     if(eq(prefix, XML)) return Uri.uri(XML_URI, false);
     final Atts at = element.nsScope(sc);
-    final byte[] s = at.value(prefix);
-    return s == null || s.length == 0 ? Empty.VALUE : Uri.uri(s, false);
+    final byte[] uri = at.value(prefix);
+    return uri == null || uri.length == 0 ? Empty.VALUE : Uri.uri(uri, false);
   }
 }

@@ -280,6 +280,9 @@ public enum Function implements AFunction {
   IMPLICIT_TIMEZONE(FnImplicitTimezone::new, "implicit-timezone()",
       params(), DAY_TIME_DURATION_O, flag(NDT)),
   /** XQuery function. */
+  IN_SCOPE_NAMESPACES(FnInScopeNamespaces::new, "in-scope-namespaces(element)",
+      params(ELEMENT_O), MAP_O),
+  /** XQuery function. */
   IN_SCOPE_PREFIXES(FnInScopePrefixes::new, "in-scope-prefixes(element)",
       params(ELEMENT_O), STRING_ZM),
   /** XQuery function. */

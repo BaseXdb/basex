@@ -58,8 +58,8 @@ public final class Uri extends AStr {
    * @return uri instance
    */
   public static Uri uri(final byte[] value, final boolean normalize) {
-    final byte[] u = normalize ? Token.normalize(value) : value;
-    return u.length == 0 ? EMPTY : new Uri(u);
+    final byte[] uri = normalize ? Token.normalize(value) : value;
+    return uri.length == 0 ? EMPTY : new Uri(uri);
   }
 
   /**

@@ -135,6 +135,14 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void inScopeNamespaces() {
+    final Function func = IN_SCOPE_NAMESPACES;
+    query(func.args(" <a/>") + " => map:keys()", "xml");
+    query(func.args(" <a xmlns='x'/>") + " => map:keys() => sort()", "\nxml");
+    query(func.args(" <a xmlns:p='x'/>") + " => map:keys() => sort()", "p\nxml");
+  }
+
+  /** Test method. */
   @Test public void isNaN() {
     final Function func = IS_NAN;
     query(func.args(" xs:double('NaN')"), true);
