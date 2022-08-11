@@ -7,7 +7,9 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -19,18 +21,19 @@ public final class FnReplace extends RegEx {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(exprs[0], qc);
-    final byte[] pattern = toToken(exprs[1], qc), replacement = toToken(exprs[2], qc);
-
-    if(exprs.length < 4) {
+    final byte[] pattern = toToken(exprs[1], qc), replacement = toZeroToken(exprs[2], qc);
+    final boolean noFlags = exprs.length < 4, noAction = exprs.length < 5;
+    if(noFlags) {
+      // shortcut for simple character replacements
       final int sp = patternChar(pattern), rp = patternChar(replacement);
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
 
-    final RegExpr regExpr = regExpr(pattern, exprs.length == 4 ? exprs[3] : null, qc, true);
-    final String input = string(value);
-    String replace = string(replacement);
+    final RegExpr regExpr = regExpr(pattern, noFlags ? null : exprs[3], qc, true);
+    final FItem action = noAction ? null : toFunction(exprs[4], 2, qc);
 
-    if((regExpr.pattern.flags() & Pattern.LITERAL) == 0) {
+    String replace = string(replacement);
+    if(noAction && (regExpr.pattern.flags() & Pattern.LITERAL) == 0) {
       // standard parsing: raise errors for some special cases
       final int rl = replacement.length;
       for(int r = 0; r < rl; ++r) {
@@ -72,7 +75,25 @@ public final class FnReplace extends RegEx {
     }
 
     try {
-      return Str.get(regExpr.pattern.matcher(input).replaceAll(replace));
+      final Matcher m = regExpr.pattern.matcher(string(value));
+      final String replaced;
+      if(noAction) {
+        replaced = m.replaceAll(replace);
+      } else {
+        final StringBuilder sb = new StringBuilder();
+        while(m.find()) {
+          final int gc = m.groupCount();
+          final TokenList tl = new TokenList(gc);
+          for(int g = 0; g < gc; g++) tl.add(m.group(g + 1));
+          final Item rplc = action.invoke(qc, info, Str.get(m.group()), StrSeq.get(tl)).
+              atomItem(qc, ii);
+          m.appendReplacement(sb, rplc == Empty.VALUE ? "" : string(toToken(rplc)));
+        }
+        replaced = m.appendTail(sb).toString();
+      }
+      return Str.get(replaced);
+    } catch(final QueryException ex) {
+      throw ex;
     } catch(final Exception ex) {
       if(ex.getMessage().contains("No group")) {
         Util.debug(ex);

@@ -63,7 +63,8 @@ abstract class RegEx extends StandardFunc {
   final RegExpr regExpr(final byte[] pattern, final Expr modifier, final QueryContext qc,
       final boolean check) throws QueryException {
 
-    final byte[] mod = modifier != null ? toToken(modifier, qc) : Token.EMPTY;
+    byte[] mod = modifier != null ? toTokenOrNull(modifier, qc) : null;
+    if(mod == null) mod = Token.EMPTY;
     final byte[] key = Token.concat(pattern, '\b', mod);
 
     synchronized(patterns) {
