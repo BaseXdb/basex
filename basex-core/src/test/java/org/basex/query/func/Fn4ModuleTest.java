@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public class Fn4ModuleTest extends QueryPlanTest {
+  /** Document. */
+  private static final String DOC = "src/test/resources/input.xml";
   /** Months. */
   private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
       + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";
@@ -270,15 +273,15 @@ public class Fn4ModuleTest extends QueryPlanTest {
     final Function func = SLICE;
 
     String in = "() =>";
-    query(in + func.args(+0), "");
-    query(in + func.args(+1, +2, +3), "");
-    query(in + func.args(-1, -2, -3), "");
-    query(in + func.args(+0, +0, +0), "");
+    check(in + func.args(+0), "", empty());
+    check(in + func.args(+1, +2, +3), "", empty());
+    check(in + func.args(-1, -2, -3), "", empty());
+    check(in + func.args(+0, +0, +0), "", empty());
 
     in = "'a' =>";
-    query(in + func.args(0), "a");
-    query(in + func.args(0, 0), "a");
-    query(in + func.args(0, 0, 0), "a");
+    check(in + func.args(0), "a", root(Str.class));
+    check(in + func.args(0, 0), "a", root(Str.class));
+    check(in + func.args(0, 0, 0), "a", root(Str.class));
 
     in = "('a', 'b', 'c', 'd', 'e', 'f', 'g') =>";
     query(in + func.args(+2, +4), "b\nc\nd");
@@ -289,8 +292,8 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(in + func.args(+4, +3), "d\nc");
     query(in + func.args(+2, +5, +2), "b\nd");
     query(in + func.args(+5, +2, -2), "e\nc");
-    query(in + func.args(+2, +5, -2), "");
-    query(in + func.args(+5, +2, +2), "");
+    check(in + func.args(+2, +5, -2), "", empty());
+    check(in + func.args(+5, +2, +2), "", empty());
     query(in + func.args(), "a\nb\nc\nd\ne\nf\ng");
     query(in + func.args(-1), "g");
     query(in + func.args(-3), "e\nf\ng");
@@ -348,6 +351,27 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(in + func.args(999) + " => count()", 2);
     query(in + func.args(1000) + " => count()", 1);
     query(in + func.args(1001) + " => count()", 1);
+
+    query(in + func.args(wrap(1000)), 1000);
+    query(in + func.args(1000, wrap(1000)), 1000);
+    query(in + func.args(1000, 1000, wrap(1)), 1000);
+
+    check(func.args(" (" + wrap("1") + " + 1, 3)", 1, 2), "2\n3", root(List.class));
+    check(func.args(" (" + wrap("1") + " + 1, 3)", 1, 2), "2\n3", root(List.class));
+    check(func.args(" replicate(" + wrap("1") + " + 1, 3)", 2), "2\n2", root(REPLICATE));
+
+    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + _PROF_VOID.args(),
+        "", empty(func));
+    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + _PROF_VOID.args(),
+        "", empty(func), exists(TAIL));
+    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + _PROF_VOID.args(),
+        "", empty(func), exists(_UTIL_RANGE));
+    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + _PROF_VOID.args(),
+        "", empty(func), exists(_UTIL_LAST));
+    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + _PROF_VOID.args(),
+        "", empty(func), exists(_UTIL_LAST));
+    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + _PROF_VOID.args(),
+        "", empty(func), exists(_UTIL_RANGE));
   }
 
   /** Test method. */

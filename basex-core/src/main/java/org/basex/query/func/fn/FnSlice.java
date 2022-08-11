@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.func.Function.*;
+
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -21,16 +23,53 @@ public class FnSlice extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     Value input = exprs[0].value(qc);
-    final long size = input.size();
-    final Slice s = slice(size, qc);
-    if(s.empty) return Empty.VALUE;
 
-    if(s.reverse) input = input.reverse(qc);
+    final Slice slice = slice(input.size(), qc);
+    if(slice.length == 0) return Empty.VALUE;
+    if(slice.reverse) input = input.reverse(qc);
+    if(slice.step == 1) return input.subsequence(slice.start - 1, slice.length, qc);
+
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long i = s.start; i <= s.end; i += s.step) {
-      if(i > 0 && i <= size) vb.add(input.itemAt(i - 1));
-    }
+    for(long i = slice.start; i <= slice.end; i += slice.step) vb.add(input.itemAt(i - 1));
     return vb.value();
+  }
+
+  @Override
+  protected final Expr opt(final CompileContext cc) throws QueryException {
+    final Expr input = exprs[0];
+    final SeqType st = input.seqType();
+    if(st.zero()) return input;
+
+    // rewrite to util:range to trigger further rewritings
+    final long size = input.size();
+    final IntPredicate value = e -> e >= exprs.length || exprs[e] instanceof Value;
+    if(size != -1 && value.test(1) && value.test(2) && value.test(3)) {
+      final Slice slice = slice(size, cc.qc);
+      if(slice.step == 1) {
+        final Expr arg = slice.reverse ? cc.function(REVERSE, info, input) : input;
+        return cc.function(_UTIL_RANGE, info, arg, Int.get(slice.start), Int.get(slice.end));
+      }
+    }
+
+    exprType.assign(st.union(Occ.ZERO));
+    data(input.data());
+    return this;
+  }
+
+  /**
+   * Returns slice properties.
+   * @param size input size
+   * @param qc query context
+   * @return slice properties
+   * @throws QueryException query exception
+   */
+  Slice slice(final long size, final QueryContext qc) throws QueryException {
+    Slice s = new Slice(size, toLong(1, qc), toLong(2, qc), toLong(3, qc), false);
+    if(s.step < 0) s = new Slice(size, -s.start, -s.end, -s.step, true);
+    s.start = Math.max(1, s.start);
+    s.end = Math.min(size, s.end);
+    s.length = s.end < 1 || s.start > size || s.start > s.end ? 0 : s.end - s.start + 1;
+    return s;
   }
 
   /**
@@ -48,50 +87,14 @@ public class FnSlice extends StandardFunc {
     return 0;
   }
 
-  @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
-    final SeqType st = input.seqType();
-    if(st.zero()) return input;
-
-    final long size = input.size();
-    long sz = -1;
-    final IntPredicate value = e -> e >= exprs.length || exprs[e] instanceof Value;
-    if(size != -1 && value.test(1) && value.test(2) && value.test(3)) {
-      final Slice s = slice(size, cc.qc);
-      if(s.empty) return Empty.VALUE;
-      if(s.step == 1) sz = s.end - s.start + 1;
-    }
-
-    exprType.assign(st.union(Occ.ZERO), sz);
-    data(input.data());
-    return this;
-  }
-
-  /**
-   * Returns a slice.
-   * @param size input size
-   * @param qc query context
-   * @return slice
-   * @throws QueryException query exception
-   */
-  Slice slice(final long size, final QueryContext qc) throws QueryException {
-    Slice s = new Slice(size, toLong(1, qc), toLong(2, qc), toLong(3, qc), false);
-    if(s.step < 0) s = new Slice(size, -s.start, -s.end, -s.step, true);
-    s.start = Math.max(1, s.start);
-    s.end = Math.max(0, s.end);
-    if(s.end < 1 || s.start > size || s.start > s.end) s.empty = true;
-    return s;
-  }
-
   /** Slice properties. */
   private static final class Slice {
     /** Reverse input. */
     private final boolean reverse;
     /** Step. */
     private final long step;
-    /** Empty result. */
-    private boolean empty;
+    /** Result length. */
+    private long length;
     /** Start position. */
     private long start;
     /** End position. */
@@ -116,7 +119,7 @@ public class FnSlice extends StandardFunc {
     @Override
     public String toString() {
       return Util.className(this) + "[start:" + start + ", end:" + end + ", step:" + step +
-          ", reverse:" + reverse + ",empty:" + empty + ']';
+          ", reverse:" + reverse + ",length:" + length + ']';
     }
   }
 }
