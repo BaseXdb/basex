@@ -266,6 +266,91 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void slice() {
+    final Function func = SLICE;
+
+    String in = "() =>";
+    query(in + func.args(+0), "");
+    query(in + func.args(+1, +2, +3), "");
+    query(in + func.args(-1, -2, -3), "");
+    query(in + func.args(+0, +0, +0), "");
+
+    in = "'a' =>";
+    query(in + func.args(0), "a");
+    query(in + func.args(0, 0), "a");
+    query(in + func.args(0, 0, 0), "a");
+
+    in = "('a', 'b', 'c', 'd', 'e', 'f', 'g') =>";
+    query(in + func.args(+2, +4), "b\nc\nd");
+    query(in + func.args(+2, +4), "b\nc\nd");
+    query(in + func.args(+2), "b\nc\nd\ne\nf\ng");
+    query(in + func.args(" ()", +2), "a\nb");
+    query(in + func.args(+3, +3), "c");
+    query(in + func.args(+4, +3), "d\nc");
+    query(in + func.args(+2, +5, +2), "b\nd");
+    query(in + func.args(+5, +2, -2), "e\nc");
+    query(in + func.args(+2, +5, -2), "");
+    query(in + func.args(+5, +2, +2), "");
+    query(in + func.args(), "a\nb\nc\nd\ne\nf\ng");
+    query(in + func.args(-1), "g");
+    query(in + func.args(-3), "e\nf\ng");
+    query(in + func.args(" ()", -2), "a\nb\nc\nd\ne\nf");
+    query(in + func.args(+2, -2), "b\nc\nd\ne\nf");
+    query(in + func.args(-2, +2), "f\ne\nd\nc\nb");
+    query(in + func.args(-4, -2), "d\ne\nf");
+    query(in + func.args(-2, -4), "f\ne\nd");
+    query(in + func.args(-4, -2, +2), "d\nf");
+    query(in + func.args(-2, -4, -2), "f\nd");
+
+    in = "('a', 'b', 'c', 'd', 'e', 'f', 'g')[. < 'c'] =>";
+    query(in + func.args(+0), "a\nb");
+    query(in + func.args(+1), "a\nb");
+    query(in + func.args(-1), "b");
+    query(in + func.args(+1, +2), "a\nb");
+    query(in + func.args(-1, +2), "b");
+    query(in + func.args(+1, -2), "a");
+    query(in + func.args(-1, -2), "b\na");
+    query(in + func.args(+1, +2, +3), "a");
+    query(in + func.args(+1, +2, -3), "");
+    query(in + func.args(+1, -2, +3), "a");
+    query(in + func.args(+1, -2, -3), "a");
+    query(in + func.args(-1, +2, +3), "b");
+    query(in + func.args(-1, +2, -3), "b");
+    query(in + func.args(-1, -2, +3), "");
+    query(in + func.args(-1, -2, -3), "b");
+
+    in = "('a', 'b', 'c', 'd', 'e', 'f', 'g')[. < 'b'] =>";
+    query(in + func.args(+0), "a");
+    query(in + func.args(+1), "a");
+    query(in + func.args(-1), "a");
+    query(in + func.args(+1, +2), "a");
+    query(in + func.args(-1, +2), "a");
+    query(in + func.args(+1, -2), "a");
+    query(in + func.args(-1, -2), "a");
+    query(in + func.args(+1, +2, +3), "a");
+    query(in + func.args(+1, +2, -3), "");
+    query(in + func.args(+1, -2, +3), "");
+    query(in + func.args(+1, -2, -3), "a");
+    query(in + func.args(-1, +2, +3), "a");
+    query(in + func.args(-1, +2, -3), "");
+    query(in + func.args(-1, -2, +3), "");
+    query(in + func.args(-1, -2, -3), "a");
+
+    in = "(1 to 1000) =>";
+    query(in + func.args(-1001) + " => count()", 1000);
+    query(in + func.args(-1000) + " => count()", 1000);
+    query(in + func.args(-999) + " => count()", 999);
+    query(in + func.args(-2) + " => count()", 2);
+    query(in + func.args(-1) + " => count()", 1);
+    query(in + func.args(0) + " => count()", 1000);
+    query(in + func.args(1) + " => count()", 1000);
+    query(in + func.args(2) + " => count()", 999);
+    query(in + func.args(999) + " => count()", 2);
+    query(in + func.args(1000) + " => count()", 1);
+    query(in + func.args(1001) + " => count()", 1);
+  }
+
+  /** Test method. */
   @Test public void some() {
     final Function func = SOME;
 

@@ -465,6 +465,9 @@ public enum Function implements AFunction {
   SERIALIZE(FnSerialize::new, "serialize(input[,options])",
       params(ITEM_ZM, ITEM_ZO), STRING_O),
   /** XQuery function. */
+  SLICE(FnSlice::new, "slice(input[,start[,end[,step]]])",
+      params(ITEM_ZM, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ITEM_ZM),
+  /** XQuery function. */
   SOME(FnSome::new, "some(input,predicate)",
       params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
