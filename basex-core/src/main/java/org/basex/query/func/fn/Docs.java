@@ -30,7 +30,7 @@ public abstract class Docs extends DynamicFn {
    */
   QueryInput queryInput(final byte[] uri) {
     return queryInput != null ? queryInput :
-      Uri.uri(uri).isValid() ? new QueryInput(string(uri), sc) : null;
+      Uri.get(uri).isValid() ? new QueryInput(string(uri), sc) : null;
   }
 
   @Override

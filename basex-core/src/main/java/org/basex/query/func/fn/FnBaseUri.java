@@ -27,7 +27,7 @@ public final class FnBaseUri extends ContextFn {
     ANode nd = node;
     do {
       if(nd == null) return sc.baseURI().resolve(base, info);
-      final Uri bu = Uri.uri(nd.baseURI(), false);
+      final Uri bu = Uri.get(nd.baseURI(), false);
       if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       base = bu.resolve(base, info);
       if(nd.type == NodeType.DOCUMENT_NODE && nd instanceof DBNode) break;

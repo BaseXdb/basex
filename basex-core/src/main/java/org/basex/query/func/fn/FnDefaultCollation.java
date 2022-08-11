@@ -16,6 +16,6 @@ public final class FnDefaultCollation extends StandardFunc {
   @Override
   public Uri item(final QueryContext qc, final InputInfo ii) {
     final Collation coll = sc.collation;
-    return Uri.uri(coll == null ? QueryText.COLLATION_URI : coll.uri());
+    return Uri.get(coll == null ? QueryText.COLLATION_URI : coll.uri());
   }
 }

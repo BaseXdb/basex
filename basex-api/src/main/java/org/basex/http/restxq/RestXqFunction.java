@@ -477,7 +477,7 @@ public final class RestXqFunction extends WebFunction {
             name = new QNm(COLON, uri);
             part = NamePart.URI;
           } else {
-            if(!XMLToken.isNCName(local) || !Uri.uri(uri).isValid()) throw error(INV_CODE_X, err);
+            if(!XMLToken.isNCName(local) || !Uri.get(uri).isValid()) throw error(INV_CODE_X, err);
             name = new QNm(local, uri);
             part = NamePart.FULL;
           }

@@ -873,17 +873,17 @@ public enum AtomType implements Type {
         final InputInfo ii) throws QueryException {
 
       if(!item.type.isStringOrUntyped()) throw typeError(item, this, ii);
-      final Uri u = Uri.uri(item.string(ii));
+      final Uri u = Uri.get(item.string(ii));
       if(!u.isValid()) throw castError(item, ii);
       return u;
     }
     @Override
     public Uri cast(final Object value, final QueryContext qc, final InputInfo ii) {
-      return Uri.uri(token(value));
+      return Uri.get(token(value));
     }
     @Override
     public Uri read(final DataInput in, final QueryContext qc) throws IOException {
-      return Uri.uri(in.readToken());
+      return Uri.get(in.readToken());
     }
   },
 

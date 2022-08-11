@@ -24,12 +24,12 @@ public final class FnResolveUri extends StandardFunc {
     if(relative == null) return Empty.VALUE;
 
     // check relative uri
-    final Uri rel = Uri.uri(relative);
+    final Uri rel = Uri.get(relative);
     if(!rel.isValid()) throw URIARG_X.get(info, rel);
     if(rel.isAbsolute()) return rel;
 
     // check base uri: reject invalid, relative, and non-hierarchical URIs and fragment identifiers
-    final Uri uri = base == null ? sc.baseURI() : Uri.uri(base);
+    final Uri uri = base == null ? sc.baseURI() : Uri.get(base);
     final byte[] string = uri.string();
     if(!uri.isValid() || !uri.isAbsolute() || contains(string, '#') || !contains(string, '/'))
       throw URIARG_X.get(info, uri);

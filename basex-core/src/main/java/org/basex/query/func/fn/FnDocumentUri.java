@@ -25,7 +25,7 @@ public final class FnDocumentUri extends ContextFn {
     if(data != null && data.meta.name.isEmpty()) return Empty.VALUE;
 
     final byte[] uri = node.baseURI();
-    return uri.length == 0 ? Empty.VALUE : Uri.uri(uri, false);
+    return uri.length == 0 ? Empty.VALUE : Uri.get(uri, false);
   }
 
   @Override

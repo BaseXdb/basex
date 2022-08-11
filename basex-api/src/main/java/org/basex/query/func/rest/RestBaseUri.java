@@ -18,6 +18,6 @@ public final class RestBaseUri extends ApiFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final HttpServletRequest request = request(qc);
     final String uri = request.getRequestURI(), path = request.getPathInfo();
-    return Uri.uri(path != null ? uri.substring(0, uri.length() - path.length()) : uri);
+    return Uri.get(path != null ? uri.substring(0, uri.length() - path.length()) : uri);
   }
 }

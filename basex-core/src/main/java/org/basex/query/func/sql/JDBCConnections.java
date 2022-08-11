@@ -30,7 +30,7 @@ public final class JDBCConnections implements QueryResource {
   synchronized Uri add(final Connection conn, final String url) {
     final byte[] uri = token(url + "/connection-" + ++lastId);
     conns.put(uri, conn);
-    return Uri.uri(uri);
+    return Uri.get(uri);
   }
 
   /**
@@ -43,7 +43,7 @@ public final class JDBCConnections implements QueryResource {
     final String url = string(get(stmt.getConnection())).replaceAll("^(.+)/.+$", "$1");
     final byte[] uri = token(url + "/statement-" + ++lastId);
     conns.put(uri, stmt);
-    return Uri.uri(uri);
+    return Uri.get(uri);
   }
 
   /**

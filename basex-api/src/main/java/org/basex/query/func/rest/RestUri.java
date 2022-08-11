@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class RestUri extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Uri.uri(request(qc).getRequestURI());
+    return Uri.get(request(qc).getRequestURI());
   }
 }

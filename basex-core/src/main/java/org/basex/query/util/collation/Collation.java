@@ -55,7 +55,7 @@ public abstract class Collation {
     // return default collation
     if(uri == null) return sc.collation;
 
-    final Uri u = Uri.uri(uri);
+    final Uri u = Uri.get(uri);
     if(!u.isValid()) throw INVURI_X.get(ii, uri);
     final byte[] url = u.isAbsolute() ? uri :
       Token.startsWith(uri, '?') ? concat(URL, uri) : sc.baseURI().resolve(u, ii).string();

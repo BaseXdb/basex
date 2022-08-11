@@ -25,7 +25,7 @@ public final class FnInScopeNamespaces extends StandardFunc {
     for(int a = 0; a < as; ++a) {
       final byte[] key = atts.name(a);
       if(key.length + atts.value(a).length != 0) {
-        builder.put(Str.get(key), Uri.uri(atts.value(a)));
+        builder.put(Str.get(key), Uri.get(atts.value(a)));
       }
     }
     return builder.finish();

@@ -117,7 +117,7 @@ public final class StaticContext {
       if(!Strings.endsWith(string, '/') &&
         (Strings.endsWith(uri, '.') || Strings.endsWith(uri, '/'))) string += '/';
     }
-    baseURI = Uri.uri(string);
+    baseURI = Uri.get(string);
   }
 
   /**

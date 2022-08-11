@@ -31,7 +31,7 @@ public final class FnPut extends StandardFunc {
     if(!node.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
       throw UPFOTYPE_X.get(info, exprs[0]);
 
-    final Uri uri = Uri.uri(href);
+    final Uri uri = Uri.get(href);
     if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, href);
     final Updates updates = qc.updates();
     final DBNode target = updates.determineDataRef(node, qc);

@@ -28,7 +28,7 @@ public final class ClientSessions implements QueryResource {
   synchronized Uri add(final ClientSession cs) {
     final byte[] uri = Token.token(cs + "/" + ++lastId);
     conns.put(uri, cs);
-    return Uri.uri(uri);
+    return Uri.get(uri);
   }
 
   /**

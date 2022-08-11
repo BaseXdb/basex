@@ -684,7 +684,7 @@ public class QueryParser extends InputParser {
     }
     final byte[] uri = stringLiteral();
     if(pref != null && uri.length == 0) throw error(NSEMPTY);
-    if(!Uri.uri(uri).isValid()) throw error(INVURI_X, uri);
+    if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
     addLocations(new TokenList());
     throw error(IMPLSCHEMA);
   }
@@ -702,7 +702,7 @@ public class QueryParser extends InputParser {
 
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) throw error(NSMODURI);
-    if(!Uri.uri(uri).isValid()) throw error(INVURI_X, uri);
+    if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
     if(moduleURIs.contains(token(uri))) throw error(DUPLMODULE_X, uri);
     moduleURIs.add(uri);
 
@@ -737,7 +737,7 @@ public class QueryParser extends InputParser {
     if(add) {
       do {
         final byte[] uri = stringLiteral();
-        if(!Uri.uri(uri).isValid() || IO.get(string(uri)) instanceof IOContent)
+        if(!Uri.get(uri).isValid() || IO.get(string(uri)) instanceof IOContent)
           throw error(INVURI_X, uri);
         list.add(uri);
       } while(wsConsumeWs(COMMA));
@@ -2688,7 +2688,7 @@ public class QueryParser extends InputParser {
           if(xmlDecl) throw error(DUPLNSDEF_X, XML);
           xmlDecl = true;
         } else {
-          if(!Uri.uri(uri).isValid()) throw error(INVURI_X, uri);
+          if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
           if(pr) {
             if(uri.length == 0) throw error(NSEMPTYURI);
             if(eq(pref, XML, XMLNS)) throw error(BINDXML_X, pref);

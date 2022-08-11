@@ -197,7 +197,7 @@ public final class SerializerOptions extends Options {
 
     // parse parameters and character map
     if(name.equals(PARAMETER_DOCUMENT.name())) {
-      Uri uri = Uri.uri(value);
+      Uri uri = Uri.get(value);
       if(!uri.isValid()) throw INVURI_X.get(ii, value);
       if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, ii);
       final IO io = IO.get(string(uri.string()));

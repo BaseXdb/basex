@@ -38,8 +38,8 @@ public final class Uri extends AStr {
    * @param value value
    * @return uri instance
    */
-  public static Uri uri(final byte[] value) {
-    return uri(value, true);
+  public static Uri get(final byte[] value) {
+    return get(value, true);
   }
 
   /**
@@ -47,8 +47,8 @@ public final class Uri extends AStr {
    * @param value string value
    * @return uri instance
    */
-  public static Uri uri(final String value) {
-    return uri(Token.token(value), true);
+  public static Uri get(final String value) {
+    return get(Token.token(value), true);
   }
 
   /**
@@ -57,7 +57,7 @@ public final class Uri extends AStr {
    * @param normalize remove leading and trailing whitespaces
    * @return uri instance
    */
-  public static Uri uri(final byte[] value, final boolean normalize) {
+  public static Uri get(final byte[] value, final boolean normalize) {
     final byte[] uri = normalize ? Token.normalize(value) : value;
     return uri.length == 0 ? EMPTY : new Uri(uri);
   }
@@ -86,7 +86,7 @@ public final class Uri extends AStr {
       String uri = base.resolve(res).toString();
       if(uri.startsWith(IO.FILEPREF))
         uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
-      return uri(Token.token(uri), false);
+      return get(Token.token(uri), false);
     } catch(final URISyntaxException ex) {
       throw URIARG_X.get(ii, ex.getMessage());
     }
