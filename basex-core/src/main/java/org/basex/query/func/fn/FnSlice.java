@@ -35,7 +35,7 @@ public class FnSlice extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  public Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0];
     final SeqType st = input.seqType();
     if(st.zero()) return input;
@@ -63,7 +63,7 @@ public class FnSlice extends StandardFunc {
    * @return slice properties
    * @throws QueryException query exception
    */
-  Slice slice(final long size, final QueryContext qc) throws QueryException {
+  protected final Slice slice(final long size, final QueryContext qc) throws QueryException {
     Slice s = new Slice(size, toLong(1, qc), toLong(2, qc), toLong(3, qc), false);
     if(s.step < 0) s = new Slice(size, -s.start, -s.end, -s.step, true);
     s.start = Math.max(1, s.start);
@@ -88,17 +88,17 @@ public class FnSlice extends StandardFunc {
   }
 
   /** Slice properties. */
-  private static final class Slice {
+  public static final class Slice {
     /** Reverse input. */
-    private final boolean reverse;
+    public final boolean reverse;
     /** Step. */
-    private final long step;
+    public final long step;
     /** Result length. */
-    private long length;
+    public long length;
     /** Start position. */
-    private long start;
+    public long start;
     /** End position. */
-    private long end;
+    public long end;
 
     /**
      * Constructor.

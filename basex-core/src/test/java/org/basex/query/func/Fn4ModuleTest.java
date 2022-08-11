@@ -478,6 +478,95 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void arraySlice() {
+    final Function func = _ARRAY_SLICE;
+
+    String in = "array { } =>";
+    query(in + func.args(+0), "[]");
+    query(in + func.args(+1, +2, +3), "[]");
+    query(in + func.args(-1, -2, -3), "[]");
+    query(in + func.args(+0, +0, +0), "[]");
+
+    in = "array { 'a' } =>";
+    query(in + func.args(0), "[\"a\"]");
+    query(in + func.args(0, 0), "[\"a\"]");
+    query(in + func.args(0, 0, 0), "[\"a\"]");
+
+    in = "array { 'a', 'b', 'c', 'd', 'e', 'f', 'g' } =>";
+    query(in + func.args(+2, +4), "[\"b\",\"c\",\"d\"]");
+    query(in + func.args(+2, +4), "[\"b\",\"c\",\"d\"]");
+    query(in + func.args(+2), "[\"b\",\"c\",\"d\",\"e\",\"f\",\"g\"]");
+    query(in + func.args(" ()", +2), "[\"a\",\"b\"]");
+    query(in + func.args(+3, +3), "[\"c\"]");
+    query(in + func.args(+4, +3), "[\"d\",\"c\"]");
+    query(in + func.args(+2, +5, +2), "[\"b\",\"d\"]");
+    query(in + func.args(+5, +2, -2), "[\"e\",\"c\"]");
+    query(in + func.args(+2, +5, -2), "[]");
+    query(in + func.args(+5, +2, +2), "[]");
+    query(in + func.args(), "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\",\"g\"]");
+    query(in + func.args(-1), "[\"g\"]");
+    query(in + func.args(-3), "[\"e\",\"f\",\"g\"]");
+    query(in + func.args(" ()", -2), "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]");
+    query(in + func.args(+2, -2), "[\"b\",\"c\",\"d\",\"e\",\"f\"]");
+    query(in + func.args(-2, +2), "[\"f\",\"e\",\"d\",\"c\",\"b\"]");
+    query(in + func.args(-4, -2), "[\"d\",\"e\",\"f\"]");
+    query(in + func.args(-2, -4), "[\"f\",\"e\",\"d\"]");
+    query(in + func.args(-4, -2, +2), "[\"d\",\"f\"]");
+    query(in + func.args(-2, -4, -2), "[\"f\",\"d\"]");
+
+    in = "array { 'a', 'b' } =>";
+    query(in + func.args(+0), "[\"a\",\"b\"]");
+    query(in + func.args(+1), "[\"a\",\"b\"]");
+    query(in + func.args(-1), "[\"b\"]");
+    query(in + func.args(+1, +2), "[\"a\",\"b\"]");
+    query(in + func.args(-1, +2), "[\"b\"]");
+    query(in + func.args(+1, -2), "[\"a\"]");
+    query(in + func.args(-1, -2), "[\"b\",\"a\"]");
+    query(in + func.args(+1, +2, +3), "[\"a\"]");
+    query(in + func.args(+1, +2, -3), "[]");
+    query(in + func.args(+1, -2, +3), "[\"a\"]");
+    query(in + func.args(+1, -2, -3), "[\"a\"]");
+    query(in + func.args(-1, +2, +3), "[\"b\"]");
+    query(in + func.args(-1, +2, -3), "[\"b\"]");
+    query(in + func.args(-1, -2, +3), "[]");
+    query(in + func.args(-1, -2, -3), "[\"b\"]");
+
+    in = "array { 'a' } =>";
+    query(in + func.args(+0), "[\"a\"]");
+    query(in + func.args(+1), "[\"a\"]");
+    query(in + func.args(-1), "[\"a\"]");
+    query(in + func.args(+1, +2), "[\"a\"]");
+    query(in + func.args(-1, +2), "[\"a\"]");
+    query(in + func.args(+1, -2), "[\"a\"]");
+    query(in + func.args(-1, -2), "[\"a\"]");
+    query(in + func.args(+1, +2, +3), "[\"a\"]");
+    query(in + func.args(+1, +2, -3), "[]");
+    query(in + func.args(+1, -2, +3), "[]");
+    query(in + func.args(+1, -2, -3), "[\"a\"]");
+    query(in + func.args(-1, +2, +3), "[\"a\"]");
+    query(in + func.args(-1, +2, -3), "[]");
+    query(in + func.args(-1, -2, +3), "[]");
+    query(in + func.args(-1, -2, -3), "[\"a\"]");
+
+    in = "array { 1 to 1000 } =>";
+    query(in + func.args(-1001) + " => array:size()", 1000);
+    query(in + func.args(-1000) + " => array:size()", 1000);
+    query(in + func.args(-999) + " => array:size()", 999);
+    query(in + func.args(-2) + " => array:size()", 2);
+    query(in + func.args(-1) + " => array:size()", 1);
+    query(in + func.args(0) + " => array:size()", 1000);
+    query(in + func.args(1) + " => array:size()", 1000);
+    query(in + func.args(2) + " => array:size()", 999);
+    query(in + func.args(999) + " => array:size()", 2);
+    query(in + func.args(1000) + " => array:size()", 1);
+    query(in + func.args(1001) + " => array:size()", 1);
+
+    query(in + func.args(" array { " + wrap(1000) + " }"), "[1000]");
+    query(in + func.args(" array { " + 1000 + " }", wrap(1000)), "[1000]");
+    query(in + func.args(" array { " + 1000 + " }", 1000, wrap(1)), "[1000]");
+  }
+
+  /** Test method. */
   @Test public void mapGroupBy() {
     final Function func = _MAP_GROUP_BY;
 

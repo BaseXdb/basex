@@ -662,6 +662,9 @@ public enum Function implements AFunction {
   _ARRAY_SIZE(ArraySize::new, "size(array)",
       params(ARRAY_O), INTEGER_O, ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_SLICE(ArraySlice::new, "slice(array[,start[,end[,step]]])",
+      params(ARRAY_O, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ARRAY_O, ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_SORT(ArraySort::new, "sort(array[,collation[,key]])",
       params(ARRAY_O, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()),
       ARRAY_O, ARRAY_URI),
