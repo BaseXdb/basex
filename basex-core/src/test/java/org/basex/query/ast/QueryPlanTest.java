@@ -4,6 +4,7 @@ import static org.basex.util.Prop.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -35,7 +36,7 @@ public abstract class QueryPlanTest extends SandboxTest {
           if(qp2.value() != Bln.TRUE) fail(NL + "- Query: " + query + NL +
               "- Optimized: " + qp.qc.main + NL +
               "- Check: " + test + NL +
-              "- Plan: " + plan.serialize());
+              "- Plan: " + plan.serialize(SerializerMode.INDENT.get()));
         }
       }
     } catch(final Exception ex) {

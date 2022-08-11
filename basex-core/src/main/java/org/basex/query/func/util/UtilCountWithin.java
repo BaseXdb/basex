@@ -103,7 +103,7 @@ public final class UtilCountWithin extends StandardFunc {
    * @throws QueryException query exception
    */
   private long[] minMaxValues(final QueryContext qc) throws QueryException {
-    return exprs[1] instanceof Value && (exprs.length == 2 || exprs[2] instanceof Value) ?
+    return exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value) ?
       minMax(qc) : null;
   }
 
