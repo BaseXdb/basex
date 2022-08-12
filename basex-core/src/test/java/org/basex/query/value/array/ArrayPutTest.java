@@ -17,11 +17,11 @@ public final class ArrayPutTest extends ArrayTest {
    */
   @Test public void setAllTest() {
     final int n = 5000;
-    final ArrayBuilder builder = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder();
     for(int i = 0; i < n; i++) {
-      builder.append(Int.get(i));
+      ab.append(Int.get(i));
     }
-    final XQArray array = builder.array();
+    final XQArray array = ab.array();
     for(int i = 0; i < n; i++) {
       final XQArray arr = array.put(i, Int.get(-i));
       for(int j = 0; j < n; j++) {

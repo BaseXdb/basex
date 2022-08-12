@@ -196,9 +196,9 @@ public final class ArrayRemoveTest extends ArrayTest {
     final ArrayList<Value> list = new ArrayList<>(n);
     for(int i = 0; i < n; i++) list.add(Int.get(i));
 
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value value : list) builder.append(value);
-    XQArray arr = builder.array();
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(final Value value : list) ab.append(value);
+    XQArray arr = ab.array();
 
     final Random rng = new Random(42);
     for(int i = 0; i < n; i++) {
@@ -244,26 +244,26 @@ public final class ArrayRemoveTest extends ArrayTest {
 
   /**
    * Creates an array containing {@link Int} instances representing the given integers.
-   * @param vals values in the array
+   * @param values values in the array
    * @return the array
    */
-  private static XQArray from(final int... vals) {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final int v : vals) builder.append(Int.get(v));
-    return builder.array();
+  private static XQArray from(final int... values) {
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(final int value : values) ab.append(Int.get(value));
+    return ab.array();
   }
 
   /**
    * Checks that the given array contains the given integers.
    * @param arr array to check the contents of
-   * @param vals integers to look for
+   * @param values integers to look for
    * @throws AssertionError of the check fails
    */
-  private static void assertContains(final XQArray arr, final int... vals) {
+  private static void assertContains(final XQArray arr, final int... values) {
     final Iterator<Value> iter = arr.iterator(0);
-    for(final int v : vals) {
+    for(final int value : values) {
       assertTrue(iter.hasNext());
-      assertEquals(v, ((Int) iter.next()).itr());
+      assertEquals(value, ((Int) iter.next()).itr());
     }
     assertFalse(iter.hasNext());
   }

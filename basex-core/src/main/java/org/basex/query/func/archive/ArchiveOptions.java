@@ -43,6 +43,6 @@ public final class ArchiveOptions extends StandardFunc {
     if(level >= 0) mb.put(CreateOptions.ALGORITHM.name(),
         level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN);
 
-    return mb.finish();
+    return mb.map();
   }
 }

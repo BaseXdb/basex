@@ -79,13 +79,17 @@ public final class Except extends Set {
   Value nodes(final QueryContext qc) throws QueryException {
     final ANodeBuilder nodes = new ANodeBuilder();
     Iter iter = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
+    for(Item item; (item = qc.next(iter)) != null;) {
+      nodes.add(toNode(item));
+    }
     nodes.ddo();
 
     final int el = exprs.length;
     for(int e = 1; e < el && !nodes.isEmpty(); e++) {
       iter = exprs[e].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) nodes.removeAll(toNode(item));
+      for(Item item; (item = qc.next(iter)) != null;) {
+        nodes.removeAll(toNode(item));
+      }
     }
     return nodes.value(this);
   }

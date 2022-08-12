@@ -47,7 +47,9 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
     final BasicNodeIter iter = node.childIter();
     if(node.type == NodeType.DOCUMENT_NODE || node.type == NodeType.DOCUMENT_NODE_ELEMENT) {
-      for(ANode child; (child = iter.next()) != null;) node(child);
+      for(ANode child; (child = iter.next()) != null;) {
+        node(child);
+      }
     } else if(node.type == NodeType.ELEMENT) {
       final QNm name = node.qname();
       final byte[] type = name.local();

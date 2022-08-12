@@ -28,12 +28,12 @@ public final class JobBindings extends StandardFunc {
     final QueryJobTask jt = jobs.tasks.get(id);
     if(job == null && jt != null) job = jt.job;
 
-    XQMap map = XQMap.empty();
+    final MapBuilder mb = new MapBuilder(info);
     if(job instanceof QueryJob) {
       for(final Entry<String, Value> entry : ((QueryJob) job).bindings().entrySet()) {
-        map = map.put(Str.get(entry.getKey()), entry.getValue(), info);
+        mb.put(entry.getKey(), entry.getValue());
       }
     }
-    return map;
+    return mb.map();
   }
 }

@@ -417,7 +417,9 @@ public final class SeqType {
         } else if(tp == UNTYPED_ATOMIC) {
           if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
           final Iter iter2 = type.cast(item1, qc, sc, ii).iter();
-          for(Item item2; (item2 = qc.next(iter2)) != null;) items.add(item2);
+          for(Item item2; (item2 = qc.next(iter2)) != null;) {
+            items.add(item2);
+          }
         } else if(type == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL))) {
           items.add(Dbl.get(item1.dbl(ii)));
         } else if(type == FLOAT && tp.instanceOf(DECIMAL)) {

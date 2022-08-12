@@ -30,7 +30,9 @@ public final class BinJoin extends StandardFunc {
     } else {
       bl = new ByteList();
       final Iter iter = binaries.atomIter(qc, info);
-      for(Item item; (item = qc.next(iter)) != null;) bl.add(toB64(item, false).binary(info));
+      for(Item item; (item = qc.next(iter)) != null;) {
+        bl.add(toB64(item, false).binary(info));
+      }
     }
     return B64.get(bl.finish());
   }

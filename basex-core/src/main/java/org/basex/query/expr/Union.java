@@ -76,7 +76,9 @@ public final class Union extends Set {
     final ANodeBuilder nodes = new ANodeBuilder();
     for(final Expr expr : exprs) {
       final Iter iter = expr.iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
+      for(Item item; (item = qc.next(iter)) != null;) {
+        nodes.add(toNode(item));
+      }
     }
     return nodes.value(this);
   }

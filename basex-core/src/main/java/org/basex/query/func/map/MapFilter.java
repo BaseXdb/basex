@@ -20,12 +20,14 @@ public final class MapFilter extends StandardFunc {
     final XQMap map = toMap(exprs[0], qc);
     final FItem predicate = toFunction(exprs[1], 2, qc);
 
-    final MapBuilder builder = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder(info);
     map.apply((k, v) -> {
       qc.checkStop();
-      if(toBoolean(predicate.invoke(qc, info, k, v).item(qc, info))) builder.put(k, v);
+      if(toBoolean(predicate.invoke(qc, info, k, v).item(qc, info))) {
+        mb.put(k, v);
+      }
     });
-    return builder.finish();
+    return mb.map();
   }
 
   @Override

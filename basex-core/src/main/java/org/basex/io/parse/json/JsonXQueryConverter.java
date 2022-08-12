@@ -108,9 +108,9 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   void closeArray() {
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value value : arrays.pop()) builder.append(value);
-    stack.push(builder.array());
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(final Value value : arrays.pop()) ab.append(value);
+    stack.push(ab.array());
   }
 
   @Override

@@ -314,13 +314,13 @@ public abstract class JavaCall extends Arr {
           final Iterator<?> ir = (Iterator<?>) object;
           while(ir.hasNext()) vb.add(toValue(ir.next(), qc, info, wrap));
         } else if(object instanceof Map) {
-          XQMap map = XQMap.empty();
+          final MapBuilder mb = new MapBuilder(info);
           for(final Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
             final Item key = toValue(entry.getKey(), qc, info, wrap).item(qc, info);
-            final Value val = toValue(entry.getValue(), qc, info, wrap);
-            map = map.put(key, val, info);
+            final Value value = toValue(entry.getValue(), qc, info, wrap);
+            mb.put(key, value);
           }
-          vb.add(map);
+          vb.add(mb.map());
         } else {
           vb.add(Str.get(object.toString()));
         }

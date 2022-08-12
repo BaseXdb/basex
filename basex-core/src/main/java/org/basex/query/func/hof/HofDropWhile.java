@@ -28,7 +28,9 @@ public final class HofDropWhile extends HofTakeWhile {
       public Item next() throws QueryException {
         Item item = qc.next(input);
         if(!found) {
-          while(item != null && test(item, predicate, qc)) item = qc.next(input);
+          while(item != null && test(item, predicate, qc)) {
+            item = qc.next(input);
+          }
           found = true;
         }
         return item;
@@ -48,7 +50,9 @@ public final class HofDropWhile extends HofTakeWhile {
     final ValueBuilder vb = new ValueBuilder(qc);
     Item item;
     while((item = qc.next(input)) != null && test(item, predicate, qc));
-    do vb.add(item); while((item = qc.next(input)) != null);
+    do {
+      vb.add(item);
+    } while((item = qc.next(input)) != null);
     return vb.value(this);
   }
 

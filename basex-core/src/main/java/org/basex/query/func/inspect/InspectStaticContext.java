@@ -2,6 +2,7 @@ package org.basex.query.func.inspect;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -38,19 +39,19 @@ public final class InspectStaticContext extends StandardFunc {
       case BASE_URI:
         return sctx.baseURI();
       case NAMESPACES:
-        XQMap map = XQMap.empty();
+        MapBuilder mb = new MapBuilder(info);
         Atts nsp = sctx.ns.list;
         int ns = nsp.size();
         for(int n = 0; n < ns; n++) {
-          map = map.put(Str.get(nsp.name(n)), Str.get(nsp.value(n)), info);
+          mb.put(Str.get(nsp.name(n)), Str.get(nsp.value(n)));
         }
         nsp = NSGlobal.NS;
         ns = nsp.size();
         for(int n = 0; n < ns; n++) {
           final Str key = Str.get(nsp.name(n));
-          if(!map.contains(key, info)) map = map.put(key, Str.get(nsp.value(n)), info);
+          if(!mb.contains(key)) mb.put(key, Str.get(nsp.value(n)));
         }
-        return map;
+        return mb.map();
       case ELEMENT_NAMESPACE:
         return sctx.elemNS == null ? Empty.VALUE : Uri.get(sctx.elemNS);
       case FUNCTION_NAMESPACE:
@@ -71,40 +72,28 @@ public final class InspectStaticContext extends StandardFunc {
         tl.add(sctx.inheritNS ? INHERIT : NO_INHERIT);
         return StrSeq.get(tl);
       case DECIMAL_FORMATS:
-        map = XQMap.empty();
+        mb = new MapBuilder(info);
         // enforce creation of default formatter
-        sctx.decFormat(Token.EMPTY);
+        sctx.decFormat(EMPTY);
         // loop through all formatters
         for(final byte[] format : sctx.decFormats) {
           final DecFormatter df = sctx.decFormats.get(format);
-          map = map.put(Str.get(format), XQMap.empty().
-              put(Str.get(DF_DEC), Str.get(token(df.decimal)), info).
-              put(Str.get(DF_EXP), Str.get(token(df.exponent)), info).
-              put(Str.get(DF_GRP), Str.get(token(df.grouping)), info).
-              put(Str.get(DF_PC), Str.get(token(df.percent)), info).
-              put(Str.get(DF_PM), Str.get(token(df.permille)), info).
-              put(Str.get(DF_ZD), Str.get(token(df.zero)), info).
-              put(Str.get(DF_DIG), Str.get(token(df.optional)), info).
-              put(Str.get(DF_PAT), Str.get(token(df.pattern)), info).
-              put(Str.get(DF_INF), Str.get(df.inf), info).
-              put(Str.get(DF_NAN), Str.get(df.nan), info).
-              put(Str.get(DF_MIN), Str.get(token(df.minus)), info)
-          , info);
+          mb.put(Str.get(format), new MapBuilder(info).
+            put(DF_DEC, cpToken(df.decimal)).
+            put(DF_EXP, cpToken(df.exponent)).
+            put(DF_GRP, cpToken(df.grouping)).
+            put(DF_PC, cpToken(df.percent)).
+            put(DF_PM, cpToken(df.permille)).
+            put(DF_ZD, cpToken(df.zero)).
+            put(DF_DIG, cpToken(df.optional)).
+            put(DF_PAT, cpToken(df.pattern)).
+            put(DF_INF, df.inf).
+            put(DF_NAN, df.nan).
+            put(DF_MIN, cpToken(df.minus)).map());
         }
-        return map;
+        return mb.map();
       default:
         throw INSPECT_UNKNOWN_X.get(info, name);
     }
-  }
-
-  /**
-   * Converts codepoints to a token.
-   * @param cps codepoints
-   * @return token
-   */
-  private static byte[] token(final int... cps) {
-    final TokenBuilder tb = new TokenBuilder(cps.length);
-    for(final int cp : cps) tb.add(cp);
-    return tb.finish();
   }
 }

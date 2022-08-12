@@ -166,12 +166,12 @@ public final class XQMap extends XQData {
 
     if(materialized(test, ii)) return this;
 
-    XQMap map = EMPTY;
+    final MapBuilder mb = new MapBuilder(ii);
     for(final Item key : keys()) {
       qc.checkStop();
-      map = map.put(key, get(key, ii).materialize(test, ii, qc), ii);
+      mb.put(key, get(key, ii).materialize(test, ii, qc));
     }
-    return map;
+    return mb.map();
   }
 
   @Override

@@ -27,7 +27,9 @@ public final class UtilDdo extends StandardFunc {
     if(value instanceof DBNodeSeq) return value;
 
     final ANodeBuilder nb = new ANodeBuilder();
-    for(Item item; (item = qc.next(nodes)) != null;) nb.add(toNode(item));
+    for(Item item; (item = qc.next(nodes)) != null;) {
+      nb.add(toNode(item));
+    }
     return nb.value(this);
   }
 

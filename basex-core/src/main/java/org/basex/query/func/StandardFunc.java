@@ -172,7 +172,9 @@ public abstract class StandardFunc extends Arr {
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = Serializer.get(ao, sopts)) {
-        for(Item item; (item = qc.next(iter)) != null;) ser.serialize(item);
+        for(Item item; (item = qc.next(iter)) != null;) {
+          ser.serialize(item);
+        }
       }
       return new TokenBuilder(ao.finish()).normalize().finish();
     } catch(final QueryIOException ex) {
@@ -526,7 +528,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates an expression to a function item.
+   * Evaluates an expression to a non-updating function item.
    * @param expr expression
    * @param arity required number of arguments (arity)
    * @param qc query context
@@ -541,7 +543,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Evaluates an expression to a function item.
    * @param expr expression
-   * @param arity number of arguments (arity)
+   * @param arity required number of arguments (arity)
    * @param qc query context
    * @param updating updating flag
    * @return function item

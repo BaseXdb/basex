@@ -23,7 +23,9 @@ public final class ArrayFoldRight extends ArrayFn {
     final FItem action = toFunction(exprs[2], 2, qc);
 
     final ListIterator<Value> iter = array.iterator(array.arraySize());
-    while(iter.hasPrevious()) result = action.invoke(qc, info, iter.previous(), result);
+    while(iter.hasPrevious()) {
+      result = action.invoke(qc, info, iter.previous(), result);
+    }
     return result;
   }
 

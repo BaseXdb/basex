@@ -73,7 +73,9 @@ public final class CachedPath extends AxisPath {
     // cast is safe (steps will always return a {@link NodeIter} instance)
     final NodeIter ni = (NodeIter) steps[step].iter(qc);
     if(step + 1 == steps.length) {
-      for(ANode node; (node = ni.next()) != null;) list.add(node);
+      for(ANode node; (node = ni.next()) != null;) {
+        list.add(node);
+      }
     } else {
       for(ANode node; (node = ni.next()) != null;) {
         qc.focus.value = node;

@@ -142,7 +142,9 @@ public final class Lookup extends Arr {
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) add(item, vb, qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      add(item, vb, qc);
+    }
     return vb.value(this);
   }
 
@@ -170,7 +172,9 @@ public final class Lookup extends Arr {
     } else {
       final FItem fitem = (FItem) item;
       final Iter ir = keys.atomIter(qc, info);
-      for(Item key; (key = qc.next(ir)) != null;) vb.add(fitem.invoke(qc, info, key));
+      for(Item key; (key = qc.next(ir)) != null;) {
+        vb.add(fitem.invoke(qc, info, key));
+      }
     }
     return vb;
   }

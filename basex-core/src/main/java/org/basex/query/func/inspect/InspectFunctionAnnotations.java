@@ -17,12 +17,12 @@ import org.basex.util.*;
 public final class InspectFunctionAnnotations extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    XQMap map = XQMap.empty();
+    final MapBuilder mb = new MapBuilder(info);
     for(final Ann ann : toFunction(exprs[0], qc).annotations()) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item arg : ann.value()) vb.add(arg);
-      map = map.put(ann.name(), vb.value(), info);
+      mb.put(ann.name(), vb.value());
     }
-    return map;
+    return mb.map();
   }
 }

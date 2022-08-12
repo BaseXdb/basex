@@ -38,13 +38,12 @@ public final class DbOption extends StandardFunc {
     if(value instanceof Boolean) return Bln.get((Boolean) value);
     if(value instanceof Integer) return Int.get((Integer) value);
     if(value instanceof Options) {
-      XQMap map = XQMap.empty();
-      final Options opts = (Options) value;
-      for(final Option<?> opt : opts) {
+      final MapBuilder mb = new MapBuilder(info);
+      for(final Option<?> opt : (Options) value) {
         final Item item = item(opt.value());
-        if(item != null) map = map.put(Str.get(opt.name()), item, info);
+        if(item != null) mb.put(Str.get(opt.name()), item);
       }
-      return map;
+      return mb.map();
     }
     // string or enumeration
     return Str.get(value.toString());

@@ -25,7 +25,9 @@ public final class HofSortWith extends HofFn {
 
     final ItemList items = new ItemList(Seq.initialCapacity(input.size()));
     final Iter iter = input.iter();
-    for(Item item; (item = qc.next(iter)) != null;) items.add(item);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      items.add(item);
+    }
 
     try {
       Arrays.sort(items.list, 0, items.size(), comparator);

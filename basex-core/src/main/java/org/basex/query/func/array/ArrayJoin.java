@@ -36,11 +36,11 @@ public final class ArrayJoin extends ArrayFn {
     item = iter.next();
     if(item == null) return first.concat(second);
 
-    final ArrayBuilder builder = new ArrayBuilder().append(first).append(second);
+    final ArrayBuilder ab = new ArrayBuilder().append(first).append(second);
     do {
-      builder.append(toArray(item));
+      ab.append(toArray(item));
     } while((item = qc.next(iter)) != null);
-    return builder.array(this);
+    return ab.array(this);
   }
 
   @Override

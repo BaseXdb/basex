@@ -24,7 +24,9 @@ public final class ProfVoid extends StandardFunc {
     // cache items; ensure that lazy items will be evaluated
     final Value val = value.iterValue();
     if(val == null) {
-      for(Item item; (item = qc.next(value)) != null;) item.cache(false, info);
+      for(Item item; (item = qc.next(value)) != null;) {
+        item.cache(false, info);
+      }
     } else {
       val.cache(false, ii);
     }

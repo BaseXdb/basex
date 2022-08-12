@@ -31,9 +31,11 @@ public final class ArraySort extends StandardFunc {
       values.add((key == null ? value : key.invoke(qc, info, value)).atomValue(qc, info));
     }
 
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final int order : FnSort.sort(values, this, coll, qc)) builder.append(array.get(order));
-    return builder.array(this);
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(final int order : FnSort.sort(values, this, coll, qc)) {
+      ab.append(array.get(order));
+    }
+    return ab.array(this);
   }
 
   @Override

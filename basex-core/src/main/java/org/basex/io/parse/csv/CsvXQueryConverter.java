@@ -60,13 +60,13 @@ public final class CsvXQueryConverter extends CsvConverter {
   protected XQMap finish() throws QueryIOException {
     if(row != null) rows.add(row.array(STRING_ARRAY));
     try {
-      XQMap map = XQMap.empty();
+      final MapBuilder mb = new MapBuilder();
       if(!headers.isEmpty()) {
         final ArrayBuilder names = new ArrayBuilder();
         for(final byte[] header : headers) names.append(Str.get(header));
-        map = map.put(NAMES, names.array(STRING_ARRAY), null);
+        mb.put(NAMES, names.array(STRING_ARRAY));
       }
-      return map.put(RECORDS, rows.value(STRING_ARRAY), null);
+      return mb.put(RECORDS, rows.value(STRING_ARRAY)).map();
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

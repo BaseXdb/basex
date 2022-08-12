@@ -153,6 +153,7 @@ public final class ValueBuilder {
     final Value first = firstValue;
     if(first != null) return first;
     final TreeSeqBuilder tree = builder;
+    builder = null;
     return tree != null ? tree.sequence(type) : Empty.VALUE;
   }
 

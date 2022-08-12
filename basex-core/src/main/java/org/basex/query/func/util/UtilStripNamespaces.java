@@ -22,7 +22,9 @@ public class UtilStripNamespaces extends StandardFunc {
     final TokenSet prefixes = new TokenSet();
     if(exprs.length > 1) {
       final Iter iter = exprs[1].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) prefixes.add(toToken(item));
+      for(Item item; (item = qc.next(iter)) != null;) {
+        prefixes.add(toToken(item));
+      }
     }
     return DataBuilder.stripNamespaces(node, prefixes, qc.context, info);
   }

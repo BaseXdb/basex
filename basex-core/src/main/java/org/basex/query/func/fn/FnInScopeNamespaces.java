@@ -20,14 +20,14 @@ public final class FnInScopeNamespaces extends StandardFunc {
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Atts atts = toElem(exprs[0], qc).nsScope(sc).add(XML, XML_URI);
 
-    final MapBuilder builder = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder(info);
     final int as = atts.size();
     for(int a = 0; a < as; ++a) {
       final byte[] key = atts.name(a);
       if(key.length + atts.value(a).length != 0) {
-        builder.put(Str.get(key), Uri.get(atts.value(a)));
+        mb.put(Str.get(key), Uri.get(atts.value(a)));
       }
     }
-    return builder.finish();
+    return mb.map();
   }
 }

@@ -160,7 +160,9 @@ public abstract class BXNode implements Node {
   @Override
   public BXDoc getOwnerDocument() {
     ANode n = nd;
-    for(ANode p; (p = n.parent()) != null;) n = p;
+    for(ANode p; (p = n.parent()) != null;) {
+      n = p;
+    }
     return n.type == NodeType.DOCUMENT_NODE ? (BXDoc) get(n) : null;
   }
 

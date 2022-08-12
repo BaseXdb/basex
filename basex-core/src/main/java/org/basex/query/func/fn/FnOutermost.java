@@ -40,7 +40,9 @@ public class FnOutermost extends StandardFunc {
     final Iter nodes = exprs[0].iter(qc);
 
     final ANodeBuilder list = new ANodeBuilder();
-    for(Item item; (item = qc.next(nodes)) != null;) list.add(toNode(item));
+    for(Item item; (item = qc.next(nodes)) != null;) {
+      list.add(toNode(item));
+    }
     list.ddo();
 
     // only go further if there are at least two nodes

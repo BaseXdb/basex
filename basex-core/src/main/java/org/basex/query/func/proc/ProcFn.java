@@ -42,7 +42,9 @@ abstract class ProcFn extends StandardFunc {
     final StringList sl = new StringList().add(toString(exprs[0], qc));
     if(exprs.length > 1) {
       final Iter iter = exprs[1].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) sl.add(toString(item));
+      for(Item item; (item = qc.next(iter)) != null;) {
+        sl.add(toString(item));
+      }
     }
     final String[] args = sl.finish();
 

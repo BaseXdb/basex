@@ -162,7 +162,9 @@ public final class Let extends ForLet {
         double s = 0;
         int c = 0;
         final Iter iter = expr.iter(qc);
-        for(Item item; (item = qc.next(iter)) != null; s += item.score(), c++);
+        for(Item item; (item = qc.next(iter)) != null; c++) {
+          s += item.score();
+        }
         return Dbl.get(Scoring.avg(s, c));
       } finally {
         qc.scoring = scoring;

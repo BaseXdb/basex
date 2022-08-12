@@ -22,7 +22,9 @@ public final class FtScore extends StandardFunc {
       qc.scoring = true;
       final Iter input = exprs[0].iter(qc);
       final DoubleList values = new DoubleList(Seq.initialCapacity(input.size()));
-      for(Item item; (item = qc.next(input)) != null;) values.add(item.score());
+      for(Item item; (item = qc.next(input)) != null;) {
+        values.add(item.score());
+      }
       return DblSeq.get(values.finish());
     } finally {
       qc.scoring = s;

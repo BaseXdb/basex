@@ -20,7 +20,9 @@ public final class ArrayFoldLeft extends ArrayFn {
     Value result = exprs[1].value(qc);
     final FItem action = toFunction(exprs[2], 2, qc);
 
-    for(final Value value : array.members()) result = action.invoke(qc, info, result, value);
+    for(final Value value : array.members()) {
+      result = action.invoke(qc, info, result, value);
+    }
     return result;
   }
 

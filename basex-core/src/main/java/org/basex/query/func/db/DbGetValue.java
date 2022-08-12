@@ -12,7 +12,6 @@ import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 
@@ -47,12 +46,12 @@ public class DbGetValue extends DbAccess {
         return resource(bin, qc);
       }
 
-      XQMap map = XQMap.empty();
+      final MapBuilder mb = new MapBuilder(info);
       final IOFile bin = data.meta.dir(type);
       for(final String path : data.resources.paths("", type)) {
-        map = map.put(Str.get(path), resource(type.filePath(bin, path), qc), info);
+        mb.put(path, resource(type.filePath(bin, path), qc));
       }
-      return map;
+      return mb.map();
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }

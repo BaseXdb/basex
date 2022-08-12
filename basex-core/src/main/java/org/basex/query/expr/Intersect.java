@@ -83,7 +83,9 @@ public final class Intersect extends Set {
   Value nodes(final QueryContext qc) throws QueryException {
     ANodeBuilder nodes = new ANodeBuilder();
     Iter iter = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) nodes.add(toNode(item));
+    for(Item item; (item = qc.next(iter)) != null;) {
+      nodes.add(toNode(item));
+    }
 
     final int el = exprs.length;
     for(int e = 1; e < el && !nodes.isEmpty(); ++e) {

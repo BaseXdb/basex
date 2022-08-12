@@ -117,7 +117,7 @@ final class XsltReport {
    * @return report
    */
   XQMap finish() {
-    return rb.finish();
+    return rb.map();
   }
 
   /**

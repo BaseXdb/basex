@@ -27,7 +27,9 @@ public final class UtilLast extends StandardFunc {
 
     // loop through all items
     Item last = null;
-    for(Item item; (item = qc.next(input)) != null;) last = item;
+    for(Item item; (item = qc.next(input)) != null;) {
+      last = item;
+    }
     return last == null ? Empty.VALUE : last;
   }
 

@@ -57,16 +57,18 @@ public final class CArray extends Arr {
       return XQArray.member(exprs[0].value(qc));
     }
 
-    final ArrayBuilder builder = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder();
     for(final Expr expr : exprs) {
       if(seq) {
-        builder.append(expr.value(qc));
+        ab.append(expr.value(qc));
       } else {
         final Iter iter = expr.iter(qc);
-        for(Item item; (item = qc.next(iter)) != null;) builder.append(item);
+        for(Item item; (item = qc.next(iter)) != null;) {
+          ab.append(item);
+        }
       }
     }
-    return builder.array(this);
+    return ab.array(this);
   }
 
   @Override

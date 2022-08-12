@@ -22,9 +22,9 @@ public final class MapFind extends StandardFunc {
     final Iter input = exprs[0].iter(qc);
     final Item key = toAtomItem(exprs[1], qc);
 
-    final ArrayBuilder builder = new ArrayBuilder();
-    find(input, key, builder, qc);
-    return builder.array(this);
+    final ArrayBuilder ab = new ArrayBuilder();
+    find(input, key, ab, qc);
+    return ab.array(this);
   }
 
   @Override

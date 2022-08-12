@@ -20,11 +20,13 @@ public final class ArrayFilter extends ArrayFn {
     final XQArray array = toArray(exprs[0], qc);
     final FItem predicate = toFunction(exprs[1], 1, qc);
 
-    final ArrayBuilder builder = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) builder.append(value);
+      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
+        ab.append(value);
+      }
     }
-    return builder.array(this);
+    return ab.array(this);
   }
 
   @Override

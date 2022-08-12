@@ -70,6 +70,6 @@ public final class ProfTrack extends StandardFunc {
     }
     // evaluated value
     if(value != null) mb.put(TrackOptions.VALUE.name(), value);
-    return mb.finish();
+    return mb.map();
   }
 }

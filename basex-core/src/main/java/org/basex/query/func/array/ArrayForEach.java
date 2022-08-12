@@ -20,9 +20,11 @@ public final class ArrayForEach extends ArrayFn {
     final XQArray array = toArray(exprs[0], qc);
     final FItem action = toFunction(exprs[1], 1, qc);
 
-    final ArrayBuilder builder = new ArrayBuilder();
-    for(final Value value : array.members()) builder.append(action.invoke(qc, info, value));
-    return builder.array(this);
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(final Value value : array.members()) {
+      ab.append(action.invoke(qc, info, value));
+    }
+    return ab.array(this);
   }
 
   @Override

@@ -18,7 +18,9 @@ public final class FtCount extends FtAccess {
     final FTPosData tmp = qc.ftPosData;
     qc.ftPosData = new FTPosData();
     final Iter nodes = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(nodes)) != null;) toDBNode(item);
+    for(Item item; (item = qc.next(nodes)) != null;) {
+      toDBNode(item);
+    }
     final int size = qc.ftPosData.size();
     qc.ftPosData = tmp;
     return Int.get(size);

@@ -30,7 +30,9 @@ public class FnSlice extends StandardFunc {
     if(slice.step == 1) return input.subsequence(slice.start - 1, slice.length, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long i = slice.start; i <= slice.end; i += slice.step) vb.add(input.itemAt(i - 1));
+    for(long i = slice.start; i <= slice.end; i += slice.step) {
+      vb.add(input.itemAt(i - 1));
+    }
     return vb.value();
   }
 

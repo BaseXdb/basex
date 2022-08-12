@@ -63,15 +63,15 @@ public final class CMap extends Arr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    XQMap map = XQMap.empty();
+    final MapBuilder mb = new MapBuilder(info);
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       final Item key = toAtomItem(exprs[e], qc);
       final Value value = exprs[e + 1].value(qc);
-      if(map.contains(key, info)) throw MAPDUPLKEY_X_X_X.get(info, key, map.get(key, info), value);
-      map = map.put(key, value, info);
+      if(mb.contains(key)) throw MAPDUPLKEY_X_X_X.get(info, key, mb.get(key), value);
+      mb.put(key, value);
     }
-    return map;
+    return mb.map();
   }
 
   @Override

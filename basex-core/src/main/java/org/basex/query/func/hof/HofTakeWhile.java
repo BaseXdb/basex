@@ -44,7 +44,9 @@ public class HofTakeWhile extends StandardFunc {
     if(value != null) return value;
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(input)) != null && test(item, predicate, qc);) vb.add(item);
+    for(Item item; (item = qc.next(input)) != null && test(item, predicate, qc);) {
+      vb.add(item);
+    }
     return vb.value(this);
   }
 

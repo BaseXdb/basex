@@ -19,7 +19,9 @@ public final class ArrayBuilder {
   private static final int NODE_SIZE = (XQArray.MIN_LEAF + XQArray.MAX_LEAF + 1) / 2;
 
   /** Ring buffer containing the root-level members. */
-  private final Value[] members = new Value[CAP];
+  private Value[] members = new Value[CAP];
+  /** Builder for the middle tree. */
+  private FingerTreeBuilder<Value> tree = new FingerTreeBuilder<>();
 
   /** Number of members in left digit. */
   private int inLeft;
@@ -27,8 +29,6 @@ public final class ArrayBuilder {
   private int mid = CAP / 2;
   /** Number of members in right digit. */
   private int inRight;
-  /** Builder for the middle tree. */
-  private final FingerTreeBuilder<Value> tree = new FingerTreeBuilder<>();
 
   /**
    * Adds a member to the start of the array.
@@ -174,20 +174,25 @@ public final class ArrayBuilder {
     final int n = inLeft + inRight;
     if(n == 0) return XQArray.empty();
 
+    final Value[] values = members;
+    members = null;
+    final FingerTreeBuilder<Value> builder = tree;
+    tree = null;
+
     final int start = (mid - inLeft + CAP) % CAP;
     if(n <= XQArray.MAX_SMALL) {
       // small int array, fill directly
       final Value[] small = new Value[n];
-      for(int i = 0; i < n; i++) small[i] = members[(start + i) % CAP];
+      for(int i = 0; i < n; i++) small[i] = values[(start + i) % CAP];
       return new SmallArray(small, type);
     }
 
     // deep array
-    final int a = tree.isEmpty() ? n / 2 : inLeft, b = n - a;
+    final int a = builder.isEmpty() ? n / 2 : inLeft, b = n - a;
     final Value[] ls = new Value[a], rs = new Value[b];
-    for(int i = 0; i < a; i++) ls[i] = members[(start + i) % CAP];
-    for(int i = a; i < n; i++) rs[i - a] = members[(start + i) % CAP];
-    return new BigArray(ls, tree.freeze(), rs, type);
+    for(int i = 0; i < a; i++) ls[i] = values[(start + i) % CAP];
+    for(int i = a; i < n; i++) rs[i - a] = values[(start + i) % CAP];
+    return new BigArray(ls, builder.freeze(), rs, type);
   }
 
   /**
