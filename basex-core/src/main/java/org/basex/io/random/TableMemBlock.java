@@ -15,30 +15,39 @@ import org.basex.util.list.*;
  */
 final class TableMemBlock {
   /** Table data, with two values for one XML node. */
-  private final long[] data = new long[IO.BLOCKSIZE << 1];
+  private long[] data;
   /** First pre value. */
   int firstPre;
 
   /**
-   * Returns a list with new blocks.
+   * Constructor with initial capacity.
+   * @param compact compact block size
+   */
+  private TableMemBlock(final boolean compact) {
+    data = new long[(compact ? 1 : IO.BLOCKSIZE) << 1];
+  }
+
+  /**
+   * Creates new blocks.
    * @param count number of entries to add
+   * @param compact compact block size
    * @return new blocks
    */
-  static ArrayList<TableMemBlock> get(final int count) {
+  private static ArrayList<TableMemBlock> get(final int count, final boolean compact) {
     final int bs = IO.BLOCKSIZE + count - 1 >>> IO.BLOCKPOWER;
     final ArrayList<TableMemBlock> list = new ArrayList<>(bs);
-    for(int b = 0; b < bs; b++) list.add(new TableMemBlock());
+    for(int b = 0; b < bs; b++) list.add(new TableMemBlock(compact));
     return list;
   }
 
   /**
-   * Returns a list with new blocks.
+   * Creates new blocks with computed pre values.
    * @param count number of entries to add
    * @param pre pre value of first block (will be incremented for subsequent blocks)
    * @return new blocks
    */
   static ArrayList<TableMemBlock> get(final int count, final int pre) {
-    final ArrayList<TableMemBlock> blocks = get(count);
+    final ArrayList<TableMemBlock> blocks = get(count, true);
     int fp = pre;
     for(final TableMemBlock block : blocks) {
       block.firstPre = fp;
@@ -73,7 +82,9 @@ final class TableMemBlock {
    * @param value value
    */
   void value(final int pre, final int offset, final long value) {
-    data[index(pre, offset)] = value;
+    final int i = index(pre, offset);
+    resize(i + 1);
+    data[i] = value;
   }
 
   /**
@@ -103,12 +114,14 @@ final class TableMemBlock {
 
     // check if entries can be inserted into existing block
     if(count <= remaining) {
+      resize((last + copy) << 1);
       System.arraycopy(data, first << 1, data, last << 1, copy << 1);
       return null;
     }
 
     // otherwise, create new blocks
-    final ArrayList<TableMemBlock> blocks = get(count - remaining);
+    resize(IO.BLOCKSIZE << 1);
+    final ArrayList<TableMemBlock> blocks = get(count - remaining, false);
     // create temporary array with final entries
     final int total = filled + count;
     final long[] longs = new long[total << 1];
@@ -132,6 +145,16 @@ final class TableMemBlock {
       copied2 += fill2;
     }
     return blocks;
+  }
+
+  /**
+   * Resizes the table block.
+   * @param size minimum size
+   */
+  private void resize(final int size) {
+    final long[] dt = data;
+    final int dl = dt.length;
+    if(dl < size) data = Arrays.copyOf(dt, Math.min(Math.max(size, dl << 1), IO.BLOCKSIZE << 1));
   }
 
   @Override
