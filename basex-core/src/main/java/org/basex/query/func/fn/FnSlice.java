@@ -42,14 +42,27 @@ public class FnSlice extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    // rewrite to util:range to trigger further rewritings
-    final long size = input.size();
+    // for the following optimizations, the numeric properties must either be static or absent
     final IntPredicate value = e -> e >= exprs.length || exprs[e] instanceof Value;
-    if(size != -1 && value.test(1) && value.test(2) && value.test(3)) {
-      final Slice slice = slice(size, cc.qc);
-      if(slice.step == 1) {
-        final Expr arg = slice.reverse ? cc.function(REVERSE, info, input) : input;
-        return cc.function(_UTIL_RANGE, info, arg, Int.get(slice.start), Int.get(slice.end));
+    if(value.test(1) && value.test(2) && value.test(3)) {
+      final long size = input.size();
+      if(size != -1) {
+        final Slice slice = slice(size, cc.qc);
+        if(slice.step == 1) {
+          // slice($VALUE, 2)  ->  util:range($VALUE, 2)
+          // slice($TEN-ITEMS, 2, 1)  ->  util:range(reverse($VALUE), 9, 10)
+          final Expr arg = slice.reverse ? cc.function(REVERSE, info, input) : input;
+          return cc.function(_UTIL_RANGE, info, arg, Int.get(slice.start), Int.get(slice.end));
+        }
+      }
+      // input size is unknown: exact range cannot be computed, check original properties
+      final long start = toLong(1, 1, cc.qc), end = toLong(2, Long.MAX_VALUE, cc.qc);
+      if(end == Long.MAX_VALUE && toLong(3, 1, cc.qc) == 1) {
+        // slice($VALUE, -1)  ->  util:last($VALUE)
+        if(start == -1) return cc.function(_UTIL_LAST, info, input);
+        // slice($VALUE, 1)  ->  $VALUE
+        if(start == 0 || start == 1) return input;
+        // no rewritings possible for greater start values (slice always returns last item)
       }
     }
 
@@ -66,7 +79,7 @@ public class FnSlice extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Slice slice(final long size, final QueryContext qc) throws QueryException {
-    Slice s = new Slice(size, toLong(1, qc), toLong(2, qc), toLong(3, qc), false);
+    Slice s = new Slice(size, toLong(1, 0, qc), toLong(2, 0, qc), toLong(3, 0, qc), false);
     if(s.step < 0) s = new Slice(size, -s.start, -s.end, -s.step, true);
     s.start = Math.max(1, s.start);
     s.end = Math.min(size, s.end);
@@ -77,16 +90,17 @@ public class FnSlice extends StandardFunc {
   /**
    * Returns a normalized specified integer argument.
    * @param i index of argument
+   * @param dflt default value if argument does not exist
    * @param qc query context
    * @return integer
    * @throws QueryException query exception
    */
-  private long toLong(final int i, final QueryContext qc) throws QueryException {
+  private long toLong(final int i, final long dflt, final QueryContext qc) throws QueryException {
     if(i < exprs.length) {
       final Item item = exprs[i].atomItem(qc, info);
       if(item != Empty.VALUE) return toLong(item);
     }
-    return 0;
+    return dflt;
   }
 
   /** Slice properties. */
