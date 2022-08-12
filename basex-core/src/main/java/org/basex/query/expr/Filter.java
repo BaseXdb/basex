@@ -178,12 +178,12 @@ public abstract class Filter extends Preds {
           } else if(opV == OpV.EQ && e instanceof Range) {
             final Expr arg1 = e.arg(0), arg2 = e.arg(1);
             if(LAST.is(arg2) && arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple()) {
-              // expr[position() = INT to last()]
-              ex = cc.function(SUBSEQUENCE, info, prepare.apply(expr), arg1);
-            } else if(arg1 == Int.ONE && arg2 instanceof Arith) {
-              // expr[position() = 1 to last() - 1]
-              final Expr arth1 = arg2.arg(0), arth2 = arg2.arg(1);
-              if(LAST.is(arth1) && ((Arith) arg2).calc == Calc.MINUS && arth2 == Int.ONE) {
+              // expr[position() = INT to last()]  ->  util:range(expr, INT)
+              ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
+            } else if(arg1 instanceof Int && arg2 instanceof Arith) {
+              // expr[position() = 1 to last() - 1]  ->  util:init(expr)
+              if(((Int) arg1).itr() <= 1 && LAST.is(arg2.arg(0)) &&
+                  ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
                 ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
               }
             }
