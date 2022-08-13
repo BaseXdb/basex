@@ -40,7 +40,8 @@ public class FileCopy extends FileFn {
     if(Files.isDirectory(trg)) {
       // target is a directory: attach file name
       trg = trg.resolve(src.getFileName());
-      if(Files.isDirectory(trg)) throw FILE_IS_DIR_X.get(info, trg.toAbsolutePath());
+      if(!Files.isDirectory(src) && Files.isDirectory(trg))
+        throw FILE_IS_DIR_X.get(info, trg.toAbsolutePath());
     } else if(!Files.exists(trg)) {
       // target does not exist: ensure that parent exists
       if(!Files.isDirectory(trg.getParent())) throw FILE_NO_DIR_X.get(info, trg.toAbsolutePath());
@@ -65,7 +66,7 @@ public class FileCopy extends FileFn {
       final QueryContext qc) throws IOException {
 
     if(Files.isDirectory(src)) {
-      Files.createDirectory(trg);
+      if(!Files.exists(trg)) Files.createDirectory(trg);
       try(DirectoryStream<Path> children = Files.newDirectoryStream(src)) {
         qc.checkStop();
         for(final Path child : children) {

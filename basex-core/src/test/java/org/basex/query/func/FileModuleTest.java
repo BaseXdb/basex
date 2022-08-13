@@ -135,6 +135,19 @@ public final class FileModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void copy2() {
+    String query = _FILE_CREATE_DIR.args(PATH1) + ','
+        + _FILE_CREATE_DIR.args(PATH2) + ','
+        + _FILE_CREATE_DIR.args(PATH3) + ','
+        + _FILE_WRITE_TEXT.args(PATH4, "X") + ", "
+        + "for $i in" + _FILE_CHILDREN.args(PATH1) + ' '
+        + "return" + _FILE_COPY.args(" $i", PATH2);
+
+    query(query);
+    query(query);
+  }
+
+  /** Test method. */
   @Test public void createDir() {
     final Function func = _FILE_CREATE_DIR;
     // successful queries
