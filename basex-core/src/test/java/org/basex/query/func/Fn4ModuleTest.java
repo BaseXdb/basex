@@ -104,6 +104,7 @@ public class Fn4ModuleTest extends QueryPlanTest {
     check(func.args(" replicate(<_/>, 2)"), "<_/>\n<_/>", root(REPLICATE));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 6, empty(REVERSE));
 
+    error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOM_X_X);
@@ -193,6 +194,7 @@ public class Fn4ModuleTest extends QueryPlanTest {
     check(func.args(" replicate(<_/>, 2)"), "<_/>\n<_/>", root(REPLICATE));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 4, empty(REVERSE));
 
+    error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOM_X_X);

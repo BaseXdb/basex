@@ -38,32 +38,21 @@ public class FnLowest extends StandardFunc {
     final Collation coll = toCollation(1, false, qc);
     final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
 
-    final QueryFunction<Item, Value> modify = item -> {
+    final ItemList result = new ItemList();
+    Value lowest = null;
+    for(Item item; (item = qc.next(input)) != null;) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item it : (key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info)) {
         vb.add(it.type == AtomType.DOUBLE || !it.instanceOf(AtomType.UNTYPED_ATOMIC) ? it :
           Dbl.get(toDouble(it)));
       }
-      return vb.value();
-    };
-
-    final ItemList result = new ItemList();
-    Item item = qc.next(input);
-    Value lowest;
-    if(item != null) {
+      final Value low = vb.value();
+      int diff = FnSort.compare(lowest != null ? lowest : low, low, coll, info);
+      if(min) diff = -diff;
+      if(diff > 0) continue;
+      if(diff < 0) result.reset();
       result.add(item);
-      lowest = modify.apply(item);
-      while((item = qc.next(input)) != null) {
-        final Value low = modify.apply(item);
-        int diff = FnSort.compare(lowest, low, coll, info);
-        if(min) diff = -diff;
-        if(diff > 0) continue;
-        if(diff < 0) {
-          result.reset();
-          lowest = low;
-        }
-        result.add(item);
-      }
+      lowest = low;
     }
     return result.value(this);
   }
