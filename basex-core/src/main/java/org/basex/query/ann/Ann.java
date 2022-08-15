@@ -87,4 +87,11 @@ public final class Ann {
       qs.params(list.finish());
     }
   }
+
+  @Override
+  public String toString() {
+    final QueryString qs = new QueryString();
+    toString(qs);
+    return qs.toString();
+  }
 }
