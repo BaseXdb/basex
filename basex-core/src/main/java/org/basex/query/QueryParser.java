@@ -2160,10 +2160,7 @@ public class QueryParser extends InputParser {
     skipWs();
     final char ch = curr();
     // variables
-    if(ch == '$') {
-      final InputInfo ii = info();
-      return localVars.resolve(varName(), ii);
-    }
+    if(ch == '$') return varRef();
     // parentheses
     if(ch == '(' && next() != '#') return parenthesized();
     // direct constructor
@@ -2223,14 +2220,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr keySpecifier() throws QueryException {
-    skipWs();
+    if(wsConsume("*")) return Lookup.WILDCARD;
     final char ch = curr();
-    if(ch == '*') {
-      consume();
-      return Lookup.WILDCARD;
-    }
     if(ch == '(') return parenthesized();
-    // numeric literal
+    if(ch == '$') return varRef();
+    if(quote(ch)) return Str.get(stringLiteral());
     final Expr num = numericLiteral(ch);
     if(num != null) {
       if(Function.ERROR.is(num) || num instanceof Int) return num;
@@ -2471,6 +2465,16 @@ public class QueryParser extends InputParser {
     final QNm name = varName();
     final SeqType st = type != null ? type : optAsType();
     return new Var(name, st, qc, sc, ii);
+  }
+
+  /**
+   * Parses a variable reference.
+   * @return variable reference
+   * @throws QueryException query exception
+   */
+  private ParseExpr varRef() throws QueryException {
+    final InputInfo ii = info();
+    return localVars.resolve(varName(), ii);
   }
 
   /**
