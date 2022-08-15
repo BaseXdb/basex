@@ -14,7 +14,7 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class MixUpdatesTest extends SandboxTest {
-  /**Prepare tests. */
+  /** Prepare tests. */
   @BeforeAll public static void beforeClass() {
     set(MainOptions.MIXUPDATES, true);
   }

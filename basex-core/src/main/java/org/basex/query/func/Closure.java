@@ -434,9 +434,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private void checkUpdating() throws QueryException {
     // derive updating flag from function body
     updating = expr.has(Flag.UPD);
-    final boolean updAnn = anns.contains(Annotation.UPDATING);
-    if(updating != updAnn) {
-      if(!updAnn) anns.add(new Ann(info, Annotation.UPDATING, Empty.VALUE));
+    final boolean annUpdating = anns.contains(Annotation.UPDATING);
+    if(updating != annUpdating) {
+      if(!annUpdating) anns.add(new Ann(info, Annotation.UPDATING, Empty.VALUE));
       else if(!expr.vacuous()) throw UPEXPECTF.get(info);
     }
   }

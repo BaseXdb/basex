@@ -170,16 +170,16 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @throws QueryException query exception
    */
   void checkUp() throws QueryException {
-    final boolean upd = expr.has(Flag.UPD);
-    if(upd) expr.checkUp();
+    final boolean exprUpdating = expr.has(Flag.UPD);
+    if(exprUpdating) expr.checkUp();
     final InputInfo ii = expr.info() != null ? expr.info() : info;
     if(updating) {
       // updating function
+      if(!(exprUpdating || expr.vacuous())) throw UPEXPECTF.get(ii);
       if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(info);
-      if(!upd && !expr.vacuous()) throw UPEXPECTF.get(ii);
-    } else if(upd) {
+    } else {
       // uses updates, but is not declared as such
-      throw UPNOT_X.get(ii, description());
+      if(exprUpdating) throw UPNOT_X.get(ii, description());
     }
   }
 
