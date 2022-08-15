@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class MapRemove extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     XQMap map = toMap(exprs[0], qc);
     final Iter keys = exprs[1].iter(qc);
 

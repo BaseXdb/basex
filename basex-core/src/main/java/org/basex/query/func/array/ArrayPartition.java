@@ -1,5 +1,7 @@
 package org.basex.query.func.array;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -29,9 +31,9 @@ public final class ArrayPartition extends ArrayFn {
           qc.checkStop();
           final Item item = input.next();
           if(item == null || toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
-            final Item member = member(value);
+            final Value v = value;
             value = item;
-            if(member != Empty.VALUE) return member;
+            if(v != Empty.VALUE) return XQArray.member(v);
           } else {
             value = ValueBuilder.concat(value, item, qc);
           }
@@ -46,20 +48,13 @@ public final class ArrayPartition extends ArrayFn {
     return iter(qc).value(qc, this);
   }
 
-  /**
-   * Returns a new array member or a empty sequence.
-   * @param value value to be wrapped
-   * @return new entry
-   */
-  private Item member(final Value value) {
-    return value != Empty.VALUE ? XQArray.member(value) : Empty.VALUE;
-  }
-
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0];
     final SeqType st =  input.seqType();
     if(st.zero()) return input;
+    if(st.one() && exprs[1] instanceof FuncItem)
+      return cc.function(_UTIL_ARRAY_MEMBER, info, input);
 
     exprs[1] = coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O,
         st.with(Occ.ZERO_OR_MORE), st.with(Occ.EXACTLY_ONE));

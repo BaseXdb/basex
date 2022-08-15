@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class MapContains extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
 

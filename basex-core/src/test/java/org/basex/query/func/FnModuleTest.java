@@ -177,6 +177,9 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query(func.args(" (1 to 100000000) ! string()"), 100000000);
     query(func.args(" for $i in 1 to 100000000 return string('x')"), 100000000);
+
+    query(func.args(" count(array { <a/>, <b/> }) "), 1);
+    query(func.args(" count([ <a/>, <b/> ]) "), 1);
   }
 
   /** Test method. */

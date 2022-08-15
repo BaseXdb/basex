@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class MapPut extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
     final Value value = exprs[2].value(qc);

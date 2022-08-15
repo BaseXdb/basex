@@ -23,6 +23,7 @@ public final class ArrayFlatten extends ArrayFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Deque<Iter> stack = new ArrayDeque<>();
     stack.push(exprs[0].iter(qc));
+
     return new Iter() {
       @Override
       public Item next() throws QueryException {

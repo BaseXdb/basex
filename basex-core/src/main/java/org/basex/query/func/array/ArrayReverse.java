@@ -2,7 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class ArrayReverse extends ArrayFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return toArray(exprs[0], qc).reverseArray(qc);
   }
 

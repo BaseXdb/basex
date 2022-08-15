@@ -32,10 +32,15 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // determine static key type (all keys must be single items)
+    final boolean values = allAreValues(true);
     final int el = exprs.length;
-    if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
+    if(el == 2) {
+      return cc.replaceWith(this, values
+          ? XQMap.entry(toAtomItem(exprs[0], cc.qc), exprs[1].value(cc.qc), info)
+          : cc.function(_MAP_ENTRY, info, exprs));
+    }
 
+    // determine static key type (all keys must be single items)
     Type kt = null;
     for(int e = 0; e < el; e += 2) {
       final SeqType st = exprs[e].seqType();
@@ -58,11 +63,11 @@ public final class CMap extends Arr {
 
     exprType.assign(MapType.get((AtomType) kt, dt));
 
-    return allAreValues(true) ? cc.preEval(this) : this;
+    return values ? cc.preEval(this) : this;
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final MapBuilder mb = new MapBuilder(info);
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {

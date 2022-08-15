@@ -3,7 +3,6 @@ package org.basex.query.func.array;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.type.*;
 
@@ -15,7 +14,7 @@ import org.basex.query.value.type.*;
  */
 public final class ArraySlice extends FnSlice {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public XQArray value(final QueryContext qc) throws QueryException {
     XQArray array = toArray(exprs[0], qc);
 
     final Slice slice = slice(array.arraySize(), qc);

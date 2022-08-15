@@ -3,7 +3,6 @@ package org.basex.query.func.array;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.array.XQArray;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -15,7 +14,7 @@ import org.basex.util.*;
  */
 public final class ArrayPut extends ArrayFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
     return array.put(toPos(array, toLong(exprs[1], qc), false), exprs[2].value(qc));
   }

@@ -18,6 +18,24 @@ import org.junit.jupiter.api.*;
  */
 public final class UtilModuleTest extends QueryPlanTest {
   /** Test method. */
+  @Test public void arrayMember() {
+    final Function func = _UTIL_ARRAY_MEMBER;
+
+    query(func.args(" ()"), "[()]");
+    query(func.args(" 1"), "[1]");
+    query(func.args(" (1, 2)"), "[(1,2)]");
+    query(func.args(" [1]"), "[[1]]");
+    query(func.args(" [1, 2]"), "[[1,2]]");
+    query(func.args(" [ (1, 2) ]"), "[[(1,2)]]");
+
+    check("array { <_>x</_> }", "[<_>x</_>]", root(func));
+    check("[ <_>x</_> ]", "[<_>x</_>]", root(func));
+    check("[ (<_>x</_>, <_>y</_>) ]", "[(<_>x</_>,<_>y</_>)]", root(func));
+    check("array { <_>x</_>, <_>y</_> }", "[<_>x</_>,<_>y</_>]", empty(func));
+    check("array { <_>x</_>, <_>y</_> }", "[<_>x</_>,<_>y</_>]", empty(func));
+  }
+
+  /** Test method. */
   @Test public void arrayMembers() {
     final Function func = _UTIL_ARRAY_MEMBERS;
 

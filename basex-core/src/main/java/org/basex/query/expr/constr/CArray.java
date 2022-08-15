@@ -1,6 +1,7 @@
 package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -21,23 +22,30 @@ import org.basex.util.hash.*;
  */
 public final class CArray extends Arr {
   /** Create sequences as array members. */
-  private final boolean seq;
+  private final boolean sequences;
 
   /**
    * Constructor.
    * @param info input info
-   * @param seq create sequences
+   * @param sequences create sequences
    * @param exprs array expressions
    */
-  public CArray(final InputInfo info, final boolean seq, final Expr... exprs) {
+  public CArray(final InputInfo info, final boolean sequences, final Expr... exprs) {
     super(info, SeqType.ARRAY_O, exprs);
-    this.seq = seq;
+    this.sequences = sequences;
   }
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
+    final boolean values = allAreValues(true);
+    if(exprs.length == 1 && (sequences || exprs[0].size() == 1)) {
+      return cc.replaceWith(this, values
+          ? XQArray.member(exprs[0].value(cc.qc))
+          : cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
+    }
+
     SeqType dt = null;
-    if(seq) {
+    if(sequences) {
       dt = SeqType.union(exprs, true);
     } else {
       for(final Expr expr : exprs) {
@@ -52,14 +60,9 @@ public final class CArray extends Arr {
 
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // create array with single member
-    if(exprs.length == 1 && (seq || exprs[0].size() == 1)) {
-      return XQArray.member(exprs[0].value(qc));
-    }
-
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Expr expr : exprs) {
-      if(seq) {
+      if(sequences) {
         ab.append(expr.value(qc));
       } else {
         final Iter iter = expr.iter(qc);
@@ -74,7 +77,7 @@ public final class CArray extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = null;
-    if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT)) {
+    if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA)) {
       simplifyAll(mode, cc);
       expr = List.get(cc, info, exprs);
     }
@@ -83,12 +86,12 @@ public final class CArray extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CArray(info, seq, copyAll(cc, vm, exprs)));
+    return copyType(new CArray(info, sequences, copyAll(cc, vm, exprs)));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof CArray && seq == ((CArray) obj).seq && super.equals(obj);
+    return obj instanceof CArray && sequences == ((CArray) obj).sequences && super.equals(obj);
   }
 
   @Override
@@ -98,6 +101,6 @@ public final class CArray extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(seq ? "[ " : ARRAY + " { ").tokens(exprs, SEP).token(seq ? " ]" : " }");
+    qs.token(sequences ? "[ " : ARRAY + " { ").tokens(exprs, SEP).token(sequences ? " ]" : " }");
   }
 }

@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class ArrayJoin extends ArrayFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
     final Expr arrays = exprs[0];
     if(arrays.seqType().zeroOrOne()) {

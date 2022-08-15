@@ -1710,6 +1710,9 @@ public enum Function implements AFunction {
   // Utility Module
 
   /** XQuery function. */
+  _UTIL_ARRAY_MEMBER(UtilArrayMember::new, "array-member(input)",
+      params(ITEM_ZM), ARRAY_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_ARRAY_MEMBERS(UtilArrayMembers::new, "array-members(array)",
       params(ARRAY_O), ARRAY_ZM, UTIL_URI),
   /** XQuery function. */
