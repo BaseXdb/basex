@@ -448,8 +448,8 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     check(func.args(" (<a/>, <b/>, <c/>)", 2), "<b/>", root(CElem.class));
     check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2), "<b/>", root(CElem.class));
-    check(func.args(" (<a/>, <b/>[data()], <c/>)", 2), "<c/>", root(_UTIL_OR));
-    check(func.args(" (<a/>, <b/>[data()], <c/>, <d/>)", 2), "<c/>", root(_UTIL_OR));
+    check(func.args(" (<a/>, <b/>[data()], <c/>)", 2), "<c/>", root(Otherwise.class));
+    check(func.args(" (<a/>, <b/>[data()], <c/>, <d/>)", 2), "<c/>", root(Otherwise.class));
     check(func.args(" (<a/>[data()], <b/>, <c/>)", 2), "<c/>", root(_UTIL_ITEM));
 
     check(func.args(REPLICATE.args(" <a/>", 2), 1), "<a/>", root(CElem.class));
@@ -557,12 +557,12 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(" (2, <_>3</_>[. = 4])", "<z/>"), 2, root(List.class));
 
     check(func.args(" (3, <_>4</_>)[. = 3]", " ()"), 3, root(IterFilter.class));
-    check(func.args(" (4, <_>5</_>)[. = 4]", "<z/>"), 4, root(_UTIL_OR));
+    check(func.args(" (4, <_>5</_>)[. = 4]", "<z/>"), 4, root(Otherwise.class));
 
-    check(func.args(_PROF_VOID.args(1), 2), 2, root(List.class));
-    check(func.args(_PROF_VOID.args(2), _PROF_VOID.args(3)), "", root(List.class));
+    check(func.args(_PROF_VOID.args(1), 2), 2, root(Otherwise.class));
+    check(func.args(_PROF_VOID.args(2), _PROF_VOID.args(3)), "", root(Otherwise.class));
 
-    check(func.args(" <_>6</_>[. = 6]", 7), "<_>6</_>", root(_UTIL_OR));
+    check(func.args(" <_>6</_>[. = 6]", 7), "<_>6</_>", root(Otherwise.class));
   }
 
   /** Test method. */

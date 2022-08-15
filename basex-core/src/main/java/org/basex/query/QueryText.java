@@ -116,6 +116,7 @@ public interface QueryText {
   /** Parser token. */ String ORDER = "order";
   /** Parser token. */ String ORDERED = "ordered";
   /** Parser token. */ String ORDERING = "ordering";
+  /** Parser token. */ String OTHERWISE = "otherwise";
   /** Parser token. */ String PARAGRAPH = "paragraph";
   /** Parser token. */ String PARAGRAPHS = "paragraphs";
   /** Parser token. */ String PHRASE = "phrase";

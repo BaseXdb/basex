@@ -1445,8 +1445,7 @@ public class QueryParser extends InputParser {
    */
   private Expr elvis() throws QueryException {
     final Expr ex = or();
-    if(!wsConsumeWs(ELVIS)) return ex;
-    return Function._UTIL_OR.get(sc, info(), ex, check(single(), NOELVIS));
+    return wsConsumeWs(ELVIS) ? new Otherwise(info(), ex, check(single(), NODEFAULT)) : ex;
   }
 
   /**
@@ -1571,14 +1570,27 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr multiplicative() throws QueryException {
-    Expr ex = union();
+    Expr ex = otherwise();
     while(ex != null) {
       final Calc c = consume('*') ? Calc.MULT : wsConsumeWs(DIV) ? Calc.DIV
           : wsConsumeWs(IDIV) ? Calc.IDIV : wsConsumeWs(MOD) ? Calc.MOD : null;
       if(c == null) break;
-      ex = new Arith(info(), ex, check(union(), CALCEXPR), c);
+      ex = new Arith(info(), ex, check(otherwise(), CALCEXPR), c);
     }
     return ex;
+  }
+
+  /**
+   * Parses the "OtherwiseExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr otherwise() throws QueryException {
+    Expr ex = union();
+    if(ex == null || !wsConsumeWs(OTHERWISE)) return ex;
+    final ExprList el = new ExprList(ex);
+    do add(el, union()); while(wsConsume(OTHERWISE));
+    return new Otherwise(info(), el.finish());
   }
 
   /**

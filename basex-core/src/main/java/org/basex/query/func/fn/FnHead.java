@@ -68,7 +68,7 @@ public final class FnHead extends StandardFunc {
         // head(($a[.], 1))         ->  util:or($a[.], 1)
         // head(($a[.], $b[.], 1))  ->  (will not be rewritten)
         final Expr dflt = List.get(cc, info, Arrays.copyOfRange(args, 1, al));
-        return cc.function(_UTIL_OR, info, first, cc.function(HEAD, info, dflt));
+        return new Otherwise(info, first, cc.function(HEAD, info, dflt)).optimize(cc);
       }
     }
 

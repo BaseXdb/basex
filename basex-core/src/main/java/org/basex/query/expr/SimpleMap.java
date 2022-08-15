@@ -66,13 +66,7 @@ public abstract class SimpleMap extends Arr {
   public final Expr compile(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      Expr expr = exprs[e];
-      try {
-        expr = expr.compile(cc);
-      } catch(final QueryException qe) {
-        // replace original expression with error
-        expr = cc.error(qe, expr);
-      }
+      final Expr expr = cc.compileOrError(exprs[e], e == 0);
       if(e == 0) cc.pushFocus(expr);
       else cc.updateFocus(expr);
       exprs[e] = expr;
@@ -270,8 +264,7 @@ public abstract class SimpleMap extends Arr {
       }
       if(inline) {
         try {
-          final InlineContext ic = new InlineContext(null, expr, cc);
-          return ic.inline(next);
+          return new InlineContext(null, expr, cc).inline(next);
         } catch(final QueryException qe) {
           // replace original expression with error
           return cc.error(qe, next);

@@ -27,13 +27,7 @@ public abstract class Logical extends Arr {
   public final Expr compile(final CompileContext cc) throws QueryException {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      try {
-        exprs[e] = exprs[e].compile(cc);
-      } catch(final QueryException qe) {
-        // first expression is evaluated eagerly
-        if(e == 0) throw qe;
-        exprs[e] = cc.error(qe, exprs[e]);
-      }
+      exprs[e] = cc.compileOrError(exprs[e], e == 0);
     }
     return optimize(cc);
   }

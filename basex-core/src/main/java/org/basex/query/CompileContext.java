@@ -347,6 +347,23 @@ public final class CompileContext {
   }
 
   /**
+   * Compiles an expression or creates an error.
+   * @param expr expression
+   * @param error return error
+   * @return compiled expression or error.
+   * @throws QueryException query exception
+   */
+  public Expr compileOrError(final Expr expr, final boolean error) throws QueryException {
+    try {
+      return expr.compile(this);
+    } catch(final QueryException ex) {
+      // replace original expression with error
+      if(error) throw ex;
+      return error(ex, expr);
+    }
+  }
+
+  /**
    * Creates and returns an optimized instance of the specified function.
    * @param function function
    * @param ii input info

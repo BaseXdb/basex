@@ -1,8 +1,10 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
+import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -31,5 +33,33 @@ public final class XQuery4Test extends QueryPlanTest {
     query("let $_ := '' let $m := map { '': 1 } return $m?$_", 1);
 
     query("declare variable $_ := 1; [ 9 ]?$_", 9);
+  }
+
+  /** Otherwise expression. */
+  @Test public void otherwise() {
+    query("() otherwise ()", "");
+    query("() otherwise 2", 2);
+    query("1 otherwise ()", 1);
+    query("1 otherwise 2", 1);
+    query("1 otherwise 2 otherwise 3", 1);
+
+    query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
+    query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 2]", 2);
+    query("(1 to 10)[. = 1] otherwise (1 to 10)[. = 0]", 1);
+    query("(1 to 10)[. = 1] otherwise (1 to 10)[. = 2]", 1);
+
+    query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
+
+    check("1 otherwise prof:void(2)", 1, root(Int.class));
+    check("prof:void(1) otherwise 2", 2, root(Otherwise.class));
+    check("prof:void(1) otherwise prof:void(2)", "", root(Otherwise.class));
+
+    check("count(prof:void(1) otherwise prof:void(2))", 0, root(COUNT));
+    query("count((1 to 10)[. = 0] otherwise (1 to 10)[. = 2])", 1);
+    query("count((1 to 10)[. = 1] otherwise (1 to 10)[. = 2])", 1);
+
+    query("(1 to 10)[. = 0] otherwise (1 to 6) ! string()", "1\n2\n3\n4\n5\n6");
+    query("count((1 to 10)[. = 0] otherwise (1 to 6) ! string())", 6);
+    query("count((1 to 10)[. = 0] otherwise sort((1 to 6)[. = 3]) otherwise 1)", 1);
   }
 }

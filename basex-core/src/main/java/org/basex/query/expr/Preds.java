@@ -46,12 +46,7 @@ public abstract class Preds extends Arr {
       final QueryFocus focus = cc.qc.focus;
       final Value init = focus.value;
       for(int e = 0; e < el; ++e) {
-        try {
-          exprs[e] = exprs[e].compile(cc);
-        } catch(final QueryException ex) {
-          // replace original expression with error
-          exprs[e] = cc.error(ex, exprs[e]);
-        }
+        exprs[e] = cc.compileOrError(exprs[e], false);
       }
       focus.value = init;
       return null;

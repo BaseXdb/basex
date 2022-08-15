@@ -137,13 +137,7 @@ public abstract class Path extends ParseExpr {
     cc.get(rt, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
-        Expr step = steps[s];
-        try {
-          step = step.compile(cc);
-        } catch(final QueryException ex) {
-          // replace original expression with error
-          step = cc.error(ex, step);
-        }
+        final Expr step = cc.compileOrError(steps[s], root == null && s == 0);
         steps[s] = step;
         cc.updateFocus(step);
       }

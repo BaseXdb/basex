@@ -10,6 +10,7 @@ import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -112,7 +113,7 @@ public abstract class Arr extends ParseExpr {
    * @return {@code true} if at least one expression has changed
    * @throws QueryException query exception
    */
-  protected boolean simplifyAll(final Simplify mode, final CompileContext cc)
+  protected final boolean simplifyAll(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
     boolean changed = false;
@@ -131,7 +132,7 @@ public abstract class Arr extends ParseExpr {
    * Flattens nested expressions.
    * @param cc compilation context
    */
-  protected void flatten(final CompileContext cc) {
+  protected final void flatten(final CompileContext cc) {
     // flatten nested expressions
     final ExprList list = new ExprList(exprs.length);
     final Class<? extends Arr> clazz = getClass();
@@ -143,6 +144,21 @@ public abstract class Arr extends ParseExpr {
         list.add(expr);
       }
     }
+    exprs = list.finish();
+  }
+
+  /**
+   * Removes empty expressions.
+   * @param cc compilation context
+   */
+  protected final void removeEmpty(final CompileContext cc) {
+    if(!((Checks<Expr>) expr -> expr == Empty.VALUE).any(exprs)) return;
+
+    final ExprList list = new ExprList(exprs.length - 1);
+    for(final Expr expr : exprs) {
+      if(expr != Empty.VALUE) list.add(expr);
+    }
+    cc.info(QueryText.OPTREMOVE_X_X, Empty.VALUE, (Supplier<?>) this::description);
     exprs = list.finish();
   }
 
@@ -167,7 +183,7 @@ public abstract class Arr extends ParseExpr {
    * @return {@code true} if evaluation can be skipped
    * @throws QueryException query exception
    */
-  boolean optimizeEbv(final boolean or, final boolean positional, final CompileContext cc)
+  final boolean optimizeEbv(final boolean or, final boolean positional, final CompileContext cc)
       throws QueryException {
 
     final ExprList list = new ExprList(exprs.length);
@@ -269,7 +285,7 @@ public abstract class Arr extends ParseExpr {
    * @return optimized expression or null
    * @throws QueryException query exception
    */
-  Expr rewrite(final Class<? extends Arr> inverse,
+  final Expr rewrite(final Class<? extends Arr> inverse,
       final QueryBiFunction<Boolean, Expr[], Expr> newExpr, final CompileContext cc)
       throws QueryException {
 

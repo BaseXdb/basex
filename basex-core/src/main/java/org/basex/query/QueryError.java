@@ -938,7 +938,7 @@ public enum QueryError {
   /** Error code. */
   NOTERNARY(XPST, 3, "Incomplete ternary if expression."),
   /** Error code. */
-  NOELVIS(XPST, 3, "Expecting default expression."),
+  NODEFAULT(XPST, 3, "Expecting default expression."),
   /** Error code. */
   NOIF(XPST, 3, "Incomplete 'if' expression."),
   /** Error code. */

@@ -47,12 +47,7 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    try {
-      super.compile(cc);
-    } catch(final QueryException ex) {
-      // replace original expression with error
-      expr = cc.error(ex, expr);
-    }
+    expr = cc.compileOrError(expr, false);
     return optimize(cc);
   }
 

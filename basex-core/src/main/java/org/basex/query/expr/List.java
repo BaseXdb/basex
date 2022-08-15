@@ -2,8 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.util.function.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -53,13 +51,6 @@ public final class List extends Arr {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) exprs[e] = exprs[e].compile(cc);
-    return optimize(cc);
-  }
-
-  @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     flatten(cc);
     removeEmpty(cc);
@@ -105,21 +96,6 @@ public final class List extends Arr {
     }
 
     return this;
-  }
-
-  /**
-   * Removes empty expressions.
-   * @param cc compilation context
-   */
-  private void removeEmpty(final CompileContext cc) {
-    if(!((Checks<Expr>) expr -> expr == Empty.VALUE).any(exprs)) return;
-
-    final ExprList list = new ExprList(exprs.length - 1);
-    for(final Expr expr : exprs) {
-      if(expr != Empty.VALUE) list.add(expr);
-    }
-    cc.info(OPTREMOVE_X_X, Empty.VALUE, (Supplier<?>) this::description);
-    exprs = list.finish();
   }
 
   /**

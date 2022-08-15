@@ -38,12 +38,7 @@ public final class SwitchGroup extends Arr {
     // compile and simplify branches
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
-      try {
-        exprs[e] = exprs[e].compile(cc);
-      } catch(final QueryException ex) {
-        // replace original expression with error
-        exprs[e] = cc.error(ex, exprs[e]);
-      }
+      exprs[e] = cc.compileOrError(exprs[e], false);
     }
     return optimize(cc);
   }
