@@ -402,7 +402,7 @@ public abstract class SimpleMap extends Arr {
 
     exprType.assign(list.peek().seqType(), new long[] { min, max });
     exprs = list.finish();
-    return size() == 0 && !has(Flag.NDT) ? cc.emptySeq(this) : null;
+    return size() == 0 && !has(Flag.NDT, Flag.HOF) ? cc.emptySeq(this) : null;
   }
 
   @Override
