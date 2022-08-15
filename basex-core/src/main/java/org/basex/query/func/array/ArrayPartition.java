@@ -1,9 +1,8 @@
 package org.basex.query.func.array;
 
-import java.util.function.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -18,25 +17,42 @@ import org.basex.query.value.type.*;
  */
 public final class ArrayPartition extends ArrayFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc);
-    final FItem breakWhen = toFunction(exprs[1], 2, qc);
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return new Iter() {
+      final Iter input = exprs[0].iter(qc);
+      final FItem breakWhen = toFunction(exprs[1], 2, qc);
+      Value value = Empty.VALUE;
 
-    final ValueBuilder vb = new ValueBuilder(qc);
-    final Consumer<Value> add = v -> {
-      if(v != Empty.VALUE) vb.add(XQArray.member(v));
-    };
-    Value value = Empty.VALUE;
-    for(final Item item : input) {
-      if(toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
-        add.accept(value);
-        value = item;
-      } else {
-        value = ValueBuilder.concat(value, item, qc);
+      @Override
+      public Item next() throws QueryException {
+        while(value != null) {
+          qc.checkStop();
+          final Item item = input.next();
+          if(item == null || toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
+            final Item member = member(value);
+            value = item;
+            if(member != Empty.VALUE) return member;
+          } else {
+            value = ValueBuilder.concat(value, item, qc);
+          }
+        }
+        return null;
       }
-    }
-    add.accept(value);
-    return vb.value(this);
+    };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc, this);
+  }
+
+  /**
+   * Returns a new array member or a empty sequence.
+   * @param value value to be wrapped
+   * @return new entry
+   */
+  private Item member(final Value value) {
+    return value != Empty.VALUE ? XQArray.member(value) : Empty.VALUE;
   }
 
   @Override

@@ -486,12 +486,18 @@ public class Fn4ModuleTest extends QueryPlanTest {
     String fn = " function($seq, $curr) { true() }";
     query(func.args(" ()", fn), "");
     query(func.args(1, fn), "[1]");
-    query(func.args(" (1 to 1000)", " function($seq, $curr) { false() }") + " => count()", 1);
+    query(func.args(" (1 to 1000)", fn) + " => count()", 1000);
+    query(func.args(" (1 to 1000)[. < 3]", fn) + " => count()", 2);
+    query(func.args(" (1 to 1000)[. < 2]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 1]", fn) + " => count()", 0);
 
     fn = " function($seq, $curr) { false() }";
     query(func.args(" ()", fn), "");
     query(func.args(1, fn), "[1]");
-    query(func.args(" (1 to 1000)", " function($seq, $curr) { true() }") + " => count()", 1000);
+    query(func.args(" (1 to 1000)", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 3]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 2]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 1]", fn) + " => count()", 0);
 
     fn = " function($seq, $curr) { not($seq = $curr) }";
     query(func.args(" (1, 1)", fn), "[(1,1)]");
