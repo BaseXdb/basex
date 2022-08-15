@@ -60,9 +60,8 @@ public class FnApply extends StandardFunc {
       }
     }
 
-    final boolean updating = this instanceof UpdateApply;
     ft = exprs[0].funcType();
-    if(ft != null && !updating) exprType.assign(ft.declType);
+    if(ft != null) exprType.assign(ft.declType);
     return this;
   }
 }

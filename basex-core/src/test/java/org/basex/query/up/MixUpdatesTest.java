@@ -100,4 +100,29 @@ public final class MixUpdatesTest extends SandboxTest {
     query("for-each(1, update:output#1)", 1);
     query("apply(update:output#1, [1])", 1);
   }
+
+  /** Test method. */
+  @Test public void gh2136() {
+    query(_XQUERY_EVAL.args(" '<a/> update { }'"), "<a/>");
+    query(_XQUERY_EVAL.args(" 'function() { <a/> update { } }'") + "()", "<a/>");
+    query(_XQUERY_EVAL.args(" 'function() { <a/> update { } }'") + " ! .()", "<a/>");
+
+    query("<x/> !" + FOR_EACH_PAIR.args(" .", " .", " contains#2"), true);
+    query("<x/> !" + _UPDATE_FOR_EACH_PAIR.args(" .", " .", " contains#2"), true);
+
+    query("<x/> !" + FOR_EACH_PAIR.args(" .", " .",
+        " function($k, $v) {" + _UPDATE_OUTPUT.args(1) + "}"), 1);
+    query("<x/> !" + _UPDATE_FOR_EACH_PAIR.args(" .", " .",
+        " function($k, $v) {" + _UPDATE_OUTPUT.args(1) + "}"), 1);
+
+    query("<x/> !" + FOR_EACH_PAIR.args(" .", " .",
+        " function($k, $v) { update:output#1 }") + "(1)", 1);
+    query("<x/> !" + _UPDATE_FOR_EACH_PAIR.args(" .", " .",
+        " function($k, $v) { update:output#1 }") + "(1)", 1);
+
+    query("<x/> !" + FOR_EACH_PAIR.args(" .", " .",
+        " function($k, $v) { update:output#1 }") + " ! .(1)", 1);
+    query("<x/> !" + _UPDATE_FOR_EACH_PAIR.args(" .", " .",
+        " function($k, $v) { update:output#1 }") + " ! .(1)", 1);
+  }
 }

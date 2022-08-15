@@ -375,8 +375,9 @@ public abstract class SimpleMap extends Arr {
    * Determines the type and result size and drops expressions that will never be evaluated.
    * @param cc compilation context
    * @return optimized expression or {@code null}
+   * @throws QueryException query exception
    */
-  private Expr dropOps(final CompileContext cc) {
+  private Expr dropOps(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList(exprs.length);
     long min = 1, max = 1;
     for(final Expr expr : exprs) {
@@ -397,11 +398,12 @@ public abstract class SimpleMap extends Arr {
       }
     }
     final int ls = list.size();
-    if(exprs.length != ls) cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-    if(ls == 1) return exprs[0];
+    if(ls != exprs.length) {
+      cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
+      return ls == 1 ? exprs[0] : get(cc, info, list.finish());
+    }
 
-    exprType.assign(list.peek().seqType(), new long[] { min, max });
-    exprs = list.finish();
+    exprType.assign(exprs[ls - 1].seqType(), new long[] { min, max });
     return size() == 0 && !has(Flag.NDT, Flag.HOF) ? cc.emptySeq(this) : null;
   }
 

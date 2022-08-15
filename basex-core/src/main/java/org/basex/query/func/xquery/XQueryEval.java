@@ -112,11 +112,9 @@ public class XQueryEval extends StandardFunc {
         }
         qctx.parseMain(string(query.read()), null, sctx);
 
-        if(updating) {
-          if(!sc.mixUpdates && !qctx.updating && !qctx.main.expr.vacuous())
-            throw XQUERY_UPDATE2.get(info);
-        } else if(qctx.updating) {
-          throw XQUERY_UPDATE1.get(info);
+        if(!sc.mixUpdates && updating != qctx.updating) {
+          if(!updating) throw XQUERY_UPDATE1.get(info);
+          if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATE2.get(info);
         }
 
         final ValueBuilder vb = new ValueBuilder(qc);
@@ -149,5 +147,10 @@ public class XQueryEval extends StandardFunc {
   public boolean accept(final ASTVisitor visitor) {
     // locked resources cannot be detected statically
     return visitor.lock((String) null) && super.accept(visitor);
+  }
+
+  @Override
+  public boolean updating() {
+    return sc.mixUpdates || super.updating();
   }
 }

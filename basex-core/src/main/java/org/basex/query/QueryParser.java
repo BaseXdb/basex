@@ -285,16 +285,15 @@ public class QueryParser extends InputParser {
     qc.functions.check(qc);
     qc.vars.check();
 
-    // check updating semantics, finalize updating flag
-    if(qc.updating && !sc.mixUpdates) {
-      qc.functions.checkUp();
-      qc.vars.checkUp();
-      if(main != null) {
-        main.expr.checkUp();
-        qc.updating = main.expr.has(Flag.UPD);
-      } else {
-        qc.updating = false;
+    if(qc.updating) {
+      // check updating semantics if updating expressions exist
+      if(!sc.mixUpdates) {
+        qc.functions.checkUp();
+        qc.vars.checkUp();
+        if(main != null) main.expr.checkUp();
       }
+      // check if main expression is updating
+      qc.updating = main != null && main.expr.has(Flag.UPD);
     }
   }
 

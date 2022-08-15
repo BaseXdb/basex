@@ -39,9 +39,8 @@ public class MapForEach extends StandardFunc {
       exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, declType, mtype.declType);
     }
 
-    final boolean updating = this instanceof UpdateMapForEach;
     final FuncType ft = exprs[1].funcType();
-    if(ft != null && !updating) exprType.assign(ft.declType.type);
+    if(ft != null) exprType.assign(ft.declType.type);
 
     return this;
   }

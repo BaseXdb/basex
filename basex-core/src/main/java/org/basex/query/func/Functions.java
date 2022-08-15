@@ -335,7 +335,7 @@ public final class Functions {
     // built-in functions
     final StandardFunc sf = get(name, args, sc, ii);
     if(sf != null) {
-      if(sf.definition.has(Flag.UPD)) qc.updating();
+      if(sf.updating()) qc.updating();
       return sf;
     }
 

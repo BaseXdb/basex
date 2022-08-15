@@ -73,9 +73,8 @@ public class FnForEachPair extends StandardFunc {
         st2.with(Occ.EXACTLY_ONE));
 
     // assign type after coercion (expression might have changed)
-    final boolean updating = this instanceof UpdateForEachPair;
     final FuncType ft = exprs[2].funcType();
-    if(ft != null && !updating) {
+    if(ft != null) {
       final SeqType declType = ft.declType;
       final boolean oneOrMore = st1.oneOrMore() && st2.oneOrMore() && declType.oneOrMore();
       final long size = declType.zero() ? 0 : declType.one() ?
