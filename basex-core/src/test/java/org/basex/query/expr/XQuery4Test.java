@@ -89,10 +89,86 @@ public final class XQuery4Test extends QueryPlanTest {
 
     query("- ->{ . }(1)", -1);
     query("--->{ . }(1)", 1);
-    query("1-->{ . }(2)", -1);
-    query("1--->{ . }(2)", 3);
 
     error("-> { . }(())", INVPROMOTE_X_X_X);
     error("-> { . }(1 to 5)", INVPROMOTE_X_X_X);
+
+    error("function() { . + $i }", VARUNDEF_X);
+    error("-> { . + $i }", VARUNDEF_X);
+  }
+
+  /** Thin arrow operator. */
+  @Test public void thinArrow() {
+    query("() -> { }", "");
+    query("1 -> { }", "");
+    query("() -> { . }", "");
+    query("1 -> { . }", 1);
+    query("(1, 2) -> { . }", "1\n2");
+    query("0 -> { 1, 2 }", "1\n2");
+    query("(0 to 5) -> { . + 1 }", "1\n2\n3\n4\n5\n6");
+
+    query("'abc' -> upper-case() -> tokenize('\\s+')", "ABC");
+    query("(1, 4, 9, 16, 25, 36) -> math:sqrt() -> { . + 1 } => sum()", 27);
+
+    query("('$' -> concat(?))('x')", "$x");
+    query("'$' -> concat('x')", "$x");
+
+    final String eqname = "Q{http://www.w3.org/2005/xpath-functions}";
+    query("'xyz' -> " + eqname + "contains('x')", true);
+    query("('a', 'b') -> (" + eqname + "contains('abc', ?))()", "true\ntrue");
+
+    query("('no', 'yes') -> identity()", "no\nyes");
+    query("('no', 'yes') -> identity() => identity()", "no\nyes");
+    query("('no', 'yes') => identity() -> identity()", "no\nyes");
+
+    query("(1 to 9) -> count() => count()", 9);
+    query("(1 to 9) => count() -> count()", 1);
+
+    query("2 > 3 -> { 1 }", true);
+    query("1-->{.}(2)", -1);
+    query("1 - -> { . }(2)", -1);
+    query("1--->{.}(2)", 3);
+    query("1 - - -> { . }(3)", 4);
+    query("-5 -> abs()", 5);
+    query("(-6) -> abs()", 6);
+
+    query("'abc' -> ((starts-with#2, ends-with#2) => head())('a')", true);
+    query("'abc' -> ((starts-with#2, ends-with#2) => tail())('a')", false);
+
+    query("(-5 to 0) -> (abs#1)() => sum()", 15);
+    query("let $x := abs#1 return (-5 to 0) -> $x() => sum()", 15);
+    query("for $x in abs#1 return (-5 to 0) -> $x() => sum()", 15);
+    query("declare variable $ABS := abs#1; (-5 to 0) -> $ABS() => sum()", 15);
+
+    query("1 -> ([ 'A' ])()", "A");
+    query("1 -> (array { 'B' })()", "B");
+    query("(1, 2) -> (array { 'C', 'D' })()", "C\nD");
+    query("1 -> (map { 1: 'V' })()", "V");
+    query("(1, 2) -> (map { 1: 'W', 2: 'X' })()", "W\nX");
+    query("let $map := map { 0: 'off', 1: 'on' } return 1 -> $map()", "on");
+    query("(1, 2) -> ([ 3[2], 1[0] ])()", "");
+
+    query("256 ! 2 -> xs:byte()", 2);
+    query("(256 ! 2) -> xs:byte()", 2);
+    query("256 ! (2 -> xs:byte())", 2);
+
+    query("'Jemand musste Josef K. verleumdet haben.'"
+        + "=> tokenize() -> string-length() -> { . + 1 } => sum()",
+        41);
+    query("'Happy families are all alike; every unhappy family is unhappy in its own way.'"
+      + "=> tokenize()"
+      + "-> { upper-case(substring(., 1, 1)) || lower-case(substring(., 2)) }"
+      + "=> string-join(' ')",
+      "Happy Families Are All Alike; Every Unhappy Family Is Unhappy In Its Own Way.");
+
+    error("2 ! 256 -> xs:byte()", FUNCCAST_X_X_X);
+    error("1 -> if()", RESERVED_X);
+    error("0 -> unknown()", WHICHFUNC_X);
+    error("0 -> unknown(?)", WHICHFUNC_X);
+    error("0 -> local:unknown()", WHICHFUNC_X);
+    error("0 -> local:unknown(?)", WHICHFUNC_X);
+    error("0 -> Q{}unknown()", WHICHFUNC_X);
+    error("0 -> Q{}unknown(?)", WHICHFUNC_X);
+    error("let $_ := 0 return 0 -> $_()", INVFUNCITEM_X_X);
   }
 }

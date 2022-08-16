@@ -41,11 +41,11 @@ public final class DynFuncCall extends FuncCall {
    * @param info input info
    * @param sc static context
    * @param expr function expression
-   * @param arg arguments
+   * @param args arguments
    */
   public DynFuncCall(final InputInfo info, final StaticContext sc, final Expr expr,
-      final Expr... arg) {
-    this(info, sc, false, false, expr, arg);
+      final Expr... args) {
+    this(info, sc, false, false, expr, args);
   }
 
   /**
@@ -55,12 +55,12 @@ public final class DynFuncCall extends FuncCall {
    * @param updating updating flag
    * @param ndt non-deterministic flag
    * @param expr function expression
-   * @param arg arguments
+   * @param args arguments
    */
   public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
-      final boolean ndt, final Expr expr, final Expr... arg) {
+      final boolean ndt, final Expr expr, final Expr... args) {
 
-    super(info, ExprList.concat(arg, expr));
+    super(info, ExprList.concat(args, expr));
     this.sc = sc;
     this.updating = updating;
     this.ndt = ndt;
