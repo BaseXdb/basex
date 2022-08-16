@@ -235,7 +235,8 @@ public interface QueryText {
   /** Parser token. */ String PRAGMA2 = "#)";
   /** Parser Token. */ String QUESTION = "?";
   /** Parser Token. */ String ASTERISK = "*";
-  /** Parser token. */ String ARROW = "=>";
+  /** Parser token. */ String FATARROW = "=>";
+  /** Parser token. */ String THINARROW = "->";
   /** Parser token. */ String TERNARY1 = "??";
   /** Parser token. */ String TERNARY2 = "!!";
   /** Parser token. */ String ELVIS = "?:";

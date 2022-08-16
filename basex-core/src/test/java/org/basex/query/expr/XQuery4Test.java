@@ -62,4 +62,37 @@ public final class XQuery4Test extends QueryPlanTest {
     query("count((1 to 10)[. = 0] otherwise (1 to 6) ! string())", 6);
     query("count((1 to 10)[. = 0] otherwise sort((1 to 6)[. = 3]) otherwise 1)", 1);
   }
+
+  /** Function item, arrow. */
+  @Test public void functionItemArrow() {
+    query("->() { }()", "");
+    query("->($a) { $a }(())", "");
+    query("->($a) { $a }(1)", 1);
+    query("->($a) { $a }(1 to 2)", "1\n2");
+    query("->($a, $b) { $a + $b }(1, 2)", 3);
+    query("sum((1 to 6) ! ->($a) { $a * $a }(.))", 91);
+    query("sum(for $i in 1 to 6  return ->($a) { $a * $a }($i))", 91);
+
+    query("- ->(){ 1 }()", -1);
+    query("--->(){ 1 }()", 1);
+    query("1-->(){ 2 }()", -1);
+    query("1--->(){ 2 }()", 3);
+  }
+
+  /** Function item, no parameter list. */
+  @Test public void functionContextItem() {
+    query("function { . + 1 }(1)", 2);
+    query("-> { . + 1 }(1)", 2);
+    query("-> { . + . }(1)", 2);
+    query("sum((1 to 6) ! -> { . * . }(.))", 91);
+    query("sum(for $i in 1 to 6  return -> { . * . }($i))", 91);
+
+    query("- ->{ . }(1)", -1);
+    query("--->{ . }(1)", 1);
+    query("1-->{ . }(2)", -1);
+    query("1--->{ . }(2)", 3);
+
+    error("-> { . }(())", INVPROMOTE_X_X_X);
+    error("-> { . }(1 to 5)", INVPROMOTE_X_X_X);
+  }
 }

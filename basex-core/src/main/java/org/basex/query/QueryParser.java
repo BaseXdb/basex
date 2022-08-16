@@ -1720,7 +1720,7 @@ public class QueryParser extends InputParser {
   private Expr arrow() throws QueryException {
     Expr ex = transformWith();
     if(ex != null) {
-      while(wsConsume(ARROW)) {
+      while(wsConsume(FATARROW)) {
         skipWs();
         final Expr e;
         if(curr('(')) {
@@ -1778,7 +1778,7 @@ public class QueryParser extends InputParser {
     boolean minus = false, found = false;
     do {
       skipWs();
-      if(consume('-')) {
+      if(next() != '>' && consume('-')) {
         minus ^= true;
       } else if(consume('+')) {
       } else {
@@ -2296,18 +2296,28 @@ public class QueryParser extends InputParser {
     // parse annotations
     final AnnList anns = annotations(false).check(false, true);
     // inline function
-    if(wsConsume(FUNCTION) && wsConsume(PAREN1)) {
+    if(wsConsume(THINARROW) || wsConsume(FUNCTION)) {
       if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
         throw error(NOVISALLOWED);
 
       final HashMap<Var, Expr> global = new HashMap<>();
       localVars.pushContext(global);
-      final Var[] params = paramList();
-      wsCheck(PAREN2);
-      final SeqType type = optAsType();
-      final Expr body = enclosedExpr();
+      Var[] params = null;
+      Expr body = null;
+      SeqType type = null;
+      if(wsConsume(PAREN1)) {
+        params = paramList();
+        wsCheck(PAREN2);
+        type = optAsType();
+        body = enclosedExpr();
+      } else if(curr('{')) {
+        final QNm qnm = new QNm("i");
+        final Var var = new Var(qnm, SeqType.ITEM_O, true, qc, sc, info());
+        params = new Var[] { localVars.add(var) };
+        body = new CachedMap(info(), new VarRef(var.info(), var), enclosedExpr());
+      }
       final VarScope vs = localVars.popContext();
-      return new Closure(info(), type, params, body, anns, global, vs);
+      if(body != null) return new Closure(info(), type, params, body, anns, global, vs);
     }
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);
