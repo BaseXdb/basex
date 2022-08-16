@@ -1726,8 +1726,7 @@ public class QueryParser extends InputParser {
         if(curr('(')) {
           e = parenthesized();
         } else if(curr('$')) {
-          final InputInfo ii = info();
-          e = localVars.resolve(varName(), ii);
+          e = varRef();
         } else {
           e = eQName(ARROWSPEC, sc.funcNS);
         }
@@ -2311,10 +2310,11 @@ public class QueryParser extends InputParser {
         type = optAsType();
         body = enclosedExpr();
       } else if(curr('{')) {
-        final QNm qnm = new QNm("i");
-        final Var var = new Var(qnm, SeqType.ITEM_O, true, qc, sc, info());
+        final InputInfo ii = info();
+        final QNm qnm = new QNm("arg");
+        final Var var = new Var(qnm, SeqType.ITEM_O, true, qc, sc, ii);
         params = new Var[] { localVars.add(var) };
-        body = new CachedMap(info(), new VarRef(var.info(), var), enclosedExpr());
+        body = new CachedMap(ii, localVars.resolve(qnm, ii), enclosedExpr());
       }
       final VarScope vs = localVars.popContext();
       if(body != null) return new Closure(info(), type, params, body, anns, global, vs);
