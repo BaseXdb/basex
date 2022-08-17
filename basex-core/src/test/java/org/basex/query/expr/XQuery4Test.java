@@ -171,4 +171,57 @@ public final class XQuery4Test extends QueryPlanTest {
     error("0 -> Q{}unknown(?)", WHICHFUNC_X);
     error("let $_ := 0 return 0 -> $_()", INVFUNCITEM_X_X);
   }
+
+  /** Generalized element/attribute tests. */
+  @Test public void elemAttrTest() {
+    String prefix = "<xml:a/> instance of ";
+    query(prefix + "element()", true);
+    query(prefix + "element(*)", true);
+    query(prefix + "element(*:a)", true);
+    query(prefix + "element(xml:*)", true);
+    query(prefix + "element(xml:a)", true);
+    query(prefix + "element(Q{http://www.w3.org/XML/1998/namespace}a)", true);
+    query(prefix + "element(Q{http://www.w3.org/XML/1998/namespace}*)", true);
+
+    query(prefix + "xs:string", false);
+    query(prefix + "text()", false);
+    query(prefix + "element(*:b)", false);
+    query(prefix + "element(xsi:*)", false);
+    query(prefix + "element(xml:b)", false);
+    query(prefix + "element(xsi:a)", false);
+    query(prefix + "element(Q{X}a)", false);
+    query(prefix + "element(Q{http://www.w3.org/XML/1998/namespace}b)", false);
+
+    query(prefix + "element(*, xs:untyped)", true);
+    query(prefix + "element(*, xs:anyType)", true);
+    error(prefix + "element(*, xs:string)", STATIC_X);
+    error(prefix + "element(*, xs:untypedAtomic)", STATIC_X);
+    error(prefix + "element(*, xs:xyz)", TYPEUNDEF_X);
+
+    prefix = "<_ xml:a=''/>/@* instance of ";
+    query(prefix + "attribute()", true);
+    query(prefix + "attribute(*)", true);
+    query(prefix + "attribute(*:a)", true);
+    query(prefix + "attribute(xml:*)", true);
+    query(prefix + "attribute(xml:a)", true);
+    query(prefix + "attribute(Q{http://www.w3.org/XML/1998/namespace}a)", true);
+    query(prefix + "attribute(Q{http://www.w3.org/XML/1998/namespace}*)", true);
+
+    query(prefix + "xs:string", false);
+    query(prefix + "text()", false);
+    query(prefix + "attribute(*:b)", false);
+    query(prefix + "attribute(xsi:*)", false);
+    query(prefix + "attribute(xml:b)", false);
+    query(prefix + "attribute(xsi:a)", false);
+    query(prefix + "attribute(Q{X}a)", false);
+    query(prefix + "attribute(Q{http://www.w3.org/XML/1998/namespace}b)", false);
+
+    query(prefix + "attribute(*, xs:untyped)", true);
+    query(prefix + "attribute(*, xs:anyType)", true);
+    query(prefix + "attribute(*, xs:anySimpleType)", true);
+    query(prefix + "attribute(*, xs:anyAtomicType)", true);
+    query(prefix + "attribute(*, xs:untypedAtomic)", true);
+    error(prefix + "attribute(*, xs:string)", STATIC_X);
+    error(prefix + "attribute(*, xs:xyz)", TYPEUNDEF_X);
+  }
 }
