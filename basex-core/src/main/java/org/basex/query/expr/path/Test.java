@@ -1,7 +1,5 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.value.type.AtomType.*;
-import static org.basex.query.value.type.NodeType.*;
 
 import java.util.*;
 import java.util.List;
@@ -36,28 +34,13 @@ public abstract class Test extends ExprInfo {
   /**
    * Returns a node test, a name test or {@code null}.
    * @param type node type (element, attribute, processing instruction)
-   * @param name node name
-   * @return test or {@code null}
-   */
-  public static Test get(final NodeType type, final QNm name) {
-    return get(type, name, null, null);
-  }
-
-  /**
-   * Returns a node test, a name test or {@code null}.
-   * @param type node type (element, attribute, processing instruction)
    * @param name node name (can be {@code null})
-   * @param ann type annotation (can be {@code null})
-   * @param ns default element namespace (can be {@code null})
-   * @return test or {@code null}
+   * @param defaultNs default element namespace (used for optimizations, can be {@code null})
+   * @return test
    */
-  public static Test get(final NodeType type, final QNm name, final Type ann, final byte[] ns) {
-    if(ann == null || ann.oneOf(ANY_TYPE, UNTYPED) ||
-        type == ATTRIBUTE && ann.oneOf(ANY_SIMPLE_TYPE, ANY_ATOMIC_TYPE, UNTYPED_ATOMIC)) {
-      return name == null ? KindTest.get(type) : new NameTest(name,
-        type == PROCESSING_INSTRUCTION ? NamePart.LOCAL : NamePart.FULL, type, ns);
-    }
-    return null;
+  public static Test get(final NodeType type, final QNm name, final byte[] defaultNs) {
+    final NamePart part = type == NodeType.PROCESSING_INSTRUCTION ? NamePart.LOCAL : NamePart.FULL;
+    return new NameTest(name, part, type, defaultNs);
   }
 
   /**

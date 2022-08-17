@@ -47,7 +47,7 @@ public final class CAttr extends CName {
       if(nm != null) {
         name = nm;
         exprType.assign(SeqType.get(NodeType.ATTRIBUTE, Occ.EXACTLY_ONE,
-            Test.get(NodeType.ATTRIBUTE, nm)));
+            Test.get(NodeType.ATTRIBUTE, nm, null)));
       }
     }
     optValue(cc);

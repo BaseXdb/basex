@@ -491,8 +491,7 @@ public final class RestXqFunction extends WebFunction {
 
       // message
       if(name != null && name.hasPrefix() && !name.hasURI()) throw error(INV_NONS_X, name);
-      final NameTest test = part != null ?
-        new NameTest(name, part, NodeType.ELEMENT, null) : null;
+      final NameTest test = part != null ? new NameTest(name, part, NodeType.ELEMENT, null) : null;
 
       final Function<NameTest, String> toString = t -> t != null ? t.toString() : "*";
       if(!error.isEmpty()) {

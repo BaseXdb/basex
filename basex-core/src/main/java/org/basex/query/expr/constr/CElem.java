@@ -66,7 +66,7 @@ public final class CElem extends CName {
       if(nm != null) {
         name = nm;
         exprType.assign(SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
-            Test.get(NodeType.ELEMENT, nm)));
+            Test.get(NodeType.ELEMENT, nm, null)));
       }
     }
 

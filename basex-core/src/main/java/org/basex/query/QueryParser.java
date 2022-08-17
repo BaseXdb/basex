@@ -429,7 +429,7 @@ public class QueryParser extends InputParser {
       } else if(consume('%')) {
         skipWs();
         final InputInfo ii = info();
-        final QNm name = eQName(QNAME_X, XQ_URI);
+        final QNm name = eQName(XQ_URI, QNAME_X);
 
         final ItemList items = new ItemList();
         if(wsConsumeWs(PAREN1)) {
@@ -545,7 +545,7 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     skipWs();
-    final QNm qname = eQName(QNAME_X, XQ_URI);
+    final QNm qname = eQName(XQ_URI, QNAME_X);
     final byte[] value = stringLiteral();
     final String name = string(qname.local());
 
@@ -619,7 +619,7 @@ public class QueryParser extends InputParser {
     if(def && !wsConsumeWs(DECIMAL_FORMAT)) return false;
 
     // use empty name for default declaration
-    final QNm name = def ? QNm.EMPTY : eQName(QNAME_X, null);
+    final QNm name = def ? QNm.EMPTY : eQName(null, QNAME_X);
 
     // check if format has already been declared
     if(sc.decFormats.get(name.id()) != null) throw error(DECDUPL);
@@ -911,7 +911,7 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
-    final QNm name = checkReserved(eQName(FUNCNAME, sc.funcNS));
+    final QNm name = checkReserved(eQName(sc.funcNS, FUNCNAME));
     wsCheck(PAREN1);
     if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
 
@@ -1596,7 +1596,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr otherwise() throws QueryException {
-    Expr ex = union();
+    final Expr ex = union();
     if(ex == null || !wsConsumeWs(OTHERWISE)) return ex;
     final ExprList el = new ExprList(ex);
     do add(el, union()); while(wsConsume(OTHERWISE));
@@ -1635,7 +1635,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
-    Expr ex = instanceoff();
+    Expr ex = instanceOf();
     boolean lastIs = false;
     ExprList el = null;
     while(true) {
@@ -1647,7 +1647,7 @@ public class QueryParser extends InputParser {
       }
       lastIs = is;
       if(el == null) el = new ExprList(ex);
-      add(el, instanceoff());
+      add(el, instanceOf());
     }
     return el != null ? intersectExcept(lastIs, el) : ex;
   }
@@ -1667,7 +1667,7 @@ public class QueryParser extends InputParser {
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr instanceoff() throws QueryException {
+  private Expr instanceOf() throws QueryException {
     final Expr ex = treat();
     if(!wsConsumeWs(INSTANCE)) return ex;
     wsCheck(OF);
@@ -1734,7 +1734,7 @@ public class QueryParser extends InputParser {
         skipWs();
         final boolean enclosed = thin && curr('{');
         final Expr e = enclosed ? enclosedExpr() : curr('(') ? parenthesized() :
-          curr('$') ? varRef() : eQName(ARROWSPEC, sc.funcNS);
+          curr('$') ? varRef() : eQName(sc.funcNS, ARROWSPEC);
 
         final InputInfo ii = info();
         if(enclosed) {
@@ -1810,7 +1810,7 @@ public class QueryParser extends InputParser {
 
     if(consume(TYPE)) {
       final InputInfo ii = info();
-      qnames.add(eQName(QNAME_X, SKIPCHECK), ii);
+      qnames.add(eQName(SKIPCHECK, QNAME_X), ii);
     }
     consume(STRICT);
     consume(LAX);
@@ -1849,7 +1849,7 @@ public class QueryParser extends InputParser {
 
     final ArrayList<Pragma> el = new ArrayList<>();
     do {
-      final QNm name = eQName(QNAME_X, null);
+      final QNm name = eQName(null, QNAME_X);
       char ch = curr();
       if(ch != '#' && !ws(ch)) throw error(PRAGMAINV);
       token.reset();
@@ -2074,8 +2074,8 @@ public class QueryParser extends InputParser {
     if(consume('*')) {
       p = pos;
       if(consume(':')) {
-        // name test: *:name
         if(!consume('*')) {
+          // name test: *:name
           return new NameTest(new QNm(ncName(QNAME_X)), NamePart.LOCAL, type, sc.elemNS);
         }
       }
@@ -2088,17 +2088,17 @@ public class QueryParser extends InputParser {
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
         // name test: Q{uri}*
-        final QNm name = new QNm(COLON, uri);
-        return new NameTest(name, NamePart.URI, type, sc.elemNS);
+        return new NameTest(new QNm(COLON, uri), NamePart.URI, type, sc.elemNS);
       }
     }
     pos = p;
 
     final InputInfo ii = info();
-    QNm name = eQName(null, SKIPCHECK);
+    QNm name = eQName(SKIPCHECK, null);
     if(name != null) {
       p = pos;
       if(all && wsConsumeWs(PAREN1)) {
+        // kind test
         final NodeType nt = NodeType.find(name);
         if(nt != null) {
           final Test test = kindTest(nt);
@@ -2322,7 +2322,7 @@ public class QueryParser extends InputParser {
 
     // named function reference
     pos = p;
-    final QNm name = eQName(null, sc.funcNS);
+    final QNm name = eQName(sc.funcNS, null);
     if(name != null && wsConsumeWs(HSH)) {
       checkReserved(name);
       final char ch = curr();
@@ -2463,7 +2463,7 @@ public class QueryParser extends InputParser {
   private QNm varName() throws QueryException {
     check('$');
     skipWs();
-    return eQName(NOVARNAME, null);
+    return eQName(null, NOVARNAME);
   }
 
   /**
@@ -2517,7 +2517,7 @@ public class QueryParser extends InputParser {
    */
   private Expr functionCall() throws QueryException {
     final int p = pos;
-    final QNm name = eQName(null, sc.funcNS);
+    final QNm name = eQName(sc.funcNS, null);
     if(name != null && !reserved(name)) {
       skipWs();
       final InputInfo ii = info();
@@ -2939,7 +2939,7 @@ public class QueryParser extends InputParser {
 
     final Expr name;
     final InputInfo ii = info();
-    final QNm qn = eQName(null, SKIPCHECK);
+    final QNm qn = eQName(SKIPCHECK, null);
     if(qn != null) {
       name = qn;
       qnames.add(qn, ii);
@@ -2963,7 +2963,7 @@ public class QueryParser extends InputParser {
 
     final Expr name;
     final InputInfo ii = info();
-    final QNm qn = eQName(null, SKIPCHECK);
+    final QNm qn = eQName(SKIPCHECK, null);
     if(qn != null) {
       name = qn;
       qnames.add(qn, false, ii);
@@ -3044,7 +3044,7 @@ public class QueryParser extends InputParser {
    */
   private SeqType simpleType() throws QueryException {
     skipWs();
-    final QNm name = eQName(TYPEINVALID, sc.elemNS);
+    final QNm name = eQName(sc.elemNS, TYPEINVALID);
     Type type = ListType.find(name);
     if(type == null) {
       type = AtomType.find(name, false);
@@ -3101,7 +3101,7 @@ public class QueryParser extends InputParser {
 
     // parse optional annotation and type name
     final AnnList anns = annotations(false).check(false, false);
-    final QNm name = eQName(TYPEINVALID, null);
+    final QNm name = eQName(null, TYPEINVALID);
     skipWs();
     // check if name is followed by parentheses
     final boolean func = curr('(');
@@ -3185,7 +3185,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "ElementTest" rule without the type name and the opening bracket.
+   * Parses the "KindTest" rule without the type name and the opening bracket.
    * @param type type
    * @return test or {@code null}
    * @throws QueryException query exception
@@ -3194,8 +3194,8 @@ public class QueryParser extends InputParser {
     final Test tp;
     switch(type) {
       case DOCUMENT_NODE: tp = documentTest(); break;
-      case ELEMENT: tp = elementTest(); break;
-      case ATTRIBUTE: tp = attributeTest(); break;
+      case ELEMENT: tp = elemAttrTest(type); break;
+      case ATTRIBUTE: tp = elemAttrTest(type); break;
       case PROCESSING_INSTRUCTION:  tp = piTest(); break;
       case SCHEMA_ELEMENT:
       case SCHEMA_ATTRIBUTE: tp = schemaTest(); break;
@@ -3216,37 +3216,9 @@ public class QueryParser extends InputParser {
 
     wsCheck(PAREN1);
     skipWs();
-    final Test test = elem ? elementTest() : schemaTest();
+    final Test test = elem ? elemAttrTest(NodeType.ELEMENT) : schemaTest();
     wsCheck(PAREN2);
     return new DocTest(test != null ? test : KindTest.ELEMENT);
-  }
-
-  /**
-   * Parses the "ElementTest" rule without the leading keyword and its brackets.
-   * @return test or {@code null}
-   * @throws QueryException query exception
-   */
-  private Test elementTest() throws QueryException {
-    final QNm name = eQName(null, sc.elemNS);
-    final boolean wc = name == null && consume(ASTERISK);
-    if(name != null || wc) {
-      Type ann = null;
-      if(wsConsumeWs(COMMA)) {
-        // parse type name
-        final QNm tn = eQName(QNAME_X, sc.elemNS);
-        ann = ListType.find(tn);
-        if(ann == null) ann = AtomType.find(tn, true);
-        if(ann == null) throw error(TYPEUNDEF_X, AtomType.similar(tn));
-        // parse (and ignore) optional question mark
-        wsConsume(QUESTION);
-      }
-      if(ann != null || !wc) {
-        final Test test = Test.get(NodeType.ELEMENT, name, ann, sc.elemNS);
-        if(test == null) throw error(STATIC_X, ann);
-        return test;
-      }
-    }
-    return null;
   }
 
   /**
@@ -3255,34 +3227,48 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test schemaTest() throws QueryException {
-    final QNm name = eQName(QNAME_X, sc.elemNS);
-    throw error(SCHEMAINV_X, name);
+    throw error(SCHEMAINV_X, eQName(sc.elemNS, QNAME_X));
   }
 
   /**
-   * Parses the "AttributeTest" rule without the leading keyword and its brackets.
+   * Parses the "ElementTest" and "AttributeTest" rule without the leading keyword and brackets.
+   * Parses the "TypeName" rule.
+   * @param type node type
    * @return test or {@code null}
    * @throws QueryException query exception
    */
-  private Test attributeTest() throws QueryException {
-    final QNm name = eQName(null, null);
-    final boolean wc = name == null && consume(ASTERISK);
-    if(name != null || wc) {
-      Type ann = null;
-      if(wsConsumeWs(COMMA)) {
-        // parse type name
-        final QNm tn = eQName(QNAME_X, sc.elemNS);
-        ann = ListType.find(tn);
-        if(ann == null) ann = AtomType.find(tn, true);
-        if(ann == null) throw error(TYPEUNDEF_X, AtomType.similar(tn));
-      }
-      if(ann != null || !wc) {
-        final Test test = Test.get(NodeType.ATTRIBUTE, name, ann, sc.elemNS);
-        if(test == null) throw error(STATIC_X, ann);
-        return test;
-      }
+  private Test elemAttrTest(final NodeType type) throws QueryException {
+    final Test test = nodeTest(type, true);
+    if(test != null) {
+      typeName(type);
+      return test;
+    }
+    final QNm name = eQName(type == NodeType.ELEMENT ? sc.elemNS : null, null);
+    if(name != null) {
+      typeName(type);
+      return Test.get(type, name, sc.elemNS);
     }
     return null;
+  }
+
+  /**
+   * Parses the "TypeName" rule.
+   * @param type node type
+   * @throws QueryException query exception
+   */
+  private void typeName(final NodeType type) throws QueryException {
+    if(wsConsumeWs(COMMA)) {
+      final QNm tn = eQName(sc.elemNS, QNAME_X);
+      Type ann = ListType.find(tn);
+      if(ann == null) ann = AtomType.find(tn, true);
+      if(ann == null) throw error(TYPEUNDEF_X, AtomType.similar(tn));
+      // parse (and ignore) optional question mark
+      if(type == NodeType.ELEMENT) wsConsume(QUESTION);
+      if(!ann.oneOf(AtomType.ANY_TYPE, AtomType.UNTYPED) && (type == NodeType.ELEMENT ||
+         !ann.oneOf(AtomType.ANY_SIMPLE_TYPE, AtomType.ANY_ATOMIC_TYPE, AtomType.UNTYPED_ATOMIC))) {
+        throw error(STATIC_X, ann);
+      }
+    }
   }
 
   /**
@@ -3301,7 +3287,7 @@ public class QueryParser extends InputParser {
     } else {
       return null;
     }
-    return Test.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name));
+    return Test.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name), null);
   }
 
   /**
@@ -3891,12 +3877,12 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "EQName" rule.
+   * @param ns default namespace (can be {@code null}), or {@link #SKIPCHECK} to skip checks
    * @param error optional error message. If not {@code null}, will be raised if no EQName is found
-   * @param ns default namespace, or operation mode ({@link #SKIPCHECK})
    * @return QName or {@code null}
    * @throws QueryException query exception
    */
-  private QNm eQName(final QueryError error, final byte[] ns) throws QueryException {
+  private QNm eQName(final byte[] ns, final QueryError error) throws QueryException {
     final int p = pos;
     if(consume(EQNAME)) {
       final byte[] uri = bracedURILiteral(), name = ncName(null);
