@@ -716,15 +716,15 @@ public enum QueryError {
   IETF_INV_X(FORG, 10, "Invalid input: '%'."),
 
   /** Error code. */
-  REGMOD_X(FORX, 1, "Invalid regular flag: '%'."),
+  REGFLAG_X(FORX, 1, "Invalid regular flag: '%'."),
   /** Error code. */
-  REGPAT_X(FORX, 2, "Invalid regular expression: %."),
+  REGINVALID_X(FORX, 2, "Invalid regular expression: %."),
   /** Error code. */
-  REGROUP_X(FORX, 3, "Pattern matches empty string: '%'."),
+  REGEMPTY_X(FORX, 3, "Pattern matches empty string: '%'."),
   /** Error code. */
-  FUNREPBS_X(FORX, 4, "Invalid backslash in replacement string: %."),
+  REGBACKSLASH_X(FORX, 4, "Invalid backslash in replacement string: %."),
   /** Error code. */
-  FUNREPDOL_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
+  REGDOLLAR_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
 
   /** Error code. */
   FIATOM_X_X(FOTY, 13, "Items of type % cannot be atomized: %."),

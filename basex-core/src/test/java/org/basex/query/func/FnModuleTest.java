@@ -60,7 +60,7 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void analyzeString() {
     final Function func = ANALYZE_STRING;
     query(func.args("a", "", "j") + "//fn:non-match/text()", "a");
-    error(func.args("a", ""), REGROUP_X);
+    error(func.args("a", ""), REGEMPTY_X);
   }
 
   /** Test method. */
@@ -544,8 +544,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(wrap("nöp"), wrap("ö")), true);
     query(func.args(wrap("nop"), wrap(".")), true);
 
-    error(func.args("a", "+"), REGPAT_X);
-    error(func.args("a", "+", "j"), REGPAT_X);
+    error(func.args("a", "+"), REGINVALID_X);
+    error(func.args("a", "+", "j"), REGINVALID_X);
   }
 
   /** Test method. */
@@ -796,12 +796,12 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("a", ".", "b"), "b");
 
     query(func.args("a", "", "x", "j"), "xax");
-    error(func.args("a", "", "x"), REGROUP_X);
+    error(func.args("a", "", "x"), REGEMPTY_X);
 
     // GH-573
     query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
     query(func.args("aaaa AAA 123", "(\\s+\\P{Ll}{3,280}?)", "$1@"), "aaaa AAA@ 123@");
-    error(func.args("asdf", "a{12, 3}", ""), REGPAT_X);
+    error(func.args("asdf", "a{12, 3}", ""), REGINVALID_X);
 
     // GH-1940
     query(func.args("hello", "hel(?:lo)", "$1"), "");
@@ -1277,7 +1277,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" normalize-space(" + wrap("A") + ")", ";"), "A",
         exists(NORMALIZE_SPACE));
 
-    error(func.args("a", ""), REGROUP_X);
+    error(func.args("a", ""), REGEMPTY_X);
   }
 
   /** Test method. */

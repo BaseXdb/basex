@@ -229,6 +229,50 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void replace() {
+    final Function func = REPLACE;
+
+    query(func.args("a", "a", " ()"), "");
+
+    query(func.args("b", "b", " ()", " ()", " function($k, $g) { }"), "");
+    query(func.args("c", "c", " ()", " ()", " function($k, $g) { upper-case($k) }"), "C");
+    query(func.args("de", ".", " ()", " ()", " function($k, $g) { $k || $k }"), "ddee");
+
+    query(func.args("Chapter 9", "[0-9]+", " ()", " ()",
+        " function($k, $g) { string(number($k) + 1) }"), "Chapter 10");
+    query("let $map := map { 'LAX': 'Los Angeles', 'LHR': 'London' } return"
+        + func.args("LHR to LAX", "[A-Z]{3}", " ()", " ()",
+        " function($s, $g) { $map($s) }"), "London to Los Angeles");
+    query(func.args("57°43′30″", "([0-9]+)°([0-9]+)′([0-9]+)″", " ()", " ()", " function($s, $g) "
+        + "{ string(number($g[1]) + number($g[2]) div 60 + number($g[3]) div 3600) || '°' }"),
+        "57.725°");
+    query(func.args("A1 B234", "([A-Z]+)([0-9]+)", " ()", " ()",
+        " function($s, $g) { string-join(characters($g[2]) ! ($g[1] || .)) }"),
+        "A1 B2B3B4");
+    query(func.args("A(0)B(1)C(0)D(9)", "(.)\\((\\d)\\)", " ()", " ()",
+        " function($s, $g) { $g[1][$g[2] != '0'] }"),
+        "BD");
+    query(func.args("chop first character ", "(.).*? ", " ()", " ()", " substring-after#2"),
+        "hop irst haracter ");
+    query(func.args("12345678", ".(.)", " ()", " ()", " replace(?, ?, '')"),
+        1357);
+    query("for $function in (head#1, tail#1) return" +
+        func.args("1234", "(.)(.)", " ()", " ()", " function($s, $g) { $function($g) }"),
+        "13\n24");
+    query("for $function in (substring-before#2, substring-after#2) return" +
+        func.args("1234", ".(..)", " ()", " ()", " $function"),
+        "14\n4");
+    query("for $before in (true(), false()) "
+        + "let $name := 'fn:substring-' || (if($before) then 'before' else 'after') "
+        + "let $function := function-lookup(xs:QName($name), 2) "
+        + "return" + func.args("1234", ".(..)", " ()", " ()", " $function"),
+        "14\n4");
+
+    error(func.args("W", ".*", " ()", " ()", " function($k, $g) { }"), REGEMPTY_X);
+    error(func.args("X", ".", " ()", " ()", " contains#2"), INVCONVERT_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void replicate() {
     final Function func = REPLICATE;
 

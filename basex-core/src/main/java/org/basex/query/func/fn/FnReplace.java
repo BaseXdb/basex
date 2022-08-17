@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -39,10 +40,10 @@ public final class FnReplace extends RegEx {
       for(int r = 0; r < rl; ++r) {
         final int n = r + 1 == rl ? 0 : replacement[r + 1];
         if(replacement[r] == '\\') {
-          if(n != '\\' && n != '$') throw FUNREPBS_X.get(info, replacement);
+          if(n != '\\' && n != '$') throw REGBACKSLASH_X.get(info, replacement);
           ++r;
         } else if(replacement[r] == '$' && (r == 0 || replacement[r - 1] != '\\') && !digit(n)) {
-          throw FUNREPDOL_X.get(info, replacement);
+          throw REGDOLLAR_X.get(info, replacement);
         }
       }
 
@@ -97,9 +98,14 @@ public final class FnReplace extends RegEx {
     } catch(final Exception ex) {
       if(ex.getMessage().contains("No group")) {
         Util.debug(ex);
-        throw REGROUP_X.get(info, pattern);
+        throw REGEMPTY_X.get(info, pattern);
       }
-      throw REGPAT_X.get(info, ex);
+      throw REGINVALID_X.get(info, ex);
     }
+  }
+
+  @Override
+  public boolean has(final Flag... flags) {
+    return Flag.HOF.in(flags) && exprs.length > 4 || super.has(flags);
   }
 }

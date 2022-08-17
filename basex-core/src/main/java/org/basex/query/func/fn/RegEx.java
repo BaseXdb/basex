@@ -108,7 +108,7 @@ abstract class RegEx extends StandardFunc {
       else if(mod == 'q') flags |= LITERAL;
       else if(mod == 'x') strip = true;
       else if(mod == 'j' || mod == '!') java = true;
-      else if(mod != ';') throw REGMOD_X.get(info, (char) mod);
+      else if(mod != ';') throw REGFLAG_X.get(info, (char) mod);
     }
 
     try {
@@ -128,7 +128,7 @@ abstract class RegEx extends StandardFunc {
           // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
           final Pattern p = (pattern.flags() & Pattern.MULTILINE) == 0 ? pattern :
             Pattern.compile(pattern.pattern());
-          if(p.matcher("").matches()) throw REGROUP_X.get(info, string);
+          if(p.matcher("").matches()) throw REGEMPTY_X.get(info, string);
         }
         groups = parser.groups();
       }
@@ -140,7 +140,7 @@ abstract class RegEx extends StandardFunc {
 
     } catch(final PatternSyntaxException | ParseException | TokenMgrError ex) {
       Util.debug(ex);
-      throw REGPAT_X.get(info, regex);
+      throw REGINVALID_X.get(info, regex);
     }
   }
 }
