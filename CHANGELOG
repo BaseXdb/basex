@@ -1,3 +1,11 @@
+VERSION 10.1 (August 18, 2022) -----------------------------------------
+
+ - Bug fix: HTTP Requests, sending headers
+ - Bug fix: Storage handling of main-memory databases
+ - Bug fix: GUI editor, double clicks
+ - Bug fix: function items and mixed updates
+ - undocumented XQuery 4 preview features
+
 VERSION 10.0 (August 1, 2022) ------------------------------------------
 
  STORAGE
