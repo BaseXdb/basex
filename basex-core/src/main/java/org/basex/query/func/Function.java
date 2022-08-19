@@ -595,7 +595,8 @@ public enum Function implements AFunction {
       params(MAP_O, ANY_ATOMIC_TYPE_O), ITEM_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_GROUP_BY(MapGroupBy::new, "group-by(input,key)",
-      params(ITEM_ZO, ANY_ATOMIC_TYPE_ZO), MAP_O, flag(HOF), MAP_URI),
+      params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType()),
+      MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
