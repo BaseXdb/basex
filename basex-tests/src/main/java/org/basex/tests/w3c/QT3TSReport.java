@@ -124,7 +124,7 @@ public final class QT3TSReport {
     product.add("version", Prop.VERSION);
     product.add("released", "true");
     product.add("open-source", "true");
-    product.add("language", "XQ31");
+    product.add("language", "XQ40");
 
     // dependency element
     for(final String[] deps : DEPENDENCIES) {

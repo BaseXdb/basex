@@ -334,7 +334,8 @@ public abstract class StandardFunc extends Arr {
     byte[] uri = null;
     if(i < exprs.length) {
       final Item item = exprs[i].atomItem(qc, info);
-      if(!empty && item != Empty.VALUE) uri = toToken(item);
+      if(item != Empty.VALUE) uri = toToken(item);
+      else if(!empty) checkNoEmpty(item);
     }
     return Collation.get(uri, qc, sc, info, WHICHCOLL_X);
   }

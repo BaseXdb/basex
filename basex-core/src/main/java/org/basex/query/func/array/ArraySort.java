@@ -23,7 +23,7 @@ public final class ArraySort extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
-    final Collation coll = toCollation(1, false, qc);
+    final Collation coll = toCollation(1, true, qc);
     final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
 
     final ValueList values = new ValueList(array.arraySize());

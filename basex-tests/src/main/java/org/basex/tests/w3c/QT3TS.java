@@ -452,7 +452,7 @@ public final class QT3TS extends Main {
       // skip default-language
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
-      "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|31)'))" +
+      "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
         ']', ctx).context(test).value().size() == 0;
   }
 

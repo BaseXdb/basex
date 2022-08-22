@@ -35,7 +35,7 @@ public class FnLowest extends StandardFunc {
    */
   Value value(final boolean min, final QueryContext qc) throws QueryException {
     final Iter input = exprs[0].iter(qc);
-    final Collation coll = toCollation(1, false, qc);
+    final Collation coll = toCollation(1, true, qc);
     final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
 
     final ItemList result = new ItemList();
