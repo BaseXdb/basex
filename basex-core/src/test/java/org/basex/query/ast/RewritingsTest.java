@@ -171,7 +171,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() <= -800000000]", "", exists(cmpr));
     check("<a>5</a>[text() > 8000000000000000000]", "", exists(cmpr));
     check("<a>5</a>[text() < -8000000000000000000]", "", exists(cmpr));
-    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", true, empty(cmpr));
+    check("exists(<x>1234567890.1234567</x>[. >= 1234567890])", true, empty(cmpr));
 
     check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, empty(cmpr));
     check("<a>5</a>[xs:integer(.) > 8000000000000000000]", "", empty(cmpr));
