@@ -1,9 +1,11 @@
 package org.basex.gui.text;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.Token.*;
 
 import java.awt.*;
-import java.util.*;
+
+import org.basex.util.hash.*;
 
 /**
  * This class defines syntax highlighting for JSON files.
@@ -13,11 +15,13 @@ import java.util.*;
  */
 final class SyntaxJSON extends Syntax {
   /** Keywords. */
-  private static final HashSet<String> KEYWORDS = new HashSet<>();
+  private static final TokenSet KEYWORDS = new TokenSet();
 
   // initialize keywords
   static {
-    Collections.addAll(KEYWORDS, "false", "true", "null");
+    KEYWORDS.add("false");
+    KEYWORDS.add("true");
+    KEYWORDS.add("null");
   }
 
   /** Quoted flag. */
@@ -40,9 +44,10 @@ final class SyntaxJSON extends Syntax {
     if(quoted) {
       back = !back && ch == '\\';
     } else {
-      if("-+0123456789".indexOf(ch) != -1) return PURPLE;
       if("{}[]:,".indexOf(ch) != -1) return GRAY;
-      if(KEYWORDS.contains(iter.currString())) return BLUE;
+      final byte[] token = token(iter.currString());
+      if(KEYWORDS.contains(token)) return BLUE;
+      if(digit(ch) && !Double.isNaN(toDouble(token))) return PURPLE;
     }
 
     if(quote) quoted ^= true;

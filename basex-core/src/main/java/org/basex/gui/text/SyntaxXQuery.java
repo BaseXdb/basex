@@ -111,7 +111,7 @@ final class SyntaxXQuery extends Syntax {
     }
 
     // integers
-    if(digit(ch) && toLong(token(iter.currString())) != Long.MIN_VALUE) return PURPLE;
+    if(digit(ch) && !Double.isNaN(toDouble(token(iter.currString())))) return PURPLE;
 
     // special characters
     if(!XMLToken.isNCChar(ch)) {
