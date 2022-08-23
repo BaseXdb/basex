@@ -172,11 +172,11 @@ public class TypeCheck extends Single {
       if(!st.occ.check(value.size())) throw error(value, st);
       return value;
     }
+
     // check occurrence indicator and item type
     if(st.instance(value)) return value;
-
-    if(!promote) throw error(value, st);
-    return st.promote(value, null, qc, sc, info, false);
+    if(promote) return st.promote(value, null, qc, sc, info, false);
+    throw error(value, st);
   }
 
   @Override
@@ -207,7 +207,7 @@ public class TypeCheck extends Single {
   }
 
   /**
-   * Returns the used error code.
+   * Returns the used error code. Overwritten by {@link Treat#error}.
    * @return error code
    */
   public QueryError error() {

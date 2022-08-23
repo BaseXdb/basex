@@ -300,20 +300,17 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(declType == null || argType.instanceOf(declType)) {
       // return type is already correct
       checked = body;
-    } else if(body instanceof FuncItem && declType.type instanceof FuncType) {
-      // function item coercion
-      if(!declType.occ.check(1)) throw typeError(body, declType, null, info, true);
-      checked = ((FuncItem) body).coerceTo((FuncType) declType.type, qc, info, true);
     } else if(body instanceof Value) {
       // we can type check immediately
       final Value value = (Value) body;
       checked = declType.instance(value) ? value :
-        declType.promote(value, null, qc, vs.sc, info, false);
+        declType.promote(value, name, qc, vs.sc, info, false);
     } else {
       // check at each call: reject impossible arities
       if(argType.type.instanceOf(declType.type) && argType.occ.intersect(declType.occ) == null &&
-        !body.has(Flag.NDT)) throw typeError(body, declType, null, info, true);
-
+        !body.has(Flag.NDT)) {
+        throw typeError(body, declType, name, info, true);
+      }
       checked = new TypeCheck(vs.sc, info, body, declType, true);
     }
 

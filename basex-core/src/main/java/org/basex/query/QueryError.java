@@ -727,11 +727,11 @@ public enum QueryError {
   REGDOLLAR_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
 
   /** Error code. */
-  FIATOM_X_X(FOTY, 13, "Items of type % cannot be atomized: %."),
+  FIATOMIZE_X(FOTY, 13, "Atomic value required, function item found: %."),
   /** Error code. */
-  FISTRING_X_X(FOTY, 14, "Items of type % have no string representation: %."),
+  FISTRING_X(FOTY, 14, "Function item has no string value: %."),
   /** Error code. */
-  FICMP_X_X(FOTY, 15, "Items of type % cannot be compared: %."),
+  FICOMPARE_X(FOTY, 15, "Function item cannot be compared: %."),
 
   /** Error code. */
   UPFOTYPE_X(FOUP, 1, "Document or element expected, % found."),
@@ -1595,7 +1595,7 @@ public enum QueryError {
    */
   public static QueryException diffError(final Item item1, final Item item2, final InputInfo ii) {
     final Type type1 = item1.type, type2 = item2.type;
-    return type1 == type2 ? CMPTYPE_X_X_X.get(ii, type1, item1, item2) :
+    return type1.eq(type2) ? CMPTYPE_X_X_X.get(ii, type1, item1, item2) :
       CMPTYPES_X_X_X_X.get(ii, type1, type2, item1, item2);
   }
 
@@ -1603,14 +1603,14 @@ public enum QueryError {
    * Throws a type exception.
    * @param ii input info
    * @param expr expression
-   * @param type target type
+   * @param st target type
    * @param name name (can be {@code null})
    * @param promote promote or treat as
    * @return query exception
    */
-  public static QueryException typeError(final Expr expr, final SeqType type, final QNm name,
+  public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
       final InputInfo ii, final boolean promote) {
-    return typeError(expr, type, name, ii, promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X);
+    return typeError(expr, st, name, ii, promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X);
   }
 
   /**

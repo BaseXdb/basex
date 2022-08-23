@@ -133,7 +133,7 @@ public final class FuncItem extends FItem implements Scope {
     if(optimize ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
     // create new compilation context and variable scope
-    final CompileContext cc = new CompileContext(qc, true);
+    final CompileContext cc = new CompileContext(qc, false);
     final VarScope vs = new VarScope(sc);
     final Var[] vars = new Var[pl];
     final Expr[] args = new Expr[pl];
@@ -206,23 +206,23 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X_X.get(info, type, this);
+    throw FIATOMIZE_X.get(info, this);
   }
 
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X_X.get(info, type, this);
+    throw FIATOMIZE_X.get(info, this);
   }
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOM_X_X.get(ii, type, this);
+    throw FIATOMIZE_X.get(ii, this);
   }
 
   @Override
   public boolean deep(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    throw FICMP_X_X.get(info, type, this);
+    throw FICOMPARE_X.get(info, this);
   }
 
   @Override

@@ -20,12 +20,12 @@ public final class FnString extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = ctxArg(0, qc).item(qc, info);
+
     if(item == Empty.VALUE) return Str.EMPTY;
     if(item.type == AtomType.STRING) return item;
+    if(!(item instanceof FItem) || item instanceof XQJava) return Str.get(item.string(info));
 
-    if(item instanceof FItem && !(item instanceof XQJava))
-      throw FISTRING_X_X.get(info, item.type, item);
-    return Str.get(item.string(info));
+    throw FISTRING_X.get(info, item);
   }
 
   @Override

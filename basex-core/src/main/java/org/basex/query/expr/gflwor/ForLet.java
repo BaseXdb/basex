@@ -92,7 +92,7 @@ abstract class ForLet extends Clause {
     //   let $a as element(a) := <a/> where $a instance of element(b) return $a
     //   let $a := (<a/>, <b/>) where $a/self::a return $a
     //   for $a allowing empty in 0 where $a return count($a)
-    if(vars.length != 1 || scoring || var.checksType() || size() != 1 || !ex.uses(var))
+    if(vars.length != 1 || scoring || var.checkType() || size() != 1 || !ex.uses(var))
       return false;
 
     final InlineContext ic = new InlineContext(var, new ContextValue(info), cc);

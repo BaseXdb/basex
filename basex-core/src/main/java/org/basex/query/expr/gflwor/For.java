@@ -210,7 +210,7 @@ public final class For extends ForLet {
 
   @Override
   Expr inlineExpr(final CompileContext cc) {
-    return empty || vars.length > 1 || var.checksType() ? null : expr;
+    return empty || vars.length > 1 || var.checkType() ? null : expr;
   }
 
   @Override

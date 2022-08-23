@@ -47,11 +47,11 @@ public final class FnIndexWhere extends StandardFunc {
 
     // rewrite to FLWOR expression
     // index-where(INPUT, FUNCTION)  ->  for $i at $p in INPUT where FUNCTION($i) return $p
-    final IntObjMap<Var> map = new IntObjMap<>();
+    final IntObjMap<Var> vm = new IntObjMap<>();
     final LinkedList<Clause> clauses = new LinkedList<>();
 
-    final Var i = cc.copy(new Var(new QNm("i"), null, cc.qc, sc, info), map);
-    final Var p = cc.copy(new Var(new QNm("p"), SeqType.INTEGER_O, cc.qc, sc, info), map);
+    final Var i = cc.copy(new Var(new QNm("i"), null, cc.qc, sc, info), vm);
+    final Var p = cc.copy(new Var(new QNm("p"), SeqType.INTEGER_O, cc.qc, sc, info), vm);
     clauses.add(new For(i, p, null, input, false).optimize(cc));
 
     final Expr pred = coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE));

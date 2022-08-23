@@ -128,9 +128,9 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(REPLICATE.args(1.0, 3)), 1, empty(func));
     check(func.args(REPLICATE.args(wrap(1), 3)), 1, type(func, "xs:double"));
 
-    error(func.args(" true#0"), FIATOM_X_X);
-    error(func.args(REPLICATE.args(" true#0", 2)), FIATOM_X_X);
-    error(func.args(" (1 to 999999) ! true#0"), FIATOM_X_X);
+    error(func.args(" true#0"), FIATOMIZE_X);
+    error(func.args(REPLICATE.args(" true#0", 2)), FIATOMIZE_X);
+    error(func.args(" (1 to 999999) ! true#0"), FIATOMIZE_X);
   }
 
   /** Test method. */
@@ -642,7 +642,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check("for $d in (1, 2.34)[. != 0] return $d[" + func.args() + ']', 1, exists(func));
 
     error(func.args(), NOCTX_X);
-    error(func.args(" true#0"), FIATOM_X_X);
+    error(func.args(" true#0"), FIATOMIZE_X);
   }
 
   /** Test method. */
@@ -908,8 +908,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check("(" + _RANDOM_DOUBLE.args() + " => " + REPLICATE.args(10, true) + " => " +
         func.args() + ")[. > 1]", "", exists(func));
 
-    error(func.args(" true#0"), FIATOM_X_X);
-    error(func.args(" (1 to 2) ! true#0"), FIATOM_X_X);
+    error(func.args(" true#0"), FIATOMIZE_X);
+    error(func.args(" (1 to 2) ! true#0"), FIATOMIZE_X);
   }
 
   /** Test method. */
@@ -936,7 +936,7 @@ public final class FnModuleTest extends QueryPlanTest {
         empty(func), exists(SingleIterPath.class));
 
     error(func.args(), NOCTX_X);
-    error(func.args(" true#0"), FISTRING_X_X);
+    error(func.args(" true#0"), FISTRING_X);
   }
 
   /** Test method. */
@@ -954,7 +954,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("A"), 1);
     query("<_>A</_>[" + func.args() + ']', "<_>A</_>");
     query(func.args(" ([()], 'a')"), 1);
-    error("true#0[" + func.args() + ']', FIATOM_X_X);
+    error("true#0[" + func.args() + ']', FIATOMIZE_X);
   }
 
   /** Test method. */

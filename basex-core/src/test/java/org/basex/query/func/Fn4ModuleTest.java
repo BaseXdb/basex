@@ -107,7 +107,7 @@ public class Fn4ModuleTest extends QueryPlanTest {
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
-    error(func.args(" true#0"), FIATOM_X_X);
+    error(func.args(" true#0"), FIATOMIZE_X);
   }
 
   /** Test method. */
@@ -197,7 +197,7 @@ public class Fn4ModuleTest extends QueryPlanTest {
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
-    error(func.args(" true#0"), FIATOM_X_X);
+    error(func.args(" true#0"), FIATOMIZE_X);
   }
 
   /** Test method. */

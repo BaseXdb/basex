@@ -152,12 +152,12 @@ public final class XQMap extends XQData {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X_X.get(ii, type, this);
+    throw FIATOMIZE_X.get(ii, this);
   }
 
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw FIATOM_X_X.get(ii, type, this);
+    throw FIATOMIZE_X.get(ii, this);
   }
 
   @Override
@@ -267,7 +267,7 @@ public final class XQMap extends XQData {
   public boolean deep(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
 
-    if(item instanceof FuncItem) throw FICMP_X_X.get(ii, item.type, item);
+    if(item instanceof FuncItem) throw FICOMPARE_X.get(ii, item);
     if(item instanceof XQMap) return root.deep(((XQMap) item).root, coll, ii);
     return false;
   }

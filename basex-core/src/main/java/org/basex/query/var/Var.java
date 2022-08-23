@@ -198,7 +198,7 @@ public final class Var extends ExprInfo {
    * Determines if this variable checks the type of the expression bound to it.
    * @return {@code true} if the type is checked or promoted, {@code false} otherwise
    */
-  public boolean checksType() {
+  public boolean checkType() {
     return declType != null;
   }
 
@@ -210,7 +210,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
-    return checksType() ? new TypeCheck(sc, info, expr, declType, promote).optimize(cc) : expr;
+    return checkType() ? new TypeCheck(sc, info, expr, declType, promote).optimize(cc) : expr;
   }
 
   /**
@@ -224,7 +224,7 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value value, final QueryContext qc, final boolean opt)
       throws QueryException {
 
-    if(!checksType() || declType.instance(value)) return value;
+    if(!checkType() || declType.instance(value)) return value;
     if(promote) return declType.promote(value, name, qc, sc, info, opt);
     throw typeError(value, declType, name, info, promote);
   }
@@ -246,7 +246,7 @@ public final class Var extends ExprInfo {
    */
   public void checkType(final Expr expr) throws QueryException {
     final SeqType et = expr.seqType(), vt = seqType();
-    if(!checksType() || vt.type.instanceOf(et.type) ||
+    if(!checkType() || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
     if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {

@@ -61,6 +61,7 @@ public abstract class AQuery extends Command {
       try {
         final boolean runquery = options.get(MainOptions.RUNQUERY);
         final boolean serialize = options.get(MainOptions.SERIALIZE);
+        final boolean optplan = options.get(MainOptions.OPTPLAN);
         final int runs = Math.max(1, options.get(MainOptions.RUNS));
         for(int r = 0; r < runs; ++r) {
           // reuse existing processor instance
@@ -70,8 +71,9 @@ public abstract class AQuery extends Command {
           }
           init(context);
 
+          queryPlan(!optplan);
           qp.optimize();
-          queryPlan();
+          queryPlan(optplan);
           if(!runquery) continue;
 
           final PrintOutput po = r == 0 && serialize ? out : new NullOutput();
@@ -111,7 +113,7 @@ public abstract class AQuery extends Command {
       }
     }
     // add query plan, if not done yet, and info string
-    queryPlan();
+    queryPlan(true);
     info(info.toString(qp, out.size(), hits, jc().locks, error == null));
 
     // error
@@ -201,9 +203,10 @@ public abstract class AQuery extends Command {
 
   /**
    * Generates a query plan.
+   * @param create create plan
    */
-  private void queryPlan() {
-    if(!plan && options.get(MainOptions.XMLPLAN)) {
+  private void queryPlan(final boolean create) {
+    if(create && !plan && options.get(MainOptions.XMLPLAN)) {
       try {
         info(NL + QUERY_PLAN + COL);
         info(qp.toXml().serialize(SerializerMode.INDENT.get()).toString());

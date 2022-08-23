@@ -222,7 +222,7 @@ public final class ArrayTest extends SandboxTest {
 
   /** Functions. */
   @Test public void functions() {
-    error("string([ 1 ])", FISTRING_X_X);
+    error("string([ 1 ])", FISTRING_X);
     query("number([ 1 ])", 1);
     query("concat('a', [ 'b' ], [])", "ab");
     query("count(([ 1 ], [ 2 ]))", 2);

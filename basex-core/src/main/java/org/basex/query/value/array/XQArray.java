@@ -386,7 +386,7 @@ public abstract class XQArray extends XQData {
   public final boolean deep(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
 
-    if(item instanceof FuncItem) throw FICMP_X_X.get(ii, item.type, item);
+    if(item instanceof FuncItem) throw FICOMPARE_X.get(ii, item);
     if(item instanceof XQArray) {
       final XQArray o = (XQArray) item;
       if(arraySize() != o.arraySize()) return false;
