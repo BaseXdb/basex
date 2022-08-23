@@ -917,7 +917,7 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-   /** Displays the root node in the text view. */
+  /** Displays the root node in the text view. */
   C_SHOW_HOME(GO_HOME, null, true, false) {
     @Override
     public void execute(final GUI gui) {

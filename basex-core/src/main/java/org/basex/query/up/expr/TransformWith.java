@@ -89,9 +89,9 @@ public final class TransformWith extends Copy {
     // Context dependency, positional access: only check first expression.
     // Example: . update { delete node a }
     return Flag.CNS.in(flags) ||
-       Flag.CTX.in(flags) && result().has(Flag.CTX) ||
-       Flag.POS.in(flags) && result().has(Flag.POS) ||
-       super.has(Flag.UPD.remove(Flag.POS.remove(Flag.CTX.remove(flags))));
+        Flag.CTX.in(flags) && result().has(Flag.CTX) ||
+        Flag.POS.in(flags) && result().has(Flag.POS) ||
+        super.has(Flag.UPD.remove(Flag.POS.remove(Flag.CTX.remove(flags))));
   }
 
   @Override

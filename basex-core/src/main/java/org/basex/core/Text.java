@@ -654,7 +654,7 @@ public interface Text {
   String BACKUP_RENAMED_X = lang("backup_renamed_%");
   /** Database was not renamed. */
   String BACKUP_NOT_RENAMED_X = lang("backup_not_renamed_%");
- /** Database was dropped. */
+  /** Database was dropped. */
   String BACKUP_DROPPED_X = lang("backup_dropped_%");
   /** Backup was not found. */
   String BACKUP_NOT_FOUND_X = lang("backup_not_found_%");

@@ -36,7 +36,7 @@ final class ViewMover extends BaseXPanel {
       @Override
       public void execute() { ((ViewPanel) getParent()).delete(); }
     });
-   }
+  }
 
   @Override
   public void paintComponent(final Graphics g) {

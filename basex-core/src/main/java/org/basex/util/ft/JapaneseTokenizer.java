@@ -326,10 +326,8 @@ final class JapaneseTokenizer extends Tokenizer {
     pos++;
     String n = currToken.getSurface();
     final int hinshi = currToken.getHinshi();
-    if(st &&
-       (hinshi == Morpheme.HINSHI_DOUSHI ||
-        hinshi == Morpheme.HINSHI_KEIYOUSHI)) {
-        n = currToken.getBaseForm();
+    if(st && (hinshi == Morpheme.HINSHI_DOUSHI || hinshi == Morpheme.HINSHI_KEIYOUSHI)) {
+      n = currToken.getBaseForm();
     }
     byte[] t = token(n);
     final boolean a = ascii(t);

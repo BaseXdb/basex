@@ -107,7 +107,7 @@ public class FnHttpTest extends HTTPTest {
 
     // Execute the same query but with content set from $bodies
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
-       " <http:request method='post'>"
+        " <http:request method='post'>"
         + "<http:body media-type='application/xml'/>"
         + "</http:request>",
         REST_URL,

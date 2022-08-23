@@ -20,7 +20,7 @@ import org.basex.util.Base64;
 public class B64 extends Bin {
   /** Empty value. */
   public static final B64 EMPTY = new B64(new byte[0]);
- /** Constant values. */
+  /** Constant values. */
   private static final B64[] B64S;
 
   // caches the first 128 integers

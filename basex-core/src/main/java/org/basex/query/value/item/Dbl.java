@@ -83,7 +83,7 @@ public final class Dbl extends ANum {
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Double.isNaN(value) || Double.isInfinite(value))
-     throw valueError(AtomType.DECIMAL, string(), ii);
+      throw valueError(AtomType.DECIMAL, string(), ii);
     return new BigDecimal(value);
   }
 
@@ -143,12 +143,12 @@ public final class Dbl extends ANum {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item instanceof Dec ? item.eq(this, coll, sc, ii) : value == item.dbl(ii);
+    return item.type == AtomType.DECIMAL ? item.eq(this, coll, sc, ii) : value == item.dbl(ii);
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    if(item instanceof Dec) return -item.diff(this, coll, ii);
+    if(item.type == AtomType.DECIMAL) return -item.diff(this, coll, ii);
     // cannot be replaced by Double.compare (different semantics)
     final double d = item.dbl(ii);
     return Double.isNaN(value) || Double.isNaN(d) ? UNDEF : value < d ? -1 : value > d ? 1 : 0;

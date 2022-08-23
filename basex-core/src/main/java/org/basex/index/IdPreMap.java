@@ -192,7 +192,7 @@ public class IdPreMap {
 
     // remove all updates which has affected records which now have to be deleted
     final int removeStart = startIndex < rows && pres[startIndex] < pre ?
-         startIndex + 1 : startIndex;
+      startIndex + 1 : startIndex;
     int removeEnd = -1;
     for(int i = startIndex; i < rows; ++i) {
       if(end < pres[i] + nids[i] - fids[i]) break;

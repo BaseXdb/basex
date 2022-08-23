@@ -654,7 +654,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _ARRAY_PARITION(ArrayPartition::new, "partition(input,break-when)",
       params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_ZM, flag(HOF), ARRAY_URI),
- /** XQuery function. */
+  /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */

@@ -77,7 +77,7 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" //*[text() contains text '1']"), 1);
     query(func.args(" //li[text() contains text 'exercise']"), 2);
     query("for $i in //li[text() contains text 'exercise'] return " +
-       func.args(" $i[text() contains text 'exercise']"), "1\n1");
+        func.args(" $i[text() contains text 'exercise']"), "1\n1");
   }
 
   /** Test method. */

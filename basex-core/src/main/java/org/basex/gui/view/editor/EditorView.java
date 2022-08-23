@@ -1072,7 +1072,7 @@ public final class EditorView extends View {
    */
   public boolean confirm(final EditorArea edit) {
     final boolean all = edit == null;
-     final EditorArea[] eas = all ? editors() : new EditorArea[] { edit };
+    final EditorArea[] eas = all ? editors() : new EditorArea[] { edit };
     final String[] buttons = all && eas.length > 1 ? new String[] { CLOSE_ALL } : new String[0];
 
     for(final EditorArea ea : eas) {

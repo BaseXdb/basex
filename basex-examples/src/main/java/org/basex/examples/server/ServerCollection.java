@@ -73,8 +73,8 @@ public final class ServerCollection {
     System.out.println("\n* Finding documents in folder /book/chapters/0:");
     System.out.println(session.execute(
         new XQuery(
-         "for $doc in collection('input/book/chapters/0') " +
-         "return $doc")));
+            "for $doc in collection('input/book/chapters/0') " +
+            "return $doc")));
   }
 
   /**

@@ -25,7 +25,7 @@ public final class ConcurrencyTest extends SandboxTest {
   private static final String FILE = "src/test/resources/factbook.zip";
   /** Test queries. */
   private static final String [] QUERIES = {
-   '(' + _DB_GET.args(NAME) + "//province)[position() < 10] ! (insert node <test/> into .)",
+    '(' + _DB_GET.args(NAME) + "//province)[position() < 10] ! (insert node <test/> into .)",
     "(1 to 100000)[. = 0]"
   };
 

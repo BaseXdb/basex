@@ -172,7 +172,7 @@ public final class Export extends Command {
     String path = file;
     while(exp.contains(path)) {
       path = file.indexOf('.') == -1 ? file + '(' + ++c + ')' :
-           file.replaceAll("(.*)\\.(.*)", "$1(" + ++c + ").$2");
+             file.replaceAll("(.*)\\.(.*)", "$1(" + ++c + ").$2");
     }
     exp.add(path);
     return new IOFile(path);

@@ -272,8 +272,8 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
   @Test public void shiftInsertIntoAsFirst() {
     final Data d = data(TESTDOCUMENT);
     compare(new NodeUpdate[] {
-     new InsertIntoAsFirst(22, d, null, null),
-     new DeleteNode(23, d, null),
+      new InsertIntoAsFirst(22, d, null, null),
+      new DeleteNode(23, d, null),
     });
   }
 

@@ -533,7 +533,7 @@ final class TextRenderer extends BaseXBack {
         parentheses.pop();
         final int cr = parentheses.pop(), yy = parentheses.pop(), xx = parentheses.pop();
         if(cpos == pos || cpos == cr) {
-         g.setColor(GUIConstants.color4);
+          g.setColor(GUIConstants.color4);
           g.drawRect(xx, yy - (fontHeight << 2) / 5, charWidth(open), fontHeight);
           g.drawRect(x, lineY, charWidth(cp), fontHeight);
         }

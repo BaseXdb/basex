@@ -24,7 +24,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
   private static final int MAX = 600;
   /** Refresh action. */
   private final Timer timer = new Timer(100, this);
-   /** Information label. */
+  /** Information label. */
   private BaseXLabel info;
   /** Cancel button. */
   private BaseXButton cancel;

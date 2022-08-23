@@ -100,25 +100,25 @@ public final class Flt extends ANum {
 
   @Override
   public Flt floor() {
-    final float v = (float) Math.floor(value);
-    return v == value ? this : get(v);
+    final float f = (float) Math.floor(value);
+    return f == value ? this : get(f);
   }
 
   @Override
   public Flt round(final int scale, final boolean even) {
-    final float v = Dbl.get(value).round(scale, even).flt();
-    return value == v ? this : get(v);
+    final float f = Dbl.get(value).round(scale, even).flt();
+    return value == f ? this : get(f);
   }
 
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item instanceof Dec ? item.eq(this, coll, sc, ii) : value == item.dbl(ii);
+    return item.type == AtomType.DECIMAL ? item.eq(this, coll, sc, ii) : value == item.dbl(ii);
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    if(item instanceof Dec) return -item.diff(this, coll, ii);
+    if(item.type == AtomType.DECIMAL) return -item.diff(this, coll, ii);
     // cannot be replaced by Double.compare (different semantics)
     final double d = item.dbl(ii);
     return Double.isNaN(value) || Double.isNaN(d) ? UNDEF : value < d ? -1 : value > d ? 1 : 0;

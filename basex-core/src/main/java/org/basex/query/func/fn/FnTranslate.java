@@ -42,7 +42,7 @@ public final class FnTranslate extends StandardFunc {
     final SeqType st = value.seqType(), withSt = with.seqType();
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) && replace == Str.EMPTY &&
-       withSt.one() && withSt.type.isStringOrUntyped()) {
+        withSt.one() && withSt.type.isStringOrUntyped()) {
       return cc.function(Function.STRING, info, value);
     }
     return this;
