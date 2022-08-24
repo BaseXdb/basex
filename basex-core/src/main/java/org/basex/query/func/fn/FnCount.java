@@ -42,17 +42,18 @@ public final class FnCount extends StandardFunc {
     final long size = input.size();
     if(size >= 0 && !input.has(Flag.NDT)) return Int.get(size);
 
-    // rewrite count(map:keys(...)) to map:size(...)
+    // count(map:keys(E))  ->  map:size(E)
     if(_MAP_KEYS.is(input))
       return cc.function(_MAP_SIZE, info, input.args());
-    // rewrite count(string-to-codepoints(...)) to string-length(...)
+    // count(util:array-members(E))  ->  array:size(E)
+    if(_UTIL_ARRAY_MEMBERS.is(input))
+      return cc.function(_ARRAY_SIZE, info, input.args());
+    // count(string-to-codepoints(E))  ->  string-length(E)
+    // count(characters(E))  ->  string-length(E)
     if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input))
       return cc.function(STRING_LENGTH, info, input.args());
 
-    final Expr embedded = embed(cc, true);
-    if(embedded != null) return embedded;
-
-    return this;
+    return embed(cc, true);
   }
 
   @Override

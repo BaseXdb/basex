@@ -110,6 +110,7 @@ public final class UtilInit extends StandardFunc {
       final Expr[] args = input.args();
       final Expr last = args[args.length - 1];
       if(last.seqType().oneOrMore()) {
+        // util:init(1, (2 to 5)))  ->  1, util:init(2 to 5))
         args[args.length - 1] = cc.function(_UTIL_INIT, info, last);
         return List.get(cc, info, args);
       }

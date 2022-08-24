@@ -1085,6 +1085,10 @@ public final class FnModuleTest extends QueryPlanTest {
         root(REPLICATE));
 
     query("sort(" + func.args(" tokenize(<_/>)", 3) + ')', "");
+
+    check(func.args(" ('x', (1 to 3)[.])", 2, 2), "1\n2", empty(Str.class), empty(List.class));
+    check(func.args(" ('x', (1 to 3)[.], 4 to 6)", 2, 2), "1\n2", empty(Str.class));
+    check(func.args(" ('x', (1 to 3)[.], 4 to 6)", 2, 4), "1\n2\n3\n4", empty(Str.class));
   }
 
   /** Test method. */

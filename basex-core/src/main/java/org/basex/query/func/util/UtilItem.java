@@ -85,16 +85,21 @@ public final class UtilItem extends StandardFunc {
       if(_FILE_READ_TEXT_LINES.is(input))
         return FileReadTextLines.opt(this, ps, 1, cc);
 
-      // rewrite to head function
       if(input instanceof List) {
         final Expr[] args = input.args();
         final int al = args.length;
         for(int a = 0; a < al; a++) {
-          if(a == ps) {
+          final boolean exact = a == ps, one = args[a].seqType().one();
+          if(exact || !one && a > 0) {
+            // util:item((item1, item2, item3)  ->  item2
+            if(exact && one) return args[a];
+            // util:item((1, 2 to 6), 2)  ->  head((2 to 6))
+            // util:item((1, (2 to 6)[. mod 2], 7), 3)  ->  util:item(((2 to 6)[. mod 2], 7), 2)
             final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
-            return cc.function(HEAD, info, list);
+            return exact ? cc.function(HEAD, info, list) :
+              cc.function(_UTIL_ITEM, info, list, Int.get(ps - a + 1));
           }
-          if(!args[a].seqType().one()) break;
+          if(!one) break;
         }
       }
     }
@@ -102,12 +107,17 @@ public final class UtilItem extends StandardFunc {
     if(_UTIL_INIT.is(input))
       return cc.function(_UTIL_ITEM, info, input.arg(0), pos);
 
-    final Expr embedded = embed(cc, false);
-    if(embedded != null) return embedded;
+    final long diff = countInputDiff(1);
+    if(diff != Long.MIN_VALUE) {
+      // util:item(E, count(E))  ->  util:last(E)
+      if(diff == 0) return cc.function(_UTIL_LAST, info, input);
+      // util:item(E, count(E) + 1)  ->  ()
+      if(diff > 0) return Empty.VALUE;
+    }
 
     exprType.assign(st.with(occ));
     data(input.data());
-    return this;
+    return embed(cc, false);
   }
 
   /**

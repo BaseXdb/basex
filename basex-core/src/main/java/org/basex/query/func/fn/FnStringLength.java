@@ -33,7 +33,7 @@ public final class FnStringLength extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     if(mode == Simplify.EBV) {
-      // if(string-length(nodes))  ->  if(string(nodes))
+      // if(string-length(E))  ->  if(string(E))
       return cc.simplify(this, cc.function(STRING, info, exprs)).simplifyFor(mode, cc);
     }
     return super.simplifyFor(mode, cc);

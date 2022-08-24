@@ -46,7 +46,7 @@ public class FnEmpty extends StandardFunc {
     if(REPLICATE.is(input) && input.arg(1) instanceof Int) {
       input = input.arg(0);
     }
-    // rewrite list to union expression:  exists((a, b))  ->  exists(a | b)
+    // rewrite list to union expression:  exists((nodes1, nodes2))  ->  exists(nodes1 | nodes2)
     if(input instanceof List && input.seqType().type instanceof NodeType) {
       input = new Union(info, input.args()).optimize(cc);
     }
@@ -54,32 +54,31 @@ public class FnEmpty extends StandardFunc {
 
     // replace optimized expression by boolean function
     if(input instanceof Filter) {
-      // rewrite filter:  exists($a[text() = 'Ukraine'])  ->  $a/text() = 'Ukraine'
+      // rewrite filter:  exists($a[text() = string])  ->  $a/text() = string
       final Filter filter = (Filter) input;
       input = filter.flattenEbv(filter.root, false, cc);
     } else if(INDEX_OF.is(input)) {
-      // rewrite index-of:  exists(index-of($texts, 'Ukraine'))  ->  $texts = 'Ukraine'
+      // rewrite index-of:  exists(index-of($texts, string))  ->  $texts = string
       final Expr[] args = input.args();
       if(args.length == 2 && args[1].seqType().one() &&
           CmpG.compatible(args[0].seqType(), args[1].seqType(), true)) {
         input = new CmpG(args[0], args[1], OpG.EQ, null, sc, info).optimize(cc);
       }
     } else if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input)) {
-      // exists(string-to-codepoints(...))  ->  boolean(string(...))
+      // exists(string-to-codepoints(E))  ->  boolean(string(E))
       input = cc.function(STRING, info, input.args());
     }
     if(input != exprs[0]) return cc.function(exists ? BOOLEAN : NOT, info, input);
 
-    // exists(map:keys(...))  ->  map:size(...) > 0
-    if(_MAP_KEYS.is(input)) {
-      input = cc.function(_MAP_SIZE, info, input.args());
+    // exists(map:keys(E))  ->  map:size(E) > 0
+    // empty(util:array-members(E))  ->  array:size(E) = 0
+    final boolean map = _MAP_KEYS.is(input), array = _UTIL_ARRAY_MEMBERS.is(input);
+    if(map || array) {
+      input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
       return new CmpG(input, Int.ZERO, exists ? OpG.NE : OpG.EQ, null, sc, info).optimize(cc);
     }
 
-    final Expr embedded = embed(cc, true);
-    if(embedded != null) return embedded;
-
-    return this;
+    return embed(cc, true);
   }
 
   @Override

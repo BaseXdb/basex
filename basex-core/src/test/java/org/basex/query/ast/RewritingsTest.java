@@ -405,7 +405,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>, <b/>)[position() > 1 and position() < 4]",
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 4]",
-        "<b/>", count(_UTIL_RANGE, 1));
+        "<b/>", empty(List.class), root(IterFilter.class));
   }
 
   /** Predicates. */

@@ -9,6 +9,7 @@ import java.net.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -260,7 +261,7 @@ public abstract class StandardFunc extends Arr {
    * Tries to embed a positional function call in its first argument.
    * @param cc compilation context
    * @param skip skip evaluation of remaining operands
-   * @return optimized expression or {@code null}
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
   protected Expr embed(final CompileContext cc, final boolean skip) throws QueryException {
@@ -273,7 +274,30 @@ public abstract class StandardFunc extends Arr {
         return skip ? ops[0] : SimpleMap.get(cc, info, ops);
       }
     }
-    return null;
+    return this;
+  }
+
+  /**
+   * Returns the difference to the input length in an argument that counts the length
+   * of an input expression.
+   * @param i index of optional argument
+   * @return length, or {@code Long#MIN_VALUE} if the value cannot be statically retrieved.
+   */
+  protected long countInputDiff(final int i) {
+    if(exprs.length > i) {
+      final Expr input = exprs[0], end = exprs[i];
+      final Predicate<Expr> countInput = e -> Function.COUNT.is(e) && e.arg(0).equals(input);
+      // function(E, count(E))  ->  0
+      if(countInput.test(end)) return 0;
+      // function(E, count(E) - 1)  ->  -1
+      if(end instanceof Arith && countInput.test(end.arg(0)) && end.arg(1) instanceof Int) {
+        final Calc calc = ((Arith) end).calc;
+        final long sum = ((Int) exprs[1]).itr();
+        if(calc == Calc.PLUS) return sum;
+        if(calc == Calc.MINUS) return -sum;
+      }
+    }
+    return Long.MIN_VALUE;
   }
 
   @Override

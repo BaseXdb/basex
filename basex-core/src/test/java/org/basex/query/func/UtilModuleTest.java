@@ -444,7 +444,7 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     check(func.args(_UTIL_INIT.args(" (1, 2, 3, <_/>)"), 2), 2, empty(_UTIL_INIT));
 
-    check(func.args(" (7 to 9)[. = 8]", 1), 8, exists(HEAD), type(HEAD, "xs:integer?"));
+    check(func.args(" (7 to 9)[. = 8]", 1), 8, root(HEAD), type(HEAD, "xs:integer?"));
 
     check(func.args(" (<a/>, <b/>, <c/>)", 2), "<b/>", root(CElem.class));
     check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2), "<b/>", root(CElem.class));
@@ -455,6 +455,10 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(REPLICATE.args(" <a/>", 2), 1), "<a/>", root(CElem.class));
     check(func.args(REPLICATE.args(" <a/>", 2), 2), "<a/>", root(CElem.class));
     check(func.args(REPLICATE.args(" <a/>", 2), 3), "", empty());
+
+    check(func.args(" ('x', (2 to 10)[. = 5])", 2), 5, root(HEAD), empty(Str.class));
+    check(func.args(" ('x', (2 to 10)[. = 5])", 3), "", empty(List.class), empty(Str.class));
+    check(func.args(" ('x', (2 to 10)[. = 5], 3)", 3), 3, exists(List.class), empty(Str.class));
   }
 
   /** Test method. */

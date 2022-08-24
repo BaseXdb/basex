@@ -92,7 +92,8 @@ public final class FnTail extends StandardFunc {
       final Expr[] args = input.args();
       final Expr first = args[0];
       if(first.seqType().oneOrMore()) {
-        // tail((1, 2), 3))  ->  tail(1 to 2), 3
+        // tail(1, 2, 3)  ->  tail(2, 3)
+        // tail((1 to 4), 5))  ->  tail(1 to 4), 5
         args[0] = cc.function(TAIL, info, first);
         return List.get(cc, info, args);
       }

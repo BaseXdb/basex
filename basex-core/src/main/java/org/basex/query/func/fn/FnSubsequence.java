@@ -10,7 +10,6 @@ import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -172,7 +171,7 @@ public class FnSubsequence extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values
     final Expr input = exprs[0];
     final SeqType st = input.seqType();
@@ -221,24 +220,39 @@ public class FnSubsequence extends StandardFunc {
       if(input instanceof List) {
         final Expr[] args = input.args();
         if(((Checks<Expr>) ex -> ex.seqType().one()).all(args)) {
+          // subsequence((item1, item2, item3, item4), 2, 2)  ->  (item2, item3)
           return List.get(cc, info, Arrays.copyOfRange(args, (int) sr.start, (int) sr.end));
         }
+        final int al = args.length;
+        for(int a = 0; a < al; a++) {
+          final boolean exact = a == sr.start, one = args[a].seqType().one();
+          if(a > 0 && (exact || !one)) {
+            // subsequence((item, expr1, expr2), 2, 2)  ->  subsequence((expr1, expr2), 1, 2)
+            final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
+            final long start = sr.start - a + 1, end = sr.end - start;
+            return cc.function(SUBSEQUENCE, info, list, Int.get(start), Int.get(end));
+          }
+          if(!one) break;
+        }
       }
-    } else if(exprs[1] == Int.ONE && exprs[2] instanceof Arith && !input.has(Flag.NDT)) {
-      // subsequence(expr, 1, count(expr) - 1)  ->  util:init(expr)
-      final Arith arith = (Arith) exprs[2];
-      if(COUNT.is(arith.exprs[0]) && arith.calc == Calc.MINUS && arith.exprs[1] == Int.ONE &&
-          input.equals(arith.exprs[0].arg(0))) {
-        return cc.function(_UTIL_INIT, info, input);
+    } else if(exprs[1] instanceof Int) {
+      final long start = ((Int) exprs[1]).itr(), diff = countInputDiff(2) + start;
+      if(diff == (int) diff) {
+        if(start <= 1) {
+          // subsequence(expr, 1, count(expr) - 1)  ->  util:init(expr)
+          if(diff == 0) return cc.function(_UTIL_INIT, info, input);
+          // subsequence(expr, 1, count(expr) + 10)  ->  expr
+          if(diff >= 1) return input;
+        } else if(start <= diff) {
+          // subsequence(expr, 3, count(expr) - 1)  ->  subsequence(expr, 3)
+          return cc.function(SUBSEQUENCE, info, input, exprs[1]);
+        }
       }
     }
 
-    final Expr embedded = embed(cc, false);
-    if(embedded != null) return embedded;
-
     exprType.assign(st.union(Occ.ZERO), sz);
     data(input.data());
-    return this;
+    return embed(cc, false);
   }
 
   @Override

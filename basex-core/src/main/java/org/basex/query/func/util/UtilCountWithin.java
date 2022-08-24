@@ -68,11 +68,7 @@ public final class UtilCountWithin extends StandardFunc {
         if(min >= 2) return Bln.FALSE;
       }
     }
-
-    final Expr embedded = embed(cc, true);
-    if(embedded != null) return embedded;
-
-    return this;
+    return embed(cc, true);
   }
 
   @Override
