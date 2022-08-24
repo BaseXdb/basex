@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
+import org.basex.query.expr.constr.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -325,18 +326,34 @@ public final class FilterTest extends QueryPlanTest {
   /** Rewrite positional tests. */
   @Test public void positional() {
     String expr = "(<a/>, <b/>, <c/>)";
-    check(expr + "[position() = 0 to last()]", "<a/>\n<b/>\n<c/>", empty(LAST));
-    check(expr + "[position() = 1 to last()]", "<a/>\n<b/>\n<c/>", empty(LAST));
-    check(expr + "[position() = 2 to last()]", "<b/>\n<c/>", empty(LAST));
-    check(expr + "[position() = 3 to last()]", "<c/>", empty(LAST));
-    check(expr + "[position() = 1 to last() - 1]", "<a/>\n<b/>", empty(LAST));
+    check(expr + "[position() = 0 to last()]", "<a/>\n<b/>\n<c/>",
+        empty(LAST), root(List.class));
+    check(expr + "[position() = 1 to last()]", "<a/>\n<b/>\n<c/>",
+        empty(LAST), root(List.class));
+    check(expr + "[position() = 2 to last()]", "<b/>\n<c/>",
+        empty(LAST), root(List.class));
+    check(expr + "[position() = 3 to last()]", "<c/>",
+        empty(LAST), root(CElem.class));
+    check(expr + "[position() = 1 to last() - 1]", "<a/>\n<b/>",
+        empty(LAST), root(List.class));
 
     expr = "((<a/>, <b/>, <c/>)[. = ''])";
-    check(expr + "[position() = 0 to last()]", "<a/>\n<b/>\n<c/>", empty(LAST));
-    check(expr + "[position() = 1 to last()]", "<a/>\n<b/>\n<c/>", empty(LAST));
-    check(expr + "[position() = 2 to last()]", "<b/>\n<c/>", empty(LAST));
-    check(expr + "[position() = 3 to last()]", "<c/>", empty(LAST));
-    check(expr + "[position() = 1 to last() - 1]", "<a/>\n<b/>", empty(LAST));
-    check(expr + "[position() = 1 to last() - 2]", "<a/>", exists(LAST));
+    check(expr + "[position() = 0 to last()]", "<a/>\n<b/>\n<c/>",
+        empty(LAST), root(IterFilter.class));
+    check(expr + "[position() = 1 to last()]", "<a/>\n<b/>\n<c/>",
+        empty(LAST), root(IterFilter.class));
+    check(expr + "[position() = 2 to last()]", "<b/>\n<c/>",
+        empty(LAST), root(TAIL));
+    check(expr + "[position() = 3 to last()]", "<c/>",
+        empty(LAST), root(_UTIL_RANGE));
+    check(expr + "[position() = 1 to last() - 1]", "<a/>\n<b/>",
+        empty(LAST), root(_UTIL_INIT));
+    check(expr + "[position() = 1 to last() - 2]", "<a/>",
+        exists(LAST), root(CachedFilter.class));
+
+    check(expr + "[position() = -65535 to xs:integer(" + wrap(1) + ")]", "<a/>",
+        root(_UTIL_RANGE), "//Int = 1");
+    check(expr + "[position() = 0 to xs:integer(" + wrap(1) + ")]", "<a/>",
+        root(_UTIL_RANGE), "//Int = 1");
   }
 }

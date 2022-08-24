@@ -45,18 +45,15 @@ final class Pos extends Arr implements CmpPos {
   static Expr get(final Expr expr, final OpV op, final InputInfo ii, final CompileContext cc)
       throws QueryException {
 
-    Expr min = null, max = null;
-    final SeqType st2 = expr.seqType();
+    if(expr == Empty.VALUE) return Bln.FALSE;
 
-    // rewrite only simple expressions that may be simplified even further later on
+    Expr min = null, max = null;
     if(expr.isSimple()) {
-      if(expr instanceof Range && op == OpV.EQ) {
-        final Range range = (Range) expr;
-        final Expr start = range.exprs[0], end = range.exprs[1];
-        if(st2.type.instanceOf(AtomType.INTEGER)) {
-          min = start;
-          max = start.equals(end) ? start : end;
-        }
+      final SeqType st2 = expr.seqType();
+      if(expr instanceof Range && op == OpV.EQ && st2.type.instanceOf(AtomType.INTEGER)) {
+        final Expr start = expr.arg(0), end = expr.arg(1);
+        min = start instanceof Int && ((Int) start).itr() < 1 ? Int.ONE : start;
+        max = min.equals(end) ? min : end;
       } else if(st2.one() && !st2.mayBeArray()) {
         switch(op) {
           case EQ:
@@ -83,8 +80,6 @@ final class Pos extends Arr implements CmpPos {
             break;
           default:
         }
-      } else if(expr == Empty.VALUE) {
-        return Bln.FALSE;
       }
     }
     return min != null ? new Pos(ii, min, max).optimize(cc) : null;
