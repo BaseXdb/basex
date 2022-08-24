@@ -155,17 +155,16 @@ public final class Dec extends ANum {
 
   /**
    * Converts the given token into a decimal value.
-   * @param item item to be converted
+   * @param value value to be converted
    * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  public static BigDecimal parse(final Item item, final InputInfo ii) throws QueryException {
-    final byte[] value = item.string(ii);
+  public static BigDecimal parse(final byte[] value, final InputInfo ii) throws QueryException {
     try {
       if(!contains(value, 'e') && !contains(value, 'E'))
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ex) { Util.debug(ex); }
-    throw AtomType.DECIMAL.castError(item, ii);
+    throw AtomType.DECIMAL.castError(value, ii);
   }
 }

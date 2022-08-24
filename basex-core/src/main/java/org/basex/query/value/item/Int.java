@@ -200,16 +200,15 @@ public final class Int extends ANum {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Converts the given item to a long primitive.
-   * @param item item to be converted
+   * Converts the given token to a long value.
+   * @param value value to be converted
    * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
-  public static long parse(final Item item, final InputInfo ii) throws QueryException {
-    final byte[] value = item.string(ii);
+  public static long parse(final byte[] value, final InputInfo ii) throws QueryException {
     final long l = Token.toLong(value);
     if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MIN_LONG)) return l;
-    throw AtomType.INTEGER.castError(item, ii);
+    throw AtomType.INTEGER.castError(value, ii);
   }
 }

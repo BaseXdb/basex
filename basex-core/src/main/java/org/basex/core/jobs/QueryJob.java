@@ -120,7 +120,7 @@ public final class QueryJob extends Job implements Runnable {
     // undefined
     if(string == null || string.isEmpty()) return null;
     // integer
-    if(string.matches("^\\d+$")) return Int.get(Int.parse(Str.get(string), ii));
+    if(string.matches("^\\d+$")) return Int.get(Int.parse(token(string), ii));
     // dayTimeDuration
     if(Dur.DTD.matcher(string).matches()) return new DTDur(token(string), ii);
     // time

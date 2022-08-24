@@ -137,32 +137,33 @@ public class DBNode extends ANode {
 
   @Override
   public final long itr(final InputInfo ii) throws QueryException {
-    if(type == NodeType.ELEMENT) {
+    // try to directly retrieve inlined numeric value from XML storage
+    long l = Long.MIN_VALUE;
+    final boolean text = type == NodeType.TEXT;
+    if(text || type == NodeType.ATTRIBUTE) {
+      l = data.textItr(pre, text);
+    } else if(type == NodeType.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
-        final long l = data.textItr(pre + as, true);
-        if(l != Long.MIN_VALUE) return l;
+        l = data.textItr(pre + as, true);
       }
-    } else if(type == NodeType.TEXT || type == NodeType.ATTRIBUTE) {
-      final long l = data.textItr(pre, type == NodeType.TEXT);
-      if(l != Long.MIN_VALUE) return l;
     }
-    return Int.parse(this, ii);
+    return l == Long.MIN_VALUE ? Int.parse(string(), ii) : l;
   }
 
   @Override
   public final double dbl(final InputInfo ii) throws QueryException {
     // try to directly retrieve inlined numeric value from XML storage
     double d = Double.NaN;
-    if(type == NodeType.ELEMENT) {
+    final boolean text = type == NodeType.TEXT;
+    if(text || type == NodeType.ATTRIBUTE) {
+      d = data.textDbl(pre, text);
+    } else if(type == NodeType.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
         d = data.textDbl(pre + as, true);
       }
-    } else if(type == NodeType.TEXT || type == NodeType.ATTRIBUTE) {
-      d = data.textDbl(pre, type == NodeType.TEXT);
     }
-    // GH-1206: parse invalid values again
     return Double.isNaN(d) ? Dbl.parse(string(), ii) : d;
   }
 

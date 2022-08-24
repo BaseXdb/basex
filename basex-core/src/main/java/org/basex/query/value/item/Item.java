@@ -119,7 +119,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(this, ii);
+    return Dec.parse(string(ii), ii);
   }
 
   /**
@@ -129,7 +129,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public long itr(final InputInfo ii) throws QueryException {
-    return Int.parse(this, ii);
+    return Int.parse(string(ii), ii);
   }
 
   /**
