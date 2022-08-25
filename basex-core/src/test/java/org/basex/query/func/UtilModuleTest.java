@@ -478,7 +478,7 @@ public final class UtilModuleTest extends QueryPlanTest {
 
     check(func.args(_PROF_VOID.args(" ()")), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
-    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(func, "element(a)|element(b)?"));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "element(b)|element(a)?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
 
     check(func.args(" tokenize(<_/>)"), "", exists(_UTIL_LAST));
@@ -497,7 +497,7 @@ public final class UtilModuleTest extends QueryPlanTest {
     check(func.args(REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
         root(IterFilter.class), empty(REPLICATE));
     check(func.args(REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<b/>",
-        root(_UTIL_LAST), empty(REPLICATE));
+        root(HEAD), empty(REPLICATE));
     check(func.args(REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>", exists(REPLICATE));
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));

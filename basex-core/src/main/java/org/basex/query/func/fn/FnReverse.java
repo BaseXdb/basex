@@ -12,7 +12,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -72,11 +71,7 @@ public final class FnReverse extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0];
-    // zero/single items or singleton sequence: return argument
-    if(input.seqType().zeroOrOne() || input instanceof SingletonSeq &&
-        ((SingletonSeq) input).singleItem()) return input;
-    // reverse sequence
-    if(input instanceof RangeSeq) return ((RangeSeq) input).reverse(cc.qc);
+    if(input.seqType().zeroOrOne()) return input;
 
     // reverse(reverse(E))  ->  E
     if(REVERSE.is(input)) return input.arg(0);
@@ -90,16 +85,19 @@ public final class FnReverse extends StandardFunc {
     if(REPLICATE.is(input) && !input.has(Flag.NDT))
       if(input.arg(0).seqType().zeroOrOne()) return input;
 
-    // rewrite list
+    // reverse((expr1, expr2))  ->  reverse(expr2), reverse(expr1)
     if(input instanceof List) {
       final Expr[] args = input.args();
-      if(((Checks<Expr>) ex -> ex instanceof Value || ex.seqType().zeroOrOne()).all(args)) {
-        final int al = args.length;
-        final ExprList list = new ExprList(al);
-        for(int a = al - 1; a >= 0; a--) {
-          list.add(args[a] instanceof Value ? ((Value) args[a]).reverse(cc.qc) : args[a]);
-        }
-        return List.get(cc, input.info(), list.finish());
+      final int al = args.length;
+      final ExprList list = new ExprList(al);
+      for(int a = al - 1; a >= 0; a--) list.add(cc.function(REVERSE, info, args[a]));
+      return List.get(cc, input.info(), list.finish());
+    }
+    // reverse(root[test])  ->  reverse(root)[test]
+    if(input instanceof IterFilter) {
+      final IterFilter filter = (IterFilter) input;
+      if(filter.root.size() != -1) {
+        return Filter.get(cc, info, cc.function(REVERSE, filter.info(), filter.root), filter.exprs);
       }
     }
 

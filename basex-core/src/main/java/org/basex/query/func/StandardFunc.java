@@ -258,7 +258,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Tries to embed a positional function call in its first argument.
+   * Tries to embed a positional function call in the input argument.
    * @param cc compilation context
    * @param skip skip evaluation of remaining operands
    * @return optimized or original expression

@@ -57,7 +57,7 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public void write(final DataOutput out) throws IOException, QueryException {
-    out.writeLong(size / value.size());
+    out.writeLong(count());
     Store.write(out, value);
   }
 
@@ -80,12 +80,12 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public long atomSize() {
-    return value.atomSize();
+    return size * value.atomSize();
   }
 
   @Override
   protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
-    return value.size() == 1 ? new SingletonSeq(length, value) : super.subSeq(pos, length, qc);
+    return singleItem() ? new SingletonSeq(length, value) : super.subSeq(pos, length, qc);
   }
 
   @Override
@@ -95,12 +95,12 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Value remove(final long pos, final QueryContext qc) {
-    return value.size() == 1 ? get(value, size - 1) : copyRemove(pos, qc);
+    return singleItem() ? get(value, size - 1) : copyRemove(pos, qc);
   }
 
   @Override
   public Value reverse(final QueryContext qc) {
-    return get(value.reverse(qc), size / value.size());
+    return singleItem() ? this : get(value.reverse(qc), count());
   }
 
   @Override
@@ -115,7 +115,7 @@ public final class SingletonSeq extends Seq {
       expr = value.simplifyFor(mode, cc);
     } else if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER,
         Simplify.STRING)) {
-      expr = get((Value) value.simplifyFor(mode, cc), size / value.size());
+      expr = get((Value) value.simplifyFor(mode, cc), count());
     }
     return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
   }
@@ -144,7 +144,7 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.function(REPLICATE, value, size / value.size());
+    qs.function(REPLICATE, value, count());
   }
 
   /**
@@ -152,7 +152,15 @@ public final class SingletonSeq extends Seq {
    * @return result of check
    */
   public boolean singleItem() {
-    return value instanceof Item;
+    return value.size() == 1;
+  }
+
+  /**
+   * Value count.
+   * @return count
+   */
+  public long count() {
+    return size / value.size();
   }
 
   // STATIC METHODS ===============================================================================

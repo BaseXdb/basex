@@ -63,6 +63,13 @@ public final class UtilLast extends StandardFunc {
       if(stl.oneOrMore()) return cc.function(_UTIL_LAST, info, last);
     }
 
+    // util:last(reverse(root)[test])  ->  head(root[test])
+    if(input instanceof IterFilter) {
+      final IterFilter filter = (IterFilter) input;
+      final Expr root = cc.function(REVERSE, filter.info(), filter.root);
+      return cc.function(HEAD, info, Filter.get(cc, filter.info(), root, filter.exprs));
+    }
+
     exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE));
     data(input.data());
     return embed(cc, false);

@@ -35,18 +35,26 @@ public final class FnHead extends StandardFunc {
 
     // rewrite nested function calls
     final long size = input.size();
-    if(_UTIL_INIT.is(input) && size > 1)
-      return cc.function(HEAD, info, input.args());
     if(TAIL.is(input))
       return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(2));
+    if(_UTIL_INIT.is(input) && size > 1)
+      return cc.function(HEAD, info, input.args());
     if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
       final SeqRange r = SeqRange.get(input, cc);
-      // safety check (at this stage, r.length will never be 0)
+      // safety check (at this stage, r.length should never be 0)
       if(r != null && r.length != 0)
         return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(r.start + 1));
     }
-    if(REVERSE.is(input))
+    if(REVERSE.is(input)) {
+      // head(reverse(root[test]))  ->  head(reverse(root)[test])
+      if(input.arg(0) instanceof IterFilter) {
+        final IterFilter filter = (IterFilter) input.arg(0);
+        return cc.function(HEAD, info,
+            Filter.get(cc, filter.info(), cc.function(REVERSE, info, filter.root), filter.exprs));
+      }
+      // head(reverse(E))  ->  util:last(E)
       return cc.function(_UTIL_LAST, info, input.args());
+    }
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
       if(input.arg(1) instanceof Int) return cc.function(HEAD, info, input.arg(0));

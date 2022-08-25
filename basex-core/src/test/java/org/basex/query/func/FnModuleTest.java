@@ -434,7 +434,8 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" <a/>[name()]"), "<a/>", empty(func));
     check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(func));
     check(func.args(" (1, error())"), 1, exists(Int.class));
-    check(func.args(" reverse((1, 2, 3)[. > 1])"), 3, exists(_UTIL_LAST));
+    check(func.args(" reverse((1 to " + wrap(3) + ")[. > 1])"), 3,
+        "exists(//IterFilter/FnReverse)");
 
     check(func.args(_UTIL_INIT.args(" (<a/>, <b/>, <c/>)")), "<a/>", empty(_UTIL_INIT));
     check(func.args(_UTIL_INIT.args(" (<a/>, <b/>) ")), "<a/>", empty(_UTIL_INIT));
@@ -835,9 +836,9 @@ public final class FnModuleTest extends QueryPlanTest {
         "<c/>\n<b/>", empty(_UTIL_INIT));
     check(func.args(" (<a/>, <b/>, <c/>)[position() < last()]"),
         "<b/>\n<a/>", empty(TAIL));
-    check(func.args(" tail(" + func.args(" (1 to 2)[. > 0]") + ")"),
+    check(func.args(" tail(" + func.args(" (1 to " + wrap(2) + ")[. > 0]") + ")"),
         1, exists(_UTIL_INIT));
-    check(func.args(" (" + func.args(" (1 to 2)[. > 0]") + ")[position() < last()]"),
+    check(func.args(" (" + func.args(" (1 to " + wrap(2) + ")[. > 0]") + ")[position() < last()]"),
         2, exists(TAIL));
     check(func.args(REPLICATE.args(" <a/>", 2)),
         "<a/>\n<a/>", empty(func));
@@ -850,6 +851,9 @@ public final class FnModuleTest extends QueryPlanTest {
         "b\na\n<_/>", empty(func));
     check("(<a/>, <b/>)[. = ''] =>" + func.args() + " =>" + func.args(),
         "<a/>\n<b/>", empty(func));
+
+    check(func.args(" (1 to 6, (7 to " + wrap(13) + ")[. > 12], (14 to " + wrap(20) + ")[. > 18])"),
+        "20\n19\n13\n6\n5\n4\n3\n2\n1", count(REVERSE, 2));
   }
 
   /** Test method. */
