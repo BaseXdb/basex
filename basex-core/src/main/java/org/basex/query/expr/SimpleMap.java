@@ -171,8 +171,8 @@ public abstract class SimpleMap extends Arr {
         } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
             args[1] instanceof ContextValue) {
           if(expr instanceof RangeSeq) {
-            // (3 to 4) ! util:item(X, .)  ->  util:range(X, 3, 4)
-            // reverse(3 to 4) ! util:item(X, .)  ->  reverse(util:range(X, 3, 4))
+            // (A to B) ! util:item(E, .)  ->  util:range(E, A, B)
+            // reverse(A to B) ! util:item(E, .)  ->  reverse(util:range(E, A, B))
             final RangeSeq seq = (RangeSeq) expr;
             final long[] range = seq.range(false);
             final Expr func = cc.function(_UTIL_RANGE, info,
@@ -180,16 +180,16 @@ public abstract class SimpleMap extends Arr {
             return seq.asc ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
-            // (1 to $i) ! util:item(X, .)  ->  util:range(X, 1, $i)
+            // (E1 to E2) ! util:item(X, .)  ->  util:range(X, E1, E2)
             return cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
           }
         } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
             args[0] instanceof ContextValue)) {
-          // ITEMS ! data(.)  ->  data(ITEMS)
+          // E ! data(.)  ->  data(E)
           return cc.function(DATA, info, expr);
         } else if(STRING_TO_CODEPOINTS.is(expr) && CODEPOINTS_TO_STRING.is(next) &&
             args[0] instanceof ContextValue) {
-          // string-to-codepoints(STRING) ! codepoints-to-string(.)  ->  characters(STRING)
+          // string-to-codepoints(E) ! codepoints-to-string(.)  ->  characters(E)
           return cc.function(CHARACTERS, info, expr.args());
         }
       }

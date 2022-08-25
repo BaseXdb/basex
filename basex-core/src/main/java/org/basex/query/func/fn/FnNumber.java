@@ -43,9 +43,9 @@ public final class FnNumber extends ContextFn {
     // $double[number() = 1]  ->  $double[. = 1]
     if(type == DOUBLE) return context && cc.nestedFocus() ? ContextValue.get(cc, info) : value;
 
-    // number(string(ITEM))
-    // number(xs:untypedAtomic(ITEM))
-    // number(ITEM promote to xs:untypedAtomic)  ->  number(ITEM)
+    // number(string(E))
+    // number(xs:untypedAtomic(E))
+    // number(ITEM promote to xs:untypedAtomic)  ->  number(E)
     if(type != null) {
       final Expr arg = simplify(value, cc);
       if(arg != null) return cc.function(Function.NUMBER, info, arg);

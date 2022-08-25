@@ -39,30 +39,31 @@ public final class UtilLast extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zeroOrOne()) return input;
 
-    // rewrite nested function calls
     final long size = input.size();
+    // util:last(tail(E))  ->  util:last(E)
     if(TAIL.is(input) && size > 1)
       return cc.function(_UTIL_LAST, info, input.args());
+    // util:last(util:init(E))  ->  util:item(E, size)
     if(_UTIL_INIT.is(input) && size > 0)
       return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(size));
+    // util:last(reverse(E))  ->  head(E)
     if(REVERSE.is(input))
       return cc.function(HEAD, info, input.args());
+    // util:last(replicate(E, count))  ->  util:last(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
       if(input.arg(1) instanceof Int) return cc.function(_UTIL_LAST, info, input.arg(0));
     }
 
-    // rewrite list
+    // util:last((1, 2))  ->  2
+    // util:last((1, (2 to 3))  ->  util:last(2 to 3)
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr last = args[args.length - 1];
       final SeqType stl = last.seqType();
-      // head((1, 2))  ->  2
       if(stl.one()) return last;
-      // head((1, (2 to 3))  ->  util:last(2 to 3)
       if(stl.oneOrMore()) return cc.function(_UTIL_LAST, info, last);
     }
-
     // util:last(reverse(root)[test])  ->  head(root[test])
     if(input instanceof IterFilter) {
       final IterFilter filter = (IterFilter) input;

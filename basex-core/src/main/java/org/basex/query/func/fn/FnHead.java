@@ -33,12 +33,14 @@ public final class FnHead extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zeroOrOne()) return input;
 
-    // rewrite nested function calls
     final long size = input.size();
+    // head(tail(E))  ->  util:item(E, 2)
     if(TAIL.is(input))
       return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(2));
+    // head(util:init(E))  ->  head(E)
     if(_UTIL_INIT.is(input) && size > 1)
       return cc.function(HEAD, info, input.args());
+    // head(subsequence(E, pos))  ->  util:item(E, pos)
     if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
       final SeqRange r = SeqRange.get(input, cc);
       // safety check (at this stage, r.length should never be 0)
@@ -55,10 +57,12 @@ public final class FnHead extends StandardFunc {
       // head(reverse(E))  ->  util:last(E)
       return cc.function(_UTIL_LAST, info, input.args());
     }
+    // head(replicate(E, count))  ->  head(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
       if(input.arg(1) instanceof Int) return cc.function(HEAD, info, input.arg(0));
     }
+    // head(file:read-text-lines(E))  ->  file:read-text-lines(E, 0, 1)
     if(_FILE_READ_TEXT_LINES.is(input))
       return FileReadTextLines.opt(this, 0, 1, cc);
 

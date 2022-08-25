@@ -91,8 +91,8 @@ abstract class Convert extends Single {
     final SeqType est = expr.seqType();
     Expr arg = null;
     if(est.one() && !est.mayBeArray() && castType.type.instanceOf(AtomType.NUMERIC)) {
-      // xs:int(string(ITEM))
-      // xs:int(xs:double(ITEM))  ->  xs:int(ITEM)
+      // xs:int(string(I))
+      // xs:int(xs:double(I))  ->  xs:int(I)
       arg = FnNumber.simplify(expr, cc);
       if(arg == null && expr instanceof Cast && (
         castType.type.instanceOf(est.type) ||

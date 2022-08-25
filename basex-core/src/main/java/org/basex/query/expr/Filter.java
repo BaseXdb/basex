@@ -136,23 +136,23 @@ public abstract class Filter extends Preds {
       } else if(pred instanceof ItrPos) {
         final ItrPos pos = (ItrPos) pred;
         if(pos.min != pos.max) {
-          // expr[min..max]  ->  util:range(expr, min, max)
+          // E[min..max]  ->  util:range(E, min, max)
           ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr),
               Int.get(pos.min), Int.get(pos.max));
         } else if(pos.min == 1) {
-          // expr[1]  ->  head(expr)
+          // E[1]  ->  head(E)
           ex = cc.function(HEAD, info, prepare.apply(expr));
         } else {
-          // expr[pos]  ->  util:item(expr, pos)
+          // E[pos]  ->  util:item(E, pos)
           ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), Int.get(pos.min));
         }
       } else if(pred instanceof Pos) {
         final Pos pos = (Pos) pred;
         if(pos.exact()) {
-          // expr[pos]  ->  util:item(expr, pos.min)
+          // E[pos]  ->  util:item(E, pos.min)
           ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
         } else {
-          // expr[min..max]  ->  util:range(expr, pos.min, pos.max)
+          // E[min..max]  ->  util:range(E, pos.min, pos.max)
           ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pos.exprs[0], pos.exprs[1]);
         }
       } else if(numeric(pred)) {
@@ -170,18 +170,18 @@ public abstract class Filter extends Preds {
         if(cmp.positional() && opV != null) {
           final Expr e = cmp.exprs[1];
           if((opV == OpV.LT || opV == OpV.NE) && LAST.is(e)) {
-            // expr[position() < last()]  ->  util:init(expr)
+            // E[position() < last()]  ->  util:init(E)
             ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
           } else if(opV == OpV.NE && e.seqType().instanceOf(SeqType.INTEGER_O) && e.isSimple()) {
-            // expr[position() != INT]  ->  remove(expr, INT)
+            // E[position() != pos]  ->  remove(E, pos)
             ex = cc.function(REMOVE, info, prepare.apply(expr), e);
           } else if(opV == OpV.EQ && e instanceof Range) {
             final Expr arg1 = e.arg(0), arg2 = e.arg(1);
             if(LAST.is(arg2) && arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple()) {
-              // expr[position() = INT to last()]  ->  util:range(expr, INT)
+              // E[position() = pos to last()]  ->  util:range(E, pos)
               ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
             } else if(arg1 instanceof Int && arg2 instanceof Arith) {
-              // expr[position() = 1 to last() - 1]  ->  util:init(expr)
+              // E[position() = 1 to last() - 1]  ->  util:init(E)
               if(((Int) arg1).itr() <= 1 && LAST.is(arg2.arg(0)) &&
                   ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
                 ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
@@ -190,7 +190,7 @@ public abstract class Filter extends Preds {
           }
         }
       } else if(pred instanceof Arith && LAST.is(pred.arg(0)) && preds.isEmpty()) {
-        // expr[last() - 1]  ->  util:item(expr, count(expr) - 1)
+        // E[last() - 1]  ->  util:item(E, size - 1)
         final long es = expr.size();
         if(es != -1) ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr),
             new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));

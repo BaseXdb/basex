@@ -85,42 +85,39 @@ public final class UtilInit extends StandardFunc {
 
     final long size = input.size();
     if(size != -1) {
-      // two results: return first item
+      // util:init(TWO-RESULTS)  ->  head(TWO-RESULTS)
       if(size == 2) return cc.function(HEAD, info, input);
-      // rewrite nested function calls
+      // util:init(util:init(E))  ->  subsequence(E, 1, size - 2)
       if(_UTIL_INIT.is(input))
         return cc.function(SUBSEQUENCE, info, input.arg(0), Int.ONE, Int.get(size - 1));
     }
-
+    // util:init(subsequence(E, pos, length))  ->  subsequence(E, pos, length - 1)
     if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
       final SeqRange r = SeqRange.get(input, cc);
       if(r != null) return cc.function(SUBSEQUENCE, info, input.arg(0),
           Int.get(r.start + 1), Int.get(r.length - 1));
     }
+    // util:init(replicate(I, count))  ->  replicate(I, count - 1)
     if(REPLICATE.is(input)) {
-      final Expr[] args = input.args();
+      final Expr[] args = input.args().clone();
       if(args[1] instanceof Int && args[0].seqType().zeroOrOne()) {
         args[1] = Int.get(((Int) args[1]).itr() - 1);
         return cc.function(REPLICATE, info, args);
       }
     }
 
-    // rewrite list
+    // util:init(1, (2 to 5)))  ->  1, util:init(2 to 5))
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr last = args[args.length - 1];
       if(last.seqType().oneOrMore()) {
-        // util:init(1, (2 to 5)))  ->  1, util:init(2 to 5))
         args[args.length - 1] = cc.function(_UTIL_INIT, info, last);
         return List.get(cc, info, args);
       }
     }
 
-    final Expr embedded = embed(cc, false);
-    if(embedded != null) return embedded;
-
     exprType.assign(st.union(Occ.ZERO), size - 1);
     data(input.data());
-    return this;
+    return embed(cc, false);
   }
 }

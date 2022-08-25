@@ -69,42 +69,41 @@ public final class FnTail extends StandardFunc {
     // two results: return last item
     if(size == 2) return cc.function(_UTIL_LAST, info, input);
 
-    // rewrite nested function calls
+    // tail(tail(E))  ->  subsequence(E, 3)
     if(TAIL.is(input))
       return cc.function(SUBSEQUENCE, info, input.arg(0), Int.get(3));
+    // tail(subsequence(E, pos, length))  ->  subsequence(E, pos + 1, length - 1)
     if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
       final SeqRange r = SeqRange.get(input, cc);
       if(r != null) return cc.function(SUBSEQUENCE, info, input.arg(0),
           Int.get(r.start + 2), Int.get(r.length - 1));
     }
+    // tail(replicate(I, count))  ->  replicate(I, count - 1)
     if(REPLICATE.is(input)) {
-      final Expr[] args = input.args();
+      final Expr[] args = input.args().clone();
       if(args[1] instanceof Int && args[0].seqType().zeroOrOne()) {
         args[1] = Int.get(((Int) args[1]).itr() - 1);
         return cc.function(REPLICATE, info, args);
       }
     }
+    // head(file:read-text-lines(E))  ->  file:read-text-lines(E, 1)
     if(_FILE_READ_TEXT_LINES.is(input))
       return FileReadTextLines.opt(this, 1, Long.MAX_VALUE, cc);
 
-    // rewrite list
+    // tail(1, 2, 3)  ->  tail(2, 3)
+    // tail((1 to 4), 5))  ->  tail(1 to 4), 5
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr first = args[0];
       if(first.seqType().oneOrMore()) {
-        // tail(1, 2, 3)  ->  tail(2, 3)
-        // tail((1 to 4), 5))  ->  tail(1 to 4), 5
         args[0] = cc.function(TAIL, info, first);
         return List.get(cc, info, args);
       }
     }
 
-    final Expr embedded = embed(cc, false);
-    if(embedded != null) return embedded;
-
     exprType.assign(st.union(Occ.ZERO), size - 1);
     data(input.data());
-    return this;
+    return embed(cc, false);
   }
 
   @Override
