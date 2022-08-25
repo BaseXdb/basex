@@ -79,11 +79,4 @@ public final class SubSeq extends Seq {
     for(long i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }
-
-  @Override
-  public long atomSize() {
-    long sz = 0;
-    for(int i = 0; i < size; i++) sz += itemAt(i).atomSize();
-    return sz;
-  }
 }

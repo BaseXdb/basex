@@ -38,11 +38,6 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final long atomSize() {
-    return size;
-  }
-
-  @Override
   public boolean sameType() {
     return true;
   }

@@ -151,12 +151,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract void cache(boolean lazy, InputInfo ii) throws QueryException;
 
   /**
-   * Computes the number of atomized items.
-   * @return atomized item
-   */
-  public abstract long atomSize();
-
-  /**
    * Returns a Java representation of the value.
    * @return Java object
    * @throws QueryException query exception

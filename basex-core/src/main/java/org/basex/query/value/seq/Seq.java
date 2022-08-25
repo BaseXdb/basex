@@ -260,13 +260,6 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public long atomSize() {
-    long sz = 0;
-    for(final Item item : this) sz += item.atomSize();
-    return sz;
-  }
-
-  @Override
   public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 

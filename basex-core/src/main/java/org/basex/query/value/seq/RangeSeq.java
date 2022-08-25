@@ -130,11 +130,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public long atomSize() {
-    return size;
-  }
-
-  @Override
   public boolean sameType() {
     return true;
   }

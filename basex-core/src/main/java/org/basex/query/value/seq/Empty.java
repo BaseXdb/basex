@@ -110,11 +110,6 @@ public final class Empty extends Item {
   }
 
   @Override
-  public long atomSize() {
-    return 0;
-  }
-
-  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
     return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? cc.simplify(this, Bln.FALSE) : this;
   }

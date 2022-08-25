@@ -277,15 +277,6 @@ public abstract class Item extends Value {
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   * Overwritten by {@link XQArray}.
-   */
-  @Override
-  public long atomSize() {
-    return 1;
-  }
-
   @Override
   public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {

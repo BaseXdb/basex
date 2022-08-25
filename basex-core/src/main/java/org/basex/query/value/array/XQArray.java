@@ -304,15 +304,6 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final long atomSize() {
-    long size = 0;
-    for(final Value value : members()) {
-      for(final Item item : value) size += item.atomSize();
-    }
-    return size;
-  }
-
-  @Override
   public final void string(final boolean indent, final TokenBuilder tb, final int level,
       final InputInfo ii) throws QueryException {
 

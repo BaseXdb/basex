@@ -79,11 +79,6 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public long atomSize() {
-    return size * value.atomSize();
-  }
-
-  @Override
   protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
     return singleItem() ? new SingletonSeq(length, value) : super.subSeq(pos, length, qc);
   }
