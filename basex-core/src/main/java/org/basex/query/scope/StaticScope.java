@@ -1,5 +1,7 @@
 package org.basex.query.scope;
 
+import static org.basex.query.QueryError.*;
+
 import java.io.*;
 
 import org.basex.io.in.*;
@@ -77,7 +79,9 @@ public abstract class StaticScope extends ExprInfo implements Scope {
       final int fp = vs.enter(qc);
       try {
         final Value val = expr.value(qc);
-        if(declType != null) declType.treat(val, name, qc, info);
+        if(declType != null && !declType.instance(val)) {
+          throw typeError(val, declType, name, info, false);
+        }
         value = val;
       } finally {
         VarScope.exit(fp, qc);

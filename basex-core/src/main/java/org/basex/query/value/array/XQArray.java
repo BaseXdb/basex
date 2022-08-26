@@ -369,7 +369,9 @@ public abstract class XQArray extends XQData {
     if(dt.eq(SeqType.ITEM_ZM)) return true;
 
     // check types of members
-    for(final Value value : members()) if(!dt.instance(value)) return false;
+    for(final Value value : members()) {
+      if(!dt.instance(value)) return false;
+    }
     return true;
   }
 

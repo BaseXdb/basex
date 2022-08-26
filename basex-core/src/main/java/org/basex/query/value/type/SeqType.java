@@ -267,13 +267,19 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Value value) {
-    // try shortcut (but value type may be too general)
-    if(value.seqType().instanceOf(this)) return true;
-
     // check cardinality
-    if(!occ.check(value.size())) return false;
+    final long size = value.size();
+    if(!occ.check(size)) return false;
 
-    // value type may be too general: check type of each item
+    // single item, empty sequence
+    if(size == 1) return instance((Item) value);
+    if(size == 0) return true;
+
+    // sequence: try shortcut, based on value type
+    final SeqType st = value.seqType();
+    if(st.type.instanceOf(type) && st.kindInstanceOf(this)) return true;
+
+    // if type is too general, check type of each item
     for(final Item item : value) {
       if(!instance(item)) return false;
     }
@@ -334,29 +340,6 @@ public final class SeqType {
       return null;
     } finally {
       if(!error && ii != null) ii.internal(false);
-    }
-  }
-
-  /**
-   * Treats the specified value as this sequence type.
-   * @param value value to check
-   * @param name name of variable (can be {@code null})
-   * @param qc query context
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public void treat(final Value value, final QNm name, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-
-    // try shortcut (but value type may be too general)
-    if(value.seqType().instanceOf(this)) return;
-
-    // check cardinality
-    if(!occ.check(value.size())) throw typeError(value, this, name, ii, false);
-
-    for(final Item item : value) {
-      qc.checkStop();
-      if(!instance(item)) throw typeError(value, this, name, ii, false);
     }
   }
 
@@ -564,8 +547,7 @@ public final class SeqType {
   public boolean instanceOf(final SeqType st) {
     // empty sequence: only check cardinality
     return zero() ? !st.oneOrMore() :
-      (st.type == ITEM || type.instanceOf(st.type)) &&
-      occ.instanceOf(st.occ) && kindInstanceOf(st);
+      type.instanceOf(st.type) && occ.instanceOf(st.occ) && kindInstanceOf(st);
   }
 
   /**

@@ -129,7 +129,7 @@ public class FuncType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(this, SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(SeqType.FUNCTION, AtomType.ITEM)) return true;
     if(this == SeqType.FUNCTION || !(type instanceof FuncType) || type instanceof MapType ||
         type instanceof ArrayType) return false;
 
