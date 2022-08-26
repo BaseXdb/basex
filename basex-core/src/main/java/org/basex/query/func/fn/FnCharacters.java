@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -30,6 +31,12 @@ public class FnCharacters extends StandardFunc {
         @Override
         public Str get(final long i) {
           return Str.get(new byte[] { value[(int) i] });
+        }
+        @Override
+        public Value value(final QueryContext q, final Expr expr) {
+          final TokenList tl = new TokenList((int) size);
+          for(final byte b : value) tl.add(new byte[] { b });
+          return StrSeq.get(tl);
         }
       };
     }

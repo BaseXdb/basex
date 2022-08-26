@@ -64,8 +64,7 @@ public final class Instance extends Single {
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // check instance of value
     final Iter iter = expr.iter(qc);
-    final Value value = iter.iterValue();
-    if(value != null) return Bln.get(seqType.instance(value));
+    if(iter.valueIter()) return Bln.get(seqType.instance(iter.value(qc, expr)));
 
     // only check item type
     if(check == 1) {

@@ -36,7 +36,7 @@ public final class FnIndexWhere extends StandardFunc {
         list.add(c);
       }
     }
-    return IntSeq.get(list.finish());
+    return IntSeq.get(list);
   }
 
   @Override

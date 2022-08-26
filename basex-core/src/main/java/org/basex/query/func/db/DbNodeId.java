@@ -33,10 +33,8 @@ public class DbNodeId extends StandardFunc {
   public final Value value(final QueryContext qc) throws QueryException {
     final Iter nodes = exprs[0].iter(qc);
     final LongList list = new LongList(Seq.initialCapacity(nodes.size()));
-    for(Item item; (item = qc.next(nodes)) != null;) {
-      list.add(id(toDBNode(item)));
-    }
-    return IntSeq.get(list.finish());
+    for(Item item; (item = qc.next(nodes)) != null;) list.add(id(toDBNode(item)));
+    return IntSeq.get(list);
   }
 
   @Override

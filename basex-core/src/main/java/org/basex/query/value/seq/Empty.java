@@ -7,7 +7,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -32,11 +31,11 @@ public final class Empty extends Item {
       return null;
     }
     @Override
-    public Value iterValue() {
-      return VALUE;
+    public boolean valueIter() {
+      return true;
     }
     @Override
-    public Value value(final QueryContext qc, final Expr expr) {
+    public Empty value(final QueryContext qc, final Expr expr) {
       return VALUE;
     }
   };

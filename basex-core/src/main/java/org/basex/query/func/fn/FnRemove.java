@@ -23,10 +23,8 @@ public final class FnRemove extends StandardFunc {
 
     // position out of bounds: return original value
     if(pos <= 0 || size != -1 && pos > size) return input;
-
-    // check if iterator is value-based
-    final Value value = input.iterValue();
-    if(value != null) return value(value, pos, qc).iter();
+    // value-based iterator
+    if(input.valueIter()) return value(input.value(qc, null), pos, qc).iter();
 
     return new Iter() {
       long c;

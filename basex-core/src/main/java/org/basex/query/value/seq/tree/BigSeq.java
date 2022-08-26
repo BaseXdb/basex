@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -514,19 +513,16 @@ final class BigSeq extends TreeSeq {
         if(sub == null) sub = middle.iterator();
         return sub.next();
       }
-
-      @Override
-      public Value iterValue() {
-        return BigSeq.this;
-      }
-
       @Override
       public Item get(final long i) {
         return itemAt(i);
       }
-
       @Override
-      public Value value(final QueryContext qc, final Expr expr) {
+      public boolean valueIter() {
+        return true;
+      }
+      @Override
+      public BigSeq value(final QueryContext qc, final Expr expr) {
         return BigSeq.this;
       }
     };

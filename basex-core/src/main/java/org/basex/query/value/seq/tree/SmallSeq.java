@@ -139,14 +139,12 @@ public final class SmallSeq extends TreeSeq {
       public Item get(final long i) {
         return items[(int) i];
       }
-
       @Override
-      public Value iterValue() {
-        return SmallSeq.this;
+      public boolean valueIter() {
+        return true;
       }
-
       @Override
-      public Value value(final QueryContext qc, final Expr expr) {
+      public SmallSeq value(final QueryContext qc, final Expr expr) {
         return SmallSeq.this;
       }
     };

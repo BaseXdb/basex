@@ -114,8 +114,8 @@ public class TypeCheck extends Single {
   public final Iter iter(final QueryContext qc) throws QueryException {
     final SeqType st = seqType();
     final Iter iter = expr.iter(qc);
-    final Value value = iter.iterValue();
-    if(value != null) {
+    if(iter.valueIter()) {
+      final Value value = iter.value(qc, null);
       if(st.instance(value)) return iter;
       if(!promote) throw error(value, st);
     }

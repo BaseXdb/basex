@@ -155,7 +155,7 @@ public class DBNodeSeq extends NativeSeq {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a sequence with the specified items.
+   * Creates a sequence with the specified values.
    * @param pres pre values
    * @param data data reference
    * @param type node type (can be {@code null})
@@ -168,7 +168,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   /**
-   * Creates a sequence with the specified items.
+   * Creates a sequence with the specified values.
    * @param pres pre values
    * @param data data reference
    * @param expr expression (can be {@code null})

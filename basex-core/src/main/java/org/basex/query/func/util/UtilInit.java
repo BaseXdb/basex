@@ -29,8 +29,7 @@ public final class UtilInit extends StandardFunc {
     if(size == 0 || size == 1) return Empty.ITER;
 
     // check if iterator is value-based
-    final Value value = input.iterValue();
-    if(value != null) return value.subsequence(0, size - 1, qc).iter();
+    if(input.valueIter()) return input.value(qc, null).subsequence(0, size - 1, qc).iter();
 
     // return optimized iterator if result size is known
     if(size != -1) return new Iter() {

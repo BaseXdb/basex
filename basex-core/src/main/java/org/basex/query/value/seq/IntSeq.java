@@ -128,18 +128,17 @@ public final class IntSeq extends NativeSeq {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates an xs:integer sequence with the specified items.
-   * @param values values
+   * Creates an xs:integer sequence with the specified values.
+   * @param values values (will be invalidated by this call)
    * @return value
    */
-  public static Value get(final int[] values) {
-    final LongList list = new LongList(values.length);
-    for(final int value : values) list.add(value);
-    return get(list.finish(), AtomType.INTEGER);
+  public static Value get(final LongList values) {
+    return values.isEmpty() ? Empty.VALUE : values.size() == 1 ? Int.get(values.get(0)) :
+      new IntSeq(values.finish(), AtomType.INTEGER);
   }
 
   /**
-   * Creates an xs:integer sequence with the specified items.
+   * Creates an xs:integer sequence with the specified values.
    * @param values values
    * @return value
    */
@@ -148,7 +147,7 @@ public final class IntSeq extends NativeSeq {
   }
 
   /**
-   * Creates a sequence with the specified items.
+   * Creates a sequence with the specified values.
    * @param values values
    * @param type type
    * @return value

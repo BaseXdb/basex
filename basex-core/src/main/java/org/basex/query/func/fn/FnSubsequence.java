@@ -38,13 +38,16 @@ public class FnSubsequence extends StandardFunc {
     final Iter input = exprs[0].iter(qc);
     if(sr == ALL) return input;
 
-    // return subsequence iterator if iterator is value-based
+    // return empty iterator if no items remain
     final long size = sr.adjust(input.size());
     if(sr.length == 0) return Empty.ITER;
 
+    // return subsequence if iterator is value-based
+    if(input.valueIter()) {
+      return input.value(qc, null).subsequence(sr.start, sr.length, qc).iter();
+    }
+    // size is known: create specific iterator
     if(size != -1) {
-      final Value value = input.iterValue();
-      if(value != null) return value.subsequence(sr.start, sr.length, qc).iter();
       if(sr.length == size) return input;
 
       return new Iter() {
@@ -65,8 +68,7 @@ public class FnSubsequence extends StandardFunc {
         }
       };
     }
-
-    // otherwise, return standard iterator
+    // otherwise, create standard iterator
     return new Iter() {
       long c;
 
@@ -82,30 +84,32 @@ public class FnSubsequence extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // no range: return empty sequence
     final SeqRange sr = range(qc);
     if(sr == EMPTY) return Empty.VALUE;
 
+    // return iterator if all results are returned, of it iterator yields no items
     final Expr input = exprs[0];
     if(sr == ALL) return input.value(qc);
-    final Iter iter = input.iter(qc);
 
+    // return empty iterator if no items remain
+    final Iter iter = input.iter(qc);
     final long size = sr.adjust(iter.size());
     if(sr.length == 0) return Empty.VALUE;
 
-    // take fast route if result size is known
+    // return subsequence if iterator is value-based
+    if(iter.valueIter()) {
+      return iter.value(qc, null).subsequence(sr.start, sr.length, qc);
+    }
+    // size is known: collect by position
     if(size != -1) {
-      // return subsequence if iterator is value-based
-      final Value value = iter.iterValue();
-      if(value != null) return value.subsequence(sr.start, sr.length, qc);
-
       if(sr.length == size) return iter.value(qc, this);
 
       final ValueBuilder vb = new ValueBuilder(qc);
       for(long i = sr.start; i < sr.end; i++) vb.add(iter.get(i));
       return vb.value(this);
     }
-
-    // otherwise, retrieve all items
+    // otherwise, collect via iterator
     final ValueBuilder vb = new ValueBuilder(qc);
     long c = 0;
     for(Item item; c < sr.end && (item = qc.next(iter)) != null; c++) {

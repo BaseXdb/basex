@@ -17,7 +17,7 @@ public final class HofDropWhile extends HofTakeWhile {
     final Iter input = exprs[0].iter(qc);
     final FItem predicate = toFunction(exprs[1], 1, qc);
 
-    // check if iterator is value-based
+    // value-based iterator
     final Value value = value(input, predicate, qc);
     if(value != null) return value.iter();
 
@@ -67,9 +67,9 @@ public final class HofDropWhile extends HofTakeWhile {
   private Value value(final Iter input, final FItem predicate, final QueryContext qc)
       throws QueryException {
 
-    final Value value = input.iterValue();
-    if(value == null) return null;
+    if(!input.valueIter()) return null;
 
+    final Value value = input.value(qc, null);
     final long size = value.size();
     long c = -1;
     while(++c < size && test(value.itemAt(c), predicate, qc));

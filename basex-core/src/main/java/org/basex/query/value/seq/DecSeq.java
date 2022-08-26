@@ -81,7 +81,7 @@ public final class DecSeq extends NativeSeq {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a sequence with the specified items.
+   * Creates a sequence with the specified values.
    * @param values values
    * @return value
    */

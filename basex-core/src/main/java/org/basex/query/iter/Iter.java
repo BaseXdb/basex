@@ -44,11 +44,11 @@ public abstract class Iter {
   }
 
   /**
-   * If available, returns a value on which the iterator is based on.
-   * @return value or {@code null}
+   * Indicates if this iterator is based on a value.
+   * @return result of check
    */
-  public Value iterValue() {
-    return null;
+  public boolean valueIter() {
+    return false;
   }
 
   /**

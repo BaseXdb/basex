@@ -27,11 +27,10 @@ public final class FnTail extends StandardFunc {
 
     // return empty iterator if iterator yields 0 or 1 items, or if result is an empty sequence
     if(size == 0 || size == 1 || input.next() == null) return Empty.ITER;
+    // value-based iterator
+    if(input.valueIter()) return input.value(qc, null).subsequence(1, size - 1, qc).iter();
 
-    // check if iterator is value-based
-    final Value value = input.iterValue();
-    if(value != null) return value.subsequence(1, size - 1, qc).iter();
-
+    // create iterator
     return new Iter() {
       @Override
       public Item next() throws QueryException {

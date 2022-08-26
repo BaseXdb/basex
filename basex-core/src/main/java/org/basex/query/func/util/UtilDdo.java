@@ -23,8 +23,10 @@ public final class UtilDdo extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter nodes = exprs[0].iter(qc);
-    final Value value = nodes.iterValue();
-    if(value instanceof DBNodeSeq) return value;
+    if(nodes.valueIter()) {
+      final Value value = nodes.value(qc, null);
+      if(value instanceof DBNodeSeq) return value;
+    }
 
     final ANodeBuilder nb = new ANodeBuilder();
     for(Item item; (item = qc.next(nodes)) != null;) {

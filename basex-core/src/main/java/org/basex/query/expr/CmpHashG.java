@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -40,13 +39,12 @@ public final class CmpHashG extends CmpG {
       final QueryContext qc) throws QueryException {
 
     // check if iterator is based on value with more than one item
-    final Value value2 = iter2.iterValue();
-    if(value2 != null && value2.size() > 1) {
+    if(iter2.valueIter() && iter2.size() > 1) {
       // retrieve cache (first call: initialize it)
       final CmpCache cache = qc.threads.get(this).get();
 
       // check if caching is enabled
-      if(cache.active(value2, iter2)) {
+      if(cache.active(iter2.value(qc, null), iter2)) {
         final HashItemSet set = cache.set;
         Iter ir2 = cache.iter;
 

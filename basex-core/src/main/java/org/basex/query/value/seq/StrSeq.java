@@ -81,17 +81,17 @@ public final class StrSeq extends NativeSeq {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a sequence with the specified items.
-   * @param items items (will be invalidated by this call)
+   * Creates a sequence with the specified values.
+   * @param values values (will be invalidated by this call)
    * @return value
    */
-  public static Value get(final TokenList items) {
-    return items.isEmpty() ? Empty.VALUE : items.size() == 1 ? Str.get(items.get(0)) :
-      new StrSeq(items.finish());
+  public static Value get(final TokenList values) {
+    return values.isEmpty() ? Empty.VALUE : values.size() == 1 ? Str.get(values.get(0)) :
+      new StrSeq(values.finish());
   }
 
   /**
-   * Creates a sequence with the specified items.
+   * Creates a sequence with the specified values.
    * @param values values
    * @return value
    */

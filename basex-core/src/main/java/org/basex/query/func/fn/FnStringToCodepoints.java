@@ -3,11 +3,13 @@ package org.basex.query.func.fn;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -27,6 +29,12 @@ public final class FnStringToCodepoints extends StandardFunc {
         public Int get(final long i) {
           return Int.get(value[(int) i]);
         }
+        @Override
+        public Value value(final QueryContext q, final Expr expr) throws QueryException {
+          final LongList list = new LongList(Seq.initialCapacity(size));
+          for(final byte b : value) list.add(b);
+          return IntSeq.get(list);
+        }
       };
     }
 
@@ -45,6 +53,9 @@ public final class FnStringToCodepoints extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return IntSeq.get(cps(toZeroToken(exprs[0], qc)));
+    final int[] cps = cps(toZeroToken(exprs[0], qc));
+    final LongList list = new LongList(cps.length);
+    for(final int cp : cps) list.add(cp);
+    return IntSeq.get(list);
   }
 }
