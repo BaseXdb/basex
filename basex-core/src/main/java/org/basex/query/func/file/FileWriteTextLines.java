@@ -48,7 +48,7 @@ public class FileWriteTextLines extends FileFn {
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       final Iter values = exprs[1].iter(qc);
-      for(Item item; (item = values.next()) != null;) {
+      for(Item item; (item = qc.next(values)) != null;) {
         if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STRING, info);
 
         final byte[] s = item.string(info);

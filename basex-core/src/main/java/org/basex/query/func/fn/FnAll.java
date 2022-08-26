@@ -26,7 +26,7 @@ public class FnAll extends StandardFunc {
     final FItem predicate = toFunction(exprs[1], 1, qc);
 
     final boolean some = some();
-    for(Item item; (item = qc.next(input)) != null;) {
+    for(Item item; (item = input.next()) != null;) {
       if(toBoolean(predicate.invoke(qc, info, item).item(qc, info)) ^ !some) {
         return Bln.get(some);
       }

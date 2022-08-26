@@ -34,10 +34,10 @@ abstract class HashFn extends StandardFunc {
         try(BufferInput bi = value.input(info)) {
           final byte[] tmp = new byte[IO.BLOCKSIZE];
           do {
+            qc.checkStop();
             final int n = bi.read(tmp);
             if(n == -1) return B64.get(md.digest());
             md.update(tmp, 0, n);
-            qc.checkStop();
           } while(true);
         } catch(final IOException ex) {
           throw FILE_IO_ERROR_X.get(info, ex);

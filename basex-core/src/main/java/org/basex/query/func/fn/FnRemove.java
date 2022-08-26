@@ -31,7 +31,7 @@ public final class FnRemove extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        return ++c != pos || input.next() != null ? qc.next(input) : null;
+        return ++c != pos || input.next() != null ? input.next() : null;
       }
       @Override
       public Item get(final long i) throws QueryException {

@@ -23,11 +23,11 @@ public final class HofFoldLeft1 extends StandardFunc {
     final Iter input = exprs[0].iter(qc);
     final FItem action = toFunction(exprs[1], 2, qc);
 
-    Value sum = checkNoEmpty(input.next());
-    for(Item item; (item = qc.next(input)) != null;) {
-      sum = action.invoke(qc, info, sum, item);
+    Value value = checkNoEmpty(input.next());
+    for(Item item; (item = input.next()) != null;) {
+      value = action.invoke(qc, info, value, item);
     }
-    return sum;
+    return value;
   }
 
   @Override

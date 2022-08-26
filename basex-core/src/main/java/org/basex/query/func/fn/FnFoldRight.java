@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
 
 /**
@@ -43,8 +42,8 @@ public final class FnFoldRight extends StandardFunc {
     final FItem action = toFunction(exprs[2], 2, qc);
 
     if(items instanceof TreeSeq) {
-      final ListIterator<Item> iter = ((TreeSeq) items).iterator(items.size());
-      while(iter.hasPrevious()) {
+      for(final ListIterator<Item> iter = ((TreeSeq) items).iterator(items.size());
+          iter.hasPrevious();) {
         value = action.invoke(qc, info, iter.previous(), value);
       }
     } else {
@@ -58,7 +57,7 @@ public final class FnFoldRight extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0], zero = exprs[1], action = exprs[2];
-    if(input == Empty.VALUE) return zero;
+    if(input.seqType().zero()) return zero;
 
     FnFoldLeft.opt(this, cc, false, false);
 

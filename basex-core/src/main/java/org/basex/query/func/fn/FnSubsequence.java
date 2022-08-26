@@ -55,7 +55,6 @@ public class FnSubsequence extends StandardFunc {
 
         @Override
         public Item next() throws QueryException {
-          qc.checkStop();
           return c < sr.end ? input.get(c++) : null;
         }
         @Override

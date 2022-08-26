@@ -68,7 +68,7 @@ public final class Instance extends Single {
 
     // only check item type
     if(check == 1) {
-      for(Item item; (item = iter.next()) != null;) {
+      for(Item item; (item = qc.next(iter)) != null;) {
         if(!seqType.instance(item)) return Bln.FALSE;
       }
       return Bln.TRUE;
@@ -81,7 +81,7 @@ public final class Instance extends Single {
 
     // check both occurrence indicator and type
     long c = 0;
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       if(++c > max || !seqType.instance(item)) return Bln.FALSE;
     }
     return Bln.get(c != 0 || !seqType.oneOrMore());

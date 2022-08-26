@@ -28,7 +28,7 @@ public final class HofScanLeft extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item in = qc.next(inner);
+          final Item in = inner.next();
           if(in != null) return in;
           final Item out = input.next();
           if(out == null) return null;

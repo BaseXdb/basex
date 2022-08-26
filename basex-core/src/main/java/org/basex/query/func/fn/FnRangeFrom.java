@@ -24,7 +24,7 @@ public class FnRangeFrom extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(input)) != null;) {
+        for(Item item; (item = input.next()) != null;) {
           if(started || toBoolean(start.invoke(qc, info, item).item(qc, info))) {
             started = true;
             return item;

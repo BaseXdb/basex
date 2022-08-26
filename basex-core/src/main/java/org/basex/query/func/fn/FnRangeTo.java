@@ -20,7 +20,7 @@ public final class FnRangeTo extends FnRangeFrom {
 
       @Override
       public Item next() throws QueryException {
-        final Item item = ended ? null : qc.next(input);
+        final Item item = ended ? null : input.next();
         if(item != null && toBoolean(end.invoke(qc, info, item).item(qc, info))) {
           ended  = true;
         }

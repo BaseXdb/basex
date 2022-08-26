@@ -29,9 +29,11 @@ public final class ArrayJoin extends ArrayFn {
     final Iter iter = arrays.iter(qc);
     Item item = iter.next();
     if(item == null) return XQArray.empty();
+
     final XQArray first = toArray(item);
     item = iter.next();
     if(item == null) return first;
+
     final XQArray second = toArray(item);
     item = iter.next();
     if(item == null) return first.concat(second);

@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -46,14 +45,14 @@ public final class FnFoldLeft extends StandardFunc {
     Item it = item;
     do {
       value = action.invoke(qc, info, value, it);
-    } while((it = qc.next(input)) != null);
+    } while((it = input.next()) != null);
     return value;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0], zero = exprs[1], action = exprs[2];
-    if(input == Empty.VALUE) return zero;
+    if(input.seqType().zero()) return zero;
 
     opt(this, cc, false, true);
 

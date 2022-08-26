@@ -40,7 +40,6 @@ public final class FnReverse extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        qc.checkStop();
         return --c >= 0 ? input.get(c) : null;
       }
       @Override

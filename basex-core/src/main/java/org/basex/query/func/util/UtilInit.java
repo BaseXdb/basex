@@ -57,7 +57,7 @@ public final class UtilInit extends StandardFunc {
       public Item next() throws QueryException {
         final Item item = last;
         if(item != null) {
-          last = qc.next(input);
+          last = input.next();
           if(last == null) return null;
         }
         return item;

@@ -91,7 +91,7 @@ abstract class DbAccess extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         Item item;
-        while((item = iter.next()) != null && !nt.matches(item)) qc.checkStop();
+        while((item = qc.next(iter)) != null && !nt.matches(item));
         return item;
       }
     };

@@ -52,7 +52,7 @@ public final class FnSort extends StandardFunc {
     final long size = input.size();
     final ValueList values = new ValueList(size);
     final Iter iter = input.iter();
-    for(Item item; (item = qc.next(iter)) != null;) {
+    for(Item item; (item = iter.next()) != null;) {
       values.add((key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info));
     }
 

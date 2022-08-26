@@ -28,7 +28,6 @@ public final class ArrayPartition extends ArrayFn {
       @Override
       public Item next() throws QueryException {
         while(value != null) {
-          qc.checkStop();
           final Item item = input.next();
           if(item == null || toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
             final Value v = value;

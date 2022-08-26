@@ -26,7 +26,7 @@ public final class UtilIntersperse extends StandardFunc {
     Item item = values.next();
     if(item != null) {
       vb.add(item);
-      while((item = values.next()) != null) vb.add(sep).add(item);
+      while((item = qc.next(values)) != null) vb.add(sep).add(item);
     }
     return vb.value(this);
   }

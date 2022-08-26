@@ -23,7 +23,7 @@ public final class MapGroupBy extends StandardFunc {
     final FItem key = toFunction(exprs[1], 1, qc);
 
     XQMap map = XQMap.empty();
-    for(Item item; (item = qc.next(input)) != null;) {
+    for(Item item; (item = input.next()) != null;) {
       final Item k = key.invoke(qc, info, item).atomItem(qc, info);
       if(k != Empty.VALUE) {
         map = map.addAll(XQMap.entry(k, item, info), MergeDuplicates.COMBINE, qc, info);

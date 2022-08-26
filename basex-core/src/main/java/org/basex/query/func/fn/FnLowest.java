@@ -40,7 +40,7 @@ public class FnLowest extends StandardFunc {
 
     final ItemList result = new ItemList();
     Value lowest = null;
-    for(Item item; (item = qc.next(input)) != null;) {
+    for(Item item; (item = input.next()) != null;) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item it : (key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info)) {
         vb.add(it.type == AtomType.DOUBLE || !it.instanceOf(AtomType.UNTYPED_ATOMIC) ? it :

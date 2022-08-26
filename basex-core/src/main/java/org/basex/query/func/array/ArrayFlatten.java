@@ -35,6 +35,7 @@ public final class ArrayFlatten extends ArrayFn {
             final Iterator<Value> members = ((XQArray) next).members().iterator();
             stack.push(new Iter() {
               private Iter iter = Empty.ITER;
+
               @Override
               public Item next() throws QueryException {
                 for(;;) {

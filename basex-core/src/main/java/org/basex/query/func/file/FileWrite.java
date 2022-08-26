@@ -41,7 +41,7 @@ public class FileWrite extends FileFn {
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       try(Serializer ser = Serializer.get(out, sopts)) {
         final Iter values = exprs[1].iter(qc);
-        for(Item item; (item = values.next()) != null;) {
+        for(Item item; (item = qc.next(values)) != null;) {
           ser.serialize(item);
         }
       }

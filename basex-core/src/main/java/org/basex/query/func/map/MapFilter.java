@@ -22,7 +22,6 @@ public final class MapFilter extends StandardFunc {
 
     final MapBuilder mb = new MapBuilder(info);
     map.apply((k, v) -> {
-      qc.checkStop();
       if(toBoolean(predicate.invoke(qc, info, k, v).item(qc, info))) {
         mb.put(k, v);
       }

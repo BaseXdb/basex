@@ -172,7 +172,7 @@ public final class Lookup extends Arr {
     } else {
       final FItem fitem = (FItem) item;
       final Iter ir = keys.atomIter(qc, info);
-      for(Item key; (key = qc.next(ir)) != null;) {
+      for(Item key; (key = ir.next()) != null;) {
         vb.add(fitem.invoke(qc, info, key));
       }
     }

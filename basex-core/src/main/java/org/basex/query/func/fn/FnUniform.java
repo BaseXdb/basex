@@ -27,7 +27,7 @@ public final class FnUniform extends StandardFunc {
 
     final Item first = values.next();
     if(first != null) {
-      for(Item item; (item = values.next()) != null;) {
+      for(Item item; (item = qc.next(values)) != null;) {
         if(!item.equiv(first, coll, info)) return Bln.FALSE;
       }
     }

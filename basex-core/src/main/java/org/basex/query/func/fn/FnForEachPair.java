@@ -30,7 +30,7 @@ public class FnForEachPair extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         do {
-          final Item item = qc.next(iter);
+          final Item item = iter.next();
           if(item != null) return item;
           final Item item1 = input1.next(), item2 = input2.next();
           if(item1 == null || item2 == null) return null;

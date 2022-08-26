@@ -27,7 +27,7 @@ public class FnForEach extends StandardFunc {
     final FItem action = toFunction(exprs[1], 1, this instanceof UpdateForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(input)) != null;) {
+    for(Item item; (item = input.next()) != null;) {
       vb.add(action.invoke(qc, info, item));
     }
     return vb.value(this);
