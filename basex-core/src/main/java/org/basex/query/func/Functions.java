@@ -183,7 +183,7 @@ public final class Functions {
    * @param expr function body
    * @param vs variable scope
    * @param ii input info
-   * @param runtime run-time flag
+   * @param runtime runtime flag
    * @param updating flag for updating functions
    * @return the function expression
    */
@@ -202,7 +202,7 @@ public final class Functions {
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @param runtime {@code true} if this method is called at run-time, {@code false} otherwise
+   * @param runtime {@code true} if this method is called at runtime, {@code false} otherwise
    * @return function literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */

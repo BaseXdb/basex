@@ -75,15 +75,15 @@ public final class Lookup extends Arr {
    * @throws QueryException query exception
    */
   private Expr opt(final CompileContext cc) throws QueryException {
-    final Expr inputs = exprs[0], keys = exprs[1];
+    final Expr input = exprs[0], keys = exprs[1];
     final long ks = keys.seqType().mayBeArray() || keys.has(Flag.NDT) ? -1 : keys.size();
     if(ks == 0) return keys;
 
-    final long is = inputs.size();
-    final QueryBiFunction<Expr, Expr, Expr> rewrite = (input, arg) ->
-      keys == WILDCARD ? cc.function(inputs.funcType() instanceof MapType ?
-      Function._UTIL_MAP_VALUES : Function._UTIL_ARRAY_VALUES, info, input) :
-      new DynFuncCall(info, cc.sc(), input, arg).optimize(cc);
+    final long is = input.size();
+    final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) ->
+      keys == WILDCARD ? cc.function(input.funcType() instanceof MapType ?
+      Function._UTIL_MAP_VALUES : Function._UTIL_ARRAY_VALUES, info, in) :
+      new DynFuncCall(info, cc.sc(), in, arg).optimize(cc);
 
     // single keys
     if(ks == 1) {
@@ -91,25 +91,25 @@ public final class Lookup extends Arr {
       //   INPUT?(KEY)  ->  INPUT(KEY)
       //   ARRAY?*      ->  util:array-values(MAP)
       //   MAP?*        ->  util:map-values(MAP)
-      if(is == 1) return rewrite.apply(inputs, keys);
+      if(is == 1) return rewrite.apply(input, keys);
       // multiple inputs:
       //   INPUTS?(KEY)  ->  INPUTS ! .(KEY)
-      final Expr ex = cc.get(inputs, () -> rewrite.apply(ContextValue.get(cc, info), keys));
-      return SimpleMap.get(cc, info, inputs, ex);
+      final Expr ex = cc.get(input, () -> rewrite.apply(ContextValue.get(cc, info), keys));
+      return SimpleMap.get(cc, info, input, ex);
     }
 
     // multiple deterministic keys, inputs are values or variable references
-    if(ks != -1 && (inputs instanceof Value || inputs instanceof VarRef)) {
+    if(ks != -1 && (input instanceof Value || input instanceof VarRef)) {
       if(is == 1) {
         // single input:
         //  INPUT?(KEYS)  ->  KEYS ! INPUT(.)
-        final Expr ex = cc.get(keys, () -> rewrite.apply(inputs, ContextValue.get(cc, info)));
+        final Expr ex = cc.get(keys, () -> rewrite.apply(input, ContextValue.get(cc, info)));
         return SimpleMap.get(cc, info, keys, ex);
       }
       // multiple inputs:
       //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
       final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
-      final For fr = new For(var, inputs).optimize(cc);
+      final For fr = new For(var, input).optimize(cc);
       final Expr ex = cc.get(keys, () ->
         rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));
       return new GFLWOR(info, fr, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
