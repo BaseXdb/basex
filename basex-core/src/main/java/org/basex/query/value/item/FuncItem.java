@@ -36,12 +36,15 @@ public final class FuncItem extends FItem implements Scope {
   private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
-  /** Query focus. */
-  private final QueryFocus focus;
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
   /** Input information. */
   private final InputInfo info;
+
+  /** Query focus. */
+  private QueryFocus focus;
+  /** Indicates if the query focus is accessed or modified. */
+  private Boolean fcs;
 
   /**
    * Constructor.
@@ -56,7 +59,7 @@ public final class FuncItem extends FItem implements Scope {
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
       final FuncType type, final Expr expr, final int stackSize, final InputInfo info) {
-    this(sc, anns, name, params, type, expr, null, stackSize, info);
+    this(sc, anns, name, params, type, expr, stackSize, info, null);
   }
 
   /**
@@ -67,13 +70,13 @@ public final class FuncItem extends FItem implements Scope {
    * @param params formal parameters
    * @param type function type
    * @param expr function body
-   * @param focus query focus (can be {@code null})
    * @param stackSize stack-frame size
    * @param info input info
+   * @param focus query focus (can be {@code null})
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final QueryFocus focus, final int stackSize,
-      final InputInfo info) {
+      final FuncType type, final Expr expr, final int stackSize, final InputInfo info,
+      final QueryFocus focus) {
 
     super(type, anns);
     this.name = name;
@@ -81,8 +84,8 @@ public final class FuncItem extends FItem implements Scope {
     this.expr = expr;
     this.stackSize = stackSize;
     this.sc = sc;
-    this.focus = focus;
     this.info = info;
+    this.focus = focus;
   }
 
   @Override
@@ -104,12 +107,16 @@ public final class FuncItem extends FItem implements Scope {
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 
-    // bind variables and cache context
+    final int pl = params.length;
+    for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
+
+    // use shortcut if focus is not accessed
+    if(fcs == null) fcs = expr.has(Flag.FCS, Flag.CTX, Flag.POS);
+    if(!fcs) return expr.value(qc);
+
     final QueryFocus qf = qc.focus;
     qc.focus = focus != null ? focus : new QueryFocus();
     try {
-      final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return expr.value(qc);
     } finally {
       qc.focus = qf;

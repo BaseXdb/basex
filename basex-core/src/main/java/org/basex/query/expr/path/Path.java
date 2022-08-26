@@ -213,21 +213,18 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean has(final Flag... flags) {
-    /* Context dependency: check if no root exists, or if it depends on context.
-     * Examples: text(); ./abc */
-    if(Flag.CTX.in(flags) && (root == null || root.has(Flag.CTX))) return true;
-    /* Positional access: only check root node (steps will refer to result of root node).
-     * Example: position()/a */
-    if(Flag.POS.in(flags) && root != null && root.has(Flag.POS)) return true;
+    // Context dependency, positional access: only check root expression.
+    // Examples: text(); ./abc; position()/a
+    if(Flag.FCS.in(flags) ||
+       Flag.CTX.in(flags) && (root == null || root.has(Flag.CTX)) ||
+       Flag.POS.in(flags) && root != null && root.has(Flag.POS)) return true;
     // check remaining flags
     final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
-    if(flgs.length != 0) {
-      for(final Expr step : steps) {
-        if(step.has(flgs)) return true;
-      }
-      return root != null && root.has(flgs);
+    if(flgs.length == 0) return false;
+    for(final Expr step : steps) {
+      if(step.has(flgs)) return true;
     }
-    return false;
+    return root != null && root.has(flgs);
   }
 
   /**
