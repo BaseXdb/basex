@@ -468,7 +468,19 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (<a/>[. = ''], <b/>, <c/>)"), "<a/>", root(Otherwise.class));
     check(func.args(" (<a/>[. = ''], <b/>[. = ''])"), "<a/>", root(Otherwise.class));
     check(func.args(" (<a/>[. = ''], <b/>[. = ''], <c/>[. = ''])"), "<a/>", empty(Otherwise.class));
+  }
 
+  /** Test method. */
+  @Test public void indexOf() {
+    final Function func = INDEX_OF;
+
+    query(func.args(" 1 to 1000000", 0), "");
+    query("count(" + func.args(" 1 to 1000000", 0) + ")", 0);
+
+    query(func.args(" reverse(1 to 1000000)", 1000000), 1);
+    query("count(" + func.args(" reverse(1 to 1000000)", 1000000) + ")", 1);
+
+    query("count(" + func.args(" (1 to 1000000) ! 'x'", "x") + ")", 1000000);
   }
 
   /** Test method. */

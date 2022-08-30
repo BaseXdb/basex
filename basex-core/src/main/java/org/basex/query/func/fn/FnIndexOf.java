@@ -8,7 +8,9 @@ import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -29,9 +31,7 @@ public final class FnIndexOf extends StandardFunc {
       public Int next() throws QueryException {
         for(Item item; (item = qc.next(input)) != null;) {
           ++c;
-          if(item.comparable(search) && OpV.EQ.eval(item, search, coll, sc, info)) {
-            return Int.get(c);
-          }
+          if(equal(item, search, coll)) return Int.get(c);
         }
         return null;
       }
@@ -40,7 +40,30 @@ public final class FnIndexOf extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    final Iter input = exprs[0].atomIter(qc, info);
+    final Item search = toAtomItem(exprs[1], qc);
+    final Collation coll = toCollation(2, qc);
+
+    final LongList list = new LongList();
+    int c = 0;
+    for(Item item; (item = qc.next(input)) != null;) {
+      ++c;
+      if(equal(item, search, coll)) list.add(c);
+    }
+    return IntSeq.get(list);
+  }
+
+  /**
+   * Checks the specified items for equality.
+   * @param item input input
+   * @param search search item
+   * @param coll collation
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean equal(final Item item, final Item search, final Collation coll)
+      throws QueryException {
+    return item.comparable(search) && OpV.EQ.eval(item, search, coll, sc, info);
   }
 
   @Override
