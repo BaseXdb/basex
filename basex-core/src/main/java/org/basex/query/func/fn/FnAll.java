@@ -41,6 +41,8 @@ public class FnAll extends StandardFunc {
     if(st.zero()) return cc.merge(input, Bln.TRUE, info);
 
     // create FLWOR expression
+    // some(INPUT, PREDICATE)  ->  (for $i in INPUT return PREDICATE($i)) = true()
+    // all(INPUT, PREDICATE)  ->  not((for $i in INPUT return PREDICATE($i)) = false())
     final Var var = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), new IntObjMap<>());
     final For fr = new For(var, input).optimize(cc);
 

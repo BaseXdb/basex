@@ -37,6 +37,7 @@ public final class FnFilter extends StandardFunc {
     if(st.zero()) return input;
 
     // create filter expression
+    // filter(INPUT, PREDICATE)  ->  INPUT[FUNCTION(.)]
     final Expr predicate = cc.get(input, () -> {
       final Expr dfc = new DynFuncCall(info, sc, exprs[1], ContextValue.get(cc, info)).optimize(cc);
       return new TypeCheck(sc, info, dfc, SeqType.BOOLEAN_O, true).optimize(cc);

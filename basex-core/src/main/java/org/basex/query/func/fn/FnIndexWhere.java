@@ -46,7 +46,7 @@ public final class FnIndexWhere extends StandardFunc {
     if(st.zero()) return input;
 
     // rewrite to FLWOR expression
-    // index-where(INPUT, FUNCTION)  ->  for $i at $p in INPUT where FUNCTION($i) return $p
+    // index-where(INPUT, PREDICATE)  ->  for $i at $p in INPUT where PREDICATE($i) return $p
     final IntObjMap<Var> vm = new IntObjMap<>();
     final LinkedList<Clause> clauses = new LinkedList<>();
 

@@ -40,6 +40,7 @@ public class FnForEach extends StandardFunc {
     if(st.zero()) return input;
 
     // create FLWOR expression
+    // for-each(INPUT, ACTION)  ->  for $i in INPUT return ACTION($i)
     final Var var = cc.copy(new Var(new QNm("each"), null, cc.qc, sc, info), new IntObjMap<>());
     final For fr = new For(var, input).optimize(cc);
 
