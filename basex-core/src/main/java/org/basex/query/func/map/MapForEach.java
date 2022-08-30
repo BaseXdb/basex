@@ -23,7 +23,7 @@ public class MapForEach extends StandardFunc {
     final FItem action = toFunction(exprs[1], 2, this instanceof UpdateMapForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((i, v) -> vb.add(action.invoke(qc, info, i, v)));
+    map.apply((key, value) -> vb.add(action.invoke(qc, info, key, value)));
     return vb.value(this);
   }
 

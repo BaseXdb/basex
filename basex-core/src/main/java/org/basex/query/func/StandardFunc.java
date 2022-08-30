@@ -522,17 +522,17 @@ public abstract class StandardFunc extends Arr {
     if(i < exprs.length) {
       final Item item = exprs[i].item(qc, info);
       final XQMap map = item == Empty.VALUE ? XQMap.empty() : toMap(item);
-      map.apply((it, v) -> {
-        final byte[] key;
-        if(it.type.isStringOrUntyped()) {
-          key = it.string(null);
+      map.apply((key, value) -> {
+        final byte[] k;
+        if(key.type.isStringOrUntyped()) {
+          k = key.string(null);
         } else {
-          final QNm qnm = toQNm(it, false);
+          final QNm qnm = toQNm(key, false);
           final TokenBuilder tb = new TokenBuilder();
           if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
-          key = tb.add(qnm.local()).finish();
+          k = tb.add(qnm.local()).finish();
         }
-        hm.put(string(key), v);
+        hm.put(string(k), value);
       });
     }
     return hm;

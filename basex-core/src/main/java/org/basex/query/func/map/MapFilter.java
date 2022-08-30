@@ -21,9 +21,9 @@ public final class MapFilter extends StandardFunc {
     final FItem predicate = toFunction(exprs[1], 2, qc);
 
     final MapBuilder mb = new MapBuilder(info);
-    map.apply((k, v) -> {
-      if(toBoolean(predicate.invoke(qc, info, k, v).item(qc, info))) {
-        mb.put(k, v);
+    map.apply((key, value) -> {
+      if(toBoolean(predicate.invoke(qc, info, key, value).item(qc, info))) {
+        mb.put(key, value);
       }
     });
     return mb.map();

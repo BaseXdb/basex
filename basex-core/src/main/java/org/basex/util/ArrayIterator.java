@@ -50,7 +50,7 @@ public final class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
       if(array[start] != null) return true;
       ++start;
     }
-    return start < end;
+    return false;
   }
 
   @Override

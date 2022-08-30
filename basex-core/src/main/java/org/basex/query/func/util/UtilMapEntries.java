@@ -23,9 +23,8 @@ public final class UtilMapEntries extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final XQMap map = toMap(exprs[0], qc);
-
     return new Iter() {
+      final XQMap map = toMap(exprs[0], qc);
       final BasicIter<Item> keys = map.keys().iter();
 
       @Override
@@ -50,7 +49,7 @@ public final class UtilMapEntries extends StandardFunc {
     final XQMap map = toMap(exprs[0], qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((k, v) -> vb.add(entry(k, v)));
+    map.apply((key, value) -> vb.add(entry(key, value)));
     return vb.value(this);
   }
 
