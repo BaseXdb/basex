@@ -75,6 +75,13 @@ public final class MapModuleTest extends QueryPlanTest {
     query(func.args(" map { 1: 2 }", " function($k, $v) { $k+$v }"), 3);
     query(func.args(" map { 'a': 1, 'b': 2 }", " function($k, $v) { $v }"), "1\n2");
 
+    query("count(" + func.args(" map:merge((1 to 10) ! map:entry(., ()))",
+        " function($k, $v) { $v }") + ')', 0);
+    query("count(" + func.args(" map:merge((1 to 10) ! map:entry(., .))",
+        " function($k, $v) { $v }") + ')', 10);
+    query("count(" + func.args(" map:merge((1 to 10) ! map:entry(., (., .)))",
+        " function($k, $v) { $v }") + ')', 20);
+
     check(func.args(" map { 'aa': 'a' }", " matches#2"), true, type(func, "xs:boolean*"));
   }
 
