@@ -364,14 +364,14 @@ final class XMLScanner extends Job {
    * @throws IOException I/O exception
    */
   private void comment() throws IOException {
-    do {
+    while(true) {
       final int ch = nextChar();
       if(ch == '-' && consume('-')) {
         check('>');
         return;
       }
       token.add(ch);
-    } while(true);
+    }
   }
 
   /**
@@ -385,14 +385,14 @@ final class XMLScanner extends Job {
 
     int ch = nextChar();
     if(ch != '?' && !ws(ch)) throw error(PITEXT);
-    do {
+    while(true) {
       while(ch != '?') {
         token.add(ch);
         ch = nextChar();
       }
       if((ch = consume()) == '>') return;
       token.add('?');
-    } while(true);
+    }
   }
 
   /**

@@ -1776,7 +1776,7 @@ public class QueryParser extends InputParser {
    */
   private Expr unary() throws QueryException {
     boolean minus = false, found = false;
-    do {
+    while(true) {
       skipWs();
       if(next() != '>' && consume('-')) {
         minus ^= true;
@@ -1786,7 +1786,7 @@ public class QueryParser extends InputParser {
         return found ? new Unary(info(), check(ex, EVALUNARY), minus) : ex;
       }
       found = true;
-    } while(true);
+    }
   }
 
   /**
@@ -2665,7 +2665,7 @@ public class QueryParser extends InputParser {
       final TokenBuilder tb = new TokenBuilder();
 
       boolean simple = true;
-      do {
+      while(true) {
         while(!consume(delim)) {
           final char ch = curr();
           switch(ch) {
@@ -2707,7 +2707,7 @@ public class QueryParser extends InputParser {
         }
         if(!consume(delim)) break;
         tb.add(delim);
-      } while(true);
+      }
 
       if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
 
@@ -2787,7 +2787,7 @@ public class QueryParser extends InputParser {
   private Expr dirElemContent(final byte[] name) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     boolean strip = true;
-    do {
+    while(true) {
       final char ch = curr();
       if(ch == '<') {
         if(wsConsume(CDATA)) {
@@ -2814,7 +2814,7 @@ public class QueryParser extends InputParser {
       } else {
         throw error(NOCLOSING_X, name);
       }
-    } while(true);
+    }
   }
 
   /**
@@ -2837,14 +2837,14 @@ public class QueryParser extends InputParser {
     check('-');
     check('-');
     final TokenBuilder tb = new TokenBuilder();
-    do {
+    while(true) {
       final char ch = consumeContent();
       if(ch == '-' && consume('-')) {
         check('>');
         return new CComm(sc, info(), false, Str.get(tb.finish()));
       }
       tb.add(ch);
-    } while(true);
+    }
   }
 
   /**
@@ -2859,14 +2859,14 @@ public class QueryParser extends InputParser {
 
     final boolean space = skipWs();
     final TokenBuilder tb = new TokenBuilder();
-    do {
+    while(true) {
       final char ch = consumeContent();
       if(ch == '?' && consume('>')) {
         return new CPI(sc, info(), false, Str.get(str), Str.get(tb.finish()));
       }
       if(!space) throw error(PIWRONG);
       tb.add(ch);
-    } while(true);
+    }
   }
 
   /**

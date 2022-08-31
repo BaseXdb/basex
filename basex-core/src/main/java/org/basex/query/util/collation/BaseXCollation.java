@@ -44,7 +44,7 @@ final class BaseXCollation extends Collation {
     final int elemC = next(iterC);
     if(elemC == -1) return 0;
     final int offC = iterC.getOffset();
-    do {
+    while(true) {
       // find first equal character
       for(int elemS; (elemS = next(iterS)) != elemC;) {
         if(elemS == -1 || mode == Mode.STARTS_WITH) return -1;
@@ -62,7 +62,7 @@ final class BaseXCollation extends Collation {
       }
       iterS.setOffset(offS);
       iterC.setOffset(offC);
-    } while(true);
+    }
   }
 
   /**
@@ -86,10 +86,10 @@ final class BaseXCollation extends Collation {
    * @return next element, or {@code -1}
    */
   private static int next(final CollationElementIterator it) {
-    do {
+    while(true) {
       final int c = it.next();
       if(c != 0) return c;
-    } while(true);
+    }
   }
 
   @Override

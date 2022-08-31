@@ -29,13 +29,13 @@ public class FnForEachPair extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        do {
+        while(true) {
           final Item item = iter.next();
           if(item != null) return item;
           final Item item1 = input1.next(), item2 = input2.next();
           if(item1 == null || item2 == null) return null;
           iter = action.invoke(qc, info, item1, item2).iter();
-        } while(true);
+        }
       }
 
       @Override

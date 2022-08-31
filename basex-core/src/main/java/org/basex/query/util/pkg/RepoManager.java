@@ -314,11 +314,11 @@ public final class RepoManager {
   private IOFile uniqueDir(final String name) {
     String nm = name;
     int c = 0;
-    do {
+    while(true) {
       final IOFile io = context.repo.path(nm);
       if(!io.exists()) return io;
       nm = name + '-' + ++c;
-    } while(true);
+    }
   }
 
   /**

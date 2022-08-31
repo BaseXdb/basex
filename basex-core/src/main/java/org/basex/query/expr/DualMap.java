@@ -36,7 +36,7 @@ public final class DualMap extends SimpleMap {
         final QueryFocus qf = qc.focus;
         final Value value = qf.value;
         try {
-          do {
+          while(true) {
             // evaluate left operand
             qf.value = value;
             Item item = iter.next();
@@ -45,7 +45,7 @@ public final class DualMap extends SimpleMap {
             qf.value = item;
             item = exprs[1].item(qc, info);
             if(item != Empty.VALUE) return item;
-          } while(true);
+          }
         } finally {
           qf.value = value;
         }

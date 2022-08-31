@@ -44,7 +44,7 @@ public final class IterPath extends AxisPath {
         final QueryFocus qf = qc.focus;
         final Value value = qf.value;
         try {
-          do {
+          while(true) {
             final Item item = qc.next(iter[pos]);
             if(item == null) {
               if(--pos == -1) return null;
@@ -55,7 +55,7 @@ public final class IterPath extends AxisPath {
             } else {
               return item;
             }
-          } while(true);
+          }
         } finally {
           qf.value = value;
         }

@@ -38,7 +38,7 @@ public final class ArrayFlatten extends ArrayFn {
 
               @Override
               public Item next() throws QueryException {
-                for(;;) {
+                while(true) {
                   final Item item = iter.next();
                   if(item != null) return item;
                   if(!members.hasNext()) return null;

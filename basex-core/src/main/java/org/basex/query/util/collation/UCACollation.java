@@ -52,7 +52,7 @@ final class UCACollation extends Collation {
     final int elemC = next(iterC);
     if(elemC == -1) return 0;
     final int offC = (int) Reflect.invoke(CEI_GET_OFFSET, iterC);
-    do {
+    while(true) {
       // find first equal character
       for(int elemS; (elemS = next(iterS)) != elemC;) {
         if(elemS == -1 || mode == Mode.STARTS_WITH) return -1;
@@ -70,7 +70,7 @@ final class UCACollation extends Collation {
       }
       Reflect.invoke(CEI_SET_OFFSET, iterC, offS);
       Reflect.invoke(CEI_SET_OFFSET, iterC, offC);
-    } while(true);
+    }
   }
 
   /**
@@ -80,11 +80,11 @@ final class UCACollation extends Collation {
    * @return result of check
    */
   private static boolean startsWith(final Object string, final Object sub) {
-    do {
+    while(true) {
       final int s = next(sub);
       if(s == -1) return true;
       if(s != next(string)) return false;
-    } while(true);
+    }
   }
 
   /**
@@ -93,10 +93,10 @@ final class UCACollation extends Collation {
    * @return next element, or {@code -1}
    */
   private static int next(final Object it) {
-    do {
+    while(true) {
       final int c = (int) Reflect.invoke(CEI_NEXT, it);
       if(c != 0) return c;
-    } while(true);
+    }
   }
 
   @Override

@@ -151,14 +151,14 @@ public final class StaticOptions extends Options {
   public String createTempDb(final String name) {
     String db;
     int c = 0;
-    do {
+    while(true) {
       db = name + '.' + c++;
       final IOFile io = dbPath(db);
       if(!io.exists()) {
         io.md();
         return db;
       }
-    } while(true);
+    }
   }
 
   /**

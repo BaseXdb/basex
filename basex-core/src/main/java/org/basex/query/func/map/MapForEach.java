@@ -20,23 +20,21 @@ import org.basex.query.value.type.*;
 public class MapForEach extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final XQMap map = toMap(exprs[0], qc);
+    final FItem action = toFunction(exprs[1], 2, MapForEach.this instanceof UpdateMapForEach, qc);
+    final BasicIter<Item> keys = map.keys().iter();
+
     return new Iter() {
-      final XQMap map = toMap(exprs[0], qc);
-      final FItem action = toFunction(exprs[1], 2, MapForEach.this instanceof UpdateMapForEach, qc);
-      final BasicIter<Item> keys = map.keys().iter();
-      Iter iter;
+      Iter iter = Empty.ITER;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          if(iter == null) {
-            final Item key = keys.next();
-            if(key == null) return null;
-            iter = action.invoke(qc, info, key, map.get(key, info)).iter();
-          }
           final Item item = iter.next();
           if(item != null) return item;
-          iter = null;
+          final Item key = keys.next();
+          if(key == null) return null;
+          iter = action.invoke(qc, info, key, map.get(key, info)).iter();
         }
       }
     };

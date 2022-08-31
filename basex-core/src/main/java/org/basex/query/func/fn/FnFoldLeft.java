@@ -100,7 +100,7 @@ public final class FnFoldLeft extends StandardFunc {
       // if initial item has more specific type, assign it and check optimized result type
       final SeqType at = ft.argTypes[i];
       if(!input.eq(at) && input.instanceOf(at)) {
-        do {
+        while(true) {
           args[i] = input;
           optFunc = sf.coerceFunc(action, cc, ft.declType, args);
           output = optFunc.funcType().declType;
@@ -109,7 +109,7 @@ public final class FnFoldLeft extends StandardFunc {
           if(output.instanceOf(input)) break;
           // combine input and output type, optimize again
           input = input.union(output);
-        } while(true);
+        }
       }
 
       sf.exprType.assign(array || !seq.oneOrMore() ? output.union(zero) : output);
