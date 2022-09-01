@@ -55,9 +55,11 @@ public final class UtilDdo extends StandardFunc {
       if(REVERSE.is(nodes) || SORT.is(nodes)) return cc.function(_UTIL_DDO, info, nodes.arg(0));
       // util:ddo(/a/b/c)  ->  /a/b/c
       if(nodes.ddo()) return nodes;
-      // adopt type of argument
+      // adopt type of input
       exprType.assign(type);
     }
+
+    exprType.data(nodes);
     return this;
   }
 }

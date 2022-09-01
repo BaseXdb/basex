@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -43,7 +42,7 @@ public final class Union extends Set {
     if(st == null) st = SeqType.NODE_ZM;
     if(!(st.type instanceof NodeType)) return null;
 
-    exprType.assign(st.union(Occ.ONE_OR_MORE));
+    exprType.assign(st.union(Occ.ONE_OR_MORE)).data(exprs);
 
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
@@ -112,11 +111,6 @@ public final class Union extends Set {
         return node;
       }
     };
-  }
-
-  @Override
-  public Data data() {
-    return data(exprs);
   }
 
   @Override

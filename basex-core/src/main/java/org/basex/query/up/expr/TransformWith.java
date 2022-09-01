@@ -35,7 +35,7 @@ public final class TransformWith extends Copy {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     exprs[1] = result().compile(cc);
-    cc.pushFocus(new Dummy(result().seqType().with(Occ.EXACTLY_ONE), null));
+    cc.pushFocus(new Dummy(result().seqType(), null));
     try {
       exprs[0] = modify().compile(cc);
     } finally {

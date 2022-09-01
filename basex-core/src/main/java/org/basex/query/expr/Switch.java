@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
@@ -70,7 +69,8 @@ public final class Switch extends ParseExpr {
     if(expr != this) return cc.replaceWith(this, expr);
 
     // combine types of return expressions
-    exprType.assign(SeqType.union(groups, true));
+    exprType.assign(SeqType.union(groups, true)).data(groups);
+
     return this;
   }
 
@@ -286,13 +286,6 @@ public final class Switch extends ParseExpr {
   @Override
   public void markTailCalls(final CompileContext cc) {
     for(final SwitchGroup group : groups) group.markTailCalls(cc);
-  }
-
-  @Override
-  public Data data() {
-    final ExprList list = new ExprList(groups.length);
-    for(final SwitchGroup group : groups) list.add(group.rtrn());
-    return data(list.finish());
   }
 
   @Override

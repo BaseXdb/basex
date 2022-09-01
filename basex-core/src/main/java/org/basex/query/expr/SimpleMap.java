@@ -6,7 +6,6 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.path.*;
@@ -396,13 +395,8 @@ public abstract class SimpleMap extends Arr {
       return ls == 1 ? exprs[0] : get(cc, info, list.finish());
     }
 
-    exprType.assign(exprs[ls - 1].seqType(), new long[] { min, max });
+    exprType.assign(exprs[ls - 1], new long[] { min, max });
     return size() == 0 && !has(Flag.NDT, Flag.HOF) ? cc.emptySeq(this) : null;
-  }
-
-  @Override
-  public Data data() {
-    return exprs[exprs.length - 1].data();
   }
 
   /**

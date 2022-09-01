@@ -50,8 +50,7 @@ public final class HofScanLeft extends StandardFunc {
     final Expr input = exprs[0], zero = exprs[1];
     if(input == Empty.VALUE) return zero;
 
-    exprType.assign(input.seqType().union(Occ.ZERO));
-    data(input.data());
+    exprType.assign(input.seqType().union(Occ.ZERO)).data(input);
     return this;
   }
 }

@@ -97,9 +97,13 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
+  public Data data() {
+    return exprType.data();
+  }
+
+  @Override
   public final void refineType(final Expr expr) {
     exprType.refine(expr);
-    if(data() == null) data(expr.data());
   }
 
   @Override
@@ -110,13 +114,13 @@ public abstract class ParseExpr extends Expr {
   // OPTIMIZATIONS ================================================================================
 
   /**
-   * Copies this expression's type to the specified expression.
+   * Assigns this expression's type to the specified expression.
    * @param <T> expression type
    * @param expr expression to be modified
    * @return specified expression
    */
   public final <T extends Expr> T copyType(final T expr) {
-    expr.refineType(this);
+    if(expr instanceof ParseExpr) ((ParseExpr) expr).exprType.assign(this);
     return expr;
   }
 
@@ -127,24 +131,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final ParseExpr adoptType(final Expr expr) {
     exprType.assign(expr);
-    if(data() == null) data(expr.data());
     return this;
-  }
-
-  /**
-   * Returns the common data reference for all expressions.
-   * @param exprs expressions
-   * @return data reference or {@code null}
-   */
-  static Data data(final Expr... exprs) {
-    Data data1 = null;
-    for(final Expr expr : exprs) {
-      if(expr.seqType().zero()) continue;
-      final Data data2 = expr.data();
-      if(data1 == null) data1 = data2;
-      if(data1 == null || data1 != data2) return null;
-    }
-    return data1;
   }
 
   // VALIDITY CHECKS ==============================================================================

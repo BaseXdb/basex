@@ -38,7 +38,7 @@ public abstract class Preds extends Arr {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    // called at an early stage as it influences the optimization of predicates
+    // called at an early stage as it affects the optimization of predicates
     type(cc.qc.focus.value);
 
     final int el = exprs.length;
@@ -86,8 +86,12 @@ public abstract class Preds extends Arr {
         exact = false;
       }
     }
-    exprType.assign(root.seqType().union(Occ.ZERO), exact || max == 0 ? max : -1);
-    return max == 0;
+
+    final boolean empty = max == 0;
+    SeqType st = root.seqType();
+    st = max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO);
+    exprType.assign(st, exact || empty ? max : -1);
+    return empty;
   }
 
   /**
@@ -187,7 +191,7 @@ public abstract class Preds extends Arr {
     if(expr instanceof ANum) expr = ItrPos.get(((ANum) expr).dbl(), info);
 
     // merge node tests with steps; remove redundant node tests
-    // child::node()[self:*]  ->  child::*
+    // child::node()[self::*]  ->  child::*
     if(expr instanceof SingleIterPath) {
       final Step predStep = (Step) ((Path) expr).steps[0];
       if(predStep.axis == Axis.SELF && !predStep.mayBePositional() && root instanceof Step &&
@@ -197,6 +201,7 @@ public abstract class Preds extends Arr {
         if(test != null) {
           cc.info(OPTMERGE_X, predStep);
           rootStep.test = test;
+          rootStep.exprType.assign(Step.seqType(rootStep.axis, rootStep.test, rootStep.exprs));
           list.add(predStep.exprs);
           expr = Bln.TRUE;
         }

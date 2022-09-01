@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -98,14 +97,9 @@ public final class Otherwise extends Arr {
       occ = occ == null ? o : occ.union(o);
     }
     final SeqType st = SeqType.union(exprs, false);
-    exprType.assign(st != null ? st.type : AtomType.ITEM, occ);
+    exprType.assign(st != null ? st.type : AtomType.ITEM, occ).data(exprs);
 
     return this;
-  }
-
-  @Override
-  public Data data() {
-    return data(exprs);
   }
 
   @Override

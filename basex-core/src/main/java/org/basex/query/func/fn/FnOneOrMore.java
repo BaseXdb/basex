@@ -53,8 +53,7 @@ public final class FnOneOrMore extends StandardFunc {
     if(st.oneOrMore()) return input;
     if(st.zero()) throw ONEORMORE.get(info);
 
-    exprType.assign(st.with(Occ.ONE_OR_MORE));
-    data(input.data());
+    exprType.assign(st.with(Occ.ONE_OR_MORE)).data(input);
     return this;
   }
 }

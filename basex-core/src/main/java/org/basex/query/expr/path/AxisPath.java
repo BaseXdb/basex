@@ -1,6 +1,5 @@
 package org.basex.query.expr.path;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.PathCache.*;
@@ -134,15 +133,5 @@ public abstract class AxisPath extends Path {
   @Override
   public final boolean ddo() {
     return true;
-  }
-
-  @Override
-  public final Data data() {
-    return data;
-  }
-
-  @Override
-  public final void data(final Data dt) {
-    data = dt;
   }
 }

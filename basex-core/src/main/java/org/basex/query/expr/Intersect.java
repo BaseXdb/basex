@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -49,7 +48,7 @@ public final class Intersect extends Set {
         if(st == null) return Empty.VALUE;
       }
     }
-    exprType.assign(st.union(Occ.ZERO));
+    exprType.assign(st.union(Occ.ZERO)).data(exprs);
 
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
@@ -128,11 +127,6 @@ public final class Intersect extends Set {
         return nodes[0];
       }
     };
-  }
-
-  @Override
-  public Data data() {
-    return data(exprs);
   }
 
   @Override

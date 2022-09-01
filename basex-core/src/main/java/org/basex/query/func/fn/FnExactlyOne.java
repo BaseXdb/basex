@@ -42,8 +42,7 @@ public final class FnExactlyOne extends StandardFunc {
     if(st.one()) return input;
     if(st.zero() || input.size() > 1) throw EXACTLYONE.get(info);
 
-    exprType.assign(st.with(Occ.EXACTLY_ONE));
-    data(input.data());
+    exprType.assign(st.with(Occ.EXACTLY_ONE)).data(input);
     return this;
   }
 }

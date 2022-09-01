@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import org.basex.core.locks.*;
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -17,9 +16,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class ContextValue extends Simple {
-  /** Data reference (can be {@code null}). */
-  private Data data;
-
   /**
    * Constructor.
    * @param info input info
@@ -66,16 +62,6 @@ public final class ContextValue extends Simple {
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
     return ic.var == null ? ic.copy() : null;
-  }
-
-  @Override
-  public Data data() {
-    return data;
-  }
-
-  @Override
-  public void data(final Data dt) {
-    data = dt;
   }
 
   @Override

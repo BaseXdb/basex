@@ -1,6 +1,5 @@
 package org.basex.query.func.fn;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -87,9 +86,7 @@ public final class FnInsertBefore extends StandardFunc {
     }
 
     final long sz = size != -1 && sizeInsert != -1 ? size + sizeInsert : -1;
-    exprType.assign(st.union(stInsert), st.occ.add(stInsert.occ), sz);
-    final Data data = input.data();
-    if(data != null && insert.data() == data) data(data);
+    exprType.assign(st.union(stInsert), st.occ.add(stInsert.occ), sz).data(input, insert);
 
     return this;
   }

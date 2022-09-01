@@ -42,8 +42,8 @@ public final class UtilRoot extends StandardFunc {
     final Expr nodes = exprs[0];
     final SeqType st = nodes.seqType();
     if(st.instanceOf(SeqType.DOCUMENT_NODE_ZM)) return nodes;
-    if(st.zeroOrOne()) exprType.assign(st.occ);
-    data(nodes.data());
+
+    exprType.assign(st.zeroOrOne() ? st.occ : Occ.ZERO_OR_MORE).data(nodes);
     return this;
   }
 

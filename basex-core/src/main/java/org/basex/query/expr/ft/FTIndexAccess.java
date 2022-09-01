@@ -36,6 +36,7 @@ public final class FTIndexAccess extends Simple {
     super(info, SeqType.TEXT_ZM);
     this.ftexpr = ftexpr;
     this.db = db;
+    exprType.data(db.data());
   }
 
   @Override

@@ -51,7 +51,7 @@ public final class Util {
    * @return runtime exception (indicates that an error is raised)
    */
   public static RuntimeException notExpected() {
-    return notExpected("Not Expected.");
+    return new RuntimeException("Not Expected.");
   }
 
   /**

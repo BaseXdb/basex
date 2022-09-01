@@ -15,9 +15,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class IndexStaticDb extends IndexDb {
-  /** Data reference. */
-  private final Data data;
-
   /**
    * Constructor.
    * @param data data reference
@@ -25,7 +22,7 @@ public final class IndexStaticDb extends IndexDb {
    */
   public IndexStaticDb(final Data data, final InputInfo info) {
     super(info);
-    this.data = data;
+    exprType.data(data);
   }
 
   @Override
@@ -69,22 +66,18 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public IndexDb copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new IndexStaticDb(data, info));
-  }
-
-  @Override
-  public Data data() {
-    return data;
+    return copyType(new IndexStaticDb(data(), info));
   }
 
   @Override
   Data data(final QueryContext qc) {
-    return data;
+    return data();
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof IndexStaticDb && data == ((IndexStaticDb) obj).data && super.equals(obj);
+    return obj instanceof IndexStaticDb && data() == ((IndexStaticDb) obj).data() &&
+        super.equals(obj);
   }
 
   @Override
@@ -94,6 +87,6 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.quoted(Token.token(data.meta.name));
+    qs.quoted(Token.token(data().meta.name));
   }
 }

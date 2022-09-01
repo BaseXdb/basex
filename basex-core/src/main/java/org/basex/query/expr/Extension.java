@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.index.*;
@@ -87,11 +86,6 @@ public final class Extension extends Single {
     } finally {
       pragma.finish(qc, state);
     }
-  }
-
-  @Override
-  public Data data() {
-    return expr.data();
   }
 
   @Override

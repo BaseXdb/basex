@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.Function;
 import org.basex.query.iter.*;
@@ -42,8 +41,6 @@ public final class Except extends Set {
     if(st.zero()) return exprs[0];
     if(!(st.type instanceof NodeType)) return null;
 
-    exprType.assign(st.union(Occ.ZERO));
-
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE) {
@@ -63,6 +60,8 @@ public final class Except extends Set {
       }
     }
     exprs = list.finish();
+
+    exprType.assign(st.union(Occ.ZERO)).data(exprs[0]);
     return null;
   }
 
@@ -123,11 +122,6 @@ public final class Except extends Set {
         return temp;
       }
     };
-  }
-
-  @Override
-  public Data data() {
-    return exprs[0].data();
   }
 
   @Override

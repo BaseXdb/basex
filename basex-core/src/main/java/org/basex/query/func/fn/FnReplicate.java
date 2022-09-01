@@ -118,8 +118,8 @@ public class FnReplicate extends StandardFunc {
     if(input == Empty.VALUE || sz == 0 && single) return input;
 
     // adopt sequence type
-    exprType.assign(input.seqType().union(c > 0 ? Occ.ONE_OR_MORE : Occ.ZERO_OR_MORE), sz);
-    data(input.data());
+    final Occ occ = c > 0 ? Occ.ONE_OR_MORE : Occ.ZERO_OR_MORE;
+    exprType.assign(input.seqType().union(occ), sz).data(input);
     return this;
   }
 

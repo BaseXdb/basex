@@ -71,8 +71,7 @@ public final class UtilLast extends StandardFunc {
       return cc.function(HEAD, info, Filter.get(cc, filter.info(), root, filter.exprs));
     }
 
-    exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE));
-    data(input.data());
+    exprType.assign(st.with(st.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE)).data(input);
     return embed(cc, false);
   }
 }

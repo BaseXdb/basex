@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -82,15 +81,9 @@ public final class Try extends Single {
     for(final Catch ctch : catches) {
       if(!Function.ERROR.is(ctch.expr)) st = st.union(ctch.seqType());
     }
-    exprType.assign(st);
-    return this;
-  }
+    exprType.assign(st).data(ExprList.concat(catches, expr));
 
-  @Override
-  public Data data() {
-    final ExprList list = new ExprList(catches.length + 1).add(expr);
-    for(final Catch ctch : catches) list.add(ctch);
-    return data(list.finish());
+    return this;
   }
 
   @Override

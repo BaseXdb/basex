@@ -116,23 +116,7 @@ public abstract class Step extends Preds {
    * @param preds predicates
    */
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
-    super(info, SeqType.get(
-      // type
-      axis == ATTRIBUTE ? NodeType.ATTRIBUTE : test.type,
-      // occurrence
-      axis == SELF && test == KindTest.NODE && preds.length == 0
-      // one result: self::node()
-      ? Occ.EXACTLY_ONE :
-        axis == SELF || axis == PARENT ||
-        axis == ATTRIBUTE && test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
-        preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact()
-      // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
-      ? Occ.ZERO_OR_ONE
-      : Occ.ZERO_OR_MORE,
-      // node kind test
-      test instanceof KindTest ? null : test
-    ), preds);
-
+    super(info, seqType(axis, test, preds), preds);
     this.axis = axis;
     this.test = test;
   }
@@ -170,20 +154,13 @@ public abstract class Step extends Preds {
     }
     if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
 
-    // check if the step or test will never yield results
-    boolean empty = noMatches();
-    if(rt != null) {
-      final Test t = test.optimize(rt.data());
-      if(t == null) {
-        empty = true;
-      } else {
-        test = t;
-      }
-    }
-    if(empty) {
+    // check if the test or step will never yield results
+    final Test t = test.optimize(data());
+    if(t == null || noMatches()) {
       cc.info(QueryText.OPTSTEP_X, this);
       return cc.emptySeq(this);
     }
+    test = t;
 
     // simplify predicates, choose best implementation
     return simplify(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
@@ -191,18 +168,37 @@ public abstract class Step extends Preds {
 
   @Override
   protected final void type(final Expr expr) {
-    if(expr == null || axis != SELF) return;
-
-    final SeqType seqType = expr.seqType();
-    if(test == KindTest.NODE) {
-      // node test: adopt type of context expression
-      // <a/>/self::node()
-      exprType.assign(seqType.type);
-    } else if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE) {
-      // other kind tests, no predicates: step will yield one result
-      // $elements/self::element()
-      exprType.assign(Occ.EXACTLY_ONE);
+    exprType.data(expr);
+    if(expr != null && axis == SELF) {
+      final SeqType seqType = expr.seqType();
+      // node test: adopt type of context expression: <a/>/self::node()
+      if(test == KindTest.NODE) exprType.assign(seqType.type);
+      // no predicates: step will yield single result: $elements/self::element()
+      if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE)
+        exprType.assign(Occ.EXACTLY_ONE);
     }
+  }
+
+  /**
+   * Determines the sequence type of the step.
+   * @param axis axis
+   * @param test test
+   * @param preds predicates
+   * @return sequence type
+   */
+  public static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
+    final Type type = axis == ATTRIBUTE ? NodeType.ATTRIBUTE : test.type;
+    final Occ occ = axis == SELF && test == KindTest.NODE && preds.length == 0
+      // one result: self::node()
+      ? Occ.EXACTLY_ONE :
+        axis == SELF || axis == PARENT ||
+        axis == ATTRIBUTE && test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
+        preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact()
+      // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
+      ? Occ.ZERO_OR_ONE
+      : Occ.ZERO_OR_MORE;
+    final Test t = test instanceof KindTest ? null : test;
+    return SeqType.get(type, occ, t);
   }
 
   @Override

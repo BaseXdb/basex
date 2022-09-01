@@ -89,8 +89,7 @@ public class HofTakeWhile extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    exprType.assign(st.union(Occ.ZERO));
-    data(input.data());
+    exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;
   }
 }

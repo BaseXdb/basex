@@ -2,7 +2,6 @@ package org.basex.query.expr.path;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -87,11 +86,6 @@ public final class MixedPath extends Path {
   @Override
   public boolean ddo() {
     return seqType().type instanceof NodeType;
-  }
-
-  @Override
-  public Data data() {
-    return steps[steps.length - 1].data();
   }
 
   @Override

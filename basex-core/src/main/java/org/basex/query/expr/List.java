@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
@@ -70,7 +69,7 @@ public final class List extends Arr {
       if(size != -1) size = sz == -1 ? -1 : size + sz;
       occ = occ.add(expr.seqType().occ);
     }
-    exprType.assign(st != null ? st : SeqType.EMPTY_SEQUENCE_Z, occ, size);
+    exprType.assign(st != null ? st : SeqType.EMPTY_SEQUENCE_Z, occ, size).data(exprs);
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {
@@ -300,11 +299,6 @@ public final class List extends Arr {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new List(info, copyAll(cc, vm, exprs)));
-  }
-
-  @Override
-  public Data data() {
-    return data(exprs);
   }
 
   @Override

@@ -249,7 +249,7 @@ public enum NodeType implements Type {
   @Override
   public final AtomType atomic() {
     return this == PROCESSING_INSTRUCTION || this == COMMENT ? AtomType.STRING :
-      AtomType.UNTYPED_ATOMIC;
+      this == NODE ? AtomType.ANY_ATOMIC_TYPE : AtomType.UNTYPED_ATOMIC;
   }
 
   @Override

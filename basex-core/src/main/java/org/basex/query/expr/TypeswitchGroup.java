@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import java.util.*;
 import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
@@ -258,11 +257,6 @@ public final class TypeswitchGroup extends Single {
     if(ex == expr) return false;
     expr = ex;
     return true;
-  }
-
-  @Override
-  public Data data() {
-    return expr.data();
   }
 
   @Override

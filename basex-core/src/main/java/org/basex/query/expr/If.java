@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
@@ -113,7 +112,7 @@ public final class If extends Arr {
 
     // determine type
     final SeqType st1 = br1.seqType(), st2 = br2.seqType();
-    exprType.assign(st1.union(st2));
+    exprType.assign(st1.union(st2)).data(exprs);
 
     // logical rewritings
     if(st1.eq(SeqType.BOOLEAN_O) && st2.eq(SeqType.BOOLEAN_O)) {
@@ -225,11 +224,6 @@ public final class If extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     return simplifyAll(mode, cc) ? optimize(cc) : super.simplifyFor(mode, cc);
-  }
-
-  @Override
-  public Data data() {
-    return data(exprs);
   }
 
   @Override

@@ -32,7 +32,7 @@ public final class FnRoot extends ContextFn {
     } else {
       expr = value;
     }
-    if(expr != null) data(expr.data());
+    exprType.data(expr);
     return optFirst(true, false, value);
   }
 }

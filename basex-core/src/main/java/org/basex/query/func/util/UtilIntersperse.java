@@ -1,6 +1,5 @@
 package org.basex.query.func.util;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -39,10 +38,7 @@ public final class UtilIntersperse extends StandardFunc {
 
     final long size = values.size(), sizeSep = sep.size();
     final long sz = size != -1 && sizeSep != -1 ? size + sizeSep * (size - 1) : -1;
-    exprType.assign(st.union(stSep), st.occ, sz);
-
-    final Data data = values.data(), dataSep = sep.data();
-    if(data != null && data == dataSep) data(data);
+    exprType.assign(st.union(stSep), st.occ, sz).data(values, sep);
 
     return this;
   }

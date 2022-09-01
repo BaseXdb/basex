@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
@@ -214,7 +213,7 @@ public abstract class Filter extends Preds {
 
   @Override
   protected final void type(final Expr expr) {
-    exprType.assign(root.seqType().union(Occ.ZERO));
+    exprType.assign(root.seqType().union(Occ.ZERO)).data(root);
   }
 
   /**
@@ -281,11 +280,6 @@ public abstract class Filter extends Preds {
     changed |= ic.var != null && ic.cc.ok(root, () -> ic.inline(exprs));
 
     return changed ? optimize(ic.cc) : null;
-  }
-
-  @Override
-  public final Data data() {
-    return root.data();
   }
 
   @Override

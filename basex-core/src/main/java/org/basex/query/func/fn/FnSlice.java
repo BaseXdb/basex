@@ -66,8 +66,7 @@ public class FnSlice extends StandardFunc {
       }
     }
 
-    exprType.assign(st.union(Occ.ZERO));
-    data(input.data());
+    exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;
   }
 

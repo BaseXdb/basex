@@ -1,10 +1,10 @@
 package org.basex.query.var;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -36,8 +36,10 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public VarRef optimize(final CompileContext cc) {
-    exprType.assign(var.seqType(), var.size());
+  public Expr optimize(final CompileContext cc) {
+    final SeqType st = var.seqType();
+    if(st.zero()) return Empty.VALUE;
+    exprType.assign(st, var.size()).data(var.data());
     return this;
   }
 
@@ -49,11 +51,6 @@ public final class VarRef extends ParseExpr {
   @Override
   public boolean ddo() {
     return var.ddo();
-  }
-
-  @Override
-  public Data data() {
-    return var.data();
   }
 
   @Override
@@ -73,7 +70,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public ParseExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final Var nw = vm.get(var.id);
     return new VarRef(info, nw != null ? nw : var).optimize(cc);
   }

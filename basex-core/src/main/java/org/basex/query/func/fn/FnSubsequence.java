@@ -259,8 +259,7 @@ public class FnSubsequence extends StandardFunc {
       }
     }
 
-    exprType.assign(st.union(Occ.ZERO), sz);
-    data(input.data());
+    exprType.assign(st.union(Occ.ZERO), sz).data(input);
     return embed(cc, false);
   }
 

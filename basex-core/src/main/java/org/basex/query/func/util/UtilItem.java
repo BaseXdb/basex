@@ -119,8 +119,7 @@ public final class UtilItem extends StandardFunc {
       if(diff > 0) return Empty.VALUE;
     }
 
-    exprType.assign(st.with(occ));
-    data(input.data());
+    exprType.assign(st.with(occ)).data(input);
     return embed(cc, false);
   }
 

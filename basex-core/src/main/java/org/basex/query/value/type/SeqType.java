@@ -444,6 +444,7 @@ public final class SeqType {
    * @return resulting type
    */
   public SeqType union(final SeqType st) {
+    if(this == st) return this;
     // ignore general type of empty sequence
     final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
@@ -473,6 +474,7 @@ public final class SeqType {
    * @return resulting type or {@code null}
    */
   public SeqType intersect(final SeqType st) {
+    if(this == st) return this;
     final Type tp = type.intersect(st.type);
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);
@@ -546,8 +548,8 @@ public final class SeqType {
    */
   public boolean instanceOf(final SeqType st) {
     // empty sequence: only check cardinality
-    return zero() ? !st.oneOrMore() :
-      type.instanceOf(st.type) && occ.instanceOf(st.occ) && kindInstanceOf(st);
+    return this == st || (zero() ? !st.oneOrMore() :
+      type.instanceOf(st.type) && occ.instanceOf(st.occ) && kindInstanceOf(st));
   }
 
   /**

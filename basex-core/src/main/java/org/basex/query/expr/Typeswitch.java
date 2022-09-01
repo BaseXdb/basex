@@ -4,12 +4,10 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -80,7 +78,7 @@ public final class Typeswitch extends ParseExpr {
     groups = newGroups.toArray(TypeswitchGroup[]::new);
 
     // determine common type
-    exprType.assign(SeqType.union(groups, true));
+    exprType.assign(SeqType.union(groups, true)).data(groups);
 
     // check if always the same branch will be evaluated
     Expr expr = this;
@@ -122,13 +120,6 @@ public final class Typeswitch extends ParseExpr {
       changed |= group.simplify(mode, cc);
     }
     return changed ? optimize(cc) : super.simplifyFor(mode, cc);
-  }
-
-  @Override
-  public Data data() {
-    final ExprList list = new ExprList(groups.length);
-    for(final TypeswitchGroup group : groups) list.add(group);
-    return data(list.finish());
   }
 
   @Override

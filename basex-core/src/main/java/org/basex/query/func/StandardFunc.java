@@ -47,9 +47,6 @@ public abstract class StandardFunc extends Arr {
   /** Static context. */
   public StaticContext sc;
 
-  /** Data reference (can be {@code null}). */
-  private Data data;
-
   /**
    * Constructor.
    */
@@ -251,7 +248,8 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Expr compileData(final CompileContext cc) throws QueryException {
     if(cc.dynamic && exprs.length > 0 && exprs[0] instanceof Value) {
-      data = toData(cc.qc);
+      final Data data = toData(cc.qc);
+      exprType.data(data);
       cc.info(OPTOPEN_X, data.meta.name);
     }
     return this;
@@ -298,16 +296,6 @@ public abstract class StandardFunc extends Arr {
       }
     }
     return Long.MIN_VALUE;
-  }
-
-  @Override
-  public final Data data() {
-    return data;
-  }
-
-  @Override
-  public final void data(final Data dt) {
-    data = dt;
   }
 
   /**
@@ -545,6 +533,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Data toData(final QueryContext qc) throws QueryException {
+    final Data data = exprType.data();
     return data != null ? data : qc.resources.database(toName(0, false, DB_NAME_X, qc), info);
   }
 

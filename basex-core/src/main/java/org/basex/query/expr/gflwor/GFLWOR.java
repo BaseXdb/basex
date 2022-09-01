@@ -3,7 +3,6 @@ package org.basex.query.expr.gflwor;
 import java.util.*;
 import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -128,7 +127,7 @@ public final class GFLWOR extends ParseExpr {
       return expr;
     }
 
-    exprType.assign(rtrn.seqType(), calcSize(true));
+    exprType.assign(rtrn, calcSize(true));
     return this;
   }
 
@@ -831,7 +830,7 @@ public final class GFLWOR extends ParseExpr {
           final Count cnt = (Count) clauses.get(1);
           if(fst.pos != null) {
             // for $a at $b in ... count $c ...  ->  for $a at $b in ... let $c := $b ...
-            final VarRef ref = new VarRef(cnt.info(), fst.pos).optimize(cc);
+            final Expr ref = new VarRef(cnt.info(), fst.pos).optimize(cc);
             clauses.set(1, new Let(cnt.var, ref).optimize(cc));
           } else {
             // for $a in 1 to 3 count $c ...  -> for $a at $c in 1 to 3 ...
@@ -967,11 +966,6 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public VarUsage count(final Var var) {
     return count(var, 0);
-  }
-
-  @Override
-  public Data data() {
-    return rtrn.data();
   }
 
   /**

@@ -39,8 +39,6 @@ public abstract class Path extends ParseExpr {
   public Expr root;
   /** Path steps. */
   public Expr[] steps;
-  /** Data reference (can be {@code null}). */
-  protected Data data;
 
   /**
    * Constructor.
@@ -347,6 +345,7 @@ public abstract class Path extends ParseExpr {
    */
   private ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
     // ensure that path starts with document nodes
+    final Data data = data();
     return rt != null && rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) && data != null &&
         data.meta.uptodate ? pathNodes(data.paths.root(), stats) : null;
   }
@@ -358,6 +357,7 @@ public abstract class Path extends ParseExpr {
    * @return path nodes, or {@code null} if nodes cannot be collected
    */
   final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats) {
+    final Data data = data();
     ArrayList<PathNode> pn = nodes;
     for(final Expr expr : steps) {
       if(expr instanceof UtilRoot) {
@@ -489,33 +489,34 @@ public abstract class Path extends ParseExpr {
    * @param rt root at compile time (can be {@code null})
    */
   private void seqType(final Expr rt) {
-    if(rt != null) data = rt.data();
-
-    final SeqType st = steps[steps.length - 1].seqType();
+    final Expr last = steps[steps.length - 1];
+    final Data data = last.data();
+    final SeqType st = last.seqType();
     Occ occ = Occ.ZERO_OR_MORE;
-    long size = size(rt);
+    long size = size(rt, data);
 
     if(size == -1 && rt != null) {
-      size = rt.size();
       occ = rt.seqType().occ;
+      size = rt.size();
 
       for(final Expr step : steps) {
+        occ = occ.union(step.seqType().occ);
         final long sz = step.size();
         size = size != -1 && sz != -1 ? size * sz : -1;
-        occ = occ.union(step.seqType().occ);
       }
       // more than one result: final size is unknown due to DDO
       if(size > 1) size = -1;
     }
-    exprType.assign(st, occ, size);
+    exprType.assign(st, occ, size).data(data);
   }
 
   /**
    * Computes the result size via database statistics.
    * @param rt root at compile time (can be {@code null})
+   * @param data data reference
    * @return number of results (or {@code -1})
    */
-  private long size(final Expr rt) {
+  private long size(final Expr rt, final Data data) {
     // check if path will yield any results
     if(root != null && root.size() == 0) return 0;
     for(final Expr step : steps) {
@@ -558,6 +559,7 @@ public abstract class Path extends ParseExpr {
    */
   private ArrayList<PathNode> pathNodes(final int last) {
     // skip request if no path index exists or might be out-of-date
+    final Data data = data();
     if(data == null || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -614,6 +616,7 @@ public abstract class Path extends ParseExpr {
     // - if path does not start with document nodes
     // - if index does not exist or is out-dated
     // - if several namespaces occur in the input
+    final Data data = data();
     if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) ||
         data == null || !data.meta.uptodate || data.defaultNs() == null) return this;
 
@@ -729,6 +732,7 @@ public abstract class Path extends ParseExpr {
     int predIndex = 0, stepIndex = 0;
 
     // check if path can be converted to an index access
+    final Data data = data();
     final int sl = steps.length;
     for(int s = 0; s < sl; s++) {
       // only accept descendant steps without positional predicates
@@ -845,7 +849,7 @@ public abstract class Path extends ParseExpr {
       final NameTest test = (NameTest) step.test;
       if(test.part() != NamePart.LOCAL) return true;
       // only support unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data.paths.desc(test.qname.local());
+      final ArrayList<PathNode> pn = data().paths.desc(test.qname.local());
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;
@@ -1026,16 +1030,15 @@ public abstract class Path extends ParseExpr {
   private static Expr mergeStep(final Step curr, final Expr next, final Expr prev,
       final CompileContext cc) throws QueryException {
 
-    // do not merge steps if first one contains positional predicates
+    // do not merge if current step contains positional predicates
     if(curr.mayBePositional()) return null;
 
     // merge self steps:  child::*/self::a  ->  child::a
     final Step nxt = next instanceof Step ? (Step) next : null;
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
       final Test test = curr.test.intersect(nxt.test);
-      if(test == null) return null;
-      curr.test = test;
-      return curr.addPredicates(nxt.exprs).optimize(prev, cc);
+      return test == null ? null :
+        Step.get(cc, prev, curr.info(), curr.axis, test, ExprList.concat(curr.exprs, nxt.exprs));
     }
 
     // merge descendant-or-self::node()
@@ -1051,10 +1054,7 @@ public abstract class Path extends ParseExpr {
       return false;
     };
     // example: //child::*  ->  descendant::*
-    if(simple.test(nxt)) {
-      nxt.axis = DESCENDANT;
-      return nxt.optimize(prev, cc);
-    }
+    if(simple.test(nxt)) return Step.get(cc, prev, nxt.info(), DESCENDANT, nxt.test, nxt.exprs);
 
     // function for merging steps inside union expressions
     final QueryFunction<Expr, Expr> rewrite = expr -> {
@@ -1067,7 +1067,9 @@ public abstract class Path extends ParseExpr {
         final Union union = (Union) expr;
         if(startWithChild.all(union.exprs)) {
           for(final Expr path : union.exprs) {
-            ((Step) ((Path) path).steps[0]).axis = DESCENDANT;
+            final Path p = (Path) path;
+            final Step s = (Step) p.steps[0];
+            p.steps[0] = Step.get(cc, prev, s.info(), DESCENDANT, s.test, s.exprs);
           }
           return union.optimize(cc);
         }

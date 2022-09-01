@@ -100,8 +100,7 @@ public final class FnTail extends StandardFunc {
       }
     }
 
-    exprType.assign(st.union(Occ.ZERO), size - 1);
-    data(input.data());
+    exprType.assign(st.union(Occ.ZERO), size - 1).data(input);
     return embed(cc, false);
   }
 

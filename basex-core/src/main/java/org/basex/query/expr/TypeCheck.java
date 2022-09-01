@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
@@ -104,7 +103,8 @@ public class TypeCheck extends Single {
     if(!expr.seqType().mayBeArray()) {
       final Occ o = et.occ.intersect(st.occ);
       if(o == null) throw error(expr, st);
-      exprType.assign(st, o, et.occ == st.occ ? es : -1);
+      exprType.assign(st, o, et.occ == st.occ ? es : -1).
+        data(st.type instanceof NodeType ? expr : null);
     }
 
     return this;
@@ -239,11 +239,6 @@ public class TypeCheck extends Single {
     final TypeCheck ex = copyType(get(expr.copy(cc, vm), seqType()));
     ex.occ = occ;
     return ex;
-  }
-
-  @Override
-  public final Data data() {
-    return seqType().type instanceof NodeType ? expr.data() : null;
   }
 
   @Override

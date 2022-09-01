@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
@@ -163,7 +162,7 @@ public final class CompileContext {
   public void pushFocus(final Expr expr) {
     focuses.add(qc.focus);
     final QueryFocus qf = new QueryFocus();
-    if(expr != null) qf.value = dummyItem(expr);
+    if(expr != null) qf.value = dummy(expr);
     qc.focus = qf;
   }
 
@@ -172,7 +171,7 @@ public final class CompileContext {
    * @param expr focus expression
    */
   public void updateFocus(final Expr expr) {
-    qc.focus.value = dummyItem(expr);
+    qc.focus.value = dummy(expr);
   }
 
   /**
@@ -212,14 +211,8 @@ public final class CompileContext {
    * @param expr expression
    * @return dummy item
    */
-  private Item dummyItem(final Expr expr) {
-    Data data = expr.data();
-    // no data reference: if expression is a step, use data from current focus
-    if(data == null && expr instanceof Step) {
-      final Value value = qc.focus.value;
-      if(value != null) data = value.data();
-    }
-    return new Dummy(expr.seqType().with(Occ.EXACTLY_ONE), data);
+  private Item dummy(final Expr expr) {
+    return new Dummy(expr.seqType().with(Occ.EXACTLY_ONE), expr.data());
   }
 
   /**

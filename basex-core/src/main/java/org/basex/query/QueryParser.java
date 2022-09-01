@@ -958,7 +958,7 @@ public class QueryParser extends InputParser {
       skipWs();
       if(curr() != '$' && params.length == 0) break;
       final InputInfo ii = info();
-      final Var var = localVars.add(new Var(varName(), optAsType(), true, qc, sc, ii));
+      final Var var = localVars.add(new Var(varName(), optAsType(), qc, sc, ii, true));
       for(final Var param : params) {
         if(param.name.eq(var.name)) throw error(FUNCDUPL_X, var);
       }
@@ -2305,7 +2305,7 @@ public class QueryParser extends InputParser {
       } else if(curr('{')) {
         final InputInfo ii = info();
         final QNm name = new QNm("arg");
-        final Var var = new Var(name, SeqType.ITEM_O, true, qc, sc, ii);
+        final Var var = new Var(name, SeqType.ITEM_O, qc, sc, ii, true);
         params = new Var[] { localVars.add(var) };
         body = new CachedMap(ii, localVars.resolve(name, ii), enclosedExpr());
       }
