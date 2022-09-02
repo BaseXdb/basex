@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -21,13 +20,12 @@ public final class CmpHashG extends CmpG {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
-   * @param coll collation (can be {@code null})
    * @param sc static context
    * @param info input info
    */
-  CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
-      final StaticContext sc, final InputInfo info) {
-    super(expr1, expr2, op, coll, sc, info);
+  CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final StaticContext sc,
+      final InputInfo info) {
+    super(expr1, expr2, op, null, sc, info);
   }
 
   /**
@@ -75,7 +73,7 @@ public final class CmpHashG extends CmpG {
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CmpHashG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info));
+    return copyType(new CmpHashG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, sc, info));
   }
 
   @Override

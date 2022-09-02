@@ -356,4 +356,20 @@ public final class FilterTest extends QueryPlanTest {
     check(expr + "[position() = 0 to xs:integer(" + wrap(1) + ")]", "<a/>",
         root(_UTIL_RANGE), "//Int = 1");
   }
+
+  /** GH-2140: Dynamic positional range expressions. */
+  @Test public void dynamicRange() {
+    String prefix = "((65 to 70) ! element { codepoints-to-string(.) } {})[. = ''][position() ";
+    String suffix = "] -> name() => string-join()";
+
+    check(prefix + " = last() - 1 to last() - 2" + suffix, "",       exists(RangePos.class));
+    check(prefix + " = last() - 2 to last() - 2" + suffix, "D",      empty(RangePos.class));
+    check(prefix + " = last() - 3 to last() - 2" + suffix, "CD",     exists(RangePos.class));
+
+    check(prefix + "!= last() - 3 to last() - 2" + suffix, "ABCDEF", exists(CmpG.class));
+    check(prefix + "<= last() - 3 to last() - 2" + suffix, "ABCD",   exists(CmpSimpleG.class));
+    check(prefix + "<  last() - 3 to last() - 2" + suffix, "ABC",    exists(CmpSimpleG.class));
+    check(prefix + ">= last() - 3 to last() - 2" + suffix, "CDEF",   exists(CmpSimpleG.class));
+    check(prefix + ">  last() - 3 to last() - 2" + suffix, "DEF",    exists(CmpSimpleG.class));
+  }
 }

@@ -501,9 +501,11 @@ public abstract class Cmp extends Arr {
   private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
     if(!positional()) return this;
 
-    Expr expr = ItrPos.get(exprs[1], op, info);
-    if(expr == null) expr = Pos.get(exprs[1], op, info, cc);
-    return expr != null ? expr : this;
+    final Expr expr = exprs[1];
+    Expr ex = ItrPos.get(expr, op, info);
+    if(ex == null) ex = Pos.get(expr, op, info, cc);
+    if(ex == null) ex = RangePos.get(expr, op, info, cc);
+    return ex != null ? ex : this;
   }
 
   /**

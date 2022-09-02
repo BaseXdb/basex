@@ -45,8 +45,6 @@ final class Pos extends Arr implements CmpPos {
   static Expr get(final Expr expr, final OpV op, final InputInfo ii, final CompileContext cc)
       throws QueryException {
 
-    if(expr == Empty.VALUE) return Bln.FALSE;
-
     Expr min = null, max = null;
     if(expr.isSimple()) {
       final SeqType st2 = expr.seqType();
@@ -82,7 +80,7 @@ final class Pos extends Arr implements CmpPos {
         }
       }
     }
-    return min != null ? new Pos(ii, min, max).optimize(cc) : null;
+    return min != null ? new Pos(ii, min, max) : null;
   }
 
   @Override
@@ -166,7 +164,7 @@ final class Pos extends Arr implements CmpPos {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags);
+    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
   }
 
   @Override

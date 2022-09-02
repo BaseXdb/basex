@@ -135,7 +135,7 @@ public abstract class Filter extends Preds {
       } else if(pred instanceof ItrPos) {
         final ItrPos pos = (ItrPos) pred;
         if(pos.min != pos.max) {
-          // E[min..max]  ->  util:range(E, min, max)
+          // E[min .. max]  ->  util:range(E, min, max)
           ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr),
               Int.get(pos.min), Int.get(pos.max));
         } else if(pos.min == 1) {
@@ -151,8 +151,20 @@ public abstract class Filter extends Preds {
           // E[pos]  ->  util:item(E, pos.min)
           ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
         } else {
-          // E[min..max]  ->  util:range(E, pos.min, pos.max)
+          // E[min .. max]  ->  util:range(E, pos.min, pos.max)
           ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pos.exprs[0], pos.exprs[1]);
+        }
+      } else if(pred instanceof RangePos) {
+        final Expr range = ((RangePos) pred).expr, arg1 = range.arg(0), arg2 = range.arg(1);
+        if(arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple() && LAST.is(arg2)) {
+          // E[pos .. last()]  ->  util:range(E, pos)
+          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
+        } else if(arg1 instanceof Int && arg2 instanceof Arith) {
+          // E[1 .. last() - 1]  ->  util:init(E)
+          if(((Int) arg1).itr() <= 1 && LAST.is(arg2.arg(0)) &&
+              ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
+            ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
+          }
         }
       } else if(numeric(pred)) {
         /* - rewrite positional predicate to util:item
@@ -174,18 +186,6 @@ public abstract class Filter extends Preds {
           } else if(opV == OpV.NE && e.seqType().instanceOf(SeqType.INTEGER_O) && e.isSimple()) {
             // E[position() != pos]  ->  remove(E, pos)
             ex = cc.function(REMOVE, info, prepare.apply(expr), e);
-          } else if(opV == OpV.EQ && e instanceof Range) {
-            final Expr arg1 = e.arg(0), arg2 = e.arg(1);
-            if(LAST.is(arg2) && arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple()) {
-              // E[position() = pos to last()]  ->  util:range(E, pos)
-              ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
-            } else if(arg1 instanceof Int && arg2 instanceof Arith) {
-              // E[position() = 1 to last() - 1]  ->  util:init(E)
-              if(((Int) arg1).itr() <= 1 && LAST.is(arg2.arg(0)) &&
-                  ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
-                ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
-              }
-            }
           }
         }
       } else if(pred instanceof Arith && LAST.is(pred.arg(0)) && preds.isEmpty()) {

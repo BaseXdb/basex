@@ -213,7 +213,7 @@ public class CmpG extends Cmp {
           type1.isStringOrUntyped() && type2.isStringOrUntyped()) && !st2.zeroOrOne()) {
         // hash-based comparisons
         hash = this instanceof CmpHashG ? (CmpHashG) this :
-          new CmpHashG(expr1, expr2, op, null, sc, info);
+          new CmpHashG(expr1, expr2, op, sc, info);
         expr = hash;
       }
       // pre-evaluate expression; discard hashed results
