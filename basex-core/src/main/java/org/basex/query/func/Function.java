@@ -1509,8 +1509,8 @@ public enum Function implements AFunction {
   _PROF_VARIABLES(ProfVariables::new, "variables()",
       params(), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_VOID(ProfVoid::new, "void(value)",
-      params(ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
+  _PROF_VOID(ProfVoid::new, "void(value[,skip])",
+      params(ITEM_ZM, BOOLEAN_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
 
   // Random Module
 
