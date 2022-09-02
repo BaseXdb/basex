@@ -39,16 +39,17 @@ public abstract class Preds extends Arr {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     // called at an early stage as it affects the optimization of predicates
-    type(cc.qc.focus.value);
-
+    final Expr root = type(cc.qc.focus.value);
     final int el = exprs.length;
     if(el != 0) cc.get(this, () -> {
-      final QueryFocus focus = cc.qc.focus;
-      final Value init = focus.value;
+      if(root != null) {
+        final long size = root.size();
+        if(size != -1) cc.qc.focus.size = size;
+      }
       for(int e = 0; e < el; ++e) {
         exprs[e] = cc.compileOrError(exprs[e], false);
+        cc.qc.focus.size = 1;
       }
-      focus.value = init;
       return null;
     });
     return optimize(cc);
@@ -56,9 +57,10 @@ public abstract class Preds extends Arr {
 
   /**
    * Assigns the expression type.
-   * @param expr root expression
+   * @param expr root expression (can be {@code null})
+   * @return actual root expression (can be {@code null})
    */
-  protected abstract void type(Expr expr);
+  protected abstract Expr type(Expr expr);
 
   /**
    * Assigns the sequence type and result size.
@@ -187,7 +189,7 @@ public abstract class Preds extends Arr {
     // E[position()]  ->  E[true()]
     if(Function.POSITION.is(expr)) expr = Bln.TRUE;
 
-    // positional tests: E[1]  ->  E[position() = 1]
+    // positional tests: E[n]  ->  E[position() = n to n]
     if(expr instanceof ANum) expr = ItrPos.get(((ANum) expr).dbl(), info);
 
     // merge node tests with steps; remove redundant node tests

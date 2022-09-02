@@ -135,8 +135,7 @@ public abstract class Step extends Preds {
    */
   final Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
-    final Expr rt = root != null ? root : cc.qc.focus.value;
-    type(rt);
+    final Expr rt = type(root != null ? root : cc.qc.focus.value);
 
     // choose stricter axis
     final Axis old = axis;
@@ -167,7 +166,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  protected final void type(final Expr expr) {
+  protected final Expr type(final Expr expr) {
     exprType.data(expr);
     if(expr != null && axis == SELF) {
       final SeqType seqType = expr.seqType();
@@ -177,6 +176,7 @@ public abstract class Step extends Preds {
       if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE)
         exprType.assign(Occ.EXACTLY_ONE);
     }
+    return expr;
   }
 
   /**

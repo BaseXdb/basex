@@ -212,8 +212,9 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  protected final void type(final Expr expr) {
+  protected final Expr type(final Expr expr) {
     exprType.assign(root.seqType().union(Occ.ZERO)).data(root);
+    return root;
   }
 
   /**
