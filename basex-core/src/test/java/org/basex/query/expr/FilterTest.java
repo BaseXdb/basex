@@ -357,19 +357,21 @@ public final class FilterTest extends QueryPlanTest {
         root(_UTIL_RANGE), "//Int = 1");
   }
 
-  /** GH-2140: Dynamic positional range expressions. */
-  @Test public void dynamicRange() {
-    String prefix = "((65 to 70) ! element { codepoints-to-string(.) } {})[. = ''][position() ";
-    String suffix = "] -> name() => string-join()";
+  /** Dynamic positional range expressions. */
+  @Test public void gh2140() {
+    final String pre = "((65 to 70) ! element { codepoints-to-string(.) } {})[. = ''][position() ";
+    final String post = "] -> name() => string-join()";
 
-    check(prefix + " = last() - 1 to last() - 2" + suffix, "",       exists(RangePos.class));
-    check(prefix + " = last() - 2 to last() - 2" + suffix, "D",      empty(RangePos.class));
-    check(prefix + " = last() - 3 to last() - 2" + suffix, "CD",     exists(RangePos.class));
+    check(pre + " = last() - 1 to last() - 2" + post, "",       exists(RangePos.class));
+    check(pre + " = last() - 2 to last() - 2" + post, "D",      empty(RangePos.class));
+    check(pre + " = last() - 3 to last() - 2" + post, "CD",     exists(RangePos.class));
 
-    check(prefix + "!= last() - 3 to last() - 2" + suffix, "ABCDEF", exists(CmpG.class));
-    check(prefix + "<= last() - 3 to last() - 2" + suffix, "ABCD",   exists(CmpSimpleG.class));
-    check(prefix + "<  last() - 3 to last() - 2" + suffix, "ABC",    exists(CmpSimpleG.class));
-    check(prefix + ">= last() - 3 to last() - 2" + suffix, "CDEF",   exists(CmpSimpleG.class));
-    check(prefix + ">  last() - 3 to last() - 2" + suffix, "DEF",    exists(CmpSimpleG.class));
+    check(pre + "!= last() - 3 to last() - 2" + post, "ABCDEF", exists(CmpG.class));
+    check(pre + "<= last() - 3 to last() - 2" + post, "ABCD",   exists(CmpG.class));
+    check(pre + "<  last() - 3 to last() - 2" + post, "ABC",    exists(CmpG.class));
+    check(pre + ">= last() - 3 to last() - 2" + post, "CDEF",   exists(CmpG.class));
+    check(pre + ">  last() - 3 to last() - 2" + post, "DEF",    exists(CmpG.class));
+
+    query("let $i := 1 return <x><a/></x>/*[position() >= $i to 0]", "");
   }
 }

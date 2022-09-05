@@ -159,12 +159,10 @@ public abstract class Filter extends Preds {
         if(arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple() && LAST.is(arg2)) {
           // E[pos .. last()]  ->  util:range(E, pos)
           ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
-        } else if(arg1 instanceof Int && arg2 instanceof Arith) {
+        } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
+            ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
           // E[1 .. last() - 1]  ->  util:init(E)
-          if(((Int) arg1).itr() <= 1 && LAST.is(arg2.arg(0)) &&
-              ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
-            ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
-          }
+          ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
         }
       } else if(numeric(pred)) {
         /* - rewrite positional predicate to util:item

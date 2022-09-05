@@ -48,10 +48,9 @@ final class Pos extends Arr implements CmpPos {
     Expr min = null, max = null;
     if(expr.isSimple()) {
       final SeqType st2 = expr.seqType();
-      if(expr instanceof Range && op == OpV.EQ && st2.type.instanceOf(AtomType.INTEGER)) {
-        final Expr start = expr.arg(0), end = expr.arg(1);
-        min = start instanceof Int && ((Int) start).itr() < 1 ? Int.ONE : start;
-        max = min.equals(end) ? min : end;
+      if(op == OpV.EQ && expr instanceof Range) {
+        min = expr.arg(0);
+        max = expr.arg(1);
       } else if(st2.one() && !st2.mayBeArray()) {
         switch(op) {
           case EQ:

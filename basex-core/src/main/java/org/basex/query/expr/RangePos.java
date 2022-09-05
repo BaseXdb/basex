@@ -34,27 +34,10 @@ final class RangePos extends Single {
    * @param expr positions to be matched
    * @param op comparator
    * @param ii input info
-   * @param cc compilation context
    * @return optimized expression or {@code null}
-   * @throws QueryException query exception
    */
-  static Expr get(final Expr expr, final OpV op, final InputInfo ii, final CompileContext cc)
-      throws QueryException {
-    if(expr instanceof Range && expr.arg(0).seqType().instanceOf(SeqType.INTEGER_O) &&
-        expr.arg(1).seqType().instanceOf(SeqType.INTEGER_O)) {
-      int a = -1;
-      switch(op) {
-        case EQ: return new RangePos(ii, expr);
-        case GE: case GT: a = 0; break;
-        case LE: case LT: a = 1; break;
-        default:
-      }
-      if(a != -1) {
-        final Expr pos = cc.function(Function.POSITION, ii);
-        return new CmpG(pos, expr.arg(a), op.general(), null, null, ii).optimize(cc);
-      }
-    }
-    return null;
+  static Expr get(final Expr expr, final OpV op, final InputInfo ii) {
+    return expr instanceof Range && op == OpV.EQ ? new RangePos(ii, expr) : null;
   }
 
   @Override

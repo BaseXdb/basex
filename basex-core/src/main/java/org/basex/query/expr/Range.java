@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -40,7 +41,7 @@ public final class Range extends Arr {
 
       final Expr expr1 = exprs[0], expr2 = exprs[1];
       if(expr1.equals(expr2)) {
-        if(expr1.seqType().instanceOf(SeqType.INTEGER_O)) {
+        if(expr1.seqType().instanceOf(SeqType.INTEGER_O) && !expr1.has(Flag.NDT)) {
           expr = expr1;
         } else {
           exprType.assign(Occ.EXACTLY_ONE);
