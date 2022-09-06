@@ -2,6 +2,8 @@ package org.basex.query.func.fn;
 
 import org.basex.core.locks.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -23,5 +25,10 @@ public final class FnPosition extends StandardFunc {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.lock(Locking.CONTEXT) && super.accept(visitor);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    return mode.oneOf(Simplify.PREDICATE) ? Bln.TRUE : super.simplifyFor(mode, cc);
   }
 }

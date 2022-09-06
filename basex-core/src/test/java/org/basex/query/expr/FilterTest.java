@@ -360,17 +360,24 @@ public final class FilterTest extends QueryPlanTest {
   /** Dynamic positional range expressions. */
   @Test public void gh2140() {
     final String pre = "((65 to 70) ! element { codepoints-to-string(.) } {})[. = ''][position() ";
-    final String post = "] -> name() => string-join()";
+    final String post = "] ! name(.) => string-join()";
 
-    check(pre + " = last() - 1 to last() - 2" + post, "",       exists(RangePos.class));
-    check(pre + " = last() - 2 to last() - 2" + post, "D",      empty(RangePos.class));
-    check(pre + " = last() - 3 to last() - 2" + post, "CD",     exists(RangePos.class));
+    check(pre + " = last() - 1 to last() - 2" + post, "",       exists(Pos.class));
+    check(pre + " = last() - 2 to last() - 2" + post, "D",      empty(Pos.class));
+    check(pre + " = last() - 3 to last() - 2" + post, "CD",     exists(Pos.class));
 
     check(pre + "!= last() - 3 to last() - 2" + post, "ABCDEF", exists(CmpG.class));
     check(pre + "<= last() - 3 to last() - 2" + post, "ABCD",   exists(CmpG.class));
     check(pre + "<  last() - 3 to last() - 2" + post, "ABC",    exists(CmpG.class));
     check(pre + ">= last() - 3 to last() - 2" + post, "CDEF",   exists(CmpG.class));
     check(pre + ">  last() - 3 to last() - 2" + post, "DEF",    exists(CmpG.class));
+
+    check(pre + " + 1 = last()" + post, "E", empty(CmpSimpleG.class), empty(Pos.class));
+    check(pre + " - 1 = last()" + post, "", empty(CmpSimpleG.class), empty(Pos.class));
+    check(pre + " + 1 < last()" + post, "ABCD", empty(CmpSimpleG.class), exists(Pos.class));
+    check(pre + " - 1 < last()" + post, "ABCDEF", empty(CmpSimpleG.class), empty(Pos.class));
+    check("for $i in -3 to 3 return " + pre + " + 1 = $i" + post,
+        "\n\n\n\n\nA\nB", empty(CmpSimpleG.class));
 
     query("let $i := 1 return <x><a/></x>/*[position() >= $i to 0]", "");
   }

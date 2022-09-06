@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -258,21 +259,21 @@ public final class PathTest extends QueryPlanTest {
   /** Position checks. */
   @Test public void cmpPos() {
     check("<a/>/*[1]",
-        "", exists(IterPosStep.class), exists(ItrPos.class));
+        "", exists(IterPosStep.class), exists(Int.class));
     check("<a/>/*[position() = 1]",
-        "", exists(IterPosStep.class), exists(ItrPos.class));
+        "", exists(IterPosStep.class), exists(Int.class));
     check("for $i in 1 to 2 return <a/>/*[$i]",
         "", exists(IterPosStep.class), exists(VarRef.class));
     check("for $i in 1 to 2 return <a/>/*[position() = $i]",
-        "", exists(IterPosStep.class), exists(Pos.class));
+        "", exists(IterPosStep.class), empty(SimplePos.class));
     check("for $i in 1 to 2 return <a/>/*[position() = $i to $i]",
-        "", exists(IterPosStep.class), exists(Pos.class));
+        "", exists(IterPosStep.class), empty(SimplePos.class));
     check("for $i in 1 to 2 return <a/>/*[position() = $i to $i + 1]",
-        "", exists(IterPosStep.class), exists(Pos.class));
+        "", exists(IterPosStep.class), exists(SimplePos.class));
     check("let $i := 1 return <a/>/*[position() = $i to $i + 1]",
-        "", exists(IterPosStep.class), exists(ItrPos.class));
+        "", exists(IterPosStep.class), empty(VarRef.class), exists(IntPos.class));
     check("let $i := 1 return <a/>/*[position() = 0 to $i]",
-        "", exists(IterPosStep.class), exists(ItrPos.class));
+        "", exists(IterPosStep.class), empty(VarRef.class), count(Int.class, 1));
     check("let $i := 0 return <a/>/*[position() = 1 to $i]",
         "", empty());
   }

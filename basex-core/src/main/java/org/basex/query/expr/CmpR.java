@@ -130,12 +130,13 @@ public final class CmpR extends Single {
 
     if(expr instanceof Value) return cc.preEval(this);
 
-    Expr ex = this;
     if(Function.POSITION.is(expr)) {
-      final long mn = Math.max((long) Math.ceil(min), 1), mx = (long) Math.floor(max);
-      ex = ItrPos.get(RangeSeq.get(mn, mx - mn + 1, true), OpV.EQ, info);
+      // E[let $p := position() return $p > .1e0]
+      final long mn = Math.max((long) Math.ceil(min), 1), size = (long) Math.floor(max) - mn + 1;
+      final Expr pos = RangeSeq.get(mn, size, true).optimizePos(OpV.EQ, cc);
+      return cc.replaceWith(this, pos instanceof Bln ? pos : IntPos.get(pos, OpV.EQ, info));
     }
-    return cc.replaceWith(this, ex);
+    return this;
   }
 
   @Override

@@ -51,7 +51,7 @@ public final class IterPosStep extends Step {
               // pre-evaluate numeric position
               final Item item = expr.item(qc, info);
               if(item == Empty.VALUE) return null;
-              final Expr ex = ItrPos.get(toDouble(item), info);
+              final Expr ex = IntPos.get(toDouble(item), info);
               if(!(ex instanceof CmpPos)) return null;
               posExpr[e] = (CmpPos) ex;
             }

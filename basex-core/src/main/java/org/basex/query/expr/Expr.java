@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
@@ -335,6 +336,19 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Optimizes an expression for positional access.
+   * Overwritten by {@link Int}, {@link Range}, {@link RangeSeq}}.
+   * @param op comparison operator
+   * @param cc compilation context
+   * @return boolean result, optimized or original expression
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+    return this;
+  }
+
+  /**
    * Checks if an expression can be rewritten to an index access.
    * If so, the index expression will be bound to {@link IndexInfo#expr}.
    * This method will be called by the {@link Path} expression.
@@ -381,7 +395,7 @@ public abstract class Expr extends ExprInfo {
    * Tries to merge two expressions that are part of an EBV test.
    * Called by {@link And}, {@link Or}), {@link Step} and {@link Filter}.
    * Overwritten by {@link CmpG}, {@link CmpIR}, {@link CmpR}, {@link CmpSR},
-   * {@link ItrPos}, {@link Pos} and others.
+   * {@link IntPos}, {@link SimplePos} and others.
    * @param expr second expression
    * @param or union or intersection
    * @param cc compilation context
@@ -463,8 +477,7 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link CmpG#optimize(CompileContext)} or {@link CmpV#optimize(CompileContext)},
    *     in order to pre-evaluate equality tests.
    *   </li>
-   *   <li>{@link CmpG#optimize(CompileContext)} or
-   *     {@link Pos#get(Expr, CmpV.OpV, InputInfo, CompileContext)},
+   *   <li>{@link CmpG#optimize(CompileContext)},
    *     in order to compare the start and end value.
    *   </li>
    *   <li>{@link PathCache}, in order to find identical root values at runtime.

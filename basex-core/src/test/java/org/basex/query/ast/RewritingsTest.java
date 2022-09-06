@@ -624,7 +624,7 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1741() {
     check("<a/>/<b/>[1]", "<b/>", root(CElem.class));
     check("<a/>/.[1]", "<a/>", root(CElem.class));
-    check("<doc><x/><y/></doc>/*/..[1] ! name()", "doc", empty(ItrPos.class));
+    check("<doc><x/><y/></doc>/*/..[1] ! name()", "doc", empty(IntPos.class));
 
     check("<a/>/<b/>[2]", "", empty());
     check("<a/>/.[2]", "", empty());
@@ -1359,7 +1359,7 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1840() {
     check("(1, 2, 3)[position() = 1 or position() = 1]", 1, root(Int.class));
     check("(1, 2, 3)[position() = 1 or position() = 2]", "1\n2", root(RangeSeq.class));
-    check("(1, 2, 3)[position() = 1 or position() = 3]", "1\n3", count(ItrPos.class, 2));
+    check("(1, 2, 3)[position() = 1 or position() = 3]", "1\n3", count(IntPos.class, 2));
 
     check("(1, 2, 3)[position() = 1 to 2 or position() = 1]", "1\n2", root(RangeSeq.class));
     check("(1, 2, 3)[position() = 1 to 2 or position() = 2]", "1\n2", root(RangeSeq.class));

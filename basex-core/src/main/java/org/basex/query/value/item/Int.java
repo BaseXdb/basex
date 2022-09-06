@@ -5,6 +5,8 @@ import java.math.*;
 
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -170,6 +172,19 @@ public final class Int extends ANum {
     if(item.type == AtomType.DECIMAL) return -item.diff(this, coll, ii);
     final double d = item.dbl(ii);
     return Double.isNaN(d) ? UNDEF : value < d ? -1 : value > d ? 1 : 0;
+  }
+
+  @Override
+  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+    switch(op) {
+      case EQ:
+      case LE: if(value < 1) return Bln.FALSE; break;
+      case NE:
+      case GT: if(value < 1) return Bln.TRUE; break;
+      case LT: if(value < 2) return Bln.FALSE; break;
+      case GE: if(value < 2) return Bln.TRUE; break;
+    }
+    return this;
   }
 
   @Override

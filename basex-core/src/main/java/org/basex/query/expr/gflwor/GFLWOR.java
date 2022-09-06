@@ -728,7 +728,7 @@ public final class GFLWOR extends ParseExpr {
         clauses.remove(d);
         if(count(pos.pos, c) == VarUsage.NEVER) {
           // for $e at $p in E where $p = P ...  ->  for $e in E[position() = P] ...
-          pos.addPredicate(cc, ItrPos.get(cmp.min, cmp.max, cmp.info()));
+          pos.addPredicate(cc, IntPos.get(cmp.min, cmp.max, cmp.info()));
           cc.info(QueryText.OPTPRED_X, expr);
           changed = true;
         } else {

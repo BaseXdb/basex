@@ -5,6 +5,8 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.CmpV.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -70,6 +72,21 @@ public final class Range extends Arr {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new Range(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+  }
+
+  @Override
+  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+    if(op == OpV.EQ) {
+      Expr min = exprs[0], max = exprs[1];
+      // position() = X to 0  ->  false()
+      if(max instanceof Int && ((Int) max).itr() < 1) return Bln.FALSE;
+      // position() = 0 to X  ->  position() = 1 to X
+      if(min instanceof Int && ((Int) min).itr() < 1) min = Int.ONE;
+      // position() = 1 to last()  ->  true()
+      if(min == Int.ONE && Function.LAST.is(max)) return Bln.TRUE;
+      if(min != exprs[0]) return new Range(info, min, max).optimize(cc);
+    }
+    return this;
   }
 
   @Override

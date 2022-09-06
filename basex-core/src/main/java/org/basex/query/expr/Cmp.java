@@ -147,25 +147,8 @@ public abstract class Cmp extends Arr {
     final Type type = root.seqType().type;
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final OpV opV = opV();
-    if(positional()) {
-      if(Preds.numeric(expr2) && opV == OpV.EQ) {
-        // position() = NUMBER  ->  NUMBER
-        return expr2;
-      } else if(LAST.is(expr2)) {
-        switch(opV) {
-          // position() =/>= last()  ->  last()
-          case EQ: case GE: return expr2;
-          // position() <= last()  ->  true()
-          case LE: return Bln.TRUE;
-          // position() > last()  ->  false()
-          case GT: return Bln.FALSE;
-          // position() </!= last()  ->  handled in {@link Filter} expression
-          default:
-        }
-      }
-    } else if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof ContextFn &&
+    if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof ContextFn &&
         (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item) && opV == OpV.EQ) {
-
       // skip functions that do not refer to the current context item
       final ContextFn func = (ContextFn) expr1;
       final Value value = (Value) expr2;
@@ -493,46 +476,18 @@ public abstract class Cmp extends Arr {
 
   /**
    * Positional optimizations.
-   * @param op operator
+   * @param op comparison operator
    * @param cc compilation context
    * @return optimized or original expression
    * @throws QueryException query exception
    */
   private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
-    if(!positional()) return this;
-
-    Expr pos = exprs[1], ex = null;
-    if(op == OpV.EQ) {
-      if(pos instanceof Range) {
-        Expr start = pos.arg(0), end = pos.arg(1);
-        if(end instanceof Int && ((Int) end).itr() < 1) {
-          ex = Bln.FALSE;
-        } else if(start instanceof Int && ((Int) start).itr() < 1) {
-          pos = new Range(info, Int.ONE, end).optimize(cc);
-          ex = new CmpG(exprs[0], pos, op.general(), coll, sc, info).optimize(cc);
-        }
-      } else if(pos instanceof RangeSeq) {
-        final long[] range = ((RangeSeq) pos).range(false);
-        if(range[1] < 1) {
-          ex = Bln.FALSE;
-        } else if(range[0] < 1) {
-          pos = RangeSeq.get(1, range[1], true);
-          ex = new CmpG(exprs[0], pos, op.general(), coll, sc, info).optimize(cc);
-        }
-      }
+    Expr ex = null;
+    if(POSITION.is(exprs[0]) && exprs[1].seqType().type.isNumberOrUntyped()) {
+      final Expr pos = exprs[1].optimizePos(op, cc);
+      ex = pos instanceof Bln ? pos : Pos.get(pos, op, info, cc);
     }
-    if(ex == null) ex = ItrPos.get(pos, op, info);
-    if(ex == null) ex = Pos.get(pos, op, info, cc);
-    if(ex == null) ex = RangePos.get(pos, op, info);
     return ex != null ? ex : this;
-  }
-
-  /**
-   * Indicates if this is a positional comparison.
-   * @return result of check
-   */
-  boolean positional() {
-    return POSITION.is(exprs[0]);
   }
 
   /**

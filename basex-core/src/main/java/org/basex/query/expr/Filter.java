@@ -129,24 +129,16 @@ public abstract class Filter extends Preds {
       preds.isEmpty() ? ex : get(cc, info, ex, preds.next());
     for(final Expr pred : exprs) {
       Expr ex = null;
-      if(LAST.is(pred)) {
-        // rewrite positional predicate to util:last
-        ex = cc.function(_UTIL_LAST, info, prepare.apply(expr));
-      } else if(pred instanceof ItrPos) {
-        final ItrPos pos = (ItrPos) pred;
-        if(pos.min != pos.max) {
-          // E[min .. max]  ->  util:range(E, min, max)
-          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr),
-              Int.get(pos.min), Int.get(pos.max));
-        } else if(pos.min == 1) {
-          // E[1]  ->  head(E)
-          ex = cc.function(HEAD, info, prepare.apply(expr));
-        } else {
-          // E[pos]  ->  util:item(E, pos)
-          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), Int.get(pos.min));
-        }
-      } else if(pred instanceof Pos) {
-        final Pos pos = (Pos) pred;
+      if(pred.seqType().instanceOf(SeqType.NUMERIC_O) && pred.isSimple()) {
+        // E[pos]  ->  util:item(E, pos)
+        ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pred);
+      } else if(pred instanceof IntPos) {
+        // E[min .. max]  ->  util:range(E, min, max)
+        final IntPos pos = (IntPos) pred;
+        ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), Int.get(pos.min),
+            Int.get(pos.max));
+      } else if(pred instanceof SimplePos) {
+        final SimplePos pos = (SimplePos) pred;
         if(pos.exact()) {
           // E[pos]  ->  util:item(E, pos.min)
           ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
@@ -154,41 +146,32 @@ public abstract class Filter extends Preds {
           // E[min .. max]  ->  util:range(E, pos.min, pos.max)
           ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pos.exprs[0], pos.exprs[1]);
         }
-      } else if(pred instanceof RangePos) {
-        final Expr range = ((RangePos) pred).expr, arg1 = range.arg(0), arg2 = range.arg(1);
-        if(arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple() && LAST.is(arg2)) {
-          // E[pos .. last()]  ->  util:range(E, pos)
-          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
-        } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
-            ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
-          // E[1 .. last() - 1]  ->  util:init(E)
-          ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
-        }
-      } else if(numeric(pred)) {
-        /* - rewrite positional predicate to util:item
-         *   expr[pos]  ->  util:item(expr, pos)
-         * - only choose deterministic and context-independent offsets. illegal:
-         *   (1 to 10)[random:integer(10)]  or  (1 to 10)[.]  or  $a[$a[.]] */
-        if(pred.seqType().one()) {
-          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pred);
-        }
-      } else if(pred instanceof Cmp) {
-        // rewrite positional predicate to fn:remove
-        final Cmp cmp = (Cmp) pred;
-        final OpV opV = cmp.opV();
-        if(cmp.positional() && opV != null) {
-          final Expr e = cmp.exprs[1];
-          if((opV == OpV.LT || opV == OpV.NE) && LAST.is(e)) {
-            // E[position() < last()]  ->  util:init(E)
+      } else if(pred instanceof Pos) {
+        final Expr pos = ((Pos) pred).expr;
+        if(pos instanceof Range) {
+          final Expr arg1 = pos.arg(0), arg2 = pos.arg(1);
+          if(arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple() && LAST.is(arg2)) {
+            // E[pos .. last()]  ->  util:range(E, pos)
+            ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
+          } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
+              ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
+            // E[1 .. last() - 1]  ->  util:init(E)
             ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
-          } else if(opV == OpV.NE && e.seqType().instanceOf(SeqType.INTEGER_O) && e.isSimple()) {
-            // E[position() != pos]  ->  remove(E, pos)
-            ex = cc.function(REMOVE, info, prepare.apply(expr), e);
           }
         }
-      } else if(pred instanceof Arith && LAST.is(pred.arg(0)) && preds.isEmpty()) {
-        // E[last() - 1]  ->  util:item(E, size - 1)
+      } else if(pred instanceof CmpG) {
+        final Expr op1 = pred.arg(0), op2 = pred.arg(1);
+        if(POSITION.is(op1) && ((Cmp) pred).opV() == OpV.NE &&
+            op2.seqType().instanceOf(SeqType.INTEGER_O) && op2.isSimple()) {
+          // E[position() != pos]  ->  remove(E, pos)
+          ex = cc.function(REMOVE, info, prepare.apply(expr), op2);
+        }
+      } else if(LAST.is(pred)) {
+        // E[last()]  ->  util:last(E)
+        ex = cc.function(_UTIL_LAST, info, prepare.apply(expr));
+      } else if(pred instanceof Arith && preds.isEmpty() && LAST.is(pred.arg(0))) {
         final long es = expr.size();
+        // E[last() - 1]  ->  util:item(E, size - 1)
         if(es != -1) ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr),
             new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));
       }

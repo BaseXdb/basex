@@ -10,6 +10,7 @@ import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -190,7 +191,7 @@ public abstract class Arr extends ParseExpr {
     boolean pos = false;
     for(final Expr expr : exprs) {
       // pre-evaluate values
-      if(expr instanceof Value) {
+      if(expr instanceof Value && (!positional || !(expr instanceof ANum))) {
         // skip evaluation: true() or $bool  ->  true()
         if(expr.ebv(cc.qc, info).bool(info) == or) return true;
         // ignore result: true() and $bool  ->  $bool

@@ -10,6 +10,8 @@ import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.Function;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -137,6 +139,25 @@ public final class RangeSeq extends Seq {
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
     return true;
+  }
+
+  @Override
+  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+    final long[] range = range(false);
+    final long min = range[0], max = range[1];
+    range[0] = Math.max(range[0], 1);
+    range[1] = Math.max(range[1], 1);
+    switch(op) {
+      case EQ: if(max < 1) return Bln.FALSE; break;
+      case LE: return max < 1 ? Bln.FALSE : Int.get(range[1]);
+      case NE: if(max < 1) return Bln.TRUE; break;
+      case GT: return max < 1 ? Bln.TRUE : Int.get(range[0]);
+      case LT: return max < 2 ? Bln.FALSE : Int.get(range[1]);
+      case GE: return max < 2 ? Bln.TRUE : Int.get(range[0]);
+    }
+    if(min == range[0] && max == range[1]) return this;
+    final Expr ex = RangeSeq.get(range[0], range[1], true);
+    return ex == Empty.VALUE ? Bln.FALSE : ex;
   }
 
   @Override

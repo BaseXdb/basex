@@ -236,23 +236,28 @@ public class CmpG extends Cmp {
    */
   private Expr optArith(final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr1 instanceof Arith) {
-      final Arith arith = (Arith) expr1;
-      final Expr op1 = arith.arg(0), op2 = arith.arg(1);
-      final Calc calc = arith.calc;
-      if(calc == Calc.MINUS && op2.seqType().instanceOf(SeqType.NUMERIC_O) && expr2 == Int.ZERO) {
-        // sum(A) - sum(B) = 0  ->  sum(A) = sum(B)
-        return new CmpG(op1, op2, op, coll, sc, info).optimize(cc);
-      }
-      if(calc != Calc.MOD && calc != Calc.IDIV && op2 instanceof ANum &&
-        (expr2 instanceof ANum || expr2 instanceof Arith && expr2.arg(1) instanceof ANum)) {
-        // count(E) div 2 = 1  ->  count(E) = 1 * 2
-        // $a - 1 = $b + 1  ->  $a = $b + 2
-        final Expr arg2 = new Arith(info, expr2, op2, calc.invert()).optimize(cc);
-        return new CmpG(op1, arg2, op, coll, sc, info).optimize(cc);
+    Expr ex = null;
+
+    if(expr1 instanceof Arith && expr2.seqType().instanceOf(SeqType.NUMERIC_O)) {
+      final Expr op1 = expr1.arg(0), op2 = expr1.arg(1);
+      if(op2.seqType().instanceOf(SeqType.NUMERIC_O)) {
+        final Calc calc = ((Arith) expr1).calc;
+        if(calc == Calc.MINUS && expr2 == Int.ZERO) {
+          // E - NUMERIC = 0  ->  E = NUMERIC
+          ex = new CmpG(op1, op2, op, coll, sc, info);
+        } else if(calc != Calc.IDIV && calc != Calc.MOD && (
+            Function.POSITION.is(op1) || op2 instanceof ANum &&
+          (expr2 instanceof ANum || expr2 instanceof Arith && expr2.arg(1) instanceof ANum)
+        )) {
+          // position() + 1 < last()  ->  position() < last() - 1
+          // count(E) div 2 = 1  ->  count(E) = 1 * 2
+          // $a - 1 = $b + 1  ->  $a = $b + 2
+          final Expr arg2 = new Arith(info, expr2, op2, calc.invert()).optimize(cc);
+          ex = new CmpG(op1, arg2, op, coll, sc, info);
+        }
       }
     }
-    return this;
+    return ex != null ? ex.optimize(cc) : this;
   }
 
   @Override

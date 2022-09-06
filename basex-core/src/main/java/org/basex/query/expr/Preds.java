@@ -7,7 +7,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -74,11 +73,11 @@ public abstract class Preds extends Arr {
 
     // check for positional predicates
     for(final Expr expr : exprs) {
-      if(Function.LAST.is(expr)) {
+      if(expr instanceof Int || Function.LAST.is(expr)) {
         // use minimum of old value and 1
         max = Math.min(max, 1);
-      } else if(expr instanceof ItrPos) {
-        final ItrPos pos = (ItrPos) expr;
+      } else if(expr instanceof IntPos) {
+        final IntPos pos = (IntPos) expr;
         // subtract start position. example: ...[1 to 2][2]  ->  2  ->  1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
         // use minimum of old value and range. example: ...[1 to 5]  ->  5
@@ -145,10 +144,9 @@ public abstract class Preds extends Arr {
   private void simplify(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
-    Expr expr = pred;
-
-    // comparisons: E[position() = 1]  ->  E[1]
-    if(expr instanceof CmpG || expr instanceof CmpV) expr = ((Cmp) expr).optPred(root, cc);
+    // E[exists(nodes)]  ->  E[nodes]
+    // E[count(nodes)]  will not be rewritten
+    Expr expr = pred.simplifyFor(Simplify.PREDICATE, cc);
 
     // map operator: E[. ! ...]  ->  E[...], E[E ! ...]  ->  E[...]
     final SeqType rst = root.seqType();
@@ -182,15 +180,8 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // E[exists(nodes)]  ->  E[nodes]
-    // E[count(nodes)]  will not be rewritten
-    expr = expr.simplifyFor(Simplify.PREDICATE, cc);
-
-    // E[position()]  ->  E[true()]
-    if(Function.POSITION.is(expr)) expr = Bln.TRUE;
-
-    // positional tests: E[n]  ->  E[position() = n to n]
-    if(expr instanceof ANum) expr = ItrPos.get(((ANum) expr).dbl(), info);
+    // comparisons: E[local-name() eq 'a']  ->  E[self::*:a]
+    if(expr instanceof CmpG || expr instanceof CmpV) expr = ((Cmp) expr).optPred(root, cc);
 
     // merge node tests with steps; remove redundant node tests
     // child::node()[self::*]  ->  child::*
@@ -218,19 +209,15 @@ public abstract class Preds extends Arr {
 
     // positional tests:
     //   <a/>/.[position() = 1]  ->  <a/>/.[true()]
-    //   $child/..[position() = 2]  ->  $child/..[false()]
-    if(root instanceof Step && expr instanceof ItrPos) {
+    //   $child/..[position() > 1]  ->  $child/..[false()]
+    if(root instanceof Step) {
       final Axis axis = ((Step) root).axis;
-      if(axis == Axis.SELF || axis == Axis.PARENT) expr = Bln.get(((ItrPos) expr).min == 1);
-    }
-
-    // positional comparisons: E[position() = last() - 1]  ->  E[last() - 1]
-    if(expr instanceof Cmp) {
-      final Cmp cmp = (Cmp) expr;
-      final Expr ex = cmp.exprs[1];
-      final SeqType st = ex.seqType();
-      if(cmp.positional() && cmp.opV() == OpV.EQ && st.one()) {
-        expr = new Cast(cc.sc(), info, ex, SeqType.NUMERIC_O).optimize(cc);
+      if(axis == Axis.SELF || axis == Axis.PARENT) {
+        if(expr instanceof Int) {
+          expr = Bln.get(((Int) expr).itr() == 1);
+        } else if(expr instanceof IntPos) {
+          expr = Bln.get(((IntPos) expr).min == 1);
+        }
       }
     }
 

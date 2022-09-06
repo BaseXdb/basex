@@ -105,6 +105,16 @@ public final class Arith extends Arr {
   }
 
   @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    if(mode == Simplify.PREDICATE && Function.LAST.is(exprs[0]) && exprs[1] instanceof ANum) {
+      final double d = ((ANum) exprs[1]).dbl();
+      return cc.simplify(this, calc == Calc.PLUS && d > 0 || calc == Calc.MINUS && d < 0 ||
+        calc == Calc.MULT && d > 1 || calc == Calc.DIV && d < 1 ? Empty.VALUE : this);
+    }
+    return super.simplifyFor(mode, cc);
+  }
+
+  @Override
   public Arith copy(final CompileContext cc, final IntObjMap<Var> vm) {
     return copyType(new Arith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), calc));
   }
