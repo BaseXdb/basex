@@ -5,6 +5,7 @@ import static java.lang.Float.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -125,6 +126,20 @@ public abstract class ANum extends Item {
     final double d = dbl();
     return cc.simplify(this, mode == Simplify.PREDICATE && (d != itr() || d < 1) ||
         mode == Simplify.EBV && d == 0 ? Bln.FALSE : this);
+  }
+
+  @Override
+  public final Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+    final double d = dbl();
+    switch(op) {
+      case EQ: if(d < 1 || d != (long) d) return Bln.FALSE; break;
+      case LE: if(d < 1) return Bln.FALSE; break;
+      case NE: if(d < 1 || d != (long) d) return Bln.TRUE; break;
+      case GT: if(d < 1) return Bln.TRUE; break;
+      case LT: if(d < Math.nextUp(1d)) return Bln.FALSE; break;
+      case GE: if(d < Math.nextUp(1d)) return Bln.TRUE; break;
+    }
+    return this;
   }
 
   @Override

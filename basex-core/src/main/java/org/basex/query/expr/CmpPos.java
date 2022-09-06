@@ -12,7 +12,7 @@ public interface CmpPos {
   /**
    * Checks the current position.
    * <ul>
-   *   <li> Returns {@code 2} if the test is successful and remaining test can be skipped
+   *   <li> Returns {@code 2} if the test is successful and remaining tests can be skipped
    *   <li> Returns {@code 1} if the test is successful
    *   <li> Returns {@code 0} otherwise
    * </ul>

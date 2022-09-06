@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
@@ -96,6 +97,11 @@ public final class Empty extends Item {
   @Override
   public SeqType seqType() {
     return SeqType.EMPTY_SEQUENCE_Z;
+  }
+
+  @Override
+  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+    return Bln.FALSE;
   }
 
   @Override
