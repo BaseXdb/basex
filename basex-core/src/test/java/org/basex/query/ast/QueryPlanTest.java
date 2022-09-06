@@ -4,7 +4,6 @@ import static org.basex.util.Prop.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -27,21 +26,21 @@ public abstract class QueryPlanTest extends SandboxTest {
   protected static void check(final String query, final Object expected, final String... tests) {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.optimize();
+      final FElem plan = qp.toXml();
       // compare result
-      if(expected != null) compare(query, qp.value().serialize().toString(), expected);
+      if(expected != null) {
+        compare(query, qp.value().serialize().toString(), expected, plan);
+      }
       // check syntax tree
-      final FDoc plan = new FDoc().add(qp.toXml());
       for(final String test : tests) {
-        try(QueryProcessor qp2 = new QueryProcessor(test, context).context(plan)) {
-          if(qp2.value() != Bln.TRUE) fail(NL + "- Query: " + query + NL +
-              "- Optimized: " + qp.qc.main + NL +
-              "- Check: " + test + NL +
-              "- Plan: " + plan.serialize(SerializerMode.INDENT.get()));
+        try(QueryProcessor qp2 = new QueryProcessor(test, context).context(new FDoc().add(plan))) {
+          if(qp2.value() != Bln.TRUE) fail(NL + "QUERY: " + query + NL +
+              "OPTIMIZED: " + qp.qc.main + NL + "TEST: " + test + NL + serialize(plan));
         }
       }
     } catch(final Exception ex) {
       Util.stack(ex);
-      throw new AssertionError(query, ex);
+      throw ex instanceof RuntimeException ? (RuntimeException) ex : new RuntimeException(ex);
     }
   }
 

@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -100,7 +101,7 @@ public abstract class Sandbox {
    * @param expected expected result
    */
   protected static void query(final String query, final Object expected) {
-    compare(query, query(query), expected);
+    compare(query, query(query), expected, null);
   }
 
   /**
@@ -108,16 +109,31 @@ public abstract class Sandbox {
    * @param query query string
    * @param result query result
    * @param expected expected result
+   * @param plan query plan (can be {@code null})
    */
-  protected static void compare(final String query, final String result, final Object expected) {
+  protected static void compare(final String query, final String result, final Object expected,
+      final ANode plan) {
     final String res = normNL(result), exp = expected.toString();
     if(OUTPUT) {
       Util.errln(query.strip());
       Util.errln(res.replaceAll("\n", ","));
     }
-    if(!res.equals(exp)) throw Util.notExpected(
-        "Wrong result:\n[Q] " + query + "\n[E] \u00bb" + exp +
-        "\u00ab\n[F] \u00bb" + res + "\u00ab\n");
+    if(!res.equals(exp)) throw Util.notExpected("\n" + query +
+        "\nEXPECTED: [" + exp + "]\nRETURNED: [" + res + "]\n" + serialize(plan));
+  }
+
+  /**
+   * Returns a string representation of a query plan.
+   * @param plan query plan
+   * @return string
+   */
+  protected static String serialize(final ANode plan) {
+    if(plan == null) return "";
+    try {
+      return "PLAN: " + plan.serialize(SerializerMode.INDENT.get());
+    } catch(final QueryIOException ex) {
+      throw Util.notExpected(ex);
+    }
   }
 
   /**
