@@ -1,6 +1,8 @@
 package org.basex.query.value.item;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -76,6 +78,12 @@ public final class Atm extends Item {
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     return item.type.isUntyped() ? coll == null ? Token.diff(value, item.string(ii)) :
       coll.compare(value, item.string(ii)) : -item.diff(this, coll, ii);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
+    return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?
+      cc.simplify(this, Bln.get(this != EMPTY)) : this;
   }
 
   @Override

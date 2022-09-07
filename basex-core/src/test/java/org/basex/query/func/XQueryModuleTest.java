@@ -142,6 +142,7 @@ public final class XQueryModuleTest extends QueryPlanTest {
     error(func.args(updating), FUNCUP_X);
     error(func.args(" (" + updating + ", " + updating + ')'), FUNCUP_X);
     error(func.args(" (" + updating + ", " + updating + ")[number(<_>1</_>)]"), FUNCUP_X);
+    error(func.args(" (" + updating + ", " + updating + ")[" + wrap(1) + ']'), FUNCUP_X);
 
     error(func.args(" count#1"), INVARITY_X_X_X);
     error(func.args(" 123"), INVFUNCITEM_X_X);
