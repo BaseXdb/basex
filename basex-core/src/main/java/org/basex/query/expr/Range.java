@@ -4,11 +4,12 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
-import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -25,6 +26,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Range extends Arr {
+  /** Dummy value for representing the last item in a sequence. */
+  private static final long LAST = 1L << 52;
+
   /**
    * Constructor.
    * @param info input info
@@ -77,40 +81,42 @@ public final class Range extends Arr {
 
   @Override
   public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
-    if(!exprs[0].seqType().instanceOf(SeqType.INTEGER_O) ||
-      !exprs[1].seqType().instanceOf(SeqType.INTEGER_O)) return this;
+    final Predicate<Type> type = t -> t.instanceOf(AtomType.INTEGER) || t.isUntyped();
+    if(!type.test(exprs[0].seqType().type) || !type.test(exprs[1].seqType().type)) return this;
 
     Expr[] minMax = exprs.clone();
     final double mn = pos(minMax[0]), mx = pos(minMax[1]);
+    if(mx < mn) return Bln.FALSE;
+
     final boolean results = mn <= mx;
     switch(op) {
       case EQ:
-        if(mn <= 1 && mx >= Integer.MAX_VALUE) return Bln.TRUE;
-        if(mn > Integer.MAX_VALUE || mx < 1) return Bln.FALSE;
+        if(mn <= 1 && mx >= LAST) return Bln.TRUE;
+        if(mn > LAST || mx < 1) return Bln.FALSE;
         if(mn < 1) minMax[0] = Int.ONE;
-        if(mn == Integer.MAX_VALUE && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
         break;
       case NE:
-        if(mn <= 1 && mx >= Integer.MAX_VALUE) return Bln.FALSE;
-        if(results && (mn > Integer.MAX_VALUE || mx < 1)) return Bln.TRUE;
+        if(mn <= 1 && mx >= LAST) return Bln.FALSE;
+        if(results && (mn > LAST || mx < 1)) return Bln.TRUE;
         if(mn < 1) minMax[0] = Int.ONE;
-        if(mn == Integer.MAX_VALUE && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
         break;
       case LE:
         if(mx < 1) return Bln.FALSE;
-        if(results && mx >= Integer.MAX_VALUE) return Bln.TRUE;
+        if(results && mx >= LAST) return Bln.TRUE;
         if(mn < 1) minMax[0] = Int.ONE;
         break;
       case LT:
         if(mx <= 1) return Bln.FALSE;
-        if(results && mx > Integer.MAX_VALUE) return Bln.TRUE;
+        if(results && mx > LAST) return Bln.TRUE;
         break;
       case GE:
-        if(mn > Integer.MAX_VALUE) return Bln.FALSE;
+        if(mn > LAST) return Bln.FALSE;
         if(results && mx <= 1) return Bln.TRUE;
         break;
       case GT:
-        if(mn >= Integer.MAX_VALUE) return Bln.FALSE;
+        if(mn >= LAST) return Bln.FALSE;
         if(results && mx < 1) return Bln.TRUE;
         break;
     }
@@ -122,19 +128,19 @@ public final class Range extends Arr {
   /**
    * Returns a static positional value for the specified expression.
    * @param expr expression
-   * @return positional value or {@code null}
+   * @return positional value or {@code Double#NaN}
    */
   private static double pos(final Expr expr) {
     if(expr instanceof Int) return ((Int) expr).itr();
-    if(Function.LAST.is(expr)) return Integer.MAX_VALUE;
+    if(Function.LAST.is(expr)) return LAST;
     if(expr instanceof Arith && Function.LAST.is(expr.arg(0))) {
       final long l = expr.arg(1) instanceof Int ? ((Int) expr.arg(1)).itr() : 0;
       if(l != 0) {
         switch(((Arith) expr).calc) {
-          case PLUS : return Integer.MAX_VALUE + l;
-          case MINUS: return Integer.MAX_VALUE - l;
-          case MULT : return Integer.MAX_VALUE * l;
-          case DIV  : return Integer.MAX_VALUE / l;
+          case PLUS : return LAST + l;
+          case MINUS: return LAST - l;
+          case MULT : return LAST * l;
+          case DIV  : return LAST / l;
           default: break;
         }
       }

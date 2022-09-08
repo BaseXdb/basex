@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -362,7 +363,7 @@ public final class FilterTest extends QueryPlanTest {
     final String pre = "((65 to 70) ! element { codepoints-to-string(.) } {})[. = ''][position() ";
     final String post = "] ! name(.) => string-join()";
 
-    check(pre + " = last() - 1 to last() - 2" + post, "",       exists(Pos.class));
+    check(pre + " = last() - 1 to last() - 2" + post, "",       root(Str.class));
     check(pre + " = last() - 2 to last() - 2" + post, "D",      empty(Pos.class));
     check(pre + " = last() - 3 to last() - 2" + post, "CD",     exists(Pos.class));
 
@@ -380,5 +381,34 @@ public final class FilterTest extends QueryPlanTest {
         "\n\n\n\n\nA\nB", empty(CmpSimpleG.class));
 
     query("let $i := 1 return <x><a/></x>/*[position() >= $i to 0]", "");
+  }
+
+  /** Rewrite positional range tests. */
+  @Test public void positionalRange() {
+    final String pre = "(1 to 1000000)[. < 1][position() ";
+    final String post = "]";
+
+    // equal
+    check(pre + "= 1 to last()" + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "= 0 to last()" + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "= 1 to last() + 1" + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "= -2 to last() + 2" + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "= last() to 1" + post, "", empty());
+    check(pre + "= last() + 1 to last() + 2" + post, "", empty());
+
+    check(pre + "= last() to last() - 1" + post, "", empty());
+    check(pre + "= last() to last()" + post, "", exists(HEAD), exists(REVERSE));
+    check(pre + "= last() to last() + 1" + post, "", exists(HEAD), exists(REVERSE));
+    check(pre + "= last() to last() + 2" + post, "", exists(HEAD), exists(REVERSE));
+
+    check(pre + "= 0 to " + wrap(7) + post, "", empty(Pos.class), "//Int = 1");
+    check(pre + "= " + wrap(7) + " to 0" + post, "", empty());
+
+    // not equal: various optimizations are currently discarded
+    check(pre + "!= 0 to last() + 1" + post, "", empty());
+    check(pre + "!= last() + 1 to last() + 2" + post, "", empty(Pos.class));
+    check(pre + "!= " + wrap(7) + " to 0" + post, "", empty(Pos.class));
+    check(pre + "!= 0 to " + wrap(7) + post, "", exists(Range.class));
+    check(pre + "!= last() to last() + 2" + post, "", exists(Range.class));
   }
 }
