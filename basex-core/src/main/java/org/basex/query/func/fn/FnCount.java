@@ -58,13 +58,13 @@ public final class FnCount extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
     if(mode == Simplify.EBV) {
       // if(count(nodes))  ->  if(nodes)
       // if(count(items))  ->  if(exists(items))
-      final Expr input = exprs[0];
-      return cc.simplify(this, input.seqType().type instanceof NodeType ? input :
-        cc.function(EXISTS, info, exprs));
+      expr = exprs[0].seqType().type instanceof NodeType ? exprs[0] :
+        cc.function(EXISTS, info, exprs);
     }
-    return this;
+    return cc.simplify(this, expr, mode);
   }
 }

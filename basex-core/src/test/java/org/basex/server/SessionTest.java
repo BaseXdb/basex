@@ -565,14 +565,14 @@ public abstract class SessionTest extends SandboxTest {
 
   /** Runs an erroneous query. */
   @Test public void queryError2() {
-    assertThrows(BaseXException.class, () -> session.query("(1,'a')[. eq 1]").execute());
+    assertThrows(BaseXException.class, () -> session.query("(1, 'a')[. eq 1]").execute());
   }
 
   /**
    * Runs an erroneous query.
    * @throws IOException I/O exception */
   @Test public void queryError3() throws IOException {
-    final Query query = session.query("(1,'a')[. eq 1]");
+    final Query query = session.query("(1, 'a')[. eq 1]");
     assertThrows(BaseXException.class, query::next);
   }
 

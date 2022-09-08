@@ -274,24 +274,40 @@ public abstract class Expr extends ExprInfo {
   public abstract Expr copy(CompileContext cc, IntObjMap<Var> vm);
 
   /**
-   * This function is called at compile time for expressions whose operands might be simplified.
+   * Simplifies the expression. Overwritten by many expressions;
+   * calls {@link #simplify(Simplify, CompileContext)} otherwise.
    * @param mode mode of simplification
    * @param cc compilation context
    * @return simplified or original expression
    * @see Simplify
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // return true if a deterministic expression returns at least one node
+    return simplify(mode, cc);
+  }
+
+  /**
+   * Simplifies the expression.
+   * @param mode mode of simplification
+   * @param cc compilation context
+   * @return simplified or original expression
+   * @see Simplify
+   * @throws QueryException query exception
+   */
+  public final Expr simplify(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      if(seqType().instanceOf(SeqType.NODE_OM) && !has(Flag.NDT)) expr = Bln.TRUE;
-    } else if(mode == Simplify.COUNT) {
+      // boolean(<a/>)  ->  true()
+      // E[()]  ->  E[false()]
+      final SeqType st = seqType();
+      final boolean nodes = st.instanceOf(SeqType.NODE_OM);
+      if((nodes || st.zero()) && !has(Flag.NDT)) expr = Bln.get(nodes);
+    } else if(mode == Simplify.COUNT && !(this instanceof Value)) {
+      // count(db:get('db')//with-known-result-size)  ->  replicate('', size)
       final long size = size();
       if(size != -1 && !has(Flag.NDT)) expr = SingletonSeq.get(Str.EMPTY, size);
     }
-    return cc.simplify(this, expr);
+    return expr != this ? cc.simplify(this, expr, mode) : this;
   }
 
   /**

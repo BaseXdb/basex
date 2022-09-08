@@ -105,14 +105,14 @@ public final class SingletonSeq extends Seq {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = null;
+    Expr expr = this;
     if(mode == Simplify.DISTINCT) {
-      expr = value.simplifyFor(mode, cc);
+      expr = value;
     } else if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER,
         Simplify.STRING)) {
       expr = get((Value) value.simplifyFor(mode, cc), count());
     }
-    return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

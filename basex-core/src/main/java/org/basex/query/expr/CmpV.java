@@ -213,11 +213,9 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      expr = toGeneral(cc, false);
-    }
-    return expr != this ? expr.simplifyFor(mode, cc) : super.simplifyFor(mode, cc);
+    // E[@x eq 'x']  ->  E[@x = 'x']  (triggers further optimizations)
+    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? toGeneral(cc, false) :
+      this, mode);
   }
 
   /**

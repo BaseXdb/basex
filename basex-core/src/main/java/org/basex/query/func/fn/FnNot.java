@@ -42,7 +42,7 @@ public final class FnNot extends StandardFunc {
     // not(position() = <_>3</_>)  ->  position() != 3
     if(input instanceof CmpPos) {
       final Expr ex = ((CmpPos) input).invert(cc);
-      if(ex != input) return ex;
+      if(ex != null) return ex;
     }
     // not($node/text())  ->  empty($node/text())
     final SeqType st = input.seqType();

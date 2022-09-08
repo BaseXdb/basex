@@ -229,22 +229,20 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc)
-      throws QueryException {
-
-    Value value = null;
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
     if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
       if(mode == Simplify.STRING) {
         final TokenList list = new TokenList(size);
         for(int i = 0; i < size; i++) list.add(itemAt(i).string(null));
-        value = StrSeq.get(list);
+        expr = StrSeq.get(list);
       } else {
         final Item[] items = new Item[(int) size];
         for(int i = 0; i < size; i++) items[i] = Atm.get(itemAt(i).string(null));
-        value = ItemSeq.get(items, (int) size, AtomType.UNTYPED_ATOMIC);
+        expr = ItemSeq.get(items, (int) size, AtomType.UNTYPED_ATOMIC);
       }
     }
-    return value != null ? cc.simplify(this, value) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

@@ -28,10 +28,11 @@ public final class UtilArrayMember extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
     if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA)) {
       simplifyAll(mode, cc);
-      return cc.simplify(this, exprs[0]);
+      expr = exprs[0];
     }
-    return super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 }

@@ -126,18 +126,12 @@ public final class SwitchGroup extends Arr {
     return exprs[0];
   }
 
-  /**
-   * Simplifies all expressions for requests of the specified type.
-   * @param mode mode of simplification
-   * @param cc compilation context
-   * @return {@code true} if expression has changed
-   * @throws QueryException query exception
-   */
-  boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Expr expr = rtrn().simplifyFor(mode, cc);
-    if(expr == rtrn()) return false;
-    exprs[0] = expr;
-    return true;
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // varying behavior: return null if return expression has changed
+    final Expr rtrn = rtrn();
+    exprs[0] = rtrn.simplifyFor(mode, cc);
+    return rtrn != exprs[0] ? null : this;
   }
 
   @Override

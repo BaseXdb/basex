@@ -11,7 +11,6 @@ import org.basex.io.out.*;
 import org.basex.io.out.DataOutput;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -82,11 +81,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public final Value value(final QueryContext qc) {
     return this;
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return mode == Simplify.COUNT ? this : super.simplifyFor(mode, cc);
   }
 
   /**

@@ -20,6 +20,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class BlnSeq extends NativeSeq {
+  /** Distinct boolean sequence. */
+  public static final BlnSeq DISTINCT = new BlnSeq(new boolean[] { false, true });
   /** Values. */
   private final boolean[] values;
 
@@ -69,16 +71,18 @@ public final class BlnSeq extends NativeSeq {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode == Simplify.DISTINCT) {
+    Expr expr = this;
+    if(mode == Simplify.DISTINCT && this != DISTINCT) {
       // replace with new sequence
       boolean f = false, t = false;
       for(final boolean b : values) {
         if(b) t = true;
         else f = true;
+        if(f && t) break;
       }
-      return cc.simplify(this, f && t ? new BlnSeq(new boolean[] { true, false }) : Bln.get(t));
+      expr = f ^ t ? Bln.get(t) : DISTINCT;
     }
-    return super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

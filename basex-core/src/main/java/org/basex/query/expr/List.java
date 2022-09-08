@@ -233,7 +233,7 @@ public final class List extends Arr {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // otherwise, rewrite list to union
+      // E[A, B]  ->  E[A | B]
       expr = toUnion(cc);
     } else if(mode == Simplify.DISTINCT) {
       final int el = exprs.length;
@@ -242,7 +242,7 @@ public final class List extends Arr {
       exprs = list.finish();
       if(exprs.length != el) {
         // remove duplicate list expressions
-        expr = cc.simplify(this, List.get(cc, info, exprs));
+        expr = List.get(cc, info, exprs);
       } else if(seqType().type == AtomType.INTEGER) {
         // merge numbers and ranges
         expr = toDistinctRange();
@@ -253,7 +253,7 @@ public final class List extends Arr {
     } else if(simplifyAll(mode, cc)) {
       expr = optimize(cc);
     }
-    return expr == this ? super.simplifyFor(mode, cc) : expr.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   /**

@@ -75,17 +75,17 @@ public final class FnDistinctValues extends StandardFunc {
 
     final AtomType type = st.type.atomic();
     if(type != null) {
-      // assign atomic type of argument
-      exprType.assign(type);
-
       if(exprs.length == 1) {
         // distinct-values(1 to 10)  ->  1 to 10
-        if(values instanceof Range || values instanceof RangeSeq) return values;
+        if(values instanceof Range || values instanceof RangeSeq || values == BlnSeq.DISTINCT)
+          return values;
         // distinct-values($string)  ->  $string
         // distinct-values($node)  ->  data($node)
         if(st.zeroOrOne() && !st.mayBeArray())
           return type == st.type ? values : cc.function(Function.DATA, info, exprs);
       }
+      // assign atomic type of argument
+      exprType.assign(type);
     }
     return this;
   }

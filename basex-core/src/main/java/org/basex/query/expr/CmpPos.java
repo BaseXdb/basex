@@ -16,7 +16,6 @@ public interface CmpPos {
    *   <li> Returns {@code 1} if the test is successful
    *   <li> Returns {@code 0} otherwise
    * </ul>
-   * Should only be called if this is a {@link #simple} check.
    * @param pos current position
    * @param qc query context
    * @return result of check
@@ -25,13 +24,7 @@ public interface CmpPos {
   int test(long pos, QueryContext qc) throws QueryException;
 
   /**
-   * Checks if the positional range is deterministic.
-   * @return result of check
-   */
-  boolean simple();
-
-  /**
-   * Checks if minimum and maximum expressions are identical.
+   * Checks if the minimum and maximum positions are identical.
    * @return result of check
    */
   boolean exact();
@@ -39,7 +32,7 @@ public interface CmpPos {
   /**
    * If possible, returns an optimized expression with inverted operands.
    * @param cc compilation context
-   * @return original or modified expression
+   * @return inverted expression or {@code null}
    * @throws QueryException query exception
    */
   Expr invert(CompileContext cc) throws QueryException;

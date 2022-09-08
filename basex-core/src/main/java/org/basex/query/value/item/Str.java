@@ -116,9 +116,10 @@ public final class Str extends AStr {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?
-      cc.simplify(this, Bln.get(this != EMPTY)) : this;
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // E['x']  ->  E[true()]
+    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?
+      Bln.get(this != EMPTY) : this, mode);
   }
 
   @Override

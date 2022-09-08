@@ -138,11 +138,9 @@ public class FnReplicate extends StandardFunc {
     } else if(mode == Simplify.DISTINCT) {
       // distinct-values(replicate($node, 2))  ->  distinct-values($node)
       final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
-      if(count > 0 && (singleEval(true) || !exprs[0].has(Flag.NDT))) {
-        expr = exprs[0].simplifyFor(mode, cc);
-      }
+      if(count > 0 && (singleEval(true) || !exprs[0].has(Flag.NDT))) expr = exprs[0];
     }
-    return expr != this ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   /**

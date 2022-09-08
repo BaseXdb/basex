@@ -3,7 +3,6 @@ package org.basex.query.value.seq;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.iter.*;
@@ -112,11 +111,6 @@ public final class Empty extends Item {
   @Override
   public Iter atomIter(final QueryContext qc, final InputInfo ii) {
     return ITER;
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
-    return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? cc.simplify(this, Bln.FALSE) : this;
   }
 
   @Override

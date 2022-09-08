@@ -25,26 +25,10 @@ final class SimplePos extends Arr implements CmpPos {
   /**
    * Constructor.
    * @param info input info
-   * @param min min expression
-   * @param max max expression
+   * @param range (min/max) expressions
    */
-  private SimplePos(final InputInfo info, final Expr min, final Expr max) {
-    super(info, SeqType.BOOLEAN_O, min, max);
-  }
-
-  /**
-   * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
-   * @param pos positions to be matched
-   * @param op comparison operator
-   * @param ii input info
-   * @param cc compilation context
-   * @return optimized expression or {@code null}
-   * @throws QueryException query exception
-   */
-  static Expr get(final Expr pos, final OpV op, final InputInfo ii, final CompileContext cc)
-      throws QueryException {
-    final Expr[] minMax = Pos.minMax(pos, op, cc, ii);
-    return minMax != null ? new SimplePos(ii, minMax[0], minMax[1]) : null;
+  SimplePos(final InputInfo info, final Expr... range) {
+    super(info, SeqType.BOOLEAN_O, range);
   }
 
   @Override
@@ -102,7 +86,7 @@ final class SimplePos extends Arr implements CmpPos {
         return new CmpG(pos, expr1, OpG.LT, null, cc.sc(), info).optimize(cc);
       }
     }
-    return this;
+    return null;
   }
 
   @Override
@@ -111,23 +95,18 @@ final class SimplePos extends Arr implements CmpPos {
   }
 
   @Override
-  public boolean simple() {
-    return exprs[0].isSimple() && (exact() || exprs[1].isSimple());
-  }
-
-  @Override
   public int test(final long pos, final QueryContext qc) throws QueryException {
-    final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1 == Empty.VALUE) return 0;
-    final double min = toDouble(item1), max;
+    final Item min = exprs[0].atomItem(qc, info);
+    if(min == Empty.VALUE) return 0;
+    final double mn = toDouble(min), mx;
     if(exact()) {
-      max = min;
+      mx = mn;
     } else {
-      final Item item2 = exprs[1].atomItem(qc, info);
-      if(item2 == Empty.VALUE) return 0;
-      max = toDouble(item2);
+      final Item max = exprs[1].atomItem(qc, info);
+      if(max == Empty.VALUE) return 0;
+      mx = toDouble(max);
     }
-    return pos == max ? 2 : pos >= min && pos <= max ? 1 : 0;
+    return pos == mx ? 2 : pos >= mn && pos <= mx ? 1 : 0;
   }
 
   @Override
@@ -137,10 +116,9 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode.oneOf(Simplify.PREDICATE)) {
-      return exact() && exprs[0].seqType().instanceOf(SeqType.NUMERIC_O) ? exprs[0] : this;
-    }
-    return super.simplifyFor(mode, cc);
+    // E[position() = NUMBER]  ->  E[NUMBER]
+    return cc.simplify(this, mode.oneOf(Simplify.PREDICATE) && exact() &&
+        exprs[0].seqType().instanceOf(SeqType.NUMERIC_O) ? exprs[0] : this, mode);
   }
 
   @Override

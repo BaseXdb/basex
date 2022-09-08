@@ -75,13 +75,13 @@ public abstract class ANode extends Item {
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    Item item = null;
+    Expr expr = this;
     if(mode == Simplify.STRING) {
-      item = Str.get(string());
+      expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
-      item = Atm.get(string());
+      expr = Atm.get(string());
     }
-    return item != null ? cc.simplify(this, item) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

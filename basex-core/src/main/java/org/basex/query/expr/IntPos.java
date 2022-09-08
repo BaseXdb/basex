@@ -107,11 +107,6 @@ public final class IntPos extends Simple implements CmpPos {
   }
 
   @Override
-  public boolean simple() {
-    return true;
-  }
-
-  @Override
   public int test(final long pos, final QueryContext qc) {
     return pos == max ? 2 : pos >= min && pos <= max ? 1 : 0;
   }
@@ -133,7 +128,7 @@ public final class IntPos extends Simple implements CmpPos {
       return new CmpG(pos, Int.get(min), OpG.NE, null, cc.sc(), info).optimize(cc);
     }
     return min == 1 ? get(max + 1, MAX_VALUE, info) :
-      max == MAX_VALUE ? get(1, min - 1, info) : this;
+      max == MAX_VALUE ? get(1, min - 1, info) : null;
   }
 
   @Override
@@ -156,15 +151,14 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags);
+    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
   }
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode.oneOf(Simplify.PREDICATE)) {
-      return exact() ? Int.get(min) : this;
-    }
-    return super.simplifyFor(mode, cc);
+    // E[position() = 3]  ->  E[3]
+    return cc.simplify(this, mode.oneOf(Simplify.PREDICATE) && exact() ?
+      Int.get(min) : this, mode);
   }
 
   @Override

@@ -138,13 +138,12 @@ public abstract class Filter extends Preds {
         ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), Int.get(pos.min),
             Int.get(pos.max));
       } else if(pred instanceof SimplePos) {
-        final SimplePos pos = (SimplePos) pred;
-        if(pos.exact()) {
+        if(((SimplePos) pred).exact()) {
           // E[pos]  ->  util:item(E, pos.min)
-          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pos.exprs[0]);
+          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pred.arg(0));
         } else {
           // E[min .. max]  ->  util:range(E, pos.min, pos.max)
-          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pos.exprs[0], pos.exprs[1]);
+          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pred.arg(0), pred.arg(1));
         }
       } else if(pred instanceof Pos) {
         final Expr pos = ((Pos) pred).expr;
@@ -217,6 +216,7 @@ public abstract class Filter extends Preds {
 
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E[a[. = 'x']]  ->  E[a = 'x']
       expr = flattenEbv(root, true, cc);
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
@@ -226,7 +226,7 @@ public abstract class Filter extends Preds {
       final Expr pred = exprs[0];
       if(pred.seqType().instanceOf(SeqType.NODE_ZO)) expr = SimpleMap.get(cc, info, root, pred);
     }
-    return expr != this ? expr.simplifyFor(mode, cc) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

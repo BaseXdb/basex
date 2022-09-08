@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
@@ -26,11 +28,10 @@ public final class Range extends Arr {
   /**
    * Constructor.
    * @param info input info
-   * @param expr1 first expression
-   * @param expr2 second expression
+   * @param range (min/max) expressions
    */
-  public Range(final InputInfo info, final Expr expr1, final Expr expr2) {
-    super(info, SeqType.INTEGER_ZM, expr1, expr2);
+  public Range(final InputInfo info, final Expr... range) {
+    super(info, SeqType.INTEGER_ZM, range);
   }
 
   @Override
@@ -41,10 +42,10 @@ public final class Range extends Arr {
     if(expr == this) {
       if(allAreValues(false)) return cc.preEval(this);
 
-      final Expr expr1 = exprs[0], expr2 = exprs[1];
-      if(expr1.equals(expr2)) {
-        if(expr1.seqType().instanceOf(SeqType.INTEGER_O) && !expr1.has(Flag.NDT)) {
-          expr = expr1;
+      final Expr min = exprs[0], max = exprs[1];
+      if(min.equals(max)) {
+        if(min.seqType().instanceOf(SeqType.INTEGER_O) && !min.has(Flag.NDT)) {
+          expr = min;
         } else {
           exprType.assign(Occ.EXACTLY_ONE);
         }
@@ -55,39 +56,92 @@ public final class Range extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1 == Empty.VALUE) return Empty.VALUE;
-    final Item item2 = exprs[1].atomItem(qc, info);
-    if(item2 == Empty.VALUE) return Empty.VALUE;
-    final long min = toLong(item1), max = toLong(item2);
+    final Item min = exprs[0].atomItem(qc, info);
+    if(min == Empty.VALUE) return Empty.VALUE;
+    final Item max = exprs[1].atomItem(qc, info);
+    if(max == Empty.VALUE) return Empty.VALUE;
+    final long mn = toLong(min), mx = toLong(max);
     // min smaller than max: empty sequence
-    if(min > max) return Empty.VALUE;
+    if(mn > mx) return Empty.VALUE;
     // max smaller than min: create range
-    final long size = max - min + 1;
-    if(size > 0) return RangeSeq.get(min, size, true);
+    final long size = mx - mn + 1;
+    if(size > 0) return RangeSeq.get(mn, size, true);
     // overflow of long value
-    throw RANGE_X.get(info, max);
+    throw RANGE_X.get(info, mx);
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Range(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+    return copyType(new Range(info, copyAll(cc, vm, exprs)));
   }
 
   @Override
   public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
-    if(op == OpV.EQ) {
-      Expr min = exprs[0], max = exprs[1];
-      // position() = X to 0  ->  false()
-      if(max instanceof Int && ((Int) max).itr() < 1) return Bln.FALSE;
-      // position() = 0 to X  ->  position() = 1 to X
-      if(min instanceof Int && ((Int) min).itr() < 1) min = Int.ONE;
-      // position() = 1 to last()  ->  true()
-      if(min == Int.ONE && Function.LAST.is(max)) return Bln.TRUE;
-      if(min != exprs[0]) return new Range(info, min, max).optimize(cc);
+    if(!exprs[0].seqType().instanceOf(SeqType.INTEGER_O) ||
+      !exprs[1].seqType().instanceOf(SeqType.INTEGER_O)) return this;
+
+    Expr[] minMax = exprs.clone();
+    final double mn = pos(minMax[0]), mx = pos(minMax[1]);
+    final boolean results = mn <= mx;
+    switch(op) {
+      case EQ:
+        if(mn <= 1 && mx >= Integer.MAX_VALUE) return Bln.TRUE;
+        if(mn > Integer.MAX_VALUE || mx < 1) return Bln.FALSE;
+        if(mn < 1) minMax[0] = Int.ONE;
+        if(mn == Integer.MAX_VALUE && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        break;
+      case NE:
+        if(mn <= 1 && mx >= Integer.MAX_VALUE) return Bln.FALSE;
+        if(results && (mn > Integer.MAX_VALUE || mx < 1)) return Bln.TRUE;
+        if(mn < 1) minMax[0] = Int.ONE;
+        if(mn == Integer.MAX_VALUE && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        break;
+      case LE:
+        if(mx < 1) return Bln.FALSE;
+        if(results && mx >= Integer.MAX_VALUE) return Bln.TRUE;
+        if(mn < 1) minMax[0] = Int.ONE;
+        break;
+      case LT:
+        if(mx <= 1) return Bln.FALSE;
+        if(results && mx > Integer.MAX_VALUE) return Bln.TRUE;
+        break;
+      case GE:
+        if(mn > Integer.MAX_VALUE) return Bln.FALSE;
+        if(results && mx <= 1) return Bln.TRUE;
+        break;
+      case GT:
+        if(mn >= Integer.MAX_VALUE) return Bln.FALSE;
+        if(results && mx < 1) return Bln.TRUE;
+        break;
     }
-    return this;
+    if(Arrays.equals(exprs, minMax)) return this;
+    final Expr ex = new Range(info, minMax).optimize(cc);
+    return ex == Empty.VALUE ? Bln.FALSE : ex;
   }
+
+  /**
+   * Returns a static positional value for the specified expression.
+   * @param expr expression
+   * @return positional value or {@code null}
+   */
+  private static double pos(final Expr expr) {
+    if(expr instanceof Int) return ((Int) expr).itr();
+    if(Function.LAST.is(expr)) return Integer.MAX_VALUE;
+    if(expr instanceof Arith && Function.LAST.is(expr.arg(0))) {
+      final long l = expr.arg(1) instanceof Int ? ((Int) expr.arg(1)).itr() : 0;
+      if(l != 0) {
+        switch(((Arith) expr).calc) {
+          case PLUS : return Integer.MAX_VALUE + l;
+          case MINUS: return Integer.MAX_VALUE - l;
+          case MULT : return Integer.MAX_VALUE * l;
+          case DIV  : return Integer.MAX_VALUE / l;
+          default: break;
+        }
+      }
+    }
+    return Double.NaN;
+  }
+
 
   @Override
   public boolean equals(final Object obj) {

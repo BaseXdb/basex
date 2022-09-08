@@ -106,12 +106,14 @@ public final class Arith extends Arr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
     if(mode == Simplify.PREDICATE && Function.LAST.is(exprs[0]) && exprs[1] instanceof ANum) {
+      // E[last() + 1]  ->  E[false()]
       final double d = ((ANum) exprs[1]).dbl();
-      return cc.simplify(this, calc == Calc.PLUS && d > 0 || calc == Calc.MINUS && d < 0 ||
-        calc == Calc.MULT && d > 1 || calc == Calc.DIV && d < 1 ? Empty.VALUE : this);
+      if(calc == Calc.PLUS && d > 0 || calc == Calc.MINUS && d < 0 ||
+        calc == Calc.MULT && d > 1 || calc == Calc.DIV && d < 1) expr = Bln.FALSE;
     }
-    return super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

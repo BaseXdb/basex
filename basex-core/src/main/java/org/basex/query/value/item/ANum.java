@@ -120,26 +120,30 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final Expr simplifyFor(final Simplify mode, final CompileContext cc) {
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
     // predicate: E[0]  ->  E[false()]
     // EBV: if(0)  ->  if(false())
     final double d = dbl();
     return cc.simplify(this, mode == Simplify.PREDICATE && (d != itr() || d < 1) ||
-        mode == Simplify.EBV && d == 0 ? Bln.FALSE : this);
+        mode == Simplify.EBV && d == 0 ? Bln.FALSE : this, mode);
   }
 
   @Override
   public final Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
     final double d = dbl();
+    final long l = (long) d;
+    final boolean fractional = d != l;
     switch(op) {
-      case EQ: if(d < 1 || d != (long) d) return Bln.FALSE; break;
+      case EQ: if(d < 1 || fractional) return Bln.FALSE; break;
       case LE: if(d < 1) return Bln.FALSE; break;
-      case NE: if(d < 1 || d != (long) d) return Bln.TRUE; break;
+      case NE: if(d < 1 || fractional) return Bln.TRUE; break;
       case GT: if(d < 1) return Bln.TRUE; break;
       case LT: if(d < Math.nextUp(1d)) return Bln.FALSE; break;
       case GE: if(d < Math.nextUp(1d)) return Bln.TRUE; break;
     }
-    return this;
+    // convert numbers without fractional part
+    return fractional || this instanceof Int ? this : Int.get(l);
   }
 
   @Override

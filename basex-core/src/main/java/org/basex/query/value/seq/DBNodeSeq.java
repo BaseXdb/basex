@@ -109,20 +109,20 @@ public class DBNodeSeq extends NativeSeq {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    Value value = null;
+    Expr expr = this;
     if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
       if(mode == Simplify.STRING) {
         final TokenList list = new TokenList(size);
         for(int i = 0; i < size; i++) list.add(data.atom(pres[i]));
-        value = StrSeq.get(list);
+        expr = StrSeq.get(list);
       } else {
         final int sz = (int) size;
         final Item[] items = new Item[sz];
         for(int i = 0; i < size; i++) items[i] = Atm.get(data.atom(pres[i]));
-        value = ItemSeq.get(items, sz, AtomType.UNTYPED_ATOMIC);
+        expr = ItemSeq.get(items, sz, AtomType.UNTYPED_ATOMIC);
       }
     }
-    return value != null ? cc.simplify(this, value) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

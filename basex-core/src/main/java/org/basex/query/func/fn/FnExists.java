@@ -22,12 +22,7 @@ public final class FnExists extends FnEmpty {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // if(exists(nodes))  ->  if(nodes)
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      final Expr input = exprs[0];
-      if(input.seqType().type instanceof NodeType) {
-        return cc.simplify(this, input.simplifyFor(mode, cc));
-      }
-    }
-    return this;
+    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) &&
+        exprs[0].seqType().type instanceof NodeType ? exprs[0] : this, mode);
   }
 }

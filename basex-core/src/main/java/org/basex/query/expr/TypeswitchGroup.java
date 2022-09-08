@@ -245,18 +245,12 @@ public final class TypeswitchGroup extends Single {
     return expr.exprSize();
   }
 
-  /**
-   * Simplifies all expressions for requests of the specified type.
-   * @param mode mode of simplification
-   * @param cc compilation context
-   * @return {@code true} if expression has changed
-   * @throws QueryException query exception
-   */
-  boolean simplify(final Simplify mode, final CompileContext cc) throws QueryException {
-    final Expr ex = expr.simplifyFor(mode, cc);
-    if(ex == expr) return false;
-    expr = ex;
-    return true;
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // varying behavior: return null if return expression has changed
+    final Expr rtrn = expr;
+    expr = rtrn.simplifyFor(mode, cc);
+    return rtrn != expr ? null : this;
   }
 
   @Override

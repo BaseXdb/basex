@@ -40,11 +40,10 @@ public final class FnBoolean extends StandardFunc {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) {
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // if(boolean(number))  ->  if(number)
     // E[boolean(nodes)]  ->  E[nodes]
-    final Expr input = exprs[0];
-    return mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && !input.seqType().mayBeNumber() ?
-      cc.simplify(this, input) : this;
+    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) &&
+        !exprs[0].seqType().mayBeNumber() ? exprs[0] : this, mode);
   }
 }

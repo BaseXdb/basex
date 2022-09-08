@@ -133,11 +133,8 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = null;
-    if(mode == Simplify.COUNT) {
-      expr = removeOrderBy(cc);
-    }
-    return expr != null ? expr.simplifyFor(mode, cc) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, mode == Simplify.COUNT &&
+        clauses.removeIf(clause -> clause instanceof OrderBy) ? optimize(cc) : this, mode);
   }
 
   /**
@@ -833,7 +830,7 @@ public final class GFLWOR extends ParseExpr {
             final Expr ref = new VarRef(cnt.info(), fst.pos).optimize(cc);
             clauses.set(1, new Let(cnt.var, ref).optimize(cc));
           } else {
-            // for $a in 1 to 3 count $c ...  -> for $a at $c in 1 to 3 ...
+            // for $a in 1 to 3 count $c ...  ->  for $a at $c in 1 to 3 ...
             clauses.set(0, new For(fst.var, cnt.var, fst.score, fst.expr, false).optimize(cc));
             clauses.remove(1);
           }
@@ -1055,16 +1052,6 @@ public final class GFLWOR extends ParseExpr {
 
     // error will always be thrown
     throw qe;
-  }
-
-  /**
-   * Removes order by clauses.
-   * @param cc compilation context
-   * @return rewritten expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr removeOrderBy(final CompileContext cc) throws QueryException {
-    return clauses.removeIf(clause -> clause instanceof OrderBy) ? optimize(cc) : null;
   }
 
   @Override

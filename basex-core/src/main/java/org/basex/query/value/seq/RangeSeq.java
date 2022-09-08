@@ -148,12 +148,22 @@ public final class RangeSeq extends Seq {
     range[0] = Math.max(range[0], 1);
     range[1] = Math.max(range[1], 1);
     switch(op) {
-      case EQ: if(max < 1) return Bln.FALSE; break;
-      case LE: return max < 1 ? Bln.FALSE : Int.get(range[1]);
-      case NE: if(max < 1) return Bln.TRUE; break;
-      case GT: return max < 1 ? Bln.TRUE : Int.get(range[0]);
-      case LT: return max < 2 ? Bln.FALSE : Int.get(range[1]);
-      case GE: return max < 2 ? Bln.TRUE : Int.get(range[0]);
+      case EQ:
+        if(max < 1) return Bln.FALSE;
+        if(min < 2 && max == Long.MAX_VALUE) return Bln.TRUE;
+        break;
+      case NE:
+        if(max < 1) return Bln.TRUE;
+        if(min < 2 && max == Long.MAX_VALUE) return Bln.FALSE;
+        break;
+      case LE:
+        return max < 1 ? Bln.FALSE : Int.get(range[1]);
+      case LT:
+        return max < 2 ? Bln.FALSE : Int.get(range[1]);
+      case GT:
+        return max < 1 ? Bln.TRUE : Int.get(range[0]);
+      case GE:
+        return max < 2 ? Bln.TRUE : Int.get(range[0]);
     }
     if(min == range[0] && max == range[1]) return this;
     final Expr ex = RangeSeq.get(range[0], range[1], true);

@@ -45,9 +45,9 @@ public final class FnString extends ContextFn {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
     final Expr item = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
     final SeqType st = item.seqType();
-    Expr expr = null;
     if(mode == Simplify.STRING && st.type.isStringOrUntyped() && st.one()) {
       // $node[string() = 'x']  ->  $node[. = 'x']
       expr = item;
@@ -55,6 +55,6 @@ public final class FnString extends ContextFn {
       // boolean(string($node))  ->  boolean($node/descendant::text())
       expr = simplifyEbv(item, cc);
     }
-    return expr != null ? cc.simplify(this, expr) : super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 }

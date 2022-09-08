@@ -95,8 +95,8 @@ public abstract class Step extends Preds {
     // check for simple positional predicates
     boolean pos = false;
     for(final Expr pred : preds) {
-      if(pred instanceof CmpPos && ((CmpPos) pred).simple() || numeric(pred)) {
-        // predicate is known to be positional check; can be optimized
+      if(pred instanceof CmpPos || numeric(pred)) {
+        // predicate is known to be a positional check; can be optimized
         pos = true;
       } else if(mayBePositional(pred)) {
         // predicate **may** be positional: choose cached evaluation

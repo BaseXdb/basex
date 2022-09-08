@@ -191,22 +191,23 @@ public abstract class Path extends ParseExpr {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
+    Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // merge nested predicates. example: if(a[b])  ->  if(a/b)
       final Expr last = steps[steps.length - 1];
       if(last instanceof Step) {
         final Step step = (Step) last;
         if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
             !step.exprs[0].seqType().mayBeNumber()) {
-          // merge nested predicates. example: if(a[b])  ->  if(a/b)
           final Expr s = step.flattenEbv(this, true, cc);
           if(s != step) {
             step.exprs = new Expr[0];
-            return cc.simplify(this, s);
+            expr = s;
           }
         }
       }
     }
-    return super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override
@@ -292,8 +293,8 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr simplify(final CompileContext cc) throws QueryException {
-    // return root if it yields no result
-    if(root != null && root.seqType().zero()) return cc.replaceWith(this, root);
+    // root yields no result
+    if(root != null && root.seqType().zero()) return cc.emptySeq(this);
 
     // find empty results, remove redundant steps
     final int sl = steps.length;
@@ -329,12 +330,14 @@ public abstract class Path extends ParseExpr {
     // self step was removed: ensure that result will be in distinct document order
     if(removed && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
       if(root == null) root = ContextValue.get(cc, info);
-      if(!root.ddo()) root = cc.simplify(root, cc.function(Function._UTIL_DDO, info, root));
+      if(!root.ddo()) {
+        root = cc.replaceWith(root, cc.function(Function._UTIL_DDO, info, root));
+      }
     }
 
     // no steps left: return root
     steps = list.finish();
-    return steps.length == 0 ? cc.simplify(this, root) : this;
+    return cc.replaceWith(this, steps.length == 0 ? root : this);
   }
 
   /**

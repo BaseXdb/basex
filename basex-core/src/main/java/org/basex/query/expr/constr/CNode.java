@@ -79,8 +79,8 @@ public abstract class CNode extends Arr {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
-    SeqType st = null;
     // ignore PIs and attributes as values must be normalized
+    SeqType st = null;
     if(exprs.length == 1 && !(this instanceof CPI || this instanceof CAttr)) {
       final SeqType st1 = exprs[0].seqType();
       if(st1.zeroOrOne() && st1.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZO) && !has(Flag.NDT)) {
@@ -91,8 +91,8 @@ public abstract class CNode extends Arr {
         }
       }
     }
-    return st != null ? cc.simplify(this, new Cast(cc.sc(), info, exprs[0], st).optimize(cc)) :
-      super.simplifyFor(mode, cc);
+    return cc.simplify(this, st != null ? new Cast(cc.sc(), info, exprs[0], st).optimize(cc) : this,
+      mode);
   }
 
   @Override

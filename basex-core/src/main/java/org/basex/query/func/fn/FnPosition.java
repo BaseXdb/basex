@@ -30,7 +30,8 @@ public final class FnPosition extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return mode.oneOf(Simplify.PREDICATE) ? Bln.TRUE : super.simplifyFor(mode, cc);
+    // E[position()]  ->  E[true()]
+    return cc.simplify(this, mode.oneOf(Simplify.PREDICATE) ? Bln.TRUE : this, mode);
   }
 
   @Override

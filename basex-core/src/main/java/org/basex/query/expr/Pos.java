@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
@@ -37,58 +35,61 @@ final class Pos extends Single {
    * @param op comparison operator
    * @param ii input info
    * @param cc compilation context
+   * @param create create create new instance of this class
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  static Expr get(final Expr pos, final OpV op, final InputInfo ii, final CompileContext cc)
-      throws QueryException {
+  static Expr get(final Expr pos, final OpV op, final InputInfo ii, final CompileContext cc,
+      final boolean create) throws QueryException {
 
-    final Expr ex = IntPos.get(pos, op, ii);
+    // static result. example: position() > 0  ->  true
+    final Expr ps = pos.optimizePos(op, cc);
+    if(ps instanceof Bln) return ps;
+
+    // value range. example: position() = 5 to 10
+    final Expr ex = IntPos.get(ps, op, ii);
     if(ex != null) return ex;
-    if(pos.isSimple()) return SimplePos.get(pos, op, ii, cc);
 
-    final Expr[] minMax = minMax(pos, op, cc, ii);
-    if(minMax == null) return null;
-
-    final Expr range;
-    if(pos instanceof Range && Arrays.equals(pos.args(), minMax)) {
-      range = pos;
-    } else if(minMax[0] == minMax[1]) {
-      range = minMax[0];
-    } else {
-      range = new Range(ii, minMax[0], minMax[1]).optimize(cc);
+    // equality check, range: position() = RANGE
+    if(op == OpV.EQ && ps instanceof Range) {
+      return ps.isSimple() ? new SimplePos(ii, ps.args()) : create ? new Pos(ii, ps) : null;
     }
-    return new Pos(ii, range);
-  }
 
-  /**
-   * Returns min/max positions for a positional query.
-   * @param pos positions to be matched
-   * @param op comparator
-   * @param ii input info
-   * @param cc compilation context
-   * @return optimized expression or {@code null}
-   * @throws QueryException query exception
-   */
-  static Expr[] minMax(final Expr pos, final OpV op, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
-    final SeqType st2 = pos.seqType();
-    final boolean range = op == OpV.EQ && pos instanceof Range;
-    if(range) return pos.args();
-
-    if(st2.one() && !st2.mayBeArray()) {
+    // rewrite check of single values to equality check
+    Expr[] minMax = null;
+    final SeqType st = ps.seqType();
+    final Type type = st.type;
+    if(st.one() && type.isNumberOrUntyped()) {
       switch(op) {
-        case EQ: return new Expr[] { pos, pos };
-        case GE: return new Expr[] { pos, Int.MAX };
-        case GT: return new Expr[] { new Arith(ii, st2.type.instanceOf(AtomType.INTEGER) ? pos :
-            cc.function(Function.FLOOR, ii, pos), Int.ONE, Calc.PLUS).optimize(cc), Int.MAX };
-        case LE: return new Expr[] { Int.ONE, pos };
-        case LT: return new Expr[] { Int.ONE, new Arith(ii, st2.type.instanceOf(AtomType.INTEGER) ?
-            pos : cc.function(Function.CEILING, ii, pos), Int.ONE, Calc.MINUS).optimize(cc) };
+        case EQ:
+          minMax = new Expr[] { ps, ps };
+          break;
+        case GE:
+          minMax = new Expr[] { ps, Int.MAX };
+          break;
+        case GT:
+          minMax = new Expr[] { new Arith(ii, type.instanceOf(AtomType.INTEGER) ? ps :
+            cc.function(Function.FLOOR, ii, ps), Int.ONE, Calc.PLUS).optimize(cc), Int.MAX };
+          break;
+        case LE:
+          minMax = new Expr[] { Int.ONE, ps };
+          break;
+        case LT:
+          minMax = new Expr[] { Int.ONE, new Arith(ii, type.instanceOf(AtomType.INTEGER) ?
+            ps : cc.function(Function.CEILING, ii, ps), Int.ONE, Calc.MINUS).optimize(cc) };
+          break;
         default:
       }
     }
-    return null;
+
+    // position() = 'xyz', position() != 2
+    if(minMax == null) return null;
+    // position() <= $pos  ->  position() = 1 to $pos
+    if(ps.isSimple()) return new SimplePos(ii, minMax);
+    // position() = last()
+    if(minMax[0] == minMax[1]) return create ? new Pos(ii, minMax[0]) : null;
+    // rewritten to equality range: position() < last()  ->  position() = 1 to last() - 1
+    return get(new Range(ii, minMax).optimize(cc), OpV.EQ, ii, cc, create);
   }
 
   @Override
@@ -100,14 +101,7 @@ final class Pos extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
-    Expr ex = null;
-    final Expr pos = expr.optimizePos(OpV.EQ, cc);
-    if(pos instanceof Bln) {
-      ex = pos;
-    } else {
-      ex = IntPos.get(pos, OpV.EQ, info);
-      if(ex == null && pos.isSimple()) ex = SimplePos.get(pos, OpV.EQ, info, cc);
-    }
+    final Expr ex = get(expr, OpV.EQ, info, cc, false);
     return ex != null ? cc.replaceWith(this, ex) : this;
   }
 
@@ -134,10 +128,9 @@ final class Pos extends Single {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    if(mode.oneOf(Simplify.PREDICATE)) {
-      return expr.seqType().instanceOf(SeqType.NUMERIC_O) ? expr : this;
-    }
-    return super.simplifyFor(mode, cc);
+    // E[position() = last()]  ->  E[last()]
+    return cc.simplify(this, mode.oneOf(Simplify.PREDICATE) &&
+        expr.seqType().instanceOf(SeqType.NUMERIC_O) ? expr : this, mode);
   }
 
   @Override

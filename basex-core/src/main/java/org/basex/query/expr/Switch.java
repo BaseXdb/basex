@@ -78,7 +78,7 @@ public final class Switch extends ParseExpr {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     boolean changed = false;
     for(final SwitchGroup group : groups) {
-      changed |= group.simplify(mode, cc);
+      changed |= group.simplifyFor(mode, cc) == null;
     }
     return changed ? optimize(cc) : super.simplifyFor(mode, cc);
   }

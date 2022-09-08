@@ -449,8 +449,7 @@ public abstract class SimpleMap extends Arr {
         }
       }
     }
-    return expr != this ? cc.simplify(this, expr).simplifyFor(mode, cc) :
-      super.simplifyFor(mode, cc);
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

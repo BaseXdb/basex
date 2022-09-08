@@ -280,14 +280,18 @@ public final class CompileContext {
   }
 
   /**
-   * Replaces an expression with a simplified one.
+   * Replaces an expression with a simplified one and simplifies the result expression.
    * As the simplified expression may have a different type, no type refinement is performed.
    * @param expr original expression
    * @param result resulting expression
+   * @param mode mode of simplification
    * @return optimized expression
+   * @throws QueryException query exception
    */
-  public Expr simplify(final Expr expr, final Expr result) {
-    return replaceWith(expr, result, false);
+  public Expr simplify(final Expr expr, final Expr result, final Simplify mode)
+      throws QueryException {
+    return result != expr ? replaceWith(expr, result, false).simplifyFor(mode, this) :
+      result.simplify(mode, this);
   }
 
   /**
@@ -308,13 +312,11 @@ public final class CompileContext {
    * @return optimized expression
    */
   private Expr replaceWith(final Expr expr, final Expr result, final boolean refine) {
-    // result yields no items and is deterministic: replace with empty sequence
-    final Expr res = result.seqType().zero() && !result.has(Flag.NDT) ? Empty.VALUE : result;
-    if(res != expr) {
+    if(result != expr) {
       info("%", (Supplier<String>) () -> {
-        final String exprDesc = expr.description(), resDesc = res.description();
+        final String exprDesc = expr.description(), resDesc = result.description();
         final byte[] exprString = QueryError.normalize(expr, null);
-        final byte[] resString = QueryError.normalize(res, null);
+        final byte[] resString = QueryError.normalize(result, null);
         final boolean eqDesc = exprDesc.equals(resDesc), eqString = Token.eq(exprString, resString);
 
         final TokenBuilder tb = new TokenBuilder();
@@ -324,9 +326,9 @@ public final class CompileContext {
         if(!eqString) tb.add(" -> ").add(resString);
         return tb.toString();
       });
-      if(refine) res.refineType(expr);
+      if(refine) result.refineType(expr);
     }
-    return res;
+    return result;
   }
 
   /**

@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
@@ -134,75 +133,6 @@ public abstract class Cmp extends Arr {
     if(expr == this) expr = optEmptyString(op, cc);
     if(expr == this) expr = optStringLength(op, cc);
     return expr;
-  }
-
-  /**
-   * Optimizes this expression as predicate.
-   * @param root root expression
-   * @param cc compilation context
-   * @return resulting expression
-   * @throws QueryException query exception
-   */
-  final Expr optPred(final Expr root, final CompileContext cc) throws QueryException {
-    final Type type = root.seqType().type;
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final OpV opV = opV();
-    if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof ContextFn &&
-        (this instanceof CmpG ? expr2 instanceof Value : expr2 instanceof Item) && opV == OpV.EQ) {
-      // skip functions that do not refer to the current context item
-      final ContextFn func = (ContextFn) expr1;
-      final Value value = (Value) expr2;
-      if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;
-
-      final ArrayList<QNm> qnames = new ArrayList<>();
-      NamePart part = null;
-      if(expr2.seqType().type.isStringOrUntyped()) {
-        // local-name() eq 'a'  ->  self::*:a
-        if(LOCAL_NAME.is(func)) {
-          part = NamePart.LOCAL;
-          for(final Item item : value) {
-            final byte[] name = item.string(info);
-            if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
-          }
-        } else if(NAMESPACE_URI.is(func)) {
-          // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1}* | self::Q{URI2}*
-          for(final Item item : value) {
-            final byte[] uri = item.string(info);
-            if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.COLON, uri));
-          }
-          if(qnames.size() == value.size()) part = NamePart.URI;
-        } else if(NAME.is(func)) {
-          // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
-          final Data data = cc.qc.focus.value.data();
-          final byte[] dataNs = data != null ? data.defaultNs() : null;
-          if(dataNs != null && dataNs.length == 0) {
-            part = NamePart.LOCAL;
-            for(final Item item : value) {
-              final byte[] name = item.string(info);
-              if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
-            }
-          }
-        }
-      } else if(NODE_NAME.is(func) && expr2.seqType().type == AtomType.QNAME) {
-        // node-name() = xs:QName('pref:local')  ->  self::pref:local
-        part = NamePart.FULL;
-        for(final Item item : value) {
-          qnames.add((QNm) item);
-        }
-      }
-
-      if(part != null) {
-        final ExprList paths = new ExprList(2);
-        for(final QNm qname : qnames) {
-          final Test test = new NameTest(qname, part, (NodeType) type, cc.sc().elemNS);
-          final Expr step = Step.get(cc, null, info, test);
-          if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
-        }
-        return paths.isEmpty() ? Bln.FALSE : paths.size() == 1 ? paths.get(0) :
-          new Union(info, paths.finish()).optimize(cc);
-      }
-    }
-    return this;
   }
 
   /**
@@ -482,12 +412,11 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
-    Expr ex = null;
-    if(POSITION.is(exprs[0]) && exprs[1].seqType().type.isNumberOrUntyped()) {
-      final Expr pos = exprs[1].optimizePos(op, cc);
-      ex = pos instanceof Bln ? pos : Pos.get(pos, op, info, cc);
+    if(POSITION.is(exprs[0])) {
+      final Expr expr = Pos.get(exprs[1], op, info, cc, true);
+      if(expr != null) return expr;
     }
-    return ex != null ? ex : this;
+    return this;
   }
 
   /**

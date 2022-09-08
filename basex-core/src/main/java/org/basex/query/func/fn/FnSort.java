@@ -126,9 +126,7 @@ public final class FnSort extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return mode.oneOf(Simplify.COUNT)
-        ? cc.simplify(this, exprs[0]).simplifyFor(mode, cc)
-        : super.simplifyFor(mode, cc);
+    return cc.simplify(this, mode.oneOf(Simplify.COUNT) ? exprs[0] : this, mode);
   }
 
   @Override

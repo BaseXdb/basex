@@ -150,23 +150,20 @@ public abstract class Preds extends Arr {
 
     // map operator: E[. ! ...]  ->  E[...], E[E ! ...]  ->  E[...]
     final SeqType rst = root.seqType();
+    final Predicate<Expr> first = f -> f instanceof ContextValue ||
+        root.equals(f) && root.isSimple() && rst.one();
     if(expr instanceof SimpleMap) {
-      final SimpleMap map = (SimpleMap) expr;
-      final Expr[] mexprs = map.exprs;
-      final Expr first = mexprs[0], second = mexprs[1];
-      if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
-          !second.has(Flag.POS)) {
-        expr = SimpleMap.get(cc, map.info, Arrays.copyOfRange(mexprs, 1, mexprs.length));
+      final Expr[] mexprs = ((SimpleMap) expr).exprs;
+      if(first.test(mexprs[0]) && !mexprs[1].has(Flag.POS)) {
+        expr = SimpleMap.get(cc, expr.info(), Arrays.copyOfRange(mexprs, 1, mexprs.length));
       }
     }
 
     // paths: E[./...]  ->  E[...], E[E/...]  ->  E[...]
     if(expr instanceof Path && rst.type instanceof NodeType) {
       final Path path = (Path) expr;
-      final Expr first = path.root;
-      if((first instanceof ContextValue || root.equals(first) && root.isSimple() && rst.one()) &&
-          !path.steps[0].has(Flag.POS)) {
-        expr = Path.get(cc, path.info, null, path.steps);
+      if(first.test(path.root) && !path.steps[0].has(Flag.POS)) {
+        expr = Path.get(cc, expr.info(), null, path.steps);
       }
     }
 
@@ -179,9 +176,6 @@ public abstract class Preds extends Arr {
         expr = cc.error(ex, expr);
       }
     }
-
-    // comparisons: E[local-name() eq 'a']  ->  E[self::*:a]
-    if(expr instanceof CmpG || expr instanceof CmpV) expr = ((Cmp) expr).optPred(root, cc);
 
     // merge node tests with steps; remove redundant node tests
     // child::node()[self::*]  ->  child::*
@@ -199,12 +193,6 @@ public abstract class Preds extends Arr {
           expr = Bln.TRUE;
         }
       }
-    }
-
-    // context value: E[.]  ->  E
-    if(expr instanceof ContextValue && rst.type instanceof NodeType) {
-      cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-      expr = Bln.TRUE;
     }
 
     // positional tests:
@@ -232,7 +220,7 @@ public abstract class Preds extends Arr {
     }
 
     // add predicate to list
-    if(expr != Bln.TRUE) list.add(cc.simplify(pred, expr));
+    if(expr != Bln.TRUE) list.add(cc.simplify(pred, expr, Simplify.PREDICATE));
   }
 
   /**
@@ -258,7 +246,7 @@ public abstract class Preds extends Arr {
     final QueryBiFunction<Expr, Boolean, Expr> createExpr = (e, cmp) ->
         e instanceof ContextValue ? createRoot.apply(root) :
         e instanceof Path         ? Path.get(cc, info, createRoot.apply(root), e) :
-        cmp                       ? SimpleMap.get(cc, info, createRoot.apply(root), e) : null;
+        cmp                       ? SimpleMap.get(cc, info, createRoot.apply(root), e) : this;
 
     // rewrite to general comparison
     // a[. = 'x']           ->  a = 'x'
@@ -274,7 +262,7 @@ public abstract class Preds extends Arr {
         type1 == type2 || type1.isStringOrUntyped() && type2.isStringOrUntyped()
       )) && !op2.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(op1, true);
-        if(expr != null) {
+        if(expr != this) {
           return new CmpG(expr, op2, cmp.opG(), cmp.coll, cmp.sc, cmp.info).optimize(cc);
         }
       }
@@ -288,7 +276,7 @@ public abstract class Preds extends Arr {
       final FTExpr ftexpr = cmp.ftexpr;
       if(!ftexpr.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(cmp.expr, true);
-        if(expr != null) return new FTContains(expr, ftexpr, cmp.info).optimize(cc);
+        if(expr != this) return new FTContains(expr, ftexpr, cmp.info).optimize(cc);
       }
     }
 
@@ -296,11 +284,11 @@ public abstract class Preds extends Arr {
     // rewrite to path: root[data()]  ->  root/descendant::text()
     if(rst.type instanceof NodeType) {
       Expr expr = createExpr.apply(pred, false);
-      if(expr == null && (Function.DATA.is(pred) || Function.STRING.is(pred))) {
+      if(expr == this && (Function.DATA.is(pred) || Function.STRING.is(pred))) {
         final ContextFn func = (ContextFn) pred;
         if(func.contextAccess()) expr = func.simplifyEbv(root, cc);
       }
-      if(expr != null) return expr;
+      if(expr != this) return expr;
     }
 
     // rewrite to simple map: $node[string()]  ->  $node ! string()
