@@ -52,7 +52,8 @@ final class Pos extends Single {
 
     // equality check, range: position() = RANGE
     if(op == OpV.EQ && ps instanceof Range) {
-      return ps.isSimple() ? new SimplePos(ii, ps.args()) : create ? new Pos(ii, ps) : null;
+      return !((Range) ps).simple ? null :
+        ps.isSimple() ? new SimplePos(ii, ps.args()) : create ? new Pos(ii, ps) : null;
     }
 
     // rewrite check of single values to equality check
@@ -89,7 +90,8 @@ final class Pos extends Single {
     // position() = last()
     if(minMax[0] == minMax[1]) return create ? new Pos(ii, minMax[0]) : null;
     // rewritten to equality range: position() < last()  ->  position() = 1 to last() - 1
-    return get(new Range(ii, minMax).optimize(cc), OpV.EQ, ii, cc, create);
+    return type.instanceOf(AtomType.INTEGER) ?
+      get(new Range(ii, minMax).optimize(cc), OpV.EQ, ii, cc, create) : null;
   }
 
   @Override

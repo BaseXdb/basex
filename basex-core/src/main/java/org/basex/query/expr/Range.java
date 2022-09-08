@@ -28,6 +28,8 @@ import org.basex.util.hash.*;
 public final class Range extends Arr {
   /** Dummy value for representing the last item in a sequence. */
   private static final long LAST = 1L << 52;
+  /** Expressions yield integers. */
+  boolean simple;
 
   /**
    * Constructor.
@@ -47,12 +49,11 @@ public final class Range extends Arr {
       if(allAreValues(false)) return cc.preEval(this);
 
       final Expr min = exprs[0], max = exprs[1];
+      final SeqType st1 = min.seqType(), st2 = max.seqType();
+      simple = st1.instanceOf(SeqType.INTEGER_O) && st2.instanceOf(SeqType.INTEGER_O);
       if(min.equals(max)) {
-        if(min.seqType().instanceOf(SeqType.INTEGER_O) && !min.has(Flag.NDT)) {
-          expr = min;
-        } else {
-          exprType.assign(Occ.EXACTLY_ONE);
-        }
+        exprType.assign(Occ.EXACTLY_ONE);
+        if(simple && !min.has(Flag.NDT)) expr = min;
       }
     }
     return cc.replaceWith(this, expr);
@@ -75,14 +76,19 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Range(info, copyAll(cc, vm, exprs)));
+  public Range copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    final Range r = copyType(new Range(info, copyAll(cc, vm, exprs)));
+    r.simple = simple;
+    return r;
   }
 
   @Override
   public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
-    final Predicate<Type> type = t -> t.instanceOf(AtomType.INTEGER) || t.isUntyped();
-    if(!type.test(exprs[0].seqType().type) || !type.test(exprs[1].seqType().type)) return this;
+    final Predicate<Expr> type = e -> {
+      final SeqType st = e.seqType();
+      return st.one() && (st.type.instanceOf(AtomType.INTEGER) || st.type.isUntyped());
+    };
+    if(!type.test(exprs[0]) || !type.test(exprs[1])) return this;
 
     Expr[] minMax = exprs.clone();
     final double mn = pos(minMax[0]), mx = pos(minMax[1]);

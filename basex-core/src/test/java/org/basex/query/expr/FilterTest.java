@@ -389,26 +389,20 @@ public final class FilterTest extends QueryPlanTest {
     final String post = "]";
 
     // equal
-    check(pre + "= 1 to last()" + post, "", empty(Pos.class), root(IterFilter.class));
-    check(pre + "= 0 to last()" + post, "", empty(Pos.class), root(IterFilter.class));
-    check(pre + "= 1 to last() + 1" + post, "", empty(Pos.class), root(IterFilter.class));
-    check(pre + "= -2 to last() + 2" + post, "", empty(Pos.class), root(IterFilter.class));
-    check(pre + "= last() to 1" + post, "", empty());
+    check(pre + "=  1         to last()    " + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "=  0         to last()    " + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "=  1         to last() + 1" + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "= -2         to last() + 2" + post, "", empty(Pos.class), root(IterFilter.class));
+    check(pre + "= last()     to 1         " + post, "", empty());
     check(pre + "= last() + 1 to last() + 2" + post, "", empty());
 
     check(pre + "= last() to last() - 1" + post, "", empty());
-    check(pre + "= last() to last()" + post, "", exists(HEAD), exists(REVERSE));
+    check(pre + "= last() to last()    " + post, "", exists(HEAD), exists(REVERSE));
     check(pre + "= last() to last() + 1" + post, "", exists(HEAD), exists(REVERSE));
     check(pre + "= last() to last() + 2" + post, "", exists(HEAD), exists(REVERSE));
 
-    check(pre + "= 0 to " + wrap(7) + post, "", empty(Pos.class), "//Int = 1");
-    check(pre + "= " + wrap(7) + " to 0" + post, "", empty());
-
     // not equal: various optimizations are currently discarded
-    check(pre + "!= 0 to last() + 1" + post, "", empty());
+    check(pre + "!= 0          to last() + 1" + post, "", empty());
     check(pre + "!= last() + 1 to last() + 2" + post, "", empty(Pos.class));
-    check(pre + "!= " + wrap(7) + " to 0" + post, "", empty(Pos.class));
-    check(pre + "!= 0 to " + wrap(7) + post, "", exists(Range.class));
-    check(pre + "!= last() to last() + 2" + post, "", exists(Range.class));
   }
 }
