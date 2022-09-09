@@ -18,14 +18,18 @@ import org.basex.util.*;
 public final class ProfType extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // implementation for dynamic function lookup
     type(qc);
     return exprs[0].value(qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    type(cc.qc);
-    return exprs[0];
+    if(cc.dynamic) {
+      type(cc.qc);
+      return exprs[0];
+    }
+    return this;
   }
 
   /**

@@ -116,10 +116,10 @@ public abstract class AQuery extends Command {
     queryPlan(true);
     info(info.toString(qp, out.size(), hits, jc().locks, error == null));
 
-    // critical error
-    if(exception instanceof RuntimeException) throw (RuntimeException) exception;
     // error
     if(error != null) return error(queryinfo ? info() + ERROR + COL + NL + error : error);
+    // critical error
+    if(exception instanceof RuntimeException) throw (RuntimeException) exception;
     // success
     return true;
   }
@@ -152,11 +152,11 @@ public abstract class AQuery extends Command {
     try {
       init(ctx);
       return qp.updating;
-    } catch(final Exception ex) {
-      Util.debug(ex);
+    } catch(final QueryException ex) {
       exception = ex;
-      qp.close();
       return false;
+    } finally {
+      qp.close();
     }
   }
 

@@ -489,8 +489,9 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     } catch(final Exception ex) {
       // unexpected error
-      BaseXDialog.error(this, Util.info(EXEC_ERROR_X_X, cmd, Util.bug(ex)));
       updating = false;
+      running = false;
+      BaseXDialog.error(this, Util.info(EXEC_ERROR_X_X, cmd, Util.bug(ex)));
     }
     stop();
     return ok;
