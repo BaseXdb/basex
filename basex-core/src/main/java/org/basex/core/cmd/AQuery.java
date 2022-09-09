@@ -153,10 +153,10 @@ public abstract class AQuery extends Command {
       init(ctx);
       return qp.updating;
     } catch(final QueryException ex) {
-      exception = ex;
-      return false;
-    } finally {
       qp.close();
+      exception = ex;
+      if(exception instanceof RuntimeException) throw (RuntimeException) exception;
+      return false;
     }
   }
 
