@@ -76,20 +76,24 @@ public final class Arith extends Arr {
         expr = ex;
       } else if(expr1 instanceof Arith) {
         final Calc acalc = ((Arith) expr1).calc;
+        final boolean add = acalc == Calc.PLUS || acalc == Calc.MULT;
+        final boolean sub = acalc == Calc.MINUS || acalc == Calc.DIV;
+        final boolean inverse = acalc == calc.invert();
         final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
-        if(arg2 instanceof Value && expr2 instanceof Value &&
-            (acalc == calc || acalc == calc.invert())) {
+
+        if(arg2 instanceof Value && expr2 instanceof Value && (acalc == calc || inverse)) {
           // (E - 3) + 2  ->  E - (3 - 2)
           // (E * 3 div 2  ->  E * (3 div 2)
-          final Calc ncalc = acalc == Calc.PLUS || acalc == Calc.MULT ? calc :
-            acalc == Calc.MINUS || acalc == Calc.DIV ? calc.invert() : null;
+          final Calc ncalc = add ? calc : sub ? calc.invert() : null;
           if(ncalc != null) {
             expr = new Arith(info, arg1, new Arith(info, arg2, expr2, ncalc).optimize(cc),
                 acalc).optimize(cc);
           }
-        } else if(acalc == calc.invert() && arg2.equals(expr2)) {
-          // E + INT - INT  ->  E
-          expr = new Cast(cc.sc(), info, arg1, SeqType.NUMERIC_O).optimize(cc);
+        } else if(inverse) {
+          // E + NUMBER - NUMBER  ->  E
+          // NUMBER * E div NUMBER  ->  E
+          expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
+          if(expr != this) expr = new Cast(cc.sc(), info, expr, SeqType.NUMERIC_O).optimize(cc);
         }
       }
     }

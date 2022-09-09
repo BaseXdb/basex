@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -156,6 +157,8 @@ public final class ArithTest extends QueryPlanTest {
     check(wrap(6) + "div 3 * 2", 4, count(Arith.class, 1));
     check("(1 to 2) ! (" + wrap(1) + "+ . - .)", "1\n1", empty(Arith.class));
     check("(1 to 2) ! (" + wrapContext() + "+ . - .)", "1\n2", empty(Arith.class));
+    check("(1 to 6) ! (. + 1 - .)", "1\n1\n1\n1\n1\n1",
+        empty(Arith.class), root(SingletonSeq.class));
   }
 
   /** Simplify arithmetic expressions. */
