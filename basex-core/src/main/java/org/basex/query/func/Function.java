@@ -79,6 +79,12 @@ public enum Function implements AFunction {
   ALL(FnAll::new, "all(input,predicate)",
       params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
+  ALL_DIFFERENT(FnAllDifferent::new, "all-different(values[,collation])",
+      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
+  /** XQuery function. */
+  ALL_EQUAL(FnAllEqual::new, "all-equal(values[,collation])",
+      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
+  /** XQuery function. */
   ANALYZE_STRING(FnAnalyzeString::new, "analyze-string(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_O), ELEMENT_O, flag(CNS)),
   /** XQuery function. */
@@ -531,12 +537,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   TRUE(FnTrue::new, "true()",
       params(), BOOLEAN_O),
-  /** XQuery function. */
-  UNIFORM(FnUniform::new, "uniform(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
-  /** XQuery function. */
-  UNIQUE(FnUnique::new, "unique(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
   /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),

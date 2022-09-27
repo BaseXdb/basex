@@ -45,6 +45,86 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void allDifferent() {
+    final Function func = ALL_DIFFERENT;
+
+    query(func.args(" ()"), true);
+    query(func.args(1), true);
+    query(func.args("x"), true);
+    query(func.args(" (1, 1)"), false);
+    query(func.args(" (1 to 1000) ! 1"), false);
+    query(func.args(" (1 to 1000) ! 'x'"), false);
+    query(func.args(" (1 to 2)"), true);
+    query(func.args(" (1, 2, 3)"), true);
+    query(func.args(" (1, 2, 3) ! string()"), true);
+    query(func.args(" (1, '1')"), true);
+    query(func.args(" (1, 1.0, 1e0)"), false);
+
+    query(func.args(" <a/>[. = '']"), true);
+    query(func.args(" (<a/>, <b/>)[. = '']"), false);
+    query(func.args(" <a/>[. != '']"), true);
+    query(func.args(" (<a/>, <b/>)[. != '']"), true);
+
+    query(func.args(" []"), true);
+    query(func.args(" [ 1 ]"), true);
+    query(func.args(" [ 1, 1 ]"), false);
+    query(func.args(" [ 1, 2 ]"), true);
+
+    query(func.args(" (1 to <_>1</_>/text())"), true);
+    query(func.args(" (1 to <_>2</_>/text())"), true);
+
+    query(func.args(" replicate((1 to 100)[. < 1], 100)"), true);
+    query(func.args(" replicate((1 to 100)[. < 2], 100)"), false);
+    query(func.args(" replicate((1 to 100)[. < 3], 100)"), false);
+    query(func.args(" reverse((1 to 10) ! string())"), true);
+    query(func.args(" sort((1 to 10) ! string())"), true);
+
+    final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+    query(func.args(" ('A', 'a')", c), false);
+    query(func.args(" ('A', 'b')", c), true);
+  }
+
+  /** Test method. */
+  @Test public void allEqual() {
+    final Function func = ALL_EQUAL;
+
+    query(func.args(" ()"), true);
+    query(func.args(1), true);
+    query(func.args("x"), true);
+    query(func.args(" (1, 1)"), true);
+    query(func.args(" (1 to 1000) ! 1"), true);
+    query(func.args(" (1 to 1000) ! 'x'"), true);
+    query(func.args(" (1 to 2)"), false);
+    query(func.args(" (1, 2, 3)"), false);
+    query(func.args(" (1, 2, 3) ! string()"), false);
+    query(func.args(" (1, '1')"), false);
+    query(func.args(" (1, 1.0, 1e0)"), true);
+
+    query(func.args(" <a/>[. = '']"), true);
+    query(func.args(" (<a/>, <b/>)[. = '']"), true);
+    query(func.args(" <a/>[. != '']"), true);
+    query(func.args(" (<a/>, <b/>)[. != '']"), true);
+
+    query(func.args(" []"), true);
+    query(func.args(" [ 1 ]"), true);
+    query(func.args(" [ 1, 1 ]"), true);
+    query(func.args(" [ 1, 2 ]"), false);
+
+    query(func.args(" (1 to <_>1</_>/text())"), true);
+    query(func.args(" (1 to <_>2</_>/text())"), false);
+
+    query(func.args(" replicate((1 to 100)[. < 1], 100)"), true);
+    query(func.args(" replicate((1 to 100)[. < 2], 100)"), true);
+    query(func.args(" replicate((1 to 100)[. < 3], 100)"), false);
+    query(func.args(" reverse((1 to 10) ! string())"), false);
+    query(func.args(" sort((1 to 10) ! string())"), false);
+
+    final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+    query(func.args(" ('A', 'a')", c), true);
+    query(func.args(" ('A', 'b')", c), false);
+  }
+
+  /** Test method. */
   @Test public void characters() {
     final Function func = CHARACTERS;
 
@@ -441,86 +521,6 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(lookup + "(1 to 9, not#1)", false);
     query(lookup + "(0 to 9, boolean#1)", true);
     query(lookup + "(0 to 9, not#1)", true);
-  }
-
-  /** Test method. */
-  @Test public void uniform() {
-    final Function func = UNIFORM;
-
-    query(func.args(" ()"), true);
-    query(func.args(1), true);
-    query(func.args("x"), true);
-    query(func.args(" (1, 1)"), true);
-    query(func.args(" (1 to 1000) ! 1"), true);
-    query(func.args(" (1 to 1000) ! 'x'"), true);
-    query(func.args(" (1 to 2)"), false);
-    query(func.args(" (1, 2, 3)"), false);
-    query(func.args(" (1, 2, 3) ! string()"), false);
-    query(func.args(" (1, '1')"), false);
-    query(func.args(" (1, 1.0, 1e0)"), true);
-
-    query(func.args(" <a/>[. = '']"), true);
-    query(func.args(" (<a/>, <b/>)[. = '']"), true);
-    query(func.args(" <a/>[. != '']"), true);
-    query(func.args(" (<a/>, <b/>)[. != '']"), true);
-
-    query(func.args(" []"), true);
-    query(func.args(" [ 1 ]"), true);
-    query(func.args(" [ 1, 1 ]"), true);
-    query(func.args(" [ 1, 2 ]"), false);
-
-    query(func.args(" (1 to <_>1</_>/text())"), true);
-    query(func.args(" (1 to <_>2</_>/text())"), false);
-
-    query(func.args(" replicate((1 to 100)[. < 1], 100)"), true);
-    query(func.args(" replicate((1 to 100)[. < 2], 100)"), true);
-    query(func.args(" replicate((1 to 100)[. < 3], 100)"), false);
-    query(func.args(" reverse((1 to 10) ! string())"), false);
-    query(func.args(" sort((1 to 10) ! string())"), false);
-
-    final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
-    query(func.args(" ('A', 'a')", c), true);
-    query(func.args(" ('A', 'b')", c), false);
-  }
-
-  /** Test method. */
-  @Test public void unique() {
-    final Function func = UNIQUE;
-
-    query(func.args(" ()"), true);
-    query(func.args(1), true);
-    query(func.args("x"), true);
-    query(func.args(" (1, 1)"), false);
-    query(func.args(" (1 to 1000) ! 1"), false);
-    query(func.args(" (1 to 1000) ! 'x'"), false);
-    query(func.args(" (1 to 2)"), true);
-    query(func.args(" (1, 2, 3)"), true);
-    query(func.args(" (1, 2, 3) ! string()"), true);
-    query(func.args(" (1, '1')"), true);
-    query(func.args(" (1, 1.0, 1e0)"), false);
-
-    query(func.args(" <a/>[. = '']"), true);
-    query(func.args(" (<a/>, <b/>)[. = '']"), false);
-    query(func.args(" <a/>[. != '']"), true);
-    query(func.args(" (<a/>, <b/>)[. != '']"), true);
-
-    query(func.args(" []"), true);
-    query(func.args(" [ 1 ]"), true);
-    query(func.args(" [ 1, 1 ]"), false);
-    query(func.args(" [ 1, 2 ]"), true);
-
-    query(func.args(" (1 to <_>1</_>/text())"), true);
-    query(func.args(" (1 to <_>2</_>/text())"), true);
-
-    query(func.args(" replicate((1 to 100)[. < 1], 100)"), true);
-    query(func.args(" replicate((1 to 100)[. < 2], 100)"), false);
-    query(func.args(" replicate((1 to 100)[. < 3], 100)"), false);
-    query(func.args(" reverse((1 to 10) ! string())"), true);
-    query(func.args(" sort((1 to 10) ! string())"), true);
-
-    final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
-    query(func.args(" ('A', 'a')", c), false);
-    query(func.args(" ('A', 'b')", c), true);
   }
 
   /** Test method. */

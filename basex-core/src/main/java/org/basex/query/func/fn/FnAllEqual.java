@@ -19,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class FnUniform extends StandardFunc {
+public final class FnAllEqual extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = exprs[0].atomIter(qc, info);
@@ -55,7 +55,7 @@ public final class FnUniform extends StandardFunc {
           REPLICATE.is(values) && values.arg(1) instanceof Int) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
-        return cc.function(UNIFORM, info, args);
+        return cc.function(ALL_EQUAL, info, args);
       }
     }
     return this;

@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class FnUnique extends StandardFunc {
+public final class FnAllDifferent extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = exprs[0].atomIter(qc, info);
@@ -53,7 +53,7 @@ public final class FnUnique extends StandardFunc {
       if(REVERSE.is(values) || SORT.is(values)) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
-        return cc.function(UNIQUE, info, args);
+        return cc.function(ALL_DIFFERENT, info, args);
       }
     }
     return this;
