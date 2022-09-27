@@ -2943,4 +2943,11 @@ public final class RewritingsTest extends QueryPlanTest {
         "return ($c, string-length($c))",
         "a\n1", root(IterMap.class));
   }
+
+  /** Inlined type check. */
+  @Test public void gh2142() {
+    inline(true);
+    check("function() { let $s := function() as xs:string { <_>1</_>/text() }() "
+        + "return ($s, number($s)) }()", "1\n1");
+  }
 }
