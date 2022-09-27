@@ -109,9 +109,9 @@ public final class Resources implements Index {
   }
 
   /**
-   * Returns the pre value of the document node that matches the specified path, or {@code -1}.
+   * Returns the pre value of the document node that matches the specified path.
    * @param path input path
-   * @return pre value, or {@code -1}
+   * @return pre value or {@code -1}
    */
   public int doc(final String path) {
     return docs.doc(path);

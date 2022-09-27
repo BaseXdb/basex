@@ -259,13 +259,23 @@ final class Docs {
   /**
    * Returns the pre value of a document node that matches the specified path.
    * @param path input path
-   * @return pre value of document node, or {@code -1}
+   * @return pre value, or {@code -1} if the document does not exist or if the path is invalid
    */
   synchronized int doc(final String path) {
-    // invalid or empty path, or no documents: return -1
     final String pth = MetaData.normPath(path);
-    // find path; return -1 if path is empty or does not exist
-    return pth == null || pth.isEmpty() ? -1 : Math.max(-1, find(normalize(token(pth))));
+    if(pth != null && !pth.isEmpty()) {
+      final byte[] npth = normalize(token(pth));
+      final TokenList paths = paths();
+      final int[] order = order();
+      int l = 0, h = order.length - 1;
+      while(l <= h) {
+        final int m = l + h >>> 1, o = order[m], c = diff(paths.get(o), npth);
+        if(c == 0) return docs().get(o);
+        if(c < 0) l = m + 1;
+        else h = m - 1;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -309,26 +319,6 @@ final class Docs {
         else if(dir && i >= 0) map.put(substring(np, 0, i), ResourceType.XML);
       }
     }
-  }
-
-  /**
-   * Returns the pre value of the addressed resource.
-   * @param path path to be found
-   * @return pre value, or {@code -1}
-   */
-  private int find(final byte[] path) {
-    // binary search
-    final TokenList paths = paths();
-    final int[] order = order();
-    int l = 0, h = order.length - 1;
-    while(l <= h) {
-      final int m = l + h >>> 1;
-      final int c = diff(paths.get(order[m]), path);
-      if(c == 0) return docs().get(m);
-      if(c < 0) l = m + 1;
-      else h = m - 1;
-    }
-    return -1;
   }
 
   /**
