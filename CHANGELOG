@@ -1,3 +1,11 @@
+VERSION 10.2 (September 28, 2022) --------------------------------------
+
+ - new undocumented XQuery 4 preview features
+ - optimization: better rewritings of positional tests
+ - optimization: simplifying arithmetic expressions
+ - optimization: consistent propagation of data reference
+ - optimization: faster invocation of function items
+
 VERSION 10.1 (August 18, 2022) -----------------------------------------
 
  - Bug fix: HTTP Requests, sending headers
