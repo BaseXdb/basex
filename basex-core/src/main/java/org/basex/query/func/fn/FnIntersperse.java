@@ -1,4 +1,4 @@
-package org.basex.query.func.util;
+package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -15,17 +15,17 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class UtilIntersperse extends StandardFunc {
+public class FnIntersperse extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter values = exprs[0].iter(qc);
+    final Iter input = exprs[0].iter(qc);
     final Value sep = exprs[1].value(qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    Item item = values.next();
+    Item item = input.next();
     if(item != null) {
       vb.add(item);
-      while((item = qc.next(values)) != null) vb.add(sep).add(item);
+      while((item = qc.next(input)) != null) vb.add(sep).add(item);
     }
     return vb.value(this);
   }

@@ -304,6 +304,9 @@ public enum Function implements AFunction {
   INSERT_BEFORE(FnInsertBefore::new, "insert-before(input,position,insert)",
       params(ITEM_ZM, INTEGER_O, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
+  INTERSPERSE(FnIntersperse::new, "intersperse(input,separator)",
+      params(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
+  /** XQuery function. */
   IRI_TO_URI(FnIriToUri::new, "iri-to-uri(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
@@ -1720,7 +1723,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_ARRAY_VALUES(UtilArrayValues::new, "array-values(array)",
       params(ARRAY_O), ITEM_ZM, UTIL_URI),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   _UTIL_CHARS(UtilChars::new, "chars(value)",
       params(STRING_O), STRING_ZM, UTIL_URI),
   /** XQuery function. */
@@ -1741,8 +1744,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_INIT(UtilInit::new, "init(input)",
       params(ITEM_ZM), ITEM_ZM, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_INTERSPERSE(UtilIntersperse::new, "intersperse(values[,separator])",
+  /** XQuery function (obsolete). */
+  _UTIL_INTERSPERSE(UtilIntersperse::new, "intersperse(input,separator)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ITEM(UtilItem::new, "item(input,position)",
