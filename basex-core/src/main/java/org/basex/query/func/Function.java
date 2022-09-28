@@ -76,7 +76,7 @@ public enum Function implements AFunction {
   ADJUST_TIME_TO_TIMEZONE(FnAdjustTimeToTimezone::new, "adjust-time-to-timezone(value[,timezone])",
       params(TIME_ZO, DAY_TIME_DURATION_ZO), TIME_ZO),
   /** XQuery function. */
-  ALL(FnAll::new, "all(input,predicate)",
+  ALL(FnAll::new, "all(input[,predicate])",
       params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   ALL_DIFFERENT(FnAllDifferent::new, "all-different(values[,collation])",
@@ -478,7 +478,7 @@ public enum Function implements AFunction {
   SLICE(FnSlice::new, "slice(input[,start[,end[,step]]])",
       params(ITEM_ZM, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ITEM_ZM),
   /** XQuery function. */
-  SOME(FnSome::new, "some(input,predicate)",
+  SOME(FnSome::new, "some(input[,predicate])",
       params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   SORT(FnSort::new, "sort(input[,collation[,key]])",

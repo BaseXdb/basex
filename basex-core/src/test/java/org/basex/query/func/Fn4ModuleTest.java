@@ -27,6 +27,10 @@ public class Fn4ModuleTest extends QueryPlanTest {
   @Test public void all() {
     final Function func = ALL;
 
+    query(func.args(" (1 to 10) ! boolean(.)"), true);
+    query(func.args(" reverse(1 to 10) ! boolean(.)"), true);
+    query(func.args(" reverse(0 to 9) ! boolean(.)"), false);
+
     query(func.args(" ()", " boolean#1"), true);
     query(func.args(1, " boolean#1"), true);
     query(func.args(" 0 to 1", " boolean#1"), false);
@@ -523,6 +527,10 @@ public class Fn4ModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void some() {
     final Function func = SOME;
+
+    query(func.args(" (1 to 10) ! boolean(.)"), true);
+    query(func.args(" reverse(1 to 10) ! boolean(.)"), true);
+    query(func.args(" reverse(0 to 9) ! boolean(.)"), true);
 
     query(func.args(" ()", " boolean#1"), true);
     query(func.args(1, " boolean#1"), true);

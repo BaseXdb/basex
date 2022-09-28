@@ -23,13 +23,12 @@ public class FnAll extends StandardFunc {
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = exprs[0].iter(qc);
-    final FItem predicate = toFunction(exprs[1], 1, qc);
+    final FItem predicate = exprs.length > 1 ? toFunction(exprs[1], 1, qc) : null;
 
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
-      if(toBoolean(predicate.invoke(qc, info, item).item(qc, info)) ^ !some) {
-        return Bln.get(some);
-      }
+      final Item it = predicate != null ? predicate.invoke(qc, info, item).item(qc, info) : item;
+      if(toBoolean(it) ^ !some) return Bln.get(some);
     }
     return Bln.get(!some);
   }
@@ -46,9 +45,10 @@ public class FnAll extends StandardFunc {
     final Var var = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), new IntObjMap<>());
     final For fr = new For(var, input).optimize(cc);
 
-    final Expr func = coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE));
+    final Expr func = exprs.length > 1 ?
+      coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE)) : null;
     final Expr ref = new VarRef(info, var).optimize(cc);
-    final Expr rtrn = new DynFuncCall(info, sc, func, ref).optimize(cc);
+    final Expr rtrn = func != null ? new DynFuncCall(info, sc, func, ref).optimize(cc) : ref;
     final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);
 
     final boolean some = some();
