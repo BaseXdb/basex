@@ -305,7 +305,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, INTEGER_O, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   INTERSPERSE(FnIntersperse::new, "intersperse(input,separator)",
-      params(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
+      params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri::new, "iri-to-uri(value)",
       params(STRING_ZO), STRING_O),
