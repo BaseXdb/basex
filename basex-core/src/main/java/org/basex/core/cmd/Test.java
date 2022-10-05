@@ -34,7 +34,8 @@ public final class Test extends Command {
 
     try {
       final Suite suite = new Suite();
-      suite.test(root, context, this).serialize(Serializer.get(out));
+      final SerializerOptions sopts = context.options.get(MainOptions.SERIALIZER);
+      suite.test(root, context, this).serialize(Serializer.get(out, sopts));
       out.print(NL);
 
       final StringBuilder sb = new StringBuilder(RESULT).append(COLS);
