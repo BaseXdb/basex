@@ -215,7 +215,7 @@ public abstract class HTTPTest extends SandboxTest {
     if(type != null) builder.setHeader(HTTPText.CONTENT_TYPE, type.toString());
 
     try {
-      final HttpClient client = IOUrl.clientBuilder(true).build();
+      final HttpClient client = IOUrl.client(true);
       final HttpResponse<String> response = client.send(builder.build(),
           HttpResponse.BodyHandlers.ofString());
       final String body = response.body();

@@ -134,7 +134,7 @@ public final class Client {
     }
 
     final String fw = request.attribute(FOLLOW_REDIRECT);
-    final HttpClient client = IOUrl.clientBuilder(fw == null || Strings.toBoolean(fw)).build();
+    final HttpClient client = IOUrl.client(fw == null || Strings.toBoolean(fw));
     final BodyHandler<InputStream> handler = HttpResponse.BodyHandlers.ofInputStream();
 
     // send request (with optional authorization)

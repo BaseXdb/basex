@@ -30,8 +30,8 @@ public final class IOUrl extends IO {
   private static final HashMap<Integer, String> REASONS = new HashMap<>();
   /** Optional SSL context for ignoring certificates. */
   private static SSLContext ssl;
-  /** Global HTTP client instance. */
-  private static HttpClient client;
+  /** Cached HTTP client instances. */
+  private static final HttpClient[] CLIENTS = new HttpClient[2];
 
   static {
     REASONS.put(100, "Continue");
@@ -134,7 +134,7 @@ public final class IOUrl extends IO {
    * @throws IOException I/O exception
    */
   public HttpResponse<InputStream> response() throws IOException {
-    if(client == null) client = clientBuilder(true).build();
+    final HttpClient client = client(true);
 
     final HttpResponse<InputStream> response;
     try {
@@ -166,14 +166,18 @@ public final class IOUrl extends IO {
   }
 
   /**
-   * Returns a unified HTTP client builder.
+   * Returns a singleton HTTP client instance.
    * @param redirect follow redirects
    * @return client builder
    */
-  public static HttpClient.Builder clientBuilder(final boolean redirect) {
-    final HttpClient.Builder cb = HttpClient.newBuilder();
-    if(ssl != null) cb.sslContext(ssl).connectTimeout(Duration.ofMinutes(1));
-    return cb.followRedirects(redirect ? Redirect.ALWAYS : Redirect.NEVER);
+  public static HttpClient client(final boolean redirect) {
+    final int i = redirect ? 1 : 0;
+    if(CLIENTS[i] == null) {
+      final HttpClient.Builder cb = HttpClient.newBuilder();
+      if(ssl != null) cb.sslContext(ssl).connectTimeout(Duration.ofMinutes(1));
+      CLIENTS[i] = cb.followRedirects(redirect ? Redirect.ALWAYS : Redirect.NEVER).build();
+    }
+    return CLIENTS[i];
   }
 
   /**
