@@ -24,7 +24,7 @@ public class DbNodeId extends StandardFunc {
       @Override
       public Int next() throws QueryException {
         final Item item = qc.next(nodes);
-        return item != null ? Int.get(id(toDBNode(item))) : null;
+        return item != null ? Int.get(id(toDBNode(item, false))) : null;
       }
     };
   }
@@ -33,7 +33,7 @@ public class DbNodeId extends StandardFunc {
   public final Value value(final QueryContext qc) throws QueryException {
     final Iter nodes = exprs[0].iter(qc);
     final LongList list = new LongList(Seq.initialCapacity(nodes.size()));
-    for(Item item; (item = qc.next(nodes)) != null;) list.add(id(toDBNode(item)));
+    for(Item item; (item = qc.next(nodes)) != null;) list.add(id(toDBNode(item, false)));
     return IntSeq.get(list);
   }
 

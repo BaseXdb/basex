@@ -314,12 +314,14 @@ public abstract class StandardFunc extends Arr {
   /**
    * Converts an item to a database node.
    * @param item item
+   * @param mainmem accept main-memory database nods
    * @return database node
    * @throws QueryException query exception
    */
-  protected final DBNode toDBNode(final Item item) throws QueryException {
-    if(checkNoEmpty(item, NodeType.NODE) instanceof DBNode) return (DBNode) item;
-    throw DB_NODE_X.get(info, item);
+  protected final DBNode toDBNode(final Item item, final boolean mainmem) throws QueryException {
+    if(checkNoEmpty(item, NodeType.NODE) instanceof DBNode &&
+        (mainmem || !item.data().inMemory())) return (DBNode) item;
+      throw DB_NODE_X.get(info, item);
   }
 
   /**

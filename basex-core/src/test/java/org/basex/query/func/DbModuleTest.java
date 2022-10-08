@@ -684,6 +684,7 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_NAME;
     query(func.args(_DB_GET.args(NAME)), NAME);
     query(func.args(_DB_GET.args(NAME) + "/*"), NAME);
+    error(func.args(" <x/> update { }"), DB_NODE_X);
   }
 
   /** Test method. */
@@ -800,7 +801,7 @@ public final class DbModuleTest extends QueryPlanTest {
     final Function func = _DB_PATH;
     query(func.args(_DB_GET.args(NAME)), XML.replaceAll(".*/", ""));
     query(func.args(_DB_GET.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
-    query(func.args(" <x/> update { }"), "");
+    error(func.args(" <x/> update { }"), DB_NODE_X);
   }
 
   /** Test method. */
