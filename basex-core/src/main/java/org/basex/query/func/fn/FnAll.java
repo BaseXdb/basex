@@ -37,7 +37,8 @@ public class FnAll extends StandardFunc {
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0];
     final SeqType st = input.seqType();
-    if(st.zero()) return cc.merge(input, Bln.TRUE, info);
+    final boolean some = some();
+    if(st.zero()) return cc.merge(input, Bln.get(!some), info);
 
     // create FLWOR expression
     // some(INPUT, PREDICATE)  ->  (for $i in INPUT return PREDICATE($i)) = true()
@@ -51,7 +52,6 @@ public class FnAll extends StandardFunc {
     final Expr rtrn = func != null ? new DynFuncCall(info, sc, func, ref).optimize(cc) : ref;
     final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);
 
-    final boolean some = some();
     final Expr cmp = new CmpG(flwor, Bln.get(some), OpG.EQ, null, sc, info).optimize(cc);
     return some ? cmp : Function.NOT.get(sc, info, cmp);
   }
