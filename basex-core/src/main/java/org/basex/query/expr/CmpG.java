@@ -181,14 +181,14 @@ public class CmpG extends Cmp {
       }
     }
 
+    // simplify operands
+    simplifyAll(Simplify.DISTINCT, cc);
+
     // swap operands
     if(swap()) {
       cc.info(QueryText.OPTSWAP_X, this);
       op = op.swap();
     }
-
-    // simplify operands
-    simplifyAll(Simplify.DISTINCT, cc);
 
     // optimize expression
     expr = opt(cc);
