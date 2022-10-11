@@ -16,6 +16,7 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.Options.*;
 
 /**
  * This is the starter class for the stand-alone console mode.
@@ -136,6 +137,11 @@ public class BaseX extends CLI {
           case 'w':
             execute(new Set(MainOptions.STRIPWS, null), false);
             break;
+          case 'W':
+            if(sopts == null) sopts = new SerializerOptions();
+            sopts.set(SerializerOptions.INDENT, YesNo.YES);
+            execute(new Set(MainOptions.SERIALIZER, sopts), false);
+            break;
           case 'x':
             execute(new Set(MainOptions.XMLPLAN, null), false);
             qp ^= true;
@@ -212,7 +218,7 @@ public class BaseX extends CLI {
           // options followed by a string
           v = arg.string();
         } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
-            c == 'v' || c == 'V' || c == 'w' || c == 'x' || c == 'X' || c == 'z') {
+            c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
           // options to be toggled
           v = "";
         } else if(!local()) {

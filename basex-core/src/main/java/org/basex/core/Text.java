@@ -87,7 +87,7 @@ public interface Text {
   String S_STANDALONE = "Standalone";
   /** Start information. */
   String  S_LOCALINFO =
-    " [-bcdiIoqrRstuvVwxz] [input]" + NL +
+    " [-bcdiIoqrRstuvVwWxz] [input]" + NL +
     "  [input]    XQuery or command file, or query string" + NL +
     "  -b<args>   Bind external query variables" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
@@ -104,6 +104,7 @@ public interface Text {
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
     "  -w         Toggle whitespace stripping" + NL +
+    "  -W         Enable indentation with whitespaces" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
@@ -111,7 +112,7 @@ public interface Text {
   String S_CLIENT = "Client";
   /** Client start information. */
   String S_CLIENTINFO =
-    " [-bcdiInopPqrRsUvVwxz] [input]" + NL +
+    " [-bcdiInopPqrRsUvVwWxz] [input]" + NL +
     "  [input]    XQuery or command file, or query string" + NL +
     "  -b<args>   Bind external query variables" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
@@ -130,6 +131,7 @@ public interface Text {
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
     "  -w         Toggle whitespace stripping" + NL +
+    "  -W         Enable indentation with whitespaces" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
