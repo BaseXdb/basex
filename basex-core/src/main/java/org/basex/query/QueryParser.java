@@ -1545,7 +1545,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(ex);
     do add(el, range()); while(wsConsume(CONCAT));
-    return Function.CONCAT.get(sc, info(), el.finish());
+    return new Concat(info(), el.finish());
   }
 
   /**
@@ -2601,7 +2601,7 @@ public class QueryParser extends InputParser {
       final int p = pos;
       if(consume(']') && consume('`') && consume('`')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
-        return el.size() == 1 ? el.get(0) : Function.CONCAT.get(sc, info(), el.finish());
+        return el.size() == 1 ? el.get(0) : new Concat(info(), el.finish());
       }
       pos = p;
       if(consume('`') && consume('{')) {

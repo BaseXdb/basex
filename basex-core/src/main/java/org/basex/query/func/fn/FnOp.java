@@ -61,7 +61,7 @@ public class FnOp extends StandardFunc {
       case "<<"       : body = new CmpN(info, arg1, arg2, OpN.ET); break;
       case ">>"       : body = new CmpN(info, arg1, arg2, OpN.GT); break;
       case "is"       : body = new CmpN(info, arg1, arg2, OpN.EQ); break;
-      case "||"       : body = Function.CONCAT.get(sc, info, arg1, arg2); break;
+      case "||"       : body = new Concat(info, arg1, arg2); break;
       case "|":
       case "union"    : body = new Union(info, arg1, arg2); break;
       case "except"   : body = new Except(info, arg1, arg2); break;

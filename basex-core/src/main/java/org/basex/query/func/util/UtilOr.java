@@ -15,19 +15,19 @@ public final class UtilOr extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    return create().value(qc);
+    return build().value(qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return create().optimize(cc);
+    return build().optimize(cc);
   }
 
   /**
-   * Creates a new otherwise expression.
+   * Creates a new {@link Otherwise} expression.
    * @return new otherwise expression
    */
-  private Otherwise create() {
+  private Otherwise build() {
     return new Otherwise(info, exprs);
   }
 }

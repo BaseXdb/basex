@@ -59,9 +59,6 @@ public final class CachedStep extends Step {
 
   @Override
   public Step copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final int pl = exprs.length;
-    final Expr[] pred = new Expr[pl];
-    for(int p = 0; p < pl; p++) pred[p] = exprs[p].copy(cc, vm);
-    return copyType(new CachedStep(info, axis, test.copy(), pred));
+    return copyType(new CachedStep(info, axis, test.copy(), copyAll(cc, vm, exprs)));
   }
 }
