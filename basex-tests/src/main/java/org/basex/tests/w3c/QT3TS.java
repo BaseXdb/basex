@@ -312,20 +312,22 @@ public final class QT3TS extends Main {
       if(env != null) {
         // bind documents
         for(final HashMap<String, String> src : env.sources) {
-          // add document reference
-          final String file = file(base, src.get(FILE));
-          query.addDocument(src.get(URI), file);
-          final String role = src.get(ROLE);
+          final String file = src.get(FILE), role = src.get(ROLE);
+          if(file ==  null) continue;
+
+          final String path = file(base, file);
+          query.addDocument(src.get(URI), path);
           if(role == null) continue;
 
-          final XdmValue doc = query.document(file);
+          final XdmValue doc = query.document(path);
           if(role.equals(".")) query.context(doc);
           else query.variable(role, doc);
         }
         // bind resources
         for(final HashMap<String, String> src : env.resources) {
-          query.addResource(src.get(URI), file(base, src.get(FILE)),
-              src.get(QT3Constants.ENCODING));
+          final String file = src.get(FILE);
+          if(file == null) continue;
+          query.addResource(src.get(URI), file(base, file), src.get(QT3Constants.ENCODING));
         }
         // bind collections
         query.addCollection(env.collURI, env.collSources.toArray());
