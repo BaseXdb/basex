@@ -303,6 +303,49 @@ public class Fn4ModuleTest extends QueryPlanTest {
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
   }
+  /** Test method. */
+  @Test public void op() {
+    final Function func = OP;
+
+    query(func.args("+") + " => count()", 1);
+    query(func.args("+") + " instance of function(item()*, item()*) as xs:anyAtomicType?", true);
+    query(func.args("+") + "(1, 2)", 3);
+    query(func.args(wrap("+")) + "(1, 2)", 3);
+
+    query(func.args(",") + "(<a>1</a>, <b>1</b>)", "<a>1</a>\n<b>1</b>");
+    query(func.args("and") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args("or") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args("+") + "(<a>1</a>, <b>1</b>)", 2);
+    query(func.args("-") + "(<a>1</a>, <b>1</b>)", 0);
+    query(func.args("*") + "(<a>1</a>, <b>1</b>)", 1);
+    query(func.args("div") + "(<a>1</a>, <b>1</b>)", 1);
+    query(func.args("idiv") + "(<a>1</a>, <b>1</b>)", 1);
+    query(func.args("mod") + "(<a>1</a>, <b>1</b>)", 0);
+    query(func.args("=") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args("<") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args("<=") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args(">") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args(">=") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args("!=") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args("eq") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args("lt") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args("le") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args("gt") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args("ge") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args("ne") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args("<<") + "(<a>1</a>, <b>1</b>)", true);
+    query(func.args(">>") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args("is") + "(<a>1</a>, <b>1</b>)", false);
+    query(func.args("||") + "(<a>1</a>, <b>1</b>)", "11");
+    query(func.args("|") + "(<a>1</a>, <b>1</b>)", "<a>1</a>\n<b>1</b>");
+    query(func.args("union") + "(<a>1</a>, <b>1</b>)", "<a>1</a>\n<b>1</b>");
+    query(func.args("except") + "(<a>1</a>, <b>1</b>)", "<a>1</a>");
+    query(func.args("intersect") + "(<a>1</a>, <b>1</b>)", "");
+    query(func.args("to") + "(<a>1</a>, <b>1</b>)", 1);
+    query(func.args("otherwise") + "(<a>1</a>, <b>1</b>)", "<a>1</a>");
+
+    error(func.args("xyz"), UNKNOWNOP_X);
+  }
 
   /** Test method. */
   @Test public void rangeFrom() {

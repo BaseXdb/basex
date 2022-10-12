@@ -396,6 +396,9 @@ public enum Function implements AFunction {
   ONE_OR_MORE(FnOneOrMore::new, "one-or-more(input)",
       params(ITEM_ZM), ITEM_OM),
   /** XQuery function. */
+  OP(FnOp::new, "op(operator)",
+      params(STRING_O), FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
+  /** XQuery function. */
   OUTERMOST(FnOutermost::new, "outermost(nodes)",
       params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
