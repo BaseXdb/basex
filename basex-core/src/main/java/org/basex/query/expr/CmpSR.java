@@ -155,7 +155,7 @@ public final class CmpSR extends Single {
       if(d > 0) return Bln.FALSE;
       if(d == 0) {
         // return simplified comparison for exact hit, or false if value is not included
-        return mni && mxi ? new CmpG(expr, Str.get(mn), OpG.EQ, null, null, info).optimize(cc) :
+        return mni && mxi ? new CmpG(info, expr, Str.get(mn), OpG.EQ, null, null).optimize(cc) :
           Bln.FALSE;
       }
     }

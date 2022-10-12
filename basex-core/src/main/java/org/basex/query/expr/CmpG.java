@@ -150,15 +150,15 @@ public class CmpG extends Cmp {
 
   /**
    * Constructor.
+   * @param info input info
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
    * @param coll collation (can be {@code null})
    * @param sc static context
-   * @param info input info
    */
-  public CmpG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
-      final StaticContext sc, final InputInfo info) {
+  public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final OpG op,
+      final Collation coll, final StaticContext sc) {
     super(info, expr1, expr2, coll, SeqType.BOOLEAN_O, sc);
     this.op = op;
   }
@@ -249,7 +249,7 @@ public class CmpG extends Cmp {
         final Calc calc = ((Arith) expr1).calc;
         if(calc == Calc.MINUS && expr2 == Int.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
-          ex = new CmpG(op1, op2, op, coll, sc, info);
+          ex = new CmpG(info, op1, op2, op, coll, sc);
         } else if(calc != Calc.IDIV && calc != Calc.MOD && (
             Function.POSITION.is(op1) || op2 instanceof ANum &&
           (expr2 instanceof ANum || expr2 instanceof Arith && expr2.arg(1) instanceof ANum)
@@ -258,7 +258,7 @@ public class CmpG extends Cmp {
           // count(E) div 2 = 1  ->  count(E) = 1 * 2
           // $a - 1 = $b + 1  ->  $a = $b + 2
           final Expr arg2 = new Arith(info, expr2, op2, calc.invert()).optimize(cc);
-          ex = new CmpG(op1, arg2, op, coll, sc, info);
+          ex = new CmpG(info, op1, arg2, op, coll, sc);
         }
       }
     }
@@ -385,7 +385,7 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
-      new CmpG(expr1, expr2, op.invert(), coll, sc, info) : null;
+      new CmpG(info, expr1, expr2, op.invert(), coll, sc) : null;
   }
 
   @Override
@@ -423,7 +423,7 @@ public class CmpG extends Cmp {
     final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
     final QueryFunction<OpG, Expr> newList = newOp -> {
       final Expr exprR = List.get(cc, info, exprR1, exprR2);
-      return new CmpG(exprL, exprR, newOp, coll, sc, info).optimize(cc);
+      return new CmpG(info, exprL, exprR, newOp, coll, sc).optimize(cc);
     };
 
     // check if comparisons can be merged
@@ -551,7 +551,7 @@ public class CmpG extends Cmp {
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final CmpG cmp = new CmpG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc, info);
+    final CmpG cmp = new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc);
     cmp.check = check;
     return copyType(cmp);
   }

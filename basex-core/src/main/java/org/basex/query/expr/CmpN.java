@@ -78,12 +78,12 @@ public final class CmpN extends Cmp {
 
   /**
    * Constructor.
+   * @param info input info
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op comparator
-   * @param info input info
    */
-  public CmpN(final Expr expr1, final Expr expr2, final OpN op, final InputInfo info) {
+  public CmpN(final InputInfo info, final Expr expr1, final Expr expr2, final OpN op) {
     super(info, expr1, expr2, null, SeqType.BOOLEAN_ZO, null);
     this.op = op;
   }
@@ -124,7 +124,7 @@ public final class CmpN extends Cmp {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CmpN(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, info));
+    return copyType(new CmpN(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op));
   }
 
   @Override

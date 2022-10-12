@@ -27,7 +27,7 @@ public final class CmpSimpleG extends CmpG {
    */
   CmpSimpleG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,
       final StaticContext sc, final InputInfo info, final boolean check) {
-    super(expr1, expr2, op, coll, sc, info);
+    super(info, expr1, expr2, op, coll, sc);
     this.check = check;
   }
 

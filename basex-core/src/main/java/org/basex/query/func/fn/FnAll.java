@@ -52,7 +52,7 @@ public class FnAll extends StandardFunc {
     final Expr rtrn = func != null ? new DynFuncCall(info, sc, func, ref).optimize(cc) : ref;
     final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);
 
-    final Expr cmp = new CmpG(flwor, Bln.get(some), OpG.EQ, null, sc, info).optimize(cc);
+    final Expr cmp = new CmpG(info, flwor, Bln.get(some), OpG.EQ, null, sc).optimize(cc);
     return some ? cmp : Function.NOT.get(sc, info, cmp);
   }
 

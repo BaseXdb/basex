@@ -30,7 +30,7 @@ public final class Except extends Set {
    * @param info input info
    * @param exprs expressions
    */
-  public Except(final InputInfo info, final Expr[] exprs) {
+  public Except(final InputInfo info, final Expr... exprs) {
     super(info, exprs);
   }
 

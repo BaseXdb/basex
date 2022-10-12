@@ -29,7 +29,7 @@ public final class Intersect extends Set {
    * @param info input info
    * @param exprs expressions
    */
-  public Intersect(final InputInfo info, final Expr[] exprs) {
+  public Intersect(final InputInfo info, final Expr... exprs) {
     super(info, exprs);
   }
 

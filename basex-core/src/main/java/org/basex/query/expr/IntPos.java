@@ -125,7 +125,7 @@ public final class IntPos extends Simple implements CmpPos {
   public Expr invert(final CompileContext cc) throws QueryException {
     if(exact()) {
       final Expr pos = cc.function(Function.POSITION, info);
-      return new CmpG(pos, Int.get(min), OpG.NE, null, cc.sc(), info).optimize(cc);
+      return new CmpG(info, pos, Int.get(min), OpG.NE, null, cc.sc()).optimize(cc);
     }
     return min == 1 ? get(max + 1, MAX_VALUE, info) :
       max == MAX_VALUE ? get(1, min - 1, info) : null;

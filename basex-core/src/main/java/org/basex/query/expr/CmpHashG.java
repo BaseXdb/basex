@@ -25,7 +25,7 @@ public final class CmpHashG extends CmpG {
    */
   CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final StaticContext sc,
       final InputInfo info) {
-    super(expr1, expr2, op, null, sc, info);
+    super(info, expr1, expr2, op, null, sc);
   }
 
   /**

@@ -174,15 +174,15 @@ public final class CmpV extends Cmp {
 
   /**
    * Constructor.
+   * @param info input info
    * @param expr1 first expression
    * @param expr2 second expression
    * @param opV operator
    * @param coll collation (can be {@code null})
    * @param sc static context
-   * @param info input info
    */
-  public CmpV(final Expr expr1, final Expr expr2, final OpV opV, final Collation coll,
-      final StaticContext sc, final InputInfo info) {
+  public CmpV(final InputInfo info, final Expr expr1, final Expr expr2, final OpV opV,
+      final Collation coll, final StaticContext sc) {
     super(info, expr1, expr2, coll, SeqType.BOOLEAN_ZO, sc);
     this.opV = opV;
   }
@@ -230,7 +230,7 @@ public final class CmpV extends Cmp {
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Predicate<SeqType> p = st -> single ? st.one() : st.zeroOrOne();
     if(p.test(st1) && p.test(st2) && CmpG.compatible(st1, st2, opV == OpV.EQ || opV == OpV.NE)) {
-      return new CmpG(expr1, expr2, OpG.get(opV), coll, sc, info).optimize(cc);
+      return new CmpG(info, expr1, expr2, OpG.get(opV), coll, sc).optimize(cc);
     }
     return this;
   }
@@ -250,7 +250,7 @@ public final class CmpV extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
-      new CmpV(expr1, expr2, opV.invert(), coll, sc, info) : null;
+      new CmpV(info, expr1, expr2, opV.invert(), coll, sc) : null;
   }
 
   @Override
@@ -265,7 +265,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CmpV(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), opV, coll, sc, info));
+    return copyType(new CmpV(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), opV, coll, sc));
   }
 
   @Override

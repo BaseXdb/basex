@@ -247,7 +247,7 @@ public abstract class Cmp extends Arr {
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
                   OpG opG = ((CmpG) last).op;
                   if(!success) opG = opG.invert();
-                  return new CmpG(op1.get(), op2, opG, coll, sc, info).optimize(cc);
+                  return new CmpG(info, op1.get(), op2, opG, coll, sc).optimize(cc);
                 }
               } else if(success && last instanceof CmpR) {
                 // (number ! (. >= 1e0) = true()  ->  number >= 1e0

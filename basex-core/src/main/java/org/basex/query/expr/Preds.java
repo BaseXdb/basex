@@ -263,7 +263,7 @@ public abstract class Preds extends Arr {
       )) && !op2.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(op1, true);
         if(expr != this) {
-          return new CmpG(expr, op2, cmp.opG(), cmp.coll, cmp.sc, cmp.info).optimize(cc);
+          return new CmpG(cmp.info, expr, op2, cmp.opG(), cmp.coll, cmp.sc).optimize(cc);
         }
       }
     }

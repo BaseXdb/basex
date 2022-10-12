@@ -1337,7 +1337,7 @@ public class QueryParser extends InputParser {
 
     final InputInfo info = clauses.peek().info();
     final GFLWOR flwor = new GFLWOR(info, clauses, rtrn);
-    final CmpG cmp = new CmpG(flwor, Bln.get(some), OpG.EQ, null, sc, info);
+    final CmpG cmp = new CmpG(info, flwor, Bln.get(some), OpG.EQ, null, sc);
     return some ? cmp : Function.NOT.get(sc, info, cmp);
   }
 
@@ -1498,15 +1498,15 @@ public class QueryParser extends InputParser {
     if(ex != null) {
       for(final OpV c : OpV.VALUES) {
         if(wsConsumeWs(c.name))
-          return new CmpV(ex, check(ftContains(), CMPEXPR), c, sc.collation, sc, info());
+          return new CmpV(info(), ex, check(ftContains(), CMPEXPR), c, sc.collation, sc);
       }
       for(final OpN c : OpN.VALUES) {
         if(wsConsumeWs(c.name))
-          return new CmpN(ex, check(ftContains(), CMPEXPR), c, info());
+          return new CmpN(info(), ex, check(ftContains(), CMPEXPR), c);
       }
       for(final OpG c : OpG.VALUES) {
         if(wsConsumeWs(c.name))
-          return new CmpG(ex, check(ftContains(), CMPEXPR), c, sc.collation, sc, info());
+          return new CmpG(info(), ex, check(ftContains(), CMPEXPR), c, sc.collation, sc);
       }
     }
     return ex;

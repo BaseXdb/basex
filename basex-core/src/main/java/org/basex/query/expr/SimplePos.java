@@ -79,11 +79,11 @@ final class SimplePos extends Arr implements CmpPos {
       final Expr pos = cc.function(Function.POSITION, info);
       final Expr expr1 = exprs[0], expr2 = exprs[1];
       if(exact()) {
-        return new CmpG(pos, expr1, OpG.NE, null, cc.sc(), info).optimize(cc);
+        return new CmpG(info, pos, expr1, OpG.NE, null, cc.sc()).optimize(cc);
       } else if(expr1 == Int.ONE) {
-        return new CmpG(pos, expr2, OpG.GT, null, cc.sc(), info).optimize(cc);
+        return new CmpG(info, pos, expr2, OpG.GT, null, cc.sc()).optimize(cc);
       } else if(expr2 == Int.MAX) {
-        return new CmpG(pos, expr1, OpG.LT, null, cc.sc(), info).optimize(cc);
+        return new CmpG(info, pos, expr1, OpG.LT, null, cc.sc()).optimize(cc);
       }
     }
     return null;
