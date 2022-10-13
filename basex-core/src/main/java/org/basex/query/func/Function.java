@@ -562,6 +562,10 @@ public enum Function implements AFunction {
   URI_COLLECTION(FnUriCollection::new, "uri-collection([uri])",
       params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
+  WHILE(FnWhile::new, "while(input,predicate,action)",
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_ZM).seqType(),
+      FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
       params(NODE_ZO, MAP_O), STRING_ZO),
   /** XQuery function. */
