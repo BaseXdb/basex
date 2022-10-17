@@ -793,6 +793,8 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args("ADDRAW"), false);
     query(func.args("runs"), 1);
     query(func.args("bindings"), "");
+    query(func.args("serializer") + "?indent", "no");
+
     error(func.args("XYZ"), DB_OPTION_X);
   }
 
