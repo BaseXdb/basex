@@ -765,8 +765,8 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void mapGroupBy() {
-    final Function func = _MAP_GROUP_BY;
+  @Test public void mapBuild() {
+    final Function func = _MAP_BUILD;
 
     query(func.args(" ()", " boolean#1"), "map{}");
     query(func.args(" 0", " boolean#1"), "map{false():0}");

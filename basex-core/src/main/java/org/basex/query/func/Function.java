@@ -584,6 +584,11 @@ public enum Function implements AFunction {
   // Map Module
 
   /** XQuery function. */
+  _MAP_BUILD(MapBuild::new, "build(input,key[,value[,duplicates]])",
+      params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(),
+      FuncType.get(ITEM_ZM, ITEM_O).seqType(), FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
+      MAP_O, flag(HOF), MAP_URI),
+  /** XQuery function. */
   _MAP_CONTAINS(MapContains::new, "contains(map,key)",
       params(MAP_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O, MAP_URI),
   /** XQuery function. */
@@ -603,10 +608,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _MAP_GET(MapGet::new, "get(map,key)",
       params(MAP_O, ANY_ATOMIC_TYPE_O), ITEM_ZM, MAP_URI),
-  /** XQuery function. */
-  _MAP_GROUP_BY(MapGroupBy::new, "group-by(input,key)",
-      params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType()),
-      MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
