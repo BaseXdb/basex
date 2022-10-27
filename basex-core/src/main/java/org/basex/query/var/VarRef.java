@@ -37,10 +37,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    final SeqType st = var.seqType();
-    if(st.zero()) return Empty.VALUE;
-    exprType.assign(st, var.size()).data(var.data());
-    return this;
+    return var.seqType().zero() ? Empty.VALUE : assignType();
   }
 
   @Override
@@ -72,7 +69,16 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final Var nw = vm.get(var.id);
-    return new VarRef(info, nw != null ? nw : var).optimize(cc);
+    return new VarRef(info, nw != null ? nw : var).assignType();
+  }
+
+  /**
+   * Assigns the variable type to the expression.
+   * @return self reference
+   */
+  private VarRef assignType() {
+    exprType.assign(var.seqType(), var.size()).data(var.data());
+    return this;
   }
 
   @Override
