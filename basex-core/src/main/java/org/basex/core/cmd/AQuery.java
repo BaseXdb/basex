@@ -96,12 +96,9 @@ public abstract class AQuery extends Command {
           }
           qp.close();
         }
-      } catch(final QueryException | IOException ex) {
+      } catch(final QueryException | JobException | IOException ex) {
         exception = ex;
         error = Util.message(ex);
-      } catch(final JobException ex) {
-        exception = ex;
-        error = ex.getMessage();
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         error = BASEX_OVERFLOW.message;
@@ -152,11 +149,14 @@ public abstract class AQuery extends Command {
     try {
       init(ctx);
       return qp.updating;
-    } catch(final QueryException ex) {
+    } catch(final QueryException | JobException ex) {
       qp.close();
       exception = ex;
-      if(exception instanceof RuntimeException) throw (RuntimeException) exception;
       return false;
+    } catch(final RuntimeException ex) {
+      qp.close();
+      exception = ex;
+      throw ex;
     }
   }
 

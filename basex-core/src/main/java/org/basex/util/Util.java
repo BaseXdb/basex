@@ -9,6 +9,7 @@ import java.util.*;
 
 import javax.net.ssl.*;
 
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.list.*;
@@ -174,6 +175,7 @@ public final class Util {
     if(throwable instanceof SocketException) return CONNECTION_ERROR;
 
     String msg = throwable.getMessage();
+    if(throwable instanceof JobException) return msg;
     if(msg == null || msg.isEmpty() || throwable instanceof RuntimeException)
       msg = throwable.toString();
     if(throwable instanceof FileNotFoundException ||
