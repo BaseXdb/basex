@@ -1309,4 +1309,9 @@ public final class UpdateTest extends SandboxTest {
     query("<e a='' b=''/> update { replace node @a with () }", "<e b=\"\"/>");
     query("<e a='' b=''/> update { replace node @b with () }", "<e a=\"\"/>");
   }
+
+  /** String value of modified text nodes. */
+  @Test public void gh2148() {
+    query("data(<_>a</_> update { replace node text() with . || 'b' })", "ab");
+  }
 }

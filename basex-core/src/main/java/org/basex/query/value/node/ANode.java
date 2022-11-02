@@ -38,9 +38,6 @@ public abstract class ANode extends Item {
   /** Unique node id. ID can get negative, as subtraction of ids is used for all comparisons. */
   public final int id = ID.incrementAndGet();
 
-  /** Cached string value. */
-  byte[] value;
-
   /**
    * Constructor.
    * @param type item type

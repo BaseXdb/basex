@@ -17,6 +17,8 @@ import org.basex.util.*;
 public abstract class FNode extends ANode {
   /** Parent node (can be {@code null}). */
   FNode parent;
+  /** Cached string value. */
+  byte[] value;
 
   /**
    * Constructor.

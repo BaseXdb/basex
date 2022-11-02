@@ -196,8 +196,11 @@ public final class FElem extends FNode {
     // only elements can declare namespaces
     while(n instanceof Element) {
       final NamedNodeMap atts = n.getAttributes();
-      final byte[] pref = token(n.getPrefix());
-      if(nsMap.get(pref) != null) nsMap.put(pref, token(n.getNamespaceURI()));
+      final String prefix = n.getPrefix();
+      if(prefix != null) {
+        final byte[] pref = token(prefix);
+        if(nsMap.get(pref) != null) nsMap.put(pref, token(n.getNamespaceURI()));
+      }
       final int len = atts.getLength();
       for(int i = 0; i < len; ++i) {
         final Attr a = (Attr) atts.item(i);
@@ -437,7 +440,7 @@ public final class FElem extends FNode {
       tb.add('>');
       final ANode child = children.get(0);
       if(child.type == NodeType.TEXT && children.size() == 1) {
-        tb.add(QueryString.toValue(child.value));
+        tb.add(QueryString.toValue(child.string()));
       } else {
         tb.add(DOTS);
       }

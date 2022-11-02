@@ -103,7 +103,6 @@ public class DBNode extends ANode {
    */
   private DBNode set(final int p, final int k) {
     type = type(k);
-    value = null;
     pre = p;
     return this;
   }
@@ -131,8 +130,7 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] string() {
-    if(value == null) value = data.atom(pre);
-    return value;
+    return data.atom(pre);
   }
 
   @Override
