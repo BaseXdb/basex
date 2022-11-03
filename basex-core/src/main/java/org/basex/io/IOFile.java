@@ -70,7 +70,7 @@ public final class IOFile extends IO {
    * @param file file reference
    * @param last last path segment; if it ends with a slash, it indicates a directory
    */
-  private IOFile(final File file, final String last) {
+  public IOFile(final File file, final String last) {
     super(normalize(file.getAbsolutePath(), Strings.endsWith(last, '/') ||
         Strings.endsWith(last, '\\')));
     boolean abs = file.isAbsolute();
