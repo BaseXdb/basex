@@ -22,7 +22,7 @@ public final class BinaryExample {
     // create session
     try(BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
       // create empty database
-      session.execute("create db database");
+      session.execute("CREATE DB database");
       System.out.println(session.info());
 
       // define input stream
@@ -36,7 +36,7 @@ public final class BinaryExample {
 
       // receive data
       final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      session.execute("retrieve test.bin", baos);
+      session.execute("BINARY GET test.bin", baos);
 
       // should always yield true
       if(Arrays.equals(bytes, baos.toByteArray())) {
@@ -46,7 +46,7 @@ public final class BinaryExample {
       }
 
       // drop database
-      session.execute("drop db database");
+      session.execute("DROP DB database");
     }
   }
 }

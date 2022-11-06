@@ -28,10 +28,10 @@ public final class CreateExample {
       System.out.println(session.info());
 
       // run query on database
-      System.out.println(session.execute("xquery doc('database')"));
+      System.out.println(session.execute("XQUERY doc('database')"));
 
       // drop database
-      session.execute("drop db database");
+      session.execute("DROP DB database");
     }
   }
 }

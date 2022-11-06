@@ -27,7 +27,7 @@ public final class Example {
 
       // version 2 (faster): perform command and pass on result to output stream
       final OutputStream out = System.out;
-      session.execute("xquery 1 to 10", out);
+      session.execute("XQUERY 1 to 10", out);
 
       // print time needed
       final double ms = (System.nanoTime() - time) / 1000000.0d;

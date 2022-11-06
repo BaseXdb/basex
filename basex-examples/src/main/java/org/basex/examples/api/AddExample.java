@@ -21,7 +21,7 @@ public final class AddExample {
     // create session
     try(BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin")) {
       // create empty database
-      session.execute("create db database");
+      session.execute("CREATE DB database");
       System.out.println(session.info());
 
       // define input stream
@@ -39,7 +39,7 @@ public final class AddExample {
       System.out.println(session.info());
 
       // run query on database
-      System.out.println(session.execute("xquery collection('database')"));
+      System.out.println(session.execute("XQUERY collection('database')"));
 
       // define input stream
       bais = new ByteArrayInputStream("<x>Hello Replacement!</x>".getBytes());
@@ -49,10 +49,10 @@ public final class AddExample {
       System.out.println(session.info());
 
       // run query on database
-      System.out.println(session.execute("xquery collection('database')"));
+      System.out.println(session.execute("XQUERY collection('database')"));
 
       // drop database
-      session.execute("drop db database");
+      session.execute("DROP DB database");
     }
   }
 }
