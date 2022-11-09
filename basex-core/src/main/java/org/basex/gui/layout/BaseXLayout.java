@@ -613,8 +613,12 @@ public final class BaseXLayout {
 
   /**
    * Assigns macOS-specific interface GUI properties.
+   * @param quit quit or cancel operation
    */
-  public static void quitMac() {
-    if(qr != null) qr.performQuit();
+  public static void quitMac(final boolean quit) {
+    if(qr != null) {
+      if(quit) qr.performQuit();
+      else qr.cancelQuit();
+    }
   }
 }
