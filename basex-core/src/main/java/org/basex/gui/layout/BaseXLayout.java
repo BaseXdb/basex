@@ -593,7 +593,10 @@ public final class BaseXLayout {
       final Desktop desktop = Desktop.getDesktop();
       desktop.setAboutHandler(e -> DialogAbout.show(gui));
       desktop.setPreferencesHandler(e -> DialogPrefs.show(gui));
-      desktop.setQuitHandler((e, r) -> GUIMenuCmd.C_EXIT.execute(gui));
+      desktop.setQuitHandler((e, r) -> {
+        GUIMenuCmd.C_EXIT.execute(gui);
+        r.performQuit();
+      });
 
       final Taskbar taskbar = Taskbar.getTaskbar();
       taskbar.setIconImage(BaseXImages.get("logo_large"));
