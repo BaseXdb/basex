@@ -236,6 +236,7 @@ public final class GUI extends JFrame implements BaseXWindow {
     if(editor.confirm(null)) {
       context.close();
       super.dispose();
+      BaseXLayout.quitMac();
     }
   }
 

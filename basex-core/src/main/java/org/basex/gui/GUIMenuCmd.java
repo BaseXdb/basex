@@ -328,7 +328,6 @@ public enum GUIMenuCmd implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       gui.dispose();
-      BaseXLayout.quitMac();
     }
   },
 
