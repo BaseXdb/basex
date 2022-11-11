@@ -14,18 +14,19 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public class FnRangeFrom extends StandardFunc {
+public class FnItemsStartingWhere extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       final Iter input = exprs[0].iter(qc);
-      final FItem start = toFunction(exprs[1], 1, qc);
+      final FItem predicate = toFunction(exprs[1], 1, qc);
       boolean started;
 
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = input.next()) != null;) {
-          if(started || toBoolean(start.invoke(qc, info, item).item(qc, info))) {
+          if(started) return item;
+          if(toBoolean(predicate.invoke(qc, info, item).item(qc, info))) {
             started = true;
             return item;
           }

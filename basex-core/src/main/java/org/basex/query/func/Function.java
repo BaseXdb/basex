@@ -312,6 +312,18 @@ public enum Function implements AFunction {
   /** XQuery function. */
   IS_NAN(FnIsNaN::new, "is-NaN(value)", params(ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
+  ITEMS_AFTER(FnItemsAfter::new, "items-after(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  ITEMS_BEFORE(FnItemsBefore::new, "items-before(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  ITEMS_ENDING_WHERE(FnItemsEndingWhere::new, "items-ending-where(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  ITEMS_STARTING_WHERE(FnItemsStartingWhere::new, "items-starting-where(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
   /** XQuery function. */
@@ -431,12 +443,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator::new, "random-number-generator([seed])",
       params(ANY_ATOMIC_TYPE_O), MAP_O, flag(HOF, NDT)),
-  /** XQuery function. */
-  RANGE_FROM(FnRangeFrom::new, "range-from(input,start)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
-  /** XQuery function. */
-  RANGE_TO(FnRangeTo::new, "range-to(input,end)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   REMOVE(FnRemove::new, "remove(input,position)",
       params(ITEM_ZM, INTEGER_O), ITEM_ZM),

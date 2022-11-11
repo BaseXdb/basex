@@ -10,20 +10,17 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class FnRangeTo extends FnRangeFrom {
+public final class FnItemsBefore extends FnItemsStartingWhere {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       final Iter input = exprs[0].iter(qc);
-      final FItem end = toFunction(exprs[1], 1, qc);
-      boolean ended;
+      final FItem predicate = toFunction(exprs[1], 1, qc);
 
       @Override
       public Item next() throws QueryException {
-        final Item item = ended ? null : input.next();
-        if(item != null && toBoolean(end.invoke(qc, info, item).item(qc, info))) {
-          ended  = true;
-        }
+        Item item = input.next();
+        if(item != null && toBoolean(predicate.invoke(qc, info, item).item(qc, info))) item = null;
         return item;
       }
     };

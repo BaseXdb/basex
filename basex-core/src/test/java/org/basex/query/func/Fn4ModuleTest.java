@@ -270,6 +270,62 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void itemsAfter() {
+    final Function func = ITEMS_AFTER;
+
+    query(func.args(" ()", " boolean#1"), "");
+    query(func.args(0, " boolean#1"), "");
+    query(func.args(1, " boolean#1"), "");
+    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "2\n3\n0");
+    query(func.args(" 0 to 2", " not#1"), "1\n2");
+    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), 3);
+    query(func.args(MONTHS, " contains(?, 'Nov')"), "December");
+    query(func.args(MONTHS, " starts-with(?, 'Dec')"), "");
+  }
+
+  /** Test method. */
+  @Test public void itemsBefore() {
+    final Function func = ITEMS_BEFORE;
+
+    query(func.args(" ()", " boolean#1"), "");
+    query(func.args(0, " boolean#1"), 0);
+    query(func.args(1, " boolean#1"), "");
+    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), 0);
+    query(func.args(" 1 to 3", " not#1"), "1\n2\n3");
+    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), 1);
+    query(func.args(MONTHS, " contains(?, 'Feb')"), "January");
+    query(func.args(MONTHS, " starts-with(?, 'Jan')"), "");
+  }
+
+  /** Test method. */
+  @Test public void itemsEndingWhere() {
+    final Function func = ITEMS_ENDING_WHERE;
+
+    query(func.args(" ()", " boolean#1"), "");
+    query(func.args(0, " boolean#1"), 0);
+    query(func.args(1, " boolean#1"), 1);
+    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "0\n1");
+    query(func.args(" 1 to 3", " not#1"), "1\n2\n3");
+    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "1\n2");
+    query(func.args(MONTHS, " contains(?, '')"), "January");
+    query(func.args(MONTHS, " starts-with(?, 'Feb')"), "January\nFebruary");
+  }
+
+  /** Test method. */
+  @Test public void itemsStartingWhere() {
+    final Function func = ITEMS_STARTING_WHERE;
+
+    query(func.args(" ()", " boolean#1"), "");
+    query(func.args(0, " boolean#1"), "");
+    query(func.args(1, " boolean#1"), 1);
+    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "1\n2\n3\n0");
+    query(func.args(" 1 to 3", " not#1"), "");
+    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "2\n3");
+    query(func.args(MONTHS, " contains(?, 'z')"), "");
+    query(func.args(MONTHS, " starts-with(?, 'Nov')"), "November\nDecember");
+  }
+
+  /** Test method. */
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");
@@ -345,34 +401,6 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(func.args("otherwise") + "(<a>1</a>, <b>1</b>)", "<a>1</a>");
 
     error(func.args("xyz"), UNKNOWNOP_X);
-  }
-
-  /** Test method. */
-  @Test public void rangeFrom() {
-    final Function func = RANGE_FROM;
-
-    query(func.args(" ()", " boolean#1"), "");
-    query(func.args(0, " boolean#1"), "");
-    query(func.args(1, " boolean#1"), 1);
-    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "1\n2\n3\n0");
-    query(func.args(" 1 to 3", " not#1"), "");
-    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "2\n3");
-    query(func.args(MONTHS, " contains(?, 'z')"), "");
-    query(func.args(MONTHS, " starts-with(?, 'Nov')"), "November\nDecember");
-  }
-
-  /** Test method. */
-  @Test public void rangeTo() {
-    final Function func = RANGE_TO;
-
-    query(func.args(" ()", " boolean#1"), "");
-    query(func.args(0, " boolean#1"), 0);
-    query(func.args(1, " boolean#1"), 1);
-    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "0\n1");
-    query(func.args(" 1 to 3", " not#1"), "1\n2\n3");
-    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "1\n2");
-    query(func.args(MONTHS, " contains(?, '')"), "January");
-    query(func.args(MONTHS, " starts-with(?, 'Feb')"), "January\nFebruary");
   }
 
   /** Test method. */
