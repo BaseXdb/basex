@@ -327,7 +327,7 @@ public enum GUIMenuCmd implements GUICommand {
   C_EXIT(EXIT, null, false, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.dispose();
+      gui.quit();
     }
   },
 

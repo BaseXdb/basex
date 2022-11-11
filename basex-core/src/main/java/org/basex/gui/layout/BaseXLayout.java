@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
-import java.awt.desktop.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
 import java.io.*;
@@ -595,8 +594,8 @@ public final class BaseXLayout {
       desktop.setAboutHandler(e -> DialogAbout.show(gui));
       desktop.setPreferencesHandler(e -> DialogPrefs.show(gui));
       desktop.setQuitHandler((e, r) -> {
-        qr = r;
-        GUIMenuCmd.C_EXIT.execute(gui);
+        if(gui.quit()) r.performQuit();
+        else r.cancelQuit();
       });
 
       final Taskbar taskbar = Taskbar.getTaskbar();
@@ -605,20 +604,6 @@ public final class BaseXLayout {
     } catch(final Exception ex) {
       Util.errln("Failed to initialize native Mac OS X interface:");
       Util.stack(ex);
-    }
-  }
-
-  /** Current quit handler. */
-  private static QuitResponse qr;
-
-  /**
-   * Assigns macOS-specific interface GUI properties.
-   * @param quit quit or cancel operation
-   */
-  public static void quitMac(final boolean quit) {
-    if(qr != null) {
-      if(quit) qr.performQuit();
-      else qr.cancelQuit();
     }
   }
 }

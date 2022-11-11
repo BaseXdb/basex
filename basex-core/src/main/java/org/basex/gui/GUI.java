@@ -231,14 +231,21 @@ public final class GUI extends JFrame implements BaseXWindow {
 
   @Override
   public void dispose() {
-    saveOptions();
-    // check if all modified texts are saved or closed
-    final boolean dispose = editor.confirm(null);
-    if(dispose) {
+    quit();
+  }
+
+  /**
+   * Closes the GUI.
+   * @return success flag
+   */
+  public boolean quit() {
+    if(editor.confirm(null)) {
+      saveOptions();
       context.close();
       super.dispose();
+      return true;
     }
-    BaseXLayout.quitMac(dispose);
+    return false;
   }
 
   /**
