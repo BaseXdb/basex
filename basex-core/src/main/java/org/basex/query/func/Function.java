@@ -205,6 +205,9 @@ public enum Function implements AFunction {
   EXISTS(FnExists::new, "exists(input)",
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
+  EXPANDED_QNAME(FnExpandedQName::new, "expanded-QName(qname)",
+      params(QNAME_ZO), STRING_O),
+  /** XQuery function. */
   FALSE(FnFalse::new, "false()",
       params(), BOOLEAN_O),
   /** XQuery function. */
@@ -419,6 +422,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(json[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO),
+  /** XQuery function. */
+  PARSE_QNAME(FnParseQName::new, "parse-QName(eqname)",
+      params(STRING_O), QNAME_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
