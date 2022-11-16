@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-22, BSD License
  * @author Christian Gruen
  */
-public final class FnWhile extends StandardFunc {
+public final class FnIterateWhile extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem predicate = toFunction(exprs[1], 1, qc), action = toFunction(exprs[2], 1, qc);

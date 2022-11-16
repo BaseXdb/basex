@@ -182,6 +182,8 @@ public final class SeqType {
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
   /** Predicate function. */
   public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O).seqType();
+  /** Predicate function. */
+  public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, ITEM_O).seqType();
   /** Single map. */
   public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */

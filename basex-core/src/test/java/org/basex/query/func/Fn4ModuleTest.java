@@ -326,6 +326,45 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void iterateWhile() {
+    final Function func = ITERATE_WHILE;
+    query(func.args(1, " not#1", " ->($_) { error() }"), 1);
+    error(func.args(1, " boolean#1", " ->($_) { error() }"), FUNERR1);
+    query(func.args(1, " empty#1", " identity#1"), 1);
+    query(func.args(" ()", " empty#1", " string#1"), "");
+    query(func.args(" (21 to 24)", " function($s) { head($s) < 23 }", " tail#1"), "23\n24");
+    query(func.args(" (6 to 8)", " function($s) { sum($s) > 10 }",
+        " function($s) { $s ! (. - 1) }"), "2\n3\n4");
+    query(func.args(" reverse(1 to 100)", " function($s) { sum($s) > 20 or head($s) > 4 }",
+        " function($s) { tail($s) }"), "4\n3\n2\n1");
+
+    query(func.args(1, " function($x) { $x < 10000 }", " function($x) { $x + 1 }"), 10000);
+    query(func.args(2, " function($x) { $x < 1000 }", " function($x) { $x * $x }"), 65536);
+    query(func.args(1, " function($x) { count($x) < 3 }", " function($x) { $x, $x }"),
+        "1\n1\n1\n1");
+    query(func.args(" (1 to 100)", " function($s) { $s[last()] - $s[1] > 1 }",
+        " function($s) { subsequence($s, 2, count($s) - 2) }"),
+        "50\n51");
+
+    query(func.args(" 1e0", " -> { . instance of xs:float }",
+        " -> { if(. instance of xs:double) then xs:float(.) else xs:double(.) }"),
+        1);
+    query(func.args(1, " -> { not(. instance of xs:byte) }",
+        " -> { if(. instance of xs:short) then xs:byte(.) else xs:short(.) }"),
+        1);
+
+    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
+        " -> { characters(?string) = ?remove }",
+        " -> { map { 'string': replace(?string, ?remove, ''),"
+        + "'remove': ?remove -> string-to-codepoints() -> { . + 2 } -> codepoints-to-string() } }")
+        + "?string", "unhdrduhul");
+
+    query("let $s := (1 to 1000) return " + func.args(1, " -> { . = $s }", " -> { . + 1 }"), 1001);
+    query("let $i := 3936256 return " + func.args(" $i", " -> { abs(. * . - $i) >= 0.0000000001 }",
+        " -> { (. + $i div .) div 2 }"), 1984);
+  }
+
+  /** Test method. */
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");
@@ -620,45 +659,6 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(lookup + "(1 to 9, not#1)", false);
     query(lookup + "(0 to 9, boolean#1)", true);
     query(lookup + "(0 to 9, not#1)", true);
-  }
-
-  /** Test method. */
-  @Test public void whilee() {
-    final Function func = WHILE;
-    query(func.args(1, " not#1", " ->($_) { error() }"), 1);
-    error(func.args(1, " boolean#1", " ->($_) { error() }"), FUNERR1);
-    query(func.args(1, " empty#1", " identity#1"), 1);
-    query(func.args(" ()", " empty#1", " string#1"), "");
-    query(func.args(" (21 to 24)", " function($s) { head($s) < 23 }", " tail#1"), "23\n24");
-    query(func.args(" (6 to 8)", " function($s) { sum($s) > 10 }",
-        " function($s) { $s ! (. - 1) }"), "2\n3\n4");
-    query(func.args(" reverse(1 to 100)", " function($s) { sum($s) > 20 or head($s) > 4 }",
-        " function($s) { tail($s) }"), "4\n3\n2\n1");
-
-    query(func.args(1, " function($x) { $x < 10000 }", " function($x) { $x + 1 }"), 10000);
-    query(func.args(2, " function($x) { $x < 1000 }", " function($x) { $x * $x }"), 65536);
-    query(func.args(1, " function($x) { count($x) < 3 }", " function($x) { $x, $x }"),
-        "1\n1\n1\n1");
-    query(func.args(" (1 to 100)", " function($s) { $s[last()] - $s[1] > 1 }",
-        " function($s) { subsequence($s, 2, count($s) - 2) }"),
-        "50\n51");
-
-    query(func.args(" 1e0", " -> { . instance of xs:float }",
-        " -> { if(. instance of xs:double) then xs:float(.) else xs:double(.) }"),
-        1);
-    query(func.args(1, " -> { not(. instance of xs:byte) }",
-        " -> { if(. instance of xs:short) then xs:byte(.) else xs:short(.) }"),
-        1);
-
-    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
-        " -> { characters(?string) = ?remove }",
-        " -> { map { 'string': replace(?string, ?remove, ''),"
-        + "'remove': ?remove -> string-to-codepoints() -> { . + 2 } -> codepoints-to-string() } }")
-        + "?string", "unhdrduhul");
-
-    query("let $s := (1 to 1000) return " + func.args(1, " -> { . = $s }", " -> { . + 1 }"), 1001);
-    query("let $i := 3936256 return " + func.args(" $i", " -> { abs(. * . - $i) >= 0.0000000001 }",
-        " -> { (. + $i div .) div 2 }"), 1984);
   }
 
   /** Test method. */

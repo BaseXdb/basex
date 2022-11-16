@@ -127,6 +127,10 @@ public enum Function implements AFunction {
   CONTAINS(FnContains::new, "contains(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
   /** XQuery function. */
+  CONTAINS_SEQUENCE(FnContainsSequence::new,
+      "contains-sequence(input,subsequence[,compare])",
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
+  /** XQuery function. */
   CONTAINS_TOKEN(FnContainsToken::new, "contains-token(value,token[,collation])",
       params(STRING_ZM, STRING_O, STRING_O), BOOLEAN_O),
   /** XQuery function. */
@@ -189,6 +193,10 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ENDS_WITH(FnEndsWith::new, "ends-with(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
+  /** XQuery function. */
+  ENDS_WITH_SEQUENCE(FnEndsWithSequence::new,
+      "ends-with-sequence(input,subsequence[,compare])",
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
       params(STRING_O), STRING_ZO),
@@ -326,6 +334,10 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ITEMS_STARTING_WHERE(FnItemsStartingWhere::new, "items-starting-where(input,predicate)",
       params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  ITERATE_WHILE(FnIterateWhile::new, "iterate-while(input,predicate,action)",
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_ZM).seqType(),
+      FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
@@ -502,6 +514,10 @@ public enum Function implements AFunction {
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
   /** XQuery function. */
+  STARTS_WITH_SEQUENCE(FnStartsWithSequence::new,
+      "starts-with-sequence(input,subsequence[,compare])",
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
+  /** XQuery function. */
   STATIC_BASE_URI(FnStaticBaseUri::new, "static-base-uri()",
       params(), ANY_URI_ZO),
   /** XQuery function. */
@@ -573,10 +589,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   URI_COLLECTION(FnUriCollection::new, "uri-collection([uri])",
       params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
-  /** XQuery function. */
-  WHILE(FnWhile::new, "while(input,predicate,action)",
-      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_ZM).seqType(),
-      FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
       params(NODE_ZO, MAP_O), STRING_ZO),
@@ -1333,7 +1345,7 @@ public enum Function implements AFunction {
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
   _HOF_SORT_WITH(HofSortWith::new, "sort-with(input,comparator)",
-      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_O, ITEM_O).seqType()),
+      params(ITEM_ZM, BIPREDICATE_O),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
   _HOF_TAKE_WHILE(HofTakeWhile::new, "take-while(input,predicate)",
@@ -1344,7 +1356,7 @@ public enum Function implements AFunction {
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
   _HOF_TOP_K_WITH(HofTopKWith::new, "top-k-with(input,comparator,k)",
-      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_O, ITEM_O).seqType(), INTEGER_O),
+      params(ITEM_ZM, BIPREDICATE_O, INTEGER_O),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
   _HOF_UNTIL(HofUntil::new, "until(predicate,action,zero)",
