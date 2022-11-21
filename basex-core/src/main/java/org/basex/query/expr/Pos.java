@@ -52,8 +52,11 @@ final class Pos extends Single {
 
     // equality check, range: position() = RANGE
     if(op == OpV.EQ && ps instanceof Range) {
-      return !((Range) ps).simple ? null :
-        ps.isSimple() ? new SimplePos(ii, ps.args()) : create ? new Pos(ii, ps) : null;
+      if(((Range) ps).ints) {
+        if(ps.isSimple()) return new SimplePos(ii, ps.args());
+        if(create) return new Pos(ii, ps);
+      }
+      return null;
     }
 
     // rewrite check of single values to equality check
