@@ -191,12 +191,15 @@ public final class QueryJob extends Job implements Runnable {
     final String id = jc.id();
     final Context ctx = jc.context;
     final JobOptions opts = job.options;
-    log(LogType.REQUEST, opts.get(JobOptions.LOG));
 
+    String log = opts.get(JobOptions.LOG);
+    if(log != null && log.isEmpty()) log = null;
+    if(log != null) ctx.log.write(LogType.REQUEST, log, null, "JOB:" + id, ctx);
+
+    Performance perf = new Performance();
     qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
     try {
       // parse, push and register query. order is important!
-      final Performance perf = new Performance();
       for(final Entry<String, Value> binding : job.bindings.entrySet()) {
         final String key = binding.getKey();
         final Value value = binding.getValue();
@@ -210,6 +213,7 @@ public final class QueryJob extends Job implements Runnable {
       // register job
       pushJob(qp);
       register(ctx);
+      perf = new Performance();
       if(remove) ctx.jobs.tasks.remove(id);
 
       // retrieve result; copy persistent database nodes
@@ -237,35 +241,26 @@ public final class QueryJob extends Job implements Runnable {
         unregister(ctx);
         popJob();
         qp = null;
-        result.time += jc.performance.ns(false);
+        result.time += jc.performance.ns();
       }
 
       // write concluding log entry, invalidate performance measurements
-      if(result.exception != null) {
-        log(LogType.ERROR, result.exception.getMessage());
-      } else {
-        log(LogType.OK, null);
+      if(log != null) {
+        final LogType type;
+        String msg = null;
+        if(result.exception != null) {
+          type = LogType.ERROR;
+          msg = result.exception.getMessage();
+        } else {
+          type = LogType.OK;
+        }
+        ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
       }
-      jc.performance = null;
 
       if(remove) ctx.jobs.tasks.remove(id);
       if(notify != null) notify.accept(result);
       if(result.value == Empty.VALUE) ctx.jobs.results.remove(id);
     }
-  }
-
-  /**
-   * Creates a log entry.
-   * @param type log type
-   * @param info info string (can be {@code null})
-   */
-  private void log(final LogType type, final String info) {
-    final String log = job.options.get(JobOptions.LOG);
-    if(log == null || log.isEmpty()) return;
-
-    final JobContext jc = jc();
-    final Context ctx = jc.context;
-    ctx.log.write(type, info, jc.performance, "JOB:" + jc.id(), ctx);
   }
 
   @Override
