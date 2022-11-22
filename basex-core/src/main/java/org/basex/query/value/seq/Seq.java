@@ -213,10 +213,8 @@ public abstract class Seq extends Value {
 
   @Override
   public boolean sameType() {
-    final BasicIter<Item> iter = iter();
-    final Type tp = iter.next().type;
-    for(Item item; (item = iter.next()) != null;) {
-      if(!tp.eq(item.type)) return false;
+    for(final Item item : this) {
+      if(!type.eq(item.type)) return false;
     }
     return true;
   }

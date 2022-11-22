@@ -38,7 +38,7 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public boolean sameType() {
+  public final boolean sameType() {
     return true;
   }
 

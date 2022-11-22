@@ -75,7 +75,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public boolean sameType() {
+  public final boolean sameType() {
     return true;
   }
 
