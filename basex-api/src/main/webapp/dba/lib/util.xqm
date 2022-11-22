@@ -52,7 +52,12 @@ declare function util:serialize(
 ) as xs:string {
   (: serialize more characters than requested, because limit represents number of bytes :)
   let $limit := options:get($options:MAXCHARS)
-  let $string := serialize($result, map { 'limit': $limit * 2 + 1, 'method': 'basex' })
+  let $indent := options:get($options:INDENT)
+  let $string := serialize($result, map {
+    'limit': $limit * 2 + 1,
+    'method': 'basex',
+    'indent': $indent
+  })
   return util:chop($string, $limit)
 };
 

@@ -28,47 +28,38 @@ function dba:settings(
   $info   as xs:string?
 ) as element(html) {
   let $system := html:properties(db:system())
-  let $table-row := function($items) {
-    <tr><td>{ $items }</td></tr>
+  let $table-row := function($label, $items) {
+    <tr><td>{ $label, <br/>, $items }</td></tr>
+  }
+  let $option := function($key, $values, $label) {
+    $table-row($label,
+      <select name='{ $key }'>{
+        let $selected := options:get($key)
+        for $value in $values
+        return element option { attribute selected { }[$value = $selected], $value }
+      }</select>
+    )
   }
   let $number := function($key, $label) {
-    $table-row((
-      $label,
-      <br/>,
-      <input type='number' name='{ $key }' value='{ options:get($key) }'/>
-    ))
+    $table-row($label, <input type='number' name='{ $key }' value='{ options:get($key) }'/>)
   }
   let $string := function($key, $label) {
-    $table-row((
-      $label,
-      <br/>,
-      <input type='text' name='{ $key }' value='{ options:get($key) }'/>
-    ))
+    $table-row($label, <input type='text' name='{ $key }' value='{ options:get($key) }'/>)
   }
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='33%'>
         <form action='settings' method='post'>
-          <h2>Settings » { html:button('update', 'Update') }</h2>
+          <h2>Settings » { html:button('save', 'Save') }</h2>
           <h3>Queries</h3>
           <table>
             {
               $number($options:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
               $number($options:MEMORY, 'Memory limit, in MB (0 = disabled)'),
-              $number($options:MAXCHARS, 'Maximum output size')
+              $number($options:MAXCHARS, 'Maximum output size'),
+              $option($options:PERMISSION, $options:PERMISSIONS, 'Permission'),
+              $option($options:INDENT, $options:INDENTS, 'Indent results')
             }
-            <tr>
-              <td colspan='2'>Permission:</td>
-            </tr>
-            <tr>
-              <td>
-                <select name='permission'>{
-                  let $pm := options:get($options:PERMISSION)
-                  for $p in $options:PERMISSIONS
-                  return element option { attribute selected { }[$p = $pm], $p }
-                }</select>
-              </td>
-            </tr>
           </table>
           <h3>Tables</h3>
           <table>{
@@ -101,14 +92,14 @@ function dba:settings(
 };
 
 (:~
- : Updates the settings.
+ : Saves the settings.
  : @return redirection
  :)
 declare
   %rest:POST
   %rest:path('/dba/settings')
-function dba:settings-update(
+function dba:settings-save(
 ) as element(rest:response) {
   options:save(html:parameters()),
-  web:redirect($dba:CAT, map { 'info': 'Settings were updated.' })
+  web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
 };

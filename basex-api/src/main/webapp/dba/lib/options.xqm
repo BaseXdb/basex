@@ -14,8 +14,10 @@ declare variable $options:DBA-DIRECTORY := (
   )
 );
 
-(:~ Permissions. :)
+(:~ Permission values. :)
 declare variable $options:PERMISSIONS := ('none', 'read', 'write', 'create', 'admin');
+(:~ Indentation values. :)
+declare variable $options:INDENTS := ('no', 'yes');
 
 (:~ Maximum length of XML characters. :)
 declare variable $options:MAXCHARS := 'maxchars';
@@ -29,18 +31,21 @@ declare variable $options:MEMORY := 'memory';
 declare variable $options:PERMISSION := 'permission';
 (:~ Show DBA log entries. :)
 declare variable $options:IGNORE-LOGS := 'ignore-logs';
+(:~ Indent results. :)
+declare variable $options:INDENT := 'indent';
 
 (:~ Options file. :)
 declare %private variable $options:FILE := $options:DBA-DIRECTORY || '.dba.xml';
 
 (:~ Default options. :)
 declare %basex:lazy %private variable $options:DEFAULTS := map {
-  $options:MAXCHARS  : 200000,
-  $options:MAXROWS   : 200,
-  $options:TIMEOUT   : 30,
-  $options:MEMORY    : 500,
-  $options:PERMISSION: 'admin',
-  $options:IGNORE-LOGS: ''
+  $options:MAXCHARS   : 200000,
+  $options:MAXROWS    : 200,
+  $options:TIMEOUT    : 30,
+  $options:MEMORY     : 500,
+  $options:PERMISSION : 'admin',
+  $options:IGNORE-LOGS: '',
+  $options:INDENT     : 'no'
 };
 
 (:~ Currently assigned options. :)

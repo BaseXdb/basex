@@ -60,6 +60,10 @@ input[type=password] {
   width: 240;
 }
 
+input[type=number] {
+  width: 240;
+}
+
 select {
   width: 240;
 }
