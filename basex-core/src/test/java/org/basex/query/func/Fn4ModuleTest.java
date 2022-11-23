@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -281,6 +282,95 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), 3);
     query(func.args(MONTHS, " contains(?, 'Nov')"), "December");
     query(func.args(MONTHS, " starts-with(?, 'Dec')"), "");
+  }
+
+  /** Test method. */
+  @Test public void itemsAt() {
+    final Function func = ITEMS_AT;
+
+    query(func.args(" ()", " ()"), "");
+    query(func.args(" ()", 1), "");
+    query(func.args(1, " ()"), "");
+    query(func.args(1, 1), 1);
+    query(func.args(1, -1), "");
+    query(func.args(1, 0), "");
+    query(func.args(1, 2), "");
+    query(func.args(" 1 to 2", 2), 2);
+    query(func.args(" 1 to 2", 3), "");
+    query(func.args(" 1 to 2", 0), "");
+    query(func.args(" 1 to 2", -1), "");
+
+    query("for $i in 1 to 2 return " + func.args(" $i", 1), "1\n2");
+    query(func.args(" (<a/>, <b/>)", 1), "<a/>");
+    query(func.args(" (<a/>, <b/>)", 3), "");
+
+    query(func.args(" (<a/>, <b/>)[name()]", 1), "<a/>");
+    query(func.args(" (<a/>, <b/>)[name()]", 2), "<b/>");
+    query(func.args(" (<a/>, <b/>)[name()]", 3), "");
+
+    query(func.args(" <a/>", 2), "");
+    query(func.args(" (<a/>, <b/>)", wrap(0)), "");
+    query(func.args(" (<a/>, <b/>)", wrap(1)), "<a/>");
+    query(func.args(" (<a/>, <b/>)", wrap(3)), "");
+    query(func.args(" tokenize(" + wrap(1) + ")", 2), "");
+
+    query(func.args(1, wrap(0)), "");
+    query(func.args(" 1[. = 1]", wrap(1)), 1);
+    query(func.args(" 1[. = 1]", wrap(2)), "");
+
+    query("count(" + func.args(" 1 to 10", " 1 to 10") + ")", 10);
+    query("count(" + func.args(" reverse(1 to 10)", " 1 to 10") + ")", 10);
+    query("count(" + func.args(" 1 to 10", " reverse(1 to 10)") + ")", 10);
+    query("count(" + func.args(" reverse(1 to 10)", " reverse(1 to 10)") + ")", 10);
+    query("count(" + func.args(" 1 to 10", " xs:integer(<?_ 1?>) to 10") + ")", 10);
+
+    query("count(" + func.args(" (1 to 10)[. > 0]", " 1 to 10") + ")", 10);
+    query("count(" + func.args(" (1 to 10)", " (1 to 10)[. > 0]") + ")", 10);
+    query("count(" + func.args(" (1 to 10)[. > 0]", " (1 to 10)[. > 0]") + ")", 10);
+
+    query("count(" + func.args(" (1 to 10)[. > 0]", " (-100 to 100)[. < 1]") + ")", 0);
+    query("count(" + func.args(" (1 to 10)[. > 0]", " (-100 to 100)[. > 10]") + ")", 0);
+
+    query("count(" + func.args(" xs:string(<?_ x?>)", " xs:integer(<?_ 1?>)") + ")", 1);
+    query(func.args(" (<a/>, <b/>)[. = '']", 2), "<b/>");
+    query(func.args(" reverse((<a/>, <b/>)[. = ''])", 2), "<a/>");
+
+    check(func.args(" (7 to 9)[. = 8]", -1), "", empty());
+    check(func.args(" (7 to 9)[. = 8]", 0), "", empty());
+    check(func.args(" 1[. = 1]", 1), 1, empty(func));
+    check(func.args(" 1[. = 1]", 2), "", empty());
+
+    check(func.args(" (1, 2, <_/>)", 3), "<_/>", root(CElem.class));
+    check(func.args(" reverse((1, 2, <_/>))", 2), 2, empty(REVERSE));
+
+    check(func.args(" tail((1, 2, 3, <_/>))", 2), 3, empty(TAIL));
+    check(func.args(" tail((<_/>[data()], <_/>, <_/>))", 2), "", empty(TAIL), root(ITEMS_AT));
+
+    check(func.args(" (7 to 9)[. = 8]", 1), 8, root(HEAD), type(HEAD, "xs:integer?"));
+
+    check(func.args(" (<a/>, <b/>, <c/>)", 2), "<b/>", root(CElem.class));
+    check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2), "<b/>", root(CElem.class));
+    check(func.args(" (<a/>, <b/>[data()], <c/>)", 2), "<c/>", root(Otherwise.class));
+    check(func.args(" (<a/>, <b/>[data()], <c/>, <d/>)", 2), "<c/>", root(Otherwise.class));
+    check(func.args(" (<a/>[data()], <b/>, <c/>)", 2), "<c/>", root(ITEMS_AT));
+
+    check(func.args(" replicate(<a/>, 5)", 0), "", empty());
+    check(func.args(" replicate(<a/>, 5)", 3), "<a/>", root(CElem.class));
+    check(func.args(" replicate(<a/>, 5)", 6), "", empty());
+
+    check(func.args(" ('x', (2 to 10)[. = 5])", 2), 5, root(HEAD), empty(Str.class));
+    check(func.args(" ('x', (2 to 10)[. = 5])", 3), "", empty(List.class), empty(Str.class));
+    check(func.args(" ('x', (2 to 10)[. = 5], 3)", 3), 3, exists(List.class), empty(Str.class));
+
+    check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq)"),
+        10, root(HEAD));
+    check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) + 1"),
+        "", empty());
+    check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) - 1"),
+        9, root(GFLWOR.class));
+
+    check(func.args(_PROF_VOID.args(" ()"), 0), "", empty(func));
+    check(func.args(_UTIL_INIT.args(" (1, 2, 3, <_/>)"), 2), 2, empty(_UTIL_INIT));
   }
 
   /** Test method. */

@@ -167,11 +167,10 @@ public abstract class SimpleMap extends Arr {
             // SINGLETONSEQ ! replicate(., C)  ->  replicate(SINGLETONSEQ, C)
             return cc.function(REPLICATE, info, expr, args[1]);
           }
-        } else if(_UTIL_ITEM.is(next) && !args[0].has(Flag.CTX) &&
-            args[1] instanceof ContextValue) {
+        } else if(ITEMS_AT.is(next) && !args[0].has(Flag.CTX) && args[1] instanceof ContextValue) {
           if(expr instanceof RangeSeq) {
-            // (A to B) ! util:item(E, .)  ->  util:range(E, A, B)
-            // reverse(A to B) ! util:item(E, .)  ->  reverse(util:range(E, A, B))
+            // (A to B) ! items-at(E, .)  ->  util:range(E, A, B)
+            // reverse(A to B) ! items-at(E, .)  ->  reverse(util:range(E, A, B))
             final RangeSeq seq = (RangeSeq) expr;
             final long[] range = seq.range(false);
             final Expr func = cc.function(_UTIL_RANGE, info,
@@ -179,7 +178,7 @@ public abstract class SimpleMap extends Arr {
             return seq.asc ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
-            // (E1 to E2) ! util:item(X, .)  ->  util:range(X, E1, E2)
+            // (E1 to E2) ! items-at(X, .)  ->  util:range(X, E1, E2)
             return cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
           }
         } else if(DATA.is(next) && (((FnData) next).contextAccess() ||

@@ -43,9 +43,9 @@ public final class UtilLast extends StandardFunc {
     // util:last(tail(E))  ->  util:last(E)
     if(TAIL.is(input) && size > 1)
       return cc.function(_UTIL_LAST, info, input.args());
-    // util:last(util:init(E))  ->  util:item(E, size)
+    // util:last(util:init(E))  ->  items-at(E, size)
     if(_UTIL_INIT.is(input) && size > 0)
-      return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(size));
+      return cc.function(ITEMS_AT, info, input.arg(0), Int.get(size));
     // util:last(reverse(E))  ->  head(E)
     if(REVERSE.is(input))
       return cc.function(HEAD, info, input.args());

@@ -79,9 +79,9 @@ public final class IntPos extends Simple implements CmpPos {
       return get(range[0], range[1], ii);
     }
     if(pos instanceof ANum) {
-      final ANum item = (ANum) pos;
-      final long p = item.itr();
-      final boolean exact = p == item.dbl();
+      final ANum num = (ANum) pos;
+      final long p = num.itr();
+      final boolean exact = p == num.dbl();
       switch(op) {
         case EQ: return exact ? get(p, p, ii) : Bln.FALSE;
         case GE: return get(exact ? p : p + 1, MAX_VALUE, ii);

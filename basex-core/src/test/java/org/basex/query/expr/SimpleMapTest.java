@@ -123,7 +123,7 @@ public final class SimpleMapTest extends QueryPlanTest {
   /** Positional access. */
   @Test public void positional() {
     check("for $i in 2 to 3 return (1 to 4)[$i]", "2\n3", root(RangeSeq.class));
-    check("(2 to 3) !" + _UTIL_ITEM.args(" 1 to 4", " ."), "2\n3", root(RangeSeq.class));
+    check("(2 to 3) !" + ITEMS_AT.args(" 1 to 4", " ."), "2\n3", root(RangeSeq.class));
   }
 
   /** Inline sequences. */

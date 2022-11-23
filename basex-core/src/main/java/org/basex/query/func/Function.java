@@ -326,6 +326,9 @@ public enum Function implements AFunction {
   ITEMS_AFTER(FnItemsAfter::new, "items-after(input,predicate)",
       params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
+  ITEMS_AT(FnItemsAt::new, "items-at(input,at)",
+      params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
+  /** XQuery function. */
   ITEMS_BEFORE(FnItemsBefore::new, "items-before(input,predicate)",
       params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
   /** XQuery function. */

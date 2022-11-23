@@ -208,9 +208,9 @@ public class FnSubsequence extends StandardFunc {
 
       if(sr.length == 1) {
         // subsequence(E, 1, 1)  ->  head(E)
-        // subsequence(E, pos, 1)  ->  util:item(E, pos)
+        // subsequence(E, pos, 1)  ->  items-at(E, pos)
         return sr.start == 0 ? cc.function(HEAD, info, input) :
-          cc.function(_UTIL_ITEM, info, input, Int.get(sr.start + 1));
+          cc.function(ITEMS_AT, info, input, Int.get(sr.start + 1));
       }
       // subsequence(E, 2)  ->  tail(E)
       if(sr.length == Long.MAX_VALUE && sr.start == 1)

@@ -281,13 +281,15 @@ public abstract class StandardFunc extends Arr {
   protected long countInputDiff(final int i) {
     if(exprs.length > i) {
       final Expr input = exprs[0], end = exprs[i];
-      final Predicate<Expr> countInput = e -> Function.COUNT.is(e) && e.arg(0).equals(input);
+      final Predicate<Expr> countInput = e -> {
+        return Function.COUNT.is(e) && e.arg(0).equals(input) && !e.has(Flag.NDT);
+      };
       // function(E, count(E))  ->  0
       if(countInput.test(end)) return 0;
       // function(E, count(E) - 1)  ->  -1
       if(end instanceof Arith && countInput.test(end.arg(0)) && end.arg(1) instanceof Int) {
         final Calc calc = ((Arith) end).calc;
-        final long sum = ((Int) exprs[1]).itr();
+        final long sum = ((Int) end.arg(1)).itr();
         if(calc == Calc.PLUS) return sum;
         if(calc == Calc.MINUS) return -sum;
       }

@@ -35,6 +35,17 @@ final class SimplePos extends Arr implements CmpPos {
   public Expr optimize(final CompileContext cc) throws QueryException {
     simplifyAll(Simplify.NUMBER, cc);
 
+    final QueryFunction<Expr, Expr> simplify = expr -> {
+      if(expr instanceof ANum && !(expr instanceof Int)) {
+        final ANum num = (ANum) expr;
+        final long p = num.itr();
+        if(p == num.dbl()) return Int.get(p);
+      }
+      return expr;
+    };
+    exprs[0] = simplify.apply(exprs[0]);
+    exprs[1] = simplify.apply(exprs[1]);
+
     Expr min = exprs[0], max = exprs[1], ex = null;
     if(exact()) {
       min = max = min.optimizePos(OpV.EQ, cc);

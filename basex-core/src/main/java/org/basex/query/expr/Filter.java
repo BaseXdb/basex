@@ -129,21 +129,18 @@ public abstract class Filter extends Preds {
       preds.isEmpty() ? ex : get(cc, info, ex, preds.next());
     for(final Expr pred : exprs) {
       Expr ex = null;
-      if(pred.seqType().instanceOf(SeqType.NUMERIC_O) && pred.isSimple()) {
-        // E[pos]  ->  util:item(E, pos)
-        ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pred);
-      } else if(pred instanceof IntPos) {
+      if(pred instanceof IntPos) {
         // E[min .. max]  ->  util:range(E, min, max)
         final IntPos pos = (IntPos) pred;
         ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), Int.get(pos.min),
             Int.get(pos.max));
       } else if(pred instanceof SimplePos) {
-        if(((SimplePos) pred).exact()) {
-          // E[pos]  ->  util:item(E, pos.min)
-          ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr), pred.arg(0));
-        } else {
+        if(!((SimplePos) pred).exact()) {
           // E[min .. max]  ->  util:range(E, pos.min, pos.max)
           ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pred.arg(0), pred.arg(1));
+        } else if(pred.arg(0).seqType().instanceOf(SeqType.INTEGER_O)) {
+          // E[pos]  ->  items-at(E, pos.min)
+          ex = cc.function(ITEMS_AT, info, prepare.apply(expr), pred.arg(0));
         }
       } else if(pred instanceof Pos) {
         final Expr pos = ((Pos) pred).expr;
@@ -170,9 +167,20 @@ public abstract class Filter extends Preds {
         ex = cc.function(_UTIL_LAST, info, prepare.apply(expr));
       } else if(pred instanceof Arith && preds.isEmpty() && LAST.is(pred.arg(0))) {
         final long es = expr.size();
-        // E[last() - 1]  ->  util:item(E, size - 1)
-        if(es != -1) ex = cc.function(_UTIL_ITEM, info, prepare.apply(expr),
+        // E[last() - 1]  ->  items-at(E, size - 1)
+        if(es != -1) ex = cc.function(ITEMS_AT, info, prepare.apply(expr),
             new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));
+      } else if(pred.isSimple()) {
+        // E[pos]  ->  items-at(E, pos)
+        Expr at = null;
+        if(pred.seqType().instanceOf(SeqType.INTEGER_O)) {
+          at = pred;
+        } else if(pred instanceof ANum) {
+          final ANum num = (ANum) pred;
+          final long p = num.itr();
+          if(p == num.dbl()) at = Int.get(p);
+        }
+        if(at != null) ex = cc.function(ITEMS_AT, info, prepare.apply(expr), at);
       }
       // replace temporary result expression or add predicate to temporary list
       if(ex != null) {

@@ -383,69 +383,6 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void item() {
-    final Function func = _UTIL_ITEM;
-
-    query(func.args(" ()", 1), "");
-    query(func.args(1, 1), 1);
-    query(func.args(1, 0), "");
-    query(func.args(1, 2), "");
-    query(func.args(" 1 to 2", 2), 2);
-    query(func.args(" 1 to 2", 3), "");
-    query(func.args(" 1 to 2", 0), "");
-    query(func.args(" 1 to 2", -1), "");
-    query(func.args(" 1 to 2", 1.5), "");
-
-    query("for $i in 1 to 2 return " + func.args(" $i", 1), "1\n2");
-    query(func.args(" (<a/>, <b/>)", 1), "<a/>");
-    query(func.args(" (<a/>, <b/>)", 3), "");
-
-    query(func.args(" (<a/>, <b/>)[name()]", 1), "<a/>");
-    query(func.args(" (<a/>, <b/>)[name()]", 2), "<b/>");
-    query(func.args(" (<a/>, <b/>)[name()]", 3), "");
-
-    query(func.args(" (<a/>, <b/>)", 1.5), "");
-    query(func.args(" <a/>", 2), "");
-    query(func.args(" (<a/>, <b/>)", wrap(1)), "<a/>");
-    query(func.args(" tokenize(" + wrap(1) + ")", 2), "");
-
-    query(func.args(1, wrap(0)), "");
-    query(func.args(" 1[. = 1]", wrap(1)), 1);
-    query(func.args(" 1[. = 1]", wrap(2)), "");
-
-    check(func.args(_PROF_VOID.args(" ()"), 0), "", empty(func));
-    check(func.args(" (7 to 9)[. = 8]", -1), "", empty());
-    check(func.args(" (7 to 9)[. = 8]", 0), "", empty());
-    check(func.args(" (7 to 9)[. = 8]", 1.5), "", empty());
-    check(func.args(" 1[. = 1]", 1), 1, empty(func));
-    check(func.args(" 1[. = 1]", 2), "", empty());
-
-    check(func.args(" (1, 2, <_/>)", 3), "<_/>", root(CElem.class));
-    check(func.args(" reverse((1, 2, <_/>))", 2), 2, empty(REVERSE));
-
-    check(func.args(" tail((1, 2, 3, <_/>))", 2), 3, empty(TAIL));
-    check(func.args(" tail((<_/>[data()], <_/>, <_/>))", 2), "", empty(TAIL), root(_UTIL_ITEM));
-
-    check(func.args(_UTIL_INIT.args(" (1, 2, 3, <_/>)"), 2), 2, empty(_UTIL_INIT));
-
-    check(func.args(" (7 to 9)[. = 8]", 1), 8, root(HEAD), type(HEAD, "xs:integer?"));
-
-    check(func.args(" (<a/>, <b/>, <c/>)", 2), "<b/>", root(CElem.class));
-    check(func.args(" (<a/>, <b/>, <c/>, <d/>)", 2), "<b/>", root(CElem.class));
-    check(func.args(" (<a/>, <b/>[data()], <c/>)", 2), "<c/>", root(Otherwise.class));
-    check(func.args(" (<a/>, <b/>[data()], <c/>, <d/>)", 2), "<c/>", root(Otherwise.class));
-    check(func.args(" (<a/>[data()], <b/>, <c/>)", 2), "<c/>", root(_UTIL_ITEM));
-
-    check(func.args(REPLICATE.args(" <a/>", 2), 1), "<a/>", root(CElem.class));
-    check(func.args(REPLICATE.args(" <a/>", 2), 2), "<a/>", root(CElem.class));
-    check(func.args(REPLICATE.args(" <a/>", 2), 3), "", empty());
-
-    check(func.args(" ('x', (2 to 10)[. = 5])", 2), 5, root(HEAD), empty(Str.class));
-    check(func.args(" ('x', (2 to 10)[. = 5])", 3), "", empty(List.class), empty(Str.class));
-    check(func.args(" ('x', (2 to 10)[. = 5], 3)", 3), 3, exists(List.class), empty(Str.class));
-  }
-
-  /** Test method. */
   @Test public void last() {
     final Function func = _UTIL_LAST;
 

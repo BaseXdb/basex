@@ -342,11 +342,20 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $i in (1, 2)[. > 0] return 9[position() < $i]", 9, exists(_UTIL_RANGE));
 
     // check if positional predicates are rewritten to utility functions
-    final String seq = " (1, 1.1, 1.9, 2, 2.1, 2.2, 2.1, 2.2) ";
+    String seq = " (0, 1, 2, 3, 3, 4, 5) ";
     check("for $i in" + seq + "return ('a', 'b')[$i]",
-        "a\nb", exists(_UTIL_ITEM));
+        "a\nb", exists(ITEMS_AT));
     check("for $i in" + seq + "return ('a', 'b')[position() = $i]",
-        "a\nb", exists(_UTIL_ITEM));
+        "a\nb", exists(ITEMS_AT));
+    check("for $i in" + seq + "return ('a', 'b')[$i][$i]",
+        "a", count(ITEMS_AT, 2));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]",
+        "a", count(ITEMS_AT, 2));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
+        exists(ITEMS_AT));
+
+    // check if positional predicates are rewritten to utility functions
+    seq = " (1, 1.1, 1.9, 2, 2.1, 2.2, 2.1, 2.2) ";
     check("for $i in" + seq + "return ('a', 'b')[position() >= $i]",
         "a\nb\nb\nb\nb", exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a', 'b')[position() > $i]",
@@ -357,16 +366,10 @@ public final class RewritingsTest extends QueryPlanTest {
         "a\na\na\na\nb\na\nb\na\nb\na\nb", exists(_UTIL_RANGE));
 
     // check if multiple positional predicates are rewritten to utility functions
-    check("for $i in" + seq + "return ('a', 'b')[$i][$i]",
-        "a", count(_UTIL_ITEM, 2));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]",
-        "a", count(_UTIL_ITEM, 2));
     check("for $i in" + seq + "return ('a', 'b')[position() < $i][position() < $i]",
         "a\na\na\na\nb\na\nb\na\nb\na\nb", count(_UTIL_RANGE, 2));
 
     // check if positional predicates are merged and rewritten to utility functions
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
-        exists(_UTIL_ITEM));
     check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() <= $i]", "a\nb",
         exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]",
@@ -395,13 +398,13 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3]",
         "<b/>", root(IterFilter.class));
     check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3]",
-        "<b/>", count(_UTIL_ITEM, 1));
+        "<b/>", count(ITEMS_AT, 1));
     check("(<a/>, <b/>)[position() > 1 and position() < 3 and <b/>]",
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3 and <b/>]",
         "<b/>", root(IterFilter.class));
     check("(<a/>[. = ''], <b/>)[position() > 1 and position() < 3 and <b/>]",
-        "<b/>", count(_UTIL_ITEM, 1));
+        "<b/>", count(ITEMS_AT, 1));
     check("(<a/>, <b/>)[position() > 1 and position() < 4]",
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 4]",
@@ -1429,7 +1432,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("for $c in 1 to 10 return $c[.]", 1, root(DualMap.class));
     check("for $c in 1 to 10 return $c[position() = (0, 2)]", "", root(DualMap.class));
 
-    // no rewriting: position checks are replaced by util:item
+    // no rewriting: position checks are replaced by items-at
     check("for $c in 1 to 10 return $c[position() =" + wrap(2) + "]", "", root(DualMap.class));
     check("for $c in 1 to 10 return $c[$c]", 1, root(DualMap.class));
   }
@@ -2854,7 +2857,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("subsequence((1 to 6) ! (. * 2), 2, 2)", "4\n6", root(DualMap.class));
 
     check(_UTIL_INIT.args(" (1 to 10)[. > 7] ! (. * .)"), "64\n81", root(DualMap.class));
-    check(_UTIL_ITEM.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(ItemMap.class));
+    check(ITEMS_AT.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(ItemMap.class));
     check(_UTIL_LAST.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(ItemMap.class));
   }
 

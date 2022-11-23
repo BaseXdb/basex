@@ -34,18 +34,18 @@ public final class FnHead extends StandardFunc {
     if(st.zeroOrOne()) return input;
 
     final long size = input.size();
-    // head(tail(E))  ->  util:item(E, 2)
+    // head(tail(E))  ->  items-at(E, 2)
     if(TAIL.is(input))
-      return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(2));
+      return cc.function(ITEMS_AT, info, input.arg(0), Int.get(2));
     // head(util:init(E))  ->  head(E)
     if(_UTIL_INIT.is(input) && size > 1)
       return cc.function(HEAD, info, input.args());
-    // head(subsequence(E, pos))  ->  util:item(E, pos)
+    // head(subsequence(E, pos))  ->  items-at(E, pos)
     if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
       final SeqRange r = SeqRange.get(input, cc);
       // safety check (at this stage, r.length should never be 0)
       if(r != null && r.length != 0)
-        return cc.function(_UTIL_ITEM, info, input.arg(0), Int.get(r.start + 1));
+        return cc.function(ITEMS_AT, info, input.arg(0), Int.get(r.start + 1));
     }
     if(REVERSE.is(input)) {
       // head(reverse(root[test]))  ->  head(reverse(root)[test])
