@@ -6,6 +6,7 @@ import org.basex.core.cmd.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -397,9 +398,9 @@ public final class FilterTest extends QueryPlanTest {
     check(pre + "= last() + 1 to last() + 2" + post, "", empty());
 
     check(pre + "= last() to last() - 1" + post, "", empty());
-    check(pre + "= last() to last()    " + post, "", exists(HEAD), exists(REVERSE));
-    check(pre + "= last() to last() + 1" + post, "", exists(HEAD), exists(REVERSE));
-    check(pre + "= last() to last() + 2" + post, "", exists(HEAD), exists(REVERSE));
+    check(pre + "= last() to last()    " + post, "", exists(HEAD), exists(RangeSeq.class));
+    check(pre + "= last() to last() + 1" + post, "", exists(HEAD), exists(RangeSeq.class));
+    check(pre + "= last() to last() + 2" + post, "", exists(HEAD), exists(RangeSeq.class));
 
     // not equal: various optimizations are currently discarded
     check(pre + "!= 0          to last() + 1" + post, "", empty());

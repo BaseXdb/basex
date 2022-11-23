@@ -69,6 +69,7 @@ public final class FnReverse extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0];
     if(input.seqType().zeroOrOne()) return input;
+    if(input instanceof Value) return ((Value) input).reverse(cc.qc);
 
     // reverse(reverse(E))  ->  E
     if(REVERSE.is(input)) return input.arg(0);
