@@ -186,9 +186,9 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(func.args(" (<_ _='9'/>, <_ _='10'/>)", " ()",
         " function($a) { string($a/@*) }"), "<_ _=\"9\"/>");
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
-    check(func.args(" replicate(<_/>, 2)"), "<_/>\n<_/>", root(REPLICATE));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 6, empty(REVERSE));
 
+    error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
@@ -480,9 +480,9 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(func.args(" (<_ _='9'/>, <_ _='10'/>)", " ()",
         " function($a) { string($a/@*) }"), "<_ _=\"10\"/>");
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
-    check(func.args(" replicate(<_/>, 2)"), "<_/>\n<_/>", root(REPLICATE));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 4, empty(REVERSE));
 
+    error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
