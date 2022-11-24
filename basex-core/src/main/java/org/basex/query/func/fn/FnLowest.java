@@ -2,6 +2,8 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -43,8 +45,7 @@ public class FnLowest extends StandardFunc {
     for(Item item; (item = input.next()) != null;) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item it : (key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info)) {
-        vb.add(it.type == AtomType.DOUBLE || !it.instanceOf(AtomType.UNTYPED_ATOMIC) ? it :
-          Dbl.get(toDouble(it)));
+        vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
       }
       final Value low = vb.value();
       int diff = FnSort.compare(lowest != null ? lowest : low, low, coll, info);
@@ -76,22 +77,24 @@ public class FnLowest extends StandardFunc {
     if(st.zero()) return input;
 
     if(exprs.length < 2) {
-      if(st.zeroOrOne() && st.type.isSortable()) return input;
+      final Predicate<Type> noCheck = type -> type.isSortable() && !type.isUntyped();
+      if(st.zeroOrOne() && noCheck.test(st.type)) return input;
 
-      // range values
+      // lowest(1 to 10)  ->  1 to 10
       if(input instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) input;
         return (seq.asc ? seq : seq.reverse(null)).itemAt(min ? 0 : seq.size() - 1);
       }
-      // sortable single or singleton values
-      if(st.type.isSortable() && (st.one() || input instanceof SingletonSeq &&
+      // lowest(ITEM)  ->  ITEM
+      if(noCheck.test(st.type) && (st.one() || input instanceof SingletonSeq &&
           ((SingletonSeq) input).singleItem())) return input;
 
       if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
+        // lowest(replicate(5, 2))  ->  replicate(5, 2)
         final SeqType ast = input.arg(0).seqType();
-        if(ast.zeroOrOne() && ast.type.isSortable()) return input;
-      }
-      if(REVERSE.is(input) || SORT.is(input)) {
+        if(ast.zeroOrOne() && noCheck.test(ast.type)) return input;
+      } else if(REVERSE.is(input) || SORT.is(input)) {
+        // lowest(reverse(E))  ->  lowest(E)
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
         return cc.function(min ? LOWEST : HIGHEST, info, args);

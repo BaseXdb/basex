@@ -488,6 +488,7 @@ public class Fn4ModuleTest extends QueryPlanTest {
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
   }
+
   /** Test method. */
   @Test public void op() {
     final Function func = OP;
