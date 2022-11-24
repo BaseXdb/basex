@@ -360,14 +360,13 @@ public abstract class Path extends ParseExpr {
    * @return path nodes, or {@code null} if nodes cannot be collected
    */
   final ArrayList<PathNode> pathNodes(final ArrayList<PathNode> nodes, final boolean stats) {
-    final Data data = data();
     ArrayList<PathNode> pn = nodes;
     for(final Expr expr : steps) {
       if(expr instanceof UtilRoot) {
         pn = UtilRoot.nodes(pn);
       } else if(expr instanceof Step) {
         final Step step = (Step) expr;
-        pn = step.nodes(pn, data, stats);
+        pn = step.nodes(pn, stats);
         // check if paths within predicates are correct
         if(!stats && pn != null) {
           for(final Expr ex : step.exprs) {
@@ -539,7 +538,7 @@ public abstract class Path extends ParseExpr {
     for(int s = 0; s < sl; s++) {
       final Step curr = axisStep(s);
       if(curr != null) {
-        nodes = curr.nodes(nodes, data, true);
+        nodes = curr.nodes(nodes, true);
         if(nodes == null) return -1;
       } else if(s + 1 == sl) {
         lastSize = steps[s].size();

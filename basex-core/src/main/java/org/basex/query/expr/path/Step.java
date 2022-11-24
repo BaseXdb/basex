@@ -219,14 +219,12 @@ public abstract class Step extends Preds {
    * Returns the path nodes that are the result of this step.
    * @param nodes initial path nodes
    * @param stats assess database statistics; if {@code true}, return early if step has predicates
-   * @param data data reference
    * @return path nodes, or {@code null} if nodes cannot be collected
    */
-  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data,
-      final boolean stats) {
-
+  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final boolean stats) {
     // skip steps with predicates or different namespaces
-    if(stats && exprs.length != 0 || data.defaultNs() == null) return null;
+    final Data data = data();
+    if(stats && exprs.length != 0 || data == null || data.defaultNs() == null) return null;
 
     // skip axes other than descendant, child, and attribute
     if(axis != ATTRIBUTE && axis != CHILD  && axis != SELF && axis != DESCENDANT &&
