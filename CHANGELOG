@@ -1,3 +1,9 @@
+VERSION 10.4 (December 1, 2022) ----------------------------------------
+
+ - minor bug fixes
+ - DBA, settings: enable indentation
+ - XQuery 4 preview features updated
+
 VERSION 10.3 (October 11, 2022) ----------------------------------------
 
  - better pooling of HTTP requests
