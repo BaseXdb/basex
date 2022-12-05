@@ -5,6 +5,8 @@ import java.util.zip.*;
 
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -67,14 +69,23 @@ final class ZIPOut extends ArchiveOut {
   }
 
   @Override
-  public void write(final ZipEntry entry, final BufferInput in) throws IOException {
+  public void write(final ZipEntry entry, final Bin bin, final InputInfo info)
+      throws IOException, QueryException {
+
     if(stored) {
-      write(entry, in.content());
-    } else {
-      zos.putNextEntry(entry);
-      for(int b; (b = in.read()) != -1;) zos.write(b);
-      zos.closeEntry();
+      try(BufferInput bi = bin.input(info)) {
+        final CRC32 crc = new CRC32();
+        long size = 0;
+        try(CheckedInputStream cis = new CheckedInputStream(bi, crc)) {
+          while(cis.read() != -1) size++;
+        }
+        entry.setCrc(crc.getValue());
+        entry.setSize(size);
+      }
     }
+    zos.putNextEntry(entry);
+    write(bin, zos, info);
+    zos.closeEntry();
   }
 
   @Override

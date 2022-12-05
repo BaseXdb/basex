@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -30,7 +31,7 @@ public final class ArchiveDelete extends ArchiveFn {
       names.add(checkElemToken(en).string(info));
     }
 
-    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       final String format = in.format();
       if(in instanceof GZIPIn) throw ARCHIVE_MODIFY_X.get(info, format);
 

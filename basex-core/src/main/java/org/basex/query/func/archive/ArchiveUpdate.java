@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
+import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -24,7 +25,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
     final B64 archive = toB64(exprs[0], qc, false);
     final Map<String, Item[]> map = toMap(1, qc);
 
-    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       final String format = in.format();
       if(in instanceof GZIPIn) throw ARCHIVE_MODIFY_X.get(info, format);
 

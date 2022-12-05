@@ -23,8 +23,8 @@ public class BufferInput extends InputStream {
   /** Input file. */
   private IO input;
 
-  /** Reference to the data input stream. */
-  private final InputStream in;
+  /** Reference to the data input stream (can be {@code null}). */
+  private final InputStream is;
   /** Buffer marker to jump back ({@code -1} if not available). */
   private int bmark;
   /** Number of read bytes. */
@@ -32,11 +32,11 @@ public class BufferInput extends InputStream {
 
   /**
    * Returns a buffered input stream.
-   * @param in input stream
+   * @param is input stream
    * @return stream
    */
-  public static BufferInput get(final InputStream in) {
-    return in instanceof BufferInput ? (BufferInput) in : new BufferInput(in);
+  public static BufferInput get(final InputStream is) {
+    return is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
   }
 
   /**
@@ -46,7 +46,8 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O Exception
    */
   public static BufferInput get(final IO input) throws IOException {
-    return get(input.inputStream());
+    final InputStream is = input.inputStream();
+    return is instanceof BufferInput ? (BufferInput) is : new BufferInput(is, input.length());
   }
 
   /**
@@ -65,29 +66,29 @@ public class BufferInput extends InputStream {
    * @param is input stream
    */
   public BufferInput(final InputStream is) {
-    this(is, IO.BLOCKSIZE);
+    this(is, is instanceof BufferInput ? ((BufferInput) is).length : -1);
   }
 
   /**
    * Initializes the file reader.
-   * @param in input stream
-   * @param bufsize buffer size
+   * @param is input stream
+   * @param length of input ({@code -1} if unknown)
    */
-  public BufferInput(final InputStream in, final int bufsize) {
-    this.in = in;
-    array = new byte[bufsize];
-    length = in instanceof BufferInput ? ((BufferInput) in).length : -1;
+  private BufferInput(final InputStream is, final long length) {
+    this.is = is;
+    this.length = length;
+    array = new byte[IO.BLOCKSIZE];
   }
 
   /**
    * Empty constructor with fixed input.
    * @param array array input
    */
-  BufferInput(final byte[] array) {
+  protected BufferInput(final byte[] array) {
     this.array = array;
     bsize = array.length;
     length = bsize;
-    in = null;
+    is = null;
   }
 
   /**
@@ -116,7 +117,7 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O exception
    * @see InputStream#read()
    */
-  int readByte() throws IOException {
+  protected int readByte() throws IOException {
     final int blen = array.length;
     final byte[] buf = array;
     if(bpos >= bsize) {
@@ -128,7 +129,7 @@ public class BufferInput extends InputStream {
         bpos = 0;
       }
       int r;
-      while((r = in.read(buf, bsize, blen - bsize)) == 0);
+      while((r = is.read(buf, bsize, blen - bsize)) == 0);
       if(r < 0) return -1;
       bsize += r;
     }
@@ -159,7 +160,7 @@ public class BufferInput extends InputStream {
 
   @Override
   public final void close() throws IOException {
-    if(in != null && !(in instanceof FilterInputStream)) in.close();
+    if(is != null && !(is instanceof FilterInputStream)) is.close();
   }
 
   /**

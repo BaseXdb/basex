@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -25,7 +26,7 @@ public final class ArchiveEntries extends StandardFunc {
     final B64 archive = toB64(exprs[0], qc, false);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;

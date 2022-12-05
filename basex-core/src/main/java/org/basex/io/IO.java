@@ -93,9 +93,9 @@ public abstract class IO {
 
   /** Absolute file path. All paths have forward slashes, no matter which OS is used. */
   protected String pth;
-  /** File size (in bytes). */
+  /** Input size in bytes ({@code -1} if unknown). */
   protected long len = -1;
-  /** File name. */
+  /** Filename. */
   private String nm;
 
   /**
@@ -196,7 +196,7 @@ public abstract class IO {
   }
 
   /**
-   * Sets the input length.
+   * Sets the number of bytes of the input.
    * @param length length
    */
   public final void length(final long length) {
@@ -204,8 +204,8 @@ public abstract class IO {
   }
 
   /**
-   * Returns the file length.
-   * @return file length
+   * Returns the number of bytes of the input.
+   * @return length
    */
   public long length() {
     return len;

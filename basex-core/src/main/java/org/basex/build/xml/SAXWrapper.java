@@ -101,8 +101,8 @@ public final class SAXWrapper extends SingleParser {
 
     // create input source with wrapped input stream
     final InputStream wrapped = new InputStream() {
-      final InputStream buffer = input instanceof ByteArrayInputStream ||
-          input instanceof ArrayInput ? input : BufferInput.get(input);
+      final InputStream buffer = input instanceof ByteArrayInputStream ? input :
+        BufferInput.get(input);
 
       @Override
       public int read() throws IOException {

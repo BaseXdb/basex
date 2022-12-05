@@ -8,6 +8,7 @@ import java.nio.file.*;
 import java.util.zip.*;
 
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -28,7 +29,7 @@ public class ArchiveExtractTo extends ArchiveFn {
     final B64 archive = toB64(exprs[1], qc, false);
     final TokenSet hs = entries(2, qc);
 
-    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         final String name = ze.getName();

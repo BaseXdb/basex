@@ -9,6 +9,7 @@ import java.util.zip.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -19,7 +20,7 @@ import org.basex.util.*;
  */
 abstract class ArchiveOut implements Closeable {
   /** Buffer. */
-  private final byte[] data = new byte[IO.BLOCKSIZE];
+  protected final byte[] data = new byte[IO.BLOCKSIZE];
 
   /**
    * Returns a new instance of an archive writer.
@@ -64,10 +65,13 @@ abstract class ArchiveOut implements Closeable {
   /**
    * Writes the specified entry.
    * @param entry zip entry
-   * @param in input stream
+   * @param bin binary data
+   * @param info input info
    * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
-  public abstract void write(ZipEntry entry, BufferInput in) throws IOException;
+  public abstract void write(ZipEntry entry, Bin bin, InputInfo info) throws IOException,
+    QueryException;
 
   @Override
   public abstract void close();
@@ -80,5 +84,20 @@ abstract class ArchiveOut implements Closeable {
    */
   public final void write(final ArchiveIn in, final OutputStream out) throws IOException {
     for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
+  }
+
+  /**
+   * Writes data from the specified binary to the specified output stream.
+   * @param bin binary item
+   * @param out output stream
+   * @param info input info
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  public final void write(final Bin bin, final OutputStream out, final InputInfo info)
+      throws IOException, QueryException {
+    try(BufferInput bi = bin.input(info)) {
+      for(int c; (c = bi.read(data)) != -1;) out.write(data, 0, c);
+    }
   }
 }

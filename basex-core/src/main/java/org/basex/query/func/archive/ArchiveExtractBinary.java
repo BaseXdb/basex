@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -38,7 +39,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
     final TokenSet entries = entries(1, qc);
 
     final TokenList tl = new TokenList();
-    try(ArchiveIn in = ArchiveIn.get(archive.input(info), info)) {
+    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(!ze.isDirectory() && (entries == null || entries.remove(token(ze.getName())) != 0)) {

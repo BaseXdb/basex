@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -20,8 +21,9 @@ public final class ConvertBinaryToString extends ConvertFn {
     final Bin value = toBin(exprs[0], qc);
     final String encoding = toEncodingOrNull(1, CONVERT_ENCODING_X, qc);
     final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
-    try {
-      return Str.get(toString(value.input(info), encoding, validate));
+
+    try(BufferInput bi = value.input(info)) {
+      return Str.get(toString(bi, encoding, validate));
     } catch(final IOException ex) {
       throw CONVERT_STRING_X.get(info, ex);
     }

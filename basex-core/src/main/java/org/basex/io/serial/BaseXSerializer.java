@@ -2,6 +2,7 @@ package org.basex.io.serial;
 
 import java.io.*;
 
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -35,8 +36,8 @@ public final class BaseXSerializer extends AdaptiveSerializer {
     if(nested == 0) {
       try {
         if(binary && item instanceof Bin) {
-          try(InputStream is = item.input(null)) {
-            for(int b; (b = is.read()) != -1;) out.write(b);
+          try(BufferInput bi = item.input(null)) {
+            for(int b; (b = bi.read()) != -1;) out.write(b);
           }
         } else {
           printChars(item.string(null));

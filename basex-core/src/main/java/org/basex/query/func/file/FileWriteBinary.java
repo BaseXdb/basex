@@ -45,8 +45,8 @@ public class FileWriteBinary extends FileFn {
           ((ArchiveCreate) exprs[1]).create(out, qc);
         } else {
           final Bin value = toBin(exprs[1], qc);
-          try(BufferInput in = value.input(info)) {
-            for(int b; (b = in.read()) != -1;) out.write(b);
+          try(BufferInput bi = value.input(info)) {
+            for(int b; (b = bi.read()) != -1;) out.write(b);
           }
         }
       }

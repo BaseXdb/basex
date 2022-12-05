@@ -6,6 +6,7 @@ import static org.basex.query.func.archive.ArchiveText.*;
 import java.io.*;
 import java.util.zip.*;
 
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -25,10 +26,10 @@ public final class ArchiveOptions extends StandardFunc {
     final String format;
     int level = -1;
 
-    try(ArchiveIn arch = ArchiveIn.get(archive.input(info), info)) {
-      format = arch.format();
-      while(arch.more()) {
-        final ZipEntry ze = arch.entry();
+    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
+      format = in.format();
+      while(in.more()) {
+        final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
         level = ze.getMethod();
         break;

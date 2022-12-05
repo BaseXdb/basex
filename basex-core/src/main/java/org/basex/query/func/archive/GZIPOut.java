@@ -3,7 +3,8 @@ package org.basex.query.func.archive;
 import java.io.*;
 import java.util.zip.*;
 
-import org.basex.io.in.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -41,8 +42,9 @@ final class GZIPOut extends ArchiveOut {
   }
 
   @Override
-  public void write(final ZipEntry entry, final BufferInput in) throws IOException {
-    for(int b; (b = in.read()) != -1;) zos.write(b);
+  public void write(final ZipEntry entry, final Bin bin, final InputInfo info)
+      throws IOException, QueryException {
+    write(bin, zos, info);
   }
 
   @Override

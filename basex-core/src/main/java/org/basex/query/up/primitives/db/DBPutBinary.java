@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.primitives.*;
@@ -47,8 +48,8 @@ public final class DBPutBinary extends DBUpdate {
       final IOFile bin = data.meta.file(string(path), ResourceType.BINARY);
       if(bin.isDir()) bin.delete();
       bin.parent().md();
-      try {
-        bin.write(paths.get(path).input(info));
+      try(BufferInput bi = paths.get(path).input(info)) {
+        bin.write(bi);
       } catch(final IOException ex) {
         Util.debug(ex);
         throw UPDBPUT_X.get(info, path);

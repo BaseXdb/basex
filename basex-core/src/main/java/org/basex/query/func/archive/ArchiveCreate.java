@@ -146,7 +146,7 @@ public class ArchiveCreate extends ArchiveFn {
 
     // data to be compressed
     if(content instanceof Bin) {
-      out.write(ze, content.input(info));
+      out.write(ze, (Bin) content, info);
     } else {
       final byte[] value = toBytes(content);
       out.write(ze, encoding == Strings.UTF8 ? value : encode(value, encoding, qc));

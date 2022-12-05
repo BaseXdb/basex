@@ -474,7 +474,7 @@ final class WebDAVService {
       throws IOException {
 
     // use 4MB as buffer input
-    try(BufferInput bi = new BufferInput(in, 1 << 22)) {
+    try(BufferInput bi = new BufferInput(in)) {
       // guess the content type from the first character
       if(peek(bi) == '<') {
         try {
