@@ -344,15 +344,18 @@ public final class RewritingsTest extends QueryPlanTest {
     // check if positional predicates are rewritten to utility functions
     String seq = " (0, 1, 2, 3, 3, 4, 5) ";
     check("for $i in" + seq + "return ('a', 'b')[$i]",
-        "a\nb", exists(ITEMS_AT));
+        "a\nb", exists(SmallSeq.class));
     check("for $i in" + seq + "return ('a', 'b')[position() = $i]",
-        "a\nb", exists(ITEMS_AT));
+        "a\nb", exists(SmallSeq.class));
+    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
+        exists(SmallSeq.class));
+    check("for $i in (3, 5, 7, 8, 11, 13) return ('a', 'b')[position() = $i and position() = $i]",
+        "", empty());
+
     check("for $i in" + seq + "return ('a', 'b')[$i][$i]",
         "a", count(ITEMS_AT, 2));
     check("for $i in" + seq + "return ('a', 'b')[position() = $i][position() = $i]",
         "a", count(ITEMS_AT, 2));
-    check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
-        exists(ITEMS_AT));
 
     // check if positional predicates are rewritten to utility functions
     seq = " (1, 1.1, 1.9, 2, 2.1, 2.2, 2.1, 2.2) ";

@@ -178,8 +178,12 @@ public abstract class SimpleMap extends Arr {
             return seq.asc ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
-            // (E1 to E2) ! items-at(X, .)  ->  util:range(X, E1, E2)
+            // (START to END) ! items-at(X, .)  ->  util:range(X, START, END)
             return cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
+          }
+          if(expr.seqType().instanceOf(SeqType.INTEGER_ZM)) {
+            // INTEGERS ! items-at(X, .)  ->  items-at(X, INTEGERS)
+            return cc.function(ITEMS_AT, info, args[0], expr);
           }
         } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
             args[0] instanceof ContextValue)) {
