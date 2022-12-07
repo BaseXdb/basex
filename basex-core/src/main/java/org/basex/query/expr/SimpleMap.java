@@ -404,13 +404,15 @@ public abstract class SimpleMap extends Arr {
 
   /**
    * Converts the map to a path expression.
+   * @param mode mode of simplification
    * @param cc compilation context
    * @return converted or original expression
    * @throws QueryException query context
    */
-  private Expr toPath(final CompileContext cc) throws QueryException {
-    Expr root = exprs[0];
+  private Expr toPath(final Simplify mode, final CompileContext cc) throws QueryException {
     final ExprList steps = new ExprList();
+
+    Expr root = exprs[0].simplifyFor(mode, cc);
     if(root instanceof AxisPath) {
       final AxisPath path = (AxisPath) root;
       root = path.root;
@@ -418,8 +420,9 @@ public abstract class SimpleMap extends Arr {
     }
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
-      if(!(exprs[e] instanceof AxisPath)) return this;
-      final AxisPath path = (AxisPath) exprs[e];
+      final Expr expr = exprs[e].simplifyFor(mode, cc);
+      if(!(expr instanceof AxisPath)) return this;
+      final AxisPath path = (AxisPath) expr;
       if(path.root != null) return this;
       steps.add(path.steps);
     }
@@ -448,7 +451,7 @@ public abstract class SimpleMap extends Arr {
           expr = last == Bln.FALSE ? Bln.FALSE : get(cc, info, Arrays.copyOf(exprs, el - 1));
         } else {
           // nodes ! text() = string  ->  nodes/text() = string
-          expr = toPath(cc);
+          expr = toPath(mode, cc);
         }
       }
     }

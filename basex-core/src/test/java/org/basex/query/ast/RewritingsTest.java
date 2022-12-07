@@ -2956,4 +2956,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("function() { let $s := function() as xs:string { <_>1</_>/text() }() "
         + "return ($s, number($s)) }()", "1\n1");
   }
+
+  /** Path existence checks. */
+  @Test public void gh2145() {
+    check("name(<a><b/></a>[(b, b)])",
+        "a", empty(List.class), empty(IterMap.class), count(SingleIterPath.class, 1));
+
+    check("name(<a><b><c/></b></a>[b ! (c, d)])",
+        "a", empty(List.class), empty(IterMap.class), exists(IterPath.class));
+    check("name(<a><b><c/></b></a>[b ! (c, d, c)])",
+        "a", empty(List.class), empty(IterMap.class), exists(IterPath.class));
+  }
 }
