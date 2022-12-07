@@ -870,6 +870,21 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void arrayIndexWhere() {
+    final Function func = _ARRAY_INDEX_WHERE;
+
+    query(func.args(" array { }", " boolean#1"), "");
+    query(func.args(" array { 0 }", " boolean#1"), "");
+    query(func.args(" array { 1 }", " boolean#1"), 1);
+    query(func.args(" array { 0, 4, 9 }", " boolean#1"), "2\n3");
+    query(func.args(" array { 1 to 9 }", " function($n) { $n mod 5 = 0 }"), 5);
+    query(func.args(" array { " + MONTHS + " }", " contains(?, 'z')"), "");
+    query(func.args(" array { " + MONTHS + " }", " contains(?, 'v')"), 11);
+    query(func.args(" array { " + MONTHS + " }", " starts-with(?, 'J')"), "1\n6\n7");
+    query(func.args(" [ 1, (2, 3), 4, (5, 6) ]", " function($n) { count($n) > 1 }"), "2\n4");
+  }
+
+  /** Test method. */
   @Test public void arrayPartition() {
     final Function func = _ARRAY_PARITION;
 

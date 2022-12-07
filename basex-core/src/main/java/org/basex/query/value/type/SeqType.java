@@ -183,6 +183,8 @@ public final class SeqType {
   /** Predicate function. */
   public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O).seqType();
   /** Predicate function. */
+  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_O, ITEM_ZM).seqType();
+  /** Predicate function. */
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, ITEM_O).seqType();
   /** Single map. */
   public static final SeqType MAP_O = MAP.seqType();

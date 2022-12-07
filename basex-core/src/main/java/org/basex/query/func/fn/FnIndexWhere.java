@@ -27,8 +27,8 @@ public final class FnIndexWhere extends StandardFunc {
     // implementation for dynamic function lookup
     final Iter input = exprs[0].iter(qc);
     final FItem predicate = toFunction(exprs[1], 1, qc);
-    int c = 0;
 
+    int c = 0;
     final LongList list = new LongList();
     for(Item item; (item = input.next()) != null;) {
       ++c;

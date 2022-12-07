@@ -342,7 +342,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   ITERATE_WHILE(FnIterateWhile::new, "iterate-while(input,predicate,action)",
-      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_ZM).seqType(),
+      params(ITEM_ZM, PREDICATE_ZM,
       FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
@@ -664,7 +664,7 @@ public enum Function implements AFunction {
       params(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FILTER(ArrayFilter::new, "filter(array,predicate)",
-      params(ARRAY_O, FuncType.get(BOOLEAN_O, ITEM_ZM).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
+      params(ARRAY_O, PREDICATE_ZM), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FLATTEN(ArrayFlatten::new, "flatten(input)",
       params(ITEM_ZM), ITEM_ZM, ARRAY_URI),
@@ -692,6 +692,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _ARRAY_HEAD(ArrayHead::new, "head(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
+  /** XQuery function. */
+  _ARRAY_INDEX_WHERE(ArrayIndexWhere::new, "index-where(array,predicate)",
+      params(ARRAY_O, PREDICATE_ZM), INTEGER_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore::new, "insert-before(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZO), ARRAY_O, ARRAY_URI),
@@ -1375,7 +1378,7 @@ public enum Function implements AFunction {
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
   _HOF_UNTIL(HofUntil::new, "until(predicate,action,zero)",
-      params(FuncType.get(BOOLEAN_O, ITEM_ZM).seqType(),
+      params(PREDICATE_ZM,
       FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM, flag(HOF), HOF_URI),
 
   // HTML Module
