@@ -233,6 +233,9 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM).seqType()),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
+  FOOT(FnFoot::new, "foot(input)",
+      params(ITEM_ZM), ITEM_ZO),
+  /** XQuery function. */
   FOR_EACH(FnForEach::new, "for-each(input,action)",
       params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
@@ -575,6 +578,9 @@ public enum Function implements AFunction {
   TRUE(FnTrue::new, "true()",
       params(), BOOLEAN_O),
   /** XQuery function. */
+  TRUNK(FnTrunk::new, "trunk(input)",
+      params(ITEM_ZM), ITEM_ZM),
+  /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
@@ -671,6 +677,9 @@ public enum Function implements AFunction {
       params(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM).seqType()),
       ITEM_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_FOOT(ArrayFoot::new, "foot(array)",
+      params(ARRAY_O), ITEM_ZM, ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_FOR_EACH(ArrayForEach::new, "for-each(array,action)",
       params(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
@@ -716,6 +725,9 @@ public enum Function implements AFunction {
       params(ARRAY_O, INTEGER_O, INTEGER_O), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_TAIL(ArrayTail::new, "tail(array)",
+      params(ARRAY_O), ARRAY_O, ARRAY_URI),
+  /** XQuery function. */
+  _ARRAY_TRUNK(ArrayTrunk::new, "trunk(array)",
       params(ARRAY_O), ARRAY_O, ARRAY_URI),
 
   // Math Module

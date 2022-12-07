@@ -75,9 +75,9 @@ public final class FnReverse extends StandardFunc {
     if(REVERSE.is(input)) return input.arg(0);
     // reverse(tail(reverse(E))  ->  util:init(E)
     if(TAIL.is(input) && REVERSE.is(input.arg(0)))
-      return cc.function(_UTIL_INIT, info, input.arg(0).args());
+      return cc.function(TRUNK, info, input.arg(0).args());
     // reverse(util:init(reverse(E))  ->  tail(E)
-    if(_UTIL_INIT.is(input) && REVERSE.is(input.arg(0)))
+    if(TRUNK.is(input) && REVERSE.is(input.arg(0)))
       return cc.function(TAIL, info, input.arg(0).args());
     // reverse(replicate(ZOO, count))  ->  replicate(ZOO, count)
     if(REPLICATE.is(input) && !input.has(Flag.NDT))

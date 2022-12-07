@@ -395,7 +395,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(<a/>, <b/>)[last()]",
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[last()]",
-        "<b/>", count(_UTIL_LAST, 1));
+        "<b/>", count(FOOT, 1));
     check("(<a/>, <b/>)[position() > 1 and position() < 3]",
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 3]",
@@ -2377,13 +2377,13 @@ public final class RewritingsTest extends QueryPlanTest {
         root(Str.class));
 
     check(REPLICATE.args(" <x/>", " <c>200000000000</c>") + "[last()]", "<x/>",
-        root(_UTIL_LAST));
+        root(FOOT));
     check(REPLICATE.args(" <x/>", " <c>200000000000</c>", true) + "[last()]", "<x/>",
-        root(_UTIL_LAST));
+        root(FOOT));
 
     check("for-each-pair((1 to 10000000000), (1 to 9999999999), "
         + "function($a, $b) { $a = $b })[last()]", true,
-        root(_UTIL_LAST));
+        root(FOOT));
   }
 
   /** Element constructors: Text concatenation. */
@@ -2859,9 +2859,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("reverse((1 to 2) ! <_>{ . }</_>)", "<_>2</_>\n<_>1</_>", root(DualMap.class));
     check("subsequence((1 to 6) ! (. * 2), 2, 2)", "4\n6", root(DualMap.class));
 
-    check(_UTIL_INIT.args(" (1 to 10)[. > 7] ! (. * .)"), "64\n81", root(DualMap.class));
+    check(TRUNK.args(" (1 to 10)[. > 7] ! (. * .)"), "64\n81", root(DualMap.class));
     check(ITEMS_AT.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(ItemMap.class));
-    check(_UTIL_LAST.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(ItemMap.class));
+    check(FOOT.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(ItemMap.class));
   }
 
   /** Check existence of paths in predicates. */

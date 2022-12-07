@@ -349,7 +349,7 @@ public final class FilterTest extends QueryPlanTest {
     check(expr + "[position() = 3 to last()]", "<c/>",
         empty(LAST), root(_UTIL_RANGE));
     check(expr + "[position() = 1 to last() - 1]", "<a/>\n<b/>",
-        empty(LAST), root(_UTIL_INIT));
+        empty(LAST), root(TRUNK));
     check(expr + "[position() = 1 to last() - 2]", "<a/>",
         exists(LAST), root(CachedFilter.class));
 

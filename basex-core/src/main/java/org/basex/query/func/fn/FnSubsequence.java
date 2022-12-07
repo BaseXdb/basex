@@ -195,11 +195,11 @@ public class FnSubsequence extends StandardFunc {
       if(size != -1) {
         if(sr.length == size) return input;
         // subsequence(E, last)  ->  util:last(E)
-        if(sr.start == size - 1) return cc.function(_UTIL_LAST, info, input);
+        if(sr.start == size - 1) return cc.function(FOOT, info, input);
         // subsequence(E, 2)  ->  tail(E)
         if(sr.start == 1 && sr.end == size) return cc.function(TAIL, info, input);
         // subsequence(E, 1, last - 1)  ->  util:init(E)
-        if(sr.start == 0 && sr.end == size - 1) return cc.function(_UTIL_INIT, info, input);
+        if(sr.start == 0 && sr.end == size - 1) return cc.function(TRUNK, info, input);
         sz = sr.length;
       } else if(st.zeroOrOne()) {
         // sr.length is always larger than 0 at this point
@@ -249,7 +249,7 @@ public class FnSubsequence extends StandardFunc {
       if(diff == (int) diff) {
         if(start <= 1) {
           // subsequence(E, 1, count(E) - 1)  ->  util:init(E)
-          if(diff == 0) return cc.function(_UTIL_INIT, info, input);
+          if(diff == 0) return cc.function(TRUNK, info, input);
           // subsequence(E, 1, count(E) + 10)  ->  E
           if(diff >= 1) return input;
         } else if(start <= diff) {

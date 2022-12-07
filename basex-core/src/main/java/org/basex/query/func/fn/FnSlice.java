@@ -59,7 +59,7 @@ public class FnSlice extends StandardFunc {
       final long start = toLong(1, 1, cc.qc), end = toLong(2, Long.MAX_VALUE, cc.qc);
       if(end == Long.MAX_VALUE && toLong(3, 1, cc.qc) == 1) {
         // slice(E, -1)  ->  util:last(E)
-        if(start == -1) return cc.function(_UTIL_LAST, info, input);
+        if(start == -1) return cc.function(FOOT, info, input);
         // slice(E, 1)  ->  E
         if(start == 0 || start == 1) return input;
         // no rewritings possible for greater start values (slice always returns last item)

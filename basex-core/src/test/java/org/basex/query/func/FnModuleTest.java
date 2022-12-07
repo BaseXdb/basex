@@ -437,10 +437,10 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" reverse((1 to " + wrap(3) + ")[. > 1])"), 3,
         "exists(//IterFilter/FnReverse)");
 
-    check(func.args(_UTIL_INIT.args(" (<a/>, <b/>, <c/>)")), "<a/>", empty(_UTIL_INIT));
-    check(func.args(_UTIL_INIT.args(" (<a/>, <b/>) ")), "<a/>", empty(_UTIL_INIT));
-    check(func.args(_UTIL_INIT.args(" <a/>")), "", empty());
-    check(func.args(_UTIL_INIT.args(" (1, 2)[. = 0]")), "", exists(_UTIL_INIT));
+    check(func.args(TRUNK.args(" (<a/>, <b/>, <c/>)")), "<a/>", empty(TRUNK));
+    check(func.args(TRUNK.args(" (<a/>, <b/>) ")), "<a/>", empty(TRUNK));
+    check(func.args(TRUNK.args(" <a/>")), "", empty());
+    check(func.args(TRUNK.args(" (1, 2)[. = 0]")), "", exists(TRUNK));
 
     check(func.args(" tail((<a/>, <b/>, <c/>[. = '']))"), "<b/>", root(CElem.class));
     check(func.args(" tail((<a/>, <b/>, <c/>))"), "<b/>", root(CElem.class));
@@ -845,11 +845,11 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (1 to 2) ! (1, 2)"), "2\n1\n2\n1");
 
     check(func.args(" tail((<a/>, <b/>, <c/>))"),
-        "<c/>\n<b/>", empty(_UTIL_INIT));
+        "<c/>\n<b/>", empty(TRUNK));
     check(func.args(" (<a/>, <b/>, <c/>)[position() < last()]"),
         "<b/>\n<a/>", empty(TAIL));
     check(func.args(" tail(" + func.args(" (1 to " + wrap(2) + ")[. > 0]") + ")"),
-        1, exists(_UTIL_INIT));
+        1, exists(TRUNK));
     check(func.args(" (" + func.args(" (1 to " + wrap(2) + ")[. > 0]") + ")[position() < last()]"),
         2, exists(TAIL));
     check(func.args(REPLICATE.args(" <a/>", 2)),

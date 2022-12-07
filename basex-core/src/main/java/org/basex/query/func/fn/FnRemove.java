@@ -85,7 +85,7 @@ public final class FnRemove extends StandardFunc {
       // skip first item
       if(p == 1) return cc.function(Function.TAIL, info, input);
       // skip last item
-      if(p == size) return cc.function(Function._UTIL_INIT, info, input);
+      if(p == size) return cc.function(Function.TRUNK, info, input);
       // decrement result size
       sz--;
     }

@@ -152,7 +152,7 @@ public abstract class Filter extends Preds {
           } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
               ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
             // E[1 .. last() - 1]  ->  util:init(E)
-            ex = cc.function(_UTIL_INIT, info, prepare.apply(expr));
+            ex = cc.function(TRUNK, info, prepare.apply(expr));
           }
         }
       } else if(pred instanceof CmpG) {
@@ -164,7 +164,7 @@ public abstract class Filter extends Preds {
         }
       } else if(LAST.is(pred)) {
         // E[last()]  ->  util:last(E)
-        ex = cc.function(_UTIL_LAST, info, prepare.apply(expr));
+        ex = cc.function(FOOT, info, prepare.apply(expr));
       } else if(pred instanceof Arith && preds.isEmpty() && LAST.is(pred.arg(0))) {
         final long es = expr.size();
         // E[last() - 1]  ->  items-at(E, size - 1)

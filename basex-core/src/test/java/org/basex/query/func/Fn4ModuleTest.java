@@ -161,6 +161,49 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void foot() {
+    final Function func = FOOT;
+
+    query(func.args(" ()"), "");
+    query(func.args(1), 1);
+    query(func.args(" 1 to 2"), 2);
+
+    query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
+    query(func.args(" (<a/>, <b/>)"), "<b/>");
+    query(func.args(" (<a/>, <b/>)[position() > 2]"), "");
+
+    query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
+    query(func.args(" (<a/>, <b/>)"), "<b/>");
+
+    check(func.args(_PROF_VOID.args(" ()")), "", empty(func));
+    check(func.args(" <a/>"), "<a/>", empty(func));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "element(b)|element(a)?"));
+    check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
+
+    check(func.args(" tokenize(<_/>)"), "", exists(FOOT));
+    check(func.args(" tokenize(" + wrap(1) + ")"), 1, exists(FOOT));
+    check(func.args(" tokenize(" + wrap("1 2") + ")"), 2, exists(FOOT));
+
+    check(func.args(" tail(tokenize(<a/>))"), "", exists(TAIL));
+    check(func.args(" tail(1 ! <_>{.}</_>)"), "", empty());
+    check(func.args(" tail((1 to 2) ! <_>{.}</_>)"), "<_>2</_>", empty(TAIL));
+    check(func.args(" tail((1 to 3) ! <_>{.}</_>)"), "<_>3</_>", empty(TAIL));
+
+    check(func.args(TRUNK.args(" (1 to 3) ! <_>{.}</_>")), "<_>2</_>", empty(TRUNK));
+    check(func.args(TRUNK.args(" tokenize(<a/>)")), "", exists(TRUNK));
+
+    check(func.args(REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>[. = '']", 2)), "<a/>",
+        root(IterFilter.class), empty(REPLICATE));
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)[. = '']", 2)), "<b/>",
+        root(HEAD), empty(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>", exists(REPLICATE));
+
+    check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));
+    check(func.args(" (<a/>, 1 to 2)"), 2, root(Int.class));
+  }
+
+  /** Test method. */
   @Test public void highest() {
     final Function func = HIGHEST;
     query(func.args(" ()"), "");
@@ -370,7 +413,7 @@ public class Fn4ModuleTest extends QueryPlanTest {
         9, root(GFLWOR.class));
 
     check(func.args(_PROF_VOID.args(" ()"), 0), "", empty(func));
-    check(func.args(_UTIL_INIT.args(" (1, 2, 3, <_/>)"), 2), 2, empty(_UTIL_INIT));
+    check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
   }
 
   /** Test method. */
@@ -718,9 +761,9 @@ public class Fn4ModuleTest extends QueryPlanTest {
     check(func.args(" doc('" + DOC + "')//*", 9) + " => " + _PROF_VOID.args(),
         "", empty(func), exists(_UTIL_RANGE));
     check(func.args(" doc('" + DOC + "')//*", 10) + " => " + _PROF_VOID.args(),
-        "", empty(func), exists(_UTIL_LAST));
+        "", empty(func), exists(FOOT));
     check(func.args(" doc('" + DOC + "')//*", 11) + " => " + _PROF_VOID.args(),
-        "", empty(func), exists(_UTIL_LAST));
+        "", empty(func), exists(FOOT));
     check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + _PROF_VOID.args(),
         "", empty(func), exists(_UTIL_RANGE));
   }
@@ -750,6 +793,80 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(lookup + "(1 to 9, not#1)", false);
     query(lookup + "(0 to 9, boolean#1)", true);
     query(lookup + "(0 to 9, not#1)", true);
+  }
+
+  /** Test method. */
+  @Test public void trunk() {
+    final Function func = TRUNK;
+
+    // static rewrites
+    query(func.args(" ()"), "");
+    query(func.args("A"), "");
+    query(func.args(" (1, 2)"), 1);
+    query(func.args(" (1 to 3)"), "1\n2");
+
+    // known result size
+    query(func.args(wrap(1) + "+ 1"), "");
+    query(func.args(" (" + wrap(1) + "+ 1, 3)"), 2);
+    query(func.args(_PROF_VOID.args(" ()")), "");
+
+    // unknown result size
+    query(func.args(" 1[. = 0]"), "");
+    query(func.args(" 1[. = 1]"), "");
+    query(func.args(" (1 to 2)[. = 0]"), "");
+    query(func.args(" (1 to 4)[. < 3]"), 1);
+
+    // value-based iterator
+    query(func.args(" tokenize(<_></_>)"), "");
+    query(func.args(" tokenize(<_>X</_>)"), "");
+    query(func.args(" tokenize(<_>X Y</_>)"), "X");
+    query(func.args(" tokenize(<_>X Y Z</_>)"), "X\nY");
+
+    // iterator with known result size
+    check(func.args(" (<a/>, <b/>)"), "<a/>", root(CElem.class));
+    check(func.args(" sort((1 to 3) ! <_>{ . }</_>)"), "<_>1</_>\n<_>2</_>", exists(func));
+    check("reverse(" + func.args(" (<a/>, <b/>, <c/>))"), "<b/>\n<a/>", root(List.class));
+
+    // nested function calls
+    check(func.args(func.args(" ()")), "", empty());
+    check(func.args(func.args(" (<a/>)")), "", empty());
+    check(func.args(func.args(" (<a/>, <b/>)")), "", empty());
+    check(func.args(func.args(" (<a/>, <b/>, <c/>)")), "<a/>", root(CElem.class));
+    check(func.args(func.args(" (<a/>, <b/>, <c/>, <d/>)")), "<a/>\n<b/>", root(List.class));
+    check(func.args(func.args(" (1 to 10) ! <a>{. }</a>")),
+        "<a>1</a>\n<a>2</a>\n<a>3</a>\n<a>4</a>\n<a>5</a>\n<a>6</a>\n<a>7</a>\n<a>8</a>",
+        root(DualMap.class));
+
+    check(func.args(REPLICATE.args(" <a/>", 2)), "<a/>", root(CElem.class));
+    check(func.args(REPLICATE.args(" <a/>", 3)), "<a/>\n<a/>", root(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>[. = '']", 2)), "<a/>", root(IterFilter.class));
+
+    check(func.args(" (<a/>, <b/>)"), "<a/>", root(CElem.class), empty(TRUNK));
+    check(func.args(" (<a/>, <b/>, <c/>)"), "<a/>\n<b/>", root(List.class), empty(TRUNK));
+    check(func.args(" (<a/>, 1 to 2)"), "<a/>\n1", root(List.class), empty(TRUNK));
+
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 1)"),
+        "", empty());
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 2)"),
+        "<_>1</_>", root(CElem.class));
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 1, 3)"),
+        "<_>1</_>\n<_>2</_>", root(DualMap.class));
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 2, 3)"),
+        "<_>2</_>\n<_>3</_>", root(DualMap.class));
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 4, 2)"),
+        "<_>4</_>", root(CElem.class));
+    check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 5, 1)"),
+        "", empty());
+  }
+
+  /** Test method. */
+  @Test public void arrayFoot() {
+    final Function func = _ARRAY_FOOT;
+    query(func.args(" [ 1 ]"), 1);
+    query(func.args(" array { 1 to 5 }"), 5);
+    query(func.args(" [ 1, 2 to 3 ]"), "2\n3");
+
+    error(func.args(" [ ]"), ARRAYEMPTY);
   }
 
   /** Test method. */
@@ -881,6 +998,16 @@ public class Fn4ModuleTest extends QueryPlanTest {
     query(in + func.args(" array { " + wrap(1000) + " }"), "[1000]");
     query(in + func.args(" array { " + 1000 + " }", wrap(1000)), "[1000]");
     query(in + func.args(" array { " + 1000 + " }", 1000, wrap(1)), "[1000]");
+  }
+
+  /** Test method. */
+  @Test public void arrayTrunk() {
+    final Function func = _ARRAY_TRUNK;
+    query(func.args(" [ 1 ]"), "[]");
+    query(func.args(" array { 1 to 5 }"), "[1,2,3,4]");
+    query(func.args(" [ 1, 2 to 3 ]"), "[1]");
+
+    error(func.args(" [ ]"), ARRAYEMPTY);
   }
 
   /** Test method. */
