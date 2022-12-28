@@ -49,7 +49,7 @@ public final class ModuleLoader {
    * implementing {@link QueryResource}.
    */
   public void close() {
-    if(loader instanceof URLClassLoader) {
+    if(loader != LOADER) {
       try {
         ((URLClassLoader) loader).close();
       } catch(final IOException ex) {
