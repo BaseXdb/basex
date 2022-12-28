@@ -59,6 +59,8 @@ public abstract class IO {
   public static final String IGNORESUFFIX = ".ignore";
   /** File prefix. */
   public static final String FILEPREF = "file:/";
+  /** Jar prefix. */
+  public static final String JARPREF = "jar:";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
