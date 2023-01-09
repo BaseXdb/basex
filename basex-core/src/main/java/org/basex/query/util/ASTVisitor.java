@@ -13,7 +13,7 @@ import org.basex.query.var.*;
  * A visitor for all sub-expressions in an {@link Expr}. All methods return a
  * {@code boolean} which signals if the tree walk should be continued.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public abstract class ASTVisitor {

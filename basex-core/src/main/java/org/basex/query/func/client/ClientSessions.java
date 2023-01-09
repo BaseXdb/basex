@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Opened database client sessions.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class ClientSessions implements QueryResource {

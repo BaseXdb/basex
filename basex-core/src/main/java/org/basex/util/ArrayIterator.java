@@ -6,7 +6,7 @@ import java.util.*;
  * This class is used to iterate over the elements of an array, or parts of it.
  * {@code null} references are skipped. An iterator cannot be used twice.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  * @param <E> generic object type
  */

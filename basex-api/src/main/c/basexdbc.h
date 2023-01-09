@@ -1,7 +1,7 @@
 /**
  * basexdbc.h : communicate with BaseX database server
  *
- * Copyright (c) 2005-22, Alexander Holupirek <alex@holupirek.de>, BSD license
+ * Copyright (c) 2005-23, Alexander Holupirek <alex@holupirek.de>, BSD license
  */
 
 #ifdef __cplusplus

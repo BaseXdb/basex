@@ -9,7 +9,7 @@ import org.basex.util.*;
  * This class caches the output bytes in an array, similar to {@link ByteArrayOutputStream}.
  * This implementation is faster because functions are not synchronized.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class ArrayOutput extends PrintOutput {

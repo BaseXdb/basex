@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Sequence of items of type {@link Str xs:string}, containing at least two of them.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class StrSeq extends NativeSeq {

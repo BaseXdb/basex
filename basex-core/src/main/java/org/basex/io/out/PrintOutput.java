@@ -9,7 +9,7 @@ import org.basex.io.*;
 /**
  * This class is a stream-wrapper for textual data encoded in UTF8.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {

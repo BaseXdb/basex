@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Interface for XQuery functions.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public interface XQFunction extends XQFunctionExpr {

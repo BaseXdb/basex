@@ -17,7 +17,7 @@ import org.basex.util.options.*;
 /**
  * Update primitive for the optimize function.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Dimitar Popov
  */
 public final class DBOptimize extends DBUpdate {

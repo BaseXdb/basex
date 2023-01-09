@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with one or more simple numeric predicates.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class IterPosStep extends Step {

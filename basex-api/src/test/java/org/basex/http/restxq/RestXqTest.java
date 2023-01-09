@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class contains RESTXQ tests.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {

@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Lukas Kircher
  */
 public final class CryptoEncrypt extends StandardFunc {

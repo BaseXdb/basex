@@ -9,7 +9,7 @@ import org.basex.util.similarity.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class StringLevenshtein extends StandardFunc {

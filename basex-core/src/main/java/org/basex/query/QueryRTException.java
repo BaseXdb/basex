@@ -4,7 +4,7 @@ package org.basex.query;
  * A runtime exception wrapping a {@link QueryException}, used for throwing those out of
  * methods whose interface doesn't allow it.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public final class QueryRTException extends RuntimeException {

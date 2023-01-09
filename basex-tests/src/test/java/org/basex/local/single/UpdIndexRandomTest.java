@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 /**
  * This test class performs random incremental updates with random documents.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class UpdIndexRandomTest extends SandboxTest {

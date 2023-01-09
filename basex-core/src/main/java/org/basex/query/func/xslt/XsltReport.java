@@ -22,7 +22,7 @@ import org.basex.util.*;
 /**
  * XSLT report builder, with focus on the XSLT Saxon processor.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class XsltReport {

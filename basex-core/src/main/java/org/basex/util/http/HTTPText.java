@@ -8,7 +8,7 @@ import org.basex.query.value.item.*;
 /**
  * HTTP strings.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Rositsa Shadura
  */
 public interface HTTPText {

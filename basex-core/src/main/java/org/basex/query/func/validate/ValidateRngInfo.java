@@ -6,7 +6,7 @@ import org.basex.query.value.*;
 /**
  * Validates a document against a RelaxNG document.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public class ValidateRngInfo extends ValidateRng {

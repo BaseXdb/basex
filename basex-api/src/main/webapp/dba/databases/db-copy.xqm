@@ -1,7 +1,7 @@
 (:~
  : Copy database.
  :
- : @author Christian Grün, BaseX Team 2005-22, BSD License
+ : @author Christian Grün, BaseX Team 2005-23, BSD License
  :)
 module namespace dba = 'dba/databases';
 

@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * This is an efficient and memory-saving hash map for storing tokens and booleans.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class TokenBoolMap extends TokenSet {

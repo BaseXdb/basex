@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Main-memory node fragment.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {

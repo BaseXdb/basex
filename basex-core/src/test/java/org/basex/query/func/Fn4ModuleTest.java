@@ -14,7 +14,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests standard functions of XQuery 4.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public class Fn4ModuleTest extends QueryPlanTest {

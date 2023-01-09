@@ -17,7 +17,7 @@ import org.xml.sax.helpers.*;
  *
  * Part 4: Processing Results.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  */
 public final class Part4 extends Main {
   /**

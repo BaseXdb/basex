@@ -9,7 +9,7 @@ import org.basex.query.value.array.*;
 /**
  * Functions on arrays.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 abstract class ArrayFn extends StandardFunc {

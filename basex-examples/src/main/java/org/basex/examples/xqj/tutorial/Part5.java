@@ -12,7 +12,7 @@ import javax.xml.xquery.*;
  *
  * Part 5: Serializing Results.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  */
 public final class Part5 extends Main {
   /**

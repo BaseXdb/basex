@@ -22,7 +22,7 @@ import org.basex.util.options.*;
 /**
  * This class serializes items to in a markup language.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {

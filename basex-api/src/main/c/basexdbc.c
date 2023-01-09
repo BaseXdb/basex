@@ -2,7 +2,7 @@
  * basexdbc.c : communicate with BaseX database server
  * Works with BaseX 7.x and with BaseX 8.0 and later
  *
- * Copyright (c) 2005-22, Alexander Holupirek <alex@holupirek.de>, BSD license
+ * Copyright (c) 2005-23, Alexander Holupirek <alex@holupirek.de>, BSD license
  *
  * Significant Changes:
  * 11 Dec 2016 - Craig Phillips <github.com/smallfriex> - to support newer authentication

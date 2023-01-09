@@ -12,7 +12,7 @@ import org.basex.io.random.*;
 /**
  * This class provides temporary access to sorted list data.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Sebastian Gath
  */
 final class FTList {

@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * Update primitive for the {@link Function#_DB_PUT_VALUE} function.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class DBPut extends DBUpdate {

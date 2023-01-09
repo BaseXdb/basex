@@ -18,7 +18,7 @@ import org.xml.sax.*;
 /**
  * Evaluates the 'binary put' command and stores binary resources in the database.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class BinaryPut extends ACreate {

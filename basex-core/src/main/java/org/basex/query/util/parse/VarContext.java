@@ -9,7 +9,7 @@ import org.basex.query.var.*;
 /**
  * Variable context for resolving local variables.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class VarContext {

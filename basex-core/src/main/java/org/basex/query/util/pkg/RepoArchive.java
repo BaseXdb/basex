@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Contains methods for zipping and unzipping archives.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class RepoArchive {

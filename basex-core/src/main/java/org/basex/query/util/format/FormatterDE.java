@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * German language formatter. Can be instantiated via {@link Formatter#get}.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class FormatterDE extends Formatter {

@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 /**
  * An array storing {@link Value}s.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public abstract class XQArray extends XQData {

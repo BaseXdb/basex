@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests standard functions.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class FnModuleTest extends QueryPlanTest {

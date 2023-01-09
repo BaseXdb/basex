@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * JTree node for representing database resources.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Lukas Kircher
  */
 public abstract class ResourceNode extends DefaultMutableTreeNode

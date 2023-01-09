@@ -6,7 +6,7 @@ import org.basex.util.list.*;
 /**
  * Information required for parsing a module.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class ModInfo {

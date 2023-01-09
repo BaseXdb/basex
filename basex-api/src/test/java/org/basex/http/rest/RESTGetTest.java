@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the embedded REST API and the GET method.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class RESTGetTest extends RESTTest {

@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class FnPath extends ContextFn {
@@ -133,7 +133,7 @@ public final class FnPath extends ContextFn {
   /**
    * Path cache.
    *
-   * @author BaseX Team 2005-22, BSD License
+   * @author BaseX Team 2005-23, BSD License
    * @author Christian Gruen
    */
   private static final class PathMap extends LinkedHashMap<ANode, byte[]> {

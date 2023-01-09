@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Update primitive for the {@link Function#_DB_ALTER} function.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class DBAlter extends NameUpdate {

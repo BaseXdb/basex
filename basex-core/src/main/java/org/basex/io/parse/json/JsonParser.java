@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * A JSON parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public final class JsonParser extends InputParser {

@@ -16,7 +16,7 @@ import org.basex.io.in.*;
 /**
  * Evaluates the 'binary get' command and retrieves binary resources.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class BinaryGet extends ACreate {

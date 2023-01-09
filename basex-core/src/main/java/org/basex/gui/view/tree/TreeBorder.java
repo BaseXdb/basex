@@ -3,7 +3,7 @@ package org.basex.gui.view.tree;
 /**
  * This class is used to store subtree borders.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Wolfgang Miller
  */
 final class TreeBorder {

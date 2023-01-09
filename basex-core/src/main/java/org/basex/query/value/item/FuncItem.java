@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 /**
  * Function item.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
@@ -277,7 +277,7 @@ public final class FuncItem extends FItem implements Scope {
   /**
    * A visitor for checking inlined expressions.
    *
-   * @author BaseX Team 2005-22, BSD License
+   * @author BaseX Team 2005-23, BSD License
    * @author Leo Woerteler
    */
   private class InlineVisitor extends ASTVisitor {

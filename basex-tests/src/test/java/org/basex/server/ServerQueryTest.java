@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
  * This class performs a client/server stress tests with a specified
  * number of threads and queries.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class ServerQueryTest extends SandboxTest {

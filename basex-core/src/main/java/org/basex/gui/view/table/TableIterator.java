@@ -6,7 +6,7 @@ import org.basex.gui.view.table.TableData.TableCol;
 /**
  * This is an iterator for parsing the rows' contents.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class TableIterator {

@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Functions on relational databases.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Rositsa Shadura
  */
 abstract class SqlFn extends StandardFunc {

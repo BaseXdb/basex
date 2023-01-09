@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 /**
  * General test of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Lukas Kircher
  */
 public final class UpdateTest extends SandboxTest {

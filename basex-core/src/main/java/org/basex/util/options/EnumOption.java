@@ -5,7 +5,7 @@ import org.basex.util.list.*;
 /**
  * Option containing an enumeration value.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  * @param <V> enumeration value
  */

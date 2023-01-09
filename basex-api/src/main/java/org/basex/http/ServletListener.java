@@ -5,7 +5,7 @@ import javax.servlet.*;
 /**
  * This class creates and destroys servlet contexts.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class ServletListener implements ServletContextListener {

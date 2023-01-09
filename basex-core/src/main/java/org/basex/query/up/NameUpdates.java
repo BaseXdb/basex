@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * This class 'caches' all update operations that use a database name as reference.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class NameUpdates {

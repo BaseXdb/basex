@@ -3,7 +3,7 @@ package org.basex.query.util.regex;
 /**
  * A parenthesized group.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public final class Group extends RegExp {

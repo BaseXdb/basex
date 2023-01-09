@@ -3,7 +3,7 @@ package org.basex.query.util.pkg;
 /**
  * Package dependency.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Rositsa Shadura
  */
 final class PkgDep {

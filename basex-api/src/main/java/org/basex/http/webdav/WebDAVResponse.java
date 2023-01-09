@@ -17,7 +17,7 @@ import com.bradmcevoy.http.Cookie;
  * the source was integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

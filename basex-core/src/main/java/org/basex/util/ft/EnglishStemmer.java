@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
  * English stemming algorithm, based on the publication from Porter (1980),
  * "An algorithm for suffix stripping", enhanced with a basic dictionary for irregular plurals.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class EnglishStemmer extends InternalStemmer {

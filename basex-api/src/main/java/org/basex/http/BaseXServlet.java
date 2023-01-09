@@ -21,7 +21,7 @@ import org.basex.util.http.*;
 /**
  * Base class for various servlets.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {

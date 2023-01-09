@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Abstract axis path expression.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public abstract class AxisPath extends Path {

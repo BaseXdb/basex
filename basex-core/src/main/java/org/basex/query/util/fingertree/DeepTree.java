@@ -7,7 +7,7 @@ import org.basex.util.*;
  * A <i>deep</i> node containing elements in the left and right digit and a subtree in
  * the middle.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

@@ -3,7 +3,7 @@ package org.basex.query.util.regex;
 /**
  * A character class.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 public final class CharClass extends RegExp {

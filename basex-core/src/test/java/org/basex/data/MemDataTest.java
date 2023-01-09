@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
 /**
  * Test index updates when using memory storage ({@link MemData}).
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Dimitar Popov
  */
 public class MemDataTest extends SandboxTest {

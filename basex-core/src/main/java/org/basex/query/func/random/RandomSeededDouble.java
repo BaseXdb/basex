@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Dirk Kirsten
  */
 public final class RandomSeededDouble extends StandardFunc {

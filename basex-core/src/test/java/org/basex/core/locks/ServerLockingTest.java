@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * This class tests database locking inside BaseX. For this purpose, two queries are forced to be
  * executed in parallel. If this fails, locking prevents these queries to run in parallel.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Jens Erat
  */
 public final class ServerLockingTest extends SandboxTest {

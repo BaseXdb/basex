@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * Update that operates on a data reference.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Lukas Kircher
  */
 public abstract class DataUpdate extends Update {

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the client/server query API.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public abstract class SessionTest extends SandboxTest {

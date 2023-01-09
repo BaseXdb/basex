@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'delete' command and deletes resources from a database.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class Delete extends ACreate {

@@ -9,7 +9,7 @@ import org.basex.util.*;
  * This class provides methods for reading XML input and recursive entities.
  * The input encoding will be guessed by analyzing the first bytes.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public class XMLInput extends InputStream {

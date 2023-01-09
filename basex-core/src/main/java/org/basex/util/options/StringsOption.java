@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Option containing an strings array value.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class StringsOption extends Option<String[]> {

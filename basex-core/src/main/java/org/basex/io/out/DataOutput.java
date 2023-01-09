@@ -10,7 +10,7 @@ import org.basex.util.list.*;
  * This is an output stream for project specific data types.
  * It bears resemblance to Java's {@link DataOutputStream}.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class DataOutput extends OutputStream {

@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Inner node of a {@link XQMap}.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
 final class TrieBranch extends TrieNode {

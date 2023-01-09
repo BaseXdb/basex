@@ -5,7 +5,7 @@ import org.basex.data.*;
 /**
  * Builder for values-based index structures.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public abstract class ValuesBuilder extends IndexBuilder {

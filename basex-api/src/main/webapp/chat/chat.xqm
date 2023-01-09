@@ -1,6 +1,6 @@
 (:~
  : Simple WebSocket chat. RESTXQ functions.
- : @author BaseX Team 2005-22, BSD License
+ : @author BaseX Team 2005-23, BSD License
  :)
 module namespace chat = 'chat';
 
@@ -125,7 +125,7 @@ declare %private function chat:wrap(
     <head>
       <meta charset='utf-8'/>
       <title>BaseX WebSocket Chat</title>
-      <meta name='author' content='BaseX Team 2005-22, BSD License'/>
+      <meta name='author' content='BaseX Team 2005-23, BSD License'/>
       <link rel='stylesheet' type='text/css' href='/static/style.css'/>
       { $headers }
     </head>

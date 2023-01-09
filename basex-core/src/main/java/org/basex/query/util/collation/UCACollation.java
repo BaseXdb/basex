@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * This collation is based on the ICU collator.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 final class UCACollation extends Collation {

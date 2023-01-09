@@ -45,7 +45,7 @@ import org.basex.util.list.*;
  * This class organizes both static and dynamic properties that are specific to a
  * single query.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class QueryContext extends Job implements Closeable {

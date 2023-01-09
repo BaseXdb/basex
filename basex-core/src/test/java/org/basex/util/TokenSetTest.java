@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.*;
 /**
  * Token set tests.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public class TokenSetTest {

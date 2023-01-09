@@ -10,7 +10,7 @@ import java.io.*;
  * <li>{@code 0x00} is sent to indicate the end of a stream</li>
  * </ul>
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class ServerOutput extends OutputStream {

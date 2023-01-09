@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * This class provides access to all kinds of resources (databases, documents, database connections,
  * sessions) used by an XQuery expression.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class QueryResources {

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class references input passed on in a query. It can be a URI or a database path.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class QueryInput {

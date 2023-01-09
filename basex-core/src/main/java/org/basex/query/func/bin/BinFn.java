@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Functions on binary data.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 abstract class BinFn extends StandardFunc {

@@ -14,7 +14,7 @@ import org.xml.sax.*;
  * Catalog resolver: Convenience methods for retrieving resolver instances of the standard
  * JDK 11 implementation or Norman Walsh’s enhanced XML resolver.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class Resolver {

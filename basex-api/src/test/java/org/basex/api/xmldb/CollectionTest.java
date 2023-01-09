@@ -16,7 +16,7 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API Collection implementation.
  *
- * @author BaseX Team 2005-22, BSD License
+ * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class CollectionTest extends XMLDBBaseTest {
