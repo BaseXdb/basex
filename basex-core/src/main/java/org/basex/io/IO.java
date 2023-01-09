@@ -242,12 +242,13 @@ public abstract class IO {
     if(path.isEmpty()) return this;
     final IO io = get(path);
     if(io.isAbsolute()) return io;
-    if(IOUrl.isJarURL(pth))
+    if(IOUrl.isJarURL(pth)) {
       try {
         return get(new URL(new URL(pth), path).toString());
+      } catch(final MalformedURLException ex) {
+        Util.stack(ex);
       }
-      catch (@SuppressWarnings("unused") MalformedURLException ex) {
-      }
+    }
     return get((Strings.endsWith(pth, '/') ? pth : dir()) + path);
   }
 

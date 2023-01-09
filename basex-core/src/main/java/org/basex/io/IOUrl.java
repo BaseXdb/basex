@@ -124,9 +124,7 @@ public final class IOUrl extends IO {
 
   @Override
   public InputStream inputStream() throws IOException {
-    return isJarURL(pth)
-        ? new URL(pth).openStream()
-        : response().body();
+    return isJarURL(pth) ? new URL(pth).openStream() : response().body();
   }
 
 
