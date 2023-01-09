@@ -124,7 +124,9 @@ public final class IOUrl extends IO {
 
   @Override
   public InputStream inputStream() throws IOException {
-    return response().body();
+    return isJarURL(pth)
+        ? new URL(pth).openStream()
+        : response().body();
   }
 
 
@@ -198,7 +200,7 @@ public final class IOUrl extends IO {
   static boolean isValid(final String url) {
     final int ul = url.length();
     int u = url.indexOf(':');
-    if(u < 2 || u + 1 == ul || url.charAt(u + 1) != '/') return false;
+    if(u < 2 || u + 1 == ul) return false;
     while(--u >= 0) {
       final char c = url.charAt(u);
       if(!(c >= 'a' && c <= 'z' || c == '+' || c == '-' || c == '.' || c == '_')) return false;
@@ -229,6 +231,15 @@ public final class IOUrl extends IO {
    */
   static boolean isFileURL(final String url) {
     return url.startsWith(FILEPREF);
+  }
+
+  /**
+   * Checks if the specified string is a jar URL.
+   * @param url url to be tested
+   * @return result of check
+   */
+  static boolean isJarURL(final String url) {
+    return url.startsWith(JARPREF);
   }
 
   /**

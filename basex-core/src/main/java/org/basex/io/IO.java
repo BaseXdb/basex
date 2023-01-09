@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.FTToken.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 
 import javax.xml.transform.stream.*;
@@ -59,6 +60,8 @@ public abstract class IO {
   public static final String IGNORESUFFIX = ".ignore";
   /** File prefix. */
   public static final String FILEPREF = "file:/";
+  /** Jar prefix. */
+  public static final String JARPREF = "jar:";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
@@ -238,7 +241,14 @@ public abstract class IO {
   public final IO merge(final String path) {
     if(path.isEmpty()) return this;
     final IO io = get(path);
-    return io.isAbsolute() ? io : get((Strings.endsWith(pth, '/') ? pth : dir()) + path);
+    if(io.isAbsolute()) return io;
+    if(IOUrl.isJarURL(pth))
+      try {
+        return get(new URL(new URL(pth), path).toString());
+      }
+      catch (@SuppressWarnings("unused") MalformedURLException ex) {
+      }
+    return get((Strings.endsWith(pth, '/') ? pth : dir()) + path);
   }
 
   /**

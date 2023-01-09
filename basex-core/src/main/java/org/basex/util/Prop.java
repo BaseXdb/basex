@@ -109,7 +109,7 @@ public final class Prop {
    */
   private static String applicationDir(final URL location) {
     try {
-      if(location != null) return new IOFile(Paths.get(location.toURI()).toString()).dir();
+      if(location != null && "file".equals(location.getProtocol())) return new IOFile(Paths.get(location.toURI()).toString()).dir();
     } catch(final Exception ex) {
       Util.stack(ex);
     }
