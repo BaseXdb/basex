@@ -25,7 +25,6 @@ function dba:file-upload(
 ) as element(rest:response) {
   (: save files :)
   let $dir := db:option('dbpath') || '/'
-  let $dir := config:directory()
   return try {
     (: reject backups with invalid content :)
     map:for-each($files, function($file, $content) {
