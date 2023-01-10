@@ -412,6 +412,10 @@ public final class RewritingsTest extends QueryPlanTest {
         "<b/>", root(CElem.class));
     check("(<a/>, <b/>[. = ''])[position() > 1 and position() < 4]",
         "<b/>", empty(List.class), root(IterFilter.class));
+    check("<a/>[position() >= last() - 1]",
+        "<a/>", exists(MAX));
+    check("<a/>[position() > last() - 2]",
+        "<a/>", exists(CmpSimpleG.class));
   }
 
   /** Predicates. */
