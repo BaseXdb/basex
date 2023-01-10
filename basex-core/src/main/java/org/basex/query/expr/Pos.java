@@ -69,11 +69,11 @@ final class Pos extends Single {
           minMax = new Expr[] { ps, ps };
           break;
         case GE:
-          minMax = new Expr[] { cc.function(Function.MAX, ii, new List(ii, Int.ONE, ps).optimize(cc)), Int.MAX };
+          minMax = new Expr[] { ps, Int.MAX };
           break;
         case GT:
-          minMax = new Expr[] { cc.function(Function.MAX, ii, new List(ii, Int.ONE, new Arith(ii, type.instanceOf(AtomType.INTEGER) ? ps :
-            cc.function(Function.FLOOR, ii, ps), Int.ONE, Calc.PLUS))).optimize(cc), Int.MAX };
+          minMax = new Expr[] { new Arith(ii, type.instanceOf(AtomType.INTEGER) ? ps :
+            cc.function(Function.FLOOR, ii, ps), Int.ONE, Calc.PLUS).optimize(cc), Int.MAX };
           break;
         case LE:
           minMax = new Expr[] { Int.ONE, ps };

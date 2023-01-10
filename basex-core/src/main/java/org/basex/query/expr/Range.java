@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
@@ -70,9 +69,8 @@ public final class Range extends Arr {
     if(mn > mx) return Empty.VALUE;
     // max smaller than min: create range
     final long size = mx - mn + 1;
-    if(size > 0) return RangeSeq.get(mn, size, true);
-    // overflow of long value
-    throw RANGE_X.get(info, mx);
+    // too large range: assign maximum
+    return RangeSeq.get(mn, size < 0 ? Long.MAX_VALUE : size, true);
   }
 
   @Override
