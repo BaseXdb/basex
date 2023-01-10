@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -84,11 +85,22 @@ public final class Typeswitch extends ParseExpr {
     Expr expr = this;
     // choose branch that can be statically determined
     TypeswitchGroup tg = null;
-    for(final TypeswitchGroup group : groups) {
-      if(tg == null && group.instance(ct)) tg = group;
+    final int gl = groups.length;
+    for(int g = 0; g < gl - 1; g++) {
+      final SeqType[] matchingTypes = groups[g].matchingTypes(ct);
+      if(matchingTypes.length > 0) {
+        // make sure that preceding groups do not branch on subtypes
+        final boolean isPrecededBySubtype = IntStream.range(0, g)
+            .mapToObj(i -> groups[i])
+            .flatMap(precedingGroup -> Arrays.stream(precedingGroup.seqTypes))
+            .anyMatch(seqType -> Arrays.stream(matchingTypes)
+                .anyMatch(matchingType -> seqType.instanceOf(matchingType)));
+        if (!isPrecededBySubtype)
+          tg = groups[g];
+        break;
+      }
     }
     // choose default branch if none of the branches will be chosen
-    final int gl = groups.length;
     if(tg == null) {
       boolean opt = true;
       for(int g = 0; opt && g < gl - 1; g++) opt = groups[g].noMatches(ct);

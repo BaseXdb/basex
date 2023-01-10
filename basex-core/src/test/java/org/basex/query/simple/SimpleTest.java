@@ -182,6 +182,16 @@ public final class SimpleTest extends QueryTest {
         "typeswitch(<a>1</a>) case $a as xs:string return 1 default return 1" },
       { "Typeswitch 3", integers(1, 2),
         "typeswitch(<a>1</a>) case $a as xs:string return (1, 2) default return (1, 2)" },
+      { "Typeswitch 4", integers(1, 2, 3, 4, 5),
+        "(xs:byte(0), xs:short(0), xs:int(0), xs:long(0), 0)!"
+        + "(typeswitch (.)"
+        + " case xs:byte return 1"
+        + " case xs:short return 2"
+        + " case xs:int return 3"
+        + " case xs:long return 4"
+        + " case xs:decimal | xs:integer return 5"
+        + " default return 6\r\n"
+        + ")" },
 
       { "FunctionContext 0", "declare function local:x() { /x }; local:x()" },
 
