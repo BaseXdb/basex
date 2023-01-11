@@ -36,11 +36,16 @@ public final class FnIterateWhile extends StandardFunc {
 
       // repeat coercion until output types are equal and output type is instance of input type
       SeqType nst = optAction.funcType().declType;
-      while(!ost.eq(nst) || !nst.instanceOf(ist)) {
-        ist = ist.union(nst);
-        optAction = coerceFunc(action, cc, SeqType.ITEM_ZM, ist);
-        ost = nst;
-        nst = nst.union(optAction.funcType().declType);
+      if (nst.type == NoneType.NONE) {
+        ost = ist;
+      }
+      else {
+        while(!ost.eq(nst) || !nst.instanceOf(ist)) {
+          ist = ist.union(nst);
+          optAction = coerceFunc(action, cc, SeqType.ITEM_ZM, ist);
+          ost = nst;
+          nst = nst.union(optAction.funcType().declType);
+        }
       }
       exprType.assign(ost);
       exprs[2] = optAction;

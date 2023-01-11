@@ -3,6 +3,7 @@ package org.basex.query.value.type;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 import static org.basex.query.value.type.NodeType.*;
+import static org.basex.query.value.type.NoneType.*;
 import static org.basex.query.value.type.Occ.*;
 
 import java.util.*;
@@ -24,6 +25,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class SeqType {
+  /** none (result type of fn:error). */
+  public static final SeqType NONE_ZM = NONE.seqType();
   /** Zero items (single instance). */
   public static final SeqType EMPTY_SEQUENCE_Z = ITEM.seqType(ZERO);
 
@@ -449,6 +452,7 @@ public final class SeqType {
    */
   public SeqType union(final SeqType st) {
     if(this == st) return this;
+    if(type == NONE) return st; else if(st.type == NONE) return this;
     // ignore general type of empty sequence
     final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
@@ -479,6 +483,7 @@ public final class SeqType {
    */
   public SeqType intersect(final SeqType st) {
     if(this == st) return this;
+    if(type == NONE) return st; else if(st.type == NONE) return this;
     final Type tp = type.intersect(st.type);
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);

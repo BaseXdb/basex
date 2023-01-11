@@ -142,4 +142,26 @@ public final class TCOTest extends QueryPlanTest {
 
         42);
   }
+
+  /** Checks if static typing of fn:error affects tail call optimization */
+  @Test public void typeCheckOnFnError() {
+    check("declare function local:sum($result, $values) as xs:integer"
+        + "{"
+        + "  if (empty($values)) then"
+        + "    $result"
+        + "  else"
+        + "    let $head := head($values)"
+        + "    return"
+        + "      if ($head instance of xs:integer) then"
+        + "        local:sum($result + $head, tail($values))"
+        + "      else"
+        + "        fn:error()"
+        + "};"
+        + "local:sum(0, 1 to 100000)",
+
+        5000050000L,
+
+        exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']")
+    );
+  }
 }

@@ -18,6 +18,9 @@ import org.basex.util.*;
 public interface Type {
   /** Type IDs for client/server communication. */
   enum ID {
+    // result type of fn:error
+    /** none.                     */ NON(0),
+
     // function types
     /** function(*).              */ FUN(7),
     /** map(*).                   */ MAP(30),
