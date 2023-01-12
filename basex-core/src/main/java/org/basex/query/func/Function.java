@@ -1137,7 +1137,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_PUT_VALUE(DbPutValue::new, "put-value(database,input,path)",
-      params(STRING_O, STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, ITEM_ZM, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database,path,new-path)",
       params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
