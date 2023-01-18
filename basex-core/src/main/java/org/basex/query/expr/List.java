@@ -250,8 +250,9 @@ public final class List extends Arr {
         // otherwise, rewrite list to union
         expr = toUnion(cc);
       }
-    } else if(simplifyAll(mode, cc)) {
-      expr = optimize(cc);
+    } else {
+      final Expr[] ex = simplifyAll(mode, cc);
+      if(ex != exprs) expr = List.get(cc, info, ex);
     }
     return cc.simplify(this, expr, mode);
   }

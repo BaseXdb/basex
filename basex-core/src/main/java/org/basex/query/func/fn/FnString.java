@@ -31,7 +31,7 @@ public final class FnString extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // string(data(E))  ->  string(E)
-    simplifyAll(Simplify.STRING, cc);
+    exprs = simplifyAll(Simplify.STRING, cc);
 
     final boolean context = contextAccess();
     final Expr item = context ? cc.qc.focus.value : exprs[0];

@@ -78,8 +78,7 @@ public final class CArray extends Arr {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA)) {
-      simplifyAll(mode, cc);
-      expr = List.get(cc, info, exprs);
+      expr = List.get(cc, info, simplifyAll(mode, cc));
     }
     return cc.simplify(this, expr, mode);
   }

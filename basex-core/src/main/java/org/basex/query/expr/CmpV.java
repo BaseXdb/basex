@@ -189,7 +189,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.STRING, cc);
+    exprs = simplifyAll(Simplify.STRING, cc);
     if(allAreValues(false)) return cc.preEval(this);
 
     // swap operands

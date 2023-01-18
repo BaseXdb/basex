@@ -175,14 +175,14 @@ public class CmpG extends Cmp {
     final Type t1 = exprs[0].seqType().type.atomic(), t2 = exprs[1].seqType().type.atomic();
     if(t1 != null && t2 != null) {
       if(t1.isStringOrUntyped() && t2.isStringOrUntyped()) {
-        simplifyAll(Simplify.STRING, cc);
+        exprs = simplifyAll(Simplify.STRING, cc);
       } else if(t1.isNumber() && t2.isNumber()) {
-        simplifyAll(Simplify.NUMBER, cc);
+        exprs = simplifyAll(Simplify.NUMBER, cc);
       }
     }
 
     // simplify operands
-    simplifyAll(Simplify.DISTINCT, cc);
+    exprs = simplifyAll(Simplify.DISTINCT, cc);
 
     // swap operands
     if(swap()) {

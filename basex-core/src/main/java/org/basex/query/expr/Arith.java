@@ -37,7 +37,7 @@ public final class Arith extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.NUMBER, cc);
+    exprs = simplifyAll(Simplify.NUMBER, cc);
     if(allAreValues(false)) return cc.preEval(this);
 
     // move values to second position

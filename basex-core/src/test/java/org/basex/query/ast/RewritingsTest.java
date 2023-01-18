@@ -2976,4 +2976,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("name(<a><b><c/></b></a>[b ! (c, d, c)])",
         "a", empty(List.class), empty(IterMap.class), exists(IterPath.class));
   }
+
+  /** Simplified if expression yields errors. */
+  @Test public void gh2161() {
+    check("let $s := ('1', '2') where ($s ! (if(.) then <a/> else ())) return ()", "");
+  }
 }

@@ -111,22 +111,20 @@ public abstract class Arr extends ParseExpr {
    * Simplifies all expressions for requests of the specified type.
    * @param mode mode of simplification
    * @param cc compilation context
-   * @return {@code true} if at least one expression has changed
+   * @return simplified or original expressions
    * @throws QueryException query exception
    */
-  protected final boolean simplifyAll(final Simplify mode, final CompileContext cc)
+  protected final Expr[] simplifyAll(final Simplify mode, final CompileContext cc)
       throws QueryException {
 
     boolean changed = false;
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      final Expr expr = exprs[e].simplifyFor(mode, cc);
-      if(expr != exprs[e]) {
-        exprs[e] = expr;
-        changed = true;
-      }
+    final ExprList list = new ExprList(exprs.length);
+    for(final Expr expr : exprs) {
+      final Expr ex = expr.simplifyFor(mode, cc);
+      if(ex != expr) changed = true;
+      list.add(ex);
     }
-    return changed;
+    return changed ? list.toArray() : exprs;
   }
 
   /**

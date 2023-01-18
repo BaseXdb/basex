@@ -223,7 +223,9 @@ public final class If extends Arr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return simplifyAll(mode, cc) ? optimize(cc) : super.simplifyFor(mode, cc);
+    final Expr[] ex = simplifyAll(mode, cc);
+    return ex != exprs ? new If(info, cond, ex[0], ex[1]).optimize(cc) :
+      super.simplifyFor(mode, cc);
   }
 
   @Override
