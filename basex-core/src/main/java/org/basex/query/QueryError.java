@@ -590,6 +590,8 @@ public enum QueryError {
   NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
   /** Error code. */
   CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
+  /** Error code. */
+  CHARINV_X(FOCH, 5, "Invalid name or glyph: %."),
 
   /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
