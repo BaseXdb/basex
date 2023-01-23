@@ -28,8 +28,6 @@ public final class StaticOptions extends Options {
   public static final StringOption REPOPATH = new StringOption("REPOPATH", Prop.HOMEDIR + "repo");
   /** Language name. */
   public static final StringOption LANG = new StringOption("LANG", Prop.language);
-  /** Flag to include key names in the language strings. */
-  public static final BooleanOption LANGKEYS = new BooleanOption("LANGKEYS", false);
   /** Locking strategy. */
   public static final BooleanOption FAIRLOCK = new BooleanOption("FAIRLOCK", false);
   /** Timeout (seconds) for remembering result of asynchronous queries. */
@@ -124,7 +122,6 @@ public final class StaticOptions extends Options {
 
     // assigns static variables and system properties
     Prop.language = get(LANG);
-    Prop.langkeys = get(LANGKEYS);
     Prop.debug = get(DEBUG);
     final String ph = get(PROXYHOST);
     if(!ph.isEmpty()) {

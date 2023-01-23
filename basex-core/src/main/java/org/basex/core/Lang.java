@@ -50,7 +50,6 @@ public final class Lang {
           final String key = line.substring(0, i).trim();
           String val = line.substring(i + 1).trim();
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-          if(Prop.langkeys) val = '[' + key + ": " + val + ']';
           if(TEXTS.put(key, val) != null) {
             Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
           }
