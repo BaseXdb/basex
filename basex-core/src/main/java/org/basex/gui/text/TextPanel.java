@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 import java.util.AbstractMap.*;
 import java.util.Map.*;
@@ -22,10 +21,10 @@ import org.basex.gui.listener.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.gui.text.TextEditor.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Renders and provides edit capabilities for text.
@@ -1045,20 +1044,20 @@ public class TextPanel extends BaseXPanel {
 
     // find insertion candidates
     final ArrayList<Entry<String, String>> pairs = new ArrayList<>();
-    final int il = LISTS.size();
-    for(int i = 0; i < il; i++) {
-      if(i > 0) pairs.add(null);
-      for(final Entry<String, String> pair : LISTS.get(i)) {
+    final int ll = LISTS.size();
+    for(int l = 0; l < ll; l++) {
+      if(l > 0) pairs.add(null);
+      for(final Entry<String, String> pair : LISTS.get(l)) {
         final String name = pair.getKey();
         if(name.startsWith(input) || name.replace(":", "").startsWith(input)) pairs.add(pair);
       }
     }
-    if(pairs.size() < il) {
+    if(pairs.size() < ll) {
       pairs.clear();
-      for(int i = 0; i < il; i++) {
+      for(int i = 0; i < ll; i++) {
         if(i > 0) pairs.add(null);
         for(final Entry<String, String> pair : LISTS.get(i)) {
-          if(SmartStrings.matches(pair.getKey(), input)) pairs.add(pair);
+          if(SmartStrings.charsOccurIn(pair.getKey(), input)) pairs.add(pair);
         }
       }
     }
@@ -1121,23 +1120,10 @@ public class TextPanel extends BaseXPanel {
 
   /* Reads in the property file. */
   static {
-    for(int i = 0; i < 5; i++) LISTS.add(new ArrayList<>());
-    final String file = "/completions.properties";
-    final InputStream is = TextPanel.class.getResourceAsStream(file);
-    if(is == null) {
-      Util.errln(file + " not found.");
-    } else {
-      // add custom completions
-      try(NewlineInput nli = new NewlineInput(is)) {
-        for(String line; (line = nli.readLine()) != null;) {
-          final int i = line.indexOf('=');
-          if(i == -1 || Strings.startsWith(line, '#')) continue;
-          LISTS.get(0).add(new SimpleEntry<>(line.substring(0, i),
-              line.substring(i + 1).replace("\\n", "\n")));
-        }
-      } catch(final IOException ex) {
-        Util.errln(ex);
-      }
+    for(int l = 0; l < 5; l++) LISTS.add(new ArrayList<>());
+    final TokenMap map = Util.properties("completions.properties");
+    for(final byte[] key : map) {
+      LISTS.get(0).add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
     }
     // add functions (default functions first)
     for(final FuncDefinition fd : Functions.DEFINITIONS) {

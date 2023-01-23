@@ -2,10 +2,8 @@ package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -18,7 +16,7 @@ import org.basex.util.hash.*;
  */
 final class EnglishStemmer extends InternalStemmer {
   /** Dictionary with most frequent terms. */
-  private static final TokenMap DICTIONARY = new TokenMap();
+  private static final TokenMap DICTIONARY = Util.properties("stemmer-en.properties");
 
   /** Stemming character. */
   private static final byte[] AT = token("at");
@@ -74,18 +72,6 @@ final class EnglishStemmer extends InternalStemmer {
     "able", "al", "ance", "ant", "ate", "ement", "ence", "ent", "er", "ible", "ic", "ism",
     "iti", "ive", "ize", "ment", "ou", "ous", "sion", "tion"
   );
-
-  /* Reads in dictionary. */
-  static {
-    try(InputStream is = EnglishStemmer.class.getResourceAsStream("/stemmer-en.properties")) {
-      for(final byte[] line : split(new IOStream(is).read(), '\n')) {
-        final byte[][] tokens = split(line, '=');
-        if(!startsWith(line, '#') && tokens.length == 2) DICTIONARY.put(tokens[0], tokens[1]);
-      }
-    } catch(final Throwable ex) {
-      Util.stack(ex);
-    }
-  }
 
   /** Token to be stemmed. */
   private byte[] token;

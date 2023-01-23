@@ -51,7 +51,7 @@ public final class SmartStrings {
    * @param sub substring
    * @return result of check
    */
-  public static boolean matches(final String string, final String sub) {
+  public static boolean charsOccurIn(final String string, final String sub) {
     final int sl = string.length(), tl = sub.length();
     int t = 0;
     for(int s = 0; s < sl && t < tl; s++) {
