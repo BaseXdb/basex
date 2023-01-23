@@ -140,8 +140,9 @@ public class FnSubsequence extends StandardFunc {
     final long start = start(d);
 
     long end = Long.MAX_VALUE;
-    if(exprs.length > 2) {
-      d = toDouble(exprs[2], qc);
+    final Item e = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    if(e != Empty.VALUE) {
+      d = toDouble(e);
       if(Double.isNaN(d) || start == Long.MIN_VALUE && d == Double.POSITIVE_INFINITY) return EMPTY;
       end = end(start, d);
     }

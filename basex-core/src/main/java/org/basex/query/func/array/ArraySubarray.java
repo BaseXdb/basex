@@ -4,7 +4,9 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -22,12 +24,14 @@ public final class ArraySubarray extends ArrayFn {
 
     final long size = array.arraySize();
     if(start < 0 || start > size) throw ARRAYBOUNDS_X_X.get(info, start + 1, size + 1);
-    if(exprs.length == 2) return array.subArray(start, size - start, qc);
 
-    final long length = toLong(exprs[2], qc);
-    if(length < 0) throw ARRAYNEG_X.get(info, length);
-    if(start + length > size) throw ARRAYBOUNDS_X_X.get(info, start + 1 + length, size + 1);
-    return array.subArray(start, length, qc);
+    final Item length = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    if(length == Empty.VALUE) return array.subArray(start, size - start, qc);
+
+    final long len = toLong(length);
+    if(len < 0) throw ARRAYNEG_X.get(info, len);
+    if(start + len > size) throw ARRAYBOUNDS_X_X.get(info, start + 1 + len, size + 1);
+    return array.subArray(start, len, qc);
   }
 
   @Override

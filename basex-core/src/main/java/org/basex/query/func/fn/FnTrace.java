@@ -22,7 +22,7 @@ public class FnTrace extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc);
-    final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
+    final byte[] label = exprs.length > 1 ? toTokenOrNull(exprs[1], qc) : null;
 
     if(value.isEmpty() || value instanceof RangeSeq || value instanceof SingletonSeq) {
       trace(token(value.toString()), label, qc);

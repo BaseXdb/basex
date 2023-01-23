@@ -459,16 +459,18 @@ public abstract class StandardFunc extends Arr {
   protected final String toEncodingOrNull(final int i, final QueryError err, final QueryContext qc)
       throws QueryException {
 
-    if(i >= exprs.length) return null;
-    final String encoding = toString(exprs[i], qc);
+    final Item encoding = i < exprs.length ? exprs[i].atomItem(qc, info) : Empty.VALUE;
+    if(encoding == Empty.VALUE) return null;
+
+    final String enc = toString(encoding);
     try {
-      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
+      if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
     } catch(final IllegalArgumentException ex) {
       // character set is invalid or unknown (e.g. empty string)
       Util.debug(ex);
     }
-    throw err.get(info, QueryError.similar(encoding,
-        Levenshtein.similar(token(encoding), Strings.encodings())));
+    throw err.get(info, QueryError.similar(enc,
+        Levenshtein.similar(token(enc), Strings.encodings())));
   }
 
   /**

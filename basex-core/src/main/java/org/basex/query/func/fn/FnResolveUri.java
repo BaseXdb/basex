@@ -20,7 +20,7 @@ public final class FnResolveUri extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] relative = toTokenOrNull(exprs[0], qc);
-    final byte[] base = exprs.length > 1 ? toToken(exprs[1], qc) : null;
+    final byte[] base = exprs.length > 1 ? toTokenOrNull(exprs[1], qc) : null;;
     if(relative == null) return Empty.VALUE;
 
     // check relative uri

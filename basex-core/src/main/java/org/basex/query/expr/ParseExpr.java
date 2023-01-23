@@ -558,7 +558,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Evaluates an expression to a QName.
    * @param expr expression
-   * @param empty return {@code null} if the given item is empty
+   * @param empty return {@code null} if the expression yields an empty sequence
    * @param qc query context
    * @return QName or {@code null}
    * @throws QueryException query exception

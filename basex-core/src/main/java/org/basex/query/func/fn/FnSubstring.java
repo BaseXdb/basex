@@ -22,7 +22,7 @@ public final class FnSubstring extends StandardFunc {
     final byte[] value = toZeroToken(exprs[0], qc);
     final boolean ascii = Token.ascii(value);
     int length = ascii ? value.length : Token.length(value);
-    int start = start(qc), end = exprs.length == 3 ? length(qc) : length;
+    int start = start(qc), end = length(length, qc);
 
     if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
     if(start < 0) {
@@ -51,8 +51,8 @@ public final class FnSubstring extends StandardFunc {
     if(value == Empty.VALUE || value == Str.EMPTY) return Str.EMPTY;
 
     final int start = exprs[1] instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
-    final int length = exprs.length < 3 ? Integer.MAX_VALUE :
-      exprs[2] instanceof Value ? length(cc.qc) : Integer.MIN_VALUE;
+    final int length = exprs.length < 3 || exprs[2] instanceof Value ?
+      length(Integer.MAX_VALUE, cc.qc) : Integer.MIN_VALUE;
 
     // invalid start offset or zero length: return empty string
     if(start == Integer.MIN_VALUE || length == 0) return Str.EMPTY;
@@ -79,12 +79,14 @@ public final class FnSubstring extends StandardFunc {
   /**
    * Evaluates the length argument.
    * @param qc query context
+   * @param def default length
    * @return start offset
    * @throws QueryException query exception
    */
-  private int length(final QueryContext qc) throws QueryException {
-    final Item length = toAtomItem(exprs[2], qc);
-    return length instanceof Int ? (int) length.itr(info) : subPos(length.dbl(info) + 1);
+  private int length(final int def, final QueryContext qc) throws QueryException {
+    final Item length = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    return length == Empty.VALUE ? def : length instanceof Int ? (int) length.itr(info) :
+      subPos(length.dbl(info) + 1);
   }
 
   /**
