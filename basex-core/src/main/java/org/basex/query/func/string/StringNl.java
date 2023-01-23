@@ -12,11 +12,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class StringNl extends StandardFunc {
-  /** Newline character. */
-  private static final Str NL = Str.get("\n");
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return NL;
+    return Str.NL;
   }
 }

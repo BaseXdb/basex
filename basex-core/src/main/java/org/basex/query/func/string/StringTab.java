@@ -12,11 +12,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class StringTab extends StandardFunc {
-  /** Tab character. */
-  private static final Str TAB = Str.get("\t");
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return TAB;
+    return Str.TAB;
   }
 }

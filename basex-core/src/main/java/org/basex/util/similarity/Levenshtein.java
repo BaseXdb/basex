@@ -18,7 +18,7 @@ public final class Levenshtein {
   private static final int MAX = 50;
 
   /** Default number of allowed errors; dynamic calculation if value is 0. */
-  private final int error;
+  private final int maxErrors;
   /** Matrix for calculating Levenshtein distance. */
   private int[][] matrix;
 
@@ -31,17 +31,17 @@ public final class Levenshtein {
 
   /**
    * Constructor.
-   * @param error allowed errors
+   * @param maxErrors maximum number of allowed errors
    */
-  public Levenshtein(final int error) {
-    this.error = error;
+  public Levenshtein(final int maxErrors) {
+    this.maxErrors = maxErrors;
   }
 
   /**
    * Returns the most similar entry.
-   * @param token token to be compared
+   * @param token input token
    * @param objects objects to be compared
-   * @return most similar token or {@code null}
+   * @return most similar entry or {@code null}
    */
   public static Object similar(final byte[] token, final Object[] objects) {
     return similar(token, objects, Function.identity());
@@ -49,10 +49,10 @@ public final class Levenshtein {
 
   /**
    * Returns the most similar entry.
-   * @param token token to be compared
+   * @param token input token
    * @param objects objects to be compared
    * @param prepare function for preparing the object to be compared for the comparison
-   * @return most similar token or {@code null}
+   * @return most similar entry or {@code null}
    */
   public static Object similar(final byte[] token, final Object[] objects,
       final Function<Object, Object> prepare) {
@@ -75,33 +75,33 @@ public final class Levenshtein {
 
   /**
    * Compares two tokens for similarity.
-   * @param token token to be compared
-   * @param compare second token to be compared
+   * @param token input token
+   * @param compare token to be compared
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] compare) {
-    return similar(token, compare, error);
+    return similar(token, compare, maxErrors);
   }
 
   /**
    * Compares two tokens for similarity.
-   * @param token token to be compared
-   * @param compare second token to be compared
-   * @param err number of allowed errors; dynamic calculation if value is 0
+   * @param token input token
+   * @param compare token to be compared
+   * @param max number of allowed errors; dynamic calculation if value is {@code 0}
    * @return true if the arrays are similar
    */
-  public boolean similar(final byte[] token, final byte[] compare, final int err) {
-    return distance(token, compare, err) != Integer.MAX_VALUE;
+  public boolean similar(final byte[] token, final byte[] compare, final int max) {
+    return distance(token, compare, max) != Integer.MAX_VALUE;
   }
 
   /**
    * Computes the Levenshtein distance.
    * @param token original token
    * @param compare token to be compared
-   * @param err number of allowed errors; dynamic calculation if value is 0
+   * @param max maximum number of allowed errors; dynamic calculation if value is {@code 0}
    * @return distance
    */
-  private int distance(final byte[] token, final byte[] compare, final int err) {
+  private int distance(final byte[] token, final byte[] compare, final int max) {
     final int sl = compare.length, tl = token.length;
     int clen = 0, tlen = 0;
     for(int c = 0; c < sl; c += cl(compare, c)) ++clen;
@@ -109,11 +109,11 @@ public final class Levenshtein {
 
     // use exact search for too short and too long values
     final int dlen = Math.abs(clen - tlen);
-    if(err == 0 && (tlen < 4 || clen < 4) || tlen > MAX || clen > MAX)
+    if(max == 0 && (tlen < 4 || clen < 4) || tlen > MAX || clen > MAX)
       return dlen == 0 && same(token, compare) ? 0 : Integer.MAX_VALUE;
 
     // skip different tokens with too different lengths
-    final int k = err == 0 ? Math.max(1, clen >> 2) : err;
+    final int k = max == 0 ? Math.max(1, clen >> 2) : max;
     if(dlen > k) return Integer.MAX_VALUE;
 
     // compute distance
@@ -156,8 +156,8 @@ public final class Levenshtein {
    * <p>1.0 is returned if the strings are equal; 0.0 is returned if all strings are
    * completely different.</p>
    *
-   * @param cps1 first array
-   * @param cps2 second array
+   * @param cps1 first codepoints array
+   * @param cps2 second codepoints array
    * @return distance (0.0 - 1.0)
    */
   public static double distance(final int[] cps1, final int[] cps2) {
@@ -192,14 +192,14 @@ public final class Levenshtein {
 
   /**
    * Compares two character arrays for equality.
-   * @param tk token to be compared
-   * @param sb second token to be compared
+   * @param token input token
+   * @param compare token to be compared
    * @return true if the arrays are equal
    */
-  private static boolean same(final byte[] tk, final byte[] sb) {
-    final int tl = tk.length, sl = sb.length;
-    for(int s = 0, t = 0; t < tl && s < sl; t += cl(tk, t), s += cl(sb, s)) {
-      if(lc(noDiacritics(cp(tk, t))) != lc(noDiacritics(cp(sb, t)))) return false;
+  private static boolean same(final byte[] token, final byte[] compare) {
+    final int tl = token.length, cl = compare.length;
+    for(int c = 0, t = 0; t < tl && c < cl; t += cl(token, t), c += cl(compare, c)) {
+      if(lc(noDiacritics(cp(token, t))) != lc(noDiacritics(cp(compare, t)))) return false;
     }
     return true;
   }
