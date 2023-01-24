@@ -1740,9 +1740,14 @@ public class QueryParser extends InputParser {
         if(enclosed) {
           ex = new CachedMap(ii, ex, e);
         } else {
-          final ExprList argList = new ExprList(thin ? new ContextValue(ii) : ex);
-          final Expr fc = e instanceof QNm ? funcCall(checkReserved((QNm) e), argList, ii) :
-            dynFuncCall(e, argList, argumentList(argList), ii);
+          final Expr expr = thin ? new ContextValue(ii) : ex;
+          final Expr fc;
+          if(e instanceof QNm) {
+            fc = funcCall(checkReserved((QNm) e), ii, argumentList(true, expr));
+          } else {
+            final FuncArgs args = argumentList(false, expr);
+            fc = dynFuncCall(e, ii, args.exprs(), args.holes());
+          }
           ex = thin ? new CachedMap(ii, ex, fc) : fc;
         }
       }
@@ -2137,8 +2142,8 @@ public class QueryParser extends InputParser {
         } else if(curr('(')) {
           // parses the "ArgumentList" rule
           final InputInfo ii = info();
-          final ExprList argList = new ExprList();
-          ex = dynFuncCall(ex, argList, argumentList(argList), ii);
+          final FuncArgs args = argumentList(true);
+          ex = dynFuncCall(ex, ii, args.exprs(), args.holes());
         } else {
           final int p = pos;
           if(consume(QUESTION) && !consume(QUESTION) && !consume(':')) {
@@ -2515,11 +2520,7 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && !reserved(name)) {
       skipWs();
-      final InputInfo ii = info();
-      if(curr('(')) {
-        final Expr ex = funcCall(name, new ExprList(), ii);
-        if(ex != null) return ex;
-      }
+      if(curr('(')) return funcCall(name, info(), argumentList(true));
     }
     pos = p;
     return null;
@@ -2528,61 +2529,78 @@ public class QueryParser extends InputParser {
   /**
    * Returns a function call.
    * @param name function name
-   * @param argList list of arguments
    * @param ii input info
-   * @return function or {@code null}
+   * @param args function arguments
+   * @return function call
    * @throws QueryException query exception
    */
-  private Expr funcCall(final QNm name, final ExprList argList, final InputInfo ii)
+  private Expr funcCall(final QNm name, final InputInfo ii, final FuncArgs args)
       throws QueryException {
-    final int[] ph = argumentList(argList);
-    if(ph == null) return Functions.get(name, argList.finish(), qc, sc, ii);
+
+    final int[] holes = args.holes();
+    final Expr[] exprs = args.exprs();
+    if(holes == null) return Functions.get(name, exprs, args.keywords(), qc, sc, ii);
 
     // partial function
-    final int arity = argList.size() + ph.length;
+    final int arity = exprs.length + holes.length;
     final Expr func = Functions.getLiteral(name, arity, qc, sc, ii, false);
-    return func == null ? undeclaredLiteral(name, arity, ii) : dynFuncCall(func, argList, ph, ii);
+    return func == null ? undeclaredLiteral(name, arity, ii) : dynFuncCall(func, ii, exprs, holes);
   }
 
   /**
    * Generates a dynamic function call or a partial function application.
    * @param expr function expression
-   * @param argList list of arguments
-   * @param ph placeholders for partial function application
    * @param ii input info
+   * @param args arguments
+   * @param holes positions of the placeholders
    * @return function call
    */
-  private Expr dynFuncCall(final Expr expr, final ExprList argList, final int[] ph,
-      final InputInfo ii) {
-    final Expr[] args = argList.finish();
-    return ph == null ? new DynFuncCall(ii, sc, expr, args) : new PartFunc(ii, sc, expr, args, ph);
+  private Expr dynFuncCall(final Expr expr, final InputInfo ii, final Expr[] args,
+      final int[] holes) {
+    return holes == null ? new DynFuncCall(ii, sc, expr, args) :
+      new PartFunc(ii, sc, ExprList.concat(args, expr), holes);
   }
 
   /**
    * Parses the "ArgumentList" rule.
-   * @param args list to put the arguments into
-   * @return array of arguments, place-holders '?' are represented as {@code null} entries
+   * @param keywords allow keyword arguments
+   * @param exprs arguments
+   * @return function arguments
    * @throws QueryException query exception
    */
-  private int[] argumentList(final ExprList args) throws QueryException {
+  private FuncArgs argumentList(final boolean keywords, final Expr... exprs)
+      throws QueryException {
+    final FuncArgs args  = new FuncArgs(exprs);
     wsCheck(PAREN1);
-    int[] holes = null;
-    if(!wsConsume(PAREN2)) {
-      int i = args.size();
+    if(!wsConsumeWs(PAREN2)) {
+      boolean kw = false;
       do {
-        final Expr ex = single();
-        if(ex != null) {
-          args.add(ex);
-        } else if(wsConsume(QUESTION)) {
-          holes = holes == null ? new int[] { i } : Array.add(holes, i);
-        } else {
-          throw error(FUNCARG_X, found());
+        final int p = pos;
+        if(keywords) {
+          final QNm name = eQName(null, null);
+          if(name != null && wsConsume(ASSIGN)) {
+            final Expr ex = single();
+            if(ex == null) throw error(FUNCARG_X, found());
+            if(args.add(name, ex)) throw error(DUPLPARAM_X, name);
+            kw = true;
+          } else {
+            pos = p;
+          }
         }
-        i++;
-      } while(wsConsume(COMMA));
-      if(!wsConsume(PAREN2)) throw error(FUNCARG_X, found());
+        if(p == pos && !kw) {
+          final Expr ex = single();
+          if(ex != null) {
+            args.add(ex);
+          } else if(wsConsume(QUESTION)) {
+            args.add(null);
+          } else {
+            throw error(FUNCARG_X, found());
+          }
+        }
+      } while(wsConsumeWs(COMMA));
+      if(!consume(PAREN2)) throw error(FUNCARG_X, found());
     }
-    return holes;
+    return args;
   }
 
   /**

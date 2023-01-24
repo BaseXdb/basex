@@ -95,8 +95,8 @@ public abstract class StandardFunc extends Arr {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       // consider variable-size parameters
-      final int p = Math.min(e, definition.params.length - 1);
-      final Type type = definition.params[p].type;
+      final int p = Math.min(e, definition.types.length - 1);
+      final Type type = definition.types[p].type;
       if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
         final Simplify mode = type.instanceOf(AtomType.NUMERIC) ? Simplify.NUMBER : Simplify.STRING;
         exprs[e] = exprs[e].simplifyFor(mode, cc);

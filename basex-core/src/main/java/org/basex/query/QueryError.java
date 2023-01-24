@@ -1307,6 +1307,14 @@ public enum QueryError {
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** Error code. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
+  /** Error code. */
+  DUPLPARAM_X(XPST, 141, "Parameter supplied twice: %."),
+  /** Error code. */
+  DUPLPARAM_X_X(XPST, 141, "%: Parameter supplied twice: %."),
+  /** Error code. */
+  WHICHPARAM_X(XPST, 142, "Unknown parameter: %."),
+  /** Error code. */
+  WHICHPARAM_X_X(XPST, 142, "%: Unknown parameter: %."),
 
   /** Error code. */
   NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),

@@ -12,6 +12,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
 import org.basex.query.util.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -78,11 +79,11 @@ public final class Functions {
   }
 
   /**
-   * Returns a built-in function with the specified name.
+   * Returns the definition of a built-in function with the specified name.
    * @param name function name
-   * @return function if found, {@code null} otherwise
+   * @return function definition if found, {@code null} otherwise
    */
-  static FuncDefinition getBuiltIn(final QNm name) {
+  static FuncDefinition builtIn(final QNm name) {
     final int id = CACHE.id(name.id());
     return id != 0 ? DEFINITIONS.get(id - 1) : null;
   }
@@ -100,28 +101,20 @@ public final class Functions {
   }
 
   /**
-   * Returns a built-in function with the specified name and arity.
-   * Raises an error if the function is found, but has a different arity.
-   * @param name function name
-   * @param arity number of arguments
+   * Raises an error for the wrong number of function arguments.
+   * @param fd function definition
+   * @param arity number of supplied arguments
    * @param ii input info
-   * @return function if found, {@code null} otherwise
-   * @throws QueryException query exception
+   * @return query exception
    */
-  private static FuncDefinition getBuiltIn(final QNm name, final long arity, final InputInfo ii)
-      throws QueryException {
-
-    final FuncDefinition fd = getBuiltIn(name);
-    if(fd == null) return null;
-
-    final int min = fd.minMax[0], max = fd.minMax[1];
-    if(arity >= min && arity <= max) return fd;
-
+  public static QueryException wrongArity(final FuncDefinition fd, final int arity,
+      final InputInfo ii) {
     final IntList arities = new IntList();
+    final int min = fd.minMax[0], max = fd.minMax[1];
     if(max != Integer.MAX_VALUE) {
       for(int m = min; m <= max; m++) arities.add(m);
     }
-    throw wrongArity(fd, arity, arities, ii);
+    return wrongArity(fd, arity, arities, ii);
   }
 
   /**
@@ -132,7 +125,7 @@ public final class Functions {
    * @param ii input info
    * @return error
    */
-  public static QueryException wrongArity(final Object function, final long arity,
+  public static QueryException wrongArity(final Object function, final int arity,
       final IntList arities, final InputInfo ii) {
 
     final int as = arities.ddo().size();
@@ -158,18 +151,46 @@ public final class Functions {
   }
 
   /**
-   * Returns the specified function.
+   * Returns an instance of a built-in function.
    * @param name function qname
-   * @param args optional arguments
+   * @param args positional arguments
+   * @param keywords keyword arguments (can be {@code null})
    * @param sc static context
    * @param ii input info
-   * @return function instance
+   * @return function instance if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static StandardFunc get(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    final FuncDefinition fd = getBuiltIn(name, args.length, ii);
-    return fd == null ? null : fd.get(sc, ii, args);
+  private static StandardFunc builtIn(final QNm name, final Expr[] args,
+      final QNmMap<Expr> keywords, final StaticContext sc, final InputInfo ii)
+          throws QueryException {
+
+    final FuncDefinition fd = builtIn(name);
+    if(fd == null) return null;
+
+    final int arity = args.length, min = fd.minMax[0], max = fd.minMax[1];
+    if(arity <= max) {
+      if(keywords == null) {
+        if(arity >= min) return fd.get(sc, ii, args);
+      } else {
+        final ExprList list = new ExprList().add(args);
+        for(final QNm qnm : keywords) {
+          int i = -1;
+          for(int q = 0; q < fd.names.length; q++) {
+            if(qnm.eq(fd.names[q])) {
+              i = q;
+              break;
+            }
+          }
+          if(i == -1) throw WHICHPARAM_X_X.get(ii, fd, qnm);
+
+          for(int e = list.size(); e < i; e++) list.set(e, Empty.VALUE);
+          if(list.get(i) != null) throw DUPLPARAM_X_X.get(ii, fd, qnm);
+          list.set(i, keywords.get(qnm));
+        }
+        if(list.size() >= min) return fd.get(sc, ii, list.finish());
+      }
+    }
+    throw wrongArity(fd, arity, ii);
   }
 
   /**
@@ -209,7 +230,7 @@ public final class Functions {
   public static Expr getLiteral(final QNm name, final int arity, final QueryContext qc,
       final StaticContext sc, final InputInfo ii, final boolean runtime) throws QueryException {
 
-    // parse type constructors
+    // parse type constructor
     if(eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, arity, ii);
       final VarScope vs = new VarScope(sc);
@@ -223,9 +244,12 @@ public final class Functions {
       return closureOrFItem(anns, name, params, ft, expr, vs, ii, runtime, false);
     }
 
-    // built-in functions
-    final FuncDefinition fd = getBuiltIn(name, arity, ii);
+    // built-in function
+    final FuncDefinition fd = builtIn(name);
     if(fd != null) {
+      final int min = fd.minMax[0], max = fd.minMax[1];
+      if(arity < min || arity > max) throw wrongArity(fd, arity, ii);
+
       final AnnList anns = new AnnList();
       final VarScope vs = new VarScope(sc);
       final FuncType ft = fd.type(arity, anns);
@@ -315,29 +339,33 @@ public final class Functions {
   /**
    * Returns a function call with the specified name and number of arguments.
    * @param name name of the function
-   * @param args optional arguments
+   * @param args positional arguments
+   * @param keywords keyword arguments (can be {@code null})
    * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return function call
    * @throws QueryException query exception
    */
-  public static Expr get(final QNm name, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+  public static Expr get(final QNm name, final Expr[] args, final QNmMap<Expr> keywords,
+      final QueryContext qc, final StaticContext sc, final InputInfo ii) throws QueryException {
 
-    // type constructors
-    if(eq(name.uri(), XS_URI)) {
+    // type constructor
+    if(keywords == null && eq(name.uri(), XS_URI)) {
       final Type type = getCast(name, args.length, ii);
       final SeqType st = SeqType.get(type, Occ.ZERO_OR_ONE);
       return new Cast(sc, ii, args[0], st);
     }
 
-    // built-in functions
-    final StandardFunc sf = get(name, args, sc, ii);
+    // built-in function
+    final StandardFunc sf = builtIn(name, args, keywords, sc, ii);
     if(sf != null) {
       if(sf.updating()) qc.updating();
       return sf;
     }
+
+    // reject keyword parameters for other function types
+    if(keywords != null) throw WHICHPARAM_X.get(ii, keywords.iterator().next());
 
     // user-defined function
     final TypedFunc tf = qc.functions.funcCall(name, args, sc, ii);

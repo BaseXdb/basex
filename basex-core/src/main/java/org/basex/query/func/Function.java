@@ -294,7 +294,7 @@ public enum Function implements AFunction {
   ID(FnId::new, "id(values[,node])",
       params(STRING_ZM, NODE_O), ELEMENT_ZM),
   /** XQuery function. */
-  IDENTITY(FnIdentity::new, "identity(value)", params(ITEM_ZM), ITEM_ZM),
+  IDENTITY(FnIdentity::new, "identity(input)", params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   IDREF(FnIdref::new, "idref(values[,node])",
       params(STRING_ZM, NODE_O), NODE_ZM),

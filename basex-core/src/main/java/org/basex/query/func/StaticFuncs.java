@@ -49,7 +49,7 @@ public final class StaticFuncs extends ExprInfo {
 
     final byte[] uri = qname.uri();
     if(uri.length == 0) throw FUNNONS_X.get(ii, qname.string());
-    if(NSGlobal.reserved(uri) || Functions.getBuiltIn(qname) != null)
+    if(NSGlobal.reserved(uri) || Functions.builtIn(qname) != null)
       throw FNRESERVED_X.get(ii, qname.string());
 
     final StaticFunc sf = new StaticFunc(anns, qname, params, type, expr, doc, vs, ii);

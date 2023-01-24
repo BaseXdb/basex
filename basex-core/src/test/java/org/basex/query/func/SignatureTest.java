@@ -8,7 +8,9 @@ import java.util.*;
 import org.basex.*;
 import org.basex.build.*;
 import org.basex.io.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -37,29 +39,31 @@ public final class SignatureTest extends SandboxTest {
     final String desc = fd.toString(), name = desc.replaceAll("\\(.*", "");
 
     // check that there are enough argument names
-    final String[] names = fd.names();
+    final QNm[] names = fd.names;
     final int min = fd.minMax[0], max = fd.minMax[1];
     assertEquals(names.length, max == Integer.MAX_VALUE ? min : max, fd + Arrays.toString(names));
     // all variable names must be distinct
-    final Set<String> set = new HashSet<>(Arrays.asList(names));
+    final Set<QNm> set = new HashSet<>(Arrays.asList(names));
     assertEquals(names.length, set.size(), "Duplicate argument names: " + fd);
     // var-arg functions must have a number at the end
-    if(max == Integer.MAX_VALUE) assertTrue(names[names.length - 1].matches(".*\\d+$"));
+    if(max == Integer.MAX_VALUE) {
+      assertTrue(Token.string(names[names.length - 1].local()).matches(".*\\d+$"));
+    }
 
     // test too few, too many, and wrong argument types
     for(int al = Math.max(min - 1, 0); al <= max + 1; al++) {
       final boolean in = al >= min && al <= max;
       final StringBuilder qu = new StringBuilder(name + '(');
       int any = 0;
-      for(int p = 0; p < al; p++) {
-        if(p != 0) qu.append(", ");
+      for(int t = 0; t < al; t++) {
+        if(t != 0) qu.append(", ");
         if(in) {
           // test arguments
-          if(fd.params[p].type == AtomType.STRING) {
-            qu.append((char) (48 + p));
+          if(fd.types[t].type == AtomType.STRING) {
+            qu.append((char) (48 + t));
           } else { // any type (skip test)
-            qu.append("'").append((char) (65 + p)).append("'");
-            if(SeqType.STRING_O.instanceOf(fd.params[p])) any++;
+            qu.append("'").append((char) (65 + t)).append("'");
+            if(SeqType.STRING_O.instanceOf(fd.types[t])) any++;
           }
         } else {
           // test wrong number of arguments
