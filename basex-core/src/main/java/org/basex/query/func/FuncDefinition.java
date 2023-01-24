@@ -117,6 +117,18 @@ public final class FuncDefinition {
   }
 
   /**
+   * Returns the index of the specified parameter.
+   * @param name parameter name
+   * @return index or {@code -1}
+   */
+  public int indexOf(final QNm name) {
+    for(int n = names.length - 1; n >= 0; n--) {
+      if(name.eq(names[n])) return n;
+    }
+    return -1;
+  }
+
+  /**
    * Returns the function type of this function with the given arity.
    * @param arity number of arguments
    * @param anns annotations

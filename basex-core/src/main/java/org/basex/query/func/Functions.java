@@ -169,25 +169,21 @@ public final class Functions {
 
     final int arity = args.length, min = fd.minMax[0], max = fd.minMax[1];
     if(arity <= max) {
-      if(keywords == null) {
-        if(arity >= min) return fd.get(sc, ii, args);
-      } else {
+      if(keywords != null) {
         final ExprList list = new ExprList().add(args);
         for(final QNm qnm : keywords) {
-          int i = -1;
-          for(int q = 0; q < fd.names.length; q++) {
-            if(qnm.eq(fd.names[q])) {
-              i = q;
-              break;
-            }
-          }
+          final int i = fd.indexOf(qnm);
           if(i == -1) throw WHICHPARAM_X_X.get(ii, fd, qnm);
-
-          for(int e = list.size(); e < i; e++) list.set(e, Empty.VALUE);
           if(list.get(i) != null) throw DUPLPARAM_X_X.get(ii, fd, qnm);
           list.set(i, keywords.get(qnm));
         }
-        if(list.size() >= min) return fd.get(sc, ii, list.finish());
+        // pass on empty sequence for remaining arguments
+        for(int l = list.size() - 1; l >= 0; l--) {
+          if(list.get(l) == null) list.set(l, Empty.VALUE);
+        }
+        return fd.get(sc, ii, list.finish());
+      } else if(arity >= min) {
+        return fd.get(sc, ii, args);
       }
     }
     throw wrongArity(fd, arity, ii);
@@ -365,7 +361,7 @@ public final class Functions {
     }
 
     // reject keyword parameters for other function types
-    if(keywords != null) throw WHICHPARAM_X.get(ii, keywords.iterator().next());
+    if(keywords != null) throw WHICHPARAM_X_X.get(ii, name.prefixId(), keywords.iterator().next());
 
     // user-defined function
     final TypedFunc tf = qc.functions.funcCall(name, args, sc, ii);
