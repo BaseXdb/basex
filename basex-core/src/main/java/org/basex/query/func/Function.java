@@ -470,8 +470,8 @@ public enum Function implements AFunction {
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator::new, "random-number-generator([seed])",
       params(ANY_ATOMIC_TYPE_ZO), MAP_O, flag(HOF, NDT)),
   /** XQuery function. */
-  REMOVE(FnRemove::new, "remove(input,position)",
-      params(ITEM_ZM, INTEGER_O), ITEM_ZM),
+  REMOVE(FnRemove::new, "remove(input,positions)",
+      params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
   /** XQuery function. */
   REPLACE(FnReplace::new, "replace(value,pattern,replacement[,flags[,action])",
       params(STRING_ZO, STRING_O, STRING_ZO, STRING_ZO,

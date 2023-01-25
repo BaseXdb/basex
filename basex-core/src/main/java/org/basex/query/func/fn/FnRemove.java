@@ -8,6 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -19,23 +20,23 @@ public final class FnRemove extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter input = exprs[0].iter(qc);
-    final long pos = toLong(exprs[1], qc), size = input.size();
+    final LongList pos = positions(qc);
 
-    // position out of bounds: return original value
-    if(pos <= 0 || size != -1 && pos > size) return input;
     // value-based iterator
-    if(input.valueIter()) return value(input.value(qc, null), pos, qc).iter();
+    if(input.valueIter() || pos.size() > 1) return value(input.value(qc, null), pos, qc).iter();
 
+    final long size = input.size();
     return new Iter() {
+      final long p = pos.get(0);
       long c;
 
       @Override
       public Item next() throws QueryException {
-        return ++c != pos || input.next() != null ? input.next() : null;
+        return c++ != p || input.next() != null ? input.next() : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return input.get(i + 1 < pos ? i : i + 1);
+        return input.get(i + 1 < p ? i : i + 1);
       }
       @Override
       public long size() {
@@ -46,24 +47,47 @@ public final class FnRemove extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return value(exprs[0].value(qc), toLong(exprs[1], qc), qc);
+    final Value input = exprs[0].value(qc);
+    final LongList pos = positions(qc);
+    return value(input, pos, qc);
   }
 
   /**
    * Returns the result value.
    * @param value original value
-   * @param pos position of the item to remove
+   * @param list positions of the items to remove (sorted, duplicate-free)
    * @param qc query context
    * @return resulting value
    */
-  private static Value value(final Value value, final long pos, final QueryContext qc) {
-    final long size = value.size();
-    // position out of bounds: return original value
-    if(pos <= 0 || pos > size) return value;
-    // remove first or last item (size > 0)
-    if(pos == 1 || pos == size) return value.subsequence(pos == 1 ? 1 : 0, size - 1, qc);
-    // remove item at supplied position
-    return ((Seq) value).remove(pos - 1, qc);
+  private static Value value(final Value value, final LongList list, final QueryContext qc) {
+    Value v = value;
+    for(int l = list.size() - 1; l >= 0 && v != Empty.VALUE; l--) {
+      final long pos = list.get(l), size = v.size();
+      if(pos == 0) {
+        // remove first item
+        v = v.subsequence(1, size - 1, qc);
+      } else if(pos == size - 1) {
+        // remove last item
+        v = v.subsequence(0, size - 1, qc);
+      } else if(pos > 0 && pos < size) {
+        // remove item at supplied position
+        v = ((Seq) v).remove(pos, qc);
+      }
+    }
+    return v;
+  }
+
+  /**
+   * Returns sorted and duplicate-free positions.
+   * @param qc query context
+   * @return positions
+   * @throws QueryException query exception
+   */
+  private LongList positions(final QueryContext qc) throws QueryException {
+    final LongList pos = new LongList();
+    final Iter iter = exprs[1].iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) pos.add(toLong(item) - 1);
+    return pos.ddo();
   }
 
   @Override
@@ -76,7 +100,7 @@ public final class FnRemove extends StandardFunc {
     if(st.zero()) return input;
 
     long sz = -1;
-    if(pos instanceof Value) {
+    if(pos instanceof Item && pos.size() == 1) {
       // position is static...
       final long p = toLong(pos, cc.qc);
       // return all items

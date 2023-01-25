@@ -20,16 +20,16 @@ public final class ArrayRemove extends ArrayFn {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     XQArray array = toArray(exprs[0], qc);
 
-    // collect positions, sort and remove duplicates
-    final LongList list = new LongList();
-    final Iter pos = exprs[1].iter(qc);
-    for(Item item; (item = qc.next(pos)) != null;) {
-      list.add(toPos(array, toLong(item), false));
+    // collect and sort positions and remove duplicates
+    final LongList pos = new LongList();
+    final Iter iter = exprs[1].iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      pos.add(toPos(array, toLong(item), false));
     }
-    list.ddo();
+    pos.ddo();
 
     // delete entries backwards
-    for(int l = list.size() - 1; l >= 0; l--) array = array.remove(list.get(l), qc);
+    for(int l = pos.size() - 1; l >= 0; l--) array = array.remove(pos.get(l), qc);
     return array;
   }
 

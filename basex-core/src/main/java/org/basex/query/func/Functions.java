@@ -173,8 +173,8 @@ public final class Functions {
         final ExprList list = new ExprList().add(args);
         for(final QNm qnm : keywords) {
           final int i = fd.indexOf(qnm);
-          if(i == -1) throw WHICHPARAM_X_X.get(ii, fd, qnm);
-          if(list.get(i) != null) throw DUPLPARAM_X_X.get(ii, fd, qnm);
+          if(i == -1) throw WHICHKEYWORD_X_X.get(ii, fd, qnm);
+          if(list.get(i) != null) throw DUPLKEYWORD_X_X.get(ii, fd, qnm);
           list.set(i, keywords.get(qnm));
         }
         // pass on empty sequence for remaining arguments
@@ -361,18 +361,20 @@ public final class Functions {
     }
 
     // reject keyword parameters for other function types
-    if(keywords != null) throw WHICHPARAM_X_X.get(ii, name.prefixId(), keywords.iterator().next());
+    if(keywords == null) {
+      // user-defined function
+      final TypedFunc tf = qc.functions.funcCall(name, args, sc, ii);
+      if(tf != null) {
+        if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
+        return tf.func;
+      }
 
-    // user-defined function
-    final TypedFunc tf = qc.functions.funcCall(name, args, sc, ii);
-    if(tf != null) {
-      if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
-      return tf.func;
+      // Java function
+      final JavaCall jf = JavaCall.get(name, args, qc, sc, ii);
+      if(jf != null) return jf;
+    } else if(!NSGlobal.reserved(name.uri())) {
+      throw NOKEYWORD_X.get(ii, name.prefixString());
     }
-
-    // Java function
-    final JavaCall jf = JavaCall.get(name, args, qc, sc, ii);
-    if(jf != null) return jf;
 
     // user-defined function that has not been declared yet
     return qc.functions.undeclaredFuncCall(name, args, sc, ii).func;

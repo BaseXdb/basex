@@ -1308,13 +1308,13 @@ public enum QueryError {
   /** Error code. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
   /** Error code. */
-  DUPLPARAM_X(XPST, 141, "Parameter supplied twice: %."),
+  DUPLKEYWORD_X(XPST, 141, "Keyword supplied twice: %."),
   /** Error code. */
-  DUPLPARAM_X_X(XPST, 141, "%: Parameter supplied twice: %."),
+  DUPLKEYWORD_X_X(XPST, 141, "%: Keyword supplied twice: %."),
   /** Error code. */
-  WHICHPARAM_X(XPST, 142, "Unknown parameter: %."),
+  WHICHKEYWORD_X_X(XPST, 142, "%: Unknown keyword: %."),
   /** Error code. */
-  WHICHPARAM_X_X(XPST, 142, "%: Unknown parameter: %."),
+  NOKEYWORD_X(XPST, 142, "%: Keyword arguments not supported."),
 
   /** Error code. */
   NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),

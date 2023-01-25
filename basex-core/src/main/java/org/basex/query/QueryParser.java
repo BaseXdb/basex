@@ -2581,7 +2581,7 @@ public class QueryParser extends InputParser {
           if(name != null && wsConsume(ASSIGN)) {
             final Expr ex = single();
             if(ex == null) throw error(FUNCARG_X, found());
-            if(args.add(name, ex)) throw error(DUPLPARAM_X, name);
+            if(args.add(name, ex)) throw error(DUPLKEYWORD_X, name);
             kw = true;
           } else {
             pos = p;
