@@ -24,43 +24,28 @@ public final class SqlConnect extends SqlFn {
   /** Password. */
   private static final String PASS = "password";
 
-  @SuppressWarnings("resource")
   @Override
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // URL to relational database
     final String url = toString(exprs[0], qc);
-    final JDBCConnections jdbc = jdbc(qc);
+    final String username = exprs.length > 1 ? toStringOrNull(exprs[1], qc) : null;
+    final String password = exprs.length > 2 ? toStringOrNull(exprs[2], qc) : null;
+    final HashMap<String, String> options = toOptions(3, new Options(), qc).free();
+
+    // parse options; overwrite with user and password (if supplied); treat autocommit independently
+    final Properties props = new Properties();
+    props.putAll(options);
+    if(username != null) props.setProperty(USER, username);
+    if(password != null) props.setProperty(PASS, password);
+    final Object auto = props.remove(AUTOCOMMIT);
+
+    // open connection and set auto-commit mode
+    final Connection conn;
     try {
-      final Connection conn;
-      if(exprs.length > 2) {
-        // credentials
-        final String username = toString(exprs[1], qc), password = toString(exprs[2], qc);
-        if(exprs.length == 4) {
-          // parse connection options
-          final HashMap<String, String> options = toOptions(3, new Options(), qc).free();
-
-          // prepares connection properties
-          final Properties props = new Properties();
-          options.forEach((key, value) -> {
-            if(!key.equals(AUTOCOMMIT)) props.setProperty(key, value);
-          });
-          props.setProperty(USER, username);
-          props.setProperty(PASS, password);
-
-          // open connection and set auto-commit mode
-          conn = DriverManager.getConnection(url, props);
-          if(options.containsKey(AUTOCOMMIT)) {
-            conn.setAutoCommit(Strings.toBoolean(options.get(AUTOCOMMIT)));
-          }
-        } else {
-          conn = DriverManager.getConnection(url, username, password);
-        }
-      } else {
-        conn = DriverManager.getConnection(url);
-      }
-      return jdbc.add(conn, url);
+      conn = DriverManager.getConnection(url, props);
+      if(auto != null) conn.setAutoCommit(Strings.toBoolean(auto.toString()));
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }
+    return jdbc(qc).add(conn, url);
   }
 }
