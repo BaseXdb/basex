@@ -11,6 +11,7 @@ import java.io.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -103,6 +104,15 @@ abstract class MarkupSerializer extends StandardSerializer {
           out.print('\n');
         }
       }
+    }
+  }
+
+  @Override
+  public void serialize(final Item item) throws IOException {
+    if(item instanceof XQArray) {
+      for(Item it : flatten((XQArray) item)) super.serialize(it);
+    } else {
+      super.serialize(item);
     }
   }
 

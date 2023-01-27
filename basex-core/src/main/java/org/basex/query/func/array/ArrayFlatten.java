@@ -98,8 +98,9 @@ public final class ArrayFlatten extends ArrayFn {
     for(Item item; (item = qc.next(iter)) != null;) {
       if(item instanceof XQArray) {
         for(final Value value : ((XQArray) item).members()) add(vb, value, qc);
+      } else {
+        vb.add(item);
       }
-      else vb.add(item);
     }
   }
 }

@@ -11,6 +11,7 @@ import java.util.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -158,5 +159,24 @@ public abstract class StandardSerializer extends OutputSerializer {
       }
     }
     return false;
+  }
+
+  /**
+   * Flattens an array.
+   * @param array array
+   * @return contained items
+   */
+  static ItemList flatten(final XQArray array) {
+    final ItemList list = new ItemList();
+    for(final Value value : array.members()) {
+      for(Item item : value) {
+        if(item instanceof XQArray) {
+          list.add(flatten((XQArray) item));
+        } else {
+          list.add(item);
+        }
+      }
+    }
+    return list;
   }
 }
