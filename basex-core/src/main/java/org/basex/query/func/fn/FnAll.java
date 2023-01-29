@@ -53,7 +53,7 @@ public class FnAll extends StandardFunc {
     final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);
 
     final Expr cmp = new CmpG(info, flwor, Bln.get(some), OpG.EQ, null, sc).optimize(cc);
-    return some ? cmp : Function.NOT.get(sc, info, cmp);
+    return some ? cmp : cc.function(Function.NOT, info, cmp);
   }
 
   /**
