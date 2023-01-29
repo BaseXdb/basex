@@ -1249,6 +1249,18 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[a and b]", "", count(SingleIterPath.class, 2));
 
     check("<a/>[empty(b) or empty(c)]", "<a/>", exists(Or.class));
+
+    final String e1 = " (1 to 6)[. = (1, 2)]", e2 = " (1 to 6)[. = (7, 8)]";
+    check(EMPTY.args(e1)  + " and " + EMPTY.args(e2),  false, root(EMPTY));
+    check(EXISTS.args(e1) + " or "  + EXISTS.args(e2), true, root(EXISTS));
+    check(EMPTY.args(e1)  + " or "  + EMPTY.args(e2),  true, root(Or.class));
+    check(EXISTS.args(e1) + " and " + EXISTS.args(e2), false, root(And.class));
+    query("for $j in 6 to 11 "
+        + "let $i := 1 "
+        + "let $a := $i[. >= 2] "
+        + "let $b := $j[. >= 11] "
+        + "where exists($a) and exists($b) "
+        + "return count($a)", "");
   }
 
   /** Documents with different default namespaces. */

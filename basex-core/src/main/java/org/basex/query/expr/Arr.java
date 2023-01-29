@@ -246,12 +246,8 @@ public abstract class Arr extends ParseExpr {
       final ExprList tmp = new ExprList(exprs.length);
       for(final Expr expr : exprs) tmp.add(expr.arg(0));
       final Expr expr = or ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
-      list.add(cc.function(not, info, expr.optimize(cc)));
-    } else {
-      list.add(exprs);
+      exprs = list.add(cc.function(not, info, expr.optimize(cc))).finish();
     }
-
-    exprs = list.finish();
     return false;
   }
 
