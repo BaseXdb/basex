@@ -180,7 +180,7 @@ public final class Functions {
         // pass on empty sequence for remaining arguments
         for(int l = list.size() - 1; l >= 0; l--) {
           if(list.get(l) == null) {
-            if(l <= min) throw ARGMISSING_X_X.get(ii, fd, fd.names[l].prefixString());
+            if(l < min) throw ARGMISSING_X_X.get(ii, fd, fd.names[l].prefixString());
             list.set(l, Empty.VALUE);
           }
         }
