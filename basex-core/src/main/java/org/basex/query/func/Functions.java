@@ -173,13 +173,16 @@ public final class Functions {
         final ExprList list = new ExprList().add(args);
         for(final QNm qnm : keywords) {
           final int i = fd.indexOf(qnm);
-          if(i == -1) throw WHICHKEYWORD_X_X.get(ii, fd, qnm);
-          if(list.get(i) != null) throw DUPLKEYWORD_X_X.get(ii, fd, qnm);
+          if(i == -1) throw KEYWORDUNKNOWN_X_X.get(ii, fd, qnm);
+          if(list.get(i) != null) throw ARGTWICE_X_X.get(ii, fd, qnm);
           list.set(i, keywords.get(qnm));
         }
         // pass on empty sequence for remaining arguments
         for(int l = list.size() - 1; l >= 0; l--) {
-          if(list.get(l) == null) list.set(l, Empty.VALUE);
+          if(list.get(l) == null) {
+            if(l <= min) throw ARGMISSING_X_X.get(ii, fd, fd.names[l].prefixString());
+            list.set(l, Empty.VALUE);
+          }
         }
         return fd.get(sc, ii, list.finish());
       } else if(arity >= min) {
@@ -373,7 +376,7 @@ public final class Functions {
       final JavaCall jf = JavaCall.get(name, args, qc, sc, ii);
       if(jf != null) return jf;
     } else if(!NSGlobal.reserved(name.uri())) {
-      throw NOKEYWORD_X.get(ii, name.prefixString());
+      throw KEYWORDSUPPORT_X.get(ii, name.prefixString());
     }
 
     // user-defined function that has not been declared yet
