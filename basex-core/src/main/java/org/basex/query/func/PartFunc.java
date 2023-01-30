@@ -31,7 +31,7 @@ public final class PartFunc extends Arr {
    * Constructor.
    * @param info input info
    * @param sc static context
-   * @param exprs expressions (body, arguments)
+   * @param exprs expressions (arguments, body)
    * @param holes positions of the placeholders
    */
   public PartFunc(final InputInfo info, final StaticContext sc, final Expr[] exprs,

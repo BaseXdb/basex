@@ -3008,4 +3008,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check(NOT.args(EMPTY.args(e1)  + " or "  + EMPTY.args(e2)),  false,  root(And.class));
     check(NOT.args(EXISTS.args(e1) + " and " + EXISTS.args(e2)), true , root(Or.class));
   }
+
+  /** Function Arity of Partial Function Applications. */
+  @Test public void gh2166() {
+    query("declare function local:a() { function($a) { $a(1) }(local:b(2, ?)) };"
+        + "declare function local:b($b, $c) { };"
+        + "local:a()", "");
+  }
 }

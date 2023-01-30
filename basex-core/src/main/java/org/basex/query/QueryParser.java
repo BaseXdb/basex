@@ -2544,7 +2544,7 @@ public class QueryParser extends InputParser {
     // partial function
     final int arity = exprs.length + holes.length;
     final Expr func = Functions.getLiteral(name, arity, qc, sc, ii, false);
-    return func == null ? undeclaredLiteral(name, arity, ii) : dynFuncCall(func, ii, exprs, holes);
+    return dynFuncCall(func == null ? undeclaredLiteral(name, arity, ii) : func, ii, exprs, holes);
   }
 
   /**
