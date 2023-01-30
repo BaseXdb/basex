@@ -125,7 +125,7 @@ public final class FnTokenize extends RegEx {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr value = exprs[0], pattern = exprs.length == 2 ? exprs[1] : null;
+    final Expr value = exprs[0], pattern = exprs.length > 1 ? exprs[1] : null;
 
     // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
     if(NORMALIZE_SPACE.is(value) && pattern instanceof Str && eq(((Str) pattern).string(), SPACE)) {
@@ -140,7 +140,7 @@ public final class FnTokenize extends RegEx {
    * @return result of check
    */
   public boolean whitespaces() {
-    final Expr pattern = exprs.length == 2 && exprs[1] != Empty.VALUE ? exprs[1] : null;
+    final Expr pattern = exprs.length > 1 && exprs[1] != Empty.VALUE ? exprs[1] : null;
     return pattern == null || pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACES);
   }
 }

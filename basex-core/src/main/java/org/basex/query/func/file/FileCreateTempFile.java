@@ -33,10 +33,11 @@ public class FileCreateTempFile extends FileFn {
   final synchronized Item createTemp(final boolean dir, final QueryContext qc)
       throws QueryException, IOException {
 
+    final int el = exprs.length;
     final String prefix = toString(exprs[0], qc);
-    final String suffix = exprs.length > 1 ? toString(exprs[1], qc) : "";
+    final String suffix = el > 1 ? toString(exprs[1], qc) : "";
     final Path root;
-    if(exprs.length > 2) {
+    if(el > 2) {
       root = toPath(2, qc);
       if(Files.isRegularFile(root)) throw FILE_NO_DIR_X.get(info, root);
     } else {

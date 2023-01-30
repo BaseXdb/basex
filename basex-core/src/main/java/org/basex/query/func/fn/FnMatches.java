@@ -26,7 +26,7 @@ public final class FnMatches extends RegEx {
       final int ch = patternChar(pattern);
       if(ch != -1) return Bln.get(contains(value, ch));
     }
-    final Pattern p = pattern(pattern, exprs.length == 3 ? exprs[2] : null, qc, false);
+    final Pattern p = pattern(pattern, exprs.length > 2 ? exprs[2] : null, qc, false);
     return Bln.get(p.matcher(string(value)).find());
   }
 

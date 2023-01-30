@@ -17,13 +17,13 @@ public final class BinFind extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final B64 binary = toB64(exprs[0], qc, true);
-    final Long offset = toLong(exprs[1], qc);
+    final Item offset = exprs[1].atomItem(qc, info);
     final B64 search = toB64(exprs[2], qc, false);
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int pos = indexOf(bytes, search.binary(info), bounds(offset, null, bl)[0]);
+    final int pos = indexOf(bytes, search.binary(info), bounds(offset, Empty.VALUE, bl)[0]);
     return pos == -1 ? Empty.VALUE : Int.get(pos);
   }
 }

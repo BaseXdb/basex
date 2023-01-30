@@ -62,17 +62,6 @@ abstract class FileFn extends StandardFunc {
   }
 
   /**
-   * Returns the value of an optional boolean.
-   * @param i argument index
-   * @param qc query context
-   * @return boolean value
-   * @throws QueryException query exception
-   */
-  final boolean toBoolean(final int i, final QueryContext qc) throws QueryException {
-    return i < exprs.length && toBoolean(exprs[i], qc);
-  }
-
-  /**
    * Returns a unified string representation of the path.
    * @param path directory path
    * @param dir directory flag

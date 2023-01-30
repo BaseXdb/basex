@@ -24,7 +24,7 @@ public final class FnFormatInteger extends StandardFunc {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = exprs[0].atomItem(qc, info);
     final byte[] picture = toToken(exprs[1], qc);
-    final byte[] language = exprs.length == 2 ? EMPTY : toZeroToken(exprs[2], qc);
+    final byte[] language = exprs.length > 2 ? toZeroToken(exprs[2], qc) : EMPTY;
     if(value == Empty.VALUE) return Str.EMPTY;
 
     final long number = toLong(value);

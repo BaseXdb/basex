@@ -21,7 +21,7 @@ public final class UtilDeepEqual extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final DeepEqual de = new DeepEqual(info);
     final Mode[] modes = Mode.values();
-    if(exprs.length == 3) {
+    if(exprs.length > 2) {
       for(final Item item : exprs[2].atomValue(qc, info)) {
         final byte[] key = uc(toToken(item));
         boolean found = false;

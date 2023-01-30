@@ -128,7 +128,7 @@ public class FnMin extends StandardFunc {
     final Expr expr = optFirst();
     if(expr != this) return expr;
 
-    final boolean noColl = exprs.length == 1;
+    final boolean noColl = exprs.length < 2;
     final Expr values = exprs[0];
     final SeqType st = values.seqType();
     Type type = st.type;

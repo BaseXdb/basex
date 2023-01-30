@@ -152,7 +152,7 @@ public final class FnSort extends StandardFunc {
         args[0] = args[0].arg(0);
         return cc.function(SORT, info, args);
       }
-    } else if(exprs.length == 3) {
+    } else if(exprs.length > 2) {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE));
     }
     return adoptType(input);

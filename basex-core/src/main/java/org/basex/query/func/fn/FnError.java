@@ -31,10 +31,10 @@ public final class FnError extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int al = exprs.length;
-    final QNm code = al > 0 ? toQNm(exprs[0], true, qc) : null;
-    final String desc = al > 1 ? toStringOrNull(exprs[1], qc) : null;
-    final Value object = al > 2 ? exprs[2].value(qc) : null;
+    final int el = exprs.length;
+    final QNm code = el > 0 ? toQNm(exprs[0], true, qc) : null;
+    final String desc = el > 1 ? toStringOrNull(exprs[1], qc) : null;
+    final Value object = el > 2 ? exprs[2].value(qc) : null;
 
     throw new QueryException(info, code != null ? code : FUNERR1.qname(),
       desc != null ? desc : FUNERR1.message).value(object);

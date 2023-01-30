@@ -45,7 +45,7 @@ public class XQueryEval extends StandardFunc {
   }
 
   /**
-   * Evaluates the specified string.
+   * Evaluates the specified string as XQuery expression.
    * @param query query
    * @param updating updating query
    * @param qc query context

@@ -29,7 +29,7 @@ public class DbGetBinary extends DbGetValue {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs.length == 1) {
+    if(exprs.length < 2) {
       super.opt(cc);
     } else {
       exprType.assign(SeqType.BASE64_BINARY_O);

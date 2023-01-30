@@ -42,7 +42,7 @@ public final class FnAllEqual extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = exprs[0];
-    if(exprs.length == 1) {
+    if(exprs.length < 2) {
       final SeqType st = values.seqType();
       final AtomType type = st.type.atomic();
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())

@@ -52,7 +52,7 @@ public final class UtilDuplicates extends StandardFunc {
       // assign atomic type of argument
       exprType.assign(type);
 
-      if(exprs.length == 1) {
+      if(exprs.length < 2) {
         // util:duplicates(1 to 10)  ->  ()
         if(values instanceof RangeSeq || values instanceof Range ||
             st.zeroOrOne()) return Empty.VALUE;

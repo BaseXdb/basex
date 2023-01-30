@@ -73,7 +73,7 @@ public class DbGetValue extends DbAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs.length == 1) {
+    if(exprs.length < 2) {
       exprType.assign(MapType.get(AtomType.STRING, SeqType.ITEM_ZM).seqType());
     }
     return this;

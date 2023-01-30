@@ -21,7 +21,7 @@ public final class InspectFunctions extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // returns all functions from the query context
-    if(exprs.length == 0) {
+    if(exprs.length < 1) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final StaticFunc sf : qc.functions.funcs()) {
         vb.add(Functions.getUser(sf, qc, sf.sc, info));
@@ -57,7 +57,7 @@ public final class InspectFunctions extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    if(exprs.length == 0) cc.qc.functions.compileAll(cc);
+    if(exprs.length < 1) cc.qc.functions.compileAll(cc);
     return this;
   }
 

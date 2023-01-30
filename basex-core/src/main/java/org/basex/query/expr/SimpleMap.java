@@ -37,16 +37,17 @@ public abstract class SimpleMap extends Arr {
   }
 
   /**
-   * Creates a new, optimized map expression, or the first expression if only one was specified.
+   * Creates a new, optimized map expression.
    * @param cc compilation context
    * @param ii input info
-   * @param exprs one or more expressions
-   * @return filter root, path or filter expression
+   * @param exprs expressions
+   * @return list, single expression or empty sequence
    * @throws QueryException query exception
    */
   public static Expr get(final CompileContext cc, final InputInfo ii, final Expr... exprs)
       throws QueryException {
-    return exprs.length == 1 ? exprs[0] : new CachedMap(ii, exprs).optimize(cc);
+    final int el = exprs.length;
+    return el > 1 ? new CachedMap(ii, exprs).optimize(cc) : el > 0 ? exprs[0] : Empty.VALUE;
   }
 
   @Override
@@ -395,7 +396,7 @@ public abstract class SimpleMap extends Arr {
     final int ls = list.size();
     if(ls != exprs.length) {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-      return ls == 1 ? exprs[0] : get(cc, info, list.finish());
+      return get(cc, info, list.finish());
     }
 
     exprType.assign(exprs[ls - 1], new long[] { min, max });

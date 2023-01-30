@@ -27,12 +27,14 @@ import org.basex.util.*;
 public final class AdminLogs extends AdminFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return exprs.length == 0 ? list(qc).iter() : logs(qc);
+    final String date = exprs.length > 0 ? toStringOrNull(exprs[0], qc) : null;
+    return date == null ? list(qc).iter() : logs(date, qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return exprs.length == 0 ? list(qc) : logs(qc).value(qc, this);
+    final String date = exprs.length > 0 ? toStringOrNull(exprs[0], qc) : null;
+    return date == null ? list(qc) : logs(date, qc).value(qc, this);
   }
 
   /**
@@ -50,17 +52,19 @@ public final class AdminLogs extends AdminFn {
   }
 
   /**
-   * Returns the logs from the specified log file.
+   * Returns the log entries from the specified log file.
+   * @param date date of the log file
    * @param qc query context
-   * @return list
+   * @return iterator with log entries
    * @throws QueryException query exception
    */
-  private Iter logs(final QueryContext qc) throws QueryException {
-    // return content of single log file
-    final String date = toString(exprs[0], qc);
+  private Iter logs(final String date, final QueryContext qc) throws QueryException {
     final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
 
-    final LinkedList<LogEntry> list = logs(date, qc);
+    final LogFile file = qc.context.log.file(date);
+    if(file == null) throw WHICHRES_X.get(info, date);
+
+    final LinkedList<LogEntry> list = logs(file, qc);
     final HashMap<String, LinkedList<LogEntry>> map = new HashMap<>();
     if(merge) {
       // group entries by address
@@ -119,17 +123,13 @@ public final class AdminLogs extends AdminFn {
 
   /**
    * Returns all log entries.
-   * @param name name of log file
+   * @param file log file
    * @param qc query context
    * @return list
    * @throws QueryException query exception
    */
-  private LinkedList<LogEntry> logs(final String name, final QueryContext qc)
+  private LinkedList<LogEntry> logs(final LogFile file, final QueryContext qc)
       throws QueryException {
-
-    final Log log = qc.context.log;
-    final LogFile file = log.file(name);
-    if(file == null) throw WHICHRES_X.get(info, name);
 
     try {
       final LinkedList<LogEntry> logs = new LinkedList<>();

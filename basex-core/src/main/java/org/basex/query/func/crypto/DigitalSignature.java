@@ -89,14 +89,14 @@ final class DigitalSignature {
    * @param sig signature algorithm
    * @param ns signature element namespace prefix
    * @param tp signature type (enveloped, enveloping, detached)
-   * @param expr XPath expression which specifies node to be signed
+   * @param path XPath expression which specifies node to be signed
    * @param cert certificate which contains keystore information for signing the node, may be null
    * @param qc query context
    * @return signed node
    * @throws QueryException query exception
    */
-  Item generateSignature(final ANode node, final byte[] can, final byte[] dig, final byte[] sig,
-      final byte[] ns, final byte[] tp, final byte[] expr, final ANode cert, final QueryContext qc)
+  Item generate(final ANode node, final byte[] can, final byte[] dig, final byte[] sig,
+      final byte[] ns, final byte[] tp, final byte[] path, final ANode cert, final QueryContext qc)
       throws QueryException {
 
     // checking input variables
@@ -196,13 +196,13 @@ final class DigitalSignature {
       final List<Transform> tfList;
 
       // validating a given XPath expression to get nodes to be signed
-      if(expr.length > 0) {
+      if(path.length > 0) {
         final XPathFactory xpf = XPathFactory.newInstance();
-        final XPathExpression xExpr = xpf.newXPath().compile(string(expr));
+        final XPathExpression xExpr = xpf.newXPath().compile(string(path));
         final NodeList xRes = (NodeList) xExpr.evaluate(inputNode, XPathConstants.NODESET);
-        if(xRes.getLength() < 1) throw CX_XPINV.get(info, expr);
+        if(xRes.getLength() < 1) throw CX_XPINV.get(info, path);
         tfList = new ArrayList<>(2);
-        tfList.add(fac.newTransform(Transform.XPATH, new XPathFilterParameterSpec(string(expr))));
+        tfList.add(fac.newTransform(Transform.XPATH, new XPathFilterParameterSpec(string(path))));
         tfList.add(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
 
       } else {

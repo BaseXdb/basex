@@ -52,7 +52,7 @@ public final class Client {
 
   /**
    * Sends an HTTP request and returns the response.
-   * @param href URL to send the request to
+   * @param href URL to send the request to (can be empty string)
    * @param request request data
    * @param bodies request body
    * @return HTTP response
@@ -75,14 +75,13 @@ public final class Client {
 
   /**
    * Returns a URI.
-   * @param href URL to send the request to
+   * @param href URL to send the request to (can be empty string)
    * @param request request
    * @return URI
    * @throws QueryException query exception
    */
   private URI uri(final byte[] href, final Request request) throws QueryException {
-    final String uri = href == null || href.length == 0 ? request.attribute(HREF) :
-      Token.string(href);
+    final String uri = href.length == 0 ? request.attribute(HREF) : Token.string(href);
     if(uri == null || uri.isEmpty()) throw HC_URL.get(info);
     try {
       return new URI(uri);

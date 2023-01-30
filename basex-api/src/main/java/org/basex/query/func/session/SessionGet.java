@@ -16,12 +16,11 @@ public final class SessionGet extends SessionFn {
   public Value value(final QueryContext qc) throws QueryException {
     final ASession session = session(qc, false);
     final String name = toString(exprs[0], qc);
-    final Value dflt = exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
 
     if(session != null) {
       final Object object = session.get(name);
       if(object != null) return JavaCall.toValue(object, qc, info);
     }
-    return dflt;
+    return exprs.length > 1 ? exprs[1].value(qc) : Empty.VALUE;
   }
 }

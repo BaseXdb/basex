@@ -29,7 +29,7 @@ public final class FnSubstring extends StandardFunc {
       end += start;
       start = 0;
     }
-    end = Math.min(length, exprs.length == 3 ? start + end : Integer.MAX_VALUE);
+    end = Math.min(length, exprs.length > 2 ? start + end : Integer.MAX_VALUE);
     if(start >= end) return Str.EMPTY;
     if(ascii) return Str.get(Token.substring(value, start, end));
 

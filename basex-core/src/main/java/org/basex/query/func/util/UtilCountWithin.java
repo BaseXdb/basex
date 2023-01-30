@@ -110,8 +110,9 @@ public final class UtilCountWithin extends StandardFunc {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-    final long min = toLong(exprs[1], qc), max = exprs.length == 2 ? Long.MAX_VALUE :
-      exprs[1] == exprs[2] ? min : toLong(exprs[2], qc);
+    final long min = toLong(exprs[1], qc);
+    final long max = exprs.length > 2 ? exprs[1] == exprs[2] ? min : toLong(exprs[2], qc) :
+      Long.MAX_VALUE;
     return new long[] { min, max };
   }
 }
