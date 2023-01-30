@@ -26,10 +26,6 @@ public final class FnNot extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0], inverted = invert(input, cc);
-    if(inverted != input) {
-      System.err.println("[1] " + this);
-      System.err.println(" →  " + inverted);
-    }
     return inverted != input ? inverted : this;
   }
 

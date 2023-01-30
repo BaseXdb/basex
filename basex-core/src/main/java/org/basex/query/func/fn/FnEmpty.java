@@ -92,7 +92,6 @@ public class FnEmpty extends StandardFunc {
       return cc.function(func, info, List.get(cc, info, exprs[0], expr.arg(0)));
     }
     if(_UTIL_COUNT_WITHIN.is(expr)) {
-      System.err.println(this);
       return expr.mergeEbv(this, or, cc);
     }
     return null;
