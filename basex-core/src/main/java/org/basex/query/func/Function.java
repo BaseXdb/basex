@@ -665,6 +665,12 @@ public enum Function implements AFunction {
   _ARRAY_APPEND(ArrayAppend::new, "append(array,add)",
       params(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_EMPTY(ArrayEmpty::new, "empty(array)",
+      params(ARRAY_O), BOOLEAN_O, ARRAY_URI),
+  /** XQuery function. */
+  _ARRAY_EXISTS(ArrayExists::new, "exists(array)",
+      params(ARRAY_O), BOOLEAN_O, ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_FILTER(ArrayFilter::new, "filter(array,predicate)",
       params(ARRAY_O, PREDICATE_ZM), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */

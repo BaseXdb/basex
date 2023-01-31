@@ -883,8 +883,29 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void arrayEmpty() {
+    final Function func = _ARRAY_EMPTY;
+
+    query(func.args(" [ ]"), true);
+    query(func.args(" array { () }"), true);
+    query(func.args(" [ () ]"), false);
+    query(func.args(" [ 1 ]"), false);
+  }
+
+  /** Test method. */
+  @Test public void arrayExists() {
+    final Function func = _ARRAY_EXISTS;
+
+    query(func.args(" [ ]"), false);
+    query(func.args(" array { () }"), false);
+    query(func.args(" [ () ]"), true);
+    query(func.args(" [ 1 ]"), true);
+  }
+
+  /** Test method. */
   @Test public void arrayFoot() {
     final Function func = _ARRAY_FOOT;
+
     query(func.args(" [ 1 ]"), 1);
     query(func.args(" array { 1 to 5 }"), 5);
     query(func.args(" [ 1, 2 to 3 ]"), "2\n3");
