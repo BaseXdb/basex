@@ -68,7 +68,7 @@ public final class If extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(EMPTY.is(cond)) {
       // if(empty(A)) then B else C  ->  if(exists(A)) then C else B
-      cond = cc.function(EXISTS, info, cond.arg(0));
+      cond = cc.function(EXISTS, cond.info(), cond.arg(0));
       swap();
       cc.info(QueryText.OPTSWAP_X, this);
     } else if(NOT.is(cond)) {
@@ -102,10 +102,8 @@ public final class If extends Arr {
     // rewrite to elvis operator:
     //   if(exists(VALUE)) then VALUE else DEFAULT  ->  VALUE ?: DEFAULT
     //   if(NODES) then NODES else DEFAULT  ->  NODES ?: DEFAULT
-    final Expr cmp = EXISTS.is(cond) ? cond.arg(0) :
-      ct.type instanceof NodeType ? cond : null;
-    if(!ndt && cmp != null && cmp.equals(br1)) return
-        cc.function(_UTIL_OR, info, br1, br2);
+    final Expr cmp = EXISTS.is(cond) ? cond.arg(0) : ct.type instanceof NodeType ? cond : null;
+    if(!ndt && cmp != null && cmp.equals(br1)) return new Otherwise(info, br1, br2).optimize(cc);
 
     // if(A) then B else B  ->  prof:void(A), B
     if(br1.equals(br2)) return cc.merge(cond, br1, info);
@@ -271,7 +269,7 @@ public final class If extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token("(").token(QueryText.IF).paren(cond).token(QueryText.THEN).token(exprs[0]);
-    qs.token(QueryText.ELSE).token(exprs[1]).token(')');
+    qs.token(QueryText.IF).paren(cond).brace(exprs[0]);
+    if(exprs[1] != Empty.VALUE) qs.token(QueryText.ELSE).brace(exprs[1]);
   }
 }

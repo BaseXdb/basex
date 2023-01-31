@@ -1422,14 +1422,42 @@ public class QueryParser extends InputParser {
    */
   private Expr iff() throws QueryException {
     if(!wsConsumeWs(IF, PAREN1, IFPAR)) return null;
-    final InputInfo ii = info();
+
+    final LinkedList<InputInfo> infos = new LinkedList<>();
+    infos.add(info());
+    final ExprList list = new ExprList(3).add(ifCond());
+    if(wsConsumeWs(THEN)) {
+      list.add(check(single(), NOIF));
+      if(wsConsumeWs(ELSE)) list.add(check(single(), NOIF));
+    } else {
+      list.add(enclosedExpr());
+      while(wsConsume(ELSE)) {
+        if(!wsConsume(IF)) {
+          list.add(enclosedExpr());
+          break;
+        }
+        infos.add(info());
+        list.add(ifCond()).add(enclosedExpr());
+      }
+    }
+    Expr ex = (list.size() & 1) == 0 ? Empty.VALUE : list.pop();
+    while(!list.isEmpty()) {
+      final Expr thn = list.pop(), cond = list.pop();
+      ex = new If(infos.removeLast(), cond, thn, ex);
+    }
+    return ex;
+  }
+
+  /**
+   * Parses the if condition.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr ifCond() throws QueryException {
     wsCheck(PAREN1);
-    final Expr iff = check(expr(), NOIF);
+    final Expr ex = check(expr(), NOIF);
     wsCheck(PAREN2);
-    if(!wsConsumeWs(THEN)) throw error(NOIF);
-    final Expr thn = check(single(), NOIF);
-    final Expr els = wsConsumeWs(ELSE) ? check(single(), NOIF) : Empty.VALUE;
-    return new If(ii, iff, thn, els);
+    return ex;
   }
 
   /**
