@@ -99,7 +99,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+  public Expr optimizePos(final OpV op, final CompileContext cc) {
     return Bln.FALSE;
   }
 

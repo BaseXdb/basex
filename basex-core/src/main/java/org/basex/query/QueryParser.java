@@ -3144,7 +3144,7 @@ public class QueryParser extends InputParser {
 
     // parse type
     SeqType st = null;
-    Type type = null;
+    Type type;
     if(wsConsume(PAREN1)) {
       // function type
       type = FuncType.find(name);
@@ -4134,7 +4134,7 @@ public class QueryParser extends InputParser {
       if(ch == '(' && next() == ':') {
         comment();
       } else {
-        if(ch <= 0 || ch > ' ') return i != pos;
+        if(ch == 0 || ch > ' ') return i != pos;
         ++pos;
       }
     }
@@ -4190,7 +4190,7 @@ public class QueryParser extends InputParser {
     final int i = pos;
     while(more()) {
       final char ch = curr();
-      if(ch <= 0 || ch > ' ') return i != pos;
+      if(ch == 0 || ch > ' ') return i != pos;
       ++pos;
     }
     return true;

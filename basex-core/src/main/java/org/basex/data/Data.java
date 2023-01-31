@@ -339,7 +339,7 @@ public abstract class Data {
       case ATTR:
         int d = table.read1(pre, 0) >> 3 & IO.MAXATTS;
         // skip additional attributes if value is larger than maximum range
-        if(d >= IO.MAXATTS) while(d < pre && kind(pre - d) == ATTR) d++;
+        if(d == IO.MAXATTS) while(d < pre && kind(pre - d) == ATTR) d++;
         return d;
       default:
         return pre + 1;
@@ -365,7 +365,7 @@ public abstract class Data {
   public final int attSize(final int pre, final int kind) {
     int s = kind == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
     // skip additional attributes if value is larger than maximum range
-    if(s >= IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+    if(s == IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
     return s;
   }
 

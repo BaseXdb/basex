@@ -130,7 +130,7 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+  public final Expr optimizePos(final OpV op, final CompileContext cc) {
     final double d = dbl();
     final long l = (long) d;
     final boolean fractional = d != l;

@@ -13,7 +13,7 @@ import org.basex.query.value.seq.*;
  */
 public final class SessionsIds extends SessionsFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     return StrSeq.get(SessionListener.ids());
   }
 }

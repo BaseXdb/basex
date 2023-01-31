@@ -169,7 +169,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   static ItemList flatten(final XQArray array) {
     final ItemList list = new ItemList();
     for(final Value value : array.members()) {
-      for(Item item : value) {
+      for(final Item item : value) {
         if(item instanceof XQArray) {
           list.add(flatten((XQArray) item));
         } else {

@@ -263,11 +263,10 @@ final class DigitalSignature {
   /**
    * Validates a signature.
    * @param node input node
-   *
-   * @return true if signature valid
+   * @return boolean result of validation
    * @throws QueryException query exception
    */
-  Item validateSignature(final ANode node) throws QueryException {
+  Bln validateSignature(final ANode node) throws QueryException {
     try {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), doc);

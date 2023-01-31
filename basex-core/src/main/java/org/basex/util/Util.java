@@ -346,7 +346,7 @@ public final class Util {
         if(map.contains(key)) throw notExpected("%: '%' is declared twice.", name, key);
         map.put(key, value);
       }
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       throw notExpected("%: %", name, ex);
     }
     return map;

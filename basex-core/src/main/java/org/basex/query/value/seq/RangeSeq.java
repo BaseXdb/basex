@@ -142,7 +142,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+  public Expr optimizePos(final OpV op, final CompileContext cc) {
     final long[] range = range(false);
     final long min = range[0], max = range[1];
     range[0] = Math.max(range[0], 1);

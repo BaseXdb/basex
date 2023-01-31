@@ -91,7 +91,7 @@ public final class Typeswitch extends ParseExpr {
         boolean branch = false;
         for(int h = 0; !branch && h < g; h++) {
           for(final SeqType st : groups[h].seqTypes) {
-            if(((Checks<SeqType>) match -> st.instanceOf(match)).any(matching)) {
+            if(((Checks<SeqType>) st::instanceOf).any(matching)) {
               branch = true;
               break;
             }

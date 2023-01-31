@@ -67,7 +67,7 @@ final class GreekStemmer extends InternalStemmer {
     // "long list"
     l = rule22(s, l);
 
-    final TokenBuilder tb = new TokenBuilder(l << 1);
+    final TokenBuilder tb = new TokenBuilder((long) l << 1);
     for(int i = 0; i < l; i++) tb.add(s[i]);
     return tb.finish();
   }
@@ -172,8 +172,7 @@ final class GreekStemmer extends InternalStemmer {
         e(s, len, "\u03bd\u03c4\u03b1\u03bd\u03c4") ||
         e(s, len, "\u03ba\u03c5\u03c1") ||
         e(s, len, "\u03b8\u03b5\u03b9") ||
-        e(s, len, "\u03c0\u03b5\u03b8\u03b5\u03c1")))
-      len += 2; // add back -\u03b1\u03b4
+        e(s, len, "\u03c0\u03b5\u03b8\u03b5\u03c1")))  len += 2; // add back -\u03b1\u03b4
     }
     return len;
   }
@@ -197,8 +196,7 @@ final class GreekStemmer extends InternalStemmer {
         e(s, len, "\u03b3\u03b7\u03c0") ||
         e(s, len, "\u03b4\u03b1\u03c0") ||
         e(s, len, "\u03ba\u03c1\u03b1\u03c3\u03c0") ||
-        e(s, len, "\u03bc\u03b9\u03bb"))
-      len += 2; // add back
+        e(s, len, "\u03bc\u03b9\u03bb")) len += 2; // add back
     }
     return len;
   }

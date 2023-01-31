@@ -155,7 +155,7 @@ final class FormatterFR extends Formatter {
       tb.add(WORDS1000000[w]);
       final long r = n % f;
       if(ordinal != null && r == 0) tb.add(ORDINAL).add(ordinal);
-      else if(i > 1 && (ordinal == null || r == 0)) tb.add("s");
+      else if(i > 1 && ordinal == null) tb.add("s");
       if(r != 0) {
         tb.add(' ');
         word(tb, r, ordinal, last);

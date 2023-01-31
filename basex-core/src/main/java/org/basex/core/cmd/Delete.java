@@ -27,7 +27,7 @@ public final class Delete extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    String path = MetaData.normPath(args[0]);
+    final String path = MetaData.normPath(args[0]);
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
     return update(data, () -> {

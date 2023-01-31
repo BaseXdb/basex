@@ -88,7 +88,7 @@ public final class Range extends Arr {
     };
     if(!type.test(exprs[0]) || !type.test(exprs[1])) return this;
 
-    Expr[] minMax = exprs.clone();
+    final Expr[] minMax = exprs.clone();
     final double mn = pos(minMax[0]), mx = pos(minMax[1]);
     if(mx < mn) return Bln.FALSE;
 

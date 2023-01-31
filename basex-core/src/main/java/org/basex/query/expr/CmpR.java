@@ -218,11 +218,10 @@ public final class CmpR extends Single {
     // skip if numbers are negative, doubles, or of different string length
     final int mnl = min >= 0 && (long) min == min ? Token.token(min).length : -1;
     final int mxl = max >= 0 && (long) max == max ? Token.token(max).length : -1;
-    if(mnl != mxl || mnl == -1) return false;
+    if(mnl == -1 || mnl != mxl) return false;
 
     // don't use index if min/max values are infinite
-    if(min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ||
-        Token.token((int) nr.min).length != Token.token((int) nr.max).length) return false;
+    if(Token.token((int) nr.min).length != Token.token((int) nr.max).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add('[').add(min).add(',').add(max).add(']');

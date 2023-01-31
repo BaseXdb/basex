@@ -97,27 +97,20 @@ public final class SerializerTest extends SandboxTest {
     query(ITEM_SEPARATOR.arg("&#xa;") + METHOD.arg("text") + "1, 2", "1\n2");
 
     // GH-2163: XQuery, serialization item-separator option
-    Map.of("xml", "", "text", "", "adaptive", "[]").forEach((key, value) -> {
-      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[]", value);
-    });
-    Map.of("xml", 1, "text", 1, "adaptive", "[1]").forEach((key, value) -> {
-      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[1]", value);
-    });
-    Map.of("xml", "", "text", "", "adaptive", "[]|[]").forEach((key, value) -> {
-      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[], []", value);
-    });
-    Map.of("xml", "1|2", "text", "1|2", "adaptive", "[1]|[2]").forEach((key, value) -> {
-      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[ 1 ], [ 2 ]", value);
-    });
-    Map.of("xml", "1|2|3", "text", "1|2|3", "adaptive", "[1,2]|[3]").forEach((key, value) -> {
-      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[ 1, 2 ], [ 3 ]", value);
-    });
-    Map.of("xml", "1|2", "text", "1|2", "adaptive", "1|[[2]]|[]").forEach((key, value) -> {
-      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "1, [[ 2 ]], []", value);
-    });
-    Map.of("xml", "1|2|3", "text", "1|2|3", "adaptive", "1|[2,3]").forEach((key, value) -> {
-      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "1, [ 2, 3 ]", value);
-    });
+    Map.of("xml", "", "text", "", "adaptive", "[]").forEach((key, value) ->
+      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[]", value));
+    Map.of("xml", 1, "text", 1, "adaptive", "[1]").forEach((key, value) ->
+      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[1]", value));
+    Map.of("xml", "", "text", "", "adaptive", "[]|[]").forEach((key, value) ->
+      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[], []", value));
+    Map.of("xml", "1|2", "text", "1|2", "adaptive", "[1]|[2]").forEach((key, value) ->
+      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[ 1 ], [ 2 ]", value));
+    Map.of("xml", "1|2|3", "text", "1|2|3", "adaptive", "[1,2]|[3]").forEach((key, value) ->
+      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "[ 1, 2 ], [ 3 ]", value));
+    Map.of("xml", "1|2", "text", "1|2", "adaptive", "1|[[2]]|[]").forEach((key, value) ->
+      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "1, [[ 2 ]], []", value));
+    Map.of("xml", "1|2|3", "text", "1|2|3", "adaptive", "1|[2,3]").forEach((key, value) ->
+      query(METHOD.arg(key) + ITEM_SEPARATOR.arg("|") + "1, [ 2, 3 ]", value));
   }
 
   /** Test: xml:space='preserve'. */

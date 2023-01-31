@@ -396,7 +396,7 @@ public final class QueryContext extends Job implements Closeable {
     if(local && contextScope != null) {
       // check if scope may still be overwritten by dynamic context
       if(!finalContext) list.add(Locking.CONTEXT);
-      local &= contextScope.databases(new LockVisitor(list, true));
+      local = contextScope.databases(new LockVisitor(list, true));
     }
     if(local) {
       list.add(locks);
