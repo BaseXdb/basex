@@ -20,11 +20,11 @@ public final class ArrayReverseTest extends ArrayTest {
   @Test public void randomTest() {
     final Random rng = new Random(42);
     for(int n = 0; n < 1_000; n++) {
-      XQArray arr = XQArray.empty();
-      for(int i = 0; i < n; i++) arr = arr.insertBefore(rng.nextInt(i + 1), Int.get(i), qc);
-      assertEquals(n, arr.arraySize());
-      final XQArray rev = arr.reverseArray(qc);
-      final ListIterator<Value> af = arr.iterator(0), ab = arr.iterator(n);
+      XQArray array = XQArray.empty();
+      for(int i = 0; i < n; i++) array = array.insertBefore(rng.nextInt(i + 1), Int.get(i), qc);
+      assertEquals(n, array.arraySize());
+      final XQArray rev = array.reverseArray(qc);
+      final ListIterator<Value> af = array.iterator(0), ab = array.iterator(n);
       final ListIterator<Value> rf = rev.iterator(0), rb = rev.iterator(n);
       for(int i = 0; i < n; i++) {
         assertTrue(af.hasNext());

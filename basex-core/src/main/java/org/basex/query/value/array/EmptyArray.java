@@ -53,8 +53,8 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray concat(final XQArray seq) {
-    return seq;
+  public XQArray concat(final XQArray other) {
+    return other;
   }
 
   @Override

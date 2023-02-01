@@ -21,11 +21,11 @@ public final class ArrayPutTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       ab.append(Int.get(i));
     }
-    final XQArray array = ab.array();
+    final XQArray array1 = ab.array();
     for(int i = 0; i < n; i++) {
-      final XQArray arr = array.put(i, Int.get(-i));
+      final XQArray array2 = array1.put(i, Int.get(-i));
       for(int j = 0; j < n; j++) {
-        assertEquals(i == j ? -j : j, ((Int) arr.get(j)).itr());
+        assertEquals(i == j ? -j : j, ((Int) array2.get(j)).itr());
       }
     }
   }
