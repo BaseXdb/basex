@@ -25,10 +25,11 @@ public class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IOFile root = new IOFile(toPath(0, qc).toString());
+    if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
+
     final CreateFromOptions opts = toOptions(1, new CreateFromOptions(), qc);
     final boolean recursive = opts.get(CreateFromOptions.RECURSIVE);
     final boolean rootDir = opts.get(CreateFromOptions.ROOT_DIR);
-    if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
 
     final Iter entries;
     if(exprs.length > 2) {

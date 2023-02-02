@@ -33,12 +33,12 @@ abstract class BinFn extends StandardFunc {
    */
   final ByteBuffer unpack(final QueryContext qc, final long len) throws QueryException {
     final B64 binary = toB64(exprs[0], qc, false);
-    final Long offset = toLong(exprs[1], qc);
+    final Item offset = exprs[1].atomItem(qc, info);
     final ByteOrder order = order(2, qc);
 
     final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(offset, len, bl);
+    final int[] bounds = bounds(offset, Int.get(len), bl);
 
     final ByteBuffer bb = ByteBuffer.allocate(bounds[1]).order(order);
     bb.put(bytes, bounds[0], bounds[1]).position(0);
@@ -54,8 +54,8 @@ abstract class BinFn extends StandardFunc {
    */
   final Int unpackInteger(final QueryContext qc, final boolean signed) throws QueryException {
     final B64 binary = toB64(exprs[0], qc, false);
-    final Long offset = toLong(exprs[1], qc);
-    final Long size = toLong(exprs[2], qc);
+    final Item offset = exprs[1].atomItem(qc, info);
+    final Item size = exprs[2].atomItem(qc, info);
     final ByteOrder order = order(3, qc);
 
     final byte[] bytes = binary.binary(info);
@@ -148,13 +148,16 @@ abstract class BinFn extends StandardFunc {
 
   /**
    * Checks the bounds of the specified offset value.
-   * @param off offset value (may be {@code null})
-   * @param len length value (may be {@code null})
+   * @param offset offset value (may be empty sequence)
+   * @param length length value (may be empty sequence)
    * @param size size of input data
    * @return bounds (two integers)
    * @throws QueryException query exception
    */
-  final int[] bounds(final Long off, final Long len, final int size) throws QueryException {
+  final int[] bounds(final Item offset, final Item length, final int size) throws QueryException {
+    final Long off = offset == Empty.VALUE ? null : toLong(offset);
+    final Long len = length == Empty.VALUE ? null : toLong(length);
+
     int of = 0;
     if(off != null) {
       if(off < 0 || off > size) throw BIN_IOOR_X_X.get(info, off, size);

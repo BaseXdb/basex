@@ -33,7 +33,7 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.NUMBER, cc);
+    exprs = simplifyAll(Simplify.NUMBER, cc);
 
     final QueryFunction<Expr, Expr> simplify = expr -> {
       if(expr instanceof ANum && !(expr instanceof Int)) {

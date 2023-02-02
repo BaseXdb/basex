@@ -18,174 +18,173 @@ import org.junit.jupiter.api.*;
 public final class ArrayRemoveTest extends ArrayTest {
   /** Remove one element from singleton array. */
   @Test public void singletonTest() {
-    final XQArray singleton = XQArray.member(Int.get(42));
-    assertSame(XQArray.empty(), singleton.remove(0, qc));
+    final XQArray array = XQArray.member(Int.get(42));
+    assertSame(XQArray.empty(), array.remove(0, qc));
   }
 
   /** Delete each element once from arrays of varying length. */
   @Test public void deleteOneTest() {
     final int n = 200;
-    XQArray arr = XQArray.empty();
+    XQArray array1 = XQArray.empty();
     for(int k = 0; k < n; k++) {
       for(int i = 0; i < k; i++) {
-        final XQArray arr2 = arr.remove(i, qc);
-        final Iterator<Value> iter = arr2.iterator(0);
+        final XQArray array2 = array1.remove(i, qc);
+        final Iterator<Value> iter2 = array2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
-          assertTrue(iter.hasNext());
-          assertEquals(j < i ? j : j + 1, ((Int) iter.next()).itr());
+          assertTrue(iter2.hasNext());
+          assertEquals(j < i ? j : j + 1, ((Int) iter2.next()).itr());
         }
-        assertFalse(iter.hasNext());
+        assertFalse(iter2.hasNext());
       }
-      arr = arr.snoc(Int.get(k));
-      assertEquals(k + 1, arr.arraySize());
-      assertEquals(k, ((Int) arr.last()).itr());
+      array1 = array1.snoc(Int.get(k));
+      assertEquals(k + 1, array1.arraySize());
+      assertEquals(k, ((Int) array1.last()).itr());
     }
   }
 
   /** Delete elements so that the middle tree collapses. */
   @Test public void collapseMiddleTest() {
-    final XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
+    final XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
-    XQArray arr2 = arr.tail();
-    arr2 = arr2.remove(4, qc);
-    arr2 = arr2.remove(2, qc);
-    assertContains(arr2, 1, 2, 4, 6, 7, 8);
+    XQArray array2 = array.tail();
+    array2 = array2.remove(4, qc);
+    array2 = array2.remove(2, qc);
+    assertContains(array2, 1, 2, 4, 6, 7, 8);
 
-    XQArray arr3 = arr.cons(Int.get(-1)).snoc(Int.get(9));
-    arr3 = arr3.remove(5, qc);
-    arr3 = arr3.remove(5, qc);
-    assertContains(arr3, -1, 0, 1, 2, 3, 6, 7, 8, 9);
+    array2 = array.cons(Int.get(-1)).snoc(Int.get(9));
+    array2 = array2.remove(5, qc);
+    array2 = array2.remove(5, qc);
+    assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8, 9);
 
-    XQArray arr4 = arr.cons(Int.get(-1));
-    arr4 = arr4.remove(5, qc);
-    arr4 = arr4.remove(5, qc);
-    assertContains(arr4, -1, 0, 1, 2, 3, 6, 7, 8);
+    array2 = array.cons(Int.get(-1));
+    array2 = array2.remove(5, qc);
+    array2 = array2.remove(5, qc);
+    assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8);
   }
 
   /** Delete elements so that the left digit is emptied. */
   @Test public void emptyLeftDigitTest() {
-    XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
-    arr = arr.remove(0, qc);
-    arr = arr.remove(0, qc);
-    arr = arr.remove(0, qc);
-    arr = arr.remove(0, qc);
-    assertContains(arr, 4, 5, 6, 7, 8);
+    XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
+    array = array.remove(0, qc);
+    array = array.remove(0, qc);
+    array = array.remove(0, qc);
+    array = array.remove(0, qc);
+    assertContains(array, 4, 5, 6, 7, 8);
   }
 
   /** Delete elements so that the right digit is emptied. */
   @Test public void emptyRightDigitTest() {
-    XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
-    arr = arr.remove(8, qc);
-    arr = arr.remove(7, qc);
-    arr = arr.remove(6, qc);
-    arr = arr.remove(5, qc);
-    assertContains(arr, 0, 1, 2, 3, 4);
+    XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
+    array = array.remove(8, qc);
+    array = array.remove(7, qc);
+    array = array.remove(6, qc);
+    array = array.remove(5, qc);
+    assertContains(array, 0, 1, 2, 3, 4);
 
-    XQArray arr2 = from(1, 2, 3, 4, 5, 6, 7, 8, 9).cons(Int.ZERO);
+    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).cons(Int.ZERO);
     for(int i = 9; i >= 4; i--) {
-      arr2 = arr2.remove(i, qc);
+      array = array.remove(i, qc);
     }
-    assertContains(arr2, 0, 1, 2, 3);
+    assertContains(array, 0, 1, 2, 3);
   }
 
   /** Delete in the left digit of a deep node. */
   @Test public void deepLeftTest() {
-    XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-    arr = arr.remove(3, qc);
-    assertContains(arr, 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+    XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+    array = array.remove(3, qc);
+    assertContains(array, 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
-    XQArray arr2 = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-    arr2 = arr2.remove(6, qc);
-    assertContains(arr2, 0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+    array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+    array = array.remove(6, qc);
+    assertContains(array, 0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
-    XQArray arr3 = from(
+    array = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
-    arr3 = arr3.remove(9, qc);
-    arr3 = arr3.remove(6, qc);
-    arr3 = arr3.remove(5, qc);
-    arr3 = arr3.remove(4, qc);
-    arr3 = arr3.remove(3, qc);
-    arr3 = arr3.remove(3, qc);
-    assertContains(arr3,
+    array = array.remove(9, qc);
+    array = array.remove(6, qc);
+    array = array.remove(5, qc);
+    array = array.remove(4, qc);
+    array = array.remove(3, qc);
+    array = array.remove(3, qc);
+    assertContains(array,
         0, 1, 2, 8, 10, 11, 12, 13, 14,
         15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
 
-    XQArray arr4 = from(
+    array = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24);
-    arr4 = arr4.remove(6, qc);
-    arr4 = arr4.remove(5, qc);
-    arr4 = arr4.remove(4, qc);
-    arr4 = arr4.remove(3, qc);
-    arr4 = arr4.remove(3, qc);
-    assertContains(arr4,
+    array = array.remove(6, qc);
+    array = array.remove(5, qc);
+    array = array.remove(4, qc);
+    array = array.remove(3, qc);
+    array = array.remove(3, qc);
+    assertContains(array,
         0, 1, 2, 8, 9, 10, 11, 12, 13, 14,
         15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
 
-    XQArray arr5 = from(
+    array = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24);
-    arr5 = arr5.remove(17, qc);
-    arr5 = arr5.remove(16, qc);
-    arr5 = arr5.remove(15, qc);
-    arr5 = arr5.remove(6, qc);
-    arr5 = arr5.remove(5, qc);
-    arr5 = arr5.remove(4, qc);
-    arr5 = arr5.remove(3, qc);
-    arr5 = arr5.remove(3, qc);
-    assertContains(arr5, 0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24);
+    array = array.remove(17, qc);
+    array = array.remove(16, qc);
+    array = array.remove(15, qc);
+    array = array.remove(6, qc);
+    array = array.remove(5, qc);
+    array = array.remove(4, qc);
+    array = array.remove(3, qc);
+    array = array.remove(3, qc);
+    assertContains(array, 0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24);
 
-    XQArray arr6 = from(
+    array = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
         21
     );
     for(int i = 12; i >= 4; i--) {
-      arr6 = arr6.remove(i, qc);
+      array = array.remove(i, qc);
     }
-    assertContains(arr6, 0, 1, 2, 3, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+    assertContains(array, 0, 1, 2, 3, 13, 14, 15, 16, 17, 18, 19, 20, 21);
   }
 
   /** Delete in the middle tree of a deep node. */
   @Test public void deepMiddleTest() {
-    XQArray arr = from(
+    XQArray array = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26);
 
     for(int i = 8; i >= 6; i--) {
-      arr = arr.remove(i, qc);
+      array = array.remove(i, qc);
     }
-
     for(int i = 15; i >= 9; i--) {
-      arr = arr.remove(i - 3, qc);
+      array = array.remove(i - 3, qc);
     }
 
-    assertContains(arr, 0, 1, 2, 3, 4, 5, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26);
+    assertContains(array, 0, 1, 2, 3, 4, 5, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26);
 
-    XQArray arr2 = from(
+    array = from(
         5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
-    for(int i = 4; i >= 0; i--) arr2 = arr2.cons(Int.get(i));
-    for(int i = 31; i <= 35; i++) arr2 = arr2.snoc(Int.get(i));
-    for(int i = 22; i >= 16; i--) arr2 = arr2.remove(i, qc);
-    assertContains(arr2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+    for(int i = 4; i >= 0; i--) array = array.cons(Int.get(i));
+    for(int i = 31; i <= 35; i++) array = array.snoc(Int.get(i));
+    for(int i = 22; i >= 16; i--) array = array.remove(i, qc);
+    assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
             14, 15, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
   }
 
   /** Delete in the right digit of a deep node. */
   @Test public void deepRightTest() {
-    XQArray arr = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
-    for(int i = 12; i >= 8; i--) arr = arr.remove(i, qc);
-    arr = arr.remove(8, qc);
-    assertContains(arr, 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 16, 17);
+    XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    for(int i = 12; i >= 8; i--) array = array.remove(i, qc);
+    array = array.remove(8, qc);
+    assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 16, 17);
 
-    XQArray arr2 = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
-    for(int i = 12; i >= 9; i--) arr2 = arr2.remove(i, qc);
-    arr2 = arr2.remove(9, qc);
-    assertContains(arr2, 0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17);
+    array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+    for(int i = 12; i >= 9; i--) array = array.remove(i, qc);
+    array = array.remove(9, qc);
+    assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17);
   }
 
   /**
@@ -198,21 +197,21 @@ public final class ArrayRemoveTest extends ArrayTest {
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : list) ab.append(value);
-    XQArray arr = ab.array();
+    XQArray array = ab.array();
 
     final Random rng = new Random(42);
     for(int i = 0; i < n; i++) {
       final int delPos = rng.nextInt(n - i);
       list.remove(delPos);
-      arr = arr.remove(delPos, qc);
+      array = array.remove(delPos, qc);
       final int size = n - i - 1;
-      assertEquals(size, arr.arraySize());
+      assertEquals(size, array.arraySize());
       assertEquals(size, list.size());
 
       if(i % 1000 == 999) {
-        arr.checkInvariants();
+        array.checkInvariants();
         for(int j = 0; j < size; j++) {
-          assertEquals(((Int) list.get(j)).itr(), ((Int) arr.get(j)).itr());
+          assertEquals(((Int) list.get(j)).itr(), ((Int) array.get(j)).itr());
         }
       }
     }
@@ -223,22 +222,22 @@ public final class ArrayRemoveTest extends ArrayTest {
    */
   @Test public void removeTest() {
     final int n = 100;
-    XQArray seq = XQArray.empty();
+    XQArray array1 = XQArray.empty();
 
     for(int k = 0; k < n; k++) {
-      assertEquals(k, seq.arraySize());
+      assertEquals(k, array1.arraySize());
       for(int i = 0; i < k; i++) {
-        final XQArray seq2 = seq.remove(i, qc);
-        assertEquals(k - 1, seq2.arraySize());
+        final XQArray array2 = array1.remove(i, qc);
+        assertEquals(k - 1, array2.arraySize());
 
-        final Iterator<Value> iter = seq2.iterator(0);
+        final Iterator<Value> iter2 = array2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
-          assertTrue(iter.hasNext());
-          assertEquals(j < i ? j : j + 1, ((Int) iter.next()).itr());
+          assertTrue(iter2.hasNext());
+          assertEquals(j < i ? j : j + 1, ((Int) iter2.next()).itr());
         }
-        assertFalse(iter.hasNext());
+        assertFalse(iter2.hasNext());
       }
-      seq = seq.snoc(Int.get(k));
+      array1 = array1.snoc(Int.get(k));
     }
   }
 
@@ -255,12 +254,12 @@ public final class ArrayRemoveTest extends ArrayTest {
 
   /**
    * Checks that the given array contains the given integers.
-   * @param arr array to check the contents of
+   * @param array array to check the contents of
    * @param values integers to look for
    * @throws AssertionError of the check fails
    */
-  private static void assertContains(final XQArray arr, final int... values) {
-    final Iterator<Value> iter = arr.iterator(0);
+  private static void assertContains(final XQArray array, final int... values) {
+    final Iterator<Value> iter = array.iterator(0);
     for(final int value : values) {
       assertTrue(iter.hasNext());
       assertEquals(value, ((Int) iter.next()).itr());

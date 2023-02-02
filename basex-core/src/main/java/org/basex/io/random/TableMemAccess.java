@@ -69,28 +69,28 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public void write1(final int pre, final int offset, final int value) {
     final TableMemBlock block = block(pre);
-    final long d = (offset < 8 ? 7 : 15) - offset << 3;
+    final long d = (long) (offset < 8 ? 7 : 15) - offset << 3;
     block.value(pre, offset, block.value(pre, offset) & ~(0xFFL << d) | (long) value << d);
   }
 
   @Override
   public void write2(final int pre, final int offset, final int value) {
     final TableMemBlock block = block(pre);
-    final long d = (offset < 8 ? 6 : 14) - offset << 3;
+    final long d = (long) (offset < 8 ? 6 : 14) - offset << 3;
     block.value(pre, offset, block.value(pre, offset) & ~(0xFFFFL << d) | (long) value << d);
   }
 
   @Override
   public void write4(final int pre, final int offset, final int value) {
     final TableMemBlock block = block(pre);
-    final long d = (offset < 8 ? 4 : 12) - offset << 3;
+    final long d = (long) (offset < 8 ? 4 : 12) - offset << 3;
     block.value(pre, offset, block.value(pre, offset) & ~(0xFFFFFFFFL << d) | (long) value << d);
   }
 
   @Override
   public void write5(final int pre, final int offset, final long value) {
     final TableMemBlock block = block(pre);
-    final long d = (offset < 8 ? 3 : 11) - offset << 3;
+    final long d = (long) (offset < 8 ? 3 : 11) - offset << 3;
     block.value(pre, offset, block.value(pre, offset) & ~(0xFFFFFFFFFFL << d) | value << d);
   }
 

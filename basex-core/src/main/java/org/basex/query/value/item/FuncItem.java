@@ -42,7 +42,7 @@ public final class FuncItem extends FItem implements Scope {
   private final InputInfo info;
 
   /** Query focus. */
-  private QueryFocus focus;
+  private final QueryFocus focus;
   /** Indicates if the query focus is accessed or modified. */
   private Boolean fcs;
 

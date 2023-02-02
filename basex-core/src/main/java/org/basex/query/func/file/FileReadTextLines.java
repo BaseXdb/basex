@@ -80,6 +80,7 @@ public final class FileReadTextLines extends FileRead {
     final Path path = toPath(0, qc);
     final String encoding = toEncodingOrNull(1, FILE_UNKNOWN_ENCODING_X, qc);
     final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
+
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
@@ -95,10 +96,14 @@ public final class FileReadTextLines extends FileRead {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-    final long start = exprs.length < 4 ? 1 : toLong(exprs[3], qc);
-    final long length = exprs.length < 5 ? Long.MAX_VALUE : toLong(exprs[4], qc);
-    final long end = start + length < 0 ? Long.MAX_VALUE : start + length;
-    return new long[] { start, end };
+    final int el = exprs.length;
+   final Item offset = el > 3 ? exprs[3].atomItem(qc, info) : Empty.VALUE;
+    final Item length = el > 4 ? exprs[4].atomItem(qc, info) : Empty.VALUE;
+
+    final long off = offset != Empty.VALUE ? toLong(offset) : 1;
+    final long len = length != Empty.VALUE ? toLong(length) : Long.MAX_VALUE;
+    final long end = off + len < 0 ? Long.MAX_VALUE : off + len;
+    return new long[] { off, end };
   }
 
   /**

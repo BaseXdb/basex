@@ -28,7 +28,7 @@ public class FnAll extends StandardFunc {
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
       final Item it = predicate != null ? predicate.invoke(qc, info, item).item(qc, info) : item;
-      if(toBoolean(it) ^ !some) return Bln.get(some);
+      if(toBoolean(it) == some) return Bln.get(some);
     }
     return Bln.get(!some);
   }
@@ -53,7 +53,7 @@ public class FnAll extends StandardFunc {
     final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);
 
     final Expr cmp = new CmpG(info, flwor, Bln.get(some), OpG.EQ, null, sc).optimize(cc);
-    return some ? cmp : Function.NOT.get(sc, info, cmp);
+    return some ? cmp : cc.function(Function.NOT, info, cmp);
   }
 
   /**

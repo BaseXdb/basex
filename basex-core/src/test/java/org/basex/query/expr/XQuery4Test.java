@@ -224,4 +224,22 @@ public final class XQuery4Test extends QueryPlanTest {
     error(prefix + "attribute(*, xs:string)", STATIC_X);
     error(prefix + "attribute(*, xs:xyz)", TYPEUNDEF_X);
   }
+
+  /** New if syntax. */
+  @Test public void iff() {
+    query("if(0) { }", "");
+    query("if(1) { 2 }", 2);
+    query("if(1) { 2 } else { 3 }", 2);
+    query("if(0) { } else { 1 }", 1);
+    query("if(0) { } else if(1) { 2 }", 2);
+    query("if(0) { } else if(0) { } else { 1 }", 1);
+    query("if(0) { } else if(0) { } else if(0) { } else if(0) { } else { 1 }", 1);
+
+    error("if() { }", NOIF);
+    error("if(0) { } else", WRONGCHAR_X_X);
+    error("if(0) { } else ()", WRONGCHAR_X_X);
+    error("if(0) { } else if() { }", NOIF);
+    error("if(0) { } else if(0) then", WRONGCHAR_X_X);
+    error("if(0) { } else if(0) { } else", WRONGCHAR_X_X);
+  }
 }

@@ -373,7 +373,7 @@ public abstract class Path extends ParseExpr {
             if(ex instanceof AxisPath) {
               final AxisPath path = (AxisPath) ex;
               if(path.root == null) {
-                final ArrayList<PathNode> tmp = path.pathNodes(pn, stats);
+                final ArrayList<PathNode> tmp = path.pathNodes(pn, false);
                 if(tmp != null && tmp.isEmpty()) return tmp;
               }
             }

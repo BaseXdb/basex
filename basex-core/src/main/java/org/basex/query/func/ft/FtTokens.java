@@ -22,13 +22,13 @@ public final class FtTokens extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    byte[] entry = exprs.length < 2 ? Token.EMPTY : toToken(exprs[1], qc);
-    if(entry.length != 0) {
+    byte[] prefix = exprs.length > 1 ? toToken(exprs[1], qc) : Token.EMPTY;
+    if(prefix.length != 0) {
       final FTLexer lexer = new FTLexer(new FTOpt().assign(data.meta));
-      lexer.init(entry);
-      entry = lexer.nextToken();
+      lexer.init(prefix);
+      prefix = lexer.nextToken();
     }
-    return IndexFn.entries(data, new IndexEntries(entry, IndexType.FULLTEXT), this);
+    return IndexFn.entries(data, new IndexEntries(prefix, IndexType.FULLTEXT), this);
   }
 
   @Override

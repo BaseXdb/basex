@@ -18,12 +18,12 @@ import org.junit.jupiter.api.*;
 public final class ArraySliceTest extends ArrayTest {
   /** Exhaustively tests creating sub-arrays of arrays of a range of lengths. */
   @Test public void testSlice() {
-    XQArray arr = XQArray.empty();
+    XQArray array = XQArray.empty();
     for(int len = 0; len < 100; len++) {
-      assertEquals(len, arr.arraySize());
+      assertEquals(len, array.arraySize());
       for(int pos = 0; pos < len; pos++) {
         for(int k = 0; k <= len - pos; k++) {
-          final XQArray sub = arr.subArray(pos, k, qc);
+          final XQArray sub = array.subArray(pos, k, qc);
           assertEquals(k, sub.arraySize());
           sub.checkInvariants();
           final Iterator<Value> iter = sub.iterator(0);
@@ -35,7 +35,7 @@ public final class ArraySliceTest extends ArrayTest {
           }
         }
       }
-      arr = arr.snoc(Int.get(len));
+      array = array.snoc(Int.get(len));
     }
   }
 }

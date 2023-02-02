@@ -12,6 +12,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 import org.w3c.dom.ls.*;
@@ -66,7 +67,7 @@ public class ValidateXsd extends ValidateFn {
           QueryException {
 
         final IO in = read(toNodeOrAtomItem(0, qc), null);
-        final Item schema = exprs.length > 1 ? toNodeOrAtomItem(1, qc) : null;
+        final Item schema = exprs.length > 1 ? toNodeOrAtomItem(1, qc) : Empty.VALUE;
         final HashMap<String, String> options = toOptions(2, new Options(), qc).free();
 
         // create schema factory and set version
@@ -84,7 +85,7 @@ public class ValidateXsd extends ValidateFn {
         }
 
         // schema declaration is included in document, or specified as string
-        final Schema s = schema == null ? sf.newSchema() :
+        final Schema s = schema == Empty.VALUE ? sf.newSchema() :
           sf.newSchema(new URL(prepare(read(schema, null), handler).url()));
 
         final Validator v = s.newValidator();

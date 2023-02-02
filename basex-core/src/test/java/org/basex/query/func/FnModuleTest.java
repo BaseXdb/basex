@@ -798,6 +798,17 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (1, <_>2</_>, 3, 4)", 2) + "[1]", 1);
     query(func.args(" (1, <_>2</_>, 3, 4)", 2) + "[2]", 3);
     query(func.args(" (1, <_>2</_>, 3, 4)", 2) + "[3]", 4);
+
+    // multiple positions
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (1, 2)"), "3\n4");
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (2, 3)"), "1\n4");
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (2, 4)"), "1\n3");
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (2, 2)"), "1\n3\n4");
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (1 to 3)"), 4);
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (2 to 4)"), 1);
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (0 to 3)"), 4);
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (1 to 4)"), "");
+    query(func.args(" (1, <_>2</_>, 3, 4)", " (1 to 5)"), "");
   }
 
   /** Test method. */

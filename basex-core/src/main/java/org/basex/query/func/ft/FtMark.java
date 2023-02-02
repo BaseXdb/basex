@@ -38,24 +38,19 @@ public class FtMark extends StandardFunc {
   /**
    * Performs the mark function.
    * @param qc query context
-   * @param ex extract flag
+   * @param extract extract flag
    * @return iterator
    * @throws QueryException query exception
    */
-  final Iter mark(final QueryContext qc, final boolean ex) throws QueryException {
-    byte[] m = MARK;
-    int l = ex ? 150 : Integer.MAX_VALUE;
+  final Iter mark(final QueryContext qc, final boolean extract) throws QueryException {
+    final int el = exprs.length;
+    final Item name = el > 1 ? exprs[1].atomItem(qc, info) : Empty.VALUE;
+    final Item length = el > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
 
-    if(exprs.length > 1) {
-      // name of the marker element; default is <mark/>
-      m = toToken(exprs[1], qc);
-      if(!XMLToken.isQName(m)) throw valueError(AtomType.QNAME, m, info);
-    }
-    if(exprs.length > 2) {
-      l = (int) toLong(exprs[2], qc);
-    }
-    final byte[] mark = m;
-    final int len = l;
+    final byte[] m = name != Empty.VALUE ? toToken(name) : MARK;
+    if(!XMLToken.isQName(m)) throw valueError(AtomType.QNAME, m, info);
+    final int l = length != Empty.VALUE ? (int) Math.min(Integer.MAX_VALUE, toLong(length)) :
+      extract ? 150 : Integer.MAX_VALUE;
 
     return new Iter() {
       final FTPosData ftd = new FTPosData();
@@ -80,7 +75,7 @@ public class FtMark extends StandardFunc {
             // copy node to main memory data instance
             final MemData md = new MemData(qc.context.options);
             final DataBuilder db = new DataBuilder(md, qc);
-            db.ftpos(mark, qc.ftPosData, len).build(toDBNode(item, true));
+            db.ftpos(m, qc.ftPosData, l).build(toDBNode(item, true));
 
             final IntList il = new IntList();
             final int s = md.meta.size;

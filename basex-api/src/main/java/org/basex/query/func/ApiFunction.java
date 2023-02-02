@@ -31,8 +31,8 @@ public enum ApiFunction implements AFunction {
   _REQUEST_ADDRESS(RequestAddress::new, "address()",
       params(), STRING_O, REQUEST_URI),
   /** XQuery function. */
-  _REQUEST_ATTRIBUTE(RequestAttribute::new, "attribute(name)",
-      params(STRING_O), ITEM_ZM, REQUEST_URI),
+  _REQUEST_ATTRIBUTE(RequestAttribute::new, "attribute(name[,default])",
+      params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames::new, "attribute-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -178,7 +178,7 @@ public enum ApiFunction implements AFunction {
   _WS_EMIT(WsEmit::new, "emit(message)",
       params(ITEM_O), EMPTY_SEQUENCE_Z, WS_URI),
   /** XQuery function. */
-  _WS_EVAL(WsEval::new, "eval(string[,bindings[,options]])",
+  _WS_EVAL(WsEval::new, "eval(string[,bindings,options])",
       params(STRING_O, MAP_ZO, MAP_ZO), STRING_O, WS_URI),
   /** XQuery function. */
   _WS_GET(WsGet::new, "get(id,key[,default])",

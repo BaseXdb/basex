@@ -72,7 +72,7 @@ class IndexPath extends IndexPred {
     // choose new root expression: add predicates of last step to root
     int s = path.steps.length - 1;
     final Step last = step(s);
-    final Expr rt = last.exprs.length == 0 ? root : Filter.get(cc, path.info(), root, last.exprs);
+    final Expr rt = last.exprs.length > 0 ? Filter.get(cc, path.info(), root, last.exprs) : root;
 
     // attribute index request: start inverted path with attribute step
     if(!ii.text && (last.test instanceof NameTest || last.test instanceof UnionTest)) {

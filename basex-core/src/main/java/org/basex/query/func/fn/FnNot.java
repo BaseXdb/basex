@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -24,31 +25,53 @@ public final class FnNot extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = exprs[0], inverted = invert(input, cc);
+    return inverted != input ? inverted : this;
+  }
 
-    // not(empty(A))  ->  exists(A)
-    if(EMPTY.is(input)) return cc.function(EXISTS, info, input.args());
-    // not(exists(A))  ->  empty(A)
+  /**
+   * Inverts the specified expression.
+   * @param input input info
+   * @param cc compilation context
+   * @return inverted or original expression
+   * @throws QueryException query exception
+   */
+  private Expr invert(final Expr input, final CompileContext cc) throws QueryException {
+    // exists(A)  ->  empty(A)
     if(EXISTS.is(input)) return cc.function(EMPTY, info, input.args());
-    // not(not(A))  ->  boolean(A)
+    // empty(A)  ->  exists(A)
+    if(EMPTY.is(input)) return cc.function(EXISTS, info, input.args());
+    // not(A)  ->  boolean(A)
     if(NOT.is(input)) return cc.function(BOOLEAN, info, input.args());
 
-    // not('a' = 'b')  ->  'a' != 'b'
+    // 'a' = 'b'  ->  'a' != 'b'
     if(input instanceof Cmp) {
-      final Expr ex = ((Cmp) input).invert(cc);
-      if(ex != input) return ex;
+      final Expr inverted = ((Cmp) input).invert(cc);
+      if(inverted != input) return inverted;
     }
-    // not(position() = 1)  ->  position() != 1
-    // not(position() = <_>3</_>)  ->  position() != 3
+    // position() = 1  ->  position() != 1
     if(input instanceof CmpPos) {
       final Expr ex = ((CmpPos) input).invert(cc);
       if(ex != null) return ex;
     }
-    // not($node/text())  ->  empty($node/text())
+    // $node/text()  ->  empty($node/text())
     final SeqType st = input.seqType();
     if(st.type instanceof NodeType) return cc.function(EMPTY, info, input);
 
-    return this;
+    // A = 1 or position() = 1  ->  A != 1 and position() != 1
+    if(input instanceof Logical) {
+      Expr[] args = input.args();
+      final ExprList tmp = new ExprList(args.length);
+      for(final Expr arg : args) {
+        final Expr inverted = invert(arg, cc);
+        if(inverted == arg) return input;
+        tmp.add(inverted);
+      }
+      args = tmp.finish();
+      final InputInfo ii = input.info();
+      return (input instanceof And ? new Or(ii, args) : new And(ii, args)).optimize(cc);
+    }
+    return input;
   }
 
   @Override

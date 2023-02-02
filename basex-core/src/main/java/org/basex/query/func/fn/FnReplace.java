@@ -21,9 +21,11 @@ import org.basex.util.list.*;
 public final class FnReplace extends RegEx {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final int el = exprs.length;
     final byte[] value = toZeroToken(exprs[0], qc);
-    final byte[] pattern = toToken(exprs[1], qc), replacement = toZeroToken(exprs[2], qc);
-    final boolean noFlags = exprs.length < 4, noAction = exprs.length < 5;
+    final byte[] pattern = toToken(exprs[1], qc);
+    final byte[] replacement = el > 2 ? toZeroToken(exprs[2], qc) : EMPTY;
+    final boolean noFlags = el < 4, noAction = el < 5;
     if(noFlags) {
       // shortcut for simple character replacements
       final int sp = patternChar(pattern), rp = patternChar(replacement);

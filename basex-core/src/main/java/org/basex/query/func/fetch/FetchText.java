@@ -19,6 +19,7 @@ public final class FetchText extends FetchDoc {
     final IO io = toIO(0, qc);
     final String encoding = toEncodingOrNull(1, FETCH_ENCODING_X, qc);
     final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
+
     return new StrLazy(io, encoding, FETCH_OPEN_X, validate);
   }
 }

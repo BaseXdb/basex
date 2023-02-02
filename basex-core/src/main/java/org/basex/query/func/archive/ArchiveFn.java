@@ -52,10 +52,9 @@ abstract class ArchiveFn extends StandardFunc {
 
   /**
    * Returns all archive entries from the specified argument.
-   * A {@code null} reference is returned if no entries are specified.
    * @param e argument index
    * @param qc query context
-   * @return set with all entries
+   * @return set with all entries, or {@code null} if no entries are specified
    * @throws QueryException query exception
    */
   final TokenSet entries(final int e, final QueryContext qc) throws QueryException {
@@ -68,6 +67,6 @@ abstract class ArchiveFn extends StandardFunc {
         hs.add(checkElemToken(en).string(info));
       }
     }
-    return hs;
+    return hs == null || hs.isEmpty() ? null : hs;
   }
 }

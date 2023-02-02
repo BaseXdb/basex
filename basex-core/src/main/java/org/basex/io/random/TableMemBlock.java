@@ -114,7 +114,7 @@ final class TableMemBlock {
 
     // check if entries can be inserted into existing block
     if(count <= remaining) {
-      resize((last + copy) << 1);
+      resize(last + copy << 1);
       System.arraycopy(data, first << 1, data, last << 1, copy << 1);
       return null;
     }

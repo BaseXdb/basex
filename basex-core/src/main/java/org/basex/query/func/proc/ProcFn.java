@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -39,14 +40,11 @@ abstract class ProcFn extends StandardFunc {
    */
   final ProcResult exec(final QueryContext qc, final boolean fork) throws QueryException {
     // arguments
-    final StringList sl = new StringList().add(toString(exprs[0], qc));
-    if(exprs.length > 1) {
-      final Iter iter = exprs[1].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) {
-        sl.add(toString(item));
-      }
+    final StringList args = new StringList().add(toString(exprs[0], qc));
+    final Iter arguments = exprs.length > 1 ? exprs[1].iter(qc) : Empty.ITER;
+    for(Item item; (item = qc.next(arguments)) != null;) {
+      args.add(toString(item));
     }
-    final String[] args = sl.finish();
 
     // options
     final ProcOptions opts = toOptions(2, new ProcOptions(), qc);
@@ -64,7 +62,7 @@ abstract class ProcFn extends StandardFunc {
 
     final ProcResult result = new ProcResult();
     final Process proc;
-    final ProcessBuilder pb = new ProcessBuilder(args);
+    final ProcessBuilder pb = new ProcessBuilder(args.finish());
     if(dir != null) pb.directory(toPath(dir).toFile());
     try {
       proc = pb.start();

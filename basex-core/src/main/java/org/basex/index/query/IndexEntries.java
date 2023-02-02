@@ -40,12 +40,12 @@ public final class IndexEntries implements IndexSearch {
 
   /**
    * Constructor for traversing entries.
-   * @param text token to start with
+   * @param prefix token to start with
    * @param asc return results in ascending order
    * @param type index type
    */
-  public IndexEntries(final byte[] text, final boolean asc, final IndexType type) {
-    this(type, text);
+  public IndexEntries(final byte[] prefix, final boolean asc, final IndexType type) {
+    this(type, prefix);
     descending = !asc;
   }
 

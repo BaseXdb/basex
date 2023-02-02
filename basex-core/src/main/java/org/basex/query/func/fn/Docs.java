@@ -53,7 +53,7 @@ public abstract class Docs extends DynamicFn {
       final ArrayList<String> list = new ArrayList<>(1);
       if(sc.withdb) {
         // lock default collection (only collection functions can have 0 arguments)
-        if(exprs.length == 0) {
+        if(exprs.length < 1) {
           list.add(Locking.COLLECTION);
         } else {
           // check if input argument is a static string

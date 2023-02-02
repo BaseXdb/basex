@@ -130,6 +130,29 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void charr() {
+    final Function func = CHAR;
+
+    // test pre-evaluation
+    query(func.args("\\t") + " => string-to-codepoints()", 9);
+    query(func.args("\\r") + " => string-to-codepoints()", 13);
+    query(func.args("\\n") + " => string-to-codepoints()", 10);
+    query(func.args("\\n"), "\n");
+    query(func.args("#10"), "\n");
+    query(func.args("#xa"), "\n");
+    query(func.args("#xA"), "\n");
+    query(func.args("#x0A"), "\n");
+    query(func.args("#00000000000000000000010"), "\n");
+    query(func.args("#x0000000000000000000000A"), "\n");
+    query(func.args("#32"), " ");
+    query(func.args("#x20"), " ");
+
+    query(func.args("ring"), "\u02DA");
+    query(func.args("AMP"), "&");
+    query(func.args("amp"), "&");
+  }
+
+  /** Test method. */
   @Test public void characters() {
     final Function func = CHARACTERS;
 
@@ -860,8 +883,29 @@ public class Fn4ModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void arrayEmpty() {
+    final Function func = _ARRAY_EMPTY;
+
+    query(func.args(" [ ]"), true);
+    query(func.args(" array { () }"), true);
+    query(func.args(" [ () ]"), false);
+    query(func.args(" [ 1 ]"), false);
+  }
+
+  /** Test method. */
+  @Test public void arrayExists() {
+    final Function func = _ARRAY_EXISTS;
+
+    query(func.args(" [ ]"), false);
+    query(func.args(" array { () }"), false);
+    query(func.args(" [ () ]"), true);
+    query(func.args(" [ 1 ]"), true);
+  }
+
+  /** Test method. */
   @Test public void arrayFoot() {
     final Function func = _ARRAY_FOOT;
+
     query(func.args(" [ 1 ]"), 1);
     query(func.args(" array { 1 to 5 }"), 5);
     query(func.args(" [ 1, 2 to 3 ]"), "2\n3");

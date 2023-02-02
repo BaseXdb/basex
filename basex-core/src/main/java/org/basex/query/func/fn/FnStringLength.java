@@ -20,7 +20,7 @@ public final class FnStringLength extends ContextFn {
   @Override
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value;
-    if(exprs.length == 0) {
+    if(exprs.length < 1) {
       final Item item = ctxValue(qc).item(qc, info);
       if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item);
       value = item == Empty.VALUE ? Token.EMPTY : item.string(info);

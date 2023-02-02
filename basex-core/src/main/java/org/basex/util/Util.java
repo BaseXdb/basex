@@ -11,7 +11,9 @@ import javax.net.ssl.*;
 
 import org.basex.core.jobs.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -323,5 +325,30 @@ public final class Util {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns the contents of a property file.
+   * @param name name of property resource file
+   * @return property map
+   */
+  public static TokenMap properties(final String name) {
+    final InputStream is = Util.class.getResourceAsStream('/' + name);
+    if(is == null) throw notExpected("%: Property file missing.", name);
+
+    final TokenMap map = new TokenMap();
+    try(NewlineInput nli = new NewlineInput(is)) {
+      for(String line; (line = nli.readLine()) != null;) {
+        final int s = line.indexOf('=');
+        if(s == -1 || Strings.startsWith(line, '#')) continue;
+        final byte[] key = Token.token(line.substring(0, s).trim());
+        final byte[] value = Token.token(line.substring(s + 1).trim().replace("\\n", "\n"));
+        if(map.contains(key)) throw notExpected("%: '%' is declared twice.", name, key);
+        map.put(key, value);
+      }
+    } catch(final IOException ex) {
+      throw notExpected("%: %", name, ex);
+    }
+    return map;
   }
 }

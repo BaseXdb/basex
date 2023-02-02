@@ -12,11 +12,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class StringCr extends StandardFunc {
-  /** Carriage return character. */
-  private static final Str CR = Str.get("\r");
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return CR;
+    return Str.CR;
   }
 }

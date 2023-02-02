@@ -877,6 +877,9 @@ public final class DbModuleTest extends QueryPlanTest {
     query(func.args(NAME, 1, "value2"));
     query(_DB_GET_VALUE.args(NAME, "value2"), 1);
 
+    query(func.args(NAME, " string(attribute a { 'x' })", "value3"));
+    query(_DB_GET_VALUE.args(NAME, "value3"), "x");
+
     error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
         DB_CONFLICT5_X);
     error(_DB_PUT_VALUE.args(NAME, "VALUE", ".."), RESINV_X);

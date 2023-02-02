@@ -31,14 +31,12 @@ public final class PartFunc extends Arr {
    * Constructor.
    * @param info input info
    * @param sc static context
-   * @param expr function expression
-   * @param args arguments
+   * @param exprs expressions (arguments, body)
    * @param holes positions of the placeholders
    */
-  public PartFunc(final InputInfo info, final StaticContext sc, final Expr expr, final Expr[] args,
+  public PartFunc(final InputInfo info, final StaticContext sc, final Expr[] exprs,
       final int[] holes) {
-
-    super(info, SeqType.FUNCTION_O, ExprList.concat(args, expr));
+    super(info, SeqType.FUNCTION_O, exprs);
     this.sc = sc;
     this.holes = holes;
   }
@@ -107,8 +105,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new PartFunc(info, sc, body().copy(cc, vm),
-        copyAll(cc, vm, Arrays.copyOf(exprs, exprs.length - 1)), holes.clone()));
+    return copyType(new PartFunc(info, sc, copyAll(cc, vm, exprs), holes.clone()));
   }
 
   @Override

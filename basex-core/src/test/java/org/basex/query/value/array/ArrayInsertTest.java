@@ -20,21 +20,21 @@ public final class ArrayInsertTest extends ArrayTest {
   @Test public void fuzzyTest() {
     final int n = 50_000;
     final ArrayList<Integer> list = new ArrayList<>(n);
-    XQArray arr = XQArray.empty();
+    XQArray array = XQArray.empty();
 
     final Random rng = new Random(42);
     for(int i = 0; i < n; i++) {
       final int insPos = rng.nextInt(i + 1);
       list.add(insPos, i);
-      arr = arr.insertBefore(insPos, Int.get(i), qc);
+      array = array.insertBefore(insPos, Int.get(i), qc);
       final int size = i + 1;
-      assertEquals(size, arr.arraySize());
+      assertEquals(size, array.arraySize());
       assertEquals(size, list.size());
 
       if(i % 1000 == 999) {
-        arr.checkInvariants();
+        array.checkInvariants();
         for(int j = 0; j < size; j++) {
-          assertEquals(list.get(j).intValue(), ((Int) arr.get(j)).itr());
+          assertEquals(list.get(j).intValue(), ((Int) array.get(j)).itr());
         }
       }
     }
@@ -45,18 +45,18 @@ public final class ArrayInsertTest extends ArrayTest {
    */
   @Test public void insertTest() {
     final int n = 1_000;
-    XQArray seq = XQArray.empty();
+    XQArray array = XQArray.empty();
 
-    for(int i = 0; i < n; i++) seq = seq.snoc(Int.get(i));
-    assertEquals(n, seq.arraySize());
+    for(int i = 0; i < n; i++) array = array.snoc(Int.get(i));
+    assertEquals(n, array.arraySize());
 
     final Int val = Int.get(n);
     for(int i = 0; i <= n; i++) {
-      final XQArray seq2 = seq.insertBefore(i, val, qc);
-      assertEquals(n, ((Int) seq2.get(i)).itr());
-      assertEquals(n + 1L, seq2.arraySize());
+      final XQArray array2 = array.insertBefore(i, val, qc);
+      assertEquals(n, ((Int) array2.get(i)).itr());
+      assertEquals(n + 1L, array2.arraySize());
       for(int j = 0; j < n; j++) {
-        assertEquals(j, ((Int) seq2.get(j < i ? j : j + 1)).itr());
+        assertEquals(j, ((Int) array2.get(j < i ? j : j + 1)).itr());
       }
     }
   }

@@ -33,7 +33,7 @@ public final class CComm extends CNode {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    simplifyAll(Simplify.STRING, cc);
+    exprs = simplifyAll(Simplify.STRING, cc);
     optValue(cc);
     return this;
   }

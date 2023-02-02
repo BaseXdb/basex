@@ -20,7 +20,7 @@ public final class FnStringJoin extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = exprs[0].atomIter(qc, info);
-    final byte[] sep = exprs.length == 2 ? toToken(exprs[1], qc) : Token.EMPTY;
+    final byte[] sep = exprs.length > 1 ? toToken(exprs[1], qc) : Token.EMPTY;
 
     // no results: empty string
     Item item = values.next();

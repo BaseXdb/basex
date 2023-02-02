@@ -24,10 +24,11 @@ import org.basex.util.list.*;
 public class FileList extends FileFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final int el = exprs.length;
     try {
       final Path dir = toPath(0, qc).toRealPath();
-      final boolean recursive = toBoolean(1, qc);
-      final Pattern pattern = exprs.length == 3 ? Pattern.compile(IOFile.regex(
+      final boolean recursive = el > 1 && toBooleanOrFalse(exprs[1], qc);
+      final Pattern pattern = el > 2 ? Pattern.compile(IOFile.regex(
           toString(exprs[2], qc), false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
       final TokenList tl = new TokenList();

@@ -20,16 +20,16 @@ public final class VariousArrayTest extends ArrayTest {
    */
   @Test public void consSnocTest() {
     final int n = 200_000;
-    XQArray seq = XQArray.empty();
+    XQArray array = XQArray.empty();
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
-      seq = seq.cons(val).snoc(val);
+      array = array.cons(val).snoc(val);
     }
 
-    assertEquals(2 * n, seq.arraySize());
+    assertEquals(2 * n, array.arraySize());
     for(long i = 0; i < 2 * n; i++) {
       final long diff = i - n, j = diff < 0 ? -(diff + 1) : diff;
-      assertEquals(j, ((Int) seq.get(i)).itr());
+      assertEquals(j, ((Int) array.get(i)).itr());
     }
   }
 
@@ -38,24 +38,24 @@ public final class VariousArrayTest extends ArrayTest {
    */
   @Test public void queueTest() {
     final int n = 2_000_000, k = n / 100;
-    XQArray seq = XQArray.empty();
-    for(int i = 0; i < k; i++) seq = seq.cons(Int.get(i));
+    XQArray array = XQArray.empty();
+    for(int i = 0; i < k; i++) array = array.cons(Int.get(i));
 
     for(int i = k; i < n; i++) {
-      assertEquals(k, seq.arraySize());
-      assertEquals(i - k, ((Int) seq.last()).itr());
-      seq = seq.init();
-      seq = seq.cons(Int.get(i));
+      assertEquals(k, array.arraySize());
+      assertEquals(i - k, ((Int) array.last()).itr());
+      array = array.init();
+      array = array.cons(Int.get(i));
     }
 
-    assertEquals(k, seq.arraySize());
+    assertEquals(k, array.arraySize());
     for(int i = 0; i < k; i++) {
-      assertEquals(n - k + i, ((Int) seq.last()).itr());
-      seq = seq.init();
-      assertEquals(k - i - 1, seq.arraySize());
+      assertEquals(n - k + i, ((Int) array.last()).itr());
+      array = array.init();
+      assertEquals(k - i - 1, array.arraySize());
     }
 
-    assertTrue(seq.isEmptyArray());
+    assertTrue(array.isEmptyArray());
   }
 
   /**
@@ -63,25 +63,25 @@ public final class VariousArrayTest extends ArrayTest {
    */
   @Test public void stackTest() {
     final int n = 2_000_000;
-    XQArray seq = XQArray.empty();
+    XQArray array = XQArray.empty();
 
     for(int i = 0; i < n; i++) {
-      assertEquals(i, seq.arraySize());
+      assertEquals(i, array.arraySize());
       final Int val = Int.get(i);
-      seq = seq.cons(val).cons(val);
-      assertEquals(i, ((Int) seq.head()).itr());
-      seq = seq.tail();
+      array = array.cons(val).cons(val);
+      assertEquals(i, ((Int) array.head()).itr());
+      array = array.tail();
     }
 
-    assertEquals(n, seq.arraySize());
+    assertEquals(n, array.arraySize());
 
     for(int i = n; --i >= 0;) {
-      assertEquals(i, ((Int) seq.head()).itr());
-      seq = seq.tail();
-      assertEquals(i, seq.arraySize());
+      assertEquals(i, ((Int) array.head()).itr());
+      array = array.tail();
+      assertEquals(i, array.arraySize());
     }
 
-    assertTrue(seq.isEmptyArray());
+    assertTrue(array.isEmptyArray());
   }
 
   /**
@@ -89,14 +89,14 @@ public final class VariousArrayTest extends ArrayTest {
    */
   @Test public void iteratorTest() {
     final int n = 1_000;
-    XQArray seq = XQArray.empty();
-    assertFalse(seq.iterator(0).hasNext());
+    XQArray array = XQArray.empty();
+    assertFalse(array.iterator(0).hasNext());
 
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
-      seq = seq.cons(val).snoc(val);
+      array = array.cons(val).snoc(val);
       final int k = 2 * (i + 1);
-      final Iterator<Value> iter = seq.iterator(0);
+      final Iterator<Value> iter = array.iterator(0);
       for(int j = 0; j < k; j++) {
         assertTrue(iter.hasNext());
         final Value next = iter.next();
@@ -109,15 +109,15 @@ public final class VariousArrayTest extends ArrayTest {
 
   /** Tests {@link XQArray#tail()}. */
   @Test public void tailTest() {
-    XQArray seq = XQArray.empty();
+    XQArray array = XQArray.empty();
     for(int i = 0; i < 15; i++) {
-      seq = seq.snoc(Int.get(i));
+      array = array.snoc(Int.get(i));
     }
 
-    assertEquals(0, ((Int) seq.head()).itr());
-    assertEquals(15, seq.arraySize());
-    seq = seq.tail();
-    assertEquals(1, ((Int) seq.head()).itr());
-    assertEquals(14, seq.arraySize());
+    assertEquals(0, ((Int) array.head()).itr());
+    assertEquals(15, array.arraySize());
+    array = array.tail();
+    assertEquals(1, ((Int) array.head()).itr());
+    assertEquals(14, array.arraySize());
   }
 }

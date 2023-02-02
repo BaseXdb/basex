@@ -85,8 +85,10 @@ public class FnEmpty extends StandardFunc {
   public final Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 
+    // exists(A) or exists(B)  ->  exists((A, B))
+    // empty(A) and empty(B)  ->  empty((A, B))
     final Function func = this instanceof FnExists ? EXISTS : EMPTY;
-    if(!or && func.is(expr)) {
+    if(func == (or ? EXISTS : EMPTY) && func.is(expr)) {
       return cc.function(func, info, List.get(cc, info, exprs[0], expr.arg(0)));
     }
     if(_UTIL_COUNT_WITHIN.is(expr)) {

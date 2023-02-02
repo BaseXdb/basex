@@ -204,7 +204,7 @@ final class ProjectFiles {
           final String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
           if(mode == 0 ? SmartStrings.startsWith(file, query) :
              mode == 1 ? SmartStrings.contains(file, query) :
-             SmartStrings.matches(file, query)) {
+             SmartStrings.charsOccurIn(file, query)) {
 
             // check file contents
             if(filterContent(path, search)) {

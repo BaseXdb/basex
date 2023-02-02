@@ -6,8 +6,8 @@ import java.util.*;
 import java.util.jar.*;
 
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -38,27 +38,14 @@ public final class Lang {
   private static synchronized void read(final String lang) {
     TEXTS.clear();
     CHECK.clear();
-    final String path = '/' + SUFFIX + '/' + lang + '.' + SUFFIX;
-    final InputStream is = Lang.class.getResourceAsStream(path);
-    if(is == null) {
-      Util.errln(path + " not found.");
-    } else {
-      try(NewlineInput nli = new NewlineInput(is)) {
-        for(String line; (line = nli.readLine()) != null;) {
-          final int i = line.indexOf('=');
-          if(i == -1 || Strings.startsWith(line, '#')) continue;
-          final String key = line.substring(0, i).trim();
-          String val = line.substring(i + 1).trim();
-          if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-          if(Prop.langkeys) val = '[' + key + ": " + val + ']';
-          if(TEXTS.put(key, val) != null) {
-            Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, key);
-          }
-          CHECK.put(key, true);
-        }
-      } catch(final IOException ex) {
-        Util.errln(ex);
+    final String path = SUFFIX + '/' + lang + '.' + SUFFIX;
+    final TokenMap map = Util.properties(path);
+    for(final byte[] key : map) {
+      final String name = Token.string(key), val = Token.string(map.get(key));
+      if(TEXTS.put(name, val.replace("\n", Prop.NL)) != null) {
+        Util.errln("%." + SUFFIX + ": '%' is declared twice", lang, name);
       }
+      CHECK.put(name, true);
     }
   }
 

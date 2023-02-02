@@ -16,9 +16,9 @@ public final class RequestAttribute extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String name = toString(exprs[0], qc);
-    final Value dflt = exprs.length == 1 ? Empty.VALUE : exprs[1].value(qc);
-
     final Object object = request(qc).getAttribute(name);
-    return object != null ? JavaCall.toValue(object, qc, info) : dflt;
+    if(object != null) return JavaCall.toValue(object, qc, info);
+
+    return exprs.length > 1 ? exprs[1].value(qc) : Empty.VALUE;
   }
 }

@@ -1249,6 +1249,18 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[a and b]", "", count(SingleIterPath.class, 2));
 
     check("<a/>[empty(b) or empty(c)]", "<a/>", exists(Or.class));
+
+    final String e1 = " (1 to 6)[. = (1, 2)]", e2 = " (1 to 6)[. = (7, 8)]";
+    check(EMPTY.args(e1)  + " and " + EMPTY.args(e2),  false, root(EMPTY));
+    check(EXISTS.args(e1) + " or "  + EXISTS.args(e2), true,  root(EXISTS));
+    check(EMPTY.args(e1)  + " or "  + EMPTY.args(e2),  true,  root(Or.class));
+    check(EXISTS.args(e1) + " and " + EXISTS.args(e2), false, root(And.class));
+    query("for $j in 6 to 11 "
+        + "let $i := 1 "
+        + "let $a := $i[. >= 2] "
+        + "let $b := $j[. >= 11] "
+        + "where exists($a) and exists($b) "
+        + "return count($a)", "");
   }
 
   /** Documents with different default namespaces. */
@@ -2975,5 +2987,32 @@ public final class RewritingsTest extends QueryPlanTest {
         "a", empty(List.class), empty(IterMap.class), exists(IterPath.class));
     check("name(<a><b><c/></b></a>[b ! (c, d, c)])",
         "a", empty(List.class), empty(IterMap.class), exists(IterPath.class));
+  }
+
+  /** Simplified if expression yields errors. */
+  @Test public void gh2161() {
+    check("let $s := ('1', '2') where ($s ! (if(.) then <a/> else ())) return ()", "");
+  }
+
+  /** Invert logical arguments of fn:not. */
+  @Test public void gh2164() {
+    check("(1 to 6)[not(boolean(.))]", "", empty(BOOLEAN), exists(NOT));
+    check("(1 to 6)[not(not(.))]", "1\n2\n3\n4\n5\n6", exists(BOOLEAN), empty(NOT));
+    check("(1 to 6)[not(. != 1)]", 1, empty(NOT), "//@op = '='");
+    check("(1 to 6)[not(position() != 3)]", 3, root(Int.class));
+    check("(1 to 6)[not(. = 3 or (. != 1 and . != 4))]", "1\n4", empty(NOT));
+
+    final String e1 = " (1 to 6)[. = (1, 2)]", e2 = " (1 to 6)[. = (7, 8)]";
+    check(NOT.args(EMPTY.args(e1)  + " and " + EMPTY.args(e2)),  true , root(EXISTS));
+    check(NOT.args(EXISTS.args(e1) + " or "  + EXISTS.args(e2)), false,  root(EMPTY));
+    check(NOT.args(EMPTY.args(e1)  + " or "  + EMPTY.args(e2)),  false,  root(And.class));
+    check(NOT.args(EXISTS.args(e1) + " and " + EXISTS.args(e2)), true , root(Or.class));
+  }
+
+  /** Function Arity of Partial Function Applications. */
+  @Test public void gh2166() {
+    query("declare function local:a() { function($a) { $a(1) }(local:b(2, ?)) };"
+        + "declare function local:b($b, $c) { };"
+        + "local:a()", "");
   }
 }

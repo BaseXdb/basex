@@ -1,10 +1,9 @@
 package org.basex.util.http;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.in.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Single Internet media type.
@@ -13,6 +12,19 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class MediaType implements Comparable<MediaType> {
+  /** File suffixes and media types. */
+  private static final HashMap<String, MediaType> MEDIATYPES = new HashMap<>();
+
+  /* Reads in the media-types. */
+  static {
+    final HashMap<String, MediaType> cache = new HashMap<>();
+    final TokenMap map = Util.properties("media-types.properties");
+    for(final byte[] key : map) {
+      final String suffix = Token.string(key), type = Token.string(map.get(key));
+      MEDIATYPES.put(suffix, cache.computeIfAbsent(type, MediaType::new));
+    }
+  }
+
   /** Multipart type. */
   private static final String MULTIPART = "multipart";
   /** Text type. */
@@ -238,35 +250,6 @@ public final class MediaType implements Comparable<MediaType> {
   public static MediaType get(final String path) {
     final int s = path.lastIndexOf('/'), d = path.lastIndexOf('.');
     final String suffix = d <= s ? "" : path.substring(d + 1).toLowerCase(Locale.ENGLISH);
-    return TYPES.getOrDefault(suffix, APPLICATION_OCTET_STREAM);
-  }
-
-  /** Hash map containing all assignments. */
-  private static final HashMap<String, MediaType> TYPES = new HashMap<>();
-
-  /* Reads in the media-types. */
-  static {
-    final HashMap<String, MediaType> cache = new HashMap<>();
-    try {
-      final String file = "/media-types.properties";
-      final InputStream is = MediaType.class.getResourceAsStream(file);
-      if(is == null) {
-        Util.errln(file + " not found.");
-      } else {
-        try(NewlineInput nli = new NewlineInput(is)) {
-          for(String line; (line = nli.readLine()) != null;) {
-            final int i = line.indexOf('=');
-            if(i == -1 || Strings.startsWith(line, '#')) continue;
-            final String suffix = line.substring(0, i), type = line.substring(i + 1);
-            final MediaType mt = cache.computeIfAbsent(type, MediaType::new);
-            TYPES.put(suffix, mt);
-          }
-        }
-      }
-    } catch(final IOException ex) {
-      Util.errln(ex);
-    } catch(final Throwable ex) {
-      Util.stack(ex);
-    }
+    return MEDIATYPES.getOrDefault(suffix, APPLICATION_OCTET_STREAM);
   }
 }

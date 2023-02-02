@@ -227,7 +227,7 @@ public final class Var extends ExprInfo {
 
     if(!checkType() || declType.instance(value)) return value;
     if(promote) return declType.promote(value, name, qc, sc, info, opt);
-    throw typeError(value, declType, name, info, promote);
+    throw typeError(value, declType, name, info, false);
   }
 
   /**

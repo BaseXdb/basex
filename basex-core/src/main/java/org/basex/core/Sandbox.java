@@ -116,7 +116,7 @@ public abstract class Sandbox {
     final String res = normNL(result), exp = expected.toString();
     if(OUTPUT) {
       Util.errln(query.strip());
-      Util.errln(res.replaceAll("\n", ","));
+      Util.errln(res.replace('\n', ','));
     }
     if(!res.equals(exp)) throw Util.notExpected("\n" + query +
         "\nEXPECTED: [" + exp + "]\nRETURNED: [" + res + "]\n" + serialize(plan));

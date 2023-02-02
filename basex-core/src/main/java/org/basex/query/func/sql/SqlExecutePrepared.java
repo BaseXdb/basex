@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -33,16 +34,17 @@ public final class SqlExecutePrepared extends SqlExecute {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
-    ANode params = null;
-    if(exprs.length > 1) {
-      params = toElem(exprs[1], qc);
-      if(!params.qname().eq(Q_PARAMETERS)) throw INVALIDOPTION_X.get(info, params.qname().local());
-    }
+    final Item params = exprs.length > 1 ? exprs[1].item(qc, info) : Empty.VALUE;
     final StatementOptions options = toOptions(2, new StatementOptions(), qc);
+
+    final ANode prms = params != Empty.VALUE ? toElem(params, qc) : null;
+    if(prms != null && !prms.qname().eq(Q_PARAMETERS)) {
+      throw INVALIDOPTION_X.get(info, prms.qname().local());
+    }
 
     try {
       ps.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
-      if(params != null) setParameters(params.childIter(), ps);
+      if(prms != null) setParameters(prms.childIter(), ps);
       // If execute returns false, statement was updating: return number of updated rows
       return iter(ps, false, ps.execute());
     } catch(final QueryException ex) {

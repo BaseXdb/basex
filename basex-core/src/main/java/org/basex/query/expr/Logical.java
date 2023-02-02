@@ -40,7 +40,7 @@ public abstract class Logical extends Arr {
    * @throws QueryException query exception
    */
   final Expr optimize(final CompileContext cc, final boolean or) throws QueryException {
-    simplifyAll(Simplify.EBV, cc);
+    exprs = simplifyAll(Simplify.EBV, cc);
     if(optimizeEbv(or, false, cc)) return cc.replaceWith(this, Bln.get(or));
 
     final int el = exprs.length;

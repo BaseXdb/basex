@@ -61,7 +61,7 @@ public final class Inline {
       int c = 32;
       // upper bit: 09/0A = 0, 0D/20 = 1
       // lower bit: 0A/20 = 0, 09/0D = 1
-      for(final byte b : token) value |= (b < 0x0B ? 0L : 1L) << --c | (b & 1) << --c;
+      for(final byte b : token) value |= (b < 0x0B ? 0L : 1L) << --c | (long) (b & 1) << --c;
       return value;
     }
     // no inlining possible

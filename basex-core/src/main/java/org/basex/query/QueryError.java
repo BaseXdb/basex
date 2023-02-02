@@ -590,6 +590,8 @@ public enum QueryError {
   NORMUNI_X(FOCH, 3, "Unsupported normalization form ('%')."),
   /** Error code. */
   CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
+  /** Error code. */
+  CHARINV_X(FOCH, 5, "Invalid name or glyph: %."),
 
   /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
@@ -993,10 +995,8 @@ public enum QueryError {
   ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
   /** Error code. */
   CASTTYPE_X(XPST, 3, "%"),
-
   /** Error code. */
   STATIC_X(XPST, 5, "No XML Schema support: %."),
-
   /** Error code. */
   VARUNDEF_X(XPST, 8, "Undeclared variable: %."),
   /** Error code. */
@@ -1007,7 +1007,6 @@ public enum QueryError {
   TYPEUNDEF_X(XPST, 8, "Undefined type annotation: %."),
   /** Error code. */
   SCHEMAINV_X(XPST, 8, "Undefined schema name: %."),
-
   /** Error code. */
   FUNCPRIVATE_X(XPST, 17, "Function not visible: %."),
   /** Error code. */
@@ -1020,14 +1019,12 @@ public enum QueryError {
   ABSTRACTFUNC_X(XPST, 17, "No function exists for abstract type: %."),
   /** Error code. */
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
-
   /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
   /** Error code. */
   JAVACLASS_X(XPST, 17, "Unknown class: %."),
   /** Error code. */
   JAVAMEMBER_X(XPST, 17, "Unknown method or field: %."),
-
   /** Error code. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
   /** Error code. */
@@ -1036,6 +1033,16 @@ public enum QueryError {
   NOURI_X(XPST, 81, "Namespace prefix not declared: %."),
   /** Error code. */
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
+  /** Error code. */
+  KEYWORDTWICE_X(XPST, 141, "Keyword supplied twice: %."),
+  /** Error code. */
+  ARGMISSING_X_X(XPST, 141, "%: No argument supplied for: %."),
+  /** Error code. */
+  ARGTWICE_X_X(XPST, 141, "%: Argument supplied twice for: %."),
+  /** Error code. */
+  KEYWORDUNKNOWN_X_X(XPST, 142, "%: Unknown keyword: %."),
+  /** Error code. */
+  KEYWORDSUPPORT_X(XPST, 142, "%: Keyword arguments not supported."),
 
   /** Error code. */
   JAVANOINSTANCE_X_X(XPTY, 4, "% instance expected as first argument, % found."),

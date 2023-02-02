@@ -310,6 +310,19 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Evaluates an expression to a boolean.
+   * @param expr expression
+   * @param qc query context
+   * @return boolean, or {@code false} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final boolean toBooleanOrFalse(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item != Empty.VALUE && toBoolean(item);
+  }
+
+  /**
    * Converts an item to a boolean.
    * @param item item to be converted
    * @return boolean
@@ -558,7 +571,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Evaluates an expression to a QName.
    * @param expr expression
-   * @param empty return {@code null} if the given item is empty
+   * @param empty return {@code null} if the expression yields an empty sequence
    * @param qc query context
    * @return QName or {@code null}
    * @throws QueryException query exception

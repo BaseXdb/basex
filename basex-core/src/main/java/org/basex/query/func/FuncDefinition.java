@@ -21,14 +21,17 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FuncDefinition {
+  /** Result type. */
+  public final SeqType seqType;
+
   /** Function constructor. */
   final Supplier<? extends StandardFunc> supplier;
   /** Minimum and maximum number of arguments. */
   final int[] minMax;
   /** Parameter types. */
-  final SeqType[] params;
-  /** Sequence type. */
-  public final SeqType seqType;
+  final SeqType[] types;
+  /** Parameter names. */
+  final QNm[] names;
   /** URI. */
   final byte[] uri;
   /** Minimum permission. */
@@ -46,45 +49,53 @@ public final class FuncDefinition {
    *             arguments in parentheses. Optional arguments are represented in nested
    *             square brackets; three dots indicate that the number of arguments of a
    *             function is not limited
-   * @param params parameter types
+   * @param types parameter types
    * @param seqType return type
    * @param flags static function properties
    * @param uri uri
    * @param perm minimum permission
    */
   FuncDefinition(final Supplier<? extends StandardFunc> supplier, final String desc,
-      final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
+      final SeqType[] types, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
       final Perm perm) {
 
     this.supplier = supplier;
     this.desc = desc;
     this.seqType = seqType;
-    this.params = params;
+    this.types = types;
     this.flags = flags;
     this.uri = uri;
     this.perm = perm;
-    minMax = minMax(desc, params);
+    minMax = minMax(desc, types);
+
+    // extract parameter names from function descriptions
+    final int p = desc.indexOf('(');
+    final String[] tmp = Strings.split(desc.substring(p + 1).replace(",...", "").
+        replaceAll("[\\[\\])\\s]", ""), ',');
+    final int tl = tmp.length == 1 && tmp[0].isEmpty() ? 0 : tmp.length;
+    names = new QNm[tl];
+    for(int n = 0; n < tl; n++) names[n] = new QNm(tmp[n]);
 
     // treat updating expressions as non-deterministic
     if(flags.contains(Flag.UPD)) flags.add(Flag.NDT);
   }
 
   /**
-   * Computes the minimum and maximum number of arguments by analyzing the description string.
+   * Computes the minimum and maximum number of parameters by analyzing the description string.
    * @param desc description
-   * @param args arguments
+   * @param params arguments
    * @return min/max values
    */
-  public static int[] minMax(final String desc, final SeqType[] args) {
+  public static int[] minMax(final String desc, final SeqType[] params) {
     // count number of minimum and maximum arguments by analyzing the description
-    final int b = desc.indexOf('['), al = args.length;
-    if(b == -1) return new int[] { al, al };
+    final int optional = desc.indexOf('['), pl = params.length;
+    if(optional == -1) return new int[] { pl, pl };
 
-    int c = b + 1 < desc.length() && desc.charAt(b + 1) == ',' ? 1 : 0;
-    for(int i = 0; i < b; i++) {
+    int c = desc.charAt(optional + 1) == ',' ? 1 : 0;
+    for(int i = 0; i < optional; i++) {
       if(desc.charAt(i) == ',') c++;
     }
-    return new int[] { c, desc.contains(DOTS) ? Integer.MAX_VALUE : al };
+    return new int[] { c, desc.contains(DOTS) ? Integer.MAX_VALUE : pl };
   }
 
   /**
@@ -106,6 +117,18 @@ public final class FuncDefinition {
   }
 
   /**
+   * Returns the index of the specified parameter.
+   * @param name parameter name
+   * @return index or {@code -1}
+   */
+  public int indexOf(final QNm name) {
+    for(int n = names.length - 1; n >= 0; n--) {
+      if(name.eq(names[n])) return n;
+    }
+    return -1;
+  }
+
+  /**
    * Returns the function type of this function with the given arity.
    * @param arity number of arguments
    * @param anns annotations
@@ -114,24 +137,14 @@ public final class FuncDefinition {
   FuncType type(final int arity, final AnnList anns) {
     final SeqType[] st = new SeqType[arity];
     if(arity != 0 && minMax[1] == Integer.MAX_VALUE) {
-      final int pl = params.length;
-      Array.copy(params, pl, st);
-      final SeqType var = params[pl - 1];
-      for(int p = pl; p < arity; p++) st[p] = var;
+      final int tl = types.length;
+      Array.copy(types, tl, st);
+      final SeqType var = types[tl - 1];
+      for(int t = tl; t < arity; t++) st[t] = var;
     } else {
-      Array.copy(params, arity, st);
+      Array.copy(types, arity, st);
     }
     return FuncType.get(anns, seqType, st);
-  }
-
-  /**
-   * Returns the names of the function parameters.
-   * @return names of function parameters
-   */
-  String[] names() {
-    final String names = desc.replaceFirst(".*?\\(", "").replace(",...", "").
-        replaceAll("[\\[\\])\\s]", "");
-    return names.isEmpty() ? new String[0] : Strings.split(names, ',');
   }
 
   /**
@@ -140,16 +153,15 @@ public final class FuncDefinition {
    * @return names of parameters
    */
   QNm[] paramNames(final int arity) {
-    final String[] strings = names();
-    final QNm[] names = new QNm[arity];
-    final int nl = strings.length;
-    for(int n = Math.min(arity, nl); --n >= 0;) names[n] = new QNm(strings[n]);
+    final QNm[] qnms = new QNm[arity];
+    final int nl = names.length;
+    for(int n = Math.min(arity, nl); --n >= 0;) qnms[n] = names[n];
     if(arity > nl) {
-      final String[] parts = strings[nl - 1].split("(?=\\d+$)", 2);
+      final String[] parts = Token.string(names[nl - 1].local()).split("(?=\\d+$)", 2);
       final int start = Integer.parseInt(parts[1]);
-      for(int n = nl; n < arity; n++) names[n] = new QNm(parts[0] + (start + n - nl + 1), "");
+      for(int n = nl; n < arity; n++) qnms[n] = new QNm(parts[0] + (start + n - nl + 1), "");
     }
-    return names;
+    return qnms;
   }
 
   /**

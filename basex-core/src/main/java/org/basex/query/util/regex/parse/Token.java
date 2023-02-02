@@ -118,9 +118,7 @@ public class Token implements Serializable {
    * @return token
    */
   private static Token newToken(final int k, final String img) {
-    switch(k) {
-      default : return new Token(k, img);
-    }
+      return new Token(k, img);
   }
 
   /**

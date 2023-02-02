@@ -36,8 +36,7 @@ public class FileWriteBinary extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toParent(toPath(0, qc));
-
-    if(exprs.length == 2) {
+    if(exprs.length < 3) {
       // write full file
       try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append))) {
         if(exprs[1].getClass() == ArchiveCreate.class) {

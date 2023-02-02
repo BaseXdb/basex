@@ -95,8 +95,8 @@ public abstract class StandardFunc extends Arr {
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       // consider variable-size parameters
-      final int p = Math.min(e, definition.params.length - 1);
-      final Type type = definition.params[p].type;
+      final int p = Math.min(e, definition.types.length - 1);
+      final Type type = definition.types[p].type;
       if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
         final Simplify mode = type.instanceOf(AtomType.NUMERIC) ? Simplify.NUMBER : Simplify.STRING;
         exprs[e] = exprs[e].simplifyFor(mode, cc);
@@ -281,9 +281,8 @@ public abstract class StandardFunc extends Arr {
   protected long countInputDiff(final int i) {
     if(exprs.length > i) {
       final Expr input = exprs[0], end = exprs[i];
-      final Predicate<Expr> countInput = e -> {
-        return Function.COUNT.is(e) && e.arg(0).equals(input) && !e.has(Flag.NDT);
-      };
+      final Predicate<Expr> countInput = e ->
+        Function.COUNT.is(e) && e.arg(0).equals(input) && !e.has(Flag.NDT);
       // function(E, count(E))  ->  0
       if(countInput.test(end)) return 0;
       // function(E, count(E) - 1)  ->  -1
@@ -320,7 +319,7 @@ public abstract class StandardFunc extends Arr {
   protected final DBNode toDBNode(final Item item, final boolean mainmem) throws QueryException {
     if(checkNoEmpty(item, NodeType.NODE) instanceof DBNode &&
         (mainmem || !item.data().inMemory())) return (DBNode) item;
-      throw DB_NODE_X.get(info, item);
+    throw DB_NODE_X.get(info, item);
   }
 
   /**
@@ -459,16 +458,18 @@ public abstract class StandardFunc extends Arr {
   protected final String toEncodingOrNull(final int i, final QueryError err, final QueryContext qc)
       throws QueryException {
 
-    if(i >= exprs.length) return null;
-    final String encoding = toString(exprs[i], qc);
+    final Item encoding = i < exprs.length ? exprs[i].atomItem(qc, info) : Empty.VALUE;
+    if(encoding == Empty.VALUE) return null;
+
+    final String enc = toString(encoding);
     try {
-      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
+      if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
     } catch(final IllegalArgumentException ex) {
       // character set is invalid or unknown (e.g. empty string)
       Util.debug(ex);
     }
-    throw err.get(info, QueryError.similar(encoding,
-        Levenshtein.similar(token(encoding), Strings.encodings())));
+    throw err.get(info, QueryError.similar(enc,
+        Levenshtein.similar(token(enc), Strings.encodings())));
   }
 
   /**

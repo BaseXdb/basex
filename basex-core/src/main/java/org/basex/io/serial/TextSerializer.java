@@ -3,6 +3,8 @@ package org.basex.io.serial;
 import java.io.*;
 
 import org.basex.query.util.ft.*;
+import org.basex.query.value.array.*;
+import org.basex.query.value.item.*;
 
 /**
  * This class serializes items as text.
@@ -19,6 +21,15 @@ final class TextSerializer extends StandardSerializer {
    */
   TextSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
     super(os, sopts);
+  }
+
+  @Override
+  public void serialize(final Item item) throws IOException {
+    if(item instanceof XQArray) {
+      for(final Item it : flatten((XQArray) item)) super.serialize(it);
+    } else {
+      super.serialize(item);
+    }
   }
 
   @Override

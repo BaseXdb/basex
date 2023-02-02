@@ -56,7 +56,7 @@ public final class FnData extends ContextFn {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     // data(xs:untypedAtomic(E))  ->  data(E)
-    simplifyAll(Simplify.DATA, cc);
+    exprs = simplifyAll(Simplify.DATA, cc);
   }
 
   @Override

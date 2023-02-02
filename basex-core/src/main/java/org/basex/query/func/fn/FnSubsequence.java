@@ -135,21 +135,24 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   private SeqRange range(final QueryContext qc) throws QueryException {
-    double d = toDouble(exprs[1], qc);
-    if(Double.isNaN(d)) return EMPTY;
-    final long start = start(d);
+    double start = toDouble(exprs[1], qc);
+    if(Double.isNaN(start)) return EMPTY;
+    final long s = start(start);
 
-    long end = Long.MAX_VALUE;
-    if(exprs.length > 2) {
-      d = toDouble(exprs[2], qc);
-      if(Double.isNaN(d) || start == Long.MIN_VALUE && d == Double.POSITIVE_INFINITY) return EMPTY;
-      end = end(start, d);
+    final Item end = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    long e = Long.MAX_VALUE;
+    if(end != Empty.VALUE) {
+      start = toDouble(end);
+      if(Double.isNaN(start) || s == Long.MIN_VALUE && start == Double.POSITIVE_INFINITY) {
+        return EMPTY;
+      }
+      e = end(s, start);
     }
-    if(end == Long.MAX_VALUE && start <= 1) return ALL;
-    if(start == Long.MIN_VALUE) return EMPTY;
+    if(e == Long.MAX_VALUE && s <= 1) return ALL;
+    if(s == Long.MIN_VALUE) return EMPTY;
 
     // return all values, no values, or the specified range
-    final SeqRange sr = new SeqRange(Math.max(0, start - 1), end);
+    final SeqRange sr = new SeqRange(Math.max(0, s - 1), e);
     return sr.length == 0 ? EMPTY : sr;
   }
 

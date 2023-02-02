@@ -19,16 +19,16 @@ public final class ArrayMembersTest extends ArrayTest {
   @Test public void randomTest() {
     for(int n = 0; n < 1_000; n++) {
       final Random rng = new Random(1337 + n);
-      XQArray arr = XQArray.empty();
+      XQArray array = XQArray.empty();
       final ArrayList<Integer> list = new ArrayList<>(n);
       for(int i = 0; i < n; i++) {
         final int insPos = rng.nextInt(i + 1);
-        arr = arr.insertBefore(insPos, Int.get(i), qc);
+        array = array.insertBefore(insPos, Int.get(i), qc);
         list.add(insPos, i);
       }
 
       final int startPos = rng.nextInt(n + 1);
-      final ListIterator<Value> iter1 = arr.iterator(startPos);
+      final ListIterator<Value> iter1 = array.iterator(startPos);
       final ListIterator<Integer> iter2 = list.listIterator(startPos);
       int pos = startPos;
       for(int i = 0; i < 100; i++) {

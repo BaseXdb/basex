@@ -17,9 +17,10 @@ public final class SessionsGet extends SessionsFn {
   public Value value(final QueryContext qc) throws QueryException {
     final ASession session = session(qc);
     final String name = toString(exprs[1], qc);
-    final Value dflt = exprs.length == 2 ? Empty.VALUE : exprs[2].value(qc);
 
     final Object object = session.get(name);
-    return object != null ? JavaCall.toValue(object, qc, info) : dflt;
+    if(object != null) return JavaCall.toValue(object, qc, info);
+
+    return exprs.length > 2 ? exprs[2].value(qc) : Empty.VALUE;
   }
 }

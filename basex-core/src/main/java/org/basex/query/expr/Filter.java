@@ -232,7 +232,9 @@ public abstract class Filter extends Preds {
     } else if (mode == Simplify.COUNT && exprs.length == 1) {
       // $nodes[@attr]  ->  $nodes ! @attr
       final Expr pred = exprs[0];
-      if(pred.seqType().instanceOf(SeqType.NODE_ZO)) expr = SimpleMap.get(cc, info, root, pred);
+      if(pred.seqType().instanceOf(SeqType.NODE_ZO)) {
+        expr = SimpleMap.get(cc, info, root, pred);
+      }
     }
     return cc.simplify(this, expr, mode);
   }

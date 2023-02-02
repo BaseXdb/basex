@@ -110,7 +110,7 @@ public final class TableMemAccessTest extends SandboxTest {
    * @param o offset
    */
   private void singleAppend(final int n, final int o) {
-    final ByteList list = new ByteList(n * ENTRY.length);
+    final ByteList list = new ByteList((long) n * ENTRY.length);
     for(int i = 0; i < n; i++) {
       ENTRY[0] = (byte) (o + i);
       list.add(ENTRY);

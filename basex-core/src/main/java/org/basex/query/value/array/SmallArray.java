@@ -76,8 +76,8 @@ final class SmallArray extends XQArray {
   }
 
   @Override
-  public XQArray concat(final XQArray seq) {
-    return seq.isEmptyArray() ? this : seq.prepend(this);
+  public XQArray concat(final XQArray other) {
+    return other.isEmptyArray() ? this : other.prepend(this);
   }
 
   @Override

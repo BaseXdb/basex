@@ -76,8 +76,6 @@ public final class Prop {
 
   /** Language (applied after restart). */
   public static String language = "English";
-  /** Flag for prefixing texts with their keys (helps while translating texts). */
-  public static boolean langkeys;
   /** Debug mode. */
   public static boolean debug;
   /** GUI mode. */

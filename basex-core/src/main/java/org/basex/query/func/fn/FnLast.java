@@ -27,7 +27,7 @@ public final class FnLast extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final long size = cc.qc.focus.size;
     return size > 1 ? Int.get(size) : this;
   }

@@ -35,7 +35,7 @@ public final class FnPosition extends StandardFunc {
   }
 
   @Override
-  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+  public Expr optimizePos(final OpV op, final CompileContext cc) {
     return Bln.TRUE;
   }
 }
