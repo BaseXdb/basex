@@ -21,6 +21,8 @@ final class HTMLSerializer extends MarkupSerializer {
   static final TokenList EMPTIES = new TokenList();
   /** HTML5: elements with an empty content model. */
   static final TokenList EMPTIES5 = new TokenList();
+  /** (X)HTML: formatted elements. */
+  static final TokenList FORMATTEDS = new TokenList();
   /** (X)HTML: URI attributes. */
   static final TokenSet URIS = new TokenSet();
 
@@ -147,6 +149,20 @@ final class HTMLSerializer extends MarkupSerializer {
     }
   }
 
+  @Override
+  protected void indent() throws IOException {
+    if(atomic) {
+      atomic = false;
+    } else if(indent) {
+      for(final QNm qname : elems) {
+        byte[] lc = lc(qname.local());
+        if(eq(qname.uri(), EMPTY) && FORMATTEDS.contains(lc)) return;
+        if(html5 && eq(qname.uri(), XHTML_URI) && FORMATTEDS.contains(lc)) return;
+      }
+      super.indent();
+    }
+  }
+
   // HTML Serializer: cache elements
   static {
     // script elements
@@ -239,6 +255,12 @@ final class HTMLSerializer extends MarkupSerializer {
     EMPTIES5.add("source");
     EMPTIES5.add("track");
     EMPTIES5.add("wbr");
+    // formatted elements
+    FORMATTEDS.add("pre");
+    FORMATTEDS.add("script");
+    FORMATTEDS.add("style");
+    FORMATTEDS.add("title");
+    FORMATTEDS.add("textarea");
     // URI attributes
     URIS.add("a@href");
     URIS.add("a@name");

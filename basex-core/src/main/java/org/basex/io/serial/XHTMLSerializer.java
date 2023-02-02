@@ -70,4 +70,17 @@ final class XHTMLSerializer extends MarkupSerializer {
       printDoctype(type, docpub, docsys);
     }
   }
+
+  @Override
+  protected void indent() throws IOException {
+    if(atomic) {
+      atomic = false;
+    } else if(indent) {
+      for(final QNm qname : elems) {
+        if(eq(qname.uri(), XHTML_URI) && HTMLSerializer.FORMATTEDS.contains(qname.local())) return;
+        if(html5 && eq(qname.uri(), EMPTY) && HTMLSerializer.FORMATTEDS.contains(lc(qname.local()))) return;
+      }
+      super.indent();
+    }
+  }
 }
