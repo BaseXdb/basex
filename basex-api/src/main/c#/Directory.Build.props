@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>8</LangVersion>
+    <RootNamespace>BaseXClient</RootNamespace>
+  </PropertyGroup>
+</Project>
