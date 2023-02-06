@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -72,15 +73,10 @@ final class XHTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void indent() throws IOException {
-    if(atomic) {
-      atomic = false;
-    } else if(indent) {
-      for(final QNm qname : elems) {
-        if(eq(qname.uri(), XHTML_URI) && HTMLSerializer.FORMATTEDS.contains(qname.local())) return;
-        if(html5 && eq(qname.uri(), EMPTY) && HTMLSerializer.FORMATTEDS.contains(lc(qname.local()))) return;
-      }
-      super.indent();
-    }
+  boolean suppressIndentation(final QNm qname) throws QueryIOException {
+    final byte[] uri = qname.uri(), local = qname.local();
+    return eq(uri, XHTML_URI) && HTMLSerializer.FORMATTEDS.contains(local) ||
+        html5 && eq(uri, EMPTY) && HTMLSerializer.FORMATTEDS.contains(lc(local)) ||
+        super.suppressIndentation(qname);
   }
 }

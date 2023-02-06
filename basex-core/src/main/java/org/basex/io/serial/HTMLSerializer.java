@@ -6,9 +6,9 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * This class serializes items as HTML.
@@ -18,16 +18,16 @@ import org.basex.util.list.*;
  */
 final class HTMLSerializer extends MarkupSerializer {
   /** (X)HTML: elements with an empty content model. */
-  static final TokenList EMPTIES = new TokenList();
+  static final TokenSet EMPTIES = new TokenSet();
   /** HTML5: elements with an empty content model. */
-  static final TokenList EMPTIES5 = new TokenList();
+  static final TokenSet EMPTIES5 = new TokenSet();
   /** (X)HTML: formatted elements. */
-  static final TokenList FORMATTEDS = new TokenList();
+  static final TokenSet FORMATTEDS = new TokenSet();
   /** (X)HTML: URI attributes. */
   static final TokenSet URIS = new TokenSet();
 
   /** HTML: script elements. */
-  private static final TokenList SCRIPTS = new TokenList();
+  private static final TokenSet SCRIPTS = new TokenSet();
   /** HTML: boolean attributes. */
   private static final TokenSet BOOLEAN = new TokenSet();
 
@@ -103,7 +103,7 @@ final class HTMLSerializer extends MarkupSerializer {
 
   @Override
   protected void startOpen(final QNm name) throws IOException {
-    if(elems.isEmpty()) checkRoot(HTML);
+    if(opened.isEmpty()) checkRoot(HTML);
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
@@ -150,17 +150,8 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void indent() throws IOException {
-    if(atomic) {
-      atomic = false;
-    } else if(indent) {
-      for(final QNm qname : elems) {
-        byte[] lc = lc(qname.local());
-        if(eq(qname.uri(), EMPTY) && FORMATTEDS.contains(lc)) return;
-        if(html5 && eq(qname.uri(), XHTML_URI) && FORMATTEDS.contains(lc)) return;
-      }
-      super.indent();
-    }
+  boolean suppressIndentation(final QNm qname) throws QueryIOException {
+    return FORMATTEDS.contains(lc(qname.local())) || super.suppressIndentation(qname);
   }
 
   // HTML Serializer: cache elements
@@ -259,8 +250,8 @@ final class HTMLSerializer extends MarkupSerializer {
     FORMATTEDS.add("pre");
     FORMATTEDS.add("script");
     FORMATTEDS.add("style");
-    FORMATTEDS.add("title");
     FORMATTEDS.add("textarea");
+    FORMATTEDS.add("title");
     // URI attributes
     URIS.add("a@href");
     URIS.add("a@name");

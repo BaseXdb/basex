@@ -47,7 +47,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   final boolean content;
   /** Undeclare prefixes. */
   private final boolean undecl;
-
+  /** Suppress indentation elements. */
+  private QNmSet suppress;
   /** Media type. */
   private final String media;
 
@@ -148,12 +149,12 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
-    if(elems.isEmpty()) checkRoot(null);
+    if(opened.isEmpty()) checkRoot(null);
     final byte[] val = norm(value);
     if(ftp == null) {
       final QNmSet qnames = cdata();
       final int vl = val.length;
-      if(qnames.isEmpty() || elems.isEmpty() || !qnames.contains(elems.peek())) {
+      if(qnames.isEmpty() || opened.isEmpty() || !qnames.contains(opened.peek())) {
         for(int k = 0; k < vl; k += cl(val, k)) {
           printChar(cp(val, k));
         }
@@ -215,7 +216,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void startOpen(final QNm name) throws IOException {
-    if(elems.isEmpty()) checkRoot(name.string());
+    if(opened.isEmpty()) checkRoot(name.string());
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
@@ -257,7 +258,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void atomic(final Item item) throws IOException {
-    if(elems.isEmpty()) checkRoot(null);
+    if(opened.isEmpty()) checkRoot(null);
     super.atomic(item);
   }
 
@@ -327,11 +328,8 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(atomic) {
       atomic = false;
     } else if(indent) {
-      final QNmSet qnames = suppress();
-      if(!qnames.isEmpty()) {
-        for(final QNm qname : elems) {
-          if(qnames.contains(qname)) return;
-        }
+      for(final QNm qname : opened) {
+        if(suppressIndentation(qname)) return;
       }
       super.indent();
     }
@@ -408,25 +406,20 @@ abstract class MarkupSerializer extends StandardSerializer {
     return list;
   }
 
-  /** Suppress indentation elements. */
-  private QNmSet suppress;
-
   /**
-   * Initializes and returns the elements whose contents must not be indented.
-   * @return list
+   * Checks if indentation is to be suppressed for the the specified QName.
+   * @param qname qname to check
+   * @return result of check
    * @throws QueryIOException query I/O exception
    */
-  private QNmSet suppress() throws QueryIOException {
-    QNmSet list = suppress;
-    if(list == null) {
-      list = new QNmSet();
-      final String supp = sopts.get(SUPPRESS_INDENTATION);
-      for(final byte[] name : split(normalize(token(supp)), ' ')) {
-        if(name.length != 0) list.add(resolve(name));
+  boolean suppressIndentation(final QNm qname) throws QueryIOException {
+    if(suppress == null) {
+      suppress = new QNmSet();
+      for(final byte[] name : split(normalize(token(sopts.get(SUPPRESS_INDENTATION))), ' ')) {
+        if(name.length != 0) suppress.add(resolve(name));
       }
-      suppress = list;
     }
-    return list;
+    return suppress.contains(qname);
   }
 
   /**
