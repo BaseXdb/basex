@@ -2627,34 +2627,37 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "StringConstructor" rule.
+   * Parses the "StringConstructor" and "StringTemplate" rules.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr stringConstructor() throws QueryException {
     check('`');
-    check('`');
-    check('[');
-
+    final boolean constr = consume("`[");
     final ExprList el = new ExprList();
     final TokenBuilder tb = new TokenBuilder();
     while(more()) {
+      // check for end
       final int p = pos;
-      if(consume(']') && consume('`') && consume('`')) {
+      if(constr ? consume(']') && consume('`') && consume('`') : consume('`') && !consume('`')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
         return el.size() == 1 ? el.get(0) : new Concat(info(), el.finish());
       }
       pos = p;
-      if(consume('`') && consume('{')) {
+      // check for variable part
+      if(constr ? consume('`') && consume('{') : consume('{') && !consume('{')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
         final Expr ex = expr();
         if(ex != null) el.add(Function.STRING_JOIN.get(sc, info(), ex, Str.SPACE));
         skipWs();
         check('}');
-        check('`');
+        if(constr) check('`');
       } else {
+        // fixed part
         pos = p;
-        tb.add(consume());
+        final char ch = consume();
+        if(!constr && (ch == '{' || ch == '}' || ch == '`')) check(ch);
+        tb.add(ch);
       }
     }
     throw error(INCOMPLETE);
