@@ -58,26 +58,22 @@ public class QueryParser extends InputParser {
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
   /** Reserved function names. */
-  private static final TokenSet KEYWORDS = new TokenSet();
+  private static final TokenSet KEYWORDS;
   /** Decimal declarations. */
   private static final byte[][] DECFORMATS = tokens(
     DF_DEC, DF_DIG, DF_GRP, DF_EXP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZD
   );
 
+  // initialize keywords
   static {
-    final byte[][] keys = {
+    KEYWORDS = new TokenSet(
       NodeType.ATTRIBUTE.qname().string(), NodeType.COMMENT.qname().string(),
       NodeType.DOCUMENT_NODE.qname().string(), NodeType.ELEMENT.qname().string(),
       NodeType.NAMESPACE_NODE.qname().string(), NodeType.NODE.qname().string(),
       NodeType.PROCESSING_INSTRUCTION.qname().string(), NodeType.TEXT.qname().string(),
       NodeType.SCHEMA_ATTRIBUTE.qname().string(), NodeType.SCHEMA_ELEMENT.qname().string(),
-
-      ArrayType.ARRAY, FuncType.FUNCTION, MapType.MAP,
-      AtomType.ITEM.qname().string(),
-
-      token(EMPTY_SEQUENCE), token(IF), token(SWITCH), token(TYPESWITCH)
-    };
-    for(final byte[] key : keys) KEYWORDS.add(key);
+      ArrayType.ARRAY, FuncType.FUNCTION, MapType.MAP, AtomType.ITEM.qname().string(),
+      token(EMPTY_SEQUENCE), token(IF), token(SWITCH), token(TYPESWITCH));
   }
 
   /** URIs of modules loaded by the current file. */
