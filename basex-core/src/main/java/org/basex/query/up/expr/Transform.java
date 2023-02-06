@@ -155,7 +155,7 @@ public final class Transform extends Copy {
     for(final Let copy : copies) {
       if(more) qs.token(SEP);
       else more = true;
-      qs.token(copy.var.id()).token(ASSIGN).token(copy.expr);
+      qs.token(copy.var.id()).token(":=").token(copy.expr);
     }
     qs.token(MODIFY).token(modify()).token(RETURN).token(result());
   }

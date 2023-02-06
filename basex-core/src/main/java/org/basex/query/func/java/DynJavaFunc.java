@@ -162,7 +162,7 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   String name() {
-    return className(clazz) + COL + name;
+    return className(clazz) + ':' + name;
   }
 
   @Override

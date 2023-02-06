@@ -309,7 +309,7 @@ public final class Var extends ExprInfo {
    * @return variable id
    */
   public byte[] id() {
-    return Token.concat(DOLLAR, name.string(), "_", id);
+    return Token.concat("$", name.string(), "_", id);
   }
 
   @Override
@@ -320,6 +320,6 @@ public final class Var extends ExprInfo {
 
   @Override
   public String toErrorString() {
-    return Strings.concat(DOLLAR, name.string());
+    return Strings.concat("$", name.string());
   }
 }

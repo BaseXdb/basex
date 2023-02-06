@@ -84,6 +84,6 @@ public abstract class Pragma extends ExprInfo {
 
   @Override
   public final void toString(final QueryString qs) {
-    qs.token(PRAGMA).token(name).token(value).token(PRAGMA2);
+    qs.token("(#").token(name).token(value).token("#)");
   }
 }

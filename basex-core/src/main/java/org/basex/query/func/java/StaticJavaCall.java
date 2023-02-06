@@ -1,7 +1,6 @@
 package org.basex.query.func.java;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import java.lang.reflect.*;
 
@@ -114,7 +113,7 @@ public final class StaticJavaCall extends JavaCall {
 
   @Override
   String name() {
-    return className(module.getClass()) + COL + method.getName();
+    return className(module.getClass()) + ':' + method.getName();
   }
 
   @Override

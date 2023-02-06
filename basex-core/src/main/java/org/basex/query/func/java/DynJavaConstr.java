@@ -103,7 +103,7 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   String name() {
-    return className(clazz) + COL + NEW;
+    return className(clazz) + ':' + NEW;
   }
 
   @Override

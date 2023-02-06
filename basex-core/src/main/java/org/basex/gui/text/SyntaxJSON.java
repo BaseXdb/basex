@@ -15,13 +15,11 @@ import org.basex.util.hash.*;
  */
 final class SyntaxJSON extends Syntax {
   /** Keywords. */
-  private static final TokenSet KEYWORDS = new TokenSet();
+  private static final TokenSet KEYWORDS;
 
   // initialize keywords
   static {
-    KEYWORDS.add("false");
-    KEYWORDS.add("true");
-    KEYWORDS.add("null");
+    KEYWORDS = new TokenSet("false", "true", "null");
   }
 
   /** Quoted flag. */

@@ -1,7 +1,6 @@
 package org.basex.query.func.inspect;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.QueryText.DOLLAR;
 import static org.basex.util.Token.*;
 
 import org.basex.io.*;
@@ -100,7 +99,7 @@ final class XQDoc extends Inspect {
       for(int i = 0; i < al; i++) {
         final Var var = sf.params[i];
         if(i > 0) qs.token(SEP);
-        qs.concat(DOLLAR, var.name.string()).token(AS).token(tp.argTypes[i]);
+        qs.concat("$", var.name.string()).token(AS).token(tp.argTypes[i]);
       }
       qs.token(')').token(AS).token(tp.declType);
       if(sf.expr == null) qs.token("external");

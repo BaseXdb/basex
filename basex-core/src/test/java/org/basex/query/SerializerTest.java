@@ -31,6 +31,21 @@ public final class SerializerTest extends SandboxTest {
       query(option + "<html xmlns='http://www.w3.org/1999/xhtml'><" + e + "/></html>",
           "<html xmlns=\"http://www.w3.org/1999/xhtml\"><" + e + " /></html>");
     }
+    query(option + INDENT.arg("yes")
+        + "<html xmlns='http://www.w3.org/1999/xhtml'><body><pre><u>test</u></pre></body></html>",
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+        + "<body>\n"
+        + "<pre><u>test</u></pre>\n"
+        + "</body>\n"
+        + "</html>");
+    query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
+        + "<html><body><PRE><u>test</u></PRE></body></html>",
+        "<!DOCTYPE html>\n"
+        + "<html>\n"
+        + "<body>\n"
+        + "<PRE><u>test</u></PRE>\n"
+        + "</body>\n"
+        + "</html>");
   }
 
   /** method=xhtml, meta element. */
@@ -63,6 +78,22 @@ public final class SerializerTest extends SandboxTest {
 
     query(option + "<?x y?>", "<?x y>");
     error(option + "<?x > ?>", SERPI);
+
+    query(option + INDENT.arg("yes")
+        + "<html><body><PRE><u>test</u></PRE></body></html>",
+        "<html>\n"
+        + "<body>\n"
+        + "<PRE><u>test</u></PRE>\n"
+        + "</body>\n"
+        + "</html>");
+    query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
+        + "<html><body><PRE><u>test</u></PRE></body></html>",
+        "<!DOCTYPE html>\n"
+        + "<html>\n"
+        + "<body>\n"
+        + "<PRE><u>test</u></PRE>\n"
+        + "</body>\n"
+        + "</html>");
   }
 
   /** Test: method=html, version=5.0. */

@@ -31,7 +31,7 @@ import org.basex.util.list.*;
  */
 public abstract class Serializer implements Closeable {
   /** Stack with names of opened elements. */
-  protected final Stack<QNm> elems = new Stack<>();
+  protected final Stack<QNm> opened = new Stack<>();
   /** Current level. */
   protected int level;
   /** Current element name. */
@@ -185,10 +185,10 @@ public abstract class Serializer implements Closeable {
       finishEmpty();
       opening = false;
     } else {
-      elem = elems.peek();
+      elem = opened.peek();
       level--;
       finishClose();
-      elems.pop();
+      opened.pop();
     }
   }
 
@@ -524,7 +524,7 @@ public abstract class Serializer implements Closeable {
     if(!opening) return;
     opening = false;
     finishOpen();
-    elems.push(elem);
+    opened.push(elem);
     level++;
   }
 

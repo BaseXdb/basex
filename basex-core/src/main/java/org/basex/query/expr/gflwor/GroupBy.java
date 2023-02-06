@@ -348,7 +348,7 @@ public final class GroupBy extends Clause {
   public void toString(final QueryString qs) {
     final int pl = post.length;
     for(int p = 0; p < pl; p++) {
-      qs.token(LET).token("(: post-group :)").token(post[p]).token(ASSIGN).token(preExpr[p]);
+      qs.token(LET).token("(: post-group :)").token(post[p]).token(":=").token(preExpr[p]);
     }
     qs.token(GROUP).token(BY).tokens(specs, SEP);
   }

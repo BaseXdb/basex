@@ -242,4 +242,17 @@ public final class XQuery4Test extends QueryPlanTest {
     error("if(0) { } else if(0) then", WRONGCHAR_X_X);
     error("if(0) { } else if(0) { } else", WRONGCHAR_X_X);
   }
+
+  /** String templates. */
+  @Test public void stringTemplates() {
+    query("``", "");
+    query("`1`", 1);
+    query("`{}`", "");
+    query("`{{``}}`", "{`}");
+    query("``[]``", "");
+
+    error("`{`", INCOMPLETE);
+    error("```", INCOMPLETE);
+    error("`}`", WRONGCHAR_X_X);
+  }
 }

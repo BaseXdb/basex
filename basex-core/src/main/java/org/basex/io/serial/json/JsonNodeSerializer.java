@@ -140,7 +140,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
           throw error("<%> found, <%> expected", elem, VALUE);
         }
       } else {
-        throw error("<%> is typed as \"%\" and cannot be nested", elems.get(level - 1), ptype);
+        throw error("<%> is typed as \"%\" and cannot be nested", opened.get(level - 1), ptype);
       }
     }
 
@@ -172,14 +172,14 @@ public final class JsonNodeSerializer extends JsonSerializer {
       out.print('"');
     } else if(eq(type, BOOLEAN)) {
       if(!eq(value, TRUE, FALSE))
-        throw error("Value of <%> is no boolean: \"%\"", elems.get(level - 1), value);
+        throw error("Value of <%> is no boolean: \"%\"", opened.get(level - 1), value);
       out.print(value);
     } else if(eq(type, NUMBER)) {
       if(Double.isNaN(toDouble(value)))
-        throw error("Value of <%> is no number: \"%\"", elems.get(level - 1), value);
+        throw error("Value of <%> is no number: \"%\"", opened.get(level - 1), value);
       out.print(value);
     } else if(trim(value).length != 0) {
-      throw error("<%> is typed as \"%\" and cannot have a value", elems.get(level - 1), type);
+      throw error("<%> is typed as \"%\" and cannot have a value", opened.get(level - 1), type);
     }
   }
 

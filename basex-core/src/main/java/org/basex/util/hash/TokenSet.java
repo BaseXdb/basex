@@ -24,17 +24,34 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * Default constructor.
    */
   public TokenSet() {
-    super(Array.INITIAL_CAPACITY);
+    this(Array.INITIAL_CAPACITY);
+  }
+
+  /**
+   * Constructor with initial capacity.
+   * @param capacity array capacity (will be resized to a power of two)
+   */
+  protected TokenSet(final long capacity) {
+    super(capacity);
     keys = new byte[capacity()][];
   }
 
   /**
-   * Constructor, specifying initial keys.
-   * @param key initial keys
+   * Constructor with initial keys.
+   * @param keys keys to be added
    */
-  public TokenSet(final byte[]... key) {
-    this();
-    for(final byte[] i : key) add(i);
+  public TokenSet(final byte[]... keys) {
+    this(keys.length);
+    for(final byte[] key : keys) add(key);
+  }
+
+  /**
+   * Convenience constructor with initial strings as keys.
+   * @param keys keys to be added
+   */
+  public TokenSet(final String... keys) {
+    this(keys.length);
+    for(final String key : keys) add(key);
   }
 
   /**

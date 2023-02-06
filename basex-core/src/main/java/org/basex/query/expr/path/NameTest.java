@@ -1,7 +1,6 @@
 package org.basex.query.expr.path;
 
 import org.basex.data.*;
-import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -179,7 +178,7 @@ public final class NameTest extends Test {
     } else if(prefix.length > 0) {
       tb.add(prefix).add(':');
     } else if(uri.length != 0) {
-      tb.add(QueryText.EQNAME).add(uri).add('}');
+      tb.add("Q{").add(uri).add('}');
     }
     // add local part
     if(part == NamePart.URI) {

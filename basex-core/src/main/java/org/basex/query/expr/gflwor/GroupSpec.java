@@ -95,7 +95,7 @@ public final class GroupSpec extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(var).token(ASSIGN).token(expr);
+    qs.token(var).token(":=").token(expr);
     if(coll != null) qs.token(COLLATION).token("\"").token(coll.uri()).token('"');
   }
 }
