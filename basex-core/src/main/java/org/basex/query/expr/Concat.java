@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
@@ -79,6 +77,6 @@ public final class Concat extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, ' ' + CONCAT + ' ', true);
+    qs.tokens(exprs, " || ", true);
   }
 }

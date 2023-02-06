@@ -320,7 +320,7 @@ public final class QNm extends Item {
     final byte[] u = uri();
     if(ns != null && Token.eq(u, ns)) return local();
     final byte[] p = NSGlobal.prefix(u);
-    return p.length != 0 ? concat(p, token(COL), local()) : id();
+    return p.length != 0 ? concat(p, COLON, local()) : id();
   }
 
   /**
@@ -368,7 +368,7 @@ public final class QNm extends Item {
    * @return QName as token
    */
   public static byte[] eqName(final byte[] uri, final byte[] local) {
-    return concat(QueryText.EQNAME, uri, CURLY2, local);
+    return concat("Q{", uri, "}", local);
   }
 
   /**
@@ -378,7 +378,7 @@ public final class QNm extends Item {
    * @return QName as token
    */
   public static String eqName(final String uri, final String local) {
-    return Strings.concat(QueryText.EQNAME, uri, CURLY2, local);
+    return Strings.concat("Q{", uri, "}", local);
   }
 
   /**

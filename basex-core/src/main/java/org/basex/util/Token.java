@@ -64,6 +64,8 @@ public final class Token {
   public static final byte[] COLON = { ':' };
   /** Dollar. */
   public static final byte[] DOLLAR = { '$' };
+  /** Question mark. */
+  public static final byte[] QUESTION = { '?' };
 
   /** Comparator for byte arrays. */
   public static final Comparator<byte[]> COMPARATOR = Token::diff;

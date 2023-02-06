@@ -487,7 +487,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final boolean inlined = !global.isEmpty();
     if(inlined) {
       qs.token("((: inline-closure :)");
-      global.forEach((k, v) -> qs.token(LET).token(k).token(ASSIGN).token(v));
+      global.forEach((k, v) -> qs.token(LET).token(k).token(":=").token(v));
       qs.token(RETURN);
     }
     qs.token(FUNCTION).params(params);

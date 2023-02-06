@@ -176,7 +176,7 @@ public final class StaticVar extends StaticDecl {
     qs.token(DECLARE).token(anns).token(VARIABLE).token(name());
     if(declType != null) qs.token(AS).token(declType);
     if(external) qs.token(EXTERNAL);
-    if(expr != null) qs.token(ASSIGN).token(expr);
+    if(expr != null) qs.token(":=").token(expr);
     qs.token(';');
   }
 }

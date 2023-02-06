@@ -200,46 +200,8 @@ public interface QueryText {
   /** Parser token. */ String LOCK = "lock";
   /** Parser token. */ String NON_DETERMNISTIC = "non-deterministic";
 
-  // PARSER KEYWORDS (IGNORED BY THE SYNTAX HIGHLIGHTER) ==========================================
-
-  /** Parsed by the syntax highlighter (don't remove!). */
+  /** Parsed by the syntax highlighter (don’t remove): remaining constants will be ignored. */
   String IGNORE = null;
-
-  /** Parser token. */ String CONCAT = "||";
-  /** Parser token. */ String ASSIGN = ":=";
-  /** Parser token. */ String EQNAME = "Q{";
-  /** Parser token. */ String CDATA = "<![CDATA[";
-  /** Parser token. */ String COL = ":";
-  /** Parser token. */ String COLS = "::";
-  /** Parser token. */ String COLWC = ":*";
-  /** Parser token. */ String HSH = "#";
-  /** Parser token. */ String SEMICOL = ";";
-  /** Parser token. */ String COMMA = ",";
-  /** Parser token. */ String DOLLAR = "$";
-  /** Parser token. */ String DOTS2 = "..";
-  /** Parser token. */ String IS = "=";
-  /** Parser token. */ String EXCL = "!";
-  /** Parser token. */ String XQ10 = "1.0";
-  /** Parser token. */ String XQ11 = "1.1";
-  /** Parser token. */ String XQ30 = "3.0";
-  /** Parser token. */ String XQ31 = "3.1";
-  /** Parser token. */ String XQ40 = "4.0";
-  /** Parser token. */ String PAREN1 = "(";
-  /** Parser token. */ String PAREN2 = ")";
-  /** Parser token. */ String SQUARE1 = "[";
-  /** Parser token. */ String SQUARE2 = "]";
-  /** Parser token. */ String CURLY1 = "{";
-  /** Parser token. */ String CURLY2 = "}";
-  /** Parser token. */ String PIPE = "|";
-  /** Parser token. */ String PRAGMA = "(#";
-  /** Parser token. */ String PRAGMA2 = "#)";
-  /** Parser Token. */ String QUESTION = "?";
-  /** Parser Token. */ String WILDCARD = "*";
-  /** Parser token. */ String FATARROW = "=>";
-  /** Parser token. */ String THINARROW = "->";
-  /** Parser token. */ String TERNARY1 = "??";
-  /** Parser token. */ String TERNARY2 = "!!";
-  /** Parser token. */ String ELVIS = "?:";
 
   // PREFIXES =====================================================================================
 

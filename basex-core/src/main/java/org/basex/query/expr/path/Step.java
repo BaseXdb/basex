@@ -451,7 +451,7 @@ public abstract class Step extends Preds {
       final java.util.function.Function<Test, TokenBuilder> add = type -> {
         if(axis == ATTRIBUTE && type instanceof NameTest)
           return tb.add('@').add(type.toString(false));
-        if(axis != CHILD) tb.add(axis).add(QueryText.COLS);
+        if(axis != CHILD) tb.add(axis).add("::");
         return tb.add(type.toString(test.type == NodeType.ATTRIBUTE));
       };
       if(test instanceof UnionTest) {

@@ -118,7 +118,7 @@ public final class Let extends ForLet {
   public void toString(final QueryString qs) {
     qs.token(LET);
     if(scoring) qs.token(SCORE);
-    qs.token(var).token(ASSIGN).token(expr);
+    qs.token(var).token(":=").token(expr);
   }
 
   /** Evaluator for a block of {@code let} expressions. */
