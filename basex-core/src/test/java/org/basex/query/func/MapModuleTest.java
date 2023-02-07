@@ -90,6 +90,10 @@ public final class MapModuleTest extends QueryPlanTest {
     final Function func = _MAP_GET;
     query(func.args(" map { }", 1), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 1), 2);
+
+    query(func.args(_MAP_ENTRY.args(1, 2), 3), "");
+    query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { }"), "");
+    query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { 4, 5 }"), "4\n5");
   }
 
   /** Test method. */

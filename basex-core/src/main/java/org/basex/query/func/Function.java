@@ -641,8 +641,9 @@ public enum Function implements AFunction {
       params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_GET(MapGet::new, "get(map,key)",
-      params(MAP_O, ANY_ATOMIC_TYPE_O), ITEM_ZM, MAP_URI),
+  _MAP_GET(MapGet::new, "get(map,key[,fallback])",
+      params(MAP_O, ANY_ATOMIC_TYPE_O, FuncType.get(ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
+      ITEM_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
@@ -695,8 +696,8 @@ public enum Function implements AFunction {
       params(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()),
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_GET(ArrayGet::new, "get(array,position)",
-      params(ARRAY_O, INTEGER_O), ITEM_ZM, ARRAY_URI),
+  _ARRAY_GET(ArrayGet::new, "get(array,position[,fallback])",
+      params(ARRAY_O, INTEGER_O, FuncType.get(INTEGER_O, ITEM_ZM).seqType()), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_HEAD(ArrayHead::new, "head(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),

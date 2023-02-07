@@ -137,6 +137,16 @@ public final class ArrayModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void get() {
+    final Function func = _ARRAY_GET;
+    query(func.args(" [ 1, 2 ]", 1), 1);
+
+    error(func.args(" [ 1, 2 ]", 3), ARRAYBOUNDS_X_X);
+    query(func.args(" [ 1, 2 ]", 3, " function($k) { }"), "");
+    query(func.args(" [ 1, 2 ]", 3, " function($k) { 4, 5 }"), "4\n5");
+  }
+
+ /** Test method. */
   @Test public void head() {
     final Function func = _ARRAY_HEAD;
     query(func.args(" [ 1 ]"), 1);
