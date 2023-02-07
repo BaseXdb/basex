@@ -708,14 +708,14 @@ public final class QT3TS extends Main {
    */
   private String assertXML(final QT3Result result, final XdmValue expected) {
     final String file = asString("@file", expected);
-    final boolean norm = asBoolean("@normalize-space=('true','1')", expected);
-    final boolean pref = asBoolean("@ignore-prefixes=('true','1')", expected);
+    final boolean normalizeSpace = asBoolean("@normalize-space=('true','1')", expected);
+    final boolean ignorePrefixes = asBoolean("@ignore-prefixes=('true','1')", expected);
 
     String exp = expected.getString();
     try {
       if(!file.isEmpty()) exp = string(new IOFile(baseDir, file).read());
       exp = normNL(exp);
-      if(norm) exp = string(normalize(token(exp)));
+      if(normalizeSpace) exp = string(normalize(token(exp)));
 
       final XdmValue returned = result.value;
       final String res = normNL(
@@ -728,7 +728,7 @@ public final class QT3TS extends Main {
 
       // include check for comments, processing instructions and namespaces
       final StringBuilder flags = new StringBuilder("'").append(Mode.ALLNODES).append('\'');
-      if(!pref) flags.append(",'").append(Mode.NAMESPACES).append('\'');
+      if(!ignorePrefixes) flags.append(",'").append(Mode.NAMESPACES).append('\'');
       final String query = Function._UTIL_DEEP_EQUAL.args(" <X>" + exp + "</X>",
           " <X>" + res + "</X>" , " (" + flags.append(")").toString());
       return asBoolean(query, expected) ? null : exp;

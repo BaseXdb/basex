@@ -338,9 +338,9 @@ final class TrieList extends TrieNode {
   @Override
   boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
     if(!(node instanceof TrieList) || size != node.size) return false;
-    final TrieList ol = (TrieList) node;
 
     // do the evil nested-loop thing
+    final TrieList ol = (TrieList) node;
     OUTER:
     for(int i = 0; i < size; i++) {
       final Item key = keys[i];

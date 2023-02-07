@@ -254,15 +254,14 @@ final class TrieBranch extends TrieNode {
   @Override
   boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
     if(!(node instanceof TrieBranch)) return false;
+
+    // check bit usage first
     final TrieBranch ob = (TrieBranch) node;
-
-    // check bin usage first
     if(used != ob.used) return false;
-
     // recursively compare children
-    for(int i = 0; i < KIDS; i++)
-      if(kids[i] != null && !kids[i].equal(ob.kids[i], deep)) return false;
-
+    for(int k = 0; k < KIDS; k++) {
+      if(kids[k] != null && !kids[k].equal(ob.kids[k], deep)) return false;
+    }
     // everything OK
     return true;
   }
