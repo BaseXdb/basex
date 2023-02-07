@@ -24,7 +24,7 @@ public class FnContainsSequence extends StandardFunc {
       final FItem compare = toFunction(exprs[2], 2, qc);
       cmp = (item1, item2) -> toBoolean(compare.invoke(qc, info, item1, item2).item(qc, info));
     } else {
-      cmp = new DeepEqual(info).collation(sc.collation)::equal;
+      cmp = new DeepEqual(info, qc).collation(sc.collation)::equal;
     }
     return Bln.get(compare(input, subsequence, cmp));
   }

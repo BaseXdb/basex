@@ -7,7 +7,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -64,8 +63,7 @@ abstract class TrieNode {
     @Override
     int hash(final InputInfo ii) { return 0; }
     @Override
-    boolean deep(final TrieNode node, final Collation coll, final InputInfo ii) {
-      return this == node; }
+    boolean equal(final TrieNode node, final DeepEqual deep) { return this == node; }
     @Override
     public TrieNode put(final int hash, final Item key, final Value value, final int level,
         final InputInfo ii) { return new TrieLeaf(hash, key, value); }
@@ -250,21 +248,6 @@ abstract class TrieNode {
   abstract boolean instanceOf(AtomType kt, SeqType dt);
 
   /**
-   * Compares two values.
-   * @param value1 first value
-   * @param value2 second value
-   * @param coll collation (can be {@code null})
-   * @param ii input info
-   * @return {@code true} if both values are deep equal, {@code false} otherwise
-   * @throws QueryException query exception
-   */
-  static boolean deep(final Value value1, final Value value2, final Collation coll,
-      final InputInfo ii) throws QueryException {
-    return value1.size() == value2.size() && new DeepEqual(ii).collation(coll).
-        equal(value1, value2);
-  }
-
-  /**
    * Calculates the hash code of this node.
    * @param ii input info
    * @return hash value
@@ -275,12 +258,11 @@ abstract class TrieNode {
   /**
    * Checks if this node is indistinguishable from the given node.
    * @param node other node
-   * @param coll collation
-   * @param ii input info
+   * @param deep comparator
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean deep(TrieNode node, Collation coll, InputInfo ii) throws QueryException;
+  abstract boolean equal(TrieNode node, DeepEqual deep) throws QueryException;
 
   /**
    * Recursive {@link #toString()} helper.

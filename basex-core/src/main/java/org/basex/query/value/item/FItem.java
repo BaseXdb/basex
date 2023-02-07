@@ -8,6 +8,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.map.*;
@@ -89,10 +90,9 @@ public abstract class FItem extends Item implements XQFunction {
   /**
    * Performs a deep comparison of two items.
    * @param item item to be compared
-   * @param coll collation (can be {@code null})
-   * @param ii input info
+   * @param deep comparator
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean deep(Item item, Collation coll, InputInfo ii) throws QueryException;
+  public abstract boolean equal(Item item, DeepEqual deep) throws QueryException;
 }

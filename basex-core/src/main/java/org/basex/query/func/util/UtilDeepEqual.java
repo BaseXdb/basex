@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class UtilDeepEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final DeepEqual de = new DeepEqual(info);
+    final DeepEqual deep = new DeepEqual(info, qc);
     final Mode[] modes = Mode.values();
     if(exprs.length > 2) {
       for(final Item item : exprs[2].atomValue(qc, info)) {
@@ -28,13 +28,13 @@ public final class UtilDeepEqual extends StandardFunc {
         for(final Mode m : modes) {
           found = eq(key, token(m.name()));
           if(found) {
-            de.flag(m);
+            deep.flag(m);
             break;
           }
         }
         if(!found) throw INVALIDOPTION_X.get(info, key);
       }
     }
-    return Bln.get(de.equal(exprs[0].iter(qc), exprs[1].iter(qc), qc));
+    return Bln.get(deep.equal(exprs[0].iter(qc), exprs[1].iter(qc)));
   }
 }

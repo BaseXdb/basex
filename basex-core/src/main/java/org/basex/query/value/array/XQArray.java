@@ -12,7 +12,6 @@ import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -376,18 +375,16 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final boolean deep(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-
-    if(item instanceof FuncItem) throw FICOMPARE_X.get(ii, item);
+  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+    if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
     if(item instanceof XQArray) {
-      final XQArray o = (XQArray) item;
-      if(arraySize() != o.arraySize()) return false;
-      final Iterator<Value> iter1 = iterator(0), iter2 = o.iterator(0);
-      while(iter1.hasNext()) {
-        final Value value1 = iter1.next(), value2 = iter2.next();
-        if(value1.size() != value2.size() ||
-            !new DeepEqual(ii).collation(coll).equal(value1, value2)) return false;
+      if(item != this) {
+        final XQArray array = (XQArray) item;
+        if(arraySize() != array.arraySize()) return false;
+        final Iterator<Value> iter1 = iterator(0), iter2 = array.iterator(0);
+        while(iter1.hasNext()) {
+          if(!deep.equal(iter1.next(), iter2.next())) return false;
+        }
       }
       return true;
     }

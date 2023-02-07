@@ -7,7 +7,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -226,10 +226,9 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  boolean deep(final TrieNode node, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return node instanceof TrieLeaf && key.sameKey(((TrieLeaf) node).key, ii) &&
-        deep(value, ((TrieLeaf) node).value, coll, ii);
+  boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
+    return node instanceof TrieLeaf && key.sameKey(((TrieLeaf) node).key, deep.info) &&
+        deep.equal(value, ((TrieLeaf) node).value);
   }
 
   @Override

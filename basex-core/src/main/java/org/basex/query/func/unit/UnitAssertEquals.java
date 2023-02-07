@@ -19,7 +19,7 @@ public final class UnitAssertEquals extends UnitFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
-    final DeepEqual de = new DeepEqual(info);
+    final DeepEqual deep = new DeepEqual(info, qc);
     Item item1, item2;
     int c = 1;
     while(true) {
@@ -27,7 +27,7 @@ public final class UnitAssertEquals extends UnitFn {
       item2 = iter2.next();
       final boolean empty1 = item1 == null, empty2 = item2 == null;
       if(empty1 && empty2) return Empty.VALUE;
-      if(empty1 || empty2 || !de.equal(item1.iter(), item2.iter())) break;
+      if(empty1 || empty2 || !deep.equal(item1, item2)) break;
       c++;
     }
     final Item item = exprs.length > 2 ? toNodeOrAtomItem(2, qc) : null;

@@ -8,7 +8,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -336,19 +336,18 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  boolean deep(final TrieNode node, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
     if(!(node instanceof TrieList) || size != node.size) return false;
     final TrieList ol = (TrieList) node;
 
     // do the evil nested-loop thing
     OUTER:
     for(int i = 0; i < size; i++) {
-      final Item k = keys[i];
+      final Item key = keys[i];
       for(int j = 0; j < size; j++) {
-        if(k.sameKey(ol.keys[j], ii)) {
+        if(key.sameKey(ol.keys[j], deep.info)) {
           // check bound value, too
-          if(!deep(values[i], ol.values[j], coll, ii)) return false;
+          if(!deep.equal(values[i], ol.values[j])) return false;
           // value matched, continue with next key
           continue OUTER;
         }

@@ -25,11 +25,13 @@ public final class DeepEqual {
     /** Compare all node types. */ ALLNODES,
     /** Compare namespaces.     */ NAMESPACES,
   }
-
-  /** Input info. */
-  private final InputInfo info;
+  /** Input info (can be {@code null}). */
+  public final InputInfo info;
+  /** Query context (allows interruption of process, can be {@code null}). */
+  private final QueryContext qc;
   /** Flag values. */
   private final EnumSet<Mode> flags = EnumSet.noneOf(Mode.class);
+
   /** Collation. */
   private Collation coll;
 
@@ -37,15 +39,17 @@ public final class DeepEqual {
    * Constructor.
    */
   public DeepEqual() {
-    this(null);
+    this(null, null);
   }
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
+   * @param qc query context (allows interruption of process, can be {@code null})
    */
-  public DeepEqual(final InputInfo info) {
+  public DeepEqual(final InputInfo info, final  QueryContext qc) {
     this.info = info;
+    this.qc = qc;
   }
 
   /**
@@ -76,7 +80,7 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Value value1, final Value value2) throws QueryException {
-    return equal(value1.iter(), value2.iter());
+    return value1.size() == value2.size() && equal(value1.iter(), value2.iter());
   }
 
   /**
@@ -87,20 +91,6 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Iter iter1, final Iter iter2) throws QueryException {
-    return equal(iter1, iter2, null);
-  }
-
-  /**
-   * Checks values for deep equality.
-   * @param iter1 first iterator
-   * @param iter2 second iterator
-   * @param qc query context (allows interruption of process, can be {@code null})
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean equal(final Iter iter1, final Iter iter2, final QueryContext qc)
-      throws QueryException {
-
     final long size1 = iter1.size(), size2 = iter2.size();
     if(size1 != -1 && size2 != -1 && size1 != size2) return false;
 
@@ -113,11 +103,11 @@ public final class DeepEqual {
 
       // check functions
       if(item1 instanceof FItem) {
-        if(((FItem) item1).deep(item2, coll, info)) continue;
+        if(((FItem) item1).equal(item2, this)) continue;
         return false;
       }
       if(item2 instanceof FItem) {
-        if(((FItem) item2).deep(item1, coll, info)) continue;
+        if(((FItem) item2).equal(item1, this)) continue;
         return false;
       }
 
