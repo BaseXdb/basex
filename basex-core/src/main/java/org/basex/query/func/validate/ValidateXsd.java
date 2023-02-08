@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.*;
 
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
@@ -25,6 +26,9 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public class ValidateXsd extends ValidateFn {
+  /** Schema cache. */
+  static final ConcurrentHashMap<String, Schema> MAP = new ConcurrentHashMap<>();
+
   /** Schema factory. */
   private static final String FACTORY = "http://www.w3.org/2001/XMLSchema";
   /** Saxon version URI. */
@@ -66,32 +70,38 @@ public class ValidateXsd extends ValidateFn {
       void process(final ValidationHandler handler) throws IOException, SAXException,
           QueryException {
 
-        final IO in = read(toNodeOrAtomItem(0, qc), null);
+        final IO input = read(toNodeOrAtomItem(0, qc), null);
         final Item schema = exprs.length > 1 ? toNodeOrAtomItem(1, qc) : Empty.VALUE;
         final HashMap<String, String> options = toOptions(2, new Options(), qc).free();
 
-        // create schema factory and set version
-        final SchemaFactory sf = JAVA ? SchemaFactory.newInstance(FACTORY) :
-          (SchemaFactory) Reflect.get(Reflect.find(IMPL[OFFSET]));
-        // Saxon: use version 1.1
-        if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
+        final String url = schema != Empty.VALUE ? prepare(read(schema, null), handler).url() : "";
+        final String caching = options.remove("cache");
+        final boolean cache = caching != null && Strings.toBoolean(caching);
 
-        final LSResourceResolver ls = Resolver.resources(qc.context.options);
-        if(ls != null) sf.setResourceResolver(ls);
+        Schema s = cache ? MAP.get(url) : null;
+        if(s == null) {
+          // create schema factory and set version
+          final SchemaFactory sf = JAVA ? SchemaFactory.newInstance(FACTORY) :
+            (SchemaFactory) Reflect.get(Reflect.find(IMPL[OFFSET]));
+          // Saxon: use version 1.1
+          if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
 
-        // assign parser features
-        for(final Entry<String, String> entry : options.entrySet()) {
-          sf.setFeature(entry.getKey(), Strings.toBoolean(entry.getValue()));
+          final LSResourceResolver ls = Resolver.resources(qc.context.options);
+          if(ls != null) sf.setResourceResolver(ls);
+
+          // assign parser features
+          for(final Entry<String, String> entry : options.entrySet()) {
+            sf.setFeature(entry.getKey(), Strings.toBoolean(entry.getValue()));
+          }
+          // schema declaration is included in document, or specified as string
+          s = url.isEmpty() ? sf.newSchema() : sf.newSchema(new URL(url));
+          if(cache) MAP.put(url, s);
         }
-
-        // schema declaration is included in document, or specified as string
-        final Schema s = schema == Empty.VALUE ? sf.newSchema() :
-          sf.newSchema(new URL(prepare(read(schema, null), handler).url()));
 
         final Validator v = s.newValidator();
         v.setErrorHandler(handler);
-        v.validate(in instanceof IOContent || in instanceof IOStream ?
-            new StreamSource(in.inputStream()) : new StreamSource(in.url()));
+        v.validate(input instanceof IOContent || input instanceof IOStream ?
+            new StreamSource(input.inputStream()) : new StreamSource(input.url()));
       }
     });
   }
