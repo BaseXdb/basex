@@ -8,7 +8,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -64,7 +64,7 @@ final class TrieList extends TrieNode {
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
-        if(key.sameKey(keys[i], ii)) {
+        if(key.atomicEq(keys[i], ii)) {
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -93,7 +93,7 @@ final class TrieList extends TrieNode {
     // same hash, replace or merge
     if(hs == hash) {
       for(int i = keys.length; i-- > 0;) {
-        if(key.sameKey(keys[i], ii)) {
+        if(key.atomicEq(keys[i], ii)) {
           // replace value
           final Value[] vs = values.clone();
           vs[i] = value;
@@ -124,7 +124,7 @@ final class TrieList extends TrieNode {
       throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;) {
-        if(key.sameKey(keys[k], ii)) return values[k];
+        if(key.atomicEq(keys[k], ii)) return values[k];
       }
     }
     return null;
@@ -135,7 +135,7 @@ final class TrieList extends TrieNode {
       throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;)
-        if(key.sameKey(keys[k], ii)) return true;
+        if(key.atomicEq(keys[k], ii)) return true;
     }
     return false;
   }
@@ -153,7 +153,7 @@ final class TrieList extends TrieNode {
     qc.checkStop();
     if(hash == leaf.hash) {
       for(int k = keys.length; k-- > 0;) {
-        if(leaf.key.sameKey(keys[k], ii)) {
+        if(leaf.key.atomicEq(keys[k], ii)) {
           switch(merge) {
             case USE_FIRST:
             case UNSPECIFIED:
@@ -208,7 +208,7 @@ final class TrieList extends TrieNode {
         // check if the key is already in the list
         for(int j = unmatched.nextSetBit(0); j >= 0; j = unmatched.nextSetBit(j + 1)) {
           final Item k = list.keys[j];
-          if(k.sameKey(ok, ii)) {
+          if(k.atomicEq(ok, ii)) {
             unmatched.clear(j);
             switch(merge) {
               case USE_FIRST:
@@ -270,7 +270,7 @@ final class TrieList extends TrieNode {
     try {
       for(int i = 1; i < size; i++) {
         for(int j = i; j-- > 0;) {
-          if(keys[i].sameKey(keys[j], null)) return false;
+          if(keys[i].atomicEq(keys[j], null)) return false;
         }
       }
     } catch(final QueryException ex) {
@@ -336,19 +336,18 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  boolean deep(final TrieNode node, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
     if(!(node instanceof TrieList) || size != node.size) return false;
-    final TrieList ol = (TrieList) node;
 
     // do the evil nested-loop thing
+    final TrieList ol = (TrieList) node;
     OUTER:
     for(int i = 0; i < size; i++) {
-      final Item k = keys[i];
+      final Item key = keys[i];
       for(int j = 0; j < size; j++) {
-        if(k.sameKey(ol.keys[j], ii)) {
+        if(key.atomicEq(ol.keys[j], deep.info)) {
           // check bound value, too
-          if(!deep(values[i], ol.values[j], coll, ii)) return false;
+          if(!deep.equal(values[i], ol.values[j])) return false;
           // value matched, continue with next key
           continue OUTER;
         }

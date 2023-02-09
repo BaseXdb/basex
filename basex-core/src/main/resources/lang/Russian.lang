@@ -288,7 +288,6 @@ query_executed_%_%   = Запрос% выполнен за %.
 query_plan           = План запроса
 ratio                = Пропорции
 read_locking         = Блокировка на чтение
-reads                = Чтения
 recently_opened      = Недавно открытые файлы
 red                  = Красный
 redo                 = Вернуть
@@ -406,7 +405,6 @@ view                 = Вид
 visualization        = Визуализация
 whole_word           = Слово целиком
 write_locking        = Блокировка на запись
-writes               = Записей
 yes                  = Да
 
 # Help texts

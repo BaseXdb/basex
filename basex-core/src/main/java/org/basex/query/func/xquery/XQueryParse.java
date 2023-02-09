@@ -47,13 +47,13 @@ public class XQueryParse extends StandardFunc {
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IO query = toContent(0, qc);
-    final XQueryOptions opts = toOptions(1, new XQueryOptions(), qc);
+    final XQueryOptions options = toOptions(1, new XQueryOptions(), true, qc);
 
     // base-uri: choose uri specified in options, file path, or base-uri from parent query
     try(QueryContext qctx = new QueryContext(qc.context)) {
       final AModule module = qctx.parse(query.string(),
-          toBaseUri(query.path(), opts, XQueryOptions.BASE_URI));
-      if(opts.get(XQueryOptions.COMPILE)) qctx.compile();
+          toBaseUri(query.path(), options, XQueryOptions.BASE_URI));
+      if(options.get(XQueryOptions.COMPILE)) qctx.compile();
 
       final FElem root;
       if(module instanceof MainModule) {
@@ -62,10 +62,10 @@ public class XQueryParse extends StandardFunc {
         final QNm name = module.sc.module;
         root = new FElem(LIBRARY_MODULE).add(PREFIX, name.string()).add(URI, name.uri());
       }
-      if(opts.get(XQueryOptions.PLAN)) root.add(qctx.toXml(false));
+      if(options.get(XQueryOptions.PLAN)) root.add(qctx.toXml(false));
       return root;
     } catch(final QueryException ex) {
-      if(!opts.get(XQueryOptions.PASS)) ex.info(info);
+      if(!options.get(XQueryOptions.PASS)) ex.info(info);
       throw ex;
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);

@@ -28,7 +28,7 @@ import org.basex.util.*;
  */
 public final class Log implements QueryTracer {
   /** Server string. */
-  public static final String SERVER = "SERVER";
+  private static final String SERVER = "SERVER";
   /** Log types. */
   public enum LogType {
     /** Request. */ REQUEST,

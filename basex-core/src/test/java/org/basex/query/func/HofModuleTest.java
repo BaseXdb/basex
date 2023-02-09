@@ -67,10 +67,6 @@ public final class HofModuleTest extends QueryPlanTest {
         count(Util.className(Arith.class) + "[@op = '+']", 4));
   }
 
-  /** Test method: see {@link Fn4ModuleTest}. */
-  @Test public void id() {
-  }
-
   /** Test method. */
   @Test public void sortWith() {
     final Function func = _HOF_SORT_WITH;

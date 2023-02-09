@@ -149,11 +149,11 @@ public class QueryParser extends InputParser {
       prolog2();
 
       localVars.pushContext(null);
-      final Expr expr = expr();
-      if(expr == null) throw alterError(EXPREMPTY);
+      final Expr ex = expr();
+      if(ex == null) throw alterError(EXPREMPTY);
       final VarScope vs = localVars.popContext();
 
-      final MainModule mm = new MainModule(expr, vs);
+      final MainModule mm = new MainModule(ex, vs);
       mm.set(funcs, vars, moduleURIs, namespaces, doc);
       finish(mm);
       check(mm);
@@ -421,8 +421,7 @@ public class QueryParser extends InputParser {
       final Ann ann;
       if(updating && wsConsumeWs(UPDATING)) {
         ann = new Ann(info(), Annotation.UPDATING, Empty.VALUE);
-      } else if(consume('%')) {
-        skipWs();
+      } else if(wsConsumeWs("%")) {
         final InputInfo ii = info();
         final QNm name = eQName(XQ_URI, QNAME_X);
 
@@ -436,12 +435,11 @@ public class QueryParser extends InputParser {
             }
             items.add((Item) ex);
           } while(wsConsumeWs(","));
-          wsCheck(")");
+          check(')');
         }
-        skipWs();
 
-        final Annotation def = Annotation.get(name);
         // check if annotation is a pre-defined one
+        final Annotation def = Annotation.get(name);
         if(def == null) {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
@@ -450,7 +448,6 @@ public class QueryParser extends InputParser {
                 ii, '%', name.string());
           }
           ann = new Ann(ii, name, items.value());
-
         } else {
           // check if annotation is specified more than once
           if(def.single && anns.contains(def)) throw BASEX_ANNOTATION3_X_X.get(ii, '%', def.id());
@@ -473,7 +470,6 @@ public class QueryParser extends InputParser {
       anns.add(ann);
       if(ann.definition == Annotation.UPDATING) qc.updating();
     }
-    skipWs();
     return anns;
   }
 
@@ -728,14 +724,14 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private boolean addLocations(final TokenList list) throws QueryException {
-    final boolean add = wsConsumeWs(AT);
+    final boolean add = wsConsume(AT);
     if(add) {
       do {
         final byte[] uri = stringLiteral();
         if(!Uri.get(uri).isValid() || IO.get(string(uri)) instanceof IOContent)
           throw error(INVURI_X, uri);
         list.add(uri);
-      } while(wsConsumeWs(","));
+      } while(wsConsume(","));
     }
     return add;
   }
@@ -835,25 +831,24 @@ public class QueryParser extends InputParser {
     }
 
     final boolean external = wsConsumeWs(EXTERNAL);
-    if(external) {
-      if(!wsConsumeWs(":=")) return;
-    } else {
-      wsCheck(":=");
-      qc.finalContext = true;
+    if(!consume(":=")) {
+      if(external) return;
+      throw error(WRONGCHAR_X_X, ":=", found());
     }
+    if(!external) qc.finalContext = true;
 
     localVars.pushContext(null);
-    final Expr expr = check(single(), NOCIDECL);
+    final Expr ex = check(single(), NOCIDECL);
     final VarScope vs = localVars.popContext();
 
     final SeqType st = sc.contextType;
-    qc.contextScope = new ContextScope(expr, st != null ? st : SeqType.ITEM_O, vs);
+    qc.contextScope = new ContextScope(ex, st != null ? st : SeqType.ITEM_O, vs);
     final StaticScope cs =  qc.contextScope;
     cs.info = info();
     cs.doc(currDoc.toString());
 
     if(sc.module != null) throw error(DECITEM);
-    if(!sc.mixUpdates && expr.has(Flag.UPD)) throw error(UPCTX, expr);
+    if(!sc.mixUpdates && ex.has(Flag.UPD)) throw error(UPCTX, ex);
   }
 
   /**
@@ -867,16 +862,15 @@ public class QueryParser extends InputParser {
 
     localVars.pushContext(null);
     final boolean external = wsConsumeWs(EXTERNAL);
-    final Expr bind;
-    if(external) {
-      bind = wsConsumeWs(":=") ? check(single(), NOVARDECL) : null;
-    } else {
-      wsCheck(":=");
-      bind = check(single(), NOVARDECL);
+    Expr ex = null;
+    if(wsConsume(":=")) {
+      ex = check(single(), NOVARDECL);
+    } else if(!external) {
+      throw error(WRONGCHAR_X_X, ":=", found());
     }
     final VarScope vs = localVars.popContext();
     final String varDoc = currDoc.toString();
-    final StaticVar sv = qc.vars.declare(var, anns, bind, external, varDoc, vs);
+    final StaticVar sv = qc.vars.declare(var, anns, ex, external, varDoc, vs);
     vars.put(sv.id(), sv);
   }
 
@@ -912,8 +906,6 @@ public class QueryParser extends InputParser {
 
     localVars.pushContext(null);
     final Var[] args = paramList();
-    wsCheck(")");
-
     final SeqType type = optAsType();
     final Expr ex = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope vs = localVars.popContext();
@@ -960,6 +952,7 @@ public class QueryParser extends InputParser {
       params = Array.add(params, var);
       if(!consume(',')) break;
     }
+    wsCheck(")");
     return params;
   }
 
@@ -1462,11 +1455,11 @@ public class QueryParser extends InputParser {
    */
   private Expr ternaryIf() throws QueryException {
     final Expr iff = elvis();
-    if(!wsConsumeWs("??")) return iff;
+    if(!wsConsume("??")) return iff;
 
     final InputInfo ii = info();
     final Expr thn = check(single(), NOTERNARY);
-    if(!wsConsumeWs("!!")) throw error(NOTERNARY);
+    if(!wsConsume("!!")) throw error(NOTERNARY);
     final Expr els = check(single(), NOTERNARY);
     return new If(ii, iff, thn, els);
   }
@@ -1478,7 +1471,7 @@ public class QueryParser extends InputParser {
    */
   private Expr elvis() throws QueryException {
     final Expr ex = or();
-    return wsConsumeWs("?:") ? new Otherwise(info(), ex, check(single(), NODEFAULT)) : ex;
+    return wsConsume("?:") ? new Otherwise(info(), ex, check(single(), NODEFAULT)) : ex;
   }
 
   /**
@@ -1763,12 +1756,11 @@ public class QueryParser extends InputParser {
         if(enclosed) {
           ex = new CachedMap(ii, ex, e);
         } else {
-          final Expr expr = thin ? new ContextValue(ii) : ex;
-          final Expr fc;
+          final Expr arg = thin ? new ContextValue(ii) : ex, fc;
           if(e instanceof QNm) {
-            fc = funcCall(checkReserved((QNm) e), ii, argumentList(true, expr));
+            fc = funcCall(checkReserved((QNm) e), ii, argumentList(true, arg));
           } else {
-            final FuncArgs args = argumentList(false, expr);
+            final FuncArgs args = argumentList(false, arg);
             fc = dynFuncCall(e, ii, args.exprs(), args.holes());
           }
           ex = thin ? new CachedMap(ii, ex, fc) : fc;
@@ -2052,17 +2044,18 @@ public class QueryParser extends InputParser {
     } else {
       for(final Axis ax : Axis.VALUES) {
         final int p = pos;
-        if(!wsConsumeWs(ax.name)) continue;
-        if(wsConsumeWs("::")) {
-          alterPos = pos;
-          axis = ax;
-          final boolean element = ax != Axis.ATTRIBUTE;
-          test = nodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
-          checkTest(test, element);
-          if(test == null) throw error(AXISMISS_X, axis);
-          break;
+        if(wsConsume(ax.name)) {
+          if(wsConsumeWs("::")) {
+            alterPos = pos;
+            axis = ax;
+            final boolean element = ax != Axis.ATTRIBUTE;
+            test = nodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
+            checkTest(test, element);
+            if(test == null) throw error(AXISMISS_X, axis);
+            break;
+          }
+          pos = p;
         }
-        pos = p;
       }
 
       if(axis == null) {
@@ -2217,8 +2210,6 @@ public class QueryParser extends InputParser {
     }
     // map constructor
     if(wsConsumeWs(MAP, "{", INCOMPLETE)) return new CMap(info(), keyValues());
-    // square array constructor
-    if(wsConsumeWs("[")) return new CArray(info(), true, values());
     // curly array constructor
     if(wsConsumeWs(ARRAY, "{", INCOMPLETE)) {
       wsCheck("{");
@@ -2226,6 +2217,8 @@ public class QueryParser extends InputParser {
       wsCheck("}");
       return exp == null ? new CArray(info(), false) : new CArray(info(), false, exp);
     }
+    // square array constructor
+    if(wsConsume("[")) return new CArray(info(), true, values());
     // unary lookup
     p = pos;
     if(consume("?")) {
@@ -2327,7 +2320,6 @@ public class QueryParser extends InputParser {
       SeqType type = null;
       if(wsConsume("(")) {
         params = paramList();
-        wsCheck(")");
         type = optAsType();
         body = enclosedExpr();
       } else if(curr('{')) {
@@ -3138,6 +3130,7 @@ public class QueryParser extends InputParser {
 
     // parse annotations and type name
     final AnnList anns = annotations(false).check(false, false);
+    skipWs();
     final QNm name = eQName(null, TYPEINVALID);
 
     // parse type
@@ -3322,7 +3315,7 @@ public class QueryParser extends InputParser {
         final Test test = nodeTest(NodeType.ELEMENT, false);
         if(test == null) throw error(NOCATCH);
         codes = Array.add(codes, test instanceof NameTest ? (NameTest) test : null);
-      } while(wsConsumeWs("|"));
+      } while(wsConsume("|"));
 
       final int s = localVars.openScope();
       final int cl = Catch.NAMES.length;
@@ -3499,7 +3492,7 @@ public class QueryParser extends InputParser {
       return ex;
     }
 
-    if(wsConsumeWs("(")) {
+    if(wsConsume("(")) {
       final FTExpr ex = ftSelection(false);
       wsCheck(")");
       return ex;
@@ -4073,24 +4066,25 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Consumes the specified token and surrounding whitespaces.
-   * @param string string to consume
+   * Consumes the specified string and surrounding whitespaces.
+   * @param string string to consume (words must not be followed by letters)
    * @return true if token was found
    * @throws QueryException query exception
    */
   private boolean wsConsumeWs(final String string) throws QueryException {
     final int p = pos;
-    if(!wsConsume(string)) return false;
-    if(skipWs() || !XMLToken.isNCStartChar(string.charAt(0)) || !XMLToken.isNCChar(curr()))
-      return true;
-    pos = p;
+    if(wsConsume(string)) {
+      if(skipWs() || !XMLToken.isNCStartChar(string.charAt(0)) || !XMLToken.isNCChar(curr()))
+        return true;
+      pos = p;
+    }
     return false;
   }
 
   /**
    * Consumes the specified two strings or jumps back to the old query position. If the strings are
    * found, the cursor is placed after the first token.
-   * @param string1 string to consume
+   * @param string1 string to consume (words must not be followed by letters)
    * @param string2 second string
    * @param expr alternative error message (can be {@code null})
    * @return result of check

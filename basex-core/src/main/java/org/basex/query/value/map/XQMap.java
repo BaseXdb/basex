@@ -12,7 +12,7 @@ import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -264,12 +264,9 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public boolean deep(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-
-    if(item instanceof FuncItem) throw FICOMPARE_X.get(ii, item);
-    if(item instanceof XQMap) return root.deep(((XQMap) item).root, coll, ii);
-    return false;
+  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+    if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
+    return item == this || item instanceof XQMap && root.equal(((XQMap) item).root, deep);
   }
 
   @Override

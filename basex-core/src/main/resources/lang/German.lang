@@ -288,7 +288,6 @@ query_executed_%_%   = Anfrage% ausgeführt (%).
 query_plan           = Ausführungsplan
 ratio                = Verhältnis
 read_locking         = Read Locks
-reads                = Reads
 recently_opened      = Zuletzt geöffnete Dateien
 red                  = Rot
 redo                 = Wiederherstellen
@@ -406,7 +405,6 @@ view                 = Ansicht
 visualization        = Visualisierung
 whole_word           = Ganzes Wort
 write_locking        = Write Locks
-writes               = Writes
 yes                  = Ja
 
 # Help texts

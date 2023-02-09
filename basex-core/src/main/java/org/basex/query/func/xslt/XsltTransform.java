@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
@@ -49,8 +50,8 @@ public class XsltTransform extends XsltFn {
    */
   final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
     final IO in = read(0, qc), xsl = read(1, qc);
-    final Options opts = toOptions(2, new Options(), qc);
-    final XsltOptions xopts = toOptions(3, new XsltOptions(), qc);
+    final HashMap<String, String> params = toOptions(2, qc);
+    final XsltOptions options = toOptions(3, new XsltOptions(), true, qc);
 
     final ArrayOutput result = new ArrayOutput();
     final PrintStream errPS = System.err;
@@ -60,7 +61,7 @@ public class XsltTransform extends XsltFn {
       // redirect errors
       System.setErr(new PrintStream(err));
       final StreamSource ss = xsl.streamSource();
-      final String key = xopts.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
+      final String key = options.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
 
       // retrieve new or cached templates object
       Templates templates = key != null ? MAP.get(key) : null;
@@ -79,7 +80,7 @@ public class XsltTransform extends XsltFn {
       if(ur != null) tr.setURIResolver(ur);
 
       // bind parameters
-      opts.free().forEach(tr::setParameter);
+      params.forEach(tr::setParameter);
 
       // do transformation and return result
       if(simple) {

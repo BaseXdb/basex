@@ -9,7 +9,7 @@ import org.basex.core.MainOptions.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -84,10 +84,9 @@ public final class XQJava extends FItem {
   }
 
   @Override
-  public boolean deep(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
     if(item instanceof XQJava) return equals(item);
-    throw FICOMPARE_X.get(ii, this);
+    throw FICOMPARE_X.get(deep.info, this);
   }
 
   @Override

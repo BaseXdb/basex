@@ -61,10 +61,6 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" array { <_>1</_> to 100000 }") + " =>" + FOOT.args(), "100000");
   }
 
-  /** Test method: see {@link Fn4ModuleTest}. */
-  @Test public void chars() {
-  }
-
   /** Test method. */
   @Test public void countWithin() {
     final Function func = _UTIL_COUNT_WITHIN;
@@ -239,14 +235,6 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void deepEquals() {
-    final Function func = _UTIL_DEEP_EQUAL;
-    query(func.args(1, 1), true);
-    query(func.args(1, 1, "ALLNODES"), true);
-    error(func.args("(1 to 2)", "(1 to 2)", "X"), INVALIDOPTION_X);
-  }
-
-  /** Test method. */
   @Test public void duplicates() {
     final Function func = _UTIL_DUPLICATES;
 
@@ -312,10 +300,6 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" ()", 1, 2), 2);
     query(func.args(" (<a/>, <b/>)", 1, 2), 1);
     error(func.args(" (1, 2)", 1, 2), ARGTYPE_X_X_X);
-  }
-
-  /** Test method: see {@link Fn4ModuleTest}. */
-  @Test public void intersperse() {
   }
 
   /** Test method. */
@@ -403,10 +387,6 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" (<a/>, <b/>)", 3, 4), "");
 
     query(func.args(" (<a/>, <b/>)[name()]", 1, 9223372036854775807L), "<a/>\n<b/>");
-  }
-
-  /** Test method: see {@link Fn4ModuleTest}. */
-  @Test public void replicate() {
   }
 
   /** Test method. */

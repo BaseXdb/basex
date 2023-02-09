@@ -22,14 +22,14 @@ public final class FtSearch extends FtAccess {
   public NodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final Value query = exprs[1].value(qc);
-    final FtIndexOptions opts = toOptions(2, new FtIndexOptions(), qc);
+    final FtIndexOptions options = toOptions(2, new FtIndexOptions(), true, qc);
 
     final IndexDb db = new IndexStaticDb(data, info);
-    final FTMode mode = opts.get(FtIndexOptions.MODE);
-    final FTOpt opt = ftOpt(opts, qc).assign(data.meta);
+    final FTMode mode = options.get(FtIndexOptions.MODE);
+    final FTOpt opt = ftOpt(options, qc).assign(data.meta);
 
     final FTWords ftw = new FTWords(info, db, query, mode).ftOpt(opt).optimize(qc);
-    return new FTIndexAccess(info, ftExpr(ftw, opts), db).iter(qc);
+    return new FTIndexAccess(info, ftExpr(ftw, options), db).iter(qc);
   }
 
   @Override

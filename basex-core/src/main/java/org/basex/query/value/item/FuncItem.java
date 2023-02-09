@@ -12,7 +12,6 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -227,8 +226,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public boolean deep(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
     throw FICOMPARE_X.get(info, this);
   }
 

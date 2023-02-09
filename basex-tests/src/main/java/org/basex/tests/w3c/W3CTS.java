@@ -14,7 +14,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -261,6 +261,7 @@ public abstract class W3CTS extends Main {
     boolean inspect = false;
     boolean correct = true;
 
+    final DeepEqual deep = new DeepEqual();
     final Value states = states(root);
     final long ss = states.size();
     for(int s = 0; s < ss; s++) {
@@ -390,8 +391,7 @@ public abstract class W3CTS extends Main {
             if(xml || frag) {
               try {
                 final Value val = toValue(expect.replaceAll("^<\\?xml.*?\\?>", "").trim(), frag);
-                if(new DeepEqual().equal(value.iter(), val.iter()) ||
-                   new DeepEqual().equal(toValue(actual, frag).iter(), val.iter())) break;
+                if(deep.equal(value, val) || deep.equal(toValue(actual, frag), val)) break;
               } catch(final Throwable ex) {
                 Util.errln('\n' + outname + ':');
                 Util.stack(ex);

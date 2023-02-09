@@ -288,7 +288,6 @@ query_executed_%_%   = Consulta % ejecutada en %.
 query_plan           = Plan de le Consulta
 ratio                = Ratio
 read_locking         = Bloqueo de lectura
-reads                = Reads
 recently_opened      = Ficheros abiertos recientemente
 red                  = Rojo
 redo                 = Rehacer
@@ -406,7 +405,6 @@ view                 = Vista
 visualization        = Visualización
 whole_word           = Palabra Entera
 write_locking        = Bloqueo de Escritura
-writes               = Writes
 yes                  = Sí
 
 # Help texts

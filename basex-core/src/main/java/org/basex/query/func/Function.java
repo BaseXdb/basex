@@ -91,6 +91,9 @@ public enum Function implements AFunction {
   APPLY(FnApply::new, "apply(function,arguments)",
       params(FUNCTION_O, ARRAY_O), ITEM_ZM, flag(POS, CTX, NDT, HOF), FN_URI, Perm.ADMIN),
   /** XQuery function. */
+  ATOMIC_EQUAL(FnAtomicEqual::new, "atomic-equal(value1,value2)",
+      params(ANY_ATOMIC_TYPE_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O),
+  /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables::new,
       "available-environment-variables()",
       params(), STRING_ZM),
@@ -163,8 +166,8 @@ public enum Function implements AFunction {
   DAYS_FROM_DURATION(FnDayFromDuration::new, "days-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
   /** XQuery function. */
-  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation])",
-      params(ITEM_ZM, ITEM_ZM, STRING_O), BOOLEAN_O),
+  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation,options])",
+      params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_O), BOOLEAN_O),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation::new, "default-collation()",
       params(), STRING_O),
@@ -641,8 +644,9 @@ public enum Function implements AFunction {
       params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_GET(MapGet::new, "get(map,key)",
-      params(MAP_O, ANY_ATOMIC_TYPE_O), ITEM_ZM, MAP_URI),
+  _MAP_GET(MapGet::new, "get(map,key[,fallback])",
+      params(MAP_O, ANY_ATOMIC_TYPE_O, FuncType.get(ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
+      ITEM_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
@@ -695,8 +699,8 @@ public enum Function implements AFunction {
       params(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()),
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_GET(ArrayGet::new, "get(array,position)",
-      params(ARRAY_O, INTEGER_O), ITEM_ZM, ARRAY_URI),
+  _ARRAY_GET(ArrayGet::new, "get(array,position[,fallback])",
+      params(ARRAY_O, INTEGER_O, FuncType.get(INTEGER_O, ITEM_ZM).seqType()), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_HEAD(ArrayHead::new, "head(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
@@ -1787,9 +1791,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_DEEP_EQUAL(UtilDeepEqual::new, "deep-equal(input1,input2[,options])",
-      params(ITEM_ZM, ITEM_ZM, STRING_ZM), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_DDO(UtilDdo::new, "ddo(nodes)",
       params(NODE_ZM), NODE_ZM, UTIL_URI),

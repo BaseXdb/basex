@@ -40,9 +40,9 @@ public class JsonParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final JsonParserOptions opts = toOptions(1, new JsonParserOptions(), qc);
+    final JsonParserOptions options = toOptions(1, new JsonParserOptions(), true, qc);
     try {
-      return JsonConverter.get(opts).convert(io);
+      return JsonConverter.get(options).convert(io);
     } catch(final IOException ex) {
       throw JSON_PARSE_X.get(info, ex);
     }

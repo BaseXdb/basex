@@ -4,7 +4,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -252,18 +252,16 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  boolean deep(final TrieNode node, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
     if(!(node instanceof TrieBranch)) return false;
+
+    // check bit usage first
     final TrieBranch ob = (TrieBranch) node;
-
-    // check bin usage first
     if(used != ob.used) return false;
-
     // recursively compare children
-    for(int i = 0; i < KIDS; i++)
-      if(kids[i] != null && !kids[i].deep(ob.kids[i], coll, ii)) return false;
-
+    for(int k = 0; k < KIDS; k++) {
+      if(kids[k] != null && !kids[k].equal(ob.kids[k], deep)) return false;
+    }
     // everything OK
     return true;
   }

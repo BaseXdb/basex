@@ -23,11 +23,11 @@ public final class ArchiveWrite extends ArchiveCreate {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(0, qc);
     final Map<String, Item[]> map = toMap(1, qc);
-    final CreateOptions opts = toOptions(3, new CreateOptions(), qc);
+    final CreateOptions options = toOptions(3, new CreateOptions(), true, qc);
 
     try {
       try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile()))) {
-        create(map, opts, out, qc);
+        create(map, options, out, qc);
       }
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);

@@ -41,9 +41,9 @@ public class HtmlParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final HtmlOptions opts = toOptions(1, new HtmlOptions(), qc);
+    final HtmlOptions options = toOptions(1, new HtmlOptions(), true, qc);
     try {
-      return new DBNode(new org.basex.build.html.HtmlParser(io, new MainOptions(), opts));
+      return new DBNode(new org.basex.build.html.HtmlParser(io, new MainOptions(), options));
     } catch(final IOException ex) {
       throw HTML_PARSE_X.get(info, ex);
     }

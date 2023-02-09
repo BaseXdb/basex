@@ -13,6 +13,10 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class ArrayModuleTest extends QueryPlanTest {
+  /** Months. */
+  private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
+      + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";
+
   /** Test method. */
   @Test public void append() {
     final Function func = _ARRAY_APPEND;
@@ -21,6 +25,26 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" [ ]", 1), "[1]");
     query(func.args(" [ 1 ]", 2), "[1,2]");
     query(func.args(" [ 1, 2, 3 ]", " (4, 5)"), "[1,2,3,(4,5)]");
+  }
+
+  /** Test method. */
+  @Test public void emptyy() {
+    final Function func = _ARRAY_EMPTY;
+
+    query(func.args(" [ ]"), true);
+    query(func.args(" array { () }"), true);
+    query(func.args(" [ () ]"), false);
+    query(func.args(" [ 1 ]"), false);
+  }
+
+  /** Test method. */
+  @Test public void exists() {
+    final Function func = _ARRAY_EXISTS;
+
+    query(func.args(" [ ]"), false);
+    query(func.args(" array { () }"), false);
+    query(func.args(" [ () ]"), true);
+    query(func.args(" [ 1 ]"), true);
   }
 
   /** Test method. */
@@ -105,6 +129,17 @@ public final class ArrayModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void foot() {
+    final Function func = _ARRAY_FOOT;
+
+    query(func.args(" [ 1 ]"), 1);
+    query(func.args(" array { 1 to 5 }"), 5);
+    query(func.args(" [ 1, 2 to 3 ]"), "2\n3");
+
+    error(func.args(" [ ]"), ARRAYEMPTY);
+  }
+
+  /** Test method. */
   @Test public void forEach() {
     final Function func = _ARRAY_FOR_EACH;
     query("([ 2 ], 2)[. instance of array(*)] ! " +
@@ -137,6 +172,16 @@ public final class ArrayModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void get() {
+    final Function func = _ARRAY_GET;
+    query(func.args(" [ 1, 2 ]", 1), 1);
+
+    error(func.args(" [ 1, 2 ]", 3), ARRAYBOUNDS_X_X);
+    query(func.args(" [ 1, 2 ]", 3, " function($k) { }"), "");
+    query(func.args(" [ 1, 2 ]", 3, " function($k) { 4, 5 }"), "4\n5");
+  }
+
+ /** Test method. */
   @Test public void head() {
     final Function func = _ARRAY_HEAD;
     query(func.args(" [ 1 ]"), 1);
@@ -144,6 +189,21 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" [ 1 to 2, 3 ]"), "1\n2");
 
     error(func.args(" [ ]"), ARRAYEMPTY);
+  }
+
+  /** Test method. */
+  @Test public void indexWhere() {
+    final Function func = _ARRAY_INDEX_WHERE;
+
+    query(func.args(" array { }", " boolean#1"), "");
+    query(func.args(" array { 0 }", " boolean#1"), "");
+    query(func.args(" array { 1 }", " boolean#1"), 1);
+    query(func.args(" array { 0, 4, 9 }", " boolean#1"), "2\n3");
+    query(func.args(" array { 1 to 9 }", " function($n) { $n mod 5 = 0 }"), 5);
+    query(func.args(" array { " + MONTHS + " }", " contains(?, 'z')"), "");
+    query(func.args(" array { " + MONTHS + " }", " contains(?, 'v')"), 11);
+    query(func.args(" array { " + MONTHS + " }", " starts-with(?, 'J')"), "1\n6\n7");
+    query(func.args(" [ 1, (2, 3), 4, (5, 6) ]", " function($n) { count($n) > 1 }"), "2\n4");
   }
 
   /** Test method. */
@@ -172,6 +232,48 @@ public final class ArrayModuleTest extends QueryPlanTest {
 
     // GH-1954
     query(func.args(" if (<a/>/text()) then array { } else ()") + " ! array:size(.)", 0);
+  }
+
+  /** Test method. */
+  @Test public void partition() {
+    final Function func = _ARRAY_PARITION;
+
+    String fn = " function($seq, $curr) { true() }";
+    query(func.args(" ()", fn), "");
+    query(func.args(1, fn), "[1]");
+    query(func.args(" (1 to 1000)", fn) + " => count()", 1000);
+    query(func.args(" (1 to 1000)[. < 3]", fn) + " => count()", 2);
+    query(func.args(" (1 to 1000)[. < 2]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 1]", fn) + " => count()", 0);
+
+    fn = " function($seq, $curr) { false() }";
+    query(func.args(" ()", fn), "");
+    query(func.args(1, fn), "[1]");
+    query(func.args(" (1 to 1000)", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 3]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 2]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 1]", fn) + " => count()", 0);
+
+    fn = " function($seq, $curr) { not($seq = $curr) }";
+    query(func.args(" (1, 1)", fn), "[(1,1)]");
+    query(func.args(" (1, 1, 2, 1)", fn), "[(1,1)]\n[2]\n[1]");
+
+    fn = " function($seq, $curr) { $curr > $seq }";
+    query(func.args(" (846, 23, 5, 8, 6, 1000)", fn), "[(846,23,5)]\n[(8,6)]\n[1000]");
+
+    query(func.args(" ('Anita', 'Anne', 'Barbara', 'Catherine', 'Christine')",
+        " function($x, $y) { substring($x[last()], 1, 1) ne substring($y, 1, 1) }"),
+        "[(\"Anita\",\"Anne\")]\n[\"Barbara\"]\n[(\"Catherine\",\"Christine\")]");
+    query(func.args(" (1, 2, 3, 4, 5, 6)", " function($a, $b){ count($a) eq 2 }"),
+        "[(1,2)]\n[(3,4)]\n[(5,6)]");
+    query(func.args(" (1, 4, 6, 3, 1, 1)", " function($a, $b) { sum($a) ge 5 }"),
+        "[(1,4)]\n[6]\n[(3,1,1)]");
+    query(func.args(" tokenize('In the beginning was the word')",
+        " function($a, $b) { sum(($a, $b) ! string-length()) gt 10 }"),
+        "[(\"In\",\"the\")]\n[\"beginning\"]\n[(\"was\",\"the\",\"word\")]");
+    query(func.args(" (1, 2, 3, 6, 7, 9, 10)",
+        " function($seq, $new) { not($new = $seq[last()] + 1) }"),
+        "[(1,2,3)]\n[(6,7)]\n[(9,10)]");
   }
 
   /** Test method. */
@@ -221,6 +323,95 @@ public final class ArrayModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void slice() {
+    final Function func = _ARRAY_SLICE;
+
+    String in = "array { } =>";
+    query(in + func.args(+0), "[]");
+    query(in + func.args(+1, +2, +3), "[]");
+    query(in + func.args(-1, -2, -3), "[]");
+    query(in + func.args(+0, +0, +0), "[]");
+
+    in = "array { 'a' } =>";
+    query(in + func.args(0), "[\"a\"]");
+    query(in + func.args(0, 0), "[\"a\"]");
+    query(in + func.args(0, 0, 0), "[\"a\"]");
+
+    in = "array { 'a', 'b', 'c', 'd', 'e', 'f', 'g' } =>";
+    query(in + func.args(+2, +4), "[\"b\",\"c\",\"d\"]");
+    query(in + func.args(+2, +4), "[\"b\",\"c\",\"d\"]");
+    query(in + func.args(+2), "[\"b\",\"c\",\"d\",\"e\",\"f\",\"g\"]");
+    query(in + func.args(" ()", +2), "[\"a\",\"b\"]");
+    query(in + func.args(+3, +3), "[\"c\"]");
+    query(in + func.args(+4, +3), "[\"d\",\"c\"]");
+    query(in + func.args(+2, +5, +2), "[\"b\",\"d\"]");
+    query(in + func.args(+5, +2, -2), "[\"e\",\"c\"]");
+    query(in + func.args(+2, +5, -2), "[]");
+    query(in + func.args(+5, +2, +2), "[]");
+    query(in + func.args(), "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\",\"g\"]");
+    query(in + func.args(-1), "[\"g\"]");
+    query(in + func.args(-3), "[\"e\",\"f\",\"g\"]");
+    query(in + func.args(" ()", -2), "[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\"]");
+    query(in + func.args(+2, -2), "[\"b\",\"c\",\"d\",\"e\",\"f\"]");
+    query(in + func.args(-2, +2), "[\"f\",\"e\",\"d\",\"c\",\"b\"]");
+    query(in + func.args(-4, -2), "[\"d\",\"e\",\"f\"]");
+    query(in + func.args(-2, -4), "[\"f\",\"e\",\"d\"]");
+    query(in + func.args(-4, -2, +2), "[\"d\",\"f\"]");
+    query(in + func.args(-2, -4, -2), "[\"f\",\"d\"]");
+
+    in = "array { 'a', 'b' } =>";
+    query(in + func.args(+0), "[\"a\",\"b\"]");
+    query(in + func.args(+1), "[\"a\",\"b\"]");
+    query(in + func.args(-1), "[\"b\"]");
+    query(in + func.args(+1, +2), "[\"a\",\"b\"]");
+    query(in + func.args(-1, +2), "[\"b\"]");
+    query(in + func.args(+1, -2), "[\"a\"]");
+    query(in + func.args(-1, -2), "[\"b\",\"a\"]");
+    query(in + func.args(+1, +2, +3), "[\"a\"]");
+    query(in + func.args(+1, +2, -3), "[]");
+    query(in + func.args(+1, -2, +3), "[\"a\"]");
+    query(in + func.args(+1, -2, -3), "[\"a\"]");
+    query(in + func.args(-1, +2, +3), "[\"b\"]");
+    query(in + func.args(-1, +2, -3), "[\"b\"]");
+    query(in + func.args(-1, -2, +3), "[]");
+    query(in + func.args(-1, -2, -3), "[\"b\"]");
+
+    in = "array { 'a' } =>";
+    query(in + func.args(+0), "[\"a\"]");
+    query(in + func.args(+1), "[\"a\"]");
+    query(in + func.args(-1), "[\"a\"]");
+    query(in + func.args(+1, +2), "[\"a\"]");
+    query(in + func.args(-1, +2), "[\"a\"]");
+    query(in + func.args(+1, -2), "[\"a\"]");
+    query(in + func.args(-1, -2), "[\"a\"]");
+    query(in + func.args(+1, +2, +3), "[\"a\"]");
+    query(in + func.args(+1, +2, -3), "[]");
+    query(in + func.args(+1, -2, +3), "[]");
+    query(in + func.args(+1, -2, -3), "[\"a\"]");
+    query(in + func.args(-1, +2, +3), "[\"a\"]");
+    query(in + func.args(-1, +2, -3), "[]");
+    query(in + func.args(-1, -2, +3), "[]");
+    query(in + func.args(-1, -2, -3), "[\"a\"]");
+
+    in = "array { 1 to 1000 } =>";
+    query(in + func.args(-1001) + " => array:size()", 1000);
+    query(in + func.args(-1000) + " => array:size()", 1000);
+    query(in + func.args(-999) + " => array:size()", 999);
+    query(in + func.args(-2) + " => array:size()", 2);
+    query(in + func.args(-1) + " => array:size()", 1);
+    query(in + func.args(0) + " => array:size()", 1000);
+    query(in + func.args(1) + " => array:size()", 1000);
+    query(in + func.args(2) + " => array:size()", 999);
+    query(in + func.args(999) + " => array:size()", 2);
+    query(in + func.args(1000) + " => array:size()", 1);
+    query(in + func.args(1001) + " => array:size()", 1);
+
+    query(in + func.args(" array { " + wrap(1000) + " }"), "[1000]");
+    query(in + func.args(" array { " + 1000 + " }", wrap(1000)), "[1000]");
+    query(in + func.args(" array { " + 1000 + " }", 1000, wrap(1)), "[1000]");
+  }
+
+  /** Test method. */
   @Test public void sort() {
     final Function func = _ARRAY_SORT;
     query("([ 2, 1 ], 1)[. instance of array(*)] ! " + func.args(" .", " ()", " hof:id#1"),
@@ -263,6 +454,16 @@ public final class ArrayModuleTest extends QueryPlanTest {
     query(func.args(" [ 1 ]"), "[]");
     query(func.args(" array { 1 to 5 }"), "[2,3,4,5]");
     query(func.args(" [ 1 to 2, 3 ]"), "[3]");
+
+    error(func.args(" [ ]"), ARRAYEMPTY);
+  }
+
+  /** Test method. */
+  @Test public void trunk() {
+    final Function func = _ARRAY_TRUNK;
+    query(func.args(" [ 1 ]"), "[]");
+    query(func.args(" array { 1 to 5 }"), "[1,2,3,4]");
+    query(func.args(" [ 1, 2 to 3 ]"), "[1]");
 
     error(func.args(" [ ]"), ARRAYEMPTY);
   }

@@ -288,7 +288,6 @@ query_executed_%_%   = Query% uitgevoerd in % seconden.
 query_plan           = Query plan
 ratio                = Verhouding
 read_locking         = Read Locking
-reads                = Reads
 recently_opened      = Recent geopende bestanden
 red                  = Rood
 redo                 = Opnieuw
@@ -406,7 +405,6 @@ view                 = View
 visualization        = Visualisatie
 whole_word           = Heel woord
 write_locking        = Write Locking
-writes               = Writes
 yes                  = Ja
 
 # Help texts

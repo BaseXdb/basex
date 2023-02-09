@@ -7,7 +7,6 @@ import org.basex.build.json.JsonOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -51,18 +50,16 @@ public class FnJsonDoc extends Parse {
   final Item parse(final byte[] json, final boolean xml, final QueryContext qc)
       throws QueryException {
 
-    final JsonParserOptions opts = new JsonParserOptions();
-    if(exprs.length > 1) new FuncOptions(info).acceptUnknown().assign(toMap(exprs[1], qc), opts);
-
-    final boolean esc = opts.get(JsonParserOptions.ESCAPE);
-    final FuncItem fb = opts.get(JsonParserOptions.FALLBACK);
+    final JsonParserOptions options = toOptions(1, new JsonParserOptions(), false, qc);
+    final boolean esc = options.get(JsonParserOptions.ESCAPE);
+    final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
     final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, info);
     if(esc && fallback != null) throw OPTION_JSON_X.get(info,
         "Escaping cannot be combined with a fallback function.");
 
     try {
-      opts.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.XQUERY);
-      final JsonConverter conv = JsonConverter.get(opts);
+      options.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.XQUERY);
+      final JsonConverter conv = JsonConverter.get(options);
       if(!esc && fallback != null) conv.fallback(string -> {
         try {
           final Item item = fallback.invoke(qc, info, Str.get(string)).item(qc, info);

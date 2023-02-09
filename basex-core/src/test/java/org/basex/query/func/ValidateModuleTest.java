@@ -140,6 +140,12 @@ public final class ValidateModuleTest extends SandboxTest {
       "</xs:schema> " +
       "return validate:xsd($doc, $schema)", "");
 
+    // caching
+    query(func.args(FILE, XSD, " map { 'cache': true() }"), "");
+    query(func.args(FILE, XSD, " map { 'cache': 'yes' }"), "");
+    query(func.args(FILE, XSD, " map { 'cache': 'on' }"), "");
+    query(func.args(FILE, XSD, " map { 'cache': 1 }"), "");
+
     // invalid arguments
     error(func.args("unknown"), WHICHRES_X);
     error(func.args(FILE, "unknown.xsd"), WHICHRES_X);

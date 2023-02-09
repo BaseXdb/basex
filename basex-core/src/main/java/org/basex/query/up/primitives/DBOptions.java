@@ -27,8 +27,8 @@ public final class DBOptions {
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBOptions(final Options options, final List<Option<?>> supported, final InputInfo info)
-      throws QueryException {
+  public DBOptions(final HashMap<String, String> options, final List<Option<?>> supported,
+      final InputInfo info) throws QueryException {
     this(options, supported.toArray(Option<?>[]::new), info);
   }
 
@@ -39,17 +39,17 @@ public final class DBOptions {
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBOptions(final Options options, final Option<?>[] supported, final InputInfo info)
-      throws QueryException {
+  public DBOptions(final HashMap<String, String> options, final Option<?>[] supported,
+      final InputInfo info) throws QueryException {
 
-    final HashMap<String, Option<?>> opts = new HashMap<>();
+    final HashMap<String, Option<?>> support = new HashMap<>();
     for(final Option<?> option : supported) {
-      opts.put(option.name().toLowerCase(Locale.ENGLISH), option);
+      support.put(option.name().toLowerCase(Locale.ENGLISH), option);
     }
 
-    for(final Entry<String, String> entry : options.free().entrySet()) {
+    for(final Entry<String, String> entry : options.entrySet()) {
       final String key = entry.getKey();
-      final Option<?> option = opts.get(key);
+      final Option<?> option = support.get(key);
       if(option == null) throw BASEX_OPTIONS1_X.get(info, key);
 
       final String value = entry.getValue();

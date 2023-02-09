@@ -27,7 +27,7 @@ public final class JobResult extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String id = toString(exprs[0], qc);
-    final ResultOptions opts = toOptions(1, new ResultOptions(), qc);
+    final ResultOptions options = toOptions(1, new ResultOptions(), true, qc);
 
     final Map<String, QueryJobResult> results = qc.context.jobs.results;
     final QueryJobResult result = results.get(id);
@@ -38,7 +38,7 @@ public final class JobResult extends StandardFunc {
       if(result.exception != null) throw result.exception;
       return result.value;
     } finally {
-      if(!opts.get(ResultOptions.KEEP)) results.remove(id);
+      if(!options.get(ResultOptions.KEEP)) results.remove(id);
     }
   }
 }

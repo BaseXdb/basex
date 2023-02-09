@@ -1,4 +1,4 @@
-package org.basex.query.func.fn;
+package org.basex.query.util;
 
 import static org.basex.util.Token.*;
 
@@ -20,42 +20,31 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DeepEqual {
-  /** Flags. */
-  public enum Mode {
-    /** Compare all node types. */ ALLNODES,
-    /** Compare namespaces.     */ NAMESPACES,
-  }
+  /** Input info (can be {@code null}). */
+  public final InputInfo info;
+  /** Query context (to interrupt process, can be {@code null}). */
+  private final QueryContext qc;
 
-  /** Input info. */
-  private final InputInfo info;
-  /** Flag values. */
-  private final EnumSet<Mode> flags = EnumSet.noneOf(Mode.class);
   /** Collation. */
   private Collation coll;
+  /** Options. */
+  private DeepEqualOptions options;
 
   /**
    * Constructor.
    */
   public DeepEqual() {
-    this(null);
+    this(null, null);
   }
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
+   * @param qc query context (to interrupt process, can be {@code null})
    */
-  public DeepEqual(final InputInfo info) {
+  public DeepEqual(final InputInfo info, final  QueryContext qc) {
     this.info = info;
-  }
-
-  /**
-   * Sets the specified flag.
-   * @param flag flag
-   * @return self reference
-   */
-  public DeepEqual flag(final Mode flag) {
-    flags.add(flag);
-    return this;
+    this.qc = qc;
   }
 
   /**
@@ -69,6 +58,16 @@ public final class DeepEqual {
   }
 
   /**
+   * Assigns options.
+   * @param opts  options
+   * @return self reference
+   */
+  public DeepEqual options(final DeepEqualOptions opts) {
+    options = opts;
+    return this;
+  }
+
+  /**
    * Checks values for deep equality.
    * @param value1 first value
    * @param value2 second value
@@ -76,7 +75,7 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Value value1, final Value value2) throws QueryException {
-    return equal(value1.iter(), value2.iter());
+    return value1.size() == value2.size() && equal(value1.iter(), value2.iter());
   }
 
   /**
@@ -87,23 +86,12 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Iter iter1, final Iter iter2) throws QueryException {
-    return equal(iter1, iter2, null);
-  }
-
-  /**
-   * Checks values for deep equality.
-   * @param iter1 first iterator
-   * @param iter2 second iterator
-   * @param qc query context (allows interruption of process, can be {@code null})
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean equal(final Iter iter1, final Iter iter2, final QueryContext qc)
-      throws QueryException {
-
     final long size1 = iter1.size(), size2 = iter2.size();
     if(size1 != -1 && size2 != -1 && size1 != size2) return false;
 
+    final boolean comments = options != null && options.get(DeepEqualOptions.COMMENTS);
+    final boolean pis = options != null && options.get(DeepEqualOptions.PROCESSING_INSTRUCTIONS);
+    final boolean prefixes = options != null && options.get(DeepEqualOptions.NAMESPACES_PREFIXES);
     while(true) {
       if(qc != null) qc.checkStop();
 
@@ -113,11 +101,11 @@ public final class DeepEqual {
 
       // check functions
       if(item1 instanceof FItem) {
-        if(((FItem) item1).deep(item2, coll, info)) continue;
+        if(((FItem) item1).equal(item2, this)) continue;
         return false;
       }
       if(item2 instanceof FItem) {
-        if(((FItem) item2).deep(item1, coll, info)) continue;
+        if(((FItem) item2).equal(item1, this)) continue;
         return false;
       }
 
@@ -142,21 +130,19 @@ public final class DeepEqual {
       stack.push(ch1);
       stack.push(ch2);
 
-      boolean skip = false;
+      boolean cm = true, pi = true;
       do {
         type1 = node1 != null ? node1.type : null;
         type2 = node2 != null ? node2.type : null;
 
         // skip comparison of descendant comments and processing instructions
-        if(skip) {
-          if(type1 == NodeType.COMMENT || type1 == NodeType.PROCESSING_INSTRUCTION) {
-            node1 = ch1.next();
-            continue;
-          }
-          if(type2 == NodeType.COMMENT || type2 == NodeType.PROCESSING_INSTRUCTION) {
-            node2 = ch2.next();
-            continue;
-          }
+        if(!cm && type1 == NodeType.COMMENT || !pi && type1 == NodeType.PROCESSING_INSTRUCTION) {
+          node1 = ch1.next();
+          continue;
+        }
+        if(!cm && type2 == NodeType.COMMENT || !pi && type2 == NodeType.PROCESSING_INSTRUCTION) {
+          node2 = ch2.next();
+          continue;
         }
 
         if(node1 == null || node2 == null) {
@@ -169,9 +155,7 @@ public final class DeepEqual {
 
           // compare names
           QNm n1 = node1.qname(), n2 = node2.qname();
-          if(n1 != null && (!n1.eq(n2) ||
-              flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
-            return false;
+          if(n1 != null && (!n1.eq(n2) || prefixes && !eq(n1.prefix(), n2.prefix()))) return false;
 
           if(type1 == NodeType.TEXT || type1 == NodeType.ATTRIBUTE || type1 == NodeType.COMMENT ||
              type1 == NodeType.PROCESSING_INSTRUCTION || type1 == NodeType.NAMESPACE_NODE) {
@@ -190,8 +174,7 @@ public final class DeepEqual {
               for(ANode a2; (a2 = ir2.next()) != null;) {
                 n2 = a2.qname();
                 if(!n1.eq(n2)) continue;
-                if(flags.contains(Mode.NAMESPACES) && !eq(n1.prefix(), n2.prefix()) ||
-                    !eq(a1.string(), a2.string())) {
+                if(prefixes && !eq(n1.prefix(), n2.prefix()) || !eq(a1.string(), a2.string())) {
                   return false;
                 }
                 ir2 = node2.attributeIter();
@@ -201,7 +184,7 @@ public final class DeepEqual {
             }
 
             // compare namespaces
-            if(flags.contains(Mode.NAMESPACES)) {
+            if(prefixes) {
               final Atts ns1 = node1.namespaces(), ns2 = node2.namespaces();
               final int nl1 = ns1.size(), nl2 = ns2.size();
               if(nl1 != nl2) return false;
@@ -227,7 +210,8 @@ public final class DeepEqual {
         // check next child
         node1 = ch1.next();
         node2 = ch2.next();
-        skip = !flags.contains(Mode.ALLNODES);
+        cm = comments;
+        pi = pis;
       } while(!stack.isEmpty());
     }
   }

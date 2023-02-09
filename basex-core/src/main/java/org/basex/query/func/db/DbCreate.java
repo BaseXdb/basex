@@ -2,6 +2,8 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.primitives.*;
@@ -11,7 +13,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -49,8 +50,8 @@ public final class DbCreate extends DbNew {
       inputs = new NewInput[0];
     }
 
-    final Options opts = toOptions(3, new Options(), qc);
-    qc.updates().add(new DBCreate(name, inputs, opts, qc, info), qc);
+    final HashMap<String, String> options = toOptions(3, qc);
+    qc.updates().add(new DBCreate(name, inputs, options, qc, info), qc);
     return Empty.VALUE;
   }
 }

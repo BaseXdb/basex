@@ -240,7 +240,7 @@ public final class Util {
   }
 
   /**
-   * Prints the current stack trace to System.err.
+   * Prints the current stack trace to System.err. Used for testing.
    * @param depth number of steps to print
    */
   public static void stack(final int depth) {
