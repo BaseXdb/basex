@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.io.*;
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
@@ -337,7 +338,7 @@ public abstract class Seq extends Value {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a value from the input stream.
+   * Creates a value from the input stream. Called from {@link Store#read(DataInput, QueryContext)}.
    * @param in data input
    * @param type type
    * @param qc query context

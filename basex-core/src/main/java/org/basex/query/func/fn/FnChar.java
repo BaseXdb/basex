@@ -14,13 +14,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class FnChar extends StandardFunc {
-  /** Tab character. */
-  public static final byte[] CHAR_TAB = { '\\', '\t' };
-  /** Newline character. */
-  public static final byte[] CHAR_NL = { '\\', '\n' };
-  /** Carriage return. */
-  public static final byte[] CHAR_CR = { '\\', '\r' };
-
   @Override
   public final Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] name = toToken(exprs[0], qc);

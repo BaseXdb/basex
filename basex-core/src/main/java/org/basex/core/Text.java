@@ -818,10 +818,6 @@ public interface Text {
   String PARAMETERS = lang("parameters");
   /** "Path". */
   String PATH = lang("path");
-  /** "Reads". */
-  String READS = lang("reads");
-  /** "Writes". */
-  String WRITES = lang("writes");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
   /** Indent result. */

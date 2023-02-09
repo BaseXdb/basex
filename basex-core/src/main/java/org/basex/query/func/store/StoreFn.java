@@ -12,7 +12,7 @@ import org.basex.query.func.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public abstract class StoreFn extends StandardFunc {
+abstract class StoreFn extends StandardFunc {
   /**
    * Returns the key argument.
    * @param qc query context

@@ -28,7 +28,7 @@ import org.basex.util.hash.*;
  */
 public abstract class StandardSerializer extends OutputSerializer {
   /** Normalization form. */
-  protected final Form form;
+  private final Form form;
   /** Character map. */
   private final IntObjMap<byte[]> map;
 

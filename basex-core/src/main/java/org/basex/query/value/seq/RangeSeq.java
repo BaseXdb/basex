@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import java.io.*;
 import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -54,7 +55,7 @@ public final class RangeSeq extends Seq {
   }
 
   /**
-   * Creates a value from the input stream.
+   * Creates a value from the input stream. Called from {@link Store#read(DataInput, QueryContext)}.
    * @param in data input
    * @param type type
    * @param qc query context

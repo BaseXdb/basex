@@ -136,8 +136,6 @@ public interface Commands {
   String QUERY = "query";
   /** Command attribute: "type". */
   String TYPE = "type";
-  /** Command attribute: "id". */
-  String ID = "id";
   /** Command attribute: "start". */
   String START = "start";
   /** Command attribute: "end". */

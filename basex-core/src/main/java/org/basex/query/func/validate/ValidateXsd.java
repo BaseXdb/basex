@@ -27,7 +27,7 @@ import org.xml.sax.*;
  */
 public class ValidateXsd extends ValidateFn {
   /** Schema cache. */
-  static final ConcurrentHashMap<String, Schema> MAP = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<String, Schema> MAP = new ConcurrentHashMap<>();
 
   /** Schema factory. */
   private static final String FACTORY = "http://www.w3.org/2001/XMLSchema";

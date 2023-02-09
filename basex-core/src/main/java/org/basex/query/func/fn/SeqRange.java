@@ -12,11 +12,11 @@ import org.basex.util.*;
  */
 public final class SeqRange {
   /** Start position (inclusive, starting from 0). */
-  public long start;
+  long start;
   /** End position (exclusive, starting from 0, larger than or equal to start). */
-  public long end;
+  long end;
   /** Length (larger than or equal to 0). */
-  public long length;
+  long length;
 
   /**
    * Constructor.
