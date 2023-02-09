@@ -288,7 +288,6 @@ query_executed_%_%   = Kueri% dijalankan dalam %.
 query_plan           = Rencana kueri
 ratio                = Rasio
 read_locking         = Baca pengunci
-reads                = Reads
 recently_opened      = Berkas terbuka terbaru
 red                  = Merah
 redo                 = Kerjakan kembali
@@ -406,7 +405,6 @@ view                 = Lihat
 visualization        = Visualisasi
 whole_word           = Seluruh kata
 write_locking        = Tulis pengunci
-writes               = Writes
 yes                  = Ya
 
 # Help texts

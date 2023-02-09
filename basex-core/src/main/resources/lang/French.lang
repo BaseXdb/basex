@@ -288,7 +288,6 @@ query_executed_%_%   = Requête% executée en %.
 query_plan           = Plan de requête
 ratio                = Ratio
 read_locking         = Blocage en lecture
-reads                = Reads
 recently_opened      = Récemment ouverts
 red                  = Rouge
 redo                 = Refaire
@@ -406,7 +405,6 @@ view                 = Affichage
 visualization        = Visualisation
 whole_word           = Mot entier
 write_locking        = Blocage en écriture
-writes               = Writes
 yes                  = Oui
 
 # Help texts

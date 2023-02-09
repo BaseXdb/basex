@@ -288,7 +288,6 @@ query_executed_%_%   = % % のクエリーが実行されました。
 query_plan           = クエリー計画
 ratio                = 比率
 read_locking         = 読み込みロック
-reads                = Reads
 recently_opened      = 最近開いたファイル
 red                  = 赤
 redo                 = やり直し
@@ -406,7 +405,6 @@ view                 = ビュー
 visualization        = ビジュアライゼーション
 whole_word           = 単語全体
 write_locking        = 書き込みロック
-writes               = Writes
 yes                  = はい
 
 # Help texts

@@ -288,7 +288,6 @@ query_executed_%_%   = Interogare % executata in %.
 query_plan           = Planul de interogare
 ratio                = Raport
 read_locking         = Blocare pe citire
-reads                = Reads
 recently_opened      = Recently opened files
 red                  = Roșu
 redo                 = Refacere
@@ -406,7 +405,6 @@ view                 = Vizualizare
 visualization        = Visualization
 whole_word           = Cuvantul intreg
 write_locking        = Blocare pe scriere
-writes               = Writes
 yes                  = Da
 
 # Help texts

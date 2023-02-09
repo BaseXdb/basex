@@ -288,7 +288,6 @@ query_executed_%_%   = Query% executed in %.
 query_plan           = Query Plan
 ratio                = Ratio
 read_locking         = Read Locking
-reads                = Reads
 recently_opened      = Recently opened files
 red                  = Red
 redo                 = Redo
@@ -406,7 +405,6 @@ view                 = View
 visualization        = Visualization
 whole_word           = Whole Word
 write_locking        = Write Locking
-writes               = Writes
 yes                  = Yes
 
 # Help texts
