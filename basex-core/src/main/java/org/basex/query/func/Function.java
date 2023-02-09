@@ -91,6 +91,9 @@ public enum Function implements AFunction {
   APPLY(FnApply::new, "apply(function,arguments)",
       params(FUNCTION_O, ARRAY_O), ITEM_ZM, flag(POS, CTX, NDT, HOF), FN_URI, Perm.ADMIN),
   /** XQuery function. */
+  ATOMIC_EQUAL(FnAtomicEqual::new, "atomic-equal(value1,value2)",
+      params(ANY_ATOMIC_TYPE_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O),
+  /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables::new,
       "available-environment-variables()",
       params(), STRING_ZM),
