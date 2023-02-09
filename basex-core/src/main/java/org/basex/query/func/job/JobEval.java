@@ -35,7 +35,7 @@ public class JobEval extends StandardFunc {
    */
   private Str eval(final IOContent query, final QueryContext qc) throws QueryException {
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final JobOptions options = toOptions(2, new JobOptions(), qc);
+    final JobOptions options = toOptions(2, new JobOptions(), true, qc);
     options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
 
     final boolean service = Boolean.TRUE.equals(options.get(JobOptions.SERVICE));

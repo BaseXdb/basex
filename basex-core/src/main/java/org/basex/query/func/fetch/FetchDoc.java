@@ -3,6 +3,7 @@ package org.basex.query.func.fetch;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -13,7 +14,6 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -35,8 +35,8 @@ public class FetchDoc extends StandardFunc {
    * @throws QueryException query exception
    */
   protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
-    final Options opts = toOptions(1, new Options(), qc);
-    final DBOptions dbopts = new DBOptions(opts, MainOptions.PARSING, info);
+    final HashMap<String, String> options = toOptions(1, qc);
+    final DBOptions dbopts = new DBOptions(options, MainOptions.PARSING, info);
     final MainOptions mopts = dbopts.assignTo(new MainOptions());
     try {
       return new DBNode(Parser.singleParser(io, mopts, ""));

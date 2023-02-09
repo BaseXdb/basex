@@ -1,5 +1,7 @@
 package org.basex.query.func.db;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
@@ -7,7 +9,6 @@ import org.basex.query.up.primitives.db.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -25,9 +26,9 @@ public final class DbAdd extends DbNew {
       if(token != null) path = toDbPath(token);
     }
     final NewInput input = toNewInput(toNodeOrAtomItem(1, qc), path);
-    final Options opts = toOptions(3, new Options(), qc);
+    final HashMap<String, String> options = toOptions(3, qc);
 
-    qc.updates().add(new DBAdd(data, input, opts, false, qc, info), qc);
+    qc.updates().add(new DBAdd(data, input, options, false, qc, info), qc);
     return Empty.VALUE;
   }
 }

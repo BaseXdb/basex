@@ -66,17 +66,17 @@ public class XQueryEval extends StandardFunc {
 
     // bind variables and context value, parse options
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final XQueryOptions opts = new XQueryOptions();
-    opts.put(XQueryOptions.PERMISSION, perm);
-    toOptions(2, opts, qc);
+    final XQueryOptions options = new XQueryOptions();
+    options.put(XQueryOptions.PERMISSION, perm);
+    toOptions(2, options, true, qc);
 
-    final Perm evalPerm = Perm.get(opts.get(XQueryOptions.PERMISSION).toString());
+    final Perm evalPerm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
     if(!user.has(evalPerm)) throw XQUERY_PERMISSION2_X.get(info, evalPerm);
     user.perm(evalPerm);
 
     try(QueryContext qctx = new QueryContext(qc)) {
       // limit memory consumption: enforce garbage collection and calculate usage
-      final long mb = opts.get(XQueryOptions.MEMORY);
+      final long mb = options.get(XQueryOptions.MEMORY);
       if(mb != 0) {
         Performance.gc(2);
         final long limit = Performance.memory() + (mb << 20);
@@ -94,7 +94,7 @@ public class XQueryEval extends StandardFunc {
       }
 
       // timeout
-      final long ms = opts.get(XQueryOptions.TIMEOUT) * 1000L;
+      final long ms = options.get(XQueryOptions.TIMEOUT) * 1000L;
       if(ms != 0) {
         if(to == null) to = new Timer(true);
         to.schedule(new TimerTask() {
@@ -106,7 +106,7 @@ public class XQueryEval extends StandardFunc {
       // evaluate query
       try {
         final StaticContext sctx = new StaticContext(qctx);
-        sctx.baseURI(toBaseUri(query.url(), opts, XQueryOptions.BASE_URI));
+        sctx.baseURI(toBaseUri(query.url(), options, XQueryOptions.BASE_URI));
         for(final Entry<String, Value> binding : bindings.entrySet()) {
           qctx.bind(binding.getKey(), binding.getValue(), null, sctx);
         }
@@ -134,7 +134,7 @@ public class XQueryEval extends StandardFunc {
           Util.debug(ex);
           throw XQUERY_PERMISSION1_X.get(info, ex.getLocalizedMessage());
         }
-        if(!opts.get(XQueryOptions.PASS)) ex.info(info);
+        if(!options.get(XQueryOptions.PASS)) ex.info(info);
         throw ex;
       }
     } finally {

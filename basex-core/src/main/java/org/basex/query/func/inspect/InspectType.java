@@ -40,9 +40,9 @@ public final class InspectType extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value value = exprs[0].value(qc);
-    final InspectOptions opts = toOptions(1, new InspectOptions(), qc);
-    final Mode mode = opts.get(InspectOptions.MODE);
-    final boolean item = opts.get(InspectOptions.ITEM);
+    final InspectOptions options = toOptions(1, new InspectOptions(), true, qc);
+    final Mode mode = options.get(InspectOptions.MODE);
+    final boolean item = options.get(InspectOptions.ITEM);
 
     SeqType st = null;
     switch(mode) {

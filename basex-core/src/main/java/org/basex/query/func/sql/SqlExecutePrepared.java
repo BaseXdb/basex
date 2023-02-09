@@ -35,7 +35,7 @@ public final class SqlExecutePrepared extends SqlExecute {
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
     final Item params = exprs.length > 1 ? exprs[1].item(qc, info) : Empty.VALUE;
-    final StatementOptions options = toOptions(2, new StatementOptions(), qc);
+    final StatementOptions options = toOptions(2, new StatementOptions(), true, qc);
 
     final ANode prms = params != Empty.VALUE ? toElem(params, qc) : null;
     if(prms != null && !prms.qname().eq(Q_PARAMETERS)) {

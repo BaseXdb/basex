@@ -38,8 +38,8 @@ public class ArchiveCreate extends ArchiveFn {
    */
   public final void create(final OutputStream os, final QueryContext qc) throws QueryException {
     final Map<String, Item[]> map = toMap(0, qc);
-    final CreateOptions opts = toOptions(2, new CreateOptions(), qc);
-    create(map, opts, os, qc);
+    final CreateOptions options = toOptions(2, new CreateOptions(), true, qc);
+    create(map, options, os, qc);
   }
 
   /**

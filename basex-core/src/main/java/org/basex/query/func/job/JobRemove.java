@@ -28,12 +28,12 @@ public final class JobRemove extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String id = toString(exprs[0], qc);
-    final RemoveOptions opts = toOptions(1, new RemoveOptions(), qc);
+    final RemoveOptions options = toOptions(1, new RemoveOptions(), true, qc);
 
     // remove job
     qc.context.jobs.remove(id);
     // remove service
-    if(opts.get(RemoveOptions.SERVICE)) {
+    if(options.get(RemoveOptions.SERVICE)) {
       try {
         final Jobs jobs = new Jobs(qc.context);
         jobs.remove(id);

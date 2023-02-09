@@ -36,8 +36,8 @@ public final class FuncOptions {
   /** Input info. */
   private final InputInfo info;
 
-  /** Accept unknown options. */
-  private boolean acceptUnknown;
+  /** Raise error if option is unknown. */
+  private boolean enforceKnown;
 
   /**
    * Constructor.
@@ -59,23 +59,17 @@ public final class FuncOptions {
   }
 
   /**
-   * Accept unknown options.
-   * @return self reference
-   */
-  public FuncOptions acceptUnknown() {
-    acceptUnknown = true;
-    return this;
-  }
-
-  /**
    * Assigns values to the specified options.
    * @param item item to be converted (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
+   * @param enforce raise error if option is unknown
    * @return specified options
    * @throws QueryException query exception
    */
-  public <T extends Options> T assign(final Item item, final T options) throws QueryException {
+  public <T extends Options> T assign(final Item item, final T options, final boolean enforce)
+      throws QueryException {
+    enforceKnown = enforce;
     return assign(item, options, INVALIDOPT_X);
   }
 
@@ -94,7 +88,7 @@ public final class FuncOptions {
     if(item != Empty.VALUE) {
       try {
         if(item instanceof XQMap) {
-          options.assign((XQMap) item, !acceptUnknown, info);
+          options.assign((XQMap) item, enforceKnown, info);
         } else {
           if(test == null) throw MAP_X_X.get(info, item.type, item);
           if(!test.matches(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);

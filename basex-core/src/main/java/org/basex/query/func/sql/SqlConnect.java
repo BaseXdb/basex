@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Functions on relational databases.
@@ -30,7 +29,7 @@ public final class SqlConnect extends SqlFn {
     final String url = toString(exprs[0], qc);
     final String username = el > 1 ? toStringOrNull(exprs[1], qc) : null;
     final String password = el > 2 ? toStringOrNull(exprs[2], qc) : null;
-    final HashMap<String, String> options = toOptions(3, new Options(), qc).free();
+    final HashMap<String, String> options = toOptions(3, qc);
 
     // parse options; overwrite with user and password (if supplied); treat autocommit independently
     final Properties props = new Properties();

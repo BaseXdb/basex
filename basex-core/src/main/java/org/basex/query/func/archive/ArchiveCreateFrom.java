@@ -27,9 +27,9 @@ public class ArchiveCreateFrom extends ArchiveCreate {
     final IOFile root = new IOFile(toPath(0, qc).toString());
     if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
 
-    final CreateFromOptions opts = toOptions(1, new CreateFromOptions(), qc);
-    final boolean recursive = opts.get(CreateFromOptions.RECURSIVE);
-    final boolean rootDir = opts.get(CreateFromOptions.ROOT_DIR);
+    final CreateFromOptions options = toOptions(1, new CreateFromOptions(), true, qc);
+    final boolean recursive = options.get(CreateFromOptions.RECURSIVE);
+    final boolean rootDir = options.get(CreateFromOptions.ROOT_DIR);
 
     final Iter entries;
     if(exprs.length > 2) {
@@ -46,8 +46,8 @@ public class ArchiveCreateFrom extends ArchiveCreate {
       entries = StrSeq.get(tl).iter();
     }
 
-    final int level = level(opts);
-    final String format = opts.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
+    final int level = level(options);
+    final String format = options.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
     final String dir = rootDir && root.parent() != null ? root.name() + '/' : "";
     final ArrayOutput ao = new ArrayOutput();
     try(ArchiveOut out = ArchiveOut.get(format, info, ao)) {

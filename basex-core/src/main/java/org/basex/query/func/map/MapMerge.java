@@ -31,8 +31,9 @@ public final class MapMerge extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = exprs[0].iter(qc);
-    final MergeDuplicates merge = options(qc).get(MergeOptions.DUPLICATES);
+    final MergeOptions options = toOptions(1, new MergeOptions(), false, qc);
 
+    final MergeDuplicates merge = options.get(MergeOptions.DUPLICATES);
     XQMap map = XQMap.empty();
     for(Item item; (item = qc.next(maps)) != null;) {
       map = map.addAll(toMap(item), merge, qc, info);
@@ -70,25 +71,15 @@ public final class MapMerge extends StandardFunc {
       final SeqType dt = mt.declType;
       // broaden type if values may be combined
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
-      if(!dt.zero() && el > 1 && (!(exprs[1] instanceof Value) ||
-        options(cc.qc).get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE)) {
-        mt = MapType.get(mt.keyType(), dt.union(Occ.ONE_OR_MORE));
+      if(!dt.zero() && el > 1) {
+        if(!(exprs[1] instanceof Value) || toOptions(1, new MergeOptions(), false, cc.qc).
+            get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
+          mt = MapType.get(mt.keyType(), dt.union(Occ.ONE_OR_MORE));
+        }
       }
       exprType.assign(mt);
     }
 
     return this;
-  }
-
-  /**
-   * Returns map options.
-   * @param qc query context
-   * @return options
-   * @throws QueryException query exception
-   */
-  private MergeOptions options(final QueryContext qc) throws QueryException {
-    final MergeOptions opts = new MergeOptions();
-    if(exprs.length > 1) new FuncOptions(info).acceptUnknown().assign(toMap(exprs[1], qc), opts);
-    return opts;
   }
 }

@@ -2,6 +2,8 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
@@ -14,7 +16,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -28,7 +29,7 @@ public final class DbPut extends DbNew {
     final Data data = toData(qc);
     final Item input = toNodeOrAtomItem(1, qc);
     final String path = toDbPath(2, qc);
-    final Options opts = toOptions(3, new Options(), qc);
+    final HashMap<String, String> options = toOptions(3, qc);
 
     final Updates updates = qc.updates();
     final IntList docs = data.resources.docs(path);
@@ -42,8 +43,8 @@ public final class DbPut extends DbNew {
       // store XML document: replace existing document or add new one
       final NewInput ni = toNewInput(input, path);
       final Update update = docs.isEmpty() ?
-        new DBAdd(data, ni, opts, true, qc, info) :
-        new ReplaceDoc(docs.get(d++), data, ni, opts, qc, info);
+        new DBAdd(data, ni, options, true, qc, info) :
+        new ReplaceDoc(docs.get(d++), data, ni, options, qc, info);
       updates.add(update, qc);
 
       // delete file resources

@@ -485,17 +485,31 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Evaluates an expression to user options.
+   * @param i index of optional argument
+   * @param qc query context
+   * @return user options
+   * @throws QueryException query exception
+   */
+  protected final HashMap<String, String> toOptions(final int i, final QueryContext qc)
+      throws QueryException {
+    return toOptions(i, new Options(), false, qc).free();
+  }
+
+  /**
    * Evaluates an expression to options.
    * @param <E> options type
    * @param i index of optional argument
    * @param opts options
+   * @param enforce raise error if option is unknown
    * @param qc query context
    * @return options
    * @throws QueryException query exception
    */
-  protected final <E extends Options> E toOptions(final int i, final E opts, final QueryContext qc)
-      throws QueryException {
-    return i < exprs.length ? new FuncOptions(info).assign(exprs[i].item(qc, info), opts) : opts;
+  protected final <E extends Options> E toOptions(final int i, final E opts, final boolean enforce,
+      final QueryContext qc) throws QueryException {
+    return i < exprs.length ? new FuncOptions(info).assign(exprs[i].item(qc, info), opts, enforce) :
+      opts;
   }
 
   /**

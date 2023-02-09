@@ -15,7 +15,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 import org.w3c.dom.ls.*;
 import org.xml.sax.*;
 
@@ -72,7 +71,7 @@ public class ValidateXsd extends ValidateFn {
 
         final IO input = read(toNodeOrAtomItem(0, qc), null);
         final Item schema = exprs.length > 1 ? toNodeOrAtomItem(1, qc) : Empty.VALUE;
-        final HashMap<String, String> options = toOptions(2, new Options(), qc).free();
+        final HashMap<String, String> options = toOptions(2, qc);
 
         final String url = schema != Empty.VALUE ? prepare(read(schema, null), handler).url() : "";
         final String caching = options.remove("cache");

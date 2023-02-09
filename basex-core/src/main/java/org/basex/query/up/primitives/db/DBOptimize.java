@@ -32,13 +32,13 @@ public final class DBOptimize extends DBUpdate {
    * Constructor.
    * @param data data
    * @param all optimize all database structures flag
-   * @param opts database options
+   * @param opts query options
    * @param qc database context
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBOptimize(final Data data, final boolean all, final Options opts, final QueryContext qc,
-      final InputInfo info) throws QueryException {
+  public DBOptimize(final Data data, final boolean all, final HashMap<String, String> opts,
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBOPTIMIZE, data, info);
     this.all = all;

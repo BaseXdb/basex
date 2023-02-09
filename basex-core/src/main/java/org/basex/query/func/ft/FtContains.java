@@ -20,22 +20,22 @@ public final class FtContains extends FtAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = exprs[0].value(qc), terms = exprs[1].value(qc);
-    final FtContainsOptions opts = toOptions(2, new FtContainsOptions(), qc);
+    final FtContainsOptions options = toOptions(2, new FtContainsOptions(), true, qc);
 
-    final FTMode mode = opts.get(FtIndexOptions.MODE);
-    final FTOpt opt = ftOpt(opts, qc).assign(qc.ftOpt());
+    final FTMode mode = options.get(FtIndexOptions.MODE);
+    final FTOpt opt = ftOpt(options, qc).assign(qc.ftOpt());
 
-    final FTDiacritics dc = opts.get(FtContainsOptions.DIACRITICS);
+    final FTDiacritics dc = options.get(FtContainsOptions.DIACRITICS);
     if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);
-    final Boolean st = opts.get(FtContainsOptions.STEMMING);
+    final Boolean st = options.get(FtContainsOptions.STEMMING);
     if(st != null) opt.set(ST, st);
-    final String ln = opts.get(FtContainsOptions.LANGUAGE);
+    final String ln = options.get(FtContainsOptions.LANGUAGE);
     if(ln != null) opt.ln = Language.get(ln);
-    final FTCase cs = opts.get(FtContainsOptions.CASE);
+    final FTCase cs = options.get(FtContainsOptions.CASE);
     if(cs != null) opt.cs = cs;
 
     final FTWords ftw = new FTWords(info, terms, mode, null).ftOpt(opt).optimize(qc);
-    return new FTContains(input, ftExpr(ftw, opts), info).item(qc, info);
+    return new FTContains(input, ftExpr(ftw, options), info).item(qc, info);
   }
 
   @Override

@@ -30,18 +30,18 @@ public class FtTokenize extends FtAccess {
    */
   protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
     final Item value = exprs[0].atomItem(qc, info);
-    final FtTokenizeOptions opts = toOptions(1, new FtTokenizeOptions(), qc);
+    final FtTokenizeOptions options = toOptions(1, new FtTokenizeOptions(), true, qc);
 
     final TokenList tl = new TokenList();
     if(value != Empty.VALUE) {
       final FTOpt opt = new FTOpt().assign(qc.ftOpt());
-      final FTDiacritics dc = opts.get(FtTokenizeOptions.DIACRITICS);
+      final FTDiacritics dc = options.get(FtTokenizeOptions.DIACRITICS);
       if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);
-      final Boolean st = opts.get(FtTokenizeOptions.STEMMING);
+      final Boolean st = options.get(FtTokenizeOptions.STEMMING);
       if(st != null) opt.set(ST, st);
-      final String ln = opts.get(FtTokenizeOptions.LANGUAGE);
+      final String ln = options.get(FtTokenizeOptions.LANGUAGE);
       if(ln != null) opt.ln = Language.get(ln);
-      final FTCase cs = opts.get(FtTokenizeOptions.CASE);
+      final FTCase cs = options.get(FtTokenizeOptions.CASE);
       if(cs != null) opt.cs = cs;
 
       final FTLexer lexer = new FTLexer(opt).init(toToken(value));

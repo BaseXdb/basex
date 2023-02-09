@@ -39,7 +39,7 @@ public final class DBCreate extends NameUpdate {
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBCreate(final String name, final NewInput[] inputs, final Options opts,
+  public DBCreate(final String name, final NewInput[] inputs, final HashMap<String, String> opts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBCREATE, name, qc, info);

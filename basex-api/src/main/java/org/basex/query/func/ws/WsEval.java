@@ -22,13 +22,13 @@ public final class WsEval extends WsFn {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IOContent query = toContent(0, qc);
     final HashMap<String, Value> bindings = toBindings(1, qc);
-    final WsOptions wo = toOptions(2, new WsOptions(), qc);
+    final WsOptions options = toOptions(2, new WsOptions(), true, qc);
 
-    final JobOptions opts = new JobOptions();
-    opts.set(JobOptions.BASE_URI, toBaseUri(query.url(), wo, WsOptions.BASE_URI));
-    opts.set(JobOptions.ID, wo.get(WsOptions.ID));
+    final JobOptions jopts = new JobOptions();
+    jopts.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, WsOptions.BASE_URI));
+    jopts.set(JobOptions.ID, options.get(WsOptions.ID));
 
-    final QueryJobSpec spec = new QueryJobSpec(opts, bindings, query);
+    final QueryJobSpec spec = new QueryJobSpec(jopts, bindings, query);
     final WebSocket ws = ws(qc);
     final Consumer<QueryJobResult> notify = result -> {
       try {

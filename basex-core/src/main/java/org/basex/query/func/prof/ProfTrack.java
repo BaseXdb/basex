@@ -30,22 +30,22 @@ public final class ProfTrack extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final TrackOptions opts = toOptions(1, new TrackOptions(), qc);
+    final TrackOptions options = toOptions(1, new TrackOptions(), true, qc);
 
     // include memory consumption
     long min = -1;
-    if(opts.get(TrackOptions.MEMORY)) {
+    if(options.get(TrackOptions.MEMORY)) {
       Performance.gc(4);
       min = Performance.memory();
     }
     // include execution time (called after garbage collection)
     Performance perf = null;
-    if(opts.get(TrackOptions.TIME)) {
+    if(options.get(TrackOptions.TIME)) {
       perf = new Performance();
     }
     // include resulting value
     Value value = null;
-    if(opts.get(TrackOptions.VALUE)) {
+    if(options.get(TrackOptions.VALUE)) {
       // retrieve and assign value
       value = exprs[0].value(qc);
     } else {
