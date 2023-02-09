@@ -390,7 +390,7 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final boolean sameKey(final Item item, final InputInfo ii) throws QueryException {
+  public final boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
     return item instanceof ADate && hasTz() == ((ADate) item).hasTz() && eq(item, null, null, ii);
   }
 

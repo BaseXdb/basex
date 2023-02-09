@@ -8,7 +8,7 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.map.*;
@@ -48,7 +48,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final boolean sameKey(final Item item, final InputInfo ii) {
+  public final boolean atomicEq(final Item item, final InputInfo ii) {
     return false;
   }
 

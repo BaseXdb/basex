@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
@@ -17,13 +17,14 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.DeepEqual.Mode;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
-import org.basex.util.options.Options.YesNo;
+import org.basex.util.list.*;
+import org.basex.util.options.Options.*;
 
 /**
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
@@ -727,10 +728,14 @@ public final class QT3TS extends Main {
       if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
-      final StringBuilder flags = new StringBuilder("'").append(Mode.ALLNODES).append('\'');
-      if(!ignorePrefixes) flags.append(",'").append(Mode.NAMESPACES).append('\'');
-      final String query = Function._UTIL_DEEP_EQUAL.args(" <X>" + exp + "</X>",
-          " <X>" + res + "</X>" , " (" + flags.append(")").toString());
+      final StringList options = new StringList();
+      if(!ignorePrefixes) {
+        options.add("'" + DeepEqualOptions.NAMESPACES_PREFIXES.name() + "': true()");
+      }
+      options.add("'" + DeepEqualOptions.COMMENTS.name() + "': true()");
+      options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "': true()");
+      final String query = Function.DEEP_EQUAL.args(" <X>" + exp + "</X>",
+          " <X>" + res + "</X>", " ()", " map { " + String.join(", ", options) + " }");
       return asBoolean(query, expected) ? null : exp;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", exp, ex);

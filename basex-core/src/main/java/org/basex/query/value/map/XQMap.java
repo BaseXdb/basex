@@ -12,7 +12,7 @@ import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;

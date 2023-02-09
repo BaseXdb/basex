@@ -166,8 +166,8 @@ public enum Function implements AFunction {
   DAYS_FROM_DURATION(FnDayFromDuration::new, "days-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
   /** XQuery function. */
-  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation])",
-      params(ITEM_ZM, ITEM_ZM, STRING_O), BOOLEAN_O),
+  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation,options])",
+      params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_O), BOOLEAN_O),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation::new, "default-collation()",
       params(), STRING_O),
@@ -1791,9 +1791,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_DEEP_EQUAL(UtilDeepEqual::new, "deep-equal(input1,input2[,options])",
-      params(ITEM_ZM, ITEM_ZM, STRING_ZM), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_DDO(UtilDdo::new, "ddo(nodes)",
       params(NODE_ZM), NODE_ZM, UTIL_URI),

@@ -202,13 +202,13 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Compares the items for equality.
+   * Compares atomic items for equality.
    * @param item item to be compared
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean sameKey(final Item item, final InputInfo ii) throws QueryException {
+  public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
     return comparable(item) && eq(item, null, null, ii);
   }
 

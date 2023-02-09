@@ -70,7 +70,7 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean sameKey(final Item item, final InputInfo ii) throws QueryException {
+  public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
     return item.type.isStringOrUntyped() && eq(item, null, null, ii);
   }
 

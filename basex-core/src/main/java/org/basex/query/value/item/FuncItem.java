@@ -10,7 +10,6 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
