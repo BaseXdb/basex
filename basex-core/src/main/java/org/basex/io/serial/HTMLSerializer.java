@@ -23,6 +23,8 @@ final class HTMLSerializer extends MarkupSerializer {
   static final TokenSet EMPTIES5;
   /** (X)HTML: formatted elements. */
   static final TokenSet FORMATTEDS;
+  /** (X)HTML: inline elements. */
+  static final TokenSet INLINES;
   /** (X)HTML: URI attributes. */
   static final TokenSet URIS;
 
@@ -56,6 +58,14 @@ final class HTMLSerializer extends MarkupSerializer {
         "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
     // formatted elements
     FORMATTEDS = new TokenSet("pre", "script", "style", "textarea", "title");
+    // inline elements
+    INLINES = new TokenSet("a", "abbr", "acronym", "applet", "area", "audio", "b", "basefont",
+        "bdi", "bdo", "big", "br", "button", "canvas", "cite", "code", "data", "datalist", "del",
+        "dfn", "em", "embed", "font", "i", "iframe", "img", "input", "ins", "kbd", "label", "link",
+        "map", "mark", "math", "meta", "meter", "noscript", "object", "output", "picture",
+        "progress", "q", "ruby", "s", "samp", "script", "select", "slot", "small", "span", "strike",
+        "strong", "sub", "sup", "svg", "template", "textarea", "time", "tt", "u", "var", "video",
+        "wbr");
     // URI attributes
     URIS = new TokenSet("a@href", "a@name", "applet@codebase", "area@href",
         "base@href", "blockquote@cite", "body@background", "button@datasrc", "del@cite",
@@ -182,6 +192,13 @@ final class HTMLSerializer extends MarkupSerializer {
     } else if(html5) {
       printDoctype(type, null, null);
     }
+  }
+
+  @Override
+  boolean inline() {
+    return INLINES.contains(lc(closed.local())) ||
+        opening && INLINES.contains(lc(elem.local())) ||
+        super.inline();
   }
 
   @Override

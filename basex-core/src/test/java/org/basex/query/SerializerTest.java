@@ -46,6 +46,16 @@ public final class SerializerTest extends SandboxTest {
         + "<PRE><u>test</u></PRE>\n"
         + "</body>\n"
         + "</html>");
+    query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
+        + "<html><body><a name='x'>x</a><p><hr/></p><a><hr/></a></body></html>",
+        "<!DOCTYPE html>\n"
+        + "<html>\n"
+        + "<body><a name=\"x\">x</a><p>\n"
+        + "<hr/>\n"
+        + "</p><a>\n"
+        + "<hr/>\n"
+        + "</a></body>\n"
+        + "</html>");
   }
 
   /** method=xhtml, meta element. */
@@ -92,6 +102,18 @@ public final class SerializerTest extends SandboxTest {
         + "<html>\n"
         + "<body>\n"
         + "<PRE><u>test</u></PRE>\n"
+        + "</body>\n"
+        + "</html>");
+    query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
+        + "<html><body><p><b>x</b><ul><li>1</li><li>2</li></ul></p></body></html>",
+        "<!DOCTYPE html>\n"
+        + "<html>\n"
+        + "<body>\n"
+        + "<p><b>x</b><ul>\n"
+        + "<li>1</li>\n"
+        + "<li>2</li>\n"
+        + "</ul>\n"
+        + "</p>\n"
         + "</body>\n"
         + "</html>");
   }

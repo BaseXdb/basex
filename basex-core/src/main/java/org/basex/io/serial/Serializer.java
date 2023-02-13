@@ -36,6 +36,8 @@ public abstract class Serializer implements Closeable {
   protected int level;
   /** Current element name. */
   protected QNm elem;
+  /** Most recent tag, in case it was a closing tag. */
+  protected QNm closed = QNm.EMPTY;
   /** Indentation flag. */
   protected boolean indent;
 
@@ -51,7 +53,7 @@ public abstract class Serializer implements Closeable {
   /** Flag for skipping elements. */
   protected int skip;
   /** Indicates if an element is currently being opened. */
-  private boolean opening;
+  protected boolean opening;
 
   /**
    * Returns a default serializer.
@@ -172,6 +174,7 @@ public abstract class Serializer implements Closeable {
     opening = true;
     elem = name;
     startOpen(name);
+    closed = QNm.EMPTY;
     nstack.push(nspaces.size());
   }
 
@@ -188,7 +191,7 @@ public abstract class Serializer implements Closeable {
       elem = opened.peek();
       level--;
       finishClose();
-      opened.pop();
+      closed = opened.pop();
     }
   }
 
