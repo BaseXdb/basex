@@ -328,6 +328,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(atomic) {
       atomic = false;
     } else if(indent) {
+      if (inline()) return;
       for(final QNm qname : opened) {
         if(suppressIndentation(qname)) return;
       }
@@ -404,6 +405,15 @@ abstract class MarkupSerializer extends StandardSerializer {
       cdata = list;
     }
     return list;
+  }
+
+  /**
+   * Checks if the next element should be rendered inline with its context, i.e.
+   * without indentation adjacent to it.
+   * @return result of check
+   */
+  boolean inline() {
+    return false;
   }
 
   /**
