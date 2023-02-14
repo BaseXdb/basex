@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.hash.*;
 
 /**
  * This class serializes items as XHTML.
@@ -73,10 +74,26 @@ final class XHTMLSerializer extends MarkupSerializer {
   }
 
   @Override
+  boolean inline() {
+    return contains(HTMLSerializer.INLINES, closed) ||
+        opening && contains(HTMLSerializer.INLINES, elem) ||
+        super.inline();
+  }
+
+  @Override
   boolean suppressIndentation(final QNm qname) throws QueryIOException {
-    final byte[] uri = qname.uri(), local = qname.local();
-    return eq(uri, XHTML_URI) && HTMLSerializer.FORMATTEDS.contains(local) ||
-        html5 && eq(uri, EMPTY) && HTMLSerializer.FORMATTEDS.contains(lc(local)) ||
-        super.suppressIndentation(qname);
+    return contains(HTMLSerializer.FORMATTEDS, qname) || super.suppressIndentation(qname);
+  }
+
+  /**
+   * Checks whether the token set contains the specified element.
+   * @param elements the token set of element local names
+   * @param element the element QName
+   * @return {@code true} if the element is contained in the token set
+   */
+  private boolean contains(final TokenSet elements, final QNm element) {
+    final byte[] uri = element.uri(), local = element.local();
+    return eq(uri, XHTML_URI) && elements.contains(local) ||
+        html5 && eq(uri, EMPTY) && elements.contains(lc(local));
   }
 }
