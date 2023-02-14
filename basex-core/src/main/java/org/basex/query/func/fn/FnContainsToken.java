@@ -27,9 +27,7 @@ public final class FnContainsToken extends StandardFunc {
       final Iter value = exprs[0].iter(qc);
       for(Item item; (item = qc.next(value)) != null;) {
         for(final byte[] distinct : distinctTokens(toToken(item))) {
-          if(coll == null ? eq(token, distinct) : coll.compare(token, distinct) == 0) {
-            return Bln.TRUE;
-          }
+          if(eq(token, distinct, coll)) return Bln.TRUE;
         }
       }
     }

@@ -23,7 +23,7 @@ public final class FnCompare extends StandardFunc {
     final byte[] value1 = toTokenOrNull(exprs[0], qc), value2 = toTokenOrNull(exprs[1], qc);
     final Collation coll = toCollation(2, qc);
     if(value1 == null || value2 == null) return Empty.VALUE;
-    final long diff = coll == null ? diff(value1, value2) : coll.compare(value1, value2);
+    final long diff = diff(value1, value2, coll);
     return Int.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);
   }
 

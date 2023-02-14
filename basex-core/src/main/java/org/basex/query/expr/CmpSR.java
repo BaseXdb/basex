@@ -129,10 +129,8 @@ public final class CmpSR extends Single {
   private boolean eval(final Item item) throws QueryException {
     if(!item.type.isStringOrUntyped()) throw diffError(item, Str.EMPTY, info);
     final byte[] s = item.string(info);
-    final int mn = min == null ?  1 :
-      coll == null ? Token.diff(s, min) : coll.compare(s, min);
-    final int mx = max == null ? -1 :
-      coll == null ? Token.diff(s, max) : coll.compare(s, max);
+    final int mn = min == null ?  1 : Token.diff(s, min, coll);
+    final int mx = max == null ? -1 : Token.diff(s, max, coll);
     return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
   }
 

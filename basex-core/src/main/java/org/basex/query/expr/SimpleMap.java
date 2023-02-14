@@ -421,13 +421,13 @@ public abstract class SimpleMap extends Arr {
     }
     cc.pushFocus(root);
     try {
-    final int el = exprs.length;
-    for(int e = 1; e < el; e++) {
-      final Expr expr = exprs[e].simplifyFor(mode, cc);
-      if(!(expr instanceof AxisPath)) return this;
-      final AxisPath path = (AxisPath) expr;
-      if(path.root != null) return this;
-      steps.add(path.steps);
+      final int el = exprs.length;
+      for(int e = 1; e < el; e++) {
+        final Expr expr = exprs[e].simplifyFor(mode, cc);
+        if(!(expr instanceof AxisPath)) return this;
+        final AxisPath path = (AxisPath) expr;
+        if(path.root != null) return this;
+        steps.add(path.steps);
         cc.updateFocus(expr);
       }
     } finally {

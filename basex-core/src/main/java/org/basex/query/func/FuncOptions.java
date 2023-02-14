@@ -36,7 +36,7 @@ public final class FuncOptions {
   /** Input info. */
   private final InputInfo info;
 
-  /** Raise error if option is unknown. */
+  /** Raise error if a supplied option is unknown. */
   private boolean enforceKnown;
 
   /**
@@ -63,7 +63,7 @@ public final class FuncOptions {
    * @param item item to be converted (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
-   * @param enforce raise error if option is unknown
+   * @param enforce raise error if a supplied option is unknown
    * @return specified options
    * @throws QueryException query exception
    */

@@ -65,8 +65,8 @@ public final class Atm extends Item {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type.isUntyped() ? coll == null ? Token.eq(value, item.string(ii)) :
-      coll.compare(value, item.string(ii)) == 0 : item.eq(this, coll, sc, ii);
+    return item.type.isUntyped() ? Token.eq(value, item.string(ii), coll) :
+      item.eq(this, coll, sc, ii);
   }
 
   @Override
@@ -76,8 +76,8 @@ public final class Atm extends Item {
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    return item.type.isUntyped() ? coll == null ? Token.diff(value, item.string(ii)) :
-      coll.compare(value, item.string(ii)) : -item.diff(this, coll, ii);
+    return item.type.isUntyped() ? Token.diff(value, item.string(ii), coll) :
+      -item.diff(this, coll, ii);
   }
 
   @Override

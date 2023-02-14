@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.io.out.*;
+import org.basex.query.util.collation.*;
 import org.basex.util.list.*;
 
 /**
@@ -664,6 +665,17 @@ public final class Token {
    * Compares two tokens for equality.
    * @param token1 first token (can be {@code null})
    * @param token2 token to be compared (can be {@code null})
+   * @param coll collation (can be {@code null})
+   * @return true if the tokens are equal
+   */
+  public static boolean eq(final byte[] token1, final byte[] token2, final Collation coll) {
+    return coll != null ? coll.compare(token1, token2) == 0 : eq(token1, token2);
+  }
+
+  /**
+   * Compares two tokens for equality.
+   * @param token1 first token (can be {@code null})
+   * @param token2 token to be compared (can be {@code null})
    * @return true if the tokens are equal
    */
   public static boolean eq(final byte[] token1, final byte[] token2) {
@@ -691,14 +703,24 @@ public final class Token {
    *         positive if first token is bigger
    */
   public static int diff(final byte[] token, final byte[] compare) {
-    final int tl = token.length;
-    final int cl = compare.length;
-    final int l = Math.min(tl, cl);
+    final int tl = token.length, cl = compare.length, l = Math.min(tl, cl);
     for(int i = 0; i < l; ++i) {
       final int c = (token[i] & 0xFF) - (compare[i] & 0xFF);
       if(c != 0) return c;
     }
     return tl - cl;
+  }
+
+  /**
+   * Compares two tokens lexicographically.
+   * @param token first token
+   * @param compare token to be compared
+   * @param coll collation (can be {@code null})
+   * @return 0 if tokens are equal, negative if first token is smaller,
+   *         positive if first token is bigger
+   */
+  public static int diff(final byte[] token, final byte[] compare, final Collation coll) {
+    return coll != null ? coll.compare(token, compare) : diff(token, compare);
   }
 
   /**

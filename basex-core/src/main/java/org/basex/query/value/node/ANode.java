@@ -89,8 +89,8 @@ public abstract class ANode extends Item {
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type.isUntyped() ? coll == null ? Token.eq(string(), item.string(ii)) :
-      coll.compare(string(), item.string(ii)) == 0 : item.eq(this, coll, sc, ii);
+    return item.type.isStringOrUntyped() ? Token.eq(string(), item.string(ii), coll) :
+      item.eq(this, coll, sc, ii);
   }
 
   @Override
@@ -101,8 +101,8 @@ public abstract class ANode extends Item {
   @Override
   public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item.type.isUntyped() ? coll == null ? Token.diff(string(), item.string(ii)) :
-      coll.compare(string(), item.string(ii)) : -item.diff(this, coll, ii);
+    return item.type.isStringOrUntyped() ? Token.diff(string(), item.string(ii), coll) :
+      -item.diff(this, coll, ii);
   }
 
   @Override

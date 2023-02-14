@@ -370,7 +370,7 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param value value to be assigned
-   * @param error error
+   * @param error raise error if a supplied option is unknown
    * @param ii input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
@@ -568,7 +568,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses and assigns options from the specified map.
    * @param map map
-   * @param error raise error if option is unknown
+   * @param error raise error if a supplied option is unknown
    * @param ii input info
    * @throws BaseXException database exception
    * @throws QueryException query exception
