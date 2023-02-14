@@ -86,12 +86,12 @@ final class XHTMLSerializer extends MarkupSerializer {
   }
 
   /**
-   * Checks whether the tokenset contains the specified element
-   * @param elements the tokenset of element local names
+   * Checks whether the token set contains the specified element.
+   * @param elements the token set of element local names
    * @param element the element QName
-   * @return true, if the element is contained in the tokenset.
+   * @return {@code true} if the element is contained in the token set
    */
-  private boolean contains(TokenSet elements, final QNm element) {
+  private boolean contains(final TokenSet elements, final QNm element) {
     final byte[] uri = element.uri(), local = element.local();
     return eq(uri, XHTML_URI) && elements.contains(local) ||
         html5 && eq(uri, EMPTY) && elements.contains(lc(local));
