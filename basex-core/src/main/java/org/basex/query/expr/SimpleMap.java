@@ -419,6 +419,8 @@ public abstract class SimpleMap extends Arr {
       root = path.root;
       steps.add(path.steps);
     }
+    cc.pushFocus(root);
+    try {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
       final Expr expr = exprs[e].simplifyFor(mode, cc);
@@ -426,6 +428,10 @@ public abstract class SimpleMap extends Arr {
       final AxisPath path = (AxisPath) expr;
       if(path.root != null) return this;
       steps.add(path.steps);
+        cc.updateFocus(expr);
+      }
+    } finally {
+      cc.removeFocus();
     }
     return cc.replaceWith(this, Path.get(cc, info, root, steps.finish()));
   }

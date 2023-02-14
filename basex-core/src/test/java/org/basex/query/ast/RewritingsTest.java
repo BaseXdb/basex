@@ -2987,6 +2987,10 @@ public final class RewritingsTest extends QueryPlanTest {
         "a", empty(List.class), empty(IterMap.class), exists(IterPath.class));
     check("name(<a><b><c/></b></a>[b ! (c, d, c)])",
         "a", empty(List.class), empty(IterMap.class), exists(IterPath.class));
+
+    check("<_>A</_>[text() ! string(.)]", "<_>A</_>", exists(STRING));
+    check("<_>A</_>[text() ! string()]", "<_>A</_>", exists(STRING));
+    check("<_>A</_>[string()]", "<_>A</_>", exists(SingleIterPath.class));
   }
 
   /** Simplified if expression yields errors. */
