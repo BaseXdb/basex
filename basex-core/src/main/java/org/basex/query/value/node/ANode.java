@@ -1,5 +1,8 @@
 package org.basex.query.value.node;
 
+import static org.basex.query.util.DeepEqualOptions.*;
+import static org.basex.query.value.type.NodeType.*;
+
 import java.io.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
@@ -13,6 +16,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -30,8 +34,7 @@ import org.basex.util.*;
 public abstract class ANode extends Item {
   /** Node Types. */
   private static final NodeType[] TYPES = {
-    NodeType.DOCUMENT_NODE, NodeType.ELEMENT, NodeType.TEXT, NodeType.ATTRIBUTE,
-    NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION
+    DOCUMENT_NODE, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PROCESSING_INSTRUCTION
   };
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
@@ -89,20 +92,127 @@ public abstract class ANode extends Item {
   @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type.isStringOrUntyped() ? Token.eq(string(), item.string(ii), coll) :
+    return comparable(item) ? Token.eq(string(), item.string(ii), coll) :
       item.eq(this, coll, sc, ii);
   }
 
   @Override
   public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
-    return item.type.isStringOrUntyped() && eq(item, null, null, ii);
+    return comparable(item) && eq(item, null, null, ii);
   }
 
   @Override
   public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item.type.isStringOrUntyped() ? Token.diff(string(), item.string(ii), coll) :
+    return comparable(item) ? Token.diff(string(), item.string(ii), coll) :
       -item.diff(this, coll, ii);
+  }
+
+  @Override
+  public final boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+    final Type type1 = type, type2 = item.type;
+    if(type1 != type2) return false;
+    final ANode node1 = this, node2 = (ANode) item;
+    if(node1.is(node2)) return true;
+
+    QNm name1 = node1.qname(), name2 = node2.qname();
+    if(type1 == NAMESPACE_NODE) return name1.eq(name2) && Token.eq(node1.string(), node2.string());
+
+    // compare names
+    final DeepEqualOptions options = deep.options;
+    if(name1 != null && (!name1.eq(name2) ||
+        options.get(NAMESPACE_PREFIXES) && !Token.eq(name1.prefix(), name2.prefix())
+    )) return false;
+    // compare values
+    if((type1 == TEXT || type1 == COMMENT || type1 == PROCESSING_INSTRUCTION ||
+        type1 == ATTRIBUTE) && !Token.eq(node1.string(), node2.string(), deep)
+    ) return false;
+    // compare base URIs
+    if(options.get(BASE_URI)) {
+      if(deep.nested) return Token.eq(node1.baseURI(), node2.baseURI());
+      final Uri uri1 = FnBaseUri.uri(node1, Uri.EMPTY, deep.info);
+      final Uri uri2 = FnBaseUri.uri(node2, Uri.EMPTY, deep.info);
+      if(uri1 == null ? uri2 != null : uri2 == null || !uri1.eq(uri2)) return false;
+    }
+    if(type1 == ELEMENT) {
+      // compare attributes
+      final BasicNodeIter iter1 = node1.attributeIter();
+      BasicNodeIter iter2 = node2.attributeIter();
+      if(iter1.size() != iter2.size()) return false;
+
+      for(ANode attr1; (attr1 = iter1.next()) != null;) {
+        name1 = attr1.qname();
+        for(ANode attr2;;) {
+          attr2 = iter2.next();
+          if(attr2 == null) return false;
+          name2 = attr2.qname();
+          if(name1.eq(name2)) {
+            if((!options.get(NAMESPACE_PREFIXES) || Token.eq(name1.prefix(), name2.prefix())) &&
+                Token.eq(attr1.string(), attr2.string(), deep)) break;
+            return false;
+          }
+        }
+        iter2 = node2.attributeIter();
+      }
+
+      // compare namespaces
+      if(options.get(IN_SCOPE_NAMESPACES)) {
+        final Atts atts1 = deep.nested ? node1.namespaces() : node1.nsScope(null);
+        final Atts atts2 = deep.nested ? node2.namespaces() : node2.nsScope(null);
+        if(!atts1.equals(atts2)) return false;
+      }
+    } else if(type1 != DOCUMENT_NODE) {
+      return true;
+    }
+
+    final Function<ANode, ANodeList> children = node -> {
+      final ANodeList nl = new ANodeList();
+      for(final ANode child : node.childIter()) {
+        if(deep.qc != null) deep.qc.checkStop();
+        final Type tp = child.type;
+        if(tp == COMMENT && !options.get(COMMENTS) ||
+           tp == PROCESSING_INSTRUCTION && !options.get(PROCESSING_INSTRUCTIONS)) continue;
+        if(tp == TEXT) {
+          final byte[] string = child.string();
+          if(Token.ws(string) && !options.get(PRESERVE_SPACE)) continue;
+          if(!nl.isEmpty() && nl.peek().type == NodeType.TEXT && !options.get(TEXT_BOUNDARIES)) {
+            nl.add(new FTxt(Token.concat(nl.pop().string(), string)));
+            continue;
+          }
+        }
+        nl.add(child.finish());
+      }
+      return nl;
+    };
+
+    final ANodeList list1 = children.apply(node1), list2 = children.apply(node2);
+    final int size1 = list1.size();
+    if(size1 != list2.size()) return false;
+    deep.nested = true;
+
+    // respect order
+    if(name1 == null || !options.unordered(name1)) {
+      for(final NodeIter iter1 = list1.iter(), iter2 = list2.iter();;) {
+        if(deep.qc != null) deep.qc.checkStop();
+        final ANode child1 = iter1.next();
+        if(child1 == null) return true;
+        if(!child1.equal(iter2.next(), deep)) return false;
+      }
+    }
+
+    // ignore order
+    for(int l1 = size1 - 1; l1 >= 0; l1--) {
+      boolean found = false;
+      for(int l2 = list2.size() - 1; !found && l2 >= 0; l2--) {
+        if(deep.qc != null) deep.qc.checkStop();
+        if(list1.get(l1).equal(list2.get(l2), deep)) {
+          list2.remove(l2);
+          found = true;
+        }
+      }
+      if(!found) return false;
+    }
+    return true;
   }
 
   @Override
@@ -112,7 +222,7 @@ public abstract class ANode extends Item {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) {
-    return type == NodeType.PROCESSING_INSTRUCTION || type == NodeType.COMMENT ?
+    return type == PROCESSING_INSTRUCTION || type == COMMENT ?
       Str.get(string()) : Atm.get(string());
   }
 
@@ -208,7 +318,7 @@ public abstract class ANode extends Item {
         }
       }
       node = node.parent();
-    } while(node != null && node.type == NodeType.ELEMENT);
+    } while(node != null && node.type == ELEMENT);
     if(sc != null) sc.ns.inScope(ns);
     return ns;
   }
@@ -420,7 +530,7 @@ public abstract class ANode extends Item {
           ANode node = ANode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
-            if(node.type != NodeType.ATTRIBUTE) {
+            if(node.type != ATTRIBUTE) {
               for(final ANode nd : ir) {
                 if(nd.is(node)) break;
               }
@@ -494,7 +604,7 @@ public abstract class ANode extends Item {
           final ANodeList list = new ANodeList();
           ANode node = ANode.this, root = node.parent();
           while(root != null) {
-            if(node.type != NodeType.ATTRIBUTE) {
+            if(node.type != ATTRIBUTE) {
               final ANodeList tmp = new ANodeList();
               for(final ANode c : root.childIter()) {
                 if(c.is(node)) break;
@@ -526,7 +636,7 @@ public abstract class ANode extends Item {
       @Override
       public ANode next() {
         if(iter == null) {
-          if(type == NodeType.ATTRIBUTE) return null;
+          if(type == ATTRIBUTE) return null;
           final ANode root = parent();
           if(root == null) return null;
 

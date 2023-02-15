@@ -147,7 +147,7 @@ public abstract class JsonSerializer extends StandardSerializer {
    */
   protected final void string(final byte[] string) throws IOException {
     out.print('"');
-    final byte[] str = norm(string);
+    final byte[] str = normalize(string, form);
     final int sl = str.length;
     for(int s = 0; s < sl; s += cl(str, s)) printChar(cp(str, s));
     out.print('"');

@@ -10,6 +10,7 @@ import java.util.regex.*;
 import javax.xml.datatype.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -373,6 +374,13 @@ public abstract class ADate extends ADateDur {
       final InputInfo ii) throws QueryException {
     return df(item, ii) == 0;
   }
+
+  @Override
+  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+    return super.equal(item, deep) && (
+      !deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
+  }
+
 
   /**
    * Returns the difference between the current and the specified item.

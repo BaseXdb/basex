@@ -31,7 +31,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  protected TokenSet(final long capacity) {
+  public TokenSet(final long capacity) {
     super(capacity);
     keys = new byte[capacity()][];
   }

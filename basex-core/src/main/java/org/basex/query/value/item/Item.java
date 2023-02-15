@@ -13,6 +13,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -224,6 +225,17 @@ public abstract class Item extends Value {
   @SuppressWarnings("unused")
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     throw diffError(this, item, ii);
+  }
+
+  /**
+   * Performs a deep comparison of the current and the specified items.
+   * @param item item to be compared
+   * @param deep comparator
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+    return this == item || equiv(item, deep.coll, deep.info);
   }
 
   /**

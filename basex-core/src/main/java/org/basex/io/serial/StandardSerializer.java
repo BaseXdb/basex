@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.text.*;
 import java.text.Normalizer.*;
 import java.util.*;
 
@@ -28,9 +27,9 @@ import org.basex.util.hash.*;
  */
 public abstract class StandardSerializer extends OutputSerializer {
   /** Normalization form. */
-  private final Form form;
+  protected final Form form;
   /** Character map. */
-  private final IntObjMap<byte[]> map;
+  protected final IntObjMap<byte[]> map;
 
   /** Include separator. */
   protected boolean sep;
@@ -112,7 +111,7 @@ public abstract class StandardSerializer extends OutputSerializer {
           for(int cp; (cp = ti.read()) != -1;) printChar(cp);
         }
       } else {
-        printChars(norm(item.string(null)));
+        printChars(normalize(item.string(null), form));
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
@@ -133,15 +132,6 @@ public abstract class StandardSerializer extends OutputSerializer {
    */
   protected void print(final int cp) throws IOException {
     out.print(cp);
-  }
-
-  /**
-   * Normalizes the specified text.
-   * @param text text to be normalized
-   * @return normalized text
-   */
-  protected final byte[] norm(final byte[] text) {
-    return form == null || ascii(text) ? text : token(Normalizer.normalize(string(text), form));
   }
 
   /**

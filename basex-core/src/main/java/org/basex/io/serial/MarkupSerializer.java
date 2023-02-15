@@ -132,7 +132,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(!standalone) out.print(' ');
     out.print(name);
     out.print(ATT1);
-    final byte[] val = norm(value);
+    final byte[] val = normalize(value, form);
     final int vl = val.length;
     for(int k = 0; k < vl; k += cl(val, k)) {
       final int cp = cp(val, k);
@@ -150,7 +150,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
     if(opened.isEmpty()) checkRoot(null);
-    final byte[] val = norm(value);
+    final byte[] val = normalize(value, form);
     if(ftp == null) {
       final QNmSet qnames = cdata();
       final int vl = val.length;

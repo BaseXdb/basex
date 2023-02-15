@@ -3,7 +3,6 @@ package org.basex.query.value.item;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.normalize;
 
 import java.io.*;
 import java.util.regex.*;
@@ -239,6 +238,13 @@ public final class QNm extends Item {
     return eq(nm);
   }
 
+  @Override
+  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+    return super.equal(item, deep) && (
+      !deep.options.get(DeepEqualOptions.NAMESPACE_PREFIXES) ||
+      Token.eq(prefix(), ((QNm) item).prefix()));
+  }
+
   /**
    * Compares the specified name.
    * @param qnm name to be compared
@@ -379,6 +385,21 @@ public final class QNm extends Item {
    */
   public static String eqName(final String uri, final String local) {
     return Strings.concat("Q{", uri, "}", local);
+  }
+
+  /**
+   * Parses a QName.
+   * @param string string
+   * @return QNm instance, or {@code null} if it could not be parsed
+   */
+  public static QNm parse(final byte[] string) {
+    if(XMLToken.isNCName(string)) return new QNm(string, Token.EMPTY);
+    final Matcher m = EQNAME.matcher(Token.string(string));
+    if(m.matches()) {
+      final byte[] uri = token(m.group(1)), ncname = Token.token(m.group(2));
+      if(XMLToken.isNCName(ncname)) return new QNm(ncname, uri);
+    }
+    return null;
   }
 
   /**

@@ -130,7 +130,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
         out.print('"');
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
         if(name == null) throw error("Name of element <%> is invalid", key);
-        out.print(norm(name));
+        out.print(normalize(name, form));
         out.print("\":");
       } else if(eq(ptype, ARRAY)) {
         if(atts) {
@@ -168,7 +168,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
     final byte[] type = types.get(level - 1);
     if(eq(type, STRING)) {
       out.print('"');
-      for(final byte ch : norm(value)) printChar(ch);
+      for(final byte ch : normalize(value, form)) printChar(ch);
       out.print('"');
     } else if(eq(type, BOOLEAN)) {
       if(!eq(value, TRUE, FALSE))

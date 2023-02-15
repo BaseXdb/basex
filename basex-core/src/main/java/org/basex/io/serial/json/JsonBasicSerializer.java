@@ -84,7 +84,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
         if(key == null) throw error("Element '%' has no key.", type);
         key = escape(key, escapedKey, true);
         out.print('"');
-        out.print(norm(key));
+        out.print(normalize(key, form));
         out.print("\":");
       }
 
@@ -99,11 +99,11 @@ public final class JsonBasicSerializer extends JsonSerializer {
         if(value == null) throw error("Element '%' has no value.", type);
         final Boolean b = Bln.parse(value);
         if(b == null) throw error("Element '%' has invalid value: '%'.", type, value);
-        out.print(norm(token(b)));
+        out.print(normalize(token(b), form));
       } else if(eq(type, STRING)) {
         final byte[] value = value(iter, type);
         out.print('"');
-        if(value != null) out.print(norm(escape(value, escaped, false)));
+        if(value != null) out.print(normalize(escape(value, escaped, false), form));
         out.print('"');
       } else if(eq(type, NUMBER)) {
         final byte[] value = value(iter, type);

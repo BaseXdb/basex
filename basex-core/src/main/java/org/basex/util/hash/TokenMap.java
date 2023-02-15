@@ -19,6 +19,15 @@ public class TokenMap extends TokenSet {
    * Default constructor.
    */
   public TokenMap() {
+    this(Array.INITIAL_CAPACITY);
+  }
+
+  /**
+   * Constructor with initial capacity.
+   * @param capacity array capacity (will be resized to a power of two)
+   */
+  public TokenMap(final long capacity) {
+    super(capacity);
     values = new byte[capacity()][];
   }
 

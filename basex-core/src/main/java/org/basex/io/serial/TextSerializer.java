@@ -5,6 +5,7 @@ import java.io.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This class serializes items as text.
@@ -34,7 +35,7 @@ final class TextSerializer extends StandardSerializer {
 
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
-    out.print(norm(value));
+    out.print(Token.normalize(value, form));
     sep = false;
   }
 }

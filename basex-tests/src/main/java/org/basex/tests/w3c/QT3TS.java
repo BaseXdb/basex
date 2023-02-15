@@ -729,11 +729,9 @@ public final class QT3TS extends Main {
 
       // include check for comments, processing instructions and namespaces
       final StringList options = new StringList();
-      if(!ignorePrefixes) {
-        options.add("'" + DeepEqualOptions.NAMESPACES_PREFIXES.name() + "': true()");
-      }
-      options.add("'" + DeepEqualOptions.COMMENTS.name() + "': true()");
-      options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "': true()");
+      options.add("'" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "':" + !ignorePrefixes + "()");
+      options.add("'" + DeepEqualOptions.COMMENTS.name() + "':true()");
+      options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "':true()");
       final String query = Function.DEEP_EQUAL.args(" <X>" + exp + "</X>",
           " <X>" + res + "</X>", " ()", " map { " + String.join(", ", options) + " }");
       return asBoolean(query, expected) ? null : exp;

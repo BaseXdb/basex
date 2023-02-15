@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import static org.basex.util.Token.*;
 import org.basex.util.list.*;
 
 /**
@@ -70,10 +71,10 @@ public final class Atts extends ElementList {
   public Atts add(final byte[] name, final byte[] value, final boolean stripNS) {
     if(!stripNS) return add(name, value);
 
-    final byte[] local = Token.local(name);
+    final byte[] local = local(name);
     byte[] an = local;
     int c = 0;
-    while(contains(an)) an = Token.concat(local, '_', Token.token(++c));
+    while(contains(an)) an = concat(local, '_', token(++c));
     return add(an, value);
   }
 
@@ -108,7 +109,7 @@ public final class Atts extends ElementList {
    */
   public int get(final byte[] name) {
     for(int i = 0; i < size; ++i) {
-      if(Token.eq(names[i], name)) return i;
+      if(eq(names[i], name)) return i;
     }
     return -1;
   }
@@ -143,12 +144,20 @@ public final class Atts extends ElementList {
 
   @Override
   public boolean equals(final Object obj) {
+    // compare attributes, ignore order
     if(obj == this) return true;
     if(!(obj instanceof Atts)) return false;
-    final Atts a = (Atts) obj;
-    if(size != a.size) return false;
-    for(int i = 0; i < size; ++i) {
-      if(!Token.eq(names[i], a.names[i]) || !Token.eq(values[i], a.values[i])) return false;
+    final Atts atts = (Atts) obj;
+    if(size != atts.size) return false;
+
+    for(int n1 = 0; n1 < size; n1++) {
+      for(int n2 = 0;; n2++) {
+        if(n2 == size) return false;
+        if(eq(names[n1], atts.names[n2])) {
+          if(eq(values[n1], atts.values[n2])) break;
+          return false;
+        }
+      }
     }
     return true;
   }

@@ -62,7 +62,7 @@ public final class JsonMLSerializer extends JsonSerializer {
     out.print('"');
     for(final byte ch : Token.local(name)) printChar(ch);
     out.print("\":\"");
-    for(final byte ch : norm(value)) printChar(ch);
+    for(final byte ch : Token.normalize(value, form)) printChar(ch);
     out.print("\"");
   }
 

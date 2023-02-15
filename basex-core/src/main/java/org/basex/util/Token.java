@@ -1,10 +1,13 @@
 package org.basex.util;
 
+import static org.basex.query.util.DeepEqualOptions.*;
+
 import java.text.*;
 import java.util.*;
 import java.util.function.*;
 
 import org.basex.io.out.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.util.list.*;
 
@@ -663,13 +666,30 @@ public final class Token {
 
   /**
    * Compares two tokens for equality.
-   * @param token1 first token (can be {@code null})
-   * @param token2 token to be compared (can be {@code null})
+   * @param token1 first token
+   * @param token2 token to be compared
    * @param coll collation (can be {@code null})
    * @return true if the tokens are equal
    */
   public static boolean eq(final byte[] token1, final byte[] token2, final Collation coll) {
     return coll != null ? coll.compare(token1, token2) == 0 : eq(token1, token2);
+  }
+
+  /**
+   * Compares two tokens for equality.
+   * @param token1 first token
+   * @param token2 token to be compared
+   * @param deep equality
+   * @return true if the tokens are equal
+   */
+  public static boolean eq(final byte[] token1, final byte[] token2, final DeepEqual deep) {
+    final Normalizer.Form form = deep.options.get(NORMALIZATION_FORM);
+    byte[] t1 = Token.normalize(token1, form), t2 = Token.normalize(token2, form);
+    if(deep.options.get(NORMALIZE_SPACE)) {
+      t1 = Token.normalize(t1);
+      t2 = Token.normalize(t2);
+    }
+    return eq(t1, t2, deep.coll);
   }
 
   /**
@@ -1403,5 +1423,15 @@ public final class Token {
       tb.addByte(b);
     }
     return tb.finish();
+  }
+
+  /**
+   * Normalizes Unicode characters in the specified token.
+   * @param token token
+   * @param form normalization form (can be {@code null})
+   * @return normalized token
+   */
+  public static byte[] normalize(final byte[] token, final Normalizer.Form form) {
+    return form == null || ascii(token) ? token : token(Normalizer.normalize(string(token), form));
   }
 }

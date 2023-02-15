@@ -40,7 +40,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
    * @return the iterator
    */
   public BasicNodeIter iter() {
-    return new BasicNodeIter() {
+    return size == 0 ? BasicNodeIter.EMPTY : new BasicNodeIter() {
       int pos;
 
       @Override
