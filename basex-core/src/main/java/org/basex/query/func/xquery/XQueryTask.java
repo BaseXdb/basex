@@ -1,79 +1,67 @@
 package org.basex.query.func.xquery;
 
-import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Forks a set of tasks, performing their computation in parallel followed by rejoining the results.
  *
+ * @author BaseX Team 2005-23, BSD License
  * @author James Wright
  */
-final class XQueryTask extends RecursiveTask<ValueBuilder> {
-  /** Functions to evaluate in parallel. */
-  private final ArrayList<FItem> funcs;
-  /** Query context. */
-  private final QueryContext qc;
-  /** Input info. */
-  private final InputInfo ii;
-  /** First function to evaluate. */
+final class XQueryTask extends RecursiveTask<Value> {
+  /** Task context. */
+  private final TaskContext tc;
+  /** First function to evaluate (inclusive). */
   private final int start;
-  /** Last function to evaluate. */
+  /** Last function to evaluate (exclusive). */
   private final int end;
 
   /**
    * Constructor.
-   * @param funcs functions to evaluate
-   * @param qc query context
-   * @param ii input info
+   * @param tc task context
    */
-  XQueryTask(final ArrayList<FItem> funcs, final QueryContext qc, final InputInfo ii) {
-    this(funcs, qc, ii, 0, funcs.size());
+  XQueryTask(final TaskContext tc) {
+    this(tc, 0, tc.funcs.size());
   }
 
   /**
    * Private constructor.
-   * @param funcs functions to evaluate
-   * @param qc query context
-   * @param ii input info
+   * @param tc task context
    * @param start first function to evaluate
    * @param end last function to evaluate
    */
-  private XQueryTask(final ArrayList<FItem> funcs, final QueryContext qc, final InputInfo ii,
-      final int start, final int end) {
-    this.funcs = funcs;
-    this.qc = new QueryContext(qc);
-    this.ii = ii;
+  private XQueryTask(final TaskContext tc, final int start, final int end) {
+    this.tc = tc;
     this.start = start;
     this.end = end;
   }
 
   @Override
-  protected ValueBuilder compute() {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    final int s = start, e = end, l = e - s;
-    if(l == 1) {
+  protected Value compute() {
+    final int size = end - start;
+    if(size == 1) {
       // perform the work
-      try {
-        vb.add(funcs.get(s).invoke(qc, ii));
+      try(QueryContext qc = new QueryContext(tc.qc)) {
+        return tc.funcs.get(start).invoke(qc, tc.info);
       } catch(final QueryException ex) {
-        completeExceptionally(ex);
-        cancel(true);
-      } finally {
-        qc.close();
+        if(tc.errors) {
+          completeExceptionally(ex);
+          cancel(true);
+        }
       }
-    } else if(l > 1) {
+    } else {
       // split the work and join the results in the correct order
-      final int m = s + l / 2;
-      final XQueryTask task2 = new XQueryTask(funcs, qc, ii, m, e);
+      final int middle = start + size / 2;
+      final XQueryTask task2 = new XQueryTask(tc, middle, end);
       task2.fork();
-      final XQueryTask task1  = new XQueryTask(funcs, qc, ii, s, m);
-      vb.add(task1.invoke().value()).add(task2.join().value());
+      final XQueryTask task1 = new XQueryTask(tc, start, middle);
+      final Value value1 = task1.invoke(), value2 = task2.join();
+      if(tc.results) return ValueBuilder.concat(value1, value2, tc.qc);
     }
-    return vb;
+    return Empty.VALUE;
   }
 }

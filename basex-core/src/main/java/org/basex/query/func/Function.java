@@ -1907,8 +1907,8 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), EMPTY_SEQUENCE_Z,
       flag(UPD), XQUERY_URI),
   /** XQuery function. */
-  _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions)",
-      params(FUNCTION_ZM), ITEM_ZM, flag(HOF), XQUERY_URI),
+  _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions[,options])",
+      params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(NDT, HOF), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse::new, "parse(input[,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO), NODE_O, flag(NDT), XQUERY_URI, Perm.CREATE),

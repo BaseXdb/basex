@@ -127,11 +127,23 @@ public final class XQueryModuleTest extends QueryPlanTest {
     query(func.args(" (false#0, true#0)"), "false\ntrue");
     query(func.args(" function() { 123 }"), 123);
     query("count(" + func.args(" (1 to 100) ! false#0") + ')', 100);
+    query(func.args(_PROF_VOID.args(1)), "");
+    query(func.args(" (true#0," + _PROF_VOID.args(1) + ')'), true);
+    query(func.args(" true#0[" + wrap(1) + " = '1']"), true);
+    query(func.args(" true#0[" + wrap(1) + " = '']"), "");
 
     // run slow and fast query and check that results are returned in the correct order
     query(func.args(" (function() { (1 to 10000000)[.=1] }, true#0)"), "1\ntrue");
     query(func.args(" (true#0, function() { (1 to 10000000)[.=1] })"), "true\n1");
     query(func.args(" ()"), "");
+
+    // options
+    query(func.args(" (1 to 2) ! function() { 1 }", " map { 'results': false() }"), "");
+    query(func.args(" (error#0, true#0)", " map { 'errors': false() }"), true);
+    query(func.args(" (true#0, false#0)", " map { 'parallel': -1 }"), "true\nfalse");
+    query(func.args(" (true#0, false#0)", " map { 'parallel': 100 }"), "true\nfalse");
+    query(func.args(" (true#0, false#0)", " map { 'parallel': 1000000000 }"), "true\nfalse");
+    query(func.args(" (true#0, false#0)", " map { 'parallel': <_>1</_> }"), "true\nfalse");
 
     // optimizations
     check(func.args(" ()"), "", empty());
@@ -149,6 +161,7 @@ public final class XQueryModuleTest extends QueryPlanTest {
     error(func.args(" (count#1, count#1)"), ZEROFUNCS_X_X);
     error(func.args(" (123, 123)"), ZEROFUNCS_X_X);
     error(func.args(" error#0"), FUNERR1);
+    error(func.args(" replicate(error#0, 100)"), FUNERR1);
   }
 
   /** Test method. */

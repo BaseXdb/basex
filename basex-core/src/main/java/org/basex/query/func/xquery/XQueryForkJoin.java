@@ -1,5 +1,6 @@
 package org.basex.query.func.xquery;
 
+import static org.basex.query.func.xquery.TaskOptions.*;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
@@ -24,23 +25,25 @@ import org.basex.util.*;
 public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value funcs = exprs[0].value(qc);
-    final long size = funcs.size();
+    final Value functions = exprs[0].value(qc);
+    final TaskOptions options = toOptions(1, new TaskOptions(), true, qc);
+
+    final long size = functions.size();
     if(size == 0) return Empty.VALUE;
 
     final ArrayList<FItem> list = new ArrayList<>((int) size);
-    for(final Item func : funcs) {
-      if(!(func instanceof FItem) || ((FItem) func).arity() != 0)
-        throw ZEROFUNCS_X_X.get(info, func.type, func);
-      list.add(checkUp((FItem) func, false, sc));
+    for(final Item function : functions) {
+      if(!(function instanceof FItem) || ((FItem) function).arity() != 0)
+        throw ZEROFUNCS_X_X.get(info, function.type, function);
+      list.add(checkUp((FItem) function, false, sc));
     }
     // single function: invoke directly
     if(size == 1) return list.get(0).invoke(qc, info);
 
-    final ForkJoinPool pool = new ForkJoinPool();
-    final XQueryTask task = new XQueryTask(list, qc, info);
+    final ForkJoinPool pool = new ForkJoinPool(options.parallel());
+    final TaskContext tc = new TaskContext(list, options, qc, info);
     try {
-      return pool.invoke(task).value(this);
+      return pool.invoke(new XQueryTask(tc));
     } catch(final Exception ex) {
       // pass on query and job exceptions
       final Throwable e = Util.rootException(ex);
@@ -48,21 +51,28 @@ public final class XQueryForkJoin extends StandardFunc {
       if(e instanceof JobException) throw (JobException) e;
       throw XQUERY_UNEXPECTED_X.get(info, e);
     } finally {
-      // required?
       pool.shutdown();
     }
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final SeqType st = exprs[0].seqType();
-    if(st.zero()) return exprs[0];
-    if(st.one()) return new DynFuncCall(info, sc, exprs[0]).optimize(cc);
+    final Expr functions = exprs[0], options = exprs.length > 1 ? exprs[1] : null;
+    final SeqType st = functions.seqType();
+    if(st.zero()) return functions;
+    if(st.one()) return new DynFuncCall(info, sc, functions).optimize(cc);
 
-    final Type type = st.type;
-    if(type instanceof FuncType) {
-      final SeqType dt = ((FuncType) type).declType;
-      exprType.assign(dt.with(dt.occ.multiply(st.occ)));
+    final Boolean results = options == null ? Boolean.TRUE :
+      options instanceof Value ? toOptions(1, new TaskOptions(), true, cc.qc).get(RESULTS) :
+      null;
+    if(results == Boolean.TRUE) {
+      final Type type = st.type;
+      if(type instanceof FuncType) {
+        final SeqType dt = ((FuncType) type).declType;
+        exprType.assign(dt.with(dt.occ.multiply(st.occ)));
+      }
+    } else if(results == Boolean.FALSE) {
+      exprType.assign(SeqType.EMPTY_SEQUENCE_Z);
     }
     return this;
   }
