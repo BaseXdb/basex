@@ -1346,7 +1346,7 @@ public class QueryParser extends InputParser {
     ExprList exprs;
     do {
       exprs = new ExprList(null);
-      while(wsConsumeWs(CASE)) add(exprs, single());
+      while(wsConsumeWs(CASE)) add(exprs, check(expr(), NOSWITCH));
       if(exprs.size() == 1) {
         // add default case
         if(groups.isEmpty()) throw error(WRONGCHAR_X_X, CASE, found());

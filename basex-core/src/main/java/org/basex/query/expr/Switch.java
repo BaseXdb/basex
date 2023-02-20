@@ -13,7 +13,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -95,30 +94,27 @@ public final class Switch extends ParseExpr {
     final ArrayList<SwitchGroup> tmpGroups = new ArrayList<>();
     for(final SwitchGroup group : groups) {
       final int el = group.exprs.length;
-      final Expr rtrn = group.rtrn();
-      final ExprList list = new ExprList(el).add(rtrn);
+      final ExprList list = new ExprList(el).add(group.rtrn());
       for(int e = 1; e < el; e++) {
         final Expr expr = group.exprs[e];
-        if(cases.contains(expr)) {
-          // case has already been checked before
-          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-          continue;
-        }
-        if(cnd != null) {
-          // compare condition and value; return result or remove case
+        // check if same case expression exists more than once
+        boolean remove = cases.contains(expr);
+        if(!remove && cnd != null) {
+          // pre-evaluate values; skip remaining checks if match is found
           if(expr instanceof Value) {
-            final Item cs = expr.atomItem(cc.qc, info);
-            if(cnd == cs || cs != Empty.VALUE && cnd != Empty.VALUE && cnd.equiv(cs, null, info)) {
-              return rtrn;
-            }
-            cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
-            continue;
+            if(group.match(cnd, e, cc.qc)) return group.rtrn();
+            remove = true;
+          } else {
+            // value unknown at compile: perform no further compile-time checks
+            cnd = null;
           }
-          // value unknown at compile: perform no further compile-time checks
-          cnd = null;
         }
-        cases.add(expr);
-        list.add(expr);
+        if(remove) {
+          cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
+        } else {
+          cases.add(expr);
+          list.add(expr);
+        }
       }
       // build list of branches (add those with case left, or the default branch)
       if(list.size() > 1 || el == 1) {
@@ -181,10 +177,10 @@ public final class Switch extends ParseExpr {
 
     final Expr[] exprs = groups[0].exprs;
     for(int e = exprs.length - 1; e >= 1; e--) {
-      final SeqType mt = exprs[e].seqType();
-      if(!mt.one() || !(
-        string && mt.type.isStringOrUntyped() ||
-        dec && mt.type.instanceOf(AtomType.DECIMAL)
+      final SeqType est = exprs[e].seqType();
+      if(!est.oneOrMore() || !(
+        string && est.type.isStringOrUntyped() ||
+        dec && est.type.instanceOf(AtomType.DECIMAL)
       )) return this;
     }
 

@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -103,19 +104,34 @@ public final class SwitchGroup extends Arr {
 
   /**
    * Checks if the switch group matches the supplied item.
-   * @param item item to match
+   * @param cond condition
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  boolean match(final Item item, final QueryContext qc) throws QueryException {
+  boolean match(final Item cond, final QueryContext qc) throws QueryException {
     final int el = exprs.length;
     for(int e = 1; e < el; e++) {
-      final Item cs = exprs[e].atomItem(qc, info);
-      if(item == cs || item != Empty.VALUE && cs != Empty.VALUE && item.equiv(cs, null, info))
-        return true;
+      if(match(cond, e, qc)) return true;
     }
     return el == 1;
+  }
+
+  /**
+   * Checks if the switch group matches the supplied item.
+   * @param cond condition
+   * @param e index of expression
+   * @param qc query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  boolean match(final Item cond, final int e, final QueryContext qc) throws QueryException {
+    final Value value = exprs[e].atomValue(qc, info);
+    if(cond == Empty.VALUE) return cond == value;
+    for(final Item item : value) {
+      if(cond.equiv(item, null, info)) return true;
+    }
+    return false;
   }
 
   /**

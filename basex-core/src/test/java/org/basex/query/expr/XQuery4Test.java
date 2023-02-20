@@ -255,4 +255,18 @@ public final class XQuery4Test extends QueryPlanTest {
     error("```", INCOMPLETE);
     error("`}`", WRONGCHAR_X_X);
   }
+
+  /** Switch expression. */
+  @Test public void switchh() {
+    query("switch(<?_ _?>) case '_' return 1 default return 2", 1);
+    query("switch(2) case 1 to 10 return 1 default return 2", 1);
+    query("switch(()) case 1 return 1 case () return 0 default return 2", 0);
+    query("switch(<?_ _?>) case '_', '?' return 1 default return 2", 1);
+    query("switch(<?_ _?>) case ('?', '!') return 1 default return 2", 2);
+
+    check("(1 to 6) ! (switch(.) case 6 to 8 return 'x' default return ())",
+        "x", exists(If.class));
+    check("(1 to 6) ! (switch(.) case 6 to 8 return 'x' case 6 to 8 return '' default return ())",
+        "x", exists(If.class));
+  }
 }
