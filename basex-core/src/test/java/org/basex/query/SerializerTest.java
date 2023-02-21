@@ -19,6 +19,10 @@ public final class SerializerTest extends SandboxTest {
   /** Test: method=xml. */
   @Test public void xml() {
     query(METHOD.arg("xml") + "<html/>", "<html/>");
+    query(METHOD.arg("xml") + INDENT_ATTRIBUTES.arg("yes") + "<x a='1' b='2' c='3'/>",
+        "<x a=\"1\"\n"
+        + "b=\"2\"\n"
+        + "c=\"3\"/>");
   }
 
   /** Test: method=xhtml. */
@@ -55,6 +59,24 @@ public final class SerializerTest extends SandboxTest {
         + "</p><a>\n"
         + "<hr/>\n"
         + "</a><br/></body>\n"
+        + "</html>");
+    query(option + MEDIA_TYPE.arg("application/xhtml+xml")
+        + INDENT.arg("yes")
+        + INDENT_ATTRIBUTES.arg("yes")
+        + "<html xmlns='http://www.w3.org/1999/xhtml' xmlns:svg='http://www.w3.org/2000/svg'>"
+        + "<head/><body><div id='a' name='b' class='c' style='width: 42px'/></body></html>",
+        "<html xmlns:svg=\"http://www.w3.org/2000/svg\"\n"
+        + "xmlns=\"http://www.w3.org/1999/xhtml\">\n"
+        + "<head>\n"
+        + "<meta http-equiv=\"Content-Type\"\n"
+        + "content=\"application/xhtml+xml; charset=UTF-8\" />\n"
+        + "</head>\n"
+        + "<body>\n"
+        + "<div id=\"a\"\n"
+        + "name=\"b\"\n"
+        + "class=\"c\"\n"
+        + "style=\"width: 42px\"></div>\n"
+        + "</body>\n"
         + "</html>");
   }
 
@@ -115,6 +137,10 @@ public final class SerializerTest extends SandboxTest {
         + "</ul>\n"
         + "</p><br></body>\n"
         + "</html>");
+    query(option + INDENT_ATTRIBUTES.arg("yes")
+        + "<html><body onload='alert(\"loaded\")' style='background: black'/></html>",
+        "<html><body onload=\"alert(&quot;loaded&quot;)\"\n"
+        + "style=\"background: black\"></body></html>");
   }
 
   /** Test: method=html, version=5.0. */

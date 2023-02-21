@@ -19,6 +19,8 @@ public class PrintOutput extends OutputStream {
   protected long max = Long.MAX_VALUE;
   /** Number of bytes written. */
   protected long size;
+  /** Number of codepoints in the current line. */
+  protected long lineLength;
 
   /**
    * Constructor, given a filename.
@@ -64,13 +66,14 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Prints a single codepoint.
+   * Prints a single codepoint, and keeps track of the current line length.
    * @param cp codepoint to be printed
    * @throws IOException I/O exception
    */
   public void print(final int cp) throws IOException {
     if(cp <= 0x7F) {
       write(cp);
+      lineLength = cp == '\n' ? 0 : lineLength + 1;
     } else {
       if(cp <= 0x7FF) {
         write(cp >>  6 & 0x1F | 0xC0);
@@ -84,6 +87,7 @@ public class PrintOutput extends OutputStream {
         write(cp >>  6 & 0x3F | 0x80);
       }
       write(cp & 0x3F | 0x80);
+      ++lineLength;
     }
   }
 
@@ -132,6 +136,14 @@ public class PrintOutput extends OutputStream {
    */
   public final long size() {
     return size;
+  }
+
+  /**
+   * Returns the length of the current line in codepoints.
+   * @return the number of codepoints in the current line
+   */
+  public long lineLength() {
+    return lineLength;
   }
 
   @Override

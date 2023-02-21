@@ -46,6 +46,7 @@ public final class EncoderOutput extends PrintOutput {
       Util.debug(ex);
       throw SERENC_X_X.getIO(Integer.toHexString(ch), encoding);
     }
+    lineLength = ch == '\n' ? 0 : lineLength + 1;
   }
 
   @Override

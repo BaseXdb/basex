@@ -116,6 +116,9 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter: binary serialization. */
   public static final EnumOption<YesNo> BINARY =
       new EnumOption<>("binary", YesNo.YES);
+  /** Specific serialization parameter: attribute indentation. */
+  public static final EnumOption<YesNo> INDENT_ATTRIBUTES =
+      new EnumOption<>("indent-attributes", YesNo.NO);
 
   /** Newlines. */
   public enum Newline {
