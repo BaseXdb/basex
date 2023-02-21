@@ -1750,20 +1750,29 @@ public class QueryParser extends InputParser {
         skipWs();
         final boolean enclosed = thin && curr('{');
         final Expr e = enclosed ? enclosedExpr() : curr('(') ? parenthesized() :
-          curr('$') ? varRef() : eQName(sc.funcNS, ARROWSPEC);
+          curr('$') ? varRef() : checkReserved(eQName(sc.funcNS, ARROWSPEC));
 
         final InputInfo ii = info();
         if(enclosed) {
           ex = new CachedMap(ii, ex, e);
         } else {
-          final Expr arg = thin ? new ContextValue(ii) : ex, fc;
-          if(e instanceof QNm) {
-            fc = funcCall(checkReserved((QNm) e), ii, argumentList(true, arg));
+          final Expr arg;
+          For fr = null;
+          int s = 0;
+          if(thin) {
+            s = localVars.openScope();
+            fr = new For(new Var(new QNm("item"), null, qc, sc, ii), ex);
+            arg = new VarRef(ii, fr.var);
           } else {
-            final FuncArgs args = argumentList(false, arg);
-            fc = dynFuncCall(e, ii, args.exprs(), args.holes());
+            arg = ex;
           }
-          ex = thin ? new CachedMap(ii, ex, fc) : fc;
+          final boolean qname = e instanceof QNm;
+          final FuncArgs args = argumentList(qname, arg);
+          ex = qname ? funcCall((QNm) e, ii, args) : dynFuncCall(e, ii, args.exprs(), args.holes());
+          if(thin) {
+            ex = new GFLWOR(ii, fr, ex);
+            localVars.closeScope(s);
+          }
         }
       }
     }
