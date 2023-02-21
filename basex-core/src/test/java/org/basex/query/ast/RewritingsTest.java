@@ -2154,7 +2154,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check(REPLICATE.args("x", 2) + " ! (. = 'x')", "true\ntrue", root(SingletonSeq.class));
     check(REPLICATE.args(" <a/>", 2) + " ! (. = 'x')", "false\nfalse", root(REPLICATE));
 
-    check("(10, 10) ! .[. = 5]", "", root(IterFilter.class));
+    check("(10, 10) ! .[. = 5]", "", empty());
+    check("(10 to 15) ! .[. = 5]", "", root(IterFilter.class));
     check(REPLICATE.args(" <a/>", 2) + " ! .[data()]", "", root(REPLICATE));
   }
 
@@ -3018,5 +3019,21 @@ public final class RewritingsTest extends QueryPlanTest {
     query("declare function local:a() { function($a) { $a(1) }(local:b(2, ?)) };"
         + "declare function local:b($b, $c) { };"
         + "local:a()", "");
+  }
+
+  /** Simple map, if expressions. */
+  @Test public void gh2175() {
+    check("<a>A</a> ! (if(<b>B</b>/text()) then 1 else ())",
+        1, root(If.class));
+    check("<a>A</a> ! (if(text()) then 1 else ())",
+        1, root(If.class));
+    check("<a>A</a> ! (if(<b>B</b>/text()) then . else ())",
+        "<a>A</a>", root(If.class));
+    check("<a>A</a> ! (if(text()) then . else ())",
+        "<a>A</a>", root(IterFilter.class), empty(If.class));
+    check("<a>A</a> ! (if(text()) then data() else ())",
+        "A", root(DATA), empty(If.class));
+    check("<a>A</a> ! (if(text()) then string() else ())",
+        "A", root(ItemMap.class), empty(If.class));
   }
 }

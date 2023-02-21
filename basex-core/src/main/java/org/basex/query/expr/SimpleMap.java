@@ -130,14 +130,6 @@ public abstract class SimpleMap extends Arr {
   private Expr merge(final Expr expr, final Expr next, final CompileContext cc)
       throws QueryException {
 
-    // merge filter with context value as root
-    // A ! .[B]  ->  A[B]
-    if(next instanceof Filter) {
-      final Filter filter = (Filter) next;
-      if(filter.root instanceof ContextValue && !filter.mayBePositional())
-        return Filter.get(cc, info, expr, ((Filter) next).exprs);
-    }
-
     final long size = expr.size();
     if(!expr.has(Flag.NDT) && !next.has(Flag.POS)) {
       // merge expressions if next expression does not rely on the context
@@ -272,6 +264,24 @@ public abstract class SimpleMap extends Arr {
           // replace original expression with error
           return cc.error(qe, next);
         }
+      }
+    }
+
+    // merge filter with context value as root
+    // A ! .[B]  ->  A[B]
+    if(next instanceof Filter) {
+      final Filter filter = (Filter) next;
+      if(filter.root instanceof ContextValue && !filter.mayBePositional()) {
+        return Filter.get(cc, info, expr, filter.exprs);
+      }
+    }
+
+    // A ! (if(B) then C else ()  ->  A[B] ! C
+    if(next instanceof If) {
+      final If iff = (If) next;
+      if(iff.exprs[1] == Empty.VALUE && !iff.exprs[0].has(Flag.POS) &&
+          !iff.cond.seqType().mayBeNumber()) {
+        return get(cc, info, Filter.get(cc, info, expr, iff.cond), iff.exprs[0]);
       }
     }
     return null;

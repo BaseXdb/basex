@@ -273,12 +273,12 @@ public final class GFLWORTest extends QueryPlanTest {
   @Test public void whereToIfTest() {
     check("(1 to 6) ! (for $j in 1 to 5 where . eq 1 return $j)",
         "1\n2\n3\n4\n5",
-        exists(If.class),
+        exists(IterFilter.class),
         empty(GFLWOR.class)
     );
     check("(1 to 6) ! (for $j at $p in 1 to 5 where . eq 1 return $j * $p)",
         "1\n4\n9\n16\n25",
-        exists(If.class),
+        exists(IterFilter.class),
         exists(GFLWOR.class)
     );
     check("let $x := 0 where $x != <x>0</x> return 42 idiv $x", "",

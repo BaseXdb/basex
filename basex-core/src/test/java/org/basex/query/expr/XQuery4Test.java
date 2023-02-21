@@ -265,8 +265,8 @@ public final class XQuery4Test extends QueryPlanTest {
     query("switch(<?_ _?>) case ('?', '!') return 1 default return 2", 2);
 
     check("(1 to 6) ! (switch(.) case 6 to 8 return 'x' default return ())",
-        "x", exists(If.class));
+        "x", empty(Switch.class), exists(IterFilter.class));
     check("(1 to 6) ! (switch(.) case 6 to 8 return 'x' case 6 to 8 return '' default return ())",
-        "x", exists(If.class));
+        "x", empty(Switch.class), exists(IterFilter.class));
   }
 }
