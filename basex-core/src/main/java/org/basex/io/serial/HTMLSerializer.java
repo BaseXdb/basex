@@ -90,7 +90,7 @@ final class HTMLSerializer extends MarkupSerializer {
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
 
-    if(!standalone) out.print(' ');
+    if(!standalone) delimitAttribute();
     out.print(name);
 
     // don't append value for boolean attributes
@@ -152,6 +152,7 @@ final class HTMLSerializer extends MarkupSerializer {
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
+    indAttrLength = out.lineLength();
     sep = indent;
     script = SCRIPTS.contains(lc(name.local()));
     if(content && eq(lc(elem.local()), HEAD)) skip++;

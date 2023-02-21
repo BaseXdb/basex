@@ -51,6 +51,10 @@ abstract class MarkupSerializer extends StandardSerializer {
   private QNmSet suppress;
   /** Media type. */
   private final String media;
+  /** Indent attributes. */
+  private final boolean indAttr;
+  /** Attribute indentation length. */
+  protected long indAttrLength;
 
   /**
    * Constructor.
@@ -79,6 +83,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     escuri  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
     content = sopts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = sopts.yes(UNDECLARE_PREFIXES);
+    indAttr = sopts.yes(INDENT_ATTRIBUTES);
 
     if(docsys.isEmpty()) docsys = null;
     if(docpub.isEmpty()) docpub = null;
@@ -129,7 +134,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
 
-    if(!standalone) out.print(' ');
+    if(!standalone) delimitAttribute();
     out.print(name);
     out.print(ATT1);
     final byte[] val = normalize(value, form);
@@ -145,6 +150,20 @@ abstract class MarkupSerializer extends StandardSerializer {
       }
     }
     out.print(ATT2);
+  }
+
+  /**
+   * Print the delimiter preceding an attribute inside of an opening or empty
+   * tag. This is attribute indentation, if enabled, for all but the first
+   * attribute, but at least a single space.
+   * @throws IOException I/O exception
+   */
+  protected void delimitAttribute() throws IOException {
+    if (indAttr && out.lineLength() > indAttrLength) {
+      out.print('\n');
+      for (int i = 0; i < indAttrLength; ++i) out.print(' ');
+    }
+    out.print(' ');
   }
 
   @Override
@@ -220,6 +239,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
+    indAttrLength = out.lineLength();
     sep = true;
   }
 
