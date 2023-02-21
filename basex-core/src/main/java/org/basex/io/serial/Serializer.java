@@ -187,6 +187,7 @@ public abstract class Serializer implements Closeable {
     if(opening) {
       finishEmpty();
       opening = false;
+      closed = elem;
     } else {
       elem = opened.peek();
       level--;
