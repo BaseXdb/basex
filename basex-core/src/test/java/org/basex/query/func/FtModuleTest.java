@@ -103,11 +103,11 @@ public final class FtModuleTest extends SandboxTest {
     contains(func.args(" //*[text() contains text 'Exercise']"),
       "<li><mark>Exercise</mark> 1</li>");
     query("copy $a := text { 'a b' } modify () return " +
-        func.args(" $a[. contains text 'a']", "b"), "<b>a</b>\nb");
+        func.args(" $a[. contains text 'a']", "b"), "<b>a</b>\n b");
     query("copy $a := text { 'ab' } modify () return " +
         func.args(" $a[. contains text 'ab'], 'b'"), "<b>ab</b>");
     query("copy $a := text { 'a b' } modify () return " +
-        func.args(" $a[. contains text 'a b'], 'b'"), "<b>a</b>\n\n<b>b</b>");
+        func.args(" $a[. contains text 'a b'], 'b'"), "<b>a</b>\n \n<b>b</b>");
 
     query(COUNT.args(func.args(" //*[text() contains text '1']/../../../../..")), 1);
 

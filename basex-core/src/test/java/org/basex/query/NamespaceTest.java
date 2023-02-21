@@ -583,21 +583,21 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void duplicatePrefixes2() {
     query(
       "<e xmlns:p='u1'>{ <a xmlns:p='u2' p:a='v'/>/@* }</e>",
-      "<e xmlns:p_1='u2' xmlns:p='u1' p_1:a='v'/>");
+      "<e xmlns:p='u1' xmlns:p_1='u2' p_1:a='v'/>");
   }
 
   /** Handles duplicate prefixes. */
   @Test public void duplicatePrefixes3() {
     query(
       "<e xmlns:p='u' xmlns:p1='u1'>{ <a xmlns:p='u1' p:a='v'/>/@* }</e>",
-      "<e xmlns:p1='u1' xmlns:p='u' p1:a='v'/>");
+      "<e xmlns:p='u' xmlns:p1='u1' p1:a='v'/>");
   }
 
   /** Handles duplicate prefixes. */
   @Test public void duplicatePrefixes4() {
     query(
       "<e xmlns:p='u' xmlns:p1='u1'>{ <a xmlns:p='u2' p:a='v'/>/@* }</e>",
-      "<e xmlns:p_1='u2' xmlns:p1='u1' xmlns:p='u' p_1:a='v'/>");
+      "<e xmlns:p='u' xmlns:p1='u1' xmlns:p_1='u2' p_1:a='v'/>");
   }
 
   /**
@@ -645,7 +645,7 @@ public final class NamespaceTest extends SandboxTest {
         "<c>{attribute {QName('ns1', 'att1')} {}," +
         "attribute {QName('ns2', 'att2')} {}}</c></b></a>",
         "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
-        "<c xmlns:ns0_1='ns2' xmlns:ns0='ns1' ns0:att1='' ns0_1:att2=''/>" +
+        "<c xmlns:ns0='ns1' xmlns:ns0_1='ns2' ns0:att1='' ns0_1:att2=''/>" +
         "</b></a>");
   }
 

@@ -21,8 +21,8 @@ public final class SerializerTest extends SandboxTest {
     query(METHOD.arg("xml") + "<html/>", "<html/>");
     query(METHOD.arg("xml") + INDENT_ATTRIBUTES.arg("yes") + "<x a='1' b='2' c='3'/>",
         "<x a=\"1\"\n"
-        + "b=\"2\"\n"
-        + "c=\"3\"/>");
+        + "   b=\"2\"\n"
+        + "   c=\"3\"/>");
   }
 
   /** Test: method=xhtml. */
@@ -38,45 +38,45 @@ public final class SerializerTest extends SandboxTest {
     query(option + INDENT.arg("yes")
         + "<html xmlns='http://www.w3.org/1999/xhtml'><body><pre><u>test</u></pre></body></html>",
         "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-        + "<body>\n"
-        + "<pre><u>test</u></pre>\n"
-        + "</body>\n"
+        + "  <body>\n"
+        + "    <pre><u>test</u></pre>\n"
+        + "  </body>\n"
         + "</html>");
     query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
         + "<html><body><PRE><u>test</u></PRE></body></html>",
         "<!DOCTYPE html>\n"
         + "<html>\n"
-        + "<body>\n"
-        + "<PRE><u>test</u></PRE>\n"
-        + "</body>\n"
+        + "  <body>\n"
+        + "    <PRE><u>test</u></PRE>\n"
+        + "  </body>\n"
         + "</html>");
     query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
         + "<html><body><a name='x'>x</a><p><hr/></p><a><hr/></a><br/></body></html>",
         "<!DOCTYPE html>\n"
         + "<html>\n"
-        + "<body><a name=\"x\">x</a><p>\n"
-        + "<hr/>\n"
-        + "</p><a>\n"
-        + "<hr/>\n"
-        + "</a><br/></body>\n"
+        + "  <body><a name=\"x\">x</a><p>\n"
+        + "      <hr/>\n"
+        + "    </p><a>\n"
+        + "      <hr/>\n"
+        + "    </a><br/></body>\n"
         + "</html>");
     query(option + MEDIA_TYPE.arg("application/xhtml+xml")
         + INDENT.arg("yes")
         + INDENT_ATTRIBUTES.arg("yes")
         + "<html xmlns='http://www.w3.org/1999/xhtml' xmlns:svg='http://www.w3.org/2000/svg'>"
         + "<head/><body><div id='a' name='b' class='c' style='width: 42px'/></body></html>",
-        "<html xmlns:svg=\"http://www.w3.org/2000/svg\"\n"
-        + "xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-        + "<head>\n"
-        + "<meta http-equiv=\"Content-Type\"\n"
-        + "content=\"application/xhtml+xml; charset=UTF-8\" />\n"
-        + "</head>\n"
-        + "<body>\n"
-        + "<div id=\"a\"\n"
-        + "name=\"b\"\n"
-        + "class=\"c\"\n"
-        + "style=\"width: 42px\"></div>\n"
-        + "</body>\n"
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"\n"
+        + "      xmlns:svg=\"http://www.w3.org/2000/svg\">\n"
+        + "  <head>\n"
+        + "    <meta http-equiv=\"Content-Type\"\n"
+        + "          content=\"application/xhtml+xml; charset=UTF-8\"/>\n"
+        + "  </head>\n"
+        + "  <body>\n"
+        + "    <div id=\"a\"\n"
+        + "         name=\"b\"\n"
+        + "         class=\"c\"\n"
+        + "         style=\"width: 42px\"></div>\n"
+        + "  </body>\n"
         + "</html>");
   }
 
@@ -114,33 +114,33 @@ public final class SerializerTest extends SandboxTest {
     query(option + INDENT.arg("yes")
         + "<html><body><PRE><u>test</u></PRE></body></html>",
         "<html>\n"
-        + "<body>\n"
-        + "<PRE><u>test</u></PRE>\n"
-        + "</body>\n"
+        + "  <body>\n"
+        + "    <PRE><u>test</u></PRE>\n"
+        + "  </body>\n"
         + "</html>");
     query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
         + "<html><body><PRE><u>test</u></PRE></body></html>",
         "<!DOCTYPE html>\n"
         + "<html>\n"
-        + "<body>\n"
-        + "<PRE><u>test</u></PRE>\n"
-        + "</body>\n"
+        + "  <body>\n"
+        + "    <PRE><u>test</u></PRE>\n"
+        + "  </body>\n"
         + "</html>");
     query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
         + "<html><body><p><b>x</b><ul><li>1</li><li>2</li></ul></p><br/></body></html>",
         "<!DOCTYPE html>\n"
         + "<html>\n"
-        + "<body>\n"
-        + "<p><b>x</b><ul>\n"
-        + "<li>1</li>\n"
-        + "<li>2</li>\n"
-        + "</ul>\n"
-        + "</p><br></body>\n"
+        + "  <body>\n"
+        + "    <p><b>x</b><ul>\n"
+        + "        <li>1</li>\n"
+        + "        <li>2</li>\n"
+        + "      </ul>\n"
+        + "    </p><br></body>\n"
         + "</html>");
     query(option + INDENT_ATTRIBUTES.arg("yes")
         + "<html><body onload='alert(\"loaded\")' style='background: black'/></html>",
         "<html><body onload=\"alert(&quot;loaded&quot;)\"\n"
-        + "style=\"background: black\"></body></html>");
+        + "            style=\"background: black\"></body></html>");
   }
 
   /** Test: method=html, version=5.0. */

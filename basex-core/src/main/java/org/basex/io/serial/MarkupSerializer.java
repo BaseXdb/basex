@@ -372,12 +372,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     attribute(HTTP_EQUIV, CONTENT_TYPE, false);
     attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
       CHARSET, "=", encoding), false);
-    if(html) {
-      out.print(ELEM_C);
-    } else {
-      out.print(' ');
-      out.print(ELEM_SC);
-    }
+    out.print(html ? ELEM_C : ELEM_SC);
     level--;
     if(empty) finishClose();
     return true;

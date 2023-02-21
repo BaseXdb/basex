@@ -465,7 +465,8 @@ public abstract class Serializer implements Closeable {
 
       // serialize declared namespaces
       final Atts nsp = node.namespaces();
-      for(int p = nsp.size() - 1; p >= 0; p--) namespace(nsp.name(p), nsp.value(p), false);
+      final int ps = nsp.size();
+      for(int p = 0; p < ps; p++) namespace(nsp.name(p), nsp.value(p), false);
       // add new or updated namespace
       namespace(name.prefix(), name.uri(), false);
 

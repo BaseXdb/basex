@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.*;
@@ -27,7 +28,7 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class Sandbox {
-  /** Flag for writing queries and results to STDERR. */
+  /** Flag for writing queries and results to STDERR; helpful for exporting test cases. */
   private static final boolean OUTPUT = false;
   /** Base uri. */
   private static final String BASEURI = new File(".").getAbsolutePath();
@@ -65,7 +66,7 @@ public abstract class Sandbox {
       return cmd.execute(context);
     } catch(final BaseXException ex) {
       Util.stack(ex);
-      throw new AssertionError(ex.getMessage(), ex);
+      return fail(ex);
     }
   }
 
@@ -91,7 +92,7 @@ public abstract class Sandbox {
       return "";
     } catch(final QueryException | IOException ex) {
       Util.stack(ex);
-      throw new AssertionError("Query failed:\n" + query, ex);
+      return fail("Query failed:\n" + query, ex);
     }
   }
 
@@ -118,21 +119,20 @@ public abstract class Sandbox {
       Util.errln(query.strip());
       Util.errln(res.replace('\n', ','));
     }
-    if(!res.equals(exp)) throw Util.notExpected("\n" + query +
-        "\nEXPECTED: [" + exp + "]\nRETURNED: [" + res + "]\n" + serialize(plan));
+    assertEquals(exp, res, "Unexpected query result\n" +
+        (plan == null ? "" : serialize(plan) + "\n"));
   }
 
   /**
    * Returns a string representation of a query plan.
-   * @param plan query plan
+   * @param plan query plan (can be {@code null})
    * @return string
    */
   protected static String serialize(final ANode plan) {
-    if(plan == null) return "";
     try {
-      return "PLAN: " + plan.serialize(SerializerMode.INDENT.get());
+      return plan != null ? "PLAN: " + plan.serialize(SerializerMode.INDENT.get()) : "";
     } catch(final QueryIOException ex) {
-      throw Util.notExpected(ex);
+      return fail(ex);
     }
   }
 
@@ -170,7 +170,7 @@ public abstract class Sandbox {
    */
   protected static void contains(final String query, final String result) {
     final String res = normNL(query(query));
-    if(!res.contains(result)) throw Util.notExpected("Result does not contain \"" + result +
+    if(!res.contains(result)) fail("Result does not contain \"" + result +
         "\":\n" + query + "\n[E] " + result + "\n[F] " + res);
   }
 
@@ -189,14 +189,14 @@ public abstract class Sandbox {
       final TokenBuilder tb = new TokenBuilder().add("Query did not fail:\n");
       tb.add(query).add("\n[E] Error: ");
       for(final QueryError e : error) tb.add(' ').add(e.qname().prefixId());
-      throw Util.notExpected(tb.add("\n[F] ").add(res));
+      fail(tb.add("\n[F] ").add(res).toString());
     } catch(final QueryIOException ex) {
       error(query, ex.getCause(), error);
     } catch(final QueryException ex) {
       error(query, ex, error);
     } catch(final Exception ex) {
       Util.stack(ex);
-      throw Util.notExpected(ex);
+      fail(ex);
     }
   }
 
@@ -230,7 +230,7 @@ public abstract class Sandbox {
         }
         tb.add("\nResult: ").add(ex.qname().string());
       }
-      throw Util.notExpected(tb);
+      fail(tb.toString());
     }
   }
 
@@ -277,7 +277,7 @@ public abstract class Sandbox {
       file.write(data);
     } catch(final IOException ex) {
       Util.stack(ex);
-      throw new AssertionError(ex.getMessage(), ex);
+      fail(ex);
     }
   }
 
@@ -287,7 +287,7 @@ public abstract class Sandbox {
   public static void initSandbox() {
     final IOFile sb = sandbox();
     //sb.delete();
-    if(!sb.md()) throw Util.notExpected("Sandbox could not be created.");
+    if(!sb.md()) fail("Sandbox could not be created.");
 
     final String path = sb.path();
     Prop.put(StaticOptions.DBPATH, path + "/data");
@@ -314,7 +314,7 @@ public abstract class Sandbox {
       final String path = key.toString();
       if(path.startsWith(Prop.DBPREFIX)) props.remove(key);
     }
-    if(!sandbox().delete()) throw Util.notExpected("Sandbox could not be deleted.");
+    if(!sandbox().delete()) fail("Sandbox could not be deleted.");
   }
 
   /**
@@ -381,7 +381,7 @@ public abstract class Sandbox {
    * @return normalized string
    */
   public static String normNL(final String result) {
-    return result.replaceAll("(\r?\n|\r) *", "\n");
+    return result.replaceAll("(\r?\n|\r)", "\n");
   }
 
   /** Client. */
