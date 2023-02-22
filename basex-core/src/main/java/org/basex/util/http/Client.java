@@ -102,9 +102,10 @@ public final class Client {
   private static HttpResponse<InputStream> send(final URI uri, final Request request)
       throws IOException {
 
-    final HttpRequest.Builder rb = HttpRequest.newBuilder(uri);
-
+    final HttpRequest.Builder rb;
     try {
+      rb = HttpRequest.newBuilder(uri);
+
       // set timeout
       final String timeout = request.attribute(TIMEOUT);
       if(timeout != null) rb.timeout(Duration.ofSeconds(Strings.toInt(timeout)));

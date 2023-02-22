@@ -149,7 +149,7 @@ public final class IOUrl extends IO {
       /* possible exceptions, among others:
        * - construct URI: invalid argument
        * - build request: invalid URI scheme
-       * - send request: interrupted exceptions */
+       * - send request: interrupted requests */
       Util.debug(ex);
       throw new IOException(ex.getMessage());
     }
