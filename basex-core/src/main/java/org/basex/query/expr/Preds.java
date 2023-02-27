@@ -240,21 +240,24 @@ public abstract class Preds extends Arr {
     final int el = exprs.length;
     if(el == 0 || mayBePositional() || ebv && !(rst.type instanceof NodeType)) return this;
 
-    final Expr pred = exprs[el - 1];
-    final QueryFunction<Expr, Expr> createRoot = r ->
-      el == 1 ? r : Filter.get(cc, info, r, Arrays.copyOfRange(exprs, 0, el - 1));
-    final QueryBiFunction<Expr, Boolean, Expr> createExpr = (e, cmp) ->
-        e instanceof ContextValue ? createRoot.apply(root) :
-        e instanceof Path         ? Path.get(cc, info, createRoot.apply(root), e) :
-        cmp                       ? SimpleMap.get(cc, info, createRoot.apply(root), e) : this;
+    final Expr last = exprs[el - 1];
+    final QuerySupplier<Expr> createRoot = () ->
+      root instanceof Path ? ((Path) root).removePredicate(cc) :
+      el > 1 ? Filter.get(cc, info, root, Arrays.copyOfRange(exprs, 0, el - 1)) : root;
+    final QueryFunction<Expr, Expr> createSimpleMap = rhs ->
+      SimpleMap.get(cc, info, createRoot.get(), rhs);
+    final QueryBiFunction<Expr, Boolean, Expr> createExpr = (rhs, compare) ->
+      rhs instanceof ContextValue ? createRoot.get() :
+      rhs instanceof Path         ? Path.get(cc, info, createRoot.get(), rhs) :
+      compare                     ? createSimpleMap.apply(rhs) : this;
 
     // rewrite to general comparison
     // a[. = 'x']           ->  a = 'x'
     // a[@id eq 'id1']      ->  a/@id = 'id1'
     // a[text() = data(.)]  ->  skip: right operand must not depend on context
     // a[b eq ('a', 'b')]   ->  skip: an error must be raised as right operand yields a sequence
-    if(pred instanceof Cmp) {
-      final Cmp cmp = (Cmp) pred;
+    if(last instanceof Cmp) {
+      final Cmp cmp = (Cmp) last;
       final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
       final SeqType st1 = op1.seqType(), st2 = op2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
@@ -271,8 +274,8 @@ public abstract class Preds extends Arr {
     // rewrite to contains text expression (right operand must not depend on context):
     // a[. contains text 'x']  ->  a contains text 'x'
     // a[text() contains text 'x']  ->  a/text() contains text 'x'
-    if(pred instanceof FTContains) {
-      final FTContains cmp = (FTContains) pred;
+    if(last instanceof FTContains) {
+      final FTContains cmp = (FTContains) last;
       final FTExpr ftexpr = cmp.ftexpr;
       if(!ftexpr.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(cmp.expr, true);
@@ -283,16 +286,16 @@ public abstract class Preds extends Arr {
     // rewrite to path: root[path]  ->  root/path
     // rewrite to path: root[data()]  ->  root/descendant::text()
     if(rst.type instanceof NodeType) {
-      Expr expr = createExpr.apply(pred, false);
-      if(expr == this && (Function.DATA.is(pred) || Function.STRING.is(pred))) {
-        final ContextFn func = (ContextFn) pred;
+      Expr expr = createExpr.apply(last, false);
+      if(expr == this && (Function.DATA.is(last) || Function.STRING.is(last))) {
+        final ContextFn func = (ContextFn) last;
         if(func.contextAccess()) expr = func.simplifyEbv(root, cc);
       }
       if(expr != this) return expr;
     }
 
     // rewrite to simple map: $node[string()]  ->  $node ! string()
-    if(rst.zeroOrOne()) return SimpleMap.get(cc, info, createRoot.apply(root), pred);
+    if(rst.zeroOrOne()) return createSimpleMap.apply(last);
 
     return this;
   }

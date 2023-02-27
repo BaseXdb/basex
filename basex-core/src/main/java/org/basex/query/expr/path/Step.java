@@ -397,6 +397,15 @@ public abstract class Step extends Preds {
   }
 
   /**
+   * Removes the last predicate from the step.
+   * After the call, a new instance of the resulting path must be created.
+   * @return resulting step instance
+   */
+  final Step removePredicate() {
+    return copyType(get(info, axis, test, Arrays.copyOfRange(exprs, 0, exprs.length - 1)));
+  }
+
+  /**
    * Throws an exception if the context value is not a node.
    * @param qc query context
    * @return context

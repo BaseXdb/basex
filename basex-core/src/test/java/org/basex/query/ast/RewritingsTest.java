@@ -2992,6 +2992,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<_>A</_>[text() ! string(.)]", "<_>A</_>", exists(STRING));
     check("<_>A</_>[text() ! string()]", "<_>A</_>", exists(STRING));
     check("<_>A</_>[string()]", "<_>A</_>", exists(SingleIterPath.class));
+
+    // GH-2182: EBV tests, rewriting to descendant::text()
+    check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
   }
 
   /** Simplified if expression yields errors. */

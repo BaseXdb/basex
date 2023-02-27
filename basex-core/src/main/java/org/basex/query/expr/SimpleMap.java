@@ -443,7 +443,7 @@ public abstract class SimpleMap extends Arr {
     } finally {
       cc.removeFocus();
     }
-    return cc.replaceWith(this, Path.get(cc, info, root, steps.finish()));
+    return Path.get(cc, info, root, steps.finish());
   }
 
   @Override

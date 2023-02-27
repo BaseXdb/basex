@@ -199,15 +199,26 @@ public abstract class Path extends ParseExpr {
         final Step step = (Step) last;
         if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
             !step.exprs[0].seqType().mayBeNumber()) {
-          final Expr s = step.flattenEbv(this, true, cc);
-          if(s != step) {
-            step.exprs = new Expr[0];
-            expr = s;
-          }
+          final Expr ex = step.flattenEbv(this, true, cc);
+          if(ex != step) expr = ex;
         }
       }
     }
     return cc.simplify(this, expr, mode);
+  }
+
+  /**
+   * Removes the last predicate from the last step and returns the optimized expression.
+   * An error will be raised if the last step is no XPath step.
+   * @param cc compilation context
+   * @return new path
+   * @throws QueryException query exception
+   */
+  public final Expr removePredicate(final CompileContext cc) throws QueryException {
+    final ExprList list = new ExprList(steps.length).add(steps);
+    final Step step = ((Step) list.pop()).removePredicate();
+    list.add(cc.get(step, () -> step.optimize(root, cc)));
+    return copyType(get(cc, info, root, list.finish()));
   }
 
   @Override
