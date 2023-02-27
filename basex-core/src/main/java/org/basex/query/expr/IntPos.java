@@ -157,8 +157,7 @@ public final class IntPos extends Simple implements CmpPos {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // E[position() = 3]  ->  E[3]
-    return cc.simplify(this, mode.oneOf(Simplify.PREDICATE) && exact() ?
-      Int.get(min) : this, mode);
+    return cc.simplify(this, mode == Simplify.PREDICATE && exact() ? Int.get(min) : this, mode);
   }
 
   @Override

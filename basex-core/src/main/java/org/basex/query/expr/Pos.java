@@ -134,7 +134,7 @@ final class Pos extends Single {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // E[position() = last()]  ->  E[last()]
-    return cc.simplify(this, mode.oneOf(Simplify.PREDICATE) &&
+    return cc.simplify(this, mode == Simplify.PREDICATE &&
         expr.seqType().instanceOf(SeqType.NUMERIC_O) ? expr : this, mode);
   }
 

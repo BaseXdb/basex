@@ -128,7 +128,7 @@ final class SimplePos extends Arr implements CmpPos {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // E[position() = NUMBER]  ->  E[NUMBER]
-    return cc.simplify(this, mode.oneOf(Simplify.PREDICATE) && exact() &&
+    return cc.simplify(this, mode == Simplify.PREDICATE && exact() &&
         exprs[0].seqType().instanceOf(SeqType.NUMERIC_O) ? exprs[0] : this, mode);
   }
 
