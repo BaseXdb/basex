@@ -3,11 +3,13 @@ package org.basex.query;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.*;
 import java.math.*;
 import java.util.*;
+import java.util.AbstractMap.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -88,9 +90,9 @@ public class QueryParser extends InputParser {
   private final TokenMap namespaces = new TokenMap();
 
   /** Parsed variables. */
-  private final TokenObjMap<StaticVar> vars = new TokenObjMap<>();
+  private final ArrayList<StaticVar> vars = new ArrayList<>();
   /** Parsed functions. */
-  private final TokenObjMap<StaticFunc> funcs = new TokenObjMap<>();
+  private final ArrayList<StaticFunc> funcs = new ArrayList<>();
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
@@ -870,7 +872,7 @@ public class QueryParser extends InputParser {
     final VarScope vs = localVars.popContext();
     final String doc = docBuilder.toString();
     final StaticVar sv = qc.vars.declare(var, expr, anns, doc, external, vs);
-    vars.put(sv.id(), sv);
+    vars.add(sv);
   }
 
   /**
@@ -904,13 +906,13 @@ public class QueryParser extends InputParser {
     if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
 
     localVars.pushContext(null);
-    final Var[] params = paramList();
+    final ArrayList<SimpleEntry<Var, Expr>> params = paramList(true);
     final SeqType type = optAsType();
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final VarScope vs = localVars.popContext();
     final String doc = docBuilder.toString();
     final StaticFunc func = qc.functions.declare(name, params, type, expr, anns, doc, vs, ii);
-    funcs.put(func.id(), func);
+    funcs.add(func);
   }
 
   /**
@@ -935,24 +937,27 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a ParamList.
+   * @param defaults allow default parameters
    * @return declared variables
    * @throws QueryException query exception
    */
-  private Var[] paramList() throws QueryException {
-    Var[] params = { };
+  private ArrayList<SimpleEntry<Var, Expr>> paramList(final boolean defaults)
+      throws QueryException {
+    final ArrayList<SimpleEntry<Var, Expr>> list = new ArrayList<>();
     while(true) {
       skipWs();
-      if(curr() != '$' && params.length == 0) break;
+      if(curr() != '$' && list.isEmpty()) break;
       final InputInfo ii = info();
       final Var var = localVars.add(new Var(varName(), optAsType(), qc, sc, ii, true));
-      for(final Var param : params) {
-        if(param.name.eq(var.name)) throw error(FUNCDUPL_X, var);
+      final Expr expr = defaults && wsConsume(":=") ? single() : null;
+      for(final SimpleEntry<Var, Expr> param : list) {
+        if(param.getKey().name.eq(var.name)) throw error(FUNCDUPL_X, var);
       }
-      params = Array.add(params, var);
+      list.add(new SimpleEntry<>(var, expr));
       if(!consume(',')) break;
     }
     wsCheck(")");
-    return params;
+    return list;
   }
 
   /**
@@ -2328,7 +2333,7 @@ public class QueryParser extends InputParser {
       Expr body = null;
       SeqType type = null;
       if(wsConsume("(")) {
-        params = paramList();
+        params = StaticFunc.vars(paramList(false));
         type = optAsType();
         body = enclosedExpr();
       } else if(curr('{')) {

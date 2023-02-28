@@ -2,8 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.AbstractMap.*;
 import java.util.function.*;
 
 import org.basex.core.*;
@@ -31,6 +33,8 @@ import org.basex.util.hash.*;
 public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Formal parameters. */
   public final Var[] params;
+  /** Default expressions (entries can be {@code null} references). */
+  public final Expr[] defaults;
   /** Updating flag. */
   final boolean updating;
 
@@ -40,7 +44,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /**
    * Function constructor.
    * @param name function name
-   * @param params formal parameters
+   * @param params parameters with variables and optional default values
    * @param type declared return type (can be {@code null})
    * @param expr function body (can be {@code null})
    * @param anns annotations
@@ -48,10 +52,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param vs variable scope
    * @param info input info
    */
-  StaticFunc(final QNm name, final Var[] params, final SeqType type, final Expr expr,
-      final AnnList anns, final String doc, final VarScope vs, final InputInfo info) {
+  StaticFunc(final QNm name, final ArrayList<SimpleEntry<Var, Expr>> params, final SeqType type,
+      final Expr expr, final AnnList anns, final String doc, final VarScope vs,
+      final InputInfo info) {
     super(name, type, anns, doc, vs, info);
-    this.params = params;
+
+    this.params = vars(params);
+    this.defaults = defaults(params);
     this.expr = expr;
     updating = anns.contains(Annotation.UPDATING);
   }
@@ -255,7 +262,41 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public byte[] id() {
-    return StaticFuncs.id(name, params.length);
+    return id(name, params.length);
+  }
+
+  /**
+   * Returns the id of the function with the given name and arity.
+   * @param qname function name
+   * @param arity function arity
+   * @return the function signature
+   */
+  public static byte[] id(final QNm qname, final long arity) {
+    return concat(qname.prefixId(), '#', arity);
+  }
+
+  /**
+   * Returns the default values of the specified parameter list.
+   * @param list parameter list
+   * @return default values
+   */
+  public static Expr[] defaults(final ArrayList<SimpleEntry<Var, Expr>> list) {
+    final int ls = list.size();
+    final Expr[] defaults = new Expr[ls];
+    for(int l = 0; l < ls; l++) defaults[l] = list.get(l).getValue();
+    return defaults;
+  }
+
+  /**
+   * Returns the variables values of the specified parameter list.
+   * @param list parameter list
+   * @return default values
+   */
+  public static Var[] vars(final ArrayList<SimpleEntry<Var, Expr>> list) {
+    final int ls = list.size();
+    final Var[] vars = new Var[ls];
+    for(int l = 0; l < ls; l++) vars[l] = list.get(l).getKey();
+    return vars;
   }
 
   @Override

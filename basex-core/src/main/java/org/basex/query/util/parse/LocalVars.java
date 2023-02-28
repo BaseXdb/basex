@@ -102,7 +102,7 @@ public final class LocalVars {
 
   /**
    * Pushes a new variable context onto the stack.
-   * @param global mapping for non-local variables
+   * @param global mapping for non-local variables (can be {@code null})
    */
   public void pushContext(final HashMap<Var, Expr> global) {
     vars.add(new VarContext(global, parser.sc));

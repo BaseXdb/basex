@@ -13,7 +13,7 @@ import org.basex.query.var.*;
  * @author Christian Gruen
  */
 final class VarContext {
-  /** Stack of local variables. */
+  /** Stack of local variables (can be {@code null}). */
   final VarStack stack = new VarStack();
   /** Non-local variable bindings for closures. */
   final HashMap<Var, Expr> bindings;
@@ -22,7 +22,7 @@ final class VarContext {
 
   /**
    * Constructor.
-   * @param bindings non-local variable bindings for closures
+   * @param bindings non-local variable bindings for closures (can be {@code null})
    * @param sc static context
    */
   VarContext(final HashMap<Var, Expr> bindings, final StaticContext sc) {

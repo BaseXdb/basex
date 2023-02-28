@@ -1,5 +1,7 @@
 package org.basex.query.scope;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.var.*;
@@ -13,9 +15,9 @@ import org.basex.util.hash.*;
  */
 public abstract class AModule extends StaticScope {
   /** User-defined functions. */
-  public TokenObjMap<StaticFunc> funcs;
+  public ArrayList<StaticFunc> funcs;
   /** Static variables. */
-  public TokenObjMap<StaticVar> vars;
+  public ArrayList<StaticVar> vars;
   /** URIs of modules. */
   public TokenSet modules;
   /** Namespaces. */
@@ -37,8 +39,8 @@ public abstract class AModule extends StaticScope {
    * @param ns namespaces
    * @param d documentation string
    */
-  public void set(final TokenObjMap<StaticFunc> fn, final TokenObjMap<StaticVar> vr,
-      final TokenSet md, final TokenMap ns, final String d) {
+  public void set(final ArrayList<StaticFunc> fn, final ArrayList<StaticVar> vr, final TokenSet md,
+      final TokenMap ns, final String d) {
     funcs = fn;
     vars = vr;
     modules = md;
