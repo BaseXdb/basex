@@ -40,15 +40,14 @@ public final class SignatureTest extends SandboxTest {
 
     // check that there are enough argument names
     final QNm[] names = fd.names;
+    final boolean variadic = fd.variadic();
     final int min = fd.minMax[0], max = fd.minMax[1];
-    assertEquals(names.length, max == Integer.MAX_VALUE ? min : max, fd + Arrays.toString(names));
+    assertEquals(names.length, variadic ? min : max, fd + Arrays.toString(names));
     // all variable names must be distinct
     final Set<QNm> set = new HashSet<>(Arrays.asList(names));
     assertEquals(names.length, set.size(), "Duplicate argument names: " + fd);
     // var-arg functions must have a number at the end
-    if(max == Integer.MAX_VALUE) {
-      assertTrue(Token.string(names[names.length - 1].local()).matches(".*\\d+$"));
-    }
+    if(variadic) assertTrue(Token.string(names[names.length - 1].local()).matches(".*\\d+$"));
 
     // test too few, too many, and wrong argument types
     for(int al = Math.max(min - 1, 0); al <= max + 1; al++) {

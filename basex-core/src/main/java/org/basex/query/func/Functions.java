@@ -110,8 +110,8 @@ public final class Functions {
   public static QueryException wrongArity(final FuncDefinition fd, final int arity,
       final InputInfo ii) {
     final IntList arities = new IntList();
-    final int min = fd.minMax[0], max = fd.minMax[1];
-    if(max != Integer.MAX_VALUE) {
+    if(!fd.variadic()) {
+      final int min = fd.minMax[0], max = fd.minMax[1];
       for(int m = min; m <= max; m++) arities.add(m);
     }
     return wrongArity(fd, arity, arities, ii);
@@ -246,8 +246,7 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      final int min = fd.minMax[0], max = fd.minMax[1];
-      if(arity < min || arity > max) throw wrongArity(fd, arity, ii);
+      if(arity < fd.minMax[0] || arity > fd.minMax[1]) throw wrongArity(fd, arity, ii);
 
       final AnnList anns = new AnnList();
       final VarScope vs = new VarScope(sc);

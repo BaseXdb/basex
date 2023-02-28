@@ -136,7 +136,7 @@ public final class FuncDefinition {
    */
   FuncType type(final int arity, final AnnList anns) {
     final SeqType[] st = new SeqType[arity];
-    if(arity != 0 && minMax[1] == Integer.MAX_VALUE) {
+    if(arity != 0 && variadic()) {
       final int tl = types.length;
       Array.copy(types, tl, st);
       final SeqType var = types[tl - 1];
@@ -180,6 +180,14 @@ public final class FuncDefinition {
     final TokenBuilder tb = new TokenBuilder();
     if(!Token.eq(uri, FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     return tb.add(local()).finish();
+  }
+
+  /**
+   * Indicates if this is a variadic function.
+   * @return result of check
+   */
+  public boolean variadic() {
+    return minMax[1] == Integer.MAX_VALUE;
   }
 
   /**
