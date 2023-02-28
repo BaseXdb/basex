@@ -32,31 +32,28 @@ public final class StaticFuncs extends ExprInfo {
 
   /**
    * Declares a new user-defined function.
-   * @param anns annotations
    * @param qname function name
    * @param params formal parameters
    * @param type declared return type (can be {@code null})
    * @param expr function body (can be {@code null})
+   * @param anns annotations
    * @param doc xqdoc string
    * @param vs variable scope
    * @param ii input info
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final AnnList anns, final QNm qname, final Var[] params,
-      final SeqType type, final Expr expr, final String doc, final VarScope vs,
-      final InputInfo ii) throws QueryException {
+  public StaticFunc declare(final QNm qname, final Var[] params, final SeqType type,
+      final Expr expr, final AnnList anns, final String doc, final VarScope vs, final InputInfo ii)
+      throws QueryException {
 
     final byte[] uri = qname.uri();
     if(uri.length == 0) throw FUNNONS_X.get(ii, qname.string());
     if(NSGlobal.reserved(uri) || Functions.builtIn(qname) != null)
       throw FNRESERVED_X.get(ii, qname.string());
 
-    final StaticFunc sf = new StaticFunc(anns, qname, params, type, expr, doc, vs, ii);
-    final byte[] id = sf.id();
-    final FuncCache fc = funcs.get(id);
-    if(fc != null) fc.setFunc(sf);
-    else funcs.put(id, new FuncCache(sf));
+    final StaticFunc sf = new StaticFunc(qname, params, type, expr, anns, doc, vs, ii);
+    funcCache(sf.id()).setFunc(sf);
     return sf;
   }
 
@@ -90,8 +87,7 @@ public final class StaticFuncs extends ExprInfo {
       final InputInfo ii) throws QueryException {
 
     if(NSGlobal.reserved(qname.uri())) throw similarError(qname, ii);
-    final byte[] id = id(qname, args.length);
-    return funcs.computeIfAbsent(id, () -> new FuncCache(null)).newCall(qname, args, sc, ii);
+    return funcCache(id(qname, args.length)).newCall(qname, args, sc, ii);
   }
 
   /**
@@ -99,8 +95,7 @@ public final class StaticFuncs extends ExprInfo {
    * @param literal the literal
    */
   public void registerFuncLiteral(final Closure literal) {
-    final byte[] id = id(literal.funcName(), literal.arity());
-    funcs.computeIfAbsent(id, () -> new FuncCache(null)).literals.add(literal);
+    funcCache(id(literal.funcName(), literal.arity())).literals.add(literal);
   }
 
   /**
@@ -246,6 +241,15 @@ public final class StaticFuncs extends ExprInfo {
     return concat(qname.prefixId(), '#', arity);
   }
 
+  /**
+   * Returns a function cache for the specified id.
+   * @param id function id
+   * @return function cache
+   */
+  private FuncCache funcCache(final byte[] id) {
+    return funcs.computeIfAbsent(id, () -> new FuncCache());
+  }
+
   /** Function cache. */
   private static class FuncCache {
     /** Function calls. */
@@ -256,19 +260,11 @@ public final class StaticFuncs extends ExprInfo {
     StaticFunc func;
 
     /**
-     * Constructor.
-     * @param func function (can be {@code null})
-     */
-    FuncCache(final StaticFunc func) {
-      this.func = func;
-    }
-
-    /**
      * Assigns the given function to all of its references and checks their visibility.
      * @param sf function to assign
      * @throws QueryException query exception
      */
-    public void setFunc(final StaticFunc sf) throws QueryException {
+    void setFunc(final StaticFunc sf) throws QueryException {
       if(func != null) throw FUNCDEFINED_X.get(sf.info, sf.name.string());
       func = sf;
       for(final StaticFuncCall call : calls) call.init(sf);
@@ -285,7 +281,7 @@ public final class StaticFuncs extends ExprInfo {
      * @return function call
      * @throws QueryException query exception
      */
-    public TypedFunc newCall(final QNm qname, final Expr[] args, final StaticContext sc,
+    TypedFunc newCall(final QNm qname, final Expr[] args, final StaticContext sc,
         final InputInfo ii) throws QueryException {
 
       final StaticFuncCall call = new StaticFuncCall(qname, args, sc, ii);
@@ -298,7 +294,7 @@ public final class StaticFuncs extends ExprInfo {
      * Returns the function's name.
      * @return function name
      */
-    public QNm qname() {
+    QNm qname() {
       return func != null ? func.name : calls.get(0).name;
     }
   }

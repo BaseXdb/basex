@@ -39,18 +39,18 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /**
    * Function constructor.
-   * @param anns annotations
    * @param name function name
    * @param params formal parameters
    * @param type declared return type (can be {@code null})
    * @param expr function body (can be {@code null})
+   * @param anns annotations
    * @param doc xqdoc string
    * @param vs variable scope
    * @param info input info
    */
-  StaticFunc(final AnnList anns, final QNm name, final Var[] params, final SeqType type,
-      final Expr expr, final String doc, final VarScope vs, final InputInfo info) {
-    super(anns, name, type, vs, doc, info);
+  StaticFunc(final QNm name, final Var[] params, final SeqType type, final Expr expr,
+      final AnnList anns, final String doc, final VarScope vs, final InputInfo info) {
+    super(name, type, anns, doc, vs, info);
     this.params = params;
     this.expr = expr;
     updating = anns.contains(Annotation.UPDATING);

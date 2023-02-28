@@ -26,16 +26,16 @@ public final class StaticVar extends StaticDecl {
 
   /**
    * Constructor for a variable declared in a query.
-   * @param vs variable scope
-   * @param anns annotations
    * @param var variable
    * @param expr expression to be bound
-   * @param external external flag
+   * @param anns annotations
    * @param doc xqdoc string
+   * @param external external flag
+   * @param vs variable scope
    */
-  StaticVar(final VarScope vs, final AnnList anns, final Var var, final Expr expr,
-      final boolean external, final String doc) {
-    super(anns, var.name, var.declType, vs, doc, var.info);
+  StaticVar(final Var var, final Expr expr, final AnnList anns, final String doc,
+      final boolean external, final VarScope vs) {
+    super(var.name, var.declType, anns, doc, vs, var.info);
     this.expr = expr;
     this.external = external;
     lazy = anns.contains(Annotation._BASEX_LAZY);

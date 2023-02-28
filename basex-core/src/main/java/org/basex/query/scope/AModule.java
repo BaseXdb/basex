@@ -31,18 +31,18 @@ public abstract class AModule extends StaticScope {
 
   /**
    * Assigns module properties.
-   * @param f user-defined functions
-   * @param v static variables
-   * @param m URIs of modules
-   * @param n namespaces
+   * @param fn user-defined functions
+   * @param vr static variables
+   * @param md URIs of modules
+   * @param ns namespaces
    * @param d documentation string
    */
-  public void set(final TokenObjMap<StaticFunc> f, final TokenObjMap<StaticVar> v,
-      final TokenSet m, final TokenMap n, final String d) {
-    funcs = f;
-    vars = v;
-    modules = m;
-    namespaces = n;
+  public void set(final TokenObjMap<StaticFunc> fn, final TokenObjMap<StaticVar> vr,
+      final TokenSet md, final TokenMap ns, final String d) {
+    funcs = fn;
+    vars = vr;
+    modules = md;
+    namespaces = ns;
     doc(d);
   }
 }
