@@ -226,16 +226,18 @@ public final class QNm extends Item {
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
-    final QNm nm;
+    final QNm qnm;
     if(item instanceof QNm) {
-      nm = (QNm) item;
+      qnm = (QNm) item;
     } else if(item.type.isUntyped() && sc != null) {
-      nm = new QNm(item.string(ii), sc);
-      if(!nm.hasURI() && nm.hasPrefix()) throw NSDECL_X.get(ii, nm.prefix());
+      final byte[] nm = trim(item.string(ii));
+      if(!XMLToken.isQName(nm)) throw FUNCCAST_X_X_X.get(ii, item.type, type, item);
+      qnm = new QNm(nm, sc);
+      if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
     } else {
       throw diffError(this, item, ii);
     }
-    return eq(nm);
+    return eq(qnm);
   }
 
   @Override

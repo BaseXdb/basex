@@ -3039,4 +3039,15 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>A</a> ! (if(text()) then string() else ())",
         "A", root(ItemMap.class), empty(If.class));
   }
+
+  /** Compare untyped atomics with QNames. */
+  @Test public void gh2183() {
+    error("xs:QName('x') = <x/>", FUNCCAST_X_X_X);
+    error("<x/> = xs:QName('x')", FUNCCAST_X_X_X);
+    query("<x> x </x> = xs:QName('x')", true);
+
+    error("xs:QName('x') = xs:untypedAtomic('')", FUNCCAST_X_X_X);
+    error("xs:untypedAtomic('') = xs:QName('x')", FUNCCAST_X_X_X);
+    query("xs:untypedAtomic(' x ') = xs:QName('x')", true);
+  }
 }
