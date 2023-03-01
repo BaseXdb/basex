@@ -106,9 +106,9 @@ public final class RestXqWadl {
 
     final FElem param = elem("param", root);
     param.add("name", name).add("style", style);
-    final QNm qn = new QNm(name);
+    final QNm qnm = new QNm(name);
     for(final Var var : func.function.params) {
-      if(var.name.eq(qn) && var.declType != null) {
+      if(var.name.eq(qnm) && var.declType != null) {
         param.add("type", var.declType.toString());
       }
     }

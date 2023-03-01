@@ -2984,10 +2984,10 @@ public class QueryParser extends InputParser {
 
     final Expr name;
     final InputInfo ii = info();
-    final QNm qn = eQName(SKIPCHECK, null);
-    if(qn != null) {
-      name = qn;
-      qnames.add(qn, ii);
+    final QNm qnm = eQName(SKIPCHECK, null);
+    if(qnm != null) {
+      name = qnm;
+      qnames.add(qnm, ii);
     } else {
       if(!wsConsume("{")) return null;
       name = check(expr(), NOELEMNAME);
@@ -3008,10 +3008,10 @@ public class QueryParser extends InputParser {
 
     final Expr name;
     final InputInfo ii = info();
-    final QNm qn = eQName(SKIPCHECK, null);
-    if(qn != null) {
-      name = qn;
-      qnames.add(qn, false, ii);
+    final QNm qnm = eQName(SKIPCHECK, null);
+    if(qnm != null) {
+      name = qnm;
+      qnames.add(qnm, false, ii);
     } else {
       if(!wsConsume("{")) return null;
       name = check(expr(), NOATTNAME);
