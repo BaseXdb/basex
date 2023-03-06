@@ -129,7 +129,7 @@ public final class Namespaces {
 
     int id = 0;
     for(int c = 0; c < ch; c++) {
-      final NSNode child = root.child(0);
+      final NSNode child = root.child(c);
       final int[] values = child.values();
       // give up if child node has more children or more than one namespace
       // give up if namespace has a non-empty prefix

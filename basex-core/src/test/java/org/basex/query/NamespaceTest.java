@@ -764,6 +764,16 @@ public final class NamespaceTest extends SandboxTest {
         "<w:g xmlns:w='X' xmlns:a='a' a:y=''/>) into <w:h xmlns:w='X' xmlns:a='a' a:z=''/>");
   }
 
+  /** Documents with irregular namespaces, wildcard name tests. */
+  @Test public void gh2184() {
+    execute(new CreateDB("db"));
+    execute(new Add("a", "<A xmlns='a'/>"));
+    execute(new Add("b", "<b:B xmlns:b='b'/>"));
+    query("/*:B", "<b:B xmlns:b=\"b\"/>");
+    execute(new Close());
+    query("db:get('db')/*:B", "<b:B xmlns:b=\"b\"/>");
+  }
+
   /**
    * Creates the specified test databases.
    * @param db database numbers
