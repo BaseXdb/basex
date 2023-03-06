@@ -43,6 +43,18 @@
       <artifactId>jing</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.nineml</groupId>
+      <artifactId>coffeefilter</artifactId>
+      <version>1.99.13</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.nineml</groupId>
+      <artifactId>coffeegrinder</artifactId>
+      <version>1.99.12</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
   <build>

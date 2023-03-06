@@ -786,6 +786,15 @@ public enum QueryError {
   FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
 
   /** Error code. */
+  IXML_UNEXPECTED_X(IXML, 1, "Unexpected exception while generating ixml parser: %"),
+  /** Error code. */
+  IXML_GEN_X_X_X(IXML, 2, "Failed to generate ixml parser: could not match % at line %, column %."),
+  /** Error code. */
+  IXML_INP_X_X_X(IXML, 3, "Failed to parse ixml input: could not match % at line %, column %."),
+  /** Error code. */
+  IXML_RESULT_X(IXML, 4, "Failed to process ixml parser result: %"),
+
+  /** Error code. */
   SERATTR_X(SENR, 1, "Attributes cannot be serialized:%."),
   /** Error code. */
   SERNS_X(SENR, 1, "Namespaces cannot be serialized:%."),
@@ -1535,6 +1544,7 @@ public enum QueryError {
     /** Error type. */ FOUT,
     /** Error type. */ FTDY,
     /** Error type. */ FTST,
+    /** Error type. */ IXML,
     /** Error type. */ SENR,
     /** Error type. */ SEPM,
     /** Error type. */ SERE,
