@@ -21,7 +21,7 @@ public class FnContainsSequence extends StandardFunc {
     final Value input = exprs[0].value(qc);
     final Value subsequence = exprs[1].value(qc);
     final QueryBiFunction<Item, Item, Boolean> cmp;
-    if(exprs.length > 2) {
+    if(defined(2)) {
       final FItem compare = toFunction(exprs[2], 2, qc);
       cmp = (item1, item2) -> toBoolean(compare.invoke(qc, info, item1, item2).item(qc, info));
     } else {
@@ -59,7 +59,7 @@ public class FnContainsSequence extends StandardFunc {
     final SeqType ist = input.seqType(), sst = subsequence.seqType();
     if(sst.zero()) return Bln.TRUE;
 
-    if(exprs.length > 2) {
+    if(defined(2)) {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
           sst.with(Occ.EXACTLY_ONE));
     }

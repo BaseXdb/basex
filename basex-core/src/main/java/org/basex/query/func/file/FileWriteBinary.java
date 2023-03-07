@@ -36,7 +36,18 @@ public class FileWriteBinary extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toParent(toPath(0, qc));
-    if(exprs.length < 3) {
+    if(defined(2)) {
+      // write file chunk
+      final Bin binary = toBin(exprs[1], qc);
+      final long offset = toLong(exprs[2], qc);
+
+      try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
+        final long length = raf.length();
+        if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
+        raf.seek(offset);
+        raf.write(binary.binary(info));
+      }
+    } else {
       // write full file
       try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append))) {
         if(exprs[1].getClass() == ArchiveCreate.class) {
@@ -48,17 +59,6 @@ public class FileWriteBinary extends FileFn {
             for(int b; (b = bi.read()) != -1;) out.write(b);
           }
         }
-      }
-    } else {
-      // write file chunk
-      final Bin binary = toBin(exprs[1], qc);
-      final long offset = toLong(exprs[2], qc);
-
-      try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
-        final long length = raf.length();
-        if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
-        raf.seek(offset);
-        raf.write(binary.binary(info));
       }
     }
   }

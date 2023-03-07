@@ -19,7 +19,7 @@ public final class ArrayGet extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
     final Item position = toAtomItem(exprs[1], qc);
-    final FItem fallback = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
+    final FItem fallback = defined(2) ? toFunction(exprs[2], 1, qc) : null;
 
     if(fallback == null) return array.get(position, info);
 
@@ -30,13 +30,12 @@ public final class ArrayGet extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr array = exprs[0];
-    final boolean fallback = exprs.length > 2;
 
     // combine result type with return type of fallback function
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
       SeqType st = ((ArrayType) type).declType;
-      if(fallback) {
+      if(defined(2)) {
         final Type ftype = exprs[2].seqType().type;
         if(ftype instanceof FuncType) st = st.union(((FuncType) ftype).declType);
       }

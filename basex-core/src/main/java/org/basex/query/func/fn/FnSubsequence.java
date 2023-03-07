@@ -124,7 +124,7 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   SeqRange range(final CompileContext cc) throws QueryException {
-    return exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value) ?
+    return exprs[1] instanceof Value && (!defined(2) || exprs[2] instanceof Value) ?
       range(cc.qc) : null;
   }
 
@@ -139,9 +139,9 @@ public class FnSubsequence extends StandardFunc {
     if(Double.isNaN(start)) return EMPTY;
     final long s = start(start);
 
-    final Item end = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    final Item end = defined(2) ? exprs[2].atomItem(qc, info) : Empty.VALUE;
     long e = Long.MAX_VALUE;
-    if(end != Empty.VALUE) {
+    if(!end.isEmpty()) {
       start = toDouble(end);
       if(Double.isNaN(start) || s == Long.MIN_VALUE && start == Double.POSITIVE_INFINITY) {
         return EMPTY;

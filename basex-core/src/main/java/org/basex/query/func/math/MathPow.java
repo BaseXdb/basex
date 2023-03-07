@@ -21,7 +21,7 @@ public final class MathPow extends MathFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item x = exprs[0].atomItem(qc, info);
     final double y = toDouble(exprs[1], qc);
-    return x == Empty.VALUE ? Empty.VALUE : Dbl.get(power(toDouble(x), y));
+    return x.isEmpty() ? Empty.VALUE : Dbl.get(power(toDouble(x), y));
   }
 
   @Override

@@ -17,7 +17,7 @@ public final class FileDelete extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(0, qc);
-    final boolean recursive = exprs.length > 1 && toBooleanOrFalse(exprs[1], qc);
+    final boolean recursive = toBooleanOrFalse(arg(1), qc);
 
     if(recursive) {
       delete(path, qc);

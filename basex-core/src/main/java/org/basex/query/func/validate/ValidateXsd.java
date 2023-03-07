@@ -70,10 +70,10 @@ public class ValidateXsd extends ValidateFn {
           QueryException {
 
         final IO input = read(toNodeOrAtomItem(0, qc), null);
-        final Item schema = exprs.length > 1 ? toNodeOrAtomItem(1, qc) : Empty.VALUE;
+        final Item schema = defined(1) ? toNodeOrAtomItem(1, qc) : Empty.VALUE;
         final HashMap<String, String> options = toOptions(2, qc);
 
-        final String url = schema != Empty.VALUE ? prepare(read(schema, null), handler).url() : "";
+        final String url = schema.isEmpty() ? "" : prepare(read(schema, null), handler).url();
         final String caching = options.remove("cache");
         final boolean cache = caching != null && Strings.toBoolean(caching);
 

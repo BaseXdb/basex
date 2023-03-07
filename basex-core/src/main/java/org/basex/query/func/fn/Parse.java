@@ -47,7 +47,7 @@ public abstract class Parse extends StandardFunc {
       IO io = input;
       if(io == null) {
         final Item href = exprs[0].atomItem(qc, info);
-        if(href == Empty.VALUE) return check ? Bln.FALSE : Empty.VALUE;
+        if(href.isEmpty()) return check ? Bln.FALSE : Empty.VALUE;
         io = input(toToken(href));
         if(io == null) throw INVURL_X.get(info, href);
       }

@@ -23,11 +23,10 @@ import org.basex.util.list.*;
 public final class DbCreate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int el = exprs.length;
     final String name = toName(0, false, qc);
 
     final StringList paths = new StringList();
-    if(el > 2) {
+    if(defined(2)) {
       final Iter iter = exprs[2].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         paths.add(toDbPath(toString(item)));
@@ -35,7 +34,7 @@ public final class DbCreate extends DbNew {
     }
 
     final NewInput[] inputs;
-    if(el > 1) {
+    if(defined(1)) {
       final Value value = exprs[1].value(qc);
       final long is = value.size(), ps = paths.size();
       // if paths are supplied, number of specified inputs and paths must be identical

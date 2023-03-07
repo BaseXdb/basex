@@ -6,7 +6,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -23,7 +22,7 @@ public final class ArrayJoin extends ArrayFn {
     final Expr arrays = exprs[0];
     if(arrays.seqType().zeroOrOne()) {
       final Item item = arrays.item(qc, info);
-      return item == Empty.VALUE ? XQArray.empty() : toArray(item);
+      return item.isEmpty() ? XQArray.empty() : toArray(item);
     }
 
     final Iter iter = arrays.iter(qc);

@@ -43,7 +43,7 @@ public class FnSlice extends StandardFunc {
     if(st.zero()) return input;
 
     // for the following optimizations, the numeric properties must either be static or absent
-    final IntPredicate value = e -> e >= exprs.length || exprs[e] instanceof Value;
+    final IntPredicate value = e -> !defined(e) || exprs[e] instanceof Value;
     if(value.test(1) && value.test(2) && value.test(3)) {
       final long size = input.size();
       if(size != -1) {
@@ -95,9 +95,9 @@ public class FnSlice extends StandardFunc {
    * @throws QueryException query exception
    */
   private long toLong(final int i, final long dflt, final QueryContext qc) throws QueryException {
-    if(i < exprs.length) {
+    if(defined(i)) {
       final Item item = exprs[i].atomItem(qc, info);
-      if(item != Empty.VALUE) return toLong(item);
+      if(!item.isEmpty()) return toLong(item);
     }
     return dflt;
   }

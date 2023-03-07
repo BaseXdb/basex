@@ -111,7 +111,7 @@ abstract class BinFn extends StandardFunc {
   final Item pad(final QueryContext qc, final boolean left) throws QueryException {
     final B64 binary = toB64(exprs[0], qc, true);
     final long size = toLong(exprs[1], qc);
-    final long octet = exprs.length > 2 ? toLong(exprs[2], qc) : 0;
+    final long octet = defined(2) ? toLong(exprs[2], qc) : 0;
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);
@@ -139,7 +139,7 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final ByteOrder order(final int o, final QueryContext qc) throws QueryException {
-    if(o >= exprs.length) return ByteOrder.BIG_ENDIAN;
+    if(!defined(o)) return ByteOrder.BIG_ENDIAN;
     final byte[] order = toToken(exprs[o], qc);
     if(eq(order, BIG)) return ByteOrder.BIG_ENDIAN;
     if(eq(order, LITTLE)) return ByteOrder.LITTLE_ENDIAN;
@@ -155,8 +155,8 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final int[] bounds(final Item offset, final Item length, final int size) throws QueryException {
-    final Long off = offset == Empty.VALUE ? null : toLong(offset);
-    final Long len = length == Empty.VALUE ? null : toLong(length);
+    final Long off = offset.isEmpty() ? null : toLong(offset);
+    final Long len = length.isEmpty() ? null : toLong(length);
 
     int of = 0;
     if(off != null) {
@@ -205,6 +205,6 @@ abstract class BinFn extends StandardFunc {
    */
   final byte[] token(final int offset, final QueryContext qc) throws QueryException {
     final Item item = exprs[offset].atomItem(qc, info);
-    return item == Empty.VALUE ? null : toToken(item);
+    return item.isEmpty() ? null : toToken(item);
   }
 }

@@ -57,7 +57,7 @@ public final class XQueryForkJoin extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr functions = exprs[0], options = exprs.length > 1 ? exprs[1] : null;
+    final Expr functions = exprs[0], options = defined(1) ? exprs[1] : null;
     final SeqType st = functions.seqType();
     if(st.zero()) return functions;
     if(st.one()) return new DynFuncCall(info, sc, functions).optimize(cc);

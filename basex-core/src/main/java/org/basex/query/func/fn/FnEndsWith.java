@@ -15,8 +15,11 @@ import org.basex.util.*;
 public final class FnEndsWith extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc), sub = toZeroToken(exprs[1], qc);
+    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] substring = toZeroToken(exprs[1], qc);
     final Collation coll = toCollation(2, qc);
-    return Bln.get(coll == null ? Token.endsWith(value, sub) : coll.endsWith(value, sub, info));
+
+    return Bln.get(coll == null ? Token.endsWith(value, substring) :
+      coll.endsWith(value, substring, info));
   }
 }

@@ -134,7 +134,7 @@ public final class CmpIR extends Single {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return Bln.get(item != Empty.VALUE && inRange(item));
+      return Bln.get(!item.isEmpty() && inRange(item));
     }
 
     // pre-evaluate ranges

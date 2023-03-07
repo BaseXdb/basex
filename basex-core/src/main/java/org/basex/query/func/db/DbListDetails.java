@@ -27,7 +27,7 @@ public final class DbListDetails extends DbList {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // overwrites implementation of the super class
-    return exprs.length > 0 ? resources(qc) : list(qc);
+    return defined(0) ? resources(qc) : list(qc);
   }
 
   @Override
@@ -76,7 +76,7 @@ public final class DbListDetails extends DbList {
    */
   private Iter resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final String path = exprs.length > 1 ? toString(exprs[1], qc) : "";
+    final String path = defined(1) ? toString(exprs[1], qc) : "";
 
     final IntList docs = data.resources.docs(path);
     final StringList binaries = data.resources.paths(path, ResourceType.BINARY);

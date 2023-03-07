@@ -20,10 +20,10 @@ public final class ConvertBinaryToString extends ConvertFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Bin value = toBin(exprs[0], qc);
     final String encoding = toEncodingOrNull(1, CONVERT_ENCODING_X, qc);
-    final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
+    final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     try(BufferInput bi = value.input(info)) {
-      return Str.get(toString(bi, encoding, validate));
+      return Str.get(toString(bi, encoding, !fallback));
     } catch(final IOException ex) {
       throw CONVERT_STRING_X.get(info, ex);
     }

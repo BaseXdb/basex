@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -19,9 +18,9 @@ import org.basex.util.*;
 public final class FnString extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = ctxArg(0, qc).item(qc, info);
+    final Item item = context(0, qc).item(qc, info);
 
-    if(item == Empty.VALUE) return Str.EMPTY;
+    if(item.isEmpty()) return Str.EMPTY;
     if(item.type == AtomType.STRING) return item;
     if(!(item instanceof FItem) || item instanceof XQJava) return Str.get(item.string(info));
 

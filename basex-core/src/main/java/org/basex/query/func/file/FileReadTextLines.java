@@ -79,13 +79,13 @@ public final class FileReadTextLines extends FileRead {
   private NewlineInput input(final QueryContext qc) throws IOException, QueryException {
     final Path path = toPath(0, qc);
     final String encoding = toEncodingOrNull(1, FILE_UNKNOWN_ENCODING_X, qc);
-    final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
+    final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
     final NewlineInput ni = new NewlineInput(new IOFile(path.toFile()));
-    ni.encoding(encoding).validate(validate);
+    ni.encoding(encoding).validate(!fallback);
     return ni;
   }
 
@@ -96,12 +96,11 @@ public final class FileReadTextLines extends FileRead {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-    final int el = exprs.length;
-   final Item offset = el > 3 ? exprs[3].atomItem(qc, info) : Empty.VALUE;
-    final Item length = el > 4 ? exprs[4].atomItem(qc, info) : Empty.VALUE;
+   final Item offset = defined(3) ? exprs[3].atomItem(qc, info) : Empty.VALUE;
+    final Item length = defined(4) ? exprs[4].atomItem(qc, info) : Empty.VALUE;
 
-    final long off = offset != Empty.VALUE ? toLong(offset) : 1;
-    final long len = length != Empty.VALUE ? toLong(length) : Long.MAX_VALUE;
+    final long off = offset.isEmpty() ? 1 : toLong(offset);
+    final long len = length.isEmpty() ? Long.MAX_VALUE : toLong(length);
     final long end = off + len < 0 ? Long.MAX_VALUE : off + len;
     return new long[] { off, end };
   }

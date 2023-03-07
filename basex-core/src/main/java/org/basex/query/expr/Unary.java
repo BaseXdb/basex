@@ -62,7 +62,7 @@ public final class Unary extends Single {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item == Empty.VALUE) return Empty.VALUE;
+    if(item.isEmpty()) return Empty.VALUE;
 
     final Type type = item.type;
     if(type.isUntyped()) {

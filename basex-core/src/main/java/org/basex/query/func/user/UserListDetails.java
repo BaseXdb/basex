@@ -15,7 +15,7 @@ public final class UserListDetails extends UserList {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // return information on single user
-    if(exprs.length > 0) return toUser(0, qc).toXML(qc, info);
+    if(defined(0)) return toUser(0, qc).toXML(qc, info);
 
     // return information for all users
     final Context ctx = qc.context;

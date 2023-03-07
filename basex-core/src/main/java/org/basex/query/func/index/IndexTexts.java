@@ -6,7 +6,6 @@ import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -17,10 +16,9 @@ import org.basex.util.*;
 public class IndexTexts extends IndexFn {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final int el = exprs.length;
     final Data data = toData(qc);
-    final byte[] prefix = el > 1 ? toZeroToken(exprs[1], qc) : Token.EMPTY;
-    final Boolean ascending = el > 2 ? toBoolean(exprs[2], qc) : null;
+    final byte[] prefix = toZeroToken(arg(1), qc);
+    final Boolean ascending = defined(2) ? toBoolean(exprs[2], qc) : null;
 
     final IndexEntries entries = ascending != null ? new IndexEntries(prefix, ascending, type()) :
       new IndexEntries(prefix, type());

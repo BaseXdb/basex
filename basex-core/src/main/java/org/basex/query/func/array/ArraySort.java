@@ -24,7 +24,7 @@ public final class ArraySort extends StandardFunc {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(exprs[0], qc);
     final Collation coll = toCollation(1, true, qc);
-    final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
+    final FItem key = defined(2) ? toFunction(exprs[2], 1, qc) : null;
 
     final ValueList values = new ValueList(array.arraySize());
     for(final Value value : array.members()) {
@@ -47,7 +47,7 @@ public final class ArraySort extends StandardFunc {
     final Type type = st.type;
 
     if(type instanceof ArrayType) {
-      if(exprs.length > 2) {
+      if(defined(2)) {
         exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM,
             ((ArrayType) type).declType);
       }
@@ -58,6 +58,6 @@ public final class ArraySort extends StandardFunc {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && exprs.length > 2 || super.has(flags);
+    return Flag.HOF.in(flags) && defined(2) || super.has(flags);
   }
 }

@@ -59,7 +59,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final TokenSet entries(final int e, final QueryContext qc) throws QueryException {
     TokenSet hs = null;
-    if(e < exprs.length) {
+    if(defined(e)) {
       // filter result to specified entries
       hs = new TokenSet();
       final Iter names = exprs[e].iter(qc);

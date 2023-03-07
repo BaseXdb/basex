@@ -32,7 +32,7 @@ public final class ArrayPartition extends ArrayFn {
           if(item == null || toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
             final Value v = value;
             value = item;
-            if(v != Empty.VALUE) return XQArray.member(v);
+            if(!v.isEmpty()) return XQArray.member(v);
           } else {
             value = ValueBuilder.concat(value, item, qc);
           }

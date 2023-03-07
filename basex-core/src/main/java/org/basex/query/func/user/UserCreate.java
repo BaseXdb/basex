@@ -30,7 +30,7 @@ public final class UserCreate extends UserFn {
     final User user = new User(name, password);
     if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
 
-    if(exprs.length > 4) {
+    if(defined(4)) {
       final ANode node = toElem(exprs[4], qc);
       if(!T_INFO.matches(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
       user.info(node.materialize(n -> false, info, qc));

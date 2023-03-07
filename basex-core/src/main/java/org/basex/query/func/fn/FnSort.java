@@ -47,7 +47,7 @@ public final class FnSort extends StandardFunc {
    */
   private Iter iter(final Value input, final QueryContext qc) throws QueryException {
     final Collation coll = toCollation(1, true, qc);
-    final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
+    final FItem key = defined(2) ? toFunction(exprs[2], 1, qc) : null;
 
     final long size = input.size();
     final ValueList values = new ValueList(size);
@@ -136,7 +136,7 @@ public final class FnSort extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    if(exprs.length < 2) {
+    if(!defined(1)) {
       if(st.zeroOrOne() && st.type.isSortable()) return input;
       // enforce pre-evaluation as remaining arguments may not be values
       if(input instanceof Value) {
@@ -152,7 +152,7 @@ public final class FnSort extends StandardFunc {
         args[0] = args[0].arg(0);
         return cc.function(SORT, info, args);
       }
-    } else if(exprs.length > 2) {
+    } else if(defined(2)) {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE));
     }
     return adoptType(input);
@@ -160,7 +160,7 @@ public final class FnSort extends StandardFunc {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && exprs.length > 2 || super.has(flags);
+    return Flag.HOF.in(flags) && defined(2) || super.has(flags);
   }
 
   /**
@@ -169,7 +169,7 @@ public final class FnSort extends StandardFunc {
    * @return sorted value or {@code null}
    */
   private Value quickValue(final Value input) {
-    if(exprs.length < 2) {
+    if(!defined(1)) {
       // range values
       if(input instanceof RangeSeq) {
         final RangeSeq seq = (RangeSeq) input;

@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class StoreRead extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = exprs.length > 0 ? toName(0, qc) : "";
+    final String name = defined(0) ? toName(0, qc) : "";
     try {
       if(!store(qc).read(name, qc)) throw STORE_NOTFOUND_X.get(info, name);
     } catch(final IOException ex) {

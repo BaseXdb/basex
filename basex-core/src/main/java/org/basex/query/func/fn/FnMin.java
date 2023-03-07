@@ -107,7 +107,7 @@ public class FnMin extends StandardFunc {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     // do not simplify input arguments
-    if(exprs.length > 1) exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
+    if(defined(1)) exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
   }
 
   @Override
@@ -128,7 +128,7 @@ public class FnMin extends StandardFunc {
     final Expr expr = optFirst();
     if(expr != this) return expr;
 
-    final boolean noColl = exprs.length < 2;
+    final boolean noColl = !defined(1);
     final Expr values = exprs[0];
     final SeqType st = values.seqType();
     Type type = st.type;

@@ -54,10 +54,10 @@ abstract class DateTime extends StandardFunc {
     if(!item.type.isUntyped()) {
       date = type == TIME ? new Tim(date) : type == DATE ? new Dat(date) : new Dtm(date);
     }
-    final Expr spec = arg(1);
-    final Item zone = spec != null ? spec.atomItem(qc, info) : Empty.VALUE;
-    final DTDur dur = zone != Empty.VALUE ? (DTDur) checkType(zone, DAY_TIME_DURATION) : null;
-    date.timeZone(dur, spec != null && zone == Empty.VALUE, info);
+    final boolean spec = defined(1);
+    final Item zone = spec ? exprs[1].atomItem(qc, info) : Empty.VALUE;
+    final DTDur dur = zone.isEmpty() ? null : (DTDur) checkType(zone, DAY_TIME_DURATION);
+    date.timeZone(dur, spec && zone.isEmpty(), info);
     return date;
   }
 

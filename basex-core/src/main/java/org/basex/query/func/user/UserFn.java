@@ -37,7 +37,7 @@ abstract class UserFn extends StandardFunc {
    */
   protected final StringList toPatterns(final int i, final QueryContext qc) throws QueryException {
     final StringList patterns = new StringList();
-    if(exprs.length > i) {
+    if(defined(i)) {
       final Iter iter = exprs[i].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final String pattern = toString(item);
@@ -88,7 +88,7 @@ abstract class UserFn extends StandardFunc {
       throws QueryException {
 
     final ArrayList<Perm> perms = new ArrayList<>();
-    if(exprs.length > i) {
+    if(defined(i)) {
       final Iter iter = exprs[i].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final String perm = toString(item);

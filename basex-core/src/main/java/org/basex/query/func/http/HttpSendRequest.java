@@ -6,7 +6,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.basex.util.http.*;
 
 /**
@@ -22,10 +21,10 @@ public final class HttpSendRequest extends StandardFunc {
     final ANode request = toNodeOrNull(exprs[0], qc);
 
     // get HTTP URI
-    final byte[] href = exprs.length > 1 ? toZeroToken(exprs[1], qc) : Token.EMPTY;
+    final byte[] href = toZeroToken(arg(1), qc);
     // get payload
     final ValueBuilder vb = new ValueBuilder(qc);
-    if(exprs.length > 2) {
+    if(defined(2)) {
       final Iter iter = exprs[2].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         vb.add(item);

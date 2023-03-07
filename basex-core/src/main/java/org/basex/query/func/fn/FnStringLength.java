@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -20,12 +19,12 @@ public final class FnStringLength extends ContextFn {
   @Override
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value;
-    if(exprs.length < 1) {
+    if(defined(0)) {
+      value = toZeroToken(exprs[0], qc);
+    } else {
       final Item item = ctxValue(qc).item(qc, info);
       if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item);
-      value = item == Empty.VALUE ? Token.EMPTY : item.string(info);
-    } else {
-      value = toZeroToken(exprs[0], qc);
+      value = item.isEmpty() ? Token.EMPTY : item.string(info);
     }
     return Int.get(Token.length(value));
   }

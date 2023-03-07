@@ -19,7 +19,7 @@ public final class DbOptimize extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final boolean all = exprs.length > 1 && toBooleanOrFalse(exprs[1], qc);
+    final boolean all = toBooleanOrFalse(arg(1), qc);
     final HashMap<String, String> options = toOptions(2, qc);
 
     qc.updates().add(new DBOptimize(data, all, options, qc, info), qc);

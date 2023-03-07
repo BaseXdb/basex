@@ -344,12 +344,12 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Returns the specified argument/operand of an expression (function, list, etc).
-   * @param i index of argument
-   * @return arguments or {@code null}
+   * @param a index of argument
+   * @return argument or {@link Empty#UNDEFINED} if argument is undefined
    */
-  public final Expr arg(final int i) {
+  public final Expr arg(final int a) {
     final Expr[] args = args();
-    return args != null && i < args.length ? args[i] : null;
+    return args != null && a < args.length ? args[a] : Empty.UNDEFINED;
   }
 
   /**

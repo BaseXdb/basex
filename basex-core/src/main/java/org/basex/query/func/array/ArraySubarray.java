@@ -25,8 +25,8 @@ public final class ArraySubarray extends ArrayFn {
     final long size = array.arraySize();
     if(start < 0 || start > size) throw ARRAYBOUNDS_X_X.get(info, start + 1, size + 1);
 
-    final Item length = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
-    if(length == Empty.VALUE) return array.subArray(start, size - start, qc);
+    final Item length = defined(2) ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    if(length.isEmpty()) return array.subArray(start, size - start, qc);
 
     final long len = toLong(length);
     if(len < 0) throw ARRAYNEG_X.get(info, len);

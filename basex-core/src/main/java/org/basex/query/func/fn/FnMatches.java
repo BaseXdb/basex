@@ -3,8 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 
-import java.util.regex.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
@@ -21,13 +19,13 @@ public final class FnMatches extends RegEx {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(exprs[0], qc), pattern = toToken(exprs[1], qc);
+    final Expr flags = defined(2) ? exprs[2] : null;
 
-    if(exprs.length < 3) {
+    if(flags == null) {
       final int ch = patternChar(pattern);
       if(ch != -1) return Bln.get(contains(value, ch));
     }
-    final Pattern p = pattern(pattern, exprs.length > 2 ? exprs[2] : null, qc, false);
-    return Bln.get(p.matcher(string(value)).find());
+    return Bln.get(pattern(pattern, flags, qc, false).matcher(string(value)).find());
   }
 
   @Override
@@ -36,7 +34,7 @@ public final class FnMatches extends RegEx {
 
     final SeqType st = value.seqType();
     if(st.zero() || st.one() && st.type.isStringOrUntyped()) {
-      if(pattern instanceof Str && exprs.length < 3) {
+      if(pattern instanceof Str && !defined(2)) {
         if(pattern == Str.EMPTY) return Bln.TRUE;
         for(final byte b : ((Str) pattern).string()) {
           if(contains(REGEX_CHARS, b)) return this;

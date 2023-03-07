@@ -27,7 +27,7 @@ public final class RequestParameter extends ApiFunc {
       final Value query = requestCtx.queryValues().get(name);
       final Value form = requestCtx.formValues(qc.context.options).get(name);
       if(query == null && form == null) {
-        return exprs.length > 1 ? exprs[1].value(qc) : Empty.VALUE;
+        return defined(1) ? exprs[1].value(qc) : Empty.VALUE;
       }
 
       final ValueBuilder vb = new ValueBuilder(qc);

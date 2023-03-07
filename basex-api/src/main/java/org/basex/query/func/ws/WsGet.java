@@ -20,6 +20,6 @@ public final class WsGet extends WsFn {
     final Value value = client.atts.get(name);
     if(value != null) return value;
 
-    return exprs.length > 2 ? exprs[2].value(qc) : Empty.VALUE;
+    return defined(2) ? exprs[2].value(qc) : Empty.VALUE;
   }
 }

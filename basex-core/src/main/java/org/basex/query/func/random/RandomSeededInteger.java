@@ -56,7 +56,7 @@ public final class RandomSeededInteger extends StandardFunc {
     if(num < 0) throw RANGE_NEGATIVE_X.get(info, num);
 
     long max = 0;
-    if(exprs.length > 2) {
+    if(defined(2)) {
       max = toLong(exprs[2], qc);
       if(max < 1 || max > Integer.MAX_VALUE) throw RANDOM_BOUNDS_X.get(info, max);
     }

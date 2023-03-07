@@ -17,6 +17,6 @@ public final class MathLog10 extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = exprs[0].atomItem(qc, info);
-    return value == Empty.VALUE ? Empty.VALUE : Dbl.get(log10(toDouble(value)));
+    return value.isEmpty() ? Empty.VALUE : Dbl.get(log10(toDouble(value)));
   }
 }

@@ -7,7 +7,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -25,7 +24,7 @@ public final class FnExactlyOne extends StandardFunc {
     Item item;
     if(input.seqType().zeroOrOne()) {
       item = input.item(qc, info);
-      if(item != Empty.VALUE) return item;
+      if(!item.isEmpty()) return item;
     } else {
       final Iter iter = input.iter(qc);
       item = iter.next();

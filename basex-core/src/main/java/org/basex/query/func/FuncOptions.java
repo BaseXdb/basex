@@ -85,7 +85,7 @@ public final class FuncOptions {
   private <T extends Options> T assign(final Item item, final T options, final QueryError error)
       throws QueryException {
 
-    if(item != Empty.VALUE) {
+    if(item.size() != 0) {
       try {
         if(item instanceof XQMap) {
           options.assign((XQMap) item, enforceKnown, info);

@@ -20,7 +20,7 @@ public final class ProfVoid extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr value = exprs[0];
-    final boolean skip = exprs.length > 1 && toBoolean(exprs[1], qc);
+    final boolean skip = toBooleanOrFalse(arg(1), qc);
 
     // ensure that deterministic input will be evaluated
     if(!skip || value.has(Flag.NDT)) {
@@ -41,7 +41,7 @@ public final class ProfVoid extends StandardFunc {
     final Expr value = exprs[0];
     if(value.has(Flag.NDT)) {
       if(value.size() == 0) return value;
-    } else if(exprs.length > 1 && exprs[1] instanceof Value && toBoolean(exprs[1], cc.qc)) {
+    } else if(defined(1) && exprs[1] instanceof Value && toBoolean(exprs[1], cc.qc)) {
       return Empty.VALUE;
     }
     return this;

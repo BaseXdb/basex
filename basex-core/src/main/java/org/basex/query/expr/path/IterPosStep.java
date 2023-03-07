@@ -6,7 +6,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -50,7 +49,7 @@ public final class IterPosStep extends Step {
             } else if(numeric(expr)) {
               // pre-evaluate numeric position
               final Item item = expr.item(qc, info);
-              if(item == Empty.VALUE) return null;
+              if(item.isEmpty()) return null;
               final Expr ex = IntPos.get(toDouble(item), info);
               if(!(ex instanceof CmpPos)) return null;
               posExpr[e] = (CmpPos) ex;

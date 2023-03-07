@@ -61,9 +61,9 @@ public final class Range extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item min = exprs[0].atomItem(qc, info);
-    if(min == Empty.VALUE) return Empty.VALUE;
+    if(min.isEmpty()) return Empty.VALUE;
     final Item max = exprs[1].atomItem(qc, info);
-    if(max == Empty.VALUE) return Empty.VALUE;
+    if(max.isEmpty()) return Empty.VALUE;
     final long mn = toLong(min), mx = toLong(max);
     // min smaller than max: empty sequence
     if(mn > mx) return Empty.VALUE;

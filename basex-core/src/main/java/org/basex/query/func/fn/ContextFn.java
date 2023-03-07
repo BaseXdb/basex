@@ -18,10 +18,10 @@ import org.basex.query.var.*;
  */
 public abstract class ContextFn extends StandardFunc {
   /**
-   * Argument that provides the context.
-   * @return context argument.
+   * Index of the context argument.
+   * @return index
    */
-  public int contextArg() {
+  public int contextIndex() {
     return 0;
   }
 
@@ -30,7 +30,7 @@ public abstract class ContextFn extends StandardFunc {
    * @return result of check
    */
   public final boolean contextAccess() {
-    return arg(contextArg()) == null;
+    return !defined(contextIndex());
   }
 
   /**
@@ -40,8 +40,8 @@ public abstract class ContextFn extends StandardFunc {
    * @return expression
    * @throws QueryException query exception
    */
-  protected final Expr ctxArg(final int i, final QueryContext qc) throws QueryException {
-    return i < exprs.length ? exprs[i] : ctxValue(qc);
+  protected final Expr context(final int i, final QueryContext qc) throws QueryException {
+    return defined(i) ? exprs[i] : ctxValue(qc);
   }
 
   @Override
@@ -59,7 +59,7 @@ public abstract class ContextFn extends StandardFunc {
    * @return result of check
    */
   public boolean inlineable() {
-    return (contextAccess() || exprs[contextArg()] instanceof ContextValue) &&
+    return (contextAccess() || exprs[contextIndex()] instanceof ContextValue) &&
         definition.seqType.occ == Occ.ZERO_OR_ONE;
   }
 

@@ -29,7 +29,7 @@ public class FnReplicate extends StandardFunc {
     if(count == 1) return input.value(qc);
 
     // check if expression must be evaluated only once
-    final boolean once = input instanceof Value || exprs.length < 3 || !toBoolean(exprs[2], qc);
+    final boolean once = input instanceof Value || !defined(2) || !toBoolean(exprs[2], qc);
     if(once) return SingletonSeq.get(input.value(qc), count);
 
     // repeated evaluations
@@ -46,8 +46,8 @@ public class FnReplicate extends StandardFunc {
     if(count == 1) return input.iter(qc);
 
     // check if expression must be evaluated only once
-    final boolean once = exprs.length < 3 || !toBoolean(exprs[2], qc);
-    if(once) return SingletonSeq.get(input.value(qc), count).iter();
+    final boolean repeat = toBooleanOrFalse(arg(2), qc);
+    if(!repeat) return SingletonSeq.get(input.value(qc), count).iter();
 
     // repeated evaluations
     if(input.seqType().one()) {
@@ -164,6 +164,6 @@ public class FnReplicate extends StandardFunc {
      * - replicate(random:uuid(), 2, true()) */
     return exprs[0] instanceof Value ||
       // if second argument is a static integer, it is >= 1
-      (exprs.length < 3 || exprs[2] == Bln.FALSE) && (zero || exprs[1] instanceof Int);
+      (!defined(2) || exprs[2] == Bln.FALSE) && (zero || exprs[1] instanceof Int);
   }
 }

@@ -32,7 +32,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
     final boolean rootDir = options.get(CreateFromOptions.ROOT_DIR);
 
     final Iter entries;
-    if(exprs.length > 2) {
+    if(defined(2)) {
       entries = exprs[2].iter(qc);
     } else {
       final TokenList tl = new TokenList();

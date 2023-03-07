@@ -22,7 +22,7 @@ public final class FnNormalizeUnicode extends StandardFunc {
     final byte[] value = toZeroToken(exprs[0], qc);
 
     Form frm = Form.NFC;
-    if(exprs.length > 1) {
+    if(defined(1)) {
       final byte[] form = uc(trim(toToken(exprs[1], qc)));
       if(form.length == 0) return Str.get(value);
       try {

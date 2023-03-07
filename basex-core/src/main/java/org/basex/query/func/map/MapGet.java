@@ -20,17 +20,17 @@ public final class MapGet extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(exprs[0], qc);
     final Item key = toAtomItem(exprs[1], qc);
-    final FItem fallback = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
+    final FItem fallback = defined(2) ? toFunction(exprs[2], 1, qc) : null;
 
     final Value value = map.get(key, info);
-    return value != Empty.VALUE || fallback == null || map.contains(key, info) ? value :
+    return !value.isEmpty() || fallback == null || map.contains(key, info) ? value :
       fallback.invoke(qc, info, key);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = exprs[0];
-    final boolean fallback = exprs.length > 2;
+    final boolean fallback = defined(2);
     if(fallback) {
       final Type type = exprs[1].seqType().type.atomic();
       if(type != null) exprs[2] = coerceFunc(exprs[2], cc, SeqType.ITEM_ZM, type.seqType());

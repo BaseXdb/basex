@@ -58,8 +58,7 @@ public final class MapMerge extends StandardFunc {
       if(st.one()) return exprs[0];
 
       // rewrite map:merge(map:entry, map) to map:put(map, key, value)
-      final int el = exprs.length;
-      if(el == 1 && exprs[0] instanceof List && exprs[0].args().length == 2) {
+      if(!defined(1) && exprs[0] instanceof List && exprs[0].args().length == 2) {
         final Expr[] args = exprs[0].args();
         if(_MAP_ENTRY.is(args[0]) && args[1].seqType().instanceOf(SeqType.MAP_O)) {
           return cc.function(_MAP_PUT, info, args[1], args[0].arg(0), args[0].arg(1));
@@ -71,7 +70,7 @@ public final class MapMerge extends StandardFunc {
       final SeqType dt = mt.declType;
       // broaden type if values may be combined
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
-      if(!dt.zero() && el > 1) {
+      if(!dt.zero() && defined(1)) {
         if(!(exprs[1] instanceof Value) || toOptions(1, new MergeOptions(), false, cc.qc).
             get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
           mt = MapType.get(mt.keyType(), dt.union(Occ.ONE_OR_MORE));

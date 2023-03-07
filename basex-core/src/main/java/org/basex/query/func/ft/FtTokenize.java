@@ -33,7 +33,7 @@ public class FtTokenize extends FtAccess {
     final FtTokenizeOptions options = toOptions(1, new FtTokenizeOptions(), true, qc);
 
     final TokenList tl = new TokenList();
-    if(value != Empty.VALUE) {
+    if(!value.isEmpty()) {
       final FTOpt opt = new FTOpt().assign(qc.ftOpt());
       final FTDiacritics dc = options.get(FtTokenizeOptions.DIACRITICS);
       if(dc != null) opt.set(DC, dc == FTDiacritics.SENSITIVE);

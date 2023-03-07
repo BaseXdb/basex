@@ -17,7 +17,7 @@ public final class CryptoHmac extends StandardFunc {
     final byte[] value = toBytes(exprs[0], qc);
     final byte[] key = toBytes(exprs[1], qc);
     final String algorithm = toString(exprs[2], qc);
-    final String encoding = exprs.length > 3 ? toString(exprs[3], qc) : null;
+    final String encoding = defined(3) ? toString(exprs[3], qc) : null;
 
     return new Encryption(info).hmac(value, key, algorithm, encoding);
   }

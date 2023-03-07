@@ -17,8 +17,8 @@ public final class FnDateTime extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item date = exprs[0].atomItem(qc, info);
-    final Item time = exprs.length > 1 ? exprs[1].atomItem(qc, info) : null;
-    if(date == Empty.VALUE || time == Empty.VALUE) return Empty.VALUE;
+    final Item time = exprs[1].atomItem(qc, info);
+    if(date.isEmpty() || time.isEmpty()) return Empty.VALUE;
 
     final Dat dat = date.type.isUntyped() ? new Dat(date.string(info), info) :
       (Dat) checkType(date, AtomType.DATE);
@@ -29,7 +29,7 @@ public final class FnDateTime extends DateTime {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr date = exprs[0], time = exprs.length > 1 ? exprs[1] : Str.EMPTY;
+    final Expr date = exprs[0], time = defined(1) ? exprs[1] : Str.EMPTY;
     final SeqType stDate = date.seqType(), stTime = time.seqType();
     if(stDate.zero()) return date;
     if(stTime.zero()) return time;

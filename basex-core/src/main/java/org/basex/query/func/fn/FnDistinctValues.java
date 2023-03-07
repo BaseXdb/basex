@@ -75,7 +75,7 @@ public final class FnDistinctValues extends StandardFunc {
 
     final AtomType type = st.type.atomic();
     if(type != null) {
-      if(exprs.length < 2) {
+      if(!defined(1)) {
         // distinct-values(1 to 10)  ->  1 to 10
         if(values instanceof Range || values instanceof RangeSeq || values == BlnSeq.DISTINCT)
           return values;
@@ -113,7 +113,7 @@ public final class FnDistinctValues extends StandardFunc {
    */
   private Expr optStats(final CompileContext cc) throws QueryException {
     final Expr values = exprs[0];
-    if(exprs.length < 2 && values instanceof Path) {
+    if(!defined(1) && values instanceof Path) {
       final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);

@@ -38,7 +38,7 @@ public class FnLowest extends StandardFunc {
   Value value(final boolean min, final QueryContext qc) throws QueryException {
     final Iter input = exprs[0].iter(qc);
     final Collation coll = toCollation(1, true, qc);
-    final FItem key = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
+    final FItem key = defined(2) ? toFunction(exprs[2], 1, qc) : null;
 
     final ItemList result = new ItemList();
     Value lowest = null;
@@ -76,7 +76,7 @@ public class FnLowest extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    if(exprs.length < 2) {
+    if(!defined(1)) {
       final Predicate<Type> noCheck = type -> type.isSortable() && !type.isUntyped();
       if(st.zeroOrOne() && noCheck.test(st.type)) return input;
 
@@ -99,7 +99,7 @@ public class FnLowest extends StandardFunc {
         args[0] = args[0].arg(0);
         return cc.function(min ? LOWEST : HIGHEST, info, args);
       }
-    } else if(exprs.length > 2) {
+    } else if(defined(2)) {
       exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE));
     }
     return adoptType(input);
@@ -107,6 +107,6 @@ public class FnLowest extends StandardFunc {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && exprs.length > 2 || super.has(flags);
+    return Flag.HOF.in(flags) && defined(2) || super.has(flags);
   }
 }

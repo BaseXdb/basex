@@ -35,7 +35,7 @@ public class FileWrite extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toParent(toPath(0, qc));
-    final Item opts = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
+    final Item opts = defined(2) ? exprs[2].item(qc, info) : Empty.VALUE;
     final SerializerOptions sopts = FuncOptions.serializer(opts, info);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {

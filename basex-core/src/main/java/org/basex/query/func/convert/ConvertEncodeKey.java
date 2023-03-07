@@ -14,7 +14,7 @@ public class ConvertEncodeKey extends ConvertIntegersToBase64 {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] key = toToken(exprs[0], qc);
-    final boolean lax = exprs.length > 1 && toBoolean(exprs[1], qc);
+    final boolean lax = toBooleanOrFalse(arg(1), qc);
 
     final byte[] string = XMLToken.encode(key, lax);
     return Str.get(string);

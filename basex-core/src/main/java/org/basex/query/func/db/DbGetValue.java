@@ -39,7 +39,7 @@ public class DbGetValue extends DbAccess {
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 
     try {
-      if(exprs.length > 1) {
+      if(defined(1)) {
         final String path = toDbPath(1, qc);
         final IOFile bin = data.meta.file(path, type);
         if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
@@ -73,7 +73,7 @@ public class DbGetValue extends DbAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs.length < 2) {
+    if(!defined(1)) {
       exprType.assign(MapType.get(AtomType.STRING, SeqType.ITEM_ZM).seqType());
     }
     return this;

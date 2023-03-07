@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -21,22 +22,21 @@ import org.basex.util.list.*;
 public final class FnReplace extends RegEx {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int el = exprs.length;
     final byte[] value = toZeroToken(exprs[0], qc);
     final byte[] pattern = toToken(exprs[1], qc);
-    final byte[] replacement = el > 2 ? toZeroToken(exprs[2], qc) : EMPTY;
-    final boolean noFlags = el < 4, noAction = el < 5;
-    if(noFlags) {
-      // shortcut for simple character replacements
+    final byte[] replacement = toZeroToken(exprs[2], qc);
+    final Expr flags = defined(3) ? exprs[3] : null;
+    final FItem action = defined(4) ? toFunction(exprs[4], 2, qc) : null;
+
+    // shortcut for simple character replacements
+    if(flags == null) {
       final int sp = patternChar(pattern), rp = patternChar(replacement);
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
 
-    final RegExpr regExpr = regExpr(pattern, noFlags ? null : exprs[3], qc, true);
-    final FItem action = noAction ? null : toFunction(exprs[4], 2, qc);
-
+    final RegExpr regExpr = regExpr(pattern, flags, qc, true);
     String replace = string(replacement);
-    if(noAction && (regExpr.pattern.flags() & Pattern.LITERAL) == 0) {
+    if(action == null && (regExpr.pattern.flags() & Pattern.LITERAL) == 0) {
       // standard parsing: raise errors for some special cases
       final int rl = replacement.length;
       for(int r = 0; r < rl; ++r) {
@@ -80,7 +80,7 @@ public final class FnReplace extends RegEx {
     try {
       final Matcher m = regExpr.pattern.matcher(string(value));
       final String replaced;
-      if(noAction) {
+      if(action == null) {
         replaced = m.replaceAll(replace);
       } else {
         final StringBuilder sb = new StringBuilder();
@@ -90,7 +90,7 @@ public final class FnReplace extends RegEx {
           for(int g = 0; g < gc; g++) tl.add(m.group(g + 1));
           final Item rplc = action.invoke(qc, info, Str.get(m.group()), StrSeq.get(tl)).
               atomItem(qc, ii);
-          m.appendReplacement(sb, rplc == Empty.VALUE ? "" : string(toToken(rplc)));
+          m.appendReplacement(sb, rplc.isEmpty() ? "" : string(toToken(rplc)));
         }
         replaced = m.appendTail(sb).toString();
       }
@@ -108,6 +108,6 @@ public final class FnReplace extends RegEx {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && exprs.length > 4 || super.has(flags);
+    return Flag.HOF.in(flags) && defined(4) || super.has(flags);
   }
 }

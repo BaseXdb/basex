@@ -9,7 +9,6 @@ import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.list.*;
 
 /**
  * Formatting functions.
@@ -26,22 +25,14 @@ abstract class Format extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
-    final int el = exprs.length;
-    if(el == 3 || el == 4) throw Functions.wrongArity(definition, el, new IntList(), info);
-
     final Item value = exprs[0].atomItem(qc, info);
-    if(value == Empty.VALUE) return Empty.VALUE;
+    if(value.isEmpty()) return Empty.VALUE;
 
     final byte[] picture = toZeroToken(exprs[1], qc);
-
-    final boolean more = el == 5;
-    final byte[] language = more ? toZeroToken(exprs[2], qc) : EMPTY;
-    byte[] calendar = null;
-    if(more) {
-      calendar = toTokenOrNull(exprs[3], qc);
-      if(calendar != null) calendar = trim(calendar);
-    }
-    final byte[] place = more ? toZeroToken(exprs[4], qc) : EMPTY;
+    final byte[] language = toZeroToken(arg(2), qc);
+    byte[] calendar = toTokenOrNull(arg(3), qc);
+    if(calendar != null) calendar = trim(calendar);
+    final byte[] place = toZeroToken(arg(4), qc);
 
     final ADate date = toDate(value, tp, qc);
     final Formatter form = Formatter.get(language);

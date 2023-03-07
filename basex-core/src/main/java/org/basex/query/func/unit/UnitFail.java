@@ -12,6 +12,6 @@ import org.basex.query.value.*;
 public final class UnitFail extends UnitFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    throw error(exprs.length > 0 ? toNodeOrAtomItem(0, qc) : null);
+    throw error(defined(0) ? toNodeOrAtomItem(0, qc) : null);
   }
 }

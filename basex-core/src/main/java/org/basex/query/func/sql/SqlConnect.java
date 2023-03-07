@@ -25,10 +25,9 @@ public final class SqlConnect extends SqlFn {
 
   @Override
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int el = exprs.length;
     final String url = toString(exprs[0], qc);
-    final String username = el > 1 ? toStringOrNull(exprs[1], qc) : null;
-    final String password = el > 2 ? toStringOrNull(exprs[2], qc) : null;
+    final String username = toStringOrNull(arg(1), qc);
+    final String password = toStringOrNull(arg(2), qc);
     final HashMap<String, String> options = toOptions(3, qc);
 
     // parse options; overwrite with user and password (if supplied); treat autocommit independently

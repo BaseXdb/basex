@@ -5,7 +5,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -32,7 +31,7 @@ public final class Concat extends Arr {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       final Item item = expr.atomItem(qc, info);
-      if(item != Empty.VALUE) tb.add(item.string(info));
+      if(!item.isEmpty()) tb.add(item.string(info));
     }
     return Str.get(tb.finish());
   }
@@ -46,7 +45,7 @@ public final class Concat extends Arr {
     for(final Expr expr : exprs) {
       if(expr instanceof Value) {
         final Item item = expr.atomItem(cc.qc, info);
-        if(item != Empty.VALUE) tb.add(item.string(info));
+        if(!item.isEmpty()) tb.add(item.string(info));
       } else {
         if(!tb.isEmpty()) list.add(Str.get(tb.next()));
         list.add(expr);

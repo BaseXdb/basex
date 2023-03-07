@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.server.Log.*;
 import org.basex.util.*;
 
@@ -259,7 +258,7 @@ public final class QueryJob extends Job implements Runnable {
 
       if(remove) ctx.jobs.tasks.remove(id);
       if(notify != null) notify.accept(result);
-      if(result.value == Empty.VALUE) ctx.jobs.results.remove(id);
+      if(result.value != null && result.value.isEmpty()) ctx.jobs.results.remove(id);
     }
   }
 

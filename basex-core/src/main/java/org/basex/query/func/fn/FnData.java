@@ -18,17 +18,17 @@ import org.basex.util.*;
 public final class FnData extends ContextFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return ctxArg(0, qc).atomIter(qc, info);
+    return context(0, qc).atomIter(qc, info);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return ctxArg(0, qc).atomValue(qc, info);
+    return context(0, qc).atomValue(qc, info);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return ctxArg(0, qc).atomItem(qc, info);
+    return context(0, qc).atomItem(qc, info);
   }
 
   @Override
@@ -76,6 +76,6 @@ public final class FnData extends ContextFn {
 
   @Override
   public boolean inlineable() {
-    return contextAccess() || exprs[contextArg()] instanceof ContextValue;
+    return contextAccess() || exprs[contextIndex()] instanceof ContextValue;
   }
 }

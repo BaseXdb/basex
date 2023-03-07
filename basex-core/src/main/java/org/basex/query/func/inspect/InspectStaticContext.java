@@ -27,7 +27,7 @@ public final class InspectStaticContext extends StandardFunc {
     Item func = exprs[0].item(qc, info);
     final String name = toString(exprs[1], qc);
     final StaticContext sctx;
-    if(func == Empty.VALUE) {
+    if(func.isEmpty()) {
       sctx = sc;
     } else {
       func = toFunction(func, qc);

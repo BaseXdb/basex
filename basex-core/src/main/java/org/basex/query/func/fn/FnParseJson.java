@@ -15,6 +15,6 @@ public class FnParseJson extends FnJsonDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item json = exprs[0].atomItem(qc, info);
-    return json == Empty.VALUE ? Empty.VALUE : parse(toToken(json), false, qc);
+    return json.isEmpty() ? Empty.VALUE : parse(toToken(json), false, qc);
   }
 }

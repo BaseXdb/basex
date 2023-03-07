@@ -16,6 +16,6 @@ public final class FnYearFromDate extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = exprs[0].atomItem(qc, info);
-    return value == Empty.VALUE ? Empty.VALUE : Int.get(toDate(value, AtomType.DATE, qc).yea());
+    return value.isEmpty() ? Empty.VALUE : Int.get(toDate(value, AtomType.DATE, qc).yea());
   }
 }

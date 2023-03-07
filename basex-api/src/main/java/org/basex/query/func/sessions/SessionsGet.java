@@ -21,6 +21,6 @@ public final class SessionsGet extends SessionsFn {
     final Object object = session.get(name);
     if(object != null) return JavaCall.toValue(object, qc, info);
 
-    return exprs.length > 2 ? exprs[2].value(qc) : Empty.VALUE;
+    return defined(2) ? exprs[2].value(qc) : Empty.VALUE;
   }
 }

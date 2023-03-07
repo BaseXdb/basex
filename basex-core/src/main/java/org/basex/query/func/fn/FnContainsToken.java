@@ -38,7 +38,7 @@ public final class FnContainsToken extends StandardFunc {
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // support limited to default collation
     final Expr value = exprs[0], token = exprs[1];
-    return exprs.length < 3 && token.seqType().zeroOrOne() &&
+    return !defined(2) && token.seqType().zeroOrOne() &&
       ii.create(token, ii.type(value, IndexType.TOKEN), true, info);
   }
 }

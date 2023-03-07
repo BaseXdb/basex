@@ -23,7 +23,7 @@ public class FnAll extends StandardFunc {
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = exprs[0].iter(qc);
-    final FItem predicate = exprs.length > 1 ? toFunction(exprs[1], 1, qc) : null;
+    final FItem predicate = defined(1) ? toFunction(exprs[1], 1, qc) : null;
 
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
@@ -46,7 +46,7 @@ public class FnAll extends StandardFunc {
     final Var var = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), new IntObjMap<>());
     final For fr = new For(var, input).optimize(cc);
 
-    final Expr func = exprs.length > 1 ?
+    final Expr func = defined(1) ?
       coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE)) : null;
     final Expr ref = new VarRef(info, var).optimize(cc);
     final Expr rtrn = func != null ? new DynFuncCall(info, sc, func, ref).optimize(cc) : ref;

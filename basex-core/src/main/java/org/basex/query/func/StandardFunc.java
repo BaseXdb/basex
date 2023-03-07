@@ -23,6 +23,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -32,6 +33,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 import org.basex.util.similarity.*;
 
@@ -143,7 +145,7 @@ public abstract class StandardFunc extends Arr {
    * @return original expression or function argument
    */
   protected final Expr optFirst(final boolean occ, final boolean atom, final Value value) {
-    final Expr expr = exprs.length > 0 ? exprs[0] : value;
+    final Expr expr = defined(0) ? exprs[0] : value;
     if(expr != null) {
       final SeqType st = expr.seqType();
       if(st.zero()) return expr;
@@ -244,7 +246,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Expr compileData(final CompileContext cc) throws QueryException {
-    if(cc.dynamic && exprs.length > 0 && exprs[0] instanceof Value) {
+    if(cc.dynamic && defined(0) && exprs[0] instanceof Value) {
       final Data data = toData(cc.qc);
       exprType.data(data);
       cc.info(OPTOPEN_X, data.meta.name);
@@ -344,9 +346,9 @@ public abstract class StandardFunc extends Arr {
   protected final Collation toCollation(final int i, final boolean empty, final QueryContext qc)
       throws QueryException {
     byte[] uri = null;
-    if(i < exprs.length) {
+    if(defined(i)) {
       final Item item = exprs[i].atomItem(qc, info);
-      if(item != Empty.VALUE) uri = toToken(item);
+      if(!item.isEmpty()) uri = toToken(item);
       else if(!empty) checkNoEmpty(item);
     }
     return Collation.get(uri, qc, sc, info, WHICHCOLL_X);
@@ -458,8 +460,8 @@ public abstract class StandardFunc extends Arr {
   protected final String toEncodingOrNull(final int i, final QueryError err, final QueryContext qc)
       throws QueryException {
 
-    final Item encoding = i < exprs.length ? exprs[i].atomItem(qc, info) : Empty.VALUE;
-    if(encoding == Empty.VALUE) return null;
+    final Item encoding = arg(i).atomItem(qc, info);
+    if(encoding.size() == 0) return null;
 
     final String enc = toString(encoding);
     try {
@@ -508,8 +510,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final int i, final E options,
       final boolean enforce, final QueryContext qc) throws QueryException {
-    return i >= exprs.length ? options :
-      new FuncOptions(info).assign(exprs[i].item(qc, info), options, enforce);
+    return new FuncOptions(info).assign(arg(i).item(qc, info), options, enforce);
   }
 
   /**
@@ -523,22 +524,20 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<>();
-    if(i < exprs.length) {
-      final Item item = exprs[i].item(qc, info);
-      final XQMap map = item == Empty.VALUE ? XQMap.empty() : toMap(item);
-      map.apply((key, value) -> {
-        final byte[] k;
-        if(key.type.isStringOrUntyped()) {
-          k = key.string(null);
-        } else {
-          final QNm qnm = toQNm(key, false);
-          final TokenBuilder tb = new TokenBuilder();
-          if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
-          k = tb.add(qnm.local()).finish();
-        }
-        hm.put(string(k), value);
-      });
-    }
+    final Item item = arg(i).item(qc, info);
+    final XQMap map = item.size() == 0 ? XQMap.empty() : toMap(item);
+    map.apply((key, value) -> {
+      final byte[] k;
+      if(key.type.isStringOrUntyped()) {
+        k = key.string(null);
+      } else {
+        final QNm qnm = toQNm(key, false);
+        final TokenBuilder tb = new TokenBuilder();
+        if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
+        k = tb.add(qnm.local()).finish();
+      }
+      hm.put(string(k), value);
+    });
     return hm;
   }
 
@@ -625,6 +624,15 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Indicates if the supplied argument is defined.
+   * @param i index of argument
+   * @return result of check
+   */
+  protected final boolean defined(final int i) {
+    return arg(i) != Empty.UNDEFINED;
+  }
+
+  /**
    * Tries to lock a database supplied by the specified argument.
    * @param visitor visitor
    * @param backup backup flag
@@ -666,11 +674,56 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, NAME, definition.id()), exprs);
+    final int undefined = undefined();
+    if(undefined == 0) {
+      plan.add(plan.create(this, NAME, definition.id()), exprs);
+    } else {
+      final int el = exprs.length;
+      final QNm[] names = definition.paramNames(el);
+      final ExprList args = new ExprList(el - undefined);
+      final StringList nms = new StringList(el - undefined);
+      for(int e = 0; e < el; e++) {
+        if(defined(e)) {
+          args.add(exprs[e]);
+          nms.add(names[e].toString());
+        }
+      }
+      plan.add(plan.create(this, NAME, definition.id(), ARG, String.join(", ", nms.finish())),
+          args.finish());
+    }
   }
 
   @Override
   public final void toString(final QueryString qs) {
-    qs.token(definition.id()).params(exprs);
+    final int undefined = undefined();
+    if(undefined == 0) {
+      qs.token(definition.id()).params(exprs);
+    } else {
+      final int el = exprs.length;
+      final QNm[] names = definition.paramNames(el);
+      final Object[] args = new Object[el - undefined];
+      boolean gap = false;
+      for(int e = 0, a = 0; e < el; e++) {
+        if(defined(e)) {
+          args[a++] = gap ? names[e] + " := " + exprs[e] : exprs[e];
+        } else {
+          gap = true;
+        }
+      }
+      qs.token(definition.id()).params(args);
+    }
+  }
+
+  /**
+   * Returns the number of undefined arguments.
+   * @return count
+   */
+  private int undefined() {
+    int c = 0;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e++) {
+      if(!defined(e)) c++;
+    }
+    return c;
   }
 }

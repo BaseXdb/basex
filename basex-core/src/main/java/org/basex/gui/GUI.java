@@ -458,7 +458,7 @@ public final class GUI extends JFrame implements BaseXWindow {
           // update visualizations
           notify.update();
           // adopt updated nodes as result set
-          if(nodes == null && value == Empty.VALUE) nodes = context.current();
+          if(nodes == null && value.isEmpty()) nodes = context.current();
         } else if(value != null) {
           // check if result has changed
           final boolean filterrt = gopts.get(GUIOptions.FILTERRT);

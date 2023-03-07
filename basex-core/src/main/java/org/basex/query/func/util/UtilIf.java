@@ -29,6 +29,6 @@ public final class UtilIf extends StandardFunc {
    * @return new if expression
    */
   private If create() {
-    return new If(info, exprs[0], exprs[1], exprs.length > 2 ? exprs[2] : Empty.VALUE);
+    return new If(info, exprs[0], exprs[1], defined(2) ? exprs[2] : Empty.VALUE);
   }
 }

@@ -20,12 +20,9 @@ public final class DbAdd extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    String path = "";
-    if(exprs.length > 2) {
-      final String token = toStringOrNull(exprs[2], qc);
-      if(token != null) path = toDbPath(token);
-    }
-    final NewInput input = toNewInput(toNodeOrAtomItem(1, qc), path);
+    final String path = toStringOrNull(arg(2), qc);
+
+    final NewInput input = toNewInput(toNodeOrAtomItem(1, qc), path != null ? toDbPath(path) : "");
     final HashMap<String, String> options = toOptions(3, qc);
 
     qc.updates().add(new DBAdd(data, input, options, false, qc, info), qc);

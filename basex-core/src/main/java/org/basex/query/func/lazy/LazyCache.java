@@ -15,7 +15,7 @@ public final class LazyCache extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value value = exprs[0].value(qc);
-    final boolean lazy = exprs.length > 1 && toBoolean(exprs[1], qc);
+    final boolean lazy = toBooleanOrFalse(arg(1), qc);
     value.cache(lazy, info);
     return value;
   }

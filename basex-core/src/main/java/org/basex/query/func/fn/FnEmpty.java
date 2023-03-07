@@ -9,7 +9,6 @@ import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -106,7 +105,7 @@ public class FnEmpty extends StandardFunc {
   final boolean empty(final QueryContext qc) throws QueryException {
     final Expr input = exprs[0];
     return input.seqType().zeroOrOne() ?
-      input.item(qc, info) == Empty.VALUE :
+      input.item(qc, info).isEmpty() :
       input.iter(qc).next() == null;
   }
 }

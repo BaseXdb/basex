@@ -61,7 +61,7 @@ public final class FnRemove extends StandardFunc {
    */
   private static Value value(final Value value, final LongList list, final QueryContext qc) {
     Value v = value;
-    for(int l = list.size() - 1; l >= 0 && v != Empty.VALUE; l--) {
+    for(int l = list.size() - 1; l >= 0 && !v.isEmpty(); l--) {
       final long pos = list.get(l), size = v.size();
       if(pos == 0) {
         // remove first item

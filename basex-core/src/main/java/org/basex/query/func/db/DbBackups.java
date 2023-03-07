@@ -36,7 +36,7 @@ public final class DbBackups extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final String name = exprs.length > 0 ? toName(0, true, DB_NAME_X, qc) : null;
+    final String name = defined(0) ? toName(0, true, DB_NAME_X, qc) : null;
 
     final Context ctx = qc.context;
     final StringList backups = name == null ? ctx.databases.backups() : ctx.databases.backups(name);
@@ -62,7 +62,7 @@ public final class DbBackups extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return (exprs.length > 0 ? dataLock(visitor, true, 0) : visitor.lock((String) null)) &&
+    return (defined(0) ? dataLock(visitor, true, 0) : visitor.lock((String) null)) &&
         super.accept(visitor);
   }
 

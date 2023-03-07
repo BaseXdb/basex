@@ -24,6 +24,6 @@ public final class RequestCookie extends ApiFunc {
         if(c.getName().equals(name)) return Str.get(c.getValue());
       }
     }
-    return exprs.length > 1 ? Str.get(toToken(exprs[1], qc)) : Empty.VALUE;
+    return defined(1) ? Str.get(toToken(exprs[1], qc)) : Empty.VALUE;
   }
 }

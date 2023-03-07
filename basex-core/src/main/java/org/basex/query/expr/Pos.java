@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -115,7 +114,7 @@ final class Pos extends Single {
     ctxValue(qc);
 
     final Value value = expr.value(qc);
-    if(value == Empty.VALUE) return Bln.FALSE;
+    if(value.isEmpty()) return Bln.FALSE;
 
     final long pos = qc.focus.pos, min = toLong(value.itemAt(0)), size = value.size();
     return Bln.get(size == 1 ? pos == min : pos >= min && pos <= toLong(value.itemAt(size - 1)));

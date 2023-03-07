@@ -19,6 +19,6 @@ public final class RequestHeader extends ApiFunc {
     final String value = request(qc).getHeader(name);
     if(value != null) return Str.get(value);
 
-    return exprs.length > 1 ? Str.get(toToken(exprs[1], qc)) : Empty.VALUE;
+    return defined(1) ? Str.get(toToken(exprs[1], qc)) : Empty.VALUE;
   }
 }

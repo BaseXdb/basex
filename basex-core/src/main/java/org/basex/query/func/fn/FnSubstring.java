@@ -29,7 +29,7 @@ public final class FnSubstring extends StandardFunc {
       end += start;
       start = 0;
     }
-    end = Math.min(length, exprs.length > 2 ? start + end : Integer.MAX_VALUE);
+    end = Math.min(length, defined(2) ? start + end : Integer.MAX_VALUE);
     if(start >= end) return Str.EMPTY;
     if(ascii) return Str.get(Token.substring(value, start, end));
 
@@ -51,7 +51,7 @@ public final class FnSubstring extends StandardFunc {
     if(value == Empty.VALUE || value == Str.EMPTY) return Str.EMPTY;
 
     final int start = exprs[1] instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
-    final int length = exprs.length < 3 || exprs[2] instanceof Value ?
+    final int length = !defined(2) || exprs[2] instanceof Value ?
       length(Integer.MAX_VALUE, cc.qc) : Integer.MIN_VALUE;
 
     // invalid start offset or zero length: return empty string
@@ -84,7 +84,7 @@ public final class FnSubstring extends StandardFunc {
    * @throws QueryException query exception
    */
   private int length(final int def, final QueryContext qc) throws QueryException {
-    final Item length = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    final Item length = defined(2) ? exprs[2].atomItem(qc, info) : Empty.VALUE;
     return length == Empty.VALUE ? def : length instanceof Int ? (int) length.itr(info) :
       subPos(length.dbl(info) + 1);
   }

@@ -75,7 +75,7 @@ abstract class DbAccess extends StandardFunc {
       throws QueryException {
 
     // no attribute specified: return iterator
-    if(exprs.length <= a) return ia.iter(qc);
+    if(!defined(a)) return ia.iter(qc);
 
     // parse and compile the name test
     final QNm qName = new QNm(toToken(exprs[a], qc), sc);

@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -94,7 +93,7 @@ abstract class CName extends CNode {
    */
   final byte[] ncname(final boolean empty, final QueryContext qc) throws QueryException {
     final Item item = name.atomItem(qc, info);
-    if(item != Empty.VALUE) {
+    if(!item.isEmpty()) {
       final Type type = item.type;
       if(type.isStringOrUntyped() && type != AtomType.ANY_URI) return trim(item.string(info));
       throw STRNCN_X_X.get(info, type, item);

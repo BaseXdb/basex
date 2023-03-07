@@ -18,7 +18,7 @@ public final class BinPart extends BinFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final B64 binary = toB64(exprs[0], qc, true);
     final Item offset = exprs[1].atomItem(qc, info);
-    final Item size = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    final Item size = defined(2) ? exprs[2].atomItem(qc, info) : Empty.VALUE;
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);

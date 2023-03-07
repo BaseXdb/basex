@@ -43,14 +43,13 @@ public class FtMark extends StandardFunc {
    * @throws QueryException query exception
    */
   final Iter mark(final QueryContext qc, final boolean extract) throws QueryException {
-    final int el = exprs.length;
-    final Item name = el > 1 ? exprs[1].atomItem(qc, info) : Empty.VALUE;
-    final Item length = el > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    final Item name = defined(1) ? exprs[1].atomItem(qc, info) : Empty.VALUE;
+    final Item length = defined(2) ? exprs[2].atomItem(qc, info) : Empty.VALUE;
 
-    final byte[] m = name != Empty.VALUE ? toToken(name) : MARK;
+    final byte[] m = name.isEmpty() ? MARK : toToken(name);
     if(!XMLToken.isQName(m)) throw valueError(AtomType.QNAME, m, info);
-    final int l = length != Empty.VALUE ? (int) Math.min(Integer.MAX_VALUE, toLong(length)) :
-      extract ? 150 : Integer.MAX_VALUE;
+    final int l = length.isEmpty() ? extract ? 150 : Integer.MAX_VALUE :
+      (int) Math.min(Integer.MAX_VALUE, toLong(length));
 
     return new Iter() {
       final FTPosData ftd = new FTPosData();

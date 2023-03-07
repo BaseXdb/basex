@@ -41,7 +41,7 @@ abstract class ProcFn extends StandardFunc {
   final ProcResult exec(final QueryContext qc, final boolean fork) throws QueryException {
     // arguments
     final StringList args = new StringList().add(toString(exprs[0], qc));
-    final Iter arguments = exprs.length > 1 ? exprs[1].iter(qc) : Empty.ITER;
+    final Iter arguments = defined(1) ? exprs[1].iter(qc) : Empty.ITER;
     for(Item item; (item = qc.next(arguments)) != null;) {
       args.add(toString(item));
     }

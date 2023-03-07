@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -44,7 +43,7 @@ public final class DualMap extends SimpleMap {
             // evaluate right operand (yielding an item)
             qf.value = item;
             item = exprs[1].item(qc, info);
-            if(item != Empty.VALUE) return item;
+            if(!item.isEmpty()) return item;
           }
         } finally {
           qf.value = value;
@@ -80,7 +79,7 @@ public final class DualMap extends SimpleMap {
       for(Item item; (item = qc.next(iter)) != null;) {
         qf.value = item;
         item = exprs[1].item(qc, info);
-        if(item != Empty.VALUE) vb.add(item);
+        if(!item.isEmpty()) vb.add(item);
       }
       return vb.value(this);
     } finally {

@@ -29,7 +29,7 @@ public class FnSum extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = sum(false, qc);
-    return item != null ? item : exprs.length > 1 ? exprs[1].atomItem(qc, info) : Int.ZERO;
+    return item != null ? item : defined(1) ? exprs[1].atomItem(qc, info) : Int.ZERO;
   }
 
   @Override
@@ -37,7 +37,7 @@ public class FnSum extends StandardFunc {
     final Expr expr = opt(false);
     if(expr != null) return expr;
 
-    final Expr values = exprs[0], zero = exprs.length > 1 ? exprs[1] : null;
+    final Expr values = exprs[0], zero = defined(1) ? exprs[1] : null;
     final SeqType st = values.seqType(), stZero = zero != null ? zero.seqType() : null;
     if(st.zero()) {
       // sequence is empty: check if it is also deterministic

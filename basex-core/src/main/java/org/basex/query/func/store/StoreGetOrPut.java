@@ -3,7 +3,6 @@ package org.basex.query.func.store;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -18,7 +17,7 @@ public final class StoreGetOrPut extends StoreFn {
     final FItem put = toFunction(exprs[1], 0, qc);
 
     Value value = store(qc).get(key);
-    if(value == Empty.VALUE) {
+    if(value.isEmpty()) {
       value = put.invoke(qc, info);
       store(qc).put(key, value);
     }
