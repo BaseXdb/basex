@@ -30,7 +30,7 @@ public abstract class ContextFn extends StandardFunc {
    * @return result of check
    */
   public final boolean contextAccess() {
-    return exprs.length == contextArg();
+    return arg(contextArg()) == null;
   }
 
   /**

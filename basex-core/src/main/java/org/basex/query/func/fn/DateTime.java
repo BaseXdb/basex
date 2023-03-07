@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.value.type.AtomType.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -17,8 +18,7 @@ import org.basex.query.value.type.*;
  */
 abstract class DateTime extends StandardFunc {
   /**
-   * Checks if the specified item is a Duration item. If it is untyped,
-   * a duration is returned.
+   * Checks if the specified item is a Duration item. If it is untyped, a duration is returned.
    * @param item item to be checked
    * @return duration
    * @throws QueryException query exception
@@ -26,7 +26,7 @@ abstract class DateTime extends StandardFunc {
   protected final Dur checkDur(final Item item) throws QueryException {
     if(item instanceof Dur) return (Dur) item;
     if(item.type.isUntyped()) return new Dur(item.string(info), info);
-    throw typeError(item, AtomType.DURATION, info);
+    throw typeError(item, DURATION, info);
   }
 
   /**
@@ -52,14 +52,12 @@ abstract class DateTime extends StandardFunc {
     // clone item
     ADate date = toDate(item, type, qc);
     if(!item.type.isUntyped()) {
-      date = type == AtomType.TIME ? new Tim(date) :
-             type == AtomType.DATE ? new Dat(date) : new Dtm(date);
+      date = type == TIME ? new Tim(date) : type == DATE ? new Dat(date) : new Dtm(date);
     }
-    final boolean spec = exprs.length == 2;
-    final Item zon = spec ? exprs[1].atomItem(qc, info) : Empty.VALUE;
-    final DTDur dur = zon == Empty.VALUE ? null :
-      (DTDur) checkType(zon, AtomType.DAY_TIME_DURATION);
-    date.timeZone(dur, spec, info);
+    final Expr spec = arg(1);
+    final Item zone = spec != null ? spec.atomItem(qc, info) : Empty.VALUE;
+    final DTDur dur = zone != Empty.VALUE ? (DTDur) checkType(zone, DAY_TIME_DURATION) : null;
+    date.timeZone(dur, spec != null && zone == Empty.VALUE, info);
     return date;
   }
 

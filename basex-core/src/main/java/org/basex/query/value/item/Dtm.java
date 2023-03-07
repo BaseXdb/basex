@@ -84,12 +84,6 @@ public final class Dtm extends ADate {
     }
   }
 
-  @Override
-  public void timeZone(final DTDur zone, final boolean spec, final InputInfo ii)
-      throws QueryException {
-    tz(zone, spec, ii);
-  }
-
   /**
    * Returns a dateTime item for the specified milliseconds.
    * @param ms milliseconds since January 1, 1970, 00:00:00 GMT

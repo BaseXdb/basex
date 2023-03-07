@@ -236,32 +236,24 @@ public abstract class ADate extends ADateDur {
 
   /**
    * Adjusts the timezone.
-   * @param zone timezone (may be {@code null})
-   * @param spec indicates if zone has been specified
+   * @param dur duration to add to the timezone (if {@code null}, assign implicit timezone)
+   * @param undefined invalidate timezone
    * @param ii input info
    * @throws QueryException query exception
    */
-  public abstract void timeZone(DTDur zone, boolean spec, InputInfo ii) throws QueryException;
-
-  /**
-   * Adjusts the timezone.
-   * @param zone timezone
-   * @param spec indicates if zone has been specified (can be {@code null})
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  final void tz(final DTDur zone, final boolean spec, final InputInfo ii) throws QueryException {
+  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo ii)
+      throws QueryException {
     final short t;
-    if(spec && zone == null) {
+    if(undefined) {
       t = Short.MAX_VALUE;
     } else {
-      if(zone == null) {
+      if(dur == null) {
         final Calendar c = Calendar.getInstance();
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
-        t = (short) (zone.minute() + zone.hour() * 60);
-        if(zone.sec().signum() != 0) throw ZONESEC_X.get(ii, zone);
-        if(Math.abs(t) > 60 * 14 || zone.day() != 0) throw INVALZONE_X.get(ii, zone);
+        t = (short) (dur.minute() + dur.hour() * 60);
+        if(dur.sec().signum() != 0) throw ZONESEC_X.get(ii, dur);
+        if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALZONE_X.get(ii, dur);
       }
 
       // change time if two competing time zones exist

@@ -348,7 +348,8 @@ public abstract class Expr extends ExprInfo {
    * @return arguments or {@code null}
    */
   public final Expr arg(final int i) {
-    return args()[i];
+    final Expr[] args = args();
+    return args != null && i < args.length ? args[i] : null;
   }
 
   /**
