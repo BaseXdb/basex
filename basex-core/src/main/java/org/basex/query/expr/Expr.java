@@ -446,7 +446,7 @@ public abstract class Expr extends ExprInfo {
    * @param exprs expressions to visit
    * @return success flag
    */
-  protected static boolean visitAll(final ASTVisitor visitor, final Expr...exprs) {
+  protected static boolean visitAll(final ASTVisitor visitor, final Expr... exprs) {
     for(final Expr expr : exprs) {
       if(!expr.accept(visitor)) return false;
     }

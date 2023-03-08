@@ -22,8 +22,8 @@ public class FnAll extends StandardFunc {
   @Override
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // implementation for dynamic function lookup
-    final Iter input = exprs[0].iter(qc);
-    final FItem predicate = defined(1) ? toFunction(exprs[1], 1, qc) : null;
+    final Iter input = arg(0).iter(qc);
+    final FItem predicate = defined(1) ? toFunction(arg(1), 1, qc) : null;
 
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
@@ -35,7 +35,7 @@ public class FnAll extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     final boolean some = some();
     if(st.zero()) return cc.merge(input, Bln.get(!some), info);
@@ -47,7 +47,7 @@ public class FnAll extends StandardFunc {
     final For fr = new For(var, input).optimize(cc);
 
     final Expr func = defined(1) ?
-      coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE)) : null;
+      coerceFunc(arg(1), cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE)) : null;
     final Expr ref = new VarRef(info, var).optimize(cc);
     final Expr rtrn = func != null ? new DynFuncCall(info, sc, func, ref).optimize(cc) : ref;
     final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);

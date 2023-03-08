@@ -18,11 +18,11 @@ import org.basex.util.*;
 public class FnContainsSequence extends StandardFunc {
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Value input = exprs[0].value(qc);
-    final Value subsequence = exprs[1].value(qc);
+    final Value input = arg(0).value(qc);
+    final Value subsequence = arg(1).value(qc);
     final QueryBiFunction<Item, Item, Boolean> cmp;
     if(defined(2)) {
-      final FItem compare = toFunction(exprs[2], 2, qc);
+      final FItem compare = toFunction(arg(2), 2, qc);
       cmp = (item1, item2) -> toBoolean(compare.invoke(qc, info, item1, item2).item(qc, info));
     } else {
       cmp = new DeepEqual(info, qc, sc.collation, null)::equal;
@@ -55,13 +55,13 @@ public class FnContainsSequence extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], subsequence = exprs[1];
+    final Expr input = arg(0), subsequence = arg(1);
     final SeqType ist = input.seqType(), sst = subsequence.seqType();
     if(sst.zero()) return Bln.TRUE;
 
     if(defined(2)) {
-      exprs[2] = coerceFunc(exprs[2], cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
-          sst.with(Occ.EXACTLY_ONE));
+      arg(2, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
+          sst.with(Occ.EXACTLY_ONE)));
     }
     return this;
   }

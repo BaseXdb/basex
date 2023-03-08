@@ -26,7 +26,7 @@ public final class DbRename extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final String source = toDbPath(1, qc), target = toDbPath(2, qc);
+    final String source = toDbPath(arg(1), qc), target = toDbPath(arg(2), qc);
 
     if(!(Prop.CASE ? source.equals(target) : source.equalsIgnoreCase(target))) {
       // rename XML resources

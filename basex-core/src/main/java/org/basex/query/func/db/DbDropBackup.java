@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public final class DbDropBackup extends BackupFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(0, true, qc);
+    final String name = toName(arg(0), true, qc);
 
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);

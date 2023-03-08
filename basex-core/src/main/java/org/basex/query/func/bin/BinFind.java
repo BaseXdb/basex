@@ -16,9 +16,9 @@ import org.basex.util.*;
 public final class BinFind extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 binary = toB64(exprs[0], qc, true);
-    final Item offset = exprs[1].atomItem(qc, info);
-    final B64 search = toB64(exprs[2], qc, false);
+    final B64 binary = toB64(arg(0), qc, true);
+    final Item offset = arg(1).atomItem(qc, info);
+    final B64 search = toB64(arg(2), qc, false);
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);

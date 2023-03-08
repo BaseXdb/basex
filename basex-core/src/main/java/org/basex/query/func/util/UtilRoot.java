@@ -24,7 +24,7 @@ import org.basex.query.value.type.*;
 public final class UtilRoot extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value nodes = exprs[0].value(qc);
+    final Value nodes = arg(0).value(qc);
     if(nodes.seqType().type == NodeType.DOCUMENT_NODE) return nodes;
 
     final Iter iter = nodes.iter();
@@ -39,7 +39,7 @@ public final class UtilRoot extends StandardFunc {
 
   @Override
   public Expr opt(final CompileContext cc) {
-    final Expr nodes = exprs[0];
+    final Expr nodes = arg(0);
     final SeqType st = nodes.seqType();
     if(st.instanceOf(SeqType.DOCUMENT_NODE_ZM)) return nodes;
 

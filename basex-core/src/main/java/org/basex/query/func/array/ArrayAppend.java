@@ -16,12 +16,12 @@ import org.basex.util.*;
 public final class ArrayAppend extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toArray(exprs[0], qc).snoc(exprs[1].value(qc));
+    return toArray(arg(0), qc).snoc(arg(1).value(qc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = exprs[0], add = exprs[1];
+    final Expr array = arg(0), add = arg(1);
     if(array == XQArray.empty()) return new CArray(info, true, add).optimize(cc);
 
     final Type type = array.seqType().type;

@@ -25,10 +25,10 @@ public class FileList extends FileFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     try {
-      final Path dir = toPath(0, qc).toRealPath();
+      final Path dir = toPath(arg(0), qc).toRealPath();
       final boolean recursive = toBooleanOrFalse(arg(1), qc);
       final Pattern pattern = defined(2) ? Pattern.compile(IOFile.regex(
-          toString(exprs[2], qc), false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
+          toString(arg(2), qc), false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
 
       final TokenList tl = new TokenList();
       list(dir, recursive, pattern, tl, dir.getNameCount(), qc);
@@ -52,7 +52,7 @@ public class FileList extends FileFn {
   Value paths(final boolean recursive, final QueryContext qc) throws QueryException {
     try {
       final TokenList tl = new TokenList();
-      list(toPath(0, qc), recursive, null, tl, -1, qc);
+      list(toPath(arg(0), qc), recursive, null, tl, -1, qc);
       return StrSeq.get(tl);
     } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);

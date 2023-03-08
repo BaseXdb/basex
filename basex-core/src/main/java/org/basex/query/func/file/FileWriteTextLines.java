@@ -41,13 +41,13 @@ public class FileWriteTextLines extends FileFn {
   final synchronized void write(final boolean append, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = toParent(toPath(0, qc));
-    final String encoding = toEncodingOrNull(2, FILE_UNKNOWN_ENCODING_X, qc);
+    final Path path = toParent(toPath(arg(0), qc));
+    final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
-      final Iter values = exprs[1].iter(qc);
+      final Iter values = arg(1).iter(qc);
       for(Item item; (item = qc.next(values)) != null;) {
         if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STRING, info);
 

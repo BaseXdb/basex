@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class StoreDelete extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(0, qc);
+    final String name = toName(arg(0), qc);
     if(!store(qc).delete(name)) throw STORE_NOTFOUND_X.get(info, name);
     return Empty.VALUE;
   }

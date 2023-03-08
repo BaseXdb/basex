@@ -22,8 +22,8 @@ abstract class FileRead extends FileFn {
    * @throws QueryException query exception
    */
   final StrLazy text(final QueryContext qc) throws QueryException {
-    final Path path = toPath(0, qc);
-    final String encoding = toEncodingOrNull(1, FILE_UNKNOWN_ENCODING_X, qc);
+    final Path path = toPath(arg(0), qc);
+    final String encoding = toEncodingOrNull(arg(1), FILE_UNKNOWN_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());

@@ -22,7 +22,7 @@ public final class DbExists extends DbAccess {
     try {
       final Data data = toData(qc);
       if(!defined(1)) return Bln.TRUE;
-      final String path = toDbPath(1, qc);
+      final String path = toDbPath(arg(1), qc);
 
       final Checks<ResourceType> exists = type -> {
         final IOFile bin = data.meta.file(path, type);

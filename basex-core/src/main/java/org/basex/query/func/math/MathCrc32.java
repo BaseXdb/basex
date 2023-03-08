@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class MathCrc32 extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toTokenOrNull(exprs[0], qc);
+    final byte[] value = toTokenOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
     final CRC32 crc = new CRC32();

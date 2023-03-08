@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class ArraySize extends ArrayFn {
   @Override
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Int.get(toArray(exprs[0], qc).arraySize());
+    return Int.get(toArray(arg(0), qc).arraySize());
   }
 }

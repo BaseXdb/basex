@@ -23,7 +23,7 @@ import org.basex.util.*;
 public class CsvParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toTokenOrNull(exprs[0], qc);
+    final byte[] value = toTokenOrNull(arg(0), qc);
     return value != null ? parse(new IOContent(value), qc) : Empty.VALUE;
   }
 
@@ -40,7 +40,7 @@ public class CsvParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final CsvParserOptions options = toOptions(1, new CsvParserOptions(), true, qc);
+    final CsvParserOptions options = toOptions(arg(1), new CsvParserOptions(), true, qc);
     try {
       return CsvConverter.get(options).convert(io);
     } catch(final IOException ex) {

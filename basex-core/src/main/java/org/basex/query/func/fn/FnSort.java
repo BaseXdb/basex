@@ -28,13 +28,13 @@ import org.basex.util.*;
 public final class FnSort extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc), value = quickValue(input);
+    final Value input = arg(0).value(qc), value = quickValue(input);
     return value != null ? value.iter() : iter(input, qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc), value = quickValue(input);
+    final Value input = arg(0).value(qc), value = quickValue(input);
     return value != null ? value : iter(input, qc).value(qc, this);
   }
 
@@ -46,8 +46,8 @@ public final class FnSort extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter iter(final Value input, final QueryContext qc) throws QueryException {
-    final Collation coll = toCollation(1, true, qc);
-    final FItem key = defined(2) ? toFunction(exprs[2], 1, qc) : null;
+    final Collation coll = toCollation(arg(1), true, qc);
+    final FItem key = defined(2) ? toFunction(arg(2), 1, qc) : null;
 
     final long size = input.size();
     final ValueList values = new ValueList(size);
@@ -126,13 +126,13 @@ public final class FnSort extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return cc.simplify(this, mode == Simplify.COUNT ? exprs[0] : this, mode);
+    return cc.simplify(this, mode == Simplify.COUNT ? arg(0) : this, mode);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // optimize sort on sequences
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
@@ -153,7 +153,7 @@ public final class FnSort extends StandardFunc {
         return cc.function(SORT, info, args);
       }
     } else if(defined(2)) {
-      exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE));
+      arg(2, arg -> coerceFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
     }
     return adoptType(input);
   }

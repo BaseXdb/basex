@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.iter.*;
@@ -52,21 +53,17 @@ abstract class ArchiveFn extends StandardFunc {
 
   /**
    * Returns all archive entries from the specified argument.
-   * @param e argument index
+   * @param expr expression (can be {@code Empty#UNDEFINED})
    * @param qc query context
    * @return set with all entries, or {@code null} if no entries are specified
    * @throws QueryException query exception
    */
-  final TokenSet entries(final int e, final QueryContext qc) throws QueryException {
-    TokenSet hs = null;
-    if(defined(e)) {
-      // filter result to specified entries
-      hs = new TokenSet();
-      final Iter names = exprs[e].iter(qc);
-      for(Item en; (en = qc.next(names)) != null;) {
-        hs.add(checkElemToken(en).string(info));
-      }
+  final TokenSet entries(final Expr expr, final QueryContext qc) throws QueryException {
+    final TokenSet hs = new TokenSet();
+    final Iter names = expr.iter(qc);
+    for(Item en; (en = qc.next(names)) != null;) {
+      hs.add(checkElemToken(en).string(info));
     }
-    return hs == null || hs.isEmpty() ? null : hs;
+    return hs.isEmpty() ? null : hs;
   }
 }

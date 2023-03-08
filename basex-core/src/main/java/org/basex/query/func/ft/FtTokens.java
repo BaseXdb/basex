@@ -22,7 +22,7 @@ public final class FtTokens extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    byte[] prefix = defined(1) ? toToken(exprs[1], qc) : Token.EMPTY;
+    byte[] prefix = defined(1) ? toToken(arg(1), qc) : Token.EMPTY;
     if(prefix.length != 0) {
       final FTLexer lexer = new FTLexer(new FTOpt().assign(data.meta));
       lexer.init(prefix);
@@ -38,6 +38,6 @@ public final class FtTokens extends StandardFunc {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor, false, 0) && super.accept(visitor);
+    return dataLock(arg(0), false, visitor) && super.accept(visitor);
   }
 }

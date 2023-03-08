@@ -21,9 +21,9 @@ public final class FtThesaurus extends FtAccess {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ANode node = toNode(exprs[0], qc);
-    final byte[] term = toToken(exprs[1], qc);
-    final FtThesaurusOptions options = toOptions(2, new FtThesaurusOptions(), true, qc);
+    final ANode node = toNode(arg(0), qc);
+    final byte[] term = toToken(arg(1), qc);
+    final FtThesaurusOptions options = toOptions(arg(2), new FtThesaurusOptions(), true, qc);
 
     if(node != nd) {
       thesaurus = new Thesaurus(node);

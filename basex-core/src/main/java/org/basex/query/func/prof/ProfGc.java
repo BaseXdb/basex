@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class ProfGc extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final long count = defined(0) ? toLong(exprs[0], qc) : 1;
+    final long count = defined(0) ? toLong(arg(0), qc) : 1;
     Performance.gc((int) Math.min(Integer.MAX_VALUE, count));
     return Empty.VALUE;
   }

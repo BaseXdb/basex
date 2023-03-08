@@ -15,6 +15,6 @@ import org.basex.util.http.*;
 public final class WebContentType extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(MediaType.get(toString(exprs[0], qc)).toString());
+    return Str.get(MediaType.get(toString(arg(0), qc)).toString());
   }
 }

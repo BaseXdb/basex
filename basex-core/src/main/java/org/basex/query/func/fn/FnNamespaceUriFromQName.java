@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class FnNamespaceUriFromQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final QNm value = toQNm(exprs[0], true, qc);
+    final QNm value = toQNm(arg(0), true, qc);
     return value == null ? Empty.VALUE : Uri.get(value.uri());
   }
 

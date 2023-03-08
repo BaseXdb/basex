@@ -20,9 +20,9 @@ import org.basex.util.*;
 public final class WsEval extends WsFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IOContent query = toContent(0, qc);
-    final HashMap<String, Value> bindings = toBindings(1, qc);
-    final WsOptions options = toOptions(2, new WsOptions(), true, qc);
+    final IOContent query = toContent(arg(0), qc);
+    final HashMap<String, Value> bindings = toBindings(arg(1), qc);
+    final WsOptions options = toOptions(arg(2), new WsOptions(), true, qc);
 
     final JobOptions jopts = new JobOptions();
     jopts.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, WsOptions.BASE_URI));

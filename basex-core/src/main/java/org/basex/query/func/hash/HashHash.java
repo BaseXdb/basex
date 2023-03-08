@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class HashHash extends HashFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return hash(toString(exprs[1], qc), qc);
+    return hash(toString(arg(1), qc), qc);
   }
 }

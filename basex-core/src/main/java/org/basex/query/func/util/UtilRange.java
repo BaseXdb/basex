@@ -26,7 +26,7 @@ public final class UtilRange extends FnSubsequence {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs[1] instanceof Int && ((Int) exprs[1]).itr() < 1) {
+    if(arg(1) instanceof Int && ((Int) arg(1)).itr() < 1) {
       final Expr[] args = exprs.clone();
       args[1] = Int.ONE;
       return cc.function(_UTIL_RANGE, info, args);

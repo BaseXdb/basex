@@ -19,8 +19,8 @@ public final class FnFormatInteger extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = exprs[0].atomItem(qc, info);
-    final byte[] picture = toToken(exprs[1], qc);
+    final Item value = arg(0).atomItem(qc, info);
+    final byte[] picture = toToken(arg(1), qc);
     final byte[] language = toZeroToken(arg(2), qc);
     if(value.isEmpty()) return Str.EMPTY;
 

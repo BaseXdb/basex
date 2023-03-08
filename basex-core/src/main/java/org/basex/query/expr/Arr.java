@@ -124,7 +124,7 @@ public abstract class Arr extends ParseExpr {
       if(ex != expr) changed = true;
       list.add(ex);
     }
-    return changed ? list.toArray() : exprs;
+    return changed ? list.finish() : exprs;
   }
 
   /**
@@ -345,6 +345,17 @@ public abstract class Arr extends ParseExpr {
   @Override
   public final Expr[] args() {
     return exprs;
+  }
+
+  /**
+   * Re-assigns the rewritten version of an argument/operand.
+   * @param a index of argument
+   * @param rewrite function for rewriting the argument
+   * @throws QueryException query exception
+   */
+  public final void arg(final int a, final QueryFunction<Expr, Expr> rewrite)
+      throws QueryException {
+    exprs[a] = rewrite.apply(arg(a));
   }
 
   @Override

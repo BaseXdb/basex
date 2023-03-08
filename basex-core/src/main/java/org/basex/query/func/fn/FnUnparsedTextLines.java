@@ -47,7 +47,7 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr href = exprs[0];
+    final Expr href = arg(0);
     return href.seqType().zero() ? href : super.opt(cc);
   }
 

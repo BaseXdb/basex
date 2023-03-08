@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class WebDecodeUrl extends WebFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String value = toString(exprs[0], qc);
+    final String value = toString(arg(0), qc);
 
     final byte[] decoded;
     try {

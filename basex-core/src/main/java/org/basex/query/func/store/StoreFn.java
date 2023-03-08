@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 
 /**
@@ -20,18 +21,18 @@ abstract class StoreFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final byte[] toKey(final QueryContext qc) throws QueryException {
-    return toToken(exprs[0], qc);
+    return toToken(arg(0), qc);
   }
 
   /**
    * Evaluates an expression to a store name.
-   * @param i expression index
+   * @param expr expression
    * @param qc query context
    * @return store name
    * @throws QueryException query exception
    */
-  final String toName(final int i, final QueryContext qc) throws QueryException {
-    return toName(i, false, STORE_NAME_X, qc);
+  final String toName(final Expr expr, final QueryContext qc) throws QueryException {
+    return toName(expr, false, STORE_NAME_X, qc);
   }
 
   /**

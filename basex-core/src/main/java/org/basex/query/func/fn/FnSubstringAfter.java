@@ -21,9 +21,9 @@ import org.basex.util.*;
 public final class FnSubstringAfter extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
-    final byte[] substring = toZeroToken(exprs[1], qc);
-    final Collation coll = toCollation(2, qc);
+    final byte[] value = toZeroToken(arg(0), qc);
+    final byte[] substring = toZeroToken(arg(1), qc);
+    final Collation coll = toCollation(arg(2), qc);
 
     if(value.length == 0) return Str.EMPTY;
     if(substring.length == 0) return Str.get(value);
@@ -37,7 +37,7 @@ public final class FnSubstringAfter extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr value = exprs[0], substring = exprs[1];
+    final Expr value = arg(0), substring = arg(1);
     final SeqType st = value.seqType(), stSub = substring.seqType();
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&

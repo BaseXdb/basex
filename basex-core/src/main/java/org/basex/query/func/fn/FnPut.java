@@ -23,12 +23,12 @@ import org.basex.util.*;
 public final class FnPut extends StandardFunc {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNode(exprs[0], qc);
-    final byte[] href = toZeroToken(exprs[1], qc);
-    final Item options = defined(2) ? exprs[2].item(qc, info) : Empty.VALUE;
+    final ANode node = toNode(arg(0), qc);
+    final byte[] href = toZeroToken(arg(1), qc);
+    final Item options = arg(2).item(qc, info);
 
     if(!node.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
-      throw UPFOTYPE_X.get(info, exprs[0]);
+      throw UPFOTYPE_X.get(info, arg(0));
 
     final Uri uri = Uri.get(href);
     if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, href);

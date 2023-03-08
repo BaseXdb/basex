@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class UnitAssert extends UnitFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(exprs[0].ebv(qc, info).bool(info)) return Empty.VALUE;
-    throw error(defined(1) ? toNodeOrAtomItem(1, qc) : null);
+    if(arg(0).ebv(qc, info).bool(info)) return Empty.VALUE;
+    throw error(defined(1) ? toNodeOrAtomItem(arg(1), qc) : null);
   }
 }

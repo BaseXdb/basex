@@ -19,8 +19,8 @@ import org.basex.util.ft.*;
 public final class FtContains extends FtAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Value input = exprs[0].value(qc), terms = exprs[1].value(qc);
-    final FtContainsOptions options = toOptions(2, new FtContainsOptions(), true, qc);
+    final Value input = arg(0).value(qc), terms = arg(1).value(qc);
+    final FtContainsOptions options = toOptions(arg(2), new FtContainsOptions(), true, qc);
 
     final FTMode mode = options.get(FtIndexOptions.MODE);
     final FTOpt opt = ftOpt(options, qc).assign(qc.ftOpt());
@@ -40,7 +40,7 @@ public final class FtContains extends FtAccess {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.STRING, cc);
-    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.STRING, cc));
+    arg(1, arg -> arg.simplifyFor(Simplify.STRING, cc));
   }
 }

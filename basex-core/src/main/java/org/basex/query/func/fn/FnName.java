@@ -15,7 +15,7 @@ import org.basex.util.*;
 public class FnName extends FnNodeName {
   @Override
   public final Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(0, qc), qc);
+    final ANode node = toNodeOrNull(context(qc), qc);
     return node == null || empty(node.type) ? Str.EMPTY : Str.get(name(node));
   }
 

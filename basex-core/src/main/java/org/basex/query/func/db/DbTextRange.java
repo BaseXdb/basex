@@ -49,7 +49,7 @@ public class DbTextRange extends DbAccess {
    */
   final StringRangeAccess rangeAccess(final Data data, final QueryContext qc)
       throws QueryException {
-    final byte[] min = toToken(exprs[1], qc), max = toToken(exprs[2], qc);
+    final byte[] min = toToken(arg(1), qc), max = toToken(arg(2), qc);
     final StringRange sr = new StringRange(type(), min, true, max, true);
     return new StringRangeAccess(info, sr, new IndexStaticDb(data, info));
   }

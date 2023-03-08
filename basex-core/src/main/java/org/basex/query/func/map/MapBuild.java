@@ -19,10 +19,10 @@ import org.basex.util.*;
 public final class MapBuild extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final FItem key = defined(1) ? toFunction(exprs[1], 1, qc) : null;
-    final FItem value = defined(2) ? toFunction(exprs[2], 1, qc) : null;
-    final FItem duplicates = defined(3) ? toFunction(exprs[3], 2, qc) : null;
+    final Iter input = arg(0).iter(qc);
+    final FItem key = defined(1) ? toFunction(arg(1), 1, qc) : null;
+    final FItem value = defined(2) ? toFunction(arg(2), 1, qc) : null;
+    final FItem duplicates = defined(3) ? toFunction(arg(3), 2, qc) : null;
 
     XQMap map = XQMap.empty();
     for(Item item; (item = input.next()) != null;) {
@@ -42,17 +42,19 @@ public final class MapBuild extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return cc.merge(input, XQMap.empty(), info);
 
     AtomType ktype = null;
     if(defined(1)) {
-      final FuncType ft = exprs[1].funcType();
+      final FuncType ft = arg(1).funcType();
       if(ft != null) {
         ktype = ft.declType.type.atomic();
-        if(ktype != null) exprs[1] = coerceFunc(exprs[1], cc, ktype.seqType(Occ.ZERO_OR_ONE),
-            st.with(Occ.EXACTLY_ONE));
+        if(ktype != null) {
+          final SeqType dt = ktype.seqType(Occ.ZERO_OR_ONE);
+          arg(1, arg -> coerceFunc(arg, cc, dt, st.with(Occ.EXACTLY_ONE)));
+        }
       }
     }
     if(ktype == null) ktype = AtomType.ANY_ATOMIC_TYPE;

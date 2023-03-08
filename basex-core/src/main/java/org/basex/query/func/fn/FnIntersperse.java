@@ -18,8 +18,8 @@ import org.basex.query.value.type.*;
 public class FnIntersperse extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final Value separator = exprs[1].value(qc);
+    final Iter input = arg(0).iter(qc);
+    final Value separator = arg(1).value(qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     Item item = input.next();
@@ -32,7 +32,7 @@ public class FnIntersperse extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr values = exprs[0], separator = exprs[1];
+    final Expr values = arg(0), separator = arg(1);
     final SeqType st = values.seqType(), stSep = separator.seqType();
     if(st.zeroOrOne() || separator == Empty.VALUE) return values;
 

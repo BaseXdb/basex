@@ -16,7 +16,7 @@ import org.basex.util.*;
 public class FnChar extends StandardFunc {
   @Override
   public final Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] name = toToken(exprs[0], qc);
+    final byte[] name = toToken(arg(0), qc);
 
     final int nl = name.length;
     if(nl == 2 && name[0] == '\\') {

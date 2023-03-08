@@ -31,9 +31,9 @@ public final class FnAnalyzeString extends RegEx {
 
   @Override
   public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String value = string(toZeroToken(exprs[0], qc));
-    final byte[] pattern = toToken(exprs[1], qc);
-    final Expr modifier = defined(2) ? exprs[2] : null;
+    final String value = string(toZeroToken(arg(0), qc));
+    final byte[] pattern = toToken(arg(1), qc);
+    final Expr modifier = defined(2) ? arg(2) : null;
     final Matcher m = pattern(pattern, modifier, qc, true).matcher(value);
 
     final FElem root = new FElem(Q_ANALYZE).declareNS();

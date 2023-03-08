@@ -24,8 +24,8 @@ import org.basex.util.list.*;
 public final class InspectStaticContext extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    Item func = exprs[0].item(qc, info);
-    final String name = toString(exprs[1], qc);
+    Item func = arg(0).item(qc, info);
+    final String name = toString(arg(1), qc);
     final StaticContext sctx;
     if(func.isEmpty()) {
       sctx = sc;

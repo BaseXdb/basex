@@ -11,6 +11,6 @@ import org.basex.query.util.*;
 abstract class BackupFn extends DbAccess {
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor, true, 0) && visitAll(visitor, exprs);
+    return dataLock(arg(0), true, visitor) && visitAll(visitor, exprs);
   }
 }

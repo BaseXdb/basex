@@ -23,7 +23,7 @@ import org.basex.util.*;
 public class JobEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return eval(toContent(0, qc), qc);
+    return eval(toContent(arg(0), qc), qc);
   }
 
   /**
@@ -34,8 +34,8 @@ public class JobEval extends StandardFunc {
    * @throws QueryException query exception
    */
   private Str eval(final IOContent query, final QueryContext qc) throws QueryException {
-    final HashMap<String, Value> bindings = toBindings(1, qc);
-    final JobOptions options = toOptions(2, new JobOptions(), true, qc);
+    final HashMap<String, Value> bindings = toBindings(arg(1), qc);
+    final JobOptions options = toOptions(arg(2), new JobOptions(), true, qc);
     options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
 
     final boolean service = Boolean.TRUE.equals(options.get(JobOptions.SERVICE));

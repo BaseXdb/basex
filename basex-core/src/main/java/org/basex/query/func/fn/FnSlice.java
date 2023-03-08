@@ -22,7 +22,7 @@ import org.basex.util.*;
 public class FnSlice extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    Value input = exprs[0].value(qc);
+    Value input = arg(0).value(qc);
 
     final Slice slice = slice(input.size(), qc);
     if(slice.length == 0) return Empty.VALUE;
@@ -38,12 +38,12 @@ public class FnSlice extends StandardFunc {
 
   @Override
   public Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
     // for the following optimizations, the numeric properties must either be static or absent
-    final IntPredicate value = e -> !defined(e) || exprs[e] instanceof Value;
+    final IntPredicate value = e -> !defined(e) || arg(e) instanceof Value;
     if(value.test(1) && value.test(2) && value.test(3)) {
       final long size = input.size();
       if(size != -1) {
@@ -95,11 +95,8 @@ public class FnSlice extends StandardFunc {
    * @throws QueryException query exception
    */
   private long toLong(final int i, final long dflt, final QueryContext qc) throws QueryException {
-    if(defined(i)) {
-      final Item item = exprs[i].atomItem(qc, info);
-      if(!item.isEmpty()) return toLong(item);
-    }
-    return dflt;
+    final Item item = arg(i).atomItem(qc, info);
+    return item.isEmpty() ? dflt : toLong(item);
   }
 
   /** Slice properties. */

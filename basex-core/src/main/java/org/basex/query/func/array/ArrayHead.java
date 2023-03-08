@@ -15,14 +15,14 @@ import org.basex.query.value.type.*;
 public final class ArrayHead extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
+    final XQArray array = toArray(arg(0), qc);
     if(array.isEmptyArray()) throw QueryError.ARRAYEMPTY.get(info);
     return array.head();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type type = exprs[0].seqType().type;
+    final Type type = arg(0).seqType().type;
     if(type instanceof ArrayType) exprType.assign(((ArrayType) type).declType);
     return this;
   }

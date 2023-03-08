@@ -20,9 +20,9 @@ import org.basex.util.*;
 public final class FnCompare extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value1 = toTokenOrNull(exprs[0], qc);
-    final byte[] value2 = toTokenOrNull(exprs[1], qc);
-    final Collation coll = toCollation(2, qc);
+    final byte[] value1 = toTokenOrNull(arg(0), qc);
+    final byte[] value2 = toTokenOrNull(arg(1), qc);
+    final Collation coll = toCollation(arg(2), qc);
 
     if(value1 == null || value2 == null) return Empty.VALUE;
     final long diff = diff(value1, value2, coll);
@@ -31,7 +31,7 @@ public final class FnCompare extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr value1 = exprs[0], value2 = exprs[1];
+    final Expr value1 = arg(0), value2 = arg(1);
     final SeqType st1 = value1.seqType(), st2 = value2.seqType();
     if(st1.zero()) return value1;
     if(st2.zero()) return value2;

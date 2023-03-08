@@ -30,7 +30,7 @@ public final class ProfTrack extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final TrackOptions options = toOptions(1, new TrackOptions(), true, qc);
+    final TrackOptions options = toOptions(arg(1), new TrackOptions(), true, qc);
 
     // include memory consumption
     long min = -1;
@@ -47,10 +47,10 @@ public final class ProfTrack extends StandardFunc {
     Value value = null;
     if(options.get(TrackOptions.VALUE)) {
       // retrieve and assign value
-      value = exprs[0].value(qc);
+      value = arg(0).value(qc);
     } else {
       // iterate through results; skip iteration if iterator is based on a value
-      final Iter iter = exprs[0].iter(qc);
+      final Iter iter = arg(0).iter(qc);
       if(!iter.valueIter()) {
         while(qc.next(iter) != null);
       }

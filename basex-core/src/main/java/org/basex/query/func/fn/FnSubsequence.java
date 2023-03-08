@@ -35,7 +35,7 @@ public class FnSubsequence extends StandardFunc {
     if(sr == EMPTY) return Empty.ITER;
 
     // return iterator if all results are returned, of it iterator yields no items
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     if(sr == ALL) return input;
 
     // return empty iterator if no items remain
@@ -88,7 +88,7 @@ public class FnSubsequence extends StandardFunc {
     if(sr == EMPTY) return Empty.VALUE;
 
     // return iterator if all results are returned, of it iterator yields no items
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     if(sr == ALL) return input.value(qc);
 
     // return empty iterator if no items remain
@@ -124,7 +124,7 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   SeqRange range(final CompileContext cc) throws QueryException {
-    return exprs[1] instanceof Value && (!defined(2) || exprs[2] instanceof Value) ?
+    return arg(1) instanceof Value && (!defined(2) || arg(2) instanceof Value) ?
       range(cc.qc) : null;
   }
 
@@ -135,11 +135,11 @@ public class FnSubsequence extends StandardFunc {
    * @throws QueryException query exception
    */
   private SeqRange range(final QueryContext qc) throws QueryException {
-    double start = toDouble(exprs[1], qc);
+    double start = toDouble(arg(1), qc);
+    final Item end = arg(2).atomItem(qc, info);
     if(Double.isNaN(start)) return EMPTY;
-    final long s = start(start);
 
-    final Item end = defined(2) ? exprs[2].atomItem(qc, info) : Empty.VALUE;
+    final long s = start(start);
     long e = Long.MAX_VALUE;
     if(!end.isEmpty()) {
       start = toDouble(end);
@@ -179,7 +179,7 @@ public class FnSubsequence extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
@@ -247,8 +247,9 @@ public class FnSubsequence extends StandardFunc {
           if(!one) break;
         }
       }
-    } else if(exprs[1] instanceof Int) {
-      final long start = ((Int) exprs[1]).itr(), diff = countInputDiff(2) + start;
+    } else if(arg(1) instanceof Int) {
+      final long start = ((Int) arg(1)).itr();
+      final long diff = FnItemsAt.countInputDiff(arg(0), arg(2)) + start;
       if(diff == (int) diff) {
         if(start <= 1) {
           // subsequence(E, 1, count(E) - 1)  ->  util:init(E)
@@ -257,7 +258,7 @@ public class FnSubsequence extends StandardFunc {
           if(diff >= 1) return input;
         } else if(start <= diff) {
           // subsequence(E, 3, count(E) - 1)  ->  subsequence(E, 3)
-          return cc.function(SUBSEQUENCE, info, input, exprs[1]);
+          return cc.function(SUBSEQUENCE, info, input, arg(1));
         }
       }
     }
@@ -268,6 +269,6 @@ public class FnSubsequence extends StandardFunc {
 
   @Override
   public final boolean ddo() {
-    return exprs[0].ddo();
+    return arg(0).ddo();
   }
 }

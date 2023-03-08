@@ -22,9 +22,9 @@ import org.basex.util.*;
 public final class ArraySort extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
-    final Collation coll = toCollation(1, true, qc);
-    final FItem key = defined(2) ? toFunction(exprs[2], 1, qc) : null;
+    final XQArray array = toArray(arg(0), qc);
+    final Collation coll = toCollation(arg(1), true, qc);
+    final FItem key = defined(2) ? toFunction(arg(2), 1, qc) : null;
 
     final ValueList values = new ValueList(array.arraySize());
     for(final Value value : array.members()) {
@@ -40,16 +40,14 @@ public final class ArraySort extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = exprs[0];
+    final Expr array = arg(0);
     if(array == XQArray.empty()) return array;
 
-    final SeqType st = exprs[0].seqType();
+    final SeqType st = array.seqType();
     final Type type = st.type;
-
     if(type instanceof ArrayType) {
       if(defined(2)) {
-        exprs[2] = coerceFunc(exprs[2], cc, SeqType.ANY_ATOMIC_TYPE_ZM,
-            ((ArrayType) type).declType);
+        arg(2, arg -> coerceFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, ((ArrayType) type).declType));
       }
       exprType.assign(type);
     }

@@ -18,8 +18,8 @@ import org.basex.util.*;
 public final class ConvertBinaryToString extends ConvertFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin value = toBin(exprs[0], qc);
-    final String encoding = toEncodingOrNull(1, CONVERT_ENCODING_X, qc);
+    final Bin value = toBin(arg(0), qc);
+    final String encoding = toEncodingOrNull(arg(1), CONVERT_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     try(BufferInput bi = value.input(info)) {

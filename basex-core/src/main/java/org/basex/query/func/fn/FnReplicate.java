@@ -23,13 +23,13 @@ import org.basex.query.value.type.*;
 public class FnReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Expr input = exprs[0];
-    final long count = toLong(exprs[1], qc);
+    final Expr input = arg(0);
+    final long count = toLong(arg(1), qc);
     if(count <= 0) return Empty.VALUE;
     if(count == 1) return input.value(qc);
 
     // check if expression must be evaluated only once
-    final boolean once = input instanceof Value || !defined(2) || !toBoolean(exprs[2], qc);
+    final boolean once = input instanceof Value || !defined(2) || !toBoolean(arg(2), qc);
     if(once) return SingletonSeq.get(input.value(qc), count);
 
     // repeated evaluations
@@ -40,8 +40,8 @@ public class FnReplicate extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Expr input = exprs[0];
-    final long count = toLong(exprs[1], qc);
+    final Expr input = arg(0);
+    final long count = toLong(arg(1), qc);
     if(count <= 0) return Empty.ITER;
     if(count == 1) return input.iter(qc);
 
@@ -92,7 +92,7 @@ public class FnReplicate extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], count = exprs[1];
+    final Expr input = arg(0), count = arg(1);
     final boolean single = singleEval(true);
 
     // merge replicate functions
@@ -128,9 +128,9 @@ public class FnReplicate extends StandardFunc {
     // data(replicate(<a>1</a>, 2))  ->  data(replicate(xs:untypedAtomic('1'), 2))
     // distinct-values(replicate(('a', 'a'), 2))  ->  distinct-values('a', 2)
     final Expr input = mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT,
-        Simplify.DISTINCT) ? exprs[0].simplifyFor(mode, cc) : exprs[0];
+        Simplify.DISTINCT) ? arg(0).simplifyFor(mode, cc) : arg(0);
 
-    final long count = exprs[1] instanceof Int ? ((Int) exprs[1]).itr() : -1;
+    final long count = arg(1) instanceof Int ? ((Int) arg(1)).itr() : -1;
     if(count > 0 && (singleEval(true) || !input.has(Flag.NDT))) {
       // distinct-values(replicate(NODES, 2))  ->  distinct-values(NODES)
       // VALUE[replicate(NODES, 2)]  ->  VALUE[NODES]
@@ -141,7 +141,7 @@ public class FnReplicate extends StandardFunc {
     }
 
     // create function with new input argument
-    if(input != exprs[0]) {
+    if(input != arg(0)) {
       final Expr[] args = exprs.clone();
       args[0] = input;
       return cc.function(REPLICATE, info, args);
@@ -162,8 +162,8 @@ public class FnReplicate extends StandardFunc {
      * - replicate(1, 2, true())
      * rejected:
      * - replicate(random:uuid(), 2, true()) */
-    return exprs[0] instanceof Value ||
+    return arg(0) instanceof Value ||
       // if second argument is a static integer, it is >= 1
-      (!defined(2) || exprs[2] == Bln.FALSE) && (zero || exprs[1] instanceof Int);
+      (!defined(2) || arg(2) == Bln.FALSE) && (zero || arg(1) instanceof Int);
   }
 }

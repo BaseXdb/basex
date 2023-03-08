@@ -12,6 +12,7 @@ import javax.xml.transform.stream.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -49,9 +50,9 @@ public class XsltTransform extends XsltFn {
    * @throws QueryException query exception
    */
   final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
-    final IO in = read(0, qc), xsl = read(1, qc);
-    final HashMap<String, String> params = toOptions(2, qc);
-    final XsltOptions options = toOptions(3, new XsltOptions(), true, qc);
+    final IO in = read(arg(0), qc), xsl = read(arg(1), qc);
+    final HashMap<String, String> params = toOptions(arg(2), qc);
+    final XsltOptions options = toOptions(arg(3), new XsltOptions(), true, qc);
 
     final ArrayOutput result = new ArrayOutput();
     final PrintStream errPS = System.err;
@@ -116,13 +117,13 @@ public class XsltTransform extends XsltFn {
 
   /**
    * Evaluates an expression (node, URI string) to a input reference.
-   * @param i index of argument
+   * @param expr expression
    * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  private IO read(final int i, final QueryContext qc) throws QueryException {
-    final Item item = toNodeOrAtomItem(i, qc);
+  private IO read(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = toNodeOrAtomItem(expr, qc);
     if(item instanceof ANode) {
       try {
         final IO io = new IOContent(item.serialize().finish());

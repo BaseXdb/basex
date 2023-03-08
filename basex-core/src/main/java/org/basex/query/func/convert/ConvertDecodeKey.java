@@ -15,7 +15,7 @@ import org.basex.util.*;
 public class ConvertDecodeKey extends ConvertIntegersToBase64 {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] key = toToken(exprs[0], qc);
+    final byte[] key = toToken(arg(0), qc);
     final boolean lax = toBooleanOrFalse(arg(1), qc);
 
     final byte[] string = XMLToken.decode(key, lax);

@@ -20,8 +20,8 @@ public final class DbPutValue extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final Value input = exprs[1].value(qc);
-    final String path = toDbPath(2, qc);
+    final Value input = arg(1).value(qc);
+    final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw RESINV_X.get(info, path);
 

@@ -15,10 +15,10 @@ import org.basex.query.value.seq.*;
 public final class RequestAttribute extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = toString(exprs[0], qc);
+    final String name = toString(arg(0), qc);
     final Object object = request(qc).getAttribute(name);
     if(object != null) return JavaCall.toValue(object, qc, info);
 
-    return defined(1) ? exprs[1].value(qc) : Empty.VALUE;
+    return defined(1) ? arg(1).value(qc) : Empty.VALUE;
   }
 }

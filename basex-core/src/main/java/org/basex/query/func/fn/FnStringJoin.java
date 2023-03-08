@@ -19,8 +19,8 @@ import org.basex.util.*;
 public final class FnStringJoin extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter values = exprs[0].atomIter(qc, info);
-    final byte[] separator = defined(1) ? toToken(exprs[1], qc) : Token.EMPTY;
+    final Iter values = arg(0).atomIter(qc, info);
+    final byte[] separator = defined(1) ? toToken(arg(1), qc) : Token.EMPTY;
 
     // no results: empty string
     Item item = values.next();
@@ -40,7 +40,7 @@ public final class FnStringJoin extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr values = exprs[0], separator = defined(1) ? exprs[1] : Str.EMPTY;
+    final Expr values = arg(0), separator = defined(1) ? arg(1) : Str.EMPTY;
 
     // string-join(characters(A))  ->  string(A)
     if(CHARACTERS.is(values) && separator == Str.EMPTY)

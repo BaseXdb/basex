@@ -16,6 +16,6 @@ import org.basex.util.*;
 public final class FnEscapeHtmlUri extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(escape(toZeroToken(exprs[0], qc)));
+    return Str.get(escape(toZeroToken(arg(0), qc)));
   }
 }

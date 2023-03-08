@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnGenerateId extends ContextFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(0, qc), qc);
+    final ANode node = toNodeOrNull(context(qc), qc);
     if(node == null) return Str.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder(Token.ID);

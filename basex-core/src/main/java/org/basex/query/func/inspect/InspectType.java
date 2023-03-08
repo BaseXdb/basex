@@ -39,15 +39,15 @@ public final class InspectType extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Value value = exprs[0].value(qc);
-    final InspectOptions options = toOptions(1, new InspectOptions(), true, qc);
+    final Value value = arg(0).value(qc);
+    final InspectOptions options = toOptions(arg(1), new InspectOptions(), true, qc);
     final Mode mode = options.get(InspectOptions.MODE);
     final boolean item = options.get(InspectOptions.ITEM);
 
     SeqType st = null;
     switch(mode) {
       case EXPRESSION:
-        st = exprs[0].seqType();
+        st = arg(0).seqType();
         break;
       case VALUE:
         st = value.seqType();
@@ -62,7 +62,7 @@ public final class InspectType extends StandardFunc {
         st = st.with(value.seqType().occ);
 
         // compare with original type, which may be more specific (in particular for node types)
-        final SeqType et = exprs[0].seqType();
+        final SeqType et = arg(0).seqType();
         if(et.instanceOf(st)) st = et;
     }
     return Str.get((item ? st.type : st).toString());

@@ -20,9 +20,9 @@ public final class FnStringLength extends ContextFn {
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value;
     if(defined(0)) {
-      value = toZeroToken(exprs[0], qc);
+      value = toZeroToken(arg(0), qc);
     } else {
-      final Item item = ctxValue(qc).item(qc, info);
+      final Item item = context(qc).item(qc, info);
       if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item);
       value = item.isEmpty() ? Token.EMPTY : item.string(info);
     }

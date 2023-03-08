@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnString extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = context(0, qc).item(qc, info);
+    final Item item = context(qc).item(qc, info);
 
     if(item.isEmpty()) return Str.EMPTY;
     if(item.type == AtomType.STRING) return item;
@@ -33,7 +33,7 @@ public final class FnString extends ContextFn {
     exprs = simplifyAll(Simplify.STRING, cc);
 
     final boolean context = contextAccess();
-    final Expr item = context ? cc.qc.focus.value : exprs[0];
+    final Expr item = context ? cc.qc.focus.value : arg(0);
     if(item != null && item.seqType().eq(SeqType.STRING_O)) {
       // string('x')  ->  'x'
       // $string[string() = 'a']  ->  $string[. = 'a']
@@ -45,7 +45,7 @@ public final class FnString extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    final Expr item = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
+    final Expr item = contextAccess() ? ContextValue.get(cc, info) : arg(0);
     final SeqType st = item.seqType();
     if(mode == Simplify.STRING && st.type.isStringOrUntyped() && st.one()) {
       // $node[string() = 'x']  ->  $node[. = 'x']

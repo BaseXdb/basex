@@ -17,9 +17,9 @@ import org.basex.util.list.*;
 public final class WsSend extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item message = toItem(exprs[0], qc);
+    final Item message = toItem(arg(0), qc);
     final StringList ids = new StringList();
-    final Iter iter = exprs[1].iter(qc);
+    final Iter iter = arg(1).iter(qc);
     for(Item it; (it = qc.next(iter)) != null;) {
       ids.add(toString(it));
     }

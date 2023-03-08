@@ -46,14 +46,14 @@ public abstract class Parse extends StandardFunc {
     try {
       IO io = input;
       if(io == null) {
-        final Item href = exprs[0].atomItem(qc, info);
+        final Item href = arg(0).atomItem(qc, info);
         if(href.isEmpty()) return check ? Bln.FALSE : Empty.VALUE;
         io = input(toToken(href));
         if(io == null) throw INVURL_X.get(info, href);
       }
       if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
 
-      String enc = encoding ? toEncodingOrNull(1, ENCODING_X, qc) : null;
+      String enc = encoding ? toEncodingOrNull(arg(1), ENCODING_X, qc) : null;
 
       // only required for test APIs
       final String[] pathEnc = qc.resources.text(io);

@@ -21,9 +21,9 @@ import org.basex.util.*;
 public final class ArchiveWrite extends ArchiveCreate {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Path path = toPath(0, qc);
-    final Map<String, Item[]> map = toMap(1, qc);
-    final CreateOptions options = toOptions(3, new CreateOptions(), true, qc);
+    final Path path = toPath(arg(0), qc);
+    final Map<String, Item[]> map = toMap(arg(1), arg(2), qc);
+    final CreateOptions options = toOptions(arg(3), new CreateOptions(), true, qc);
 
     try {
       try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile()))) {

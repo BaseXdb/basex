@@ -7,6 +7,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 
@@ -34,14 +35,14 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   /**
-   * Returns the specified argument, or the context value if it does not exist.
-   * @param i index of optional argument
+   * Returns the context argument, or the context value if it does not exist.
    * @param qc query context
    * @return expression
    * @throws QueryException query exception
    */
-  protected final Expr context(final int i, final QueryContext qc) throws QueryException {
-    return defined(i) ? exprs[i] : ctxValue(qc);
+  protected final Expr context(final QueryContext qc) throws QueryException {
+    final Expr expr = arg(contextIndex());
+    return expr != Empty.UNDEFINED ? expr : ctxValue(qc);
   }
 
   @Override
@@ -59,7 +60,7 @@ public abstract class ContextFn extends StandardFunc {
    * @return result of check
    */
   public boolean inlineable() {
-    return (contextAccess() || exprs[contextIndex()] instanceof ContextValue) &&
+    return (contextAccess() || arg(contextIndex()) instanceof ContextValue) &&
         definition.seqType.occ == Occ.ZERO_OR_ONE;
   }
 
@@ -72,12 +73,13 @@ public abstract class ContextFn extends StandardFunc {
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
     // try to inline arguments
-    Expr expr = ic.inline(exprs) ? this : null;
+    final Expr[] args = args();
+    Expr expr = ic.inline(args) ? this : null;
     // create new expression with inlined context value
     if(ic.var == null && !(ic.expr instanceof ContextValue) && contextAccess()) {
       // $v ! string()  ->  string($v)
-      final Expr[] args = new ExprList(exprs.length + 1).add(exprs).add(ic.copy()).finish();
-      expr = definition.get(ic.cc.sc(), info, args);
+      final Expr[] newArgs = new ExprList(args.length + 1).add(args).add(ic.copy()).finish();
+      expr = definition.get(ic.cc.sc(), info, newArgs);
     }
     return expr != null ? expr.optimize(ic.cc) : null;
   }

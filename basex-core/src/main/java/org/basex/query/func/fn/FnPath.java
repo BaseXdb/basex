@@ -27,7 +27,7 @@ public final class FnPath extends ContextFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node = toNodeOrNull(context(0, qc), qc);
+    ANode node = toNodeOrNull(context(qc), qc);
     if(node == null) return Empty.VALUE;
 
     final TokenBuilder tb = new TokenBuilder();

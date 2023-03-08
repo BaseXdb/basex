@@ -15,11 +15,11 @@ public class FnIdentity extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup calls
-    return exprs[0].value(qc);
+    return arg(0).value(qc);
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    return exprs[0];
+    return arg(0);
   }
 }

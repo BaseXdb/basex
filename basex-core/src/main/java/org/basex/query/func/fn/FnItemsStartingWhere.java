@@ -18,8 +18,8 @@ public class FnItemsStartingWhere extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter input = exprs[0].iter(qc);
-      final FItem predicate = toFunction(exprs[1], 1, qc);
+      final Iter input = arg(0).iter(qc);
+      final FItem predicate = toFunction(arg(1), 1, qc);
       boolean started;
 
       @Override
@@ -43,11 +43,11 @@ public class FnItemsStartingWhere extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
+    arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE)));
     exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;
   }

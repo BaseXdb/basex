@@ -23,7 +23,7 @@ public final class FnReverse extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // optimization: reverse sequence
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
 
     // materialize value if number of results is unknown
     final long size = input.size();
@@ -62,12 +62,12 @@ public final class FnReverse extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return exprs[0].value(qc).reverse(qc);
+    return arg(0).value(qc).reverse(qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     if(input.seqType().zeroOrOne()) return input;
     if(input instanceof Value) return ((Value) input).reverse(cc.qc);
 
@@ -105,6 +105,6 @@ public final class FnReverse extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return cc.simplify(this, mode.oneOf(Simplify.DISTINCT, Simplify.COUNT) ? exprs[0] : this, mode);
+    return cc.simplify(this, mode.oneOf(Simplify.DISTINCT, Simplify.COUNT) ? arg(0) : this, mode);
   }
 }

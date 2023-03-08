@@ -19,7 +19,7 @@ public final class DbType extends DbAccess {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final String path = toDbPath(1, qc);
+    final String path = toDbPath(arg(1), qc);
 
     ResourceType type = null;
     if(data.resources.doc(path) != -1) {

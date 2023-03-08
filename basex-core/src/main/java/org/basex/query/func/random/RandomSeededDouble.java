@@ -50,8 +50,8 @@ public final class RandomSeededDouble extends StandardFunc {
    * @throws QueryException query exception
    */
   private long[] args(final QueryContext qc) throws QueryException {
-    final long seed = toLong(exprs[0], qc);
-    final long num = toLong(exprs[1], qc);
+    final long seed = toLong(arg(0), qc);
+    final long num = toLong(arg(1), qc);
     if(num < 0) throw RANGE_NEGATIVE_X.get(info, num);
     return new long[] { seed, num };
   }

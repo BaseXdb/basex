@@ -91,7 +91,7 @@ public final class DynFuncCall extends FuncCall {
 
     if(func instanceof XQData) {
       // lookup key must be atomic
-      if(nargs == 1) exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc);
+      if(nargs == 1) arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values
       if(allAreValues(false)) return cc.preEval(this);
     }

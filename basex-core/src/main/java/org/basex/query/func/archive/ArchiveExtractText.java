@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 public final class ArchiveExtractText extends ArchiveExtractBinary {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String encoding = toEncodingOrNull(2, ARCHIVE_ENCODE1_X, qc);
+    final String encoding = toEncodingOrNull(arg(2), ARCHIVE_ENCODE1_X, qc);
     final TokenList tl = new TokenList();
     for(final byte[] bytes : extract(qc)) tl.add(encode(bytes, encoding, qc));
     return StrSeq.get(tl);

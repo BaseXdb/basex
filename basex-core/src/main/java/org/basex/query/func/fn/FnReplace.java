@@ -22,11 +22,11 @@ import org.basex.util.list.*;
 public final class FnReplace extends RegEx {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
-    final byte[] pattern = toToken(exprs[1], qc);
-    final byte[] replacement = toZeroToken(exprs[2], qc);
-    final Expr flags = defined(3) ? exprs[3] : null;
-    final FItem action = defined(4) ? toFunction(exprs[4], 2, qc) : null;
+    final byte[] value = toZeroToken(arg(0), qc);
+    final byte[] pattern = toToken(arg(1), qc);
+    final byte[] replacement = toZeroToken(arg(2), qc);
+    final Expr flags = defined(3) ? arg(3) : null;
+    final FItem action = defined(4) ? toFunction(arg(4), 2, qc) : null;
 
     // shortcut for simple character replacements
     if(flags == null) {

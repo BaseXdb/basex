@@ -20,16 +20,16 @@ import org.basex.util.*;
 public final class MapPut extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQMap map = toMap(exprs[0], qc);
-    final Item key = toAtomItem(exprs[1], qc);
-    final Value value = exprs[2].value(qc);
+    final XQMap map = toMap(arg(0), qc);
+    final Item key = toAtomItem(arg(1), qc);
+    final Value value = arg(2).value(qc);
 
     return map.put(key, value, info);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr map = exprs[0], key = exprs[1], value = exprs[2];
+    final Expr map = arg(0), key = arg(1), value = arg(2);
     if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
     final Type type = map.seqType().type;

@@ -19,8 +19,8 @@ import org.basex.util.*;
 public final class UserUpdateInfo extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toElem(exprs[0], qc);
-    final User user = defined(1) ? toUser(1, qc) : null;
+    final ANode node = toElem(arg(0), qc);
+    final User user = defined(1) ? toUser(arg(1), qc) : null;
     if(!T_INFO.matches(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
 
     qc.updates().add(new UpdateInfo(node.materialize(n -> false, info, qc), user, qc, info), qc);

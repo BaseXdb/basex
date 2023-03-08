@@ -34,12 +34,12 @@ public class DbText extends DbAccess {
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     compileData(cc);
-    exprs[1] = exprs[1].simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc);
+    arg(1, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
 
     // count number of results
     final Data data = data();
     final IndexType type = type();
-    if(type != IndexType.TOKEN && data != null && exprs[1] instanceof Value) {
+    if(type != IndexType.TOKEN && data != null && arg(1) instanceof Value) {
       type.check(data, info);
       long size = 0;
       for(final byte[] token : tokens(cc.qc)) {
@@ -79,7 +79,7 @@ public class DbText extends DbAccess {
    */
   private TokenSet tokens(final QueryContext qc) throws QueryException {
     final TokenSet set = new TokenSet();
-    final Iter iter = exprs[1].iter(qc);
+    final Iter iter = arg(1).iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       set.put(toToken(item));
     }

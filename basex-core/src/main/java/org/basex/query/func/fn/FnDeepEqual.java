@@ -18,16 +18,16 @@ import org.basex.util.*;
 public final class FnDeepEqual extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter1 = exprs[0].iter(qc), iter2 = exprs[1].iter(qc);
-    final Collation coll = toCollation(2, true, qc);
-    final DeepEqualOptions options = toOptions(3, new DeepEqualOptions(), false, qc);
+    final Iter iter1 = arg(0).iter(qc), iter2 = arg(1).iter(qc);
+    final Collation coll = toCollation(arg(2), true, qc);
+    final DeepEqualOptions options = toOptions(arg(3), new DeepEqualOptions(), false, qc);
 
     return Bln.get(new DeepEqual(info, qc, coll, options).equal(iter1, iter2));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    final Expr expr1 = arg(0), expr2 = arg(1);
     // do not compare identical arguments
     if(!expr1.seqType().mayBeFunction() && !expr2.seqType().mayBeFunction() &&
         expr1.equals(expr2) && !expr1.has(Flag.NDT)) return Bln.TRUE;

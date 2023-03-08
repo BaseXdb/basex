@@ -15,8 +15,8 @@ import org.basex.util.*;
 public final class BinPackDouble extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final double dbl = toDouble(exprs[0], qc);
-    final ByteOrder order = order(1, qc);
+    final double dbl = toDouble(arg(0), qc);
+    final ByteOrder order = order(arg(1), qc);
     return B64.get(ByteBuffer.wrap(new byte[8]).order(order).putDouble(dbl).array());
   }
 }

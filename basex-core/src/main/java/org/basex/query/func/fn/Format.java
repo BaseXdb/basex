@@ -25,10 +25,10 @@ abstract class Format extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
-    final Item value = exprs[0].atomItem(qc, info);
+    final Item value = arg(0).atomItem(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
 
-    final byte[] picture = toZeroToken(exprs[1], qc);
+    final byte[] picture = toZeroToken(arg(1), qc);
     final byte[] language = toZeroToken(arg(2), qc);
     byte[] calendar = toTokenOrNull(arg(3), qc);
     if(calendar != null) calendar = trim(calendar);

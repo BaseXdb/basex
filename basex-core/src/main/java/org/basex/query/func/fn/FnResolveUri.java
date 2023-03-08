@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class FnResolveUri extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] relative = toTokenOrNull(exprs[0], qc);
+    final byte[] relative = toTokenOrNull(arg(0), qc);
     final byte[] base = toTokenOrNull(arg(1), qc);
     if(relative == null) return Empty.VALUE;
 

@@ -17,13 +17,13 @@ import org.basex.query.value.seq.*;
 public final class RequestCookie extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = toString(exprs[0], qc);
+    final String name = toString(arg(0), qc);
     final Cookie[] cookies = request(qc).getCookies();
     if(cookies != null) {
       for(final Cookie c : cookies) {
         if(c.getName().equals(name)) return Str.get(c.getValue());
       }
     }
-    return defined(1) ? Str.get(toToken(exprs[1], qc)) : Empty.VALUE;
+    return defined(1) ? Str.get(toToken(arg(1), qc)) : Empty.VALUE;
   }
 }

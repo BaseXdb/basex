@@ -18,16 +18,16 @@ import org.basex.query.value.type.*;
 public final class FnFoldLeft extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     final Item item = input.next();
-    return item != null ? value(input, item, qc) : exprs[1].value(qc);
+    return item != null ? value(input, item, qc) : arg(1).value(qc);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     final Item item = input.next();
-    return item != null ? value(input, item, qc).iter() : exprs[1].iter(qc);
+    return item != null ? value(input, item, qc).iter() : arg(1).iter(qc);
   }
 
   /**
@@ -40,8 +40,8 @@ public final class FnFoldLeft extends StandardFunc {
    */
   private Value value(final Iter input, final Item item, final QueryContext qc)
       throws QueryException {
-    Value value = exprs[1].value(qc);
-    final FItem action = toFunction(exprs[2], 2, qc);
+    Value value = arg(1).value(qc);
+    final FItem action = toFunction(arg(2), 2, qc);
     Item it = item;
     do {
       value = action.invoke(qc, info, value, it);
@@ -51,7 +51,7 @@ public final class FnFoldLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], zero = exprs[1], action = exprs[2];
+    final Expr input = arg(0), zero = arg(1), action = arg(2);
     if(input.seqType().zero()) return zero;
 
     opt(this, cc, false, true);
@@ -81,17 +81,17 @@ public final class FnFoldLeft extends StandardFunc {
   public static void opt(final StandardFunc sf, final CompileContext cc, final boolean array,
       final boolean left) throws QueryException {
 
-    final Expr[] exprs = sf.exprs;
-    final Expr action = exprs[2];
+    final Expr[] args = sf.args();
+    final Expr action = args[2];
     if(action instanceof FuncItem) {
       // function argument is a single function item
-      final SeqType seq = exprs[0].seqType(), zero = exprs[1].seqType(), curr = array &&
+      final SeqType seq = args[0].seqType(), zero = args[1].seqType(), curr = array &&
           seq.type instanceof ArrayType ? ((ArrayType) seq.type).declType :
             seq.with(Occ.EXACTLY_ONE);
 
       // assign item type of iterated value, optimize function
-      final SeqType[] args = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
-      Expr optFunc = sf.coerceFunc(action, cc, SeqType.ITEM_ZM, args);
+      final SeqType[] st = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
+      Expr optFunc = sf.coerceFunc(action, cc, SeqType.ITEM_ZM, st);
 
       final FuncType ft = optFunc.funcType();
       final int i = left ? 0 : 1;
@@ -101,8 +101,8 @@ public final class FnFoldLeft extends StandardFunc {
       final SeqType at = ft.argTypes[i];
       if(!input.eq(at) && input.instanceOf(at)) {
         while(true) {
-          args[i] = input;
-          optFunc = sf.coerceFunc(action, cc, ft.declType, args);
+          st[i] = input;
+          optFunc = sf.coerceFunc(action, cc, ft.declType, st);
           output = optFunc.funcType().declType;
 
           // optimized type is instance of input type: abort
@@ -113,7 +113,7 @@ public final class FnFoldLeft extends StandardFunc {
       }
 
       sf.exprType.assign(array || !seq.oneOrMore() ? output.union(zero) : output);
-      exprs[2] = optFunc;
+      args[2] = optFunc;
     }
   }
 }

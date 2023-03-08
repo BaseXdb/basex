@@ -18,13 +18,12 @@ import org.basex.util.hash.*;
 public class UtilStripNamespaces extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNode(exprs[0], qc);
+    final ANode node = toNode(arg(0), qc);
+    final Iter iter = arg(1).iter(qc);
+
     final TokenSet prefixes = new TokenSet();
-    if(defined(1)) {
-      final Iter iter = exprs[1].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) {
-        prefixes.add(toToken(item));
-      }
+    for(Item item; (item = qc.next(iter)) != null;) {
+      prefixes.add(toToken(item));
     }
     return DataBuilder.stripNamespaces(node, prefixes, qc.context, info);
   }

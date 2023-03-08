@@ -11,6 +11,7 @@ import java.util.zip.*;
 
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -37,8 +38,8 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    */
   public final void create(final OutputStream os, final QueryContext qc) throws QueryException {
-    final Map<String, Item[]> map = toMap(0, qc);
-    final CreateOptions options = toOptions(2, new CreateOptions(), true, qc);
+    final Map<String, Item[]> map = toMap(arg(0), arg(1), qc);
+    final CreateOptions options = toOptions(arg(2), new CreateOptions(), true, qc);
     create(map, options, os, qc);
   }
 
@@ -155,21 +156,23 @@ public class ArchiveCreate extends ArchiveFn {
 
   /**
    * Returns archive entries and contents.
-   * @param i index for supplied entries
+   * @param entries entries
+   * @param contents contents
    * @param qc query context
    * @return map with file names and entries and contents
    * @throws QueryException query exception
    */
-  final Map<String, Item[]> toMap(final int i, final QueryContext qc) throws QueryException {
-    final Iter entries = exprs[i].iter(qc), contents = exprs[i + 1].iter(qc);
+  final Map<String, Item[]> toMap(final Expr entries, final Expr contents, final QueryContext qc)
+      throws QueryException {
+    final Iter entrs = entries.iter(qc), cntnts = contents.iter(qc);
     final Map<String, Item[]> map = new LinkedHashMap<>();
     int e = 0, c = 0;
     while(true) {
-      final Item en = qc.next(entries), cn = contents.next();
+      final Item en = qc.next(entrs), cn = cntnts.next();
       if(en == null || cn == null) {
         // count remaining entries
-        if(cn != null) do c++; while(contents.next() != null);
-        if(en != null) do e++; while(entries.next() != null);
+        if(cn != null) do c++; while(cntnts.next() != null);
+        if(en != null) do e++; while(entrs.next() != null);
         if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
         break;
       }

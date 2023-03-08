@@ -14,7 +14,7 @@ public final class StoreGetOrPut extends StoreFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] key = toKey(qc);
-    final FItem put = toFunction(exprs[1], 0, qc);
+    final FItem put = toFunction(arg(1), 0, qc);
 
     Value value = store(qc).get(key);
     if(value.isEmpty()) {

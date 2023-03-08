@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class MapSize extends StandardFunc {
   @Override
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQMap map = toMap(exprs[0], qc);
+    final XQMap map = toMap(arg(0), qc);
 
     return Int.get(map.mapSize());
   }

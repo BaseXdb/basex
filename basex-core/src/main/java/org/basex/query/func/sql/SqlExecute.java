@@ -38,8 +38,8 @@ public class SqlExecute extends SqlFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
-    final String query = toString(exprs[1], qc);
-    final StatementOptions options = toOptions(2, new StatementOptions(), true, qc);
+    final String query = toString(arg(1), qc);
+    final StatementOptions options = toOptions(arg(2), new StatementOptions(), true, qc);
 
     try {
       final Statement stmt = conn.createStatement();

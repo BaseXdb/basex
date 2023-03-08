@@ -31,7 +31,7 @@ public class ValidateDtd extends ValidateFn {
       void process(final ValidationHandler handler)
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
-        final Item input = toNodeOrAtomItem(0, qc);
+        final Item input = toNodeOrAtomItem(arg(0), qc);
         final String schema = toStringOrNull(arg(1), qc);
         final IO schm = schema != null ? toIO(schema) : null;
 

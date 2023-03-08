@@ -19,14 +19,14 @@ import org.basex.util.*;
 public final class FnCodepointEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value1 = exprs[0].atomItem(qc, info), value2 = exprs[1].atomItem(qc, info);
+    final Item value1 = arg(0).atomItem(qc, info), value2 = arg(1).atomItem(qc, info);
     return value1.isEmpty() || value2.isEmpty() ? Empty.VALUE :
       Bln.get(eq(toToken(value1), toToken(value2)));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr value1 = exprs[0], value2 = exprs[1];
+    final Expr value1 = arg(0), value2 = arg(1);
     final SeqType st1 = value1.seqType(), st2 = value2.seqType();
     if(st1.zero()) return value1;
     if(st2.zero()) return value2;

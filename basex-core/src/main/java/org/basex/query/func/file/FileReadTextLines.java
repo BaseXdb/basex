@@ -77,8 +77,8 @@ public final class FileReadTextLines extends FileRead {
    * @throws QueryException query exception
    */
   private NewlineInput input(final QueryContext qc) throws IOException, QueryException {
-    final Path path = toPath(0, qc);
-    final String encoding = toEncodingOrNull(1, FILE_UNKNOWN_ENCODING_X, qc);
+    final Path path = toPath(arg(0), qc);
+    final String encoding = toEncodingOrNull(arg(1), FILE_UNKNOWN_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
@@ -96,8 +96,8 @@ public final class FileReadTextLines extends FileRead {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-   final Item offset = defined(3) ? exprs[3].atomItem(qc, info) : Empty.VALUE;
-    final Item length = defined(4) ? exprs[4].atomItem(qc, info) : Empty.VALUE;
+   final Item offset = arg(3).atomItem(qc, info);
+    final Item length = arg(4).atomItem(qc, info);
 
     final long off = offset.isEmpty() ? 1 : toLong(offset);
     final long len = length.isEmpty() ? Long.MAX_VALUE : toLong(length);
@@ -117,21 +117,21 @@ public final class FileReadTextLines extends FileRead {
   public static Expr opt(final StandardFunc func, final long start, final long length,
       final CompileContext cc) throws QueryException {
 
-    final Expr[] exprs = ((StandardFunc) func.exprs[0]).exprs;
-    final int el = exprs.length;
+    final Expr[] args = func.arg(0).args();
+    final int al = args.length;
 
     final Str encoding = Str.get(Strings.UTF8);
     final Bln validate = Bln.FALSE;
 
     // skip optimization if existing function cannot be merged with new bounds
-    if(el > 1 && !exprs[1].equals(encoding) ||
-       el > 2 && !exprs[2].equals(validate) ||
-       el > 3 && !(exprs[3] instanceof Int) ||
-       el > 4 && !(exprs[4] instanceof Int)) return func;
+    if(al > 1 && !args[1].equals(encoding) ||
+       al > 2 && !args[2].equals(validate) ||
+       al > 3 && !(args[3] instanceof Int) ||
+       al > 4 && !(args[4] instanceof Int)) return func;
 
     // old bounds
-    long s = el > 3 ? ((Int) exprs[3]).itr() - 1 : 0;
-    long l = el > 4 ? ((Int) exprs[4]).itr() : Long.MAX_VALUE;
+    long s = al > 3 ? ((Int) args[3]).itr() - 1 : 0;
+    long l = al > 4 ? ((Int) args[4]).itr() : Long.MAX_VALUE;
 
     // merge with new bounds: increase start offset, decrease number of lines to retrieve
     s += start;
@@ -139,7 +139,7 @@ public final class FileReadTextLines extends FileRead {
     if(length < l) l = length;
 
     // create new function instance
-    final Expr[] args = { exprs[0], encoding, validate, Int.get(s + 1), Int.get(l) };
-    return cc.function(Function._FILE_READ_TEXT_LINES, func.info(), args);
+    final Expr[] newArgs = { args[0], encoding, validate, Int.get(s + 1), Int.get(l) };
+    return cc.function(Function._FILE_READ_TEXT_LINES, func.info(), newArgs);
   }
 }

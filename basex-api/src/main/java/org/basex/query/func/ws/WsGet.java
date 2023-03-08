@@ -15,11 +15,11 @@ public final class WsGet extends WsFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final WebSocket client = client(qc);
-    final String name = toString(exprs[1], qc);
+    final String name = toString(arg(1), qc);
 
     final Value value = client.atts.get(name);
     if(value != null) return value;
 
-    return defined(2) ? exprs[2].value(qc) : Empty.VALUE;
+    return defined(2) ? arg(2).value(qc) : Empty.VALUE;
   }
 }

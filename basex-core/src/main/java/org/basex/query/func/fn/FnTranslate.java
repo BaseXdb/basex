@@ -18,8 +18,8 @@ import org.basex.util.*;
 public final class FnTranslate extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
-    final int[] replace = cps(toToken(exprs[1], qc)), with = cps(toToken(exprs[2], qc));
+    final byte[] value = toZeroToken(arg(0), qc);
+    final int[] replace = cps(toToken(arg(1), qc)), with = cps(toToken(arg(2), qc));
     if(value.length == 0 || replace.length == 0) return Str.get(value);
 
     final TokenBuilder tb = new TokenBuilder(value.length);
@@ -38,7 +38,7 @@ public final class FnTranslate extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr value = exprs[0], replace = exprs[1], with = exprs[2];
+    final Expr value = arg(0), replace = arg(1), with = arg(2);
     final SeqType st = value.seqType(), withSt = with.seqType();
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) && replace == Str.EMPTY &&

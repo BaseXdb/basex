@@ -23,7 +23,7 @@ public class FnUnparsedTextAvailable extends Parse {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate if target is empty
-    final Expr href = exprs[0];
+    final Expr href = arg(0);
     if(href == Empty.VALUE) return value(cc.qc);
 
     // pre-evaluate during dynamic compilation if target is not a remote URL

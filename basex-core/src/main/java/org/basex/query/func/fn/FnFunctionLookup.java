@@ -46,8 +46,8 @@ public final class FnFunctionLookup extends StandardFunc {
    * @throws QueryException query exception
    */
   private Expr literal(final QueryContext qc) throws QueryException {
-    final QNm name = toQNm(exprs[0], false, qc);
-    final long arity = toLong(exprs[1], qc);
+    final QNm name = toQNm(arg(0), false, qc);
+    final long arity = toLong(arg(1), qc);
     if(arity >= 0 && arity <= Integer.MAX_VALUE) {
       try {
         return Functions.getLiteral(name, (int) arity, qc, sc, info, true);

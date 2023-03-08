@@ -11,7 +11,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -34,8 +33,8 @@ public final class SqlExecutePrepared extends SqlExecute {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
-    final Item params = defined(1) ? exprs[1].item(qc, info) : Empty.VALUE;
-    final StatementOptions options = toOptions(2, new StatementOptions(), true, qc);
+    final Item params = arg(1).item(qc, info);
+    final StatementOptions options = toOptions(arg(2), new StatementOptions(), true, qc);
 
     final ANode prms = params.isEmpty() ? null : toElem(params, qc);
     if(prms != null && !prms.qname().eq(Q_PARAMETERS)) {

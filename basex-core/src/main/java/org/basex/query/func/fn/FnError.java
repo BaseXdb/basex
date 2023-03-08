@@ -33,7 +33,7 @@ public final class FnError extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final QNm code = toQNm(arg(0), true, qc);
     final String desc = toStringOrNull(arg(1), qc);
-    final Value object = defined(2) ? exprs[2].value(qc) : null;
+    final Value object = defined(2) ? arg(2).value(qc) : null;
     throw new QueryException(info, code != null ? code : FUNERR1.qname(),
       desc != null ? desc : FUNERR1.message).value(object);
   }

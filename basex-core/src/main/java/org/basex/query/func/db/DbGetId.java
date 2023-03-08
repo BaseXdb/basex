@@ -21,7 +21,7 @@ public class DbGetId extends DbAccess {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final Iter iter = exprs[1].atomIter(qc, info);
+    final Iter iter = arg(1).atomIter(qc, info);
 
     final IntList list = new IntList(Seq.initialCapacity(iter.size()));
     for(Item item; (item = qc.next(iter)) != null;) {

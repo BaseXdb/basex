@@ -19,7 +19,7 @@ import org.basex.query.value.seq.*;
 public final class HofSortWith extends HofFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc);
+    final Value input = arg(0).value(qc);
     final Comparator<Item> comparator = comparator(qc);
     if(input.size() < 2) return input;
 
@@ -40,7 +40,7 @@ public final class HofSortWith extends HofFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     // even single items must be sorted, as the input might be invalid
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);
   }
 }

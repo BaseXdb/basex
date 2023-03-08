@@ -19,13 +19,13 @@ public final class FnFormatNumber extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // evaluate arguments
-    Item value = exprs[0].atomItem(qc, info);
+    Item value = arg(0).atomItem(qc, info);
     if(value.isEmpty()) value = Dbl.NAN;
     else if(value.type.isUntyped()) value = Dbl.get(value.dbl(info));
     else if(!value.type.isNumberOrUntyped()) throw numberError(this, value);
 
     // retrieve picture
-    final byte[] picture = toToken(exprs[1], qc);
+    final byte[] picture = toToken(arg(1), qc);
     // retrieve format declaration
     QNm format = QNm.EMPTY;
     final byte[] name = toTokenOrNull(arg(2), qc);

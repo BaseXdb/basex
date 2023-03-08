@@ -20,14 +20,14 @@ import org.basex.query.value.seq.tree.*;
 public final class FnFoldRight extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc);
+    final Value input = arg(0).value(qc);
     return value(input, qc);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc);
-    return input.isEmpty() ? exprs[1].iter(qc) : value(input, qc).iter();
+    final Value input = arg(0).value(qc);
+    return input.isEmpty() ? arg(1).iter(qc) : value(input, qc).iter();
   }
 
   /**
@@ -38,8 +38,8 @@ public final class FnFoldRight extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value value(final Value items, final QueryContext qc) throws QueryException {
-    Value value = exprs[1].value(qc);
-    final FItem action = toFunction(exprs[2], 2, qc);
+    Value value = arg(1).value(qc);
+    final FItem action = toFunction(arg(2), 2, qc);
 
     if(items instanceof TreeSeq) {
       for(final ListIterator<Item> iter = ((TreeSeq) items).iterator(items.size());
@@ -56,7 +56,7 @@ public final class FnFoldRight extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], zero = exprs[1], action = exprs[2];
+    final Expr input = arg(0), zero = arg(1), action = arg(2);
     if(input.seqType().zero()) return zero;
 
     FnFoldLeft.opt(this, cc, false, false);

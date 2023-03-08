@@ -25,8 +25,8 @@ import org.basex.util.*;
 public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value functions = exprs[0].value(qc);
-    final TaskOptions options = toOptions(1, new TaskOptions(), true, qc);
+    final Value functions = arg(0).value(qc);
+    final TaskOptions options = toOptions(arg(1), new TaskOptions(), true, qc);
 
     final long size = functions.size();
     if(size == 0) return Empty.VALUE;
@@ -57,13 +57,13 @@ public final class XQueryForkJoin extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr functions = exprs[0], options = defined(1) ? exprs[1] : null;
+    final Expr functions = arg(0), options = arg(1);
     final SeqType st = functions.seqType();
     if(st.zero()) return functions;
     if(st.one()) return new DynFuncCall(info, sc, functions).optimize(cc);
 
-    final Boolean results = options == null ? Boolean.TRUE :
-      options instanceof Value ? toOptions(1, new TaskOptions(), true, cc.qc).get(RESULTS) :
+    final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
+      options instanceof Value ? toOptions(arg(1), new TaskOptions(), true, cc.qc).get(RESULTS) :
       null;
     if(results == Boolean.TRUE) {
       final Type type = st.type;

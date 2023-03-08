@@ -17,14 +17,14 @@ import org.basex.util.*;
 public final class ArrayTail extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
+    final XQArray array = toArray(arg(0), qc);
     if(array.isEmptyArray()) throw ARRAYEMPTY.get(info);
     return array.tail();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type type = exprs[0].seqType().type;
+    final Type type = arg(0).seqType().type;
     if(type instanceof ArrayType) exprType.assign(type);
     return this;
   }

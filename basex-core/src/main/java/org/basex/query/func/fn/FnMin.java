@@ -41,8 +41,8 @@ public class FnMin extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item minmax(final boolean min, final QueryContext qc) throws QueryException {
-    final Collation coll = toCollation(1, qc);
-    final Expr values = exprs[0];
+    final Collation coll = toCollation(arg(1), qc);
+    final Expr values = arg(0);
 
     if(values instanceof Range) {
       final Value value = values.value(qc);
@@ -107,7 +107,7 @@ public class FnMin extends StandardFunc {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     // do not simplify input arguments
-    if(defined(1)) exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
+    if(defined(1)) arg(1, arg -> arg.simplifyFor(Simplify.STRING, cc));
   }
 
   @Override
@@ -123,13 +123,13 @@ public class FnMin extends StandardFunc {
    * @throws QueryException query exception
    */
   final Expr opt(final boolean min, final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
 
     final Expr expr = optFirst();
     if(expr != this) return expr;
 
     final boolean noColl = !defined(1);
-    final Expr values = exprs[0];
+    final Expr values = arg(0);
     final SeqType st = values.seqType();
     Type type = st.type;
     if(type.isSortable()) {

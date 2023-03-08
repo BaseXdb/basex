@@ -18,8 +18,8 @@ import org.basex.util.*;
 public final class FnMatches extends RegEx {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc), pattern = toToken(exprs[1], qc);
-    final Expr flags = defined(2) ? exprs[2] : null;
+    final byte[] value = toZeroToken(arg(0), qc), pattern = toToken(arg(1), qc);
+    final Expr flags = defined(2) ? arg(2) : null;
 
     if(flags == null) {
       final int ch = patternChar(pattern);
@@ -30,7 +30,7 @@ public final class FnMatches extends RegEx {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr value = exprs[0], pattern = exprs[1];
+    final Expr value = arg(0), pattern = arg(1);
 
     final SeqType st = value.seqType();
     if(st.zero() || st.one() && st.type.isStringOrUntyped()) {

@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -34,7 +33,7 @@ public class FnCollection extends Docs {
     // return default collection or parse specified collection
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item uri = defined(0) ? exprs[0].atomItem(qc, info) : Empty.VALUE;
+      final Item uri = arg(0).atomItem(qc, info);
       if(!uri.isEmpty()) {
         qi = queryInput(toToken(uri));
         if(qi == null) throw INVCOLL_X.get(info, uri);

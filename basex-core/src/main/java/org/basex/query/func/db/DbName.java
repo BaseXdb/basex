@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class DbName extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(toDBNode(toNode(exprs[0], qc), false).data().meta.name);
+    return Str.get(toDBNode(toNode(arg(0), qc), false).data().meta.name);
   }
 }

@@ -19,7 +19,7 @@ import org.basex.util.*;
 public class FnNodeName extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(0, qc), qc);
+    final ANode node = toNodeOrNull(context(qc), qc);
     return node == null || empty(node.type) ||
       node.type == NAMESPACE_NODE && node.name().length == 0 ? Empty.VALUE : node.qname();
   }
@@ -37,7 +37,7 @@ public class FnNodeName extends ContextFn {
    * @return result of check
    */
   final boolean empty(final CompileContext cc, final boolean occ) {
-    final Expr node = contextAccess() ? cc.qc.focus.value : exprs[0];
+    final Expr node = contextAccess() ? cc.qc.focus.value : arg(0);
     if(node == null) return false;
 
     final SeqType st = node.seqType();

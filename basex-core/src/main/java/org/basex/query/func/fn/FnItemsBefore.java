@@ -14,8 +14,8 @@ public final class FnItemsBefore extends FnItemsStartingWhere {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter input = exprs[0].iter(qc);
-      final FItem predicate = toFunction(exprs[1], 1, qc);
+      final Iter input = arg(0).iter(qc);
+      final FItem predicate = toFunction(arg(1), 1, qc);
 
       @Override
       public Item next() throws QueryException {

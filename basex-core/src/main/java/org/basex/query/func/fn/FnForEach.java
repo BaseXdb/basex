@@ -23,8 +23,8 @@ public class FnForEach extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    final Iter input = exprs[0].iter(qc);
-    final FItem action = toFunction(exprs[1], 1, this instanceof UpdateForEach, qc);
+    final Iter input = arg(0).iter(qc);
+    final FItem action = toFunction(arg(1), 1, this instanceof UpdateForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
@@ -35,7 +35,7 @@ public class FnForEach extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
@@ -44,7 +44,7 @@ public class FnForEach extends StandardFunc {
     final Var var = cc.copy(new Var(new QNm("each"), null, cc.qc, sc, info), new IntObjMap<>());
     final For fr = new For(var, input).optimize(cc);
 
-    final Expr func = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
+    final Expr func = coerceFunc(arg(1), cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE));
     final boolean updating = this instanceof UpdateForEach, ndt = func.has(Flag.NDT);
     final Expr ref = new VarRef(info, var).optimize(cc);
     final Expr rtrn = new DynFuncCall(info, sc, updating, ndt, func, ref).optimize(cc);

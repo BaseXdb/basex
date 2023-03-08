@@ -22,8 +22,9 @@ public final class DbAdd extends DbNew {
     final Data data = toData(qc);
     final String path = toStringOrNull(arg(2), qc);
 
-    final NewInput input = toNewInput(toNodeOrAtomItem(1, qc), path != null ? toDbPath(path) : "");
-    final HashMap<String, String> options = toOptions(3, qc);
+    final NewInput input = toNewInput(toNodeOrAtomItem(arg(1), qc),
+        path != null ? toDbPath(path) : "");
+    final HashMap<String, String> options = toOptions(arg(3), qc);
 
     qc.updates().add(new DBAdd(data, input, options, false, qc, info), qc);
     return Empty.VALUE;

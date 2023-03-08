@@ -20,7 +20,7 @@ public final class FnExactlyOne extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     Item item;
     if(input.seqType().zeroOrOne()) {
       item = input.item(qc, info);
@@ -36,7 +36,7 @@ public final class FnExactlyOne extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.one()) return input;
     if(st.zero() || input.size() > 1) throw EXACTLYONE.get(info);

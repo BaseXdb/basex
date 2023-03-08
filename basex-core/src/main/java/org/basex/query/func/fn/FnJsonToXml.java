@@ -14,7 +14,7 @@ import org.basex.util.*;
 public class FnJsonToXml extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item json = exprs[0].atomItem(qc, info);
+    final Item json = arg(0).atomItem(qc, info);
     return json.isEmpty() ? Empty.VALUE : parse(toToken(json), true, qc);
   }
 }

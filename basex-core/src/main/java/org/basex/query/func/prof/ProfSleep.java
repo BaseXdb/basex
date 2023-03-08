@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class ProfSleep extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final long ms = toLong(exprs[0], qc);
+    final long ms = toLong(arg(0), qc);
 
     // allow interruption of long sleeps; abort loop if maximum sleep time has been reached
     final Performance perf = new Performance();

@@ -19,9 +19,9 @@ import org.basex.util.*;
 public final class HofTopKBy extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final FItem key = toFunction(exprs[1], 1, qc);
-    final long k = Math.min(toLong(exprs[2], qc), Integer.MAX_VALUE);
+    final Iter input = arg(0).iter(qc);
+    final FItem key = toFunction(arg(1), 1, qc);
+    final long k = Math.min(toLong(arg(2), qc), Integer.MAX_VALUE);
     if(k < 1) return Empty.VALUE;
 
     final MinHeap<Item, Item> heap = new MinHeap<>((item1, item2) -> {
@@ -46,7 +46,7 @@ public final class HofTopKBy extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);
   }
 }

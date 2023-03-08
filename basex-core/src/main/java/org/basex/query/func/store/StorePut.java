@@ -15,7 +15,7 @@ public final class StorePut extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] key = toKey(qc);
-    final Value value = exprs[1].value(qc);
+    final Value value = arg(1).value(qc);
 
     store(qc).put(key, value.materialize(n -> false, ii, qc));
     return Empty.VALUE;

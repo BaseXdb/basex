@@ -27,9 +27,9 @@ public final class DbPut extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final Item input = toNodeOrAtomItem(1, qc);
-    final String path = toDbPath(2, qc);
-    final HashMap<String, String> options = toOptions(3, qc);
+    final Item input = toNodeOrAtomItem(arg(1), qc);
+    final String path = toDbPath(arg(2), qc);
+    final HashMap<String, String> options = toOptions(arg(3), qc);
 
     final Updates updates = qc.updates();
     final IntList docs = data.resources.docs(path);

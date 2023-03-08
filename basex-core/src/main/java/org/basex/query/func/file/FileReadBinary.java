@@ -19,7 +19,7 @@ import org.basex.query.value.item.*;
 public final class FileReadBinary extends FileFn {
   @Override
   public B64 item(final QueryContext qc) throws QueryException, IOException {
-    final Path path = toPath(0, qc);
+    final Path path = toPath(arg(0), qc);
     final Item offset = arg(1).atomItem(qc, info);
     final Item length = arg(2).atomItem(qc, info);
     final long off = offset.isEmpty() ? 0 : toLong(offset);

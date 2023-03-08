@@ -17,7 +17,8 @@ import org.basex.util.*;
 public final class AdminDeleteLogs extends AdminFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String date = toString(exprs[0], qc);
+    final String date = toString(arg(0), qc);
+
     final LogFile file = qc.context.log.file(date);
     if(file == null) throw WHICHRES_X.get(info, date);
     if(file.current()) throw ADMIN_TODAY.get(info, date);

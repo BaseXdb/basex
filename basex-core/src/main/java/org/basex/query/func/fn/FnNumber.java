@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnNumber extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = context(0, qc).atomItem(qc, info);
+    final Item value = context(qc).atomItem(qc, info);
     if(value.isEmpty()) return Dbl.NAN;
     if(value.type == DOUBLE) return value;
     try {
@@ -35,7 +35,7 @@ public final class FnNumber extends ContextFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final boolean context = contextAccess();
-    final Expr value = context ? cc.qc.focus.value : exprs[0];
+    final Expr value = context ? cc.qc.focus.value : arg(0);
     final Type type = argType(cc);
 
     // number(1e1)  ->  1e1
@@ -58,7 +58,7 @@ public final class FnNumber extends ContextFn {
    * @return argument type or {@code null}
    */
   private Type argType(final CompileContext cc) {
-    final Expr value = contextAccess() ? cc.qc.focus.value : exprs[0];
+    final Expr value = contextAccess() ? cc.qc.focus.value : arg(0);
     if(value != null) {
       final SeqType st = value.seqType();
       if(st.one()) return st.type.atomic();

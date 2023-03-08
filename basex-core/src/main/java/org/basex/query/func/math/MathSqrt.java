@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class MathSqrt extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = exprs[0].atomItem(qc, info);
+    final Item value = arg(0).atomItem(qc, info);
     return value.isEmpty() ? Empty.VALUE : Dbl.get(sqrt(toDouble(value)));
   }
 }

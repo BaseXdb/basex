@@ -23,6 +23,6 @@ public final class FnExists extends FnEmpty {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // if(exists(nodes))  ->  if(nodes)
     return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) &&
-        exprs[0].seqType().type instanceof NodeType ? exprs[0] : this, mode);
+        arg(0).seqType().type instanceof NodeType ? arg(0) : this, mode);
   }
 }

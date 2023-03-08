@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public final class DbAlterBackup extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(0, false, qc), newname = toName(1, false, qc);
+    final String name = toName(arg(0), false, qc), newname = toName(arg(1), false, qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
     final StringList backups = qc.context.databases.backups(name);
@@ -35,6 +35,7 @@ public final class DbAlterBackup extends DbAccess {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor, true, 0) && dataLock(visitor, true, 1) && visitAll(visitor, exprs);
+    return dataLock(arg(0), true, visitor) && dataLock(arg(1), true, visitor) &&
+        visitAll(visitor, exprs);
   }
 }

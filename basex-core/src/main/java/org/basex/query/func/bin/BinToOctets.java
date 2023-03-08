@@ -17,7 +17,7 @@ import org.basex.query.value.item.*;
 public final class BinToOctets extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final B64 binary = toB64(exprs[0], qc, false);
+    final B64 binary = toB64(arg(0), qc, false);
     final byte[] bytes = binary.binary(info);
 
     return new BasicIter<Int>(bytes.length) {
@@ -34,6 +34,6 @@ public final class BinToOctets extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return ConvertBinaryToIntegers.toValue(toB64(exprs[0], qc, false).binary(info));
+    return ConvertBinaryToIntegers.toValue(toB64(arg(0), qc, false).binary(info));
   }
 }

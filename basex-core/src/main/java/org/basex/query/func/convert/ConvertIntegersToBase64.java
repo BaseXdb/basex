@@ -27,7 +27,7 @@ public class ConvertIntegersToBase64 extends ConvertFn {
    * @throws QueryException query exception
    */
   final B64 bytesToB64(final QueryContext qc) throws QueryException {
-    final Value values = exprs[0].atomValue(qc, info);
+    final Value values = arg(0).atomValue(qc, info);
 
     // return internal byte array
     if(values instanceof BytSeq) return B64.get(((BytSeq) values).toJava());

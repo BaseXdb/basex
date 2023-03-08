@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class DbPath extends DbAccess {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node, parent = toNode(exprs[0], qc);
+    ANode node, parent = toNode(arg(0), qc);
     do {
       node = parent;
       parent = node.parent();

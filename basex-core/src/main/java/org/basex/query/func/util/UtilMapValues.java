@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
 public final class UtilMapValues extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XQMap map = toMap(exprs[0], qc);
+    final XQMap map = toMap(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     map.values(vb);
@@ -25,7 +25,7 @@ public final class UtilMapValues extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = exprs[0].funcType();
+    final FuncType ft = arg(0).funcType();
     if(ft instanceof MapType) exprType.assign(ft.declType.with(Occ.ZERO_OR_MORE));
     return this;
   }

@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class MathTanh extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item radians = exprs[0].atomItem(qc, info);
+    final Item radians = arg(0).atomItem(qc, info);
     return radians.isEmpty() ? Empty.VALUE : Dbl.get(tanh(toDouble(radians)));
   }
 }

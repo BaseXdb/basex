@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class FnNilled extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(0, qc), qc);
+    final ANode node = toNodeOrNull(context(qc), qc);
     // always false, as no schema information is given
     return node == null || node.type != NodeType.ELEMENT ? Empty.VALUE : Bln.FALSE;
   }

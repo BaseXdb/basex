@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 public final class FnStringToCodepoints extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(arg(0), qc);
     final int tl = value.length;
 
     if(ascii(value)) {
@@ -53,7 +53,7 @@ public final class FnStringToCodepoints extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int[] cps = cps(toZeroToken(exprs[0], qc));
+    final int[] cps = cps(toZeroToken(arg(0), qc));
     final LongList list = new LongList(cps.length);
     for(final int cp : cps) list.add(cp);
     return IntSeq.get(list);

@@ -20,7 +20,7 @@ import org.basex.query.value.type.*;
 public final class UtilArrayValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
+    final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
       final Iterator<Value> members = array.members().iterator();
@@ -50,7 +50,7 @@ public final class UtilArrayValues extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
+    final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value member : array.members()) vb.add(member);
@@ -59,7 +59,7 @@ public final class UtilArrayValues extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = exprs[0].funcType();
+    final FuncType ft = arg(0).funcType();
     if(ft instanceof ArrayType) exprType.assign(ft.declType.with(Occ.ZERO_OR_MORE));
     return this;
   }

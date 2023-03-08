@@ -17,9 +17,9 @@ import org.basex.util.*;
 public final class BinPackInteger extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    long integer = toLong(exprs[0], qc);
-    final long size = toLong(exprs[1], qc);
-    final ByteOrder order = order(2, qc);
+    long integer = toLong(arg(0), qc);
+    final long size = toLong(arg(1), qc);
+    final ByteOrder order = order(arg(2), qc);
     if(size < 0) throw BIN_NS_X.get(info, size);
 
     final byte[] tmp = new byte[(int) size];

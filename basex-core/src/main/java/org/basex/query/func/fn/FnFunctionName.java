@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class FnFunctionName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final QNm name = toFunction(exprs[0], qc).funcName();
+    final QNm name = toFunction(arg(0), qc).funcName();
     return name == null ? Empty.VALUE : name;
   }
 }

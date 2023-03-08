@@ -18,8 +18,8 @@ import org.basex.util.*;
 public final class MapRemove extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    XQMap map = toMap(exprs[0], qc);
-    final Iter keys = exprs[1].iter(qc);
+    XQMap map = toMap(arg(0), qc);
+    final Iter keys = arg(1).iter(qc);
 
     for(Item item; (item = qc.next(keys)) != null;) {
       map = map.delete(toAtomItem(item, qc), info);
@@ -29,7 +29,7 @@ public final class MapRemove extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr map = exprs[0];
+    final Expr map = arg(0);
     if(map == XQMap.empty()) return map;
 
     final Type type = map.seqType().type;

@@ -23,13 +23,13 @@ import org.basex.util.*;
 public final class FnHead extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item input = exprs[0].iter(qc).next();
+    final Item input = arg(0).iter(qc).next();
     return input == null ? Empty.VALUE : input;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zeroOrOne()) return input;
 

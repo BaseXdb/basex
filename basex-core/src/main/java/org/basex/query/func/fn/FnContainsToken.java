@@ -21,10 +21,10 @@ import org.basex.util.*;
 public final class FnContainsToken extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] token = trim(toToken(exprs[1], qc));
-    final Collation coll = toCollation(2, qc);
+    final byte[] token = trim(toToken(arg(1), qc));
+    final Collation coll = toCollation(arg(2), qc);
     if(token.length != 0) {
-      final Iter value = exprs[0].iter(qc);
+      final Iter value = arg(0).iter(qc);
       for(Item item; (item = qc.next(value)) != null;) {
         for(final byte[] distinct : distinctTokens(toToken(item))) {
           if(eq(token, distinct, coll)) return Bln.TRUE;
@@ -37,7 +37,7 @@ public final class FnContainsToken extends StandardFunc {
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // support limited to default collation
-    final Expr value = exprs[0], token = exprs[1];
+    final Expr value = arg(0), token = arg(1);
     return !defined(2) && token.seqType().zeroOrOne() &&
       ii.create(token, ii.type(value, IndexType.TOKEN), true, info);
   }

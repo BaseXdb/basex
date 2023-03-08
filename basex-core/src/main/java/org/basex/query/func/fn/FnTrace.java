@@ -21,7 +21,7 @@ import org.basex.util.*;
 public class FnTrace extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = exprs[0].value(qc);
+    final Value value = arg(0).value(qc);
     final byte[] label = toTokenOrNull(arg(1), qc);
 
     if(value.isEmpty() || value instanceof RangeSeq || value instanceof SingletonSeq) {
@@ -41,12 +41,12 @@ public class FnTrace extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return adoptType(exprs[0]);
+    return adoptType(arg(0));
   }
 
   @Override
   public boolean ddo() {
-    return exprs[0].ddo();
+    return arg(0).ddo();
   }
 
   /**

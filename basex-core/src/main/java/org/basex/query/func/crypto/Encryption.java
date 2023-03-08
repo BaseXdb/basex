@@ -140,7 +140,7 @@ final class Encryption {
    * @param data data to process
    * @param key secret key
    * @param algorithm encryption algorithm
-   * @param encoding encoding
+   * @param encoding encoding (can be {@code null})
    * @return MAC
    * @throws QueryException query exception
    */

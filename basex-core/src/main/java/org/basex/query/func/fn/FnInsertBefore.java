@@ -19,7 +19,7 @@ public final class FnInsertBefore extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter input = exprs[0].iter(qc), insert = exprs[2].iter(qc);
+      final Iter input = arg(0).iter(qc), insert = arg(2).iter(qc);
       final long osize = input.size(), isize = insert.size();
       final long size = osize != -1 && isize != -1 ? osize + isize : -1;
       final long ps = pos(qc), pos = osize != -1 ? Math.min(ps, osize) : ps;
@@ -51,7 +51,7 @@ public final class FnInsertBefore extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc), insert = exprs[2].value(qc);
+    final Value input = arg(0).value(qc), insert = arg(2).value(qc);
     final long osize = input.size(), pos = Math.min(pos(qc), osize);
 
     // prepend, append or insert new value
@@ -67,12 +67,12 @@ public final class FnInsertBefore extends StandardFunc {
    * @throws QueryException query exception
    */
   private long pos(final QueryContext qc) throws QueryException {
-    return Math.max(0, toLong(exprs[1], qc) - 1);
+    return Math.max(0, toLong(arg(1), qc) - 1);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], pos = exprs[1], insert = exprs[2];
+    final Expr input = arg(0), pos = arg(1), insert = arg(2);
     if(input == Empty.VALUE) return insert;
     if(insert == Empty.VALUE) return input;
 

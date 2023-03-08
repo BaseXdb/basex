@@ -18,9 +18,9 @@ import org.basex.util.*;
 public final class FnContains extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
-    final byte[] substring = toZeroToken(exprs[1], qc);
-    final Collation coll = toCollation(2, qc);
+    final byte[] value = toZeroToken(arg(0), qc);
+    final byte[] substring = toZeroToken(arg(1), qc);
+    final Collation coll = toCollation(arg(2), qc);
 
     return Bln.get(coll == null ? Token.contains(value, substring) :
       coll.contains(value, substring, info));
@@ -28,7 +28,7 @@ public final class FnContains extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr value = exprs[0], substring = exprs[1];
+    final Expr value = arg(0), substring = arg(1);
     // contains($a, ''), contains($a, $a)
     if(!defined(2) && value.seqType().type.isStringOrUntyped() && !value.has(Flag.NDT)) {
       if(substring == Empty.VALUE || substring == Str.EMPTY || value.equals(substring))

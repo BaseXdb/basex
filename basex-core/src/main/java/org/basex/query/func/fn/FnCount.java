@@ -22,7 +22,7 @@ public final class FnCount extends StandardFunc {
   @Override
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // iterative access: if the iterator size is unknown, iterate through all results
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     long size = input.size();
     if(size == -1) {
       do ++size; while(qc.next(input) != null);
@@ -32,13 +32,13 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.COUNT, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.COUNT, cc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // return static result size
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final long size = input.size();
     if(size >= 0 && !input.has(Flag.NDT)) return Int.get(size);
 
@@ -62,7 +62,7 @@ public final class FnCount extends StandardFunc {
     if(mode == Simplify.EBV) {
       // if(count(nodes))  ->  if(nodes)
       // if(count(items))  ->  if(exists(items))
-      expr = exprs[0].seqType().type instanceof NodeType ? exprs[0] :
+      expr = arg(0).seqType().type instanceof NodeType ? arg(0) :
         cc.function(EXISTS, info, exprs);
     }
     return cc.simplify(this, expr, mode);

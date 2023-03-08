@@ -20,8 +20,8 @@ import org.basex.query.value.type.*;
 public final class UtilDuplicates extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter values = exprs[0].atomIter(qc, info);
-    final Collation coll = toCollation(1, qc);
+    final Iter values = arg(0).atomIter(qc, info);
+    final Collation coll = toCollation(arg(1), qc);
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     final ItemSet dupl = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
@@ -43,7 +43,7 @@ public final class UtilDuplicates extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr values = exprs[0];
+    final Expr values = arg(0);
     final SeqType st = values.seqType();
     if(st.zero()) return values;
 

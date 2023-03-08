@@ -40,7 +40,7 @@ public class DbGetValue extends DbAccess {
 
     try {
       if(defined(1)) {
-        final String path = toDbPath(1, qc);
+        final String path = toDbPath(arg(1), qc);
         final IOFile bin = data.meta.file(path, type);
         if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
         return resource(bin, qc);

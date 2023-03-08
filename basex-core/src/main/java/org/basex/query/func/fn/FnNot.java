@@ -20,12 +20,12 @@ import org.basex.util.*;
 public final class FnNot extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(!exprs[0].ebv(qc, info).bool(info));
+    return Bln.get(!arg(0).ebv(qc, info).bool(info));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], inverted = invert(input, cc);
+    final Expr input = arg(0), inverted = invert(input, cc);
     return inverted != input ? inverted : this;
   }
 
@@ -77,7 +77,7 @@ public final class FnNot extends StandardFunc {
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     // not(boolean(A))  ->  not(A)
-    exprs[0] = exprs[0].simplifyFor(Simplify.EBV, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.EBV, cc));
   }
 
   @Override

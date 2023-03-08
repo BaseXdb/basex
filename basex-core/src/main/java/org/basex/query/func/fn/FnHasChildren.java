@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnHasChildren extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(0, qc), qc);
+    final ANode node = toNodeOrNull(context(qc), qc);
     return Bln.get(node != null && node.hasChildren());
   }
 }

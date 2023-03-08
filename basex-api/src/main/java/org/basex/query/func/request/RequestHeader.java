@@ -15,10 +15,10 @@ import org.basex.query.value.seq.*;
 public final class RequestHeader extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = toString(exprs[0], qc);
+    final String name = toString(arg(0), qc);
     final String value = request(qc).getHeader(name);
     if(value != null) return Str.get(value);
 
-    return defined(1) ? Str.get(toToken(exprs[1], qc)) : Empty.VALUE;
+    return defined(1) ? Str.get(toToken(arg(1), qc)) : Empty.VALUE;
   }
 }

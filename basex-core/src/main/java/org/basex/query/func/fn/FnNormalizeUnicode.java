@@ -19,11 +19,11 @@ import org.basex.util.*;
 public final class FnNormalizeUnicode extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(arg(0), qc);
 
     Form frm = Form.NFC;
     if(defined(1)) {
-      final byte[] form = uc(trim(toToken(exprs[1], qc)));
+      final byte[] form = uc(trim(toToken(arg(1), qc)));
       if(form.length == 0) return Str.get(value);
       try {
         frm = Form.valueOf(string(form));

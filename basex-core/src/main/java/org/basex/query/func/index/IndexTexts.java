@@ -18,7 +18,7 @@ public class IndexTexts extends IndexFn {
   public final Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final byte[] prefix = toZeroToken(arg(1), qc);
-    final Boolean ascending = defined(2) ? toBoolean(exprs[2], qc) : null;
+    final Boolean ascending = defined(2) ? toBoolean(arg(2), qc) : null;
 
     final IndexEntries entries = ascending != null ? new IndexEntries(prefix, ascending, type()) :
       new IndexEntries(prefix, type());

@@ -28,7 +28,7 @@ public class FnAvg extends FnSum {
     expr = opt(true);
     if(expr != null) return expr;
 
-    final SeqType st = exprs[0].seqType();
+    final SeqType st = arg(0).seqType();
     if(!st.mayBeArray()) exprType.assign(Calc.DIV.type(st.type, st.type));
 
     return this;

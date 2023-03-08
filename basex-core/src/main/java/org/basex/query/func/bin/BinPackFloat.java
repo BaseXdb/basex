@@ -15,8 +15,8 @@ import org.basex.util.*;
 public final class BinPackFloat extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final float flt = toFloat(exprs[0], qc);
-    final ByteOrder order = order(1, qc);
+    final float flt = toFloat(arg(0), qc);
+    final ByteOrder order = order(arg(1), qc);
     return B64.get(ByteBuffer.wrap(new byte[4]).order(order).putFloat(flt).array());
   }
 }

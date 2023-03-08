@@ -26,13 +26,13 @@ public class FnEmpty extends StandardFunc {
 
   @Override
   protected final void simplifyArgs(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.COUNT, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.COUNT, cc));
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final boolean exists = this instanceof FnExists;
-    Expr input = exprs[0];
+    Expr input = arg(0);
     final SeqType st = input.seqType();
 
     // ignore non-deterministic expressions (e.g.: empty(error()))
@@ -49,7 +49,7 @@ public class FnEmpty extends StandardFunc {
     if(input instanceof List && input.seqType().type instanceof NodeType) {
       input = new Union(info, input.args()).optimize(cc);
     }
-    if(input != exprs[0]) return cc.function(exists ? EXISTS : EMPTY, info, input);
+    if(input != arg(0)) return cc.function(exists ? EXISTS : EMPTY, info, input);
 
     // replace optimized expression by boolean function
     if(input instanceof Filter) {
@@ -67,7 +67,7 @@ public class FnEmpty extends StandardFunc {
       // exists(string-to-codepoints(E))  ->  boolean(string(E))
       input = cc.function(STRING, info, input.args());
     }
-    if(input != exprs[0]) return cc.function(exists ? BOOLEAN : NOT, info, input);
+    if(input != arg(0)) return cc.function(exists ? BOOLEAN : NOT, info, input);
 
     // exists(map:keys(E))  ->  map:size(E) > 0
     // empty(util:array-members(E))  ->  array:size(E) = 0
@@ -88,7 +88,7 @@ public class FnEmpty extends StandardFunc {
     // empty(A) and empty(B)  ->  empty((A, B))
     final Function func = this instanceof FnExists ? EXISTS : EMPTY;
     if(func == (or ? EXISTS : EMPTY) && func.is(expr)) {
-      return cc.function(func, info, List.get(cc, info, exprs[0], expr.arg(0)));
+      return cc.function(func, info, List.get(cc, info, arg(0), expr.arg(0)));
     }
     if(_UTIL_COUNT_WITHIN.is(expr)) {
       return expr.mergeEbv(this, or, cc);
@@ -103,7 +103,7 @@ public class FnEmpty extends StandardFunc {
    * @throws QueryException query exception
    */
   final boolean empty(final QueryContext qc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     return input.seqType().zeroOrOne() ?
       input.item(qc, info).isEmpty() :
       input.iter(qc).next() == null;

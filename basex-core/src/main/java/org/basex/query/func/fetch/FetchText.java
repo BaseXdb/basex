@@ -16,8 +16,8 @@ import org.basex.util.*;
 public final class FetchText extends FetchDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IO io = toIO(0, qc);
-    final String encoding = toEncodingOrNull(1, FETCH_ENCODING_X, qc);
+    final IO io = toIO(arg(0), qc);
+    final String encoding = toEncodingOrNull(arg(1), FETCH_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     return new StrLazy(io, encoding, FETCH_OPEN_X, !fallback);
