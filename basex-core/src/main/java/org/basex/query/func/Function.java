@@ -622,7 +622,7 @@ public enum Function implements AFunction {
   // Map Module
 
   /** XQuery function. */
-  _MAP_BUILD(MapBuild::new, "build(input,key[,value,duplicates])",
+  _MAP_BUILD(MapBuild::new, "build(input,key[,value,combine])",
       params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(),
       FuncType.get(ITEM_ZM, ITEM_O).seqType(), FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
       MAP_O, flag(HOF), MAP_URI),
@@ -666,7 +666,7 @@ public enum Function implements AFunction {
   // Array Module
 
   /** XQuery function. */
-  _ARRAY_APPEND(ArrayAppend::new, "append(array,add)",
+  _ARRAY_APPEND(ArrayAppend::new, "append(array,member)",
       params(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_EMPTY(ArrayEmpty::new, "empty(array)",
@@ -714,7 +714,7 @@ public enum Function implements AFunction {
   _ARRAY_JOIN(ArrayJoin::new, "join(arrays)",
       params(ARRAY_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_PARITION(ArrayPartition::new, "partition(input,break-when)",
+  _ARRAY_PARTITION(ArrayPartition::new, "partition(input,break-when)",
       params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array,position,member)",
@@ -1046,13 +1046,13 @@ public enum Function implements AFunction {
   _DB_ADD(DbAdd::new, "add(database,input[,path,options])",
       params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_ALTER(DbAlter::new, "alter(database, new-name)",
+  _DB_ALTER(DbAlter::new, "alter(database,new-name)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_ALTER_BACKUP(DbAlterBackup::new, "alter-backup(name, new-name)",
+  _DB_ALTER_BACKUP(DbAlterBackup::new, "alter-backup(name,new-name)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_ATTRIBUTE(DbAttribute::new, "attribute(database,strings[,name])",
+  _DB_ATTRIBUTE(DbAttribute::new, "attribute(database,values[,name])",
       params(STRING_O, ITEM_ZM, STRING_O), ATTRIBUTE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_ATTRIBUTE_RANGE(DbAttributeRange::new, "attribute-range(database,from,to[,name])",
@@ -1064,7 +1064,7 @@ public enum Function implements AFunction {
   _DB_CONTENT_TYPE(DbContentType::new, "content-type(database,path)",
       params(STRING_O, STRING_O), STRING_O, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_COPY(DbCopy::new, "copy(database, new-name)",
+  _DB_COPY(DbCopy::new, "copy(database,new-name)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_CREATE(DbCreate::new, "create(name[,inputs,paths,options])",
@@ -1100,10 +1100,10 @@ public enum Function implements AFunction {
   _DB_GET_BINARY(DbGetBinary::new, "get-binary(database[,path])",
       params(STRING_O, STRING_O), ITEM_O, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_GET_ID(DbGetId::new, "get-id(database,ids)",
+  _DB_GET_ID(DbGetId::new, "get-id(database,values)",
       params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
-  _DB_GET_PRE(DbGetPre::new, "get-pre(database,pres)",
+  _DB_GET_PRE(DbGetPre::new, "get-pre(database,values)",
       params(STRING_O, INTEGER_ZM), NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_GET_VALUE(DbGetValue::new, "get-value(database[,path])",
@@ -1160,7 +1160,7 @@ public enum Function implements AFunction {
   _DB_SYSTEM(DbSystem::new, "system()",
       params(), ELEMENT_O, flag(CNS), DB_URI),
   /** XQuery function. */
-  _DB_TEXT(DbText::new, "text(database,strings)",
+  _DB_TEXT(DbText::new, "text(database,values)",
       params(STRING_O, ITEM_ZM), TEXT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_TEXT_RANGE(DbTextRange::new, "text-range(database,from,to)",
@@ -1193,7 +1193,7 @@ public enum Function implements AFunction {
   // File Module
 
   /** XQuery function. */
-  _FILE_APPEND(FileAppend::new, "append(path,values[,options])",
+  _FILE_APPEND(FileAppend::new, "append(path,input[,options])",
       params(STRING_O, ITEM_ZM, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_APPEND_BINARY(FileAppendBinary::new, "append-binary(path,value)",
@@ -1294,7 +1294,7 @@ public enum Function implements AFunction {
   _FILE_TEMP_DIR(FileTempDir::new, "temp-dir()",
       params(), STRING_O, FILE_URI),
   /** XQuery function. */
-  _FILE_WRITE(FileWrite::new, "write(path,values[,options])",
+  _FILE_WRITE(FileWrite::new, "write(path,input[,options])",
       params(STRING_O, ITEM_ZM, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_WRITE_BINARY(FileWriteBinary::new, "write-binary(path,value[,offset])",
@@ -1367,7 +1367,7 @@ public enum Function implements AFunction {
       params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_ID(HofId::new, "id(value)",
+  _HOF_ID(HofId::new, "id(input)",
       params(ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
   _HOF_SCAN_LEFT(HofScanLeft::new, "scan-left(input,zero,action)",
@@ -1400,7 +1400,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value[,options])",
-      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
   /** XQuery function. */
   _HTML_PARSER(HtmlParser::new, "parser()",
       params(), STRING_O, HTML_URI),
@@ -1444,7 +1444,7 @@ public enum Function implements AFunction {
   _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations::new, "function-annotations(function)",
       params(FUNCTION_O), MAP_ZO, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([uri])",
+  _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([href])",
       params(STRING_O), FUNCTION_ZM, flag(POS, CTX, CNS, NDT), INSPECT_URI, Perm.ADMIN),
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule::new, "module(href)",
@@ -1731,7 +1731,7 @@ public enum Function implements AFunction {
       params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
       EMPTY_SEQUENCE_Z, flag(UPD, HOF), UPDATE_URI),
   /** XQuery function. */
-  _UPDATE_OUTPUT(UpdateOutput::new, "output(value)",
+  _UPDATE_OUTPUT(UpdateOutput::new, "output(input)",
       params(ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), UPDATE_URI),
 
   // User Module
@@ -1825,7 +1825,7 @@ public enum Function implements AFunction {
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
-  _UTIL_REPLICATE(UtilReplicate::new, "replicate(input,count[,multiple])",
+  _UTIL_REPLICATE(UtilReplicate::new, "replicate(input,count[,repeat])",
       params(ITEM_ZM, INTEGER_O, BOOLEAN_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
@@ -1876,7 +1876,7 @@ public enum Function implements AFunction {
   _WEB_CONTENT_TYPE(WebContentType::new, "content-type(href)",
       params(STRING_O), STRING_O, WEB_URI),
   /** XQuery function. */
-  _WEB_CREATE_URL(WebCreateUrl::new, "create-url(url[,params,anchor])",
+  _WEB_CREATE_URL(WebCreateUrl::new, "create-url(href[,params,anchor])",
       params(STRING_O, MAP_O, STRING_O), STRING_O, WEB_URI),
   /** XQuery function. */
   _WEB_DECODE_URL(WebDecodeUrl::new, "decode-url(value)",
@@ -1922,15 +1922,15 @@ public enum Function implements AFunction {
   _XSLT_PROCESSOR(XsltProcessor::new, "processor()",
       params(), STRING_O, XSLT_URI),
   /** XQuery function. */
-  _XSLT_TRANSFORM(XsltTransform::new, "transform(input,stylesheet[,params,options])",
+  _XSLT_TRANSFORM(XsltTransform::new, "transform(input,stylesheet[,arguments,options])",
       params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), NODE_O, flag(NDT), XSLT_URI, Perm.CREATE),
   /** XQuery function. */
   _XSLT_TRANSFORM_REPORT(XsltTransformReport::new,
-      "transform-report(input,stylesheet[,params,options])",
+      "transform-report(input,stylesheet[,arguments,options])",
       params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), MAP_O, flag(NDT), XSLT_URI, Perm.CREATE),
   /** XQuery function. */
   _XSLT_TRANSFORM_TEXT(XsltTransformText::new,
-      "transform-text(input,stylesheet[,params,options])",
+      "transform-text(input,stylesheet[,arguments,options])",
       params(ITEM_O, ITEM_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), XSLT_URI, Perm.CREATE),
   /** XQuery function. */
   _XSLT_VERSION(XsltVersion::new, "version()",

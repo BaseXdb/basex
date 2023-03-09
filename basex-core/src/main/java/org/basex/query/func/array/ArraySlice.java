@@ -16,8 +16,8 @@ public final class ArraySlice extends FnSlice {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
     XQArray array = toArray(arg(0), qc);
-
     final Slice slice = slice(array.arraySize(), qc);
+
     if(slice.length == 0) return XQArray.empty();
     if(slice.reverse) array = array.reverseArray(qc);
     if(slice.step == 1) return array.subArray(slice.start - 1, slice.length, qc);

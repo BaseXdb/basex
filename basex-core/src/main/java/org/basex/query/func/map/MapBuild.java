@@ -22,7 +22,7 @@ public final class MapBuild extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem key = defined(1) ? toFunction(arg(1), 1, qc) : null;
     final FItem value = defined(2) ? toFunction(arg(2), 1, qc) : null;
-    final FItem duplicates = defined(3) ? toFunction(arg(3), 2, qc) : null;
+    final FItem combine = defined(3) ? toFunction(arg(3), 2, qc) : null;
 
     XQMap map = XQMap.empty();
     for(Item item; (item = input.next()) != null;) {
@@ -31,7 +31,7 @@ public final class MapBuild extends StandardFunc {
         Value v = value != null ? value.invoke(qc, info, item) : item;
         if(map.contains(k, info)) {
           final Value o = map.get(k, info);
-          v = duplicates != null ? duplicates.invoke(qc, info, o, v) :
+          v = combine != null ? combine.invoke(qc, info, o, v) :
             ValueBuilder.concat(o, v, qc);
         }
         map = map.put(k, v, info);

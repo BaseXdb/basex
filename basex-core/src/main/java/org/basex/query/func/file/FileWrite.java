@@ -35,13 +35,13 @@ public class FileWrite extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toParent(toPath(arg(0), qc));
+    final Iter input = arg(1).iter(qc);
     final Item options = arg(2).item(qc, info);
     final SerializerOptions sopts = FuncOptions.serializer(options, info);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       try(Serializer ser = Serializer.get(out, sopts)) {
-        final Iter values = arg(1).iter(qc);
-        for(Item item; (item = qc.next(values)) != null;) {
+        for(Item item; (item = qc.next(input)) != null;) {
           ser.serialize(item);
         }
       }

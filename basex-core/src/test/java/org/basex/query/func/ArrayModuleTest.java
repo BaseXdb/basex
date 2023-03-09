@@ -236,7 +236,7 @@ public final class ArrayModuleTest extends QueryPlanTest {
 
   /** Test method. */
   @Test public void partition() {
-    final Function func = _ARRAY_PARITION;
+    final Function func = _ARRAY_PARTITION;
 
     String fn = " function($seq, $curr) { true() }";
     query(func.args(" ()", fn), "");

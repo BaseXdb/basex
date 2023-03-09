@@ -15,7 +15,8 @@ import org.basex.util.*;
 public final class ArrayReverse extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toArray(arg(0), qc).reverseArray(qc);
+    final XQArray array = toArray(arg(0), qc);
+    return array.reverseArray(qc);
   }
 
   @Override
