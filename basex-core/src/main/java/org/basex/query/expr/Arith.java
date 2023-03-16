@@ -76,8 +76,8 @@ public final class Arith extends Arr {
         expr = ex;
       } else if(expr1 instanceof Arith) {
         final Calc acalc = ((Arith) expr1).calc;
-        final boolean add = acalc == Calc.PLUS || acalc == Calc.MULT;
-        final boolean sub = acalc == Calc.MINUS || acalc == Calc.DIV;
+        final boolean add = acalc.oneOf(Calc.PLUS, Calc.MULT);
+        final boolean sub = acalc.oneOf(Calc.MINUS, Calc.DIV);
         final boolean inverse = acalc == calc.invert();
         final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
 
