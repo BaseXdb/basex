@@ -257,6 +257,7 @@ public class CmpG extends Cmp {
 
     if(expr1 instanceof Arith && expr2.seqType().instanceOf(SeqType.NUMERIC_O)) {
       final Expr op11 = expr1.arg(0), op12 = expr1.arg(1), op22 = expr2.arg(1);
+      final double num12 = op12 instanceof ANum ? ((ANum) op12).dbl() : Double.NaN;
       if(op12.seqType().instanceOf(SeqType.NUMERIC_O)) {
         final Calc calc1 = ((Arith) expr1).calc;
         if(calc1 == Calc.MINUS && expr2 == Int.ZERO) {
@@ -264,16 +265,11 @@ public class CmpG extends Cmp {
           ex = new CmpG(info, op11, op12, op, coll, sc);
         } else if((
           Function.POSITION.is(op11) ||
-          op12 instanceof ANum && (
-            expr2 instanceof ANum ||
-            expr2 instanceof Arith && op22 instanceof ANum
-          )
+          !Double.isNaN(num12) &&
+          (expr2 instanceof ANum || expr2 instanceof Arith && op22 instanceof ANum)
         ) && (
           calc1.oneOf(Calc.PLUS, Calc.MINUS) ||
-          calc1.oneOf(Calc.MULT, Calc.DIV) && (
-            op.oneOf(OpG.EQ, OpG.NE) ||
-            op12 instanceof ANum && ((ANum) op12).dbl() >= 0
-          )
+          calc1.oneOf(Calc.MULT, Calc.DIV) && num12 != 0 && (op.oneOf(OpG.EQ, OpG.NE) || num12 > 0)
         )) {
           // position() + 1 < last()  ->  position() < last() - 1
           // count(E) div 2 = 1  ->  count(E) = 1 * 2
