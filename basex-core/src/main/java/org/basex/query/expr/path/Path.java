@@ -217,7 +217,7 @@ public abstract class Path extends ParseExpr {
   public final Expr removePredicate(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList(steps.length).add(steps);
     final Step step = ((Step) list.pop()).removePredicate();
-    list.add(cc.get(step, () -> step.optimize(root, cc)));
+    list.add(cc.get(root, () -> step.optimize(cc)));
     return copyType(get(cc, info, root, list.finish()));
   }
 

@@ -2995,6 +2995,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // GH-2182: EBV tests, rewriting to descendant::text()
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
+    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(ItemMap.class));
   }
 
   /** Simplified if expression yields errors. */
