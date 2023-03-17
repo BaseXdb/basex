@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static java.lang.Long.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.EXISTS;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -58,7 +59,9 @@ public final class CmpIR extends Single {
    */
   static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final long min, final long max) throws QueryException {
-    return min > max ? Bln.FALSE : min == MIN_VALUE && max == MAX_VALUE ? Bln.TRUE :
+    System.err.println(1);
+    return min > max ? Bln.FALSE :
+      min == MIN_VALUE && max == MAX_VALUE ? cc.function(EXISTS, info, expr) :
       new CmpIR(expr, min, max, info).optimize(cc);
   }
 

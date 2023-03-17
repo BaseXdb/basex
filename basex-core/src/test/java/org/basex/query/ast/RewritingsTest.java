@@ -3051,4 +3051,12 @@ public final class RewritingsTest extends QueryPlanTest {
     error("xs:untypedAtomic('') = xs:QName('x')", FUNCCAST_X_X_X);
     query("xs:untypedAtomic(' x ') = xs:QName('x')", true);
   }
+
+  /** Bug of operation on non-existing attribute. */
+  @Test public void gh2190() {
+    check("<x/>[@a >= 0 or @a <= 0]", "", empty(Or.class), empty(EXISTS));
+    check("<x/>[xs:integer(@a) >= 0 or xs:integer(@a) <= 0]", "", empty(Or.class), exists(EXISTS));
+
+    check("<x/>[position() >= 0 or position() <= 0]", "<x/>", root(CElem.class));
+  }
 }

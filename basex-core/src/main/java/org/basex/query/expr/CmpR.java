@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static java.lang.Double.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.EXISTS;
 
 import org.basex.data.*;
 import org.basex.index.*;
@@ -68,7 +69,9 @@ public final class CmpR extends Single {
    */
   static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final double min, final double max) throws QueryException {
-    return min > max ? Bln.FALSE : min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ? Bln.TRUE :
+    System.err.println(2);
+    return min > max ? Bln.FALSE :
+      min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ? cc.function(EXISTS, info, expr) :
       new CmpR(expr, min, max, info).optimize(cc);
   }
 
