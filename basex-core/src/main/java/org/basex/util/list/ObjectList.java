@@ -218,6 +218,21 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   }
 
   /**
+   * Reverses the order of the elements.
+   * @return self reference
+   */
+  @SuppressWarnings("unchecked")
+  public L reverse() {
+    final E[] lst = list;
+    for(int l = 0, r = size - 1; l < r; l++, r--) {
+      final E tmp = lst[l];
+      lst[l] = lst[r];
+      lst[r] = tmp;
+    }
+    return (L) this;
+  }
+
+  /**
    * Returns an array with all elements.
    * @return array
    */

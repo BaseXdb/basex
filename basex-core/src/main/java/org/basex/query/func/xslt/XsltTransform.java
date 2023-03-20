@@ -16,6 +16,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -96,15 +97,16 @@ public class XsltTransform extends XsltFn {
       // Saxon raises runtime exceptions for illegal parameters
       if(simple) throw XSLT_ERROR_X.get(info, ex);
       xr.addError(Str.get(Util.message(ex)));
-    } catch(final TransformerException ex) {
+    } catch(final TransformerException | TransformerFactoryConfigurationError ex) {
       Util.debug(ex);
       // catch transformation errors, throw them again or add them to report
+      final StringList list = new StringList();
       byte[] error = trim(utf8(err.toArray(), Prop.ENCODING));
-      if(error.length == 0) {
-        Throwable th = ex;
-        while(th.getCause() != null) th = th.getCause();
-        error = token(th.getLocalizedMessage());
+      if(error.length != 0) list.add(error);
+      for(Throwable th = ex; th != null; th = th.getCause()) {
+        list.add(th.toString());
       }
+      error = token(String.join("; ", list.reverse().finish()));
       if(simple) throw XSLT_ERROR_X.get(info, error);
       xr.addError(Str.get(error));
       xr.addMessage();
