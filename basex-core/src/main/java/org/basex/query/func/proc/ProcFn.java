@@ -11,7 +11,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -40,14 +39,15 @@ abstract class ProcFn extends StandardFunc {
    */
   final ProcResult exec(final QueryContext qc, final boolean fork) throws QueryException {
     // arguments
-    final StringList args = new StringList().add(toString(exprs[0], qc));
-    final Iter arguments = exprs.length > 1 ? exprs[1].iter(qc) : Empty.ITER;
-    for(Item item; (item = qc.next(arguments)) != null;) {
+    final String command = toString(arg(0), qc);
+    final StringList args = new StringList().add(command);
+    final Iter iter = arg(1).iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
       args.add(toString(item));
     }
 
     // options
-    final ProcOptions options = toOptions(2, new ProcOptions(), true, qc);
+    final ProcOptions options = toOptions(arg(2), new ProcOptions(), true, qc);
     final String encoding = options.get(ProcOptions.ENCODING);
     final Charset cs;
     try {

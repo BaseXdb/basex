@@ -35,8 +35,8 @@ public class ArchiveExtractBinary extends ArchiveFn {
    * @throws QueryException query exception
    */
   final TokenList extract(final QueryContext qc) throws QueryException {
-    final B64 archive = toB64(exprs[0], qc, false);
-    final TokenSet entries = entries(1, qc);
+    final B64 archive = toB64(arg(0), qc, false);
+    final TokenSet entries = entries(arg(1), qc);
 
     final TokenList tl = new TokenList();
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {

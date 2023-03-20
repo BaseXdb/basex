@@ -26,7 +26,7 @@ public final class UtilCountWithin extends StandardFunc {
     final long min = minMax[0], max = minMax[1];
 
     // iterative access: if the iterator size is unknown, iterate through results
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     long size = input.size();
     if(size == -1) {
       if(max == Long.MAX_VALUE) {
@@ -42,12 +42,12 @@ public final class UtilCountWithin extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.COUNT, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.COUNT, cc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
 
     // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
     final long[] minMax = minMaxValues(cc.qc);
@@ -82,10 +82,10 @@ public final class UtilCountWithin extends StandardFunc {
       else if(EXISTS.is(expr))  cmm = new long[] { 1, Long.MAX_VALUE };
       else if(EMPTY.is(expr))   cmm = new long[] { 0, 0 };
     }
-    if(cmm != null && exprs[0].equals(expr.arg(0)) && (!or || mm[1] >= cmm[0] && mm[0] <= cmm[1])) {
+    if(cmm != null && arg(0).equals(expr.arg(0)) && (!or || mm[1] >= cmm[0] && mm[0] <= cmm[1])) {
       final long mn = or ? Math.min(mm[0], cmm[0]) : Math.max(mm[0], cmm[0]);
       final long mx = or ? Math.max(mm[1], cmm[1]) : Math.min(mm[1], cmm[1]);
-      final ExprList args = new ExprList(3).add(exprs[0]).add(Int.get(mn));
+      final ExprList args = new ExprList(3).add(arg(0)).add(Int.get(mn));
       if(mx < Long.MAX_VALUE) args.add(Int.get(mx));
       return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
     }
@@ -99,7 +99,7 @@ public final class UtilCountWithin extends StandardFunc {
    * @throws QueryException query exception
    */
   private long[] minMaxValues(final QueryContext qc) throws QueryException {
-    return exprs[1] instanceof Value && (exprs.length < 3 || exprs[2] instanceof Value) ?
+    return arg(1) instanceof Value && (!defined(2) || arg(2) instanceof Value) ?
       minMax(qc) : null;
   }
 
@@ -110,9 +110,9 @@ public final class UtilCountWithin extends StandardFunc {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-    final long min = toLong(exprs[1], qc);
-    final long max = exprs.length > 2 ? exprs[1] == exprs[2] ? min : toLong(exprs[2], qc) :
-      Long.MAX_VALUE;
+    final Expr arg1 = arg(1), arg2 = arg(2);
+    final long min = toLong(arg1, qc);
+    final long max = defined(2) ? arg1 == arg2 ? min : toLong(arg2, qc) : Long.MAX_VALUE;
     return new long[] { min, max };
   }
 }

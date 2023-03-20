@@ -22,7 +22,7 @@ abstract class HofFn extends StandardFunc {
    * @throws QueryException exception
    */
   final Comparator<Item> comparator(final QueryContext qc) throws QueryException {
-    final FItem comparator = toFunction(exprs[1], 2, qc);
+    final FItem comparator = toFunction(arg(1), 2, qc);
     return (a, b) -> {
       try {
         return toBoolean(comparator.invoke(qc, info, a, b).item(qc, info)) ? -1 : 1;

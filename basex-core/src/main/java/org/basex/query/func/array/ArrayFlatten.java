@@ -22,7 +22,7 @@ public final class ArrayFlatten extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Deque<Iter> stack = new ArrayDeque<>();
-    stack.push(exprs[0].iter(qc));
+    stack.push(arg(0).iter(qc));
 
     return new Iter() {
       @Override
@@ -63,13 +63,13 @@ public final class ArrayFlatten extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    add(vb, exprs[0], qc);
+    add(vb, arg(0), qc);
     return vb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(!st.mayBeArray()) return input;
     exprType.assign(type(st.type));

@@ -9,7 +9,6 @@ import org.basex.io.*;
 import org.basex.io.random.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -20,12 +19,11 @@ import org.basex.query.value.seq.*;
 public final class FileReadBinary extends FileFn {
   @Override
   public B64 item(final QueryContext qc) throws QueryException, IOException {
-    final int el = exprs.length;
-    final Path path = toPath(0, qc);
-    final Item offset = el > 1 ? exprs[1].atomItem(qc, info) : Empty.VALUE;
-    final Item length = el > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
-    final long off = offset != Empty.VALUE ? toLong(offset) : 0;
-    long len = length != Empty.VALUE ? toLong(length) : Long.MAX_VALUE;
+    final Path path = toPath(arg(0), qc);
+    final Item offset = arg(1).atomItem(qc, info);
+    final Item length = arg(2).atomItem(qc, info);
+    final long off = offset.isEmpty() ? 0 : toLong(offset);
+    long len = length.isEmpty() ? Long.MAX_VALUE : toLong(length);
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());

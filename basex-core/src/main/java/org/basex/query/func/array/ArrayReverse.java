@@ -15,12 +15,13 @@ import org.basex.util.*;
 public final class ArrayReverse extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toArray(exprs[0], qc).reverseArray(qc);
+    final XQArray array = toArray(arg(0), qc);
+    return array.reverseArray(qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type type = exprs[0].seqType().type;
+    final Type type = arg(0).seqType().type;
     if(type instanceof ArrayType) exprType.assign(type);
     return this;
   }

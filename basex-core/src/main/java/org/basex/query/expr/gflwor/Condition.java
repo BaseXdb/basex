@@ -188,9 +188,9 @@ public final class Condition extends Single {
   @Override
   public void toXml(final QueryPlan plan) {
     final FElem elem = plan.create(start ? START : END, item);
-    if(pos  != null) plan.addElement(elem, plan.create(AT, pos));
-    if(prev != null) plan.addElement(elem, plan.create(PREVIOUS, prev));
-    if(next != null) plan.addElement(elem, plan.create(NEXT, next));
+    if(pos  != null) elem.add(plan.create(AT, pos));
+    if(prev != null) elem.add(plan.create(PREVIOUS, prev));
+    if(next != null) elem.add(plan.create(NEXT, next));
     plan.add(elem, expr);
   }
   @Override

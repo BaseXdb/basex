@@ -16,6 +16,6 @@ import org.basex.util.*;
 public final class FnEncodeForUri extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(encodeUri(toZeroToken(exprs[0], qc), false));
+    return Str.get(encodeUri(toZeroToken(arg(0), qc), false));
   }
 }

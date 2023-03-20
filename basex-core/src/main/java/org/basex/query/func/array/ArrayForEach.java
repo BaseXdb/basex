@@ -17,8 +17,8 @@ import org.basex.util.*;
 public final class ArrayForEach extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
-    final FItem action = toFunction(exprs[1], 1, qc);
+    final XQArray array = toArray(arg(0), qc);
+    final FItem action = toFunction(arg(1), 1, qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
@@ -29,16 +29,16 @@ public final class ArrayForEach extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = exprs[0];
+    final Expr array = arg(0);
     if(array == XQArray.empty()) return array;
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      exprs[1] = coerceFunc(exprs[1], cc, SeqType.ITEM_ZM, ((ArrayType) type).declType);
+      arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ((ArrayType) type).declType));
     }
 
     // assign type after coercion (expression might have changed)
-    final FuncType ft = exprs[1].funcType();
+    final FuncType ft = arg(1).funcType();
     if(ft != null) exprType.assign(ArrayType.get(ft.declType));
 
     return this;

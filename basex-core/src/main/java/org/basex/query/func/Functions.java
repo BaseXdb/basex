@@ -177,11 +177,11 @@ public final class Functions {
           if(list.get(i) != null) throw ARGTWICE_X_X.get(ii, fd, qnm);
           list.set(i, keywords.get(qnm));
         }
-        // pass on empty sequence for remaining arguments
+        // assign dummy arguments
         for(int l = list.size() - 1; l >= 0; l--) {
           if(list.get(l) == null) {
             if(l < min) throw ARGMISSING_X_X.get(ii, fd, fd.names[l].prefixString());
-            list.set(l, Empty.VALUE);
+            list.set(l, Empty.UNDEFINED);
           }
         }
         return fd.get(sc, ii, list.finish());

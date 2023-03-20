@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public final class BinJoin extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr binaries = exprs[0];
+    final Expr binaries = arg(0);
 
     final ByteList bl;
     if(binaries instanceof SingletonSeq && ((SingletonSeq) binaries).singleItem()) {

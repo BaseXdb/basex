@@ -36,8 +36,8 @@ public abstract class Docs extends DynamicFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate if target is empty
-    final Expr expr = exprs.length > 0 ? exprs[0] : null;
-    if(expr == null || expr == Empty.VALUE) return value(cc.qc);
+    final Expr expr = arg(0);
+    if(expr == Empty.VALUE || expr == Empty.UNDEFINED) return value(cc.qc);
 
     // pre-evaluate during dynamic compilation if target is not a remote URL
     if(cc.dynamic && expr instanceof Value) {
@@ -53,11 +53,9 @@ public abstract class Docs extends DynamicFn {
       final ArrayList<String> list = new ArrayList<>(1);
       if(sc.withdb) {
         // lock default collection (only collection functions can have 0 arguments)
-        if(exprs.length < 1) {
-          list.add(Locking.COLLECTION);
-        } else {
+        if(defined(0)) {
           // check if input argument is a static string
-          final Expr expr = exprs[0];
+          final Expr expr = arg(0);
           final byte[] uri = expr instanceof Str ? ((Str) expr).string() :
             expr instanceof Atm ? ((Atm) expr).string(null) : null;
           if(uri != null) {
@@ -68,6 +66,8 @@ public abstract class Docs extends DynamicFn {
             // otherwise, database cannot be locked statically
             list.add(null);
           }
+        } else {
+          list.add(Locking.COLLECTION);
         }
       }
       return list;

@@ -19,17 +19,17 @@ import org.basex.util.*;
 public final class MathPow extends MathFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item x = exprs[0].atomItem(qc, info);
-    final double y = toDouble(exprs[1], qc);
-    return x == Empty.VALUE ? Empty.VALUE : Dbl.get(power(toDouble(x), y));
+    final Item x = arg(0).atomItem(qc, info);
+    final double y = toDouble(arg(1), qc);
+    return x.isEmpty() ? Empty.VALUE : Dbl.get(power(toDouble(x), y));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr base = exprs[0];
+    final Expr base = arg(0);
     if(base instanceof ANum && ((ANum) base).dbl() == 1) return Dbl.ONE;
 
-    final Expr exp = exprs[1];
+    final Expr exp = arg(1);
     if(exp instanceof ANum) {
       final double e = ((ANum) exp).dbl();
       if(e == 0) return Dbl.ONE;

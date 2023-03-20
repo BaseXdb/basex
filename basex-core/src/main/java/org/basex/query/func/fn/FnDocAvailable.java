@@ -23,7 +23,7 @@ public class FnDocAvailable extends Docs {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
-      return Bln.get(doc(qc) != Empty.VALUE);
+      return Bln.get(!doc(qc).isEmpty());
     } catch(final QueryException ex) {
       if(ERRORS.contains(ex.error())) return Bln.FALSE;
       throw ex;
@@ -39,8 +39,8 @@ public class FnDocAvailable extends Docs {
   final Item doc(final QueryContext qc) throws QueryException {
     QueryInput qi = queryInput;
     if(qi == null) {
-      final Item href = exprs[0].atomItem(qc, info);
-      if(href == Empty.VALUE) return Empty.VALUE;
+      final Item href = arg(0).atomItem(qc, info);
+      if(href.isEmpty()) return Empty.VALUE;
       qi = queryInput(toToken(href));
       if(qi == null) throw INVDOC_X.get(info, href);
     }

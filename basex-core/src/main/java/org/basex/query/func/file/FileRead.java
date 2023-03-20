@@ -22,13 +22,13 @@ abstract class FileRead extends FileFn {
    * @throws QueryException query exception
    */
   final StrLazy text(final QueryContext qc) throws QueryException {
-    final Path path = toPath(0, qc);
-    final String encoding = toEncodingOrNull(1, FILE_UNKNOWN_ENCODING_X, qc);
-    final boolean validate = exprs.length < 3 || !toBoolean(exprs[2], qc);
+    final Path path = toPath(arg(0), qc);
+    final String encoding = toEncodingOrNull(arg(1), FILE_UNKNOWN_ENCODING_X, qc);
+    final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
-    return new StrLazy(new IOFile(path.toFile()), encoding, FILE_IO_ERROR_X, validate);
+    return new StrLazy(new IOFile(path.toFile()), encoding, FILE_IO_ERROR_X, !fallback);
   }
 }

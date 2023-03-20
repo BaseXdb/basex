@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class BinHex extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    byte[] string = token(0, qc);
+    byte[] string = toTokenOrNull(arg(0), qc);
     if(string == null) return Empty.VALUE;
 
     // add leading zero

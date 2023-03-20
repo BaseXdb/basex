@@ -22,9 +22,10 @@ public final class DbExport extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final String path = toString(exprs[1], qc);
-    final Item so = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
-    final SerializerOptions sopts = FuncOptions.serializer(so, info);
+    final String path = toString(arg(1), qc);
+    final Item options = arg(2).item(qc, info);
+
+    final SerializerOptions sopts = FuncOptions.serializer(options, info);
     try {
       Export.export(data, path, sopts, null);
     } catch(final IOException ex) {

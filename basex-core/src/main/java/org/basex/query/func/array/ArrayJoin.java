@@ -6,7 +6,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -20,10 +19,10 @@ public final class ArrayJoin extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if possible, retrieve single item
-    final Expr arrays = exprs[0];
+    final Expr arrays = arg(0);
     if(arrays.seqType().zeroOrOne()) {
       final Item item = arrays.item(qc, info);
-      return item == Empty.VALUE ? XQArray.empty() : toArray(item);
+      return item.isEmpty() ? XQArray.empty() : toArray(item);
     }
 
     final Iter iter = arrays.iter(qc);
@@ -47,7 +46,7 @@ public final class ArrayJoin extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr arrays = exprs[0];
+    final Expr arrays = arg(0);
     if(arrays.seqType().type instanceof ArrayType) {
       // remove empty entries
       final Expr[] args = arrays.args();
@@ -56,11 +55,11 @@ public final class ArrayJoin extends ArrayFn {
         for(final Expr arg : args) {
           if(arg != XQArray.empty()) list.add(arg);
         }
-        exprs[0] = List.get(cc, info, list.finish());
+        arg(0, arg -> List.get(cc, info, list.finish()));
       }
       // return simple arguments
-      final SeqType st = exprs[0].seqType();
-      if(st.one()) return exprs[0];
+      final SeqType st = arg(0).seqType();
+      if(st.one()) return arg(0);
 
       exprType.assign(st.type);
     }

@@ -341,6 +341,7 @@ public interface QueryText {
   // QUERY PLAN ===================================================================================
 
   /** Query Info. */ String QUERY_PLAN = "QueryPlan";
+  /** Query Info. */ String ARGUMENT = "Argument";
   /** Query Info. */ String COMPILED = "compiled";
   /** Query Info. */ String OP = "op";
   /** Query Info. */ String VAR = "var";

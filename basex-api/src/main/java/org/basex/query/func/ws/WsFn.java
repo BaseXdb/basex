@@ -32,7 +32,7 @@ abstract class WsFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final WebSocket client(final QueryContext qc) throws QueryException {
-    final String id = toString(exprs[0], qc);
+    final String id = toString(arg(0), qc);
     final WebSocket ws = WsPool.get(id);
     if(ws == null) throw WS_NOTFOUND_X.get(null, id);
     return ws;

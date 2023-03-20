@@ -15,7 +15,7 @@ import org.basex.query.value.seq.*;
 public final class FileParent extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException {
-    final Path parent = absolute(toPath(0, qc)).getParent();
+    final Path parent = absolute(toPath(arg(0), qc)).getParent();
     return parent == null ? Empty.VALUE : get(parent, true);
   }
 }

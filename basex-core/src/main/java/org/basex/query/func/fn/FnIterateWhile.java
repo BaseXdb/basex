@@ -16,8 +16,8 @@ import org.basex.query.value.type.*;
 public final class FnIterateWhile extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem predicate = toFunction(exprs[1], 1, qc), action = toFunction(exprs[2], 1, qc);
-    Value value = exprs[0].value(qc);
+    final FItem predicate = toFunction(arg(1), 1, qc), action = toFunction(arg(2), 1, qc);
+    Value value = arg(0).value(qc);
 
     while(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
       value = action.invoke(qc, info, value);
@@ -27,7 +27,7 @@ public final class FnIterateWhile extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], predicate = exprs[1], action = exprs[2];
+    final Expr input = arg(0), predicate = arg(1), action = arg(2);
 
     // compute function types
     if(action instanceof FuncItem) {
@@ -43,10 +43,12 @@ public final class FnIterateWhile extends StandardFunc {
         nst = nst.union(optAction.funcType().declType);
       }
       exprType.assign(ost);
-      exprs[2] = optAction;
+      final Expr oa = optAction;
+      arg(2, arg -> oa);
 
       if(predicate instanceof FuncItem) {
-        exprs[1] = coerceFunc(predicate, cc, SeqType.BOOLEAN_O, ist);
+        final SeqType is = ist;
+        arg(1, arg -> coerceFunc(predicate, cc, SeqType.BOOLEAN_O, is));
       }
     }
     return this;

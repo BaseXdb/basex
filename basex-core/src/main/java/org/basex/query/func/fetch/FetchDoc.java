@@ -24,7 +24,7 @@ import org.basex.util.*;
 public class FetchDoc extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return fetch(toIO(0, qc), qc);
+    return fetch(toIO(arg(0), qc), qc);
   }
 
   /**
@@ -35,7 +35,7 @@ public class FetchDoc extends StandardFunc {
    * @throws QueryException query exception
    */
   protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
-    final HashMap<String, String> options = toOptions(1, qc);
+    final HashMap<String, String> options = toOptions(arg(1), qc);
     final DBOptions dbopts = new DBOptions(options, MainOptions.PARSING, info);
     final MainOptions mopts = dbopts.assignTo(new MainOptions());
     try {

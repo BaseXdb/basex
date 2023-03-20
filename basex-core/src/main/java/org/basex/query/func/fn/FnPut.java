@@ -23,13 +23,12 @@ import org.basex.util.*;
 public final class FnPut extends StandardFunc {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNode(exprs[0], qc);
-    final byte[] href = toZeroToken(exprs[1], qc);
-    final Item options = exprs.length > 2 ? exprs[2].item(qc, info) : Empty.VALUE;
-    final SerializerOptions sopts = FuncOptions.serializer(options, info);
+    final ANode node = toNode(arg(0), qc);
+    final byte[] href = toZeroToken(arg(1), qc);
+    final Item options = arg(2).item(qc, info);
 
     if(!node.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
-      throw UPFOTYPE_X.get(info, exprs[0]);
+      throw UPFOTYPE_X.get(info, arg(0));
 
     final Uri uri = Uri.get(href);
     if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, href);
@@ -40,6 +39,7 @@ public final class FnPut extends StandardFunc {
     // check if all target paths are unique
     if(!updates.putPaths.add(path)) throw UPURIDUP_X.get(info, path);
 
+    final SerializerOptions sopts = FuncOptions.serializer(options, info);
     updates.add(new Put(target.pre(), target.data(), path, sopts, info), qc);
     return Empty.VALUE;
   }

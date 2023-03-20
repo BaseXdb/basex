@@ -30,8 +30,8 @@ public final class MapMerge extends StandardFunc {
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter maps = exprs[0].iter(qc);
-    final MergeOptions options = toOptions(1, new MergeOptions(), false, qc);
+    final Iter maps = arg(0).iter(qc);
+    final MergeOptions options = toOptions(arg(1), new MergeOptions(), false, qc);
 
     final MergeDuplicates merge = options.get(MergeOptions.DUPLICATES);
     XQMap map = XQMap.empty();
@@ -43,24 +43,23 @@ public final class MapMerge extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(exprs[0].seqType().type instanceof MapType) {
+    if(arg(0).seqType().type instanceof MapType) {
       // remove empty entries
-      if(exprs[0] instanceof List &&
-          ((Checks<Expr>) arg -> arg == XQMap.empty()).any(exprs[0].args())) {
+      if(arg(0) instanceof List &&
+          ((Checks<Expr>) arg -> arg == XQMap.empty()).any(arg(0).args())) {
         final ExprList list = new ExprList();
-        for(final Expr arg : exprs[0].args()) {
+        for(final Expr arg : arg(0).args()) {
           if(arg != XQMap.empty()) list.add(arg);
         }
-        exprs[0] = List.get(cc, info, list.finish());
+        arg(0, arg -> List.get(cc, info, list.finish()));
       }
       // return simple arguments
-      final SeqType st = exprs[0].seqType();
-      if(st.one()) return exprs[0];
+      final SeqType st = arg(0).seqType();
+      if(st.one()) return arg(0);
 
       // rewrite map:merge(map:entry, map) to map:put(map, key, value)
-      final int el = exprs.length;
-      if(el == 1 && exprs[0] instanceof List && exprs[0].args().length == 2) {
-        final Expr[] args = exprs[0].args();
+      if(!defined(1) && arg(0) instanceof List && arg(0).args().length == 2) {
+        final Expr[] args = arg(0).args();
         if(_MAP_ENTRY.is(args[0]) && args[1].seqType().instanceOf(SeqType.MAP_O)) {
           return cc.function(_MAP_PUT, info, args[1], args[0].arg(0), args[0].arg(1));
         }
@@ -71,8 +70,8 @@ public final class MapMerge extends StandardFunc {
       final SeqType dt = mt.declType;
       // broaden type if values may be combined
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
-      if(!dt.zero() && el > 1) {
-        if(!(exprs[1] instanceof Value) || toOptions(1, new MergeOptions(), false, cc.qc).
+      if(!dt.zero() && defined(1)) {
+        if(!(arg(1) instanceof Value) || toOptions(arg(1), new MergeOptions(), false, cc.qc).
             get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
           mt = MapType.get(mt.keyType(), dt.union(Occ.ONE_OR_MORE));
         }

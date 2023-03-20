@@ -18,22 +18,22 @@ import org.basex.query.value.type.*;
 public final class MapGet extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XQMap map = toMap(exprs[0], qc);
-    final Item key = toAtomItem(exprs[1], qc);
-    final FItem fallback = exprs.length > 2 ? toFunction(exprs[2], 1, qc) : null;
+    final XQMap map = toMap(arg(0), qc);
+    final Item key = toAtomItem(arg(1), qc);
+    final FItem fallback = defined(2) ? toFunction(arg(2), 1, qc) : null;
 
     final Value value = map.get(key, info);
-    return value != Empty.VALUE || fallback == null || map.contains(key, info) ? value :
+    return !value.isEmpty() || fallback == null || map.contains(key, info) ? value :
       fallback.invoke(qc, info, key);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr map = exprs[0];
-    final boolean fallback = exprs.length > 2;
+    final Expr map = arg(0);
+    final boolean fallback = defined(2);
     if(fallback) {
-      final Type type = exprs[1].seqType().type.atomic();
-      if(type != null) exprs[2] = coerceFunc(exprs[2], cc, SeqType.ITEM_ZM, type.seqType());
+      final Type type = arg(1).seqType().type.atomic();
+      if(type != null) arg(2, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, type.seqType()));
     } else {
       if(map == XQMap.empty()) return Empty.VALUE;
     }
@@ -43,7 +43,7 @@ public final class MapGet extends StandardFunc {
     if(type instanceof MapType) {
       SeqType st = ((MapType) type).declType;
       if(fallback) {
-        final Type ftype = exprs[2].seqType().type;
+        final Type ftype = arg(2).seqType().type;
         if(ftype instanceof FuncType) st = st.union(((FuncType) ftype).declType);
       } else {
         st = st.union(Occ.ZERO);

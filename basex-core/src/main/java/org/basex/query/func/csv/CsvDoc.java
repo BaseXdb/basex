@@ -14,7 +14,7 @@ import org.basex.util.*;
 public class CsvDoc extends CsvParse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String href = toStringOrNull(exprs[0], qc);
+    final String href = toStringOrNull(arg(0), qc);
     return href != null ? parse(toIO(href), qc) : Empty.VALUE;
   }
 }

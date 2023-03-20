@@ -16,7 +16,7 @@ public final class WsDelete extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final WebSocket client = client(qc);
-    final String key = toString(exprs[1], qc);
+    final String key = toString(arg(1), qc);
     client.atts.remove(key);
     return Empty.VALUE;
   }

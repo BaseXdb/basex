@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class BinOctal extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] string = token(0, qc);
+    final byte[] string = toTokenOrNull(arg(0), qc);
     if(string == null) return Empty.VALUE;
     final int tl = string.length;
     if(tl == 0) return B64.EMPTY;

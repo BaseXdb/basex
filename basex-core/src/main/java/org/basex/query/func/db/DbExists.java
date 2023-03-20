@@ -21,8 +21,8 @@ public final class DbExists extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {
       final Data data = toData(qc);
-      if(exprs.length < 2) return Bln.TRUE;
-      final String path = toDbPath(1, qc);
+      if(!defined(1)) return Bln.TRUE;
+      final String path = toDbPath(arg(1), qc);
 
       final Checks<ResourceType> exists = type -> {
         final IOFile bin = data.meta.file(path, type);

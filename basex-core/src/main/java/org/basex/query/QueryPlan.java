@@ -132,15 +132,6 @@ public final class QueryPlan {
   }
 
   /**
-   * Adds a child element to the specified element.
-   * @param elem element to which the attribute will be added
-   * @param child child element
-   */
-  public void addElement(final FElem elem, final FElem child) {
-    elem.add(child);
-  }
-
-  /**
    * Attaches variable information to the specified element.
    * @param elem element to which attributes will be added
    * @param var variable (can be {@code null})

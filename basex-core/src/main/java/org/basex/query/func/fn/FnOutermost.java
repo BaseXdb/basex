@@ -37,7 +37,7 @@ public class FnOutermost extends StandardFunc {
    * @throws QueryException exception
    */
   Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
-    final Iter nodes = exprs[0].iter(qc);
+    final Iter nodes = arg(0).iter(qc);
 
     final ANodeBuilder list = new ANodeBuilder();
     for(Item item; (item = qc.next(nodes)) != null;) {
@@ -97,8 +97,8 @@ public class FnOutermost extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final SeqType st = exprs[0].seqType();
-    return st.zeroOrOne() && st.type instanceof NodeType ? exprs[0] : this;
+    final SeqType st = arg(0).seqType();
+    return st.zeroOrOne() && st.type instanceof NodeType ? arg(0) : this;
   }
 
   @Override

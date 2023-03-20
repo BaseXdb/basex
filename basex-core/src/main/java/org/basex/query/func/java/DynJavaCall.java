@@ -73,11 +73,11 @@ abstract class DynJavaCall extends JavaCall {
     }
 
     final Executable single = execs.length == 1 ? execs[0] : null;
-    final int el = exprs.length;
-    final ExprList list = new ExprList(el);
-    int e = single != null && !isStatic(single) || el > 0 &&
-        (exprs[0] instanceof XQJava || exprs[0] instanceof JavaCall) ? 0 : -1;
-    while(++e < el) list.add(exprs[e]);
+    final int al = args().length;
+    final ExprList list = new ExprList(al);
+    int a = single != null && !isStatic(single) || al > 0 &&
+        (arg(0) instanceof XQJava || arg(0) instanceof JavaCall) ? 0 : -1;
+    while(++a < al) list.add(arg(a));
 
     final String args = argTypes(list.finish());
     return single != null ? JAVAARGS_X_X_X.get(info, name(), paramTypes(single, true), args) :
@@ -91,7 +91,7 @@ abstract class DynJavaCall extends JavaCall {
    */
   final QueryException instanceExpected(final Exception ex) {
     if(ex != null) Util.debug(ex);
-    return JAVANOINSTANCE_X_X.get(info, JavaCall.className(clazz), JavaCall.argType(exprs[0]));
+    return JAVANOINSTANCE_X_X.get(info, JavaCall.className(clazz), JavaCall.argType(arg(0)));
   }
 
   @Override

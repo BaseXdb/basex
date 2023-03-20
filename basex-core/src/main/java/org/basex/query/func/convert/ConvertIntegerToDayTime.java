@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class ConvertIntegerToDayTime extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return DTDur.get(toLong(exprs[0], qc));
+    return DTDur.get(toLong(arg(0), qc));
   }
 }

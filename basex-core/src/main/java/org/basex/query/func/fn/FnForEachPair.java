@@ -19,8 +19,8 @@ import org.basex.query.value.type.*;
 public class FnForEachPair extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final Iter input1 = exprs[0].iter(qc), input2 = exprs[1].iter(qc);
-    final FItem action = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
+    final Iter input1 = arg(0).iter(qc), input2 = arg(1).iter(qc);
+    final FItem action = toFunction(arg(2), 2, this instanceof UpdateForEachPair, qc);
     final long size = action.funcType().declType.one()
         ? Math.min(input1.size(), input2.size()) : -1;
 
@@ -52,8 +52,8 @@ public class FnForEachPair extends StandardFunc {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Iter input1 = exprs[0].iter(qc), input2 = exprs[1].iter(qc);
-    final FItem action = toFunction(exprs[2], 2, this instanceof UpdateForEachPair, qc);
+    final Iter input1 = arg(0).iter(qc), input2 = arg(1).iter(qc);
+    final FItem action = toFunction(arg(2), 2, this instanceof UpdateForEachPair, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item1, item2; (item1 = input1.next()) != null && (item2 = input2.next()) != null;) {
@@ -64,16 +64,16 @@ public class FnForEachPair extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input1 = exprs[0], input2 = exprs[1];
+    final Expr input1 = arg(0), input2 = arg(1);
     final SeqType st1 = input1.seqType(), st2 = input2.seqType();
     if(st1.zero()) return input1;
     if(st2.zero()) return input2;
 
-    exprs[2] = coerceFunc(exprs[2], cc, SeqType.ITEM_ZM, st1.with(Occ.EXACTLY_ONE),
-        st2.with(Occ.EXACTLY_ONE));
+    arg(2, arg -> coerceFunc(arg(2), cc, SeqType.ITEM_ZM, st1.with(Occ.EXACTLY_ONE),
+        st2.with(Occ.EXACTLY_ONE)));
 
     // assign type after coercion (expression might have changed)
-    final FuncType ft = exprs[2].funcType();
+    final FuncType ft = arg(2).funcType();
     if(ft != null) {
       final SeqType declType = ft.declType;
       final boolean oneOrMore = st1.oneOrMore() && st2.oneOrMore() && declType.oneOrMore();

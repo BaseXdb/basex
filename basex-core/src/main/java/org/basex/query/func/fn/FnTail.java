@@ -22,7 +22,7 @@ public final class FnTail extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // retrieve and decrement iterator size
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     final long size = input.size();
 
     // return empty iterator if iterator yields 0 or 1 items, or if result is an empty sequence
@@ -50,7 +50,7 @@ public final class FnTail extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // return empty sequence if value has 0 or 1 items
-    final Value input = exprs[0].value(qc);
+    final Value input = arg(0).value(qc);
     final long size = input.size();
     return size <= 1 ? Empty.VALUE : input.subsequence(1, size - 1, qc);
   }
@@ -58,7 +58,7 @@ public final class FnTail extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values to speed up evaluation of result
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     if(input instanceof Value) return value(cc.qc);
 
     final long size = input.size();
@@ -106,6 +106,6 @@ public final class FnTail extends StandardFunc {
 
   @Override
   public boolean ddo() {
-    return exprs[0].ddo();
+    return arg(0).ddo();
   }
 }

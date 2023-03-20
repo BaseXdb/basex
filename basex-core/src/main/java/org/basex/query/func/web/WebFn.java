@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.options.*;
@@ -35,12 +34,11 @@ abstract class WebFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final String createUrl(final QueryContext qc) throws QueryException {
-    final int el = exprs.length;
-    final byte[] url = toToken(exprs[0], qc);
-    final Item params = el > 1 ? exprs[1].item(qc, info) : Empty.VALUE;
-    final byte[] anchor = el > 2 ? toZeroToken(exprs[2], qc) : Token.EMPTY;
+    final byte[] url = toToken(arg(0), qc);
+    final Item params = arg(1).item(qc, info);
+    final byte[] anchor = toZeroToken(arg(2), qc);
 
-    final XQMap map = params != Empty.VALUE ? toMap(params) : XQMap.empty();
+    final XQMap map = params.isEmpty() ? XQMap.empty() : toMap(params);
     final TokenBuilder tb = new TokenBuilder().add(url);
     int c = 0;
     for(final Item key : map.keys()) {

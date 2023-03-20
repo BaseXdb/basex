@@ -21,8 +21,8 @@ public final class FtSearch extends FtAccess {
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final Value query = exprs[1].value(qc);
-    final FtIndexOptions options = toOptions(2, new FtIndexOptions(), true, qc);
+    final Value query = arg(1).value(qc);
+    final FtIndexOptions options = toOptions(arg(2), new FtIndexOptions(), true, qc);
 
     final IndexDb db = new IndexStaticDb(data, info);
     final FTMode mode = options.get(FtIndexOptions.MODE);
@@ -39,7 +39,7 @@ public final class FtSearch extends FtAccess {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return dataLock(visitor, false, 0) && super.accept(visitor);
+    return dataLock(arg(0), false, visitor) && super.accept(visitor);
   }
 
   @Override
@@ -49,7 +49,7 @@ public final class FtSearch extends FtAccess {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    exprs[1] = exprs[1].simplifyFor(Simplify.STRING, cc);
+    arg(1, arg -> arg.simplifyFor(Simplify.STRING, cc));
     super.simplifyArgs(cc);
   }
 }

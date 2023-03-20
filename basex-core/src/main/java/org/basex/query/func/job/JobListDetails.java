@@ -25,7 +25,7 @@ public final class JobListDetails extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Context ctx = qc.context;
-    final TokenList ids = exprs.length > 0 ? new TokenList(1).add(toToken(exprs[0], qc)) :
+    final TokenList ids = defined(0) ? new TokenList(1).add(toToken(arg(0), qc)) :
       qc.context.jobs.ids();
 
     final int max = ctx.soptions.get(StaticOptions.LOGMSGMAXLEN);
@@ -75,7 +75,7 @@ public final class JobListDetails extends StandardFunc {
   private byte[] dateTime(final long ms) throws QueryException {
     final Dtm dtm = Dtm.get(ms);
     final DTDur tz = new DTDur(BigDecimal.valueOf(TimeZone.getDefault().getOffset(ms) / 1000));
-    dtm.timeZone(tz, true, info);
+    dtm.timeZone(tz, false, info);
     return dtm.string(info);
   }
 }

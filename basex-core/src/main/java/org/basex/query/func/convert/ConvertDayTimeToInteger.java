@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class ConvertDayTimeToInteger extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final DTDur value = (DTDur) checkType(exprs[0], AtomType.DAY_TIME_DURATION, qc);
+    final DTDur value = (DTDur) checkType(arg(0), AtomType.DAY_TIME_DURATION, qc);
 
     final BigDecimal ms = value.sec.multiply(Dec.BD_1000);
     if(ms.compareTo(Dec.BD_MAXLONG) > 0) throw INTRANGE_X.get(info, ms);

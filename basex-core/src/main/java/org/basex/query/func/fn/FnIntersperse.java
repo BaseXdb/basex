@@ -18,27 +18,27 @@ import org.basex.query.value.type.*;
 public class FnIntersperse extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final Value sep = exprs[1].value(qc);
+    final Iter input = arg(0).iter(qc);
+    final Value separator = arg(1).value(qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     Item item = input.next();
     if(item != null) {
       vb.add(item);
-      while((item = qc.next(input)) != null) vb.add(sep).add(item);
+      while((item = qc.next(input)) != null) vb.add(separator).add(item);
     }
     return vb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr values = exprs[0], sep = exprs[1];
-    final SeqType st = values.seqType(), stSep = sep.seqType();
-    if(st.zeroOrOne() || sep == Empty.VALUE) return values;
+    final Expr values = arg(0), separator = arg(1);
+    final SeqType st = values.seqType(), stSep = separator.seqType();
+    if(st.zeroOrOne() || separator == Empty.VALUE) return values;
 
-    final long size = values.size(), sizeSep = sep.size();
+    final long size = values.size(), sizeSep = separator.size();
     final long sz = size != -1 && sizeSep != -1 ? size + sizeSep * (size - 1) : -1;
-    exprType.assign(st.union(stSep), st.occ, sz).data(values, sep);
+    exprType.assign(st.union(stSep), st.occ, sz).data(values, separator);
 
     return this;
   }

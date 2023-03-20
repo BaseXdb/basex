@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class UserExists extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(qc.context.users.get(toName(0, qc)) != null);
+    return Bln.get(qc.context.users.get(toName(arg(0), qc)) != null);
   }
 }

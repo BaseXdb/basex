@@ -20,14 +20,14 @@ public final class ProfType extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
     type(qc);
-    return exprs[0].value(qc);
+    return arg(0).value(qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     if(cc.dynamic) {
       type(cc.qc);
-      return exprs[0];
+      return arg(0);
     }
     return this;
   }
@@ -37,7 +37,7 @@ public final class ProfType extends StandardFunc {
    * @param qc query context
    */
   private void type(final QueryContext qc) {
-    final Expr value = exprs[0];
+    final Expr value = arg(0);
     FnTrace.trace(Util.inf("%, size: %, exprSize: %", value.seqType(), value.size(),
         value.exprSize()), token(value + ": "), qc);
   }

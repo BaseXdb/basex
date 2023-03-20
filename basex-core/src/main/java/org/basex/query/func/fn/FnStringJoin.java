@@ -19,8 +19,8 @@ import org.basex.util.*;
 public final class FnStringJoin extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter values = exprs[0].atomIter(qc, info);
-    final byte[] sep = exprs.length > 1 ? toToken(exprs[1], qc) : Token.EMPTY;
+    final Iter values = arg(0).atomIter(qc, info);
+    final byte[] separator = defined(1) ? toToken(arg(1), qc) : Token.EMPTY;
 
     // no results: empty string
     Item item = values.next();
@@ -33,19 +33,20 @@ public final class FnStringJoin extends StandardFunc {
     // join multiple strings
     final TokenBuilder tb = new TokenBuilder().add(first);
     do {
-      tb.add(sep).add(item.string(info));
+      tb.add(separator).add(item.string(info));
     } while((item = qc.next(values)) != null);
     return Str.get(tb.finish());
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr values = exprs[0], sep = exprs.length > 1 ? exprs[1] : Str.EMPTY;
+    final Expr values = arg(0), separator = defined(1) ? arg(1) : Str.EMPTY;
 
     // string-join(characters(A))  ->  string(A)
-    if(CHARACTERS.is(values) && sep == Str.EMPTY) return cc.function(STRING, info, values.args());
+    if(CHARACTERS.is(values) && separator == Str.EMPTY)
+      return cc.function(STRING, info, values.args());
 
-    final SeqType st = values.seqType(), stSep = sep.seqType();
+    final SeqType st = values.seqType(), stSep = separator.seqType();
     return (st.zero() || st.one() && st.type.isStringOrUntyped()) &&
         stSep.type.isStringOrUntyped() ? cc.function(Function.STRING, info, values) : this;
   }

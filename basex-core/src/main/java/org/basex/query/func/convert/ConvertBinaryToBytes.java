@@ -14,6 +14,6 @@ import org.basex.query.value.seq.*;
 public final class ConvertBinaryToBytes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return BytSeq.get(toBin(exprs[0], qc).binary(info));
+    return BytSeq.get(toBin(arg(0), qc).binary(info));
   }
 }

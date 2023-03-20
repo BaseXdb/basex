@@ -17,8 +17,8 @@ public final class WsSet extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final WebSocket client = client(qc);
-    final String key = toString(exprs[1], qc);
-    final Value value = exprs[2].value(qc);
+    final String key = toString(arg(1), qc);
+    final Value value = arg(2).value(qc);
 
     client.atts.put(key, value.materialize(n -> false, ii, qc));
     return Empty.VALUE;

@@ -20,14 +20,14 @@ import org.basex.util.*;
 public final class RequestParameter extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = toString(exprs[0], qc);
+    final String name = toString(arg(0), qc);
 
     final RequestContext requestCtx = requestContext(qc);
     try {
       final Value query = requestCtx.queryValues().get(name);
       final Value form = requestCtx.formValues(qc.context.options).get(name);
       if(query == null && form == null) {
-        return exprs.length > 1 ? exprs[1].value(qc) : Empty.VALUE;
+        return defined(1) ? arg(1).value(qc) : Empty.VALUE;
       }
 
       final ValueBuilder vb = new ValueBuilder(qc);

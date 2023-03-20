@@ -14,6 +14,6 @@ import org.basex.query.value.item.*;
 public final class FileIsDir extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException {
-    return Bln.get(Files.isDirectory(toPath(0, qc)));
+    return Bln.get(Files.isDirectory(toPath(arg(0), qc)));
   }
 }

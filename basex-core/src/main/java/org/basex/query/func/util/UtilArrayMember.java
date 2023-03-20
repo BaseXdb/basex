@@ -17,12 +17,12 @@ import org.basex.util.*;
 public final class UtilArrayMember extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return XQArray.member(exprs[0].value(qc));
+    return XQArray.member(arg(0).value(qc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    exprType.assign(ArrayType.get(exprs[0].seqType()));
+    exprType.assign(ArrayType.get(arg(0).seqType()));
     return this;
   }
 
@@ -30,7 +30,7 @@ public final class UtilArrayMember extends StandardFunc {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA)) {
-      expr = exprs[0].simplify(mode, cc);
+      expr = arg(0).simplify(mode, cc);
     }
     return cc.simplify(this, expr, mode);
   }

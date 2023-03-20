@@ -76,8 +76,8 @@ public final class Arith extends Arr {
         expr = ex;
       } else if(expr1 instanceof Arith) {
         final Calc acalc = ((Arith) expr1).calc;
-        final boolean add = acalc == Calc.PLUS || acalc == Calc.MULT;
-        final boolean sub = acalc == Calc.MINUS || acalc == Calc.DIV;
+        final boolean add = acalc.oneOf(Calc.PLUS, Calc.MULT);
+        final boolean sub = acalc.oneOf(Calc.MINUS, Calc.DIV);
         final boolean inverse = acalc == calc.invert();
         final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
 
@@ -103,9 +103,9 @@ public final class Arith extends Arr {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1 == Empty.VALUE) return Empty.VALUE;
+    if(item1.isEmpty()) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
-    return item2 == Empty.VALUE ? Empty.VALUE : calc.eval(item1, item2, info);
+    return item2.isEmpty() ? Empty.VALUE : calc.eval(item1, item2, info);
   }
 
   @Override

@@ -19,11 +19,11 @@ import org.basex.query.value.item.*;
 public final class RandomSeededPermutation extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final long seed = toLong(exprs[0], qc);
+    final long seed = toLong(arg(0), qc);
     final ItemList items = new ItemList();
     final Random r = new Random(seed);
 
-    final Iter iter = exprs[1].iter(qc);
+    final Iter iter = arg(1).iter(qc);
     for(Item item1; (item1 = qc.next(iter)) != null;) {
       final int ls = items.size();
       final int l = r.nextInt(ls + 1);
@@ -39,6 +39,6 @@ public final class RandomSeededPermutation extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return adoptType(exprs[1]);
+    return adoptType(arg(1));
   }
 }

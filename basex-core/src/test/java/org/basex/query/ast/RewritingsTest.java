@@ -2995,6 +2995,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // GH-2182: EBV tests, rewriting to descendant::text()
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
+    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(ItemMap.class));
   }
 
   /** Simplified if expression yields errors. */
@@ -3049,5 +3050,13 @@ public final class RewritingsTest extends QueryPlanTest {
     error("xs:QName('x') = xs:untypedAtomic('')", FUNCCAST_X_X_X);
     error("xs:untypedAtomic('') = xs:QName('x')", FUNCCAST_X_X_X);
     query("xs:untypedAtomic(' x ') = xs:QName('x')", true);
+  }
+
+  /** Bug of operation on non-existing attribute. */
+  @Test public void gh2190() {
+    check("<x/>[@a >= 0 or @a <= 0]", "", empty(Or.class), empty(EXISTS));
+    check("<x/>[xs:integer(@a) >= 0 or xs:integer(@a) <= 0]", "", empty(Or.class), exists(EXISTS));
+
+    check("<x/>[position() >= 0 or position() <= 0]", "<x/>", root(CElem.class));
   }
 }

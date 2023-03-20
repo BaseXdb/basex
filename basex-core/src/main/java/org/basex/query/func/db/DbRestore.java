@@ -20,7 +20,7 @@ public final class DbRestore extends BackupFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // extract database name from backup file
-    final String name = toName(0, true, qc);
+    final String name = toName(arg(0), true, qc);
 
     // find backup with or without date suffix
     final StringList backups = qc.context.databases.backups(name);

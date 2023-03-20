@@ -3,6 +3,7 @@ package org.basex.query.func.array;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -16,12 +17,14 @@ import org.basex.util.*;
 public final class ArrayAppend extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return toArray(exprs[0], qc).snoc(exprs[1].value(qc));
+    final XQArray array = toArray(arg(0), qc);
+    final Value member = arg(1).value(qc);
+    return array.snoc(member);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = exprs[0], add = exprs[1];
+    final Expr array = arg(0), add = arg(1);
     if(array == XQArray.empty()) return new CArray(info, true, add).optimize(cc);
 
     final Type type = array.seqType().type;

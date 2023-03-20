@@ -40,37 +40,37 @@ abstract class RegEx extends StandardFunc {
   /**
    * Returns a regular expression pattern.
    * @param pattern pattern
-   * @param modifier modifier item
+   * @param flags flags (can be {@code null})
    * @param qc query context
    * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final Pattern pattern(final byte[] pattern, final Expr modifier, final QueryContext qc,
+  final Pattern pattern(final byte[] pattern, final Expr flags, final QueryContext qc,
       final boolean check) throws QueryException {
-    return regExpr(pattern, modifier, qc, check).pattern;
+    return regExpr(pattern, flags, qc, check).pattern;
   }
 
   /**
    * Returns a regular expression pattern.
    * @param pattern pattern
-   * @param modifier modifier item (can be {@code null})
+   * @param flags flags (can be {@code null})
    * @param qc query context
    * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final RegExpr regExpr(final byte[] pattern, final Expr modifier, final QueryContext qc,
+  final RegExpr regExpr(final byte[] pattern, final Expr flags, final QueryContext qc,
       final boolean check) throws QueryException {
 
-    byte[] mod = modifier != null ? toTokenOrNull(modifier, qc) : null;
-    if(mod == null) mod = Token.EMPTY;
-    final byte[] key = Token.concat(pattern, '\b', mod);
+    byte[] modifiers = flags != null ? toTokenOrNull(flags, qc) : null;
+    if(modifiers == null) modifiers = Token.EMPTY;
+    final byte[] key = Token.concat(pattern, '\b', modifiers);
 
     synchronized(patterns) {
       RegExpr regExpr = patterns.get(key);
       if(regExpr == null) {
-        regExpr = parse(pattern, mod, check);
+        regExpr = parse(pattern, modifiers, check);
         patterns.put(key, regExpr);
       }
       return regExpr;

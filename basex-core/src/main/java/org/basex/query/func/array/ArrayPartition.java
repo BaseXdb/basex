@@ -21,8 +21,8 @@ public final class ArrayPartition extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter input = exprs[0].iter(qc);
-      final FItem breakWhen = toFunction(exprs[1], 2, qc);
+      final Iter input = arg(0).iter(qc);
+      final FItem breakWhen = toFunction(arg(1), 2, qc);
       Value value = Empty.VALUE;
 
       @Override
@@ -32,7 +32,7 @@ public final class ArrayPartition extends ArrayFn {
           if(item == null || toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
             final Value v = value;
             value = item;
-            if(v != Empty.VALUE) return XQArray.member(v);
+            if(!v.isEmpty()) return XQArray.member(v);
           } else {
             value = ValueBuilder.concat(value, item, qc);
           }
@@ -49,14 +49,14 @@ public final class ArrayPartition extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st =  input.seqType();
     if(st.zero()) return input;
-    if(st.one() && exprs[1] instanceof FuncItem)
+    if(st.one() && arg(1) instanceof FuncItem)
       return cc.function(_UTIL_ARRAY_MEMBER, info, input);
 
-    exprs[1] = coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O,
-        st.with(Occ.ZERO_OR_MORE), st.with(Occ.EXACTLY_ONE));
+    arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, st.with(Occ.ZERO_OR_MORE),
+        st.with(Occ.EXACTLY_ONE)));
     exprType.assign(ArrayType.get(st.union(Occ.ONE_OR_MORE)));
     return this;
   }

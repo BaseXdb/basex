@@ -41,7 +41,7 @@ public class XQueryEval extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return eval(toContent(0, qc), false, qc);
+    return eval(toContent(arg(0), qc), false, qc);
   }
 
   /**
@@ -65,10 +65,10 @@ public class XQueryEval extends StandardFunc {
     Timer to = null;
 
     // bind variables and context value, parse options
-    final HashMap<String, Value> bindings = toBindings(1, qc);
+    final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final XQueryOptions options = new XQueryOptions();
     options.put(XQueryOptions.PERMISSION, perm);
-    toOptions(2, options, true, qc);
+    toOptions(arg(2), options, true, qc);
 
     final Perm evalPerm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
     if(!user.has(evalPerm)) throw XQUERY_PERMISSION2_X.get(info, evalPerm);

@@ -23,7 +23,7 @@ public final class FnParseQName extends StandardFunc {
 
   @Override
   public QNm item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] eqname = trim(toToken(exprs[0], qc));
+    final byte[] eqname = trim(toToken(arg(0), qc));
     if(XMLToken.isNCName(eqname)) return new QNm(eqname, EMPTY);
     if(XMLToken.isQName(eqname)) {
       final QNm qnm = new QNm(eqname, sc);

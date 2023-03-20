@@ -30,9 +30,9 @@ public class ValidateRng extends ValidateFn {
     return process(new Validation() {
       @Override
       void process(final ValidationHandler handler) throws IOException, QueryException {
-        final IO in = read(toNodeOrAtomItem(0, qc), null);
-        final Item sch = toNodeOrAtomItem(1, qc);
-        final boolean compact = exprs.length > 2 && toBoolean(exprs[2], qc);
+        final IO in = read(toNodeOrAtomItem(arg(0), qc), null);
+        final Item sch = toNodeOrAtomItem(arg(1), qc);
+        final boolean compact = toBooleanOrFalse(arg(2), qc);
 
         // detect format of schema input
         IO schema;

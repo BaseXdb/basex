@@ -26,11 +26,11 @@ public final class ClientQuery extends ClientFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ClientSession cs = session(qc, false);
-    final String query = toString(exprs[1], qc);
+    final String query = toString(arg(1), qc);
     final ValueBuilder vb = new ValueBuilder(qc);
     try(org.basex.api.client.ClientQuery cq = cs.query(query)) {
       // bind variables and context value
-      for(final Entry<String, Value> binding : toBindings(2, qc).entrySet()) {
+      for(final Entry<String, Value> binding : toBindings(arg(2), qc).entrySet()) {
         final String key = binding.getKey();
         final Value value = binding.getValue();
         if(key.isEmpty()) cq.context(value);

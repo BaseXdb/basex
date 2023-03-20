@@ -20,26 +20,27 @@ import org.basex.util.*;
 public final class FnSubstringBefore extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc), sub = toZeroToken(exprs[1], qc);
-    final Collation coll = toCollation(2, qc);
-    if(value.length == 0 || sub.length == 0) return Str.EMPTY;
+    final byte[] value = toZeroToken(arg(0), qc);
+    final byte[] substring = toZeroToken(arg(1), qc);
+    final Collation coll = toCollation(arg(2), qc);
+    if(value.length == 0 || substring.length == 0) return Str.EMPTY;
 
     if(coll == null) {
-      final int pos = indexOf(value, sub);
+      final int pos = indexOf(value, substring);
       return pos == -1 ? Str.EMPTY : Str.get(substring(value, 0, pos));
     }
-    return Str.get(coll.before(value, sub, info));
+    return Str.get(coll.before(value, substring, info));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr value = exprs[0], sub = exprs[1];
-    final SeqType st = value.seqType(), stSub = sub.seqType();
+    final Expr value = arg(0), substring = arg(1);
+    final SeqType st = value.seqType(), stSub = substring.seqType();
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
-       (stSub.zero() || stSub.one() && stSub.type.isStringOrUntyped()) && exprs.length < 3) {
-      if(value == Empty.VALUE || value == Str.EMPTY || sub == Empty.VALUE || sub == Str.EMPTY ||
-          value.equals(sub)) return Str.EMPTY;
+       (stSub.zero() || stSub.one() && stSub.type.isStringOrUntyped()) && !defined(2)) {
+      if(value == Empty.VALUE || value == Str.EMPTY || substring == Empty.VALUE ||
+          substring == Str.EMPTY || value.equals(substring)) return Str.EMPTY;
     }
     return this;
   }

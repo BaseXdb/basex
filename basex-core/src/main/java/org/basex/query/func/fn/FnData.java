@@ -18,23 +18,23 @@ import org.basex.util.*;
 public final class FnData extends ContextFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return ctxArg(0, qc).atomIter(qc, info);
+    return context(qc).atomIter(qc, info);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return ctxArg(0, qc).atomValue(qc, info);
+    return context(qc).atomValue(qc, info);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return ctxArg(0, qc).atomItem(qc, info);
+    return context(qc).atomItem(qc, info);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     final boolean context = contextAccess();
-    final Expr input = context ? cc.qc.focus.value : exprs[0];
+    final Expr input = context ? cc.qc.focus.value : arg(0);
 
     if(input != null) {
       final SeqType st = input.seqType();
@@ -62,7 +62,7 @@ public final class FnData extends ContextFn {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    final Expr input = contextAccess() ? ContextValue.get(cc, info) : exprs[0];
+    final Expr input = contextAccess() ? ContextValue.get(cc, info) : arg(0);
     if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT)) {
       // data(<a/>) = ''  ->  <a/> = ''
       // A[B ! data() = '']  ->  A[B ! . = '']
@@ -76,6 +76,6 @@ public final class FnData extends ContextFn {
 
   @Override
   public boolean inlineable() {
-    return contextAccess() || exprs[contextArg()] instanceof ContextValue;
+    return contextAccess() || arg(contextIndex()) instanceof ContextValue;
   }
 }

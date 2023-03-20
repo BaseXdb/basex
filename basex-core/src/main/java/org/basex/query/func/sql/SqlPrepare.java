@@ -18,7 +18,7 @@ public final class SqlPrepare extends SqlFn {
   @Override
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Connection conn = connection(qc);
-    final String prepStmt = toString(exprs[1], qc);
+    final String prepStmt = toString(arg(1), qc);
     try {
       // keep prepared statement
       final PreparedStatement prep = conn.prepareStatement(prepStmt);

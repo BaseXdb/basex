@@ -16,15 +16,15 @@ import org.basex.util.*;
 public final class MapContains extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQMap map = toMap(exprs[0], qc);
-    final Item key = toAtomItem(exprs[1], qc);
+    final XQMap map = toMap(arg(0), qc);
+    final Item key = toAtomItem(arg(1), qc);
 
     return Bln.get(map.contains(key, info));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr map = exprs[0];
+    final Expr map = arg(0);
     if(map == XQMap.empty()) return Bln.FALSE;
 
     return this;

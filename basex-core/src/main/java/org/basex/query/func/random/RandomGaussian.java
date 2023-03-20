@@ -22,7 +22,7 @@ public final class RandomGaussian extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final long count = toLong(exprs[0], qc);
+    final long count = toLong(arg(0), qc);
     return new Iter() {
       long c = count;
 
@@ -35,7 +35,7 @@ public final class RandomGaussian extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final long count = toLong(exprs[0], qc);
+    final long count = toLong(arg(0), qc);
     final DoubleList values = new DoubleList(Seq.initialCapacity(count));
     for(long c = 0; c < count; c++) values.add(RND.nextGaussian());
     return DblSeq.get(values.finish());

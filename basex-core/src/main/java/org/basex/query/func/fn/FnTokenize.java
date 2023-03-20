@@ -29,7 +29,7 @@ public final class FnTokenize extends RegEx {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final byte[] pattern = pattern(qc), value = input(pattern, qc);
-    final boolean simple = pattern == DEFAULT || exprs.length < 3;
+    final boolean simple = pattern == DEFAULT || !defined(2);
     final int vl = value.length;
 
     if(simple) {
@@ -55,7 +55,7 @@ public final class FnTokenize extends RegEx {
       }
     }
 
-    final Pattern p = pattern(pattern, simple ? null : exprs[2], qc, true);
+    final Pattern p = pattern(pattern, simple ? null : arg(2), qc, true);
     return vl == 0 ? Empty.ITER : new Iter() {
       final String string = string(value);
       final Matcher matcher = p.matcher(string);
@@ -78,7 +78,7 @@ public final class FnTokenize extends RegEx {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] pattern = pattern(qc), value = input(pattern, qc);
-    final boolean simple = pattern == DEFAULT || exprs.length < 3;
+    final boolean simple = pattern == DEFAULT || !defined(2);
     final int vl = value.length;
 
     if(simple) {
@@ -86,7 +86,7 @@ public final class FnTokenize extends RegEx {
       if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(split(value, ch, true));
     }
 
-    final Pattern p = pattern(pattern, simple ? null : exprs[2], qc, true);
+    final Pattern p = pattern(pattern, simple ? null : arg(2), qc, true);
     if(vl == 0) return Empty.VALUE;
 
     final TokenList tl = new TokenList();
@@ -106,8 +106,7 @@ public final class FnTokenize extends RegEx {
    * @throws QueryException query exception
    */
   private byte[] pattern(final QueryContext qc) throws QueryException {
-    final int el = exprs.length;
-    final byte[] pattern = el > 1 ? toTokenOrNull(exprs[1], qc) : null;
+    final byte[] pattern = toTokenOrNull(arg(1), qc);
     return pattern != null ? pattern : DEFAULT;
   }
 
@@ -119,13 +118,13 @@ public final class FnTokenize extends RegEx {
    * @throws QueryException query exception
    */
   private byte[] input(final byte[] pattern, final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(arg(0), qc);
     return pattern == DEFAULT ? normalize(value) : value;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr value = exprs[0], pattern = exprs.length > 1 ? exprs[1] : null;
+    final Expr value = arg(0), pattern = arg(1);
 
     // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
     if(NORMALIZE_SPACE.is(value) && pattern instanceof Str && eq(((Str) pattern).string(), SPACE)) {
@@ -140,7 +139,8 @@ public final class FnTokenize extends RegEx {
    * @return result of check
    */
   public boolean whitespaces() {
-    final Expr pattern = exprs.length > 1 && exprs[1] != Empty.VALUE ? exprs[1] : null;
-    return pattern == null || pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACES);
+    final Expr pattern = arg(1);
+    return pattern == Empty.VALUE || pattern == Empty.UNDEFINED ||
+        pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACES);
   }
 }

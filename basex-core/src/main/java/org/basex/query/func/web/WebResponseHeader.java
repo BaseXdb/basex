@@ -14,9 +14,9 @@ import org.basex.query.value.*;
 public final class WebResponseHeader extends WebFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final HashMap<String, String> output = toOptions(0, qc);
-    final HashMap<String, String> headers = toOptions(1, qc);
-    final ResponseOptions response = toOptions(2, new ResponseOptions(), true, qc);
+    final HashMap<String, String> output = toOptions(arg(0), qc);
+    final HashMap<String, String> headers = toOptions(arg(1), qc);
+    final ResponseOptions response = toOptions(arg(2), new ResponseOptions(), true, qc);
 
     return createResponse(response, headers, output);
   }

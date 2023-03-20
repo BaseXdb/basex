@@ -17,8 +17,8 @@ import org.basex.util.*;
 public final class ArrayFilter extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
-    final FItem predicate = toFunction(exprs[1], 1, qc);
+    final XQArray array = toArray(arg(0), qc);
+    final FItem predicate = toFunction(arg(1), 1, qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
@@ -31,12 +31,12 @@ public final class ArrayFilter extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = exprs[0];
+    final Expr array = arg(0);
     if(array == XQArray.empty()) return array;
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      exprs[1] = coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType);
+      arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType));
       exprType.assign(type);
     }
     return this;

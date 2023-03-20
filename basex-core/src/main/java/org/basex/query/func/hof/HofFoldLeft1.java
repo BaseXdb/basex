@@ -20,8 +20,8 @@ import org.basex.query.value.type.*;
 public final class HofFoldLeft1 extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final FItem action = toFunction(exprs[1], 2, qc);
+    final Iter input = arg(0).iter(qc);
+    final FItem action = toFunction(arg(1), 2, qc);
 
     Value value = checkNoEmpty(input.next());
     for(Item item; (item = input.next()) != null;) {
@@ -32,14 +32,14 @@ public final class HofFoldLeft1 extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], action = exprs[1];
+    final Expr input = arg(0);
     if(input.seqType().zero()) throw EMPTYFOUND.get(info);
 
     // unroll fold
-    if(action instanceof Value) {
+    if(arg(1) instanceof Value) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final FItem func = toFunction(action, 2, cc.qc);
+        final FItem func = toFunction(arg(1), 2, cc.qc);
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {
@@ -49,7 +49,7 @@ public final class HofFoldLeft1 extends StandardFunc {
       }
     }
 
-    final FuncType ft = action.funcType();
+    final FuncType ft = arg(1).funcType();
     if(ft != null) exprType.assign(ft.declType);
     return this;
   }

@@ -3,13 +3,16 @@ package org.basex.query.func.fn;
 import static org.basex.query.func.Function.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -39,8 +42,8 @@ public class FnItemsAt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item evalItem(final QueryContext qc) throws QueryException {
-    final Expr input = exprs[0];
-    final long at = toLong(exprs[1], qc) - 1;
+    final Expr input = arg(0);
+    final long at = toLong(arg(1), qc) - 1;
 
     // retrieve (possibly invalid) position
     if(at < 0) return Empty.VALUE;
@@ -67,8 +70,8 @@ public class FnItemsAt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter evalIter(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc);
-    final Iter at = exprs[1].iter(qc);
+    final Value input = arg(0).value(qc);
+    final Iter at = arg(1).iter(qc);
     final long size = input.size();
     return new Iter() {
       @Override
@@ -84,7 +87,7 @@ public class FnItemsAt extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0], at = exprs[1];
+    final Expr input = arg(0), at = arg(1);
     final SeqType ist = input.seqType(), ast = at.seqType();
     if(ist.zero()) return input;
     if(ast.zero()) return Empty.VALUE;
@@ -145,7 +148,7 @@ public class FnItemsAt extends StandardFunc {
       }
     }
 
-    final long diff = countInputDiff(1);
+    final long diff = countInputDiff(arg(0), arg(1));
     if(diff != Long.MIN_VALUE) {
       // items-at(E, count(E))  ->  util:last(E)
       if(diff == 0) return cc.function(FOOT, info, input);
@@ -177,5 +180,29 @@ public class FnItemsAt extends StandardFunc {
 
     // ignore standard limitation for large values to speed up evaluation of result
     return allAreValues(false) ? value(cc.qc) : embed(cc, false);
+  }
+
+  /**
+   * Returns the difference to the input length in an argument that counts the length
+   * of an input expression.
+   * @param input input expression
+   * @param end end expression (can be {@code Empty#UNDEFINED})
+   * @return length, or {@code Long#MIN_VALUE} if the value cannot be statically retrieved.
+   */
+  static long countInputDiff(final Expr input, final Expr end) {
+    if(end != Empty.UNDEFINED) {
+      final Predicate<Expr> countInput = e ->
+        Function.COUNT.is(e) && e.arg(0).equals(input) && !e.has(Flag.NDT);
+      // function(E, count(E))  ->  0
+      if(countInput.test(end)) return 0;
+      // function(E, count(E) - 1)  ->  -1
+      if(end instanceof Arith && countInput.test(end.arg(0)) && end.arg(1) instanceof Int) {
+        final Calc calc = ((Arith) end).calc;
+        final long sum = ((Int) end.arg(1)).itr();
+        if(calc == Calc.PLUS) return sum;
+        if(calc == Calc.MINUS) return -sum;
+      }
+    }
+    return Long.MIN_VALUE;
   }
 }

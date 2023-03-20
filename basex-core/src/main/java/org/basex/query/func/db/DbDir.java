@@ -42,7 +42,7 @@ public final class DbDir extends DbList {
    */
   private Value resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final String string = toString(exprs[1], qc);
+    final String string = toString(arg(1), qc);
 
     String path = MetaData.normPath(string);
     if(path == null) throw DB_PATH_X.get(info, string);

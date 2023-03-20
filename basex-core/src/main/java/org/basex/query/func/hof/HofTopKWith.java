@@ -19,9 +19,9 @@ import org.basex.util.*;
 public final class HofTopKWith extends HofFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     final Comparator<Item> comparator = comparator(qc);
-    final long k = Math.min(toLong(exprs[2], qc), Integer.MAX_VALUE);
+    final long k = Math.min(toLong(arg(2), qc), Integer.MAX_VALUE);
     if(k < 1) return Empty.VALUE;
 
     final MinHeap<Item, Item> heap = new MinHeap<>(comparator);
@@ -42,7 +42,7 @@ public final class HofTopKWith extends HofFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     // even single items must be sorted, as the input might be invalid
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);
   }
 }

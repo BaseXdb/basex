@@ -27,7 +27,7 @@ abstract class HashFn extends StandardFunc {
    * @throws QueryException exception
    */
   final B64 hash(final String algo, final QueryContext qc) throws QueryException {
-    final Item value = exprs[0].atomItem(qc, info);
+    final Item value = arg(0).atomItem(qc, info);
     try {
       final MessageDigest md = MessageDigest.getInstance(algo);
       if(value instanceof B64Lazy) {

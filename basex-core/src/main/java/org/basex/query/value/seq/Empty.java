@@ -20,6 +20,9 @@ import org.basex.util.*;
 public final class Empty extends Item {
   /** Singleton instance. */
   public static final Empty VALUE = new Empty();
+  /** Placeholder for an undefined function argument. */
+  public static final Empty UNDEFINED = new Empty();
+
   /** Empty iterator. */
   public static final BasicIter<Item> ITER = new BasicIter<>(0) {
     @Override

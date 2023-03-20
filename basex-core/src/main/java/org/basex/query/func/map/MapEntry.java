@@ -18,16 +18,16 @@ import org.basex.util.*;
 public final class MapEntry extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item key = toAtomItem(exprs[0], qc);
-    final Value value = exprs[1].value(qc);
+    final Item key = toAtomItem(arg(0), qc);
+    final Value value = arg(1).value(qc);
 
     return XQMap.entry(key, value, info);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final AtomType type = exprs[0].seqType().type.atomic();
-    if(type != null) exprType.assign(MapType.get(type, exprs[1].seqType()));
+    final AtomType type = arg(0).seqType().type.atomic();
+    if(type != null) exprType.assign(MapType.get(type, arg(1).seqType()));
     return this;
   }
 

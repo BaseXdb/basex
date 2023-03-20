@@ -20,7 +20,7 @@ public class UpdateOutput extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(qc.updates().mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);
 
-    qc.updates().addOutput(exprs[0].value(qc), qc);
+    qc.updates().addOutput(arg(0).value(qc), qc);
     return Empty.VALUE;
   }
 }

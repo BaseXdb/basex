@@ -25,8 +25,8 @@ public final class FnIndexWhere extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    final Iter input = exprs[0].iter(qc);
-    final FItem predicate = toFunction(exprs[1], 1, qc);
+    final Iter input = arg(0).iter(qc);
+    final FItem predicate = toFunction(arg(1), 1, qc);
 
     int c = 0;
     final LongList list = new LongList();
@@ -41,7 +41,7 @@ public final class FnIndexWhere extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
@@ -54,7 +54,7 @@ public final class FnIndexWhere extends StandardFunc {
     final Var p = cc.copy(new Var(new QNm("p"), SeqType.INTEGER_O, cc.qc, sc, info), vm);
     clauses.add(new For(i, p, null, input, false).optimize(cc));
 
-    final Expr pred = coerceFunc(exprs[1], cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE));
+    final Expr pred = coerceFunc(arg(1), cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE));
     final Expr arg = new VarRef(info, i).optimize(cc);
     clauses.add(new Where(new DynFuncCall(info, sc, pred, arg).optimize(cc), info).optimize(cc));
 

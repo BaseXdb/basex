@@ -169,4 +169,29 @@ public final class ArithTest extends QueryPlanTest {
     check(wrap(1) + "- 1 != " + wrap(1) + " - 2", true,
         count(Arith.class, 1), count(Int.class, 1));
   }
+
+  /** Error in arithmetic calculation result comparison. */
+  @Test public void gh2188() {
+    check("<x _='1'/>/@* *  2 >= -2", true, empty(Arith.class));
+    check("<x _='1'/>/@* *  2 >  -2", true, empty(Arith.class));
+    check("<x _='1'/>/@* *  2 <= -2", false, empty(Arith.class));
+    check("<x _='1'/>/@* *  2 <  -2", false, empty(Arith.class));
+    check("<x _='1'/>/@* *  2  = -2", false, empty(Arith.class));
+    check("<x _='1'/>/@* *  2 != -2", true, empty(Arith.class));
+
+    check("<x _='1'/>/@* * -2 >= 2", false, exists(Arith.class));
+    check("<x _='1'/>/@* * -2 >  2", false, exists(Arith.class));
+    check("<x _='1'/>/@* * -2 <= 2", true, exists(Arith.class));
+    check("<x _='1'/>/@* * -2 <  2", true, exists(Arith.class));
+    check("<x _='1'/>/@* * -2  = 2", false, empty(Arith.class));
+    check("<x _='1'/>/@* * -2 != 2", true, empty(Arith.class));
+  }
+
+  /** Unexpected exception of division by zero. */
+  @Test public void gh2189() {
+    check("<x _='1'/>/@* * 0  = 0", true, exists(Arith.class));
+    check("<x _='1'/>/@* * 0  > 0", false, exists(Arith.class));
+    check("<x _='1'/>/@* * 0  = 0", true, exists(Arith.class));
+    check("<x _='1'/>/@* * 0 != 0", false, exists(Arith.class));
+  }
 }

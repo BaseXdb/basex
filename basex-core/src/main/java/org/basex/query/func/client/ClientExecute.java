@@ -21,7 +21,7 @@ public final class ClientExecute extends ClientFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ClientSession cs = session(qc, false);
-    final String cmd = toString(exprs[1], qc);
+    final String cmd = toString(arg(1), qc);
 
     try {
       final ArrayOutput ao = new ArrayOutput();

@@ -9,7 +9,6 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -108,13 +107,13 @@ final class SimplePos extends Arr implements CmpPos {
   @Override
   public int test(final long pos, final QueryContext qc) throws QueryException {
     final Item min = exprs[0].atomItem(qc, info);
-    if(min == Empty.VALUE) return 0;
+    if(min.isEmpty()) return 0;
     final double mn = toDouble(min), mx;
     if(exact()) {
       mx = mn;
     } else {
       final Item max = exprs[1].atomItem(qc, info);
-      if(max == Empty.VALUE) return 0;
+      if(max.isEmpty()) return 0;
       mx = toDouble(max);
     }
     return pos == mx ? 2 : pos >= mn && pos <= mx ? 1 : 0;

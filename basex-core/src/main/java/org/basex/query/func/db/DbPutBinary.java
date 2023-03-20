@@ -19,8 +19,8 @@ public final class DbPutBinary extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final Item input = toNodeOrAtomItem(1, qc);
-    final String path = toDbPath(2, qc);
+    final Item input = toNodeOrAtomItem(arg(1), qc);
+    final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw RESINV_X.get(info, path);
 

@@ -24,7 +24,7 @@ import org.basex.util.*;
 public class FnOp extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String operator = toString(exprs[0], qc);
+    final String operator = toString(arg(0), qc);
 
     final int pl =  2;
     final VarScope vs = new VarScope(sc);

@@ -22,16 +22,16 @@ import org.basex.util.list.*;
 public final class UserCreate extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toInactiveName(0, qc);
-    final String password = toString(exprs[1], qc);
-    final ArrayList<Perm> perms = toPermissions(2, qc);
-    final StringList patterns = toPatterns(3, qc);
+    final String name = toInactiveName(arg(0), qc);
+    final String password = toString(arg(1), qc);
+    final ArrayList<Perm> perms = toPermissions(arg(2), qc);
+    final StringList patterns = toPatterns(arg(3), qc);
 
     final User user = new User(name, password);
     if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
 
-    if(exprs.length > 4) {
-      final ANode node = toElem(exprs[4], qc);
+    if(defined(4)) {
+      final ANode node = toElem(arg(4), qc);
       if(!T_INFO.matches(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
       user.info(node.materialize(n -> false, info, qc));
     }

@@ -31,7 +31,7 @@ public class FnJsonDoc extends Parse {
       Util.debug(ex);
       throw ex.error() == INVCHARS_X ? PARSE_JSON_X.get(info, ex.getLocalizedMessage()) : ex;
     }
-    return item == Empty.VALUE ? Empty.VALUE : parse(item.string(info), false, qc);
+    return item.isEmpty() ? Empty.VALUE : parse(item.string(info), false, qc);
   }
 
   @Override
@@ -50,7 +50,7 @@ public class FnJsonDoc extends Parse {
   final Item parse(final byte[] json, final boolean xml, final QueryContext qc)
       throws QueryException {
 
-    final JsonParserOptions options = toOptions(1, new JsonParserOptions(), false, qc);
+    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), false, qc);
     final boolean esc = options.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
     final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, info);

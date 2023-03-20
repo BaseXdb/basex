@@ -16,17 +16,16 @@ import org.basex.util.*;
 public final class CryptoGenerateSignature extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int el = exprs.length;
-    final ANode node = toNode(exprs[0], qc);
-    final byte[] can = toToken(exprs[1], qc);
-    final byte[] dig = toToken(exprs[2], qc);
-    final byte[] sig = toToken(exprs[3], qc);
-    final byte[] ns = toToken(exprs[4], qc);
-    final byte[] tp = toToken(exprs[5], qc);
-    final Item arg6 = el > 6 ? toNodeOrAtomItem(6, qc) : Empty.VALUE;
-    final ANode arg7 = el > 7 ? toNode(exprs[7], qc) : null;
+    final ANode node = toNode(arg(0), qc);
+    final byte[] can = toToken(arg(1), qc);
+    final byte[] dig = toToken(arg(2), qc);
+    final byte[] sig = toToken(arg(3), qc);
+    final byte[] ns = toToken(arg(4), qc);
+    final byte[] tp = toToken(arg(5), qc);
+    final Item arg6 = defined(6) ? toNodeOrAtomItem(arg(6), qc) : Empty.VALUE;
+    final ANode arg7 = toNodeOrNull(arg(7), qc);
 
-    final byte[] path = arg6 == Empty.VALUE || arg6 instanceof ANode ? Token.EMPTY : toToken(arg6);
+    final byte[] path = arg6.isEmpty() || arg6 instanceof ANode ? Token.EMPTY : toToken(arg6);
     final ANode cert = arg7 != null ? arg7 : arg6 instanceof ANode ? toNode(arg6) : null;
     return new DigitalSignature(info).generate(node, can, dig, sig, ns, tp, path, cert, qc);
   }

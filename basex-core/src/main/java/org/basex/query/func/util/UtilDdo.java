@@ -22,7 +22,7 @@ import org.basex.query.value.type.*;
 public final class UtilDdo extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter nodes = exprs[0].iter(qc);
+    final Iter nodes = arg(0).iter(qc);
     if(nodes.valueIter()) {
       final Value value = nodes.value(qc, null);
       if(value instanceof DBNodeSeq) return value;
@@ -37,14 +37,14 @@ public final class UtilDdo extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr nodes = exprs[0];
+    Expr nodes = arg(0);
 
     // replace list with union:
     // util:ddo((<a/>, <b/>))  ->  <a/> | <b/>
     // util:ddo(($a, $a))  ->  $a
     if(nodes instanceof List) {
       nodes = ((List) nodes).toUnion(cc);
-      if(nodes != exprs[0]) return nodes;
+      if(nodes != arg(0)) return nodes;
     }
 
     final Type type = nodes.seqType().type;

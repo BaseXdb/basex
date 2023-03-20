@@ -29,8 +29,8 @@ import org.basex.query.value.type.*;
 public final class FnDistinctValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter values = exprs[0].atomIter(qc, info);
-    final Collation coll = toCollation(1, qc);
+    final Iter values = arg(0).atomIter(qc, info);
+    final Collation coll = toCollation(arg(1), qc);
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     return new Iter() {
@@ -51,12 +51,12 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr values = exprs[0];
+    final Expr values = arg(0);
     final SeqType st = values.seqType();
     if(st.zero()) return values;
 
@@ -75,7 +75,7 @@ public final class FnDistinctValues extends StandardFunc {
 
     final AtomType type = st.type.atomic();
     if(type != null) {
-      if(exprs.length < 2) {
+      if(!defined(1)) {
         // distinct-values(1 to 10)  ->  1 to 10
         if(values instanceof Range || values instanceof RangeSeq || values == BlnSeq.DISTINCT)
           return values;
@@ -112,8 +112,8 @@ public final class FnDistinctValues extends StandardFunc {
    * @throws QueryException query exception
    */
   private Expr optStats(final CompileContext cc) throws QueryException {
-    final Expr values = exprs[0];
-    if(exprs.length < 2 && values instanceof Path) {
+    final Expr values = arg(0);
+    if(!defined(1) && values instanceof Path) {
       final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);

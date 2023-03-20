@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class InspectModule extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new PlainDoc(qc, info).parse(toContent(toString(exprs[0], qc), qc));
+    return new PlainDoc(qc, info).parse(toContent(toString(arg(0), qc), qc));
   }
 }

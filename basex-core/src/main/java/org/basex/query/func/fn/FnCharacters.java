@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 public class FnCharacters extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(arg(0), qc);
     final int vl = value.length;
     if(vl == 0) return Empty.ITER;
 
@@ -57,7 +57,7 @@ public class FnCharacters extends StandardFunc {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(arg(0), qc);
     final int vl = value.length;
     if(vl == 0) return Empty.VALUE;
 

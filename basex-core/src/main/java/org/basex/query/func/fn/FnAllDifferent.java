@@ -23,8 +23,8 @@ import org.basex.util.*;
 public final class FnAllDifferent extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter values = exprs[0].atomIter(qc, info);
-    final Collation coll = toCollation(1, qc);
+    final Iter values = arg(0).atomIter(qc, info);
+    final Collation coll = toCollation(arg(1), qc);
 
     final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
     for(Item item; (item = qc.next(values)) != null;) {
@@ -35,13 +35,13 @@ public final class FnAllDifferent extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    exprs[0] = exprs[0].simplifyFor(Simplify.DATA, cc);
+    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr values = exprs[0];
-    if(exprs.length < 2) {
+    final Expr values = arg(0);
+    if(!defined(1)) {
       final SeqType st = values.seqType();
       final AtomType type = st.type.atomic();
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())

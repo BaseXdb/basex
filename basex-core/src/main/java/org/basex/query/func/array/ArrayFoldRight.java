@@ -18,9 +18,9 @@ import org.basex.query.value.item.*;
 public final class ArrayFoldRight extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(exprs[0], qc);
-    Value result = exprs[1].value(qc);
-    final FItem action = toFunction(exprs[2], 2, qc);
+    final XQArray array = toArray(arg(0), qc);
+    Value result = arg(1).value(qc);
+    final FItem action = toFunction(arg(2), 2, qc);
 
     for(final ListIterator<Value> iter = array.iterator(array.arraySize()); iter.hasPrevious();) {
       result = action.invoke(qc, info, iter.previous(), result);
@@ -30,7 +30,7 @@ public final class ArrayFoldRight extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = exprs[0], zero = exprs[1];
+    final Expr array = arg(0), zero = arg(1);
     if(array == XQArray.empty()) return zero;
 
     FnFoldLeft.opt(this, cc, true, false);

@@ -27,12 +27,12 @@ public class ProfTime extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    return adoptType(exprs[0]);
+    return adoptType(arg(0));
   }
 
   @Override
   public boolean ddo() {
-    return exprs[0].ddo();
+    return arg(0).ddo();
   }
 
   /**
@@ -43,8 +43,8 @@ public class ProfTime extends StandardFunc {
    * @throws QueryException query exception
    */
   final Value value(final QueryContext qc, final Supplier<byte[]> func) throws QueryException {
-    final Value value = exprs[0].value(qc);
-    final byte[] label = exprs.length > 1 ? toToken(exprs[1], qc) : null;
+    final Value value = arg(0).value(qc);
+    final byte[] label = toTokenOrNull(arg(1), qc);
     FnTrace.trace(func.get(), label, qc);
     return value;
   }

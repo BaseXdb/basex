@@ -12,6 +12,6 @@ import org.basex.query.value.item.*;
 public final class FilePathToUri extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException {
-    return Uri.get(toPath(0, qc).toUri().toString());
+    return Uri.get(toPath(arg(0), qc).toUri().toString());
   }
 }

@@ -17,8 +17,8 @@ import org.basex.query.value.type.*;
 public class HofTakeWhile extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final FItem predicate = toFunction(exprs[1], 1, qc);
+    final Iter input = arg(0).iter(qc);
+    final FItem predicate = toFunction(arg(1), 1, qc);
 
     // value-based iterator
     final Value value = value(input, predicate, qc);
@@ -36,8 +36,8 @@ public class HofTakeWhile extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final FItem predicate = toFunction(exprs[1], 1, qc);
+    final Iter input = arg(0).iter(qc);
+    final FItem predicate = toFunction(arg(1), 1, qc);
 
     // value-based iterator
     final Value value = value(input, predicate, qc);
@@ -85,7 +85,7 @@ public class HofTakeWhile extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 

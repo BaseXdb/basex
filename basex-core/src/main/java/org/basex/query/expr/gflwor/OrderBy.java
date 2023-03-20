@@ -103,12 +103,12 @@ public final class OrderBy extends Clause {
                 Item m = a[k], n = b[k];
                 if(m == Dbl.NAN || m == Flt.NAN) m = Empty.VALUE;
                 if(n == Dbl.NAN || n == Flt.NAN) n = Empty.VALUE;
-                if(m != Empty.VALUE && n != Empty.VALUE && !m.comparable(n))
+                if(!m.isEmpty() && !n.isEmpty() && !m.comparable(n))
                   throw typeError(n, m.type, key.info());
 
-                final int c = m == Empty.VALUE
-                    ? n == Empty.VALUE ? 0                 : key.least ? -1 : 1
-                    : n == Empty.VALUE ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info());
+                final int c = m.isEmpty()
+                    ? n.isEmpty() ? 0             : key.least ? -1 : 1
+                    : n.isEmpty() ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info());
                 if(c != 0) return key.desc ? -c : c;
               }
               return 0;

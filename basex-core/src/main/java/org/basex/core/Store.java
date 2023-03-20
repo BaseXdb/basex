@@ -79,7 +79,7 @@ public final class Store implements Closeable {
   public synchronized void put(final byte[] key, final Value value) {
     init();
     dirty = true;
-    if(value == Empty.VALUE) map.remove(key);
+    if(value.isEmpty()) map.remove(key);
     else map.put(key, value);
   }
 

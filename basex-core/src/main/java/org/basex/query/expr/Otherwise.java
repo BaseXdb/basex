@@ -60,7 +60,7 @@ public final class Otherwise extends Arr {
   public Value value(final QueryContext qc) throws QueryException {
     for(final Expr expr : exprs) {
       final Value value = expr.value(qc);
-      if(value != Empty.VALUE) return value;
+      if(!value.isEmpty()) return value;
     }
     return Empty.VALUE;
   }

@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class JobBindings extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String id = toString(exprs[0], qc);
+    final String id = toString(arg(0), qc);
     final JobPool jobs = qc.context.jobs;
 
     Job job = jobs.active.get(id);

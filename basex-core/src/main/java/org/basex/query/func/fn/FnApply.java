@@ -21,8 +21,8 @@ import org.basex.query.value.type.*;
 public class FnApply extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final FItem func = toFunction(exprs[0], qc);
-    final XQArray args = toArray(exprs[1], qc);
+    final FItem func = toFunction(arg(0), qc);
+    final XQArray args = toArray(arg(1), qc);
 
     final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = args.arraySize();
     if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, args);
@@ -34,7 +34,7 @@ public class FnApply extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr func = exprs[0], args = exprs[1];
+    final Expr func = arg(0), args = arg(1);
     FuncType ft = func.funcType();
     final FuncType ftArgs = args.funcType();
 
@@ -46,7 +46,7 @@ public class FnApply extends StandardFunc {
         final int as = Math.max(0, (int) array.arraySize());
         final SeqType[] ast = new SeqType[as];
         for(int a = 0; a < as; a++) ast[a] = array.get(a).seqType();
-        exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, ast);
+        arg(0, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ast));
       } else if(ft != null) {
         // argument will be of type array: assign generic array return type to all arguments
         final SeqType[] at = ft.argTypes;
@@ -55,12 +55,12 @@ public class FnApply extends StandardFunc {
           final SeqType[] ast = new SeqType[al];
           final ArrayType at2 = (ArrayType) ftArgs;
           for(int a = 0; a < al; a++) ast[a] = at2.declType;
-          exprs[0] = coerceFunc(exprs[0], cc, SeqType.ITEM_ZM, ast);
+          arg(0, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ast));
         }
       }
     }
 
-    ft = exprs[0].funcType();
+    ft = arg(0).funcType();
     if(ft != null) exprType.assign(ft.declType);
     return this;
   }

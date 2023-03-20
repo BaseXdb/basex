@@ -32,10 +32,10 @@ public class FileCopy extends FileFn {
   final synchronized void relocate(final boolean copy, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path source = toPath(0, qc);
+    final Path source = toPath(arg(0), qc);
     if(!Files.exists(source)) throw FILE_NOT_FOUND_X.get(info, source.toAbsolutePath());
     final Path src = absolute(source);
-    Path trg = absolute(toPath(1, qc));
+    Path trg = absolute(toPath(arg(1), qc));
 
     if(Files.isDirectory(trg)) {
       // target is a directory: attach file name

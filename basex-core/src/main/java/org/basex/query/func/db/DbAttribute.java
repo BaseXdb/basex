@@ -16,7 +16,7 @@ public class DbAttribute extends DbText {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    return attribute(data, valueAccess(data, qc), qc, 2);
+    return attribute(arg(2), data, valueAccess(data, qc), qc);
   }
 
   @Override

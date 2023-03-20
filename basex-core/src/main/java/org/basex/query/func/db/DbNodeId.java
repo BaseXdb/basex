@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public class DbNodeId extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final Iter nodes = exprs[0].iter(qc);
+    final Iter nodes = arg(0).iter(qc);
     return new Iter() {
       @Override
       public Int next() throws QueryException {
@@ -31,7 +31,7 @@ public class DbNodeId extends StandardFunc {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Iter nodes = exprs[0].iter(qc);
+    final Iter nodes = arg(0).iter(qc);
     final LongList list = new LongList(Seq.initialCapacity(nodes.size()));
     for(Item item; (item = qc.next(nodes)) != null;) list.add(id(toDBNode(item, false)));
     return IntSeq.get(list);
@@ -39,7 +39,7 @@ public class DbNodeId extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final Expr nodes = exprs[0];
+    final Expr nodes = arg(0);
     exprType.assign(seqType(), nodes.seqType().occ, nodes.size());
     return this;
   }

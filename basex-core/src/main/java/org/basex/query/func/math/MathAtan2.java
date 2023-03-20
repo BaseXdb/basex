@@ -16,6 +16,6 @@ import org.basex.util.*;
 public final class MathAtan2 extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Dbl.get(atan2(toDouble(exprs[0], qc), toDouble(exprs[1], qc)));
+    return Dbl.get(atan2(toDouble(arg(0), qc), toDouble(arg(1), qc)));
   }
 }

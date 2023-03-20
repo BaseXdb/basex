@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -18,12 +17,13 @@ import org.basex.util.*;
 public final class StringFormat extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String format = toString(exprs[0], qc);
-    final int el = exprs.length;
-    final Object[] args = new Object[el - 1];
-    for(int e = 1; e < el; e++) {
-      final Item item = exprs[e].item(qc, info);
-      args[e - 1] = item == Empty.VALUE ? null : item.type.isUntyped() ? string(item.string(info)) :
+    final String format = toString(arg(0), qc);
+
+    final int al = args().length;
+    final Object[] args = new Object[al - 1];
+    for(int a = 1; a < al; a++) {
+      final Item item = arg(a).item(qc, info);
+      args[a - 1] = item.isEmpty() ? null : item.type.isUntyped() ? string(item.string(info)) :
         item.toJava();
     }
     try {

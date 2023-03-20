@@ -68,7 +68,8 @@ public final class CmpR extends Single {
    */
   static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final double min, final double max) throws QueryException {
-    return min > max ? Bln.FALSE : min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ? Bln.TRUE :
+    return min > max ? Bln.FALSE : min == NEGATIVE_INFINITY && max == POSITIVE_INFINITY ?
+      cc.function(Function.EXISTS, info, expr) :
       new CmpR(expr, min, max, info).optimize(cc);
   }
 
@@ -144,7 +145,7 @@ public final class CmpR extends Single {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return Bln.get(item != Empty.VALUE && inRange(item));
+      return Bln.get(!item.isEmpty() && inRange(item));
     }
 
     // pre-evaluate ranges

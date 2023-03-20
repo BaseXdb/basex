@@ -18,7 +18,7 @@ import org.basex.query.value.seq.*;
 public final class FileCreateDir extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws QueryException, IOException {
-    final Path path = absolute(toPath(0, qc));
+    final Path path = absolute(toPath(arg(0), qc));
 
     // find the lowest existing path
     for(Path p = path; p != null;) {

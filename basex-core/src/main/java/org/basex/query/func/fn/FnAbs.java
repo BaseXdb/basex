@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class FnAbs extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANum value = toNumberOrNull(exprs[0], qc);
+    final ANum value = toNumberOrNull(arg(0), qc);
     return value == null ? Empty.VALUE : value.abs();
   }
 
@@ -26,7 +26,7 @@ public final class FnAbs extends StandardFunc {
     final Expr expr = optFirst();
     if(expr != this) return expr;
 
-    Type type = exprs[0].seqType().type;
+    Type type = arg(0).seqType().type;
     if(type.isUntyped()) type = AtomType.DOUBLE;
     if(type.isNumber()) {
       exprType.assign(type.instanceOf(AtomType.INTEGER) ? AtomType.INTEGER : type);

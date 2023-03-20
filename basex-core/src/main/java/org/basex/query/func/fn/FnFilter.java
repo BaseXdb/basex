@@ -18,8 +18,8 @@ public final class FnFilter extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup
-    final Iter input = exprs[0].iter(qc);
-    final FItem predicate = toFunction(exprs[1], 1, qc);
+    final Iter input = arg(0).iter(qc);
+    final FItem predicate = toFunction(arg(1), 1, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
@@ -32,14 +32,14 @@ public final class FnFilter extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
     // create filter expression
     // filter(INPUT, PREDICATE)  ->  INPUT[FUNCTION(.)]
     final Expr predicate = cc.get(input, () -> {
-      final Expr dfc = new DynFuncCall(info, sc, exprs[1], ContextValue.get(cc, info)).optimize(cc);
+      final Expr dfc = new DynFuncCall(info, sc, arg(1), ContextValue.get(cc, info)).optimize(cc);
       return new TypeCheck(sc, info, dfc, SeqType.BOOLEAN_O, true).optimize(cc);
     });
     return Filter.get(cc, info, input, cc.function(Function.BOOLEAN, info, predicate));

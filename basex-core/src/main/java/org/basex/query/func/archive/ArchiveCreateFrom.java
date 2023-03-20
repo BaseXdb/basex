@@ -24,16 +24,16 @@ import org.basex.util.list.*;
 public class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IOFile root = new IOFile(toPath(0, qc).toString());
+    final IOFile root = new IOFile(toPath(arg(0), qc).toString());
     if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
 
-    final CreateFromOptions options = toOptions(1, new CreateFromOptions(), true, qc);
+    final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), true, qc);
     final boolean recursive = options.get(CreateFromOptions.RECURSIVE);
     final boolean rootDir = options.get(CreateFromOptions.ROOT_DIR);
 
     final Iter entries;
-    if(exprs.length > 2) {
-      entries = exprs[2].iter(qc);
+    if(defined(2)) {
+      entries = arg(2).iter(qc);
     } else {
       final TokenList tl = new TokenList();
       if(recursive) {

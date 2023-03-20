@@ -511,6 +511,18 @@ public enum Calc {
   public abstract Calc invert();
 
   /**
+   * Checks if this is one of the specified types.
+   * @param calcs types
+   * @return result of check
+   */
+  public final boolean oneOf(final Calc... calcs) {
+    for(final Calc calc : calcs) {
+      if(this == calc) return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the numeric type with the highest precedence.
    * @param type1 first item type
    * @param type2 second item type

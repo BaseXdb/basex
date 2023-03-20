@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -20,24 +19,22 @@ public final class FnFormatNumber extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // evaluate arguments
-    Item value = exprs[0].atomItem(qc, info);
-    if(value == Empty.VALUE) value = Dbl.NAN;
+    Item value = arg(0).atomItem(qc, info);
+    if(value.isEmpty()) value = Dbl.NAN;
     else if(value.type.isUntyped()) value = Dbl.get(value.dbl(info));
     else if(!value.type.isNumberOrUntyped()) throw numberError(this, value);
 
     // retrieve picture
-    final byte[] picture = toToken(exprs[1], qc);
+    final byte[] picture = toToken(arg(1), qc);
     // retrieve format declaration
     QNm format = QNm.EMPTY;
-    if(exprs.length > 2) {
-      final byte[] name = toTokenOrNull(exprs[2], qc);
-      if(name != null) {
-        try {
-          format = QNm.resolve(trim(name), sc);
-        } catch(final QueryException ex) {
-          Util.debug(ex);
-          throw FORMNUM_X.get(info, name);
-        }
+    final byte[] name = toTokenOrNull(arg(2), qc);
+    if(name != null) {
+      try {
+        format = QNm.resolve(trim(name), sc);
+      } catch(final QueryException ex) {
+        Util.debug(ex);
+        throw FORMNUM_X.get(info, name);
       }
     }
     final DecFormatter df = sc.decFormat(format.id());

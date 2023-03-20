@@ -24,13 +24,13 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Item text = unparsedText(qc, false, true);
-    return text == Empty.VALUE ? Empty.ITER : new LinesIter(text.string(info));
+    return text.isEmpty() ? Empty.ITER : new LinesIter(text.string(info));
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item text = unparsedText(qc, false, true);
-    if(text == Empty.VALUE) return Empty.VALUE;
+    if(text.isEmpty()) return Empty.VALUE;
 
     try(NewlineInput ni = new NewlineInput(text.string(info))) {
       final TokenList tl = new TokenList();
@@ -47,7 +47,7 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr href = exprs[0];
+    final Expr href = arg(0);
     return href.seqType().zero() ? href : super.opt(cc);
   }
 

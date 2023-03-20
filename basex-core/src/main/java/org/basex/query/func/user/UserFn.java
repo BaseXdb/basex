@@ -8,11 +8,13 @@ import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.util.list.*;
 
@@ -30,15 +32,16 @@ abstract class UserFn extends StandardFunc {
 
   /**
    * Checks if the specified expression contains valid database patterns.
-   * @param i expression index
+   * @param expr expression (can be {@code Empty#UNDEFINED})
    * @param qc query context
    * @return patterns
    * @throws QueryException query exception
    */
-  protected final StringList toPatterns(final int i, final QueryContext qc) throws QueryException {
+  protected final StringList toPatterns(final Expr expr, final QueryContext qc)
+      throws QueryException {
     final StringList patterns = new StringList();
-    if(exprs.length > i) {
-      final Iter iter = exprs[i].iter(qc);
+    if(expr != Empty.UNDEFINED) {
+      final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final String pattern = toString(item);
         if(!pattern.isEmpty() && !Databases.validPattern(pattern))
@@ -53,24 +56,24 @@ abstract class UserFn extends StandardFunc {
 
   /**
    * Evaluates an expression to a username.
-   * @param i index of argument
+   * @param expr expression
    * @param qc query context
    * @return username
    * @throws QueryException query exception
    */
-  protected final String toName(final int i, final QueryContext qc) throws QueryException {
-    return toName(i, false, USER_NAME_X, qc);
+  protected final String toName(final Expr expr, final QueryContext qc) throws QueryException {
+    return toName(expr, false, USER_NAME_X, qc);
   }
 
   /**
    * Checks if the specified expression references an existing user.
-   * @param i expression index
+   * @param expr expression
    * @param qc query context
    * @return user
    * @throws QueryException query exception
    */
-  protected final User toUser(final int i, final QueryContext qc) throws QueryException {
-    final String name = toName(i, qc);
+  protected final User toUser(final Expr expr, final QueryContext qc) throws QueryException {
+    final String name = toName(expr, qc);
     final User user = qc.context.users.get(name);
     if(user != qc.context.user()) checkPerm(qc, Perm.ADMIN);
     if(user == null) throw USER_UNKNOWN_X.get(info, name);
@@ -79,17 +82,17 @@ abstract class UserFn extends StandardFunc {
 
   /**
    * Checks if the specified expression contains valid permissions.
-   * @param i expression index
+   * @param expr expression (can be {@code Empty#UNDEFINED})
    * @param qc query context
    * @return permissions
    * @throws QueryException query exception
    */
-  protected final ArrayList<Perm> toPermissions(final int i, final QueryContext qc)
+  protected final ArrayList<Perm> toPermissions(final Expr expr, final QueryContext qc)
       throws QueryException {
 
     final ArrayList<Perm> perms = new ArrayList<>();
-    if(exprs.length > i) {
-      final Iter iter = exprs[i].iter(qc);
+    if(expr != Empty.UNDEFINED) {
+      final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final String perm = toString(item);
         final Perm p = Perm.get(perm);
@@ -104,26 +107,28 @@ abstract class UserFn extends StandardFunc {
 
   /**
    * Ensures that no user with the specified name is logged in.
-   * @param i expression index
+   * @param expr expression
    * @param qc query context
    * @return name
    * @throws QueryException query exception
    */
-  protected final String toInactiveName(final int i, final QueryContext qc) throws QueryException {
-    final String name = toName(i, qc);
+  protected final String toInactiveName(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final String name = toName(expr, qc);
     toInactiveUser(qc.context.users.get(name), qc);
     return name;
   }
 
   /**
    * Ensures that the specified user is not logged in.
-   * @param i expression index
+   * @param expr expression
    * @param qc query context
    * @return user
    * @throws QueryException query exception
    */
-  protected final User toInactiveUser(final int i, final QueryContext qc) throws QueryException {
-    return toInactiveUser(toUser(i, qc), qc);
+  protected final User toInactiveUser(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    return toInactiveUser(toUser(expr, qc), qc);
   }
 
   /**

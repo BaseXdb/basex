@@ -47,12 +47,12 @@ public class DbList extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    return exprs.length > 0 ? resources(qc) : list(qc).iter();
+    return defined(0) ? resources(qc) : list(qc).iter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return exprs.length > 0 ? resources(qc).value(qc, this) : list(qc);
+    return defined(0) ? resources(qc).value(qc, this) : list(qc);
   }
 
   /**
@@ -76,7 +76,7 @@ public class DbList extends StandardFunc {
    */
   private Iter resources(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final String path = exprs.length > 1 ? toString(exprs[1], qc) : "";
+    final String path = defined(1) ? toString(arg(1), qc) : "";
 
     final IntList docs = data.resources.docs(path);
     final StringList binaries = data.resources.paths(path, ResourceType.BINARY);
@@ -105,7 +105,7 @@ public class DbList extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (exprs.length > 0 ? dataLock(visitor, false, 0) : visitor.lock((String) null)) &&
+    return (defined(0) ? dataLock(arg(0), false, visitor) : visitor.lock((String) null)) &&
         super.accept(visitor);
   }
 

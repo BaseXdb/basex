@@ -22,8 +22,8 @@ public final class RandomInteger extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long next;
-    if(exprs.length > 0) {
-      final long max = toLong(exprs[0], qc);
+    if(defined(0)) {
+      final long max = toLong(arg(0), qc);
       if(max <= 0 || max > Integer.MAX_VALUE) throw RANDOM_BOUNDS_X.get(info, max);
       next = RND.nextInt((int) max);
     } else {

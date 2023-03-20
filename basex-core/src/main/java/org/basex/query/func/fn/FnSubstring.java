@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class FnSubstring extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(exprs[0], qc);
+    final byte[] value = toZeroToken(arg(0), qc);
     final boolean ascii = Token.ascii(value);
     int length = ascii ? value.length : Token.length(value);
     int start = start(qc), end = length(length, qc);
@@ -29,7 +29,7 @@ public final class FnSubstring extends StandardFunc {
       end += start;
       start = 0;
     }
-    end = Math.min(length, exprs.length > 2 ? start + end : Integer.MAX_VALUE);
+    end = Math.min(length, defined(2) ? start + end : Integer.MAX_VALUE);
     if(start >= end) return Str.EMPTY;
     if(ascii) return Str.get(Token.substring(value, start, end));
 
@@ -47,11 +47,11 @@ public final class FnSubstring extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // empty argument: return empty string
-    final Expr value = exprs[0];
+    final Expr value = arg(0);
     if(value == Empty.VALUE || value == Str.EMPTY) return Str.EMPTY;
 
-    final int start = exprs[1] instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
-    final int length = exprs.length < 3 || exprs[2] instanceof Value ?
+    final int start = arg(1) instanceof Value ? start(cc.qc) : Integer.MAX_VALUE;
+    final int length = !defined(2) || arg(2) instanceof Value ?
       length(Integer.MAX_VALUE, cc.qc) : Integer.MIN_VALUE;
 
     // invalid start offset or zero length: return empty string
@@ -70,7 +70,7 @@ public final class FnSubstring extends StandardFunc {
    * @throws QueryException query exception
    */
   private int start(final QueryContext qc) throws QueryException {
-    final Item start = toAtomItem(exprs[1], qc);
+    final Item start = toAtomItem(arg(1), qc);
     if(start instanceof Int) return limit(start.itr(info) - 1);
     final double dbl = start.dbl(info);
     return Double.isNaN(dbl) ? Integer.MIN_VALUE : subPos(dbl);
@@ -84,8 +84,8 @@ public final class FnSubstring extends StandardFunc {
    * @throws QueryException query exception
    */
   private int length(final int def, final QueryContext qc) throws QueryException {
-    final Item length = exprs.length > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
-    return length == Empty.VALUE ? def : length instanceof Int ? (int) length.itr(info) :
+    final Item length = arg(2).atomItem(qc, info);
+    return length.isEmpty() ? def : length instanceof Int ? (int) length.itr(info) :
       subPos(length.dbl(info) + 1);
   }
 

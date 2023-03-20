@@ -21,7 +21,7 @@ public class FnFoot extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // fast route if the size is known
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     final long size = input.size();
     if(size >= 0) return size > 0 ? input.get(size - 1) : Empty.VALUE;
 
@@ -35,7 +35,7 @@ public class FnFoot extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zeroOrOne()) return input;
 

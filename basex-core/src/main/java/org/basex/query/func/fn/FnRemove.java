@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public final class FnRemove extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     final LongList pos = positions(qc);
 
     // value-based iterator
@@ -47,7 +47,7 @@ public final class FnRemove extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value input = exprs[0].value(qc);
+    final Value input = arg(0).value(qc);
     final LongList pos = positions(qc);
     return value(input, pos, qc);
   }
@@ -61,7 +61,7 @@ public final class FnRemove extends StandardFunc {
    */
   private static Value value(final Value value, final LongList list, final QueryContext qc) {
     Value v = value;
-    for(int l = list.size() - 1; l >= 0 && v != Empty.VALUE; l--) {
+    for(int l = list.size() - 1; l >= 0 && !v.isEmpty(); l--) {
       final long pos = list.get(l), size = v.size();
       if(pos == 0) {
         // remove first item
@@ -85,7 +85,7 @@ public final class FnRemove extends StandardFunc {
    */
   private LongList positions(final QueryContext qc) throws QueryException {
     final LongList pos = new LongList();
-    final Iter iter = exprs[1].iter(qc);
+    final Iter iter = arg(1).iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) pos.add(toLong(item) - 1);
     return pos.ddo();
   }
@@ -95,7 +95,7 @@ public final class FnRemove extends StandardFunc {
     // ignore standard limitation for large values to speed up evaluation of result
     if(allAreValues(false)) return value(cc.qc);
 
-    final Expr input = exprs[0], pos = exprs[1];
+    final Expr input = arg(0), pos = arg(1);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
@@ -120,6 +120,6 @@ public final class FnRemove extends StandardFunc {
 
   @Override
   public boolean ddo() {
-    return exprs[0].ddo();
+    return arg(0).ddo();
   }
 }

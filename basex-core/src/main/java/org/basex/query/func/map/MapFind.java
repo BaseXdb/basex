@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -19,8 +18,8 @@ import org.basex.query.value.seq.*;
 public final class MapFind extends StandardFunc {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
-    final Item key = toAtomItem(exprs[1], qc);
+    final Iter input = arg(0).iter(qc);
+    final Item key = toAtomItem(arg(1), qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
     find(input, key, ab, qc);
@@ -29,7 +28,7 @@ public final class MapFind extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return exprs[0] == XQMap.empty() ? XQArray.empty() : this;
+    return arg(0) == XQMap.empty() ? XQArray.empty() : this;
   }
 
   /**
@@ -47,7 +46,7 @@ public final class MapFind extends StandardFunc {
       if(item instanceof XQMap) {
         final XQMap map = (XQMap) item;
         final Value value = map.get(key, info);
-        if(value != Empty.VALUE) builder.append(value);
+        if(!value.isEmpty()) builder.append(value);
         map.apply((k, val) -> find(val.iter(), key, builder, qc));
       } else if(item instanceof XQArray) {
         for(final Value value : ((XQArray) item).members()) {

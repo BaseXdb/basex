@@ -15,8 +15,7 @@ import org.basex.util.*;
 public final class FnMonthFromDateTime extends DateTime {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = exprs[0].atomItem(qc, info);
-    return value == Empty.VALUE ? Empty.VALUE :
-      Int.get(toDate(value, AtomType.DATE_TIME, qc).mon());
+    final Item value = arg(0).atomItem(qc, info);
+    return value.isEmpty() ? Empty.VALUE : Int.get(toDate(value, AtomType.DATE_TIME, qc).mon());
   }
 }

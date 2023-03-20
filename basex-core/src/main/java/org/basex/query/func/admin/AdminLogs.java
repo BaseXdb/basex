@@ -27,13 +27,13 @@ import org.basex.util.*;
 public final class AdminLogs extends AdminFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final String date = exprs.length > 0 ? toStringOrNull(exprs[0], qc) : null;
+    final String date = toStringOrNull(arg(0), qc);
     return date == null ? list(qc).iter() : logs(date, qc);
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String date = exprs.length > 0 ? toStringOrNull(exprs[0], qc) : null;
+    final String date = toStringOrNull(arg(0), qc);
     return date == null ? list(qc) : logs(date, qc).value(qc, this);
   }
 
@@ -59,7 +59,7 @@ public final class AdminLogs extends AdminFn {
    * @throws QueryException query exception
    */
   private Iter logs(final String date, final QueryContext qc) throws QueryException {
-    final boolean merge = exprs.length > 1 && toBoolean(exprs[1], qc);
+    final boolean merge = toBooleanOrFalse(arg(1), qc);
 
     final LogFile file = qc.context.log.file(date);
     if(file == null) throw WHICHRES_X.get(info, date);

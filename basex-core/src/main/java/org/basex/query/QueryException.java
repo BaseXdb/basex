@@ -163,7 +163,7 @@ public class QueryException extends Exception {
 
   /**
    * Sets the error value.
-   * @param val error value
+   * @param val error value (can be {@code null})
    * @return self reference
    */
   public final QueryException value(final Value val) {

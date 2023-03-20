@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class ProfRuntime extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toString(exprs[0], qc);
+    final String name = toString(arg(0), qc);
 
     final Runtime rt = Runtime.getRuntime();
     switch(name) {

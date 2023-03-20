@@ -21,16 +21,15 @@ import org.basex.util.*;
 public final class BinDecodeString extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int el = exprs.length;
-    final B64 binary = toB64(exprs[0], qc, true);
-    final String encoding = toEncodingOrNull(1, BIN_UE_X, qc);
-    final Item offset = el > 2 ? exprs[2].atomItem(qc, info) : Empty.VALUE;
-    final Item size = el > 3 ? exprs[3].atomItem(qc, info) : Empty.VALUE;
+    final B64 binary = toB64(arg(0), qc, true);
+    final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
+    final Item offset = arg(2).atomItem(qc, info);
+    final Item size = arg(3).atomItem(qc, info);
     if(binary == null) return Empty.VALUE;
 
     byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(offset, offset != Empty.VALUE ? size : Empty.VALUE, bl);
+    final int[] bounds = bounds(offset, offset.isEmpty() ? Empty.VALUE : size, bl);
     final int o = bounds[0], tl = bounds[1];
     if(o > 0 || tl < bl) bytes = Arrays.copyOfRange(bytes, o, o + tl);
 

@@ -58,7 +58,8 @@ public final class CmpIR extends Single {
    */
   static Expr get(final CompileContext cc, final InputInfo info, final Expr expr,
       final long min, final long max) throws QueryException {
-    return min > max ? Bln.FALSE : min == MIN_VALUE && max == MAX_VALUE ? Bln.TRUE :
+    return min > max ? Bln.FALSE : min == MIN_VALUE && max == MAX_VALUE ?
+      cc.function(Function.EXISTS, info, expr) :
       new CmpIR(expr, min, max, info).optimize(cc);
   }
 
@@ -134,7 +135,7 @@ public final class CmpIR extends Single {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return Bln.get(item != Empty.VALUE && inRange(item));
+      return Bln.get(!item.isEmpty() && inRange(item));
     }
 
     // pre-evaluate ranges

@@ -18,11 +18,11 @@ import org.basex.util.list.*;
 public final class ArrayRemove extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    XQArray array = toArray(exprs[0], qc);
+    XQArray array = toArray(arg(0), qc);
 
     // collect and sort positions and remove duplicates
     final LongList pos = new LongList();
-    final Iter iter = exprs[1].iter(qc);
+    final Iter iter = arg(1).iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       pos.add(toPos(array, toLong(item), false));
     }
@@ -35,7 +35,7 @@ public final class ArrayRemove extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type type = exprs[0].seqType().type;
+    final Type type = arg(0).seqType().type;
     if(type instanceof ArrayType) exprType.assign(type);
     return this;
   }

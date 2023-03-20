@@ -20,7 +20,7 @@ public final class DbContentType extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final String path = toDbPath(1, qc);
+    final String path = toDbPath(arg(1), qc);
 
     String pt = null;
     ResourceType type = null;

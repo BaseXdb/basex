@@ -131,6 +131,18 @@ public class CmpG extends Cmp {
     }
 
     /**
+     * Checks if this is one of the specified types.
+     * @param ops types
+     * @return result of check
+     */
+    public final boolean oneOf(final OpG... ops) {
+      for(final OpG op : ops) {
+        if(this == op) return true;
+      }
+      return false;
+    }
+
+    /**
      * Returns the comparator for the specified value comparison operator.
      * @param opV operator to be found
      * @return comparator or {@code null}
@@ -206,7 +218,7 @@ public class CmpG extends Cmp {
       final Type type1 = st1.type, type2 = st2.type;
       // skip type check if types are identical (and a child instance of any atomic type)
       check = !(type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-          (type1.isSortable() || op != OpG.EQ && op != OpG.NE) || comparable(type1, type2));
+          (type1.isSortable() || !op.oneOf(OpG.EQ, OpG.NE)) || comparable(type1, type2));
 
       CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
@@ -244,21 +256,27 @@ public class CmpG extends Cmp {
     Expr ex = null;
 
     if(expr1 instanceof Arith && expr2.seqType().instanceOf(SeqType.NUMERIC_O)) {
-      final Expr op1 = expr1.arg(0), op2 = expr1.arg(1);
-      if(op2.seqType().instanceOf(SeqType.NUMERIC_O)) {
-        final Calc calc = ((Arith) expr1).calc;
-        if(calc == Calc.MINUS && expr2 == Int.ZERO) {
+      final Expr op11 = expr1.arg(0), op12 = expr1.arg(1), op22 = expr2.arg(1);
+      final double num12 = op12 instanceof ANum ? ((ANum) op12).dbl() : Double.NaN;
+      if(op12.seqType().instanceOf(SeqType.NUMERIC_O)) {
+        final Calc calc1 = ((Arith) expr1).calc;
+        if(calc1 == Calc.MINUS && expr2 == Int.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
-          ex = new CmpG(info, op1, op2, op, coll, sc);
-        } else if(calc != Calc.IDIV && calc != Calc.MOD && (
-            Function.POSITION.is(op1) || op2 instanceof ANum &&
-          (expr2 instanceof ANum || expr2 instanceof Arith && expr2.arg(1) instanceof ANum)
+          ex = new CmpG(info, op11, op12, op, coll, sc);
+        } else if((
+          Function.POSITION.is(op11) ||
+          !Double.isNaN(num12) &&
+          (expr2 instanceof ANum || expr2 instanceof Arith && op22 instanceof ANum)
+        ) && (
+          calc1.oneOf(Calc.PLUS, Calc.MINUS) ||
+          calc1.oneOf(Calc.MULT, Calc.DIV) && num12 != 0 && (op.oneOf(OpG.EQ, OpG.NE) || num12 > 0)
         )) {
           // position() + 1 < last()  ->  position() < last() - 1
           // count(E) div 2 = 1  ->  count(E) = 1 * 2
           // $a - 1 = $b + 1  ->  $a = $b + 2
-          final Expr arg2 = new Arith(info, expr2, op2, calc.invert()).optimize(cc);
-          ex = new CmpG(info, op1, arg2, op, coll, sc);
+          // $x * -1 = 1  ->  $x = 1 div -1  (no rewrite if RHS if */div (<,<=,>=,>) is negative)
+          final Expr arg2 = new Arith(info, expr2, op12, calc1.invert()).optimize(cc);
+          ex = new CmpG(info, op11, arg2, op, coll, sc);
         }
       }
     }

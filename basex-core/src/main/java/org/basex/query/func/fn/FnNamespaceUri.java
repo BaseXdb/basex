@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FnNamespaceUri extends ContextFn {
   @Override
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(ctxArg(0, qc), qc);
+    final ANode node = toNodeOrNull(context(qc), qc);
     final QNm qname = node != null ? node.qname() : null;
     return qname != null ? Uri.get(qname.uri(), false) : Uri.EMPTY;
   }

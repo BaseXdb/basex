@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class FnZeroOrOne extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter input = exprs[0].iter(qc);
+    final Iter input = arg(0).iter(qc);
     final Item item = input.next();
     if(item == null) return Empty.VALUE;
     if(input.next() == null) return item;
@@ -29,7 +29,7 @@ public final class FnZeroOrOne extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = exprs[0];
+    final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zeroOrOne()) return input;
     if(input.size() > 1) throw ZEROORONE.get(info);

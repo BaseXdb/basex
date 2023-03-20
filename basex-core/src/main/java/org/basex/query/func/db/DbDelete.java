@@ -22,7 +22,7 @@ public final class DbDelete extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final String path = toDbPath(1, qc);
+    final String path = toDbPath(arg(1), qc);
 
     // delete XML resources
     final IntList docs = data.resources.docs(path);
