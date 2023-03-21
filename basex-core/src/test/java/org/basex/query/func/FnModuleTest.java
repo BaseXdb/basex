@@ -284,6 +284,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("ring"), "\u02DA");
     query(func.args("AMP"), "&");
     query(func.args("amp"), "&");
+    query(func.args("Tab"), "\t");
   }
 
   /** Test method. */
