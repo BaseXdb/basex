@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 import javax.xml.transform.*;
 import javax.xml.transform.stream.*;
@@ -101,12 +102,14 @@ public class XsltTransform extends XsltFn {
       Util.debug(ex);
       // catch transformation errors, throw them again or add them to report
       final StringList list = new StringList();
-      byte[] error = trim(utf8(err.toArray(), Prop.ENCODING));
-      if(error.length != 0) list.add(error);
-      for(Throwable th = ex; th != null; th = th.getCause()) {
-        list.add(th.toString());
-      }
-      error = token(String.join("; ", list.reverse().finish()));
+      final Consumer<String> add = string -> {
+        final String normalized = string.replaceAll("\\s+", " ").trim();
+        if(!normalized.isEmpty()) list.addUnique(normalized);
+      };
+      for(Throwable th = ex; th != null; th = th.getCause()) add.accept(th.getMessage());
+      add.accept(string(trim(utf8(err.toArray(), Prop.ENCODING))));
+
+      final String error = String.join("; ", list.reverse().finish());
       if(simple) throw XSLT_ERROR_X.get(info, error);
       xr.addError(Str.get(error));
       xr.addMessage();
