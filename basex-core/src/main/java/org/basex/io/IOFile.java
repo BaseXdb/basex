@@ -322,7 +322,7 @@ public final class IOFile extends IO {
 
   @Override
   public boolean eq(final IO io) {
-    return io instanceof IOFile && (Prop.CASE ? pth.equals(io.pth) : pth.equalsIgnoreCase(io.pth));
+    return io instanceof IOFile && equals(pth, io.pth);
   }
 
   @Override

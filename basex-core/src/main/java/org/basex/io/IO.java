@@ -351,4 +351,14 @@ public abstract class IO {
     }
     return false;
   }
+
+  /**
+   * Compares file names for equality. Ignores the case, depending on the operating system.
+   * @param string1 first string
+   * @param string2 strings to be compared
+   * @return {@code true} if test is successful
+   */
+  public static boolean equals(final String string1, final String string2) {
+    return Prop.CASE ? string1.equals(string2) : string1.equalsIgnoreCase(string2);
+  }
 }

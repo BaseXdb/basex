@@ -45,7 +45,7 @@ public final class Open extends Command {
     if(data == null || !data.meta.name.equals(db)) {
       Close.close(context);
       try {
-        data = open(db, context, options);
+        data = open(db, context, options, true, true);
         context.openDB(data);
 
         final String path = args[1];
@@ -76,20 +76,25 @@ public final class Open extends Command {
    * @param name name of database
    * @param context database context
    * @param options main options
-   * @return data reference
+   * @param exists raise error if database does not exist
+   * @param perm raise error if user has wrong permissions
+   * @return data reference, or {@code null} if database does not exist
    * @throws IOException I/O exception
    */
-  public static Data open(final String name, final Context context, final MainOptions options)
-      throws IOException {
+  public static Data open(final String name, final Context context, final MainOptions options,
+      final boolean exists, final boolean perm) throws IOException {
 
     // check permissions
-    if(!context.perm(Perm.READ, name)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
+    if(perm && !context.perm(Perm.READ, name)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
 
     synchronized(context.datas) {
       Data data = context.datas.pin(name);
       if(data == null) {
         // check if the addressed database exists
-        if(!context.soptions.dbExists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
+        if(!context.soptions.dbExists(name)) {
+          if(exists) throw new BaseXException(DB_NOT_FOUND_X, name);
+          return null;
+        }
 
         // do not open a database that is currently updated
         final MetaData meta = new MetaData(name, options, context.soptions);

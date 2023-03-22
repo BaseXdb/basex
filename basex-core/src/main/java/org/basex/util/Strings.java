@@ -71,7 +71,7 @@ public final class Strings {
    * Compares two strings for equality. The arguments may be {@code null}.
    * @param string1 first string
    * @param string2 strings to be compared
-   * @return true if one test is successful
+   * @return {@code true} if test is successful
    */
   public static boolean eq(final String string1, final String string2) {
     return Objects.equals(string1, string2);
@@ -81,7 +81,7 @@ public final class Strings {
    * Compares several strings for equality. The arguments may be {@code null}.
    * @param string first string
    * @param strings strings to be compared
-   * @return true if one test is successful
+   * @return {@code true} if one test is successful
    */
   public static boolean eq(final String string, final String... strings) {
     for(final String str : strings) {
@@ -94,7 +94,7 @@ public final class Strings {
    * Compares several strings for equality, ignoring the case.
    * @param string first string
    * @param strings strings to be compared
-   * @return true if one test is successful
+   * @return {@code true} if test is successful
    */
   public static boolean eqic(final String string, final String... strings) {
     for(final String str : strings) {
