@@ -407,14 +407,16 @@ public final class QueryResources {
       final boolean mem = data.inMemory();
       if(withdb || mem) {
         // compare input path
-        final String orig = data.meta.original;
-        if(!orig.isEmpty() && IO.get(orig).eq(qi.io)) {
+        final String original = data.meta.original;
+        if(!original.isEmpty() && IO.get(original).eq(qi.io)) {
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";
           return data;
         }
-        // compare database name
-        if(IO.equals(data.meta.name, dbName)) return data;
+        // compare database name; favor existing database instances
+        if(IO.equals(data.meta.name, dbName) && (!mem || !ctx.soptions.dbExists(dbName))) {
+          return data;
+        }
       }
     }
 

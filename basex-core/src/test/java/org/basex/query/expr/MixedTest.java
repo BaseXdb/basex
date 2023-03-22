@@ -289,4 +289,17 @@ public final class MixedTest extends SandboxTest {
     query(_DB_CREATE.args("x", " <x>A</x>", "x.xml"));
     query(_DB_GET.args("x") + " ! (delete node x, " + _DB_ADD.args("x", " x", "pth") + ')');
   }
+
+  /**
+   * Distinct document/database references.
+   * @throws IOException I/O exception
+   */
+  @Test public void gh2147() throws IOException {
+    final IOFile file = new IOFile(sandbox(), "test.xml");
+    file.write("<file/>");
+    query(_DB_CREATE.args("test", " <db/>", "test.xml"));
+
+    query("doc('" + file + "'), doc('test')", "<file/>\n<db/>");
+    query("doc('test'), doc('" + file + "')", "<db/>\n<file/>");
+  }
 }
