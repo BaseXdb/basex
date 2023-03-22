@@ -20,6 +20,8 @@ public final class Str extends AStr {
   public static final Str EMPTY = new Str(Token.EMPTY);
   /** Single-spaced string. */
   public static final Str SPACE = new Str(Token.SPACE);
+  /** Value string. */
+  public static final Str VALUE = new Str(Token.token("value"));
   /** Tab string. */
   public static final Str TAB = new Str(Token.token("\t"));
   /** Newline string. */
