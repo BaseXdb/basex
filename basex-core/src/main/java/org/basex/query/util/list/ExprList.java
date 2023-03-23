@@ -27,12 +27,12 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
   }
 
   /**
-   * Constructor, specifying an initial entry.
-   * @param element array capacity
+   * Constructor, assigning the specified array.
+   * @param elements initial array
    */
-  public ExprList(final Expr element) {
-    super(element);
-    size = 1;
+  public ExprList(final Expr... elements) {
+    super(elements);
+    size = elements.length;
   }
 
   /**
