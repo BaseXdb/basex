@@ -261,13 +261,15 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected Expr embed(final CompileContext cc, final boolean skip) throws QueryException {
-    // util:last((1 to 8) ! <_>{ . }</_>)  ->  util:last((1 to 8)) ! <_>{ . }</_>
+    // head($nodes ! name())  ->  head($nodes) ! name()
+    // foot((1 to 8) ! <_>{ . }</_>)  ->  foot((1 to 8)) ! <_>{ . }</_>
+    // do not rewrite positional access:  foot($nodes ! position())
     if(arg(0) instanceof SimpleMap) {
       final Expr[] ops = arg(0).args();
-      if(((Checks<Expr>) op -> op == ops[0] || op.seqType().one()).all(ops)) {
-        arg(0, arg -> ops[0]);
-        ops[0] = definition.get(sc, info, args()).optimize(cc);
-        return skip ? ops[0] : SimpleMap.get(cc, info, ops);
+      if(((Checks<Expr>) op -> op == ops[0] || op.seqType().one() && !op.has(Flag.POS)).all(ops)) {
+        final Expr[] args = new ExprList(args().clone()).set(0, ops[0]).finish();
+        final Expr fn = definition.get(sc, info, args).optimize(cc);
+        return skip ? fn : SimpleMap.get(cc, info, new ExprList(ops.clone()).set(0, fn).finish());
       }
     }
     return this;

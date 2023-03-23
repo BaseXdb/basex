@@ -3059,4 +3059,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<x/>[position() >= 0 or position() <= 0]", "<x/>", root(CElem.class));
   }
+
+  /** Bug on node selection with last(). */
+  @Test public void gh2191() {
+    query("<a><b/><b/></a> ! head(*/last())", 2);
+    query("head(<a><b/><b/></a>/* ! last())", 2);
+  }
 }
