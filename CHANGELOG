@@ -1,3 +1,9 @@
+VERSION 10.5 (March 23, 2023) ------------------------------------------
+
+ - new XQuery 4 features
+ - numerous performance tweaks
+ - minor bug fixes
+
 VERSION 10.4 (December 1, 2022) ----------------------------------------
 
  - minor bug fixes
