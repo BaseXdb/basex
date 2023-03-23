@@ -51,9 +51,6 @@ public class FnInvisibleXml extends StandardFunc {
    * Invisible XML parser generator.
    */
   private static class Generator {
-    /** Invisible XML processor. */
-    private static InvisibleXml ixml = new InvisibleXml();
-
     /**
      * Generate a parser from an invisible XML grammar.
      * @param qc query context
@@ -65,7 +62,7 @@ public class FnInvisibleXml extends StandardFunc {
      */
     public Item generate(final QueryContext qc, final InputInfo ii, final StaticContext sc,
         final String grammar) throws QueryException {
-      final InvisibleXmlParser parser = ixml.getParserFromIxml(grammar);
+      final InvisibleXmlParser parser = new InvisibleXml().getParserFromIxml(grammar);
       if (!parser.constructed()) {
         final Exception ex = parser.getException();
         if (ex != null) throw IXML_UNEXPECTED_X.get(ii, ex);
