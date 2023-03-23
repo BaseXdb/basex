@@ -1349,7 +1349,7 @@ public class QueryParser extends InputParser {
     // collect all cases
     ExprList exprs;
     do {
-      exprs = new ExprList(null);
+      exprs = new ExprList((Expr) null);
       while(wsConsumeWs(CASE)) add(exprs, check(expr(), NOSWITCH));
       if(exprs.size() == 1) {
         // add default case
