@@ -177,7 +177,7 @@ public final class CreateDB extends ACreate {
       // database is currently locked by another job
       if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
       new DiskBuilder(name, parser, ctx.soptions, options).build().close();
-      data = Open.open(name, ctx, options);
+      data = Open.open(name, ctx, options, true, true);
     }
 
     CreateIndex.create(data, null);

@@ -70,7 +70,7 @@ public class FnOp extends StandardFunc {
       case "otherwise": body = new Otherwise(info, arg1, arg2); break;
       default         : throw UNKNOWNOP_X.get(info, operator);
     }
-    final FuncType type = FuncType.get(body.seqType(), SeqType.ITEM_ZM, SeqType.ITEM_ZM);
-    return new FuncItem(sc, new AnnList(), null, params, type, body, pl, info);
+    final FuncType ft = FuncType.get(body.seqType(), SeqType.ITEM_ZM, SeqType.ITEM_ZM);
+    return new FuncItem(sc, new AnnList(), null, params, ft, body, pl, info);
   }
 }

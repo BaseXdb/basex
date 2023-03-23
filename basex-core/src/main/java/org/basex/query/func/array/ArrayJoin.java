@@ -47,7 +47,7 @@ public final class ArrayJoin extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr arrays = arg(0);
-    if(arrays.seqType().type instanceof ArrayType) {
+    if(arrays.funcType() instanceof ArrayType) {
       // remove empty entries
       final Expr[] args = arrays.args();
       if(arrays instanceof List && ((Checks<Expr>) arg -> arg == XQArray.empty()).any(args)) {

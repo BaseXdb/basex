@@ -112,7 +112,7 @@ public final class List extends Command {
     table.header.add(INPUT_PATH).add(TYPE).add(DataText.CONTENT_TYPE).add(SIZE);
 
     try {
-      final Data data = Open.open(db, context, options);
+      final Data data = Open.open(db, context, options, true, true);
       final Resources resources = data.resources;
 
       // list XML documents

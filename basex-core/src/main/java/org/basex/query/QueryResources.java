@@ -182,14 +182,13 @@ public final class QueryResources {
     for(final Data data : datas) {
       // default mode: skip main-memory database instances (which may result from fn:doc calls)
       if(data.inMemory() && !mainmem) continue;
-      final String n = data.meta.name;
-      if(Prop.CASE ? n.equals(name) : n.equalsIgnoreCase(name)) return data;
+      if(IO.equals(data.meta.name, name)) return data;
     }
 
     // open and register database
     if(!ctx.perm(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(ii, Perm.READ, name);
     try {
-      return addData(Open.open(name, ctx, ctx.options));
+      return addData(Open.open(name, ctx, ctx.options, true, false));
     } catch(final IOException ex) {
       throw DB_OPEN2_X.get(ii, ex);
     }
@@ -256,8 +255,7 @@ public final class QueryResources {
       // check currently opened collections (required for tests)
       final int cs = colls.size();
       for(int c = 0; c < cs; c++) {
-        final String name = collNames.get(c), path = qi.io.path();
-        if(Prop.CASE ? name.equals(path) : name.equalsIgnoreCase(path)) return colls.get(c);
+        if(IO.equals(collNames.get(c), qi.io.path())) return colls.get(c);
       }
     }
 
@@ -406,26 +404,30 @@ public final class QueryResources {
 
     // check opened databases
     for(final Data data : datas) {
-      if(withdb || data.inMemory()) {
+      final boolean mem = data.inMemory();
+      if(withdb || mem) {
         // compare input path
-        final String orig = data.meta.original;
-        if(!orig.isEmpty() && IO.get(orig).eq(qi.io)) {
+        final String original = data.meta.original;
+        if(!original.isEmpty() && IO.get(original).eq(qi.io)) {
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";
           return data;
         }
-        // compare database name
-        final String name = data.meta.name;
-        if(Prop.CASE ? name.equals(dbName) : name.equalsIgnoreCase(dbName)) return data;
+        // compare database name; favor existing database instances
+        if(IO.equals(data.meta.name, dbName) && (!mem || !ctx.soptions.dbExists(dbName))) {
+          return data;
+        }
       }
     }
 
     // try to open existing database
     if(withdb && dbName != null) {
+      if(!ctx.perm(Perm.READ, dbName)) throw BASEX_PERMISSION_X_X.get(ii, Perm.READ, dbName);
       try {
-        return addData(Open.open(dbName, ctx, ctx.options));
+        final Data data = Open.open(dbName, ctx, ctx.options, false, false);
+        if(data != null) return addData(data);
       } catch(final IOException ex) {
-        Util.debug(ex);
+        throw IOERR_X.get(ii, ex);
       }
     }
 
@@ -434,7 +436,6 @@ public final class QueryResources {
     // reset database path: indicates that all documents were parsed
     qi.dbPath = "";
     return data;
-
   }
 
   /**

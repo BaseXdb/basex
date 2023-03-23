@@ -235,6 +235,35 @@ public final class ArrayModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void members() {
+    final Function func = _ARRAY_MEMBERS;
+
+    query(func.args(" []"), "");
+    query(func.args(" [ () ]"), "map{\"value\":()}");
+    query(func.args(" [ 1 ]"), "map{\"value\":1}");
+    query(func.args(" [ 1, 2 ]"), "map{\"value\":1}\nmap{\"value\":2}");
+    query(func.args(" [ (1, 2) ]"), "map{\"value\":(1,2)}");
+    query(func.args(" [ (1, 2), 3 ]"), "map{\"value\":(1,2)}\nmap{\"value\":3}");
+    query(func.args(" array { <_>1</_> to 100000 }") + " => foot()", "map{\"value\":100000}");
+  }
+
+  /** Test method. */
+  @Test public void of() {
+    final Function func = _ARRAY_OF;
+    query(func.args(" ()"), "[]");
+    query(func.args(" map { 'value': 1 }"), "[1]");
+    query(func.args(" (1 to 3) ! map { 'value': . }"), "[1,2,3]");
+    query(func.args(" (map { 'value': 1 }, map { 'value': () }, map { 'value': 2 to 3 })"),
+        "[1,(),(2,3)]");
+
+    query(func.args(" map { 'value': <a/> }") + "?1", "<a/>");
+    query(func.args(" (map { 'value': <a/> }, map { 'value': () })") + "?1", "<a/>");
+    query(func.args(" (map { 'value': <a/> }, map { 'value': () })") + "?*", "<a/>");
+
+    query(func.args(" if (<a/>/text()) then map { 'value': () } else ()") + " ! array:size(.)", 0);
+  }
+
+  /** Test method. */
   @Test public void partition() {
     final Function func = _ARRAY_PARTITION;
 

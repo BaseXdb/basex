@@ -47,7 +47,7 @@ public final class Rename extends ACreate {
   private boolean rename(final Data data, final String src, final String trg) {
     boolean ok = true;
     int c = 0;
-    if(!(Prop.CASE ? src.equals(trg) : src.equalsIgnoreCase(trg))) {
+    if(!IO.equals(src, trg)) {
       // rename XML documents
       final IntList docs = data.resources.docs(src);
       final int ds = docs.size();
@@ -87,7 +87,7 @@ public final class Rename extends ACreate {
   public static String target(final Data data, final int pre, final String src, final String trg) {
     // source references a file
     final String path = string(data.text(pre, true));
-    if(Prop.CASE ? path.equals(src) : path.equalsIgnoreCase(src)) return trg;
+    if(IO.equals(path, src)) return trg;
 
     // directory references: add trailing slashes to non-empty paths
     final String source = src.isEmpty() || Strings.endsWith(src, '/') ? src : src + '/';

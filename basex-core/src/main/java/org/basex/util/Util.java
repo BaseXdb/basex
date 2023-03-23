@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.net.*;
@@ -119,7 +120,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void outln(final Object string, final Object... ext) {
-    out((string instanceof byte[] ? Token.string((byte[]) string) : string) + NL, ext);
+    out((string instanceof byte[] ? string((byte[]) string) : string) + NL, ext);
   }
 
   /**
@@ -217,7 +218,7 @@ public final class Util {
    * @return extended string
    */
   public static String info(final Object string, final Object... ext) {
-    return Token.string(inf(string, ext));
+    return string(inf(string, ext));
   }
 
   /**
@@ -328,23 +329,22 @@ public final class Util {
   }
 
   /**
-   * Returns the contents of a property file.
-   * @param name name of property resource file
+   * Returns the contents of a property resource.
+   * @param name name of the property resource
    * @return property map
    */
   public static TokenMap properties(final String name) {
     final InputStream is = Util.class.getResourceAsStream('/' + name);
-    if(is == null) throw notExpected("%: Property file missing.", name);
+    if(is == null) throw notExpected("%: Property resource missing.", name);
 
     final TokenMap map = new TokenMap();
     try(NewlineInput nli = new NewlineInput(is)) {
       for(String line; (line = nli.readLine()) != null;) {
         final int s = line.indexOf('=');
         if(s == -1 || Strings.startsWith(line, '#')) continue;
-        final byte[] key = Token.token(line.substring(0, s).trim());
-        final byte[] value = Token.token(line.substring(s + 1).trim().replace("\\n", "\n"));
+        final byte[] key = token(line.substring(0, s).trim());
         if(map.contains(key)) throw notExpected("%: '%' is declared twice.", name, key);
-        map.put(key, value);
+        map.put(key, token(line.substring(s + 1).trim().replace("\\t", "\t").replace("\\n", "\n")));
       }
     } catch(final IOException ex) {
       throw notExpected("%: %", name, ex);

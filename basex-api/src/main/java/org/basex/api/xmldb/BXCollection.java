@@ -46,7 +46,7 @@ public final class BXCollection implements Collection {
     ctx = db.ctx;
     try {
       final MainOptions mopts = ctx.options;
-      data = open ? Open.open(name, ctx, mopts) :
+      data = open ? Open.open(name, ctx, mopts, true, true) :
         CreateDB.create(name, Parser.emptyParser(mopts), ctx, mopts);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());

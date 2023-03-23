@@ -28,7 +28,7 @@ public final class DbRename extends DbAccess {
     final Data data = toData(qc);
     final String source = toDbPath(arg(1), qc), target = toDbPath(arg(2), qc);
 
-    if(!(Prop.CASE ? source.equals(target) : source.equalsIgnoreCase(target))) {
+    if(!IO.equals(source, target)) {
       // rename XML resources
       final Updates updates = qc.updates();
       final IntList docs = data.resources.docs(source);
