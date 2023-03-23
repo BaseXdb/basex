@@ -36,6 +36,8 @@ public enum QueryError {
   /** Error code. */
   BASEX_WHICH_X(BASEX, "function", "Function not found: %."),
   /** Error code. */
+  BASEX_CLASSPATH_X_X(BASEX, "function", "Function % requires missing class: %."),
+  /** Error code. */
   BASEX_ERROR_X(BASEX, "error", "%"),
   /** Error code. */
   BASEX_HTTP(BASEX, "http", "HTTP connection required."),

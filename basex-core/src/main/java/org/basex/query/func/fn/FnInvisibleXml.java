@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -17,6 +18,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.nineml.coffeefilter.*;
+import org.nineml.coffeegrinder.parser.*;
 
 /**
  * Function implementation.
@@ -25,22 +27,59 @@ import org.nineml.coffeefilter.*;
  * @author Gunther Rademacher
  */
 public class FnInvisibleXml extends StandardFunc {
+  /** The invisible XML parser generator. */
+  private Generator generator;
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String grammar = toString(exprs[0], qc);
-    final InvisibleXmlParser parser = new InvisibleXml().getParserFromIxml(grammar);
-    if (!parser.constructed()) {
-      final Exception ex = parser.getException();
-      if (ex != null) throw IXML_UNEXPECTED_X.get(info, ex);
-      InvisibleXmlDocument doc = parser.getFailedParse();
-      throw IXML_GEN_X_X_X.get(info, doc.getResult().getLastToken(),
-          doc.getLineNumber(), doc.getColumnNumber());
+    if (generator == null) {
+      for (String className : Arrays.asList(
+          "org.nineml.coffeefilter.InvisibleXml",
+          "org.nineml.coffeefilter.InvisibleXmlParser",
+          "org.nineml.coffeefilter.InvisibleXmlDocument",
+          "org.nineml.coffeegrinder.parser.GearleyResult")) {
+        if (Reflect.find(className) == null) {
+          throw BASEX_CLASSPATH_X_X.get(ii, definition.local(), className);
+        }
+      }
+      generator = new Generator();
     }
-    final Var[] params = {new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, ii)};
-    final Expr arg = new VarRef(ii, params[0]);
-    final ParseInvisibleXml parseFunction = new ParseInvisibleXml(ii, arg, parser);
-    final FuncType type = FuncType.get(parseFunction.seqType(), STRING_O);
-    return new FuncItem(sc, new AnnList(), null, params, type, parseFunction, params.length, ii);
+    return generator.generate(qc, ii, sc, toString(exprs[0], qc));
+  }
+
+  /**
+   * Invisible XML parser generator.
+   */
+  private static class Generator {
+    /** Invisible XML processor. */
+    private static InvisibleXml ixml = new InvisibleXml();
+
+    /**
+     * Generate a parser from an invisible XML grammar.
+     * @param qc query context
+     * @param ii input info
+     * @param sc static context
+     * @param grammar the invisible XML grammar
+     * @return the parsing function
+     * @throws QueryException query exception
+     */
+    public Item generate(final QueryContext qc, final InputInfo ii, final StaticContext sc,
+        final String grammar) throws QueryException {
+      final InvisibleXmlParser parser = ixml.getParserFromIxml(grammar);
+      if (!parser.constructed()) {
+        final Exception ex = parser.getException();
+        if (ex != null) throw IXML_UNEXPECTED_X.get(ii, ex);
+        InvisibleXmlDocument doc = parser.getFailedParse();
+        GearleyResult result = doc.getResult();
+        throw IXML_GEN_X_X_X.get(ii, result.getLastToken(),
+            doc.getLineNumber(), doc.getColumnNumber());
+      }
+      final Var[] params = {new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, ii)};
+      final Expr arg = new VarRef(ii, params[0]);
+      final ParseInvisibleXml parseFunction = new ParseInvisibleXml(ii, arg, parser);
+      final FuncType type = FuncType.get(parseFunction.seqType(), STRING_O);
+      return new FuncItem(sc, new AnnList(), null, params, type, parseFunction, params.length, ii);
+    }
   }
 
   /**
@@ -67,7 +106,8 @@ public class FnInvisibleXml extends StandardFunc {
       final String input = toString(exprs[0].atomItem(qc, ii), qc);
       final InvisibleXmlDocument doc = parser.parse(input);
       if (!doc.succeeded()) {
-        throw IXML_INP_X_X_X.get(ii, doc.getResult().getLastToken(),
+        GearleyResult result = doc.getResult();
+        throw IXML_INP_X_X_X.get(ii, result.getLastToken(),
             doc.getLineNumber(), doc.getColumnNumber());
       }
       try {
