@@ -37,6 +37,7 @@
     <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
+      <scope>provided</scope>
       <optional>true</optional>
     </dependency>
     <dependency>

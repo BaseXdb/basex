@@ -46,7 +46,7 @@ public final class FnSort extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter iter(final Value input, final QueryContext qc) throws QueryException {
-    final Collation coll = toCollation(arg(1), true, qc);
+    final Collation coll = toCollationOrDefault(arg(1), qc);
     final FItem key = defined(2) ? toFunction(arg(2), 1, qc) : null;
 
     final long size = input.size();

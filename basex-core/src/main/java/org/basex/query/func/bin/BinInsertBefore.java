@@ -14,9 +14,9 @@ import org.basex.util.*;
 public final class BinInsertBefore extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 binary = toB64(arg(0), qc, true);
+    final B64 binary = toB64OrNull(arg(0), qc);
     final Item offset = arg(1).atomItem(qc, info);
-    final B64 extra = toB64(arg(2), qc, true);
+    final B64 extra = toB64OrNull(arg(2), qc);
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);

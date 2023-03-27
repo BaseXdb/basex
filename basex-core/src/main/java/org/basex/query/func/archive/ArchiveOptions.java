@@ -22,7 +22,7 @@ import org.basex.util.*;
 public final class ArchiveOptions extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 archive = toB64(arg(0), qc, false);
+    final B64 archive = toB64(arg(0), qc);
     final String format;
     int level = -1;
 

@@ -28,10 +28,12 @@ public final class FnFormatNumber extends StandardFunc {
     final byte[] picture = toToken(arg(1), qc);
     // retrieve format declaration
     QNm format = QNm.EMPTY;
-    final byte[] name = toTokenOrNull(arg(2), qc);
-    if(name != null) {
+    final Item name = arg(2).atomItem(qc, info);
+    if(name instanceof QNm) {
+      format = toQNm(name);
+    } else if(!name.isEmpty()) {
       try {
-        format = QNm.resolve(trim(name), sc);
+        format = QNm.resolve(trim(toToken(name)), sc);
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw FORMNUM_X.get(info, name);

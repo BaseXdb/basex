@@ -21,7 +21,7 @@ import org.basex.util.*;
 public final class BinDecodeString extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 binary = toB64(arg(0), qc, true);
+    final B64 binary = toB64OrNull(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
     final Item offset = arg(2).atomItem(qc, info);
     final Item size = arg(3).atomItem(qc, info);

@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class BinNot extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 binary = toB64(arg(0), qc, true);
+    final B64 binary = toB64OrNull(arg(0), qc);
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);
