@@ -1,16 +1,15 @@
 package org.basex.build.html;
 
 import static org.basex.util.Token.*;
+import static org.basex.build.html.HtmlOptions.*;
 
 import java.io.*;
-import java.lang.reflect.*;
-
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
+import org.ccil.cowan.tagsoup.*;
 import org.xml.sax.*;
 
 /**
@@ -29,24 +28,12 @@ public final class HtmlParser extends XMLParser {
   /** TagSoup URL. */
   private static final String FEATURES = "http://www.ccil.org/~cowan/tagsoup/features/";
 
-  /** XML parser class string. */
-  private static final String PCLASS = "org.ccil.cowan.tagsoup.Parser";
-  /** XML writer class string. */
-  private static final String WCLASS = "org.ccil.cowan.tagsoup.XMLWriter";
-  /** HTML reader. */
-  private static final Class<?> READER = Reflect.find(PCLASS);
-  /** HTML writer. */
-  private static final Constructor<?> WRITER = Reflect.find(Reflect.find(WCLASS), Writer.class);
-  /** XML writer output property method. */
-  private static final Method METHOD = Reflect.method(
-    Reflect.find(WCLASS), "setOutputProperty", String.class, String.class);
-
   /**
    * Checks if a CatalogResolver is available.
    * @return result of check
    */
   public static boolean available() {
-    return READER != null;
+    return Reflect.available("org.ccil.cowan.tagsoup.Parser");
   }
 
   /**
@@ -88,7 +75,7 @@ public final class HtmlParser extends XMLParser {
    */
   private static IO toXML(final IO io, final HtmlOptions hopts) throws IOException {
     // reader could not be initialized; fall back to XML
-    if(READER == null) return io;
+    if(!available()) return io;
 
     try(TextInput ti = new TextInput(io)) {
       // tries to extract the encoding from the input
@@ -107,56 +94,58 @@ public final class HtmlParser extends XMLParser {
         enc = string(substring(content, cs, ce));
       }
 
+      // define output
+      final StringWriter sw = new StringWriter();
+      final XMLReader reader = new org.ccil.cowan.tagsoup.Parser();
+      final XMLWriter writer = new XMLWriter(sw);
+      writer.setOutputProperty(ENCODING.name(), Strings.UTF8);
+      reader.setContentHandler(writer);
+
+      // set TagSoup options
+      if(hopts.get(HTML)) {
+        reader.setFeature("http://xml.org/sax/features/namespaces", false);
+        writer.setOutputProperty(METHOD.name(), "html");
+        writer.setOutputProperty(OMIT_XML_DECLARATION.name(), "yes");
+      }
+      if(hopts.get(NONS))
+        reader.setFeature("http://xml.org/sax/features/namespaces", false);
+      if(hopts.get(NOBOGONS))
+        reader.setFeature(FEATURES + "ignore-bogons", true);
+      if(hopts.get(NODEFAULTS))
+        reader.setFeature(FEATURES + "default-attributes", false);
+      if(hopts.get(NOCOLONS))
+        reader.setFeature(FEATURES + "translate-colons", true);
+      if(hopts.get(NORESTART))
+        reader.setFeature(FEATURES + "restart-elements", false);
+      if(hopts.get(IGNORABLE))
+        reader.setFeature(FEATURES + "ignorable-whitespace", true);
+      if(hopts.get(EMPTYBOGONS))
+        reader.setFeature(FEATURES + "bogons-empty", true);
+      if(hopts.get(ANY))
+        reader.setFeature(FEATURES + "bogons-empty", false);
+      if(hopts.get(NOROOTBOGONS))
+        reader.setFeature(FEATURES + "root-bogons", false);
+      if(hopts.get(NOCDATA))
+        reader.setFeature(FEATURES + "cdata-elements", false);
+      if(hopts.get(LEXICAL))
+        reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
+
+      if(hopts.get(OMIT_XML_DECLARATION))
+        writer.setOutputProperty(OMIT_XML_DECLARATION.name(), "yes");
+      if(hopts.contains(METHOD))
+        writer.setOutputProperty(METHOD.name(), hopts.get(METHOD));
+      if(hopts.contains(DOCTYPE_SYSTEM))
+        writer.setOutputProperty(DOCTYPE_SYSTEM.name(), hopts.get(DOCTYPE_SYSTEM));
+      if(hopts.contains(DOCTYPE_PUBLIC))
+        writer.setOutputProperty(DOCTYPE_PUBLIC.name(), hopts.get(DOCTYPE_PUBLIC));
+
+      if(hopts.contains(ENCODING))
+        enc = hopts.get(ENCODING);
+      // end TagSoup options
+
       // define input
       final InputSource is = new InputSource(new ArrayInput(content));
       is.setEncoding(Strings.supported(enc) ? Strings.normEncoding(enc) : Strings.UTF8);
-      // define output
-      final StringWriter sw = new StringWriter();
-      final XMLReader reader = (XMLReader) Reflect.get(READER);
-      final Object writer = Reflect.get(WRITER, sw);
-      set(writer, HtmlOptions.ENCODING, Strings.UTF8);
-
-      // set TagSoup options
-      if(hopts.get(HtmlOptions.HTML)) {
-        reader.setFeature("http://xml.org/sax/features/namespaces", false);
-        set(writer, HtmlOptions.METHOD, "html");
-        set(writer, HtmlOptions.OMIT_XML_DECLARATION, "yes");
-      }
-      if(hopts.get(HtmlOptions.NONS))
-        reader.setFeature("http://xml.org/sax/features/namespaces", false);
-      if(hopts.get(HtmlOptions.OMIT_XML_DECLARATION))
-        set(writer, HtmlOptions.OMIT_XML_DECLARATION, "yes");
-      if(hopts.get(HtmlOptions.NOBOGONS))
-        reader.setFeature(FEATURES + "ignore-bogons", true);
-      if(hopts.get(HtmlOptions.NODEFAULTS))
-        reader.setFeature(FEATURES + "default-attributes", false);
-      if(hopts.get(HtmlOptions.NOCOLONS))
-        reader.setFeature(FEATURES + "translate-colons", true);
-      if(hopts.get(HtmlOptions.NORESTART))
-        reader.setFeature(FEATURES + "restart-elements", false);
-      if(hopts.get(HtmlOptions.IGNORABLE))
-        reader.setFeature(FEATURES + "ignorable-whitespace", true);
-      if(hopts.get(HtmlOptions.EMPTYBOGONS))
-        reader.setFeature(FEATURES + "bogons-empty", true);
-      if(hopts.get(HtmlOptions.ANY))
-        reader.setFeature(FEATURES + "bogons-empty", false);
-      if(hopts.get(HtmlOptions.NOROOTBOGONS))
-        reader.setFeature(FEATURES + "root-bogons", false);
-      if(hopts.get(HtmlOptions.NOCDATA))
-        reader.setFeature(FEATURES + "cdata-elements", false);
-      if(hopts.get(HtmlOptions.LEXICAL))
-        reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
-      if(hopts.contains(HtmlOptions.METHOD))
-        set(writer, HtmlOptions.METHOD, hopts.get(HtmlOptions.METHOD));
-      if(hopts.contains(HtmlOptions.DOCTYPE_SYSTEM))
-        set(writer, HtmlOptions.DOCTYPE_SYSTEM, hopts.get(HtmlOptions.DOCTYPE_SYSTEM));
-      if(hopts.contains(HtmlOptions.DOCTYPE_PUBLIC))
-        set(writer, HtmlOptions.DOCTYPE_PUBLIC, hopts.get(HtmlOptions.DOCTYPE_PUBLIC));
-      if(hopts.contains(HtmlOptions.ENCODING))
-        is.setEncoding(hopts.get(HtmlOptions.ENCODING));
-      // end TagSoup options
-
-      reader.setContentHandler((ContentHandler) writer);
       reader.parse(is);
       return new IOContent(token(sw.toString()), io.name());
 
@@ -164,15 +153,5 @@ public final class HtmlParser extends XMLParser {
       Util.errln(ex);
       return io;
     }
-  }
-
-  /**
-   * Reflection invoke XMLWriter.setOutputProperty().
-   * @param writer writer instance
-   * @param option property
-   * @param value value
-   */
-  private static void set(final Object writer, final Option<?> option, final String value) {
-    Reflect.invoke(METHOD, writer, option.name(), value);
   }
 }
