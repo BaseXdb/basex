@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class BinShift extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 binary = toB64(arg(0), qc, true);
+    final B64 binary = toB64OrNull(arg(0), qc);
     final long by = toLong(arg(1), qc);
 
     // special cases

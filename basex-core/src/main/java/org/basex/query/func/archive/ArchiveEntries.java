@@ -23,7 +23,7 @@ import org.basex.query.value.node.*;
 public final class ArchiveEntries extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final B64 archive = toB64(arg(0), qc, false);
+    final B64 archive = toB64(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
