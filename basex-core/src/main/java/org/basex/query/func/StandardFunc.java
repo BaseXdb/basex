@@ -310,26 +310,20 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Collation toCollation(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return toCollation(expr, false, qc);
+    final byte[] uri = expr != Empty.UNDEFINED ? toToken(expr, qc) : null;
+    return Collation.get(uri, qc, sc, info, WHICHCOLL_X);
   }
 
   /**
    * Evaluates an expression to a collation.
    * @param expr expression
-   * @param empty allow empty argument
    * @param qc query context
    * @return collation, or {@code null} for default collation
    * @throws QueryException query exception
    */
-  protected final Collation toCollation(final Expr expr, final boolean empty, final QueryContext qc)
+  protected final Collation toCollationOrDefault(final Expr expr, final QueryContext qc)
       throws QueryException {
-    byte[] uri = null;
-    if(expr != Empty.UNDEFINED) {
-      final Item item = expr.atomItem(qc, info);
-      if(!item.isEmpty()) uri = toToken(item);
-      else if(!empty) checkNoEmpty(item);
-    }
-    return Collation.get(uri, qc, sc, info, WHICHCOLL_X);
+    return Collation.get(toTokenOrNull(expr, qc), qc, sc, info, WHICHCOLL_X);
   }
 
   /**
@@ -511,7 +505,7 @@ public abstract class StandardFunc extends Arr {
       if(key.type.isStringOrUntyped()) {
         k = key.string(null);
       } else {
-        final QNm qnm = toQNm(key, false);
+        final QNm qnm = toQNm(key);
         final TokenBuilder tb = new TokenBuilder();
         if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
         k = tb.add(qnm.local()).finish();

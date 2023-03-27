@@ -532,26 +532,34 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Evaluates an expression to a Base64 item.
-   * @param empty allow empty result
    * @param expr expression
    * @param qc query context
    * @return Base64 item
    * @throws QueryException query exception
    */
-  protected final B64 toB64(final Expr expr, final QueryContext qc, final boolean empty)
-      throws QueryException {
-    return toB64(expr.atomItem(qc, info), empty);
+  protected final B64 toB64(final Expr expr, final QueryContext qc) throws QueryException {
+    return toB64(expr.atomItem(qc, info));
+  }
+
+  /**
+   * Evaluates an expression to a Base64 item.
+   * @param expr expression
+   * @param qc query context
+   * @return Base64 item, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final B64 toB64OrNull(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : toB64(item);
   }
 
   /**
    * Converts an item to a base64 item.
-   * @param empty return {@code null} if the given item is empty
    * @param item item
-   * @return Base64 item or {@code null}
+   * @return Base64 item
    * @throws QueryException query exception
    */
-  protected final B64 toB64(final Item item, final boolean empty) throws QueryException {
-    if(empty && item.isEmpty()) return null;
+  protected final B64 toB64(final Item item) throws QueryException {
     return (B64) checkType(item, BASE64_BINARY);
   }
 
@@ -570,25 +578,22 @@ public abstract class ParseExpr extends Expr {
   /**
    * Evaluates an expression to a QName.
    * @param expr expression
-   * @param empty return {@code null} if the expression yields an empty sequence
    * @param qc query context
-   * @return QName or {@code null}
+   * @return QName, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
-  protected final QNm toQNm(final Expr expr, final boolean empty, final QueryContext qc)
-      throws QueryException {
-    return toQNm(expr.atomItem(qc, info), empty);
+  protected final QNm toQNmOrNull(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : toQNm(item);
   }
 
   /**
    * Converts an item to a QName.
    * @param item item
-   * @param empty return {@code null} if the given item is empty
-   * @return QName or {@code null}
+   * @return QName
    * @throws QueryException query exception
    */
-  protected final QNm toQNm(final Item item, final boolean empty) throws QueryException {
-    if(empty && item.isEmpty()) return null;
+  protected final QNm toQNm(final Item item) throws QueryException {
     final Type type = checkNoEmpty(item, QNAME).type;
     if(type == QNAME) return (QNm) item;
     if(type.isUntyped()) throw NSSENS_X_X.get(info, type, QNAME);

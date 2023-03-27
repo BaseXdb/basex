@@ -22,7 +22,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // entries to be updated
-    final B64 archive = toB64(arg(0), qc, false);
+    final B64 archive = toB64(arg(0), qc);
     final Map<String, Item[]> map = toMap(arg(1), arg(2), qc);
 
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {

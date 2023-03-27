@@ -26,7 +26,7 @@ public class ArchiveExtractTo extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(arg(0), qc);
-    final B64 archive = toB64(arg(1), qc, false);
+    final B64 archive = toB64(arg(1), qc);
     final TokenSet hs = entries(arg(2), qc);
 
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
