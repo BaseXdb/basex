@@ -842,10 +842,15 @@ public final class FnModuleTest extends QueryPlanTest {
           "<e xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"ambiguous\">"
         + "<e><e><f>2</f></e>*<e><f>3</f></e></e>+<e><f>4</f></e></e>");
     // invalid grammar
-    error(func.args("?%$"), IXML_GEN_X_X_X);
+    error(func.args("?%$"), IXML_GRM_X_X_X);
+    // parser generation failure
+    error(func.args("s: ~[#10ffff]."), IXML_GEN_X);
     // invalid input
     error("let $parser := " + func.args("s: ~[\"x\"]*.") + "\n"
         + "return $parser('x')", IXML_INP_X_X_X);
+    // result processing error
+    error("let $parser := " + func.args("-s: 'x'.") + "\n"
+        + "return $parser('x')", IXML_RESULT_X);
   }
 
   /** Test method. */

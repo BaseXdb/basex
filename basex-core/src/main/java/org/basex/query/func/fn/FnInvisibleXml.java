@@ -18,6 +18,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.nineml.coffeefilter.*;
+import org.nineml.coffeefilter.exceptions.*;
 import org.nineml.coffeegrinder.parser.*;
 
 /**
@@ -34,11 +35,12 @@ public class FnInvisibleXml extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     if (generator == null) {
       for (String className : Arrays.asList(
-          "org.nineml.coffeefilter.InvisibleXml",
-          "org.nineml.coffeefilter.InvisibleXmlParser",
+          "org.nineml.coffeegrinder.parser.GearleyResult",
+          "org.nineml.coffeefilter.exceptions.IxmlException",
           "org.nineml.coffeefilter.InvisibleXmlDocument",
-          "org.nineml.coffeegrinder.parser.GearleyResult")) {
-        if (Reflect.find(className) == null) {
+          "org.nineml.coffeefilter.InvisibleXmlParser",
+          "org.nineml.coffeefilter.InvisibleXml")) {
+        if (!Reflect.available(className)) {
           throw BASEX_CLASSPATH_X_X.get(ii, definition.local(), className);
         }
       }
@@ -65,10 +67,10 @@ public class FnInvisibleXml extends StandardFunc {
       final InvisibleXmlParser parser = new InvisibleXml().getParserFromIxml(grammar);
       if (!parser.constructed()) {
         final Exception ex = parser.getException();
-        if (ex != null) throw IXML_UNEXPECTED_X.get(ii, ex);
+        if (ex != null) throw IXML_GEN_X.get(ii, ex);
         InvisibleXmlDocument doc = parser.getFailedParse();
         GearleyResult result = doc.getResult();
-        throw IXML_GEN_X_X_X.get(ii, result.getLastToken(),
+        throw IXML_GRM_X_X_X.get(ii, result.getLastToken(),
             doc.getLineNumber(), doc.getColumnNumber());
       }
       final Var[] params = {new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, ii)};
@@ -109,7 +111,7 @@ public class FnInvisibleXml extends StandardFunc {
       }
       try {
         return new DBNode(IO.get(doc.getTree()));
-      } catch(final IOException ex) {
+      } catch(final IOException | IxmlException ex) {
         throw IXML_RESULT_X.get(ii, ex);
       }
     }
