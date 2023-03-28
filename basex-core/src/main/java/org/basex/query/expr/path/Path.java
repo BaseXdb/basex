@@ -970,13 +970,16 @@ public abstract class Path extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr movePredicates(final CompileContext cc) throws QueryException {
-    // example: //*[text()]/text()  ->  //*/text()
+    // examples:
+    // a[b]/b      ->  a/b
+    // a[b]/b/c    ->  a/b/c
+    // a[b/c]/b/c  ->  a/b/c
     return cc.get(root, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr curr = steps[s];
         if(curr instanceof Step) {
-          final Expr ex = movePredicates(cc, s);
+          final Expr ex = movePredicates(s);
           if(ex != null) return ex;
         }
         cc.updateFocus(curr);
@@ -987,12 +990,10 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Moves a predicate downwards.
-   * @param cc compilation context
    * @param s current step
    * @return new expression or {@code null}
-   * @throws QueryException query exception
    */
-  private Expr movePredicates(final CompileContext cc, final int s) throws QueryException {
+  private Expr movePredicates(final int s) {
     final Step step = (Step) steps[s];
     if(step.exprs.length != 1 || step.mayBePositional()) return null;
 
@@ -1003,32 +1004,16 @@ public abstract class Path extends ParseExpr {
 
     final Expr[] predSteps = path.steps;
     final int sl = steps.length, pl = predSteps.length;
-    int t = s + 1, p = 0;
-    for(; t < sl && p < pl; p++, t++) {
-      if(!steps[t].equals(predSteps[p])) break;
+    int p = 0;
+    for(int i = s + 1; i < sl && p < pl; p++, i++) {
+      if(!steps[i].equals(predSteps[p])) break;
     }
-    if(t == s + 1) return null;
+    if(p < pl) return null;
 
-    // compose new path
-    final ExprList list = new ExprList();
-    // add previous steps
-    for(int r = 0; r < s; r++) list.add(steps[r]);
-    // add analyzed step without predicates
-    list.add(step.copyType(Step.get(step.info(), step.axis, step.test)));
-    // add steps in between
-    for(int r = s + 1; r < t - 1; r++) list.add(steps[r]);
-    // attach remaining predicates of analyzed step
-    if(p < pl) {
-      cc.updateFocus(list.peek());
-      final Expr expr = get(cc, info, null, Arrays.copyOfRange(predSteps, p, pl));
-      list.add(((Step) steps[t - 1]).addPredicates(expr).optimize(cc));
-    } else {
-      list.add(steps[t - 1]);
-    }
-    // add remaining steps
-    for(int r = t; r < sl; r++) list.add(steps[r]);
-
-    return get(info, root, list.finish());
+    // compose new path, adopt analyzed step without predicates
+    final Expr[] exprs = steps.clone();
+    exprs[s] = step.copyType(Step.get(step.info(), step.axis, step.test));
+    return get(info, root, exprs);
   }
 
   /**

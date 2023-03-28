@@ -1580,9 +1580,12 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>/*[a]/a", "", count(IterPath.class, 1), empty(SingleIterPath.class));
     check("<a/>/*[a]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
     check("<a/>/*[a/b]/a/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
-    check("<a/>/*[a/b]/a", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
-    check("<a/>/*[a/b]/a/c", "", count(IterPath.class, 1), count(SingleIterPath.class, 1));
     check("<a/>/*[a]/a[b]/b", "", count(IterPath.class, 1), empty(SingleIterPath.class));
+
+    // GH-2193: Bug on child node selection
+    query("<X><a><b><c/></b><d/></a></X>/*[*/*]/*", "<b><c/></b>\n<d/>");
+    check("<X/>/*[a/b]/a", "", count(IterPath.class, 2));
+    check("<X/>/*[a/b]/a/c", "", count(IterPath.class, 2));
   }
 
   /** Inline paths in FLWOR expressions. */
