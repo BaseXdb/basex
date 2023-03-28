@@ -167,6 +167,20 @@
         <artifactId>slf4j-simple</artifactId>
         <version>1.7.36</version>
       </dependency>
+      <dependency>
+        <groupId>org.nineml</groupId>
+        <artifactId>coffeefilter</artifactId>
+        <version>1.99.13</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>org.nineml</groupId>
+        <artifactId>coffeegrinder</artifactId>
+        <version>1.99.12</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

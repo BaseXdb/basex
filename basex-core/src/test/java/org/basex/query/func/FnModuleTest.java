@@ -822,6 +822,38 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void invisibleXml() {
+    final Function func = INVISIBLE_XML;
+    // unambiguous grammar
+    query(func.args(
+          "e: t;\n"
+        + "   t, [\"+-\"], e.\n"
+        + "t: f;\n"
+        + "   t, [\"*/\"], f.\n"
+        + "f: [\"0\"-\"9\"]+;\n"
+        + "   \"(\", e, \")\".") + "('2*3+4')",
+        "<e><t><t><f>2</f></t>*<f>3</f></t>+<e><t><f>4</f></t></e></e>");
+    // ambiguous grammar
+    query(func.args(
+          "e: f;\n"
+        + "   e, [\"+-*/\"], e.\n"
+        + "f: [\"0\"-\"9\"]+;\n"
+        + "   \"(\", e, \")\".") + "('2*3+4')",
+          "<e xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"ambiguous\">"
+        + "<e><e><f>2</f></e>*<e><f>3</f></e></e>+<e><f>4</f></e></e>");
+    // invalid grammar
+    error(func.args("?%$"), IXML_GRM_X_X_X);
+    // parser generation failure
+    error(func.args("s: ~[#10ffff]."), IXML_GEN_X);
+    // invalid input
+    error("let $parser := " + func.args("s: ~[\"x\"]*.") + "\n"
+        + "return $parser('x')", IXML_INP_X_X_X);
+    // result processing error
+    error("let $parser := " + func.args("-s: 'x'.") + "\n"
+        + "return $parser('x')", IXML_RESULT_X);
+  }
+
+  /** Test method. */
   @Test public void isNaN() {
     final Function func = IS_NAN;
     query(func.args(" xs:double('NaN')"), true);

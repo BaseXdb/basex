@@ -36,6 +36,8 @@ public enum QueryError {
   /** Error code. */
   BASEX_WHICH_X(BASEX, "function", "Function not found: %."),
   /** Error code. */
+  BASEX_CLASSPATH_X_X(BASEX, "function", "Function % requires missing class: %."),
+  /** Error code. */
   BASEX_ERROR_X(BASEX, "error", "%"),
   /** Error code. */
   BASEX_HTTP(BASEX, "http", "HTTP connection required."),
@@ -784,6 +786,15 @@ public enum QueryError {
   NOTHES_X(FTST, 18, "Thesaurus not found: %."),
   /** Error code. */
   FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
+
+  /** Error code. */
+  IXML_GRM_X_X_X(IXML, 1, "Failed to parse ixml grammar: could not match % at line %, column %."),
+  /** Error code. */
+  IXML_GEN_X(IXML, 2, "Failed to generate ixml parser: %"),
+  /** Error code. */
+  IXML_INP_X_X_X(IXML, 3, "Failed to parse ixml input: could not match % at line %, column %."),
+  /** Error code. */
+  IXML_RESULT_X(IXML, 4, "Failed to process ixml parser result: %"),
 
   /** Error code. */
   SERATTR_X(SENR, 1, "Attributes cannot be serialized:%."),
@@ -1535,6 +1546,7 @@ public enum QueryError {
     /** Error type. */ FOUT,
     /** Error type. */ FTDY,
     /** Error type. */ FTST,
+    /** Error type. */ IXML,
     /** Error type. */ SENR,
     /** Error type. */ SEPM,
     /** Error type. */ SERE,
