@@ -32,13 +32,13 @@
     <dependency>
       <groupId>org.ccil.cowan.tagsoup</groupId>
       <artifactId>tagsoup</artifactId>
-      <scope>provided</scope>
+      <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
-      <scope>provided</scope>
+      <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
