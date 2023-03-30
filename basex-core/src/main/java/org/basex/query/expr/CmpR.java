@@ -10,6 +10,7 @@ import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
@@ -180,15 +181,23 @@ public final class CmpR extends Single {
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
+
+    Double newMin = null, newMax = null;
     if(ex instanceof CmpR) {
       final CmpR cmp = (CmpR) ex;
-      if(expr.equals(cmp.expr) && (!or || max >= cmp.min && min <= cmp.max)) {
-        final double mn = or ? Math.min(min, cmp.min) : Math.max(min, cmp.min);
-        final double mx = or ? Math.max(max, cmp.max) : Math.min(max, cmp.max);
-        return get(cc, info, expr, mn, mx);
-      }
+      newMin = cmp.min;
+      newMax = cmp.max;
+    } else if(ex instanceof CmpG && ((CmpG) ex).op == OpG.EQ && ex.arg(1) instanceof ANum) {
+      newMin = ((ANum) ex.arg(1)).dbl();
+      newMax = newMin;
     }
-    return null;
+    if(newMin == null && newMax == null || !expr.equals(ex.arg(0)) || or &&
+        (max < newMin || min > newMax)) return null;
+
+    // determine common minimum and maximum value
+    newMin = or ? Math.min(min, newMin) : Math.max(min, newMin);
+    newMax = or ? Math.max(max, newMax) : Math.min(max, newMax);
+    return get(cc, info, expr, newMin, newMax);
   }
 
   @Override

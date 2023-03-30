@@ -3087,4 +3087,31 @@ public final class RewritingsTest extends QueryPlanTest {
     query("<a><b/><b/></a> ! head(*/last())", 2);
     query("head(<a><b/><b/></a>/* ! last())", 2);
   }
+
+  /** Merge exact and range comparisons. */
+  @Test public void gh2195() {
+    // string ranges
+    check("<_>X</_>[. <= 'W'][.  = 'X']", "", empty());
+    check("<_>X</_>[. <  'X'][.  = 'X']", "", empty());
+    check("<_>X</_>[.  = 'W'][. >= 'X']", "", empty());
+    check("<_>X</_>[. <  'X'][.  = 'X']", "", empty());
+    check("<_>X</_>[. <= 'X'][.  = 'X']", "<_>X</_>", empty(CmpSR.class));
+    check("<_>X</_>[.  = 'X'][. >= 'X']", "<_>X</_>", empty(CmpSR.class));
+
+    // numeric ranges
+    check("<_>5</_>[. <= 4][.  = 5]", "", empty());
+    check("<_>5</_>[. <  5][.  = 5]", "", empty());
+    check("<_>5</_>[.  = 4][. >= 5]", "", empty());
+    check("<_>5</_>[. <  5][.  = 5]", "", empty());
+    check("<_>5</_>[. <= 5][.  = 5]", "<_>5</_>", empty(CmpSimpleG.class));
+    check("<_>5</_>[.  = 5][. >= 5]", "<_>5</_>", empty(CmpSimpleG.class));
+
+    // integer ranges
+    check("(1 to 9)[. <= 4][.  = 5]", "", empty());
+    check("(1 to 9)[. <  5][.  = 5]", "", empty());
+    check("(1 to 9)[.  = 4][. >= 5]", "", empty());
+    check("(1 to 9)[. <  5][.  = 5]", "", empty());
+    check("(1 to 9)[. <= 5][.  = 5]", 5, empty(CmpSimpleG.class));
+    check("(1 to 9)[.  = 5][. >= 5]", 5, empty(CmpSimpleG.class));
+  }
 }

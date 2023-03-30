@@ -136,17 +136,31 @@ public final class CmpSR extends Single {
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
-    if(!(ex instanceof CmpSR)) return null;
 
-    // skip intersection if expressions to be compared are different
-    final CmpSR cmp = (CmpSR) ex;
-    if(or || coll != null || cmp.coll != null || !expr.equals(cmp.expr)) return null;
+    Collation cl = null;
+    byte[] newMin = null, newMax = null;
+    boolean newMni = mni, newMxi = mxi;
+    if(ex instanceof CmpSR) {
+      final CmpSR cmp = (CmpSR) ex;
+      newMin = cmp.min;
+      newMax = cmp.max;
+      newMni &= cmp.mni;
+      newMxi &= cmp.mxi;
+      cl = cmp.coll;
+    } else if(ex instanceof CmpG) {
+      final CmpG cmp = (CmpG) ex;
+      if(cmp.op == OpG.EQ && cmp.exprs[1] instanceof Str) {
+        newMin = ((Str) cmp.exprs[1]).string();
+        newMax = newMin;
+        cl = cmp.coll;
+      }
+    }
+    if(newMin == null && newMax == null || !expr.equals(ex.arg(0)) ||
+        cl != null || coll != null || or) return null;
 
-    // find common minimum and maximum value
-    final byte[] newMin = min == null ? cmp.min : cmp.min == null ? min : Token.max(min, cmp.min);
-    final byte[] newMax = max == null ? cmp.max : cmp.max == null ? max : Token.min(max, cmp.max);
-    final boolean newMni = mni && cmp.mni, newMxi = mxi && cmp.mxi;
-
+    // determine common minimum and maximum value
+    newMin = min == null ? newMin : newMin == null ? min : Token.max(min, newMin);
+    newMax = max == null ? newMax : newMax == null ? max : Token.min(max, newMax);
     if(newMin != null && newMax != null) {
       final int diff = Token.diff(newMin, newMax);
       // return comparison for exact hit
@@ -155,7 +169,7 @@ public final class CmpSR extends Single {
       // remove comparisons that will never yield results
       if(diff >= 0) return Bln.FALSE;
     }
-    return new CmpSR(cmp.expr, newMin, newMni, newMax, newMxi, null, info).optimize(cc);
+    return new CmpSR(expr, newMin, newMni, newMax, newMxi, null, info).optimize(cc);
   }
 
   @Override

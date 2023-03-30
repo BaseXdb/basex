@@ -347,7 +347,7 @@ public abstract class Expr extends ExprInfo {
    * @param a index of argument
    * @return argument or {@link Empty#UNDEFINED} if argument is undefined
    */
-  public final Expr arg(final int a) {
+  public Expr arg(final int a) {
     final Expr[] args = args();
     return args != null && a < args.length ? args[a] : Empty.UNDEFINED;
   }

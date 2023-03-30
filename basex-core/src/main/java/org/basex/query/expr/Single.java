@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -76,6 +77,11 @@ public abstract class Single extends ParseExpr {
   @Override
   public Expr[] args() {
     return new Expr[] { expr };
+  }
+
+  @Override
+  public Expr arg(final int a) {
+    return a < 1 ? expr : Empty.UNDEFINED;
   }
 
   @Override

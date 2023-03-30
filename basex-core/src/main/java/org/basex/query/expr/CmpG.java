@@ -420,6 +420,8 @@ public class CmpG extends Cmp {
   public Expr mergeEbv(final Expr expr, final boolean or, final CompileContext cc)
       throws QueryException {
 
+    if(expr instanceof Single) return expr.mergeEbv(this, or, cc);
+
     /* OR: merge comparisons
      * E = 'a' or E = 'b'  ->  E = ('a', 'b')
      * AND: invert operator, wrap with not()
