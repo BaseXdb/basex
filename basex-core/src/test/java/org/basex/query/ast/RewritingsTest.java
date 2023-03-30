@@ -220,6 +220,25 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a>5</a>[text() > '1' and text() < '9']", "<a>5</a>", count(CmpSR.class, 1));
     check("<a>5</a>[text() > '1' and text() < '9' and <b/>]", "<a>5</a>", count(CmpSR.class, 1));
     check("<a>5</a>[text() > '1' and . < '9']", "<a>5</a>", count(CmpSR.class, 2));
+
+    // GH-2194: String range comparisons including/excluding min/max values
+    check("<a>X</a>[. <= 'X' and . >= 'X' ]", "<a>X</a>", count(CmpSimpleG.class, 1));
+    check("<a>X</a>[. <= 'X' and . >  'X' ]", "", empty());
+    check("<a>X</a>[. <  'X' and . >= 'X' ]", "", empty());
+    check("<a>X</a>[. <  'X' and . >  'X' ]", "", empty());
+
+    check("<a>X</a>[. <= 'W' and . >= 'W' ]", "", count(CmpSimpleG.class, 1));
+    check("<a>X</a>[. <= 'W' and . >  'W' ]", "", empty());
+    check("<a>X</a>[. <  'W' and . >= 'W' ]", "", empty());
+    check("<a>X</a>[. <  'W' and . >  'W' ]", "", empty());
+
+    check("<a>X</a>[. <= 'Y' and . >= 'Y' ]", "", count(CmpSimpleG.class, 1));
+    check("<a>X</a>[. <= 'Y' and . >  'Y' ]", "", empty());
+    check("<a>X</a>[. <  'Y' and . >= 'Y' ]", "", empty());
+    check("<a>X</a>[. <  'Y' and . >  'Y' ]", "", empty());
+
+    check("<a>X</a>[. <  'X' and . <  'XX']", "", count(CmpSR.class, 1));
+    check("<a>X</a>[. >= 'X' and . >= 'XX']", "", count(CmpSR.class, 1));
   }
 
   /** Checks string-length optimizations. */

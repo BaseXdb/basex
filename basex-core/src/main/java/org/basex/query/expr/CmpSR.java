@@ -136,27 +136,26 @@ public final class CmpSR extends Single {
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
-    if(or || !(ex instanceof CmpSR)) return null;
+    if(!(ex instanceof CmpSR)) return null;
 
     // skip intersection if expressions to be compared are different
     final CmpSR cmp = (CmpSR) ex;
-    if(!(coll == null && expr.equals(cmp.expr))) return null;
+    if(or || coll != null || cmp.coll != null || !expr.equals(cmp.expr)) return null;
 
     // find common minimum and maximum value
-    final byte[] mn = min == null ? cmp.min : cmp.min == null ? min : Token.max(min, cmp.min);
-    final byte[] mx = max == null ? cmp.max : cmp.max == null ? max : Token.min(max, cmp.max);
+    final byte[] newMin = min == null ? cmp.min : cmp.min == null ? min : Token.max(min, cmp.min);
+    final byte[] newMax = max == null ? cmp.max : cmp.max == null ? max : Token.min(max, cmp.max);
+    final boolean newMni = mni && cmp.mni, newMxi = mxi && cmp.mxi;
 
-    if(mn != null && mx != null) {
-      final int d = Token.diff(mn, mx);
+    if(newMin != null && newMax != null) {
+      final int diff = Token.diff(newMin, newMax);
+      // return comparison for exact hit
+      if(diff == 0 && newMni && newMxi) return
+        new CmpG(info, expr, Str.get(newMin), OpG.EQ, null, cc.sc()).optimize(cc);
       // remove comparisons that will never yield results
-      if(d > 0) return Bln.FALSE;
-      if(d == 0) {
-        // return simplified comparison for exact hit, or false if value is not included
-        return mni && mxi ? new CmpG(info, expr, Str.get(mn), OpG.EQ, null, null).optimize(cc) :
-          Bln.FALSE;
-      }
+      if(diff >= 0) return Bln.FALSE;
     }
-    return new CmpSR(cmp.expr, mn, mni && cmp.mni, mx, mxi && cmp.mxi, null, info).optimize(cc);
+    return new CmpSR(cmp.expr, newMin, newMni, newMax, newMxi, null, info).optimize(cc);
   }
 
   @Override
