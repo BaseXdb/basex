@@ -27,6 +27,8 @@ public final class FPI extends FNode {
 
   /** PI name. */
   private final QNm name;
+  /** PI value. */
+  private final byte[] value;
 
   /**
    * Constructor for creating a processing instruction.
@@ -68,13 +70,21 @@ public final class FPI extends FNode {
   }
 
   @Override
+  public byte[] string() {
+    return value;
+  }
+
+  @Override
   public FPI materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     return materialized(test, ii) ? this : new FPI(name, value);
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FPI && name.eq(((FPI) obj).name) && super.equals(obj);
+    if(this == obj) return true;
+    if(!(obj instanceof FPI)) return false;
+    final FPI f = (FPI) obj;
+    return name.eq(f.name) && Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

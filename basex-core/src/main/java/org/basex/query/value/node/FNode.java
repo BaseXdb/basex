@@ -17,8 +17,6 @@ import org.basex.util.*;
 public abstract class FNode extends ANode {
   /** Parent node (can be {@code null}). */
   FNode parent;
-  /** Cached string value. */
-  byte[] value;
 
   /**
    * Constructor.
@@ -26,12 +24,6 @@ public abstract class FNode extends ANode {
    */
   FNode(final NodeType type) {
     super(type);
-  }
-
-  @Override
-  public byte[] string() {
-    if(value == null) value = Token.EMPTY;
-    return value;
   }
 
   @Override
@@ -90,15 +82,12 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  final byte[] string(final ANodeList iter) {
-    if(value == null) {
-      final TokenBuilder tb = new TokenBuilder();
-      for(final ANode nc : iter) {
-        if(nc.type == NodeType.ELEMENT || nc.type == NodeType.TEXT) tb.add(nc.string());
-      }
-      value = tb.finish();
+  static final byte[] string(final ANodeList iter) {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final ANode nc : iter) {
+      if(nc.type == NodeType.ELEMENT || nc.type == NodeType.TEXT) tb.add(nc.string());
     }
-    return value;
+    return tb.finish();
   }
 
   /**
@@ -143,6 +132,6 @@ public abstract class FNode extends ANode {
   public boolean equals(final Object obj) {
     if(!(obj instanceof FNode)) return false;
     final FNode n = (FNode) obj;
-    return type.eq(n.type) && Token.eq(value, n.value) && parent == n.parent;
+    return type.eq(n.type) && parent == n.parent;
   }
 }

@@ -19,6 +19,8 @@ import org.basex.util.*;
 public final class FNSpace extends FNode {
   /** Namespace name. */
   private final byte[] name;
+  /** Namespace value. */
+  private final byte[] value;
 
   /**
    * Default constructor.
@@ -42,6 +44,11 @@ public final class FNSpace extends FNode {
   }
 
   @Override
+  public byte[] string() {
+    return value;
+  }
+
+  @Override
   public FNSpace materialize(final Predicate<Data> test, final InputInfo ii,
       final QueryContext qc) {
     return materialized(test, ii) ? this : new FNSpace(name, value);
@@ -49,8 +56,10 @@ public final class FNSpace extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FNSpace && Token.eq(name, ((FNSpace) obj).name) &&
-        super.equals(obj);
+    if(this == obj) return true;
+    if(!(obj instanceof FNSpace)) return false;
+    final FNSpace f = (FNSpace) obj;
+    return Token.eq(name, ((FNSpace) obj).name) && Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

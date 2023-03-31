@@ -21,6 +21,9 @@ public final class FComm extends FNode {
   /** Two dashes, marking the start/end of a comment. */
   private static final byte[] DASHES = { '-', '-' };
 
+  /** String value. */
+  private final byte[] value;
+
   /**
    * Constructor.
    * @param value text value
@@ -48,8 +51,19 @@ public final class FComm extends FNode {
   }
 
   @Override
+  public byte[] string() {
+    return value;
+  }
+
+  @Override
   public FComm materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     return materialized(test, ii) ? this : new FComm(value);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FComm && Token.eq(value, ((FComm) obj).value) &&
+        super.equals(obj);
   }
 
   @Override

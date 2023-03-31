@@ -22,6 +22,8 @@ import org.w3c.dom.*;
 public final class FAttr extends FNode {
   /** Attribute name. */
   private final QNm name;
+  /** Attribute value. */
+  private final byte[] value;
 
   /**
    * Constructor for creating an attribute.
@@ -74,6 +76,11 @@ public final class FAttr extends FNode {
   }
 
   @Override
+  public byte[] string() {
+    return value;
+  }
+
+  @Override
   public FAttr materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     return materialized(test, ii) ? this : new FAttr(name, value);
   }
@@ -85,7 +92,10 @@ public final class FAttr extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FAttr && name.eq(((FAttr) obj).name) && super.equals(obj);
+    if(this == obj) return true;
+    if(!(obj instanceof FAttr)) return false;
+    final FAttr f = (FAttr) obj;
+    return name.eq(f.name) && Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

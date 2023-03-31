@@ -15,6 +15,9 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FTxt extends FNode {
+  /** Text value. */
+  private final byte[] value;
+
   /**
    * Constructor.
    * @param t text value
@@ -42,8 +45,19 @@ public final class FTxt extends FNode {
   }
 
   @Override
+  public byte[] string() {
+    return value;
+  }
+
+  @Override
   public FTxt materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     return materialized(test, ii) ? this : new FTxt(value);
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof FTxt && Token.eq(value, ((FTxt) obj).value) &&
+        super.equals(obj);
   }
 
   @Override
