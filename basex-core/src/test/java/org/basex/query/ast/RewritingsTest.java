@@ -239,6 +239,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
     check("<a>X</a>[. <  'X' and . <  'XX']", "", count(CmpSR.class, 1));
     check("<a>X</a>[. >= 'X' and . >= 'XX']", "", count(CmpSR.class, 1));
+
+    check("<a>X</a>[.  = 'X' and .  < 'Y' ]", "<a>X</a>", count(CmpSimpleG.class, 1));
+    check("<a>X</a>[. <= 'X' and .  < 'Y' ]", "<a>X</a>", count(CmpSR.class, 1));
+    check("<a>X</a>[. >= 'X' and . <= 'Y' ]", "<a>X</a>", count(CmpSR.class, 1));
   }
 
   /** Checks string-length optimizations. */

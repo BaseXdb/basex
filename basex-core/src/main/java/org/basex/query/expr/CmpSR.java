@@ -139,13 +139,13 @@ public final class CmpSR extends Single {
 
     Collation cl = null;
     byte[] newMin = null, newMax = null;
-    boolean newMni = mni, newMxi = mxi;
+    boolean newMni = true, newMxi = true;
     if(ex instanceof CmpSR) {
       final CmpSR cmp = (CmpSR) ex;
       newMin = cmp.min;
       newMax = cmp.max;
-      newMni &= cmp.mni;
-      newMxi &= cmp.mxi;
+      newMni = cmp.mni;
+      newMxi = cmp.mxi;
       cl = cmp.coll;
     } else if(ex instanceof CmpG) {
       final CmpG cmp = (CmpG) ex;
@@ -159,8 +159,21 @@ public final class CmpSR extends Single {
         cl != null || coll != null || or) return null;
 
     // determine common minimum and maximum value
-    newMin = min == null ? newMin : newMin == null ? min : Token.max(min, newMin);
-    newMax = max == null ? newMax : newMax == null ? max : Token.min(max, newMax);
+    if(newMin == null) {
+      newMin = min;
+      newMni = mni;
+    } else if(min != null) {
+      newMin = Token.max(min, newMin);
+      newMni = Token.eq(min, newMin) ? mni : newMni;
+    }
+    if(newMax == null) {
+      newMax = max;
+      newMxi = mxi;
+    } else if(max != null) {
+      newMax = Token.min(max, newMax);
+      newMxi = Token.eq(max, newMax) ? mxi : newMxi;
+    }
+
     if(newMin != null && newMax != null) {
       final int diff = Token.diff(newMin, newMax);
       // return comparison for exact hit
