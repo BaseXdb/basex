@@ -232,7 +232,8 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    test.setEnabled(getEditor().file().hasSuffix(IO.XQSUFFIXES));
+    final EditorArea edit = getEditor();
+    test.setEnabled(edit.file().hasSuffix(IO.XQSUFFIXES) && !edit.modified());
   }
 
   @Override
