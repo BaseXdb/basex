@@ -3118,4 +3118,17 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1 to 9)[. <= 5][.  = 5]", 5, empty(CmpSimpleG.class));
     check("(1 to 9)[.  = 5][. >= 5]", 5, empty(CmpSimpleG.class));
   }
+
+  /** Speed up operations on ASCII strings. */
+  @Test public void gh2196() {
+    query("count("
+        + "  let $input := string-join("
+        + "    for $i in 1 to 10000"
+        + "    for $i in 32 to 127"
+        + "    return codepoints-to-string($i)"
+        + "  )"
+        + "  for $c in 1 to string-length($input)"
+        + "  return substring($input, $c, 1)"
+        + ")", 960000);
+  }
 }

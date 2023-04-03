@@ -15,6 +15,8 @@ import org.basex.util.*;
 public abstract class AStr extends Item {
   /** String data (can be {@code null}). */
   byte[] value;
+  /** Encoding. {@code 0}: unknown, {@code 1}: ASCII, {@code 2}: UTF-8. */
+  private byte encoding;
 
   /**
    * Constructor.
@@ -36,6 +38,17 @@ public abstract class AStr extends Item {
   @Override
   public final boolean bool(final InputInfo ii) throws QueryException {
     return string(ii).length != 0;
+  }
+
+  /**
+   * Checks if the string only consists of ASCII characters.
+   * @param ii input info
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean ascii(final InputInfo ii) throws QueryException {
+    if(encoding == 0) encoding = (byte) (Token.ascii(string(ii)) ? 1 : 2);
+    return encoding == 1;
   }
 
   @Override

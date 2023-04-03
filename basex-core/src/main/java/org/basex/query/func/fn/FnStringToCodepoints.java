@@ -20,19 +20,20 @@ import org.basex.util.list.*;
 public final class FnStringToCodepoints extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc);
-    final int tl = value.length;
+    final AStr value = toZeroStr(arg(0), qc);
+    final byte[] token = value.string(info);
+    final int tl = token.length;
 
-    if(ascii(value)) {
+    if(value.ascii(info)) {
       return new BasicIter<Int>(tl) {
         @Override
         public Int get(final long i) {
-          return Int.get(value[(int) i]);
+          return Int.get(token[(int) i]);
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
           final LongList list = new LongList(Seq.initialCapacity(size));
-          for(final byte b : value) list.add(b);
+          for(final byte b : token) list.add(b);
           return IntSeq.get(list);
         }
       };
@@ -44,8 +45,8 @@ public final class FnStringToCodepoints extends StandardFunc {
       @Override
       public Int next() {
         if(t == tl) return null;
-        final int cp = cp(value, t);
-        t += cl(value, t);
+        final int cp = cp(token, t);
+        t += cl(token, t);
         return Int.get(cp);
       }
     };

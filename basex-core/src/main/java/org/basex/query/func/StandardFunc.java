@@ -302,6 +302,19 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Evaluates an expression to a token contained in an {@link AStr} instance.
+   * @param expr expression
+   * @param qc query context
+   * @return {@link AStr} instance token (zero-length if result is an empty sequence)
+   * @throws QueryException query exception
+   */
+  protected final AStr toZeroStr(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item value = expr.atomItem(qc, info);
+    return value.isEmpty() ? Str.EMPTY : value instanceof AStr ? ((AStr) value) :
+      Str.get(toToken(value));
+  }
+
+  /**
    * Evaluates an expression to a collation.
    * @param expr expression
    * @param qc query context

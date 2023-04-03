@@ -19,29 +19,31 @@ import org.basex.util.*;
 public final class FnSubstring extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc);
-    final boolean ascii = Token.ascii(value);
-    int length = ascii ? value.length : Token.length(value);
-    int start = start(qc), end = length(length, qc);
+    final AStr value = toZeroStr(arg(0), qc);
+    final byte[] token = value.string(info);
+    final boolean ascii = value.ascii(info);
+    final int tl = token.length;
 
+    int length = ascii ? tl : Token.length(token);
+    int start = start(qc), end = length(length, qc);
     if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
+
     if(start < 0) {
       end += start;
       start = 0;
     }
     end = Math.min(length, defined(2) ? start + end : Integer.MAX_VALUE);
     if(start >= end) return Str.EMPTY;
-    if(ascii) return Str.get(Token.substring(value, start, end));
+    if(ascii) return Str.get(Token.substring(token, start, end));
 
     // process strings with non-ascii characters
     int ss = start, ee = end, p = 0;
-    final int sl = value.length;
-    for(length = 0; length < sl; length += Token.cl(value, length), ++p) {
+    for(length = 0; length < tl; length += Token.cl(token, length), ++p) {
       if(p == start) ss = length;
       if(p == end) ee = length;
     }
     if(p == end) ee = length;
-    return Str.get(Arrays.copyOfRange(value, ss, ee));
+    return Str.get(Arrays.copyOfRange(token, ss, ee));
   }
 
   @Override

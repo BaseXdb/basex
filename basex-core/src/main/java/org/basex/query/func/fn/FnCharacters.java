@@ -22,21 +22,22 @@ import org.basex.util.list.*;
 public class FnCharacters extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc);
-    final int vl = value.length;
-    if(vl == 0) return Empty.ITER;
+    final AStr value = toZeroStr(arg(0), qc);
+    final byte[] token = toToken(value);
+    final int tl = token.length;
+    if(tl == 0) return Empty.ITER;
 
-    if(ascii(value)) {
-      return new BasicIter<Str>(vl) {
+    if(value.ascii(info)) {
+      return new BasicIter<Str>(tl) {
         @Override
         public Str get(final long i) {
-          return Str.get(new byte[] { value[(int) i] });
+          return Str.get(new byte[] { token[(int) i] });
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) {
-          final TokenList tl = new TokenList((int) size);
-          for(final byte b : value) tl.add(new byte[] { b });
-          return StrSeq.get(tl);
+          final TokenList list = new TokenList((int) size);
+          for(final byte b : token) list.add(new byte[] { b });
+          return StrSeq.get(list);
         }
       };
     }
@@ -46,9 +47,9 @@ public class FnCharacters extends StandardFunc {
 
       @Override
       public Str next() {
-        if(t == vl) return null;
-        final int e = t + cl(value, t);
-        final byte[] string = Arrays.copyOfRange(value, t, e);
+        if(t == tl) return null;
+        final int e = t + cl(token, t);
+        final byte[] string = Arrays.copyOfRange(token, t, e);
         t = e;
         return Str.get(string);
       }
@@ -57,17 +58,18 @@ public class FnCharacters extends StandardFunc {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc);
-    final int vl = value.length;
-    if(vl == 0) return Empty.VALUE;
+    final AStr value = toZeroStr(arg(0), qc);
+    final byte[] token = toZeroToken(arg(0), qc);
+    final int tl = token.length;
+    if(tl == 0) return Empty.VALUE;
 
-    final TokenList list = new TokenList(vl);
-    if(ascii(value)) {
-      for(final byte b : value) list.add(new byte[] { b });
+    final TokenList list = new TokenList(tl);
+    if(value.ascii(info)) {
+      for(final byte b : token) list.add(new byte[] { b });
     } else {
-      for(int t = 0; t < vl;) {
-        final int e = t + cl(value, t);
-        final byte[] string = Arrays.copyOfRange(value, t, e);
+      for(int t = 0; t < tl;) {
+        final int e = t + cl(token, t);
+        final byte[] string = Arrays.copyOfRange(token, t, e);
         t = e;
         list.add(string);
       }
