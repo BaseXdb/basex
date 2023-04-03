@@ -34,8 +34,8 @@ public class FnCharacters extends StandardFunc {
           return Str.get(new byte[] { token[(int) i] });
         }
         @Override
-        public Value value(final QueryContext q, final Expr expr) {
-          final TokenList list = new TokenList((int) size);
+        public Value value(final QueryContext q, final Expr expr) throws QueryException {
+          final TokenList list = new TokenList(value.length(info));
           for(final byte b : token) list.add(new byte[] { b });
           return StrSeq.get(list);
         }
@@ -59,14 +59,13 @@ public class FnCharacters extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
-    final byte[] token = toZeroToken(arg(0), qc);
-    final int tl = token.length;
-    if(tl == 0) return Empty.VALUE;
+    final byte[] token = toToken(value);
 
-    final TokenList list = new TokenList(tl);
+    final TokenList list = new TokenList(value.length(info));
     if(value.ascii(info)) {
       for(final byte b : token) list.add(new byte[] { b });
     } else {
+      final int tl = token.length;
       for(int t = 0; t < tl;) {
         final int e = t + cl(token, t);
         list.add(Arrays.copyOfRange(token, t, e));

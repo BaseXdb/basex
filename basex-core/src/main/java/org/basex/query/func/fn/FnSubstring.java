@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -18,13 +16,11 @@ import org.basex.util.*;
  */
 public final class FnSubstring extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public AStr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
-    final byte[] token = value.string(info);
-    final boolean ascii = value.ascii(info);
-    final int tl = token.length;
 
-    int length = Token.length(token, ascii), start = start(qc), end = length(length, qc);
+    final int length = value.length(info);
+    int start = start(qc), end = length(length, qc);
     if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
 
     if(start < 0) {
@@ -32,17 +28,7 @@ public final class FnSubstring extends StandardFunc {
       start = 0;
     }
     end = Math.min(length, defined(2) ? start + end : Integer.MAX_VALUE);
-    if(start >= end) return Str.EMPTY;
-    if(ascii) return Str.get(Token.substring(token, start, end));
-
-    // process strings with non-ascii characters
-    int ss = start, ee = end, p = 0;
-    for(length = 0; length < tl; length += Token.cl(token, length), ++p) {
-      if(p == start) ss = length;
-      if(p == end) ee = length;
-    }
-    if(p == end) ee = length;
-    return Str.get(Arrays.copyOfRange(token, ss, ee));
+    return start < end ? value.substring(info, start, end) : Str.EMPTY;
   }
 
   @Override

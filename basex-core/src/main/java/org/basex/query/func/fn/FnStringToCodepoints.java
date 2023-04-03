@@ -23,6 +23,7 @@ public final class FnStringToCodepoints extends StandardFunc {
     final AStr value = toZeroStr(arg(0), qc);
     final byte[] token = value.string(info);
     final int tl = token.length;
+    if(tl == 0) return Empty.ITER;
 
     if(value.ascii(info)) {
       return new BasicIter<Int>(tl) {
@@ -56,12 +57,12 @@ public final class FnStringToCodepoints extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
     final byte[] token = value.string(info);
-    final int tl = token.length;
 
-    final LongList list = new LongList(tl);
+    final LongList list = new LongList(value.length(info));
     if(value.ascii(info)) {
-      for(int t = 0; t < tl; t++) list.add(token[t]);
+      for(final byte b : token) list.add(b);
     } else {
+      final int tl = token.length;
       for(int t = 0; t < tl; t += cl(token, t)) list.add(cp(token, t));
     }
     return IntSeq.get(list);

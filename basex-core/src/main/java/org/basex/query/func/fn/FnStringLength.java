@@ -28,7 +28,7 @@ public final class FnStringLength extends ContextFn {
       else if(item.isEmpty()) return Int.ZERO;
       else return Int.get(Token.length(item.string(info)));
     }
-    return Int.get(Token.length(value.string(info), value.ascii(info)));
+    return Int.get(value.length(info));
   }
 
   @Override

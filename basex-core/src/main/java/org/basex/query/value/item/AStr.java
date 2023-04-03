@@ -1,10 +1,13 @@
 package org.basex.query.value.item;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract string item.
@@ -13,10 +16,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {
-  /** String data (can be {@code null}). */
+  /** ASCII offset flag. */
+  private static final int[] ASCII = {};
+
+  /** String data ({@code null} if not initialized yet). */
   byte[] value;
-  /** Encoding. {@code 0}: unknown, {@code 1}: ASCII, {@code 2}: UTF-8. */
-  private byte encoding;
+  /** Character offsets. {@code null}: unknown, {@code ASCII}: ASCII, otherwise: offsets. */
+  private int[] offsets;
 
   /**
    * Constructor.
@@ -47,8 +53,46 @@ public abstract class AStr extends Item {
    * @throws QueryException query exception
    */
   public boolean ascii(final InputInfo ii) throws QueryException {
-    if(encoding == 0) encoding = (byte) (Token.ascii(string(ii)) ? 1 : 2);
-    return encoding == 1;
+    if(offsets == null) {
+      final byte[] token = string(ii);
+      if(Token.ascii(token)) {
+        offsets = ASCII;
+      } else {
+        final IntList list = new IntList();
+        final int tl = token.length;
+        for(int t = 0; t < tl; t += Token.cl(token, t)) list.add(t);
+        offsets = list.finish();
+      }
+    }
+    return offsets == ASCII;
+  }
+
+  /**
+   * Returns the string length.
+   * @param ii input info
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public int length(final InputInfo ii) throws QueryException {
+    return ascii(ii) ? string(ii).length : offsets.length;
+  }
+
+  /**
+   * Returns a substring.
+   * @param ii input info
+   * @param start start position
+   * @param end end position
+   * @return substring
+   * @throws QueryException query exception
+   */
+  public AStr substring(final InputInfo ii, final int start, final int end) throws QueryException {
+    if(start == 0 && end == length(ii)) return this;
+
+    final byte[] token = string(ii);
+    final boolean ascii =  ascii(ii);
+    final int s = ascii ? start : offsets[start];
+    final int e = ascii ? end : end < offsets.length ? offsets[end] : token.length;
+    return Str.get(Arrays.copyOfRange(token, s, e));
   }
 
   @Override
