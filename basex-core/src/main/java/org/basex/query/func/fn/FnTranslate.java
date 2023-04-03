@@ -17,20 +17,23 @@ import org.basex.util.*;
  */
 public final class FnTranslate extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc);
-    final int[] replace = cps(toToken(arg(1), qc)), with = cps(toToken(arg(2), qc));
-    if(value.length == 0 || replace.length == 0) return Str.get(value);
+  public AStr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final AStr value = toZeroStr(arg(0), qc), replace = toStr(arg(1), qc), with = toStr(arg(2), qc);
 
-    final TokenBuilder tb = new TokenBuilder(value.length);
-    final int sl = replace.length, rl = with.length;
-    for(final int cp : cps(value)) {
-      int s = -1;
-      while(++s < sl && cp != replace[s]);
-      if(s == sl) {
+    final int[] cps = cps(value.string(info), value.ascii(info));
+    final int[] rplc = cps(replace.string(info), replace.ascii(info));
+    final int[] wth = cps(with.string(info), with.ascii(info));
+    final int cl = cps.length, rl = rplc.length, wl = wth.length;
+    if(cl == 0 || rl == 0) return value;
+
+    final TokenBuilder tb = new TokenBuilder(cl);
+    for(final int cp : cps) {
+      int r = -1;
+      while(++r < rl && cp != rplc[r]);
+      if(r == rl) {
         tb.add(cp);
-      } else if(s < rl) {
-        tb.add(with[s]);
+      } else if(r < wl) {
+        tb.add(wth[r]);
       }
     }
     return Str.get(tb.finish());

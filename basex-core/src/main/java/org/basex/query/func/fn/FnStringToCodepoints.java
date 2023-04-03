@@ -54,9 +54,16 @@ public final class FnStringToCodepoints extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final int[] cps = cps(toZeroToken(arg(0), qc));
-    final LongList list = new LongList(cps.length);
-    for(final int cp : cps) list.add(cp);
+    final AStr value = toZeroStr(arg(0), qc);
+    final byte[] token = value.string(info);
+    final int tl = token.length;
+
+    final LongList list = new LongList(tl);
+    if(value.ascii(info)) {
+      for(int t = 0; t < tl; t++) list.add(token[t]);
+    } else {
+      for(int t = 0; t < tl; t += cl(token, t)) list.add(cp(token, t));
+    }
     return IntSeq.get(list);
   }
 }

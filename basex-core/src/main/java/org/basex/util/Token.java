@@ -228,25 +228,6 @@ public final class Token {
   }
 
   /**
-   * Converts a token from the input encoding to UTF8.
-   * @param token token to be converted
-   * @param encoding input encoding
-   * @return byte array
-   */
-  public static byte[] utf8(final byte[] token, final String encoding) {
-    // UTF8 (comparison by ref.) or no special characters: return input
-    if(encoding == Strings.UTF8 || ascii(token)) return token;
-
-    // convert to utf8. if errors occur while converting, an empty is returned.
-    try {
-      return token(new String(token, encoding));
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      return EMPTY;
-    }
-  }
-
-  /**
    * Returns a token representation of the specified object.
    * <ul>
    *   <li> byte arrays are returned as-is.</li>
@@ -327,9 +308,19 @@ public final class Token {
    * @return codepoints
    */
   public static int[] cps(final byte[] token) {
+    return cps(token, ascii(token));
+  }
+
+  /**
+   * Converts a token to a sequence of codepoints.
+   * @param token token
+   * @param ascii ASCII flag
+   * @return codepoints
+   */
+  public static int[] cps(final byte[] token, final boolean ascii) {
     final int cl = token.length;
     final int[] cps = new int[cl];
-    if(ascii(token)) {
+    if(ascii) {
       for(int c = 0; c < cl; c++) cps[c] = token[c];
       return cps;
     }
@@ -375,8 +366,18 @@ public final class Token {
    * @return number of codepoints
    */
   public static int length(final byte[] token) {
+    return length(token, ascii(token));
+  }
+
+  /**
+   * Returns the number of codepoints in the token.
+   * @param token token
+   * @param ascii ASCII flag
+   * @return number of codepoints
+   */
+  public static int length(final byte[] token, final boolean ascii) {
     final int tl = token.length;
-    if(ascii(token)) return tl;
+    if(ascii) return tl;
     int l = 0;
     for(int t = 0; t < tl; t += cl(token, t)) ++l;
     return l;
@@ -1243,7 +1244,17 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] uc(final byte[] token) {
-    if(ascii(token)) {
+    return uc(token, ascii(token));
+  }
+
+  /**
+   * Converts the specified token to upper case.
+   * @param token token to be converted
+   * @param ascii ASCII flag
+   * @return resulting token
+   */
+  public static byte[] uc(final byte[] token, final boolean ascii) {
+    if(ascii) {
       final int tl = token.length;
       final byte[] tok = new byte[tl];
       for(int t = 0; t < tl; t++) tok[t] = (byte) uc(token[t]);
@@ -1284,7 +1295,17 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] lc(final byte[] token) {
-    if(ascii(token)) {
+    return lc(token, ascii(token));
+  }
+
+  /**
+   * Converts the specified token to lower case.
+   * @param token token to be converted
+   * @param ascii ASCII flag
+   * @return resulting token
+   */
+  public static byte[] lc(final byte[] token, final boolean ascii) {
+    if(ascii) {
       final int tl = token.length;
       final byte[] tok = new byte[tl];
       for(int t = 0; t < tl; t++) tok[t] = (byte) lc(token[t]);
@@ -1432,6 +1453,18 @@ public final class Token {
    * @return normalized token
    */
   public static byte[] normalize(final byte[] token, final Normalizer.Form form) {
-    return form == null || ascii(token) ? token : token(Normalizer.normalize(string(token), form));
+    return normalize(token, form, ascii(token));
+  }
+
+  /**
+   * Normalizes Unicode characters in the specified token.
+   * @param token token
+   * @param form normalization form (can be {@code null})
+   * @param ascii ASCII flag
+   * @return normalized token
+   */
+  public static byte[] normalize(final byte[] token, final Normalizer.Form form,
+      final boolean ascii) {
+    return form == null || ascii ? token : token(Normalizer.normalize(string(token), form));
   }
 }

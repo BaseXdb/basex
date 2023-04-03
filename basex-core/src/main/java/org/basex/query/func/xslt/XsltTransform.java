@@ -107,7 +107,12 @@ public class XsltTransform extends XsltFn {
         if(!normalized.isEmpty()) list.addUnique(normalized);
       };
       for(Throwable th = ex; th != null; th = th.getCause()) add.accept(th.getMessage());
-      add.accept(string(trim(utf8(err.toArray(), Prop.ENCODING))));
+      try {
+        add.accept(new String(err.toArray(), Prop.ENCODING));
+      } catch(final Exception e) {
+        Util.debug(e);
+        add.accept(e.getMessage());
+      }
 
       final String error = String.join("; ", list.reverse().finish());
       if(simple) throw XSLT_ERROR_X.get(info, error);

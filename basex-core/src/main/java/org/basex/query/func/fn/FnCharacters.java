@@ -69,9 +69,8 @@ public class FnCharacters extends StandardFunc {
     } else {
       for(int t = 0; t < tl;) {
         final int e = t + cl(token, t);
-        final byte[] string = Arrays.copyOfRange(token, t, e);
+        list.add(Arrays.copyOfRange(token, t, e));
         t = e;
-        list.add(string);
       }
     }
     return StrSeq.get(list);

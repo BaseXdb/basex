@@ -18,15 +18,17 @@ import org.basex.util.*;
 public final class FnStringLength extends ContextFn {
   @Override
   public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value;
+    final AStr value;
     if(defined(0)) {
-      value = toZeroToken(arg(0), qc);
+      value = toZeroStr(arg(0), qc);
     } else {
       final Item item = context(qc).item(qc, info);
-      if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item);
-      value = item.isEmpty() ? Token.EMPTY : item.string(info);
+      if(item instanceof AStr) value = (AStr) item;
+      else if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item);
+      else if(item.isEmpty()) return Int.ZERO;
+      else return Int.get(Token.length(item.string(info)));
     }
-    return Int.get(Token.length(value));
+    return Int.get(Token.length(value.string(info), value.ascii(info)));
   }
 
   @Override

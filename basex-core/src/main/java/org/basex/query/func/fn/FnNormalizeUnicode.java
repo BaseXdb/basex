@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.text.*;
 import java.text.Normalizer.Form;
 
 import org.basex.query.*;
@@ -18,13 +19,13 @@ import org.basex.util.*;
  */
 public final class FnNormalizeUnicode extends StandardFunc {
   @Override
-  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc);
+  public AStr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final AStr value = toZeroStr(arg(0), qc);
 
     Form frm = Form.NFC;
     if(defined(1)) {
       final byte[] form = uc(trim(toToken(arg(1), qc)));
-      if(form.length == 0) return Str.get(value);
+      if(form.length == 0) return value;
       try {
         frm = Form.valueOf(string(form));
       } catch(final IllegalArgumentException ex) {
@@ -32,6 +33,7 @@ public final class FnNormalizeUnicode extends StandardFunc {
         throw NORMUNI_X.get(info, form);
       }
     }
-    return Str.get(Token.normalize(value, frm));
+    return value.ascii(info) ? value :
+      Str.get(Normalizer.normalize(string(value.string(info)), frm));
   }
 }

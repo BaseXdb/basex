@@ -24,8 +24,7 @@ public final class FnSubstring extends StandardFunc {
     final boolean ascii = value.ascii(info);
     final int tl = token.length;
 
-    int length = ascii ? tl : Token.length(token);
-    int start = start(qc), end = length(length, qc);
+    int length = Token.length(token, ascii), start = start(qc), end = length(length, qc);
     if(length == 0 || start == Integer.MIN_VALUE) return Str.EMPTY;
 
     if(start < 0) {
