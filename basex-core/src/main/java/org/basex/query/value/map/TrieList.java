@@ -156,7 +156,7 @@ final class TrieList extends TrieNode {
         if(leaf.key.atomicEq(keys[k], ii)) {
           switch(merge) {
             case USE_FIRST:
-            case UNSPECIFIED:
+            case USE_ANY:
               final Value[] uf = values.clone();
               uf[k] = leaf.value;
               return new TrieList(hash, keys, uf);
@@ -212,7 +212,7 @@ final class TrieList extends TrieNode {
             unmatched.clear(j);
             switch(merge) {
               case USE_FIRST:
-              case UNSPECIFIED:
+              case USE_ANY:
                 // no change, skip the entry
                 break;
               case USE_LAST:

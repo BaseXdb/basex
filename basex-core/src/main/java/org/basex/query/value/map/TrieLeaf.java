@@ -100,7 +100,7 @@ final class TrieLeaf extends TrieNode {
 
       switch(merge) {
         case USE_FIRST:
-        case UNSPECIFIED:
+        case USE_ANY:
           return leaf;
         case USE_LAST:
           return this;
@@ -140,7 +140,7 @@ final class TrieLeaf extends TrieNode {
 
           switch(merge) {
             case USE_FIRST:
-            case UNSPECIFIED:
+            case USE_ANY:
               break;
             case USE_LAST:
               vs[i] = value;
