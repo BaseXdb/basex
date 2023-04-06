@@ -25,14 +25,13 @@ public final class MapBuild extends StandardFunc {
     final FItem combine = defined(3) ? toFunction(arg(3), 2, qc) : null;
 
     XQMap map = XQMap.empty();
-    for(Item item; (item = input.next()) != null;) {
+    for(Item item; (item = qc.next(input)) != null;) {
       final Item k = (key != null ? key.invoke(qc, info, item) : item).atomItem(qc, info);
       if(!k.isEmpty()) {
         Value v = value != null ? value.invoke(qc, info, item) : item;
         if(map.contains(k, info)) {
           final Value o = map.get(k, info);
-          v = combine != null ? combine.invoke(qc, info, o, v) :
-            ValueBuilder.concat(o, v, qc);
+          v = combine != null ? combine.invoke(qc, info, o, v) : ValueBuilder.concat(o, v, qc);
         }
         map = map.put(k, v, info);
       }
