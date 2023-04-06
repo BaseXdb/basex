@@ -269,4 +269,25 @@ public final class XQuery4Test extends QueryPlanTest {
     check("(1 to 6) ! (switch(.) case 6 to 8 return 'x' case 6 to 8 return '' default return ())",
         "x", empty(Switch.class), exists(IterFilter.class));
   }
+
+  /** Numeric literals. */
+  @Test public void literals() {
+    query("0000000000000001", 1);
+    query("1", 1);
+    query("15", 15);
+    query("9223372036854775807", Long.MAX_VALUE);
+    query("-9223372036854775807", -Long.MAX_VALUE);
+
+    query("0x0000000000000001", 1);
+    query("0x1", 1);
+    query("0xF", 15);
+    query("0x7FFFFFFFFFFFFFFF", Long.MAX_VALUE);
+    query("-0x7FFFFFFFFFFFFFFF", -Long.MAX_VALUE);
+
+    query("0b0000000000000001", 1);
+    query("0b1", 1);
+    query("0b1111", 15);
+    query("0b111111111111111111111111111111111111111111111111111111111111111", Long.MAX_VALUE);
+    query("-0b111111111111111111111111111111111111111111111111111111111111111", -Long.MAX_VALUE);
+  }
 }

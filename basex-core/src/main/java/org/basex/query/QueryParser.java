@@ -2404,42 +2404,65 @@ public class QueryParser extends InputParser {
    */
   private Expr numericLiteral(final char ch) throws QueryException {
     if(!digit(ch) && ch != '.') return null;
-
-    // integer digits
     token.reset();
-    while(digit(curr())) token.add(consume());
 
-    // fractional digits?
-    final boolean dec = consume('.');
-    if(dec) {
-      token.add('.');
-      if(digit(curr())) {
-        do { token.add(consume()); } while(digit(curr()));
-      } else if(token.size() == 1) {
-        throw error(NUMBER_X, token);
+    int base = 10;
+    if(ch == '0') {
+      final char n = next();
+      if(n == 'x' || n == 'X') base = 16;
+      else if(n == 'b' || n == 'B') base = 2;
+      if(base != 10) {
+        consume();
+        consume();
       }
     }
 
-    // double value
-    if(XMLToken.isNCStartChar(curr())) {
-      if(!consume('e') && !consume('E')) throw error(NUMBERWS_X, token);
-      token.add('e');
-      if(curr('+') || curr('-')) token.add(consume());
-      if(!digit(curr())) throw error(NUMBER_X, token);
-      do { token.add(consume()); } while(digit(curr()));
+    boolean range = false;
+    long l = 0;
+    for(char c; (c = curr()) != 0;) {
+      final int n = c <= '9' ? c - 0x30 : (c & 0xDF) - 0x37;
+      if(n >= base || !(c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')) {
+        break;
+      }
+      l = l * base + n;
+      if(l < 0 || l == 0 && c != '0') range = true;
+      token.add(consume());
+    };
 
-      if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS_X, token);
-      return Dbl.get(token.toArray(), info());
+    if(base == 10) {
+      // fractional digits?
+      final boolean dec = consume('.');
+      if(dec) {
+        token.add('.');
+        if(digit(curr())) {
+          do {
+            token.add(consume());
+          } while(digit(curr()));
+        } else if(token.size() == 1) {
+          throw error(NUMBER_X, token);
+        }
+      }
+      // double value
+      if(XMLToken.isNCStartChar(curr())) {
+        if(!consume('e') && !consume('E')) throw error(NUMBERWS_X, token);
+        token.add('e');
+        if(curr('+') || curr('-')) token.add(consume());
+        if(!digit(curr())) throw error(NUMBER_X, token);
+        do {
+          token.add(consume());
+        } while(digit(curr()));
+
+        if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS_X, token);
+        return Dbl.get(token.toArray(), info());
+      }
+      // decimal value
+      if(dec) return Dec.get(new BigDecimal(string(token.toArray())));
     }
-
-    // decimal value
-    if(dec) return Dec.get(new BigDecimal(string(token.toArray())));
 
     // integer value
     if(token.isEmpty()) throw error(NUMBER_X, token);
-    final long l = toLong(token.toArray());
-    return l != Long.MIN_VALUE ? Int.get(l) :
-      FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
+    if(range) return FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
+    return Int.get(l);
   }
 
   /**

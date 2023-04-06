@@ -274,7 +274,7 @@ public class CmpG extends Cmp {
           // position() + 1 < last()  ->  position() < last() - 1
           // count(E) div 2 = 1  ->  count(E) = 1 * 2
           // $a - 1 = $b + 1  ->  $a = $b + 2
-          // $x * -1 = 1  ->  $x = 1 div -1  (no rewrite if RHS if */div (<,<=,>=,>) is negative)
+          // $x * -1 = 1  ->  $x = 1 div -1  (no rewrite if RHS of */div (<,<=,>=,>) is negative)
           final Expr arg2 = new Arith(info, expr2, op12, calc1.invert()).optimize(cc);
           ex = new CmpG(info, op11, arg2, op, coll, sc);
         }

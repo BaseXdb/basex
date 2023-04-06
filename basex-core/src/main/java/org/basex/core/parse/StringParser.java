@@ -231,8 +231,7 @@ final class StringParser extends CommandParser {
       } else if(ch == '"' && sb.length() == 0) {
         quoted = true;
       }
-      sb.append(ch);
-      parser.consume();
+      sb.append(parser.consume());
     }
     return finish(sb.toString().replaceAll("^\"|\"$", ""), cmd);
   }
