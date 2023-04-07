@@ -2414,45 +2414,46 @@ public class QueryParser extends InputParser {
       if(base != 10) {
         consume();
         consume();
+        if(curr('_')) throw error(NUMBER_X, token.add('_'));
       }
     }
 
     boolean range = false;
     long l = 0;
+    boolean us = false;
     for(char c; (c = curr()) != 0;) {
-      final int n = c <= '9' ? c - 0x30 : (c & 0xDF) - 0x37;
-      if(n >= base || !(c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')) {
-        break;
+      if(consume('_')) {
+        us = true;
+      } else {
+        final int n = c <= '9' ? c - 0x30 : (c & 0xDF) - 0x37;
+        if(n >= base || !(c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')) {
+          break;
+        }
+        l = l * base + n;
+        if(l < 0 || l == 0 && c != '0') range = true;
+        token.add(consume());
+        us = false;
       }
-      l = l * base + n;
-      if(l < 0 || l == 0 && c != '0') range = true;
-      token.add(consume());
     };
+    if(us) throw error(NUMBER_X, token.add('_'));
 
     if(base == 10) {
       // fractional digits?
       final boolean dec = consume('.');
       if(dec) {
         token.add('.');
-        if(digit(curr())) {
-          do {
-            token.add(consume());
-          } while(digit(curr()));
-        } else if(token.size() == 1) {
-          throw error(NUMBER_X, token);
-        }
+        if(digit(curr())) digits();
+        else if(token.size() == 1) throw error(NUMBER_X, token);
       }
       // double value
       if(XMLToken.isNCStartChar(curr())) {
-        if(!consume('e') && !consume('E')) throw error(NUMBERWS_X, token);
+        if(!consume('e') && !consume('E')) throw error(NUMBER_X, token);
         token.add('e');
         if(curr('+') || curr('-')) token.add(consume());
-        if(!digit(curr())) throw error(NUMBER_X, token);
-        do {
-          token.add(consume());
-        } while(digit(curr()));
+        if(digit(curr())) digits();
+        else throw error(NUMBER_X, token);
 
-        if(XMLToken.isNCStartChar(curr())) throw error(NUMBERWS_X, token);
+        if(XMLToken.isNCStartChar(curr())) throw error(NUMBER_X, token);
         return Dbl.get(token.toArray(), info());
       }
       // decimal value
@@ -2463,6 +2464,20 @@ public class QueryParser extends InputParser {
     if(token.isEmpty()) throw error(NUMBER_X, token);
     if(range) return FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
     return Int.get(l);
+  }
+
+  /**
+   * Parses the "Digits" rule.
+   * @throws QueryException query exception
+   */
+  private void digits() throws QueryException {
+    boolean us;
+    do {
+      us = false;
+      token.add(consume());
+      while(consume('_')) us = true;
+    } while(digit(curr()));
+    if(us) throw error(NUMBER_X, token.add('_'));
   }
 
   /**

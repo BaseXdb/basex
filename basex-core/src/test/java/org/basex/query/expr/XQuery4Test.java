@@ -289,5 +289,27 @@ public final class XQuery4Test extends QueryPlanTest {
     query("0b1111", 15);
     query("0b111111111111111111111111111111111111111111111111111111111111111", Long.MAX_VALUE);
     query("-0b111111111111111111111111111111111111111111111111111111111111111", -Long.MAX_VALUE);
+
+    // underscores
+    query("0b0_1", 1);
+    query("0x2_3", 35);
+    query("4_5", 45);
+    query("67.89", 67.89);
+    query("1_000_000", 1_000_000);
+    query("1_2__3_________4.5______________6e7________________________8", 1234.56e78);
+
+    error("_1", NOCTX_X);
+    error("2._3", NUMBER_X);
+    error("4e_5", NUMBER_X);
+    error("6.7e_8", NUMBER_X);
+
+    error("0b_0", NUMBER_X);
+    error("0b1_", NUMBER_X);
+    error("0x_2", NUMBER_X);
+    error("0x3_", NUMBER_X);
+    error("0x3_", NUMBER_X);
+    error("0x4_", NUMBER_X);
+    error("5.6_", NUMBER_X);
+    error("7.8e9_", NUMBER_X);
   }
 }
