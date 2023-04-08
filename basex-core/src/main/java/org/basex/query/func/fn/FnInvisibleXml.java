@@ -110,8 +110,8 @@ public final class FnInvisibleXml extends StandardFunc {
             doc.getColumnNumber());
       }
       final ArrayOutput ao = new ArrayOutput();
-      doc.getTree(new PrintStream(ao, false, StandardCharsets.UTF_8));
       try {
+        doc.getTree(new PrintStream(ao, false, StandardCharsets.UTF_8));
         return new DBNode(new IOContent(ao.finish()));
       } catch(final IOException | IxmlException ex) {
         throw IXML_RESULT_X.get(ii, ex);
