@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.SeqType.*;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.io.*;
@@ -107,8 +108,17 @@ public final class FnInvisibleXml extends StandardFunc {
         throw IXML_INP_X_X_X.get(ii, result.getLastToken(), doc.getLineNumber(),
             doc.getColumnNumber());
       }
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      PrintStream stream;
       try {
-        return new DBNode(IO.get(doc.getTree()));
+        stream = new PrintStream(baos, false, StandardCharsets.UTF_8.name());
+      } catch (UnsupportedEncodingException ex) {
+        throw Util.notExpected(ex);
+      }
+      doc.getTree(stream);
+      String tree = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+      try {
+        return new DBNode(IO.get(tree));
       } catch(final IOException | IxmlException ex) {
         throw IXML_RESULT_X.get(ii, ex);
       }
