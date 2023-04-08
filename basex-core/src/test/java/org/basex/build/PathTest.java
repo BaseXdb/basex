@@ -83,6 +83,16 @@ public final class PathTest extends SandboxTest {
   }
 
   /**
+   * Tests on empty collections.
+   */
+  @Test public void emptyCollection() {
+    execute(new Open(WEEK1));
+    query("collection()//text/text() => head()", "text");
+    query("collection(())//text/text() => head()", "text");
+    query("collection('" + WEEK1 + "')//text/text() => head()", "text");
+  }
+
+  /**
    * Checks the results of the query without index access.
    */
   @Test public void withoutIndexTest() {

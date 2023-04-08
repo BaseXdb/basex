@@ -11,7 +11,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Document and collection functions.
@@ -35,13 +34,13 @@ public abstract class Docs extends DynamicFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // pre-evaluate if target is empty
-    final Expr expr = arg(0);
-    if(expr == Empty.VALUE || expr == Empty.UNDEFINED) return value(cc.qc);
-
-    // pre-evaluate during dynamic compilation if target is not a remote URL
-    if(cc.dynamic && expr instanceof Value) {
-      queryInput = queryInput(toToken(expr.atomItem(cc.qc, info)));
+    // pre-evaluate during dynamic compilation
+    if(cc.dynamic && arg(0) instanceof Value) {
+      // target is empty
+      final Item item = arg(0).atomItem(cc.qc, info);
+      if(item.isEmpty()) return value(cc.qc);
+      // target is not a remote URL
+      queryInput = queryInput(toToken(item));
       if(queryInput == null || !(queryInput.io instanceof IOUrl)) return value(cc.qc);
     }
     return this;
@@ -62,9 +61,9 @@ public abstract class Docs extends DynamicFn {
             // add local lock if argument may reference a database
             queryInput = queryInput(uri);
             if(queryInput != null && queryInput.dbName != null) list.add(queryInput.dbName);
-          } else if(!expr.seqType().zero()) {
-            // otherwise, database cannot be locked statically
-            list.add(null);
+          } else {
+            // empty sequence: default collection; otherwise, enforce global lock
+            list.add(expr.seqType().zero() ? Locking.COLLECTION : null);
           }
         } else {
           list.add(Locking.COLLECTION);
