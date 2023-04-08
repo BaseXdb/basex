@@ -607,6 +607,21 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void formatInteger() {
+    final Function func = FORMAT_INTEGER;
+
+    query(func.args(11, "1"), "11");
+    query(func.args(11, "001"), "011");
+
+    query(func.args(1234, "16^ffff"), "04d2");
+    query(func.args(1234, "16^F"), "4D2");
+    query(func.args(12345678, "16^ffff_ffff"), "00bc_614e");
+    query(func.args(12345678, "16^#_ffff"), "bc_614e");
+    query(func.args(255, "2^1111 1111"), "1111 1111");
+    query(func.args(1023, "32^AAAA"), "00VV");
+  }
+
+  /** Test method. */
   @Test public void functionLookup() {
     final Function func = FUNCTION_LOOKUP;
 
@@ -1314,6 +1329,27 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args("Wed, 99 Jun 94 07:29:35. GMT"), IETF_PARSE_X_X_X);
     error(func.args("Wed, 99 Jun 94 07:29:35 0500"), IETF_PARSE_X_X_X);
     error(func.args("Wed, 99 Jun 94 07:29:35 +0500"), IETF_INV_X);
+  }
+
+  /** Test method. */
+  @Test public void parseInteger() {
+    final Function func = PARSE_INTEGER;
+    // successful queries
+    query(func.args("100", 2), 4);
+    query(func.args("1111111111111111", 2), 65535);
+    query(func.args("10000000000000000", 2), 65536);
+    query(func.args("4", 16), 4);
+    query(func.args("ffff", 16), 65535);
+    query(func.args("FFFF", 16), 65535);
+    query(func.args("10000", 16), 65536);
+    query(func.args("4", 10), 4);
+    query(func.args("65535", 10), 65535);
+    query(func.args("65536", 10), 65536);
+
+    error(func.args("1", 1), INTRADIX_X);
+    error(func.args("1", 100), INTRADIX_X);
+    error(func.args("abc", 10), INTINVALID_X_X);
+    error(func.args("012", 2), INTINVALID_X_X);
   }
 
   /** Test method. */

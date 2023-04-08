@@ -720,6 +720,11 @@ public enum QueryError {
   IETF_INV_X(FORG, 10, "Invalid input: '%'."),
 
   /** Error code. */
+  INTRADIX_X(FORG, 11, "Radix out of range (2-36): %."),
+  /** Error code. */
+  INTINVALID_X_X(FORG, 12, "Invalid digit for radix %: %."),
+
+  /** Error code. */
   REGFLAG_X(FORX, 1, "Invalid regular flag: '%'."),
   /** Error code. */
   REGINVALID_X(FORX, 2, "Invalid regular expression: %."),

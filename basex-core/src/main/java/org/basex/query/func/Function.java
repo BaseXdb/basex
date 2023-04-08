@@ -446,6 +446,9 @@ public enum Function implements AFunction {
   PARSE_IETF_DATE(FnParseIetfDate::new, "parse-ietf-date(value)",
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
+  PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
+      params(STRING_O, INTEGER_O), INTEGER_O),
+  /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(json[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO),
   /** XQuery function. */

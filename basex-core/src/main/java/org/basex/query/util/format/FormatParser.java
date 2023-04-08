@@ -30,6 +30,8 @@ abstract class FormatParser extends FormatUtil {
   int min;
   /** Maximum width. */
   int max = Integer.MAX_VALUE;
+  /** Radix. */
+  int radix = 10;
 
   /**
    * Constructor for formatting integers.
@@ -72,7 +74,7 @@ abstract class FormatParser extends FormatUtil {
 
     // find digit of decimal-digit-pattern
     tp.reset();
-    while(first == -1 && tp.more()) first = zeroes(tp.next());
+    while(first == -1 && tp.more()) first = zeroes(tp.next(), radix);
     // no digit found: return default primary token
     if(first == -1) return def;
 
@@ -82,7 +84,7 @@ abstract class FormatParser extends FormatUtil {
     boolean mds = false;
     while(tp.more()) {
       ch = tp.next();
-      final int d = zeroes(ch);
+      final int d = zeroes(ch, radix);
       if(d != -1) {
         // mandatory-digit-sign
         if(first != d) throw DIFFMAND_X.get(info, pic);
@@ -112,7 +114,7 @@ abstract class FormatParser extends FormatUtil {
   void finish(final byte[] pres) {
     // skip correction of case if modifier has more than one codepoint (Ww)
     final int cp = ch(pres, 0);
-    cs = cl(pres, 0) < pres.length || digit(cp) ? Case.STANDARD :
+    cs = radix == 10 && (cl(pres, 0) < pres.length || digit(cp)) ? Case.STANDARD :
       (cp & ' ') == 0 ? Case.UPPER : Case.LOWER;
     primary = lc(pres);
     if(first == -1) first = ch(primary, 0);

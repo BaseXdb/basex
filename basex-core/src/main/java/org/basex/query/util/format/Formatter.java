@@ -192,8 +192,8 @@ public abstract class Formatter extends FormatUtil {
           case 'w':
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             // first week of month: fix value, according to ISO 8601
-            if(num == 0) num = new Dtm(new Dtm(date), new DTDur(date.day() * 24, 0), false, ii).
-                toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
+            if(num == 0) num = new Dtm(new Dtm(date), new DTDur(date.day() * 24, 0),
+                false, ii).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             err = tim;
             break;
           case 'H':
@@ -539,7 +539,7 @@ public abstract class Formatter extends FormatUtil {
    * @return number character sequence
    */
   private byte[] number(final long num, final FormatParser fp, final int first) {
-    final byte[] n = number(token(num), fp, first);
+    final byte[] n = number(token(num, fp.radix), fp, first);
     return concat(n, ordinal(num, fp.ordinal));
   }
 
@@ -551,7 +551,7 @@ public abstract class Formatter extends FormatUtil {
    * @return number character sequence
    */
   private static byte[] number(final byte[] num, final FormatParser fp, final int first) {
-    final int zero = zeroes(first);
+    final int zero = zeroes(first, fp.radix);
 
     // cache characters of presentation modifier
     final int[] mod = new TokenParser(fp.primary).toArray();
@@ -564,7 +564,7 @@ public abstract class Formatter extends FormatUtil {
     boolean regSep = false;
     for(int mp = modSize - 1; mp >= modStart; --mp) {
       final int ch = mod[mp];
-      if(ch >= zero && ch <= zero + 9) {
+      if(digit(ch, zero, fp.radix)) {
         digitPos = mp;
         continue;
       }
@@ -592,17 +592,21 @@ public abstract class Formatter extends FormatUtil {
         ch = mod[modPos--];
         if(inPos >= 0) {
           if(ch == '#' && sep) reverse.add(sepChar);
-          if(ch == '#' || ch >= zero && ch <= zero + 9) ch = num[inPos--] - '0' + zero;
+          if(ch == '#' || digit(ch, zero, fp.radix)) {
+            final int n = num[inPos--];
+            ch = fp.radix == 10 ? zero + n - '0' : n;
+          }
         } else {
           // add remaining modifiers
           if(ch == '#') break;
-          if(ch >= zero && ch <= zero + 9) ch = zero;
+          if(digit(ch, zero, fp.radix)) ch = zero;
           if(regSep && modPos + 1 < digitPos) break;
         }
       } else if(inPos >= 0) {
         // add remaining numbers
         if(sep) reverse.add(sepChar);
-        ch = num[inPos--] - '0' + zero;
+        final int n = num[inPos--];
+        ch = fp.radix == 10 ? zero + n - '0' : n;
       } else {
         // add minimum number of digits
         ch = zero;
@@ -615,6 +619,20 @@ public abstract class Formatter extends FormatUtil {
     final TokenBuilder result = new TokenBuilder();
     for(int rs = reverse.size() - 1; rs >= 0; --rs) result.add(reverse.get(rs));
     return result.finish();
+  }
+
+  /**
+   * Checks if a character is a valid digit.
+   * @param ch character
+   * @param zero zero character
+   * @param radix radix
+   * @return result of check
+   */
+  static boolean digit(final int ch, final int zero, final int radix) {
+    if(radix == 10) return ch >= zero && ch <= zero + 9;
+    final int num = ch <= '9' ? ch : (ch & 0xDF) - 0x37;
+    return ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' &&
+        num < radix;
   }
 
   /**

@@ -22,8 +22,12 @@ public final class IntFormat extends FormatParser {
   public IntFormat(final byte[] picture, final InputInfo info) throws QueryException {
     super(info);
 
+    final int rc = indexOf(picture, '^');
+    radix = rc == -1 ? 10 : toInt(substring(picture, 0, rc));
+    if(radix < 2 || radix > 36) throw PICNUM_X.get(info, picture);
+
     final int sc = lastIndexOf(picture, ';');
-    final byte[] pres = sc == -1 ? picture : substring(picture, 0, sc);
+    final byte[] pres = substring(picture, rc + 1, sc == -1 ? picture.length : sc);
     if(pres.length == 0) throw PICEMPTY.get(info, picture);
     finish(presentation(pres, ONE, false));
     if(sc == -1) return;

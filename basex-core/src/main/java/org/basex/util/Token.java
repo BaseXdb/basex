@@ -2,6 +2,7 @@ package org.basex.util;
 
 import static org.basex.query.util.DeepEqualOptions.*;
 
+import java.math.*;
 import java.text.*;
 import java.util.*;
 import java.util.function.*;
@@ -86,6 +87,15 @@ public final class Token {
   public static final DecimalFormat SF = new DecimalFormat("0.0######E0", LOC);
   /** Decimal float output. */
   public static final DecimalFormat DF = new DecimalFormat("#####0.0######", LOC);
+
+  /** BigInteger representing 2 * ({@link Long#MAX_VALUE} + 1). */
+  public static final BigInteger MAX_ULONG = BigInteger.ONE.shiftLeft(64);
+  /** Digits used in base conversion. */
+  public static final byte[] DIGITS = {
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
+    'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+    'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+  };
 
   /** Maximum length for hash calculation. */
   private static final byte MAX_HASH_LENGTH = 96;
@@ -421,6 +431,47 @@ public final class Token {
     }
     if(m) num[--nl] = '-';
     return num;
+  }
+
+  /**
+   * Creates a byte array representation of the specified integer value.
+   * @param value value to be converted
+   * @param radix radix
+   * @return integer value in byte array
+   */
+  public static byte[] token(final long value, final int radix) {
+    // use fast variant for powers of two
+    for(int shift = 1, p = 2; shift < 6; shift++, p <<= 1) {
+      if(radix == p) {
+        final byte[] bytes = new byte[(64 + shift - 1) / shift];
+        final int mask = (1 << shift) - 1;
+        long n = value;
+        int pos = bytes.length;
+        do {
+          bytes[--pos] = DIGITS[(int) (n & mask)];
+          n >>>= shift;
+        } while(n != 0);
+        return substring(bytes, pos);
+      }
+    }
+
+    final ByteList bl = new ByteList();
+    long n = value;
+    if(n < 0) {
+      // unsigned value doesn't fit in any native type...
+      final BigInteger[] dr = BigInteger.valueOf(n).add(MAX_ULONG).divideAndRemainder(
+          BigInteger.valueOf(radix));
+      n = dr[0].longValue();
+      bl.add(DIGITS[dr[1].intValue()]);
+    } else {
+      bl.add(DIGITS[(int) (n % radix)]);
+      n /= radix;
+    }
+    while(n != 0) {
+      bl.add(DIGITS[(int) (n % radix)]);
+      n /= radix;
+    }
+    return bl.reverse().finish();
   }
 
   /**

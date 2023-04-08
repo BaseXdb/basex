@@ -118,6 +118,21 @@ abstract class FormatUtil {
   }
 
   /**
+   * Returns the zero base for the specified code point, or {@code -1}.
+   * @param ch character
+   * @param radix radix (2-36)
+   * @return zero base
+   */
+  static int zeroes(final int ch, final int radix) {
+    if(radix == 10) return zeroes(ch);
+    for(int r = 0; r < radix; r++) {
+      final int c = DIGITS[r];
+      if(ch == c || ch > '9' && ch == uc(c)) return '0';
+    }
+    return -1;
+  }
+
+  /**
    * Returns the character at the specified position, or {@code 0} if the
    * specified position is outside the string range.
    * @param in input
