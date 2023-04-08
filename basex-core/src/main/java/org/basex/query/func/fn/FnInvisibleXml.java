@@ -8,6 +8,7 @@ import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -108,17 +109,10 @@ public final class FnInvisibleXml extends StandardFunc {
         throw IXML_INP_X_X_X.get(ii, result.getLastToken(), doc.getLineNumber(),
             doc.getColumnNumber());
       }
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      PrintStream stream;
+      final ArrayOutput ao = new ArrayOutput();
+      doc.getTree(new PrintStream(ao, false, StandardCharsets.UTF_8));
       try {
-        stream = new PrintStream(baos, false, StandardCharsets.UTF_8.name());
-      } catch (UnsupportedEncodingException ex) {
-        throw Util.notExpected(ex);
-      }
-      doc.getTree(stream);
-      String tree = new String(baos.toByteArray(), StandardCharsets.UTF_8);
-      try {
-        return new DBNode(IO.get(tree));
+        return new DBNode(new IOContent(ao.finish()));
       } catch(final IOException | IxmlException ex) {
         throw IXML_RESULT_X.get(ii, ex);
       }
