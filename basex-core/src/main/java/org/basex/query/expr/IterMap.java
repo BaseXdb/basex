@@ -45,6 +45,7 @@ public final class IterMap extends SimpleMap {
       @Override
       public Item next() throws QueryException {
         final QueryFocus qf = qc.focus;
+        Item item = null;
         try {
           do {
             qf.value = values[pos];
@@ -54,15 +55,15 @@ public final class IterMap extends SimpleMap {
               if(iter == Empty.ITER) {
                 iters[pos--] = null;
               } else {
-                final Item item = exprs[pos].item(qc, info);
+                item = exprs[pos].item(qc, info);
                 if(item.isEmpty()) {
+                  item = null;
                   pos--;
                 } else {
                   iters[pos] = Empty.ITER;
                   if(pos < el) {
                     values[++pos] = item;
-                  } else {
-                    return item;
+                    item = null;
                   }
                 }
               }
@@ -72,17 +73,16 @@ public final class IterMap extends SimpleMap {
                 iter = exprs[pos].iter(qc);
                 iters[pos] = iter;
               }
-              final Item item = qc.next(iter);
+              item = qc.next(iter);
               if(item == null) {
                 iters[pos--] = null;
               } else if(pos < el) {
                 values[++pos] = item;
-              } else {
-                return item;
+                item = null;
               }
             }
-          } while(pos != -1);
-          return null;
+          } while(item == null && pos != -1);
+          return item;
         } finally {
           qf.value = values[0];
         }
