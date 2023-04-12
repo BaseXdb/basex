@@ -66,7 +66,7 @@ public final class IterPosStep extends Step {
 
       private boolean preds(final ANode node) throws QueryException {
         final QueryFocus qf = qc.focus;
-        final Value cv = qf.value;
+        final Value qv = qf.value;
         qf.value = node;
         try {
           final int pl = exprs.length;
@@ -84,7 +84,7 @@ public final class IterPosStep extends Step {
             }
           }
         } finally {
-          qf.value = cv;
+          qf.value = qv;
         }
         return true;
       }

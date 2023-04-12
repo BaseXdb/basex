@@ -28,7 +28,7 @@ public final class ItemMap extends SimpleMap {
     Item item = exprs[0].item(qc, info);
 
     final QueryFocus qf = qc.focus;
-    final Value value = qf.value;
+    final Value qv = qf.value;
     try {
       final int el = exprs.length;
       for(int e = 1; e < el && !item.isEmpty(); e++) {
@@ -37,7 +37,7 @@ public final class ItemMap extends SimpleMap {
       }
       return item;
     } finally {
-      qf.value = value;
+      qf.value = qv;
     }
   }
 

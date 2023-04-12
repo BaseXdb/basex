@@ -33,14 +33,16 @@ public final class DualMap extends SimpleMap {
 
       @Override
       public Item next() throws QueryException {
+        qc.checkStop();
+
         final QueryFocus qf = qc.focus;
-        final Value value = qf.value;
+        final Value qv = qf.value;
         try {
           Item item;
           do {
             // left operand
-            qf.value = value;
-            item = qc.next(iter1);
+            qf.value = qv;
+            item = iter1.next();
             if(item == null) break;
             // right operand
             qf.value = item;
@@ -48,19 +50,19 @@ public final class DualMap extends SimpleMap {
           } while(item.isEmpty());
           return item;
         } finally {
-          qf.value = value;
+          qf.value = qv;
         }
       }
 
       @Override
       public Item get(final long i) throws QueryException {
         final QueryFocus qf = qc.focus;
-        final Value value = qf.value;
+        final Value qv = qf.value;
         try {
           qf.value = iter1.get(i);
           return exprs[1].item(qc, info);
         } finally {
-          qf.value = value;
+          qf.value = qv;
         }
       }
 

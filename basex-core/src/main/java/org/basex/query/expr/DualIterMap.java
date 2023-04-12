@@ -34,25 +34,27 @@ public final class DualIterMap extends SimpleMap {
 
       @Override
       public Item next() throws QueryException {
+        qc.checkStop();
+
         final QueryFocus qf = qc.focus;
-        final Value value = qf.value;
+        final Value qv = qf.value;
+        qf.value = item1;
         try {
           while(true) {
             // right operand
             if(iter2 != null) {
-              qf.value = item1;
-              final Item item2 = qc.next(iter2);
+              final Item item2 = iter2.next();
               if(item2 != null) return item2;
             }
             // left operand
-            qf.value = value;
+            qf.value = qv;
             item1 = iter1.next();
             if(item1 == null) return null;
             qf.value = item1;
             iter2 = expr2.iter(qc);
           }
         } finally {
-          qf.value = value;
+          qf.value = qv;
         }
       }
     };

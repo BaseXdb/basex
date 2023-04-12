@@ -42,7 +42,7 @@ public final class IterPath extends AxisPath {
         if(iter[0] == null) iter[0] = exprs[0].iter(qc);
 
         final QueryFocus qf = qc.focus;
-        final Value value = qf.value;
+        final Value qv = qf.value;
         try {
           while(true) {
             final Item item = qc.next(iter[pos]);
@@ -57,7 +57,7 @@ public final class IterPath extends AxisPath {
             }
           }
         } finally {
-          qf.value = value;
+          qf.value = qv;
         }
       }
     };

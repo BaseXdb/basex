@@ -105,7 +105,7 @@ public abstract class Preds extends Arr {
   protected final boolean match(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
     final QueryFocus qf = qc.focus;
-    final Value cv = qf.value;
+    final Value qv = qf.value;
     qf.value = item;
     try {
       for(final Expr expr : exprs) {
@@ -113,7 +113,7 @@ public abstract class Preds extends Arr {
       }
       return true;
     } finally {
-      qf.value = cv;
+      qf.value = qv;
     }
   }
 

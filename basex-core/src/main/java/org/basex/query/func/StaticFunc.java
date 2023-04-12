@@ -161,14 +161,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
     // reset context and evaluate function
     final QueryFocus qf = qc.focus;
-    final Value cv = qf.value;
+    final Value qv = qf.value;
     qf.value = null;
     try {
       final int pl = params.length;
       for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return expr.value(qc);
     } finally {
-      qf.value = cv;
+      qf.value = qv;
     }
   }
 

@@ -44,6 +44,8 @@ public final class IterMap extends SimpleMap {
 
       @Override
       public Item next() throws QueryException {
+        qc.checkStop();
+
         final QueryFocus qf = qc.focus;
         Item item = null;
         try {
@@ -73,7 +75,7 @@ public final class IterMap extends SimpleMap {
                 iter = exprs[pos].iter(qc);
                 iters[pos] = iter;
               }
-              item = qc.next(iter);
+              item = iter.next();
               if(item == null) {
                 iters[pos--] = null;
               } else if(pos < el) {
