@@ -41,7 +41,7 @@ public final class DualIterMap extends SimpleMap {
             // right operand
             if(iter2 != null) {
               qf.value = item1;
-              final Item item2 = iter2.next();
+              final Item item2 = qc.next(iter2);
               if(item2 != null) return item2;
             }
             // left operand
