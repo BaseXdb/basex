@@ -1045,9 +1045,9 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a><b/></a>[b ! ..]", "<a><b/></a>", exists(CachedPath.class));
 
     // absolute paths
-    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(IterMap.class));
-    check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, empty(IterMap.class));
-    check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, empty(IterMap.class));
+    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(DualIterMap.class));
+    check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
+    check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
   }
 
   /** Rewrite if to where. */
@@ -1623,8 +1623,8 @@ public final class RewritingsTest extends QueryPlanTest {
 
     // other axes: rewrite to simple map operator
     check("count(for $c in //c return $c/..)", 2, exists(DualMap.class));
-    check("count(for $c in //* return $c//c)", 3, exists(IterMap.class));
-    check("count(for $c in //* return $c/following::*)", 2, exists(IterMap.class));
+    check("count(for $c in //* return $c//c)", 3, exists(DualIterMap.class));
+    check("count(for $c in //* return $c/following::*)", 2, exists(DualIterMap.class));
     check("let $n := reverse((<a>A</a>, <b>B</b>)) return $n/text()", "B\nA",
         root(CachedPath.class));
   }
@@ -1743,7 +1743,7 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1890() {
     check("for $i in (1 to 2)[. >= 0] return ($i + $i)", "2\n4", root(DualMap.class));
     check("for $a in (1 to 2)[. >= 0] for $b in (1 to 2) return ($a * 2)", "2\n2\n4\n4",
-        root(IterMap.class), exists(REPLICATE));
+        root(DualIterMap.class), exists(REPLICATE));
   }
 
   /** Inlining in update expression. */
@@ -1773,7 +1773,7 @@ public final class RewritingsTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<xml><a/></xml>"));
     check("/xml ! a", "<a/>", root(IterPath.class));
     check("<a/> ! a ! b ! c ! d ! e", "", root(IterPath.class), empty(IterMap.class));
-    check("<a/> ! a ! descendant::x", "", root(IterMap.class), exists(IterPath.class));
+    check("<a/> ! a ! descendant::x", "", root(DualIterMap.class), exists(IterPath.class));
   }
 
   /** Inline variables into simple map. */
@@ -2108,9 +2108,9 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Rewrite expression range to replicate. */
   @Test public void gh1934() {
     check("for $i in (1 to 2)[. >= 0] return (1 to $i) ! $i", "1\n2\n2",
-        root(IterMap.class), exists(REPLICATE));
+        root(DualIterMap.class), exists(REPLICATE));
     check("for $i in (1 to 2)[. >= 0] for $j in 1 to $i return $i", "1\n2\n2",
-        root(IterMap.class), exists(REPLICATE));
+        root(DualIterMap.class), exists(REPLICATE));
   }
 
   /** Iterative path traversal, positional access. */
@@ -2995,7 +2995,7 @@ public final class RewritingsTest extends QueryPlanTest {
         "a", root(SUBSTRING_BEFORE));
     check("for $b in <?_ a-1?> group by $c := substring-before($b, '-') " +
         "return ($c, string-length($c))",
-        "a\n1", root(IterMap.class));
+        "a\n1", root(DualIterMap.class));
   }
 
   /** Inlined type check. */

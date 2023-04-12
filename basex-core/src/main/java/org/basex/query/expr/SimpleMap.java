@@ -90,12 +90,13 @@ public abstract class SimpleMap extends Arr {
       cached = cached || expr.has(Flag.POS);
       item = item && expr.seqType().zeroOrOne();
     }
-    final boolean dual = exprs.length == 2 && exprs[1].seqType().zeroOrOne();
+    final boolean dualiter = exprs.length == 2, dual = dualiter && exprs[1].seqType().zeroOrOne();
 
     return copyType(
       cached ? new CachedMap(info, exprs) :
       item ? new ItemMap(info, exprs) :
       dual ? new DualMap(info, exprs) :
+      dualiter ? new DualIterMap(info, exprs) :
       new IterMap(info, exprs)
     );
   }

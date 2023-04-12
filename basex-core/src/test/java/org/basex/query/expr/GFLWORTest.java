@@ -46,7 +46,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "a\na",
         empty(Let.class),
         empty(For.class),
-        root(IterMap.class),
+        root(DualIterMap.class),
         exists(REPLICATE)
     );
   }
@@ -98,7 +98,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "<x/>\n<x/>",
         empty(Let.class),
         empty(For.class),
-        root(IterMap.class),
+        root(DualIterMap.class),
         exists(REPLICATE)
     );
 
@@ -109,7 +109,7 @@ public final class GFLWORTest extends QueryPlanTest {
         "<x/>\n<x/>",
         empty(Let.class),
         empty(For.class),
-        root(IterMap.class),
+        root(DualIterMap.class),
         exists(REPLICATE)
     );
   }
@@ -265,7 +265,7 @@ public final class GFLWORTest extends QueryPlanTest {
     check("for $i in 1 to 10 let $x := <x/> return ($i, $x, $x)",
         null,
         empty(Let.class),
-        exists(IterMap.class)
+        exists(DualIterMap.class)
     );
   }
 
@@ -362,7 +362,7 @@ public final class GFLWORTest extends QueryPlanTest {
     check("let $rnd := " + _RANDOM_DOUBLE.args() + " return (1 to 10) ! $rnd",
         null,
         empty(Let.class),
-        root(IterMap.class),
+        root(DualIterMap.class),
         exists(REPLICATE)
     );
   }
