@@ -3,12 +3,11 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.SeqType.*;
 
-import java.io.*;
-import java.nio.charset.*;
 import java.util.*;
 
-import org.basex.io.*;
-import org.basex.io.out.*;
+import org.basex.build.*;
+import org.basex.build.xml.*;
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -109,11 +108,17 @@ public final class FnInvisibleXml extends StandardFunc {
         throw IXML_INP_X_X_X.get(ii, result.getLastToken(), doc.getLineNumber(),
             doc.getColumnNumber());
       }
-      final ArrayOutput ao = new ArrayOutput();
+      final MemBuilder builder = new MemBuilder(null, new Parser("", new MainOptions()) {
+        @Override
+        public void parse(final Builder build) {
+          throw Util.notExpected();
+        }
+      });
+      builder.init();
       try {
-        doc.getTree(new PrintStream(ao, false, StandardCharsets.UTF_8));
-        return new DBNode(new IOContent(ao.finish()));
-      } catch(final IOException | IxmlException ex) {
+        doc.getTree(new SAXHandler(builder, false, false));
+        return new DBNode(builder.data());
+      } catch(final IxmlException ex) {
         throw IXML_RESULT_X.get(ii, ex);
       }
     }
