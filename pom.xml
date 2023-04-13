@@ -170,14 +170,14 @@
       <dependency>
         <groupId>org.nineml</groupId>
         <artifactId>coffeefilter</artifactId>
-        <version>1.99.13</version>
+        <version>2.0.0</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>org.nineml</groupId>
         <artifactId>coffeegrinder</artifactId>
-        <version>1.99.12</version>
+        <version>2.0.0</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
