@@ -22,10 +22,10 @@ public final class MemBuilder extends Builder {
   /**
    * Constructor.
    * @param name name of database
-   * @param parse parser
+   * @param parser parser
    */
-  public MemBuilder(final String name, final Parser parse) {
-    super(name, parse);
+  public MemBuilder(final String name, final Parser parser) {
+    super(name, parser);
   }
 
   /**
