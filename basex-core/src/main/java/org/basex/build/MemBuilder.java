@@ -21,6 +21,14 @@ public final class MemBuilder extends Builder {
 
   /**
    * Constructor.
+   * @param parser parser
+   */
+  public MemBuilder(final Parser parser) {
+    this("", parser);
+  }
+
+  /**
+   * Constructor.
    * @param name name of database
    * @param parser parser
    */
@@ -73,14 +81,16 @@ public final class MemBuilder extends Builder {
 
   /**
    * Initializes the builder.
+   * @return self reference
    */
-  public void init() {
+  public MemBuilder init() {
     data = new MemData(path, nspaces, parser.options);
     meta = data.meta;
     meta.name = dbName;
     elemNames = data.elemNames;
     attrNames = data.attrNames;
     path.data(data);
+    return this;
   }
 
   /**

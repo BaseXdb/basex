@@ -55,7 +55,7 @@ public final class DirParser extends Parser {
 
   /**
    * Constructor.
-   * @param source source path
+   * @param source input source
    * @param options main options
    */
   public DirParser(final IO source, final MainOptions options) {

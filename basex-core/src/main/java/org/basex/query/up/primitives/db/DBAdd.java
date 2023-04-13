@@ -30,19 +30,19 @@ public final class DBAdd extends DBUpdate {
    * Constructor.
    * @param data target database
    * @param input document to add (IO or ANode instance)
-   * @param options database options
+   * @param qopts query options
    * @param replace replace flag
    * @param qc query context
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBAdd(final Data data, final NewInput input, final HashMap<String, String> options,
+  public DBAdd(final Data data, final NewInput input, final HashMap<String, String> qopts,
       final boolean replace, final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBADD, data, info);
     this.replace = replace;
 
-    final DBOptions dbopts = new DBOptions(options, MainOptions.PARSING, info);
+    final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, info);
     final MainOptions mopts = dbopts.assignTo(new MainOptions(qc.context.options, false));
     newDocs = new DBNew(qc, mopts, info, input);
   }

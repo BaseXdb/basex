@@ -106,7 +106,7 @@ public final class MetaData {
 
   /**
    * Constructor for a main-memory database instance.
-   * @param options database options
+   * @param options main options
    */
   public MetaData(final MainOptions options) {
     this("", null, options);
@@ -115,7 +115,7 @@ public final class MetaData {
   /**
    * Constructor.
    * @param name name of the database
-   * @param options database options
+   * @param options main options
    * @param sopts static options
    */
   public MetaData(final String name, final MainOptions options, final StaticOptions sopts) {
@@ -126,7 +126,7 @@ public final class MetaData {
    * Constructor.
    * @param name name of the database
    * @param dir database directory ({@code null} if database is in main memory)
-   * @param options database options
+   * @param options main options
    */
   private MetaData(final String name, final IOFile dir, final MainOptions options) {
     this.name = name;
@@ -496,7 +496,7 @@ public final class MetaData {
    * @param parser parser
    */
   public void assign(final Parser parser) {
-    final IO source = parser.source;
+    final IO source = parser.source();
     original = source != null ? source.path() : "";
     inputsize = source != null ? source.length() : 0;
     time = source != null ? source.timeStamp() : System.currentTimeMillis();

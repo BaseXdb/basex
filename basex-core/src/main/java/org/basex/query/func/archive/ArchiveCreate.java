@@ -73,7 +73,7 @@ public class ArchiveCreate extends ArchiveFn {
 
   /**
    * Returns the compression level.
-   * @param options options
+   * @param options create options
    * @return level
    * @throws QueryException query exception
    */

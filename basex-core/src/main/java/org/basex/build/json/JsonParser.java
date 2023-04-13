@@ -31,7 +31,7 @@ public final class JsonParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param options database options
+   * @param options main options
    * @param jopts parser options
    * @throws IOException I/O exception
    */

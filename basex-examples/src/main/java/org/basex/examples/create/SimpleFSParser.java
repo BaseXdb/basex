@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
+import org.basex.io.*;
 
 /**
  * This class serves as a simple filesystem parser and creates an XML
@@ -36,7 +37,7 @@ public final class SimpleFSParser extends Parser {
    * @param pr database properties
    */
   public SimpleFSParser(final String path, final MainOptions pr) {
-    super(path, pr);
+    super(new IOFile(path), pr);
   }
 
   @Override

@@ -174,7 +174,7 @@ public final class OptimizeAll extends ACreate {
      * @param options main options
      */
     DBParser(final DiskData data, final MainOptions options) {
-      super(data.meta.original.isEmpty() ? null : IO.get(data.meta.original), options);
+      super(data.meta.original, options);
       this.data = data;
       size = data.meta.size;
     }

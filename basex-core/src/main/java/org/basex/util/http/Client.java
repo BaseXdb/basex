@@ -43,7 +43,7 @@ public final class Client {
   /**
    * Constructor.
    * @param info input info
-   * @param options database options
+   * @param options main options
    */
   public Client(final InputInfo info, final MainOptions options) {
     this.info = info;

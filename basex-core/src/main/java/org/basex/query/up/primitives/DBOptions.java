@@ -34,12 +34,12 @@ public final class DBOptions {
 
   /**
    * Constructor.
-   * @param options query options
+   * @param qopts query options
    * @param supported supported options
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBOptions(final HashMap<String, String> options, final Option<?>[] supported,
+  public DBOptions(final HashMap<String, String> qopts, final Option<?>[] supported,
       final InputInfo info) throws QueryException {
 
     final HashMap<String, Option<?>> support = new HashMap<>();
@@ -47,7 +47,7 @@ public final class DBOptions {
       support.put(option.name().toLowerCase(Locale.ENGLISH), option);
     }
 
-    for(final Entry<String, String> entry : options.entrySet()) {
+    for(final Entry<String, String> entry : qopts.entrySet()) {
       final String key = entry.getKey();
       final Option<?> option = support.get(key);
       if(option == null) throw BASEX_OPTIONS1_X.get(info, key);

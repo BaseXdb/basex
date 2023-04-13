@@ -27,7 +27,7 @@ public final class Context {
   public final ClientBlocker blocker;
   /** Job pool. */
   public final JobPool jobs;
-  /** Options. */
+  /** Main options. */
   public final MainOptions options;
   /** Static options. */
   public final StaticOptions soptions;

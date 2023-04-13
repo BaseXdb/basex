@@ -54,7 +54,7 @@ public final class Payload {
    * @param input input stream
    * @param body create body
    * @param info input info
-   * @param options database options
+   * @param options main options
    */
   public Payload(final InputStream input, final boolean body, final InputInfo info,
       final MainOptions options) {
@@ -293,7 +293,7 @@ public final class Payload {
    * Returns an XQuery value for the specified body.
    * @param body body
    * @param type type of the body
-   * @param options database options
+   * @param options main options
    * @return value
    * @throws IOException I/O exception
    * @throws QueryException query exception

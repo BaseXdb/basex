@@ -24,7 +24,7 @@ public final class QueryJobSpec {
 
   /**
    * Constructor.
-   * @param options options
+   * @param options job options
    * @param bindings variable bindings
    * @param content query content
    */

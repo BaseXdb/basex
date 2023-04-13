@@ -34,12 +34,12 @@ public final class DBCreate extends NameUpdate {
    * Constructor.
    * @param name name for created database
    * @param inputs inputs (ANode and QueryInput references)
-   * @param opts database options
+   * @param qopts query options
    * @param qc query context
    * @param info input info
    * @throws QueryException query exception
    */
-  public DBCreate(final String name, final NewInput[] inputs, final HashMap<String, String> opts,
+  public DBCreate(final String name, final NewInput[] inputs, final HashMap<String, String> qopts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBCREATE, name, qc, info);
@@ -47,7 +47,7 @@ public final class DBCreate extends NameUpdate {
     Collections.addAll(supported, MainOptions.INDEXING);
     Collections.addAll(supported, MainOptions.PARSING);
 
-    final DBOptions dbopts = new DBOptions(opts, supported, info);
+    final DBOptions dbopts = new DBOptions(qopts, supported, info);
     options = dbopts.assignTo(new MainOptions(qc.context.options, false));
     newDocs = new DBNew(qc, options, info, inputs);
   }

@@ -29,17 +29,17 @@ public final class ReplaceDoc extends NodeUpdate {
    * @param pre target node pre value
    * @param data target data instance
    * @param input new document
-   * @param options options
+   * @param qopts query options
    * @param qc query context
    * @param info input info
    * @throws QueryException query exception
    */
   public ReplaceDoc(final int pre, final Data data, final NewInput input,
-      final HashMap<String, String> options, final QueryContext qc, final InputInfo info)
+      final HashMap<String, String> qopts, final QueryContext qc, final InputInfo info)
       throws QueryException {
 
     super(UpdateType.REPLACENODE, pre, data, info);
-    final DBOptions dbopts = new DBOptions(options, MainOptions.PARSING, info);
+    final DBOptions dbopts = new DBOptions(qopts, MainOptions.PARSING, info);
     final MainOptions mopts = dbopts.assignTo(new MainOptions(qc.context.options, false));
     newDocs = new DBNew(qc, mopts, info, input);
   }

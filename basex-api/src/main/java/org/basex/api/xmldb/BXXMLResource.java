@@ -180,9 +180,8 @@ public final class BXXMLResource implements XMLResource {
   @Override
   public ContentHandler setContentAsSAX() {
     // might be replaced by a custom SAX content handler in future
-    final MemBuilder mb = new MemBuilder("", Parser.emptyParser(coll.ctx.options));
-    mb.init();
-    return new BXSAXContentHandler(this, mb);
+    final MemBuilder builder = new MemBuilder(Parser.emptyParser(coll.ctx.options)).init();
+    return new BXSAXContentHandler(this, builder);
   }
 
   /** SAX parser. */
@@ -196,7 +195,7 @@ public final class BXXMLResource implements XMLResource {
      * @param resource resource
      */
     BXSAXContentHandler(final BXXMLResource resource, final MemBuilder builder) {
-      super(builder, false, false);
+      super(builder);
       this.resource = resource;
     }
 

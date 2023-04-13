@@ -21,32 +21,29 @@ import org.w3c.dom.Text;
 public final class DOMWrapper extends Parser {
   /** Strip namespaces. */
   private final boolean stripNS;
-  /** Name of the document. */
-  private final String filename;
   /** Root document. */
-  private final Node root;
+  private final Node doc;
   /** Element counter. */
   private int nodes;
 
   /**
    * Constructor.
    * @param doc document instance
-   * @param fn filename
-   * @param opts database options
+   * @param filename filename
+   * @param options main options
    */
-  public DOMWrapper(final Document doc, final String fn, final MainOptions opts) {
-    super(fn, opts);
-    root = doc;
-    filename = fn;
-    stripNS = opts.get(MainOptions.STRIPNS);
+  public DOMWrapper(final Document doc, final String filename, final MainOptions options) {
+    super(filename, options);
+    this.doc = doc;
+    stripNS = options.get(MainOptions.STRIPNS);
   }
 
   @Override
   public void parse(final Builder builder) throws IOException {
-    builder.openDoc(token(filename));
+    builder.openDoc(token(source.path()));
 
     final Stack<NodeIterator> stack = new Stack<>();
-    stack.push(new NodeIterator(root));
+    stack.push(new NodeIterator(doc));
 
     while(!stack.empty()) {
       final NodeIterator ni = stack.peek();
@@ -91,7 +88,7 @@ public final class DOMWrapper extends Parser {
 
   @Override
   public String detailedInfo() {
-    return Util.info(NODES_PARSED_X_X, filename, nodes);
+    return Util.info(NODES_PARSED_X_X, source, nodes);
   }
 
   @Override

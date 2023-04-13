@@ -128,7 +128,7 @@ public final class CreateDB extends ACreate {
       // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
       Util.stack(ex);
-      return error(NOT_PARSED_X, parser.source);
+      return error(NOT_PARSED_X, parser.source());
     }
   }
 

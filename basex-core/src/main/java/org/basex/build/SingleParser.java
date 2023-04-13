@@ -20,7 +20,7 @@ public abstract class SingleParser extends Parser {
   /**
    * Constructor.
    * @param source input source
-   * @param options database options
+   * @param options main options
    */
   protected SingleParser(final IO source, final MainOptions options) {
     super(source, options);

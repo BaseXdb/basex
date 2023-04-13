@@ -39,7 +39,7 @@ public class XMLParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param options database options
+   * @param options main options
    * @throws IOException I/O exception
    */
   public XMLParser(final IO source, final MainOptions options) throws IOException {
@@ -49,7 +49,7 @@ public class XMLParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param options database options
+   * @param options main options
    * @param frag allow parsing of document fragment
    * @throws IOException I/O exception
    */

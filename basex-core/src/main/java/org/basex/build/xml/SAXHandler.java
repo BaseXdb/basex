@@ -49,6 +49,14 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   /**
    * Constructor.
    * @param builder builder reference
+   */
+  public SAXHandler(final Builder builder) {
+    this(builder, false, false);
+  }
+
+  /**
+   * Constructor.
+   * @param builder builder reference
    * @param stripWS strip whitespaces
    * @param stripNS strip namespaces
    */
