@@ -108,7 +108,7 @@ public final class FnInvisibleXml extends StandardFunc {
         throw IXML_INP_X_X_X.get(ii, result.getLastToken(), doc.getLineNumber(),
             doc.getColumnNumber());
       }
-      final MemBuilder builder = new MemBuilder(null, new Parser("", new MainOptions()) {
+      final MemBuilder builder = new MemBuilder("", new Parser((String) null, new MainOptions()) {
         @Override
         public void parse(final Builder build) {
           throw Util.notExpected();
