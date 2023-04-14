@@ -103,7 +103,7 @@ public class XsltTransform extends XsltFn {
       // catch transformation errors, throw them again or add them to report
       final StringList list = new StringList();
       final Consumer<String> add = string -> {
-        final String normalized = string.replaceAll("\\s+", " ").trim();
+        final String normalized = string != null ? string.replaceAll("\\s+", " ").trim() : "";
         if(!normalized.isEmpty()) list.addUnique(normalized);
       };
       for(Throwable th = ex; th != null; th = th.getCause()) add.accept(th.getMessage());
