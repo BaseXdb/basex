@@ -3,7 +3,6 @@ package org.basex.query.expr.constr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.normalize;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -54,11 +53,11 @@ abstract class CName extends CNode {
    * Evaluates the name expression as a QName.
    * @param elem element
    * @param qc query context
-   * @param sctx static context for resolving namespaces (can be {@code null})
+   * @param compile compile-time flag
    * @return result, or {@code null} if namespace cannot be resolved (at compile time)
    * @throws QueryException query exception
    */
-  final QNm qname(final boolean elem, final QueryContext qc, final StaticContext sctx)
+  final QNm qname(final boolean elem, final QueryContext qc, final boolean compile)
       throws QueryException {
 
     final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNAME);
@@ -69,8 +68,15 @@ abstract class CName extends CNode {
 
     // check for QName
     final byte[] token = normalize(item.string(info));
-    if(XMLToken.isQName(token)) return !(elem || contains(token, ':')) ?
-      new QNm(token) : sctx != null ? new QNm(token, sctx) : null;
+    if(XMLToken.isQName(token)) {
+      byte[] uri = null;
+      final int prefix = indexOf(token, ':');
+      if(prefix != -1 || elem) {
+        if(compile) return null;
+        uri = sc.ns.uri(prefix != -1 ? substring(token, 0, prefix) : EMPTY);
+      }
+      return qc.qnmPool.get(token, uri);
+    }
 
     // check for EQName
     final String string = string(token);
@@ -78,7 +84,7 @@ abstract class CName extends CNode {
       final byte[] local = token(string.replaceAll("^.*?\\}", ""));
       final byte[] uri = normalize(token(string.replaceAll("^Q\\{|\\}.*", "")));
       if(XMLToken.isNCName(local) && !eq(uri, XMLNS_URI) && !contains(uri, '{')) {
-        return new QNm(local, uri);
+        return qc.qnmPool.get(local, uri);
       }
     }
     throw INVQNAME_X.get(info, item);

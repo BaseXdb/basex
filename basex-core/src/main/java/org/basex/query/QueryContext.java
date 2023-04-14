@@ -26,6 +26,7 @@ import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.hash.*;
@@ -69,6 +70,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();
+  /** QName pool. */
+  public final QNmPool qnmPool = new QNmPool();
   /** User-defined locks. */
   public final LockList locks = new LockList();
   /** Current query focus. */

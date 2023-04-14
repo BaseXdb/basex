@@ -3,6 +3,7 @@ package org.basex.query.expr.constr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
 import java.util.*;
 import java.util.function.*;
@@ -62,7 +63,7 @@ public final class CElem extends CName {
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.STRING, cc);
     if(name instanceof Value) {
-      final QNm nm = qname(true, cc.qc, null);
+      final QNm nm = qname(true, cc.qc, true);
       if(nm != null) {
         name = nm;
         exprType.assign(SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
@@ -134,7 +135,7 @@ public final class CElem extends CName {
       for(int i = 0; i < nl; i++) inscopeNS.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
-      final QNm nm = qname(true, qc, sc);
+      QNm nm = qname(true, qc, false);
       final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CEXML.get(info, nmPrefix, nmUri);
       if(eq(nmUri, XMLNS_URI)) throw CEINV_X.get(info, nmUri);
@@ -172,9 +173,9 @@ public final class CElem extends CName {
           if(!computed && (uri == null || !eq(uri, nmUri))) sc.ns.add(nmPrefix, nmUri);
           // add to in-scope namespaces
           if(!inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
-        } else {
+        } else if(uri != null) {
           // element has no namespace: assign default uri
-          nm.uri(uri);
+          nm = qc.qnmPool.get(nm.string(), normalize(uri));
         }
       }
 
