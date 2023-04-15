@@ -62,7 +62,7 @@ public final class CPI extends CName {
     while(++i < vl && ws(value[i]));
     value = substring(value, i);
 
-    return new FPI(new QNm(nm), FPI.parse(value, info));
+    return new FPI(qc.qnmPool.get(nm, null), FPI.parse(value, info));
   }
 
   @Override

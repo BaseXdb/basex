@@ -894,11 +894,13 @@ public enum AtomType implements Type {
         final InputInfo ii) throws QueryException {
 
       if(item.type != STRING && !item.type.isUntyped()) throw typeError(item, this, ii);
-      final byte[] nm = trim(item.string(ii));
-      if(!XMLToken.isQName(nm)) throw castError(item, ii);
-      final QNm qnm = new QNm(nm, sc);
-      if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
-      return qnm;
+      final byte[] name = trim(item.string(ii));
+      if(XMLToken.isQName(name)) {
+        final QNm qnm = qc.qnmPool.get(name, sc.ns.uri(prefix(name)));
+        if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
+        return qnm;
+      }
+      throw castError(item, ii);
     }
     @Override
     public QNm cast(final Object value, final QueryContext qc, final InputInfo ii) {

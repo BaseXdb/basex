@@ -22,6 +22,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class FnOp extends StandardFunc {
+  /** QName: X. */
+  private static final QNm X = new QNm("x");
+  /** QName: Y. */
+  private static final QNm Y = new QNm("y");
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String operator = toString(arg(0), qc);
@@ -31,7 +36,7 @@ public class FnOp extends StandardFunc {
     final Var[] params = new Var[pl];
     final Expr[] args = new Expr[pl];
     for(int p = 0; p < pl; p++) {
-      params[p] = vs.addNew(new QNm(p == 0 ? "x" : "y"), null, true, qc, ii);
+      params[p] = vs.addNew(p == 0 ? X : Y, null, true, qc, ii);
       args[p] = new VarRef(ii, params[p]);
     }
     final Expr arg1 = args[0], arg2 = args[1], body;

@@ -226,7 +226,7 @@ public final class MixedTest extends SandboxTest {
     error("element { 'Q{}' } {}", INVQNAME_X);
     error("element { 'Q{ }' } {}", INVQNAME_X);
 
-    error("element { 'Q{ http://www.w3.org/2000/xmlns/ }a' } {}", INVQNAME_X);
+    error("element { 'Q{ http://www.w3.org/2000/xmlns/ }a' } {}", CEINV_X);
   }
 
   /** Faster instance of checks. */

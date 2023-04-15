@@ -79,8 +79,8 @@ abstract class DbAccess extends StandardFunc {
     if(expr == Empty.UNDEFINED) return ia.iter(qc);
 
     // parse and compile the name test
-    final QNm qName = new QNm(toToken(expr, qc), sc);
-    if(!qName.hasPrefix()) qName.uri(sc.ns.uri(EMPTY));
+    final byte[] name = toToken(expr, qc);
+    final QNm qName = qc.qnmPool.get(name, sc.ns.uri(prefix(name)));
 
     // return empty sequence if test will yield no results
     final NameTest nt = new NameTest(qName, NamePart.FULL, NodeType.ATTRIBUTE, sc.elemNS);

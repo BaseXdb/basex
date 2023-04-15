@@ -1,7 +1,6 @@
 package org.basex.query.expr.constr;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
@@ -62,31 +61,31 @@ abstract class CName extends CNode {
 
     final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNAME);
     final Type type = item.type;
-    if(type == AtomType.QNAME) return (QNm) item;
-    if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
-      throw STRQNM_X_X.get(info, type, item);
 
-    // check for QName
-    final byte[] token = normalize(item.string(info));
-    if(XMLToken.isQName(token)) {
-      byte[] uri = null;
-      final int prefix = indexOf(token, ':');
-      if(prefix != -1 || elem) {
-        if(compile) return null;
-        uri = sc.ns.uri(prefix != -1 ? substring(token, 0, prefix) : EMPTY);
-      }
-      return qc.qnmPool.get(token, uri);
-    }
+    final QNm qnm;
+    if(type == AtomType.QNAME) {
+      qnm = (QNm) item;
+    } else {
+      if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
+        throw STRQNM_X_X.get(info, type, item);
 
-    // check for EQName
-    final String string = string(token);
-    if(string.matches("^Q\\{.*\\}.+")) {
-      final byte[] local = token(string.replaceAll("^.*?\\}", ""));
-      final byte[] uri = normalize(token(string.replaceAll("^Q\\{|\\}.*", "")));
-      if(XMLToken.isNCName(local) && !eq(uri, XMLNS_URI) && !contains(uri, '{')) {
-        return qc.qnmPool.get(local, uri);
+      // check for QName
+      final byte[] token = normalize(item.string(info));
+      if(XMLToken.isQName(token)) {
+        final byte[] prefix = prefix(token);
+        byte[] uri = null;
+        if(prefix.length != 0 || elem) {
+          if(compile) return null;
+          uri = sc.ns.uri(prefix);
+        }
+        qnm = qc.qnmPool.get(token, uri);
+      } else {
+        // check for EQName
+        qnm = qc.qnmPool.get(token);
       }
     }
+    if(qnm != null) return qnm;
+
     throw INVQNAME_X.get(info, item);
   }
 

@@ -25,13 +25,11 @@ public final class FnResolveQName extends StandardFunc {
     if(qname == null) return Empty.VALUE;
     if(!XMLToken.isQName(qname)) throw valueError(AtomType.QNAME, qname, info);
 
-    final QNm qnm = new QNm(qname);
-    final byte[] pref = qnm.prefix();
-    byte[] uri = element.uri(pref);
-    if(uri == null) uri = sc.ns.uri(pref);
-    if(uri == null) throw NSDECL_X.get(info, pref);
-    qnm.uri(uri);
-    return qnm;
+    final byte[] prefix = Token.prefix(qname);
+    byte[] uri = element.uri(prefix);
+    if(uri == null) uri = sc.ns.uri(prefix);
+    if(uri == null) throw NSDECL_X.get(info, prefix);
+    return qc.qnmPool.get(qname, uri);
   }
 
   @Override

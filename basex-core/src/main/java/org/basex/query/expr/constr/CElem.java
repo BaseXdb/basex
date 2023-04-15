@@ -3,7 +3,6 @@ package org.basex.query.expr.constr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.normalize;
 
 import java.util.*;
 import java.util.function.*;
@@ -135,7 +134,7 @@ public final class CElem extends CName {
       for(int i = 0; i < nl; i++) inscopeNS.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
-      QNm nm = qname(true, qc, false);
+      final QNm nm = qname(true, qc, false);
       final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CEXML.get(info, nmPrefix, nmUri);
       if(eq(nmUri, XMLNS_URI)) throw CEINV_X.get(info, nmUri);
@@ -165,17 +164,11 @@ public final class CElem extends CName {
           final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : sc.ns.uri(EMPTY);
           if(scopeUri != null && !eq(scopeUri, uri)) throw DUPLNSCONS_X.get(info, uri);
         }
-
-        // check if element has a namespace
-        final byte[] uri = sc.ns.uri(nmPrefix);
         if(nm.hasURI()) {
-          // add to statically known namespaces
-          if(!computed && (uri == null || !eq(uri, nmUri))) sc.ns.add(nmPrefix, nmUri);
-          // add to in-scope namespaces
+          // add new namespace to statically known namespaces
+          if(!computed && !eq(sc.ns.uri(nmPrefix), nmUri)) sc.ns.add(nmPrefix, nmUri);
+          // add new namespace to in-scope namespaces
           if(!inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
-        } else if(uri != null) {
-          // element has no namespace: assign default uri
-          nm = qc.qnmPool.get(nm.string(), normalize(uri));
         }
       }
 
@@ -195,10 +188,9 @@ public final class CElem extends CName {
         final byte[] apref = qnm.prefix();
         if(eq(apref, XML)) continue;
 
-        final byte[] auri = qnm.uri();
-        final byte[] npref = addNS(apref, auri, inscopeNS);
+        final byte[] auri = qnm.uri(), npref = addNS(apref, auri, inscopeNS);
         if(npref != null) {
-          final QNm aname = new QNm(concat(npref, COLON, qnm.local()), auri);
+          final QNm aname = qc.qnmPool.get(concat(npref, COLON, qnm.local()), auri);
           constr.atts.set(a, new FAttr(aname, att.string()));
         }
       }
