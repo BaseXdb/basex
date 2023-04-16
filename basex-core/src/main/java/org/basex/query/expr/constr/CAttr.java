@@ -43,12 +43,10 @@ public final class CAttr extends CName {
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.STRING, cc);
     if(name instanceof Value) {
-      final QNm nm = qname(true, cc.qc, true);
-      if(nm != null) {
-        name = nm;
-        exprType.assign(SeqType.get(NodeType.ATTRIBUTE, Occ.EXACTLY_ONE,
-            Test.get(NodeType.ATTRIBUTE, nm, null)));
-      }
+      final QNm nm = qname(false, cc.qc);
+      name = nm;
+      exprType.assign(SeqType.get(NodeType.ATTRIBUTE, Occ.EXACTLY_ONE,
+          Test.get(NodeType.ATTRIBUTE, nm, null)));
     }
     optValue(cc);
     return this;
@@ -56,7 +54,7 @@ public final class CAttr extends CName {
 
   @Override
   public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    QNm nm = qname(false, qc, false);
+    QNm nm = qname(false, qc);
     final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
     if(computed) {
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CAXML.get(info);

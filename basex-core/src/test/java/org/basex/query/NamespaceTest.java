@@ -742,15 +742,15 @@ public final class NamespaceTest extends SandboxTest {
   @Test public void duplicateNamespaces() {
     query("copy $c := <a xmlns='X'/> modify (" +
           "  rename node $c as QName('X', 'b')," +
-          "  insert node attribute c{'a'} into $c" +
+          "  insert node attribute c { 'a' } into $c" +
           ") return $c", "<b xmlns=\"X\" c=\"a\"/>");
     error("copy $c := <a xmlns='X'/> modify (" +
         "  rename node $c as QName('Y', 'b')," +
-        "  insert node attribute c{'a'} into $c" +
+        "  insert node attribute c { 'a' } into $c" +
         ") return $c", UPNSCONFL_X_X);
     query("copy $c := <a/> modify (" +
         "  rename node $c as QName('X', 'b')," +
-        "  insert node attribute c{'a'} into $c" +
+        "  insert node attribute c { 'a' } into $c" +
         ") return $c", "<b xmlns=\"X\" c=\"a\"/>");
   }
 

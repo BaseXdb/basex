@@ -50,47 +50,36 @@ abstract class CName extends CNode {
 
   /**
    * Evaluates the name expression as a QName.
-   * @param elem element
+   * @param elem element construction
    * @param qc query context
-   * @param compile compile-time flag
-   * @return result, or {@code null} if namespace cannot be resolved (at compile time)
+   * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final boolean elem, final QueryContext qc, final boolean compile)
-      throws QueryException {
-
+  final QNm qname(final boolean elem, final QueryContext qc) throws QueryException {
     final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNAME);
     final Type type = item.type;
+    if(type == AtomType.QNAME) return (QNm) item;
 
-    final QNm qnm;
-    if(type == AtomType.QNAME) {
-      qnm = (QNm) item;
-    } else {
-      if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
-        throw STRQNM_X_X.get(info, type, item);
+    if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
+      throw STRQNM_X_X.get(info, type, item);
 
-      // check for QName
-      final byte[] token = normalize(item.string(info));
-      if(XMLToken.isQName(token)) {
-        final byte[] prefix = prefix(token);
-        byte[] uri = null;
-        if(prefix.length != 0 || elem) {
-          if(compile) return null;
-          uri = sc.ns.uri(prefix);
-        }
-        qnm = qc.qnmPool.get(token, uri);
-      } else {
-        // check for EQName
-        qnm = qc.qnmPool.get(token);
-      }
+    // check for QName
+    final byte[] token = normalize(item.string(info));
+    if(XMLToken.isQName(token)) {
+      final byte[] prefix = prefix(token);
+      final byte[] uri = prefix.length != 0 || elem ? sc.ns.uri(prefix) : null;
+      return qc.qnmPool.get(token, uri);
     }
+
+    // check for EQName
+    final QNm qnm = qc.qnmPool.get(token);
     if(qnm != null) return qnm;
 
     throw INVQNAME_X.get(info, item);
   }
 
   /**
-   * Evaluates the name expression as a NCName.
+   * Evaluates the name expression as an NCName.
    * @param empty allow empty name
    * @param qc query context
    * @return name
@@ -98,13 +87,13 @@ abstract class CName extends CNode {
    */
   final byte[] ncname(final boolean empty, final QueryContext qc) throws QueryException {
     final Item item = name.atomItem(qc, info);
-    if(!item.isEmpty()) {
+    if(item.isEmpty()) {
+      if(empty) return EMPTY;
+    } else {
       final Type type = item.type;
       if(type.isStringOrUntyped() && type != AtomType.ANY_URI) return trim(item.string(info));
-      throw STRNCN_X_X.get(info, type, item);
     }
-    if(empty) return EMPTY;
-    throw STRNCN_X_X.get(info, SeqType.EMPTY_SEQUENCE_Z, item);
+    throw STRNCN_X_X.get(info, item.seqType(), item);
   }
 
   @Override

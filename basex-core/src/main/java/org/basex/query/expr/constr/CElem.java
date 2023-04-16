@@ -62,12 +62,10 @@ public final class CElem extends CName {
   public Expr optimize(final CompileContext cc) throws QueryException {
     name = name.simplifyFor(Simplify.STRING, cc);
     if(name instanceof Value) {
-      final QNm nm = qname(true, cc.qc, true);
-      if(nm != null) {
-        name = nm;
-        exprType.assign(SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
-            Test.get(NodeType.ELEMENT, nm, null)));
-      }
+      final QNm nm = qname(true, cc.qc);
+      name = nm;
+      exprType.assign(SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
+          Test.get(NodeType.ELEMENT, nm, null)));
     }
 
     // merge adjacent and nested text values
@@ -134,7 +132,7 @@ public final class CElem extends CName {
       for(int i = 0; i < nl; i++) inscopeNS.add(nspaces.name(i), nspaces.value(i));
 
       // create and check QName
-      final QNm nm = qname(true, qc, false);
+      final QNm nm = qname(true, qc);
       final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CEXML.get(info, nmPrefix, nmUri);
       if(eq(nmUri, XMLNS_URI)) throw CEINV_X.get(info, nmUri);
@@ -166,7 +164,7 @@ public final class CElem extends CName {
         }
         if(nm.hasURI()) {
           // add new namespace to statically known namespaces
-          if(!computed && !eq(sc.ns.uri(nmPrefix), nmUri)) sc.ns.add(nmPrefix, nmUri);
+          //if(!computed && !eq(sc.ns.uri(nmPrefix), nmUri)) sc.ns.add(nmPrefix, nmUri);
           // add new namespace to in-scope namespaces
           if(!inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
         }

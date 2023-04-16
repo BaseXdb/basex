@@ -258,7 +258,7 @@ public final class SimpleTest extends QueryTest {
       { "Map 3", strings("a", "b"), "<a><b/></a>/b ! ancestor-or-self::node() ! name()" },
       { "Map 4", strings("a", "b"), "<_ a='a' b='b'/> ! (@a, @b) ! string()" },
 
-      { "Constructor 1", strings("1"), "<n xmlns='u'>{attribute{'a'}{1}}</n>/@a/string()" },
+      { "Constructor 1", strings("1"), "<n xmlns='u'>{ attribute { 'a' }{ 1 }}</n>/@a/string()" },
 
       // #1140
       { "Pred 1", empty(), "declare function local:test() {" +

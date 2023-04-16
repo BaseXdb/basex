@@ -76,9 +76,7 @@ public abstract class CNode extends Arr {
   }
 
   @Override
-  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
-      throws QueryException {
-
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // ignore PIs and attributes as values must be normalized
     SeqType st = null;
     if(exprs.length == 1 && !(this instanceof CPI || this instanceof CAttr)) {
