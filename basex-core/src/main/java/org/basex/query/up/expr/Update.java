@@ -48,11 +48,11 @@ abstract class Update extends Arr {
   final ANodeList checkNS(final ANodeList list, final ANode targ) throws QueryException {
     for(final ANode node : list) {
       final QNm name = node.qname();
-      final byte[] pref = name.prefix();
+      final byte[] prefix = name.prefix();
       // attributes without prefix have no namespace
-      if(pref.length == 0) continue;
+      if(prefix.length == 0) continue;
       // check if attribute and target have the same namespace
-      final byte[] uri = targ.uri(pref);
+      final byte[] uri = targ.uri(prefix);
       if(uri != null && !eq(name.uri(), uri)) throw UPNSCONFL_X_X.get(info, name.uri(), uri);
     }
     return list;

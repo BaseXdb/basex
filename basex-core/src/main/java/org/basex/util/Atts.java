@@ -49,14 +49,14 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts add(final byte[] name, final byte[] value) {
-    final int sz = size;
-    if(sz == names.length) {
-      final int s = Array.newCapacity(sz);
-      names = Array.copyOf(names, s);
-      values = Array.copyOf(values, s);
+    final int s = size;
+    if(s == names.length) {
+      final int ns = Array.newCapacity(s);
+      names = Array.copyOf(names, ns);
+      values = Array.copyOf(values, ns);
     }
-    names[sz] = name;
-    values[sz] = value;
+    names[s] = name;
+    values[s] = value;
     ++size;
     return this;
   }
@@ -84,11 +84,11 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts remove(final int index) {
-    final int sz = size;
-    Array.remove(names, index, 1, sz);
-    Array.remove(values, index, 1, sz);
-    names[sz - 1] = null;
-    values[sz - 1] = null;
+    final int s = size;
+    Array.remove(names, index, 1, s);
+    Array.remove(values, index, 1, s);
+    names[s - 1] = null;
+    values[s - 1] = null;
     --size;
     return this;
   }
@@ -140,6 +140,14 @@ public final class Atts extends ElementList {
   public byte[] value(final byte[] name) {
     final int i = get(name);
     return i == -1 ? null : values[i];
+  }
+
+  @Override
+  public void optimize() {
+    if(size != names.length) {
+      names = Array.copyOf(names, size);
+      values = Array.copyOf(values, size);
+    }
   }
 
   @Override

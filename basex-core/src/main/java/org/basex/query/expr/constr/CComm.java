@@ -13,7 +13,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Comment fragment.
+ * Comment constructor.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen

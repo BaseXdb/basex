@@ -146,7 +146,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void insertAttributeWithNs() {
     create(1);
-    query("insert node attribute { QName('ns', 'pref:local') } { } into /*");
+    query("insert node attribute { QName('ns', 'prefix:local') } { } into /*");
     final Data data = context.data();
     assertFalse(data.nsFlag(0));
     assertTrue(data.nsFlag(1));

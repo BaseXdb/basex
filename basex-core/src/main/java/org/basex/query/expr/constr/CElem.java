@@ -150,27 +150,21 @@ public final class CElem extends CName {
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
       if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
 
-      // add namespace for element name (unless its prefix is "xml")
+      // add new namespaces
       final Atts cns = constr.nspaces;
       if(!eq(nmPrefix, XML)) {
         // check declaration of default namespace
         final int cnsDef = cns.get(EMPTY);
         if(cnsDef != -1) {
-          final byte[] uri = cns.value(cnsDef);
-          if(!nm.hasURI()) throw EMPTYNSCONS_X.get(info, uri);
+          if(!nm.hasURI()) throw EMPTYNSCONS_X.get(info, node);
           final int scope = inscopeNS.get(EMPTY);
           final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : sc.ns.uri(EMPTY);
+          final byte[] uri = cns.value(cnsDef);
           if(scopeUri != null && !eq(scopeUri, uri)) throw DUPLNSCONS_X.get(info, uri);
         }
-        if(nm.hasURI()) {
-          // add new namespace to statically known namespaces
-          //if(!computed && !eq(sc.ns.uri(nmPrefix), nmUri)) sc.ns.add(nmPrefix, nmUri);
-          // add new namespace to in-scope namespaces
-          if(!inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
-        }
+        // add new namespace to in-scope namespaces
+        if(nm.hasURI() && !inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
       }
-
-      // add constructed namespaces
       final int cl = cns.size();
       for(int c = 0; c < cl; c++) addNS(cns.name(c), cns.value(c), inscopeNS);
 
@@ -183,10 +177,10 @@ public final class CElem extends CName {
         if(!qnm.hasPrefix() || !qnm.hasURI()) continue;
 
         // skip XML namespace
-        final byte[] apref = qnm.prefix();
-        if(eq(apref, XML)) continue;
+        final byte[] prefix = qnm.prefix();
+        if(eq(prefix, XML)) continue;
 
-        final byte[] auri = qnm.uri(), npref = addNS(apref, auri, inscopeNS);
+        final byte[] auri = qnm.uri(), npref = addNS(prefix, auri, inscopeNS);
         if(npref != null) {
           final QNm aname = qc.qnmPool.get(concat(npref, COLON, qnm.local()), auri);
           constr.atts.set(a, new FAttr(aname, att.string()));
@@ -195,7 +189,7 @@ public final class CElem extends CName {
 
       // update and optimize child nodes
       for(final ANode ch : constr.children) ch.optimize();
-      // return generated and optimized node
+      // return optimized node
       return node.optimize();
 
     } finally {
@@ -212,33 +206,33 @@ public final class CElem extends CName {
   /**
    * Adds the specified namespace to the namespace array.
    * If the prefix is already used for another URI, a new name is generated.
-   * @param pref prefix
+   * @param prefix prefix
    * @param uri uri
    * @param ns namespaces
    * @return resulting prefix or {@code null}
    */
-  private static byte[] addNS(final byte[] pref, final byte[] uri, final Atts ns) {
-    final byte[] u = ns.value(pref);
+  private static byte[] addNS(final byte[] prefix, final byte[] uri, final Atts ns) {
+    final byte[] u = ns.value(prefix);
     if(u == null) {
       // add undeclared namespace
-      ns.add(pref, uri);
+      ns.add(prefix, uri);
     } else if(!eq(u, uri)) {
       // prefixes with different URIs exist; new one must be replaced
-      byte[] apref = null;
+      byte[] pref = null;
       // check if one of the existing prefixes can be adopted
       final int nl = ns.size();
       for(int n = 0; n < nl; n++) {
-        if(eq(ns.value(n), uri)) apref = ns.name(n);
+        if(eq(ns.value(n), uri)) pref = ns.name(n);
       }
       // if negative, generate a new one that is not used yet
-      if(apref == null) {
+      if(pref == null) {
         int i = 1;
         do {
-          apref = concat(pref, "_", i++);
-        } while(ns.contains(apref));
-        ns.add(apref, uri);
+          pref = concat(prefix, "_", i++);
+        } while(ns.contains(pref));
+        ns.add(pref, uri);
       }
-      return apref;
+      return pref;
     }
     return null;
   }

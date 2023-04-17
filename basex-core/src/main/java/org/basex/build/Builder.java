@@ -302,9 +302,9 @@ public abstract class Builder extends Job {
     // get and store element references
     final int dis = level == 0 ? 1 : pre - parStack.get(level - 1);
     final int as = atts.size();
-    final byte[] pref = prefix(name);
-    int uriId = nspaces.uriIdForPrefix(pref, true);
-    if(uriId == 0 && pref.length != 0 && !eq(pref, XML))
+    final byte[] prefix = prefix(name);
+    int uriId = nspaces.uriIdForPrefix(prefix, true);
+    if(uriId == 0 && prefix.length != 0 && !eq(prefix, XML))
       throw new BuildException(WHICHNS, parser.detailedInfo(), prefix(name));
     addElem(dis, nameId, Math.min(IO.MAXATTS, as + 1), uriId, !nsp.isEmpty());
 

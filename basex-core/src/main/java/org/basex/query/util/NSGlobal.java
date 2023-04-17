@@ -108,11 +108,11 @@ public final class NSGlobal {
 
   /**
    * Finds the specified namespace uri.
-   * @param pref prefix of the namespace
+   * @param prefix prefix of the namespace
    * @return uri or {@code null}
    */
-  public static byte[] uri(final byte[] pref) {
-    return URIS.get(pref);
+  public static byte[] uri(final byte[] prefix) {
+    return URIS.get(prefix);
   }
 
   /**

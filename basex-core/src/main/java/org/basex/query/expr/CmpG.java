@@ -533,7 +533,7 @@ public class CmpG extends Cmp {
           }
         }
       } else if(NODE_NAME.is(func) && expr2.seqType().type == AtomType.QNAME) {
-        // node-name() = xs:QName('pref:local')  ->  self::pref:local
+        // node-name() = xs:QName('prefix:local')  ->  self::prefix:local
         part = NamePart.FULL;
         for(final Item item : value) {
           qnames.add((QNm) item);

@@ -56,9 +56,11 @@ public class IntList extends ElementList {
   public final IntList add(final int element) {
     int[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
+    if(s == lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity());
+      list = lst;
+    }
     lst[s] = element;
-    list = lst;
     size = s + 1;
     return this;
   }
@@ -71,9 +73,11 @@ public class IntList extends ElementList {
   public final IntList add(final int... elements) {
     int[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
-    if(ns > lst.length) lst = Arrays.copyOf(lst, newCapacity(ns));
+    if(ns > lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity(ns));
+      list = lst;
+    }
     Array.copyFromStart(elements, l, lst, s);
-    list = lst;
     size = ns;
     return this;
   }
@@ -131,12 +135,12 @@ public class IntList extends ElementList {
    */
   public final void removeAll(final int element) {
     final int[] lst = list;
-    final int sz = size;
-    int s = 0;
-    for(int i = 0; i < sz; ++i) {
-      if(lst[i] != element) lst[s++] = lst[i];
+    final int s = size;
+    int ns = 0;
+    for(int i = 0; i < s; ++i) {
+      if(lst[i] != element) lst[ns++] = lst[i];
     }
-    size = s;
+    size = ns;
   }
 
   /**
@@ -159,8 +163,8 @@ public class IntList extends ElementList {
    */
   public final void incFrom(final int diff, final int index) {
     final int[] lst = list;
-    final int sz = size;
-    for(int a = index; a < sz; a++) lst[a] += diff;
+    final int s = size;
+    for(int l = index; l < s; l++) lst[l] += diff;
   }
 
   /**
@@ -698,6 +702,11 @@ public class IntList extends ElementList {
     return list[a] < list[b] ?
       list[b] < list[c] ? b : list[a] < list[c] ? c : a :
       list[b] > list[c] ? b : list[a] > list[c] ? c : a;
+  }
+
+  @Override
+  public void optimize() {
+    if(size != list.length) list = toArray();
   }
 
   @Override

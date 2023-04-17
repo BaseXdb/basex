@@ -35,7 +35,7 @@ public final class QNm extends Item {
   /** Name with optional prefix. */
   private final byte[] name;
   /** Prefix index. */
-  private final int pref;
+  private final int prefix;
   /** Namespace URI (can be {@code null}). */
   private byte[] uri;
 
@@ -46,7 +46,7 @@ public final class QNm extends Item {
   public QNm(final byte[] name) {
     super(AtomType.QNAME);
     this.name = name;
-    pref = indexOf(name, ':');
+    prefix = indexOf(name, ':');
   }
 
   /**
@@ -266,7 +266,7 @@ public final class QNm extends Item {
    * @return result of check
    */
   public boolean hasPrefix() {
-    return pref != -1;
+    return prefix != -1;
   }
 
   /**
@@ -274,7 +274,7 @@ public final class QNm extends Item {
    * @return prefix
    */
   public byte[] prefix() {
-    return pref == -1 ? Token.EMPTY : substring(name, 0, pref);
+    return prefix == -1 ? Token.EMPTY : substring(name, 0, prefix);
   }
 
   /**
@@ -282,7 +282,7 @@ public final class QNm extends Item {
    * @return local name
    */
   public byte[] local() {
-    return pref == -1 ? name : substring(name, pref + 1);
+    return prefix == -1 ? name : substring(name, prefix + 1);
   }
 
   /**

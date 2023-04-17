@@ -60,10 +60,10 @@ public final class InspectModuleTest extends SandboxTest {
     query(query + "/return/@occurrence/data()", "");
 
     // unknown annotation
-    query("declare namespace pref='uri';" +
-        func.args(" %pref:x function() {()}") + "/annotation/@name/data()", "pref:x");
-    query("declare namespace pref='uri';" +
-        func.args(" %pref:x function() {()}") + "/annotation/@uri/data()", "uri");
+    query("declare namespace prefix = 'uri';" +
+        func.args(" %prefix:x function() {()}") + "/annotation/@name/data()", "prefix:x");
+    query("declare namespace prefix = 'uri';" +
+        func.args(" %prefix:x function() {()}") + "/annotation/@uri/data()", "uri");
   }
 
   /** Test method. */

@@ -41,7 +41,7 @@ public final class IndexFacets extends IndexFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final boolean flat = defined(1) && eq(toToken(arg(1), qc), FLAT);
-    return new FDoc().add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
+    return new FDoc(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
 
   /**

@@ -142,7 +142,7 @@ final class XsltReport {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final ANode child : node.childIter()) {
       vb.add(child.type == NodeType.TEXT ? Atm.get(child.string()) :
-        result ? new FDoc().add(child.finish()) : child.finish());
+        result ? new FDoc(child.finish()) : child.finish());
     }
     return vb.value();
   }

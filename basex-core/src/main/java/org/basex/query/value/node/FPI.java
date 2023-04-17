@@ -14,7 +14,7 @@ import org.basex.util.*;
 import org.w3c.dom.*;
 
 /**
- * PI node fragment.
+ * Processing instruction node fragment.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen

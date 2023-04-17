@@ -182,14 +182,14 @@ public class QueryParser extends InputParser {
       wsCheck(MODULE);
       wsCheck(NAMESPACE);
       skipWs();
-      final byte[] pref = ncName(NONAME_X);
+      final byte[] prefix = ncName(NONAME_X);
       wsCheck("=");
       final byte[] uri = stringLiteral();
       if(uri.length == 0) throw error(NSMODURI);
 
-      sc.module = new QNm(pref, uri);
-      sc.ns.add(pref, uri, info());
-      namespaces.put(pref, uri);
+      sc.module = new QNm(prefix, uri);
+      sc.ns.add(prefix, uri, info());
+      namespaces.put(prefix, uri);
       wsCheck(";");
 
       // get absolute path
@@ -480,12 +480,12 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void namespaceDecl() throws QueryException {
-    final byte[] pref = ncName(NONAME_X);
+    final byte[] prefix = ncName(NONAME_X);
     wsCheck("=");
     final byte[] uri = stringLiteral();
-    if(sc.ns.staticURI(pref) != null) throw error(DUPLNSDECL_X, pref);
-    sc.ns.add(pref, uri, info());
-    namespaces.put(pref, uri);
+    if(sc.ns.staticURI(prefix) != null) throw error(DUPLNSDECL_X, prefix);
+    sc.ns.add(prefix, uri, info());
+    namespaces.put(prefix, uri);
   }
 
   /**
@@ -666,17 +666,17 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void schemaImport() throws QueryException {
-    byte[] pref = null;
+    byte[] prefix = null;
     if(wsConsumeWs(NAMESPACE)) {
-      pref = ncName(NONAME_X);
-      if(eq(pref, XML, XMLNS)) throw error(BINDXML_X, pref);
+      prefix = ncName(NONAME_X);
+      if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
       wsCheck("=");
     } else if(wsConsumeWs(DEFAULT)) {
       wsCheck(ELEMENT);
       wsCheck(NAMESPACE);
     }
     final byte[] uri = stringLiteral();
-    if(pref != null && uri.length == 0) throw error(NSEMPTY);
+    if(prefix != null && uri.length == 0) throw error(NSEMPTY);
     if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
     addLocations(new TokenList());
     throw error(IMPLSCHEMA);
@@ -687,9 +687,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void moduleImport() throws QueryException {
-    byte[] pref = EMPTY;
+    byte[] prefix = EMPTY;
     if(wsConsumeWs(NAMESPACE)) {
-      pref = ncName(NONAME_X);
+      prefix = ncName(NONAME_X);
       wsCheck("=");
     }
 
@@ -700,10 +700,10 @@ public class QueryParser extends InputParser {
     moduleURIs.add(uri);
 
     // add non-default namespace
-    if(pref != EMPTY) {
-      if(sc.ns.staticURI(pref) != null) throw error(DUPLNSDECL_X, pref);
-      sc.ns.add(pref, uri, info());
-      namespaces.put(pref, uri);
+    if(prefix != EMPTY) {
+      if(sc.ns.staticURI(prefix) != null) throw error(DUPLNSDECL_X, prefix);
+      sc.ns.add(prefix, uri, info());
+      namespaces.put(prefix, uri);
     }
 
     final ModInfo mi = new ModInfo();
@@ -2803,25 +2803,25 @@ public class QueryParser extends InputParser {
       final boolean pr = startsWith(atn, XMLNS_COLON);
       if(pr || eq(atn, XMLNS)) {
         if(!simple) throw error(NSCONS);
-        final byte[] pref = pr ? local(atn) : EMPTY;
+        final byte[] prefix = pr ? local(atn) : EMPTY;
         final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
-        if(eq(pref, XML) && eq(uri, XML_URI)) {
+        if(eq(prefix, XML) && eq(uri, XML_URI)) {
           if(xmlDecl) throw error(DUPLNSDEF_X, XML);
           xmlDecl = true;
         } else {
           if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
           if(pr) {
             if(uri.length == 0) throw error(NSEMPTYURI);
-            if(eq(pref, XML, XMLNS)) throw error(BINDXML_X, pref);
+            if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
             if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
             if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
-            sc.ns.add(pref, uri);
+            sc.ns.add(prefix, uri);
           } else {
             if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
             sc.elemNS = uri;
           }
-          if(ns.contains(pref)) throw error(DUPLNSDEF_X, pref);
-          ns.add(pref, uri);
+          if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
+          ns.add(prefix, uri);
         }
       } else {
         final QNm attn = new QNm(atn);

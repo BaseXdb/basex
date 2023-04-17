@@ -150,15 +150,15 @@ public final class FElem extends FNode {
     // no parent, so we have to add all namespaces in scope
     if(parent == null) {
       nsScope(elem.getParentNode(), nsMap);
-      for(final byte[] pref : nsMap) {
-        if(!namespaces.contains(pref)) namespaces.add(pref, nsMap.get(pref));
+      for(final byte[] prefix : nsMap) {
+        if(!namespaces.contains(prefix)) namespaces.add(prefix, nsMap.get(prefix));
       }
     }
 
-    final byte[] pref = name.prefix(), uri = name.uri(), old = nsMap.get(pref);
+    final byte[] prefix = name.prefix(), uri = name.uri(), old = nsMap.get(prefix);
     if(old == null || !Token.eq(uri, old)) {
-      namespaces.add(pref, uri);
-      nsMap.put(pref, uri);
+      namespaces.add(prefix, uri);
+      nsMap.put(prefix, uri);
     }
 
     // children
@@ -220,17 +220,20 @@ public final class FElem extends FNode {
 
   @Override
   public FElem optimize() {
-    // update parent references and invalidate empty arrays
-    if(namespaces != null && namespaces.isEmpty()) {
-      namespaces = null;
+    // update parent references, discard empty arrays
+    if(namespaces != null) {
+      if(namespaces.isEmpty()) namespaces = null;
+      else namespaces.optimize();
     }
     if(attributes != null) {
       for(final ANode node : attributes) node.parent(this);
       if(attributes.isEmpty()) attributes = null;
+      else attributes.optimize();
     }
     if(children != null) {
       for(final ANode node : children) node.parent(this);
       if(children.isEmpty()) children = null;
+      else children.optimize();
     }
     return this;
   }

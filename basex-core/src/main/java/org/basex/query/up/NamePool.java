@@ -63,12 +63,11 @@ public final class NamePool {
       final NameCache nc = cache[i];
       if(nc.add <= (nc.del ? 1 : 0)) continue;
       final QNm nm = nc.name;
-      final byte[] pref = nm.prefix();
-      final byte[] uri = nm.uri();
+      final byte[] prefix = nm.prefix(), uri = nm.uri();
       // attributes with empty URI don't conflict with anything
       if(nc.attr && uri.length == 0) continue;
-      final byte[] u = at.value(pref);
-      if(u == null) at.add(pref, uri);
+      final byte[] u = at.value(prefix);
+      if(u == null) at.add(prefix, uri);
       // check if only one uri is assigned to a prefix
       else if(!eq(uri, u)) return new byte[][] { uri, u };
     }

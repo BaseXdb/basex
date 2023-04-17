@@ -48,23 +48,23 @@ public final class XMLAccess {
 
   /**
    * Returns the value of the requested attribute, or an error.
-   * @param pref error prefix
+   * @param prefix error prefix
    * @param node node
    * @param name attribute name
    * @return value
    * @throws BaseXException database exception
    */
-  public static byte[] attribute(final String pref, final ANode node, final byte[] name)
+  public static byte[] attribute(final String prefix, final ANode node, final byte[] name)
       throws BaseXException {
 
     final byte[] value = node.attribute(name);
     if(value != null) return value;
-    throw new BaseXException("%: Missing \"%\" attribute.", pref, name);
+    throw new BaseXException("%: Missing \"%\" attribute.", prefix, name);
   }
 
   /**
    * Returns an enum instance for the requested attribute.
-   * @param pref error prefix
+   * @param prefix error prefix
    * @param node node
    * @param name attribute name
    * @param values expected names
@@ -72,27 +72,27 @@ public final class XMLAccess {
    * @return enum
    * @throws BaseXException database exception
    */
-  public static <E extends Enum<E>> E attribute(final String pref, final ANode node,
+  public static <E extends Enum<E>> E attribute(final String prefix, final ANode node,
       final byte[] name, final E[] values) throws BaseXException {
-    return value(pref, attribute(pref, node, name), values);
+    return value(prefix, attribute(prefix, node, name), values);
   }
 
   /**
    * Returns an enum instance for the requested value.
-   * @param pref error prefix
+   * @param prefix error prefix
    * @param name name
    * @param names allowed names
    * @param <E> token type
    * @return enum
    * @throws BaseXException database exception
    */
-  public static <E extends Enum<E>> E value(final String pref, final byte[] name, final E[] names)
+  public static <E extends Enum<E>> E value(final String prefix, final byte[] name, final E[] names)
       throws BaseXException {
 
     final String n = string(name);
     for(final E nm : names) {
       if(n.equals(nm.toString())) return nm;
     }
-    throw new BaseXException("%: Unexpected element: \"%\".", pref, name);
+    throw new BaseXException("%: Unexpected element: \"%\".", prefix, name);
   }
 }

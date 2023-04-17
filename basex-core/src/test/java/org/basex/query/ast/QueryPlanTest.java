@@ -33,7 +33,7 @@ public abstract class QueryPlanTest extends SandboxTest {
       }
       // check syntax tree
       for(final String test : tests) {
-        try(QueryProcessor qp2 = new QueryProcessor(test, context).context(new FDoc().add(plan))) {
+        try(QueryProcessor qp2 = new QueryProcessor(test, context).context(new FDoc(plan))) {
           if(qp2.value() != Bln.TRUE) fail(NL + "QUERY: " + query + NL +
               "OPTIMIZED: " + qp.qc.main + NL + "TEST: " + test + NL + serialize(plan));
         }

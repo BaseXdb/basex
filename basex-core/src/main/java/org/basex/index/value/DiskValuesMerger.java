@@ -20,7 +20,7 @@ final class DiskValuesMerger {
   /** Index keys. */
   private final DataInput dk;
   /** File prefix. */
-  private final String pref;
+  private final String prefix;
   /** Data reference. */
   private final Data data;
 
@@ -37,9 +37,9 @@ final class DiskValuesMerger {
    * @throws IOException I/O exception
    */
   DiskValuesMerger(final Data data, final IndexType type, final int i) throws IOException {
-    pref = DiskValues.fileSuffix(type) + i;
-    dk = new DataInput(data.meta.dbFile(pref + 't'));
-    dv = new DiskValues(data, type, pref);
+    prefix = DiskValues.fileSuffix(type) + i;
+    dk = new DataInput(data.meta.dbFile(prefix + 't'));
+    dv = new DiskValues(data, type, prefix);
     this.data = data;
     next();
   }
@@ -53,7 +53,7 @@ final class DiskValuesMerger {
     if(values.length == 0) {
       dv.close();
       dk.close();
-      data.meta.drop(pref + '.');
+      data.meta.drop(prefix + '.');
     } else {
       key = dk.readToken();
     }

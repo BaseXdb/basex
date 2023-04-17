@@ -29,9 +29,10 @@ public final class FDoc extends FNode {
 
   /**
    * Constructor.
+   * @param node child
    */
-  public FDoc() {
-    this(Token.EMPTY);
+  public FDoc(final ANode node) {
+    this(new ANodeList().add(node), Token.EMPTY);
   }
 
   /**
@@ -47,7 +48,7 @@ public final class FDoc extends FNode {
    * @param uri base uri
    */
   public FDoc(final byte[] uri) {
-    this(new ANodeList(), uri);
+    this(new ANodeList(0), uri);
   }
 
   /**
@@ -78,6 +79,7 @@ public final class FDoc extends FNode {
   public FDoc optimize() {
     // update parent references
     for(final ANode node : children) node.parent(this);
+    children.optimize();
     return this;
   }
 
@@ -113,8 +115,16 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FDoc materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
-    return materialized(test, ii) ? this : new FDoc(children, uri).optimize();
+  public FDoc materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+      throws QueryException {
+
+    if(materialized(test, ii)) return this;
+
+    // nodes must be added after root constructor in order to ensure ascending node ids
+    final ANodeList ch = new ANodeList(children.size());
+    final FDoc node = new FDoc(ch, uri);
+    for(final ANode child : children) ch.add(child.materialize(test, ii, qc));
+    return node.optimize();
   }
 
   @Override

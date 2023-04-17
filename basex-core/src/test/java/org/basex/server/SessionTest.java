@@ -468,7 +468,7 @@ public abstract class SessionTest extends SandboxTest {
     }
 
     try(Query query = session.query(string)) {
-      query.bind("$a", BXNode.get(new FDoc().add(new FElem("a"))));
+      query.bind("$a", BXNode.get(new FDoc(new FElem("a"))));
       assertEqual("<a/>", query.execute());
     }
 

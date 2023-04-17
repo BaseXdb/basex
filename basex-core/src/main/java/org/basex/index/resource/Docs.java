@@ -284,9 +284,9 @@ final class Docs {
    * @return path to a directory or not
    */
   synchronized boolean isDir(final String path) {
-    final byte[] pref = concat(path, SLASH);
+    final byte[] prefix = concat(path, SLASH);
     for(final byte[] pth : paths()) {
-      if(startsWith(pth, pref)) return true;
+      if(startsWith(pth, prefix)) return true;
     }
     return false;
   }

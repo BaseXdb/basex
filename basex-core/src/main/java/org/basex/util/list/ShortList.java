@@ -37,9 +37,11 @@ public class ShortList extends ElementList {
   public ShortList add(final short element) {
     short[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
+    if(s == lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity());
+      list = lst;
+    }
     lst[s] = element;
-    list = lst;
     size = s + 1;
     return this;
   }
@@ -52,9 +54,11 @@ public class ShortList extends ElementList {
   public final ShortList add(final short... elements) {
     short[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
-    if(ns > lst.length) lst = Arrays.copyOf(lst, newCapacity(ns));
+    if(ns > lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity(ns));
+      list = lst;
+    }
     Array.copyFromStart(elements, l, lst, s);
-    list = lst;
     size = ns;
     return this;
   }
@@ -77,6 +81,11 @@ public class ShortList extends ElementList {
     list = null;
     final int s = size;
     return s == lst.length ? lst : Arrays.copyOf(lst, s);
+  }
+
+  @Override
+  public void optimize() {
+    if(size != list.length) list = toArray();
   }
 
   @Override

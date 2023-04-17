@@ -54,13 +54,13 @@ public class DiskValues extends ValueIndex {
    * Constructor, initializing the index structure.
    * @param data data reference
    * @param type index type
-   * @param pref file prefix
+   * @param prefix file prefix
    * @throws IOException I/O Exception
    */
-  DiskValues(final Data data, final IndexType type, final String pref) throws IOException {
+  DiskValues(final Data data, final IndexType type, final String prefix) throws IOException {
     super(data, type);
-    idxl = new DataAccess(data.meta.dbFile(pref + 'l'));
-    idxr = new DataAccess(data.meta.dbFile(pref + 'r'));
+    idxl = new DataAccess(data.meta.dbFile(prefix + 'l'));
+    idxr = new DataAccess(data.meta.dbFile(prefix + 'r'));
     size.set(idxl.read4());
   }
 

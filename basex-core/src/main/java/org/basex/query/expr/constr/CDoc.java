@@ -12,7 +12,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Document fragment.
+ * Document constructor.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
@@ -33,13 +33,14 @@ public final class CDoc extends CNode {
   @Override
   public FDoc item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // create document node and add children
-    final Constr c = new Constr(info, sc);
-    final FDoc doc = new FDoc(c.children, Token.EMPTY);
-    c.add(qc, exprs);
-    if(c.errAtt != null) throw DOCATTS_X.get(info, c.errAtt);
-    if(!c.atts.isEmpty()) throw DOCATTS_X.get(info, c.atts.get(0).name());
-    if(c.errNS != null) throw DOCNS_X.get(info, c.errNS);
-    if(!c.nspaces.isEmpty()) throw DOCNS_X.get(info, c.nspaces.name(0));
+    final Constr constr = new Constr(info, sc);
+    final FDoc doc = new FDoc(constr.children, Token.EMPTY);
+    constr.add(qc, exprs);
+    if(constr.errAtt != null) throw DOCATTS_X.get(info, constr.errAtt);
+    if(!constr.atts.isEmpty()) throw DOCATTS_X.get(info, constr.atts.get(0).name());
+    if(constr.errNS != null) throw DOCNS_X.get(info, constr.errNS);
+    if(!constr.nspaces.isEmpty()) throw DOCNS_X.get(info, constr.nspaces.name(0));
+
     return doc.optimize();
   }
 

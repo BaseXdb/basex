@@ -325,18 +325,18 @@ public abstract class ANode extends Item {
 
   /**
    * Recursively finds the uri for the specified prefix.
-   * @param pref prefix
+   * @param prefix prefix
    * @return uri or {@code null}
    */
-  public final byte[] uri(final byte[] pref) {
+  public final byte[] uri(final byte[] prefix) {
     final Atts at = namespaces();
     if(at != null) {
-      final byte[] s = at.value(pref);
+      final byte[] s = at.value(prefix);
       if(s != null) return s;
       final ANode n = parent();
-      if(n != null) return n.uri(pref);
+      if(n != null) return n.uri(prefix);
     }
-    return pref.length == 0 ? Token.EMPTY : null;
+    return prefix.length == 0 ? Token.EMPTY : null;
   }
 
   /**

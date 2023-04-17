@@ -39,9 +39,11 @@ public class ByteList extends ElementList {
   public ByteList add(final int element) {
     byte[] lst = list;
     final int s = size;
-    if(s == lst.length) lst = Arrays.copyOf(lst, newCapacity());
+    if(s == lst.length) {
+      lst = Arrays.copyOf(lst, newCapacity());
+      list = lst;
+    }
     lst[s] = (byte) element;
-    list = lst;
     size = s + 1;
     return this;
   }
@@ -123,6 +125,11 @@ public class ByteList extends ElementList {
       lst[r] = tmp;
     }
     return this;
+  }
+
+  @Override
+  public void optimize() {
+    if(size != list.length) list = toArray();
   }
 
   @Override

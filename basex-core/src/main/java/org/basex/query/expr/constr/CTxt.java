@@ -14,7 +14,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Text fragment.
+ * Text constructor.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen

@@ -317,10 +317,10 @@ public final class Namespaces {
 
       final int as = atts.size();
       for(int a = 0; a < as; a++) {
-        final byte[] pref = atts.name(a), uri = atts.value(a);
-        final int prefId = prefixes.put(pref), uriId = uris.put(uri);
+        final byte[] prefix = atts.name(a), uri = atts.value(a);
+        final int prefId = prefixes.put(prefix), uriId = uris.put(uri);
         nd.add(prefId, uriId);
-        if(pref.length == 0) defaults.set(level, uriId);
+        if(prefix.length == 0) defaults.set(level, uriId);
       }
     }
   }
