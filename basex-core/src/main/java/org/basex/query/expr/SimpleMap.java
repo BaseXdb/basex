@@ -425,12 +425,12 @@ public abstract class SimpleMap extends Arr {
     final ExprList steps = new ExprList();
 
     Expr root = exprs[0].simplifyFor(mode, cc);
+    cc.pushFocus(root);
     if(root instanceof AxisPath) {
       final AxisPath path = (AxisPath) root;
       root = path.root;
       steps.add(path.steps);
     }
-    cc.pushFocus(root);
     try {
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {

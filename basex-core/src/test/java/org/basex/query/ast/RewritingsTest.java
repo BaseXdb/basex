@@ -3134,4 +3134,16 @@ public final class RewritingsTest extends QueryPlanTest {
         + "  return (1 to string-length($input)) ! substring($input, ., 1)"
         + ")", 54969);
   }
+
+  /** EBV, string(). */
+  @Test public void gh2201() {
+    query("boolean(data(<_>x</_>/text()))", true);
+    query("boolean(string(<_>x</_>/text()))", true);
+
+    query("boolean(<_>x</_>/text() ! data())", true);
+    query("boolean(<_>x</_>/text() ! string())", true);
+
+    query("boolean(<_>x</_> ! text() ! data())", true);
+    query("boolean(<_>x</_> ! text() ! string())", true);
+  }
 }
