@@ -6,6 +6,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -19,9 +20,9 @@ import org.basex.query.value.node.*;
  */
 public abstract class IndexFn extends StandardFunc {
   /** Name: count. */
-  static final String COUNT = "count";
+  static final byte[] COUNT = token("count");
   /** Name: value. */
-  static final String ENTRY = "entry";
+  static final byte[] ENTRY = token("entry");
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
@@ -53,15 +54,15 @@ public abstract class IndexFn extends StandardFunc {
   static Iter entries(final Index index, final IndexEntries entries) {
     final EntryIterator ei = index.entries(entries);
 
-    return new BasicIter<FElem>(ei.size()) {
+    return new BasicIter<FNode>(ei.size()) {
       @Override
-      public FElem next() {
+      public FNode next() {
         final byte[] token = ei.next();
         return token == null ? null : get(token);
       }
 
       @Override
-      public FElem get(final long i) {
+      public FNode get(final long i) {
         return get(ei.get((int) i));
       }
 
@@ -70,8 +71,8 @@ public abstract class IndexFn extends StandardFunc {
        * @param token token
        * @return element
        */
-      private FElem get(final byte[] token) {
-        return new FElem(ENTRY).add(COUNT, token(ei.count())).add(token);
+      private FNode get(final byte[] token) {
+        return new FBuilder(new FElem(ENTRY)).add(COUNT, token(ei.count())).add(token).finish();
       }
     };
   }

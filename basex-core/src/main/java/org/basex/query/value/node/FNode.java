@@ -3,10 +3,12 @@ package org.basex.query.value.node;
 import java.util.*;
 
 import org.basex.api.dom.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.w3c.dom.*;
 
 /**
  * Main-memory node fragment.
@@ -15,6 +17,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {
+  /** Empty node array. */
+  public static final FNode[] EMPTY = {};
   /** Parent node (can be {@code null}). */
   FNode parent;
 
@@ -79,15 +83,48 @@ public abstract class FNode extends ANode {
 
   /**
    * Returns the string value for the specified nodes.
-   * @param iter iterator
-   * @return node iterator
+   * @param nodes nodes
+   * @return string
    */
-  static final byte[] string(final ANodeList iter) {
+  static final byte[] string(final ANode[] nodes) {
+    if(nodes.length == 0) return Token.EMPTY;
+
     final TokenBuilder tb = new TokenBuilder();
-    for(final ANode nc : iter) {
-      if(nc.type == NodeType.ELEMENT || nc.type == NodeType.TEXT) tb.add(nc.string());
+    for(final ANode node : nodes) {
+      if(node.type == NodeType.ELEMENT || node.type == NodeType.TEXT) tb.add(node.string());
     }
     return tb.finish();
+  }
+
+  /**
+   * Returns the children of the specified DOM node.
+   * @param node node
+   * @param parent parent node
+   * @param nsMap namespace map
+   */
+  static void children(final Node node, final FBuilder parent, final TokenMap nsMap) {
+    final NodeList ch = node.getChildNodes();
+    final int cl = ch.getLength();
+    for(int c = 0; c < cl; ++c) {
+      final Node child = ch.item(c);
+
+      switch(child.getNodeType()) {
+        case Node.TEXT_NODE:
+          parent.add(new FTxt((Text) child));
+          break;
+        case Node.COMMENT_NODE:
+          parent.add(new FComm((Comment) child));
+          break;
+        case Node.PROCESSING_INSTRUCTION_NODE:
+          parent.add(new FPI((ProcessingInstruction) child));
+          break;
+        case Node.ELEMENT_NODE:
+          parent.add(new FElem((Element) child, null, nsMap));
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   /**

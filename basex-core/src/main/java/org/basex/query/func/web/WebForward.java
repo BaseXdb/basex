@@ -1,11 +1,10 @@
 package org.basex.query.func.web;
 
-import static org.basex.query.QueryText.*;
-
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.http.*;
 
 /**
  * Function implementation.
@@ -15,8 +14,8 @@ import org.basex.util.*;
  */
 public final class WebForward extends WebFn {
   @Override
-  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String location = createUrl(qc);
-    return new FElem(new QNm(REST_PREFIX, "forward", REST_URI)).declareNS().add(location);
+    return new FBuilder(new FElem(HTTPText.Q_REST_FORWARD)).declareNS().add(location).finish();
   }
 }

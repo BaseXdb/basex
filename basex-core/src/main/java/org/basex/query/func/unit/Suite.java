@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -35,11 +36,11 @@ public final class Suite {
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public FElem test(final IOFile root, final Context ctx, final Job job) throws IOException {
+  public FNode test(final IOFile root, final Context ctx, final Job job) throws IOException {
     final ArrayList<IOFile> files = new ArrayList<>();
 
     final Performance perf = new Performance();
-    final FElem suites = new FElem(TESTSUITES);
+    final FBuilder suites = new FBuilder(new FElem(TESTSUITES));
     if(root.isDir()) {
       for(final String path : root.descendants()) {
         final IOFile file = new IOFile(root, path);
@@ -57,8 +58,6 @@ public final class Suite {
       skipped += unit.skipped;
       tests += unit.tests;
     }
-
-    suites.add(TIME, Unit.time(perf));
-    return suites;
+    return suites.add(TIME, Unit.time(perf)).finish();
   }
 }

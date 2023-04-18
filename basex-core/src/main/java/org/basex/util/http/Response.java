@@ -10,8 +10,10 @@ import java.util.Map.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -52,7 +54,7 @@ public final class Response {
 
     // construct <http:response/>
     final int status = response.statusCode();
-    final FElem root = new FElem(Q_HTTP_RESPONSE).declareNS();
+    final FBuilder root = new FBuilder(new FElem(Q_HTTP_RESPONSE)).declareNS();
     root.add(STATUS, Token.token(status));
     root.add(MESSAGE, IOUrl.reason(status));
 
@@ -61,13 +63,13 @@ public final class Response {
       final String name = entry.getKey();
       if(name != null) {
         for(final String value : entry.getValue()) {
-          root.add(new FElem(Q_HTTP_HEADER).add(NAME, name).add(VALUE, value));
+          root.add(new FBuilder(new FElem(Q_HTTP_HEADER)).add(NAME, name).add(VALUE, value));
         }
       }
     }
 
     // add payload elements and contents
-    final ItemList items = new ItemList().add(root);
+    final ItemList items = new ItemList().add((Item) null);
     try(InputStream is = response.body()) {
       final HttpHeaders headers = response.headers();
       final MediaType type = mtype != null ? new MediaType(mtype) :
@@ -79,6 +81,6 @@ public final class Response {
       if(body) items.add(payload.value());
     }
 
-    return items.value();
+    return items.set(0, root.finish()).value();
   }
 }

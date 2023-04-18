@@ -83,10 +83,27 @@ public abstract class JsonConverter {
   }
 
   /**
+   * Initializes the conversion.
+   * @param uri base URI
+   */
+  abstract void init(String uri);
+
+  /**
+   * Returns the resulting XQuery value.
+   * @return result
+   */
+  abstract Item finish();
+
+  /**
    * Called when a JSON object is opened.
    * @throws QueryIOException query exception
    */
   abstract void openObject() throws QueryIOException;
+
+  /**
+   * Called when a JSON object is closed.
+   */
+  abstract void closeObject();
 
   /**
    * Called when a pair of a JSON object is opened.
@@ -104,15 +121,16 @@ public abstract class JsonConverter {
   abstract void closePair(boolean add) throws QueryIOException;
 
   /**
-   * Called when a JSON object is closed.
-   */
-  abstract void closeObject();
-
-  /**
    * Called when a JSON array is opened.
    * @throws QueryIOException query exception
    */
   abstract void openArray() throws QueryIOException;
+
+  /**
+   * Called when a JSON array is closed.
+   * @throws QueryIOException query exception
+   */
+  abstract void closeArray() throws QueryIOException;
 
   /**
    * Called when an item of a JSON array is opened.
@@ -123,12 +141,6 @@ public abstract class JsonConverter {
    * Called when an item of a JSON array is closed.
    */
   abstract void closeItem();
-
-  /**
-   * Called when a JSON array is closed.
-   * @throws QueryIOException query exception
-   */
-  abstract void closeArray() throws QueryIOException;
 
   /**
    * Called when a number literal is encountered.
@@ -156,16 +168,4 @@ public abstract class JsonConverter {
    * @throws QueryIOException query exception
    */
   abstract void booleanLit(byte[] b) throws QueryIOException;
-
-  /**
-   * Initializes the conversion.
-   * @param uri base URI
-   */
-  abstract void init(String uri);
-
-  /**
-   * Returns the resulting XQuery value.
-   * @return result
-   */
-  abstract Item finish();
 }

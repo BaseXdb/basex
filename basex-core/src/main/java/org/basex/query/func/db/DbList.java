@@ -9,6 +9,7 @@ import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -115,8 +116,9 @@ public class DbList extends StandardFunc {
    * @param mdate modified date
    * @return resource node
    */
-  static FElem dir(final String path, final long mdate) {
-    return new FElem(DIR).add(path).add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
+  static FNode dir(final String path, final long mdate) {
+    return new FBuilder(new FElem(DIR)).add(path).
+        add(MODIFIED_DATE, DateTime.format(new Date(mdate))).finish();
   }
 
   /**
@@ -127,14 +129,14 @@ public class DbList extends StandardFunc {
    * @param type resource type
    * @return resource node
    */
-  static FElem resource(final String path, final long mdate, final long size,
+  static FNode resource(final String path, final long mdate, final long size,
       final ResourceType type) {
 
-    final FElem elem = new FElem(RESOURCE).add(path);
+    final FBuilder elem = new FBuilder(new FElem(RESOURCE)).add(path);
     elem.add(TYPE, type.toString());
     elem.add(CONTENT_TYPE, type.contentType(path).toString());
     elem.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
     elem.add(SIZE, token(size));
-    return elem;
+    return elem.finish();
   }
 }

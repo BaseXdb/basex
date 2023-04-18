@@ -37,9 +37,9 @@ import org.basex.util.*;
 public final class JsonXQueryConverter extends JsonConverter {
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<>();
-  /** Stack for intermediate array values. */
+  /** Stack for intermediate arrays. */
   private final Stack<ValueList> arrays = new Stack<>();
-  /** Stack for intermediate maps values. */
+  /** Stack for intermediate maps. */
   private final Stack<XQMap> maps = new Stack<>();
 
   /**

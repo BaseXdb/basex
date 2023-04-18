@@ -46,7 +46,7 @@ public final class Replace extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Constr constr = new Constr(info, sc).add(qc, exprs[1]);
+    final Constr constr = new Constr(info, sc, qc).add(exprs[1]);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
 
@@ -64,11 +64,11 @@ public final class Replace extends Update {
     final DBNode dbn = updates.determineDataRef(targ, qc);
 
     // replace node
-    final ANodeList aList = constr.atts;
-    ANodeList list = constr.children;
+    final ANodeList aList = toList(constr, true);
+    ANodeList list = toList(constr, false);
     if(value) {
       // replace value of node
-      final byte[] txt = list.size() < 1 ? aList.size() < 1 ? EMPTY :
+      final byte[] txt = list.isEmpty() ? aList.isEmpty() ? EMPTY :
         aList.get(0).string() : list.get(0).string();
       // check validity of future comments or PIs
       if(type == NodeType.COMMENT) FComm.parse(txt, info);

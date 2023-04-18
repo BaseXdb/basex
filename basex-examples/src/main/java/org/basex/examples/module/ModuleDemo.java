@@ -1,6 +1,7 @@
 package org.basex.examples.module;
 
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -23,11 +24,10 @@ public class ModuleDemo extends QueryModule {
    * Creates a new example node.
    * @return node
    */
-  public ANode create() {
-    FDoc doc = new FDoc("http://www.example.com");
-    FElem elem = new FElem("root").add("attr", "value");
-    doc.add(elem);
-    return doc;
+  public FNode create() {
+    FBuilder doc = new FBuilder(new FDoc("http://www.example.com"));
+    FBuilder elem = new FBuilder(new FElem("root")).add("attr", "value");
+    return doc.add(elem).finish();
   }
 
   /**

@@ -66,9 +66,4 @@ public abstract class ElementList {
   public final void reset() {
     size = 0;
   }
-
-  /**
-   * Minimizes a data structure.
-   */
-  public abstract void optimize();
 }

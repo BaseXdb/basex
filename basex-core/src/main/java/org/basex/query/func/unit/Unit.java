@@ -13,6 +13,7 @@ import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -66,8 +67,8 @@ final class Unit {
    * @param suites root element
    * @throws IOException query exception
    */
-  public void test(final FElem suites) throws IOException {
-    final FElem suite = new FElem(TESTSUITE).add(NAME, file.url());
+  public void test(final FBuilder suites) throws IOException {
+    final FBuilder suite = new FBuilder(new FElem(TESTSUITE)).add(NAME, file.url());
     final ArrayList<StaticFunc> beforeModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> afterModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> before = new ArrayList<>(0);
@@ -128,7 +129,7 @@ final class Unit {
           throw BASEX_ANNOTATION2_X_X.get(ann.info, ann, arguments(vs));
         }
 
-        final FElem testcase = new FElem(TESTCASE).add(NAME, sf.name.local());
+        final FBuilder testcase = new FBuilder(new FElem(TESTCASE)).add(NAME, sf.name.local());
         tests++;
 
         final Performance perf2 = new Performance();
@@ -152,7 +153,8 @@ final class Unit {
 
             if(code != null) {
               failures++;
-              testcase.add(new FElem(FAILURE).add(new FElem(EXPECTED).add(code.prefixId())));
+              testcase.add(new FBuilder(new FElem(FAILURE)).
+                  add(new FBuilder(new FElem(EXPECTED)).add(code.prefixId())));
             }
           } catch(final QueryException ex) {
             addError(ex, testcase, code);
@@ -163,8 +165,7 @@ final class Unit {
           testcase.add(SKIPPED, ignored.isEmpty() ? EMPTY : ignored.itemAt(0).string(null));
           skipped++;
         }
-        testcase.add(TIME, time(perf2));
-        suite.add(testcase);
+        suite.add(testcase.add(TIME, time(perf2)));
       }
 
       // run finalizing tests
@@ -176,13 +177,14 @@ final class Unit {
         addError(ex, suite, null);
       } else {
         // handle errors caused by initializing or finalizing unit functions
-        final FElem tc = new FElem(TESTINIT).add(NAME, current.name.local()).add(TIME, time(perf));
-        suite.add(tc);
-        addError(ex, tc, null);
+        final FBuilder init = new FBuilder(new FElem(TESTINIT)).
+            add(NAME, current.name.local()).add(TIME, time(perf));
+        addError(ex, init, null);
+        suite.add(init);
       }
     }
 
-    if(suite.hasChildren()) {
+    if(!suite.isEmpty()) {
       suite.add(TIME, time(perf));
       suite.add(TESTS, token(tests));
       suite.add(FAILURES, token(failures));
@@ -214,20 +216,19 @@ final class Unit {
    * @param testcase testcase element
    * @param code error code (can be {@code null})
    */
-  private void addError(final QueryException ex, final FElem testcase, final QNm code) {
+  private void addError(final QueryException ex, final FBuilder testcase, final QNm code) {
     final QNm name = ex.qname();
     if(code == null || !code.eq(name)) {
-      final FElem error;
+      final FBuilder error;
       final boolean fail = UNIT_FAIL.eq(name);
       if(fail) {
         failures++;
-        error = new FElem(FAILURE);
+        error = new FBuilder(new FElem(FAILURE));
       } else {
         errors++;
-        error = new FElem(ERROR);
+        error = new FBuilder(new FElem(ERROR));
       }
-      error.add(LINE, token(ex.line()));
-      error.add(COLUMN, token(ex.column()));
+      error.add(LINE, token(ex.line())).add(COLUMN, token(ex.column()));
       final String url = IO.get(ex.file()).url();
       if(!file.url().equals(url)) error.add(URI, url);
 
@@ -247,7 +248,7 @@ final class Unit {
         error.add(element((Item) value, INFO, -1));
       } else {
         // otherwise, add error message
-        error.add(new FElem(INFO).add(ex.getLocalizedMessage()));
+        error.add(new FBuilder(new FElem(INFO)).add(ex.getLocalizedMessage()));
       }
       testcase.add(error);
     }
@@ -258,24 +259,24 @@ final class Unit {
    * @param item item
    * @param name name (expected/returned)
    * @param count item count (ignore it {@code -1})
-   * @return new element
+   * @return element
    */
-  private static FElem element(final Item item, final byte[] name, final int count) {
-    final FElem exp = new FElem(name);
+  private static FBuilder element(final Item item, final byte[] name, final int count) {
+    final FBuilder elem = new FBuilder(new FElem(name));
     if(item != null) {
       if(item instanceof ANode) {
-        exp.add((ANode) item);
+        elem.add((ANode) item);
       } else {
         try {
-          exp.add(item.string(null));
+          elem.add(item.string(null));
         } catch(final QueryException ex) {
           Util.debug(ex);
-          exp.add(item.toString());
+          elem.add(item.toString());
         }
       }
-      if(count != -1) exp.add(ITEM, token(count)).add(TYPE, item.type.toString());
+      if(count != -1) elem.add(ITEM, token(count)).add(TYPE, item.type.toString());
     }
-    return exp;
+    return elem;
   }
 
   /**

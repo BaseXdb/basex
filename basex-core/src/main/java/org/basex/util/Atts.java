@@ -11,6 +11,8 @@ import org.basex.util.list.*;
  */
 public final class Atts extends ElementList {
   /** Name array. */
+  public static final Atts EMPTY = new Atts(0);
+  /** Name array. */
   private byte[][] names;
   /** Value array. */
   private byte[][] values;
@@ -142,12 +144,16 @@ public final class Atts extends ElementList {
     return i == -1 ? null : values[i];
   }
 
-  @Override
-  public void optimize() {
+  /**
+   * Optimizes the attribute list.
+   * @return self reference
+   */
+  public Atts finish() {
     if(size != names.length) {
       names = Array.copyOf(names, size);
       values = Array.copyOf(values, size);
     }
+    return this;
   }
 
   @Override

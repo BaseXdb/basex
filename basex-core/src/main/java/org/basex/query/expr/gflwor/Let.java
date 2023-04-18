@@ -6,12 +6,12 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.ft.*;
@@ -109,7 +109,7 @@ public final class Let extends ForLet {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    final FElem elem = plan.attachVariable(plan.create(this), var, false);
+    final FBuilder elem = plan.attachVariable(plan.create(this), var, false);
     if(scoring) plan.addAttribute(elem, SCORE, true);
     plan.add(elem, expr);
   }

@@ -30,6 +30,10 @@ public interface WebText {
   byte[] VALUE = token("value");
   /** Token "forward". */
   byte[] FORWARD = token("forward");
+  /** WADL prefix. */
+  byte[] WADL_PREFIX = token("wadl");
+  /** WADL namespace. */
+  byte[] WADL_URI = token("http://wadl.dev.java.net/2009/02");
 
   /** Permission token. */
   String ALLOW = "allow";
@@ -44,10 +48,6 @@ public interface WebText {
   String WEBSOCKET = "WebSocket";
   /** RESTXQ string. */
   String RESTXQ = "RESTXQ";
-  /** WADL prefix. */
-  String WADL = "wadl:";
-  /** WADL namespace. */
-  String WADL_URI = "http://wadl.dev.java.net/2009/02";
   /** XHTML namespace. */
   String XHTML_URL = "http://www.w3.org/1999/xhtml";
   /** Init call. */

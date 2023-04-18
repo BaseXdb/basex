@@ -9,6 +9,7 @@ import java.util.zip.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -30,15 +31,14 @@ public final class ArchiveEntries extends StandardFunc {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
-        final FElem elem = new FElem(Q_ENTRY).declareNS();
+        final FBuilder elem = new FBuilder(new FElem(Q_ENTRY)).declareNS();
         long size = ze.getSize();
         if(size != -1) elem.add(SIZE, token(size));
         size = ze.getTime();
         if(size != -1) elem.add(LAST_MODIFIED, Dtm.get(size).string(info));
         size = ze.getCompressedSize();
         if(size != -1) elem.add(COMPRESSED_SIZE, token(size));
-        elem.add(ze.getName());
-        vb.add(elem);
+        vb.add(elem.add(ze.getName()).finish());
       }
       return vb.value(this);
     } catch(final IOException ex) {

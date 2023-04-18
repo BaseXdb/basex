@@ -474,7 +474,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param full include comprehensive information
    * @return query plan
    */
-  public FElem toXml(final boolean full) {
+  public FNode toXml(final boolean full) {
     // only show root node if functions or variables exist
     final QueryPlan plan = new QueryPlan(compiled, closed, full);
     if(main != null) {

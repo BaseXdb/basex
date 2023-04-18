@@ -253,7 +253,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * Warning: the function must only be called if the list is discarded afterwards.
    * @return array (internal representation!)
    */
-  public final E[] finish() {
+  public E[] finish() {
     final E[] lst = list;
     list = null;
     final int s = size;
@@ -315,9 +315,14 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     return new ArrayIterator<>(list, size);
   }
 
-  @Override
-  public void optimize() {
+  /**
+   * Minimizes the data structures.
+   * @return self reference
+   */
+  @SuppressWarnings("unchecked")
+  public L optimize() {
     if(size != list.length) list = toArray();
+    return (L) this;
   }
 
   @Override

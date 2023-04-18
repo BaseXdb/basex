@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -157,16 +158,16 @@ public final class Jobs {
    * Returns an XML representation of all jobs.
    * @return root element
    */
-  public FElem toXml() {
-    final FElem root = new FElem(JOBS);
+  public FNode toXml() {
+    final FBuilder root = new FBuilder(new FElem(JOBS));
     for(final QueryJobSpec spec : list) {
-      final FElem elem = new FElem(JOB);
+      final FBuilder elem = new FBuilder(new FElem(JOB));
       for(final Option<?> option : spec.options) {
         final Object value = spec.options.get(option);
         if(value != null) elem.add(option.name(), value.toString());
       }
       root.add(elem.add(spec.query));
     }
-    return root;
+    return root.finish();
   }
 }

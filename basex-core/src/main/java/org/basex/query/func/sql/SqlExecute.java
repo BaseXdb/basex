@@ -8,6 +8,7 @@ import java.sql.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -86,7 +87,7 @@ public class SqlExecute extends SqlFn {
               return null;
             }
 
-            final FElem row = new FElem(Q_ROW).declareNS();
+            final FBuilder row = new FBuilder(new FElem(Q_ROW)).declareNS();
             for(int c = 1; c <= cols; c++) {
               // for each row add column values as children
               final String name = md.getColumnLabel(c);
@@ -95,29 +96,28 @@ public class SqlExecute extends SqlFn {
               if(value == null) continue;
 
               // element <sql:column name='...'>...</sql:column>
-              final FElem col = new FElem(Q_COLUMN).add(NAME, name);
-              row.add(col);
-
+              final FBuilder column = new FBuilder(new FElem(Q_COLUMN)).add(NAME, name);
               if(value instanceof SQLXML) {
                 // add XML value as child element
                 final String xml = ((SQLXML) value).getString();
                 try {
-                  col.add(new DBNode(new IOContent(xml)).childIter().next());
+                  column.add(new DBNode(new IOContent(xml)).childIter().next());
                 } catch(final IOException ex) {
                   // fallback: add string representation
                   Util.debug(ex);
-                  col.add(xml);
+                  column.add(xml);
                 }
               } else if(value instanceof Clob) {
                 // add huge string from clob
                 final Clob clob = (Clob) value;
-                col.add(clob.getSubString(1, (int) clob.length()));
+                column.add(clob.getSubString(1, (int) clob.length()));
               } else {
                 // add string representation of other values
-                col.add(value.toString());
+                column.add(value.toString());
               }
+              row.add(column);
             }
-            return row;
+            return row.finish();
           } catch(final SQLException ex) {
             throw SQL_ERROR_X.get(info, ex);
           }

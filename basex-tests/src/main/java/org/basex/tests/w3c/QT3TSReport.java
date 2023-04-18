@@ -4,6 +4,8 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.query.expr.constr.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -99,26 +101,28 @@ public final class QT3TSReport {
     final String dquery = "replace(string(current-date()),'\\+.*','')";
     final String date = new XQuery(dquery).execute(ctx);
 
-    final FElem root = element("test-suite-result");
+    final FBuilder root = element("test-suite-result").declareNS();
 
     // submission element
-    final FElem submission = element("submission", root);
+    final FBuilder submission = element("submission");
     submission.add("anonymous", "false");
 
-    final FElem created = element("created", submission);
+    final FBuilder created = element("created");
     created.add("by", Text.AUTHOR);
     created.add("email", "cg@basex.org");
     created.add("organization", Text.ORGANIZATION);
     created.add("on", date);
+    submission.add(created);
 
-    final FElem testRun = element("test-run", submission);
+    final FBuilder testRun = element("test-run");
     testRun.add("test-suite-version", "CVS");
     testRun.add("date-run", date);
+    submission.add(testRun);
 
-    element("notes", submission);
+    submission.add(element("notes"));
 
     // product element
-    final FElem product = element("product", root);
+    final FBuilder product = element("product");
     product.add("vendor", Text.ORGANIZATION);
     product.add("name", Prop.NAME);
     product.add("version", Prop.VERSION);
@@ -128,45 +132,38 @@ public final class QT3TSReport {
 
     // dependency element
     for(final String[] deps : DEPENDENCIES) {
-      final FElem dependency = element("dependency", product);
+      final FBuilder dependency = element("dependency");
       dependency.add("type", deps[0]);
       dependency.add("value", deps[1]);
       dependency.add("satisfied", deps[2]);
+      product.add(dependency);
     }
+    root.add(product);
 
     // test-set elements
-    FElem ts = null;
+    FBuilder ts = null;
     for(final String[] test : tests) {
       if(test.length == 1) {
-        ts = element("test-set", root);
+        if(ts != null) root.add(ts);
+        ts = element("test-set");
         ts.add("name", test[0]);
       } else {
-        final FElem tc = element("test-case", ts);
+        final FBuilder tc = element("test-case");
         tc.add("name", test[0]);
         tc.add("result", test[1]);
+        ts.add(tc);
       }
     }
-    return root.serialize().finish();
-  }
-
-  /**
-   * Creates a root element.
-   * @param name name of element
-   * @return element node
-   */
-  private static FElem element(final String name) {
-    return new FElem(name, URI).declareNS();
+    if(ts != null) root.add(ts);
+    return root.finish().serialize().finish();
   }
 
   /**
    * Creates an element.
    * @param name name of element
-   * @param parent parent node
    * @return element node
    */
-  private static FElem element(final String name, final FElem parent) {
-    final FElem elem = new FElem(name, URI);
-    parent.add(elem);
-    return elem;
+  private static FBuilder element(final String name) {
+    return new FBuilder(new FElem(new QNm(name, URI)));
   }
 }

@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -46,7 +47,7 @@ public final class JobListDetails extends StandardFunc {
           ? jc.performance.ns(false) / 1000000 : jr != null
           ? jr.time / 1000000 : -1;
 
-      final FElem elem = new FElem(JOB);
+      final FBuilder elem = new FBuilder(new FElem(JOB));
       elem.add(ID, key);
       elem.add(TYPE, jc.type());
       elem.add(STATE, job.state.name().toLowerCase(Locale.ENGLISH));
@@ -61,7 +62,7 @@ public final class JobListDetails extends StandardFunc {
       elem.add(WRITES, jc.locks.writes.toString());
       elem.add(TIME, dateTime(jc.time));
       elem.add(Token.chop(Token.normalize(Token.token(jc.toString())), max));
-      vb.add(elem);
+      vb.add(elem.finish());
     }
     return vb.value(this);
   }

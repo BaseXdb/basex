@@ -9,8 +9,8 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
-import org.basex.query.value.node.*;
 import org.basex.util.list.*;
 
 /**
@@ -112,12 +112,12 @@ public final class FTOpt extends ExprInfo {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    final FElem elem = plan.create(this,
+    final FBuilder elem = plan.create(this,
       WILDCARDS, is(WC) ? TRUE : null, FUZZY, is(FZ) ? TRUE : null,
       ERRORS, errors != -1 ? errors : null, CASE, cs,
       STEMMING, is(ST) || sd != null ? TRUE : null, LANGUAGE, ln,
       THESAURUS, th != null ? TRUE : null);
-    if(elem.attributeIter().next() != null) plan.add(elem);
+    if(elem.root.attributeIter().next() != null) plan.add(elem);
   }
 
   @Override

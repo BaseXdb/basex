@@ -35,8 +35,10 @@ public final class FPI extends FNode {
    * @param name name
    * @param value value
    */
-  public FPI(final String name, final String value) {
-    this(new QNm(name), token(value));
+  public FPI(final QNm name, final byte[] value) {
+    super(NodeType.PROCESSING_INSTRUCTION);
+    this.name = name;
+    this.value = value;
   }
 
   /**
@@ -44,10 +46,8 @@ public final class FPI extends FNode {
    * @param name name
    * @param value value
    */
-  public FPI(final QNm name, final byte[] value) {
-    super(NodeType.PROCESSING_INSTRUCTION);
-    this.name = name;
-    this.value = value;
+  public FPI(final String name, final String value) {
+    this(new QNm(name), token(value));
   }
 
   /**

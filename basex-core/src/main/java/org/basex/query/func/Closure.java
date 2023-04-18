@@ -10,13 +10,13 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -476,7 +476,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       list.add(value);
     });
 
-    final FElem elem = plan.create(this);
+    final FBuilder elem = plan.create(this);
     final int pl = params.length;
     for(int p = 0; p < pl; p++) plan.addAttribute(elem, ARG + p, params[p].name.string());
     plan.add(elem, list.toArray());

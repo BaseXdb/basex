@@ -6,11 +6,11 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -251,7 +251,7 @@ public class TypeCheck extends Single {
 
   @Override
   public final void toXml(final QueryPlan plan) {
-    final FElem elem = plan.create(this, AS, seqType());
+    final FBuilder elem = plan.create(this, AS, seqType());
     if(promote) plan.addAttribute(elem, PROMOTE, true);
     plan.add(elem, expr);
   }

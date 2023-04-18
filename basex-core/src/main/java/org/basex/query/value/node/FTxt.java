@@ -20,19 +20,19 @@ public final class FTxt extends FNode {
 
   /**
    * Constructor.
-   * @param t text value
+   * @param value text value
    */
-  public FTxt(final String t) {
-    this(Token.token(t));
+  public FTxt(final byte[] value) {
+    super(NodeType.TEXT);
+    this.value = value;
   }
 
   /**
    * Constructor.
    * @param value text value
    */
-  public FTxt(final byte[] value) {
-    super(NodeType.TEXT);
-    this.value = value;
+  public FTxt(final String value) {
+    this(Token.token(value));
   }
 
   /**

@@ -13,6 +13,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -82,11 +83,11 @@ public enum NodeType implements Type {
           // document fragment
           final DocumentFragment df = (DocumentFragment) value;
           final String bu = df.getBaseURI();
-          return new FDoc(df, bu != null ? Token.token(bu) : Token.EMPTY);
+          return new FDoc(bu != null ? Token.token(bu) : Token.EMPTY, df);
         }
         final byte[] token = Token.token(value);
         return Token.startsWith(token, '<') ? new DBNode(new IOContent(token)) :
-          new FDoc(new FTxt(token));
+          new FBuilder(new FDoc()).add(token).finish();
       } catch(final IOException ex) {
         throw NODEERR_X_X.get(ii, this, ex);
       }

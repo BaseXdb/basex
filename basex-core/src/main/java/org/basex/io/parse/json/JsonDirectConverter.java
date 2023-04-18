@@ -3,6 +3,8 @@ package org.basex.io.parse.json;
 import static org.basex.io.parse.json.JsonConstants.*;
 
 import org.basex.build.json.*;
+import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -51,40 +53,46 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   /** Lax QName conversion. */
   private final boolean lax;
 
-  /** Name of next element. */
-  private byte[] name = JSON;
-
   /**
    * Constructor.
    * @param opts json options
+   * @throws QueryIOException query I/O exception
    */
-  JsonDirectConverter(final JsonParserOptions opts) {
+  JsonDirectConverter(final JsonParserOptions opts) throws QueryIOException {
     super(opts);
     lax = jopts.get(JsonOptions.LAX);
+    name = JSON;
   }
 
   @Override
   void openObject() {
-    curr = addElem(OBJECT);
+    openOuter(OBJECT);
   }
-
-  @Override
-  void openPair(final byte[] key, final boolean add) {
-    name = XMLToken.encode(key, lax);
-  }
-
-  @Override
-  void closePair(final boolean add) { }
 
   @Override
   void closeObject() {
-    final FElem par = (FElem) curr.parent();
-    if(par != null) curr = par;
+    closeOuter();
+  }
+
+  @Override
+  void openPair(final byte[] key, final boolean add) throws QueryIOException {
+    addValues.add(add);
+    if(add) name = XMLToken.encode(key, lax);
+  }
+
+  @Override
+  void closePair(final boolean add) {
+    addValues.pop();
   }
 
   @Override
   void openArray() {
-    curr = addElem(ARRAY);
+    openOuter(ARRAY);
+  }
+
+  @Override
+  void closeArray() {
+    closeOuter();
   }
 
   @Override
@@ -96,28 +104,30 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   void closeItem() { }
 
   @Override
-  void closeArray() {
-    closeObject();
+  void addValue(final byte[] type, final byte[] value) {
+    if(addValues.peek()) {
+      final FBuilder elem = element(type);
+      if(value != null) elem.add(value);
+      if(curr != null) curr.add(elem);
+      else curr = elem;
+    }
   }
 
-  @Override
-  public void numberLit(final byte[] value) {
-    addElem(NUMBER).add(value);
+  /**
+   * Opens an outer entry.
+   * @param type JSON type
+   */
+  private void openOuter(final byte[] type) {
+    curr = element(type);
+    stack.push(curr);
   }
 
-  @Override
-  public void stringLit(final byte[] value) {
-    addElem(STRING).add(value);
-  }
-
-  @Override
-  public void nullLit() {
-    addElem(NULL);
-  }
-
-  @Override
-  public void booleanLit(final byte[] value) {
-    addElem(BOOLEAN).add(value);
+  /**
+   * Closes an outer entry.
+   */
+  private void closeOuter() {
+    curr = stack.pop();
+    if(!stack.isEmpty()) curr = stack.peek().add(curr);
   }
 
   /**
@@ -125,13 +135,9 @@ public final class JsonDirectConverter extends JsonXmlConverter {
    * @param type JSON type
    * @return the element
    */
-  private FElem addElem(final byte[] type) {
-    final FElem elem = new FElem(name);
-    addType(elem, elem.name(), type);
-
-    if(curr != null) curr.add(elem);
-    else curr = elem;
-    name = null;
+  private FBuilder element(final byte[] type) {
+    final FBuilder elem = new FBuilder(new FElem(name));
+    processType(elem, type);
     return elem;
   }
 }

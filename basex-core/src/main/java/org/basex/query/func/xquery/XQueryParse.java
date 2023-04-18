@@ -7,6 +7,7 @@ import java.io.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.item.*;
@@ -45,7 +46,7 @@ public class XQueryParse extends StandardFunc {
   }
 
   @Override
-  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IO query = toContent(arg(0), qc);
     final XQueryOptions options = toOptions(arg(1), new XQueryOptions(), true, qc);
 
@@ -55,15 +56,16 @@ public class XQueryParse extends StandardFunc {
           toBaseUri(query.path(), options, XQueryOptions.BASE_URI));
       if(options.get(XQueryOptions.COMPILE)) qctx.compile();
 
-      final FElem root;
+      final FBuilder root;
       if(module instanceof MainModule) {
-        root = new FElem(MAIN_MODULE).add(UPDATING, token(qctx.updating));
+        root = new FBuilder(new FElem(MAIN_MODULE)).add(UPDATING, token(qctx.updating));
       } else {
         final QNm name = module.sc.module;
-        root = new FElem(LIBRARY_MODULE).add(PREFIX, name.string()).add(URI, name.uri());
+        root = new FBuilder(new FElem(LIBRARY_MODULE)).add(PREFIX, name.string()).
+            add(URI, name.uri());
       }
       if(options.get(XQueryOptions.PLAN)) root.add(qctx.toXml(false));
-      return root;
+      return root.finish();
     } catch(final QueryException ex) {
       if(!options.get(XQueryOptions.PASS)) ex.info(info);
       throw ex;

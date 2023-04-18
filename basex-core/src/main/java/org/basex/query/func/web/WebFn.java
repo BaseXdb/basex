@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -60,20 +61,20 @@ abstract class WebFn extends StandardFunc {
    * @return response
    * @throws QueryException query exception
    */
-  final FElem createResponse(final ResponseOptions response, final HashMap<String, String> headers,
+  final FNode createResponse(final ResponseOptions response, final HashMap<String, String> headers,
       final HashMap<String, String> output) throws QueryException {
 
     // root element
-    final FElem rrest = new FElem(HTTPText.Q_REST_RESPONSE).declareNS();
+    final FBuilder rrest = new FBuilder(new FElem(HTTPText.Q_REST_RESPONSE)).declareNS();
 
     // HTTP response
-    final FElem hresp = new FElem(HTTPText.Q_HTTP_RESPONSE).declareNS();
+    final FBuilder hresp = new FBuilder(new FElem(HTTPText.Q_HTTP_RESPONSE)).declareNS();
     for(final Option<?> o : response) {
       if(response.contains(o)) hresp.add(o.name(), response.get(o).toString());
     }
     headers.forEach((name, value) -> {
       if(!value.isEmpty()) {
-        final FElem hheader = new FElem(HTTPText.Q_HTTP_HEADER);
+        final FBuilder hheader = new FBuilder(new FElem(HTTPText.Q_HTTP_HEADER));
         hresp.add(hheader.add(HTTPText.NAME, name).add(HTTPText.VALUE, value));
       }
     });
@@ -85,16 +86,16 @@ abstract class WebFn extends StandardFunc {
       for(final String entry : output.keySet())
         if(sopts.option(entry) == null) throw QueryError.INVALIDOPTION_X.get(info, entry);
 
-      final FElem param = new FElem(FuncOptions.Q_SPARAM).declareNS();
+      final FBuilder param = new FBuilder(new FElem(FuncOptions.Q_SPARAM)).declareNS();
       output.forEach((name, value) -> {
         if(!value.isEmpty()) {
-          final FElem out = new FElem(new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI));
+          final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);
+          final FBuilder out = new FBuilder(new FElem(qnm));
           param.add(out.add(HTTPText.VALUE, value));
         }
       });
       rrest.add(param);
     }
-
-    return rrest;
+    return rrest.finish();
   }
 }

@@ -2,7 +2,7 @@ package org.basex.query.func.inspect;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class InspectModule extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return new PlainDoc(qc, info).parse(toContent(toString(arg(0), qc), qc));
   }
 }

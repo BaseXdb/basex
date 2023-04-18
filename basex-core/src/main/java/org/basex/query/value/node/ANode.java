@@ -285,14 +285,6 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Minimizes the memory consumption of the node.
-   * @return self reference
-   */
-  public ANode optimize() {
-    return this;
-  }
-
-  /**
    * Returns all namespaces defined for the nodes.
    * Overwritten by {@link FElem} and {@link DBNode}.
    * @return namespace array or {@code null}
@@ -329,9 +321,9 @@ public abstract class ANode extends Item {
    * @return uri or {@code null}
    */
   public final byte[] uri(final byte[] prefix) {
-    final Atts at = namespaces();
-    if(at != null) {
-      final byte[] s = at.value(prefix);
+    final Atts ns = namespaces();
+    if(ns != null) {
+      final byte[] s = ns.value(prefix);
       if(s != null) return s;
       final ANode n = parent();
       if(n != null) return n.uri(prefix);

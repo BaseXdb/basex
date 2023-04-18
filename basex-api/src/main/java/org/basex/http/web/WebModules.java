@@ -93,7 +93,7 @@ public final class WebModules {
    * @return WADL description
    * @throws QueryException query exception
    */
-  public FElem wadl(final HttpServletRequest request, final Context ctx) throws QueryException {
+  public FNode wadl(final HttpServletRequest request, final Context ctx) throws QueryException {
     try {
       return new RestXqWadl(request).create(cache(ctx));
     } catch(final IOException ex) {

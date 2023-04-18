@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -91,7 +92,7 @@ public final class Users {
     synchronized(users) {
       try {
         file.parent().md();
-        final FElem root = new FElem(USERS);
+        final FBuilder root = new FBuilder(new FElem(USERS));
         for(final User user : users.values()) {
           root.add(user.toXML(null, null));
         }
@@ -99,7 +100,7 @@ public final class Users {
           root.add(info);
           info.parent(null);
         }
-        file.write(root.serialize(SerializerMode.INDENT.get()).finish());
+        file.write(root.finish().serialize(SerializerMode.INDENT.get()).finish());
       } catch(final IOException | QueryException ex) {
         Util.errln(ex);
       }

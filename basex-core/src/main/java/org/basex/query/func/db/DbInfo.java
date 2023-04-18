@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -19,7 +20,7 @@ public final class DbInfo extends DbAccess {
   private static final String DATABASE = "database";
 
   @Override
-  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     return toNode(DATABASE, InfoDB.db(data.meta, false, true));
   }
@@ -30,22 +31,24 @@ public final class DbInfo extends DbAccess {
    * @param string string to be converted
    * @return node
    */
-  static FElem toNode(final String name, final String string) {
-    final FElem root = new FElem(name);
-    FElem node = null;
+  static FNode toNode(final String name, final String string) {
+    final FBuilder root = new FBuilder(new FElem(name));
+
+    FBuilder header = null;
     for(final String line : string.split(Prop.NL)) {
       final String[] cols = line.split(": ", 2);
       if(cols[0].isEmpty()) continue;
 
-      final FElem child = new FElem(cols[0].replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH));
+      final String col = cols[0].replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
+      final FBuilder node = new FBuilder(new FElem(col));
       if(Strings.startsWith(cols[0], ' ')) {
-        if(node != null) node.add(child);
-        if(!cols[1].isEmpty()) child.add(cols[1]);
+        if(!cols[1].isEmpty()) node.add(cols[1]);
+        header.add(node);
       } else {
-        node = child;
-        root.add(child);
+        if(header != null) root.add(header);
+        header = node;
       }
     }
-    return root;
+    return root.add(header).finish();
   }
 }

@@ -7,9 +7,9 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -187,7 +187,7 @@ public final class Condition extends Single {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    final FElem elem = plan.create(start ? START : END, item);
+    final FBuilder elem = plan.create(start ? START : END, item);
     if(pos  != null) elem.add(plan.create(AT, pos));
     if(prev != null) elem.add(plan.create(PREVIOUS, prev));
     if(next != null) elem.add(plan.create(NEXT, next));

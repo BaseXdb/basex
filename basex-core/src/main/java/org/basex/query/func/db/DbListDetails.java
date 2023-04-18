@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -46,9 +47,9 @@ public final class DbListDetails extends DbList {
     final StringList dbs = ctx.listDBs();
     return new BasicIter<FNode>(dbs.size()) {
       @Override
-      public FElem get(final long i) {
+      public FNode get(final long i) {
         final String name = dbs.get((int) i);
-        final FElem database = new FElem(DATABASE);
+        final FBuilder database = new FBuilder(new FElem(DATABASE));
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
@@ -63,7 +64,7 @@ public final class DbListDetails extends DbList {
           // invalid database will be ignored
           Util.debug(ex);
         }
-        return database.add(name);
+        return database.add(name).finish();
       }
     };
   }

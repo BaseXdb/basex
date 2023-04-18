@@ -6,6 +6,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
@@ -23,16 +24,24 @@ import org.w3c.dom.*;
  */
 public final class FDoc extends FNode {
   /** Child nodes. */
-  private final ANodeList children;
+  private ANode[] children = EMPTY;
   /** Base URI. */
   private final byte[] uri;
 
   /**
    * Constructor.
-   * @param node child
+   * @param uri base uri
    */
-  public FDoc(final ANode node) {
-    this(new ANodeList().add(node), Token.EMPTY);
+  public FDoc(final byte[] uri) {
+    super(NodeType.DOCUMENT_NODE);
+    this.uri = uri;
+  }
+
+  /**
+   * Constructor.
+   */
+  public FDoc() {
+    this(Token.EMPTY);
   }
 
   /**
@@ -44,53 +53,26 @@ public final class FDoc extends FNode {
   }
 
   /**
-   * Constructor.
-   * @param uri base uri
-   */
-  public FDoc(final byte[] uri) {
-    this(new ANodeList(0), uri);
-  }
-
-  /**
-   * Constructor.
-   * @param children children
-   * @param uri base uri
-   */
-  public FDoc(final ANodeList children, final byte[] uri) {
-    super(NodeType.DOCUMENT_NODE);
-    this.children = children;
-    this.uri = uri;
-    optimize();
-  }
-
-  /**
    * Constructor for DOM nodes.
    * Originally provided by Erdal Karaca.
-   * @param doc DOM node
    * @param uri base uri
+   * @param doc DOM node
    */
-  public FDoc(final DocumentFragment doc, final byte[] uri) {
+  public FDoc(final byte[] uri, final DocumentFragment doc) {
     this(uri);
-    final Node elem = doc.getFirstChild();
-    if(elem instanceof Element) children.add(new FElem((Element) elem, this, new TokenMap()));
-  }
-
-  @Override
-  public FDoc optimize() {
-    // update parent references
-    for(final ANode node : children) node.parent(this);
-    children.optimize();
-    return this;
+    final FBuilder builder = new FBuilder();
+    children(doc, builder, new TokenMap());
+    finish(builder);
   }
 
   /**
-   * Adds a node and updates its parent reference.
-   * @param node node to be added
+   * Assigns nodes.
+   * @param nodes nodes to be assigned
    * @return self reference
    */
-  public FDoc add(final ANode node) {
-    children.add(node);
-    node.parent(this);
+  public FDoc finish(final FBuilder nodes) {
+    children = nodes.children == null ? FNode.EMPTY : nodes.children.finish();
+    for(final ANode child : children) child.parent(this);
     return this;
   }
 
@@ -101,12 +83,12 @@ public final class FDoc extends FNode {
 
   @Override
   public BasicNodeIter childIter() {
-    return children.iter();
+    return ANodeList.iter(children);
   }
 
   @Override
   public boolean hasChildren() {
-    return !children.isEmpty();
+    return children.length != 0;
   }
 
   @Override
@@ -115,16 +97,14 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public FDoc materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+  public FNode materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 
     if(materialized(test, ii)) return this;
 
-    // nodes must be added after root constructor in order to ensure ascending node ids
-    final ANodeList ch = new ANodeList(children.size());
-    final FDoc node = new FDoc(ch, uri);
-    for(final ANode child : children) ch.add(child.materialize(test, ii, qc));
-    return node.optimize();
+    final FBuilder doc = new FBuilder(new FDoc(uri));
+    for(final ANode child : children) doc.add(child.materialize(test, ii, qc));
+    return doc.finish();
   }
 
   @Override
@@ -135,7 +115,7 @@ public final class FDoc extends FNode {
   @Override
   public ID typeId() {
     // check if a document has a single element as child
-    return (children.size() == 1 && children.get(0).type == NodeType.ELEMENT ?
+    return (children.length == 1 && children[0].type == NodeType.ELEMENT ?
       NodeType.DOCUMENT_NODE_ELEMENT : type).id();
   }
 

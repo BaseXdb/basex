@@ -128,8 +128,8 @@ public final class CElem extends CName {
     try {
       // adds in-scope namespaces
       final Atts inscopeNS = new Atts();
-      final int nl = nspaces.size();
-      for(int i = 0; i < nl; i++) inscopeNS.add(nspaces.name(i), nspaces.value(i));
+      final int ns = nspaces.size();
+      for(int n = 0; n < ns; n++) inscopeNS.add(nspaces.name(n), nspaces.value(n));
 
       // create and check QName
       final QNm nm = qname(true, qc);
@@ -140,57 +140,18 @@ public final class CElem extends CName {
       if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 
       // create node
-      final Constr constr = new Constr(info, sc);
-      final FElem node = new FElem(nm, inscopeNS, constr.atts, constr.children);
+      final FElem node = new FElem(nm);
 
       // add child and attribute nodes
-      constr.add(qc, exprs);
+      final Constr constr = new Constr(info, sc, qc).add(exprs);
       if(constr.errAtt != null) throw NOATTALL_X.get(info, constr.errAtt);
       if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
       if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
-
-      // add new namespaces
-      final Atts cns = constr.nspaces;
-      if(!eq(nmPrefix, XML)) {
-        // check declaration of default namespace
-        final int cnsDef = cns.get(EMPTY);
-        if(cnsDef != -1) {
-          if(!nm.hasURI()) throw EMPTYNSCONS_X.get(info, node);
-          final int scope = inscopeNS.get(EMPTY);
-          final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : sc.ns.uri(EMPTY);
-          final byte[] uri = cns.value(cnsDef);
-          if(scopeUri != null && !eq(scopeUri, uri)) throw DUPLNSCONS_X.get(info, uri);
-        }
-        // add new namespace to in-scope namespaces
-        if(nm.hasURI() && !inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
-      }
-      final int cl = cns.size();
-      for(int c = 0; c < cl; c++) addNS(cns.name(c), cns.value(c), inscopeNS);
-
-      // add namespaces for attributes
-      final int al = constr.atts.size();
-      for(int a = 0; a < al; a++) {
-        final ANode att = constr.atts.get(a);
-        final QNm qnm = att.qname();
-        // skip attributes without prefixes or URIs
-        if(!qnm.hasPrefix() || !qnm.hasURI()) continue;
-
-        // skip XML namespace
-        final byte[] prefix = qnm.prefix();
-        if(eq(prefix, XML)) continue;
-
-        final byte[] auri = qnm.uri(), npref = addNS(prefix, auri, inscopeNS);
-        if(npref != null) {
-          final QNm aname = qc.qnmPool.get(concat(npref, COLON, qnm.local()), auri);
-          constr.atts.set(a, new FAttr(aname, att.string()));
-        }
-      }
-
-      // update and optimize child nodes
-      for(final ANode ch : constr.children) ch.optimize();
+      // assign namespaces
+      constr.namespaces(inscopeNS, nm);
       // return optimized node
-      return node.optimize();
+      return node.finish(constr.builder);
 
     } finally {
       sc.ns.size(s);
@@ -204,47 +165,13 @@ public final class CElem extends CName {
   }
 
   /**
-   * Adds the specified namespace to the namespace array.
-   * If the prefix is already used for another URI, a new name is generated.
-   * @param prefix prefix
-   * @param uri uri
-   * @param ns namespaces
-   * @return resulting prefix or {@code null}
-   */
-  private static byte[] addNS(final byte[] prefix, final byte[] uri, final Atts ns) {
-    final byte[] u = ns.value(prefix);
-    if(u == null) {
-      // add undeclared namespace
-      ns.add(prefix, uri);
-    } else if(!eq(u, uri)) {
-      // prefixes with different URIs exist; new one must be replaced
-      byte[] pref = null;
-      // check if one of the existing prefixes can be adopted
-      final int nl = ns.size();
-      for(int n = 0; n < nl; n++) {
-        if(eq(ns.value(n), uri)) pref = ns.name(n);
-      }
-      // if negative, generate a new one that is not used yet
-      if(pref == null) {
-        int i = 1;
-        do {
-          pref = concat(prefix, "_", i++);
-        } while(ns.contains(pref));
-        ns.add(pref, uri);
-      }
-      return pref;
-    }
-    return null;
-  }
-
-  /**
    * Adds namespaces to the namespace stack.
    * @return old position in namespace stack
    */
   private int addNS() {
-    final NSContext ns = sc.ns;
-    final int size = ns.size(), nl = nspaces.size();
-    for(int n = 0; n < nl; n++) ns.add(nspaces.name(n), nspaces.value(n));
+    final NSContext nsContext = sc.ns;
+    final int size = nsContext.size(), ns = nspaces.size();
+    for(int n = 0; n < ns; n++) nsContext.add(nspaces.name(n), nspaces.value(n));
     return size;
   }
 

@@ -26,6 +26,17 @@ public final class FAttr extends FNode {
   private final byte[] value;
 
   /**
+   * Default constructor.
+   * @param name name
+   * @param value value
+   */
+  public FAttr(final QNm name, final byte[] value) {
+    super(NodeType.ATTRIBUTE);
+    this.name = name;
+    this.value = value;
+  }
+
+  /**
    * Constructor for creating an attribute.
    * QNames will be cached and reused.
    * @param name name
@@ -43,17 +54,6 @@ public final class FAttr extends FNode {
    */
   public FAttr(final byte[] name, final byte[] value) {
     this(new QNm(name), value);
-  }
-
-  /**
-   * Default constructor.
-   * @param name name
-   * @param value value
-   */
-  public FAttr(final QNm name, final byte[] value) {
-    super(NodeType.ATTRIBUTE);
-    this.name = name;
-    this.value = value;
   }
 
   /**

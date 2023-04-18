@@ -3,6 +3,7 @@ package org.basex.query.func.inspect;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -13,10 +14,10 @@ import org.basex.util.*;
  */
 public final class InspectFunction extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem func = toFunction(arg(0), qc);
     final QNm name = func.funcName();
     final StaticFunc sf = name == null ? null : qc.functions.get(name, func.arity());
-    return new PlainDoc(qc, info).function(name, sf, func.funcType(), func.annotations(), null);
+    return new PlainDoc(qc, info).function(name, sf, func.funcType(), func.annotations());
   }
 }

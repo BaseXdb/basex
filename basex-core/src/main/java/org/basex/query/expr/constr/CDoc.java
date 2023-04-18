@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -32,16 +33,17 @@ public final class CDoc extends CNode {
 
   @Override
   public FDoc item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // create document node and add children
-    final Constr constr = new Constr(info, sc);
-    final FDoc doc = new FDoc(constr.children, Token.EMPTY);
-    constr.add(qc, exprs);
-    if(constr.errAtt != null) throw DOCATTS_X.get(info, constr.errAtt);
-    if(!constr.atts.isEmpty()) throw DOCATTS_X.get(info, constr.atts.get(0).name());
-    if(constr.errNS != null) throw DOCNS_X.get(info, constr.errNS);
-    if(!constr.nspaces.isEmpty()) throw DOCNS_X.get(info, constr.nspaces.name(0));
+    final FDoc doc = new FDoc();
 
-    return doc.optimize();
+    final Constr constr = new Constr(info, sc, qc).add(exprs);
+    if(constr.errAtt != null) throw DOCATTS_X.get(info, constr.errAtt);
+    if(constr.errNS != null) throw DOCNS_X.get(info, constr.errNS);
+    final Atts ns = constr.builder.namespaces;
+    if(ns != null) throw DOCNS_X.get(info, ns.name(0));
+    final ANodeList attributes = constr.builder.attributes;
+    if(attributes != null) throw DOCATTS_X.get(info, attributes.get(0).name());
+
+    return doc.finish(constr.builder);
   }
 
   @Override

@@ -86,7 +86,7 @@ public final class DbDir extends DbList {
    * @param type resource type
    * @return element node
    */
-  private FElem elem(final boolean dir, final String path, final long date, final long size,
+  private FNode elem(final boolean dir, final String path, final long date, final long size,
       final ResourceType type) {
     return dir ? dir(path, date) : resource(path, date, size, type);
   }

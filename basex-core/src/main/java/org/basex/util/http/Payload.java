@@ -18,6 +18,7 @@ import org.basex.io.parse.csv.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -73,26 +74,26 @@ public final class Payload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FElem parse(final MediaType type, final String encoding)
+  FNode parse(final MediaType type, final String encoding)
       throws IOException, QueryException {
 
-    final FElem body;
+    final FBuilder body;
     if(type.isMultipart()) {
       // multipart response
       final byte[] boundary = boundary(type);
-      body = new FElem(Q_HTTP_MULTIPART).add(BOUNDARY, boundary);
+      body = new FBuilder(new FElem(Q_HTTP_MULTIPART)).add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final ANode node : parts) body.add(node);
     } else {
       // single part response
-      body = new FElem(Q_HTTP_BODY);
+      body = new FBuilder(new FElem(Q_HTTP_BODY));
       if(payloads != null) {
         final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
         payloads.add(parse(BufferInput.get(in).content(), type));
       }
     }
-    return body.add(SerializerOptions.MEDIA_TYPE.name(), type.type());
+    return body.add(SerializerOptions.MEDIA_TYPE.name(), type.type()).finish();
   }
 
   /**
@@ -170,12 +171,13 @@ public final class Payload {
           base64 = val.equals(BASE64);
         }
         if(!val.isEmpty() && parts != null)
-          parts.add(new FElem(Q_HTTP_HEADER).add(NAME, key).add(VALUE, val));
+          parts.add(new FBuilder(new FElem(Q_HTTP_HEADER)).add(NAME, key).add(VALUE, val).finish());
       }
       l = readLine();
     }
     if(parts != null) {
-      parts.add(new FElem(Q_HTTP_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type.toString()));
+      parts.add(new FBuilder(new FElem(Q_HTTP_BODY)).
+          add(SerializerOptions.MEDIA_TYPE.name(), type.toString()).finish());
     }
 
     // extract payload

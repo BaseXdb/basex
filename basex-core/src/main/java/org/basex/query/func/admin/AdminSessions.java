@@ -5,6 +5,7 @@ import static org.basex.core.users.UserText.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.server.*;
@@ -24,9 +25,9 @@ public final class AdminSessions extends AdminFn {
       final String user = ctx.user().name();
       final String addr = cl.clientAddress();
       final Data data = ctx.data();
-      final FElem elem = new FElem(SESSION).add(USER, user).add(ADDRESS, addr);
+      final FBuilder elem = new FBuilder(new FElem(SESSION)).add(USER, user).add(ADDRESS, addr);
       if(data != null) elem.add(DATABASE, data.meta.name);
-      vb.add(elem);
+      vb.add(elem.finish());
     }
     return vb.value(this);
   }

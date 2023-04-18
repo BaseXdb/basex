@@ -28,17 +28,17 @@ public final class FComm extends FNode {
    * Constructor.
    * @param value text value
    */
-  public FComm(final String value) {
-    this(token(value));
+  public FComm(final byte[] value) {
+    super(NodeType.COMMENT);
+    this.value = value;
   }
 
   /**
    * Constructor.
    * @param value text value
    */
-  public FComm(final byte[] value) {
-    super(NodeType.COMMENT);
-    this.value = value;
+  public FComm(final String value) {
+    this(token(value));
   }
 
   /**

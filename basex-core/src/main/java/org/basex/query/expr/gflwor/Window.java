@@ -7,11 +7,11 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -337,7 +337,7 @@ public final class Window extends Clause {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    final FElem elem = plan.attachVariable(plan.create(this, SLIDING, sliding), var, false);
+    final FBuilder elem = plan.attachVariable(plan.create(this, SLIDING, sliding), var, false);
     plan.add(elem, start, end, expr);
   }
 

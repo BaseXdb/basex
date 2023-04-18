@@ -93,11 +93,6 @@ public class FloatList extends ElementList {
   }
 
   @Override
-  public void optimize() {
-    if(size != list.length) list = toArray();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
     if(!(obj instanceof FloatList)) return false;

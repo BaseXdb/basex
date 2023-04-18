@@ -42,8 +42,8 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{ \"\" : true }", "", "...<_ type=\"boolean\">true</_>");
     parse("{ \"\" : {} }", "", "... type=\"object\"><_ type=\"object\"/>");
     parse("{ \"\" : [] }", "", "... type=\"object\"><_ type=\"array\"/>");
-    parse("{ \"\" : 0, \"\": 1 }", "",
-        "... type=\"object\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
+    parse("{ \"A\" : 0, \"B\": 1 }", "",
+        "... type=\"object\"><A type=\"number\">0</A><B type=\"number\">1</B>");
     parse("{ \"O\" : [ 1 ] }", "", "...<O type=\"array\"><_ type=\"number\">1</_></O>");
     parse("{ \"A\" : [ 0, 1 ] }", "",
         "...<A type=\"array\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
@@ -64,8 +64,8 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{ \"\" : true }", "'merge': true()", "...<_>true</_>");
     parse("{ \"\" : {} }", "'merge': true()", "... objects=\"json _\"><_/>");
     parse("{ \"\" : [] }", "'merge': true()", "... objects=\"json\" arrays=\"_\"><_/>");
-    parse("{ \"\" : 0, \"\": 1 }", "'merge': true()",
-        "... objects=\"json\" numbers=\"_\"><_>0</_><_>1</_>");
+    parse("{ \"A\" : 0, \"B\": 1 }", "'merge': true()",
+        "... objects=\"json\" numbers=\"A B\"><A>0</A><B>1</B>");
     parse("{ \"O\" : [ 1 ] }", "'merge': true()",
         "... objects=\"json\" arrays=\"O\" numbers=\"_\"><O><_>1</_></O>");
     parse("{ \"A\" : [ 0, 1 ] }", "'merge': true()",

@@ -1,18 +1,17 @@
 package org.basex.io.parse.json;
 
+import static org.basex.io.parse.json.JsonConstants.*;
 import static org.basex.query.QueryError.*;
-
-import java.util.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * <p>This class converts a <a href="http://jsonml.org">JsonML</a>
- * document to XML.
+ * This class converts a <a href="http://jsonml.org">JsonML</a> document to XML.
  * The specified JSON input is first transformed into a tree representation
  * and then converted to an XML document.
  *
@@ -21,24 +20,124 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 final class JsonMLConverter extends JsonXmlConverter {
-  /** Element stack. */
-  private final Stack<FElem> stack = new Stack<>();
   /** Current attributes. */
   private final TokenSet atts = new TokenSet();
-  /** Current attribute name. */
-  private byte[] attName;
 
   /**
    * Constructor.
    * @param opts json options
+   * @throws QueryIOException query I/O exception
    */
-  JsonMLConverter(final JsonParserOptions opts) {
+  JsonMLConverter(final JsonParserOptions opts) throws QueryIOException {
     super(opts);
   }
 
   @Override
-  FDoc finish() {
-    return doc.add(stack.pop());
+  FNode finish() {
+    return new FBuilder(doc).add(stack.pop()).finish();
+  }
+
+  @Override
+  void openObject() throws QueryIOException {
+    if(curr == null || name != null || stack.peek() != null)
+      error("No object allowed at this stage");
+  }
+
+  @Override
+  void closeObject() {
+    stack.pop();
+    stack.push(curr);
+    reset();
+  }
+
+  @Override
+  void openPair(final byte[] key, final boolean add) throws QueryIOException {
+    name = check(key);
+    if(!atts.add(name)) error("Duplicate attribute found");
+  }
+
+  @Override
+  void closePair(final boolean add) { }
+
+  @Override
+  void openArray() throws QueryIOException {
+    if(!stack.isEmpty()) {
+      if(name == null && curr != null && stack.peek() == null) {
+        stack.pop();
+        stack.push(curr);
+      } else if(name != null || curr != null || stack.peek() == null) {
+        error("No array allowed at this stage");
+      }
+    }
+    stack.push(null);
+    reset();
+  }
+
+  @Override
+  void closeArray() throws QueryIOException {
+    FBuilder value = stack.pop();
+    if(value == null) {
+      value = curr;
+      reset();
+    }
+    if(value == null) error("Missing element name");
+
+    if(stack.isEmpty()) stack.push(value);
+    else stack.peek().add(value);
+  }
+
+  @Override
+  void openItem() { }
+
+  @Override
+  void closeItem() { }
+
+  @Override
+  void addValue(final byte[] type, final byte[] value) throws QueryIOException {
+    if(name == null && curr != null && stack.peek() == null) {
+      stack.pop();
+      stack.push(curr);
+      reset();
+    }
+
+    if(curr == null) {
+      final FBuilder elem = stack.isEmpty() ? null : stack.peek();
+      if(elem == null) curr = new FBuilder(new FElem(check(value)));
+      else elem.add(new FTxt(value));
+    } else if(name != null) {
+      curr.add(name, value);
+      name = null;
+    } else {
+      error("No value allowed at this stage");
+    }
+  }
+
+  @Override
+  void stringLit(final byte[] value) throws QueryIOException {
+    addValue(STRING, value);
+  }
+
+  @Override
+  void numberLit(final byte[] value) throws QueryIOException {
+    error("No numbers allowed");
+  }
+
+  @Override
+  void nullLit() throws QueryIOException {
+    error("No 'null' allowed");
+  }
+
+  @Override
+  void booleanLit(final byte[] b) throws QueryIOException {
+    error("No booleans allowed");
+  }
+
+  /**
+   * Resets the element creation.
+   */
+  private void reset() {
+    curr = null;
+    atts.clear();
   }
 
   /**
@@ -58,106 +157,7 @@ final class JsonMLConverter extends JsonXmlConverter {
    * @throws QueryIOException query I/O exception
    */
   private static byte[] check(final byte[] name) throws QueryIOException {
-    // retrieve name from cache, or create new instance
     if(!XMLToken.isNCName(name)) error("Invalid name: \"%\"", name);
     return name;
-  }
-
-  @Override
-  public void openObject() throws QueryIOException {
-    if(curr == null || attName != null || stack.peek() != null)
-      error("No object allowed at this stage");
-  }
-
-  @Override
-  public void openPair(final byte[] key, final boolean add) throws QueryIOException {
-    attName = check(key);
-    if(!atts.add(attName)) error("Duplicate attribute found");
-  }
-
-  @Override
-  public void closePair(final boolean add) { }
-
-  @Override
-  public void closeObject() {
-    stack.pop();
-    stack.push(curr);
-    reset();
-  }
-
-  @Override
-  public void openArray() throws QueryIOException {
-    if(!stack.isEmpty()) {
-      if(attName == null && curr != null && stack.peek() == null) {
-        stack.pop();
-        stack.push(curr);
-      } else if(attName != null || curr != null || stack.peek() == null) {
-        error("No array allowed at this stage");
-      }
-    }
-    stack.push(null);
-    reset();
-  }
-
-  @Override
-  public void openItem() { }
-
-  @Override
-  public void closeItem() { }
-
-  @Override
-  public void closeArray() throws QueryIOException {
-    FElem value = stack.pop();
-    if(value == null) {
-      value = curr;
-      reset();
-    }
-    if(value == null) error("Missing element name");
-
-    if(stack.isEmpty()) stack.push(value);
-    else stack.peek().add(value);
-  }
-
-  @Override
-  public void stringLit(final byte[] value) throws QueryIOException {
-    if(attName == null && curr != null && stack.peek() == null) {
-      stack.pop();
-      stack.push(curr);
-      reset();
-    }
-
-    if(curr == null) {
-      final FElem elem = stack.isEmpty() ? null : stack.peek();
-      if(elem == null) curr = new FElem(check(value));
-      else elem.add(new FTxt(value));
-    } else if(attName != null) {
-      curr.add(attName, value);
-      attName = null;
-    } else {
-      error("No string allowed at this stage");
-    }
-  }
-
-  @Override
-  public void numberLit(final byte[] value) throws QueryIOException {
-    error("No numbers allowed");
-  }
-
-  @Override
-  public void nullLit() throws QueryIOException {
-    error("No 'null' allowed");
-  }
-
-  @Override
-  public void booleanLit(final byte[] b) throws QueryIOException {
-    error("No booleans allowed");
-  }
-
-  /**
-   * Resets the element creation.
-   */
-  private void reset() {
-    curr = null;
-    atts.clear();
   }
 }

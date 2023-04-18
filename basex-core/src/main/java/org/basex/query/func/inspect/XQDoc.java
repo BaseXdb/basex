@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
@@ -30,9 +31,6 @@ final class XQDoc extends Inspect {
   /** Prefix. */
   private static final byte[] PREFIX = token("xqdoc");
 
-  /** Namespaces. */
-  private final TokenMap nsCache = new TokenMap();
-
   /**
    * Constructor.
    * @param qc query context
@@ -43,55 +41,78 @@ final class XQDoc extends Inspect {
   }
 
   @Override
-  public FElem parse(final IOContent content) throws QueryException {
+  public FNode parse(final IOContent content) throws QueryException {
     final AModule module = parseModule(content);
-    final FElem xqdoc = new FElem(PREFIX, PREFIX, URI).declareNS();
-    final FElem control = elem("control", xqdoc);
-    elem("date", control).add(qc.dateTime().datm.string(info));
-    elem("version", control).add("1.1");
+    final FBuilder xqdoc = new FBuilder(new FElem(new QNm(PREFIX, PREFIX, URI))).declareNS();
+    final FBuilder control = element("control");
+    control.add(element("date").add(qc.dateTime().datm.string(info)));
+    control.add(element("version").add("1.1"));
+    xqdoc.add(control);
 
     final String type = module instanceof LibraryModule ? "library" : "main";
-    final FElem mod = elem("module", xqdoc).add("type", type);
+    final FBuilder mod = element("module").add("type", type);
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;
-      elem("uri", mod).add(name.uri());
-      elem("name", mod).add(content.name());
+      mod.add(element("uri").add(name.uri()));
+      mod.add(element("name").add(content.name()));
     } else {
-      elem("uri", mod).add(content.name());
+      mod.add(element("uri").add(content.name()));
     }
     comment(module, mod);
+    xqdoc.add(mod);
 
     // imports
-    final FElem imports = elem("imports", xqdoc);
+    final FBuilder imports = element("imports");
     for(final byte[] uri : module.modules) {
-      elem("uri", elem("import", imports).add("type", "library")).add(uri);
+      final FBuilder imprt = element("import").add("type", "library");
+      imprt.add(element("uri").add(uri));
+      imports.add(imprt);
     }
+    xqdoc.add(imports);
 
     // namespaces
-    final FElem namespaces = elem("namespaces", xqdoc);
-    for(final byte[] prefix : module.namespaces) nsCache.put(prefix, module.namespaces.get(prefix));
+    final FBuilder namespaces = element("namespaces");
+    final TokenMap nsCache = new TokenMap();
+    for(final byte[] prefix : module.namespaces) {
+      nsCache.put(prefix, module.namespaces.get(prefix));
+    }
+    final QueryBiConsumer<QNm, StaticDecl> addNs = (name, sd) -> {
+      if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
+      for(final Ann ann : sd.anns) {
+        final byte[] uri = ann.name().uri();
+        if(uri.length > 0) nsCache.put(NSGlobal.prefix(uri), uri);
+      }
+    };
+    for(final StaticVar sv : module.vars) addNs.accept(sv.name, sv);
+    for(final StaticFunc sf : module.funcs) addNs.accept(sf.funcName(), sf);
+    for(final byte[] prefix : nsCache) {
+      final FBuilder namespace = element("namespace");
+      namespace.add("prefix", prefix).add("uri", nsCache.get(prefix));
+      namespaces.add(namespace);
+    }
+    xqdoc.add(namespaces);
 
     // variables
-    final FElem variables = elem("variables", xqdoc);
+    final FBuilder variables = element("variables");
     for(final StaticVar sv : module.vars) {
-      final FElem variable = elem("variable", variables);
-      elem("name", variable).add(sv.name.string());
-      if(sv.name.hasPrefix()) nsCache.put(sv.name.prefix(), sv.name.uri());
+      final FBuilder variable = element("variable");
+      variable.add(element("name").add(sv.name.string()));
       comment(sv, variable);
       annotations(sv.anns, variable);
       type(sv.seqType(), variable);
+      variables.add(variable);
     }
+    xqdoc.add(variables);
 
     // functions
-    final FElem functions = elem("functions", xqdoc);
+    final FBuilder functions = element("functions");
     for(final StaticFunc sf : module.funcs) {
       final int al = sf.arity();
       final QNm name = sf.funcName();
       final FuncType tp = sf.funcType();
-      final FElem function = elem("function", functions).add("arity", token(al));
+      final FBuilder function = element("function").add("arity", token(al));
       comment(sf, function);
-      elem("name", function).add(name.string());
-      if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
+      function.add(element("name").add(name.string()));
       annotations(sf.anns, function);
 
       final QueryString qs = new QueryString();
@@ -104,39 +125,36 @@ final class XQDoc extends Inspect {
       qs.token(')').token(AS).token(tp.declType);
       if(sf.expr == null) qs.token("external");
 
-      elem("signature", function).add(qs.toString());
+      function.add(element("signature").add(qs.toString()));
       if(al != 0) {
-        final FElem fparameters = elem("parameters", function);
+        final FBuilder fparameters = element("parameters");
         for(int a = 0; a < al; a++) {
-          final FElem fparameter = elem("parameter", fparameters);
+          final FBuilder fparameter = element("parameter");
           final Var var = sf.params[a];
-          elem("name", fparameter).add(var.name.string());
+          fparameter.add(element("name").add(var.name.string()));
           type(tp.argTypes[a], fparameter);
+          fparameters.add(fparameter);
         }
+        function.add(fparameters);
       }
-      type(sf.seqType(), elem("return", function));
+      final FBuilder rtrn = element("return");
+      type(sf.seqType(), rtrn);
+      function.add(rtrn);
+      functions.add(function);
     }
+    xqdoc.add(functions);
 
-    // add namespaces
-    for(final byte[] prefix : nsCache) {
-      final FElem namespace = elem("namespace", namespaces);
-      namespace.add("prefix", prefix).add("uri", nsCache.get(prefix));
-    }
-
-    return xqdoc;
+    return xqdoc.finish();
   }
 
   @Override
-  protected FElem elem(final String name, final FElem parent) {
-    final FElem elem = new FElem(PREFIX, token(name), URI);
-    parent.add(elem);
-    return elem;
+  protected FBuilder element(final String name) {
+    return new FBuilder(new FElem(new QNm(PREFIX, name, URI)));
   }
 
   @Override
-  protected FElem elem(final byte[] name, final FElem parent) {
-    return eq(name, DOC_TAGS) ? elem(string(name), parent) :
-      elem("custom", parent).add("tag", name);
+  protected FBuilder element(final byte[] name) {
+    return eq(name, DOC_TAGS) ? element(string(name)) : element("custom").add("tag", name);
   }
 
   /**
@@ -145,9 +163,13 @@ final class XQDoc extends Inspect {
    * @param parent parent element
    * @throws QueryException query exception
    */
-  private void comment(final StaticScope scope, final FElem parent) throws QueryException {
+  private void comment(final StaticScope scope, final FBuilder parent) throws QueryException {
     final TokenObjMap<TokenList> map = scope.doc();
-    if(map != null) comment(map, elem("comment", parent));
+    if(map != null) {
+      final FBuilder comment = element("comment");
+      comment(map, comment);
+      parent.add(comment);
+    }
   }
 
   /**
@@ -156,11 +178,11 @@ final class XQDoc extends Inspect {
    * @param parent parent node
    * @throws QueryException query exception
    */
-  private void annotations(final AnnList anns, final FElem parent) throws QueryException {
-    if(!anns.isEmpty()) annotation(anns, elem("annotations", parent), false);
-    for(final Ann ann : anns) {
-      final byte[] uri = ann.name().uri();
-      if(uri.length > 0) nsCache.put(NSGlobal.prefix(uri), uri);
+  private void annotations(final AnnList anns, final FBuilder parent) throws QueryException {
+    if(!anns.isEmpty()) {
+      final FBuilder annotations = element("annotations");
+      annotation(anns, annotations, false);
+      parent.add(annotations);
     }
   }
 
@@ -169,10 +191,11 @@ final class XQDoc extends Inspect {
    * @param st sequence type
    * @param parent parent node
    */
-  private void type(final SeqType st, final FElem parent) {
+  private void type(final SeqType st, final FBuilder parent) {
     if(st == null) return;
-    final FElem type = elem("type", parent).add(st.typeString());
+    final FBuilder type = element("type").add(st.typeString());
     final String occ = st.occ.toString();
     if(!occ.isEmpty()) type.add("occurrence", occ);
+    parent.add(type);
   }
 }

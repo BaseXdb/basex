@@ -11,6 +11,7 @@ import javax.xml.parsers.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -78,12 +79,12 @@ abstract class ValidateFn extends StandardFunc {
    * @return XML
    * @throws QueryException query exception
    */
-  protected final FElem report(final QueryContext qc) throws QueryException {
+  protected final FNode report(final QueryContext qc) throws QueryException {
     final ArrayList<ErrorInfo> errors = errors(qc);
-    final FElem report = new FElem(REPORT);
-    report.add(new FElem(STATUS).add(errors.isEmpty() ? VALID : INVALID));
+    final FBuilder report = new FBuilder(new FElem(REPORT));
+    report.add(new FBuilder(new FElem(STATUS)).add(errors.isEmpty() ? VALID : INVALID));
     for(final ErrorInfo ei : errors) {
-      final FElem error = new FElem(MESSAGE);
+      final FBuilder error = new FBuilder(new FElem(MESSAGE));
       error.add(LEVEL, ei.level);
       if(ei.line != Integer.MIN_VALUE) error.add(LINE, token(ei.line));
       if(ei.column != Integer.MIN_VALUE) error.add(COLUMN, token(ei.column));
@@ -91,7 +92,7 @@ abstract class ValidateFn extends StandardFunc {
       error.add(ei.message);
       report.add(error);
     }
-    return report;
+    return report.finish();
   }
 
   /**

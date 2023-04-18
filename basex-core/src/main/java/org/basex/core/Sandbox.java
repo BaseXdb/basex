@@ -119,8 +119,7 @@ public abstract class Sandbox {
       Util.errln(query.strip());
       Util.errln(res.replace('\n', ','));
     }
-    assertEquals(exp, res, "Unexpected query result\n" +
-        (plan == null ? "" : serialize(plan) + "\n"));
+    assertEquals(exp, res, "\n" + query + "\n" + (plan == null ? "" : serialize(plan)));
   }
 
   /**
@@ -170,8 +169,8 @@ public abstract class Sandbox {
    */
   protected static void contains(final String query, final String result) {
     final String res = normNL(query(query));
-    if(!res.contains(result)) fail("Result does not contain \"" + result +
-        "\":\n" + query + "\n[E] " + result + "\n[F] " + res);
+    if(!res.contains(result)) fail("Result does not contain substring: " + result +
+        "\n" + query + "\n[E] " + result + "\n[F] " + res);
   }
 
   /**

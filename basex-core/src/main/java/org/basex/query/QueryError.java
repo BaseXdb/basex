@@ -1190,7 +1190,7 @@ public enum QueryError {
   /** Error code. */
   CNINVNS_X(XQDY, 101, "Invalid namespace URI: '%'."),
   /** Error code. */
-  EMPTYNSCONS_X(XQDY, 102, "Element is in no namespace, no namespace can be assigned: %."),
+  EMPTYNSCONS(XQDY, 102, "Element is in no namespace, no namespace can be assigned."),
   /** Error code. */
   DUPLNSCONS_X(XQDY, 102, "Duplicate declaration of namespace '%'."),
   /** Error code. */

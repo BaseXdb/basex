@@ -8,7 +8,7 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -23,13 +23,13 @@ import org.basex.util.list.*;
  */
 public final class IndexFacets extends IndexFn {
   /** Name: name. */
-  private static final String NAME = "name";
+  private static final byte[] NAME = token("name");
   /** Name: type. */
-  private static final String TYPE = "type";
+  private static final byte[] TYPE = token("type");
   /** Name: min. */
-  private static final String MIN = "min";
+  private static final byte[] MIN = token("min");
   /** Name: max. */
-  private static final String MAX = "max";
+  private static final byte[] MAX = token("max");
   /** Name: elements. */
   private static final byte[] ELM = NodeType.ELEMENT.qname().local();
   /** Name: attributes. */
@@ -38,10 +38,10 @@ public final class IndexFacets extends IndexFn {
   private static final byte[] FLAT = token("flat");
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final boolean flat = defined(1) && eq(toToken(arg(1), qc), FLAT);
-    return new FDoc(flat ? flat(data) : tree(data, data.paths.root().get(0)));
+    return new FDoc().finish(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
 
   /**
@@ -49,21 +49,21 @@ public final class IndexFacets extends IndexFn {
    * @param data data reference
    * @return element
    */
-  private static FElem flat(final Data data) {
-    final FElem elem = new FElem(NodeType.DOCUMENT_NODE.qname());
+  private static FBuilder flat(final Data data) {
+    final FBuilder elem = new FBuilder(new FElem(NodeType.DOCUMENT_NODE.qname()));
     index(data.elemNames, ELM, elem);
     index(data.attrNames, ATT, elem);
     return elem;
   }
 
   /**
-   * Returns tree facet representation.
+   * Returns a tree facet representation.
    * @param data data reference
    * @param root root node
    * @return element
    */
-  private static FElem tree(final Data data, final PathNode root) {
-    final FElem elem = new FElem(ANode.type(root.kind).qname());
+  private static FBuilder tree(final Data data, final PathNode root) {
+    final FBuilder elem = new FBuilder(new FElem(ANode.type(root.kind).qname()));
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.elemNames : data.attrNames;
     if(root.kind == Data.ATTR || elm) elem.add(NAME, names.key(root.name));
@@ -78,10 +78,10 @@ public final class IndexFacets extends IndexFn {
    * @param name element name
    * @param root root node
    */
-  private static void index(final Names names, final byte[] name, final FElem root) {
+  private static void index(final Names names, final byte[] name, final FBuilder root) {
     final int ns = names.size();
     for(int n = 1; n <= ns; n++) {
-      final FElem sub = new FElem(name).add(NAME, names.key(n));
+      final FBuilder sub = new FBuilder(new FElem(name)).add(NAME, names.key(n));
       stats(names.stats(n), sub);
       root.add(sub);
     }
@@ -92,7 +92,7 @@ public final class IndexFacets extends IndexFn {
    * @param stats statistics
    * @param elem element
    */
-  private static void stats(final Stats stats, final FElem elem) {
+  private static void stats(final Stats stats, final FBuilder elem) {
     final int type = stats.type;
     if(!isNone(type)) elem.add(TYPE, StatsType.toString(type));
     elem.add(COUNT, token(stats.count));
@@ -111,7 +111,7 @@ public final class IndexFacets extends IndexFn {
       }
       for(final int o : list.createOrder(false)) {
         final byte[] value = values.get(o);
-        elem.add(new FElem(ENTRY).add(COUNT, token(map.get(value))).add(value));
+        elem.add(new FBuilder(new FElem(ENTRY)).add(COUNT, token(map.get(value))).add(value));
       }
     }
   }

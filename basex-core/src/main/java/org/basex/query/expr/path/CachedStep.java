@@ -40,10 +40,10 @@ public final class CachedStep extends Step {
     qc.focus = qf;
     try {
       for(final Expr expr : exprs) {
-        final long nl = list.size();
-        qf.size = nl;
+        final long ns = list.size();
+        qf.size = ns;
         int c = 0;
-        for(int n = 0; n < nl; n++) {
+        for(int n = 0; n < ns; n++) {
           final ANode node = list.get(n);
           qf.value = node;
           qf.pos = n + 1;

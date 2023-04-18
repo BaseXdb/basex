@@ -23,6 +23,7 @@ import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.QueryError.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -461,8 +462,7 @@ public class FnHttpTest extends HTTPTest {
     Request request = new Request();
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     // Node child
-    final FElem elem1 = new FElem("a").add("a");
-    request.payload.add(elem1);
+    request.payload.add(new FBuilder(new FElem("a")).add("a").finish());
     // String item child
     request.payload.add(Str.get("<b>b</b>"));
     assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", write(request));
@@ -471,8 +471,7 @@ public class FnHttpTest extends HTTPTest {
     request = new Request();
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/plain");
     // Node child
-    final FElem elem2 = new FElem("a").add("a");
-    request.payload.add(elem2);
+    request.payload.add(new FBuilder(new FElem("a")).add("a").finish());
     // String item child
     request.payload.add(Str.get("<b>b</b>"));
     assertEquals("a<b>b</b>", write(request));
@@ -482,8 +481,7 @@ public class FnHttpTest extends HTTPTest {
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     request.payloadAtts.put("method", "text");
     // Node child
-    final FElem e3 = new FElem("a").add("a");
-    request.payload.add(e3);
+    request.payload.add(new FBuilder(new FElem("a")).add("a").finish());
     // String item child
     request.payload.add(Str.get("<b>b</b>"));
     assertEquals("a<b>b</b>", write(request));
@@ -503,7 +501,7 @@ public class FnHttpTest extends HTTPTest {
     // Case 2: content is a node
     request = new Request();
     request.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    request.payload.add(new FElem("a").add("test"));
+    request.payload.add(new FBuilder(new FElem("a")).add("test").finish());
     assertEquals("<a>test</a>", write(request));
   }
 
@@ -538,8 +536,7 @@ public class FnHttpTest extends HTTPTest {
     // Case 2: content is a node
     request = new Request();
     request.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    final FElem e3 = new FElem("a").add("test");
-    request.payload.add(e3);
+    request.payload.add(new FBuilder(new FElem("a")).add("test").finish());
     assertEquals("<a>test</a>", write(request));
   }
 

@@ -15,7 +15,7 @@ import org.basex.util.http.*;
  */
 public final class WebRedirect extends WebFn {
   @Override
-  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String location = createUrl(qc);
 
     final HashMap<String, String> headers = new HashMap<>();

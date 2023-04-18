@@ -7,12 +7,12 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -264,7 +264,7 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    final FElem elem = plan.attachVariable(plan.create(this), var, false);
+    final FBuilder elem = plan.attachVariable(plan.create(this), var, false);
     if(seqTypes.length == 0) {
       plan.addAttribute(elem, DEFAULT, true);
     } else {

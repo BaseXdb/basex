@@ -7,6 +7,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -40,22 +41,22 @@ public final class DbBackups extends StandardFunc {
 
     final Context ctx = qc.context;
     final StringList backups = name == null ? ctx.databases.backups() : ctx.databases.backups(name);
-    return new BasicIter<FElem>(backups.size()) {
+    return new BasicIter<FNode>(backups.size()) {
       final IOFile dbPath = ctx.soptions.dbPath();
 
       @Override
-      public FElem get(final long i) {
+      public FNode get(final long i) {
         final String backup = backups.get((int) i);
         final IOFile zip = new IOFile(dbPath, backup + IO.ZIPSUFFIX);
         final String db = Databases.name(backup);
 
-        final FElem elem = new FElem(BACKUP).add(backup);
+        final FBuilder elem = new FBuilder(new FElem(BACKUP)).add(backup);
         if(!db.isEmpty()) elem.add(DATABASE, db);
         elem.add(DATE, Dtm.get(DateTime.parse(Databases.date(backup)).getTime()).string(info));
         elem.add(SIZE, token(zip.length()));
         final String comment = ShowBackups.comment(backup, ctx);
         if(!comment.isEmpty()) elem.add(COMMENT, comment);
-        return elem;
+        return elem.finish();
       }
     };
   }

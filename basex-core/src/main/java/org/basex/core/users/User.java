@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -106,17 +107,20 @@ public final class User {
    * @return user element
    * @throws QueryException query exception
    */
-  public synchronized FElem toXML(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FElem user = new FElem(USER).add(NAME, name).add(PERMISSION, perm.toString());
+  public synchronized FNode toXML(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final FBuilder user = new FBuilder(new FElem(USER)).add(NAME, name).
+        add(PERMISSION, perm.toString());
     passwords.forEach((key, value) -> {
-      final FElem pw = new FElem(PASSWORD).add(ALGORITHM, key.toString());
+      final FBuilder pw = new FBuilder(new FElem(PASSWORD)).add(ALGORITHM, key.toString());
       value.forEach((k, v) -> {
-        if(!v.isEmpty()) pw.add(new FElem(k.toString()).add(v));
+        if(!v.isEmpty()) pw.add(new FBuilder(new FElem(k.toString())).add(v));
       });
-      user.add(pw);
+      user.add(pw.finish());
     });
-    patterns.forEach((key, value) -> user.add(new FElem(DATABASE).add(PATTERN, key).
-        add(PERMISSION, value.toString())));
+    patterns.forEach((key, value) -> {
+      user.add(new FBuilder(new FElem(DATABASE)).add(PATTERN, key).
+          add(PERMISSION, value.toString()).finish());
+    });
     if(info != null) {
       if(qc != null) {
         // create copy of the info node if query context is available
@@ -127,7 +131,7 @@ public final class User {
         info.parent(null);
       }
     }
-    return user;
+    return user.finish();
   }
 
   /**

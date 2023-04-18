@@ -240,7 +240,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * Returns a query plan as XML.
    * @return query plan
    */
-  public FElem toXml() {
+  public FNode toXml() {
     return qc.toXml(qc.context.options.get(MainOptions.FULLPLAN));
   }
 

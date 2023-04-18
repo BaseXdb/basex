@@ -11,6 +11,7 @@ import javax.servlet.http.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -43,15 +44,15 @@ public final class RestXqWadl {
    * @return WADL description
    * @throws QueryException query exception
    */
-  public synchronized FElem create(final HashMap<String, WebModule> modules) throws QueryException {
+  public synchronized FNode create(final HashMap<String, WebModule> modules) throws QueryException {
     // create root nodes
-    final FElem application = new FElem(WADL + "application", WADL_URI).declareNS();
+    final FBuilder application = element("application").declareNS();
     final String base = request.getRequestURL().toString().replace(request.getRequestURI(),
         request.getContextPath());
-    final FElem resources = elem("resources", application).add("base", base);
+    final FBuilder resources = element("resources").add("base", base);
 
     // create children
-    final TreeMap<String, FElem> map = new TreeMap<>();
+    final TreeMap<String, FBuilder> map = new TreeMap<>();
     for(final WebModule module : modules.values()) {
       for(final RestXqFunction func : module.functions()) {
         if(func.path == null) continue;
@@ -61,7 +62,7 @@ public final class RestXqWadl {
         final String methods = func.methods.toString().replaceAll("[^A-Z ]", "");
 
         // create resource
-        final FElem resource = new FElem(WADL + "resource", WADL_URI).add("path", path);
+        final FBuilder resource = element("resource").add("path", path);
         map.put(path + '?' + methods, resource);
 
         // add documentation for path variables
@@ -71,25 +72,30 @@ public final class RestXqWadl {
         }
 
         // create method, add function documentation
-        final FElem method = elem("method", resource).add("name", methods);
+        final FBuilder method = element("method").add("name", methods);
         final TokenList descs = xqdoc != null ? xqdoc.get(Inspect.DOC_DESCRIPTION) : null;
         if(descs != null) for(final byte[] desc : descs) addDoc(desc, method);
 
         // create request
-        final FElem rqst = elem("request", method);
+        final FBuilder rqst = element("request");
         for(final WebParam rxp : func.queryParams) addParam(rxp.name, "query", rqst, xqdoc, func);
         for(final WebParam rxp : func.formParams) addParam(rxp.name, "query", rqst, xqdoc, func);
         for(final WebParam rxp : func.headerParams) addParam(rxp.name, "header", rqst, xqdoc, func);
+        method.add(rqst);
 
         // create response
-        final FElem response = elem("response", method);
-        final FElem representation = elem("representation", response);
+        final FBuilder response = element("response");
+        final FBuilder representation = element("representation");
         representation.add("mediaType", HTTPConnection.mediaType(func.sopts).toString());
+        response.add(representation);
+        method.add(response);
+
+        resource.add(method);
       }
     }
     // add resources in sorted order
-    for(final FElem elem : map.values()) resources.add(elem);
-    return application;
+    for(final FBuilder elem : map.values()) resources.add(elem);
+    return application.add(resources).finish();
   }
 
   /**
@@ -101,10 +107,10 @@ public final class RestXqWadl {
    * @param func function
    * @throws QueryException query exception
    */
-  private static void addParam(final String name, final String style, final FElem root,
+  private static void addParam(final String name, final String style, final FBuilder root,
       final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) throws QueryException {
 
-    final FElem param = elem("param", root);
+    final FBuilder param = element("param");
     param.add("name", name).add("style", style);
     final QNm qnm = new QNm(name);
     for(final Var var : func.function.params) {
@@ -113,18 +119,16 @@ public final class RestXqWadl {
       }
     }
     addDoc(Inspect.doc(xqdoc, token(name)), param);
+    root.add(param);
   }
 
   /**
    * Creates an element.
    * @param name name of element
-   * @param parent parent node
    * @return element node
    */
-  private static FElem elem(final String name, final FElem parent) {
-    final FElem elem = new FElem(WADL + name, WADL_URI);
-    if(parent != null) parent.add(elem);
-    return elem;
+  private static FBuilder element(final String name) {
+    return new FBuilder(new FElem(new QNm(WADL_PREFIX, name, WADL_URI)));
   }
 
   /**
@@ -133,10 +137,10 @@ public final class RestXqWadl {
    * @param parent parent node
    * @throws QueryException query exception
    */
-  private static void addDoc(final byte[] xqdoc, final FElem parent) throws QueryException {
+  private static void addDoc(final byte[] xqdoc, final FBuilder parent) throws QueryException {
     if(xqdoc == null) return;
-    final FElem doc = elem("doc", parent);
-    doc.namespaces().add(EMPTY, token(XHTML_URL));
+    final FBuilder doc = element("doc").addNS(EMPTY, token(XHTML_URL));
     Inspect.add(xqdoc, doc);
+    parent.add(doc);
   }
 }

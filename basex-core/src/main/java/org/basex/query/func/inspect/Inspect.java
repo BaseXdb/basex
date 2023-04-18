@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -56,7 +57,7 @@ public abstract class Inspect {
    * @return inspection element
    * @throws QueryException query exception
    */
-  public abstract FElem parse(IOContent content) throws QueryException;
+  public abstract FNode parse(IOContent content) throws QueryException;
 
   /**
    * Parses a module.
@@ -78,9 +79,14 @@ public abstract class Inspect {
    * @param parent parent element
    * @throws QueryException query exception
    */
-  final void comment(final TokenObjMap<TokenList> tags, final FElem parent) throws QueryException {
+  final void comment(final TokenObjMap<TokenList> tags, final FBuilder parent)
+      throws QueryException {
     for(final byte[] tag : tags) {
-      for(final byte[] name : tags.get(tag)) add(name, elem(tag, parent));
+      for(final byte[] name : tags.get(tag)) {
+        final FBuilder elem = element(tag);
+        add(name, elem);
+        parent.add(elem);
+      }
     }
   }
 
@@ -91,36 +97,37 @@ public abstract class Inspect {
    * @param uri include uri
    * @throws QueryException query exception
    */
-  final void annotation(final AnnList anns, final FElem parent, final boolean uri)
+  final void annotation(final AnnList anns, final FBuilder parent, final boolean uri)
       throws QueryException {
 
     for(final Ann ann : anns) {
-      final FElem annotation = elem("annotation", parent);
+      final FBuilder annotation = element("annotation");
       final QNm name = ann.name();
       annotation.add("name", name.string());
       if(uri) annotation.add("uri", name.uri());
 
       for(final Item arg : ann.value()) {
-        elem("literal", annotation).add("type", arg.type.toString()).add(arg.string(null));
+        final FBuilder literal = element("literal");
+        literal.add("type", arg.type.toString()).add(arg.string(null));
+        annotation.add(literal);
       }
+      parent.add(annotation);
     }
   }
 
   /**
-   * Creates a new element.
+   * Creates an element.
    * @param name element name
-   * @param parent parent element
    * @return element
    */
-  protected abstract FElem elem(byte[] name, FElem parent);
+  protected abstract FBuilder element(byte[] name);
 
   /**
    * Creates an element.
    * @param name name of element
-   * @param parent parent element
    * @return element node
    */
-  protected abstract FElem elem(String name, FElem parent);
+  protected abstract FBuilder element(String name);
 
   /**
    * Parses a string as XML and adds the resulting nodes to the specified parent.
@@ -128,7 +135,7 @@ public abstract class Inspect {
    * @param elem element
    * @throws QueryException query exception
    */
-  public static void add(final byte[] value, final FElem elem) throws QueryException {
+  public static void add(final byte[] value, final FBuilder elem) throws QueryException {
     try {
       if(contains(value, '<')) {
         // contains angle brackets: add as XML structure

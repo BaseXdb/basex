@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ANodeList extends ObjectList<ANode, ANodeList> {
+public class ANodeList extends ObjectList<ANode, ANodeList> {
   /**
    * Constructor.
    */
@@ -85,4 +85,34 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   public boolean equals(final Object obj) {
     return obj == this || obj instanceof ANodeList && super.equals(obj);
   }
+
+  /**
+   * Returns a node iterator.
+   * @param nodes nodes
+   * @return the iterator
+   */
+  public static BasicNodeIter iter(final ANode[] nodes) {
+    final int nl = nodes.length;
+    return nl == 0 ? BasicNodeIter.EMPTY : new BasicNodeIter() {
+      int pos;
+
+      @Override
+      public long size() {
+        return nl;
+      }
+      @Override
+      public ANode next() {
+        return pos < nl ? nodes[pos++] : null;
+      }
+      @Override
+      public ANode get(final long i) {
+        return nodes[(int) i];
+      }
+      @Override
+      public Value value(final QueryContext qc, final Expr expr) {
+        return ItemSeq.get(nodes, nl, NodeType.NODE.refine(expr));
+      }
+    };
+  }
+
 }
