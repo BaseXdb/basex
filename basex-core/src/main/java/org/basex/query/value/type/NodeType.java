@@ -13,11 +13,9 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.w3c.dom.*;
 import org.w3c.dom.Text;
 
@@ -59,7 +57,7 @@ public enum NodeType implements Type {
     public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
       if(value instanceof BXElem)  return ((BXNode) value).getNode();
-      if(value instanceof Element) return new FElem((Element) value, null, new TokenMap());
+      if(value instanceof Element) return FElem.build((Element) value, null).finish();
       try {
         return new DBNode(new IOContent(Token.token(value))).childIter().next();
       } catch(final IOException ex) {
@@ -83,11 +81,11 @@ public enum NodeType implements Type {
           // document fragment
           final DocumentFragment df = (DocumentFragment) value;
           final String bu = df.getBaseURI();
-          return new FDoc(bu != null ? Token.token(bu) : Token.EMPTY, df);
+          return FDoc.build(bu != null ? bu : "", df).finish();
         }
         final byte[] token = Token.token(value);
         return Token.startsWith(token, '<') ? new DBNode(new IOContent(token)) :
-          new FBuilder(new FDoc()).add(token).finish();
+          FDoc.build().add(token).finish();
       } catch(final IOException ex) {
         throw NODEERR_X_X.get(ii, this, ex);
       }

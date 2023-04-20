@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -34,7 +33,7 @@ public abstract class QueryPlanTest extends SandboxTest {
       }
       // check syntax tree
       for(final String test : tests) {
-        final FNode doc = new FBuilder(new FDoc()).add(plan).finish();
+        final FNode doc = FDoc.build().add(plan).finish();
         try(QueryProcessor qp2 = new QueryProcessor(test, context).context(doc)) {
           if(qp2.value() != Bln.TRUE) fail(NL + "QUERY: " + query + NL +
               "OPTIMIZED: " + qp.qc.main + NL + "TEST: " + test + NL + serialize(plan));

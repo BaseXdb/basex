@@ -7,7 +7,6 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -37,7 +36,7 @@ public final class FnAnalyzeString extends RegEx {
     final Expr modifier = defined(2) ? arg(2) : null;
     final Matcher m = pattern(pattern, modifier, qc, true).matcher(value);
 
-    final FBuilder root = new FBuilder(new FElem(Q_ANALYZE)).declareNS();
+    final FBuilder root = FElem.build(Q_ANALYZE).declareNS();
     int start = 0;
     while(m.find()) {
       if(start != m.start()) nonmatch(value.substring(start, m.start()), root);
@@ -59,8 +58,8 @@ public final class FnAnalyzeString extends RegEx {
   private static int[] match(final Matcher matcher, final String string, final FBuilder parent,
       final int group) {
 
-    final FBuilder node = new FBuilder(new FElem(group == 0 ? Q_MATCH : Q_MGROUP)).declareNS();
-    if(group > 0) node.add(NR, token(group));
+    final FBuilder node = FElem.build(group == 0 ? Q_MATCH : Q_MGROUP).declareNS();
+    if(group > 0) node.add(NR, group);
 
     final int start = matcher.start(group), end = matcher.end(group), gc = matcher.groupCount();
     int[] pos = { group + 1, start }; // group and position in string
@@ -85,6 +84,6 @@ public final class FnAnalyzeString extends RegEx {
    * @param parent root node
    */
   private static void nonmatch(final String text, final FBuilder parent) {
-    parent.add(new FBuilder(new FElem(Q_NONMATCH)).declareNS().add(text));
+    parent.add(FElem.build(Q_NONMATCH).declareNS().add(text));
   }
 }

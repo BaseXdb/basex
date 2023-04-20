@@ -11,7 +11,6 @@ import javax.xml.parsers.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -81,16 +80,13 @@ abstract class ValidateFn extends StandardFunc {
    */
   protected final FNode report(final QueryContext qc) throws QueryException {
     final ArrayList<ErrorInfo> errors = errors(qc);
-    final FBuilder report = new FBuilder(new FElem(REPORT));
-    report.add(new FBuilder(new FElem(STATUS)).add(errors.isEmpty() ? VALID : INVALID));
+    final FBuilder report = FElem.build(REPORT);
+    report.add(FElem.build(STATUS).add(errors.isEmpty() ? VALID : INVALID));
     for(final ErrorInfo ei : errors) {
-      final FBuilder error = new FBuilder(new FElem(MESSAGE));
-      error.add(LEVEL, ei.level);
-      if(ei.line != Integer.MIN_VALUE) error.add(LINE, token(ei.line));
-      if(ei.column != Integer.MIN_VALUE) error.add(COLUMN, token(ei.column));
-      if(ei.url != null) error.add(URL, ei.url);
-      error.add(ei.message);
-      report.add(error);
+      final FBuilder error = FElem.build(MESSAGE).add(LEVEL, ei.level);
+      if(ei.line != Integer.MIN_VALUE) error.add(LINE, ei.line);
+      if(ei.column != Integer.MIN_VALUE) error.add(COLUMN, ei.column);
+      report.add(error.add(URL, ei.url).add(ei.message));
     }
     return report.finish();
   }

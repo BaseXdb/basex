@@ -3,7 +3,6 @@ package org.basex.query.value.node;
 import java.util.*;
 
 import org.basex.api.dom.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -17,8 +16,6 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {
-  /** Empty node array. */
-  public static final FNode[] EMPTY = {};
   /** Parent node (can be {@code null}). */
   FNode parent;
 
@@ -99,10 +96,10 @@ public abstract class FNode extends ANode {
   /**
    * Returns the children of the specified DOM node.
    * @param node node
-   * @param parent parent node
+   * @param builder parent node
    * @param nsMap namespace map
    */
-  static void children(final Node node, final FBuilder parent, final TokenMap nsMap) {
+  static void children(final Node node, final FBuilder builder, final TokenMap nsMap) {
     final NodeList ch = node.getChildNodes();
     final int cl = ch.getLength();
     for(int c = 0; c < cl; ++c) {
@@ -110,16 +107,16 @@ public abstract class FNode extends ANode {
 
       switch(child.getNodeType()) {
         case Node.TEXT_NODE:
-          parent.add(new FTxt((Text) child));
+          builder.add(new FTxt((Text) child));
           break;
         case Node.COMMENT_NODE:
-          parent.add(new FComm((Comment) child));
+          builder.add(new FComm((Comment) child));
           break;
         case Node.PROCESSING_INSTRUCTION_NODE:
-          parent.add(new FPI((ProcessingInstruction) child));
+          builder.add(new FPI((ProcessingInstruction) child));
           break;
         case Node.ELEMENT_NODE:
-          parent.add(new FElem((Element) child, null, nsMap));
+          builder.add(FElem.build((Element) child, nsMap).finish());
           break;
         default:
           break;

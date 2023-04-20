@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -61,12 +60,12 @@ abstract class Update extends Arr {
 
   /**
    * Returns a node list.
-   * @param constr node constructor
+   * @param builder node builder
    * @param attr attributes or elements
    * @return list
    */
-  final ANodeList toList(final Constr constr, final boolean attr) {
-    final ANodeList list = attr ? constr.builder.attributes : constr.builder.children;
+  final ANodeList toList(final FBuilder builder, final boolean attr) {
+    final ANodeList list = attr ? builder.attributes : builder.children;
     return list != null ? list : new ANodeList();
   }
 }

@@ -53,8 +53,9 @@ public final class Insert extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Constr constr = new Constr(info, sc, qc).add(exprs[1]);
-    final ANodeList cList = toList(constr, false), aList = toList(constr, true);
+    final FBuilder builder = new FBuilder();
+    final Constr constr = new Constr(builder, info, sc, qc).add(exprs[1]);
+    final ANodeList cList = toList(builder, false), aList = toList(builder, true);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
 

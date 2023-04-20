@@ -1,7 +1,5 @@
 package org.basex.query.func.db;
 
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
 import org.basex.core.*;
@@ -9,7 +7,6 @@ import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -117,8 +114,7 @@ public class DbList extends StandardFunc {
    * @return resource node
    */
   static FNode dir(final String path, final long mdate) {
-    return new FBuilder(new FElem(DIR)).add(path).
-        add(MODIFIED_DATE, DateTime.format(new Date(mdate))).finish();
+    return FElem.build(DIR).add(path).add(MODIFIED_DATE, DateTime.format(new Date(mdate))).finish();
   }
 
   /**
@@ -132,11 +128,11 @@ public class DbList extends StandardFunc {
   static FNode resource(final String path, final long mdate, final long size,
       final ResourceType type) {
 
-    final FBuilder elem = new FBuilder(new FElem(RESOURCE)).add(path);
-    elem.add(TYPE, type.toString());
-    elem.add(CONTENT_TYPE, type.contentType(path).toString());
+    final FBuilder elem = FElem.build(RESOURCE).add(path);
+    elem.add(TYPE, type);
+    elem.add(CONTENT_TYPE, type.contentType(path));
     elem.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
-    elem.add(SIZE, token(size));
+    elem.add(SIZE, size);
     return elem.finish();
   }
 }

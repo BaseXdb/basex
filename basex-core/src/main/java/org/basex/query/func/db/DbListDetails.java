@@ -11,7 +11,6 @@ import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -49,16 +48,16 @@ public final class DbListDetails extends DbList {
       @Override
       public FNode get(final long i) {
         final String name = dbs.get((int) i);
-        final FBuilder database = new FBuilder(new FElem(DATABASE));
+        final FBuilder database = FElem.build(DATABASE);
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
           // count number of binary files
           final int binaries = meta.dir(ResourceType.BINARY).descendants().size();
           final int values = meta.dir(ResourceType.VALUE).descendants().size();
-          database.add(RESOURCES, token(meta.ndocs + binaries + values));
+          database.add(RESOURCES, meta.ndocs + binaries + values);
           database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
-          database.add(SIZE, token(meta.dbSize()));
+          database.add(SIZE, meta.dbSize());
           if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored

@@ -1,9 +1,6 @@
 package org.basex.query.func.proc;
 
-import static org.basex.util.Token.*;
-
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -22,10 +19,10 @@ public final class ProcExecute extends ProcFn {
     final byte[] output = result.output.normalize().finish();
     final byte[] error = result.error.normalize().finish();
 
-    final FBuilder root = new FBuilder(new FElem(RESULT));
-    if(output.length != 0) root.add(new FBuilder(new FElem(OUTPUT)).add(output));
-    if(error.length != 0) root.add(new FBuilder(new FElem(ERROR)).add(error));
-    if(!ex) root.add(new FBuilder(new FElem(CODE)).add(token(result.code)));
+    final FBuilder root = FElem.build(RESULT);
+    if(output.length != 0) root.add(FElem.build(OUTPUT).add(output));
+    if(error.length != 0) root.add(FElem.build(ERROR).add(error));
+    if(!ex) root.add(FElem.build(CODE).add(result.code));
     return root.finish();
   }
 }

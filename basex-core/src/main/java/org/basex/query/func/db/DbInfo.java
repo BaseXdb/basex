@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -32,7 +31,7 @@ public final class DbInfo extends DbAccess {
    * @return node
    */
   static FNode toNode(final String name, final String string) {
-    final FBuilder root = new FBuilder(new FElem(name));
+    final FBuilder root = FElem.build(name);
 
     FBuilder header = null;
     for(final String line : string.split(Prop.NL)) {
@@ -40,10 +39,9 @@ public final class DbInfo extends DbAccess {
       if(cols[0].isEmpty()) continue;
 
       final String col = cols[0].replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
-      final FBuilder node = new FBuilder(new FElem(col));
+      final FBuilder node = FElem.build(col);
       if(Strings.startsWith(cols[0], ' ')) {
-        if(!cols[1].isEmpty()) node.add(cols[1]);
-        header.add(node);
+        header.add(node.add(cols[1]));
       } else {
         if(header != null) root.add(header);
         header = node;

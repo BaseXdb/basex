@@ -13,7 +13,6 @@ import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -68,7 +67,7 @@ final class Unit {
    * @throws IOException query exception
    */
   public void test(final FBuilder suites) throws IOException {
-    final FBuilder suite = new FBuilder(new FElem(TESTSUITE)).add(NAME, file.url());
+    final FBuilder suite = FElem.build(TESTSUITE).add(NAME, file.url());
     final ArrayList<StaticFunc> beforeModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> afterModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> before = new ArrayList<>(0);
@@ -129,7 +128,7 @@ final class Unit {
           throw BASEX_ANNOTATION2_X_X.get(ann.info, ann, arguments(vs));
         }
 
-        final FBuilder testcase = new FBuilder(new FElem(TESTCASE)).add(NAME, sf.name.local());
+        final FBuilder testcase = FElem.build(TESTCASE).add(NAME, sf.name.local());
         tests++;
 
         final Performance perf2 = new Performance();
@@ -153,8 +152,7 @@ final class Unit {
 
             if(code != null) {
               failures++;
-              testcase.add(new FBuilder(new FElem(FAILURE)).
-                  add(new FBuilder(new FElem(EXPECTED)).add(code.prefixId())));
+              testcase.add(FElem.build(FAILURE).add(FElem.build(EXPECTED).add(code.prefixId())));
             }
           } catch(final QueryException ex) {
             addError(ex, testcase, code);
@@ -177,20 +175,16 @@ final class Unit {
         addError(ex, suite, null);
       } else {
         // handle errors caused by initializing or finalizing unit functions
-        final FBuilder init = new FBuilder(new FElem(TESTINIT)).
-            add(NAME, current.name.local()).add(TIME, time(perf));
+        final FBuilder init = FElem.build(TESTINIT).add(NAME, current.name.local()).
+            add(TIME, time(perf));
         addError(ex, init, null);
         suite.add(init);
       }
     }
 
     if(!suite.isEmpty()) {
-      suite.add(TIME, time(perf));
-      suite.add(TESTS, token(tests));
-      suite.add(FAILURES, token(failures));
-      suite.add(ERRORS, token(errors));
-      suite.add(SKIPPED, token(skipped));
-      suites.add(suite);
+      suites.add(suite.add(TIME, time(perf)).add(TESTS, tests).add(FAILURES, failures).
+        add(ERRORS, errors).add(SKIPPED, skipped));
     }
   }
 
@@ -223,12 +217,12 @@ final class Unit {
       final boolean fail = UNIT_FAIL.eq(name);
       if(fail) {
         failures++;
-        error = new FBuilder(new FElem(FAILURE));
+        error = FElem.build(FAILURE);
       } else {
         errors++;
-        error = new FBuilder(new FElem(ERROR));
+        error = FElem.build(ERROR);
       }
-      error.add(LINE, token(ex.line())).add(COLUMN, token(ex.column()));
+      error.add(LINE, ex.line()).add(COLUMN, ex.column());
       final String url = IO.get(ex.file()).url();
       if(!file.url().equals(url)) error.add(URI, url);
 
@@ -248,7 +242,7 @@ final class Unit {
         error.add(element((Item) value, INFO, -1));
       } else {
         // otherwise, add error message
-        error.add(new FBuilder(new FElem(INFO)).add(ex.getLocalizedMessage()));
+        error.add(FElem.build(INFO).add(ex.getLocalizedMessage()));
       }
       testcase.add(error);
     }
@@ -262,7 +256,7 @@ final class Unit {
    * @return element
    */
   private static FBuilder element(final Item item, final byte[] name, final int count) {
-    final FBuilder elem = new FBuilder(new FElem(name));
+    final FBuilder elem = FElem.build(name);
     if(item != null) {
       if(item instanceof ANode) {
         elem.add((ANode) item);
@@ -271,10 +265,10 @@ final class Unit {
           elem.add(item.string(null));
         } catch(final QueryException ex) {
           Util.debug(ex);
-          elem.add(item.toString());
+          elem.add(item);
         }
       }
-      if(count != -1) elem.add(ITEM, token(count)).add(TYPE, item.type.toString());
+      if(count != -1) elem.add(ITEM, count).add(TYPE, item.type);
     }
     return elem;
   }

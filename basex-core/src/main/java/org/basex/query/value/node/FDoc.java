@@ -6,7 +6,6 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
@@ -23,56 +22,66 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FDoc extends FNode {
-  /** Child nodes. */
-  private ANode[] children = EMPTY;
   /** Base URI. */
   private final byte[] uri;
+  /** Children. */
+  private ANode[] children;
 
   /**
    * Constructor.
    * @param uri base uri
    */
-  public FDoc(final byte[] uri) {
+  private FDoc(final byte[] uri) {
     super(NodeType.DOCUMENT_NODE);
     this.uri = uri;
   }
 
   /**
-   * Constructor.
-   */
-  public FDoc() {
-    this(Token.EMPTY);
-  }
-
-  /**
-   * Constructor.
+   * Creates a document builder.
    * @param uri base uri
+   * @return document builder
    */
-  public FDoc(final String uri) {
-    this(Token.token(uri));
+  public static FBuilder build(final byte[] uri) {
+    return new FBuilder(new FDoc(uri));
   }
 
   /**
-   * Constructor for DOM nodes.
+   * Creates a document builder.
+   * @param uri base uri
+   * @return document builder
+   */
+  public static FBuilder build(final String uri) {
+    return build(Token.token(uri));
+  }
+
+  /**
+   * Creates a document builder.
+   * @return document builder
+   */
+  public static FBuilder build() {
+    return build(Token.EMPTY);
+  }
+
+  /**
+   * Creates a document builder for DOM nodes.
    * Originally provided by Erdal Karaca.
    * @param uri base uri
    * @param doc DOM node
+   * @return document builder
    */
-  public FDoc(final byte[] uri, final DocumentFragment doc) {
-    this(uri);
-    final FBuilder builder = new FBuilder();
+  public static FBuilder build(final String uri, final DocumentFragment doc) {
+    final FBuilder builder = build(uri);
     children(doc, builder, new TokenMap());
-    finish(builder);
+    return builder;
   }
 
   /**
-   * Assigns nodes.
-   * @param nodes nodes to be assigned
+   * Finalizes the node.
+   * @param ch children
    * @return self reference
    */
-  public FDoc finish(final FBuilder nodes) {
-    children = nodes.children == null ? FNode.EMPTY : nodes.children.finish();
-    for(final ANode child : children) child.parent(this);
+  FDoc finish(final ANode[] ch) {
+    children = ch;
     return this;
   }
 
@@ -102,7 +111,7 @@ public final class FDoc extends FNode {
 
     if(materialized(test, ii)) return this;
 
-    final FBuilder doc = new FBuilder(new FDoc(uri));
+    final FBuilder doc = build(uri);
     for(final ANode child : children) doc.add(child.materialize(test, ii, qc));
     return doc.finish();
   }

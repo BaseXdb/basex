@@ -1,7 +1,6 @@
 package org.basex.io.parse.csv;
 
 import org.basex.build.csv.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -13,7 +12,7 @@ import org.basex.util.*;
  */
 final class CsvDirectConverter extends CsvConverter {
   /** Document root. */
-  private FDoc doc;
+  private FBuilder doc;
   /** Root node. */
   private FBuilder root;
   /** Record builder. */
@@ -30,7 +29,7 @@ final class CsvDirectConverter extends CsvConverter {
   @Override
   protected void record() {
     if(record != null) root.add(record);
-    record = new FBuilder(new FElem(RECORD));
+    record = FElem.build(RECORD);
     col = 0;
   }
 
@@ -44,23 +43,22 @@ final class CsvDirectConverter extends CsvConverter {
     final byte[] name = headers.get(col++);
     final FBuilder elem;
     if(ats) {
-      elem = new FBuilder(new FElem(ENTRY));
-      if(name != null) elem.add(NAME, name);
+      elem = FElem.build(ENTRY).add(NAME, name);
     } else {
-      elem = new FBuilder(new FElem(name != null ? name : ENTRY));
+      elem = FElem.build(name != null ? name : ENTRY);
     }
     record.add(elem.add(entry));
   }
 
   @Override
   protected void init(final String uri) {
-    doc = new FDoc(uri);
-    root = new FBuilder(new FElem(CSV));
+    doc = FDoc.build(uri);
+    root = FElem.build(CSV);
   }
 
   @Override
   protected FNode finish() {
     if(record != null) root.add(record);
-    return new FBuilder(doc).add(root).finish();
+    return doc.add(root).finish();
   }
 }

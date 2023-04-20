@@ -10,7 +10,6 @@ import java.util.Map.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -54,16 +53,15 @@ public final class Response {
 
     // construct <http:response/>
     final int status = response.statusCode();
-    final FBuilder root = new FBuilder(new FElem(Q_HTTP_RESPONSE)).declareNS();
-    root.add(STATUS, Token.token(status));
-    root.add(MESSAGE, IOUrl.reason(status));
+    final FBuilder root = FElem.build(Q_HTTP_RESPONSE).declareNS();
+    root.add(STATUS, status).add(MESSAGE, IOUrl.reason(status));
 
     // add headers
     for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
       final String name = entry.getKey();
       if(name != null) {
         for(final String value : entry.getValue()) {
-          root.add(new FBuilder(new FElem(Q_HTTP_HEADER)).add(NAME, name).add(VALUE, value));
+          root.add(FElem.build(Q_HTTP_HEADER).add(NAME, name).add(VALUE, value));
         }
       }
     }

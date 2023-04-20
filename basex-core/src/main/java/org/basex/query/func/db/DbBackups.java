@@ -1,13 +1,11 @@
 package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -46,14 +44,11 @@ public final class DbBackups extends StandardFunc {
 
       @Override
       public FNode get(final long i) {
-        final String backup = backups.get((int) i);
-        final IOFile zip = new IOFile(dbPath, backup + IO.ZIPSUFFIX);
-        final String db = Databases.name(backup);
-
-        final FBuilder elem = new FBuilder(new FElem(BACKUP)).add(backup);
+        final String backup = backups.get((int) i), db = Databases.name(backup);
+        final FBuilder elem = FElem.build(BACKUP).add(backup);
         if(!db.isEmpty()) elem.add(DATABASE, db);
         elem.add(DATE, Dtm.get(DateTime.parse(Databases.date(backup)).getTime()).string(info));
-        elem.add(SIZE, token(zip.length()));
+        elem.add(SIZE, new IOFile(dbPath, backup + IO.ZIPSUFFIX).length());
         final String comment = ShowBackups.comment(backup, ctx);
         if(!comment.isEmpty()) elem.add(COMMENT, comment);
         return elem.finish();

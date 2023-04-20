@@ -11,7 +11,6 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -128,6 +127,7 @@ final class XsltReport {
    * @return item or empty sequence
    */
   private Value convert(final IOContent content, final boolean result) {
+    final FBuilder doc = result ? FDoc.build() : null;
     ANode node;
     try {
       node = new DBNode(content);
@@ -143,7 +143,7 @@ final class XsltReport {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final ANode child : node.childIter()) {
       vb.add(child.type == NodeType.TEXT ? Atm.get(child.string()) :
-        result ? new FBuilder(new FDoc()).add(child.finish()).finish() : child.finish());
+        result ? doc.add(child.finish()).finish() : child.finish());
     }
     return vb.value();
   }

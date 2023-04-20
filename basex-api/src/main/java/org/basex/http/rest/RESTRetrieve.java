@@ -12,7 +12,6 @@ import org.basex.core.cmd.List;
 import org.basex.http.*;
 import org.basex.index.resource.*;
 import org.basex.io.serial.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -49,18 +48,17 @@ final class RESTRetrieve extends RESTCmd {
       final FBuilder root;
       final Command cmd;
       if(db) {
-        root = new FBuilder(new FElem(RESTText.Q_DATABASES)).declareNS();
+        root = FElem.build(RESTText.Q_DATABASES).declareNS();
         cmd = new List();
       } else {
-        root = new FBuilder(new FElem(RESTText.Q_DATABASE)).declareNS().
-            add(RESTText.NAME, database);
+        root = FElem.build(RESTText.Q_DATABASE).declareNS().add(RESTText.NAME, database);
         cmd = new Dir(path);
       }
       final Table table = new Table(run(cmd));
       for(final TokenList list : table.contents) {
         final boolean dir = !db && eq(RESTText.DIR, list.get(1));
-        final FBuilder elem = new FBuilder(new FElem(db ? RESTText.Q_DATABASE :
-          dir ? RESTText.Q_DIR : RESTText.Q_RESOURCE));
+        final FBuilder elem = FElem.build(db ? RESTText.Q_DATABASE :
+          dir ? RESTText.Q_DIR : RESTText.Q_RESOURCE);
         if(!dir) {
           final int ll = list.size() - (db ? 1 : 0);
           for(int l = 1; l < ll; l++) elem.add(lc(table.header.get(l)), list.get(l));

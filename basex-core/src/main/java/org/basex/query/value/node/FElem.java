@@ -8,7 +8,6 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -26,54 +25,61 @@ import org.w3c.dom.*;
 public final class FElem extends FNode {
   /** Element name. */
   private final QNm name;
-
   /** Namespaces. */
-  private Atts namespaces = Atts.EMPTY;
+  private Atts namespaces;
   /** Attributes. */
-  private ANode[] attributes = EMPTY;
-  /** Child nodes. */
-  private ANode[] children = EMPTY;
+  private ANode[] attributes;
+  /** Children. */
+  private ANode[] children;
 
   /**
    * Constructor.
    * @param name element name
    */
-  public FElem(final QNm name) {
+  private FElem(final QNm name) {
     super(NodeType.ELEMENT);
     this.name = name;
   }
 
   /**
-   * Convenience constructor for creating an element.
+   * Constructor.
    * @param name element name
+   * @return element builder
    */
-  public FElem(final String name) {
-    this(token(name));
+  public static FBuilder build(final QNm name) {
+    return new FBuilder(new FElem(name));
   }
 
   /**
    * Convenience constructor for creating an element.
    * @param name element name
+   * @return element builder
    */
-  public FElem(final byte[] name) {
-    this(new QNm(name));
+  public static FBuilder build(final byte[] name) {
+    return build(new QNm(name));
+  }
+
+  /**
+   * Convenience constructor for creating an element.
+   * @param name element name
+   * @return element builder
+   */
+  public static FBuilder build(final String name) {
+    return build(token(name));
   }
 
   /**
    * Constructor for creating an element from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param elem DOM node
-   * @param parent parent reference (can be {@code null})
    * @param nsMap namespaces in scope
+   * @return element builder
    */
-  public FElem(final Element elem, final FNode parent, final TokenMap nsMap) {
-    super(NodeType.ELEMENT);
-
-    this.parent = parent;
+  public static FBuilder build(final Element elem, final TokenMap nsMap) {
     final String nsUri = elem.getNamespaceURI();
-    name = new QNm(elem.getNodeName(), nsUri == null ? Token.EMPTY : token(nsUri));
+    final QNm name = new QNm(elem.getNodeName(), nsUri == null ? Token.EMPTY : token(nsUri));
 
-    final FBuilder builder = new FBuilder();
+    final FBuilder builder = build(name);
     final Atts nspaces = new Atts();
 
     // attributes and namespaces
@@ -97,35 +103,35 @@ public final class FElem extends FNode {
     for(int n = 0; n < ns; n++) nsMap.put(nspaces.name(n), nspaces.value(n));
 
     // no parent, so we have to add all namespaces in scope
-    if(parent == null) {
-      nsScope(elem.getParentNode(), nsMap);
-      for(final byte[] prefix : nsMap) {
-        if(!nspaces.contains(prefix)) nspaces.add(prefix, nsMap.get(prefix));
+    TokenMap namespaces = nsMap;
+    if(namespaces == null) {
+      namespaces = new TokenMap();
+      nsScope(elem.getParentNode(), namespaces);
+      for(final byte[] prefix : namespaces) {
+        if(!nspaces.contains(prefix)) nspaces.add(prefix, namespaces.get(prefix));
       }
     }
-
-    final byte[] prefix = name.prefix(), uri = name.uri(), old = nsMap.get(prefix);
+    final byte[] prefix = name.prefix(), uri = name.uri(), old = namespaces.get(prefix);
     if(old == null || !Token.eq(uri, old)) {
       nspaces.add(prefix, uri);
       nsMap.put(prefix, uri);
     }
-
-    if(!nspaces.isEmpty()) namespaces = nspaces;
+    if(!nspaces.isEmpty()) builder.namespaces = nspaces;
     children(elem, builder, new TokenMap());
-    finish(builder);
+    return builder;
   }
 
   /**
-   * Assigns nodes.
-   * @param builder node builder
+   * Finalizes the node.
+   * @param ns namespaces
+   * @param at attributes
+   * @param ch children
    * @return self reference
    */
-  public FElem finish(final FBuilder builder) {
-    namespaces = builder.namespaces == null ? Atts.EMPTY : builder.namespaces.finish();
-    attributes = builder.attributes == null ? FNode.EMPTY : builder.attributes.finish();
-    children = builder.children == null ? FNode.EMPTY : builder.children.finish();
-    for(final ANode child : children) child.parent(this);
-    for(final ANode attribute : attributes) attribute.parent(this);
+  FElem finish(final Atts ns, final ANode[] at, final ANode[] ch) {
+    namespaces = ns;
+    attributes = at;
+    children = ch;
     return this;
   }
 
@@ -208,7 +214,7 @@ public final class FElem extends FNode {
 
     if(materialized(test, ii)) return this;
 
-    final FBuilder elem = new FBuilder(new FElem(name));
+    final FBuilder elem = build(name);
     final int ns = namespaces.size();
     for(int n = 0; n < ns; n++) elem.addNS(namespaces.name(n), namespaces.value(n));
     for(final ANode attribute : attributes) elem.add(attribute.materialize(test, ii, qc));

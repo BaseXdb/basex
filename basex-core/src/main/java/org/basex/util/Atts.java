@@ -11,8 +11,6 @@ import org.basex.util.list.*;
  */
 public final class Atts extends ElementList {
   /** Name array. */
-  public static final Atts EMPTY = new Atts(0);
-  /** Name array. */
   private byte[][] names;
   /** Value array. */
   private byte[][] values;

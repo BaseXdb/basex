@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.list.*;
@@ -52,8 +51,7 @@ final class PlainDoc extends Inspect {
     final FBuilder root = element("module");
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;
-      root.add("prefix", name.string());
-      root.add("uri", name.uri());
+      root.add("prefix", name.string()).add("uri", name.uri());
     }
 
     final TokenObjMap<TokenList> doc = module.doc();
@@ -75,7 +73,7 @@ final class PlainDoc extends Inspect {
     variable.add("name", name);
     if(uri.length != 0) variable.add("uri", uri);
     type(sv.seqType(), variable);
-    variable.add("external", Boolean.toString(sv.external));
+    variable.add("external", sv.external);
 
     comment(sv, variable);
     annotation(sv.anns, variable, true);
@@ -99,7 +97,7 @@ final class PlainDoc extends Inspect {
       function.add("name", fname.string());
       if(fname.uri().length != 0) function.add("uri", fname.uri());
     }
-    function.add("external", Boolean.toString(sf != null && sf.expr == null));
+    function.add("external", sf != null && sf.expr == null);
 
     final TokenObjMap<TokenList> doc = sf != null ? sf.doc() : null;
     final int al = ft.argTypes.length;
@@ -148,7 +146,7 @@ final class PlainDoc extends Inspect {
 
   @Override
   protected FBuilder element(final String name) {
-    return new FBuilder(new FElem(name));
+    return FElem.build(name);
   }
 
   /**

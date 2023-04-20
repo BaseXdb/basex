@@ -14,7 +14,6 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -92,7 +91,7 @@ public final class Users {
     synchronized(users) {
       try {
         file.parent().md();
-        final FBuilder root = new FBuilder(new FElem(USERS));
+        final FBuilder root = FElem.build(USERS);
         for(final User user : users.values()) {
           root.add(user.toXML(null, null));
         }

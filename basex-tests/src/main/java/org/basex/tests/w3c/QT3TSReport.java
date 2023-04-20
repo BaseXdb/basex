@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -145,13 +144,9 @@ public final class QT3TSReport {
     for(final String[] test : tests) {
       if(test.length == 1) {
         if(ts != null) root.add(ts);
-        ts = element("test-set");
-        ts.add("name", test[0]);
+        ts = element("test-set").add("name", test[0]);
       } else {
-        final FBuilder tc = element("test-case");
-        tc.add("name", test[0]);
-        tc.add("result", test[1]);
-        ts.add(tc);
+        ts.add(element("test-case").add("name", test[0]).add("result", test[1]));
       }
     }
     if(ts != null) root.add(ts);
@@ -164,6 +159,6 @@ public final class QT3TSReport {
    * @return element node
    */
   private static FBuilder element(final String name) {
-    return new FBuilder(new FElem(new QNm(name, URI)));
+    return FElem.build(new QNm(name, URI));
   }
 }

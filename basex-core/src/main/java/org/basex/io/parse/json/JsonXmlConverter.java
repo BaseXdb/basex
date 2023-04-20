@@ -9,7 +9,6 @@ import java.util.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -34,7 +33,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   private final boolean strings;
 
   /** Document root. */
-  FDoc doc;
+  FBuilder doc;
   /** Current element. */
   FBuilder curr;
   /** Name of current element/attribute. */
@@ -58,7 +57,7 @@ abstract class JsonXmlConverter extends JsonConverter {
 
   @Override
   final void init(final String uri) {
-    doc = new FDoc(uri);
+    doc = FDoc.build(uri);
   }
 
   @Override
@@ -83,7 +82,7 @@ abstract class JsonXmlConverter extends JsonConverter {
         if(types[t] != null) curr.add(ATTRS[t], types[t].finish());
       }
     }
-    return new FBuilder(doc).add(curr).finish();
+    return doc.add(curr).finish();
   }
 
   @Override

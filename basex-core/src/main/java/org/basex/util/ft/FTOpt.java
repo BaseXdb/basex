@@ -9,8 +9,8 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
+import org.basex.query.value.node.*;
 import org.basex.util.list.*;
 
 /**
@@ -117,7 +117,7 @@ public final class FTOpt extends ExprInfo {
       ERRORS, errors != -1 ? errors : null, CASE, cs,
       STEMMING, is(ST) || sd != null ? TRUE : null, LANGUAGE, ln,
       THESAURUS, th != null ? TRUE : null);
-    if(elem.root.attributeIter().next() != null) plan.add(elem);
+    if(!elem.isEmpty()) plan.add(elem);
   }
 
   @Override

@@ -11,7 +11,6 @@ import javax.servlet.http.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -74,19 +73,21 @@ public final class RestXqWadl {
         // create method, add function documentation
         final FBuilder method = element("method").add("name", methods);
         final TokenList descs = xqdoc != null ? xqdoc.get(Inspect.DOC_DESCRIPTION) : null;
-        if(descs != null) for(final byte[] desc : descs) addDoc(desc, method);
+        if(descs != null) {
+          for(final byte[] desc : descs) addDoc(desc, method);
+        }
 
         // create request
         final FBuilder rqst = element("request");
-        for(final WebParam rxp : func.queryParams) addParam(rxp.name, "query", rqst, xqdoc, func);
-        for(final WebParam rxp : func.formParams) addParam(rxp.name, "query", rqst, xqdoc, func);
-        for(final WebParam rxp : func.headerParams) addParam(rxp.name, "header", rqst, xqdoc, func);
+        for(final WebParam wp : func.queryParams) addParam(wp.name, "query", rqst, xqdoc, func);
+        for(final WebParam wp : func.formParams) addParam(wp.name, "query", rqst, xqdoc, func);
+        for(final WebParam wp : func.headerParams) addParam(wp.name, "header", rqst, xqdoc, func);
         method.add(rqst);
 
         // create response
         final FBuilder response = element("response");
         final FBuilder representation = element("representation");
-        representation.add("mediaType", HTTPConnection.mediaType(func.sopts).toString());
+        representation.add("mediaType", HTTPConnection.mediaType(func.sopts));
         response.add(representation);
         method.add(response);
 
@@ -110,13 +111,10 @@ public final class RestXqWadl {
   private static void addParam(final String name, final String style, final FBuilder root,
       final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) throws QueryException {
 
-    final FBuilder param = element("param");
-    param.add("name", name).add("style", style);
+    final FBuilder param = element("param").add("name", name).add("style", style);
     final QNm qnm = new QNm(name);
     for(final Var var : func.function.params) {
-      if(var.name.eq(qnm) && var.declType != null) {
-        param.add("type", var.declType.toString());
-      }
+      if(var.name.eq(qnm) && var.declType != null) param.add("type", var.declType);
     }
     addDoc(Inspect.doc(xqdoc, token(name)), param);
     root.add(param);
@@ -128,7 +126,7 @@ public final class RestXqWadl {
    * @return element node
    */
   private static FBuilder element(final String name) {
-    return new FBuilder(new FElem(new QNm(WADL_PREFIX, name, WADL_URI)));
+    return FElem.build(new QNm(WADL_PREFIX, name, WADL_URI));
   }
 
   /**

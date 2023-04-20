@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -40,7 +39,7 @@ public final class Suite {
     final ArrayList<IOFile> files = new ArrayList<>();
 
     final Performance perf = new Performance();
-    final FBuilder suites = new FBuilder(new FElem(TESTSUITES));
+    final FBuilder suites = FElem.build(TESTSUITES);
     if(root.isDir()) {
       for(final String path : root.descendants()) {
         final IOFile file = new IOFile(root, path);

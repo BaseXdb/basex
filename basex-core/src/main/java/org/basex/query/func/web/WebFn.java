@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -65,16 +64,16 @@ abstract class WebFn extends StandardFunc {
       final HashMap<String, String> output) throws QueryException {
 
     // root element
-    final FBuilder rrest = new FBuilder(new FElem(HTTPText.Q_REST_RESPONSE)).declareNS();
+    final FBuilder rrest = FElem.build(HTTPText.Q_REST_RESPONSE).declareNS();
 
     // HTTP response
-    final FBuilder hresp = new FBuilder(new FElem(HTTPText.Q_HTTP_RESPONSE)).declareNS();
+    final FBuilder hresp = FElem.build(HTTPText.Q_HTTP_RESPONSE).declareNS();
     for(final Option<?> o : response) {
-      if(response.contains(o)) hresp.add(o.name(), response.get(o).toString());
+      if(response.contains(o)) hresp.add(o.name(), response.get(o));
     }
     headers.forEach((name, value) -> {
       if(!value.isEmpty()) {
-        final FBuilder hheader = new FBuilder(new FElem(HTTPText.Q_HTTP_HEADER));
+        final FBuilder hheader = FElem.build(HTTPText.Q_HTTP_HEADER);
         hresp.add(hheader.add(HTTPText.NAME, name).add(HTTPText.VALUE, value));
       }
     });
@@ -86,12 +85,11 @@ abstract class WebFn extends StandardFunc {
       for(final String entry : output.keySet())
         if(sopts.option(entry) == null) throw QueryError.INVALIDOPTION_X.get(info, entry);
 
-      final FBuilder param = new FBuilder(new FElem(FuncOptions.Q_SPARAM)).declareNS();
+      final FBuilder param = FElem.build(FuncOptions.Q_SPARAM).declareNS();
       output.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);
-          final FBuilder out = new FBuilder(new FElem(qnm));
-          param.add(out.add(HTTPText.VALUE, value));
+          param.add(FElem.build(qnm).add(HTTPText.VALUE, value));
         }
       });
       rrest.add(param);

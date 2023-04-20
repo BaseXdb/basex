@@ -23,8 +23,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class Constr {
-  /** Node builder. */
-  public final FBuilder builder = new FBuilder();
   /** Error: attribute position. */
   public QNm errAtt;
   /** Error: duplicate attribute. */
@@ -34,6 +32,8 @@ public final class Constr {
   /** Error: duplicate namespace. */
   byte[] duplNS;
 
+  /** Node builder. */
+  private final FBuilder builder;
   /** Query context. */
   private final QueryContext qc;
   /** Static context. */
@@ -47,11 +47,14 @@ public final class Constr {
 
   /**
    * Creates the children of the constructor.
+   * @param builder node builder
    * @param info input info
    * @param sc static context
    * @param qc query context
    */
-  public Constr(final InputInfo info, final StaticContext sc, final QueryContext qc) {
+  public Constr(final FBuilder builder, final InputInfo info, final StaticContext sc,
+      final QueryContext qc) {
+    this.builder = builder;
     this.info = info;
     this.sc = sc;
     this.qc = qc;

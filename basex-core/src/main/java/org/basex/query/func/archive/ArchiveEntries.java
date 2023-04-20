@@ -2,14 +2,12 @@ package org.basex.query.func.archive;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.archive.ArchiveText.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.zip.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -31,13 +29,13 @@ public final class ArchiveEntries extends StandardFunc {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
-        final FBuilder elem = new FBuilder(new FElem(Q_ENTRY)).declareNS();
+        final FBuilder elem = FElem.build(Q_ENTRY).declareNS();
         long size = ze.getSize();
-        if(size != -1) elem.add(SIZE, token(size));
+        if(size != -1) elem.add(SIZE, size);
         size = ze.getTime();
         if(size != -1) elem.add(LAST_MODIFIED, Dtm.get(size).string(info));
         size = ze.getCompressedSize();
-        if(size != -1) elem.add(COMPRESSED_SIZE, token(size));
+        if(size != -1) elem.add(COMPRESSED_SIZE, size);
         vb.add(elem.add(ze.getName()).finish());
       }
       return vb.value(this);

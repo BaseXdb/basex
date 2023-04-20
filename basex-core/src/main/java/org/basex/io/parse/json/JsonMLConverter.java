@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -34,7 +33,7 @@ final class JsonMLConverter extends JsonXmlConverter {
 
   @Override
   FNode finish() {
-    return new FBuilder(doc).add(stack.pop()).finish();
+    return doc.add(stack.pop()).finish();
   }
 
   @Override
@@ -102,7 +101,7 @@ final class JsonMLConverter extends JsonXmlConverter {
 
     if(curr == null) {
       final FBuilder elem = stack.isEmpty() ? null : stack.peek();
-      if(elem == null) curr = new FBuilder(new FElem(check(value)));
+      if(elem == null) curr = FElem.build(check(value));
       else elem.add(new FTxt(value));
     } else if(name != null) {
       curr.add(name, value);

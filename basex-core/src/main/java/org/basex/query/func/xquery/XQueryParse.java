@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.item.*;
@@ -58,11 +57,10 @@ public class XQueryParse extends StandardFunc {
 
       final FBuilder root;
       if(module instanceof MainModule) {
-        root = new FBuilder(new FElem(MAIN_MODULE)).add(UPDATING, token(qctx.updating));
+        root = FElem.build(MAIN_MODULE).add(UPDATING, qctx.updating);
       } else {
         final QNm name = module.sc.module;
-        root = new FBuilder(new FElem(LIBRARY_MODULE)).add(PREFIX, name.string()).
-            add(URI, name.uri());
+        root = FElem.build(LIBRARY_MODULE).add(PREFIX, name.string()).add(URI, name.uri());
       }
       if(options.get(XQueryOptions.PLAN)) root.add(qctx.toXml(false));
       return root.finish();

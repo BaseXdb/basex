@@ -18,7 +18,6 @@ import org.basex.io.parse.csv.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -81,13 +80,13 @@ public final class Payload {
     if(type.isMultipart()) {
       // multipart response
       final byte[] boundary = boundary(type);
-      body = new FBuilder(new FElem(Q_HTTP_MULTIPART)).add(BOUNDARY, boundary);
+      body = FElem.build(Q_HTTP_MULTIPART).add(BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final ANode node : parts) body.add(node);
     } else {
       // single part response
-      body = new FBuilder(new FElem(Q_HTTP_BODY));
+      body = FElem.build(Q_HTTP_BODY);
       if(payloads != null) {
         final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
         payloads.add(parse(BufferInput.get(in).content(), type));
@@ -164,20 +163,21 @@ public final class Payload {
     for(byte[] l = line; l != null && l.length > 0;) {
       final int pos = indexOf(l, ':');
       if(pos > 0) {
-        final String key = string(substring(l, 0, pos)), val = string(trim(substring(l, pos + 1)));
+        final String key = string(substring(l, 0, pos));
+        final String value = string(trim(substring(l, pos + 1)));
         if(key.equalsIgnoreCase(CONTENT_TYPE)) {
-          type = new MediaType(val);
+          type = new MediaType(value);
         } else if(key.equalsIgnoreCase(CONTENT_TRANSFER_ENCODING)) {
-          base64 = val.equals(BASE64);
+          base64 = value.equals(BASE64);
         }
-        if(!val.isEmpty() && parts != null)
-          parts.add(new FBuilder(new FElem(Q_HTTP_HEADER)).add(NAME, key).add(VALUE, val).finish());
+        if(!value.isEmpty() && parts != null) {
+          parts.add(FElem.build(Q_HTTP_HEADER).add(NAME, key).add(VALUE, value).finish());
+        }
       }
       l = readLine();
     }
     if(parts != null) {
-      parts.add(new FBuilder(new FElem(Q_HTTP_BODY)).
-          add(SerializerOptions.MEDIA_TYPE.name(), type.toString()).finish());
+      parts.add(FElem.build(Q_HTTP_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type).finish());
     }
 
     // extract payload

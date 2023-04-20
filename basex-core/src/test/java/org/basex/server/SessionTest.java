@@ -14,7 +14,6 @@ import org.basex.core.cmd.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -458,18 +457,18 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test public void queryBindBXNode() throws IOException {
     try(Query query = session.query("declare variable $a as element() external; $a")) {
-      query.bind("$a", BXNode.get(new FElem("a")));
+      query.bind("$a", BXNode.get(FElem.build("a").finish()));
       assertEqual("<a/>", query.execute());
     }
 
     final String string = "declare variable $a external; $a";
     try(Query query = session.query(string)) {
-      query.bind("$a", BXNode.get(new FElem("a")));
+      query.bind("$a", BXNode.get(FElem.build("a").finish()));
       assertEqual("<a/>", query.execute());
     }
 
     try(Query query = session.query(string)) {
-      query.bind("$a", BXNode.get(new FBuilder(new FDoc()).add(new FElem("a")).finish()));
+      query.bind("$a", BXNode.get(FDoc.build().add(FElem.build("a")).finish()));
       assertEqual("<a/>", query.execute());
     }
 

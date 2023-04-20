@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -108,18 +107,16 @@ public final class User {
    * @throws QueryException query exception
    */
   public synchronized FNode toXML(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FBuilder user = new FBuilder(new FElem(USER)).add(NAME, name).
-        add(PERMISSION, perm.toString());
+    final FBuilder user = FElem.build(USER).add(NAME, name).add(PERMISSION, perm);
     passwords.forEach((key, value) -> {
-      final FBuilder pw = new FBuilder(new FElem(PASSWORD)).add(ALGORITHM, key.toString());
+      final FBuilder pw = FElem.build(PASSWORD).add(ALGORITHM, key);
       value.forEach((k, v) -> {
-        if(!v.isEmpty()) pw.add(new FBuilder(new FElem(k.toString())).add(v));
+        if(!v.isEmpty()) pw.add(FElem.build(k.toString()).add(v));
       });
       user.add(pw.finish());
     });
     patterns.forEach((key, value) -> {
-      user.add(new FBuilder(new FElem(DATABASE)).add(PATTERN, key).
-          add(PERMISSION, value.toString()).finish());
+      user.add(FElem.build(DATABASE).add(PATTERN, key).add(PERMISSION, value).finish());
     });
     if(info != null) {
       if(qc != null) {

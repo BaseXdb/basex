@@ -310,7 +310,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final AStr toStr(final Expr expr, final QueryContext qc) throws QueryException {
     final Item value = expr.atomItem(qc, info);
-    return value instanceof AStr ? ((AStr) value) : Str.get(toToken(value));
+    return value instanceof AStr ? (AStr) value : Str.get(toToken(value));
   }
 
   /**
@@ -322,7 +322,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final AStr toZeroStr(final Expr expr, final QueryContext qc) throws QueryException {
     final Item value = expr.atomItem(qc, info);
-    return value.isEmpty() ? Str.EMPTY : value instanceof AStr ? ((AStr) value) :
+    return value.isEmpty() ? Str.EMPTY : value instanceof AStr ? (AStr) value :
       Str.get(toToken(value));
   }
 

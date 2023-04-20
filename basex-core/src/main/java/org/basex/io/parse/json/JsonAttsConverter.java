@@ -4,7 +4,6 @@ import static org.basex.io.parse.json.JsonConstants.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 
 /**
@@ -75,10 +74,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   void addValue(final byte[] type, final byte[] value) {
-    if(addValues.peek()) {
-      final FBuilder elem = element(type);
-      if(value != null) elem.add(value);
-    }
+    if(addValues.peek()) element(type).add(value);
   }
 
   /**
@@ -101,7 +97,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * @param type JSON type
    */
   private void openInner(final byte[] type) {
-    curr = new FBuilder(new FElem(type));
+    curr = FElem.build(type);
     stack.push(curr);
   }
 
@@ -119,7 +115,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * @return new element
    */
   private FBuilder element(final byte[] type) {
-    if(curr == null) curr = new FBuilder(new FElem(JSON));
+    if(curr == null) curr = FElem.build(JSON);
     processType(curr, type);
     return curr;
   }

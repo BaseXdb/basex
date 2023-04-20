@@ -7,7 +7,6 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.scope.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -35,9 +34,7 @@ public final class QueryPlan {
    * @param full include comprehensive information
    */
   public QueryPlan(final boolean compiled, final boolean updating, final boolean full) {
-    root = new FBuilder(new FElem(QUERY_PLAN));
-    root.add(COMPILED, token(compiled));
-    root.add(UPDATING, token(updating));
+    root = FElem.build(QUERY_PLAN).add(COMPILED, compiled).add(UPDATING, updating);
     nodes.add(root);
     this.full = full;
   }
@@ -68,8 +65,8 @@ public final class QueryPlan {
         }
       } else if(child instanceof byte[]) {
         elem.add((byte[]) child);
-      } else if(child != null) {
-        elem.add(child.toString());
+      } else {
+        elem.add(child);
       }
     }
 
@@ -93,7 +90,7 @@ public final class QueryPlan {
    * @return element
    */
   public FBuilder create(final ExprInfo expr, final Object... atts) {
-    final FBuilder elem = new FBuilder(new FElem(Util.className(expr)));
+    final FBuilder elem = FElem.build(Util.className(expr));
     final int al = atts.length;
     for(int a = 0; a < al - 1; a += 2) {
       addAttribute(elem, atts[a], atts[a + 1]);
@@ -117,7 +114,7 @@ public final class QueryPlan {
    * @return element
    */
   public FBuilder create(final String name, final Var var) {
-    final FBuilder elem = new FBuilder(new FElem(Strings.capitalize(name)));
+    final FBuilder elem = FElem.build(Strings.capitalize(name));
     if(var != null) attachInputInfo(attachVariable(elem, var, true), var.info);
     return elem;
   }

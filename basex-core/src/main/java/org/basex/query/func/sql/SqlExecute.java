@@ -8,7 +8,6 @@ import java.sql.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -87,7 +86,7 @@ public class SqlExecute extends SqlFn {
               return null;
             }
 
-            final FBuilder row = new FBuilder(new FElem(Q_ROW)).declareNS();
+            final FBuilder row = FElem.build(Q_ROW).declareNS();
             for(int c = 1; c <= cols; c++) {
               // for each row add column values as children
               final String name = md.getColumnLabel(c);
@@ -96,7 +95,7 @@ public class SqlExecute extends SqlFn {
               if(value == null) continue;
 
               // element <sql:column name='...'>...</sql:column>
-              final FBuilder column = new FBuilder(new FElem(Q_COLUMN)).add(NAME, name);
+              final FBuilder column = FElem.build(Q_COLUMN).add(NAME, name);
               if(value instanceof SQLXML) {
                 // add XML value as child element
                 final String xml = ((SQLXML) value).getString();
@@ -113,7 +112,7 @@ public class SqlExecute extends SqlFn {
                 column.add(clob.getSubString(1, (int) clob.length()));
               } else {
                 // add string representation of other values
-                column.add(value.toString());
+                column.add(value);
               }
               row.add(column);
             }

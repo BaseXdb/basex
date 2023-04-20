@@ -10,7 +10,6 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -107,9 +106,7 @@ public abstract class Inspect {
       if(uri) annotation.add("uri", name.uri());
 
       for(final Item arg : ann.value()) {
-        final FBuilder literal = element("literal");
-        literal.add("type", arg.type.toString()).add(arg.string(null));
-        annotation.add(literal);
+        annotation.add(element("literal").add("type", arg.type).add(arg.string(null)));
       }
       parent.add(annotation);
     }

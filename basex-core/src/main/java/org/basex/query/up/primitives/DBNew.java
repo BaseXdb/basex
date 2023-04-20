@@ -16,7 +16,6 @@ import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -171,9 +170,7 @@ public final class DBNew {
     // existing node: create data clip for copied instance
     ANode node = input.node;
     if(node != null) {
-      if(node.type != NodeType.DOCUMENT_NODE) {
-        node = new FBuilder(new FDoc(name)).add(node).finish();
-      }
+      if(node.type != NodeType.DOCUMENT_NODE) node = FDoc.build(name).add(node).finish();
       final MemData mdata = (MemData) node.copy(mopts, qc).data();
       mdata.update(0, Data.DOC, token(input.path));
       return mdata;

@@ -4,7 +4,6 @@ import static org.basex.io.parse.json.JsonConstants.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -106,8 +105,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   @Override
   void addValue(final byte[] type, final byte[] value) {
     if(addValues.peek()) {
-      final FBuilder elem = element(type);
-      if(value != null) elem.add(value);
+      final FBuilder elem = element(type).add(value);
       if(curr != null) curr.add(elem);
       else curr = elem;
     }
@@ -136,7 +134,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
    * @return the element
    */
   private FBuilder element(final byte[] type) {
-    final FBuilder elem = new FBuilder(new FElem(name));
+    final FBuilder elem = FElem.build(name);
     processType(elem, type);
     return elem;
   }

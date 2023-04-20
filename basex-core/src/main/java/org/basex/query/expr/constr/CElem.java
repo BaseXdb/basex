@@ -123,7 +123,7 @@ public final class CElem extends CName {
   }
 
   @Override
-  public FElem item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final int s = addNS();
     try {
       // adds in-scope namespaces
@@ -140,10 +140,10 @@ public final class CElem extends CName {
       if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 
       // create node
-      final FElem node = new FElem(nm);
+      final FBuilder elem = FElem.build(nm);
 
       // add child and attribute nodes
-      final Constr constr = new Constr(info, sc, qc).add(exprs);
+      final Constr constr = new Constr(elem, info, sc, qc).add(exprs);
       if(constr.errAtt != null) throw NOATTALL_X.get(info, constr.errAtt);
       if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
@@ -151,7 +151,7 @@ public final class CElem extends CName {
       // assign namespaces
       constr.namespaces(inscopeNS, nm);
       // return optimized node
-      return node.finish(constr.builder);
+      return elem.finish();
 
     } finally {
       sc.ns.size(s);

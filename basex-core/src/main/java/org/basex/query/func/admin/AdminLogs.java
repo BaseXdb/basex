@@ -10,7 +10,6 @@ import java.util.regex.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -47,8 +46,7 @@ public final class AdminLogs extends AdminFn {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final IOFile file : qc.context.log.files()) {
       final String date = file.name().replace(IO.LOGSUFFIX, "");
-      vb.add(new FBuilder(new FElem(FILE)).add(date).
-          add(SIZE, Token.token(file.length())).finish());
+      vb.add(FElem.build(FILE).add(SIZE, file.length()).add(date).finish());
     }
     return vb.value(this);
   }
@@ -108,12 +106,11 @@ public final class AdminLogs extends AdminFn {
             }
           }
           // add new element
-          final FBuilder elem = new FBuilder(new FElem(ENTRY));
-          if(entry.message != null) elem.add(entry.message);
+          final FBuilder elem = FElem.build(ENTRY).add(entry.message);
           if(entry.address != null) {
-            elem.add(TIME, entry.time).add(ADDRESS, entry.address).add(USER, entry.user);
-            if(entry.type != null) elem.add(TYPE, entry.type);
-            if(entry.ms != BigDecimal.ZERO) elem.add(MS, entry.ms.toString());
+            elem.add(TIME, entry.time).add(ADDRESS, entry.address);
+            elem.add(USER, entry.user).add(TYPE, entry.type);
+            if(entry.ms != BigDecimal.ZERO) elem.add(MS, entry.ms);
           }
           return elem.finish();
         }

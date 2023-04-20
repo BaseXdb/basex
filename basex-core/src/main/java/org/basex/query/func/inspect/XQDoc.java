@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
@@ -43,7 +42,7 @@ final class XQDoc extends Inspect {
   @Override
   public FNode parse(final IOContent content) throws QueryException {
     final AModule module = parseModule(content);
-    final FBuilder xqdoc = new FBuilder(new FElem(new QNm(PREFIX, PREFIX, URI))).declareNS();
+    final FBuilder xqdoc = FElem.build(new QNm(PREFIX, PREFIX, URI)).declareNS();
     final FBuilder control = element("control");
     control.add(element("date").add(qc.dateTime().datm.string(info)));
     control.add(element("version").add("1.1"));
@@ -52,8 +51,7 @@ final class XQDoc extends Inspect {
     final String type = module instanceof LibraryModule ? "library" : "main";
     final FBuilder mod = element("module").add("type", type);
     if(module instanceof LibraryModule) {
-      final QNm name = module.sc.module;
-      mod.add(element("uri").add(name.uri()));
+      mod.add(element("uri").add(module.sc.module.uri()));
       mod.add(element("name").add(content.name()));
     } else {
       mod.add(element("uri").add(content.name()));
@@ -64,9 +62,7 @@ final class XQDoc extends Inspect {
     // imports
     final FBuilder imports = element("imports");
     for(final byte[] uri : module.modules) {
-      final FBuilder imprt = element("import").add("type", "library");
-      imprt.add(element("uri").add(uri));
-      imports.add(imprt);
+      imports.add(element("import").add("type", "library").add(element("uri").add(uri)));
     }
     xqdoc.add(imports);
 
@@ -108,30 +104,29 @@ final class XQDoc extends Inspect {
     final FBuilder functions = element("functions");
     for(final StaticFunc sf : module.funcs) {
       final int al = sf.arity();
-      final QNm name = sf.funcName();
+      final byte[] name = sf.funcName().string();
       final FuncType tp = sf.funcType();
-      final FBuilder function = element("function").add("arity", token(al));
+      final FBuilder function = element("function").add("arity", al);
       comment(sf, function);
-      function.add(element("name").add(name.string()));
+      function.add(element("name").add(name));
       annotations(sf.anns, function);
 
       final QueryString qs = new QueryString();
-      qs.token(DECLARE).token(sf.anns).token(FUNCTION).token(name.string()).token('(');
-      for(int i = 0; i < al; i++) {
-        final Var var = sf.params[i];
-        if(i > 0) qs.token(SEP);
-        qs.concat("$", var.name.string()).token(AS).token(tp.argTypes[i]);
+      qs.token(DECLARE).token(sf.anns).token(FUNCTION).token(name).token('(');
+      for(int a = 0; a < al; a++) {
+        final Var var = sf.params[a];
+        if(a > 0) qs.token(SEP);
+        qs.concat("$", var.name.string()).token(AS).token(tp.argTypes[a]);
       }
       qs.token(')').token(AS).token(tp.declType);
       if(sf.expr == null) qs.token("external");
 
-      function.add(element("signature").add(qs.toString()));
+      function.add(element("signature").add(qs));
       if(al != 0) {
         final FBuilder fparameters = element("parameters");
         for(int a = 0; a < al; a++) {
           final FBuilder fparameter = element("parameter");
-          final Var var = sf.params[a];
-          fparameter.add(element("name").add(var.name.string()));
+          fparameter.add(element("name").add(sf.params[a].name.string()));
           type(tp.argTypes[a], fparameter);
           fparameters.add(fparameter);
         }
@@ -139,8 +134,7 @@ final class XQDoc extends Inspect {
       }
       final FBuilder rtrn = element("return");
       type(sf.seqType(), rtrn);
-      function.add(rtrn);
-      functions.add(function);
+      functions.add(function.add(rtrn));
     }
     xqdoc.add(functions);
 
@@ -149,7 +143,7 @@ final class XQDoc extends Inspect {
 
   @Override
   protected FBuilder element(final String name) {
-    return new FBuilder(new FElem(new QNm(PREFIX, name, URI)));
+    return FElem.build(new QNm(PREFIX, name, URI));
   }
 
   @Override

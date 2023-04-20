@@ -237,7 +237,7 @@ public final class StaticFuncs extends ExprInfo {
    * @return function cache
    */
   private FuncCache funcCache(final byte[] id) {
-    return funcs.computeIfAbsent(id, () -> new FuncCache());
+    return funcs.computeIfAbsent(id, FuncCache::new);
   }
 
   /** Function cache. */

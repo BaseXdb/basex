@@ -46,7 +46,8 @@ public final class Replace extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Constr constr = new Constr(info, sc, qc).add(exprs[1]);
+    final FBuilder builder = new FBuilder();
+    final Constr constr = new Constr(builder, info, sc, qc).add(exprs[1]);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
 
@@ -64,8 +65,8 @@ public final class Replace extends Update {
     final DBNode dbn = updates.determineDataRef(targ, qc);
 
     // replace node
-    final ANodeList aList = toList(constr, true);
-    ANodeList list = toList(constr, false);
+    final ANodeList aList = toList(builder, true);
+    ANodeList list = toList(builder, false);
     if(value) {
       // replace value of node
       final byte[] txt = list.isEmpty() ? aList.isEmpty() ? EMPTY :

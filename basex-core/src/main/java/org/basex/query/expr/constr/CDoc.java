@@ -32,18 +32,18 @@ public final class CDoc extends CNode {
   }
 
   @Override
-  public FDoc item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FDoc doc = new FDoc();
+  public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final FBuilder doc = FDoc.build();
 
-    final Constr constr = new Constr(info, sc, qc).add(exprs);
+    final Constr constr = new Constr(doc, info, sc, qc).add(exprs);
     if(constr.errAtt != null) throw DOCATTS_X.get(info, constr.errAtt);
     if(constr.errNS != null) throw DOCNS_X.get(info, constr.errNS);
-    final Atts ns = constr.builder.namespaces;
+    final Atts ns = doc.namespaces;
     if(ns != null) throw DOCNS_X.get(info, ns.name(0));
-    final ANodeList attributes = constr.builder.attributes;
+    final ANodeList attributes = doc.attributes;
     if(attributes != null) throw DOCATTS_X.get(info, attributes.get(0).name());
 
-    return doc.finish(constr.builder);
+    return doc.finish();
   }
 
   @Override

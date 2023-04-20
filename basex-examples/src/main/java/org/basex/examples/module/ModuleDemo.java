@@ -1,7 +1,6 @@
 package org.basex.examples.module;
 
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -25,8 +24,8 @@ public class ModuleDemo extends QueryModule {
    * @return node
    */
   public FNode create() {
-    FBuilder doc = new FBuilder(new FDoc("http://www.example.com"));
-    FBuilder elem = new FBuilder(new FElem("root")).add("attr", "value");
+    FBuilder doc = FDoc.build("http://www.example.com");
+    FBuilder elem = FElem.build("root").add("attr", "value");
     return doc.add(elem).finish();
   }
 
@@ -44,11 +43,11 @@ public class ModuleDemo extends QueryModule {
    * @return resulting value
    */
   public Value sequence() {
-    FElem elem1 = new FElem("root1");
-    FElem elem2 = new FElem("root2");
+    FBuilder elem1 = FElem.build("root1");
+    FBuilder elem2 = FElem.build("root2");
     ValueBuilder vb = new ValueBuilder(queryContext);
-    vb.add(elem1);
-    vb.add(elem2);
+    vb.add(elem1.finish());
+    vb.add(elem2.finish());
     return vb.value();
   }
 

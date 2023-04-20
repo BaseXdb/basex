@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -47,7 +46,7 @@ public final class JobListDetails extends StandardFunc {
           ? jc.performance.ns(false) / 1000000 : jr != null
           ? jr.time / 1000000 : -1;
 
-      final FBuilder elem = new FBuilder(new FElem(JOB));
+      final FBuilder elem = FElem.build(JOB);
       elem.add(ID, key);
       elem.add(TYPE, jc.type());
       elem.add(STATE, job.state.name().toLowerCase(Locale.ENGLISH));
@@ -58,10 +57,10 @@ public final class JobListDetails extends StandardFunc {
         if(jt.end != Long.MAX_VALUE) elem.add(END, dateTime(jt.end));
         if(jt.interval != 0) elem.add(INTERVAL, DTDur.get(jt.interval).string(info));
       }
-      elem.add(READS, jc.locks.reads.toString());
-      elem.add(WRITES, jc.locks.writes.toString());
+      elem.add(READS, jc.locks.reads);
+      elem.add(WRITES, jc.locks.writes);
       elem.add(TIME, dateTime(jc.time));
-      elem.add(Token.chop(Token.normalize(Token.token(jc.toString())), max));
+      elem.add(Token.chop(Token.normalize(Token.token(jc)), max));
       vb.add(elem.finish());
     }
     return vb.value(this);

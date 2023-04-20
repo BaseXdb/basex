@@ -6,7 +6,6 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -72,7 +71,7 @@ public abstract class IndexFn extends StandardFunc {
        * @return element
        */
       private FNode get(final byte[] token) {
-        return new FBuilder(new FElem(ENTRY)).add(COUNT, token(ei.count())).add(token).finish();
+        return FElem.build(ENTRY).add(COUNT, ei.count()).add(token).finish();
       }
     };
   }
