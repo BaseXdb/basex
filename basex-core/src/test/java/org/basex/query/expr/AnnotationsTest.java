@@ -53,7 +53,7 @@ public final class AnnotationsTest extends SandboxTest {
     error("declare %rest:xx function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
     // check output annotations
     error("declare %output:xx function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
-    error("declare %output:method function local:x() { 1 }; 1", BASEX_ANNOTATION2_X_X);
-    error("declare %output:method(1) function local:x() { 1 }; 1", BASEX_ANNOTATION_X_X_X);
+    error("declare %output:method function local:x() { 1 }; 1", BASEX_ANN2_X_X);
+    error("declare %output:method(1) function local:x() { 1 }; 1", BASEX_ANN_X_X_X);
   }
 }

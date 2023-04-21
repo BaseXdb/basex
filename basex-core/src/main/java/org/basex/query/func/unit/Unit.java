@@ -125,7 +125,7 @@ final class Unit {
         if(vs == 2 && eq(EXPECTED, value.itemAt(0).string(null))) {
           code = QNm.resolve(value.itemAt(1).string(null), QueryText.ERROR_URI, sf.sc, sf.info);
         } else if(vs != 0) {
-          throw BASEX_ANNOTATION2_X_X.get(ann.info, ann, arguments(vs));
+          throw BASEX_ANN2_X_X.get(ann.info, ann, arguments(vs));
         }
 
         final FBuilder testcase = FElem.build(TESTCASE).add(NAME, sf.name.local());

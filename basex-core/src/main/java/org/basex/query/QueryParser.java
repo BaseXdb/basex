@@ -226,7 +226,7 @@ public class QueryParser extends InputParser {
       return sequenceType();
     } catch(final QueryException expr) {
       Util.debug(expr);
-      throw CASTTYPE_X.get(null, expr.getLocalizedMessage());
+      throw error(CASTTYPE_X, null, expr.getLocalizedMessage());
     }
   }
 
@@ -446,22 +446,22 @@ public class QueryParser extends InputParser {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
           if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
-            throw (NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASEX_ANNOTATION1_X_X).get(
+            throw error(NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASEX_ANNOTATION1_X_X,
                 ii, '%', name.string());
           }
           ann = new Ann(ii, name, items.value());
         } else {
           // check if annotation is specified more than once
-          if(def.single && anns.contains(def)) throw BASEX_ANNOTATION3_X_X.get(ii, '%', def.id());
+          if(def.single && anns.contains(def)) throw error(BASEX_ANN3_X_X, ii, '%', def.id());
 
           final long arity = items.size();
           if(arity < def.minMax[0] || arity > def.minMax[1])
-            throw BASEX_ANNOTATION2_X_X.get(ii, def, arguments(arity));
+            throw error(BASEX_ANN2_X_X, ii, def, arguments(arity));
           final int al = def.params.length;
           for(int a = 0; a < arity; a++) {
             final SeqType st = def.params[Math.min(al - 1, a)];
             final Item item = items.get(a);
-            if(!st.instance(item)) throw BASEX_ANNOTATION_X_X_X.get(ii, def, st, item.seqType());
+            if(!st.instance(item)) throw error(BASEX_ANN_X_X_X, ii, def, st, item.seqType());
           }
           ann = new Ann(ii, def, items.value());
         }
@@ -706,17 +706,16 @@ public class QueryParser extends InputParser {
       namespaces.put(prefix, uri);
     }
 
-    final ModInfo mi = new ModInfo();
-    mi.info = info();
-    mi.uri = uri;
-    modules.add(mi);
-
     // check modules at specified locations
+    final ModInfo mi = new ModInfo();
     if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
       final byte[] path = qc.modDeclared.get(uri);
       if(path != null) mi.paths.add(path);
     }
+    mi.uri = uri;
+    mi.info = info();
+    modules.add(mi);
   }
 
   /**
@@ -758,7 +757,7 @@ public class QueryParser extends InputParser {
       if(Functions.staticURI(uri) || qc.resources.modules().addImport(string(uri), this, mi.info))
         return;
       // module not found
-      throw WHICHMOD_X.get(mi.info, uri);
+      throw error(WHICHMOD_X, mi.info, uri);
     }
     // parse supplied paths
     for(final byte[] path : mi.paths) module(string(path), string(uri), mi.info);
@@ -781,7 +780,7 @@ public class QueryParser extends InputParser {
     // check if module has already been parsed
     final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
     if(pUri != null) {
-      if(!eq(tUri, pUri)) throw WRONGMODULE_X_X_X.get(ii, io.name(), uri, pUri);
+      if(!eq(tUri, pUri)) throw error(WRONGMODULE_X_X_X, ii, io.name(), uri, pUri);
       return;
     }
     qc.modParsed.put(tPath, tUri);
@@ -792,7 +791,7 @@ public class QueryParser extends InputParser {
       query = io.string();
     } catch(final IOException expr) {
       Util.debug(expr);
-      throw error(WHICHMODFILE_X, io);
+      throw error(WHICHMODFILE_X, ii, io);
     }
 
     qc.modStack.push(tPath);
@@ -801,7 +800,7 @@ public class QueryParser extends InputParser {
     // check if import and declaration uri match
     final LibraryModule lib = qp.parseLibrary(false);
     final byte[] muri = lib.sc.module.uri();
-    if(!uri.equals(string(muri))) throw WRONGMODULE_X_X_X.get(ii, io.name(), uri, muri);
+    if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, ii, io.name(), uri, muri);
 
     // check if context value declaration types are compatible to each other
     final StaticContext sctx = qp.sc;
@@ -2517,7 +2516,7 @@ public class QueryParser extends InputParser {
     final byte[] ns = normalize(token.toArray());
     if(eq(ns, XMLNS_URI)) {
       pos = p;
-      throw error(ILLEGALEQNAME_X, info(), ns);
+      throw error(ILLEGALEQNAME_X, ns);
     }
     return ns;
   }
@@ -3484,7 +3483,7 @@ public class QueryParser extends InputParser {
     // convert "A not in B not in ..." to "A not in (B or ...)"
     final InputInfo ii = info();
     final FTExpr not = list.length == 1 ? list[0] : new FTOr(ii, list);
-    if(expr.usesExclude() || not.usesExclude()) throw FTMILD.get(ii);
+    if(expr.usesExclude() || not.usesExclude()) throw error(FTMILD, ii);
     return new FTMildNot(ii, expr, not);
   }
 

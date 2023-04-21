@@ -22,11 +22,11 @@ public enum QueryError {
   /** Error code. */
   BASEX_ANNOTATION1_X_X(BASEX, "annotation", "Annotation %% is unknown."),
   /** Error code. */
-  BASEX_ANNOTATION2_X_X(BASEX, "annotation", "%: % supplied."),
+  BASEX_ANN2_X_X(BASEX, "annotation", "%: % supplied."),
   /** Error code. */
-  BASEX_ANNOTATION3_X_X(BASEX, "annotation", "Annotation %% is declared twice."),
+  BASEX_ANN3_X_X(BASEX, "annotation", "Annotation %% is declared twice."),
   /** Error code. */
-  BASEX_ANNOTATION_X_X_X(BASEX, "annotation", "%: % expected, % found."),
+  BASEX_ANN_X_X_X(BASEX, "annotation", "%: % expected, % found."),
   /** Error code. */
   BASEX_DBPATH1_X(BASEX, "doc", "Database path '%' yields no documents."),
   /** Error code. */
@@ -71,7 +71,7 @@ public enum QueryError {
   // Admin Module
 
   /** Error code. */
-  ADMIN_DELETE_X(ADMIN, "delete", "Log file could not be deleted: %."),
+  ADMIN_DELETE_X(ADMIN, "delete", "Log file cannot be deleted: %."),
   /** Error code. */
   ADMIN_TODAY(ADMIN, "today", "Today's log file cannot be deleted."),
   /** Error code. */
@@ -124,7 +124,7 @@ public enum QueryError {
   // Client Module
 
   /** Error code. */
-  CLIENT_COMMAND_X(CLIENT, "command", "Command could not be executed: %"),
+  CLIENT_COMMAND_X(CLIENT, "command", "Command cannot be executed: %"),
   /** Error code. */
   CLIENT_CONNECT_X(CLIENT, "connect", "Connection failed: %"),
   /** Error code. */
@@ -134,7 +134,7 @@ public enum QueryError {
   /** Error code. */
   CLIENT_ID_X(CLIENT, "id", "Session with ID % is not available or has been closed."),
   /** Error code. */
-  CLIENT_QUERY_X(CLIENT, "query", "Query could not be executed: %"),
+  CLIENT_QUERY_X(CLIENT, "query", "Query cannot be executed: %"),
 
   // Conversion Module
 
@@ -149,7 +149,7 @@ public enum QueryError {
   /** Error code. */
   CONVERT_INTEGER_X_X(CONVERT, "integer", "Invalid digit for base %: %."),
   /** Error code. */
-  CONVERT_KEY_X(CONVERT, "key", "Key could not be decoded: %."),
+  CONVERT_KEY_X(CONVERT, "key", "Key cannot be decoded: %."),
 
   // Cryptographic Module
 
@@ -355,7 +355,7 @@ public enum QueryError {
   /** Error code. */
   JOBS_SERVICE(JOB, "service", "No variables allowed."),
   /** Error code. */
-  JOBS_SERVICE_X_X(JOB, "service", "Could not write service: %."),
+  JOBS_SERVICE_X_X(JOB, "service", "Cannot write service: %."),
 
   // JSON Module
 
@@ -394,7 +394,7 @@ public enum QueryError {
   // Repository Module
 
   /** Error code. */
-  REPO_DELETE_X(REPO, "delete", "File '%' could not be deleted."),
+  REPO_DELETE_X(REPO, "delete", "File '%' cannot be deleted."),
   /** Error code. */
   REPO_DELETE_X_X(REPO, "delete", "Package '%' depends on package '%'."),
   /** Error code. */
@@ -428,7 +428,7 @@ public enum QueryError {
   /** Error code. */
   SQL_ATTRIBUTE_X(SQL, "attribute", "Attribute not expected: %."),
   /** Error code. */
-  SQL_INIT_X(SQL, "init", "Could not find driver: %"),
+  SQL_INIT_X(SQL, "init", "Cannot find driver: %"),
   /** Error code. */
   SQL_ERROR_X(SQL, "error", "An SQL exception occurred: %"),
   /** Error code. */
@@ -505,7 +505,7 @@ public enum QueryError {
   /** Error code. */
   VALIDATE_ERROR_X(ErrType.VALIDATE, "error", "Validation failed: %"),
   /** Error code. */
-  VALIDATE_START_X(ErrType.VALIDATE, "init", "Validation could not be started: %"),
+  VALIDATE_START_X(ErrType.VALIDATE, "init", "Validation cannot be started: %"),
   /** Error code. */
   VALIDATE_NOTFOUND_X(ErrType.VALIDATE, "not-found", "RelaxNG validation is not available."),
 
@@ -598,7 +598,7 @@ public enum QueryError {
   /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
   /** Error code. */
-  NODEERR_X_X(FODC, 2, "% could not be created: %."),
+  NODEERR_X_X(FODC, 2, "% cannot be created: %."),
   /** Error code. */
   NODEFCOLL(FODC, 2, "No default collection available."),
   /** Error code. */
@@ -749,13 +749,13 @@ public enum QueryError {
   /** Error code. */
   UPFOURI_X(FOUP, 2, "Invalid URI: %."),
   /** Error code. */
-  UPPUTERR_X(FOUP, 2, "File '%' could not be written."),
+  UPPUTERR_X(FOUP, 2, "File '%' cannot be written."),
   /** Error code. */
-  UPDBPUT_X(FOUP, 2, "Resource '%' could not be written."),
+  UPDBPUT_X(FOUP, 2, "Resource '%' cannot be written."),
   /** Error code. */
-  UPDROPBACK_X_X(FOUP, 2, "Backup '%' could not be %."),
+  UPDROPBACK_X_X(FOUP, 2, "Backup '%' cannot be %."),
   /** Error code. */
-  UPDBERROR_X_X(FOUP, 2, "Database '%' could not be %."),
+  UPDBERROR_X_X(FOUP, 2, "Database '%' cannot be %."),
   /** Error code. */
   UPDBERROR_X(FOUP, 2, "%"),
 
@@ -793,11 +793,11 @@ public enum QueryError {
   FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
 
   /** Error code. */
-  IXML_GRM_X_X_X(IXML, 1, "Failed to parse ixml grammar: could not match % at line %, column %."),
+  IXML_GRM_X_X_X(IXML, 1, "Failed to parse ixml grammar: cannot match % at line %, column %."),
   /** Error code. */
   IXML_GEN_X(IXML, 2, "Failed to generate ixml parser: %"),
   /** Error code. */
-  IXML_INP_X_X_X(IXML, 3, "Failed to parse ixml input: could not match % at line %, column %."),
+  IXML_INP_X_X_X(IXML, 3, "Failed to parse ixml input: cannot match % at line %, column %."),
   /** Error code. */
   IXML_RESULT_X(IXML, 4, "Failed to process ixml parser result: %"),
 
@@ -1239,11 +1239,11 @@ public enum QueryError {
   /** Error code. */
   WHICHMODCLASS_X(XQST, 59, "Java class not found: %."),
   /** Error code. */
-  MODINIT_X_X_X(XQST, 59, "Could not initialize %: % (%)."),
+  MODINIT_X_X_X(XQST, 59, "Cannot initialize %: % (%)."),
   /** Error code. */
-  MODINST_X_X(XQST, 59, "Could not instantiate %: %."),
+  MODINST_X_X(XQST, 59, "Cannot instantiate %: %."),
   /** Error code. */
-  WHICHMODFILE_X(XQST, 59, "Could not retrieve module: %."),
+  WHICHMODFILE_X(XQST, 59, "Cannot retrieve module: %."),
   /** Error code. */
   WRONGMODULE_X_X_X(XQST, 59, "Imported module '%' has unexpected namespace: '%' vs '%'."),
   /** Error code. */
