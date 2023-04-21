@@ -39,7 +39,7 @@ public final class CElem extends CName {
    * @param info input info
    * @param computed computed constructor
    * @param name name
-   * @param nspaces namespaces or {@code null} if this is a computed constructor
+   * @param nspaces namespaces
    * @param exprs element contents
    */
   public CElem(final StaticContext sc, final InputInfo info, final boolean computed,
@@ -126,12 +126,7 @@ public final class CElem extends CName {
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final int s = addNS();
     try {
-      // adds in-scope namespaces
-      final Atts inscopeNS = new Atts();
-      final int ns = nspaces.size();
-      for(int n = 0; n < ns; n++) inscopeNS.add(nspaces.name(n), nspaces.value(n));
-
-      // create and check QName
+      // create and check element name
       final QNm nm = qname(true, qc);
       final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CEXML.get(info, nmPrefix, nmUri);
@@ -148,8 +143,10 @@ public final class CElem extends CName {
       if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
       if(constr.duplNS != null) throw DUPLNSCONS_X.get(info, constr.duplNS);
+
       // assign namespaces
-      constr.namespaces(inscopeNS, nm);
+      constr.namespaces(nspaces, nm);
+
       // return optimized node
       return elem.finish();
 

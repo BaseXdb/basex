@@ -176,31 +176,35 @@ public final class Constr {
 
   /**
    * Enrich and assign in-scope namespaces.
-   * @param inscopeNS in-scope namespaces
+   * @param staticNs in-scope namespaces
    * @param nm element name
    * @throws QueryException query exception
    */
-  void namespaces(final Atts inscopeNS, final QNm nm) throws QueryException {
-    final Atts namespaces = builder.namespaces;
-    final int ns = namespaces == null ? 0 : namespaces.size();
+  void namespaces(final Atts staticNs, final QNm nm) throws QueryException {
+    // dynamically added namespaces
+    final Atts dynamicNs = builder.namespaces;
+    final int sNs = staticNs.size(), dNs = dynamicNs == null ? 0 : dynamicNs.size();
+    final Atts inscopeNS = new Atts(sNs + dNs);
 
+    // add static namespaces
+    for(int n = 0; n < sNs; n++) add(inscopeNS, staticNs.name(n), staticNs.value(n));
+
+    // add dynamic namespaces
     final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
     if(!eq(nmPrefix, XML)) {
       // check declaration of default namespace
-      final int defaultNS = ns != 0 ? namespaces.get(EMPTY) : -1;
+      final int defaultNS = dNs != 0 ? dynamicNs.get(EMPTY) : -1;
       if(defaultNS != -1) {
         if(!nm.hasURI()) throw EMPTYNSCONS.get(info);
         final int scope = inscopeNS.get(EMPTY);
         final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : sc.ns.uri(EMPTY);
-        final byte[] uri = namespaces.value(defaultNS);
+        final byte[] uri = dynamicNs.value(defaultNS);
         if(scopeUri != null && !eq(scopeUri, uri)) throw DUPLNSCONS_X.get(info, uri);
       }
       // add new namespace to in-scope namespaces
-      if(nm.hasURI() && !inscopeNS.contains(nmPrefix)) inscopeNS.add(nmPrefix, nmUri);
+      if(nm.hasURI() && !inscopeNS.contains(nmPrefix)) add(inscopeNS, nmPrefix, nmUri);
     }
-    for(int n = 0; n < ns; n++) {
-      addNS(namespaces.name(n), namespaces.value(n), inscopeNS);
-    }
+    for(int n = 0; n < dNs; n++) addNS(inscopeNS, dynamicNs.name(n), dynamicNs.value(n));
 
     final ANodeList attributes = builder.attributes;
     if(attributes != null) {
@@ -215,7 +219,7 @@ public final class Constr {
         final byte[] prefix = qnm.prefix();
         if(eq(prefix, XML)) continue;
 
-        final byte[] auri = qnm.uri(), npref = addNS(prefix, auri, inscopeNS);
+        final byte[] auri = qnm.uri(), npref = addNS(inscopeNS, prefix, auri);
         if(npref != null) {
           final QNm aname = qc.shared.qnm(concat(npref, COLON, qnm.local()), auri);
           attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
@@ -228,16 +232,16 @@ public final class Constr {
   /**
    * Adds the specified namespace to the namespace array.
    * If the prefix is already used for another URI, a new name is generated.
+   * @param inscopeNS in-scope namespaces
    * @param prefix prefix
    * @param uri uri
-   * @param inscopeNS in-scope namespaces
    * @return resulting prefix or {@code null}
    */
-  private static byte[] addNS(final byte[] prefix, final byte[] uri, final Atts inscopeNS) {
+  private byte[] addNS(final Atts inscopeNS, final byte[] prefix, final byte[] uri) {
     final byte[] u = inscopeNS.value(prefix);
     if(u == null) {
       // add undeclared namespace
-      inscopeNS.add(prefix, uri);
+      add(inscopeNS, prefix, uri);
     } else if(!eq(u, uri)) {
       // prefixes with different URIs exist; new one must be replaced
       byte[] pref = null;
@@ -252,10 +256,20 @@ public final class Constr {
         do {
           pref = concat(prefix, "_", i++);
         } while(inscopeNS.contains(pref));
-        inscopeNS.add(pref, uri);
+        add(inscopeNS, pref, uri);
       }
       return pref;
     }
     return null;
+  }
+
+  /**
+   * Adds namespaces to the namespace array.
+   * @param inscopeNS in-scope namespaces
+   * @param prefix prefix
+   * @param uri uri
+   */
+  private void add(final Atts inscopeNS, final byte[] prefix, final byte[] uri) {
+    inscopeNS.add(qc.shared.token(prefix), qc.shared.token(uri));
   }
 }
