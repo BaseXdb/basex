@@ -93,7 +93,7 @@ public class FnItemsAt extends StandardFunc {
     if(ast.zero()) return Empty.VALUE;
 
     Occ occ = ast.zeroOrOne() ? Occ.ZERO_OR_ONE : Occ.ZERO_OR_MORE;
-    if(at instanceof Item) {
+    if(at instanceof Item && at.size() == 1) {
       final long ps = toLong(at, cc.qc) - 1;
       // negative position
       if(ps < 0) return Empty.VALUE;
