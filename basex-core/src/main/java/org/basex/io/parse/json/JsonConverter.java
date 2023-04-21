@@ -16,11 +16,11 @@ import org.basex.query.value.item.*;
  * @author Leo Woerteler
  */
 public abstract class JsonConverter {
+  /** Shared data references. */
+  protected final SharedData shared = new SharedData();
   /** JSON options. */
   protected final JsonParserOptions jopts;
 
-  /** Shared data references. */
-  protected SharedData shared = new SharedData();
   /** Fallback function. */
   protected JsonFallback fallback;
 
@@ -39,16 +39,6 @@ public abstract class JsonConverter {
    */
   public final JsonConverter fallback(final JsonFallback func) {
     fallback = func;
-    return this;
-  }
-
-  /**
-   * Assigns a shared data container.
-   * @param sd shared data
-   * @return self reference
-   */
-  public final JsonConverter initShare(final SharedData sd) {
-    shared = sd;
     return this;
   }
 

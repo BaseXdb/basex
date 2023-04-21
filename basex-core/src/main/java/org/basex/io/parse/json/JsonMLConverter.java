@@ -102,7 +102,7 @@ final class JsonMLConverter extends JsonXmlConverter {
     final byte[] val = shared.token(value);
     if(curr == null) {
       final FBuilder elem = stack.isEmpty() ? null : stack.peek();
-      if(elem == null) curr = FElem.build(check(val));
+      if(elem == null) curr = FElem.build(shared.qnm(check(val), null));
       else elem.add(new FTxt(val));
     } else if(name != null) {
       curr.add(name, val);

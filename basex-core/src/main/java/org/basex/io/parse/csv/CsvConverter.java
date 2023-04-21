@@ -29,6 +29,8 @@ public abstract class CsvConverter extends Job {
   /** CSV token. */
   public static final byte[] NAME = token("name");
 
+  /** Shared data references. */
+  protected final SharedData shared = new SharedData();
   /** Headers. */
   protected final TokenList headers = new TokenList(1);
   /** Attributes format. */
@@ -36,8 +38,6 @@ public abstract class CsvConverter extends Job {
   /** Lax QName conversion. */
   protected final boolean lax;
 
-  /** Shared data references. */
-  protected SharedData shared = new SharedData();
   /** Current input. */
   protected NewlineInput nli;
   /** Current column. */
@@ -54,16 +54,6 @@ public abstract class CsvConverter extends Job {
     this.copts = copts;
     lax = copts.get(CsvOptions.LAX);
     ats = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
-  }
-
-  /**
-   * Assigns a shared data container.
-   * @param sd shared data
-   * @return self reference
-   */
-  public final CsvConverter initShare(final SharedData sd) {
-    shared = sd;
-    return this;
   }
 
   /**

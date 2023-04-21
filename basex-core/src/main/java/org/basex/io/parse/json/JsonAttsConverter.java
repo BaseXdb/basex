@@ -97,7 +97,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * @param type JSON type
    */
   private void openInner(final byte[] type) {
-    curr = FElem.build(type);
+    curr = FElem.build(shared.qnm(type, null));
     stack.push(curr);
   }
 
@@ -115,7 +115,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * @return new element
    */
   private FBuilder element(final byte[] type) {
-    if(curr == null) curr = FElem.build(JSON);
+    if(curr == null) curr = FElem.build(shared.qnm(JSON, null));
     processType(curr, type);
     return curr;
   }

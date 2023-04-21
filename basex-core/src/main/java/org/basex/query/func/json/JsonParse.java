@@ -42,7 +42,7 @@ public class JsonParse extends StandardFunc {
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
     final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), true, qc);
     try {
-      return JsonConverter.get(options).initShare(qc.shared).convert(io);
+      return JsonConverter.get(options).convert(io);
     } catch(final IOException ex) {
       throw JSON_PARSE_X.get(info, ex);
     }

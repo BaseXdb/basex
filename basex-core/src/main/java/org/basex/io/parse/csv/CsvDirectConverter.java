@@ -29,7 +29,7 @@ final class CsvDirectConverter extends CsvConverter {
   @Override
   protected void record() {
     if(record != null) root.add(record);
-    record = FElem.build(RECORD);
+    record = FElem.build(shared.qnm(RECORD, null));
     col = 0;
   }
 
@@ -43,9 +43,9 @@ final class CsvDirectConverter extends CsvConverter {
     final byte[] name = headers.get(col++);
     final FBuilder elem;
     if(ats) {
-      elem = FElem.build(ENTRY).add(NAME, name);
+      elem = FElem.build(shared.qnm(ENTRY, null)).add(shared.qnm(NAME, null), name);
     } else {
-      elem = FElem.build(name != null ? name : ENTRY);
+      elem = FElem.build(shared.qnm(name != null ? name : ENTRY, null));
     }
     record.add(elem.add(shared.token(value)));
   }
@@ -53,7 +53,7 @@ final class CsvDirectConverter extends CsvConverter {
   @Override
   protected void init(final String uri) {
     doc = FDoc.build(uri);
-    root = FElem.build(CSV);
+    root = FElem.build(shared.qnm(CSV, null));
   }
 
   @Override
