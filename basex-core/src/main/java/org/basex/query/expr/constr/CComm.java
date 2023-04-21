@@ -40,7 +40,7 @@ public final class CComm extends CNode {
 
   @Override
   public FComm item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return new FComm(FComm.parse(atomValue(qc, true), info));
+    return new FComm(qc.pool.token(FComm.parse(atomValue(qc, true), info)));
   }
 
   @Override

@@ -70,8 +70,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();
-  /** QName pool. */
-  public final QNmPool qnmPool = new QNmPool();
+  /** Shared data references. */
+  public final QueryPool pool = new QueryPool();
   /** User-defined locks. */
   public final LockList locks = new LockList();
   /** Current query focus. */

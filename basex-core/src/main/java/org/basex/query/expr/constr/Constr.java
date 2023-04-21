@@ -75,7 +75,7 @@ public final class Constr {
         final Iter iter = expr.iter(qc);
         for(Item item; (item = qc.next(iter)) != null && add(item, qnames););
       }
-      builder.add(text.toArray());
+      builder.add(qc.pool.token(text.toArray()));
       return this;
     } finally {
       sc.ns.size(size);
@@ -125,7 +125,7 @@ public final class Constr {
           return false;
         }
         // add attribute
-        builder.add(name, node.string());
+        builder.add(name, qc.pool.token(node.string()));
         // add new namespace
         if(name.hasURI()) sc.ns.add(name.prefix(), name.uri());
 
@@ -159,7 +159,7 @@ public final class Constr {
         // type: element/comment/processing instruction node
 
         // add text node
-        builder.add(text.next());
+        builder.add(qc.pool.token(text.next()));
         final boolean keep = !qc.context.options.get(MainOptions.COPYNODE);
         builder.add(node.materialize(n -> keep, info, qc));
       }
@@ -217,8 +217,8 @@ public final class Constr {
 
         final byte[] auri = qnm.uri(), npref = addNS(prefix, auri, inscopeNS);
         if(npref != null) {
-          final QNm aname = qc.qnmPool.get(concat(npref, COLON, qnm.local()), auri);
-          attributes.set(a, new FAttr(aname, attr.string()));
+          final QNm aname = qc.pool.qnm(concat(npref, COLON, qnm.local()), auri);
+          attributes.set(a, new FAttr(aname, qc.pool.token(attr.string())));
         }
       }
     }

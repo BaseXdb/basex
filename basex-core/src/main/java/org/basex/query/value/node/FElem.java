@@ -42,7 +42,7 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Constructor.
+   * Convenience constructor for creating an element.
    * @param name element name
    * @return element builder
    */

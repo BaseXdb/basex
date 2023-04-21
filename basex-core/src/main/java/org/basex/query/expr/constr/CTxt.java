@@ -51,7 +51,7 @@ public final class CTxt extends CNode {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = atomValue(qc, false);
-    return value != null ? new FTxt(value) : Empty.VALUE;
+    return value != null ? new FTxt(qc.pool.token(value)) : Empty.VALUE;
   }
 
   @Override
