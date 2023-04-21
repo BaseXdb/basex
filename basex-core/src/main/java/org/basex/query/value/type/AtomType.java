@@ -896,7 +896,7 @@ public enum AtomType implements Type {
       if(item.type != STRING && !item.type.isUntyped()) throw typeError(item, this, ii);
       final byte[] name = trim(item.string(ii));
       if(XMLToken.isQName(name)) {
-        final QNm qnm = qc.pool.qnm(name, sc.ns.uri(prefix(name)));
+        final QNm qnm = qc.shared.qnm(name, sc.ns.uri(prefix(name)));
         if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
         return qnm;
       }

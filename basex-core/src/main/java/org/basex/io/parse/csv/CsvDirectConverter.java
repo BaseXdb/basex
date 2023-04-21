@@ -35,11 +35,11 @@ final class CsvDirectConverter extends CsvConverter {
 
   @Override
   protected void header(final byte[] value) {
-    headers.add(ats ? value : XMLToken.encode(value, lax));
+    headers.add(shared.token(ats ? value : XMLToken.encode(value, lax)));
   }
 
   @Override
-  protected void entry(final byte[] entry) {
+  protected void entry(final byte[] value) {
     final byte[] name = headers.get(col++);
     final FBuilder elem;
     if(ats) {
@@ -47,7 +47,7 @@ final class CsvDirectConverter extends CsvConverter {
     } else {
       elem = FElem.build(name != null ? name : ENTRY);
     }
-    record.add(elem.add(entry));
+    record.add(elem.add(shared.token(value)));
   }
 
   @Override

@@ -51,7 +51,7 @@ final class JsonMLConverter extends JsonXmlConverter {
 
   @Override
   void openPair(final byte[] key, final boolean add) throws QueryIOException {
-    name = check(key);
+    name = shared.token(check(key));
     if(!atts.add(name)) error("Duplicate attribute found");
   }
 
@@ -99,12 +99,13 @@ final class JsonMLConverter extends JsonXmlConverter {
       reset();
     }
 
+    final byte[] val = shared.token(value);
     if(curr == null) {
       final FBuilder elem = stack.isEmpty() ? null : stack.peek();
-      if(elem == null) curr = FElem.build(check(value));
-      else elem.add(new FTxt(value));
+      if(elem == null) curr = FElem.build(check(val));
+      else elem.add(new FTxt(val));
     } else if(name != null) {
-      curr.add(name, value);
+      curr.add(name, val);
       name = null;
     } else {
       error("No value allowed at this stage");

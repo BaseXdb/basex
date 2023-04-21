@@ -9,6 +9,7 @@ import org.basex.build.csv.CsvOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
 
@@ -34,12 +35,16 @@ public abstract class CsvConverter extends Job {
   protected final boolean ats;
   /** Lax QName conversion. */
   protected final boolean lax;
-  /** Current column. */
-  protected int col;
-  /** CSV options. */
-  private final CsvParserOptions copts;
+
+  /** Shared data references. */
+  protected SharedData shared = new SharedData();
   /** Current input. */
   protected NewlineInput nli;
+  /** Current column. */
+  protected int col;
+
+  /** CSV options. */
+  private final CsvParserOptions copts;
 
   /**
    * Constructor.
@@ -49,6 +54,16 @@ public abstract class CsvConverter extends Job {
     this.copts = copts;
     lax = copts.get(CsvOptions.LAX);
     ats = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
+  }
+
+  /**
+   * Assigns a shared data container.
+   * @param sd shared data
+   * @return self reference
+   */
+  public final CsvConverter initShare(final SharedData sd) {
+    shared = sd;
+    return this;
   }
 
   /**

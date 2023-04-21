@@ -21,9 +21,9 @@ public final class FnParseQName extends StandardFunc {
     final byte[] eqname = trim(toToken(arg(0), qc));
     final QNm qnm;
     if(XMLToken.isQName(eqname)) {
-      qnm = qc.pool.qnm(eqname, sc.ns.uri(prefix(eqname)));
+      qnm = qc.shared.qnm(eqname, sc.ns.uri(prefix(eqname)));
     } else {
-      qnm = qc.pool.qnm(eqname);
+      qnm = qc.shared.qnm(eqname);
     }
     if(qnm == null) throw valueError(AtomType.QNAME, eqname, info);
     if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());

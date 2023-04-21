@@ -68,11 +68,11 @@ abstract class CName extends CNode {
     if(XMLToken.isQName(token)) {
       final byte[] prefix = prefix(token);
       final byte[] uri = prefix.length != 0 || elem ? sc.ns.uri(prefix) : null;
-      return qc.pool.qnm(token, uri);
+      return qc.shared.qnm(token, uri);
     }
 
     // check for EQName
-    final QNm qnm = qc.pool.qnm(token);
+    final QNm qnm = qc.shared.qnm(token);
     if(qnm != null) return qnm;
 
     throw INVQNAME_X.get(info, item);

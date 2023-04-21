@@ -6,6 +6,7 @@ import org.basex.build.json.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -16,9 +17,12 @@ import org.basex.query.value.item.*;
  */
 public abstract class JsonConverter {
   /** JSON options. */
-  final JsonParserOptions jopts;
+  protected final JsonParserOptions jopts;
+
+  /** Shared data references. */
+  protected SharedData shared = new SharedData();
   /** Fallback function. */
-  JsonFallback fallback;
+  protected JsonFallback fallback;
 
   /**
    * Constructor.
@@ -35,6 +39,16 @@ public abstract class JsonConverter {
    */
   public final JsonConverter fallback(final JsonFallback func) {
     fallback = func;
+    return this;
+  }
+
+  /**
+   * Assigns a shared data container.
+   * @param sd shared data
+   * @return self reference
+   */
+  public final JsonConverter initShare(final SharedData sd) {
+    shared = sd;
     return this;
   }
 
@@ -60,7 +74,6 @@ public abstract class JsonConverter {
    */
   public final Item convert(final String input, final String path) throws QueryIOException {
     init(path.isEmpty() ? "" : IO.get(path).url());
-
     final JsonParser parser = new JsonParser(input, jopts, this);
     parser.parse();
     return finish();

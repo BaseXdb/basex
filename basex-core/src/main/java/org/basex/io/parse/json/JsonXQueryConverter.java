@@ -71,7 +71,7 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   void openPair(final byte[] key, final boolean add) {
-    stack.push(Str.get(key));
+    stack.push(Str.get(shared.token(key)));
   }
 
   @Override
@@ -124,7 +124,7 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   public void stringLit(final byte[] value) {
-    stack.push(Str.get(value));
+    stack.push(Str.get(shared.token(value)));
   }
 
   @Override

@@ -54,7 +54,7 @@ final class CsvBuilder extends CsvConverter {
   }
 
   @Override
-  public void entry(final byte[] entry) throws IOException {
+  public void entry(final byte[] value) throws IOException {
     final byte[] elem = ENTRY, name = headers.get(col++);
     if(ats) {
       if(name == null) {
@@ -67,7 +67,7 @@ final class CsvBuilder extends CsvConverter {
     } else {
       builder.openElem(name != null ? name : elem, atts, nsp);
     }
-    builder.text(entry);
+    builder.text(value);
     builder.closeElem();
   }
 

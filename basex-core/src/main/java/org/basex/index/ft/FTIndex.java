@@ -136,16 +136,16 @@ public final class FTIndex extends ValueIndex {
 
   /**
    * Returns a cached index entry.
-   * @param token token to be found or cached
+   * @param value token to be found or cached
    * @return cache entry
    */
-  private IndexEntry entry(final byte[] token) {
-    final IndexEntry entry = cache.get(token);
+  private IndexEntry entry(final byte[] value) {
+    final IndexEntry entry = cache.get(value);
     if(entry != null) return entry;
 
-    final long pt = token(token);
-    return pt == -1 ? new IndexEntry(token, 0, 0) :
-      cache.add(token, size(pt, token.length), pointer(pt, token.length));
+    final long pt = token(value);
+    return pt == -1 ? new IndexEntry(value, 0, 0) :
+      cache.add(value, size(pt, value.length), pointer(pt, value.length));
   }
 
   @Override

@@ -60,7 +60,7 @@ public final class CPI extends CName {
     while(++i < vl && ws(value[i]));
     value = substring(value, i);
 
-    return new FPI(qc.pool.qnm(nm, null), qc.pool.token(FPI.parse(value, info)));
+    return new FPI(qc.shared.qnm(nm, null), qc.shared.token(FPI.parse(value, info)));
   }
 
   @Override

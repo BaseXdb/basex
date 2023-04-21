@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class QueryPool {
+public final class SharedData {
   /** EQName syntax. */
   private static final Pattern EQNAME = Pattern.compile("Q\\{([^{}]*)\\}(.*)$");
   /** Cached QNames. */

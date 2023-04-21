@@ -38,7 +38,7 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected void header(final byte[] string) {
-    headers.add(string);
+    headers.add(shared.token(string));
   }
 
   @Override
@@ -49,7 +49,7 @@ public final class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected void entry(final byte[] value) {
-    row.append(Str.get(value));
+    row.append(Str.get(shared.token(value)));
   }
 
   @Override

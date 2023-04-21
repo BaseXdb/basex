@@ -71,7 +71,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();
   /** Shared data references. */
-  public final QueryPool pool = new QueryPool();
+  public final SharedData shared = new SharedData();
   /** User-defined locks. */
   public final LockList locks = new LockList();
   /** Current query focus. */

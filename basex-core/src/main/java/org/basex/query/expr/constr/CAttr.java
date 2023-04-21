@@ -64,14 +64,14 @@ public final class CAttr extends CName {
 
       // create new standard namespace to cover most frequent cases
       if(eq(nmPrefix, EMPTY) && !eq(nmUri, EMPTY))
-        nm = qc.pool.qnm(concat(NS0, nm.string()), nmUri);
+        nm = qc.shared.qnm(concat(NS0, nm.string()), nmUri);
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 
     byte[] value = atomValue(qc, true);
     if(eq(nmPrefix, XML) && eq(nm.local(), ID)) value = normalize(value);
 
-    return new FAttr(nm, qc.pool.token(value));
+    return new FAttr(nm, qc.shared.token(value));
   }
 
   @Override

@@ -218,15 +218,15 @@ public class DiskValues extends ValueIndex {
   /**
    * Returns an index entry.
    * <p><em>Important:</em> This method is thread-safe.</p>
-   * @param token token to be found or cached
+   * @param value token to be found or cached
    * @return cache entry
    */
-  private IndexEntry entry(final byte[] token) {
-    final IndexEntry entry = cache.get(token);
+  private IndexEntry entry(final byte[] value) {
+    final IndexEntry entry = cache.get(value);
     if(entry != null) return entry;
 
-    final long index = get(token);
-    if(index < 0) return new IndexEntry(token, 0, 0);
+    final long index = get(value);
+    if(index < 0) return new IndexEntry(value, 0, 0);
 
     final int count;
     final long offset;
@@ -238,7 +238,7 @@ public class DiskValues extends ValueIndex {
       offset = idxl.cursor();
     }
 
-    return cache.add(token, count, offset);
+    return cache.add(value, count, offset);
   }
 
   /**
