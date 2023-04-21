@@ -590,6 +590,7 @@ public final class Token {
     while(++s < tl && ws(token[s]));
     if(s == tl) return Double.NaN;
 
+    // check for integer value
     int e = s;
     boolean f = false;
     for(int p = s; p < tl; ++p) {
@@ -607,23 +608,35 @@ public final class Token {
       }
     }
     if(e == s) e = tl;
-    if(f || e - s > 9) return toDouble(token, s, e);
+    if(!f && e - s <= 9) {
+      final int d = toInt(token, s, e);
+      return d == Integer.MIN_VALUE ? Double.NaN : d;
+    }
 
-    final int d = toInt(token, s, e);
-    return d == Integer.MIN_VALUE ? Double.NaN : d;
-  }
+    // check if the value is a double
+    final int l = e - s;
+    if(l == 1) return Double.NaN;
+    final char[] str = new char[l];
+    int sd = 0, se = 0;
+    for(int p = 0; p < l; ++p) {
+      char b = (char) token[s + p];
+      if(b == 'e' || b == 'E') {
+        // 'e1', '1e', '1e1e1'
+        b = p == 0 || p + 1 == l || ++se > 1 ? 0 : 'e';
+      } else if(b == '-') {
+        // '1-', '1.-1', '1-1'
+        if(p > 0 && (p + 1 == l || str[p - 1] != 'e')) b = 0;
+      } else if(b == '.') {
+        // '1e.', '1.1.1',
+        if(p > 0 && str[p - 1] == 'e' || ++sd > 1) b = 0;
+      }
+      if(b == 0) return Double.NaN;
+      str[p] = b;
+    }
 
-  /**
-   * Converts the specified token into a double value.
-   * {@link Double#NaN} is returned if the input is invalid.
-   * @param token token to be converted
-   * @param start first byte to be parsed
-   * @param end last byte to be parsed - exclusive
-   * @return resulting double value
-   */
-  private static double toDouble(final byte[] token, final int start, final int end) {
+    // parse as double value
     try {
-      return Double.parseDouble(string(token, start, end - start));
+      return Double.parseDouble(new String(str));
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
       return Double.NaN;
