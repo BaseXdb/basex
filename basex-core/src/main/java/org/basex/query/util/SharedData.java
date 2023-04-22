@@ -20,7 +20,7 @@ public final class SharedData {
   /** Cached QNames. */
   private final TokenObjMap<QNm> qnames = new TokenObjMap<>();
   /** Cached tokens. */
-  private final TokenSet tokens = new TokenSet();
+  private final WeakTokenSet tokens = new WeakTokenSet();
 
   /**
    * Returns a shared QName.
@@ -55,6 +55,6 @@ public final class SharedData {
    * @return shared token
    */
   public byte[] token(final byte[] token) {
-    return token.length == 0 ? Token.EMPTY : tokens.key(tokens.put(token));
+    return token.length == 0 ? Token.EMPTY : tokens.put(token);
   }
 }
