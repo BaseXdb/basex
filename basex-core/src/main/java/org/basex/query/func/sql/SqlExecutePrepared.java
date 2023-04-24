@@ -1,7 +1,6 @@
 package org.basex.query.func.sql;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.sql.*;
@@ -20,11 +19,6 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 public final class SqlExecutePrepared extends SqlExecute {
-  /** QName. */
-  private static final QNm Q_PARAMETERS = new QNm(SQL_PREFIX, "parameters", SQL_URI);
-  /** QName. */
-  private static final QNm Q_PARAMETER = new QNm(SQL_PREFIX, "parameter", SQL_URI);
-
   /** Attribute "type" of <sql:parameter/>. */
   private static final byte[] TYPE = token("type");
   /** Attribute "null" of <sql:parameter/>. */

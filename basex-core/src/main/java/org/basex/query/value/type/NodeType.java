@@ -47,7 +47,7 @@ public enum NodeType implements Type {
       if(value instanceof BXPI) return ((BXNode) value).getNode();
       if(value instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) value);
       final Matcher m = matcher("<\\?(.*?) (.*)\\?>", value, ii);
-      return new FPI(m.group(1), m.group(2));
+      return new FPI(new QNm(m.group(1)), Token.token(m.group(2)));
     }
   },
 
@@ -109,7 +109,7 @@ public enum NodeType implements Type {
       if(value instanceof BXAttr) return ((BXNode) value).getNode();
       if(value instanceof Attr) return new FAttr((Attr) value);
       final Matcher m = matcher(" ?(.*?)=\"(.*)\"", value, ii);
-      return new FAttr(m.group(1), m.group(2));
+      return new FAttr(new QNm(m.group(1)), Token.token(m.group(2)));
     }
   },
 
@@ -121,7 +121,7 @@ public enum NodeType implements Type {
       if(value instanceof BXComm) return ((BXNode) value).getNode();
       if(value instanceof Comment) return new FComm((Comment) value);
       final Matcher m = matcher("<!--(.*?)-->", value, ii);
-      return new FComm(m.group(1));
+      return new FComm(Token.token(m.group(1)));
     }
   },
 

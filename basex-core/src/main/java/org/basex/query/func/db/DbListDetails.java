@@ -1,5 +1,6 @@
 package org.basex.query.func.db;
 
+import static org.basex.query.func.db.DbAccess.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -48,17 +49,17 @@ public final class DbListDetails extends DbList {
       @Override
       public FNode get(final long i) {
         final String name = dbs.get((int) i);
-        final FBuilder database = FElem.build(DATABASE);
+        final FBuilder database = FElem.build(Q_DATABASE);
         final MetaData meta = new MetaData(name, ctx.options, ctx.soptions);
         try {
           meta.read();
           // count number of binary files
           final int binaries = meta.dir(ResourceType.BINARY).descendants().size();
           final int values = meta.dir(ResourceType.VALUE).descendants().size();
-          database.add(RESOURCES, meta.ndocs + binaries + values);
-          database.add(MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
-          database.add(SIZE, meta.dbSize());
-          if(ctx.perm(Perm.CREATE, name)) database.add(PATH, meta.original);
+          database.add(Q_RESOURCES, meta.ndocs + binaries + values);
+          database.add(Q_MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
+          database.add(Q_SIZE, meta.dbSize());
+          if(ctx.perm(Perm.CREATE, name)) database.add(Q_PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored
           Util.debug(ex);

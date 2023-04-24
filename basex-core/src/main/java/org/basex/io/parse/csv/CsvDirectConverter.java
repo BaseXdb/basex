@@ -11,11 +11,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class CsvDirectConverter extends CsvConverter {
-  /** Document root. */
+  /** Document node. */
   private FBuilder doc;
   /** Root node. */
   private FBuilder root;
-  /** Record builder. */
+  /** Record node. */
   private FBuilder record;
 
   /**
@@ -29,7 +29,7 @@ final class CsvDirectConverter extends CsvConverter {
   @Override
   protected void record() {
     if(record != null) root.add(record);
-    record = FElem.build(shared.qnm(RECORD, null));
+    record = FElem.build(Q_RECORD);
     col = 0;
   }
 
@@ -43,17 +43,17 @@ final class CsvDirectConverter extends CsvConverter {
     final byte[] name = headers.get(col++);
     final FBuilder elem;
     if(ats) {
-      elem = FElem.build(shared.qnm(ENTRY, null)).add(shared.qnm(NAME, null), name);
+      elem = FElem.build(Q_ENTRY).add(Q_NAME, name);
     } else {
-      elem = FElem.build(shared.qnm(name != null ? name : ENTRY, null));
+      elem = FElem.build(name != null ? shared.qname(name) : Q_ENTRY);
     }
     record.add(elem.add(shared.token(value)));
   }
 
   @Override
   protected void init(final String uri) {
-    doc = FDoc.build(uri);
-    root = FElem.build(shared.qnm(CSV, null));
+    doc = FDoc.build(Token.token(uri));
+    root = FElem.build(Q_CSV);
   }
 
   @Override

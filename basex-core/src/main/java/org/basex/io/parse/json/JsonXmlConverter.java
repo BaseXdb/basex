@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -20,6 +21,25 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class JsonXmlConverter extends JsonConverter {
+  /** QName. */
+  static final QNm Q_JSON = new QNm(JSON);
+  /** QName. */
+  static final QNm Q_OBJECT = new QNm(OBJECT);
+  /** QName. */
+  static final QNm Q_ARRAY = new QNm(ARRAY);
+  /** QName. */
+  static final QNm Q_PAIR = new QNm(PAIR);
+  /** QName. */
+  static final QNm Q_ITEM = new QNm(ITEM);
+  /** QName. */
+  static final QNm Q_NAME = new QNm(NAME);
+  /** QName. */
+  static final QNm Q_KEY = new QNm(KEY);
+  /** QName. */
+  static final QNm Q_ESCAPED_KEY = new QNm(ESCAPED_KEY);
+  /** QName. */
+  static final QNm Q_ESCAPED = new QNm(ESCAPED);
+
   /** Stack for intermediate nodes. */
   final Stack<FBuilder> stack = new Stack<>();
   /** Add value pairs. */
@@ -57,7 +77,7 @@ abstract class JsonXmlConverter extends JsonConverter {
 
   @Override
   final void init(final String uri) {
-    doc = FDoc.build(uri);
+    doc = FDoc.build(token(uri));
   }
 
   @Override
@@ -79,7 +99,7 @@ abstract class JsonXmlConverter extends JsonConverter {
       }
       final int tl = types.length;
       for(int t = 0; t < tl; t++) {
-        if(types[t] != null) curr.add(ATTRS[t], types[t].finish());
+        if(types[t] != null) curr.add(shared.qname(ATTRS[t]), shared.token(types[t].finish()));
       }
     }
     return doc.add(curr).finish();
@@ -154,7 +174,7 @@ abstract class JsonXmlConverter extends JsonConverter {
    * @param type type
    */
   private void addType(final FBuilder elem, final byte[] type) {
-    if(strings || type != STRING) elem.add(TYPE, type);
+    if(strings || type != STRING) elem.add(shared.qname(TYPE), type);
   }
 
   /**

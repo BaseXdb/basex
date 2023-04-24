@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 /**
@@ -18,10 +19,24 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public abstract class IndexFn extends StandardFunc {
-  /** Name: count. */
-  static final byte[] COUNT = token("count");
-  /** Name: value. */
-  static final byte[] ENTRY = token("entry");
+  /** QName. */
+  static final QNm Q_NAME = new QNm("name");
+  /** QName. */
+  static final QNm Q_TYPE = new QNm("type");
+  /** QName. */
+  static final QNm Q_COUNT = new QNm("count");
+  /** QName. */
+  static final QNm Q_ENTRY = new QNm("entry");
+  /** QName. */
+  static final QNm Q_MIN = new QNm("min");
+  /** QName. */
+  static final QNm Q_MAX = new QNm("max");
+  /** QName. */
+  static final QNm Q_ELEMENT = new QNm("element");
+  /** QName. */
+  static final QNm Q_ATTRIBUTE = new QNm("attribute");
+  /** Flag: flat output. */
+  static final byte[] FLAT = token("flat");
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
@@ -71,7 +86,7 @@ public abstract class IndexFn extends StandardFunc {
        * @return element
        */
       private FNode get(final byte[] token) {
-        return FElem.build(ENTRY).add(COUNT, ei.count()).add(token).finish();
+        return FElem.build(Q_ENTRY).add(Q_COUNT, ei.count()).add(token).finish();
       }
     };
   }

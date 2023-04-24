@@ -117,11 +117,11 @@ public final class QueryStack {
    * @return string dump
    */
   public String dump() {
-    final TokenBuilder tb = new TokenBuilder().add(QueryText.DEBUGLOCAL).add(':');
+    final TokenBuilder tb = new TokenBuilder().add(QueryText.DEBUG_LOCAL).add(':');
     for(int i = end; --i >= 0;) {
       if(vars[i] != null) {
         tb.add(Prop.NL).add("  $").add(vars[i].name).add(" := ").add(stack[i]);
-        if(i == start && i > 0) tb.add(Prop.NL).add(QueryText.DEBUGGLOBAL).add(':');
+        if(i == start && i > 0) tb.add(Prop.NL).add(QueryText.DEBUG_GLOBAL).add(':');
       }
     }
     return tb.toString();

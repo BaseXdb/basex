@@ -340,9 +340,7 @@ public interface QueryText {
 
   // QUERY PLAN ===================================================================================
 
-  /** Query Info. */ String QUERY_PLAN = "QueryPlan";
   /** Query Info. */ String ARGUMENT = "Argument";
-  /** Query Info. */ String COMPILED = "compiled";
   /** Query Info. */ String OP = "op";
   /** Query Info. */ String VAR = "var";
   /** Query Info. */ String INDEX = "index";
@@ -404,25 +402,16 @@ public interface QueryText {
   /** Status token. */ byte[] STATUS = token("status");
   /** Language attribute. */ byte[] LANG = token("xml:lang");
 
-  /** Serialization. */ byte[] SERIALIZATION_PARAMETERS = token("serialization-parameters");
   /** Serialization. */ byte[] CHARACTER = token("character");
   /** Serialization. */ byte[] CHARACTER_MAP = token("character-map");
   /** Serialization. */ byte[] MAP_STRING = token("map-string");
 
-  /** Error token. */ byte[] E_CODE = token("code");
-  /** Error token. */ byte[] E_DESCRIPTION = token("description");
-  /** Error token. */ byte[] E_VALUE = token("value");
-  /** Error token. */ byte[] E_MODULE = token("module");
-  /** Error token. */ byte[] E_LINE_NUMBER = token("line-number");
-  /** Error token. */ byte[] E_COLUMN_NUMBER = token("column-number");
-  /** Error token. */ byte[] E_ADDITIONAL = token("additional");
+  /** Debugging info. */ String DEBUG_LOCAL = "Local Variables";
+  /** Debugging info. */ String DEBUG_GLOBAL = "Global Variables";
 
-  /** Debugging info. */ String DEBUGLOCAL = "Local Variables";
-  /** Debugging info. */ String DEBUGGLOBAL = "Global Variables";
-
-  /** Java prefix. */ String JAVAPREF = "java:";
+  /** Java prefix. */ String JAVA_PREFIX_COLON = "java:";
   /** Java keyword: new. */ String NEW = "new";
-  /** Java default namespace. */ String JAVALANG = "java.lang.";
+  /** Java default namespace. */ String JAVA_LANG_DOT = "java.lang.";
 
   /** Example for a Date format.              */ String XDATE = "2000-12-31";
   /** Example for a Time format.              */ String XTIME = "23:59:59.999";

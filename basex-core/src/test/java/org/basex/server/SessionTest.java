@@ -457,18 +457,18 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test public void queryBindBXNode() throws IOException {
     try(Query query = session.query("declare variable $a as element() external; $a")) {
-      query.bind("$a", BXNode.get(FElem.build("a").finish()));
+      query.bind("$a", BXNode.get(FElem.build(new QNm("a")).finish()));
       assertEqual("<a/>", query.execute());
     }
 
     final String string = "declare variable $a external; $a";
     try(Query query = session.query(string)) {
-      query.bind("$a", BXNode.get(FElem.build("a").finish()));
+      query.bind("$a", BXNode.get(FElem.build(new QNm("a")).finish()));
       assertEqual("<a/>", query.execute());
     }
 
     try(Query query = session.query(string)) {
-      query.bind("$a", BXNode.get(FDoc.build().add(FElem.build("a")).finish()));
+      query.bind("$a", BXNode.get(FDoc.build().add(FElem.build(new QNm("a"))).finish()));
       assertEqual("<a/>", query.execute());
     }
 
@@ -478,12 +478,12 @@ public abstract class SessionTest extends SandboxTest {
     }
 
     try(Query query = session.query(string)) {
-      query.bind("$a", BXNode.get(new FPI("a", "b")));
+      query.bind("$a", BXNode.get(new FPI(new QNm("a"), token("b"))));
       assertEqual("<?a b?>", query.execute());
     }
 
     try(Query query = session.query(string)) {
-      query.bind("$a", BXNode.get(new FComm("a")));
+      query.bind("$a", BXNode.get(new FComm(token("a"))));
       assertEqual("<!--a-->", query.execute());
     }
   }

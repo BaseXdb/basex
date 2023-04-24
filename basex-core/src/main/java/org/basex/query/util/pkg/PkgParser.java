@@ -50,15 +50,15 @@ public final class PkgParser {
       throw REPO_PARSE_X_X.get(info, io.name(), ex);
     }
 
-    final QueryFunction<byte[], String> attribute = name -> {
+    final QueryFunction<QNm, String> attribute = name -> {
       final byte[] value = node.attribute(name);
       if(value == null) throw REPO_DESCRIPTOR_X.get(info, Util.info(MISSATTR, name, E_PACKAGE));
       return string(value);
     };
-    final Pkg pkg = new Pkg(attribute.apply(A_NAME));
-    pkg.abbrev = attribute.apply(A_ABBREV);
-    pkg.spec = attribute.apply(A_SPEC);
-    pkg.version = attribute.apply(A_VERSION);
+    final Pkg pkg = new Pkg(attribute.apply(Q_NAME));
+    pkg.abbrev = attribute.apply(Q_ABBREV);
+    pkg.spec = attribute.apply(Q_SPEC);
+    pkg.version = attribute.apply(Q_VERSION);
 
     parseChildren(node, pkg);
     return pkg;
@@ -85,17 +85,17 @@ public final class PkgParser {
    * @return dependency container
    */
   private static PkgDep parseDependency(final ANode node) {
-    final Function<byte[], String> attribute = name -> {
+    final Function<QNm, String> attribute = name -> {
       final byte[] value = node.attribute(name);
       return value == null ? null : string(value);
     };
 
-    final PkgDep dep = new PkgDep(attribute.apply(A_PACKAGE));
-    dep.processor = attribute.apply(A_PROCESSOR);
-    dep.versions = attribute.apply(A_VERSIONS);
-    dep.semver = attribute.apply(A_SEMVER);
-    dep.semverMin = attribute.apply(A_SEMVER_MIN);
-    dep.semverMax = attribute.apply(A_SEMVER_MAX);
+    final PkgDep dep = new PkgDep(attribute.apply(Q_PACKAGE));
+    dep.processor = attribute.apply(Q_PROCESSOR);
+    dep.versions = attribute.apply(Q_VERSIONS);
+    dep.semver = attribute.apply(Q_SEMVER);
+    dep.semverMin = attribute.apply(Q_SEMVER_MIN);
+    dep.semverMax = attribute.apply(Q_SEMVER_MAX);
     return dep;
   }
 

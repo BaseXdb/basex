@@ -1,7 +1,6 @@
 package org.basex.query.func.xquery;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -21,16 +20,16 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class XQueryParse extends StandardFunc {
-  /** Token. */
-  private static final byte[] LIBRARY_MODULE = token("LibraryModule");
-  /** Token. */
-  private static final byte[] MAIN_MODULE = token("MainModule");
-  /** Token. */
-  private static final byte[] UPDATING = token("updating");
-  /** Token. */
-  private static final byte[] PREFIX = token("prefix");
-  /** Token. */
-  private static final byte[] URI = token("uri");
+  /** QName. */
+  private static final QNm Q_LIBRARY_MODULE = new QNm("LibraryModule");
+  /** QName. */
+  private static final QNm Q_MAIN_MODULE = new QNm("MainModule");
+  /** QName. */
+  private static final QNm Q_UPDATING = new QNm("updating");
+  /** QName. */
+  private static final QNm Q_PREFIX = new QNm("prefix");
+  /** QName. */
+  private static final QNm Q_URI = new QNm("uri");
 
   /** XQuery options. */
   public static class XQueryOptions extends Options {
@@ -57,10 +56,10 @@ public class XQueryParse extends StandardFunc {
 
       final FBuilder root;
       if(module instanceof MainModule) {
-        root = FElem.build(MAIN_MODULE).add(UPDATING, qctx.updating);
+        root = FElem.build(Q_MAIN_MODULE).add(Q_UPDATING, qctx.updating);
       } else {
         final QNm name = module.sc.module;
-        root = FElem.build(LIBRARY_MODULE).add(PREFIX, name.string()).add(URI, name.uri());
+        root = FElem.build(Q_LIBRARY_MODULE).add(Q_PREFIX, name.string()).add(Q_URI, name.uri());
       }
       if(options.get(XQueryOptions.PLAN)) root.add(qctx.toXml(false));
       return root.finish();

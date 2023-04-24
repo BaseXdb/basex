@@ -76,7 +76,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   @Override
   void openPair(final byte[] key, final boolean add) throws QueryIOException {
     addValues.add(add);
-    if(add) name = XMLToken.encode(shared.token(key), lax);
+    if(add) name = shared.token(XMLToken.encode(key, lax));
   }
 
   @Override
@@ -135,7 +135,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
    * @return the element
    */
   private FBuilder element(final byte[] type) {
-    final FBuilder elem = FElem.build(shared.qnm(name, null));
+    final FBuilder elem = FElem.build(shared.qname(name));
     processType(elem, type);
     return elem;
   }

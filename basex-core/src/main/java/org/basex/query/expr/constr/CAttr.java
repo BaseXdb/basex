@@ -64,7 +64,7 @@ public final class CAttr extends CName {
 
       // create new standard namespace to cover most frequent cases
       if(eq(nmPrefix, EMPTY) && !eq(nmUri, EMPTY))
-        nm = qc.shared.qnm(concat(NS0, nm.string()), nmUri);
+        nm = qc.shared.qname(concat(NS0, nm.string()), nmUri);
     }
     if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 

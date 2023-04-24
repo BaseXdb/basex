@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.expr.*;
 import org.basex.query.scope.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -20,6 +21,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class QueryPlan {
+  /** QName. */
+  private static final QNm Q_QUERY_PLAN = new QNm("QueryPlan");
+  /** QName. */
+  private static final QNm Q_COMPILED = new QNm("compiled");
+  /** QName. */
+  private static final QNm Q_UPDATING = new QNm("updating");
+
   /** Root node. */
   private final FBuilder root;
   /** Node stack. */
@@ -34,7 +42,7 @@ public final class QueryPlan {
    * @param full include comprehensive information
    */
   public QueryPlan(final boolean compiled, final boolean updating, final boolean full) {
-    root = FElem.build(QUERY_PLAN).add(COMPILED, compiled).add(UPDATING, updating);
+    root = FElem.build(Q_QUERY_PLAN).add(Q_COMPILED, compiled).add(Q_UPDATING, updating);
     nodes.add(root);
     this.full = full;
   }
@@ -90,7 +98,7 @@ public final class QueryPlan {
    * @return element
    */
   public FBuilder create(final ExprInfo expr, final Object... atts) {
-    final FBuilder elem = FElem.build(Util.className(expr));
+    final FBuilder elem = FElem.build(new QNm(Util.className(expr)));
     final int al = atts.length;
     for(int a = 0; a < al - 1; a += 2) {
       addAttribute(elem, atts[a], atts[a + 1]);
@@ -114,7 +122,7 @@ public final class QueryPlan {
    * @return element
    */
   public FBuilder create(final String name, final Var var) {
-    final FBuilder elem = FElem.build(Strings.capitalize(name));
+    final FBuilder elem = FElem.build(new QNm(Strings.capitalize(name)));
     if(var != null) attachInputInfo(attachVariable(elem, var, true), var.info);
     return elem;
   }
@@ -126,7 +134,7 @@ public final class QueryPlan {
    * @param value value or {@code null}
    */
   public void addAttribute(final FBuilder elem, final Object name, final Object value) {
-    if(value != null) elem.add(Util.inf(name), Util.inf(value));
+    if(value != null) elem.add(new QNm(Util.inf(name)), Util.inf(value));
   }
 
   /**

@@ -22,9 +22,9 @@ abstract class WebFn extends StandardFunc {
   /** Response options. */
   public static class ResponseOptions extends Options {
     /** Status. */
-    public static final NumberOption STATUS = new NumberOption(HTTPText.STATUS);
+    public static final NumberOption STATUS = new NumberOption("status");
     /** Message. */
-    public static final StringOption MESSAGE = new StringOption(HTTPText.MESSAGE);
+    public static final StringOption MESSAGE = new StringOption("message");
   }
 
   /**
@@ -69,12 +69,12 @@ abstract class WebFn extends StandardFunc {
     // HTTP response
     final FBuilder hresp = FElem.build(HTTPText.Q_HTTP_RESPONSE).declareNS();
     for(final Option<?> o : response) {
-      if(response.contains(o)) hresp.add(o.name(), response.get(o));
+      if(response.contains(o)) hresp.add(new QNm(o.name()), response.get(o));
     }
     headers.forEach((name, value) -> {
       if(!value.isEmpty()) {
-        final FBuilder hheader = FElem.build(HTTPText.Q_HTTP_HEADER);
-        hresp.add(hheader.add(HTTPText.NAME, name).add(HTTPText.VALUE, value));
+        hresp.add(FElem.build(HTTPText.Q_HTTP_HEADER).add(HTTPText.Q_NAME, name).
+            add(HTTPText.Q_VALUE, value));
       }
     });
     rrest.add(hresp);
@@ -85,11 +85,11 @@ abstract class WebFn extends StandardFunc {
       for(final String entry : output.keySet())
         if(sopts.option(entry) == null) throw QueryError.INVALIDOPTION_X.get(info, entry);
 
-      final FBuilder param = FElem.build(FuncOptions.Q_SPARAM).declareNS();
+      final FBuilder param = FElem.build(FuncOptions.Q_SERIALIZTION_PARAMETERS).declareNS();
       output.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);
-          param.add(FElem.build(qnm).add(HTTPText.VALUE, value));
+          param.add(FElem.build(qnm).add(HTTPText.Q_VALUE, value));
         }
       });
       rrest.add(param);

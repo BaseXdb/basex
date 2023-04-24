@@ -1,6 +1,6 @@
 package org.basex.query.func.unit;
 
-import static org.basex.util.Token.*;
+import org.basex.query.value.item.*;
 
 /**
  * XQUnit constants.
@@ -9,44 +9,44 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface Constants {
-  /** Name: testsuites. */
-  byte[] TESTSUITES = token("testsuites");
-  /** Name: testsuite. */
-  byte[] TESTSUITE = token("testsuite");
-  /** Name: testinit. */
-  byte[] TESTINIT = token("testinit");
-  /** Name: testcase. */
-  byte[] TESTCASE = token("testcase");
-  /** Name: failure. */
-  byte[] FAILURE = token("failure");
-  /** Name: line. */
-  byte[] LINE = token("line");
-  /** Name: column. */
-  byte[] COLUMN = token("column");
-  /** Name: uri. */
-  byte[] URI = token("uri");
-  /** Name: error. */
-  byte[] ERROR = token("error");
-  /** Name: expected. */
-  byte[] EXPECTED = token("expected");
-  /** Name: returned. */
-  byte[] RETURNED = token("returned");
-  /** Name: info. */
-  byte[] INFO = token("info");
-  /** Name: failures. */
-  byte[] FAILURES = token("failures");
-  /** Name: error. */
-  byte[] ERRORS = token("errors");
-  /** Name: skipped. */
-  byte[] SKIPPED = token("skipped");
-  /** Name: error. */
-  byte[] TESTS = token("tests");
-  /** Name: name. */
-  byte[] NAME = token("name");
-  /** Name: item. */
-  byte[] ITEM = token("item");
-  /** Name: type. */
-  byte[] TYPE = token("type");
-  /** Name: time. */
-  byte[] TIME = token("time");
+  /** QName. */
+  QNm Q_TESTSUITES = new QNm("testsuites");
+  /** QName. */
+  QNm Q_TESTSUITE = new QNm("testsuite");
+  /** QName. */
+  QNm Q_TESTINIT = new QNm("testinit");
+  /** QName. */
+  QNm Q_TESTCASE = new QNm("testcase");
+  /** QName. */
+  QNm Q_FAILURE = new QNm("failure");
+  /** QName. */
+  QNm Q_LINE = new QNm("line");
+  /** QName. */
+  QNm Q_COLUMN = new QNm("column");
+  /** QName. */
+  QNm Q_URI = new QNm("uri");
+  /** QName. */
+  QNm Q_ERROR = new QNm("error");
+  /** QName. */
+  QNm Q_EXPECTED = new QNm("expected");
+  /** QName. */
+  QNm Q_RETURNED = new QNm("returned");
+  /** QName. */
+  QNm Q_INFO = new QNm("info");
+  /** QName. */
+  QNm Q_FAILURES = new QNm("failures");
+  /** QName. */
+  QNm Q_ERRORS = new QNm("errors");
+  /** QName. */
+  QNm Q_SKIPPED = new QNm("skipped");
+  /** QName. */
+  QNm Q_TESTS = new QNm("tests");
+  /** QName. */
+  QNm Q_NAME = new QNm("name");
+  /** QName. */
+  QNm Q_ITEM = new QNm("item");
+  /** QName. */
+  QNm Q_TIME = new QNm("time");
+  /** QName. */
+  QNm Q_TYPE = new QNm("type");
 }

@@ -21,14 +21,14 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class ProcFn extends StandardFunc {
-  /** Name: result. */
-  static final String RESULT = "result";
-  /** Name: standard output. */
-  static final String OUTPUT = "output";
-  /** Name: standard error. */
-  static final String ERROR = "error";
-  /** Name: code. */
-  static final String CODE = "code";
+  /** QName: result. */
+  static final QNm Q_RESULT = new QNm("result");
+  /** QName: output. */
+  static final QNm Q_OUTPUT = new QNm("output");
+  /** QName: error. */
+  static final QNm Q_ERROR = new QNm("error");
+  /** QName: code. */
+  static final QNm Q_CODE = new QNm("code");
 
   /**
    * Returns the result of a command.

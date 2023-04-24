@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 
@@ -32,13 +33,13 @@ public final class XMLAccess {
    * @param name element name (can be {@code null})
    * @return iterator
    */
-  public static BasicNodeIter children(final ANode node, final byte[] name) {
+  public static BasicNodeIter children(final ANode node, final QNm name) {
     final BasicNodeIter children = node.childIter();
     return new BasicNodeIter() {
       @Override
       public ANode next() {
         for(ANode child; (child = children.next()) != null;) {
-          if(child.type == NodeType.ELEMENT && (name == null || eq(child.qname().id(), name)))
+          if(child.type == NodeType.ELEMENT && (name == null || name.eq(child.qname())))
             return child;
         }
         return null;
@@ -48,18 +49,18 @@ public final class XMLAccess {
 
   /**
    * Returns the value of the requested attribute, or an error.
-   * @param prefix error prefix
    * @param node node
    * @param name attribute name
+   * @param info element info
    * @return value
    * @throws BaseXException database exception
    */
-  public static byte[] attribute(final String prefix, final ANode node, final byte[] name)
+  public static byte[] attribute(final ANode node, final QNm name, final String info)
       throws BaseXException {
 
     final byte[] value = node.attribute(name);
     if(value != null) return value;
-    throw new BaseXException("%: Missing \"%\" attribute.", prefix, name);
+    throw new BaseXException("%: Missing \"%\" attribute.", info, name);
   }
 
   /**
@@ -73,8 +74,8 @@ public final class XMLAccess {
    * @throws BaseXException database exception
    */
   public static <E extends Enum<E>> E attribute(final String prefix, final ANode node,
-      final byte[] name, final E[] values) throws BaseXException {
-    return value(prefix, attribute(prefix, node, name), values);
+      final QNm name, final E[] values) throws BaseXException {
+    return value(prefix, attribute(node, name, prefix), values);
   }
 
   /**

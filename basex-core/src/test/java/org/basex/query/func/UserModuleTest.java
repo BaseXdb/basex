@@ -242,6 +242,6 @@ public final class UserModuleTest extends SandboxTest {
     query(func.args(" <info/>", "admin"));
 
     // invalid input
-    error(func.args(" <abc/>"), ELM_X_X);
+    error(func.args(" <abc/>"), ELM_X_X_X);
   }
 }

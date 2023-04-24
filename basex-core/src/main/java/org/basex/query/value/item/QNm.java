@@ -1,7 +1,6 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -26,9 +25,6 @@ import org.basex.util.list.*;
 public final class QNm extends Item {
   /** QName: empty. */
   public static final QNm EMPTY = new QNm(Token.EMPTY);
-  /** QName: xml:base. */
-  public static final QNm XML_BASE = new QNm(BASE, XML_URI);
-
   /** URL pattern (matching Clark and EQName notation). */
   public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)\\}(.+)$");
 
@@ -86,6 +82,16 @@ public final class QNm extends Item {
   }
 
   /**
+   * Constructor.
+   * @param prefix prefix
+   * @param local local name
+   * @param uri namespace uri
+   */
+  public QNm(final byte[] prefix, final String local, final byte[] uri) {
+    this(name(prefix, token(local)), uri);
+  }
+
+  /**
    * Constructor, binding a statically known namespace.
    * If no namespace is found, the namespace uri is set to {@code null}.
    * @param name name
@@ -103,26 +109,6 @@ public final class QNm extends Item {
   public QNm(final QName name) {
     this(token(name.getPrefix().isEmpty() ? name.getLocalPart() :
       concat(name.getPrefix(), COLON, name.getLocalPart())), token(name.getNamespaceURI()));
-  }
-
-  /**
-   * Constructor.
-   * @param prefix prefix
-   * @param local local name
-   * @param uri namespace uri
-   */
-  public QNm(final byte[] prefix, final String local, final byte[] uri) {
-    this(prefix, token(local), uri);
-  }
-
-  /**
-   * Constructor.
-   * @param prefix prefix
-   * @param local local name
-   * @param uri namespace uri
-   */
-  public QNm(final byte[] prefix, final byte[] local, final byte[] uri) {
-    this(name(prefix, local), uri);
   }
 
   @Override

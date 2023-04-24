@@ -31,8 +31,7 @@ public final class UserCreate extends UserFn {
     if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
 
     if(defined(4)) {
-      final ANode node = toElem(arg(4), qc);
-      if(!T_INFO.matches(node)) throw ELM_X_X.get(info, Q_INFO.prefixId(), node);
+      final ANode node = toElem(arg(4), Q_INFO, qc, ELM_X_X_X);
       user.info(node.materialize(n -> false, info, qc));
     }
 

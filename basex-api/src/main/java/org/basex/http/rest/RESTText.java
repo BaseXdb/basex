@@ -11,24 +11,23 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 interface RESTText {
+  /** REST. */
+  String REST = "REST";
+
   /** REST URI. */
   byte[] REST_URI = Token.concat(QueryText.BASEX_URI, "/", QueryText.REST_PREFIX);
 
-  /** REST. */
-  String REST = "REST";
-  /** Attribute. */
-  String NAME = "name";
-  /** Directory token. */
-  byte[] DIR = Token.token("dir");
-
-  /** Name. */
+  /** QName. */
   QNm Q_DATABASES = new QNm("databases", REST_URI);
-  /** Name. */
+  /** QName. */
   QNm Q_DATABASE = new QNm("database", REST_URI);
-  /** Name. */
+  /** QName. */
   QNm Q_RESOURCE = new QNm("resource", REST_URI);
-  /** Dir. */
-  QNm Q_DIR = new QNm(DIR, REST_URI);
+  /** QName. */
+  QNm Q_DIR = new QNm("dir", REST_URI);
+
+  /** QName. */
+  QNm Q_NAME = new QNm("name");
 
   /** Commands operation. */
   String COMMANDS = "commands";

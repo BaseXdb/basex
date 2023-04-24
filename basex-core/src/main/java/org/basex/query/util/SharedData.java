@@ -25,10 +25,19 @@ public final class SharedData {
   /**
    * Returns a shared QName.
    * @param name local name with optional prefix
+   * @return QName
+   */
+  public QNm qname(final byte[] name) {
+    return qname(name, null);
+  }
+
+  /**
+   * Returns a shared QName.
+   * @param name local name with optional prefix
    * @param uri URI (can be {@code null})
    * @return QName
    */
-  public QNm qnm(final byte[] name, final byte[] uri) {
+  public QNm qname(final byte[] name, final byte[] uri) {
     return qnames.computeIfAbsent(
       uri != null ? Token.concat(name, Token.SPACE, uri) : name,
       () -> new QNm(name, uri)
@@ -40,11 +49,11 @@ public final class SharedData {
    * @param eqname EQname string
    * @return QName or {@code null}
    */
-  public QNm qnm(final byte[] eqname) {
+  public QNm eqname(final byte[] eqname) {
     final Matcher m = EQNAME.matcher(string(eqname));
     if(m.matches()) {
-      final byte[] ncname = Token.token(m.group(2));
-      if(XMLToken.isNCName(ncname)) return qnm(ncname, Token.token(m.group(1)));
+      final byte[] ncname = Token.token(m.group(2)), uri = Token.token(m.group(1));
+      if(XMLToken.isNCName(ncname)) return qname(ncname, uri);
     }
     return null;
   }

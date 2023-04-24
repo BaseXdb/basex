@@ -27,6 +27,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {
+  /** Token. */
+  private static final QNm Q_HTTP_EQUIV = new QNm(HTTP_EQUIV);
+
   /** System document type. */
   String docsys;
   /** Public document type. */
@@ -314,7 +317,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   @Override
   protected boolean skipElement(final ANode node) {
     if(node.type == NodeType.ELEMENT && eq(node.name(), META)) {
-      final byte[] value = node.attribute(HTTP_EQUIV);
+      final byte[] value = node.attribute(Q_HTTP_EQUIV);
       return value != null && eq(trim(value), CONTENT_TYPE);
     }
     return false;

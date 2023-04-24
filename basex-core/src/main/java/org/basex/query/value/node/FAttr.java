@@ -37,26 +37,6 @@ public final class FAttr extends FNode {
   }
 
   /**
-   * Constructor for creating an attribute.
-   * QNames will be cached and reused.
-   * @param name name
-   * @param value value
-   */
-  public FAttr(final String name, final String value) {
-    this(token(name), token(value));
-  }
-
-  /**
-   * Constructor for creating an attribute.
-   * QNames will be cached and reused.
-   * @param name name
-   * @param value value
-   */
-  public FAttr(final byte[] name, final byte[] value) {
-    this(new QNm(name), value);
-  }
-
-  /**
    * Constructor for creating an attribute from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param attr DOM node

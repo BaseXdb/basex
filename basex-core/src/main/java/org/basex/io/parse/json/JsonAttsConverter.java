@@ -4,6 +4,7 @@ import static org.basex.io.parse.json.JsonConstants.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 /**
@@ -37,9 +38,9 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   void openPair(final byte[] key, final boolean add) throws QueryIOException {
     addValues.add(add);
     if(add) {
-      openInner(PAIR);
-      curr.add(NAME, shared.token(key));
-      name = key;
+      openInner(Q_PAIR);
+      name = shared.token(key);
+      curr.add(Q_NAME, name);
     }
   }
 
@@ -64,7 +65,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   void openItem() {
-    openInner(ITEM);
+    openInner(Q_ITEM);
   }
 
   @Override
@@ -96,8 +97,8 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * Opens an inner entry.
    * @param type JSON type
    */
-  private void openInner(final byte[] type) {
-    curr = FElem.build(shared.qnm(type, null));
+  private void openInner(final QNm type) {
+    curr = FElem.build(type);
     stack.push(curr);
   }
 
@@ -115,7 +116,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    * @return new element
    */
   private FBuilder element(final byte[] type) {
-    if(curr == null) curr = FElem.build(shared.qnm(JSON, null));
+    if(curr == null) curr = FElem.build(Q_JSON);
     processType(curr, type);
     return curr;
   }

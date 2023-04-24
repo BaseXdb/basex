@@ -7,6 +7,7 @@ import static org.basex.query.value.type.NodeType.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -495,6 +496,22 @@ public abstract class ParseExpr extends Expr {
    */
   protected final ANode toElem(final Expr expr, final QueryContext qc) throws QueryException {
     return (ANode) checkType(expr.item(qc, info), ELEMENT);
+  }
+
+  /**
+   * Evaluates an expression to an element with the specified name.
+   * @param expr expression
+   * @param name name
+   * @param qc query context
+   * @param error error code
+   * @return element
+   * @throws QueryException query exception
+   */
+  protected final ANode toElem(final Expr expr, final QNm name, final QueryContext qc,
+      final QueryError error) throws QueryException {
+    final ANode node = toElem(expr, qc);
+    if(new NameTest(name).matches(node)) return node;
+    throw error.get(info, name.prefixId(), node.type, node);
   }
 
   /**

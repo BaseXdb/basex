@@ -23,11 +23,15 @@ import org.basex.util.options.*;
  */
 public class SqlExecute extends SqlFn {
   /** QName. */
-  private static final QNm Q_ROW = new QNm(SQL_PREFIX, "row", SQL_URI);
+  static final QNm Q_ROW = new QNm(SQL_PREFIX, "row", SQL_URI);
   /** QName. */
-  private static final QNm Q_COLUMN = new QNm(SQL_PREFIX, "column", SQL_URI);
-  /** Name. */
-  private static final String NAME = "name";
+  static final QNm Q_COLUMN = new QNm(SQL_PREFIX, "column", SQL_URI);
+  /** QName. */
+  static final QNm Q_PARAMETERS = new QNm(SQL_PREFIX, "parameters", SQL_URI);
+  /** QName. */
+  static final QNm Q_PARAMETER = new QNm(SQL_PREFIX, "parameter", SQL_URI);
+  /** QName. */
+  static final QNm Q_NAME = new QNm("name");
 
   /** Statement Options. */
   public static class StatementOptions extends Options {
@@ -95,7 +99,7 @@ public class SqlExecute extends SqlFn {
               if(value == null) continue;
 
               // element <sql:column name='...'>...</sql:column>
-              final FBuilder column = FElem.build(Q_COLUMN).add(NAME, name);
+              final FBuilder column = FElem.build(Q_COLUMN).add(Q_NAME, name);
               if(value instanceof SQLXML) {
                 // add XML value as child element
                 final String xml = ((SQLXML) value).getString();

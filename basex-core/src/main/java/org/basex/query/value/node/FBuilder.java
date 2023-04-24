@@ -113,38 +113,8 @@ public final class FBuilder {
    * @param value attribute value (can be {@code null})
    * @return self reference
    */
-  public FBuilder add(final byte[] name, final byte[] value) {
-    return value != null ? add(new QNm(name), value) : this;
-  }
-
-  /**
-   * Creates and adds an attribute if the specified value is not {@code null}.
-   * @param name attribute name
-   * @param value attribute value (can be {@code null})
-   * @return self reference
-   */
-  public FBuilder add(final String name, final byte[] value) {
-    return value != null ? add(token(name), value) : null;
-  }
-
-  /**
-   * Creates and adds an attribute if the specified value is not {@code null}.
-   * @param name attribute name
-   * @param value attribute value (can be {@code null})
-   * @return self reference
-   */
-  public FBuilder add(final String name, final Object value) {
-    return value != null ? add(token(name), token(value.toString())) : this;
-  }
-
-  /**
-   * Creates and adds an attribute if the specified value is not {@code null}.
-   * @param name attribute name
-   * @param value attribute value (can be {@code null})
-   * @return self reference
-   */
-  public FBuilder add(final byte[] name, final Object value) {
-    return value != null ? add(name, token(value.toString())) : null;
+  public FBuilder add(final QNm name, final Object value) {
+    return value != null ? add(name, token(value.toString())) : this;
   }
 
   /**

@@ -12,21 +12,12 @@ import org.basex.query.value.node.*;
  * @author Christian Gruen
  */
 public final class RepoList extends RepoFn {
-  /** Element name. */
-  private static final String PACKAGE = "package";
-  /** Header attribute: name. */
-  private static final String NAME = "name";
-  /** Header attribute: type. */
-  private static final String TYPE = "type";
-  /** Header attribute: version. */
-  private static final String VERSION = "version";
-
   @Override
   public Value value(final QueryContext qc) {
     final ValueBuilder vb  = new ValueBuilder(qc);
     for(final Pkg pkg : new RepoManager(qc.context).packages()) {
-      vb.add(FElem.build(PACKAGE).add(NAME, pkg.name()).add(VERSION, pkg.version()).
-          add(TYPE, pkg.type()).finish());
+      vb.add(FElem.build(Q_PACKAGE).add(Q_NAME, pkg.name()).
+          add(Q_VERSION, pkg.version()).add(Q_TYPE, pkg.type()).finish());
     }
     return vb.value(this);
   }

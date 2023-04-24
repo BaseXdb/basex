@@ -51,7 +51,7 @@ final class PlainDoc extends Inspect {
     final FBuilder root = element("module");
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;
-      root.add("prefix", name.string()).add("uri", name.uri());
+      root.add(Q_PREFIX, name.string()).add(Q_URI, name.uri());
     }
 
     final TokenObjMap<TokenList> doc = module.doc();
@@ -70,10 +70,10 @@ final class PlainDoc extends Inspect {
   private FNode variable(final StaticVar sv) throws QueryException {
     final FBuilder variable = element("variable");
     final byte[] name = sv.name.string(), uri = sv.name.uri();
-    variable.add("name", name);
-    if(uri.length != 0) variable.add("uri", uri);
+    variable.add(Q_NAME, name);
+    if(uri.length != 0) variable.add(Q_URI, uri);
     type(sv.seqType(), variable);
-    variable.add("external", sv.external);
+    variable.add(Q_EXTERNAL, sv.external);
 
     comment(sv, variable);
     annotation(sv.anns, variable, true);
@@ -94,10 +94,10 @@ final class PlainDoc extends Inspect {
 
     final FBuilder function = element("function");
     if(fname != null) {
-      function.add("name", fname.string());
-      if(fname.uri().length != 0) function.add("uri", fname.uri());
+      function.add(Q_NAME, fname.string());
+      if(fname.uri().length != 0) function.add(Q_URI, fname.uri());
     }
-    function.add("external", sf != null && sf.expr == null);
+    function.add(Q_EXTERNAL, sf != null && sf.expr == null);
 
     final TokenObjMap<TokenList> doc = sf != null ? sf.doc() : null;
     final int al = ft.argTypes.length;
@@ -111,8 +111,8 @@ final class PlainDoc extends Inspect {
       final FBuilder argument = element("argument");
       if(names != null) {
         final byte[] name = names[a].string(), uri = names[a].uri(), pdoc = doc(doc, name);
-        argument.add("name", name);
-        if(uri.length != 0) argument.add("uri", uri);
+        argument.add(Q_NAME, name);
+        if(uri.length != 0) argument.add(Q_URI, uri);
 
         if(pdoc != null) add(pdoc, argument);
       }
@@ -127,7 +127,7 @@ final class PlainDoc extends Inspect {
         if(eq(key, DOC_PARAM, DOC_RETURN)) continue;
         for(final byte[] value : doc.get(key)) {
           final FBuilder elem = eq(key, DOC_TAGS) ? element(string(key)) :
-            element("tag").add("name", key);
+            element("tag").add(Q_NAME, key);
           add(value, elem);
           function.add(elem);
         }
@@ -146,7 +146,7 @@ final class PlainDoc extends Inspect {
 
   @Override
   protected FBuilder element(final String name) {
-    return FElem.build(name);
+    return FElem.build(new QNm(name));
   }
 
   /**
@@ -173,9 +173,9 @@ final class PlainDoc extends Inspect {
    */
   private static void type(final SeqType st, final FBuilder elem) {
     if(st != null) {
-      elem.add("type", st.typeString());
+      elem.add(Q_TYPE, st.typeString());
       final String occ = st.occ.toString();
-      if(!occ.isEmpty()) elem.add("occurrence", occ);
+      if(!occ.isEmpty()) elem.add(Q_OCCURRENCE, occ);
     }
   }
 }

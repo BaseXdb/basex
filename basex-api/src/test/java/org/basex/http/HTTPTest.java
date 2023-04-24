@@ -1,6 +1,5 @@
 package org.basex.http;
 
-import static org.basex.core.users.UserText.*;
 import static org.basex.util.http.Method.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,7 +54,7 @@ public abstract class HTTPTest extends SandboxTest {
     final StringList sl = new StringList("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT,
         "-P" + NAME, "-z", "-q");
     if(local) sl.add("-l");
-    if(!auth) sl.add("-U" + ADMIN);
+    if(!auth) sl.add("-Uadmin");
     http = new BaseXHTTP(sl.finish());
     rootUrl = url;
 
@@ -194,7 +193,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param is input stream (can be {@code null})
    * @param type media type (optional, may be {@code null})
    * @param request query
-   * @param params TODO
+   * @param params parameters
    * @return string result
    * @throws IOException I/O exception
    */
@@ -212,7 +211,7 @@ public abstract class HTTPTest extends SandboxTest {
     }
     final URI uri = URI.create(sb.toString());
     final HttpRequest.Builder builder = HttpRequest.newBuilder(uri).method(method, pub);
-    if(type != null) builder.setHeader(HTTPText.CONTENT_TYPE, type.toString());
+    if(type != null) builder.setHeader("Content-Type", type.toString());
 
     try {
       final HttpClient client = IOUrl.client(true);

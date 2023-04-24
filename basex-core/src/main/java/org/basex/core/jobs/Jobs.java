@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -42,19 +43,19 @@ public final class Jobs {
     this.context = context;
 
     synchronized(FILE) {
-      file = context.soptions.dbPath(string(JOBS) + IO.XMLSUFFIX);
+      file = context.soptions.dbPath(string(Q_JOBS.string()) + IO.XMLSUFFIX);
       if(!file.exists()) return;
 
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
       final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
-      final ANode root = children(doc, JOBS).next();
+      final ANode root = children(doc, Q_JOBS).next();
       if(root == null) {
-        Util.errln(file + ": No '%' root element.", JOBS);
+        Util.errln(file + ": No '%' root element.", Q_JOBS);
       } else {
         for(final ANode child : children(root)) {
-          final byte[] qname = child.qname().id();
-          if(eq(qname, JOB)) {
+          final QNm qname = child.qname();
+          if(qname.eq(Q_JOB)) {
             final JobOptions opts = options(child);
             if(opts != null) {
               add(new QueryJobSpec(opts, new HashMap<>(), new IOContent(child.string())));
@@ -158,11 +159,11 @@ public final class Jobs {
    * @return root element
    */
   public FNode toXml() {
-    final FBuilder root = FElem.build(JOBS);
+    final FBuilder root = FElem.build(Q_JOBS);
     for(final QueryJobSpec spec : list) {
-      final FBuilder elem = FElem.build(JOB);
+      final FBuilder elem = FElem.build(Q_JOB);
       for(final Option<?> option : spec.options) {
-        elem.add(option.name(), spec.options.get(option));
+        elem.add(new QNm(option.name()), spec.options.get(option));
       }
       root.add(elem.add(spec.query));
     }

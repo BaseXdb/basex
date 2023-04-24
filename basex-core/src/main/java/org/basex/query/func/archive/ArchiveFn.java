@@ -25,12 +25,12 @@ abstract class ArchiveFn extends StandardFunc {
   /**
    * Checks if the specified item is a string or element.
    * @param item item to be checked
+   * @param qc query context
    * @return item
    * @throws QueryException query exception
    */
-  final Item checkElemToken(final Item item) throws QueryException {
-    if(item instanceof AStr || ENTRY.matches(item)) return item;
-    throw ELMSTR_X_X_X.get(info, Q_ENTRY.prefixId(), item.type, item);
+  final Item checkElemToken(final Item item, final QueryContext qc) throws QueryException {
+    return item instanceof AStr ? item : toElem(item, Q_ENTRY, qc, ELMSTR_X_X_X);
   }
 
   /**
@@ -61,8 +61,8 @@ abstract class ArchiveFn extends StandardFunc {
   final TokenSet entries(final Expr expr, final QueryContext qc) throws QueryException {
     final TokenSet set = new TokenSet();
     final Iter names = expr.iter(qc);
-    for(Item en; (en = qc.next(names)) != null;) {
-      set.add(checkElemToken(en).string(info));
+    for(Item item; (item = qc.next(names)) != null;) {
+      set.add(checkElemToken(item, qc).string(info));
     }
     return set.isEmpty() ? null : set;
   }

@@ -461,7 +461,7 @@ public class FnHttpTest extends HTTPTest {
     Request request = new Request();
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     // Node child
-    request.payload.add(FElem.build("a").add("a").finish());
+    request.payload.add(FElem.build(new QNm("a")).add("a").finish());
     // String item child
     request.payload.add(Str.get("<b>b</b>"));
     assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", write(request));
@@ -470,7 +470,7 @@ public class FnHttpTest extends HTTPTest {
     request = new Request();
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/plain");
     // Node child
-    request.payload.add(FElem.build("a").add("a").finish());
+    request.payload.add(FElem.build(new QNm("a")).add("a").finish());
     // String item child
     request.payload.add(Str.get("<b>b</b>"));
     assertEquals("a<b>b</b>", write(request));
@@ -480,7 +480,7 @@ public class FnHttpTest extends HTTPTest {
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
     request.payloadAtts.put("method", "text");
     // Node child
-    request.payload.add(FElem.build("a").add("a").finish());
+    request.payload.add(FElem.build(new QNm("a")).add("a").finish());
     // String item child
     request.payload.add(Str.get("<b>b</b>"));
     assertEquals("a<b>b</b>", write(request));
@@ -500,7 +500,7 @@ public class FnHttpTest extends HTTPTest {
     // Case 2: content is a node
     request = new Request();
     request.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    request.payload.add(FElem.build("a").add("test").finish());
+    request.payload.add(FElem.build(new QNm("a")).add("test").finish());
     assertEquals("<a>test</a>", write(request));
   }
 
@@ -535,7 +535,7 @@ public class FnHttpTest extends HTTPTest {
     // Case 2: content is a node
     request = new Request();
     request.payloadAtts.put("method", SerialMethod.BASEX.toString());
-    request.payload.add(FElem.build("a").add("test").finish());
+    request.payload.add(FElem.build(new QNm("a")).add("test").finish());
     assertEquals("<a>test</a>", write(request));
   }
 
@@ -775,7 +775,7 @@ public class FnHttpTest extends HTTPTest {
     assertTrue(value.itemAt(0) instanceof FElem);
     final FElem response = (FElem) value.itemAt(0);
     assertNotNull(response.attributeIter());
-    if(!eq(response.attribute(token(HTTPText.STATUS)), token(expStatus))) {
+    if(!eq(response.attribute(HTTPText.Q_STATUS), token(expStatus))) {
       fail("Expected: " + expStatus + "\nFound: " + response);
     }
   }

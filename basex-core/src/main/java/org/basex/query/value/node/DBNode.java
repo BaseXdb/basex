@@ -196,7 +196,7 @@ public class DBNode extends ANode {
       }
       return Token.concat('/', data.meta.name, '/', base);
     }
-    final byte[] base = attribute(QNm.XML_BASE);
+    final byte[] base = attribute(XML_BASE);
     return base != null ? base : Token.EMPTY;
   }
 

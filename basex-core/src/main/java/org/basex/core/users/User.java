@@ -3,7 +3,6 @@ package org.basex.core.users;
 import static org.basex.core.users.UserText.*;
 import static org.basex.util.Strings.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.eq;
 import static org.basex.util.XMLAccess.*;
 
 import java.util.*;
@@ -11,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -65,13 +65,13 @@ public final class User {
    * @throws BaseXException database exception
    */
   User(final ANode user) throws BaseXException {
-    name = string(attribute("Root", user, NAME));
-    perm = attribute(name, user, PERMISSION, Perm.values());
+    name = string(attribute(user, Q_NAME, "Root"));
+    perm = attribute(name, user, Q_PERMISSION, Perm.values());
 
     for(final ANode child : children(user)) {
-      if(eq(child.qname().id(), PASSWORD)) {
+      if(child.qname().eq(Q_PASSWORD)) {
         final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
-        final Algorithm algorithm = attribute(name, child, ALGORITHM, Algorithm.values());
+        final Algorithm algorithm = attribute(name, child, Q_ALGORITHM, Algorithm.values());
         if(passwords.containsKey(algorithm)) throw new BaseXException(
             name + ": Algorithm \"" + algorithm + "\" supplied more than once.");
         passwords.put(algorithm, ec);
@@ -86,12 +86,12 @@ public final class User {
           if(ec.get(code) == null)
             throw new BaseXException(name + ", " + algorithm + ": Code \"" + code + "\" missing.");
         }
-      } else if(eq(child.qname().id(), DATABASE)) {
+      } else if(child.qname().eq(Q_DATABASE)) {
         // parse local permissions
-        final String nm = string(attribute(name, child, PATTERN));
-        final Perm prm = attribute(name, child, PERMISSION, Perm.values());
+        final String nm = string(attribute(child, Q_PATTERN, name));
+        final Perm prm = attribute(name, child, Q_PERMISSION, Perm.values());
         patterns.put(nm, prm);
-      } else if(eq(child.qname().id(), INFO)) {
+      } else if(child.qname().eq(Q_INFO)) {
         info = child.finish();
       } else {
         throw new BaseXException(name + ": invalid element: <" + child.qname() + "/>.");
@@ -107,16 +107,16 @@ public final class User {
    * @throws QueryException query exception
    */
   public synchronized FNode toXML(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FBuilder user = FElem.build(USER).add(NAME, name).add(PERMISSION, perm);
+    final FBuilder user = FElem.build(Q_USER).add(Q_NAME, name).add(Q_PERMISSION, perm);
     passwords.forEach((key, value) -> {
-      final FBuilder pw = FElem.build(PASSWORD).add(ALGORITHM, key);
+      final FBuilder pw = FElem.build(Q_PASSWORD).add(Q_ALGORITHM, key);
       value.forEach((k, v) -> {
-        if(!v.isEmpty()) pw.add(FElem.build(k.toString()).add(v));
+        if(!v.isEmpty()) pw.add(FElem.build(new QNm(k.toString())).add(v));
       });
       user.add(pw.finish());
     });
     patterns.forEach((key, value) -> {
-      user.add(FElem.build(DATABASE).add(PATTERN, key).add(PERMISSION, value).finish());
+      user.add(FElem.build(Q_DATABASE).add(Q_PATTERN, key).add(Q_PERMISSION, value).finish());
     });
     if(info != null) {
       if(qc != null) {

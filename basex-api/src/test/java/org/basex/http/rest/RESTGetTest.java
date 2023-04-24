@@ -124,7 +124,7 @@ public final class RESTGetTest extends RESTTest {
    */
   private static void check(final MediaType type, final String query) throws IOException {
     final HttpHeaders headers = new IOUrl(REST_ROOT + query).response().headers();
-    final MediaType mt = new MediaType(headers.firstValue(HTTPText.CONTENT_TYPE).get());
+    final MediaType mt = new MediaType(headers.firstValue("Content-Type").get());
     if(!mt.is(type)) fail("Wrong media type: " + mt + " returned, " + type + " expected.");
   }
 

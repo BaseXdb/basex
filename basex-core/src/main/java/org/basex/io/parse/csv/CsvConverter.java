@@ -1,7 +1,5 @@
 package org.basex.io.parse.csv;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 
 import org.basex.build.csv.*;
@@ -20,14 +18,14 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class CsvConverter extends Job {
-  /** CSV token. */
-  public static final byte[] CSV = token("csv");
-  /** CSV token. */
-  public static final byte[] RECORD = token("record");
-  /** CSV token. */
-  public static final byte[] ENTRY = token("entry");
-  /** CSV token. */
-  public static final byte[] NAME = token("name");
+  /** QName. */
+  protected static final QNm Q_CSV = new QNm("csv");
+  /** QName. */
+  protected static final QNm Q_RECORD = new QNm("record");
+  /** QName. */
+  protected static final QNm Q_ENTRY = new QNm("entry");
+  /** QName. */
+  protected static final QNm Q_NAME = new QNm("name");
 
   /** Shared data references. */
   protected final SharedData shared = new SharedData();

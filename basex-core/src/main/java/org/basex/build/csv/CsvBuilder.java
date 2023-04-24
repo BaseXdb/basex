@@ -36,13 +36,13 @@ final class CsvBuilder extends CsvConverter {
   CsvBuilder(final CsvParserOptions opts, final Builder builder) throws IOException {
     super(opts);
     this.builder = builder;
-    builder.openElem(CsvConverter.CSV, atts, nsp);
+    builder.openElem(Q_CSV.string(), atts, nsp);
   }
 
   @Override
   public void record() throws IOException {
     if(record) builder.closeElem();
-    builder.openElem(RECORD, atts, nsp);
+    builder.openElem(Q_RECORD.string(), atts, nsp);
     record = true;
     col = 0;
     line++;
@@ -55,12 +55,12 @@ final class CsvBuilder extends CsvConverter {
 
   @Override
   public void entry(final byte[] value) throws IOException {
-    final byte[] elem = ENTRY, name = headers.get(col++);
+    final byte[] elem = Q_ENTRY.string(), name = headers.get(col++);
     if(ats) {
       if(name == null) {
         builder.openElem(elem, atts, nsp);
       } else {
-        atts.add(NAME, name);
+        atts.add(Q_NAME.string(), name);
         builder.openElem(elem, atts, nsp);
         atts.reset();
       }

@@ -14,22 +14,6 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 public interface WebText {
-  /** Token "header". */
-  byte[] HEADER = token("header");
-  /** Token "response". */
-  byte[] RESPONSE = token("response");
-  /** Token "status". */
-  byte[] STATUS = token("status");
-  /** Token "reason". */
-  byte[] REASON = token("reason");
-  /** Token "message". */
-  byte[] MESSAGE = token("message");
-  /** Token "name". */
-  byte[] NAME = token("name");
-  /** Token "value". */
-  byte[] VALUE = token("value");
-  /** Token "forward". */
-  byte[] FORWARD = token("forward");
   /** WADL prefix. */
   byte[] WADL_PREFIX = token("wadl");
   /** WADL namespace. */
@@ -103,24 +87,34 @@ public interface WebText {
   String NO_VALUE_X = "'%' element has no string value.";
 
   /** QName. */
-  QNm Q_STATUS = new QNm(STATUS);
+  QNm Q_STATUS = new QNm("status");
   /** QName. */
-  QNm Q_REASON = new QNm(REASON);
+  QNm Q_REASON = new QNm("reason");
   /** QName. */
-  QNm Q_MESSAGE = new QNm(MESSAGE);
+  QNm Q_MESSAGE = new QNm("message");
   /** QName. */
-  QNm Q_NAME = new QNm(NAME);
+  QNm Q_NAME = new QNm("name");
   /** QName. */
-  QNm Q_VALUE = new QNm(VALUE);
+  QNm Q_VALUE = new QNm("value");
+  /** QName. */
+  QNm Q_TYPE = new QNm("type");
+  /** QName. */
+  QNm Q_STYLE = new QNm("style");
+  /** QName. */
+  QNm Q_BASE = new QNm("base");
+  /** QName. */
+  QNm Q_PATH = new QNm("path");
+  /** QName. */
+  QNm Q_MEDIA_TYPE = new QNm("mediaType");
 
   /** Serializer node test. */
-  NameTest OUTPUT_SERIAL = new NameTest(FuncOptions.Q_SPARAM);
+  NameTest T_OUTPUT_SERIAL = new NameTest(FuncOptions.Q_SERIALIZTION_PARAMETERS);
   /** HTTP Response test. */
-  NameTest HTTP_RESPONSE = new NameTest(new QNm(RESPONSE, HTTP_URI));
+  NameTest T_HTTP_RESPONSE = new NameTest(new QNm("response", HTTP_URI));
   /** RESTXQ Response test. */
-  NameTest REST_RESPONSE = new NameTest(new QNm(RESPONSE, REST_URI));
+  NameTest T_REST_RESPONSE = new NameTest(new QNm("response", REST_URI));
   /** RESTXQ Forward test. */
-  NameTest REST_FORWARD = new NameTest(new QNm(FORWARD, REST_URI));
+  NameTest T_REST_FORWARD = new NameTest(new QNm("forward", REST_URI));
   /** HTTP Header test. */
-  NameTest HTTP_HEADER = new NameTest(new QNm(HEADER, HTTP_URI));
+  NameTest T_HTTP_HEADER = new NameTest(new QNm("header", HTTP_URI));
 }

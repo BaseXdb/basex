@@ -13,6 +13,7 @@ import org.basex.http.*;
 import org.basex.index.resource.*;
 import org.basex.io.serial.*;
 import org.basex.query.func.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -51,17 +52,17 @@ final class RESTRetrieve extends RESTCmd {
         root = FElem.build(RESTText.Q_DATABASES).declareNS();
         cmd = new List();
       } else {
-        root = FElem.build(RESTText.Q_DATABASE).declareNS().add(RESTText.NAME, database);
+        root = FElem.build(RESTText.Q_DATABASE).declareNS().add(RESTText.Q_NAME, database);
         cmd = new Dir(path);
       }
       final Table table = new Table(run(cmd));
       for(final TokenList list : table.contents) {
-        final boolean dir = !db && eq(RESTText.DIR, list.get(1));
+        final boolean dir = !db && eq(RESTText.Q_DIR.string(), list.get(1));
         final FBuilder elem = FElem.build(db ? RESTText.Q_DATABASE :
           dir ? RESTText.Q_DIR : RESTText.Q_RESOURCE);
         if(!dir) {
           final int ll = list.size() - (db ? 1 : 0);
-          for(int l = 1; l < ll; l++) elem.add(lc(table.header.get(l)), list.get(l));
+          for(int l = 1; l < ll; l++) elem.add(new QNm(lc(table.header.get(l))), list.get(l));
         }
         root.add(elem.add(list.get(0)));
       }

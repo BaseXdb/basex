@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -37,7 +38,7 @@ public final class Users {
    * @param sopts static options
    */
   public Users(final StaticOptions sopts) {
-    file = sopts.dbPath(string(USERS) + IO.XMLSUFFIX);
+    file = sopts.dbPath(string(Q_USERS.string()) + IO.XMLSUFFIX);
     read();
     // ensure that default admin user exists
     if(get(ADMIN) == null) add(new User(ADMIN).perm(Perm.ADMIN));
@@ -52,13 +53,13 @@ public final class Users {
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
       final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
-      final ANode root = children(doc, USERS).next();
+      final ANode root = children(doc, Q_USERS).next();
       if(root == null) {
-        Util.errln(file + ": No '%' root element.", USERS);
+        Util.errln(file + ": No '%' root element.", Q_USERS);
       } else {
         for(final ANode child : children(root)) {
-          final byte[] qname = child.qname().id();
-          if(eq(qname, USER)) {
+          final QNm qname = child.qname();
+          if(qname.eq(Q_USER)) {
             try {
               final User user = new User(child);
               final String name = user.name();
@@ -71,7 +72,7 @@ public final class Users {
               // reject users with faulty data
               Util.errln(file + ": " + ex.getLocalizedMessage());
             }
-          } else if(eq(qname, INFO)) {
+          } else if(qname.eq(Q_INFO)) {
             if(info != null) Util.errln(file + ": occurs more than once: %.", qname);
             else info = child.finish();
           } else {
@@ -91,7 +92,7 @@ public final class Users {
     synchronized(users) {
       try {
         file.parent().md();
-        final FBuilder root = FElem.build(USERS);
+        final FBuilder root = FElem.build(Q_USERS);
         for(final User user : users.values()) {
           root.add(user.toXML(null, null));
         }

@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.value.item.*;
 
 /**
- * HTTP strings.
+ * HTTP constants.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Rositsa Shadura
@@ -64,8 +64,6 @@ public interface HTTPText {
 
   /** Character string. */
   String CHARSET = "charset";
-  /** Filename string. */
-  String FILENAME = "filename";
 
   /** Default multipart boundary. */
   String DEFAULT_BOUNDARY = "1BEF0A57BE110FD467A";
@@ -100,21 +98,24 @@ public interface HTTPText {
   /** QName. */
   QNm Q_HTTP_MULTIPART = new QNm(HTTP_PREFIX, "multipart", HTTP_URI);
 
-  /** Carriage return/line feed. */
-  byte[] CRLF = { '\r', '\n' };
-
-  /** Response attribute: status. */
-  String STATUS = "status";
-  /** Response attribute: message. */
-  String MESSAGE = "message";
-
-  /** Header attribute: name. */
-  String NAME = "name";
-  /** Header attribute: value. */
-  String VALUE = "value";
+  /** QName. */
+  QNm Q_BOUNDARY = new QNm("boundary");
+  /** QName. */
+  QNm Q_STATUS = new QNm("status");
+  /** QName. */
+  QNm Q_MESSAGE = new QNm("message");
+  /** QName. */
+  QNm Q_MEDIA_TYPE = new QNm("media-type");
+  /** QName. */
+  QNm Q_NAME = new QNm("name");
+  /** QName. */
+  QNm Q_VALUE = new QNm("value");
 
   /** Binary string. */
   String BINARY = "binary";
   /** Base64 string. */
   String BASE64 = "base64";
+
+  /** Carriage return/line feed. */
+  byte[] CRLF = { '\r', '\n' };
 }

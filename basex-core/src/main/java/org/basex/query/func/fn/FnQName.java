@@ -24,7 +24,7 @@ public final class FnQName extends StandardFunc {
         ? concat(XML_COLON, qname) : qname;
     if(!XMLToken.isQName(name)) throw valueError(AtomType.QNAME, qname, info);
 
-    final QNm qnm = qc.shared.qnm(name, uri);
+    final QNm qnm = qc.shared.qname(name, uri);
     if(qnm.hasPrefix() && uri.length == 0) throw valueError(AtomType.ANY_URI, qnm.uri(), info);
     return qnm;
   }

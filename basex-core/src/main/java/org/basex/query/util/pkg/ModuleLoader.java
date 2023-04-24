@@ -76,10 +76,10 @@ public final class ModuleLoader {
 
     // add Java repository package
     final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
-    final boolean java = uri.startsWith(JAVAPREF);
+    final boolean java = uri.startsWith(JAVA_PREFIX_COLON);
     String className;
     if(java) {
-      className = uri.substring(JAVAPREF.length());
+      className = uri.substring(JAVA_PREFIX_COLON.length());
     } else {
       // no "java:" prefix: check EXPath repositories
       final HashSet<String> pkgs = context.repo.nsDict().get(uri);

@@ -9,7 +9,6 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -25,10 +24,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 abstract class UserFn extends StandardFunc {
-  /** Root node test. */
-  static final QNm Q_INFO = new QNm(UserText.INFO);
-  /** Root node test. */
-  static final NameTest T_INFO = new NameTest(Q_INFO);
+  /** QName. */
+  static final QNm Q_INFO = new QNm("info");
 
   /**
    * Checks if the specified expression contains valid database patterns.

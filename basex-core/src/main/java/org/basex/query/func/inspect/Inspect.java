@@ -35,6 +35,23 @@ public abstract class Inspect {
   /** Documentation: return tag. */
   public static final byte[] DOC_RETURN = token("return");
 
+  /** QName. */
+  static final QNm Q_OCCURRENCE = new QNm("occurrence");
+  /** QName. */
+  static final QNm Q_TAG = new QNm("tag");
+  /** QName. */
+  static final QNm Q_PREFIX = new QNm("prefix");
+  /** QName. */
+  static final QNm Q_ARITY = new QNm("arity");
+  /** QName. */
+  static final QNm Q_EXTERNAL = new QNm("external");
+  /** QName. */
+  static final QNm Q_NAME = new QNm("name");
+  /** QName. */
+  static final QNm Q_URI = new QNm("uri");
+  /** QName. */
+  static final QNm Q_TYPE = new QNm("type");
+
   /** Query context. */
   final QueryContext qc;
   /** Input info. */
@@ -102,11 +119,11 @@ public abstract class Inspect {
     for(final Ann ann : anns) {
       final FBuilder annotation = element("annotation");
       final QNm name = ann.name();
-      annotation.add("name", name.string());
-      if(uri) annotation.add("uri", name.uri());
+      annotation.add(Q_NAME, name.string());
+      if(uri) annotation.add(Q_URI, name.uri());
 
       for(final Item arg : ann.value()) {
-        annotation.add(element("literal").add("type", arg.type).add(arg.string(null)));
+        annotation.add(element("literal").add(Q_TYPE, arg.type).add(arg.string(null)));
       }
       parent.add(annotation);
     }

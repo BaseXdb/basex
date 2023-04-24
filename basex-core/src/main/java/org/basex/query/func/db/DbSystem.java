@@ -13,11 +13,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DbSystem extends StandardFunc {
-  /** Resource element name. */
-  private static final String SYSTEM = "system";
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return DbInfo.toNode(SYSTEM, Info.info(qc.context));
+    return DbInfo.toNode(DbAccess.Q_SYSTEM, Info.info(qc.context), qc);
   }
 }

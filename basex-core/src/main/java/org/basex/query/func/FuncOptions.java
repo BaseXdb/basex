@@ -25,7 +25,8 @@ import org.basex.util.options.*;
  */
 public final class FuncOptions {
   /** QName. */
-  public static final QNm Q_SPARAM = new QNm(OUTPUT_PREFIX, SERIALIZATION_PARAMETERS, OUTPUT_URI);
+  public static final QNm Q_SERIALIZTION_PARAMETERS =
+      new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
   /** Value. */
   private static final byte[] VALUE = token("value");
 
@@ -215,6 +216,6 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item item, final SerializerOptions sopts,
       final InputInfo ii) throws QueryException {
-    return new FuncOptions(Q_SPARAM, ii).assign(item, sopts, SEROPT_X);
+    return new FuncOptions(Q_SERIALIZTION_PARAMETERS, ii).assign(item, sopts, SEROPT_X);
   }
 }

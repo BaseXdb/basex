@@ -26,8 +26,8 @@ public final class FnAnalyzeString extends RegEx {
   private static final QNm Q_NONMATCH = new QNm("non-match", FN_URI);
   /** QName. */
   private static final QNm Q_MGROUP = new QNm("group", FN_URI);
-  /** Attribute for the analyze-string-result function. */
-  private static final String NR = "nr";
+  /** QName. */
+  private static final QNm Q_NR = new QNm("nr");
 
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -59,7 +59,7 @@ public final class FnAnalyzeString extends RegEx {
       final int group) {
 
     final FBuilder node = FElem.build(group == 0 ? Q_MATCH : Q_MGROUP).declareNS();
-    if(group > 0) node.add(NR, group);
+    if(group > 0) node.add(Q_NR, group);
 
     final int start = matcher.start(group), end = matcher.end(group), gc = matcher.groupCount();
     int[] pos = { group + 1, start }; // group and position in string

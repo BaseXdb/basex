@@ -1,5 +1,7 @@
 package org.basex.query.func.db;
 
+import static org.basex.query.func.db.DbAccess.*;
+
 import java.util.*;
 
 import org.basex.core.*;
@@ -24,24 +26,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class DbList extends StandardFunc {
-  /** Resource element name. */
-  static final String DATABASE = "database";
-  /** Resource element name. */
-  static final String RESOURCE = "resource";
-  /** Resource element name. */
-  static final String RESOURCES = "resources";
-  /** Path. */
-  static final String PATH = "path";
-  /** Size. */
-  static final String SIZE = "size";
-  /** Type. */
-  static final String TYPE = "type";
-  /** Content type. */
-  static final String CONTENT_TYPE = "content-type";
-  /** Modified date. */
-  static final String MODIFIED_DATE = "modified-date";
-  /** Directory flag. */
-  static final String DIR = "dir";
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
@@ -114,7 +98,8 @@ public class DbList extends StandardFunc {
    * @return resource node
    */
   static FNode dir(final String path, final long mdate) {
-    return FElem.build(DIR).add(path).add(MODIFIED_DATE, DateTime.format(new Date(mdate))).finish();
+    final String date = DateTime.format(new Date(mdate));
+    return FElem.build(Q_DIR).add(path).add(Q_MODIFIED_DATE, date).finish();
   }
 
   /**
@@ -128,11 +113,11 @@ public class DbList extends StandardFunc {
   static FNode resource(final String path, final long mdate, final long size,
       final ResourceType type) {
 
-    final FBuilder elem = FElem.build(RESOURCE).add(path);
-    elem.add(TYPE, type);
-    elem.add(CONTENT_TYPE, type.contentType(path));
-    elem.add(MODIFIED_DATE, DateTime.format(new Date(mdate)));
-    elem.add(SIZE, size);
+    final FBuilder elem = FElem.build(Q_RESOURCE).add(path);
+    elem.add(Q_TYPE, type);
+    elem.add(Q_CONTENT_TYPE, type.contentType(path));
+    elem.add(Q_MODIFIED_DATE, DateTime.format(new Date(mdate)));
+    elem.add(Q_SIZE, size);
     return elem.finish();
   }
 }

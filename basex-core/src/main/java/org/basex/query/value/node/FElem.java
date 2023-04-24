@@ -51,24 +51,6 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Convenience constructor for creating an element.
-   * @param name element name
-   * @return element builder
-   */
-  public static FBuilder build(final byte[] name) {
-    return build(new QNm(name));
-  }
-
-  /**
-   * Convenience constructor for creating an element.
-   * @param name element name
-   * @return element builder
-   */
-  public static FBuilder build(final String name) {
-    return build(token(name));
-  }
-
-  /**
    * Constructor for creating an element from a DOM node.
    * Originally provided by Erdal Karaca.
    * @param elem DOM node
@@ -179,7 +161,7 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] baseURI() {
-    final byte[] base = attribute(QNm.XML_BASE);
+    final byte[] base = attribute(XML_BASE);
     return base != null ? base : Token.EMPTY;
   }
 

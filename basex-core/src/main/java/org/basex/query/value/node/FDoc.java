@@ -29,7 +29,7 @@ public final class FDoc extends FNode {
 
   /**
    * Constructor.
-   * @param uri base uri
+   * @param uri base URI
    */
   private FDoc(final byte[] uri) {
     super(NodeType.DOCUMENT_NODE);
@@ -38,20 +38,11 @@ public final class FDoc extends FNode {
 
   /**
    * Creates a document builder.
-   * @param uri base uri
+   * @param uri base URI
    * @return document builder
    */
   public static FBuilder build(final byte[] uri) {
     return new FBuilder(new FDoc(uri));
-  }
-
-  /**
-   * Creates a document builder.
-   * @param uri base uri
-   * @return document builder
-   */
-  public static FBuilder build(final String uri) {
-    return build(Token.token(uri));
   }
 
   /**
@@ -70,7 +61,7 @@ public final class FDoc extends FNode {
    * @return document builder
    */
   public static FBuilder build(final String uri, final DocumentFragment doc) {
-    final FBuilder builder = build(uri);
+    final FBuilder builder = build(Token.token(uri));
     children(doc, builder, new TokenMap());
     return builder;
   }

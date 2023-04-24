@@ -1,9 +1,7 @@
 package org.basex.query.func.archive;
 
-import static org.basex.util.Token.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -13,26 +11,18 @@ import org.basex.query.value.item.*;
  * @author Christian Gruen
  */
 interface ArchiveText {
-  /** Packer format: gzip. */
-  String GZIP = "gzip";
-  /** Packer format: zip. */
-  String ZIP = "zip";
-
   /** QName. */
   QNm Q_ENTRY = new QNm(ARCHIVE_PREFIX, "entry", ARCHIVE_URI);
-  /** Root node test. */
-  NameTest ENTRY = new NameTest(Q_ENTRY);
-
-  /** Level. */
-  byte[] LEVEL = token("compression-level");
-  /** Encoding. */
-  byte[] ENCODING = token("encoding");
-  /** Last modified. */
-  byte[] LAST_MODIFIED = token("last-modified");
-  /** Compressed size. */
-  byte[] COMPRESSED_SIZE = token("compressed-size");
-  /** Uncompressed size. */
-  byte[] SIZE = token("size");
+  /** QName. */
+  QNm Q_LEVEL = new QNm("compression-level");
+  /** QName. */
+  QNm Q_ENCODING = new QNm("encoding");
+  /** QName. */
+  QNm Q_LAST_MODIFIED = new QNm("last-modified");
+  /** QName. */
+  QNm Q_COMPRESSED_SIZE = new QNm("compressed-size");
+  /** QName. */
+  QNm Q_SIZE = new QNm("size");
 
   /** Option: algorithm: deflate. */
   String DEFLATE = "deflate";
@@ -40,4 +30,9 @@ interface ArchiveText {
   String STORED = "stored";
   /** Option: algorithm: unknown. */
   String UNKNOWN = "unknown";
+
+  /** Packer format: gzip. */
+  String GZIP = "gzip";
+  /** Packer format: zip. */
+  String ZIP = "zip";
 }

@@ -28,24 +28,25 @@ import org.xml.sax.*;
  * @author Marco Lettere (greedy/verbose validation)
  */
 abstract class ValidateFn extends StandardFunc {
-  /** String: report. */
-  private static final String REPORT = "report";
-  /** String: message. */
-  private static final String MESSAGE = "message";
-  /** String: status. */
-  private static final String STATUS = "status";
+  /** QName. */
+  private static final QNm Q_REPORT = new QNm("report");
+  /** QName. */
+  private static final QNm Q_MESSAGE = new QNm("message");
+  /** QName. */
+  private static final QNm Q_STATUS = new QNm("status");
+  /** QName. */
+  private static final QNm Q_LINE = new QNm("line");
+  /** QName. */
+  private static final QNm Q_COLUMN = new QNm("column");
+  /** QName. */
+  private static final QNm Q_LEVEL = new QNm("level");
+  /** QName. */
+  private static final QNm Q_URL = new QNm("url");
+
   /** String: valid. */
   private static final String VALID = "valid";
   /** String: invalid. */
   private static final String INVALID = "invalid";
-  /** String: line. */
-  private static final String LINE = "line";
-  /** String: column. */
-  private static final String COLUMN = "column";
-  /** String: level. */
-  private static final String LEVEL = "level";
-  /** String: url. */
-  private static final String URL = "url";
 
   /**
    * Runs the validation process and returns an empty sequence or an error.
@@ -80,13 +81,13 @@ abstract class ValidateFn extends StandardFunc {
    */
   protected final FNode report(final QueryContext qc) throws QueryException {
     final ArrayList<ErrorInfo> errors = errors(qc);
-    final FBuilder report = FElem.build(REPORT);
-    report.add(FElem.build(STATUS).add(errors.isEmpty() ? VALID : INVALID));
+    final FBuilder report = FElem.build(Q_REPORT);
+    report.add(FElem.build(Q_STATUS).add(errors.isEmpty() ? VALID : INVALID));
     for(final ErrorInfo ei : errors) {
-      final FBuilder error = FElem.build(MESSAGE).add(LEVEL, ei.level);
-      if(ei.line != Integer.MIN_VALUE) error.add(LINE, ei.line);
-      if(ei.column != Integer.MIN_VALUE) error.add(COLUMN, ei.column);
-      report.add(error.add(URL, ei.url).add(ei.message));
+      final FBuilder error = FElem.build(Q_MESSAGE).add(Q_LEVEL, ei.level);
+      if(ei.line != Integer.MIN_VALUE) error.add(Q_LINE, ei.line);
+      if(ei.column != Integer.MIN_VALUE) error.add(Q_COLUMN, ei.column);
+      report.add(error.add(Q_URL, ei.url).add(ei.message));
     }
     return report.finish();
   }

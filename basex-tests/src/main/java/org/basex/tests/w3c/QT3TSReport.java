@@ -104,37 +104,37 @@ public final class QT3TSReport {
 
     // submission element
     final FBuilder submission = element("submission");
-    submission.add("anonymous", "false");
+    submission.add(new QNm("anonymous"), "false");
 
     final FBuilder created = element("created");
-    created.add("by", Text.AUTHOR);
-    created.add("email", "cg@basex.org");
-    created.add("organization", Text.ORGANIZATION);
-    created.add("on", date);
+    created.add(new QNm("by"), Text.AUTHOR);
+    created.add(new QNm("email"), "cg@basex.org");
+    created.add(new QNm("organization"), Text.ORGANIZATION);
+    created.add(new QNm("on"), date);
     submission.add(created);
 
     final FBuilder testRun = element("test-run");
-    testRun.add("test-suite-version", "CVS");
-    testRun.add("date-run", date);
+    testRun.add(new QNm("test-suite-version"), "CVS");
+    testRun.add(new QNm("date-run"), date);
     submission.add(testRun);
 
     submission.add(element("notes"));
 
     // product element
     final FBuilder product = element("product");
-    product.add("vendor", Text.ORGANIZATION);
-    product.add("name", Prop.NAME);
-    product.add("version", Prop.VERSION);
-    product.add("released", "true");
-    product.add("open-source", "true");
-    product.add("language", "XQ40");
+    product.add(new QNm("vendor"), Text.ORGANIZATION);
+    product.add(new QNm("name"), Prop.NAME);
+    product.add(new QNm("version"), Prop.VERSION);
+    product.add(new QNm("released"), "true");
+    product.add(new QNm("open-source"), "true");
+    product.add(new QNm("language"), "XQ40");
 
     // dependency element
     for(final String[] deps : DEPENDENCIES) {
       final FBuilder dependency = element("dependency");
-      dependency.add("type", deps[0]);
-      dependency.add("value", deps[1]);
-      dependency.add("satisfied", deps[2]);
+      dependency.add(new QNm("type"), deps[0]);
+      dependency.add(new QNm("value"), deps[1]);
+      dependency.add(new QNm("satisfied"), deps[2]);
       product.add(dependency);
     }
     root.add(product);
@@ -144,9 +144,9 @@ public final class QT3TSReport {
     for(final String[] test : tests) {
       if(test.length == 1) {
         if(ts != null) root.add(ts);
-        ts = element("test-set").add("name", test[0]);
+        ts = element("test-set").add(new QNm("name"), test[0]);
       } else {
-        ts.add(element("test-case").add("name", test[0]).add("result", test[1]));
+        ts.add(element("test-case").add(new QNm("name"), test[0]).add(new QNm("result"), test[1]));
       }
     }
     if(ts != null) root.add(ts);

@@ -29,13 +29,14 @@ public final class ArchiveEntries extends StandardFunc {
       while(in.more()) {
         final ZipEntry ze = in.entry();
         if(ze.isDirectory()) continue;
+
         final FBuilder elem = FElem.build(Q_ENTRY).declareNS();
         long size = ze.getSize();
-        if(size != -1) elem.add(SIZE, size);
+        if(size != -1) elem.add(Q_SIZE, size);
         size = ze.getTime();
-        if(size != -1) elem.add(LAST_MODIFIED, Dtm.get(size).string(info));
+        if(size != -1) elem.add(Q_LAST_MODIFIED, Dtm.get(size).string(info));
         size = ze.getCompressedSize();
-        if(size != -1) elem.add(COMPRESSED_SIZE, size);
+        if(size != -1) elem.add(Q_COMPRESSED_SIZE, size);
         vb.add(elem.add(ze.getName()).finish());
       }
       return vb.value(this);

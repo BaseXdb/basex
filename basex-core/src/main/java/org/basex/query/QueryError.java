@@ -1136,7 +1136,7 @@ public enum QueryError {
   /** Error code. */
   ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
   /** Error code. */
-  ELM_X_X(XPTY, 4, "element(%) expected: %."),
+  ELM_X_X_X(XPTY, 4, "element(%) expected, % found: %."),
   /** Error code. */
   INVALIDOPTION_X(XPTY, 4, "Unknown option '%'."),
   /** Error code. */
@@ -1593,7 +1593,7 @@ public enum QueryError {
    * @return function
    */
   public final QNm qname() {
-    return new QNm(prefix + ':' + code, uri);
+    return new QNm(Token.token(prefix), code, uri);
   }
 
   /**

@@ -117,10 +117,10 @@ public class ArchiveCreate extends ArchiveFn {
     byte[] lvl = null;
     if(header instanceof ANode) {
       final ANode el = (ANode) header;
-      lvl = el.attribute(LEVEL);
+      lvl = el.attribute(Q_LEVEL);
 
       // last modified
-      final byte[] mod = el.attribute(LAST_MODIFIED);
+      final byte[] mod = el.attribute(Q_LAST_MODIFIED);
       if(mod != null) {
         try {
           ze.setTime(toMs(new Dtm(mod, info), qc));
@@ -131,7 +131,7 @@ public class ArchiveCreate extends ArchiveFn {
       }
 
       // encoding
-      final byte[] ea = el.attribute(ENCODING);
+      final byte[] ea = el.attribute(Q_ENCODING);
       if(ea != null) {
         encoding = Strings.normEncoding(string(ea));
         if(!Charset.isSupported(encoding)) throw ARCHIVE_ENCODE1_X.get(info, ea);
@@ -168,15 +168,15 @@ public class ArchiveCreate extends ArchiveFn {
     final Map<String, Item[]> map = new LinkedHashMap<>();
     int e = 0, c = 0;
     while(true) {
-      final Item en = qc.next(entrs), cn = cntnts.next();
-      if(en == null || cn == null) {
+      final Item item = qc.next(entrs), cn = cntnts.next();
+      if(item == null || cn == null) {
         // count remaining entries
         if(cn != null) do c++; while(cntnts.next() != null);
-        if(en != null) do e++; while(entrs.next() != null);
+        if(item != null) do e++; while(entrs.next() != null);
         if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
         break;
       }
-      map.put(string(checkElemToken(en).string(info)), new Item[] { en, cn });
+      map.put(string(checkElemToken(item, qc).string(info)), new Item[] { item, cn });
       e++;
       c++;
     }

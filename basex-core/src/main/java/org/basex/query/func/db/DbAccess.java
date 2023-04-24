@@ -22,6 +22,33 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 abstract class DbAccess extends StandardFunc {
+  /** QName. */
+  static final QNm Q_BACKUP = new QNm("backup");
+  /** QName. */
+  static final QNm Q_SIZE = new QNm("size");
+  /** QName. */
+  static final QNm Q_DATE = new QNm("date");
+  /** QName. */
+  static final QNm Q_DATABASE = new QNm("database");
+  /** QName. */
+  static final QNm Q_COMMENT = new QNm("comment");
+  /** QName. */
+  static final QNm Q_RESOURCE = new QNm("resource");
+  /** QName. */
+  static final QNm Q_RESOURCES = new QNm("resources");
+  /** QName. */
+  static final QNm Q_CONTENT_TYPE = new QNm("content-type");
+  /** QName. */
+  static final QNm Q_MODIFIED_DATE = new QNm("modified-date");
+  /** QName. */
+  static final QNm Q_DIR = new QNm("dir");
+  /** QName. */
+  static final QNm Q_TYPE = new QNm("type");
+  /** QName. */
+  static final QNm Q_PATH = new QNm("path");
+  /** QName. */
+  static final QNm Q_SYSTEM = new QNm("system");
+
   /**
    * Evaluates an expression to a normalized database path.
    * @param expr expression
@@ -80,10 +107,10 @@ abstract class DbAccess extends StandardFunc {
 
     // parse and compile the name test
     final byte[] name = toToken(expr, qc);
-    final QNm qName = qc.shared.qnm(name, sc.ns.uri(prefix(name)));
+    final QNm qnm = qc.shared.qname(name, sc.ns.uri(prefix(name)));
 
     // return empty sequence if test will yield no results
-    final NameTest nt = new NameTest(qName, NamePart.FULL, NodeType.ATTRIBUTE, sc.elemNS);
+    final NameTest nt = new NameTest(qnm, NamePart.FULL, NodeType.ATTRIBUTE, sc.elemNS);
     if(nt.optimize(data) == null) return Empty.ITER;
 
     // wrap iterator with name test

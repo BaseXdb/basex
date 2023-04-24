@@ -85,13 +85,13 @@ final class RestXqResponse extends WebResponse {
       // handle special cases
       if(item != null && item.type == NodeType.ELEMENT) {
         final ANode node = (ANode) item;
-        if(REST_FORWARD.matches(node)) {
+        if(T_REST_FORWARD.matches(node)) {
           // server-side forwarding
           final ANode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TEXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
           item = iter.next();
-        } else if(REST_RESPONSE.matches(node)) {
+        } else if(T_REST_RESPONSE.matches(node)) {
           // custom response
           so = build(node);
           item = iter.next();
@@ -167,7 +167,7 @@ final class RestXqResponse extends WebResponse {
     String cType = null;
     for(final ANode node : response.childIter()) {
       // process http:response element
-      if(HTTP_RESPONSE.matches(node)) {
+      if(T_HTTP_RESPONSE.matches(node)) {
         // check status and reason
         byte[] sta = null, msg = null;
         for(final ANode a : node.attributeIter()) {
@@ -183,7 +183,7 @@ final class RestXqResponse extends WebResponse {
 
         for(final ANode c : node.childIter()) {
           // process http:header elements
-          if(HTTP_HEADER.matches(c)) {
+          if(T_HTTP_HEADER.matches(c)) {
             final byte[] nam = c.attribute(Q_NAME);
             final byte[] val = c.attribute(Q_VALUE);
             if(nam != null && val != null) {
@@ -199,7 +199,7 @@ final class RestXqResponse extends WebResponse {
             throw func.error(UNEXP_NODE_X, c);
           }
         }
-      } else if(OUTPUT_SERIAL.matches(node)) {
+      } else if(T_OUTPUT_SERIAL.matches(node)) {
         // parse output:serialization-parameters
         sp = FuncOptions.serializer(node, func.sopts, func.function.info);
       } else {

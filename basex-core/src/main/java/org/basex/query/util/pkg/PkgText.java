@@ -3,6 +3,7 @@ package org.basex.query.util.pkg;
 import static org.basex.util.Token.*;
 
 import org.basex.io.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -51,29 +52,29 @@ public interface PkgText {
 
   // <package/> attributes
 
-  /** Attribute name. */
-  byte[] A_NAME = token("name");
-  /** Attribute abbrev. */
-  byte[] A_ABBREV = token("abbrev");
-  /** Attribute version. */
-  byte[] A_VERSION = token("version");
-  /** Attribute spec. */
-  byte[] A_SPEC = token("spec");
+  /** QName. */
+  QNm Q_NAME = new QNm("name");
+  /** QName. */
+  QNm Q_ABBREV = new QNm("abbrev");
+  /** QName. */
+  QNm Q_VERSION = new QNm("version");
+  /** QName. */
+  QNm Q_SPEC = new QNm("spec");
 
   // <dependency/> attributes
 
-  /** Attribute package. */
-  byte[] A_PACKAGE = token("package");
-  /** Attribute processor. */
-  byte[] A_PROCESSOR = token("processor");
-  /** Attribute versions. */
-  byte[] A_VERSIONS = token("versions");
-  /** Attribute semver. */
-  byte[] A_SEMVER = token("semver");
-  /** Attribute semver-min. */
-  byte[] A_SEMVER_MIN = token("semver-min");
-  /** Attribute semver-max. */
-  byte[] A_SEMVER_MAX = token("semver-max");
+  /** QName. */
+  QNm Q_PACKAGE = new QNm("package");
+  /** QName. */
+  QNm Q_PROCESSOR = new QNm("processor");
+  /** QName. */
+  QNm Q_VERSIONS = new QNm("versions");
+  /** QName. */
+  QNm Q_SEMVER = new QNm("semver");
+  /** QName. */
+  QNm Q_SEMVER_MIN = new QNm("semver-min");
+  /** QName. */
+  QNm Q_SEMVER_MAX = new QNm("semver-max");
 
   /** Not expected initialization error. */
   String MISSDESC = "Missing package descriptor for package '%'";

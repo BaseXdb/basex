@@ -16,7 +16,6 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.parse.json.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -80,7 +79,7 @@ public final class Payload {
     if(type.isMultipart()) {
       // multipart response
       final byte[] boundary = boundary(type);
-      body = FElem.build(Q_HTTP_MULTIPART).add(BOUNDARY, boundary);
+      body = FElem.build(Q_HTTP_MULTIPART).add(Q_BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final ANode node : parts) body.add(node);
@@ -92,7 +91,7 @@ public final class Payload {
         payloads.add(parse(BufferInput.get(in).content(), type));
       }
     }
-    return body.add(SerializerOptions.MEDIA_TYPE.name(), type.type()).finish();
+    return body.add(Q_MEDIA_TYPE, type.type()).finish();
   }
 
   /**
@@ -171,13 +170,13 @@ public final class Payload {
           base64 = value.equals(BASE64);
         }
         if(!value.isEmpty() && parts != null) {
-          parts.add(FElem.build(Q_HTTP_HEADER).add(NAME, key).add(VALUE, value).finish());
+          parts.add(FElem.build(Q_HTTP_HEADER).add(Q_NAME, key).add(Q_VALUE, value).finish());
         }
       }
       l = readLine();
     }
     if(parts != null) {
-      parts.add(FElem.build(Q_HTTP_BODY).add(SerializerOptions.MEDIA_TYPE.name(), type).finish());
+      parts.add(FElem.build(Q_HTTP_BODY).add(Q_MEDIA_TYPE, type).finish());
     }
 
     // extract payload
@@ -277,10 +276,10 @@ public final class Payload {
         }
       } else if(startsWith(lc(line), CONTENT_DISPOSITION)) {
         // get key and file name
-        name = contains(line, token(NAME + '=')) ?
-          string(line).replaceAll("^.*?" + NAME + "=\"|\".*", "").replaceAll("\\[]", "") : null;
-        filename = contains(line, token(FILENAME + '=')) ?
-          string(line).replaceAll("^.*" + FILENAME + "=\"|\"$", "") : null;
+        name = contains(line, token("name=")) ?
+          string(line).replaceAll("^.*?name=\"|\".*", "").replaceAll("\\[]", "") : null;
+        filename = contains(line, token("filename=")) ?
+          string(line).replaceAll("^.*filename=\"|\"$", "") : null;
       } else if(line.length == 0) {
         lines = 0;
       }

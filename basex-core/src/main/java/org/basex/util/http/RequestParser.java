@@ -100,9 +100,9 @@ public final class RequestParser {
 
       String name = "", value = "";
       for(final ANode attr : node.attributeIter()) {
-        final String qn = string(attr.qname().local());
-        if(qn.equals(NAME)) name = string(attr.string());
-        else if(qn.equals(VALUE)) value = string(attr.string());
+        final QNm qn = attr.qname();
+        if(qn.equals(Q_NAME)) name = string(attr.string());
+        else if(qn.equals(Q_VALUE)) value = string(attr.string());
       }
       if(!name.isEmpty() && !value.isEmpty()) headers.put(name, value);
     }

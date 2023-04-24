@@ -49,7 +49,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXComm createComment(final String value) {
-    return new BXComm(new FComm(value));
+    return new BXComm(new FComm(token(value)));
   }
 
   @Override
@@ -59,7 +59,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXElem createElement(final String name) {
-    return new BXElem(FElem.build(name).finish());
+    return new BXElem(FElem.build(new QNm(name)).finish());
   }
 
   @Override
@@ -74,7 +74,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXPI createProcessingInstruction(final String name, final String value) {
-    return new BXPI(new FPI(name, value));
+    return new BXPI(new FPI(new QNm(name), token(value)));
   }
 
   @Override

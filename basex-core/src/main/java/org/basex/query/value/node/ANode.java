@@ -32,6 +32,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ANode extends Item {
+  /** QName: xml:base. */
+  static final QNm XML_BASE = new QNm(QueryText.BASE, QueryText.XML_URI);
   /** Node Types. */
   private static final NodeType[] TYPES = {
     DOCUMENT_NODE, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PROCESSING_INSTRUCTION
@@ -421,16 +423,7 @@ public abstract class ANode extends Item {
    * @param name attribute to be found
    * @return attribute value or {@code null}
    */
-  public byte[] attribute(final byte[] name) {
-    return attribute(new QNm(name));
-  }
-
-  /**
-   * Returns the value of the specified attribute.
-   * @param name attribute to be found
-   * @return attribute value or {@code null}
-   */
-  public byte[] attribute(final QNm name) {
+  public final byte[] attribute(final QNm name) {
     final BasicNodeIter iter = attributeIter();
     while(true) {
       final ANode node = iter.next();

@@ -19,10 +19,10 @@ public final class ProcExecute extends ProcFn {
     final byte[] output = result.output.normalize().finish();
     final byte[] error = result.error.normalize().finish();
 
-    final FBuilder root = FElem.build(RESULT);
-    if(output.length != 0) root.add(FElem.build(OUTPUT).add(output));
-    if(error.length != 0) root.add(FElem.build(ERROR).add(error));
-    if(!ex) root.add(FElem.build(CODE).add(result.code));
+    final FBuilder root = FElem.build(Q_RESULT);
+    if(output.length != 0) root.add(FElem.build(Q_OUTPUT).add(output));
+    if(error.length != 0) root.add(FElem.build(Q_ERROR).add(error));
+    if(!ex) root.add(FElem.build(Q_CODE).add(result.code));
     return root.finish();
   }
 }

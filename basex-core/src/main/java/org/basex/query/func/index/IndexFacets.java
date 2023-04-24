@@ -8,6 +8,7 @@ import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -21,21 +22,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class IndexFacets extends IndexFn {
-  /** Name: name. */
-  private static final byte[] NAME = token("name");
-  /** Name: type. */
-  private static final byte[] TYPE = token("type");
-  /** Name: min. */
-  private static final byte[] MIN = token("min");
-  /** Name: max. */
-  private static final byte[] MAX = token("max");
-  /** Name: elements. */
-  private static final byte[] ELM = NodeType.ELEMENT.qname().local();
-  /** Name: attributes. */
-  private static final byte[] ATT = NodeType.ATTRIBUTE.qname().local();
-  /** Flag: flat output. */
-  private static final byte[] FLAT = token("flat");
-
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
@@ -50,8 +36,8 @@ public final class IndexFacets extends IndexFn {
    */
   private static FBuilder flat(final Data data) {
     final FBuilder elem = FElem.build(NodeType.DOCUMENT_NODE.qname());
-    index(data.elemNames, ELM, elem);
-    index(data.attrNames, ATT, elem);
+    index(data.elemNames, Q_ELEMENT, elem);
+    index(data.attrNames, Q_ATTRIBUTE, elem);
     return elem;
   }
 
@@ -65,7 +51,7 @@ public final class IndexFacets extends IndexFn {
     final FBuilder elem = FElem.build(ANode.type(root.kind).qname());
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.elemNames : data.attrNames;
-    if(root.kind == Data.ATTR || elm) elem.add(NAME, names.key(root.name));
+    if(root.kind == Data.ATTR || elm) elem.add(Q_NAME, names.key(root.name));
     stats(root.stats, elem);
     for(final PathNode pn : root.children) elem.add(tree(data, pn));
     return elem;
@@ -77,10 +63,10 @@ public final class IndexFacets extends IndexFn {
    * @param name element name
    * @param root root node
    */
-  private static void index(final Names names, final byte[] name, final FBuilder root) {
+  private static void index(final Names names, final QNm name, final FBuilder root) {
     final int ns = names.size();
     for(int n = 1; n <= ns; n++) {
-      final FBuilder sub = FElem.build(name).add(NAME, names.key(n));
+      final FBuilder sub = FElem.build(name).add(Q_NAME, names.key(n));
       stats(names.stats(n), sub);
       root.add(sub);
     }
@@ -93,12 +79,12 @@ public final class IndexFacets extends IndexFn {
    */
   private static void stats(final Stats stats, final FBuilder elem) {
     final int type = stats.type;
-    if(!isNone(type)) elem.add(TYPE, StatsType.toString(type));
-    elem.add(COUNT, stats.count);
+    if(!isNone(type)) elem.add(Q_TYPE, StatsType.toString(type));
+    elem.add(Q_COUNT, stats.count);
     if(isInteger(type) || isDouble(type)) {
       final int mn = (int) stats.min, mx = (int) stats.max;
-      elem.add(MIN, mn == stats.min ? mn : stats.min);
-      elem.add(MAX, mx == stats.max ? mx : stats.max);
+      elem.add(Q_MIN, mn == stats.min ? mn : stats.min);
+      elem.add(Q_MAX, mx == stats.max ? mx : stats.max);
     }
     if(isCategory(type)) {
       final TokenIntMap map = stats.values;
@@ -110,7 +96,7 @@ public final class IndexFacets extends IndexFn {
       }
       for(final int o : list.createOrder(false)) {
         final byte[] value = values.get(o);
-        elem.add(FElem.build(ENTRY).add(COUNT, map.get(value)).add(value));
+        elem.add(FElem.build(Q_ENTRY).add(Q_COUNT, map.get(value)).add(value));
       }
     }
   }

@@ -1,5 +1,6 @@
 package org.basex.query.func.db;
 
+import static org.basex.query.func.db.DbAccess.*;
 import static org.basex.query.QueryError.*;
 
 import org.basex.core.*;
@@ -22,17 +23,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class DbBackups extends StandardFunc {
-  /** Backup string. */
-  private static final String BACKUP = "backup";
-  /** Size string. */
-  private static final String SIZE = "size";
-  /** Date string. */
-  private static final String DATE = "date";
-  /** Database string. */
-  private static final String DATABASE = "database";
-  /** Comment string. */
-  private static final String COMMENT = "comment";
-
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final String name = defined(0) ? toName(arg(0), true, DB_NAME_X, qc) : null;
@@ -45,12 +35,12 @@ public final class DbBackups extends StandardFunc {
       @Override
       public FNode get(final long i) {
         final String backup = backups.get((int) i), db = Databases.name(backup);
-        final FBuilder elem = FElem.build(BACKUP).add(backup);
-        if(!db.isEmpty()) elem.add(DATABASE, db);
-        elem.add(DATE, Dtm.get(DateTime.parse(Databases.date(backup)).getTime()).string(info));
-        elem.add(SIZE, new IOFile(dbPath, backup + IO.ZIPSUFFIX).length());
+        final FBuilder elem = FElem.build(Q_BACKUP).add(backup);
+        if(!db.isEmpty()) elem.add(Q_DATABASE, db);
+        elem.add(Q_DATE, Dtm.get(DateTime.parse(Databases.date(backup)).getTime()).string(info));
+        elem.add(Q_SIZE, new IOFile(dbPath, backup + IO.ZIPSUFFIX).length());
         final String comment = ShowBackups.comment(backup, ctx);
-        if(!comment.isEmpty()) elem.add(COMMENT, comment);
+        if(!comment.isEmpty()) elem.add(Q_COMMENT, comment);
         return elem.finish();
       }
     };

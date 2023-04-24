@@ -26,8 +26,8 @@ import org.basex.util.hash.*;
 public final class Catch extends Single {
   /** Error QNames. */
   public static final QNm[] NAMES = {
-    create(E_CODE), create(E_DESCRIPTION), create(E_VALUE), create(E_MODULE),
-    create(E_LINE_NUMBER), create(E_COLUMN_NUMBER), create(E_ADDITIONAL)
+    qname("code"), qname("description"), qname("value"), qname("module"),
+    qname("line-number"), qname("column-number"), qname("additional")
   };
   /** Error types. */
   public static final SeqType[] TYPES = {
@@ -202,12 +202,12 @@ public final class Catch extends Single {
   }
 
   /**
-   * Creates an error QName with the specified name.
+   * Creates a QName with the specified name.
    * @param name name
    * @return QName
    */
-  private static QNm create(final byte[] name) {
-    return new QNm(concat(ERR_PREFIX, COLON, name), ERROR_URI);
+  private static QNm qname(final String name) {
+    return new QNm(ERR_PREFIX, name, ERROR_URI);
   }
 
   @Override

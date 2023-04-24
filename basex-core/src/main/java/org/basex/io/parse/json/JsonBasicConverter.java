@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 
 /**
@@ -70,7 +69,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
     if(addValues.peek()) {
       final byte[] val = value != null ? shared.token(value) : null;
       final FBuilder elem = element(type).add(val);
-      if(escape && value != null && contains(val, '\\')) elem.add(ESCAPED, TRUE);
+      if(escape && value != null && contains(val, '\\')) elem.add(Q_ESCAPED, TRUE);
       if(curr != null) curr.add(elem);
       else curr = elem;
     }
@@ -99,10 +98,10 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    * @return new element
    */
   private FBuilder element(final byte[] type) {
-    final FBuilder elem = FElem.build(new QNm(type, QueryText.FN_URI)).declareNS();
+    final FBuilder elem = FElem.build(shared.qname(type, QueryText.FN_URI)).declareNS();
     if(name != null) {
-      elem.add(KEY, name);
-      if(escape && contains(name, '\\')) elem.add(ESCAPED_KEY, TRUE);
+      elem.add(Q_KEY, name);
+      if(escape && contains(name, '\\')) elem.add(Q_ESCAPED_KEY, TRUE);
       name = null;
     }
     return elem;

@@ -98,7 +98,7 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   String desc() {
-    return QNm.eqName(JAVAPREF + className(clazz), NEW);
+    return QNm.eqName(JAVA_PREFIX_COLON + className(clazz), NEW);
   }
 
   @Override

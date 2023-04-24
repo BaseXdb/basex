@@ -39,7 +39,7 @@ public final class Suite {
     final ArrayList<IOFile> files = new ArrayList<>();
 
     final Performance perf = new Performance();
-    final FBuilder suites = FElem.build(TESTSUITES);
+    final FBuilder suites = FElem.build(Q_TESTSUITES);
     if(root.isDir()) {
       for(final String path : root.descendants()) {
         final IOFile file = new IOFile(root, path);
@@ -57,6 +57,6 @@ public final class Suite {
       skipped += unit.skipped;
       tests += unit.tests;
     }
-    return suites.add(TIME, Unit.time(perf)).finish();
+    return suites.add(Q_TIME, Unit.time(perf)).finish();
   }
 }

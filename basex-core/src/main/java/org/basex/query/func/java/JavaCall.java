@@ -359,8 +359,8 @@ public abstract class JavaCall extends Arr {
     final String uri = string(qname.uri());
 
     // check if URI starts with "java:" prefix. if yes, skip rewritings
-    final boolean enforce = uri.startsWith(JAVAPREF);
-    final String className = classPath(enforce ? uri.substring(JAVAPREF.length()) :
+    final boolean enforce = uri.startsWith(JAVA_PREFIX_COLON);
+    final String className = classPath(enforce ? uri.substring(JAVA_PREFIX_COLON.length()) :
       uriToClasspath(uri2path(uri)));
 
     // function in imported Java module
@@ -614,7 +614,7 @@ public abstract class JavaCall extends Arr {
     // prepend standard package if name starts with uppercase letter and has no dots
     //   String  ->  java.lang.String
     //   char[]  ->  char[]
-    return name.replaceAll("^([A-Z][^.]+)$", JAVALANG + "$1");
+    return name.replaceAll("^([A-Z][^.]+)$", JAVA_LANG_DOT + "$1");
   }
 
   /**
@@ -632,7 +632,8 @@ public abstract class JavaCall extends Arr {
    * @return normalized name
    */
   static String className(final String name) {
-    return name.startsWith(QueryText.JAVALANG) ? name.substring(QueryText.JAVALANG.length()) : name;
+    return name.startsWith(QueryText.JAVA_LANG_DOT) ?
+      name.substring(QueryText.JAVA_LANG_DOT.length()) : name;
   }
 
   /**
