@@ -864,8 +864,6 @@ public enum QueryError {
   /** Error code. */
   NOQUOTE_X(XPST, 3, "Expecting quote%."),
   /** Error code. */
-  ARITY_X(XPST, 3, "Expecting function arity, '%' found."),
-  /** Error code. */
   NUMBER_X(XPST, 3, "Incomplete number: '%'."),
   /** Error code. */
   NUMBERITR_X_X(XPST, 3, "Integer expected, % found: '%'."),

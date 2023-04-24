@@ -2264,7 +2264,7 @@ public class QueryParser extends InputParser {
     if(ch == '(') return parenthesized();
     if(ch == '$') return varRef();
     if(quote(ch)) return Str.get(stringLiteral());
-    final Expr num = numericLiteral(ch);
+    final Expr num = numericLiteral(ch, Long.MAX_VALUE);
     if(num != null) {
       if(Function.ERROR.is(num) || num instanceof Int) return num;
       throw error(NUMBERITR_X_X, num.seqType(), num);
@@ -2354,12 +2354,9 @@ public class QueryParser extends InputParser {
     if(name != null && wsConsumeWs("#")) {
       checkReserved(name);
       final char ch = curr();
-      final Expr num = numericLiteral(ch);
+      final Expr num = numericLiteral(ch, Integer.MAX_VALUE);
       if(Function.ERROR.is(num)) return num;
-      if(!(num instanceof Int)) throw error(ARITY_X, num == null ? ch == 0 ? "" : ch : token);
-      final long a = ((Int) num).itr();
-      if(a > Integer.MAX_VALUE) return FnError.get(RANGE_X.get(info(), num), SeqType.ITEM_ZM, sc);
-      final int arity = (int) a;
+      final int arity = (int) ((Int) num).itr();
       final Expr expr = Functions.getLiteral(name, arity, qc, sc, info(), false);
       return expr != null ? expr : undeclaredLiteral(name, arity, info());
     }
@@ -2389,7 +2386,7 @@ public class QueryParser extends InputParser {
    */
   private Expr literal() throws QueryException {
     final char ch = curr();
-    final Expr num = numericLiteral(ch);
+    final Expr num = numericLiteral(ch, 0);
     return num != null ? num : quote(ch) ? Str.get(stringLiteral()) : null;
   }
 
@@ -2398,22 +2395,25 @@ public class QueryParser extends InputParser {
    * Parses the "DecimalLiteral" rule.
    * Parses the "IntegerLiteral" rule.
    * @param ch current character
+   * @param max maximum value for integers (if 0, parse all numeric types)
    * @return numeric literal or {@code null}
    * @throws QueryException query exception
    */
-  private Expr numericLiteral(final char ch) throws QueryException {
+  private Expr numericLiteral(final char ch, final long max) throws QueryException {
     if(!digit(ch) && ch != '.') return null;
     token.reset();
 
     int base = 10;
     if(ch == '0') {
       final char n = next();
-      if(n == 'x' || n == 'X') base = 16;
-      else if(n == 'b' || n == 'B') base = 2;
-      if(base != 10) {
-        consume();
-        consume();
-        if(curr('_')) throw error(NUMBER_X, token.add('_'));
+      if(max == 0) {
+        if(n == 'x' || n == 'X') base = 16;
+        else if(n == 'b' || n == 'B') base = 2;
+        if(base != 10) {
+          consume();
+          consume();
+          if(curr('_')) throw error(NUMBER_X, token.add('_'));
+        }
       }
     }
 
@@ -2436,7 +2436,7 @@ public class QueryParser extends InputParser {
     };
     if(us) throw error(NUMBER_X, token.add('_'));
 
-    if(base == 10) {
+    if(base == 10 && max == 0) {
       // fractional digits?
       final boolean dec = consume('.');
       if(dec) {
@@ -2461,8 +2461,9 @@ public class QueryParser extends InputParser {
 
     // integer value
     if(token.isEmpty()) throw error(NUMBER_X, token);
-    if(range) return FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
-    return Int.get(l);
+
+    return !range && (max == 0 || l <= max) ? Int.get(l) :
+      FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
   }
 
   /**
