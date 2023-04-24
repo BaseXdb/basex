@@ -58,8 +58,6 @@ public final class EditorView extends View {
   final ProjectView project;
   /** Go button. */
   final AbstractButton go;
-  /** Indent button. */
-  final AbstractButton indent;
   /** Test button. */
   final AbstractButton test;
 
@@ -129,7 +127,6 @@ public final class EditorView extends View {
         BaseXKeys.EXEC.toString()), false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
-    indent = BaseXButton.command(GUIMenuCmd.C_INDENT_RESULT, gui);
     test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
         BaseXKeys.TESTS.toString()), false, gui);
 
@@ -142,7 +139,6 @@ public final class EditorView extends View {
     buttons.add(go);
     buttons.add(stop);
     buttons.add(vars);
-    buttons.add(indent);
     buttons.add(test);
     buttons.addSeparator();
     buttons.add(find);
@@ -244,7 +240,6 @@ public final class EditorView extends View {
     for(final EditorArea edit : editors()) edit.refreshLayout(mfont);
     project.refreshLayout();
     search.refreshLayout();
-    indent.setSelected(GUIMenuCmd.C_INDENT_RESULT.selected(gui));
   }
 
   @Override

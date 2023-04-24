@@ -209,7 +209,7 @@ public enum GUIMenuCmd implements GUICommand {
     public void execute(final GUI gui) {
       final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
       sopts.put(SerializerOptions.INDENT, selected(gui) ? YesNo.NO : YesNo.YES);
-      gui.editor.refreshLayout();
+      gui.layoutViews();
     }
 
     @Override

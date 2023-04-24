@@ -88,7 +88,8 @@ public final class GUIConstants {
     C_CREATE, C_OPEN_MANAGE, C_PROPERTIES, C_CLOSE, null,
     C_SHOW_EDITOR, C_SHOW_RESULT, C_SHOW_INFO, null,
     C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE, null,
-    C_GO_HOME, C_GO_BACK, C_GO_UP, C_GO_FORWARD, C_FILTER_NODES, null, C_PREFERENCES
+    C_GO_HOME, C_GO_BACK, C_GO_UP, C_GO_FORWARD, C_FILTER_NODES, null,
+    C_INDENT_RESULT, C_PREFERENCES
   };
 
   // MENUBARS =====================================================================================
@@ -119,9 +120,10 @@ public final class GUIConstants {
   }, {
     C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE,
   }, {
+    C_INDENT_RESULT, SEPARATOR,
     C_RT_EXECUTION, C_RT_FILTERING, SEPARATOR,
-    C_COLOR, C_FONTS, SEPARATOR, C_PACKAGES, Prop.MAC ? null : SEPARATOR,
-    Prop.MAC ? null : C_PREFERENCES
+    C_PACKAGES, Prop.MAC ? null : SEPARATOR,
+    C_COLOR, C_FONTS, Prop.MAC ? null : C_PREFERENCES
   }, {
     C_HELP, SEPARATOR, C_COMMUNITY, C_CHECK_FOR_UPDATES, SEPARATOR,
     C_SHOW_MEM, Prop.MAC ? null : C_ABOUT
