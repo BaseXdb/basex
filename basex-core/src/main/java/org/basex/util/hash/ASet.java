@@ -1,6 +1,7 @@
 package org.basex.util.hash;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.util.*;
 
@@ -65,6 +66,14 @@ public abstract class ASet {
    * Resizes the hash table.
    */
   protected final void checkSize() {
+    checkSize((id, bucket) -> { });
+  }
+
+  /**
+   * Resizes the hash table.
+   * @param relocateAction action to be executed while relocating id to new bucket.
+   */
+  protected final void checkSize(final BiConsumer<Integer, Integer> relocateAction) {
     if(size < capacity()) return;
 
     final int newSize = size << 1;
@@ -75,6 +84,7 @@ public abstract class ASet {
       while(id != 0) {
         final int p = hash(id) & newSize - 1;
         final int nx = next[id];
+        relocateAction.accept(id, p);
         next[id] = tmp[p];
         tmp[p] = id;
         id = nx;
