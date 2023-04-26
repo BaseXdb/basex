@@ -69,7 +69,7 @@ public final class FnData extends ContextFn {
       expr = input;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // if(data($node))  ->  if($node/descendant::text())
-      expr = simplifyEbv(input, cc);
+      expr = simplifyEbv(input, cc, null);
     }
     return cc.simplify(this, expr, mode);
   }

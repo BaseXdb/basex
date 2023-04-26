@@ -10,7 +10,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -284,13 +283,8 @@ public abstract class Preds extends Arr {
     }
 
     // rewrite to path: root[path]  ->  root/path
-    // rewrite to path: root[data()]  ->  root/descendant::text()
     if(rst.type instanceof NodeType) {
-      Expr expr = createExpr.apply(last, false);
-      if(expr == this && (Function.DATA.is(last) || Function.STRING.is(last))) {
-        final ContextFn func = (ContextFn) last;
-        if(func.contextAccess()) expr = func.simplifyEbv(root, cc);
-      }
+      final Expr expr = createExpr.apply(last, false);
       if(expr != this) return expr;
     }
 

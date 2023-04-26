@@ -2289,6 +2289,32 @@ public final class RewritingsTest extends QueryPlanTest {
     check("boolean(string-length(" + wrap("A") + "))", true, exists(STRING));
   }
 
+  /** Faster data/string checks. */
+  @Test public void gh1975() {
+    final String checkSteps = count(IterStep.class, 2);
+
+    String input = "<x><a>A</a></x>", output = "<a>A</a>";
+    check(input + "/*[string-length() > 0]", output, checkSteps);
+    check(input + "/*[string-length(.) > 0]", output, checkSteps);
+    check(input + "/*[string()]", output, checkSteps);
+    check(input + "/*[string(.)]", output, checkSteps);
+    check(input + "/*[data()]", output, checkSteps);
+    check(input + "/*[data(.)]", output, checkSteps);
+    check(input + "/*[normalize-space()]", output, checkSteps, exists(NORMALIZE_SPACE));
+    check(input + "/*[normalize-space(.)]", output, checkSteps, exists(NORMALIZE_SPACE));
+
+    input = "<x><a>{ ' ' }</a></x>";
+    output = "<a> </a>";
+    check(input + "/*[string-length() > 0]", output, checkSteps);
+    check(input + "/*[string-length(.) > 0]", output, checkSteps);
+    check(input + "/*[string()]", output, checkSteps);
+    check(input + "/*[string(.)]", output, checkSteps);
+    check(input + "/*[data()]", output, checkSteps);
+    check(input + "/*[data(.)]", output, checkSteps);
+    check(input + "/*[normalize-space()]", "", checkSteps, exists(NORMALIZE_SPACE));
+    check(input + "/*[normalize-space(.)]", "", checkSteps, exists(NORMALIZE_SPACE));
+  }
+
   /** Axis steps: Rewrites. */
   @Test public void gh1976() {
     check("document { }/parent::node()", "", root(Empty.class));

@@ -88,12 +88,18 @@ public abstract class ContextFn extends StandardFunc {
    * Optimizes EBV checks.
    * @param cc compilation context
    * @param expr context expression (can be {@code null})
+   * @param pred function for creating a predicate (can be {@code null})
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public final Expr simplifyEbv(final Expr expr, final CompileContext cc) throws QueryException {
+  public final Expr simplifyEbv(final Expr expr, final CompileContext cc,
+      final QuerySupplier<Expr> pred) throws QueryException {
     final SeqType st = expr.seqType();
-    return st.instanceOf(SeqType.ELEMENT_O) || st.instanceOf(SeqType.DOCUMENT_NODE_O) ?
-      Path.get(cc, info, expr, Step.get(cc, expr, info, Axis.DESCENDANT, KindTest.TEXT)) : this;
+    if(st.instanceOf(SeqType.ELEMENT_O) || st.instanceOf(SeqType.DOCUMENT_NODE_O)) {
+      final Expr[] preds = pred != null ? new Expr[] { pred.get() } : new Expr[0];
+      final Expr step = Step.get(cc, expr, info, Axis.DESCENDANT, KindTest.TEXT, preds);
+      return Path.get(cc, info, expr, step);
+    }
+    return this;
   }
 }

@@ -175,7 +175,7 @@ public final class CompileContext {
   }
 
   /**
-   * Evaluates a function in the given focus.
+   * Evaluates a function within the focus of the supplied expression.
    * @param expr focus expression (can be {@code null})
    * @param func function to evaluate
    * @return resulting expression
@@ -191,7 +191,7 @@ public final class CompileContext {
   }
 
   /**
-   * Evaluates a function in the given focus.
+   * Evaluates a function within the focus of the supplied expression.
    * @param expr focus expression (can be {@code null})
    * @param func function to evaluate
    * @return result of check

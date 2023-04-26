@@ -52,7 +52,7 @@ public final class FnString extends ContextFn {
       expr = item;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // boolean(string($node))  ->  boolean($node/descendant::text())
-      expr = simplifyEbv(item, cc);
+      expr = simplifyEbv(item, cc, null);
     }
     return cc.simplify(this, expr, mode);
   }
