@@ -88,7 +88,7 @@ public abstract class FNode extends ANode {
 
     final TokenBuilder tb = new TokenBuilder();
     for(final ANode node : nodes) {
-      if(node.type == NodeType.ELEMENT || node.type == NodeType.TEXT) tb.add(node.string());
+      if(node.type.oneOf(NodeType.ELEMENT, NodeType.TEXT)) tb.add(node.string());
     }
     return tb.finish();
   }

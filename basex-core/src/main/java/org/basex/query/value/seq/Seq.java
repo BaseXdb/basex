@@ -209,7 +209,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final SeqType seqType() {
-    return SeqType.get(type, Occ.ONE_OR_MORE);
+    return type.seqType(Occ.ONE_OR_MORE);
   }
 
   @Override

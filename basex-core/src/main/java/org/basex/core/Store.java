@@ -268,7 +268,7 @@ public final class Store implements Closeable {
    */
   public static synchronized void write(final DataOutput out, final Value value)
       throws IOException, QueryException {
-    out.writeNum(value.seqType().type.id().asByte());
+    out.writeNum(value.seqType().type.index());
     final long size = value.size();
     out.writeLong(size);
     if(size == 1) {
@@ -280,7 +280,7 @@ public final class Store implements Closeable {
         final boolean same = value.sameType();
         out.writeBool(same);
         for(final Item item : value) {
-          if(!same) out.writeNum(item.type.id().asByte());
+          if(!same) out.writeNum(item.type.index());
           item.write(out);
         }
       } else {
@@ -302,7 +302,7 @@ public final class Store implements Closeable {
       throws IOException, QueryException  {
     qc.checkStop();
     final int id = in.readNum();
-    final Type type = Type.ID.getType(id);
+    final Type type = Types.type(id);
     final long size = in.readLong();
     if(size == 0) return Empty.VALUE;
     if(size == 1) return type.read(in, qc);
@@ -311,7 +311,7 @@ public final class Store implements Closeable {
       final ValueBuilder vb = new ValueBuilder(qc);
       final boolean same = in.readBool();
       for(long s = 0; s < size; s++) {
-        final Type tp = same ? type : Type.ID.getType(in.readNum());
+        final Type tp = same ? type : Types.type(in.readNum());
         vb.add(tp.read(in, qc));
       }
       return vb.value(type);

@@ -123,7 +123,7 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public byte[] id() {
-    return Token.concat(Token.DOLLAR, name.id());
+    return Token.concat(Token.DOLLAR, name.internal());
   }
 
   /**

@@ -54,7 +54,7 @@ public final class Functions {
     for(final FuncDefinition fd : DEFINITIONS) {
       URIS.add(fd.uri);
       final QNm qnm = new QNm(fd.local(), fd.uri());
-      CACHE.put(qnm.id(), qnm);
+      CACHE.put(qnm.internal(), qnm);
     }
   }
 
@@ -84,7 +84,7 @@ public final class Functions {
    * @return function definition if found, {@code null} otherwise
    */
   static FuncDefinition builtIn(final QNm name) {
-    final int id = CACHE.id(name.id());
+    final int id = CACHE.id(name.internal());
     return id != 0 ? DEFINITIONS.get(id - 1) : null;
   }
 

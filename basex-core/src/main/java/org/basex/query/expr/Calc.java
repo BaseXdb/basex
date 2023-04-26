@@ -566,11 +566,12 @@ public enum Calc {
    * @throws QueryException query exception
    */
   static Dur dur(final InputInfo ii, final Item item) throws QueryException {
+    final Type type = item.type;
     if(item instanceof Dur) {
-      if(item.type == DURATION) throw NOSUBDUR_X.get(ii, item);
+      if(type == DURATION) throw NOSUBDUR_X.get(ii, item);
       return (Dur) item;
     }
-    throw NODUR_X_X.get(ii, item.type, item);
+    throw NODUR_X_X.get(ii, type, item);
   }
 
   /**

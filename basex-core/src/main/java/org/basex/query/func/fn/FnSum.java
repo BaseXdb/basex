@@ -154,22 +154,23 @@ public class FnSum extends StandardFunc {
     if(item == null) return null;
 
     Item result = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
+    Type type = result.type;
     final boolean num = result instanceof ANum;
-    final boolean dtd = result.type == DAY_TIME_DURATION, ymd = result.type == YEAR_MONTH_DURATION;
-    if(!num && !dtd && !ymd) throw NUMDUR_X_X.get(info, result.type, result);
+    final boolean dtd = type == DAY_TIME_DURATION, ymd = type == YEAR_MONTH_DURATION;
+    if(!num && !dtd && !ymd) throw NUMDUR_X_X.get(info, type, result);
 
     int c = 1;
     for(Item it; (it = qc.next(iter)) != null;) {
-      final Type type = it.type;
-      Type tp = null;
-      if(type.isNumberOrUntyped()) {
-        if(!num) tp = DURATION;
+      final Type tp = it.type;
+      Type t = null;
+      if(tp.isNumberOrUntyped()) {
+        if(!num) t = DURATION;
       } else if(num) {
-        tp = NUMERIC;
-      } else if(dtd && type != DAY_TIME_DURATION || ymd && type != YEAR_MONTH_DURATION) {
-        tp = DURATION;
+        t = NUMERIC;
+      } else if(dtd && tp != DAY_TIME_DURATION || ymd && tp != YEAR_MONTH_DURATION) {
+        t = DURATION;
       }
-      if(tp != null) throw ARGTYPE_X_X_X.get(info, tp, type, it);
+      if(t != null) throw ARGTYPE_X_X_X.get(info, t, tp, it);
       result = Calc.PLUS.eval(result, it, info);
       c++;
     }

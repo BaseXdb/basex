@@ -79,9 +79,9 @@ public final class ArrayType extends FuncType {
   }
 
   @Override
-  public Type intersect(final Type type) {
+  public ArrayType intersect(final Type type) {
     if(instanceOf(type)) return this;
-    if(type.instanceOf(this)) return type;
+    if(type.instanceOf(this)) return (ArrayType) type;
 
     if(!(type instanceof FuncType) || type instanceof MapType) return null;
 
@@ -91,8 +91,7 @@ public final class ArrayType extends FuncType {
 
     if(type instanceof ArrayType) return get(dt);
 
-    return ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.INTEGER_O) ?
-      new FuncType(dt, ft.argTypes[0].union(SeqType.INTEGER_O)) : null;
+    return null;
   }
 
   @Override
@@ -102,7 +101,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public ID id() {
-    return Type.ID.ARRAY;
+    return ID.ARRAY;
   }
 
   /**

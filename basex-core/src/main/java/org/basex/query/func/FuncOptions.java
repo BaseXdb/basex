@@ -91,8 +91,9 @@ public final class FuncOptions {
         if(item instanceof XQMap) {
           options.assign((XQMap) item, enforceKnown, info);
         } else {
-          if(test == null) throw MAP_X_X.get(info, item.type, item);
-          if(!test.matches(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), item.type, item);
+          final Type type = item.type;
+          if(test == null) throw MAP_X_X.get(info, type, item);
+          if(!test.matches(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), type, item);
           options.assign(toString((ANode) item, error));
         }
       } catch(final BaseXException ex) {

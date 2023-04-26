@@ -170,7 +170,7 @@ public final class ArrayBuilder {
    * @param type array type
    * @return resulting array
    */
-  public XQArray array(final Type type) {
+  public XQArray array(final ArrayType type) {
     final int n = inLeft + inRight;
     if(n == 0) return XQArray.empty();
 
@@ -201,7 +201,7 @@ public final class ArrayBuilder {
    * @return resulting array
    */
   public XQArray array(final Expr expr) {
-    return expr != null ? array(expr.seqType().type) : array();
+    return expr != null ? array((ArrayType) expr.seqType().type) : array();
   }
 
   @Override

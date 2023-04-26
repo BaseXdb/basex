@@ -157,7 +157,8 @@ public abstract class Formatter extends FormatUtil {
         BigDecimal frac = null;
         long num = 0;
 
-        final boolean dat = date.type == AtomType.DATE, tim = date.type == AtomType.TIME;
+        final Type type = date.type;
+        final boolean dat = type == AtomType.DATE, tim = type == AtomType.TIME;
         boolean err = false;
         switch(compSpec) {
           case 'Y':
@@ -240,7 +241,7 @@ public abstract class Formatter extends FormatUtil {
           default:
             throw INVCOMPSPEC_X.get(ii, marker);
         }
-        if(err) throw PICINVCOMP_X_X_X.get(ii, marker, date.type, date);
+        if(err) throw PICINVCOMP_X_X_X.get(ii, marker, type, date);
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier

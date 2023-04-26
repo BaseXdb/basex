@@ -100,7 +100,7 @@ public final class DataBuilder {
    */
   private int addNode(final ANode node, final int pre, final int par) {
     if(qc != null) qc.checkStop();
-    switch(node.nodeType()) {
+    switch((NodeType) node.type) {
       case DOCUMENT_NODE: return addDoc(node, pre);
       case ELEMENT: return addElem(node, pre, par);
       case TEXT: return addText(node, pre, par);
@@ -290,7 +290,7 @@ public final class DataBuilder {
   public static ANode stripNamespace(final ANode node, final byte[] uri, final Context ctx)
       throws QueryException {
 
-    if(node.type != NodeType.ELEMENT && node.type != NodeType.DOCUMENT_NODE) return node;
+    if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) return node;
 
     final MemData data = new MemData(ctx.options);
     final DataBuilder db = new DataBuilder(data, null);
@@ -337,7 +337,7 @@ public final class DataBuilder {
   public static ANode stripNamespaces(final ANode node, final TokenSet prefixes, final Context ctx,
       final InputInfo info) throws QueryException {
 
-    if(node.type != NodeType.ELEMENT && node.type != NodeType.DOCUMENT_NODE) return node;
+    if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) return node;
 
     final MemData data = new MemData(ctx.options);
     final DataBuilder db = new DataBuilder(data, null);

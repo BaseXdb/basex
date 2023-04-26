@@ -71,11 +71,12 @@ public final class Insert extends Update {
         ValueBuilder.concat(item, i2, qc));
 
     final ANode node = (ANode) item, parent = node.parent();
+    final Type type = node.type;
     if(loc) {
-      if(node.type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
+      if(type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
         throw UPTRGTYP2_X.get(info, node);
       if(parent == null) throw UPPAREMPTY_X.get(info, node);
-    } else if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) {
+    } else if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) {
       throw UPTRGTYP_X.get(info, node);
     }
 

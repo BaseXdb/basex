@@ -34,7 +34,7 @@ public final class DocTest extends Test {
     final BasicNodeIter iter = node.childIter();
     boolean found = false;
     for(ANode n; (n = iter.next()) != null;) {
-      if(n.type == NodeType.COMMENT || n.type == NodeType.PROCESSING_INSTRUCTION) continue;
+      if(n.type.oneOf(NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION)) continue;
       if(found || !child.matches(n)) return false;
       found = true;
     }

@@ -168,14 +168,15 @@ public class FuncType implements Type {
   }
 
   @Override
-  public Type intersect(final Type type) {
+  public FuncType intersect(final Type type) {
     if(instanceOf(type)) return this;
-    if(type.instanceOf(this)) return type;
+    if(type.instanceOf(this)) return (FuncType) type;
 
     if(!(type instanceof FuncType)) return null;
-    if(type instanceof MapType || type instanceof ArrayType) return type.intersect(this);
 
     final FuncType ft = (FuncType) type;
+    if(ft instanceof MapType || ft instanceof ArrayType) return ft.intersect(this);
+
     final int al = argTypes.length;
     if(al != ft.argTypes.length) return null;
 

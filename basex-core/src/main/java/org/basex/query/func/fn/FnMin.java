@@ -61,8 +61,8 @@ public class FnMin extends StandardFunc {
     final OpV op = min ? OpV.GT : OpV.LT;
     if(item instanceof AStr) {
       for(Item it; (it = qc.next(iter)) != null;) {
-        if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, it.type, it);
         final Type type2 = it.type;
+        if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, type2, it);
         if(op.eval(item, it, coll, sc, info)) item = it;
         if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, sc, info);
       }
@@ -71,7 +71,8 @@ public class FnMin extends StandardFunc {
     // booleans, dates, durations, binaries
     if(type == BOOLEAN || item instanceof ADate || item instanceof Dur || item instanceof Bin) {
       for(Item it; (it = qc.next(iter)) != null;) {
-        if(type != it.type) throw ARGTYPE_X_X_X.get(info, type, it.type, it);
+        final Type type2 = it.type;
+        if(type != type2) throw ARGTYPE_X_X_X.get(info, type, type2, it);
         if(op.eval(item, it, coll, sc, info)) item = it;
       }
       return item;

@@ -41,8 +41,9 @@ public final class FnBaseUri extends ContextFn {
   public static Uri uri(final ANode node, final Uri staticBase, final InputInfo info)
       throws QueryException {
 
-    if(node == null || node.type != NodeType.ELEMENT && node.type != NodeType.DOCUMENT_NODE &&
-        node.parent() == null) return null;
+    if(node == null) return null;
+    final Type type = node.type;
+    if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE) && node.parent() == null) return null;
 
     Uri base = Uri.EMPTY;
     ANode nd = node;

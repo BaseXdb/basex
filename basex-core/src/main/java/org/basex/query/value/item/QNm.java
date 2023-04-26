@@ -280,7 +280,7 @@ public final class QNm extends Item {
    * </ul>
    * @return QName as token
    */
-  public byte[] id() {
+  public byte[] internal() {
     return uri == null ? name : internal(null, local(), uri);
   }
 
@@ -305,7 +305,7 @@ public final class QNm extends Item {
    * <ul>
    *   <li> Skips the prefix if the namespace of the QName equals the specified one.</li>
    *   <li> Returns a prefixed name if the namespace URI is statically known.</li>
-   *   <li> Otherwise, {@link #id()} is called.</li>
+   *   <li> Otherwise, {@link #internal()} is called.</li>
    * </ul>
    * @param ns default uri (can be {@code null})
    * @return QName as token
@@ -314,7 +314,7 @@ public final class QNm extends Item {
     final byte[] u = uri();
     if(ns != null && Token.eq(u, ns)) return local();
     final byte[] p = NSGlobal.prefix(u);
-    return p.length != 0 ? concat(p, COLON, local()) : id();
+    return p.length != 0 ? concat(p, COLON, local()) : internal();
   }
 
   /**
@@ -332,7 +332,7 @@ public final class QNm extends Item {
 
   @Override
   public int hash(final InputInfo ii) {
-    return Token.hash(id());
+    return Token.hash(internal());
   }
 
   @Override
@@ -350,7 +350,7 @@ public final class QNm extends Item {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(id());
+    qs.token(internal());
   }
 
   // STATIC METHODS ===============================================================================

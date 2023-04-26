@@ -16,6 +16,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
@@ -143,7 +144,8 @@ public class XsltTransform extends XsltFn {
         throw ex.getCause(info);
       }
     }
-    if(item.type.isStringOrUntyped()) return toIO(toString(item));
-    throw STRNOD_X_X.get(info, item.type, item);
+    final Type type = item.type;
+    if(type.isStringOrUntyped()) return toIO(toString(item));
+    throw STRNOD_X_X.get(info, type, item);
   }
 }

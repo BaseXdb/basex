@@ -9,6 +9,7 @@ import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -44,7 +45,7 @@ public final class RenameNode extends NodeUpdate {
   @Override
   public void update(final NamePool pool) {
     final DBNode node = node();
-    pool.add(name, node.nodeType());
+    pool.add(name, (NodeType) node.type);
     pool.remove(node);
   }
 

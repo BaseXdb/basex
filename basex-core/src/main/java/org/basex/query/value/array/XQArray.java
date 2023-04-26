@@ -276,7 +276,8 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final Value get(final Item key, final InputInfo ii) throws QueryException {
-    if(!key.type.instanceOf(AtomType.INTEGER) && !key.type.isUntyped())
+    final Type tp = key.type;
+    if(!tp.instanceOf(AtomType.INTEGER) && !tp.isUntyped())
       throw typeError(key, AtomType.INTEGER, ii);
 
     final long pos = key.itr(ii), size = arraySize();

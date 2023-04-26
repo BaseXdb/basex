@@ -167,14 +167,13 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] name() {
-    return type == NodeType.ELEMENT || type == NodeType.ATTRIBUTE ||
-        type == NodeType.PROCESSING_INSTRUCTION ? data.name(pre, kind(nodeType())) : null;
+    return type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION) ?
+      data.name(pre, kind((NodeType) type)) : null;
   }
 
   @Override
   public final QNm qname() {
-    if(type == NodeType.ELEMENT || type == NodeType.ATTRIBUTE ||
-        type == NodeType.PROCESSING_INSTRUCTION) {
+    if(type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION)) {
       final byte[][] qname = data.qname(pre, kind());
       return new QNm(qname[0], qname[1]);
     }
@@ -229,7 +228,7 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode finish() {
-    return new DBNode(data, pre, root, nodeType());
+    return new DBNode(data, pre, root, (NodeType) type);
   }
 
   @Override

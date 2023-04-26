@@ -74,19 +74,20 @@ public final class List extends Arr {
 
     // pre-evaluate list; skip expressions with large result sizes
     if(allAreValues(true)) {
-      Type tp = null;
+      Type type = null;
       final Value[] values = new Value[el];
       int vl = 0;
       for(final Expr expr : exprs) {
         cc.qc.checkStop();
         final Value value = expr.value(cc.qc);
-        if(vl == 0) tp = value.type;
-        else if(tp != null && !tp.eq(value.type)) tp = null;
+        final Type tp = value.type;
+        if(vl == 0) type = tp;
+        else if(type != null && !type.eq(tp)) type = null;
         values[vl++] = value;
       }
 
       // result size will be small enough to be cast to an integer
-      Value value = Seq.get((int) size, tp, values);
+      Value value = Seq.get((int) size, type, values);
       if(value == null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
         for(int v = 0; v < vl; v++) vb.add(values[v]);

@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public interface Type {
-  /** Type IDs for client/server communication. */
+  /** Type IDs. */
   enum ID {
     // function types
     /** function(*).              */ FUN(7),
@@ -92,39 +92,38 @@ public interface Type {
     /** xs:QName.                 */ QNM(82, true),
     /** xs:NOTATION.              */ NOT(83),
     /** xs:numeric.               */ NUM(84),
-    /** java().                   */ JAVA(86);
+    /** java().                   */ JAVA(86),
+    /** last dummy type.          */ LAST(87);
 
-    /** Cached enums (faster). */
-    public static final ID[] VALUES = values();
-    /** Node ID. */
-    private final byte id;
+    /** Type index. */
+    private final byte index;
     /** Extended type information. */
-    private final boolean ext;
+    private final boolean extended;
 
     /**
      * Constructor.
-     * @param id type id
+     * @param index type index
      */
-    ID(final int id) {
-      this(id, false);
+    ID(final int index) {
+      this(index, false);
     }
 
     /**
      * Constructor.
-     * @param id type id
-     * @param ext extended type information
+     * @param index type index
+     * @param extended extended type information
      */
-    ID(final int id, final boolean ext) {
-      this.id = (byte) id;
-      this.ext = ext;
+    ID(final int index, final boolean extended) {
+      this.index = (byte) index;
+      this.extended = extended;
     }
 
     /**
-     * Returns the type ID. Also called by XQJ.
-     * @return type ID
+     * Returns the type index. Also called by XQJ.
+     * @return type index
      */
     public byte asByte() {
-      return id;
+      return index;
     }
 
     /**
@@ -132,36 +131,9 @@ public interface Type {
      * @return result of check
      */
     public boolean isExtended() {
-      return ext;
+      return extended;
     }
-
-    /**
-     * Gets the specified ID.
-     * @param id id
-     * @return type ID if found, {@code null} otherwise
-     */
-    public static ID get(final int id) {
-      for(final ID value : VALUES) {
-        if(value.id == id) return value;
-      }
-      return null;
-    }
-
-    /**
-     * Gets the specified type instance.
-     * @param id id
-     * @return corresponding type if found, {@code null} otherwise
-     */
-    public static Type getType(final int id) {
-      final ID i = get(id);
-      if(i == null) return null;
-      if(i == FUN) return SeqType.FUNCTION;
-      if(i == MAP) return SeqType.MAP;
-      if(i == ARRAY) return SeqType.ARRAY;
-      final Type type = AtomType.getType(i);
-      return type != null ? type : NodeType.getType(i);
-    }
-  }
+  };
 
   /**
    * Casts the specified item to this type.
@@ -292,10 +264,18 @@ public interface Type {
   AtomType atomic();
 
   /**
-   * Returns a type id to differentiate all types.
+   * Returns the type id.
    * @return id
    */
   ID id();
+
+  /**
+   * Returns the type index.
+   * @return id
+   */
+  default byte index() {
+    return id().asByte();
+  }
 
   /**
    * Checks if the type is namespace-sensitive.

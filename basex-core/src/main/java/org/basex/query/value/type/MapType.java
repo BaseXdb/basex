@@ -84,9 +84,9 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public Type intersect(final Type type) {
+  public MapType intersect(final Type type) {
     if(instanceOf(type)) return this;
-    if(type.instanceOf(this)) return type;
+    if(type.instanceOf(this)) return (MapType) type;
 
     if(!(type instanceof FuncType) || type instanceof ArrayType) return null;
 
@@ -95,13 +95,11 @@ public final class MapType extends FuncType {
     if(dt == null) return null;
 
     if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
-      final AtomType kt = (AtomType) keyType().intersect(mt.keyType());
-      return kt != null ? get(kt, dt) : null;
+      final Type kt = keyType().intersect(((MapType) type).keyType());
+      if(kt instanceof AtomType) return get((AtomType) kt, dt);
     }
 
-    return ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O) ?
-      new FuncType(dt, ft.argTypes[0].union(SeqType.ANY_ATOMIC_TYPE_O)) : null;
+    return null;
   }
 
   /**
@@ -114,7 +112,7 @@ public final class MapType extends FuncType {
 
   @Override
   public ID id() {
-    return Type.ID.MAP;
+    return ID.MAP;
   }
 
   /**

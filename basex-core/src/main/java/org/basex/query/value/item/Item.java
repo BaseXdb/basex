@@ -335,7 +335,7 @@ public abstract class Item extends Value {
 
   /**
    * Returns data model info.
-   * Overwritten by {@link QNm}, {@link DBNode}, {@link FTxt} and {@link FDoc}.
+   * Overwritten by {@link QNm}, {@link DBNode}, {@link FAttr} and {@link FDoc}.
    * @return type string
    */
   public byte[] xdmInfo() {

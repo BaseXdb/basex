@@ -20,8 +20,11 @@ public class FnNodeName extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNodeOrNull(context(qc), qc);
-    return node == null || empty(node.type) ||
-      node.type == NAMESPACE_NODE && node.name().length == 0 ? Empty.VALUE : node.qname();
+    if(node == null) return Empty.VALUE;
+
+    final Type type = node.type;
+    return empty(type) || type == NAMESPACE_NODE && node.name().length == 0 ? Empty.VALUE :
+      node.qname();
   }
 
   @Override

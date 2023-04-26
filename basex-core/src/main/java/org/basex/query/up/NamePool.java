@@ -35,9 +35,12 @@ public final class NamePool {
    * @param node node
    */
   public void remove(final ANode node) {
-    if(node.type != NodeType.ATTRIBUTE && node.type != NodeType.ELEMENT) return;
-    final int i = index(node.qname(), node.type == NodeType.ATTRIBUTE);
-    cache[i].del = true;
+    final Type type = node.type;
+    final boolean elem = type == NodeType.ELEMENT, attr = type == NodeType.ATTRIBUTE;
+    if(elem || attr) {
+      final int i = index(node.qname(), attr);
+      cache[i].del = true;
+    }
   }
 
   /**

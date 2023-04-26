@@ -126,11 +126,12 @@ public abstract class JsonSerializer extends StandardSerializer {
   @Override
   protected void atomic(final Item item) throws IOException {
     try {
-      if(item.type.isNumber()) {
+      final Type type = item.type;
+      if(type.isNumber()) {
         final byte[] str = item.string(null);
         if(eq(str, NAN, INF, NEGATVE_INF)) throw SERNUMBER_X.getIO(str);
         out.print(str);
-      } else if(item.type == AtomType.BOOLEAN) {
+      } else if(type == AtomType.BOOLEAN) {
         out.print(item.string(null));
       } else {
         string(item.string(null));

@@ -16,6 +16,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -140,7 +141,8 @@ abstract class ValidateFn extends StandardFunc {
       return io;
     }
 
-    if(item.type.isStringOrUntyped()) {
+    final Type type = item.type;
+    if(type.isStringOrUntyped()) {
       IO io = toIO(toString(item));
       if(sopts != null) {
         // add doctype declaration if specified
@@ -150,6 +152,6 @@ abstract class ValidateFn extends StandardFunc {
       return io;
     }
 
-    throw STRNOD_X_X.get(info, item.type, item);
+    throw STRNOD_X_X.get(info, type, item);
   }
 }

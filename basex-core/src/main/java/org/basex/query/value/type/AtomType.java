@@ -707,7 +707,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
@@ -727,7 +727,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
@@ -747,7 +747,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
@@ -767,7 +767,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
@@ -787,7 +787,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
-      if(item.type == DATE_TIME || item.type == DATE) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(ii), this, ii);
       throw typeError(item, this, ii);
     }
@@ -893,7 +893,8 @@ public enum AtomType implements Type {
     public QNm cast(final Item item, final QueryContext qc, final StaticContext sc,
         final InputInfo ii) throws QueryException {
 
-      if(item.type != STRING && !item.type.isUntyped()) throw typeError(item, this, ii);
+      final Type type = item.type;
+      if(type != STRING && !type.isUntyped()) throw typeError(item, this, ii);
       final byte[] name = trim(item.string(ii));
       if(XMLToken.isQName(name)) {
         final QNm qnm = qc.shared.qname(name, sc.ns.uri(prefix(name)));
@@ -919,7 +920,7 @@ public enum AtomType implements Type {
   private static final Pattern LANGPATTERN = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z\\d]{1,8})*");
 
   /** Cached enums (faster). */
-  public static final AtomType[] VALUES = values();
+  private static final AtomType[] VALUES = values();
 
   /** Name. */
   private final byte[] name;
@@ -928,8 +929,8 @@ public enum AtomType implements Type {
   /** URI. */
   private final byte[] uri;
 
-  /** Type id . */
-  private final Type.ID id;
+  /** Type ID. */
+  private final ID id;
   /** Number flag. */
   private final boolean numeric;
   /** Untyped flag. */
@@ -953,10 +954,10 @@ public enum AtomType implements Type {
    * @param untyped untyped flag
    * @param string string flag
    * @param sortable sortable flag
-   * @param id type id
+   * @param id type ID
    */
   AtomType(final String name, final AtomType parent, final byte[] uri, final boolean numeric,
-      final boolean untyped, final boolean string, final boolean sortable, final Type.ID id) {
+      final boolean untyped, final boolean string, final boolean sortable, final ID id) {
     this.name = token(name);
     this.parent = parent;
     this.uri = uri;
@@ -1064,7 +1065,7 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final Type.ID id() {
+  public final ID id() {
     return id;
   }
 
@@ -1221,18 +1222,6 @@ public enum AtomType implements Type {
       }
     }
     return QueryError.similar(qname.prefixId(XML), similar);
-  }
-
-  /**
-   * Gets the type instance for the given ID.
-   * @param id type ID
-   * @return corresponding type if found, {@code null} otherwise
-   */
-  static Type getType(final Type.ID id) {
-    for(final AtomType type : VALUES) {
-      if(type.id == id) return type;
-    }
-    return null;
   }
 
   /**

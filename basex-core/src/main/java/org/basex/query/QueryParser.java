@@ -615,7 +615,7 @@ public class QueryParser extends InputParser {
     final QNm name = def ? QNm.EMPTY : eQName(null, QNAME_X);
 
     // check if format has already been declared
-    if(sc.decFormats.get(name.id()) != null) throw error(DECDUPL);
+    if(sc.decFormats.get(name.internal()) != null) throw error(DECDUPL);
 
     // create new format
     final TokenMap map = new TokenMap();
@@ -635,7 +635,7 @@ public class QueryParser extends InputParser {
     } while(n != map.size());
 
     // completes the format declaration
-    sc.decFormats.put(name.id(), new DecFormatter(map, info()));
+    sc.decFormats.put(name.internal(), new DecFormatter(map, info()));
     return true;
   }
 
@@ -1028,7 +1028,7 @@ public class QueryParser extends InputParser {
 
     final TokenObjMap<Var> curr = new TokenObjMap<>();
     for(final Clause fl : clauses)
-      for(final Var var : fl.vars()) curr.put(var.name.id(), var);
+      for(final Var var : fl.vars()) curr.put(var.name.internal(), var);
 
     int size;
     do {
@@ -1036,7 +1036,7 @@ public class QueryParser extends InputParser {
         size = clauses.size();
         initialClause(clauses);
         for(final Clause clause : clauses) {
-          for(final Var var : clause.vars()) curr.put(var.name.id(), var);
+          for(final Var var : clause.vars()) curr.put(var.name.internal(), var);
         }
       } while(size < clauses.size());
 
@@ -1053,7 +1053,7 @@ public class QueryParser extends InputParser {
 
         // find all non-grouping variables that aren't shadowed
         final ArrayList<VarRef> ng = new ArrayList<>();
-        for(final GroupSpec spec : specs) curr.put(spec.var.name.id(), spec.var);
+        for(final GroupSpec spec : specs) curr.put(spec.var.name.internal(), spec.var);
         VARS:
         for(final Var var : curr.values()) {
           for(final GroupSpec spec : specs) {
@@ -1071,7 +1071,7 @@ public class QueryParser extends InputParser {
           // sequence isn't compatible with the type and can't be assigned
           final Var nv = localVars.add(new Var(ref.var.name, null, qc, sc, ref.var.info));
           ngrp[i] = nv;
-          curr.put(nv.name.id(), nv);
+          curr.put(nv.name.internal(), nv);
         }
         clauses.add(new GroupBy(specs, ng.toArray(VarRef[]::new), ngrp, specs[0].info()));
       }
@@ -1095,7 +1095,7 @@ public class QueryParser extends InputParser {
 
       if(wsConsumeWs(COUNT, "$", NOCOUNT)) {
         final Var var = localVars.add(newVar(SeqType.INTEGER_O));
-        curr.put(var.name.id(), var);
+        curr.put(var.name.internal(), var);
         clauses.add(new Count(var));
       }
     } while(size < clauses.size());

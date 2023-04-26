@@ -77,7 +77,7 @@ public final class User {
         passwords.put(algorithm, ec);
 
         for(final ANode code : children(child)) {
-          final Code cd = value(name, code.qname().id(), algorithm.codes);
+          final Code cd = value(name, code.qname().internal(), algorithm.codes);
           if(ec.containsKey(cd)) throw new BaseXException(
               name + ", " + algorithm + ": Code \"" + code + "\" supplied more than once.");
           ec.put(cd, string(code.string()));

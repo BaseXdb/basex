@@ -43,15 +43,15 @@ public final class FnPath extends ContextFn {
       }
       // root node: finalize traversal
       final ANode parent = node.parent();
+      final NodeType type = (NodeType) node.type;
       if(parent == null) {
-        if(node.type != NodeType.DOCUMENT_NODE) tb.add(ROOT);
+        if(type != NodeType.DOCUMENT_NODE) tb.add(ROOT);
         break;
       }
 
       final QNm qname = node.qname();
-      final NodeType type = (NodeType) node.type;
       if(type == NodeType.ATTRIBUTE) {
-        tb.add('@').add(qname.id());
+        tb.add('@').add(qname.internal());
       } else if(type == NodeType.ELEMENT) {
         tb.add(qname.eqName()).add('[').addInt(element(node, qname, qc)).add(']');
       } else if(type == NodeType.COMMENT || type == NodeType.TEXT) {
@@ -118,9 +118,10 @@ public final class FnPath extends ContextFn {
   private static int pi(final ANode node, final QNm qname, final QueryContext qc) {
     final BasicNodeIter iter = node.precedingSiblingIter();
     int p = 1;
+    final Type type = node.type;
     for(ANode fs; (fs = iter.next()) != null;) {
       qc.checkStop();
-      if(fs.type == node.type && fs.qname().eq(qname)) p++;
+      if(fs.type == type && fs.qname().eq(qname)) p++;
     }
     return p;
   }

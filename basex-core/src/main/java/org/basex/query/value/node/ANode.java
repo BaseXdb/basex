@@ -224,8 +224,7 @@ public abstract class ANode extends Item {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) {
-    return type == PROCESSING_INSTRUCTION || type == COMMENT ?
-      Str.get(string()) : Atm.get(string());
+    return type.oneOf(PROCESSING_INSTRUCTION, COMMENT) ? Str.get(string()) : Atm.get(string());
   }
 
   @Override
@@ -672,7 +671,7 @@ public abstract class ANode extends Item {
    * @return node kind
    */
   public int kind() {
-    return kind(nodeType());
+    return kind((NodeType) type);
   }
 
   /**
@@ -703,12 +702,4 @@ public abstract class ANode extends Item {
 
   @Override
   public abstract BXNode toJava() throws QueryException;
-
-  /**
-   * Returns this Node's node type.
-   * @return node type
-   */
-  public final NodeType nodeType() {
-    return (NodeType) type;
-  }
 }

@@ -93,7 +93,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
       for(final Entry<String, String> e : map.entrySet()) {
         tm.put(Token.token(e.getKey()), Token.token(e.getValue()));
       }
-      qp.sc.decFormats.put(new QNm(name).id(), new DecFormatter(tm, null));
+      qp.sc.decFormats.put(new QNm(name).internal(), new DecFormatter(tm, null));
       return this;
     } catch(final QueryException ex) {
       throw new XQueryException(ex);

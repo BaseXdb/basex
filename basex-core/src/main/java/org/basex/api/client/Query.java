@@ -4,7 +4,7 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type.ID;
+import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -106,7 +106,7 @@ public abstract class Query implements Closeable {
    * @return item type
    */
   public final Type type() {
-    return ID.getType(types.get(pos - 1));
+    return Types.type(types.get(pos - 1));
   }
 
   /**
@@ -119,10 +119,10 @@ public abstract class Query implements Closeable {
     cache = new TokenList();
     types = new ByteList();
     final ByteList bl = new ByteList();
-    for(int t; (t = input.read()) > 0;) {
+    for(int index; (index = input.read()) > 0;) {
       // skip type information
       if(full) {
-        final ID id = ID.get(t);
+        final ID id = Types.type(index).id();
         if(id != null && id.isExtended()) {
           while(input.read() > 0);
         }
@@ -131,7 +131,7 @@ public abstract class Query implements Closeable {
       final ServerInput si = new ServerInput(input);
       for(int b; (b = si.read()) != -1;) bl.add(b);
       cache.add(bl.next());
-      types.add(t);
+      types.add(index);
     }
     pos = 0;
   }

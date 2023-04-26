@@ -48,11 +48,12 @@ public final class Rename extends Update {
     if(item2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2, qc));
 
     final CNode ex;
-    if(item.type == NodeType.ELEMENT) {
+    final Type type = item.type;
+    if(type == NodeType.ELEMENT) {
       ex = new CElem(sc, info, false, exprs[1], new Atts());
-    } else if(item.type == NodeType.ATTRIBUTE) {
+    } else if(type == NodeType.ATTRIBUTE) {
       ex = new CAttr(sc, info, false, exprs[1], Empty.VALUE);
-    } else if(item.type == NodeType.PROCESSING_INSTRUCTION) {
+    } else if(type == NodeType.PROCESSING_INSTRUCTION) {
       ex = new CPI(sc, info, false, exprs[1], Empty.VALUE);
     } else {
       throw UPWRTRGTYP_X.get(info, item);
@@ -62,7 +63,7 @@ public final class Rename extends Update {
     final ANode target = (ANode) item;
 
     // check namespace conflicts...
-    if(target.type == NodeType.ELEMENT || target.type == NodeType.ATTRIBUTE) {
+    if(target.type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE)) {
       final byte[] rp = rename.prefix(), ru = rename.uri();
       final Atts at = target.nsScope(sc);
       final int as = at.size();

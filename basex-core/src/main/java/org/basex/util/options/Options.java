@@ -7,7 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -15,8 +15,9 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -380,7 +381,7 @@ public class Options implements Iterable<Option<?>> {
 
     final String nm;
     if(name instanceof QNm) {
-      nm = string(((QNm) name).id());
+      nm = string(((QNm) name).internal());
     } else if(name.type.isStringOrUntyped()) {
       nm = string(name.string(ii));
     } else {
@@ -390,7 +391,7 @@ public class Options implements Iterable<Option<?>> {
     final Item item;
     if(value.isItem()) {
       // single item: convert QName to string
-      item = value instanceof QNm ? Str.get(((QNm) value).id()) : (Item) value;
+      item = value instanceof QNm ? Str.get(((QNm) value).internal()) : (Item) value;
     } else if(value.size() > 1) {
       // multiple items: create string representation
       final TokenBuilder tb = new TokenBuilder();
@@ -433,7 +434,7 @@ public class Options implements Iterable<Option<?>> {
         tb.add(string(((Item) val).string(ii)).replace(",", ",,"));
       }
     } else if(item instanceof QNm) {
-      tb.add(((QNm) item).id());
+      tb.add(((QNm) item).internal());
     } else {
       tb.add(item.string(ii));
     }
@@ -761,8 +762,9 @@ public class Options implements Iterable<Option<?>> {
 
     Object value = null;
     String expected = null;
+    final Type type = item.type;
     if(option instanceof BooleanOption) {
-      if(item.type.eq(AtomType.BOOLEAN)) {
+      if(type == AtomType.BOOLEAN) {
         value = item.bool(ii);
       } else {
         final String s = string(item.string(ii));
@@ -775,9 +777,9 @@ public class Options implements Iterable<Option<?>> {
       value = serialize(item, ii);
     } else if(option instanceof EnumOption) {
       byte[] token;
-      if(item.type.eq(AtomType.BOOLEAN)) {
+      if(type == AtomType.BOOLEAN) {
         token = item.string(ii);
-      } else if(item.type.isNumber()) {
+      } else if(type.isNumber()) {
         final long l = item.itr(ii);
         token = l == 1 ? TRUE : l == 0 ? FALSE : null;
       } else {

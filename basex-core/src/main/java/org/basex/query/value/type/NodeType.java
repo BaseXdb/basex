@@ -241,8 +241,8 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final Type intersect(final Type type) {
-    return instanceOf(type) ? this : type.instanceOf(this) ? type : null;
+  public final NodeType intersect(final Type type) {
+    return instanceOf(type) ? this : type.instanceOf(this) ? (NodeType) type : null;
   }
 
   @Override
@@ -301,18 +301,6 @@ public enum NodeType implements Type {
       for(final NodeType type : VALUES) {
         if(Token.eq(ln, type.name)) return type;
       }
-    }
-    return null;
-  }
-
-  /**
-   * Gets the type instance for the given ID.
-   * @param id type ID
-   * @return corresponding type if found, {@code null} otherwise
-   */
-  static Type getType(final ID id) {
-    for(final NodeType type : VALUES) {
-      if(type.id == id) return type;
     }
     return null;
   }
