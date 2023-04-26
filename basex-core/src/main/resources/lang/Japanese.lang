@@ -343,6 +343,7 @@ single_cmd           = 単一のコマンドを指定してください。
 size                 = サイズ
 size_text_results    = Size of text results
 skip_corrupt_files   = 不正な（非整形式の）ファイルをスキップする
+skip_empty           = Skip empty fields
 skipped              = スキップしました。
 sort                 = ソート
 split_input_lines    = 改行で分割する

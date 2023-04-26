@@ -20,8 +20,6 @@ final class CsvBuilder extends CsvConverter {
   private final Atts atts = new Atts();
   /** Namespaces. */
   private final Atts nsp = new Atts();
-  /** Record. */
-  private boolean record;
   /** Builder. */
   private final Builder builder;
   /** Current line. */
@@ -29,34 +27,36 @@ final class CsvBuilder extends CsvConverter {
 
   /**
    * Constructor.
-   * @param opts CSV options
+   * @param copts CSV options
    * @param builder builder
    * @throws IOException I/O exception
    */
-  CsvBuilder(final CsvParserOptions opts, final Builder builder) throws IOException {
-    super(opts);
+  CsvBuilder(final CsvParserOptions copts, final Builder builder) throws IOException {
+    super(copts);
     this.builder = builder;
     builder.openElem(Q_CSV.string(), atts, nsp);
   }
 
   @Override
   public void record() throws IOException {
-    if(record) builder.closeElem();
+    finishRecord();
     builder.openElem(Q_RECORD.string(), atts, nsp);
-    record = true;
-    col = 0;
+    column = -1;
     line++;
   }
 
   @Override
   public void header(final byte[] value) {
-    headers.add(ats ? value : XMLToken.encode(value, lax));
+    headers.add(attributes ? value : XMLToken.encode(value, lax));
   }
 
   @Override
   public void entry(final byte[] value) throws IOException {
-    final byte[] elem = Q_ENTRY.string(), name = headers.get(col++);
-    if(ats) {
+    ++column;
+    if(skipEmpty && value.length == 0) return;
+
+    final byte[] elem = Q_ENTRY.string(), name = headers.get(column);
+    if(attributes) {
       if(name == null) {
         builder.openElem(elem, atts, nsp);
       } else {
@@ -77,7 +77,7 @@ final class CsvBuilder extends CsvConverter {
 
   @Override
   protected Str finish() throws IOException {
-    if(record) builder.closeElem();
+    finishRecord();
     builder.closeElem();
     return null;
   }
@@ -90,5 +90,13 @@ final class CsvBuilder extends CsvConverter {
   @Override
   public double progressInfo() {
     return (double) nli.size() / nli.length();
+  }
+
+  /**
+   * Finishes a record.
+   * @throws IOException I/O exception
+   */
+  private void finishRecord() throws IOException {
+    if(column >= 0) builder.closeElem();
   }
 }

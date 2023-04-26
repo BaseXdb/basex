@@ -343,6 +343,7 @@ single_cmd           = une seule commande attendue
 size                 = Taille
 size_text_results    = Taille des résultats textuels
 skip_corrupt_files   = Ignorer les fichiers corrompus (mal formés)
+skip_empty           = Ignorer les champs vides
 skipped              = Ignoré
 sort                 = Trier
 split_input_lines    = Éclater l’entrée en lignes

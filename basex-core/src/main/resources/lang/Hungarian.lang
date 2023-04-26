@@ -343,6 +343,7 @@ single_cmd           = Egyszerű parancs az elvárt.
 size                 = Méret
 size_text_results    = Szöveges eredmények mérete
 skip_corrupt_files   = Korrupt (nem jól formázott) fájlok
+skip_empty           = Skip empty fields
 skipped              = Kihagyva
 sort                 = Rendezés
 split_input_lines    = Bemenet sorokra tördelése

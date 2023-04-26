@@ -343,6 +343,7 @@ single_cmd           = Satu perintah diharapkan.
 size                 = Ukuran
 size_text_results    = Size of text results
 skip_corrupt_files   = Lewatkan berkas yang rusak (tidak sesuai format)
+skip_empty           = Skip empty fields
 skipped              = Terlewat
 sort                 = Sortir
 split_input_lines    = Potong masukan menjadi baris

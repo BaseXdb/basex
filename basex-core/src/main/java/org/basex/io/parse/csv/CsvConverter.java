@@ -32,26 +32,29 @@ public abstract class CsvConverter extends Job {
   /** Headers. */
   protected final TokenList headers = new TokenList(1);
   /** Attributes format. */
-  protected final boolean ats;
+  protected final boolean attributes;
   /** Lax QName conversion. */
   protected final boolean lax;
+  /** Skip empty fields. */
+  protected final boolean skipEmpty;
 
   /** Current input. */
   protected NewlineInput nli;
   /** Current column. */
-  protected int col;
+  protected int column = -1;
 
   /** CSV options. */
   private final CsvParserOptions copts;
 
   /**
    * Constructor.
-   * @param copts json options
+   * @param copts CSV options
    */
   protected CsvConverter(final CsvParserOptions copts) {
     this.copts = copts;
     lax = copts.get(CsvOptions.LAX);
-    ats = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
+    attributes = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
+    skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && copts.get(CsvOptions.HEADER);
   }
 
   /**

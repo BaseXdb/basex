@@ -38,10 +38,16 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X;Y", "'separator': ';'", "...<entry>X</entry><entry>Y</entry>");
     parse("X,Y", "", "...<entry>X</entry><entry>Y</entry>");
 
-    parse("X\nY", "'header': true()", "<csv><record><X>Y</X></record></csv>");
-    parse("A,B,C\nX,Y,Z", "'header': true()", "...<A>X</A><B>Y</B><C>Z</C>");
+    final String header = "'header': true()", skipEmpty = "'skip-empty': true()";
+    parse("X\nY", header, "<csv><record><X>Y</X></record></csv>");
+    parse("A,B,C\nX,Y,Z", header, "...<A>X</A><B>Y</B><C>Z</C>");
 
-    parse("X\nY", "'format': 'attributes', 'header': true()", "...<entry name=\"X\">Y</entry>");
+    parse("X\nY", "'format': 'attributes', " + header, "...<entry name=\"X\">Y</entry>");
+
+    parse("X,Y\n1,", header, "<csv><record><X>1</X><Y/></record></csv>");
+    parse("X,Y\n1,", skipEmpty + ", " + header, "<csv><record><X>1</X></record></csv>");
+    parse("X,Y\n,1", skipEmpty + ", " + header, "<csv><record><Y>1</Y></record></csv>");
+    parse("X,Y\n,", skipEmpty + ", " + header, "<csv/>");
 
     parseError("", "'x': 'y'");
     parseError("", "'format': 'abc'");

@@ -343,6 +343,7 @@ single_cmd           = Single command expected.
 size                 = Хэмжээ
 size_text_results    = Size of text results
 skip_corrupt_files   = Алдаатай (буруу бичигдсэн) файлуудыг алгасах
+skip_empty           = Skip empty fields
 skipped              = Алгассан
 sort                 = Sort
 split_input_lines    = Мөрүүдэд хуваах

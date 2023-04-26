@@ -20,29 +20,32 @@ final class CsvDirectConverter extends CsvConverter {
 
   /**
    * Constructor.
-   * @param opts CSV options
+   * @param copts CSV options
    */
-  CsvDirectConverter(final CsvParserOptions opts) {
-    super(opts);
+  CsvDirectConverter(final CsvParserOptions copts) {
+    super(copts);
   }
 
   @Override
   protected void record() {
-    if(record != null) root.add(record);
+    finishRecord();
     record = FElem.build(Q_RECORD);
-    col = 0;
+    column = -1;
   }
 
   @Override
   protected void header(final byte[] value) {
-    headers.add(shared.token(ats ? value : XMLToken.encode(value, lax)));
+    headers.add(shared.token(attributes ? value : XMLToken.encode(value, lax)));
   }
 
   @Override
   protected void entry(final byte[] value) {
-    final byte[] name = headers.get(col++);
+    ++column;
+    if(skipEmpty && value.length == 0) return;
+
+    final byte[] name = headers.get(column);
     final FBuilder elem;
-    if(ats) {
+    if(attributes) {
       elem = FElem.build(Q_ENTRY).add(Q_NAME, name);
     } else {
       elem = FElem.build(name != null ? shared.qname(name) : Q_ENTRY);
@@ -58,7 +61,14 @@ final class CsvDirectConverter extends CsvConverter {
 
   @Override
   protected FNode finish() {
-    if(record != null) root.add(record);
+    finishRecord();
     return doc.add(root).finish();
+  }
+
+  /**
+   * Finishes a record.
+   */
+  private void finishRecord() {
+    if(record != null && !record.isEmpty()) root.add(record);
   }
 }

@@ -103,15 +103,18 @@ public final class DbModuleTest extends QueryPlanTest {
     query(_DB_GET.args(NAME, "nostrip.xml"), "<a> </a>");
 
     // specify parsing options
-    query(func.args(NAME, CSV, "csv.xml",
+    query(func.args(NAME, CSV, "csv1.xml",
         " map { 'parser': 'csv', 'csvparser': 'header=true' }"));
-    query("exists(" + _DB_GET.args(NAME, "csv.xml") + "//City)", true);
-    query(func.args(NAME, CSV, "csv.xml",
+    query("exists(" + _DB_GET.args(NAME, "csv1.xml") + "//City)", true);
+    query(func.args(NAME, CSV, "csv2.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }"));
-    query("exists(" + _DB_GET.args(NAME, "csv.xml") + "//City)", true);
-    query(func.args(NAME, CSV, "csv.xml",
+    query("exists(" + _DB_GET.args(NAME, "csv2.xml") + "//City)", true);
+    query(func.args(NAME, CSV, "csv3.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'header': true() } }"));
-    query("exists(" + _DB_GET.args(NAME, "csv.xml") + "//City)", true);
+    query("exists(" + _DB_GET.args(NAME, "csv3.xml") + "//City)", true);
+    query(func.args(NAME, CSV, "csv4.xml",
+        " map { 'parser': 'csv', 'csvparser': map { 'header': true(), 'skip-empty': true() } }"));
+    query("empty(" + _DB_GET.args(NAME, "csv4.xml") + "//City)", true);
 
     final String addcache = " map { 'addcache': true() }";
     query(func.args(NAME, " <cache/>", "C1.xml", addcache));

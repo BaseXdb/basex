@@ -343,6 +343,7 @@ single_cmd           = Atteso un singolo comando.
 size                 = Dimensione
 size_text_results    = Dimensione di risultati testuali
 skip_corrupt_files   = Salta i documenti corrotti (non ben formati)
+skip_empty           = Salta i campi vuoti
 skipped              = Saltato
 sort                 = Ordina
 split_input_lines    = Dividi l'input in linee

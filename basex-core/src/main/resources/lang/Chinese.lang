@@ -343,6 +343,7 @@ single_cmd           = 需要一行指令
 size                 = 大小
 size_text_results    = 文本结果大小
 skip_corrupt_files   = 跳过错误（格式不良好的）文件
+skip_empty           = Skip empty fields
 skipped              = 已跳过
 sort                 = 排序
 split_input_lines    = 将输入分为多行

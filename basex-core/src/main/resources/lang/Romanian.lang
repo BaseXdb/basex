@@ -343,6 +343,7 @@ single_cmd           = O singura comanda asteptata
 size                 = Dimensiune
 size_text_results    = Size of text results
 skip_corrupt_files   = Treci peste fisierele corupte (nu foarte bine formatate)
+skip_empty           = Skip empty fields
 skipped              = Trecute peste
 sort                 = Sorteaza
 split_input_lines    = Desparte intrarea în linii

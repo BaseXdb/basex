@@ -343,6 +343,7 @@ single_cmd           = Ожидается одиночная команда
 size                 = Размер
 size_text_results    = Размер текста результата
 skip_corrupt_files   = Игнорировать поврежденные (неверно оформленные) файлы
+skip_empty           = Skip empty fields
 skipped              = Пропущено
 sort                 = Сортировка
 split_input_lines    = Разделять содержимое на строки

@@ -94,7 +94,7 @@ public final class FBuilder {
    * @return self reference
    */
   public FBuilder add(final Object value) {
-    return value != null ? add(token(value.toString())) : null;
+    return value != null ? add(token(value.toString())) : this;
   }
 
   /**
@@ -104,7 +104,7 @@ public final class FBuilder {
    * @return self reference
    */
   public FBuilder add(final QNm name, final byte[] value) {
-    return value != null ? add(new FAttr(name, value)) : null;
+    return value != null ? add(new FAttr(name, value)) : this;
   }
 
   /**

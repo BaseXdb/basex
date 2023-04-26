@@ -1173,6 +1173,8 @@ public interface Text {
   String SEPARATOR = lang("separator") + COL;
   /** Lax name conversion. */
   String LAX_NAME_CONVERSION = lang("lax_name_conversion");
+  /** Skip empty fields. */
+  String SKIP_EMPTY = lang("skip_empty");
   /** Parse quotes. */
   String PARSE_QUOTES = lang("parse_quotes");
   /** Merge type information. */

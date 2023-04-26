@@ -26,27 +26,29 @@ import org.basex.util.list.*;
  */
 final class DialogCsvParser extends DialogParser {
   /** CSV example string. */
-  private static final String EXAMPLE = "Name,Born?_\n\"John, Adam\\\",1984";
+  private static final String EXAMPLE = "Name,Born?,Comment\n\"John, Adam\\\",1984,";
 
   /** Options. */
   private final CsvParserOptions copts;
-  /** JSON example. */
+  /** Example. */
   private final TextPanel example;
-  /** CSV: encoding. */
+  /** Encoding. */
   private final BaseXCombo encoding;
-  /** CSV: Use header. */
+  /** Use header. */
   private final BaseXCheckBox header;
-  /** CSV: format. */
+  /** Format. */
   private final BaseXCombo format;
-  /** CSV: Separator. */
+  /** Separator. */
   private final BaseXCombo seps;
-  /** CSV: Separator (numeric). */
+  /** Separator (numeric). */
   private final BaseXTextField sepchar;
-  /** CSV: Lax name conversion. */
+  /** Lax name conversion. */
   private final BaseXCheckBox lax;
-  /** CSV: Parse quotes. */
+  /** Skip empty fields. */
+  private final BaseXCheckBox skipEmpty;
+  /** Parse quotes. */
   private final BaseXCheckBox quotes;
-  /** CSV: Backslashes. */
+  /** Backslashes. */
   private final BaseXCheckBox backslashes;
 
   /**
@@ -103,6 +105,8 @@ final class DialogCsvParser extends DialogParser {
     p.add(backslashes);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, CsvOptions.LAX, copts);
     p.add(lax);
+    skipEmpty = new BaseXCheckBox(dialog, SKIP_EMPTY, CsvParserOptions.SKIP_EMPTY, copts);
+    p.add(skipEmpty);
 
     pp.add(p);
 
@@ -120,6 +124,7 @@ final class DialogCsvParser extends DialogParser {
       final boolean head = header.isSelected();
       format.setEnabled(head);
       lax.setEnabled(head && copts.get(CsvOptions.FORMAT) == CsvFormat.DIRECT);
+      skipEmpty.setEnabled(head);
 
       final Item item = CsvConverter.get(copts).convert(new IOContent(EXAMPLE));
       example.setText(example(MainParser.CSV.name(), EXAMPLE, item));
@@ -142,6 +147,7 @@ final class DialogCsvParser extends DialogParser {
     copts.set(CsvOptions.LAX, lax.isSelected());
     copts.set(CsvOptions.QUOTES, quotes.isSelected());
     copts.set(CsvOptions.BACKSLASHES, backslashes.isSelected());
+    copts.set(CsvParserOptions.SKIP_EMPTY, skipEmpty.isSelected());
     String sep;
     if(seps.getSelectedIndex() < CsvSep.values().length) {
       sep = seps.getSelectedItem();
