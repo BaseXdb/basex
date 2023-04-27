@@ -236,7 +236,7 @@ public class CmpG extends Cmp {
       // pre-evaluate expression; discard hashed results
       if(allAreValues(false)) {
         expr = cc.preEval(expr);
-        if(hash != null) cc.qc.threads.get(hash).remove();
+        if(hash != null) cc.qc.threads.get(hash, info).remove();
         return expr;
       }
     }

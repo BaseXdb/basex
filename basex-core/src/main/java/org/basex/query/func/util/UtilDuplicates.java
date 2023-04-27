@@ -1,8 +1,11 @@
 package org.basex.query.func.util;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
@@ -23,13 +26,14 @@ public final class UtilDuplicates extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation coll = toCollation(arg(1), qc);
 
-    final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
-    final ItemSet dupl = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
+    final Supplier<ItemSet> newSet = () -> coll == null ? new HashItemSet(false, info) :
+      new CollationItemSet(coll, info);
+    final ItemSet set = newSet.get(), dupl = newSet.get();
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(values)) != null;) {
-          if(!set.add(item, info) && dupl.add(item, info)) return item;
+          if(!set.add(item) && dupl.add(item)) return item;
         }
         return null;
       }

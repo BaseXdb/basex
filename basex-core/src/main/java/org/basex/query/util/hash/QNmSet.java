@@ -7,7 +7,8 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This is an efficient and memory-saving hash map for storing QNames.
+ * This is an efficient and memory-saving hash set for storing QNames.
+ * It is derived from the {@link TokenSet} class.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
@@ -28,61 +29,72 @@ public class QNmSet extends ASet implements Iterable<QNm> {
   }
 
   /**
-   * Stores the specified QName if it has not been stored before.
-   * @param qnm QName to add
-   * @return {@code true} if the QName did not exist yet and was stored
+   * Stores the specified key if it has not been stored before.
+   * @param key key to be added
+   * @return {@code true} if the key did not exist yet and was stored
    */
-  public final boolean add(final QNm qnm) {
-    return index(qnm) >= 0;
+  public final boolean add(final QNm key) {
+    return index(key) > 0;
   }
 
   /**
-   * Stores the specified QName and returns its id.
-   * @param qnm QName to put
-   * @return unique id of stored QName (larger than zero)
+   * Stores the specified key and returns its id.
+   * @param key key to be added
+   * @return unique id of stored key (larger than zero)
    */
-  public final int put(final QNm qnm) {
-    final int id = index(qnm);
+  public final int put(final QNm key) {
+    final int id = index(key);
     return Math.abs(id);
   }
 
   /**
-   * Checks if the specified QName exists.
-   * @param qnm QName to look up
+   * Checks if the set contains the specified key.
+   * @param key key to be looked up
    * @return result of check
    */
-  public final boolean contains(final QNm qnm) {
-    return id(qnm) > 0;
+  public final boolean contains(final QNm key) {
+    return id(key) > 0;
   }
 
   /**
-   * Returns the id of the specified QName, or {@code 0} if the QName does not exist.
-   * @param qnm QName to look up
-   * @return id, or {@code 0} if QName does not exist
+   * Returns the id of the specified key, or {@code 0} if the key does not exist.
+   * @param key key to be looked up
+   * @return id, or {@code 0} if key does not exist
    */
-  public final int id(final QNm qnm) {
-    final int b = qnm.hash(null) & capacity() - 1;
+  public final int id(final QNm key) {
+    final int b = key.hash(null) & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(keys[id].eq(qnm)) return id;
+      if(key.eq(keys[id])) return id;
     }
     return 0;
   }
 
   /**
-   * Stores the specified QName and returns its id, or returns the negative id if the
-   * QName has already been stored.
-   * @param qnm QName to look up
-   * @return id, or negative id if QName has already been stored
+   * Returns the key with the specified id.
+   * All ids start with {@code 1} instead of {@code 0}.
+   * @param id id of the key to return
+   * @return key
    */
-  private int index(final QNm qnm) {
-    checkSize();
-    final int h = qnm.hash(null), b = h & capacity() - 1;
+  public final QNm key(final int id) {
+    return keys[id];
+  }
+
+  /**
+   * Stores the specified key and returns its id, or returns the negative id if the
+   * key has already been stored.
+   * @param key key to be indexed
+   * @return id, or negative id if key has already been stored
+   */
+  private int index(final QNm key) {
+    final int h = key.hash(null);
+    int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(keys[id].eq(qnm)) return -id;
+      if(keys[id].eq(key)) return -id;
     }
     final int s = size++;
+    if(checkCapacity()) b = h & capacity() - 1;
     next[s] = buckets[b];
-    keys[s] = qnm;
+    keys[s] = key;
     hash[s] = h;
     buckets[b] = s;
     return s;

@@ -26,9 +26,10 @@ public final class FnAllDifferent extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation coll = toCollation(arg(1), qc);
 
-    final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
+    final ItemSet set = coll == null ? new HashItemSet(false, info) :
+      new CollationItemSet(coll, info);
     for(Item item; (item = qc.next(values)) != null;) {
-      if(!set.add(item, info)) return Bln.FALSE;
+      if(!set.add(item)) return Bln.FALSE;
     }
     return Bln.TRUE;
   }

@@ -1,7 +1,5 @@
 package org.basex.util.hash;
 
-import static org.basex.util.Token.*;
-
 import java.lang.ref.*;
 import java.util.*;
 
@@ -34,36 +32,31 @@ public class WeakTokenSet extends ASet {
   }
 
   /**
-   * Stores the specified token, if not yet present in this set, and returns its stored equivalent.
-   * @param token token to be stored
+   * Stores the specified key, if not yet present in this set, and returns its stored equivalent.
+   * @param key key to be stored
    * @return token, or its equivalent that is stored in this set
    */
-  public final byte[] put(final byte[] token) {
-    final int b = Token.hash(token) & capacity() - 1;
+  public final byte[] put(final byte[] key) {
+    final int h = Token.hash(key), c = capacity();
+    int b = h & c - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      final byte[] storedToken = keys[id].get();
-      if(eq(token, storedToken)) return storedToken;
+      final byte[] stored = keys[id].get();
+      if(Token.eq(key, stored)) return stored;
     }
+
+    if(size == c && free == 0) cleanUp();
     final int s;
     if(free != 0) {
       s = free;
-      free = next[free];
-    } else if(size < capacity()) {
-      s = size++;
+      free = next[s];
     } else {
-      cleanUp();
-      if(free != 0) {
-        s = free;
-        free = next[free];
-      } else {
-        checkSize((id, bucket) -> keys[id].bucket = bucket);
-        s = size++;
-      }
+      if(checkCapacity((id, bucket) -> keys[id].bucket = bucket)) b = h & capacity() - 1;
+      s = size++;
     }
     next[s] = buckets[b];
-    keys[s] = new WeakTokenRef(token, b, gcedKeys);
+    keys[s] = new WeakTokenRef(key, b, gcedKeys);
     buckets[b] = s;
-    return token;
+    return key;
   }
 
   /**
@@ -124,19 +117,19 @@ public class WeakTokenSet extends ASet {
 
     /**
      * Constructor.
-     * @param token the key to be stored
+     * @param key the key to be stored
      * @param bucket the initial bucket of this entry
      * @param queue queue for registering this reference to
      */
-    WeakTokenRef(final byte[] token, final int bucket, final ReferenceQueue<byte[]> queue) {
-      super(token, queue);
+    WeakTokenRef(final byte[] key, final int bucket, final ReferenceQueue<byte[]> queue) {
+      super(key, queue);
       this.bucket = bucket;
     }
 
     @Override
     public String toString() {
       final byte[] token = get();
-      return token == null ? "null" : string(token);
+      return token == null ? "null" : Token.string(token);
     }
   }
 }

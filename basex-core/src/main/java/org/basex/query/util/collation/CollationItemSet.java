@@ -19,20 +19,24 @@ public final class CollationItemSet implements ItemSet {
   private final ItemList items = new ItemList();
   /** Collation. */
   private final Collation coll;
+  /** Input info (can be {@code null}). */
+  private final InputInfo info;
 
   /**
    * Constructor.
    * @param coll collation
+   * @param info input info (can be {@code null})
    */
-  public CollationItemSet(final Collation coll) {
+  public CollationItemSet(final Collation coll, final InputInfo info) {
     this.coll = coll;
+    this.info = info;
   }
 
   @Override
-  public boolean add(final Item item, final InputInfo ii) throws QueryException {
+  public boolean add(final Item item) throws QueryException {
     final int is = items.size();
     for(int id = 0; id < is; id++) {
-      if(items.get(id).equiv(item, coll, ii)) return false;
+      if(items.get(id).equiv(item, coll, info)) return false;
     }
     items.add(item);
     return true;

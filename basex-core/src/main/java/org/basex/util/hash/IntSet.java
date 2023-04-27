@@ -6,7 +6,7 @@ import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash set for storing primitive integers.
- * It is related to the {@link TokenSet} class.
+ * It is derived from the {@link TokenSet} class.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
@@ -45,7 +45,7 @@ public class IntSet extends ASet {
    * @param key key to be added
    * @return unique id of stored key (larger than zero)
    */
-  final int put(final int key) {
+  public final int put(final int key) {
     final int id = index(key);
     return Math.abs(id);
   }
@@ -64,7 +64,7 @@ public class IntSet extends ASet {
    * @param key key to be looked up
    * @return id, or {@code 0} if key does not exist
    */
-  final int id(final int key) {
+  public final int id(final int key) {
     final int b = key & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(key == keys[id]) return id;
@@ -85,16 +85,16 @@ public class IntSet extends ASet {
   /**
    * Stores the specified key and returns its id, or returns the negative id if the
    * key has already been stored.
-   * @param key key to be found
+   * @param key key to be indexed
    * @return id, or negative id if key has already been stored
    */
   private int index(final int key) {
-    checkSize();
-    final int b = key & capacity() - 1;
+    int b = key & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(key == keys[id]) return -id;
     }
     final int s = size++;
+    if(checkCapacity()) b = key & capacity() - 1;
     next[s] = buckets[b];
     keys[s] = key;
     buckets[b] = s;
@@ -121,8 +121,6 @@ public class IntSet extends ASet {
 
   @Override
   public String toString() {
-    final List<Object> k = new ArrayList<>();
-    for(final int key : keys) k.add(key);
-    return toString(k.toArray());
+    return toString(Arrays.stream(keys).boxed().toArray(Integer[]::new));
   }
 }

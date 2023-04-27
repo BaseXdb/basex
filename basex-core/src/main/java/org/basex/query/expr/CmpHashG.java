@@ -39,7 +39,7 @@ public final class CmpHashG extends CmpG {
     // check if iterator is based on value with more than one item
     if(iter2.valueIter() && iter2.size() > 1) {
       // retrieve cache (first call: initialize it)
-      final CmpCache cache = qc.threads.get(this).get();
+      final CmpCache cache = qc.threads.get(this, info).get();
 
       // check if caching is enabled
       if(cache.active(iter2.value(qc, null), iter2)) {
@@ -49,7 +49,7 @@ public final class CmpHashG extends CmpG {
         // loop through input items
         for(Item item1; (item1 = qc.next(iter1)) != null;) {
           // check if item has already been cached
-          if(set.contains(item1, info)) {
+          if(set.contains(item1)) {
             cache.hits++;
             return Bln.TRUE;
           }
@@ -57,8 +57,8 @@ public final class CmpHashG extends CmpG {
           // cache remaining items (stop after first hit)
           if(ir2 != null) {
             for(Item item2; (item2 = qc.next(ir2)) != null;) {
-              set.add(item2, info);
-              if(set.contains(item1, info)) return Bln.TRUE;
+              set.add(item2);
+              if(set.contains(item1)) return Bln.TRUE;
             }
             // iterator is exhausted, all items are cached
             cache.iter = null;

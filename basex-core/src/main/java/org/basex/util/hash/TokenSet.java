@@ -1,7 +1,5 @@
 package org.basex.util.hash;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
 import java.util.*;
 
@@ -11,7 +9,6 @@ import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash set for storing tokens.
- * The first entry of the token set (offset 0) is always empty.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
@@ -102,7 +99,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return {@code true} if the key did not exist yet and was stored
    */
   public final boolean add(final String key) {
-    return add(token(key));
+    return add(Token.token(key));
   }
 
   /**
@@ -132,7 +129,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   public final int id(final byte[] key) {
     final int b = Token.hash(key) & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq(key, keys[id])) return id;
+      if(Token.eq(key, keys[id])) return id;
     }
     return 0;
   }
@@ -157,7 +154,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   public int remove(final byte[] key) {
     final int b = Token.hash(key) & capacity() - 1;
     for(int p = 0, id = buckets[b]; id != 0; p = id, id = next[id]) {
-      if(!eq(key, keys[id])) continue;
+      if(!Token.eq(key, keys[id])) continue;
       if(p == 0) buckets[b] = next[id];
       else next[p] = next[next[p]];
       keys[id] = null;
@@ -169,16 +166,17 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   /**
    * Stores the specified key and returns its id, or returns the negative id if the
    * key has already been stored.
-   * @param key key to be found
+   * @param key key to be indexed
    * @return id, or negative id if key has already been stored
    */
   private int index(final byte[] key) {
-    checkSize();
-    final int b = Token.hash(key) & capacity() - 1;
+    final int h = Token.hash(key);
+    int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq(key, keys[id])) return -id;
+      if(Token.eq(key, keys[id])) return -id;
     }
     final int s = size++;
+    if(checkCapacity()) b = h & capacity() - 1;
     next[s] = buckets[b];
     keys[s] = key;
     buckets[b] = s;

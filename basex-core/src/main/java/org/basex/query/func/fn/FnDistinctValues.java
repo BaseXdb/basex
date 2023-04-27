@@ -32,12 +32,13 @@ public final class FnDistinctValues extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation coll = toCollation(arg(1), qc);
 
-    final ItemSet set = coll == null ? new HashItemSet(false) : new CollationItemSet(coll);
+    final ItemSet set = coll == null ? new HashItemSet(false, info) :
+      new CollationItemSet(coll, info);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(values)) != null;) {
-          if(set.add(item, info)) return item;
+          if(set.add(item)) return item;
         }
         return null;
       }
@@ -117,12 +118,12 @@ public final class FnDistinctValues extends StandardFunc {
       final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
-        final HashItemSet set = new HashItemSet(false);
+        final HashItemSet set = new HashItemSet(false, info);
         for(final Stats stats : list) {
           if(!StatsType.isCategory(stats.type)) return null;
           for(final byte[] value : stats.values) {
             final Atm item = Atm.get(value);
-            if(set.add(item, info)) vb.add(item);
+            if(set.add(item)) vb.add(item);
           }
         }
         return vb.value(this);
