@@ -78,7 +78,7 @@ public class WeakTokenSetTest {
 
   /**
    * Create an array of 4-33 distinct random ASCII strings of length 1-16.
-   * @return random string array
+   * @return list of random strings
    */
   private List<String> randomStrings() {
     final int maxLength = 1 + random.nextInt(16);
