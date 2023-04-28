@@ -34,7 +34,7 @@ public class WeakTokenSet extends ASet {
   /**
    * Stores the specified key, if not yet present in this set, and returns its stored equivalent.
    * @param key key to be stored
-   * @return token, or its equivalent that is stored in this set
+   * @return key, or its equivalent that is stored in this set
    */
   public final byte[] put(final byte[] key) {
     final int h = Token.hash(key), c = capacity();
