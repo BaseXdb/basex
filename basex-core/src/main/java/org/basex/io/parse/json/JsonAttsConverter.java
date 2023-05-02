@@ -35,7 +35,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openPair(final byte[] key, final boolean add) throws QueryIOException {
+  void openPair(final byte[] key, final boolean add) {
     addValues.add(add);
     if(add) {
       openInner(Q_PAIR);

@@ -133,7 +133,7 @@ public interface Type {
     public boolean isExtended() {
       return extended;
     }
-  };
+  }
 
   /**
    * Casts the specified item to this type.

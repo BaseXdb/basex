@@ -180,8 +180,8 @@ public final class CmpIR extends Single {
       newMin = ((Int) ex.arg(1)).itr();
       newMax = newMin;
     }
-    if(newMin == null && newMax == null || !expr.equals(ex.arg(0)) || or &&
-        (max < newMin || min > newMax)) return null;
+    if(newMin == null || !expr.equals(ex.arg(0)) || or && (max < newMin || min > newMax))
+      return null;
 
     // determine common minimum and maximum value
     newMin = or ? Math.min(min, newMin) : Math.max(min, newMin);

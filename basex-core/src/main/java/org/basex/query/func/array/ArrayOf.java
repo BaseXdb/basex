@@ -35,7 +35,7 @@ public final class ArrayOf extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final FuncType ft = arg(0).funcType();
     if(ft instanceof MapType) {
       exprType.assign(ArrayType.get(ft.declType));

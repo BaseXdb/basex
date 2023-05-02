@@ -429,13 +429,6 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public int exprSize() {
-    int size = 1;
-    for(final Expr pred : exprs) size += pred.exprSize();
-    return size;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof Step)) return false;

@@ -19,7 +19,7 @@ public final class UtilOr extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     return build().optimize(cc);
   }
 

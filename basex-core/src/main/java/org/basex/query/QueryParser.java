@@ -2433,7 +2433,7 @@ public class QueryParser extends InputParser {
         token.add(consume());
         us = false;
       }
-    };
+    }
     if(us) throw error(NUMBER_X, token.add('_'));
 
     if(base == 10 && max == 0) {

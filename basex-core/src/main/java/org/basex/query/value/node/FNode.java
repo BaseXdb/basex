@@ -83,7 +83,7 @@ public abstract class FNode extends ANode {
    * @param nodes nodes
    * @return string
    */
-  static final byte[] string(final ANode[] nodes) {
+  static byte[] string(final ANode[] nodes) {
     if(nodes.length == 0) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();

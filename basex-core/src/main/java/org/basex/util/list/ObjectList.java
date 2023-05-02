@@ -315,16 +315,6 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     return new ArrayIterator<>(list, size);
   }
 
-  /**
-   * Minimizes the data structures.
-   * @return self reference
-   */
-  @SuppressWarnings("unchecked")
-  public L optimize() {
-    if(size != list.length) list = toArray();
-    return (L) this;
-  }
-
   @Override
   @SuppressWarnings("unchecked")
   public boolean equals(final Object obj) {

@@ -82,9 +82,4 @@ public abstract class Logical extends Arr {
     }
     return changed ? optimize(ic.cc) : null;
   }
-
-  @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), exprs);
-  }
 }

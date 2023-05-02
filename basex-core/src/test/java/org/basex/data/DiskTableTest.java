@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.util.*;
 
 import org.basex.*;
 import org.basex.build.*;
@@ -331,9 +332,8 @@ public final class DiskTableTest extends SandboxTest {
    * @return byte array containing the number of entries (all bytes 5)
    */
   private static byte[] getTestEntries(final int e) {
-    final int rl = e << IO.NODEPOWER;
-    final byte[] result = new byte[rl];
-    for(int r = 0; r < rl; ++r) result[r] = 5;
+    final byte[] result = new byte[e << IO.NODEPOWER];
+    Arrays.fill(result, (byte) 5);
     return result;
   }
 }

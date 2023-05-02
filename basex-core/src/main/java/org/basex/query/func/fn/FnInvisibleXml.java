@@ -93,7 +93,7 @@ public final class FnInvisibleXml extends StandardFunc {
      * @param args function arguments
      * @param parser generated invisible XML parser
      */
-    protected ParseInvisibleXml(final InputInfo info, final InvisibleXmlParser parser,
+    private ParseInvisibleXml(final InputInfo info, final InvisibleXmlParser parser,
         final Expr... args) {
       super(info, DOCUMENT_NODE_O, args);
       this.parser = parser;

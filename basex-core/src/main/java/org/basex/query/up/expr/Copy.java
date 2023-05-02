@@ -46,13 +46,6 @@ abstract class Copy extends Arr {
     return flags.length != 0 && super.has(flags);
   }
 
-  @Override
-  public int exprSize() {
-    int size = 1;
-    for(final Expr expr : exprs) size += expr.exprSize();
-    return size;
-  }
-
   /**
    * Returns the updating expression.
    * @return result expression

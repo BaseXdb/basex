@@ -209,8 +209,8 @@ public final class FElem extends FNode {
     if(this == obj) return true;
     if(!(obj instanceof FElem)) return false;
     final FElem f = (FElem) obj;
-    return name.eq(f.name) && Objects.equals(children, f.children) &&
-        Objects.equals(attributes, f.attributes) && Objects.equals(namespaces, f.namespaces) &&
+    return name.eq(f.name) && Arrays.equals(children, f.children) &&
+        Arrays.equals(attributes, f.attributes) && Objects.equals(namespaces, f.namespaces) &&
         super.equals(obj);
   }
 

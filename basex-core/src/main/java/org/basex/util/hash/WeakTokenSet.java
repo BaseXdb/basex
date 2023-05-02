@@ -63,7 +63,7 @@ public class WeakTokenSet extends ASet {
    * Removes garbage collected keys from the set. The deletion of keys will lead to empty entries.
    * If {@link #size} is called after deletions, the original number of entries will be returned.
    */
-  public void cleanUp() {
+  protected void cleanUp() {
     for(WeakTokenRef key; (key = (WeakTokenRef) gcedKeys.poll()) != null;) {
       final int b = key.bucket;
       for(int p = 0, id = buckets[b];; p = id, id = next[id]) {
@@ -113,7 +113,7 @@ public class WeakTokenSet extends ASet {
    */
   private static final class WeakTokenRef extends WeakReference<byte[]> {
     /** The current bucket where this reference is in. */
-    int bucket;
+    private int bucket;
 
     /**
      * Constructor.
@@ -121,7 +121,7 @@ public class WeakTokenSet extends ASet {
      * @param bucket the initial bucket of this entry
      * @param queue queue for registering this reference to
      */
-    WeakTokenRef(final byte[] key, final int bucket, final ReferenceQueue<byte[]> queue) {
+    private WeakTokenRef(final byte[] key, final int bucket, final ReferenceQueue<byte[]> queue) {
       super(key, queue);
       this.bucket = bucket;
     }

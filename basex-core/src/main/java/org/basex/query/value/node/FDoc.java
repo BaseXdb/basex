@@ -2,6 +2,7 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.Arrays;
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -124,7 +125,7 @@ public final class FDoc extends FNode {
     if(this == obj) return true;
     if(!(obj instanceof FDoc)) return false;
     final FDoc f = (FDoc) obj;
-    return children.equals(f.children) && Token.eq(uri, f.uri) && super.equals(obj);
+    return Arrays.equals(children, f.children) && Token.eq(uri, f.uri) && super.equals(obj);
   }
 
   @Override

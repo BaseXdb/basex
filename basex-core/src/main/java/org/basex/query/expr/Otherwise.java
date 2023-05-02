@@ -103,11 +103,6 @@ public final class Otherwise extends Arr {
   }
 
   @Override
-  public void checkUp() throws QueryException {
-    checkNoneUp(exprs);
-  }
-
-  @Override
   public boolean vacuous() {
     return ((Checks<Expr>) Expr::vacuous).all(exprs);
   }

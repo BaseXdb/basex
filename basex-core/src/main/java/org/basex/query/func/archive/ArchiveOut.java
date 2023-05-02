@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 abstract class ArchiveOut implements Closeable {
   /** Buffer. */
-  protected final byte[] data = new byte[IO.BLOCKSIZE];
+  private final byte[] data = new byte[IO.BLOCKSIZE];
 
   /**
    * Returns a new instance of an archive writer.

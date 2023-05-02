@@ -24,10 +24,6 @@ abstract class JsonXmlConverter extends JsonConverter {
   /** QName. */
   static final QNm Q_JSON = new QNm(JSON);
   /** QName. */
-  static final QNm Q_OBJECT = new QNm(OBJECT);
-  /** QName. */
-  static final QNm Q_ARRAY = new QNm(ARRAY);
-  /** QName. */
   static final QNm Q_PAIR = new QNm(PAIR);
   /** QName. */
   static final QNm Q_ITEM = new QNm(ITEM);

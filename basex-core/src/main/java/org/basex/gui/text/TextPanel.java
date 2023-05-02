@@ -448,10 +448,6 @@ public class TextPanel extends BaseXPanel {
   }
 
   @Override
-  public void mouseClicked(final MouseEvent e) {
-  }
-
-  @Override
   public final void mouseDragged(final MouseEvent e) {
     if(SwingUtilities.isLeftMouseButton(e) && clicks == 1) {
       select(e.getPoint(), false);

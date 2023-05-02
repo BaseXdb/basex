@@ -12,6 +12,8 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
+import java.util.Arrays;
+
 /**
  * Function implementation.
  *
@@ -51,10 +53,8 @@ public class FnApply extends StandardFunc {
         // argument will be of type array: assign generic array return type to all arguments
         final SeqType[] at = ft.argTypes;
         if(at != null) {
-          final int al = at.length;
-          final SeqType[] ast = new SeqType[al];
-          final ArrayType at2 = (ArrayType) ftArgs;
-          for(int a = 0; a < al; a++) ast[a] = at2.declType;
+          final SeqType[] ast = new SeqType[at.length];
+          Arrays.fill(ast, ((ArrayType) ftArgs).declType);
           arg(0, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ast));
         }
       }

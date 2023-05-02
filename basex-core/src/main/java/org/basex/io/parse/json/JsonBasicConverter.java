@@ -38,7 +38,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openPair(final byte[] key, final boolean add) throws QueryIOException {
+  void openPair(final byte[] key, final boolean add) {
     addValues.add(add);
     if(add) name = shared.token(key);
   }
