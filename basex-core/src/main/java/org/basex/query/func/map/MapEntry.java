@@ -1,6 +1,7 @@
 package org.basex.query.func.map;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -32,7 +33,7 @@ public final class MapEntry extends StandardFunc {
   }
 
   @Override
-  protected void simplifyArgs(final CompileContext cc) {
-    // do not simplify type of key
+  protected void simplifyArgs(final CompileContext cc) throws QueryException {
+    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
   }
 }

@@ -6,7 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.query.*;
 import org.basex.query.ast.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -59,6 +61,9 @@ public final class MapModuleTest extends QueryPlanTest {
     query("exists(" + func.args("A", "B") + ')', true);
     query("exists(" + func.args(1, 2) + ')', true);
     query("exists(" + _MAP_MERGE.args(func.args(1, 2)) + ')', true);
+
+    check(func.args(" <_>A</_>", 0), "map{\"A\":0}", empty(CElem.class), root(XQMap.class));
+
     error("exists(" + func.args(" ()", 2) + ')', EMPTYFOUND);
     error("exists(" + func.args(" (1, 2)", 2) + ')', SEQFOUND_X);
   }
@@ -275,6 +280,9 @@ public final class MapModuleTest extends QueryPlanTest {
     checkSize(func.args(" map { 'a': 'b' }", "c", "d"), 2);
 
     query(func.args(" map { xs:time('01:01:01'): 'b' }", "xs:time('01:01:02+01:00')", 1));
+
+    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6),
+        "map{3:4,\"1\":2,\"5\":6}", empty(CElem.class));
 
     query("deep-equal(" + func.args(" map { 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
   }

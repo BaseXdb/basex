@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.basex.index.stats.*;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -98,8 +99,9 @@ public class FnSum extends StandardFunc {
   }
 
   @Override
-  protected final void simplifyArgs(final CompileContext cc) {
-    // do not simplify summed-up items and zero argument
+  protected final void simplifyArgs(final CompileContext cc) throws QueryException {
+    final Type type = arg(0).seqType().type;
+    if(type.isNumberOrUntyped()) arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
   }
 
   /**

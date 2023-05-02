@@ -216,6 +216,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" 1.0"), 1, empty(func));
     check(func.args(" 1e0"), 1, empty(func));
     check(func.args(" xs:float('1')"), 1, empty(func));
+    check(func.args(" (<a>1</a>, <a>3</a>)"), 2, empty(func));
 
     check(func.args(" (1, 2)[. = 1]"), 1, type(func, "xs:decimal?"));
     check(func.args(" (1.0, 2.0)[. = 1]"), 1, type(func, "xs:decimal?"));
@@ -224,7 +225,6 @@ public final class FnModuleTest extends QueryPlanTest {
 
     check(func.args(" (1, (3, 4)[. = 5])"), 1, type(func, "xs:decimal"));
     check(func.args(" (1, (3.0, 4.0)[. = 5])"), 1, type(func, "xs:decimal"));
-    check(func.args(" (<a>1</a>, <a>3</a>)"), 2, type(func, "xs:double"));
 
     check(func.args(" (1 to 3)"), 2, empty(func));
     check(func.args(" reverse(1 to 3)"), 2, empty(func));

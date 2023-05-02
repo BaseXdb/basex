@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -32,13 +33,12 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final boolean values = allAreValues(true);
+    // map { <_>A</_>: 1 }  ->  map { 'A': 1 }
     final int el = exprs.length;
-    if(el == 2) {
-      return cc.replaceWith(this, values
-          ? XQMap.entry(toAtomItem(exprs[0], cc.qc), exprs[1].value(cc.qc), info)
-          : cc.function(_MAP_ENTRY, info, exprs));
-    }
+    for(int e = 0; e < el; e += 2) exprs[e] = exprs[e].simplifyFor(Simplify.DATA, cc);
+
+    // map { $a: $b }  ->  map:entry($a, $b)
+    if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
 
     // determine static key type (all keys must be single items)
     Type kt = null;
@@ -63,7 +63,7 @@ public final class CMap extends Arr {
 
     exprType.assign(MapType.get((AtomType) kt, dt));
 
-    return values ? cc.preEval(this) : this;
+    return allAreValues(true) ? cc.preEval(this) : this;
   }
 
   @Override

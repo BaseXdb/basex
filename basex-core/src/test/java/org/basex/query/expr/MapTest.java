@@ -3,7 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.*;
+import org.basex.query.ast.*;
+import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -12,13 +13,20 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
-public final class MapTest extends SandboxTest {
+public final class MapTest extends QueryPlanTest {
   /** A map as key should lead to FOTY0013. */
   @Test public void mapAsKeyTest() {
     error("declare variable $m := map { 'a': 'b' };" +
           "declare variable $q := map { $m: 'a' };" +
           "$q", FIATOMIZE_X);
   }
+
+  /** Tests the map constructor. */
+  @Test public void constructor() {
+    check("map { 'A': 1, 2: 3 }?A", 1, root(Int.class));
+    check("map { <_>A</_>: 1, 2: 3 }?A", 1, root(Int.class));
+  }
+
 
   /** Tests the new syntax for map literals. */
   @Test public void gh755() {
