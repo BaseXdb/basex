@@ -371,7 +371,7 @@ public abstract class StandardFunc extends Arr {
   protected final Path toPath(final String path) throws QueryException {
     try {
       return path.startsWith(IO.FILEPREF) ? Paths.get(new URI(path)) : Paths.get(path);
-    } catch(final InvalidPathException | URISyntaxException ex) {
+    } catch(final IllegalArgumentException | URISyntaxException ex) {
       Util.debug(ex);
       throw FILE_INVALID_PATH_X.get(info, path);
     }
