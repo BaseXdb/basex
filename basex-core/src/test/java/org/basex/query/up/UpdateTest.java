@@ -1314,4 +1314,10 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh2148() {
     query("data(<_>a</_> update { replace node text() with . || 'b' })", "ab");
   }
+
+  /** Bogus namespace conflict when renaming attributes. */
+  @Test public void gh2205() {
+    query("<_ xmlns='_' a=''/> update { rename node @a as 'x' }", "<_ x=\"\"/>");
+    query("<_ xmlns='_' a=''/> update { rename node @a as 'x' }", "<_ xmlns=\"_\" x=\"\"/>");
+  }
 }

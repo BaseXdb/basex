@@ -59,23 +59,28 @@ public final class Rename extends Update {
       throw UPWRTRGTYP_X.get(info, item);
     }
 
-    final QNm rename = ((ANode) ex.item(qc, info)).qname();
+    final QNm newName = ((ANode) ex.item(qc, info)).qname();
     final ANode target = (ANode) item;
 
     // check namespace conflicts...
-    if(target.type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE)) {
-      final byte[] rp = rename.prefix(), ru = rename.uri();
-      final Atts at = target.nsScope(sc);
-      final int as = at.size();
-      for(int a = 0; a < as; a++) {
-        if(eq(at.name(a), rp) && !eq(at.value(a), ru))
-          throw UPNSCONFL_X_X.get(info, rename, new QNm(at.name(a), at.value(a)));
+    final Type tt = target.type;
+    final boolean elem = tt == NodeType.ELEMENT, attr = tt == NodeType.ATTRIBUTE;
+    if(elem || attr) {
+      final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
+      if(elem || newPrefix.length > 0) {
+        final Atts nspaces = target.nsScope(sc);
+        final int ns = nspaces.size();
+        for(int n = 0; n < ns; n++) {
+          final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
+          if(eq(prefix, newPrefix) && !eq(uri, newUri))
+            throw UPNSCONFL_X_X.get(info, newName, new QNm(prefix, uri));
+        }
       }
     }
 
     final Updates updates = qc.updates();
     final DBNode dbn = updates.determineDataRef(target, qc);
-    updates.add(new RenameNode(dbn.pre(), dbn.data(), info, rename), qc);
+    updates.add(new RenameNode(dbn.pre(), dbn.data(), info, newName), qc);
     return Empty.VALUE;
   }
 
