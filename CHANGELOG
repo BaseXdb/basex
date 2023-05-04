@@ -1,3 +1,15 @@
+VERSION 10.6 (May 4, 2023) ---------------------------------------------
+
+ - XQuery: Much more memory-efficient representation of XML fragments
+ - XQuery: Faster access to substrings and single characters
+ - XQuery: Faster iterations with the simple map operator 
+ - XQuery 4: more preview features available
+ - CSV/JSON conversions: Less memory consumption
+ - CSV parsing: option for skipping empty fields
+ - GUI, editor: better code completion
+ - Less reflection: Direct acccess to TagSoup, iXml, JLine
+ - Minor bug fixes
+
 VERSION 10.5 (March 23, 2023) ------------------------------------------
 
  - new XQuery 4 features
