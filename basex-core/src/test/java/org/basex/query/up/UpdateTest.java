@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.function.*;
+
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -1323,5 +1325,16 @@ public final class UpdateTest extends SandboxTest {
         "<_ xmlns=\"_\" x=\"\"/>");
     query("<_ xmlns:p='_' p:a=''/> update { rename node @Q{_}a as 'a' }",
         "<_ xmlns:p=\"_\" a=\"\"/>");
+  }
+
+  /** Updates: Preserve namespace declarations. */
+  @Test public void gh2206() {
+    final BiConsumer<String, String> run = (query, uri) -> {
+      query("(<_>{ " + query + "}</_> update {}) ! namespace-uri(*)", uri);
+    };
+    run.accept("web:response-header(headers := map { 'a':'b' })//*:header",
+        "http://expath.org/ns/http-client");
+    run.accept("json-to-xml('{\"A\":1}')/*/*", "http://www.w3.org/2005/xpath-functions");
+    run.accept("analyze-string('a', 'a')/*", "http://www.w3.org/2005/xpath-functions");
   }
 }

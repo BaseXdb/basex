@@ -232,14 +232,22 @@ public final class DataBuilder {
     final Atts ns = par == -1 ? node.nsScope(null) : node.namespaces();
     data.nspaces.open(last, ns);
 
-    // collect node name properties
+    // collect node properties
     final QNm qname = node.qname();
-    final int size = size(node, false), asize = size(node, true);
     final int nameId = data.elemNames.put(qname.string());
-    final int uriId = data.nspaces.uriId(qname.uri());
+    final int size = size(node, false), asize = size(node, true);
+
+    // find or add namespace for element name
+    final byte[] uri = qname.uri();
+    int uriId = data.nspaces.uriId(uri);
+    boolean nsFlag = !ns.isEmpty();
+    if(uriId == 0 && uri.length != 0) {
+      uriId = data.nspaces.add(last, qname.prefix(), uri, data);
+      nsFlag = true;
+    }
 
     // add element node
-    data.elem(pre - par, nameId, asize, size, uriId, !ns.isEmpty());
+    data.elem(pre - par, nameId, asize, size, uriId, nsFlag);
     data.insert(last);
 
     // add attributes and child nodes

@@ -81,6 +81,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    */
   private void openOuter(final byte[] type) {
     curr = element(type);
+    if(stack.isEmpty()) curr.declareNS();
     stack.push(curr);
   }
 
@@ -98,7 +99,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    * @return new element
    */
   private FBuilder element(final byte[] type) {
-    final FBuilder elem = FElem.build(shared.qname(type, QueryText.FN_URI)).declareNS();
+    final FBuilder elem = FElem.build(shared.qname(type, QueryText.FN_URI));
     if(name != null) {
       elem.add(Q_KEY, name);
       if(escape && contains(name, '\\')) elem.add(Q_ESCAPED_KEY, TRUE);
