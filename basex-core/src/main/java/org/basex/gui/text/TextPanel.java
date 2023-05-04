@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.AbstractMap.*;
 import java.util.Map.*;
+import java.util.function.*;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -1040,30 +1041,37 @@ public class TextPanel extends BaseXPanel {
 
     // find insertion candidates
     final ArrayList<Entry<String, String>> pairs = new ArrayList<>();
+    final Consumer<Entry<String, String>> add = pair -> {
+      for(final Entry<String, String> p : pairs) {
+        if(p != null && p.getValue().equals(pair.getValue())) return;
+      }
+      pairs.add(pair);
+    };
+
+    // add matches that start with the input string
     final int ll = LISTS.size();
     for(int l = 0; l < ll; l++) {
-      if(l > 0) pairs.add(null);
+      pairs.add(null);
       for(final Entry<String, String> pair : LISTS.get(l)) {
         final String name = pair.getKey();
-        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) pairs.add(pair);
+        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
       }
     }
-    if(pairs.size() < ll) {
-      pairs.clear();
-      for(int i = 0; i < ll; i++) {
-        if(i > 0) pairs.add(null);
-        for(final Entry<String, String> pair : LISTS.get(i)) {
-          if(SmartStrings.charsOccurIn(pair.getKey(), input)) pairs.add(pair);
+    // add matches that contain the input string
+    if(pairs.size() != ll + 1) {
+      pairs.add(null);
+      for(int l = 0; l < ll; l++) {
+        for(final Entry<String, String> pair : LISTS.get(l)) {
+          if(SmartStrings.charsOccurIn(pair.getKey(), input)) add.accept(pair);
         }
       }
     }
-
     // remove duplicate and trailing separators
-    for(int l = 0; l < pairs.size();) {
-      if(pairs.get(l) == null && (l == 0 || l + 1 == pairs.size() || pairs.get(l + 1) == null)) {
-        pairs.remove(l);
+    for(int p = 0; p < pairs.size();) {
+      if(pairs.get(p) == null && (p == 0 || p + 1 == pairs.size() || pairs.get(p + 1) == null)) {
+        pairs.remove(p);
       } else {
-        l++;
+        p++;
       }
     }
 
@@ -1083,7 +1091,7 @@ public class TextPanel extends BaseXPanel {
           pm.add(mi);
           mi.addActionListener(al);
         }
-        if(pm.getComponentCount() >= 20) {
+        if(pm.getComponentCount() >= 15) {
           final JMenuItem mi = new JMenuItem("... " + Util.info(Text.RESULTS_X, pairs.size()));
           mi.setEnabled(false);
           pm.add(mi);
@@ -1126,15 +1134,15 @@ public class TextPanel extends BaseXPanel {
       final String func = fd.toString();
       final String name = func.replaceAll("^fn:|\\(.*", "");
       final String value = name + (func.contains("()") ? "()" : "(_)");
+      final BiConsumer<Integer, String> add = (i, string) -> {
+        LISTS.get(i).add(new SimpleEntry<>(string.toLowerCase(Locale.ENGLISH), value));
+      };
       if(fd.uri() == QueryText.FN_URI) {
-        if(name.contains("-")) LISTS.get(1).add(
-            new SimpleEntry<>(name.replaceAll("(.)[^-A-Z]*-?", "$1").
-            toLowerCase(Locale.ENGLISH), value));
-        LISTS.get(2).add(new SimpleEntry<>(name.toLowerCase(Locale.ENGLISH), value));
+        add.accept(1, name.replaceAll("(.)[^-A-Z]*-?", "$1"));
+        add.accept(2, name);
       } else {
-        LISTS.get(3).add(new SimpleEntry<>(name.replaceAll("(:?.)[^-:A-Z]*-?", "$1").
-            toLowerCase(Locale.ENGLISH), value));
-        LISTS.get(4).add(new SimpleEntry<>(name.toLowerCase(Locale.ENGLISH), value));
+        add.accept(3, name.replaceAll("(:?.)[^-:A-Z]*-?", "$1"));
+        add.accept(4, name);
       }
     }
   }
