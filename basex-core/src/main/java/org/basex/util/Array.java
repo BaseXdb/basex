@@ -17,8 +17,8 @@ public final class Array {
   public static final int INITIAL_CAPACITY = 8;
   /** Maximum capacity for new arrays. */
   public static final int MAX_CAPACITY = 1 << 20;
-  /** Default factor for resizing dynamic arrays. */
-  public static final double RESIZE_CAPACITY = 1.5;
+  /** Default factor for resizing dynamic arrays (default: 50%). */
+  public static final byte RESIZE_FACTOR = 15;
 
   /** Private constructor. */
   private Array() { }
@@ -262,7 +262,7 @@ public final class Array {
    * @return new capacity
    */
   public static int newCapacity(final int size) {
-    return newCapacity(size, RESIZE_CAPACITY);
+    return newCapacity(size, RESIZE_FACTOR);
   }
 
   /**
@@ -270,11 +270,11 @@ public final class Array {
    * The returned value will not exceed the maximum allowed array size.
    * If the maximum is reached, an exception is thrown.
    * @param size old array capacity
-   * @param factor resize factor; must be larger than or equal to 1
+   * @param factor resize factor; must be 10 or larger
    * @return new capacity
    */
-  public static int newCapacity(final int size, final double factor) {
-    return (int) Math.min(MAX_SIZE, factor * checkCapacity(size + 1));
+  public static int newCapacity(final int size, final byte factor) {
+    return (int) Math.min(MAX_SIZE, (long) checkCapacity(size + 1) * factor / 10);
   }
 
   /**

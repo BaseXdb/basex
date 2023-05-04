@@ -10,10 +10,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Atts extends ElementList {
-  /** Name array. */
-  private byte[][] names;
-  /** Value array. */
-  private byte[][] values;
+  /** Name/value pairs. */
+  private byte[][] list;
 
   /**
    * Default constructor.
@@ -27,19 +25,26 @@ public final class Atts extends ElementList {
    * @param capacity array capacity
    */
   public Atts(final long capacity) {
-    final int c = Array.checkCapacity(capacity);
-    names = new byte[c][];
-    values = new byte[c][];
+    list = new byte[Array.checkCapacity(capacity << 1)][];
   }
 
   /**
    * Constructor.
-   * @param atts  object to copy
+   * @param atts object to copy
    */
   public Atts(final Atts atts) {
-    names = atts.names.clone();
-    values = atts.values.clone();
+    list = atts.list.clone();
     size = atts.size;
+  }
+
+  @Override
+  public int size() {
+    return size >>> 1;
+  }
+
+  @Override
+  public void size(final int sz) {
+    size = sz << 1;
   }
 
   /**
@@ -49,15 +54,15 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts add(final byte[] name, final byte[] value) {
+    byte[][] lst = list;
     final int s = size;
-    if(s == names.length) {
-      final int ns = Array.newCapacity(s);
-      names = Array.copyOf(names, ns);
-      values = Array.copyOf(values, ns);
+    if(s == lst.length) {
+      lst = Array.copyOf(lst, Array.newCapacity(s >>> 1) << 1);
+      list = lst;
     }
-    names[s] = name;
-    values[s] = value;
-    ++size;
+    lst[s] = name;
+    lst[s + 1] = value;
+    size = s + 2;
     return this;
   }
 
@@ -84,12 +89,12 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts remove(final int index) {
+    byte[][] lst = list;
     final int s = size;
-    Array.remove(names, index, 1, s);
-    Array.remove(values, index, 1, s);
-    names[s - 1] = null;
-    values[s - 1] = null;
-    --size;
+    Array.remove(lst, index, 2, s);
+    lst[s - 2] = null;
+    lst[s - 1] = null;
+    size = s - 2;
     return this;
   }
 
@@ -108,8 +113,9 @@ public final class Atts extends ElementList {
    * @return offset or -1
    */
   public int get(final byte[] name) {
-    for(int i = 0; i < size; ++i) {
-      if(eq(names[i], name)) return i;
+    byte[][] lst = list;
+    for(int p = 0; p < size; p += 2) {
+      if(eq(lst[p], name)) return p >>> 1;
     }
     return -1;
   }
@@ -120,7 +126,7 @@ public final class Atts extends ElementList {
    * @return name
    */
   public byte[] name(final int index) {
-    return names[index];
+    return list[index << 1];
   }
 
   /**
@@ -129,7 +135,7 @@ public final class Atts extends ElementList {
    * @return value
    */
   public byte[] value(final int index) {
-    return values[index];
+    return list[(index << 1) + 1];
   }
 
   /**
@@ -139,34 +145,39 @@ public final class Atts extends ElementList {
    */
   public byte[] value(final byte[] name) {
     final int i = get(name);
-    return i == -1 ? null : values[i];
+    return i == -1 ? null : value(i);
   }
 
   /**
    * Optimizes the attribute list.
    * @return self reference
    */
-  public Atts finish() {
-    if(size != names.length) {
-      names = Array.copyOf(names, size);
-      values = Array.copyOf(values, size);
-    }
+  public Atts optimize() {
+    final byte[][] lst = list;
+    if(size != lst.length) list = Array.copyOf(lst, size);
     return this;
   }
 
   @Override
   public boolean equals(final Object obj) {
-    // compare attributes, ignore order
-    if(obj == this) return true;
-    if(!(obj instanceof Atts)) return false;
-    final Atts atts = (Atts) obj;
-    if(size != atts.size) return false;
+    return obj == this || obj instanceof Atts && equals((Atts) obj);
+  }
 
-    for(int n1 = 0; n1 < size; n1++) {
-      for(int n2 = 0;; n2++) {
-        if(n2 == size) return false;
-        if(eq(names[n1], atts.names[n2])) {
-          if(eq(values[n1], atts.values[n2])) break;
+  /**
+   * Compares attributes.
+   * @param atts attributes to be compared
+   * @return result of check
+   */
+  public boolean equals(final Atts atts) {
+    final int s1 = size, s2 = atts.size;
+    if(s1 != s2) return false;
+    final byte[][] lst1 = list, lst2 = atts.list;
+
+    for(int p1 = 0; p1 < s1; p1 += 2) {
+      for(int p2 = 0;; p2 += 2) {
+        if(p2 == s1) return false;
+        if(eq(lst1[p1], lst2[p2])) {
+          if(eq(lst1[p1 + 1], lst2[p2 + 1])) break;
           return false;
         }
       }
@@ -177,9 +188,9 @@ public final class Atts extends ElementList {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder().add(Util.className(this)).add('[');
-    for(int i = 0; i < size; ++i) {
-      if(i > 0) tb.add(", ");
-      tb.add(names[i]).add("=\"").add(values[i]).add("\"");
+    for(int p = 0; p < size; p += 2) {
+      if(p > 0) tb.add(", ");
+      tb.add(list[p]).add("=\"").add(list[p + 1]).add("\"");
     }
     return tb.add("]").toString();
   }

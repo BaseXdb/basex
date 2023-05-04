@@ -33,7 +33,7 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
    * @param factor resize factor
    */
   public TokenList(final double factor) {
-    this.factor = factor;
+    this.factor = (byte) Math.max(10, (byte) (factor * 10));
   }
 
   /**

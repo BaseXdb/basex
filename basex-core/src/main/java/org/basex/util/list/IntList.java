@@ -36,7 +36,7 @@ public class IntList extends ElementList {
    */
   public IntList(final double factor) {
     this();
-    this.factor = factor;
+    this.factor = (byte) Math.max(10, (byte) (factor * 10));
   }
 
   /**
