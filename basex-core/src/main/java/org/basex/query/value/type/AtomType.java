@@ -1009,7 +1009,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return this == type || type == ITEM ||
+    return type.oneOf(this, AtomType.ITEM) ||
         type instanceof AtomType && parent != null && parent.instanceOf(type);
   }
 
@@ -1096,7 +1096,7 @@ public enum AtomType implements Type {
 
     final Item item = checkNum(value, ii);
     final Type type = item.type;
-    if(type == DOUBLE || type == FLOAT) {
+    if(type.oneOf(DOUBLE, FLOAT)) {
       final double d = item.dbl(ii);
       if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(this, item.string(ii), ii);
       if(min != max && (d < min || d > max)) throw castError(item, ii);

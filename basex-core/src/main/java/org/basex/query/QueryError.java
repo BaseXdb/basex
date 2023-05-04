@@ -1673,7 +1673,7 @@ public enum QueryError {
     final String expected, found;
     final Type type = value.seqType().type;
     if(type.instanceOf(AtomType.NUMERIC) || type.instanceOf(AtomType.STRING) ||
-        type == AtomType.BOOLEAN || type == AtomType.ANY_URI) {
+        type.oneOf(AtomType.BOOLEAN, AtomType.ANY_URI)) {
       expected = "Single " + type;
       found = "sequence";
     } else {

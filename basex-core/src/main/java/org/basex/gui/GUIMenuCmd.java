@@ -426,7 +426,7 @@ public enum GUIMenuCmd implements GUICommand {
       final TokenBuilder item = new TokenBuilder();
       item.add(type.qname().local()).add(" { ").add(quote(sl.get(0))).add(" }");
 
-      if(type == NodeType.ATTRIBUTE || type == NodeType.PROCESSING_INSTRUCTION) {
+      if(type.oneOf(NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION)) {
         item.add(" { ").add(quote(sl.get(1))).add(" }");
       } else if(type == NodeType.ELEMENT) {
         item.add(" { () }");

@@ -54,11 +54,11 @@ public final class FnPath extends ContextFn {
         tb.add('@').add(qname.internal());
       } else if(type == NodeType.ELEMENT) {
         tb.add(qname.eqName()).add('[').addInt(element(node, qname, qc)).add(']');
-      } else if(type == NodeType.COMMENT || type == NodeType.TEXT) {
-        tb.add(type.toString()).add('[').addInt(textComment(node, qc)).add(']');
       } else if(type == NodeType.PROCESSING_INSTRUCTION) {
         final String name = type.toString(Token.string(qname.local()));
         tb.add(name).add('[').addInt(pi(node, qname, qc)).add(']');
+      } else if(type.oneOf(NodeType.COMMENT, NodeType.TEXT)) {
+        tb.add(type.toString()).add('[').addInt(textComment(node, qc)).add(']');
       }
       steps.add(tb.next());
       nodes.add(node);

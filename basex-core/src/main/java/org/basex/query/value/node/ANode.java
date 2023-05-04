@@ -126,9 +126,8 @@ public abstract class ANode extends Item {
         options.get(NAMESPACE_PREFIXES) && !Token.eq(name1.prefix(), name2.prefix())
     )) return false;
     // compare values
-    if((type1 == TEXT || type1 == COMMENT || type1 == PROCESSING_INSTRUCTION ||
-        type1 == ATTRIBUTE) && !Token.eq(node1.string(), node2.string(), deep)
-    ) return false;
+    if(type1.oneOf(TEXT, COMMENT, PROCESSING_INSTRUCTION, ATTRIBUTE) &&
+        !Token.eq(node1.string(), node2.string(), deep)) return false;
     // compare base URIs
     if(options.get(BASE_URI)) {
       if(deep.nested) return Token.eq(node1.baseURI(), node2.baseURI());

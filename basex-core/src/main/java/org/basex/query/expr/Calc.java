@@ -400,7 +400,7 @@ public enum Calc {
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
-        return type == DECIMAL || type == INTEGER ? Int.ONE : null;
+        return type.oneOf(DECIMAL, INTEGER) ? Int.ONE : null;
       }
       return null;
     }

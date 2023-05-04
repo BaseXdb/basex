@@ -72,7 +72,7 @@ public final class Functions {
     Type type = ListType.find(name);
     if(type == null) type = AtomType.find(name, false);
     if(type == null) throw WHICHFUNC_X.get(ii, AtomType.similar(name));
-    if(type == AtomType.NOTATION || type == AtomType.ANY_ATOMIC_TYPE)
+    if(type.oneOf(AtomType.NOTATION, AtomType.ANY_ATOMIC_TYPE))
       throw ABSTRACTFUNC_X.get(ii, name.prefixId());
     if(arity != 1) throw FUNCARITY_X_X_X.get(ii, name.string(), arguments(arity), 1);
     return type;

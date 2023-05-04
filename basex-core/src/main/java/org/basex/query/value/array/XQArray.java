@@ -417,7 +417,7 @@ public abstract class XQArray extends XQData {
         for(final Value member : members()) list.add((byte) ((Int) member).itr());
         return list.finish();
       }
-      if(t == AtomType.SHORT || t == AtomType.UNSIGNED_BYTE) {
+      if(t.oneOf(AtomType.SHORT, AtomType.UNSIGNED_BYTE)) {
         final ShortList list = new ShortList(sz);
         for(final Value member : members()) list.add((short) ((Int) member).itr());
         return list.finish();

@@ -88,7 +88,7 @@ public final class Uln extends ANum {
       final InputInfo ii) throws QueryException {
     final Type tp = item.type;
     return tp == AtomType.UNSIGNED_LONG ? value.equals(((Uln) item).value) :
-           tp == AtomType.DOUBLE || tp == AtomType.FLOAT ? item.eq(this, coll, sc, ii) :
+           tp.oneOf(AtomType.DOUBLE, AtomType.FLOAT) ? item.eq(this, coll, sc, ii) :
            value.compareTo(BigInteger.valueOf(item.itr(ii))) == 0;
   }
 
@@ -96,7 +96,7 @@ public final class Uln extends ANum {
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     final Type tp = item.type;
     return tp == AtomType.UNSIGNED_LONG ? value.compareTo(((Uln) item).value) :
-           tp == AtomType.DOUBLE || tp == AtomType.FLOAT ? -item.diff(this, coll, ii) :
+           tp.oneOf(AtomType.DOUBLE, AtomType.FLOAT) ? -item.diff(this, coll, ii) :
            value.compareTo(BigInteger.valueOf(item.itr(ii)));
   }
 

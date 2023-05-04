@@ -231,8 +231,7 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return this == type || type == AtomType.ITEM ||
-        type instanceof NodeType && parent.instanceOf(type);
+    return type.oneOf(this, AtomType.ITEM) || type instanceof NodeType && parent.instanceOf(type);
   }
 
   @Override
@@ -247,7 +246,7 @@ public enum NodeType implements Type {
 
   @Override
   public final AtomType atomic() {
-    return this == PROCESSING_INSTRUCTION || this == COMMENT ? AtomType.STRING :
+    return oneOf(PROCESSING_INSTRUCTION, COMMENT) ? AtomType.STRING :
       this == NODE ? AtomType.ANY_ATOMIC_TYPE : AtomType.UNTYPED_ATOMIC;
   }
 
