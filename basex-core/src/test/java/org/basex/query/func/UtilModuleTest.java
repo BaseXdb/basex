@@ -36,32 +36,6 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void arrayMembers() {
-    final Function func = _UTIL_ARRAY_MEMBERS;
-
-    query(func.args(" []"), "");
-    query(func.args(" [ () ]"), "[()]");
-    query(func.args(" [ 1 ]"), "[1]");
-    query(func.args(" [ 1, 2 ]"), "[1]\n[2]");
-    query(func.args(" [ (1, 2) ]"), "[(1,2)]");
-    query(func.args(" [ (1, 2), 3 ]"), "[(1,2)]\n[3]");
-    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + FOOT.args(), "[100000]");
-  }
-
-  /** Test method. */
-  @Test public void arrayValues() {
-    final Function func = _UTIL_ARRAY_VALUES;
-
-    query(func.args(" []"), "");
-    query(func.args(" [ () ]"), "");
-    query(func.args(" [ 1 ]"), "1");
-    query(func.args(" [ 1, 2 ]"), "1\n2");
-    query(func.args(" [ (1, 2) ]"), "1\n2");
-    query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
-    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + FOOT.args(), "100000");
-  }
-
-  /** Test method. */
   @Test public void countWithin() {
     final Function func = _UTIL_COUNT_WITHIN;
 
@@ -300,29 +274,6 @@ public final class UtilModuleTest extends QueryPlanTest {
     query(func.args(" ()", 1, 2), 2);
     query(func.args(" (<a/>, <b/>)", 1, 2), 1);
     error(func.args(" (1, 2)", 1, 2), ARGTYPE_X_X_X);
-  }
-
-  /** Test method. */
-  @Test public void mapEntries() {
-    final Function func = _UTIL_MAP_ENTRIES;
-
-    query(func.args(" map {}"), "");
-    query(func.args(" map { 1: 2 }") + "?key", 1);
-    query(func.args(" map { 1: 2 }") + "?value", 2);
-    query(func.args(" map { 1: (2, 3) }") + "?key", 1);
-    query(func.args(" map { 1: (2, 3) }") + "?value", "2\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + "?key", "1\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + "?value", "2\n4");
-  }
-
-  /** Test method. */
-  @Test public void mapValues() {
-    final Function func = _UTIL_MAP_VALUES;
-
-    query(func.args(" map {}"), "");
-    query(func.args(" map { 1: 2 }"), 2);
-    query(func.args(" map { 1: (2, 3) }"), "2\n3");
-    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /** Test method. */

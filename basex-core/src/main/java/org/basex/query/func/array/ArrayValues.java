@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -18,54 +17,50 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ArrayMembers extends StandardFunc {
+public class ArrayValues extends StandardFunc {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
       final Iterator<Value> members = array.members().iterator();
+      Iter ir;
 
       @Override
-      public XQMap next() throws QueryException {
-        return members.hasNext() ? record(members.next()) : null;
+      public Item next() throws QueryException {
+        while(true) {
+          if(ir != null) {
+            final Item item = qc.next(ir);
+            if(item != null) return item;
+          }
+          if(!members.hasNext()) return null;
+          ir = members.next().iter();
+        }
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return record(array.get(i));
+        return array.get(i).item(qc, info);
       }
       @Override
       public long size() {
-        return array.arraySize();
+        return array.funcType().declType.one() ? array.arraySize() : -1;
       }
     };
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(record(member));
+    for(final Value member : array.members()) vb.add(member);
     return vb.value(this);
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected final Expr opt(final CompileContext cc) {
     final FuncType ft = arg(0).funcType();
-    if(ft instanceof ArrayType) {
-      exprType.assign(MapType.get(AtomType.STRING, ft.declType));
-    }
+    if(ft instanceof ArrayType) exprType.assign(ft.declType.with(Occ.ZERO_OR_MORE));
     return this;
-  }
-
-  /**
-   * Creates a value record.
-   * @param value value of the record
-   * @return map
-   * @throws QueryException query exception
-   */
-  private XQMap record(final Value value) throws QueryException {
-    return XQMap.entry(Str.VALUE, value, info);
   }
 }

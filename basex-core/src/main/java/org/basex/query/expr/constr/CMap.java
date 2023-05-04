@@ -41,10 +41,10 @@ public final class CMap extends Arr {
     if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
 
     // determine static key type (all keys must be single items)
-    Type kt = null;
+    AtomType kt = null;
     for(int e = 0; e < el; e += 2) {
       final SeqType st = exprs[e].seqType();
-      final Type type = st.type.atomic();
+      final AtomType type = st.type.atomic();
       if(type == null || !st.one() || st.mayBeArray()) {
         kt = null;
         break;
@@ -59,9 +59,7 @@ public final class CMap extends Arr {
       final SeqType dst = exprs[e].seqType();
       dt = dt == null ? dst : dt.union(dst);
     }
-    dt = dt != null ? dt.union(SeqType.EMPTY_SEQUENCE_Z) : SeqType.ITEM_ZM;
-
-    exprType.assign(MapType.get((AtomType) kt, dt));
+    exprType.assign(MapType.get(kt, dt != null ? dt : SeqType.ITEM_ZM));
 
     return allAreValues(true) ? cc.preEval(this) : this;
   }

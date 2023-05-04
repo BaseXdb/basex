@@ -56,6 +56,18 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void entries() {
+    final Function func = _MAP_ENTRIES;
+    query(func.args(" map {}"), "");
+    query(func.args(" map { 1: 2 }") + " !" + _MAP_KEYS.args(" ."), 1);
+    query(func.args(" map { 1: 2 }") + " !" + _MAP_VALUES.args(" ."), 2);
+    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_KEYS.args(" ."), 1);
+    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_VALUES.args(" ."), "2\n3");
+    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_KEYS.args(" ."), "1\n3");
+    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_VALUES.args(" ."), "2\n4");
+  }
+
+  /** Test method. */
   @Test public void entry() {
     final Function func = _MAP_ENTRY;
     query("exists(" + func.args("A", "B") + ')', true);
@@ -271,6 +283,18 @@ public final class MapModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void pairs() {
+    final Function func = _MAP_PAIRS;
+    query(func.args(" map {}"), "");
+    query(func.args(" map { 1: 2 }") + "?key", 1);
+    query(func.args(" map { 1: 2 }") + "?value", 2);
+    query(func.args(" map { 1: (2, 3) }") + "?key", 1);
+    query(func.args(" map { 1: (2, 3) }") + "?value", "2\n3");
+    query(func.args(" map { 1: 2, 3: 4 }") + "?key", "1\n3");
+    query(func.args(" map { 1: 2, 3: 4 }") + "?value", "2\n4");
+  }
+
+  /** Test method. */
   @Test public void put() {
     // no entry
     final Function func = _MAP_PUT;
@@ -297,6 +321,16 @@ public final class MapModuleTest extends QueryPlanTest {
   @Test public void size() {
     final Function func = _MAP_SIZE;
     query(func.args(" map { }"), 0);
+  }
+
+  /** Test method. */
+  @Test public void values() {
+    final Function func = _MAP_VALUES;
+
+    query(func.args(" map {}"), "");
+    query(func.args(" map { 1: 2 }"), 2);
+    query(func.args(" map { 1: (2, 3) }"), "2\n3");
+    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /**

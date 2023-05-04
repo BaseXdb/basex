@@ -77,7 +77,7 @@ public final class MapType extends FuncType {
 
     if(type instanceof MapType) {
       final MapType mt = (MapType) type;
-      return get((AtomType) keyType().union(mt.keyType()), declType.union(mt.declType));
+      return get(keyType().union(mt.keyType()), declType.union(mt.declType));
     }
     return type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType  ? type.union(this) : AtomType.ITEM;

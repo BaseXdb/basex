@@ -1014,15 +1014,14 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final Type union(final Type type) {
-    if(instanceOf(type)) return type;
+  public final AtomType union(final Type type) {
     if(type.instanceOf(this)) return this;
 
     if(type instanceof AtomType) {
+      AtomType at = (AtomType) type;
+      if(instanceOf(at)) return at;
       final List<AtomType> arr = new ArrayList<>();
-      for(AtomType at = (AtomType) type; (at = at.parent) != null;) {
-        arr.add(at);
-      }
+      while((at = at.parent) != null) arr.add(at);
       for(AtomType p = this; (p = p.parent) != null;)
         if(arr.contains(p)) return p;
     }

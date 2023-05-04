@@ -461,6 +461,9 @@ public enum Function implements AFunction {
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
+  PARTITION(FnPartition::new, "partition(input,break-when)",
+      params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_ZM, flag(HOF)),
+  /** XQuery function. */
   PATH(FnPath::new, "path([node])",
       params(NODE_ZO), STRING_ZO),
   /** XQuery function. */
@@ -636,6 +639,9 @@ public enum Function implements AFunction {
   _MAP_CONTAINS(MapContains::new, "contains(map,key)",
       params(MAP_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O, MAP_URI),
   /** XQuery function. */
+  _MAP_ENTRIES(MapEntries::new, "entries(map)",
+      params(MAP_O), MAP_ZM, MAP_URI),
+  /** XQuery function. */
   _MAP_ENTRY(MapEntry::new, "entry(key,value)",
       params(ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */
@@ -660,6 +666,13 @@ public enum Function implements AFunction {
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_O), MAP_O, MAP_URI),
   /** XQuery function. */
+  _MAP_OF(MapOf::new, "of(pairs[,combine])",
+      params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
+      MAP_O, flag(HOF), MAP_URI),
+  /** XQuery function. */
+  _MAP_PAIRS(MapPairs::new, "pairs(map)",
+      params(MAP_O), MAP_ZM, MAP_URI),
+  /** XQuery function. */
   _MAP_PUT(MapPut::new, "put(map,key,value)",
       params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */
@@ -668,6 +681,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _MAP_SIZE(MapSize::new, "size(map)",
       params(MAP_O), INTEGER_O, MAP_URI),
+  /** XQuery function. */
+  _MAP_VALUES(MapValues::new, "values(map)",
+      params(MAP_O), ITEM_ZM, MAP_URI),
 
   // Array Module
 
@@ -727,11 +743,8 @@ public enum Function implements AFunction {
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
       params(ARRAY_O), MAP_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_OF(ArrayOf::new, "of(input)",
+  _ARRAY_OF(ArrayOf::new, "of(members)",
       params(MAP_ZM), ARRAY_O, ARRAY_URI),
-  /** XQuery function. */
-  _ARRAY_PARTITION(ArrayPartition::new, "partition(input,break-when)",
-      params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
@@ -760,6 +773,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _ARRAY_TRUNK(ArrayTrunk::new, "trunk(array)",
       params(ARRAY_O), ARRAY_O, ARRAY_URI),
+  /** XQuery function. */
+  _ARRAY_VALUES(ArrayValues::new, "values(array)",
+      params(ARRAY_O), ITEM_ZM, ARRAY_URI),
 
   // Math Module
 

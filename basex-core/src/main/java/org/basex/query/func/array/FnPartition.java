@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ArrayPartition extends ArrayFn {
+public final class FnPartition extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {

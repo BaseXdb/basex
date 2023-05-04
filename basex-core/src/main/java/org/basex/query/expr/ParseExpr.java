@@ -651,18 +651,6 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to an array member.
-   * @param item item to check
-   * @return member
-   * @throws QueryException query exception
-   */
-  protected final Value toMember(final Item item) throws QueryException {
-    final XQMap map = toMap(item);
-    if(map.mapSize() == 1 && map.contains(Str.VALUE, info)) return map.get(Str.VALUE, info);
-    throw INVCONVERT_X_X_X.get(info, item.type, "record(value as item()*)", item);
-  }
-
-  /**
    * Evaluates an expression to an array.
    * @param expr expression
    * @param qc query context

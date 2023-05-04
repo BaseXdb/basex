@@ -1376,6 +1376,48 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void partition() {
+    final Function func = PARTITION;
+
+    String fn = " function($seq, $curr) { true() }";
+    query(func.args(" ()", fn), "");
+    query(func.args(1, fn), "[1]");
+    query(func.args(" (1 to 1000)", fn) + " => count()", 1000);
+    query(func.args(" (1 to 1000)[. < 3]", fn) + " => count()", 2);
+    query(func.args(" (1 to 1000)[. < 2]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 1]", fn) + " => count()", 0);
+
+    fn = " function($seq, $curr) { false() }";
+    query(func.args(" ()", fn), "");
+    query(func.args(1, fn), "[1]");
+    query(func.args(" (1 to 1000)", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 3]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 2]", fn) + " => count()", 1);
+    query(func.args(" (1 to 1000)[. < 1]", fn) + " => count()", 0);
+
+    fn = " function($seq, $curr) { not($seq = $curr) }";
+    query(func.args(" (1, 1)", fn), "[(1,1)]");
+    query(func.args(" (1, 1, 2, 1)", fn), "[(1,1)]\n[2]\n[1]");
+
+    fn = " function($seq, $curr) { $curr > $seq }";
+    query(func.args(" (846, 23, 5, 8, 6, 1000)", fn), "[(846,23,5)]\n[(8,6)]\n[1000]");
+
+    query(func.args(" ('Anita', 'Anne', 'Barbara', 'Catherine', 'Christine')",
+        " function($x, $y) { substring($x[last()], 1, 1) ne substring($y, 1, 1) }"),
+        "[(\"Anita\",\"Anne\")]\n[\"Barbara\"]\n[(\"Catherine\",\"Christine\")]");
+    query(func.args(" (1, 2, 3, 4, 5, 6)", " function($a, $b){ count($a) eq 2 }"),
+        "[(1,2)]\n[(3,4)]\n[(5,6)]");
+    query(func.args(" (1, 4, 6, 3, 1, 1)", " function($a, $b) { sum($a) ge 5 }"),
+        "[(1,4)]\n[6]\n[(3,1,1)]");
+    query(func.args(" tokenize('In the beginning was the word')",
+        " function($a, $b) { sum(($a, $b) ! string-length()) gt 10 }"),
+        "[(\"In\",\"the\")]\n[\"beginning\"]\n[(\"was\",\"the\",\"word\")]");
+    query(func.args(" (1, 2, 3, 6, 7, 9, 10)",
+        " function($seq, $new) { not($new = $seq[last()] + 1) }"),
+        "[(1,2,3)]\n[(6,7)]\n[(9,10)]");
+  }
+
+  /** Test method. */
   @Test public void randomNumberGenerator() {
     final Function func = RANDOM_NUMBER_GENERATOR;
 
