@@ -115,7 +115,7 @@ public final class BaseXImages {
     // fallback code for displaying icons
     final String path = file.path();
     final MediaType type = MediaType.get(path);
-    if(type.isXML()) return FILE_XML;
+    if(type.isXml()) return FILE_XML;
     if(type.isXQuery()) return FILE_XQUERY;
 
     if(Prop.WIN) {

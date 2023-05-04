@@ -94,7 +94,7 @@ public final class Users {
         file.parent().md();
         final FBuilder root = FElem.build(Q_USERS);
         for(final User user : users.values()) {
-          root.add(user.toXML(null, null));
+          root.add(user.toXml(null, null));
         }
         if(info != null) {
           root.add(info);

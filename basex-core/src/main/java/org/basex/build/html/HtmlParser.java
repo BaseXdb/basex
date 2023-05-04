@@ -63,7 +63,7 @@ public final class HtmlParser extends XMLParser {
    */
   public HtmlParser(final IO source, final MainOptions options, final HtmlOptions hopts)
       throws IOException {
-    super(toXML(source, hopts), options);
+    super(toXml(source, hopts), options);
   }
 
   /**
@@ -73,7 +73,7 @@ public final class HtmlParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
-  private static IO toXML(final IO io, final HtmlOptions hopts) throws IOException {
+  private static IO toXml(final IO io, final HtmlOptions hopts) throws IOException {
     // reader could not be initialized; fall back to XML
     if(!available()) return io;
 

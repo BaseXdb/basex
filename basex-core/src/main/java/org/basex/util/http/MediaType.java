@@ -184,7 +184,7 @@ public final class MediaType implements Comparable<MediaType> {
    * Checks if this is an XML type.
    * @return result of check
    */
-  public boolean isXML() {
+  public boolean isXml() {
     return is(TEXT_XML) || is(TEXT_XML_EPE) || is(APPLICATION_XML) || is(APPLICATION_XML_EPE) ||
         sub.endsWith(XML_SUFFIX);
   }

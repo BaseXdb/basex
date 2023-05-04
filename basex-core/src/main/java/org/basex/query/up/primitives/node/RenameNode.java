@@ -27,7 +27,7 @@ public final class RenameNode extends NodeUpdate {
    * @param pre target node pre value
    * @param data target data reference
    * @param ii input info
-   * @param name new QName / new name value
+   * @param name new QName
    */
   public RenameNode(final int pre, final Data data, final InputInfo ii, final QNm name) {
     super(UpdateType.RENAMENODE, pre, data, ii);

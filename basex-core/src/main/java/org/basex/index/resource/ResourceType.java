@@ -22,7 +22,7 @@ public enum ResourceType {
     @Override
     public MediaType contentType(final String path) {
       final MediaType ct = MediaType.get(path);
-      return !ct.isXML() ? MediaType.APPLICATION_XML : ct;
+      return !ct.isXml() ? MediaType.APPLICATION_XML : ct;
     }
   },
 

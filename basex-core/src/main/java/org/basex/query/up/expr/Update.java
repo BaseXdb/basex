@@ -39,7 +39,7 @@ abstract class Update extends Arr {
   }
 
   /**
-   * Checks if the new namespaces have conflicting namespaces.
+   * Checks for namespace conflicts in attributes.
    * @param list node list
    * @param target target node
    * @return specified node list

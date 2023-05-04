@@ -106,7 +106,7 @@ public final class User {
    * @return user element
    * @throws QueryException query exception
    */
-  public synchronized FNode toXML(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public synchronized FNode toXml(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FBuilder user = FElem.build(Q_USER).add(Q_NAME, name).add(Q_PERMISSION, perm);
     passwords.forEach((key, value) -> {
       final FBuilder pw = FElem.build(Q_PASSWORD).add(Q_ALGORITHM, key);

@@ -317,7 +317,7 @@ public final class Payload {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
       opts.assign(type);
       return new DBNode(new HtmlParser(io, options, opts));
-    } else if(type.isXML()) {
+    } else if(type.isXml()) {
       return new DBNode(io);
     } else if(type.isText()) {
       return Str.get(io.read());
@@ -351,7 +351,7 @@ public final class Payload {
    */
   private static IOContent prepare(final byte[] body, final MediaType type) throws IOException {
     byte[] data = body;
-    final boolean xml = type.isXML(), text = type.isText();
+    final boolean xml = type.isXml(), text = type.isText();
     if(xml || text) {
       // convert text to UTF8; skip redundant XML declaration
       data = new NewlineInput(body).encoding(type.parameter(CHARSET)).content();

@@ -81,7 +81,7 @@ public final class IdIdrefTest extends QueryTest {
     final Value actual = run(query);
 
     assertTrue(eq(actual, expected), String.format(
-      "[E] %d result(s): %s\n[F] %d result(s): %s",
+      "[E] %d result(s): %s%n[F] %d result(s): %s",
       expected.size(), serialize(expected),
       actual.size(), serialize(actual)));
   }

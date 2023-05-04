@@ -162,7 +162,7 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void evalURI() {
+  @Test public void evalUri() {
     final Function func = _JOB_EVAL;
     final String uri = " xs:anyURI('src/test/resources/input.xq')";
     query("starts-with(" + func.args(uri) + ", 'job')", true);

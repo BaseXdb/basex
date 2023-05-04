@@ -284,7 +284,7 @@ public final class Client {
         method = SerialMethod.XHTML.toString();
       } else if(mt.is(MediaType.TEXT_HTML)) {
         method = SerialMethod.HTML.toString();
-      } else if(mt.isXML()) {
+      } else if(mt.isXml()) {
         method = SerialMethod.XML.toString();
       } else if(mt.isText()) {
         method = SerialMethod.TEXT.toString();

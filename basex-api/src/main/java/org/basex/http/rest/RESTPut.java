@@ -62,7 +62,7 @@ final class RESTPut {
       opts.assign(mt);
       options.set(MainOptions.TEXTPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.TEXT);
-    } else if(!mt.is(MediaType.ALL_ALL) && !mt.isXML()) {
+    } else if(!mt.is(MediaType.ALL_ALL) && !mt.isXml()) {
       xml = false;
     }
 

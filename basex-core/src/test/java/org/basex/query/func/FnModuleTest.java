@@ -1364,7 +1364,7 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void parseXML() {
+  @Test public void parseXml() {
     final Function func = PARSE_XML;
     contains(func.args("<x>a</x>") + "//text()", "a");
     query(func.args("<a/>") + "/a[node()]", "");
