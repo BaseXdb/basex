@@ -47,12 +47,14 @@ public final class GUIOptions extends Options {
   /** Default GUI Monospace Font. */
   public static final StringOption MONOFONT = new StringOption("MONOFONT",
       WIN ? "Consolas" : Font.MONOSPACED);
-  /** Font TYPE = plain, bold, italics). */
+  /** Font TYPE (plain, bold, italics). */
   public static final NumberOption FONTTYPE = new NumberOption("FONTTYPE", 0);
   /** Font size. */
   public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", 15);
   /** Only display monospace fonts. */
   public static final BooleanOption ONLYMONO = new BooleanOption("ONLYMONO", false);
+  /** Anti-aliasing type. */
+  public static final StringOption ANTIALIAS = new StringOption("ANTIALIAS", "System");
 
   /** Red GUI color factor. */
   public static final NumberOption COLORRED = new NumberOption("COLORRED", 21);

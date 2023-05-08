@@ -80,12 +80,27 @@ public final class BaseXLayout {
   /**
    * Activates graphics anti-aliasing.
    * @param g graphics reference
-   * @return graphics reference
    */
-  public static Graphics2D antiAlias(final Graphics g) {
+  public static void antiAlias(final Graphics g) {
     final Graphics2D g2 = (Graphics2D) g;
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    return g2;
+  }
+
+  /**
+   * Chooses the anti-aliasing renderer.
+   * @param g graphics reference
+   * @param type anti-aliasing type
+   */
+  public static void antiAlias(final Graphics g, final String type) {
+    Object hint = null;
+    if(type.equals("Off")) {
+      hint = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+    } else if(type.equals("On")) {
+      hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+    } else if(type.equals("GASP")) {
+      hint = RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
+    }
+    if(hint != null) ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, hint);
   }
 
   /**

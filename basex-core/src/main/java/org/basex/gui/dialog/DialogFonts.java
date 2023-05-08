@@ -38,6 +38,8 @@ public final class DialogFonts extends BaseXDialog {
   private final BaseXList size;
   /** Only display monospace fonts. */
   private final BaseXCheckBox onlyMono;
+  /** Anti-aliasing. */
+  private final BaseXCombo antiAlias;
 
   /**
    * Default constructor.
@@ -49,7 +51,10 @@ public final class DialogFonts extends BaseXDialog {
     final GUIOptions gopts = gui.gopts;
     fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
-    final BaseXBack p = new BaseXBack(new TableLayout(2, 4, 8, 0));
+    antiAlias = new BaseXCombo(this, "System", "GASP", "On", "Off");
+    antiAlias.setSelectedItem(gopts.get(GUIOptions.ANTIALIAS));
+
+    final BaseXBack p = new BaseXBack(new TableLayout(2, 4, 8, 8));
     font = new BaseXList(this, fonts);
     font.setWidth(200);
     p.add(font);
@@ -69,7 +74,11 @@ public final class DialogFonts extends BaseXDialog {
     type.setValue(FONT_TYPES[gopts.get(GUIOptions.FONTTYPE)]);
     font.setValue(gopts.get(GUIOptions.FONT));
 
-    p.add(new BaseXBack());
+    final BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 8));
+    pp.add(new BaseXLabel("Anti-Aliasing"));
+    pp.add(antiAlias);
+    p.add(pp);
+
     onlyMono = new BaseXCheckBox(this, "Monospace", GUIOptions.ONLYMONO, gopts);
     p.add(onlyMono);
 
@@ -92,8 +101,13 @@ public final class DialogFonts extends BaseXDialog {
 
   @Override
   public void action(final Object cmp) {
+    boolean changed = false;
+
     final GUIOptions gopts = gui.gopts;
-    if(cmp == onlyMono) {
+    if(cmp == antiAlias) {
+      gopts.set(GUIOptions.ANTIALIAS, antiAlias.getSelectedItem());
+      changed = true;
+    } else if(cmp == onlyMono) {
       final boolean selected = onlyMono.isSelected();
       gopts.set(GUIOptions.ONLYMONO, selected);
       if(selected) {
@@ -106,7 +120,6 @@ public final class DialogFonts extends BaseXDialog {
       }
       font2.setValue(gopts.get(GUIOptions.MONOFONT));
     } else {
-      boolean changed = false;
       if(cmp == font) {
         final String name = font.getValue();
         if(!name.isEmpty()) {
@@ -132,13 +145,12 @@ public final class DialogFonts extends BaseXDialog {
           changed = true;
         }
       }
-
-      if(changed) {
-        final int t = gopts.get(GUIOptions.FONTTYPE);
-        font.setFont(gopts.get(GUIOptions.FONT), t);
-        font2.setFont(gopts.get(GUIOptions.MONOFONT), t);
-        gui.updateLayout();
-      }
+    }
+    if(changed) {
+      final int t = gopts.get(GUIOptions.FONTTYPE);
+      font.setFont(gopts.get(GUIOptions.FONT), t);
+      font2.setFont(gopts.get(GUIOptions.MONOFONT), t);
+      gui.updateLayout();
     }
   }
 

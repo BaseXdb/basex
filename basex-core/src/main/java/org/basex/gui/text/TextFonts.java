@@ -22,6 +22,8 @@ final class TextFonts {
   /** Fallback font metrics. */
   private final FontMetrics[] fallbackMetrics = new FontMetrics[2];
 
+  /** Monospace flag. */
+  private boolean monospace;
   /** Font style. */
   private int style;
 
@@ -39,12 +41,13 @@ final class TextFonts {
    * @param comp component
    */
   void init(final JComponent comp) {
-    if(metrics[0] != null) return;
+    if(metrics[PLAIN] != null) return;
 
     metrics[PLAIN] = comp.getFontMetrics(fonts[PLAIN]);
     metrics[BOLD] = comp.getFontMetrics(fonts[BOLD]);
+    monospace = BaseXLayout.isMono(metrics[PLAIN]);
 
-    final String name = BaseXLayout.isMono(metrics[0]) ? MONOSPACED : SANS_SERIF;
+    final String name = monospace ? MONOSPACED : SANS_SERIF;
     fallbackFonts[PLAIN] = new Font(name, PLAIN, fonts[PLAIN].getSize());
     fallbackFonts[BOLD] = fallbackFonts[PLAIN].deriveFont(BOLD);
     fallbackMetrics[PLAIN] = comp.getFontMetrics(fallbackFonts[PLAIN]);
@@ -65,6 +68,14 @@ final class TextFonts {
    */
   Font font() {
     return fonts[style];
+  }
+
+  /**
+   * Returns the monospace flag.
+   * @return monospace flag
+   */
+  boolean monospace() {
+    return monospace;
   }
 
   /**

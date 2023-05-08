@@ -49,6 +49,8 @@ final class TextRenderer extends BaseXBack {
   private boolean showLines;
   /** Mark current line. */
   private boolean markline;
+  /** Anti-aliasing type. */
+  private String antiAlias;
 
   /** Border offset. */
   private int offset;
@@ -111,6 +113,7 @@ final class TextRenderer extends BaseXBack {
     showNL = gopts.get(GUIOptions.SHOWNL);
     showLines = gopts.get(GUIOptions.SHOWLINES);
     markline = gopts.get(GUIOptions.MARKLINE);
+    antiAlias = gopts.get(GUIOptions.ANTIALIAS);
     indent = Math.max(1, gopts.get(GUIOptions.INDENT));
     repaint();
   }
@@ -118,6 +121,7 @@ final class TextRenderer extends BaseXBack {
   @Override
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
+    BaseXLayout.antiAlias(g, antiAlias);
 
     parentheses.reset();
     final TextIterator iter = init(g, false);

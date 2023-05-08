@@ -206,7 +206,8 @@ public final class PlotView extends View {
         gui.gopts.get(GUIOptions.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
     final BufferedImage img = new BufferedImage(size, size, Transparency.TRANSLUCENT);
 
-    final Graphics g = BaseXLayout.antiAlias(img.getGraphics());
+    final Graphics g = img.getGraphics();
+    BaseXLayout.antiAlias(g);
     Color c = color1A;
     if(marked) c = colormark1A;
     if(markedSub) c = colormark2A;
@@ -222,7 +223,8 @@ public final class PlotView extends View {
    */
   private void createPlotImage() {
     plotImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
-    final Graphics g = BaseXLayout.antiAlias(plotImg.getGraphics());
+    final Graphics g = plotImg.getGraphics();
+    BaseXLayout.antiAlias(g);
 
     // draw axis and grid
     drawAxis(g, true);
@@ -355,7 +357,8 @@ public final class PlotView extends View {
   private void createMarkedNodes() {
     final Data data = gui.context.data();
     markedImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
-    final Graphics gi = BaseXLayout.antiAlias(markedImg.getGraphics());
+    final Graphics gi = markedImg.getGraphics();
+    BaseXLayout.antiAlias(gi);
 
     final DBNodes marked = gui.context.marked;
     if(marked.isEmpty()) return;
@@ -677,7 +680,9 @@ public final class PlotView extends View {
     // image is created which displays the rotated label ...
     final int imgH = 160;
     final BufferedImage img = new BufferedImage(imgW, imgH, Transparency.BITMASK);
-    final Graphics2D g2d = BaseXLayout.antiAlias(img.createGraphics());
+    final Graphics2D g2d = img.createGraphics();
+    BaseXLayout.antiAlias(g2d);
+
     g2d.rotate(ROTATE, imgW, textH);
     g2d.setFont(font);
     g2d.setColor(im ? color3 : TEXT);

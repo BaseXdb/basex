@@ -316,18 +316,19 @@ public final class FolderView extends View {
     boxW = s - boxMargin;
     final int sp = Math.max(1, s >> 4);
 
-    /* Empty Box. */
+    // empty box
     final BufferedImage emptyBox = new BufferedImage(boxW + 1, boxW + 1,
             BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g = BaseXLayout.antiAlias(emptyBox.createGraphics());
+    Graphics2D g = emptyBox.createGraphics();
+    BaseXLayout.antiAlias(g);
     g.setColor(color4);
     g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
     g.setColor(color3);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
 
     openedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
-    g = BaseXLayout.antiAlias(openedMarker.createGraphics());
-
+    g = openedMarker.createGraphics();
+    BaseXLayout.antiAlias(g);
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
         boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
     p.translate(0, -1);
@@ -338,7 +339,8 @@ public final class FolderView extends View {
     g.fillPolygon(p);
 
     closedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
-    g = BaseXLayout.antiAlias(closedMarker.createGraphics());
+    g = closedMarker.createGraphics();
+    BaseXLayout.antiAlias(g);
 
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
         new int[] { 0, boxW >> 1, boxW }, 3);
