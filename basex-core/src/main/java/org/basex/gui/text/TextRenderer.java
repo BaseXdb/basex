@@ -30,16 +30,11 @@ final class TextRenderer extends BaseXBack {
   /** Current brackets. */
   private final IntList parentheses = new IntList();
 
-  /** Font. */
-  private Font font;
-  /** Default font. */
-  private Font defaultFont;
-  /** Bold font. */
-  private Font boldFont;
+  /** Fonts (default, bold). */
+  private TextFonts fonts;
+
   /** Font height. */
   private int fontHeight;
-  /** Font metrics. */
-  private FontMetrics fontMetrics;
   /** Width of current string. */
   private int stringWidth;
   /** Show invisible characters. */
@@ -102,13 +97,12 @@ final class TextRenderer extends BaseXBack {
     this.scroll = scroll;
     this.edit = edit;
     this.gui = gui;
-    font(GUIConstants.dmfont);
+    setFont(GUIConstants.dmfont);
   }
 
   @Override
   public void setFont(final Font f) {
-    defaultFont = f;
-    boldFont = f.deriveFont(Font.BOLD);
+    fonts = new TextFonts(f);
     if(gui == null) return;
 
     final GUIOptions gopts = gui.gopts;
@@ -153,8 +147,8 @@ final class TextRenderer extends BaseXBack {
   private void drawLineNumber(final Graphics g) {
     if(edit && showLines) {
       g.setColor(GUIConstants.gray);
-      final String s = Integer.toString(line);
-      g.drawString(s, offset - fontMetrics.stringWidth(s) - (OFFSET << 1), y);
+      final String string = Integer.toString(line);
+      drawString(string, offset - fonts.stringWidth(string) - (OFFSET << 1), y, g);
     }
   }
 
@@ -251,12 +245,11 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Sets a new font.
-   * @param f font
+   * @param style font style (Font#PLAIN, Font#BOLD)
    */
-  private void font(final Font f) {
-    font = f;
-    fontHeight = f.getSize() * 5 / 4;
-    fontMetrics = getFontMetrics(f);
+  private void font(final int style) {
+    fonts.assign(style);
+    fontHeight = fonts.font().getSize() * 5 / 4;
   }
 
   @Override
@@ -282,14 +275,15 @@ final class TextRenderer extends BaseXBack {
    */
   private TextIterator init(final Graphics g, final boolean start) {
     syntax.init(GUIConstants.TEXT);
-    font = defaultFont;
-    font(font);
+    font(Font.PLAIN);
 
     offset = OFFSET;
     if(g != null) {
-      g.setFont(font);
+      fonts.init(this);
       if(edit && showLines) {
-        offset += fontMetrics.stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
+        final String string = Integer.toString(text.lines());
+        g.setFont(fonts.font(string));
+        offset += fonts.stringWidth(string) + (OFFSET << 1);
       }
     }
     x = offset;
@@ -348,9 +342,9 @@ final class TextRenderer extends BaseXBack {
       final int ch = iter.next();
       // process control codes
       if(ch == TokenBuilder.BOLD) {
-        font(boldFont);
+        font(Font.BOLD);
       } else if(ch == TokenBuilder.NORM) {
-        font(defaultFont);
+        font(Font.PLAIN);
       } else if(ch == TokenBuilder.ULINE) {
         link ^= true;
       } else {
@@ -465,7 +459,7 @@ final class TextRenderer extends BaseXBack {
       if(showNL && cp == '\n') {
         // draw newline character
         g.setColor(GUIConstants.gray);
-        g.drawString("\u00b6", x, y);
+        drawString("\u00b6", x, y, g);
       } else if(showInvisible && cp == '\t') {
         // draw tab arrow
         final int lh = 1 + fontHeight / 12, xe = x + charWidth('\t') - lh;
@@ -474,10 +468,7 @@ final class TextRenderer extends BaseXBack {
         g.drawLine(x + lh, yy, xe, yy);
         g.drawLine(xe - as, yy - as, xe, yy);
         g.drawLine(xe - as, yy + as, xe, yy);
-      } else if(cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END) {
-        // control code: set new font
-        g.setFont(font);
-      } else if(cp > ' ') {
+      } else if(cp > ' ' && cp < TokenBuilder.PRIVATE_START || cp > TokenBuilder.PRIVATE_END) {
         if(showInvisible && Character.isSpaceChar(cp)) {
           // draw whitespace character
           final int s = fontHeight / 12 + 1;
@@ -497,11 +488,11 @@ final class TextRenderer extends BaseXBack {
               cp = iter.next();
               cw = charWidth(cp);
             } while(cw <= 0 && iter.more());
-            g.drawString(stringCache.toString(), xx, y);
+            drawString(stringCache.toString(), xx, y, g);
             xx = xxx;
             xxx += cw;
           }
-          g.drawString(stringCache.reset().add(cp).toString(), xx, y);
+          drawString(Character.toString(cp), xx, y, g);
           iter.pos(pos);
         }
       }
@@ -572,9 +563,21 @@ final class TextRenderer extends BaseXBack {
    * @return width
    */
   private int charWidth(final int cp) {
-    return cp == '\t' ? fontMetrics.charWidth(' ') * indent :
+    return cp == '\t' ? fonts.charWidth(' ') * indent :
       cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END ||
-      cp >= 0xD800 && cp <= 0xDC00 ? 0 : fontMetrics.charWidth(cp);
+      cp >= 0xD800 && cp <= 0xDC00 ? 0 : fonts.charWidth(cp);
+  }
+
+  /**
+   * Returns the width of the specified codepoint.
+   * @param string string to be drawn
+   * @param xx x position
+   * @param yy y position
+   * @param g graphics reference
+   */
+  private void drawString(final String string, final int xx, final int yy, final Graphics g) {
+    g.setFont(fonts.font(string));
+    g.drawString(string, xx, yy);
   }
 
   /**

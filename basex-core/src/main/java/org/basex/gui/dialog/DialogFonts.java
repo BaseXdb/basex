@@ -152,8 +152,9 @@ public final class DialogFonts extends BaseXDialog {
         final Graphics g = getGraphics();
         final StringList monos = new StringList();
         for(final String name : fonts) {
-          final FontMetrics fm = g.getFontMetrics(new Font(name, Font.PLAIN, 128));
-          if(fm.charWidth(' ') == fm.charWidth('M')) monos.add(name);
+          if(BaseXLayout.isMono(g.getFontMetrics(new Font(name, Font.PLAIN, 15)))) {
+            monos.add(name);
+          }
         }
         monoFonts = monos.finish();
         return gui.gopts.get(GUIOptions.ONLYMONO);
