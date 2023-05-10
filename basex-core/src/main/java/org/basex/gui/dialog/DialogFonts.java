@@ -144,7 +144,7 @@ public final class DialogFonts extends BaseXDialog {
     new GUIWorker<Boolean>() {
       @Override
       protected Boolean doInBackground() {
-        monoFonts = GUIConstants.monos();
+        monoFonts = GUIConstants.monos(getGraphics());
         return gui.gopts.get(GUIOptions.ONLYMONO);
       }
 
