@@ -4,11 +4,15 @@ import static java.awt.Font.*;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
+import java.util.function.*;
+import java.util.stream.*;
 
 import javax.swing.*;
 
-import org.basex.gui.layout.*;
+import org.basex.gui.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Current font with different fallbacks and styles.
@@ -17,12 +21,16 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class TextFont {
-  /** Fallback fonts for visited codepoints. */
+  /** Default variable fonts. */
+  private static final StringList VARS = new StringList();
+  /** Default monospaced fonts. */
+  private static final StringList MONO = new StringList();
+  /** Names of fallback fonts for already visited codepoints. */
   private static final IntObjMap<String> FALLBACK = new IntObjMap<>();
-  /** Cached fonts for looking up codepoints. */
-  private static final Font[] ALLFONTS = new Font[BaseXLayout.FONTS.length];
+  /** Fonts sorted in descending order by number of glyphs. */
+  private static List<Font> cachedFonts;
 
-  /** Fallback fonts. */
+  /** Cached fallback fonts. */
   private final Map<String, FontBox> fallbacks = new LinkedHashMap<>();
   /** Component. */
   private final JComponent comp;
@@ -32,6 +40,18 @@ final class TextFont {
   /** Current style. */
   private int style;
 
+  static {
+    final Set<String> set = new HashSet<>(Arrays.asList(GUIConstants.FONTS));
+    final BiConsumer<StringList, String[]> add = (list, fonts) -> {
+      for(final String font : fonts) {
+        if(set.contains(font)) list.add(font);
+      }
+    };
+    add.accept(VARS, new String[] { "Noto Sans", "DejaVu Sans", "Arial Unicode MS", SANS_SERIF });
+    add.accept(MONO, new String[] { "Noto Mono", "DejaVu Sans Mono", MONOSPACED });
+    MONO.add(VARS);
+  }
+
   /**
    * Constructor.
    * @param font font
@@ -40,7 +60,8 @@ final class TextFont {
   TextFont(final Font font, final JComponent comp) {
     this.comp = comp;
     this.font = new FontBox(font);
-    new FontBox(BaseXLayout.isMono(this.font.plainMetrics) ? MONOSPACED : SANS_SERIF);
+    final StringList fonts = GUIConstants.isMono(this.font.plainMetrics) ? MONO : VARS;
+    for(final String name : fonts) new FontBox(name);
   }
 
   /**
@@ -87,7 +108,7 @@ final class TextFont {
    */
   Font font(final String string) {
     final int i = font().canDisplayUpTo(string);
-    final FontBox box = i == -1 ? font : fallback(string.charAt(i));
+    final FontBox box = i == -1 ? font : fallback(string.codePointAt(i));
     return style == 0 ? box.plain : box.bold;
   }
 
@@ -97,14 +118,14 @@ final class TextFont {
    * @return font
    */
   private FontBox fallback(final int cp) {
-    // check if a fallback is known for the specified codepoint
+    // check if a fallback has already been registered
     final String fb = FALLBACK.get(cp);
     if(fb != null) {
       final FontBox box = fallbacks.get(fb);
       return box != null ? box : new FontBox(fb);
     }
 
-    // check existing fallback fonts
+    // check for codepoint in existing fallback fonts
     for(final Map.Entry<String, FontBox> entry : fallbacks.entrySet()) {
       final FontBox box = entry.getValue();
       if(box.plain.canDisplay(cp)) {
@@ -113,16 +134,21 @@ final class TextFont {
       }
     }
 
-    // find new font
-    final int fl = BaseXLayout.FONTS.length;
-    for(int f = 0; f < fl; f++) {
-      final String nm = BaseXLayout.FONTS[f];
-      Font fn = ALLFONTS[f];
-      if(fn == null) {
-        fn = newFont(nm);
-        ALLFONTS[f] = fn;
+    // find new font (first call: sort fonts by number of glyphs)
+    if(cachedFonts == null) {
+      final Map<Font, Integer> map = new HashMap<>(GUIConstants.FONTS.length);
+      for(final String name : GUIConstants.FONTS) {
+        final Font f = newFont(name);
+        map.put(f, f.getNumGlyphs());
       }
-      if(fn.canDisplay(cp)) {
+      cachedFonts = map.entrySet().stream().
+          sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).
+          map(Map.Entry::getKey).
+          collect(Collectors.toUnmodifiableList());
+    }
+    for(final Font f : cachedFonts) {
+      if(f.canDisplay(cp)) {
+        final String nm = f.getName();
         FALLBACK.put(cp, nm);
         return new FontBox(nm);
       }

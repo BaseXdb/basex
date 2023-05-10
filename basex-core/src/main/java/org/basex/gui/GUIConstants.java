@@ -1,5 +1,6 @@
 package org.basex.gui;
 
+import static org.basex.gui.GUICommand.*;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
@@ -12,6 +13,8 @@ import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.gui.view.map.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * GUI Constants used in different views.
@@ -259,6 +262,12 @@ public final class GUIConstants {
 
   // FONTS ========================================================================================
 
+  /** Available fonts. */
+  public static final String[] FONTS = GraphicsEnvironment.getLocalGraphicsEnvironment().
+      getAvailableFontFamilyNames();
+  /** Name of monospace font. */
+  public static final String MONOFONT = Prop.WIN ? "Consolas" : Font.MONOSPACED;
+
   /** Font. */
   public static Font font;
   /** Bold Font. */
@@ -349,6 +358,33 @@ public final class GUIConstants {
    */
   public static int fontSize() {
     return LABEL.getFont().getSize();
+  }
+
+  /**
+   * Checks if the font metrics refer to a monospaced font.
+   * @param fm font metrics
+   * @return result of check
+   */
+  public static boolean isMono(final FontMetrics fm) {
+    // tolerate slight deviations
+    final IntSet set = new IntSet();
+    for(char ch = 32; ch < 256; ch++) {
+      set.add(fm.charWidth(ch));
+      if(set.size() >= 5) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns the names of all monospace fonts.
+   * @return fonts
+   */
+  public static String[] monos() {
+    final StringList monos = new StringList();
+    for(final String name : FONTS) {
+      if(isMono(LABEL.getFontMetrics(new Font(name, Font.PLAIN, 15)))) monos.add(name);
+    }
+    return monos.finish();
   }
 
   // PRIVATE METHODS ==============================================================================

@@ -25,7 +25,6 @@ import org.basex.gui.listener.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * This class provides static layout and paint helper methods which are used all over
@@ -35,10 +34,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class BaseXLayout {
-  /** Available fonts. */
-  public static final String[] FONTS = GraphicsEnvironment.getLocalGraphicsEnvironment().
-      getAvailableFontFamilyNames();
-
   /** Desktop hints. */
   private static final Map<?, ?> HINTS = (Map<?, ?>)
     Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
@@ -546,21 +541,6 @@ public final class BaseXLayout {
    */
   public static void boldFont(final JComponent comp) {
     comp.setFont(comp.getFont().deriveFont(Font.BOLD));
-  }
-
-  /**
-   * Checks if the font metrics contain a monospaced font.
-   * @param fm font metrics
-   * @return result of check
-   */
-  public static boolean isMono(final FontMetrics fm) {
-    // tolerate slight deviations
-    final IntSet set = new IntSet();
-    for(char ch = 32; ch < 256; ch++) {
-      set.add(fm.charWidth(ch));
-      if(set.size() > 5) return false;
-    }
-    return true;
   }
 
   /**

@@ -6,7 +6,6 @@ import java.awt.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.util.list.*;
 
 /**
  * Dialog window for changing the used fonts.
@@ -50,10 +49,10 @@ public final class DialogFonts extends BaseXDialog {
     antiAlias.setSelectedItem(gopts.get(GUIOptions.ANTIALIAS));
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 3, 8, 8));
-    font = new BaseXList(this, BaseXLayout.FONTS);
+    font = new BaseXList(this, GUIConstants.FONTS);
     font.setWidth(200);
     p.add(font);
-    font2 = new BaseXList(this, BaseXLayout.FONTS);
+    font2 = new BaseXList(this, GUIConstants.FONTS);
     font2.setWidth(200);
     p.add(font2);
     size = new BaseXList(this, SIZES);
@@ -107,7 +106,7 @@ public final class DialogFonts extends BaseXDialog {
         font2.setData(ready ? monoFonts : new String[] { PLEASE_WAIT_D });
       } else {
         font2.setEnabled(true);
-        font2.setData(BaseXLayout.FONTS);
+        font2.setData(GUIConstants.FONTS);
       }
       font2.setValue(gopts.get(GUIOptions.MONOFONT));
     } else {
@@ -145,14 +144,7 @@ public final class DialogFonts extends BaseXDialog {
     new GUIWorker<Boolean>() {
       @Override
       protected Boolean doInBackground() {
-        final Graphics g = getGraphics();
-        final StringList monos = new StringList();
-        for(final String name : BaseXLayout.FONTS) {
-          if(BaseXLayout.isMono(g.getFontMetrics(new Font(name, Font.PLAIN, 15)))) {
-            monos.add(name);
-          }
-        }
-        monoFonts = monos.finish();
+        monoFonts = GUIConstants.monos();
         return gui.gopts.get(GUIOptions.ONLYMONO);
       }
 
