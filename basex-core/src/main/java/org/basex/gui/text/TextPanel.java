@@ -267,7 +267,7 @@ public class TextPanel extends BaseXPanel {
     super.setFont(f);
     if(rend != null) {
       rend.setFont(f);
-      updateScrollbar.invokeLater(true);
+      computeHeight.invokeLater(true);
     }
   }
 
@@ -294,7 +294,7 @@ public class TextPanel extends BaseXPanel {
   public final void comment() {
     final int caret = editor.pos();
     if(editor.comment(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
-    updateScrollbar.invokeLater(true);
+    computeHeight.invokeLater(true);
   }
 
   /**
@@ -304,7 +304,7 @@ public class TextPanel extends BaseXPanel {
   public final void toCase(final Case cs) {
     final int caret = editor.pos();
     if(editor.toCase(cs)) hist.store(editor.text(), caret, editor.pos());
-    updateScrollbar.invokeLater(true);
+    computeHeight.invokeLater(true);
   }
 
   /**
@@ -323,7 +323,7 @@ public class TextPanel extends BaseXPanel {
     if(!ds.ok() || !editor.sort()) return;
 
     hist.store(editor.text(), caret, editor.pos());
-    updateScrollbar.invokeLater(true);
+    computeHeight.invokeLater(true);
     repaint();
   }
 
@@ -333,7 +333,7 @@ public class TextPanel extends BaseXPanel {
   public final void format() {
     final int caret = editor.pos();
     if(editor.format(rend.getSyntax())) hist.store(editor.text(), caret, editor.pos());
-    updateScrollbar.invokeLater(true);
+    computeHeight.invokeLater(true);
   }
 
   @Override
@@ -636,18 +636,18 @@ public class TextPanel extends BaseXPanel {
     if(txt != tmp) {
       // text has changed: add old text to history
       hist.store(tmp, pos, editor.pos());
-      updateScrollbar.invokeLater(down);
+      computeHeight.invokeLater(down);
     } else if(pos != editor.pos() || selected != editor.isSelected()) {
       // cursor position or selection state has changed
       updateScrollpos.invokeLater(down ? 2 : 0);
     }
   }
 
-  /** Updates size and position of the scroll bar. */
-  private final GUICode updateScrollbar = new GUICode() {
+  /** Computes the height of the text and updates the scroll bar. */
+  private final GUICode computeHeight = new GUICode() {
     @Override
     public void execute(final Object down) {
-      rend.updateScrollbar();
+      rend.computeHeight();
       updateScrollpos.execute((Boolean) down ? 2 : 0);
     }
   };
@@ -700,7 +700,7 @@ public class TextPanel extends BaseXPanel {
     if(move != 0) editor.pos(Math.min(editor.size(), caret + move));
 
     // adjust text height
-    updateScrollbar.invokeLater(true);
+    computeHeight.invokeLater(true);
     e.consume();
   }
 
@@ -750,7 +750,7 @@ public class TextPanel extends BaseXPanel {
    */
   private void finish(final int old) {
     if(old != -1) hist.store(editor.text(), old, editor.pos());
-    updateScrollbar.invokeLater(true);
+    computeHeight.invokeLater(true);
     release(Action.CHECK);
   }
 
@@ -774,7 +774,7 @@ public class TextPanel extends BaseXPanel {
   private final GUICode resizeCode = new GUICode() {
     @Override
     public void execute(final Object arg) {
-      rend.updateScrollbar();
+      rend.computeHeight();
       // update scrollbar to display value within valid range
       scroll.pos(scroll.pos());
       rend.repaint();

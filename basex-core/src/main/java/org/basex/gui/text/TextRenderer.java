@@ -21,7 +21,7 @@ final class TextRenderer extends BaseXBack {
   /** Offset. */
   private static final int OFFSET = 5;
 
-  /** Text array to be written. */
+  /** Text editor. */
   private final TextEditor text;
   /** Vertical start position. */
   private final BaseXScrollBar scroll;
@@ -80,7 +80,7 @@ final class TextRenderer extends BaseXBack {
   /** Visibility of text cursor. */
   private boolean caret;
   /** Color highlighting flag. */
-  private boolean highlighted;
+  private boolean markNext;
   /** Indicates if the current token is part of a link. */
   private boolean link;
 
@@ -124,9 +124,9 @@ final class TextRenderer extends BaseXBack {
     BaseXLayout.antiAlias(g, antiAlias);
 
     parentheses.reset();
-    final TextIterator iter = init(g, false);
     int oldL = 0;
-    while(more(iter, g)) {
+    final TextIterator iter = init(g, false);
+    while(more(iter, g) && y < height) {
       if(line != oldL && y >= 0) {
         drawLineNumber(g);
         oldL = line;
@@ -212,11 +212,8 @@ final class TextRenderer extends BaseXBack {
     final int pos = text.jump(dir, select);
     if(pos == -1) return -1;
 
-    final int hh = height;
-    height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
     for(final TextIterator iter = init(g, true); more(iter, g) && iter.pos() < pos; next(iter));
-    height = hh;
     return y;
   }
 
@@ -225,12 +222,10 @@ final class TextRenderer extends BaseXBack {
    * @return line/column
    */
   int[] pos() {
-    final int hh = height;
-    height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
-    final TextIterator iter = init(g, true);
     boolean more = true;
     int col = 1;
+    final TextIterator iter = init(g, true);
     while(more(iter, g)) {
       final int p = iter.pos();
       while(iter.more()) {
@@ -243,7 +238,6 @@ final class TextRenderer extends BaseXBack {
       iter.pos(p);
       if(next(iter)) col = 1;
     }
-    height = hh;
     return new int[] { line, col };
   }
 
@@ -254,21 +248,6 @@ final class TextRenderer extends BaseXBack {
   private void font(final int style) {
     fonts.assign(style);
     fontHeight = fonts.font().getSize() * 5 / 4;
-  }
-
-  @Override
-  public Dimension getPreferredSize() {
-    // calculate size required for the currently rendered text
-    final Graphics g = getGraphics();
-    width = Integer.MAX_VALUE;
-    height = Integer.MAX_VALUE;
-    final TextIterator iter = init(g, true);
-    int maxX = 0;
-    while(more(iter, g)) {
-      if(iter.curr() == '\n') maxX = Math.max(x, maxX);
-      next(iter);
-    }
-    return new Dimension(Math.max(x, maxX) + charWidth(' '), y + fontHeight);
   }
 
   /**
@@ -302,14 +281,13 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Updates the scroll bar.
+   * Computes the height of the text and updates the scroll bar.
    */
-  void updateScrollbar() {
+  void computeHeight() {
     width = getWidth() - (offset >> 1);
-    height = Integer.MAX_VALUE;
+
     final Graphics g = getGraphics();
-    final TextIterator iter = init(g, true);
-    while(more(iter, g)) next(iter);
+    for(final TextIterator iter = init(g, true); more(iter, g); next(iter));
     height = getHeight() + fontHeight;
     scroll.height(y + OFFSET);
   }
@@ -319,12 +297,8 @@ final class TextRenderer extends BaseXBack {
    * @return new position
    */
   int cursorY() {
-    final int hh = height;
-    height = Integer.MAX_VALUE;
     final Graphics g = getGraphics();
-    final TextIterator iter = init(g, true);
-    while(more(iter, g) && !iter.edited()) next(iter);
-    height = hh;
+    for(final TextIterator iter = init(g, true); more(iter, g) && !iter.edited(); next(iter));
     return y - fontHeight;
   }
 
@@ -332,7 +306,7 @@ final class TextRenderer extends BaseXBack {
    * Checks if the text has more words to print.
    * @param iter iterator
    * @param g graphics reference (can be {@code null})
-   * @return true if the text has more words
+   * @return {@code true}} if more strings exist
    */
   private boolean more(final TextIterator iter, final Graphics g) {
     // no valid graphics reference, no more words found: quit
@@ -365,9 +339,7 @@ final class TextRenderer extends BaseXBack {
     }
     iter.pos(p);
     stringWidth = sw;
-
-    // check if string is visible
-    return y < height;
+    return true;
   }
 
   /**
@@ -426,15 +398,32 @@ final class TextRenderer extends BaseXBack {
     if(x == offset) markLine(g);
 
     // choose color for enabled text, depending on highlighting, link, or current syntax
-    final Color color = isEnabled() ? highlighted ? GUIConstants.GREEN : link ?
+    final Color color = isEnabled() ? markNext ? GUIConstants.GREEN : link ?
       GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
+    int cp = iter.curr();
+    markNext = cp == TokenBuilder.MARK;
 
     // retrieve first character of current token
-    int cp = iter.curr();
-    highlighted = cp == TokenBuilder.MARK;
-
     final int pos = iter.pos(), cpos = iter.caret();
-    if(y > 0 && y < height) {
+
+    // handle matching parentheses
+    if(cp == '(' || cp == '[' || cp == '{') {
+      parentheses.add(x).add(y).add(pos).add(cp);
+    } else if((cp == ')' || cp == ']' || cp == '}') && !parentheses.isEmpty()) {
+      final int open = cp == ')' ? '(' : cp == ']' ? '[' : '{';
+      if(parentheses.peek() == open) {
+        parentheses.pop();
+        final int cr = parentheses.pop(), yy = parentheses.pop(), xx = parentheses.pop();
+        if(cpos == pos || cpos == cr) {
+          g.setColor(GUIConstants.color4);
+          g.drawRect(xx, yy - (fontHeight << 2) / 5, charWidth(open), fontHeight);
+          g.drawRect(x, lineY, charWidth(cp), fontHeight);
+        }
+      }
+    }
+
+    // check if text is visible
+    if(y > 0) {
       // mark selected text
       if(iter.selectStart()) {
         int xx = x;
@@ -516,24 +505,7 @@ final class TextRenderer extends BaseXBack {
       }
     }
 
-    // handle matching parentheses
-    if(cp == '(' || cp == '[' || cp == '{') {
-      parentheses.add(x);
-      parentheses.add(y);
-      parentheses.add(pos);
-      parentheses.add(cp);
-    } else if((cp == ')' || cp == ']' || cp == '}') && !parentheses.isEmpty()) {
-      final int open = cp == ')' ? '(' : cp == ']' ? '[' : '{';
-      if(parentheses.peek() == open) {
-        parentheses.pop();
-        final int cr = parentheses.pop(), yy = parentheses.pop(), xx = parentheses.pop();
-        if(cpos == pos || cpos == cr) {
-          g.setColor(GUIConstants.color4);
-          g.drawRect(xx, yy - (fontHeight << 2) / 5, charWidth(open), fontHeight);
-          g.drawRect(x, lineY, charWidth(cp), fontHeight);
-        }
-      }
-    }
+    // finish step
     next(iter);
   }
 
