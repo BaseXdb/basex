@@ -31,7 +31,7 @@ final class TextRenderer extends BaseXBack {
   private final IntList parentheses = new IntList();
 
   /** Fonts (default, bold). */
-  private TextFonts fonts;
+  private TextFont font;
 
   /** Font height. */
   private int fontHeight;
@@ -104,7 +104,7 @@ final class TextRenderer extends BaseXBack {
 
   @Override
   public void setFont(final Font f) {
-    fonts = new TextFonts(f);
+    font = new TextFont(f, this);
     if(gui == null) return;
 
     final GUIOptions gopts = gui.gopts;
@@ -152,7 +152,7 @@ final class TextRenderer extends BaseXBack {
     if(edit && showLines) {
       g.setColor(GUIConstants.gray);
       final String string = Integer.toString(line);
-      drawString(string, offset - fonts.stringWidth(string) - (OFFSET << 1), y, g);
+      drawString(string, offset - font.stringWidth(string) - (OFFSET << 1), y, g);
     }
   }
 
@@ -245,9 +245,9 @@ final class TextRenderer extends BaseXBack {
    * Sets a new font.
    * @param style font style (Font#PLAIN, Font#BOLD)
    */
-  private void font(final int style) {
-    fonts.assign(style);
-    fontHeight = fonts.font().getSize() * 5 / 4;
+  private void setFont(final int style) {
+    font.assign(style);
+    fontHeight = font.size() * 5 / 4;
   }
 
   @Override
@@ -271,16 +271,11 @@ final class TextRenderer extends BaseXBack {
    */
   private TextIterator init(final Graphics g, final boolean start) {
     syntax.init(GUIConstants.TEXT);
-    font(Font.PLAIN);
+    setFont(Font.PLAIN);
 
     offset = OFFSET;
-    if(g != null) {
-      fonts.init(this);
-      if(edit && showLines) {
-        final String string = Integer.toString(text.lines());
-        g.setFont(fonts.font(string));
-        offset += fonts.stringWidth(string) + (OFFSET << 1);
-      }
+    if(g != null && edit && showLines) {
+      offset += font.stringWidth(Integer.toString(text.lines())) + (OFFSET << 1);
     }
     x = offset;
     y = fontHeight - (start ? 0 : scroll.pos()) - 2;
@@ -333,9 +328,9 @@ final class TextRenderer extends BaseXBack {
       final int ch = iter.next();
       // process control codes
       if(ch == TokenBuilder.BOLD) {
-        font(Font.BOLD);
+        setFont(Font.BOLD);
       } else if(ch == TokenBuilder.NORM) {
-        font(Font.PLAIN);
+        setFont(Font.PLAIN);
       } else if(ch == TokenBuilder.ULINE) {
         link ^= true;
       } else {
@@ -552,9 +547,9 @@ final class TextRenderer extends BaseXBack {
    * @return width
    */
   private int charWidth(final int cp) {
-    return cp == '\t' ? fonts.charWidth(' ') * indent :
+    return cp == '\t' ? font.charWidth(' ') * indent :
       cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END ||
-      cp >= 0xD800 && cp <= 0xDC00 ? 0 : fonts.charWidth(cp);
+      cp >= 0xD800 && cp <= 0xDC00 ? 0 : font.charWidth(cp);
   }
 
   /**
@@ -565,7 +560,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawString(final String string, final int xx, final int yy, final Graphics g) {
-    g.setFont(fonts.font(string));
+    g.setFont(font.font(string));
     g.drawString(string, xx, yy);
   }
 

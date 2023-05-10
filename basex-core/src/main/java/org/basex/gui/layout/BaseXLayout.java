@@ -35,6 +35,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class BaseXLayout {
+  /** Available fonts. */
+  public static final String[] FONTS = GraphicsEnvironment.getLocalGraphicsEnvironment().
+      getAvailableFontFamilyNames();
+
   /** Desktop hints. */
   private static final Map<?, ?> HINTS = (Map<?, ?>)
     Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");

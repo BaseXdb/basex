@@ -326,11 +326,10 @@ public final class GUIConstants {
     colormark2A = color(darker(r, 12), darker(g, 60), darker(b, 120), 100);
 
     final String name = opts.get(GUIOptions.FONT);
-    final int type = opts.get(GUIOptions.FONTTYPE);
 
     fontSize = opts.get(GUIOptions.FONTSIZE);
-    font  = new Font(name, type, fontSize);
-    mfont = new Font(opts.get(GUIOptions.MONOFONT), type, fontSize);
+    font  = new Font(name, Font.PLAIN, fontSize);
+    mfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
     dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, fontSize());
   }

@@ -47,8 +47,6 @@ public final class GUIOptions extends Options {
   /** Default GUI Monospace Font. */
   public static final StringOption MONOFONT = new StringOption("MONOFONT",
       WIN ? "Consolas" : Font.MONOSPACED);
-  /** Font TYPE (plain, bold, italics). */
-  public static final NumberOption FONTTYPE = new NumberOption("FONTTYPE", 0);
   /** Font size. */
   public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", 15);
   /** Only display monospace fonts. */

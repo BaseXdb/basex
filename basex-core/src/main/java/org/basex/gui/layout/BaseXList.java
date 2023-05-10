@@ -213,11 +213,10 @@ public final class BaseXList extends BaseXBack {
   /**
    * Sets the specified font.
    * @param font font name
-   * @param style style
    */
-  public void setFont(final String font, final int style) {
+  public void setFont(final String font) {
     final Font f = text.getFont();
-    text.setFont(new Font(font, style, f.getSize()));
+    text.setFont(new Font(font, Font.PLAIN, f.getSize()));
   }
 
   /**

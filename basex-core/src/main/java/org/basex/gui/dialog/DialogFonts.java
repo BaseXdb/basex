@@ -23,8 +23,6 @@ public final class DialogFonts extends BaseXDialog {
   /** Dialog. */
   private static DialogFonts dialog;
 
-  /** Fonts. */
-  private final String[] fonts;
   /** Monospace fonts. */
   private String[] monoFonts;
 
@@ -32,8 +30,6 @@ public final class DialogFonts extends BaseXDialog {
   private final BaseXList font;
   /** Font name chooser. */
   private final BaseXList font2;
-  /** Font type chooser. */
-  private final BaseXList type;
   /** Font size chooser. */
   private final BaseXList size;
   /** Only display monospace fonts. */
@@ -49,21 +45,17 @@ public final class DialogFonts extends BaseXDialog {
     super(gui, CHOOSE_FONT, false);
 
     final GUIOptions gopts = gui.gopts;
-    fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
 
     antiAlias = new BaseXCombo(this, "System", "GASP", "On", "Off");
     antiAlias.setSelectedItem(gopts.get(GUIOptions.ANTIALIAS));
 
-    final BaseXBack p = new BaseXBack(new TableLayout(2, 4, 8, 8));
-    font = new BaseXList(this, fonts);
+    final BaseXBack p = new BaseXBack(new TableLayout(2, 3, 8, 8));
+    font = new BaseXList(this, BaseXLayout.FONTS);
     font.setWidth(200);
     p.add(font);
-    font2 = new BaseXList(this, fonts);
+    font2 = new BaseXList(this, BaseXLayout.FONTS);
     font2.setWidth(200);
     p.add(font2);
-    type = new BaseXList(this, FONT_TYPES);
-    type.setWidth(90);
-    p.add(type);
     size = new BaseXList(this, SIZES);
     size.setWidth(50);
     p.add(size);
@@ -71,7 +63,6 @@ public final class DialogFonts extends BaseXDialog {
     font.setValue(gopts.get(GUIOptions.FONT));
     font2.setValue(gopts.get(GUIOptions.MONOFONT));
     font2.setEnabled(false);
-    type.setValue(FONT_TYPES[gopts.get(GUIOptions.FONTTYPE)]);
     font.setValue(gopts.get(GUIOptions.FONT));
 
     final BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 8));
@@ -116,7 +107,7 @@ public final class DialogFonts extends BaseXDialog {
         font2.setData(ready ? monoFonts : new String[] { PLEASE_WAIT_D });
       } else {
         font2.setEnabled(true);
-        font2.setData(fonts);
+        font2.setData(BaseXLayout.FONTS);
       }
       font2.setValue(gopts.get(GUIOptions.MONOFONT));
     } else {
@@ -138,18 +129,11 @@ public final class DialogFonts extends BaseXDialog {
           gopts.set(GUIOptions.FONTSIZE, num);
           changed = true;
         }
-      } else if(cmp == type) {
-        final int num = type.getIndex();
-        if(num >= 0) {
-          gopts.set(GUIOptions.FONTTYPE, num);
-          changed = true;
-        }
       }
     }
     if(changed) {
-      final int t = gopts.get(GUIOptions.FONTTYPE);
-      font.setFont(gopts.get(GUIOptions.FONT), t);
-      font2.setFont(gopts.get(GUIOptions.MONOFONT), t);
+      font.setFont(gopts.get(GUIOptions.FONT));
+      font2.setFont(gopts.get(GUIOptions.MONOFONT));
       gui.updateLayout();
     }
   }
@@ -163,7 +147,7 @@ public final class DialogFonts extends BaseXDialog {
       protected Boolean doInBackground() {
         final Graphics g = getGraphics();
         final StringList monos = new StringList();
-        for(final String name : fonts) {
+        for(final String name : BaseXLayout.FONTS) {
           if(BaseXLayout.isMono(g.getFontMetrics(new Font(name, Font.PLAIN, 15)))) {
             monos.add(name);
           }
