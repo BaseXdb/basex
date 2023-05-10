@@ -250,6 +250,19 @@ final class TextRenderer extends BaseXBack {
     fontHeight = fonts.font().getSize() * 5 / 4;
   }
 
+  @Override
+  public Dimension getPreferredSize() {
+    // calculate size required for the currently rendered text
+    final Graphics g = getGraphics();
+    width = Integer.MAX_VALUE;
+    height = Integer.MAX_VALUE;
+    int maxX = 0;
+    for(final TextIterator iter = init(g, true); more(iter, g); next(iter)) {
+      if(iter.curr() == TokenBuilder.NLINE) maxX = Math.max(x, maxX);
+    }
+    return new Dimension(Math.max(x, maxX) + charWidth(' '), y + fontHeight);
+  }
+
   /**
    * Initializes the renderer.
    * @param g graphics reference (can be {@code null})
@@ -449,7 +462,7 @@ final class TextRenderer extends BaseXBack {
       // retrieve first character of current token
       if(iter.erroneous()) drawError(g);
 
-      if(showNL && cp == '\n') {
+      if(showNL && cp == TokenBuilder.NLINE) {
         // draw newline character
         g.setColor(GUIConstants.gray);
         drawString("\u00b6", x, y, g);
