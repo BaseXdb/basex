@@ -2356,6 +2356,7 @@ public class QueryParser extends InputParser {
       final char ch = curr();
       final Expr num = numericLiteral(ch, Integer.MAX_VALUE);
       if(Function.ERROR.is(num)) return num;
+      if(!(num instanceof Int)) throw error(ARITY_X, ch == 0 ? "" : ch);
       final int arity = (int) ((Int) num).itr();
       final Expr expr = Functions.getLiteral(name, arity, qc, sc, info(), false);
       return expr != null ? expr : undeclaredLiteral(name, arity, info());
