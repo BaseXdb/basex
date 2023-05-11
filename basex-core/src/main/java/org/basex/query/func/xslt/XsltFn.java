@@ -2,12 +2,12 @@ package org.basex.query.func.xslt;
 
 import static org.basex.util.Reflect.*;
 
-import java.util.Arrays;
 import java.util.concurrent.*;
 
 import javax.xml.transform.*;
 
 import org.basex.query.func.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -20,11 +20,11 @@ abstract class XsltFn extends StandardFunc {
   static final ConcurrentHashMap<String, Templates> MAP = new ConcurrentHashMap<>();
 
   /** Saxon implementations. */
-  private static final String[] SAXON = {
+  private static final StringList SAXONS = new StringList(
     "com.saxonica.config.EnterpriseTransformerFactory",
     "com.saxonica.config.ProfessionalTransformerFactory",
     "net.sf.saxon.TransformerFactoryImpl"
-  };
+  );
 
   /** Processor. */
   static final String PROCESSOR;
@@ -32,38 +32,33 @@ abstract class XsltFn extends StandardFunc {
   static final String VERSION;
 
   static {
+    // check for system property, create list of implementations to check
+    final String clazz = TransformerFactory.class.getName();
+    final String property = System.getProperty(clazz);
+    final StringList impls = new StringList();
+    if(property != null) impls.add(property);
+    impls.add(SAXONS);
+
+    // search for implementation (custom, predefined)
     String processor = "Java", version = "1.0";
+    for(final String impl : impls) {
+      if(find(impl) == null) continue;
 
-    // check if system property has been assigned by the user
-    final String fac = TransformerFactory.class.getName();
-    final String impl = System.getProperty(fac);
-
-    // only set processor to unknown if it is not one of the well-known saxon ones
-    if(impl != null && !Arrays.asList(SAXON).contains(impl)) {
-      processor = "unknown";
-      version = "unknown";
-    } else {
-      // search classpath for Saxon processors, retrieve edition and XSL version
-      for(final String saxon : SAXON) {
-
-        // if fac has been set explicitly, ignore all other known saxon implementations
-        if (impl != null && !impl.equals(saxon)) {
-          continue;
-        }
-        if(find(saxon) != null) {
-          processor = "Saxon";
-
-          if (!saxon.equals(impl)) {
-            System.setProperty(fac, saxon);
-          }
-          final Class<?> vrsn = find("net.sf.saxon.Version");
-          final Object se = get(field(vrsn, "softwareEdition"), null);
-          if(se != null) processor += " " + se;
-          final Object xsl = invoke(method(vrsn, "getXSLVersionString"), null);
-          version = xsl != null ? xsl.toString() : "3.0";
-          break;
-        }
+      if(SAXONS.contains(impl)) {
+        // Saxon: assign to system property, retrieve edition and XSL version
+        System.setProperty(clazz, impl);
+        final Class<?> vrsn = find("net.sf.saxon.Version");
+        final Object se = get(field(vrsn, "softwareEdition"), null);
+        if(se != null) processor += " " + se;
+        final Object xsl = invoke(method(vrsn, "getXSLVersionString"), null);
+        processor = "Saxon";
+        version = xsl != null ? xsl.toString() : "3.0";
+      } else {
+        // unknown: assign classpath
+        processor = impl;
+        version = "";
       }
+      break;
     }
     PROCESSOR = processor;
     VERSION = version;
