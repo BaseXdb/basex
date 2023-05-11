@@ -2,6 +2,7 @@ package org.basex.query.func.xslt;
 
 import static org.basex.util.Reflect.*;
 
+import java.util.Arrays;
 import java.util.concurrent.*;
 
 import javax.xml.transform.*;
@@ -36,15 +37,25 @@ abstract class XsltFn extends StandardFunc {
     // check if system property has been assigned by the user
     final String fac = TransformerFactory.class.getName();
     final String impl = System.getProperty(fac);
-    if(impl != null) {
+
+    // only set processor to unknown if it is not one of the well-known saxon ones
+    if(impl != null && !Arrays.asList(SAXON).contains(impl)) {
       processor = "unknown";
       version = "unknown";
     } else {
       // search classpath for Saxon processors, retrieve edition and XSL version
       for(final String saxon : SAXON) {
+
+        // if fac has been set explicitly, ignore all other known saxon implementations
+        if (impl != null && !impl.equals(saxon)) {
+          continue;
+        }
         if(find(saxon) != null) {
           processor = "Saxon";
-          System.setProperty(fac, saxon);
+
+          if (!saxon.equals(impl)) {
+            System.setProperty(fac, saxon);
+          }
           final Class<?> vrsn = find("net.sf.saxon.Version");
           final Object se = get(field(vrsn, "softwareEdition"), null);
           if(se != null) processor += " " + se;
