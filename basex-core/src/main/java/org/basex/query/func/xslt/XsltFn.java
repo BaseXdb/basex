@@ -46,7 +46,7 @@ abstract class XsltFn extends StandardFunc {
 
       if(SAXONS.contains(impl)) {
         // Saxon: assign to system property, retrieve edition and XSL version
-        System.setProperty(clazz, impl);
+        if(!impl.equals(property)) System.setProperty(clazz, impl);
         final Class<?> vrsn = find("net.sf.saxon.Version");
         final Object se = get(field(vrsn, "softwareEdition"), null);
         if(se != null) processor += " " + se;
