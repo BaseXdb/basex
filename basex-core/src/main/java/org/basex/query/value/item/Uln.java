@@ -86,18 +86,16 @@ public final class Uln extends ANum {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    final Type tp = item.type;
-    return tp == AtomType.UNSIGNED_LONG ? value.equals(((Uln) item).value) :
-           tp.oneOf(AtomType.DOUBLE, AtomType.FLOAT) ? item.eq(this, coll, sc, ii) :
-           value.compareTo(BigInteger.valueOf(item.itr(ii))) == 0;
+    return item.type == AtomType.UNSIGNED_LONG ? value.equals(((Uln) item).value) :
+      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ? item.eq(this, coll, sc, ii) :
+      value.compareTo(BigInteger.valueOf(item.itr(ii))) == 0;
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    final Type tp = item.type;
-    return tp == AtomType.UNSIGNED_LONG ? value.compareTo(((Uln) item).value) :
-           tp.oneOf(AtomType.DOUBLE, AtomType.FLOAT) ? -item.diff(this, coll, ii) :
-           value.compareTo(BigInteger.valueOf(item.itr(ii)));
+    return item.type == AtomType.UNSIGNED_LONG ? value.compareTo(((Uln) item).value) :
+      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ? -item.diff(this, coll, ii) :
+      value.compareTo(BigInteger.valueOf(item.itr(ii)));
   }
 
   @Override

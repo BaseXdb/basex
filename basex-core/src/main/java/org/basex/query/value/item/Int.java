@@ -161,7 +161,8 @@ public final class Int extends ANum {
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item instanceof Int ? value == ((Int) item).value :
-           item.type == AtomType.DECIMAL ? item.eq(this, coll, sc, ii) : value == item.dbl(ii);
+            item instanceof Dec ? item.eq(this, coll, sc, ii) :
+            value == item.dbl(ii);
   }
 
   @Override

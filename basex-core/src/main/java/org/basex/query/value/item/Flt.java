@@ -113,15 +113,15 @@ public final class Flt extends ANum {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type == AtomType.DECIMAL ? item.eq(this, coll, sc, ii) : value == item.dbl(ii);
+    return item.type == AtomType.DOUBLE ? item.eq(this, coll, sc, ii) : value == item.flt(ii);
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    if(item.type == AtomType.DECIMAL) return -item.diff(this, coll, ii);
-    // cannot be replaced by Double.compare (different semantics)
-    final double d = item.dbl(ii);
-    return Double.isNaN(value) || Double.isNaN(d) ? UNDEF : value < d ? -1 : value > d ? 1 : 0;
+    if(item instanceof Dbl) return -item.diff(this, coll, ii);
+    // cannot be replaced by Float.compare (different semantics)
+    final float n = item.flt(ii);
+    return Float.isNaN(n) || Float.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
@@ -137,7 +137,7 @@ public final class Flt extends ANum {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Converts the given token to a float value.
+   * Converts the given item to a float value.
    * @param value value to be converted
    * @param ii input info
    * @return float value

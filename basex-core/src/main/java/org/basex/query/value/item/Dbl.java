@@ -143,15 +143,14 @@ public final class Dbl extends ANum {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type == AtomType.DECIMAL ? item.eq(this, coll, sc, ii) : value == item.dbl(ii);
+    return value == item.dbl(ii);
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    if(item.type == AtomType.DECIMAL) return -item.diff(this, coll, ii);
     // cannot be replaced by Double.compare (different semantics)
-    final double d = item.dbl(ii);
-    return Double.isNaN(value) || Double.isNaN(d) ? UNDEF : value < d ? -1 : value > d ? 1 : 0;
+    final double n = item.dbl(ii);
+    return Double.isNaN(n) || Double.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override
@@ -167,7 +166,7 @@ public final class Dbl extends ANum {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Converts the given token to a double value.
+   * Converts the given token into a double value.
    * @param value value to be converted
    * @param ii input info
    * @return double value

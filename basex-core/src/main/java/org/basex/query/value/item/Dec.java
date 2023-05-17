@@ -131,11 +131,15 @@ public final class Dec extends ANum {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return diff(item, coll, ii) == 0;
+    final Type t = item.type;
+    return t.isUntyped() ? dbl() == item.dbl(ii) :
+      t == AtomType.DOUBLE || t == AtomType.FLOAT ? item.eq(this, coll, sc, ii) :
+      value.compareTo(item.dec(ii)) == 0;
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
+    if(item instanceof Dbl || item instanceof Flt) return -item.diff(this, coll, ii);
     final double d = item.dbl(ii);
     return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
       Double.isNaN(d) ? UNDEF : value.compareTo(item.dec(ii));
