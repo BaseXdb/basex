@@ -66,23 +66,25 @@ public final class Atm extends Item {
   @Override
   public boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return comparable(item) ? Token.eq(value, item.string(ii), coll) : item.eq(this, coll, sc, ii);
+    return comparable(item) ? Token.eq(value, item.string(ii), coll) :
+      item.eq(this, coll, sc, ii);
   }
 
   @Override
-  public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
-    return comparable(item) && eq(item, null, null, ii);
+  public boolean deepEqual(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return comparable(item) && Token.eq(string(ii), item.string(ii), coll);
+  }
+
+  @Override
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+    return comparable(item) && Token.eq(string(deep.info), item.string(deep.info), deep);
   }
 
   @Override
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     return item.type.isUntyped() ? Token.diff(value, item.string(ii), coll) :
       -item.diff(this, coll, ii);
-  }
-
-  @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
-    return comparable(item) && Token.eq(string(deep.info), item.string(deep.info), deep);
   }
 
   @Override

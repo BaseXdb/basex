@@ -128,7 +128,7 @@ public final class SwitchGroup extends Arr {
     final Value value = exprs[e].atomValue(qc, info);
     if(cond.isEmpty()) return cond == value;
     for(final Item item : value) {
-      if(cond.equiv(item, null, info)) return true;
+      if(cond.deepEqual(item, null, info)) return true;
     }
     return false;
   }

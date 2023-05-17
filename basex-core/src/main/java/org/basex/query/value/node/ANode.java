@@ -99,11 +99,6 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
-    return comparable(item) && eq(item, null, null, ii);
-  }
-
-  @Override
   public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
     return comparable(item) ? Token.diff(string(), item.string(ii), coll) :
@@ -111,7 +106,7 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+  public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     final Type type1 = type, type2 = item.type;
     if(type1 != type2) return false;
     final ANode node1 = this, node2 = (ANode) item;
@@ -197,7 +192,7 @@ public abstract class ANode extends Item {
         if(deep.qc != null) deep.qc.checkStop();
         final ANode child1 = iter1.next();
         if(child1 == null) return true;
-        if(!child1.equal(iter2.next(), deep)) return false;
+        if(!child1.deepEqual(iter2.next(), deep)) return false;
       }
     }
 
@@ -206,7 +201,7 @@ public abstract class ANode extends Item {
       boolean found = false;
       for(int l2 = list2.size() - 1; !found && l2 >= 0; l2--) {
         if(deep.qc != null) deep.qc.checkStop();
-        if(list1.get(l1).equal(list2.get(l2), deep)) {
+        if(list1.get(l1).deepEqual(list2.get(l2), deep)) {
           list2.remove(l2);
           found = true;
         }

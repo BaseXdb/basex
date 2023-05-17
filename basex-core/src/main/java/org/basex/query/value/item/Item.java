@@ -12,6 +12,8 @@ import org.basex.io.in.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpV.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -173,7 +175,7 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Compares the items for equality.
+   * Compares items for equality. Called by {@link OpV}.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
    * @param sc static context; required for comparing items of type xs:QName (can be {@code null})
@@ -185,31 +187,39 @@ public abstract class Item extends Value {
       throws QueryException;
 
   /**
-   * Compares the items for equivalence. As item is equivalent to another if:
-   * <ul>
-   *   <li>both numeric values are NaN, or</li>
-   *   <li>if the items have comparable types and are equal</li>
-   * </ul>
+   * Compares items for deep equality.
+   * Called by {@link DeepEqual}, overwritten by {@link ADate} and {@link QNm}.
+   * @param item item to be compared
+   * @param deep comparator
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+    return this == item || deepEqual(item, deep.coll, deep.info);
+  }
+
+  /**
+   * Compares items for equality.
+   * Called by {@link #deepEqual(Item, DeepEqual)}.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean equiv(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return (this == Dbl.NAN || this == Flt.NAN) && (item == Dbl.NAN || item == Flt.NAN) ||
-        comparable(item) && eq(item, coll, null, ii);
+  public boolean deepEqual(final Item item, @SuppressWarnings("unused") final Collation coll,
+      final InputInfo ii) throws QueryException {
+    return comparable(item) && atomicEqual(item, ii);
   }
 
   /**
-   * Compares atomic items for equality.
+   * Compares atomic items for equality. Called by {@link FnAtomicEqual}.
    * @param item item to be compared
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
+  public boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
     return comparable(item) && eq(item, null, null, ii);
   }
 
@@ -225,17 +235,6 @@ public abstract class Item extends Value {
   @SuppressWarnings("unused")
   public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
     throw diffError(this, item, ii);
-  }
-
-  /**
-   * Performs a deep comparison of the current and the specified items.
-   * @param item item to be compared
-   * @param deep comparator
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
-    return this == item || equiv(item, deep.coll, deep.info);
   }
 
   /**

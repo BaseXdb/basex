@@ -84,7 +84,7 @@ public final class XQJava extends FItem {
   }
 
   @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(item instanceof XQJava) return equals(item);
     throw FICOMPARE_X.get(deep.info, this);
   }

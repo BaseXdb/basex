@@ -227,8 +227,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
-    return super.equal(item, deep) && (
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+    return super.deepEqual(item, deep) && (
       !deep.options.get(DeepEqualOptions.NAMESPACE_PREFIXES) ||
       Token.eq(prefix(), ((QNm) item).prefix()));
   }

@@ -197,7 +197,7 @@ public final class GroupBy extends Clause {
         for(int i = 0; i < il; i++) {
           final Item item1 = items1[i], item2 = items2[i];
           final boolean empty1 = item1.isEmpty(), empty2 = item2.isEmpty();
-          if(empty1 ^ empty2 || !empty1 && !item1.equiv(item2, coll[i], info)) return false;
+          if(empty1 ^ empty2 || !empty1 && !item1.deepEqual(item2, coll[i], info)) return false;
         }
         return true;
       }

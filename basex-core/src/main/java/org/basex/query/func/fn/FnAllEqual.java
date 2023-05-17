@@ -28,7 +28,7 @@ public final class FnAllEqual extends StandardFunc {
     final Item first = values.next();
     if(first != null) {
       for(Item item; (item = qc.next(values)) != null;) {
-        if(!item.equiv(first, coll, info)) return Bln.FALSE;
+        if(!item.deepEqual(first, coll, info)) return Bln.FALSE;
       }
     }
     return Bln.TRUE;

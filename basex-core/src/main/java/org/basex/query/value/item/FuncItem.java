@@ -226,7 +226,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(deep.options.get(DeepEqualOptions.FALSE_ON_ERROR)) return false;
     throw FICOMPARE_X.get(info, this);
   }

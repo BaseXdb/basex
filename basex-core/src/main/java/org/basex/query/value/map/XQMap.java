@@ -264,7 +264,7 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
     return item == this || item instanceof XQMap && root.equal(((XQMap) item).root, deep);
   }

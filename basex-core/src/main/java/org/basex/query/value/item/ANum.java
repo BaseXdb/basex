@@ -48,7 +48,7 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
+  public boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
     if(item instanceof ANum) {
       final double d1 = dbl(ii), d2 = item.dbl(ii);
       final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);

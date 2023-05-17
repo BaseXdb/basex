@@ -75,7 +75,7 @@ public final class DeepEqual {
       final Item item1 = iter1.next(), item2 = iter2.next();
       if(item1 == null || item2 == null) return item1 == null && item2 == null;
       nested = false;
-      if(!item1.equal(item2, this)) return false;
+      if(!item1.deepEqual(item2, this)) return false;
     }
   }
 }

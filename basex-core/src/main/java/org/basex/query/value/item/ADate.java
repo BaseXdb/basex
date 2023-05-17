@@ -362,17 +362,27 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+    return super.deepEqual(item, deep) && (
+      !deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
+  }
+
+  @Override
+  public final boolean deepEqual(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return comparable(item) && eq(item, coll, null, ii);
+  }
+
+  @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return df(item, ii) == 0;
   }
 
   @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
-    return super.equal(item, deep) && (
-      !deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
+  public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
+    return item instanceof ADate && eq(item, null, null, ii) && hasTz() == ((ADate) item).hasTz();
   }
-
 
   /**
    * Returns the difference between the current and the specified item.
@@ -387,11 +397,6 @@ public abstract class ADate extends ADateDur {
     final BigDecimal d1 = seconds().add(days().multiply(BD_864000));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(BD_864000));
     return d1.compareTo(d2);
-  }
-
-  @Override
-  public final boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
-    return item instanceof ADate && hasTz() == ((ADate) item).hasTz() && eq(item, null, null, ii);
   }
 
   @Override

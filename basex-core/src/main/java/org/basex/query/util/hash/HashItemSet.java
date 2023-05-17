@@ -60,7 +60,8 @@ public class HashItemSet extends ASet implements ItemSet {
   public int id(final Item key) throws QueryException {
     final int b = key.hash(info) & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq ? keys[id].eq(key, null, null, info) : keys[id].equiv(key, null, info)) return id;
+      if(eq ? keys[id].eq(key, null, null, info) : keys[id].deepEqual(key, null, info))
+        return id;
     }
     return 0;
   }
@@ -76,7 +77,8 @@ public class HashItemSet extends ASet implements ItemSet {
     final int h = key.hash(info);
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq ? keys[id].eq(key, null, null, info) : keys[id].equiv(key, null, info)) return -id;
+      if(eq ? keys[id].eq(key, null, null, info) : keys[id].deepEqual(key, null, info))
+        return -id;
     }
     final int s = size++;
     if(checkCapacity()) b = h & capacity() - 1;

@@ -107,19 +107,20 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public boolean atomicEq(final Item item, final InputInfo ii) throws QueryException {
-    return comparable(item) && eq(item, null, null, ii);
+  public final boolean deepEqual(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return comparable(item) && Token.eq(string(ii), item.string(ii), coll);
+  }
+
+  @Override
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+    return comparable(item) && Token.eq(string(deep.info), item.string(deep.info), deep);
   }
 
   @Override
   public final int diff(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
     return Token.diff(string(ii), item.string(ii), coll);
-  }
-
-  @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
-    return comparable(item) && Token.eq(string(deep.info), item.string(deep.info), deep);
   }
 
   @Override

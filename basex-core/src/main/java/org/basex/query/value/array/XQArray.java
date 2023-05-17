@@ -376,7 +376,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean equal(final Item item, final DeepEqual deep) throws QueryException {
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
     if(item instanceof XQArray) {
       if(item != this) {

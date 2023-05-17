@@ -36,7 +36,7 @@ public final class CollationItemSet implements ItemSet {
   public boolean add(final Item item) throws QueryException {
     final int is = items.size();
     for(int id = 0; id < is; id++) {
-      if(items.get(id).equiv(item, coll, info)) return false;
+      if(items.get(id).deepEqual(item, coll, info)) return false;
     }
     items.add(item);
     return true;

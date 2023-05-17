@@ -749,10 +749,10 @@ public final class Token {
    */
   public static boolean eq(final byte[] token1, final byte[] token2, final DeepEqual deep) {
     final Normalizer.Form form = deep.options.get(NORMALIZATION_FORM);
-    byte[] t1 = Token.normalize(token1, form), t2 = Token.normalize(token2, form);
+    byte[] t1 = normalize(token1, form), t2 = normalize(token2, form);
     if(deep.options.get(NORMALIZE_SPACE)) {
-      t1 = Token.normalize(t1);
-      t2 = Token.normalize(t2);
+      t1 = normalize(t1);
+      t2 = normalize(t2);
     }
     return eq(t1, t2, deep.coll);
   }

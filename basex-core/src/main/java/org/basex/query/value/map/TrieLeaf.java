@@ -47,7 +47,7 @@ final class TrieLeaf extends TrieNode {
       throws QueryException {
 
     // same hash, replace or merge
-    if(hs == hash) return key.atomicEq(ky, ii) ? new TrieLeaf(hs, ky, vl) :
+    if(hs == hash) return key.atomicEqual(ky, ii) ? new TrieLeaf(hs, ky, vl) :
       new TrieList(hash, key, value, ky, vl);
 
     // different hash, branch
@@ -68,19 +68,19 @@ final class TrieLeaf extends TrieNode {
   @Override
   TrieNode delete(final int hs, final Item ky, final int level, final InputInfo ii)
       throws QueryException {
-    return hs == hash && key.atomicEq(ky, ii) ? null : this;
+    return hs == hash && key.atomicEqual(ky, ii) ? null : this;
   }
 
   @Override
   Value get(final int hs, final Item ky, final int level, final InputInfo ii)
       throws QueryException {
-    return hs == hash && key.atomicEq(ky, ii) ? value : null;
+    return hs == hash && key.atomicEqual(ky, ii) ? value : null;
   }
 
   @Override
   boolean contains(final int hs, final Item ky, final int level, final InputInfo ii)
       throws QueryException {
-    return hs == hash && key.atomicEq(ky, ii);
+    return hs == hash && key.atomicEqual(ky, ii);
   }
 
   @Override
@@ -95,7 +95,7 @@ final class TrieLeaf extends TrieNode {
 
     qc.checkStop();
     if(hash == leaf.hash) {
-      if(!key.atomicEq(leaf.key, ii))
+      if(!key.atomicEqual(leaf.key, ii))
         return new TrieList(hash, key, value, leaf.key, leaf.value);
 
       switch(merge) {
@@ -133,7 +133,7 @@ final class TrieLeaf extends TrieNode {
     // same hash? insert binding
     if(hash == list.hash) {
       for(int i = 0; i < list.size; i++) {
-        if(key.atomicEq(list.keys[i], ii)) {
+        if(key.atomicEqual(list.keys[i], ii)) {
           final Item[] ks = list.keys.clone();
           final Value[] vs = list.values.clone();
           ks[i] = key;
@@ -227,7 +227,7 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
-    return node instanceof TrieLeaf && key.atomicEq(((TrieLeaf) node).key, deep.info) &&
+    return node instanceof TrieLeaf && key.atomicEqual(((TrieLeaf) node).key, deep.info) &&
         deep.equal(value, ((TrieLeaf) node).value);
   }
 
