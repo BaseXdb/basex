@@ -7,6 +7,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -24,11 +25,12 @@ public final class FnAllEqual extends StandardFunc {
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation coll = toCollation(arg(1), qc);
+    final DeepEqual deep = new DeepEqual(info, coll, qc);
 
     final Item first = values.next();
     if(first != null) {
       for(Item item; (item = qc.next(values)) != null;) {
-        if(!item.deepEqual(first, coll, info)) return Bln.FALSE;
+        if(!deep.equal(item, first)) return Bln.FALSE;
       }
     }
     return Bln.TRUE;

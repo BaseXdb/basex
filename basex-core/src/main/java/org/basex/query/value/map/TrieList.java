@@ -343,6 +343,7 @@ final class TrieList extends TrieNode {
     final TrieList ol = (TrieList) node;
     OUTER:
     for(int i = 0; i < size; i++) {
+      if(deep.qc != null) deep.qc.checkStop();
       final Item key = keys[i];
       for(int j = 0; j < size; j++) {
         if(key.atomicEqual(ol.keys[j], deep.info)) {

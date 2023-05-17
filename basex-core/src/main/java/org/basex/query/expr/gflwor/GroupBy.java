@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -121,10 +120,10 @@ public final class GroupBy extends Clause {
       private Group[] init(final QueryContext qc) throws QueryException {
         final ArrayList<Group> grps = new ArrayList<>();
         final IntObjMap<Group> map = new IntObjMap<>();
-        final Collation[] colls = new Collation[nonOcc];
+        final DeepEqual[] deeps = new DeepEqual[nonOcc];
         int c = 0;
         for(final GroupSpec spec : specs) {
-          if(!spec.occluded) colls[c++] = spec.coll;
+          if(!spec.occluded) deeps[c++] = new DeepEqual(info, spec.coll, qc);
         }
 
         while(sub.next(qc)) {
@@ -147,7 +146,7 @@ public final class GroupBy extends Clause {
           Group grp = null;
           // no collations, so we can use hashing
           for(Group g = fst = map.get(hash); g != null; g = g.next) {
-            if(eq(key, g.key, colls)) {
+            if(eq(key, g.key, deeps)) {
               grp = g;
               break;
             }
@@ -186,18 +185,18 @@ public final class GroupBy extends Clause {
        * Checks two keys for equality.
        * @param items1 first keys
        * @param items2 second keys
-       * @param coll collations
+       * @param deeps deep equality comparisons
        * @return {@code true} if the compare as equal, {@code false} otherwise
        * @throws QueryException query exception
        */
-      private boolean eq(final Item[] items1, final Item[] items2, final Collation[] coll)
+      private boolean eq(final Item[] items1, final Item[] items2, final DeepEqual[] deeps)
           throws QueryException {
 
         final int il = items1.length;
         for(int i = 0; i < il; i++) {
           final Item item1 = items1[i], item2 = items2[i];
           final boolean empty1 = item1.isEmpty(), empty2 = item2.isEmpty();
-          if(empty1 ^ empty2 || !empty1 && !item1.deepEqual(item2, coll[i], info)) return false;
+          if(empty1 ^ empty2 || !empty1 && !deeps[i].equal(item1, item2)) return false;
         }
         return true;
       }

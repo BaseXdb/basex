@@ -362,21 +362,15 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return super.deepEqual(item, deep) && (
-      !deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
-  }
-
-  @Override
-  public final boolean deepEqual(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return comparable(item) && eq(item, coll, null, ii);
-  }
-
-  @Override
   public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return df(item, ii) == 0;
+  }
+
+  @Override
+  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+    return comparable(item) && eq(item, deep.coll, null, deep.info) &&
+      (!deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
   }
 
   @Override

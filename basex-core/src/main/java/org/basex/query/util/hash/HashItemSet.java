@@ -3,6 +3,7 @@ package org.basex.query.util.hash;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -18,6 +19,8 @@ public class HashItemSet extends ASet implements ItemSet {
   private final boolean eq;
   /** Input info (can be {@code null}). */
   private final InputInfo info;
+  /** Deep equality comparisons (can be {@code null}). */
+  private final DeepEqual deep;
   /** Hashed keys. */
   private Item[] keys;
   /** Hash values. */
@@ -32,6 +35,7 @@ public class HashItemSet extends ASet implements ItemSet {
     super(Array.INITIAL_CAPACITY);
     this.eq = eq;
     this.info = info;
+    deep = new DeepEqual(info);
     keys = new Item[capacity()];
     hash = new int[capacity()];
   }
@@ -60,8 +64,7 @@ public class HashItemSet extends ASet implements ItemSet {
   public int id(final Item key) throws QueryException {
     final int b = key.hash(info) & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq ? keys[id].eq(key, null, null, info) : keys[id].deepEqual(key, null, info))
-        return id;
+      if(eq ? keys[id].eq(key, null, null, info) : deep.equal(keys[id], key)) return id;
     }
     return 0;
   }
@@ -77,8 +80,7 @@ public class HashItemSet extends ASet implements ItemSet {
     final int h = key.hash(info);
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq ? keys[id].eq(key, null, null, info) : keys[id].deepEqual(key, null, info))
-        return -id;
+      if(eq ? keys[id].eq(key, null, null, info) : deep.equal(keys[id], key)) return -id;
     }
     final int s = size++;
     if(checkCapacity()) b = h & capacity() - 1;

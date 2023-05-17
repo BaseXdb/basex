@@ -14,6 +14,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class DeepEqual {
+  /** Default options. */
+  private static final DeepEqualOptions DEFAULTS = new DeepEqualOptions();
+
   /** Input info (can be {@code null}). */
   public final InputInfo info;
   /** Query context (to interrupt process, can be {@code null}). */
@@ -29,22 +32,40 @@ public final class DeepEqual {
    * Constructor.
    */
   public DeepEqual() {
-    this(null, null, null, null);
+    this(null);
   }
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param qc query context (to interrupt process, can be {@code null})
+   */
+  public DeepEqual(final InputInfo info) {
+    this(info, null, null);
+  }
+
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
    * @param coll collation (can be {@code null})
+   * @param qc query context (to interrupt process, can be {@code null})
+   */
+  public DeepEqual(final InputInfo info, final Collation coll, final  QueryContext qc) {
+    this(info, coll, qc, null);
+  }
+
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
+   * @param coll collation (can be {@code null})
+   * @param qc query context (to interrupt process, can be {@code null})
    * @param options options (can be {@code null})
    */
-  public DeepEqual(final InputInfo info, final  QueryContext qc, final Collation coll,
+  public DeepEqual(final InputInfo info, final Collation coll, final  QueryContext qc,
       final DeepEqualOptions options) {
     this.info = info;
-    this.qc = qc;
     this.coll = coll;
-    this.options = options != null ? options : new DeepEqualOptions();
+    this.qc = qc;
+    this.options = options != null ? options : DEFAULTS;
   }
 
   /**
@@ -55,7 +76,9 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Value value1, final Value value2) throws QueryException {
-    return value1.size() == value2.size() && equal(value1.iter(), value2.iter());
+    final long size1 = value1.size(), size2 = value2.size();
+    return size1 == size2 && (size1 == 1 ? equal((Item) value1, (Item) value2) :
+      equal(value1.iter(), value2.iter()));
   }
 
   /**
@@ -71,11 +94,21 @@ public final class DeepEqual {
 
     while(true) {
       if(qc != null) qc.checkStop();
-
       final Item item1 = iter1.next(), item2 = iter2.next();
       if(item1 == null || item2 == null) return item1 == null && item2 == null;
-      nested = false;
-      if(!item1.deepEqual(item2, this)) return false;
+      if(!equal(item1, item2)) return false;
     }
+  }
+
+  /**
+   * Checks items for deep equality.
+   * @param item1 first item
+   * @param item2 second item
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean equal(final Item item1, final Item item2) throws QueryException {
+    nested = false;
+    return item1 == item2 || item1.deepEqual(item2, this);
   }
 }

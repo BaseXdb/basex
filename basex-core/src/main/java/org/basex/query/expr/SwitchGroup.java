@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -18,6 +19,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class SwitchGroup extends Arr {
+  /** Deep equality comparison. */
+  private final DeepEqual deep;
+
   /**
    * Constructor.
    * @param info input info
@@ -25,6 +29,7 @@ public final class SwitchGroup extends Arr {
    */
   public SwitchGroup(final InputInfo info, final Expr... exprs) {
     super(info, SeqType.ITEM_ZM, exprs);
+    deep = new DeepEqual(info);
   }
 
   @Override
@@ -128,7 +133,7 @@ public final class SwitchGroup extends Arr {
     final Value value = exprs[e].atomValue(qc, info);
     if(cond.isEmpty()) return cond == value;
     for(final Item item : value) {
-      if(cond.deepEqual(item, null, info)) return true;
+      if(deep.equal(cond, item)) return true;
     }
     return false;
   }

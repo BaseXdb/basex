@@ -379,13 +379,11 @@ public abstract class XQArray extends XQData {
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
     if(item instanceof XQArray) {
-      if(item != this) {
-        final XQArray array = (XQArray) item;
-        if(arraySize() != array.arraySize()) return false;
-        final Iterator<Value> iter1 = iterator(0), iter2 = array.iterator(0);
-        while(iter1.hasNext()) {
-          if(!deep.equal(iter1.next(), iter2.next())) return false;
-        }
+      final XQArray array = (XQArray) item;
+      if(arraySize() != array.arraySize()) return false;
+      final Iterator<Value> iter1 = iterator(0), iter2 = array.iterator(0);
+      while(iter1.hasNext()) {
+        if(!deep.equal(iter1.next(), iter2.next())) return false;
       }
       return true;
     }

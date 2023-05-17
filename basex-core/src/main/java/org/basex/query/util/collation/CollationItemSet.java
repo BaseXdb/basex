@@ -3,6 +3,7 @@ package org.basex.query.util.collation;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -17,10 +18,8 @@ import org.basex.util.*;
 public final class CollationItemSet implements ItemSet {
   /** Items. */
   private final ItemList items = new ItemList();
-  /** Collation. */
-  private final Collation coll;
-  /** Input info (can be {@code null}). */
-  private final InputInfo info;
+  /** Deep equality comparisons. */
+  private final DeepEqual deep;
 
   /**
    * Constructor.
@@ -28,15 +27,14 @@ public final class CollationItemSet implements ItemSet {
    * @param info input info (can be {@code null})
    */
   public CollationItemSet(final Collation coll, final InputInfo info) {
-    this.coll = coll;
-    this.info = info;
+    deep = new DeepEqual(info, coll, null);
   }
 
   @Override
   public boolean add(final Item item) throws QueryException {
     final int is = items.size();
     for(int id = 0; id < is; id++) {
-      if(items.get(id).deepEqual(item, coll, info)) return false;
+      if(deep.equal(items.get(id), item)) return false;
     }
     items.add(item);
     return true;

@@ -188,32 +188,18 @@ public abstract class Item extends Value {
 
   /**
    * Compares items for deep equality.
-   * Called by {@link DeepEqual}, overwritten by {@link ADate} and {@link QNm}.
+   * Called by {@link DeepEqual}.
    * @param item item to be compared
    * @param deep comparator
    * @return result of check
    * @throws QueryException query exception
    */
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return this == item || deepEqual(item, deep.coll, deep.info);
+    return comparable(item) && atomicEqual(item, deep.info);
   }
 
   /**
-   * Compares items for equality.
-   * Called by {@link #deepEqual(Item, DeepEqual)}.
-   * @param item item to be compared
-   * @param coll collation (can be {@code null})
-   * @param ii input info (can be {@code null})
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean deepEqual(final Item item, @SuppressWarnings("unused") final Collation coll,
-      final InputInfo ii) throws QueryException {
-    return comparable(item) && atomicEqual(item, ii);
-  }
-
-  /**
-   * Compares atomic items for equality. Called by {@link FnAtomicEqual}.
+   * Compares items for atomic equality. Called by {@link FnAtomicEqual}.
    * @param item item to be compared
    * @param ii input info (can be {@code null})
    * @return result of check

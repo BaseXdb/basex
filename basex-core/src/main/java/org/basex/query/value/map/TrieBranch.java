@@ -260,6 +260,7 @@ final class TrieBranch extends TrieNode {
     if(used != ob.used) return false;
     // recursively compare children
     for(int k = 0; k < KIDS; k++) {
+      if(deep.qc != null) deep.qc.checkStop();
       if(kids[k] != null && !kids[k].equal(ob.kids[k], deep)) return false;
     }
     // everything OK

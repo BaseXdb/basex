@@ -22,7 +22,7 @@ public final class FnDeepEqual extends StandardFunc {
     final Collation coll = toCollationOrDefault(arg(2), qc);
     final DeepEqualOptions options = toOptions(arg(3), new DeepEqualOptions(), false, qc);
 
-    return Bln.get(new DeepEqual(info, qc, coll, options).equal(iter1, iter2));
+    return Bln.get(new DeepEqual(info, coll, qc, options).equal(iter1, iter2));
   }
 
   @Override
