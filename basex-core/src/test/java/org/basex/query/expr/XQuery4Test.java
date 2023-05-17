@@ -312,4 +312,16 @@ public final class XQuery4Test extends QueryPlanTest {
     error("5.6_", NUMBER_X);
     error("7.8e9_", NUMBER_X);
   }
+
+  /** Try/catch expression. */
+  @Test public void tryy() {
+    query("try { 1 + <_/> } catch * { $err:map?code }", "err:FORG0001");
+    query("try { 1 + <_/> } catch * { $err:map?line-number }", 1);
+    query("try { 1 + <_/> } catch * { $err:map?additional }", "");
+    query("try { 1 + <_/> } catch * { $err:map?value }", "");
+    query("try { 1 + <_/> } catch * { map:size($err:map) }", 5);
+
+    query("try { error((), (), 1) } catch * { $err:map?value }", 1);
+    query("try { error(xs:QName('a')) } catch * { $err:map?code }", "a");
+  }
 }

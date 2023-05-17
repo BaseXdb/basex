@@ -250,14 +250,13 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind errors
-    final Map<String, Value> errs = new HashMap<>();
+    final Map<String, Value> errors = new HashMap<>();
     if(ext instanceof QueryException) {
       final Value[] values = Catch.values((QueryException) ext);
-      final QNm[] names = Catch.NAMES;
-      final int nl = names.length;
-      for(int n = 0; n < nl; n++) errs.put(string(names[n].local()), values[n]);
+      final int vl = values.length;
+      for(int v = 0; v < vl; v++) errors.put(Catch.NAMES[v], values[v]);
     }
-    for(final WebParam rxp : errorParams) bind(rxp, args, errs.get(rxp.name), qc);
+    for(final WebParam rxp : errorParams) bind(rxp, args, errors.get(rxp.name), qc);
 
     // bind permission information
     if(ext instanceof RestXqFunction && permission.var != null) {

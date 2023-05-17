@@ -3371,11 +3371,11 @@ public class QueryParser extends InputParser {
       } while(wsConsume("|"));
 
       final int s = localVars.openScope();
-      final int cl = Catch.NAMES.length;
+      final int cl = Catch.QNAMES.length;
       final Var[] vs = new Var[cl];
       final InputInfo ii = info();
-      for(int i = 0; i < cl; i++) {
-        vs[i] = localVars.add(new Var(Catch.NAMES[i], Catch.TYPES[i], qc, sc, ii));
+      for(int c = 0; c < cl; c++) {
+        vs[c] = localVars.add(new Var(Catch.QNAMES[c], Catch.TYPES[c], qc, sc, ii));
       }
       final Catch c = new Catch(ii, codes, vs);
       c.expr = enclosedExpr();

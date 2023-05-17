@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -11,6 +10,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -24,16 +24,27 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class Catch extends Single {
-  /** Error QNames. */
-  public static final QNm[] NAMES = {
-    qname("code"), qname("description"), qname("value"), qname("module"),
-    qname("line-number"), qname("column-number"), qname("additional")
+  /** Error Strings. */
+  public static final String[] NAMES = {
+    "code", "description", "value", "module", "line-number", "column-number", "additional", "map"
   };
   /** Error types. */
   public static final SeqType[] TYPES = {
     SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO,
-    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.ITEM_ZM
+    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.ITEM_ZM, SeqType.MAP_O
   };
+  /** Error QNames. */
+  public static final QNm[] QNAMES = new QNm[NAMES.length];
+  /** Error string items. */
+  public static final Str[] STRS = new Str[NAMES.length];
+
+  static {
+    for(int n = NAMES.length - 1; n >= 0; n--) {
+      final String name = NAMES[n];
+      QNAMES[n] = qname(name);
+      STRS[n] = Str.get(name);
+    }
+  }
 
   /** Error tests. */
   private final ArrayList<NameTest> tests;
@@ -83,9 +94,9 @@ public final class Catch extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Var[] vrs = new Var[NAMES.length];
-    final int vl = vrs.length;
-    for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(NAMES[v], TYPES[v], false, cc.qc, info);
+    final int vl = QNAMES.length;
+    final Var[] vrs = new Var[vl];
+    for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(QNAMES[v], TYPES[v], false, cc.qc, info);
     final Catch ctch = new Catch(info, tests.toArray(NameTest[]::new), vrs);
     final int val = vars.length;
     for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
@@ -127,19 +138,27 @@ public final class Catch extends Single {
    * Returns all error values.
    * @param qe exception
    * @return values
+   * @throws QueryException query exception
    */
-  public static Value[] values(final QueryException qe) {
-    final byte[] io = qe.file() == null ? EMPTY : token(qe.file());
-    final Value value = qe.value();
-    return new Value[] {
+  public static Value[] values(final QueryException qe) throws QueryException {
+    final Value[] values = {
       qe.qname(),
       Str.get(qe.getLocalizedMessage()),
-      value == null ? Empty.VALUE : value,
-      Str.get(io),
-      Int.get(qe.line()),
-      Int.get(qe.column()),
-      Str.get(qe.getMessage().replaceAll("\r\n?", "\n"))
+      qe.value() != null ? qe.value() : Empty.VALUE,
+      qe.file() != null ? Str.get(qe.file()) : Empty.VALUE,
+      qe.line() != 0 ? Int.get(qe.line()) : Empty.VALUE,
+      qe.column() != 0 ? Int.get(qe.column()) : Empty.VALUE,
+      Empty.VALUE,
+      null
     };
+    // assign map as last value
+    final MapBuilder mb = new MapBuilder();
+    final int nl = NAMES.length - 1;
+    for(int n = 0; n < nl; n++) {
+      if(!values[n].isEmpty()) mb.put(STRS[n], values[n]);
+    }
+    values[nl] = mb.map();
+    return values;
   }
 
   /**
