@@ -324,4 +324,85 @@ public final class XQuery4Test extends QueryPlanTest {
     query("try { error((), (), 1) } catch * { $err:map?value }", 1);
     query("try { error(xs:QName('a')) } catch * { $err:map?code }", "a");
   }
+
+  /** Window expression. */
+  @Test public void window() {
+    query("for tumbling window $w in 1 to 2 "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "end "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "only end "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start end "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start only end "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start when true() end "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start when true() only end "
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start only end when true()"
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start end when true()"
+        + "return sum($w)", "1\n2");
+    query("for tumbling window $w in 1 to 2 "
+        + "start $s at $sa previous $sp next $sn "
+        + "end $e at $ea previous $ep next $en "
+        + "return sum($w)", "1\n2");
+
+    error("for sliding window $w in 1 to 2 "
+        + "return sum($w)", WRONGCHAR_X_X);
+    error("for sliding window $w in 1 to 2 "
+        + "start "
+        + "return sum($w)", WRONGCHAR_X_X);
+    query("for sliding window $w in 1 to 2 "
+        + "end "
+        + "return sum($w)", "1\n2");
+    query("for sliding window $w in 1 to 2 "
+        + "only end "
+        + "return sum($w)", "1\n2");
+    query("for sliding window $w in 1 to 2 "
+        + "start end "
+        + "return sum($w)", "1\n2");
+    query("for sliding window $w in 1 to 2 "
+        + "start only end "
+        + "return sum($w)", "1\n2");
+    query("for sliding window $w in 1 to 2 "
+        + "start when true() end "
+        + "return sum($w)", "1\n2");
+    query("for sliding window $w in 1 to 2 "
+        + "start when true() only end "
+        + "return sum($w)", "1\n2");
+    query("for sliding window $w in 1 to 2 "
+        + "start end when true()"
+        + "return sum($w)", "1\n2");
+    query("for sliding window $w in 1 to 2 "
+        + "start only end when true()"
+        + "return sum($w)", "1\n2");
+
+    query("for tumbling window $w in 1 to 4 "
+        + "end $e when $e = 3 "
+        + "return sum($w)", "6\n4");
+    query("for tumbling window $w in 1 to 4 "
+        + "only end $e when $e = 3 "
+        + "return sum($w)", "6");
+
+    query("for sliding window $w in 1 to 4 "
+        + "end $e when $e = 3 "
+        + "return sum($w)", "6\n5\n3\n4");
+    query("for sliding window $w in 1 to 4 "
+        + "only end $e when $e = 3 "
+        + "return sum($w)", "6\n5\n3");
+  }
 }

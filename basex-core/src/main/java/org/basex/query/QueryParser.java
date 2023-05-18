@@ -1178,12 +1178,12 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "TumblingWindowClause" rule.
    * Parses the "SlidingWindowClause" rule.
-   * @param slide sliding window flag
+   * @param sliding sliding window flag
    * @return the window clause
    * @throws QueryException parse exception
    */
-  private Window windowClause(final boolean slide) throws QueryException {
-    wsCheck(slide ? SLIDING : TUMBLING);
+  private Window windowClause(final boolean sliding) throws QueryException {
+    wsCheck(sliding ? SLIDING : TUMBLING);
     wsCheck(WINDOW);
     skipWs();
 
@@ -1192,17 +1192,16 @@ public class QueryParser extends InputParser {
     final Expr expr = check(single(), NOVARDECL);
 
     // WindowStartCondition
-    wsCheck(START);
-    final Condition start = windowCond(true);
-
+    final Condition start = wsConsume(START) ? windowCond(true) :
+      new Condition(true, null, null, null, null, Bln.TRUE, info());
     // WindowEndCondition
     Condition end = null;
-    final boolean only = wsConsume(ONLY), check = slide || only;
+    final boolean only = wsConsume(ONLY), check = sliding || only;
     if(check || wsConsume(END)) {
       if(check) wsCheck(END);
       end = windowCond(false);
     }
-    return new Window(slide, localVars.add(var), expr, start, only, end);
+    return new Window(sliding, localVars.add(var), expr, start, only, end);
   }
 
   /**
@@ -1214,13 +1213,12 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = curr('$')             ? newVar(SeqType.ITEM_O)  : null;
-    final Var at  = wsConsumeWs(AT)       ? newVar(SeqType.INTEGER_O)   : null;
-    final Var prv = wsConsumeWs(PREVIOUS) ? newVar(SeqType.ITEM_ZO) : null;
-    final Var nxt = wsConsumeWs(NEXT)     ? newVar(SeqType.ITEM_ZO) : null;
-    wsCheck(WHEN);
-    return new Condition(start, localVars.add(var), localVars.add(at), localVars.add(prv),
-        localVars.add(nxt), check(single(), NOEXPR), ii);
+    final Var var = curr('$')             ? localVars.add(newVar(SeqType.ITEM_O))    : null;
+    final Var at  = wsConsumeWs(AT)       ? localVars.add(newVar(SeqType.INTEGER_O)) : null;
+    final Var prv = wsConsumeWs(PREVIOUS) ? localVars.add(newVar(SeqType.ITEM_ZO))   : null;
+    final Var nxt = wsConsumeWs(NEXT)     ? localVars.add(newVar(SeqType.ITEM_ZO))   : null;
+    final Expr expr = wsConsume(WHEN)     ? check(single(), NOEXPR) : Bln.TRUE;
+    return new Condition(start, var, at, prv, nxt, expr, ii);
   }
 
   /**

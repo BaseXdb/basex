@@ -41,12 +41,12 @@ public final class Condition extends Single {
    * @param pos position variable (can be {@code null})
    * @param prev previous variable (can be {@code null})
    * @param next next variable (can be {@code null})
-   * @param cond condition
+   * @param expr condition
    * @param info input info
    */
   public Condition(final boolean start, final Var item, final Var pos, final Var prev,
-      final Var next, final Expr cond, final InputInfo info) {
-    super(info, cond, SeqType.ITEM_ZM);
+      final Var next, final Expr expr, final InputInfo info) {
+    super(info, expr, SeqType.ITEM_ZM);
     this.start = start;
     this.item = item;
     this.pos = pos;
