@@ -1747,9 +1747,9 @@ public class QueryParser extends InputParser {
   private Expr arrow() throws QueryException {
     Expr expr = transformWith();
     if(expr != null) {
-      for(boolean thin; (thin = wsConsume("->")) || consume("=>");) {
+      for(boolean mapping; (mapping = wsConsume("=!>")) || consume("=>");) {
         skipWs();
-        final boolean enclosed = thin && curr('{');
+        final boolean enclosed = mapping && curr('{');
         final Expr ex = enclosed ? enclosedExpr() : curr('(') ? parenthesized() :
           curr('$') ? varRef() : checkReserved(eQName(sc.funcNS, ARROWSPEC));
 
@@ -1760,7 +1760,7 @@ public class QueryParser extends InputParser {
           final Expr arg;
           For fr = null;
           int s = 0;
-          if(thin) {
+          if(mapping) {
             s = localVars.openScope();
             fr = new For(new Var(new QNm("item"), null, qc, sc, ii), expr);
             arg = new VarRef(ii, fr.var);
@@ -1771,7 +1771,7 @@ public class QueryParser extends InputParser {
           final FuncArgs args = argumentList(qname, arg);
           expr = qname ? funcCall((QNm) ex, ii, args) :
             dynFuncCall(ex, ii, args.exprs(), args.holes());
-          if(thin) {
+          if(mapping) {
             expr = new GFLWOR(ii, fr, expr);
             localVars.closeScope(s);
           }
