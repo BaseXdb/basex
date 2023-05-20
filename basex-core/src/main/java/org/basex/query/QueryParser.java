@@ -34,6 +34,7 @@ import org.basex.query.up.expr.Insert.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
@@ -949,13 +950,18 @@ public class QueryParser extends InputParser {
       final InputInfo ii = info();
       final Var var = localVars.add(new Var(varName(), optAsType(), qc, sc, ii, true));
       final Expr expr = defaults && wsConsume(":=") ? single() : null;
-      for(final SimpleEntry<Var, Expr> param : list) {
-        if(param.getKey().name.eq(var.name)) throw error(FUNCDUPL_X, var);
-      }
       list.add(new SimpleEntry<>(var, expr));
       if(!consume(',')) break;
     }
     wsCheck(")");
+    // check for duplicate variable names
+    if(list.size() > 1) {
+      final QNmSet names = new QNmSet();
+      for(final SimpleEntry<Var, Expr> param : list) {
+        final Var var = param.getKey();
+        if(names.index(var.name) < 0) throw error(FUNCDUPL_X, var);
+      }
+    }
     return list;
   }
 

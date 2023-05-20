@@ -85,7 +85,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @param key key to be indexed
    * @return id, or negative id if key has already been stored
    */
-  private int index(final QNm key) {
+  public int index(final QNm key) {
     final int h = key.hash(null);
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
