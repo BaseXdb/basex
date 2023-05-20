@@ -152,6 +152,8 @@ public final class MapModuleTest extends QueryPlanTest {
         _MAP_ENTRY.args(" $i", " $i + 1")) +
         "for $k in " + func.args(" $map") + " order by $k return " +
         _MAP_GET.args(" $map", " $k"), "2\n3\n4");
+
+    query(func.args(" map:merge((1 to 9) ! map:entry(., string()))", " op('<')(?, '2')"), 1);
   }
 
   /** Test method. */
