@@ -959,7 +959,7 @@ public class QueryParser extends InputParser {
       final QNmSet names = new QNmSet();
       for(final SimpleEntry<Var, Expr> param : list) {
         final Var var = param.getKey();
-        if(names.index(var.name) < 0) throw error(FUNCDUPL_X, var);
+        if(!names.add(var.name)) throw error(FUNCDUPL_X, var);
       }
     }
     return list;

@@ -83,8 +83,8 @@ public class IntSet extends ASet {
   }
 
   /**
-   * Stores the specified key and returns its id, or returns the negative id if the
-   * key has already been stored.
+   * Stores the specified key and returns its id, or returns the negative id if the key has already
+   * been stored. The public method {@link #add} can be used to check if an added value exists.
    * @param key key to be indexed
    * @return id, or negative id if key has already been stored
    */

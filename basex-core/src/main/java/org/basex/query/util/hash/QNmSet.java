@@ -80,12 +80,12 @@ public class QNmSet extends ASet implements Iterable<QNm> {
   }
 
   /**
-   * Stores the specified key and returns its id, or returns the negative id if the
-   * key has already been stored.
+   * Stores the specified key and returns its id, or returns the negative id if the key has already
+   * been stored. The public method {@link #add} can be used to check if an added value exists.
    * @param key key to be indexed
    * @return id, or negative id if key has already been stored
    */
-  public int index(final QNm key) {
+  private int index(final QNm key) {
     final int h = key.hash(null);
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
