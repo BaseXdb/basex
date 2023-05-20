@@ -1599,8 +1599,10 @@ public class QueryParser extends InputParser {
   private Expr multiplicative() throws QueryException {
     Expr expr = otherwise();
     while(expr != null) {
-      final Calc c = consume('*') ? Calc.MULT : wsConsumeWs(DIV) ? Calc.DIV
-          : wsConsumeWs(IDIV) ? Calc.IDIV : wsConsumeWs(MOD) ? Calc.MOD : null;
+      final Calc c = consume('*') || consume('×') ? Calc.MULT :
+        consume('÷') || wsConsumeWs(DIV) ? Calc.DIV :
+        wsConsumeWs(IDIV) ? Calc.IDIV :
+        wsConsumeWs(MOD) ? Calc.MOD : null;
       if(c == null) break;
       expr = new Arith(info(), expr, check(otherwise(), CALCEXPR), c);
     }
