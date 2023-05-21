@@ -73,8 +73,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ()", " boolean#1"), true);
     query(func.args(1, " boolean#1"), true);
     query(func.args(" 0 to 1", " boolean#1"), false);
-    query(func.args(" (1, 3, 7)", " function($_) { $_ mod 2 = 1 }"), true);
-    query(func.args(" -5 to 5", " function($_) { $_ ge 0 }"), false);
+    query(func.args(" (1, 3, 7)", " function($n) { $n mod 2 = 1 }"), true);
+    query(func.args(" -5 to 5", " function($n) { $n ge 0 }"), false);
     query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
         + "'November', 'December')", " contains(?, 'r')"), true);
     check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
@@ -423,10 +423,10 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (0, 1)", " boolean#1"), 1);
 
     check(func.args(" ()", " boolean#1"), "", empty());
-    check(func.args(" 1 to 9", " function($_) { $_ = 0 }"), "", exists(IterFilter.class));
-    check(func.args(" ('a', <a/>)", " function($_ as xs:string) { $_ = 'a' }"), "a",
+    check(func.args(" 1 to 9", " function($n) { $n = 0 }"), "", exists(IterFilter.class));
+    check(func.args(" ('a', <a/>)", " function($s as xs:string) { $s = 'a' }"), "a",
         exists(IterFilter.class));
-    check(func.args(" ('a', <a/>)", " function($_ as xs:string) as xs:boolean? { $_ = 'a' }"), "a",
+    check(func.args(" ('a', <a/>)", " function($s as xs:string) as xs:boolean? { $s = 'a' }"), "a",
         exists(IterFilter.class));
 
     inline(true);
@@ -1040,8 +1040,8 @@ public final class FnModuleTest extends QueryPlanTest {
   /** Test method. */
   @Test public void iterateWhile() {
     final Function func = ITERATE_WHILE;
-    query(func.args(1, " not#1", " ->($_) { error() }"), 1);
-    error(func.args(1, " boolean#1", " ->($_) { error() }"), FUNERR1);
+    query(func.args(1, " not#1", " function($_) { error() }"), 1);
+    error(func.args(1, " boolean#1", " function($_) { error() }"), FUNERR1);
     query(func.args(1, " empty#1", " identity#1"), 1);
     query(func.args(" ()", " empty#1", " string#1"), "");
     query(func.args(" (21 to 24)", " function($s) { head($s) < 23 }", " tail#1"), "23\n24");
@@ -1058,22 +1058,26 @@ public final class FnModuleTest extends QueryPlanTest {
         " function($s) { subsequence($s, 2, count($s) - 2) }"),
         "50\n51");
 
-    query(func.args(" 1e0", " -> { . instance of xs:float }",
-        " -> { if(. instance of xs:double) then xs:float(.) else xs:double(.) }"),
+    query(func.args(" 1e0", " function($n) { $n instance of xs:float }",
+        " function($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) }"),
         1);
-    query(func.args(1, " -> { not(. instance of xs:byte) }",
-        " -> { if(. instance of xs:short) then xs:byte(.) else xs:short(.) }"),
+    query(func.args(1, " function($n) { not($n instance of xs:byte) }",
+        " function($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }"),
         1);
 
     query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
-        " -> { characters(?string) = ?remove }",
-        " -> { map { 'string': replace(?string, ?remove, ''),"
-        + "'remove': ?remove -> string-to-codepoints() -> { . + 2 } -> codepoints-to-string() } }")
+        " function($map) { characters($map?string) = $map?remove }",
+        " function($map) { map { 'string': replace($map?string, $map?remove, ''),"
+        + "'remove': $map?remove =!> string-to-codepoints() "
+        + "  =!> ($n -> { $n + 2 })() =!> codepoints-to-string() } }")
         + "?string", "unhdrduhul");
 
-    query("let $s := (1 to 1000) return " + func.args(1, " -> { . = $s }", " -> { . + 1 }"), 1001);
-    query("let $i := 3936256 return " + func.args(" $i", " -> { abs(. * . - $i) >= 0.0000000001 }",
-        " -> { (. + $i div .) div 2 }"), 1984);
+    query("let $s := (1 to 1000) return " +
+        func.args(1, " function($n) { $n = $s }",
+        " function($n) { $n + 1 }"), 1001);
+    query("let $i := 3936256 return " +
+        func.args(" $i", " function($n) { abs($n * $n - $i) >= 0.0000000001 }",
+        " function($n) { ($n + $i div $n) div 2 }"), 1984);
   }
 
   /** Test method. */
@@ -1796,8 +1800,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ()", " boolean#1"), false);
     query(func.args(1, " boolean#1"), true);
     query(func.args(" 0 to 1", " boolean#1"), true);
-    query(func.args(" (1, 3, 7)", " function($_) { $_ mod 2 = 1 }"), true);
-    query(func.args(" -5 to 5", " function($_) { $_ ge 0 }"), true);
+    query(func.args(" (1, 3, 7)", " function($n) { $n mod 2 = 1 }"), true);
+    query(func.args(" -5 to 5", " function($n) { $n ge 0 }"), true);
     query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
         + "'November', 'December')", " contains(?, 'r')"), true);
     query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"

@@ -9,7 +9,6 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
-import java.util.AbstractMap.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -34,7 +33,6 @@ import org.basex.query.up.expr.Insert.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
@@ -151,7 +149,7 @@ public class QueryParser extends InputParser {
       importModules();
       prolog2();
 
-      localVars.pushContext(null);
+      localVars.pushContext(false);
       final Expr expr = expr();
       if(expr == null) throw alterError(EXPREMPTY);
 
@@ -839,7 +837,7 @@ public class QueryParser extends InputParser {
     }
     if(!external) qc.finalContext = true;
 
-    localVars.pushContext(null);
+    localVars.pushContext(false);
     final Expr expr = check(single(), NOCIDECL);
     final VarScope vs = localVars.popContext();
     final SeqType st = sc.contextType;
@@ -861,7 +859,7 @@ public class QueryParser extends InputParser {
     final Var var = newVar();
     if(sc.module != null && !eq(var.name.uri(), sc.module.uri())) throw error(MODULENS_X, var);
 
-    localVars.pushContext(null);
+    localVars.pushContext(false);
     final boolean external = wsConsumeWs(EXTERNAL);
     Expr expr = null;
     if(wsConsume(":=")) {
@@ -905,13 +903,16 @@ public class QueryParser extends InputParser {
     wsCheck("(");
     if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
 
-    localVars.pushContext(null);
-    final ArrayList<SimpleEntry<Var, Expr>> params = paramList(true);
-    final SeqType type = optAsType();
+    localVars.pushContext(false);
+    final Params params = paramList(true, true);
+    wsCheck(")");
+    params.type = optAsType();
+    params.finish(qc, sc, localVars);
+
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
-    final VarScope vs = localVars.popContext();
     final String doc = docBuilder.toString();
-    final StaticFunc func = qc.functions.declare(name, params, type, expr, anns, doc, vs, ii);
+    final VarScope vs = localVars.popContext();
+    final StaticFunc func = qc.functions.declare(name, params, expr, anns, doc, vs, ii);
     funcs.add(func);
   }
 
@@ -937,32 +938,26 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a ParamList.
-   * @param defaults allow default parameters
-   * @return declared variables
+   * @param sttc static functions
+   * @param types parse types
+   * @return declared variables or {@code null}
    * @throws QueryException query exception
    */
-  private ArrayList<SimpleEntry<Var, Expr>> paramList(final boolean defaults)
-      throws QueryException {
-    final ArrayList<SimpleEntry<Var, Expr>> list = new ArrayList<>();
-    while(true) {
+  private Params paramList(final boolean sttc, final boolean types) throws QueryException {
+    final Params params = new Params();
+    do {
       skipWs();
-      if(curr() != '$' && list.isEmpty()) break;
-      final InputInfo ii = info();
-      final Var var = localVars.add(new Var(varName(), optAsType(), qc, sc, ii, true));
-      final Expr expr = defaults && wsConsume(":=") ? single() : null;
-      list.add(new SimpleEntry<>(var, expr));
-      if(!consume(',')) break;
-    }
-    wsCheck(")");
-    // check for duplicate variable names
-    if(list.size() > 1) {
-      final QNmSet names = new QNmSet();
-      for(final SimpleEntry<Var, Expr> param : list) {
-        final Var var = param.getKey();
-        if(!names.add(var.name)) throw error(FUNCDUPL_X, var);
+      if(curr() != '$') {
+        if(params.isEmpty()) break;
+        if(!sttc) return null;
       }
-    }
-    return list;
+      final InputInfo ii = info();
+      final QNm name = varName();
+      final SeqType type = types ? optAsType() : null;
+      final Expr dflt = sttc && wsConsume(":=") ? single() : null;
+      params.add(name, type, dflt, ii);
+    } while(consume(','));
+    return params;
   }
 
   /**
@@ -1757,32 +1752,27 @@ public class QueryParser extends InputParser {
     if(expr != null) {
       for(boolean mapping; (mapping = wsConsume("=!>")) || consume("=>");) {
         skipWs();
-        final boolean enclosed = mapping && curr('{');
-        final Expr ex = enclosed ? enclosedExpr() : curr('(') ? parenthesized() :
+        final Expr ex = curr('(') ? parenthesized() :
           curr('$') ? varRef() : checkReserved(eQName(sc.funcNS, ARROWSPEC));
 
         final InputInfo ii = info();
-        if(enclosed) {
-          expr = new CachedMap(ii, expr, ex);
+        final Expr arg;
+        For fr = null;
+        int s = 0;
+        if(mapping) {
+          s = localVars.openScope();
+          fr = new For(new Var(new QNm("item"), null, qc, sc, ii), expr);
+          arg = new VarRef(ii, fr.var);
         } else {
-          final Expr arg;
-          For fr = null;
-          int s = 0;
-          if(mapping) {
-            s = localVars.openScope();
-            fr = new For(new Var(new QNm("item"), null, qc, sc, ii), expr);
-            arg = new VarRef(ii, fr.var);
-          } else {
-            arg = expr;
-          }
-          final boolean qname = ex instanceof QNm;
-          final FuncArgs args = argumentList(qname, arg);
-          expr = qname ? funcCall((QNm) ex, ii, args) :
-            dynFuncCall(ex, ii, args.exprs(), args.holes());
-          if(mapping) {
-            expr = new GFLWOR(ii, fr, expr);
-            localVars.closeScope(s);
-          }
+          arg = expr;
+        }
+        final boolean qname = ex instanceof QNm;
+        final FuncArgs args = argumentList(qname, arg);
+        expr = qname ? funcCall((QNm) ex, ii, args) :
+          dynFuncCall(ex, ii, args.exprs(), args.holes());
+        if(mapping) {
+          expr = new GFLWOR(ii, fr, expr);
+          localVars.closeScope(s);
         }
       }
     }
@@ -2203,18 +2193,19 @@ public class QueryParser extends InputParser {
    */
   private Expr primary() throws QueryException {
     skipWs();
+    // function item
+    Expr expr = functionItem();
+    if(expr != null) return expr;
+
     final char ch = curr();
-    // variables
-    if(ch == '$') return varRef();
-    // parentheses
-    if(ch == '(' && next() != '#') return parenthesized();
     // direct constructor
     if(ch == '<') return dirConstructor();
     // string constructor and template
     if(ch == '`') return stringConstructor();
-    // function item
-    Expr expr = functionItem();
-    if(expr != null) return expr;
+    // variables
+    if(ch == '$') return varRef();
+    // parentheses
+    if(ch == '(' && next() != '#') return parenthesized();
     // function call
     expr = functionCall();
     if(expr != null) return expr;
@@ -2325,34 +2316,44 @@ public class QueryParser extends InputParser {
     skipWs();
     final int p = pos;
 
-    // parse annotations
-    final AnnList anns = annotations(false).check(false, true);
     // inline function
-    if(wsConsume("->") || wsConsume(FUNCTION)) {
+    final AnnList anns = annotations(false).check(false, true);
+    final boolean inline = wsConsume(FUNCTION) && wsConsume("("), single = !inline && curr('$');
+    if(inline || single || consume("(")) {
       if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
         throw error(NOVISALLOWED);
 
-      final HashMap<Var, Expr> global = new HashMap<>();
-      localVars.pushContext(global);
-      Var[] params = null;
-      Expr body = null;
-      SeqType type = null;
-      if(wsConsume("(")) {
-        params = StaticFunc.vars(paramList(false));
-        type = optAsType();
-        body = enclosedExpr();
-      } else if(curr('{')) {
-        final InputInfo ii = info();
-        final QNm name = new QNm("arg");
-        final Var var = new Var(name, SeqType.ITEM_O, qc, sc, ii, true);
-        params = new Var[] { localVars.add(var) };
-        body = new CachedMap(ii, localVars.resolve(name, ii), enclosedExpr());
+      final HashMap<Var, Expr> global = localVars.pushContext(true);
+      final Params params = paramList(false, inline);
+      Expr expr = null;
+      if(params != null) {
+        if(single || wsConsume(")")) {
+          if(inline || wsConsume("->")) {
+            if(inline) params.type = optAsType();
+            params.finish(qc, sc, localVars);
+            expr = enclosedExpr();
+          }
+        }
       }
       final VarScope vs = localVars.popContext();
-      if(body != null) return new Closure(info(), type, params, body, anns, global, vs);
+      if(expr != null) return new Closure(info(), params, expr, anns, global, vs);
     }
+    pos = p;
+
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);
+
+    // focus function
+    if(wsConsumeWs(FUNCTION, "{", null)) {
+      final HashMap<Var, Expr> global = localVars.pushContext(true);
+      final InputInfo ii = info();
+      final QNm name = new QNm("arg");
+      final Params params = new Params().add(name, SeqType.ITEM_ZM, null, ii).
+          finish(qc, sc, localVars);
+      final Expr expr = new CachedMap(ii, localVars.resolve(name, ii), enclosedExpr());
+      final VarScope vs = localVars.popContext();
+      return new Closure(info(), params, expr, anns, global, vs);
+    }
 
     // named function reference
     pos = p;

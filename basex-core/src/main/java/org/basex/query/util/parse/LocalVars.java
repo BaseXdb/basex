@@ -102,10 +102,13 @@ public final class LocalVars {
 
   /**
    * Pushes a new variable context onto the stack.
-   * @param global mapping for non-local variables (can be {@code null})
+   * @param global create global mapping for non-local variables
+   * @return global map or {@code null})
    */
-  public void pushContext(final HashMap<Var, Expr> global) {
-    vars.add(new VarContext(global, parser.sc));
+  public HashMap<Var, Expr> pushContext(final boolean global) {
+    final HashMap<Var, Expr> map = global ? new HashMap<>() : null;
+    vars.add(new VarContext(map, parser.sc));
+    return map;
   }
 
   /**

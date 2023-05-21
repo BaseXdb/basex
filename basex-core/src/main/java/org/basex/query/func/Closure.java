@@ -14,6 +14,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -54,16 +55,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /**
    * Constructor.
    * @param info input info
-   * @param declType declared type (can be {@code null})
-   * @param params formal parameters
+   * @param params parameters
    * @param expr function body
    * @param anns annotations
    * @param global bindings for non-local variables
    * @param vs scope
    */
-  public Closure(final InputInfo info, final SeqType declType, final Var[] params, final Expr expr,
+  public Closure(final InputInfo info, final Params params, final Expr expr,
       final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    this(info, null, declType, params, expr, anns, global, vs);
+    this(info, null, params.type, params.vars(), expr, anns, global, vs);
   }
 
   /**

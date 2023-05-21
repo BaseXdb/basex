@@ -3,13 +3,13 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 
 import java.util.*;
-import java.util.AbstractMap.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -34,7 +34,6 @@ public final class StaticFuncs extends ExprInfo {
    * Declares a new user-defined function.
    * @param qname function name
    * @param params parameters with variables and optional default values
-   * @param type declared return type (can be {@code null})
    * @param expr function body (can be {@code null})
    * @param anns annotations
    * @param doc xqdoc string
@@ -43,16 +42,16 @@ public final class StaticFuncs extends ExprInfo {
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final QNm qname, final ArrayList<SimpleEntry<Var, Expr>> params,
-      final SeqType type, final Expr expr, final AnnList anns, final String doc, final VarScope vs,
-      final InputInfo ii) throws QueryException {
+  public StaticFunc declare(final QNm qname, final Params params, final Expr expr,
+      final AnnList anns, final String doc, final VarScope vs, final InputInfo ii)
+          throws QueryException {
 
     final byte[] uri = qname.uri();
     if(uri.length == 0) throw FUNNONS_X.get(ii, qname.string());
     if(NSGlobal.reserved(uri) || Functions.builtIn(qname) != null)
       throw FNRESERVED_X.get(ii, qname.string());
 
-    final StaticFunc sf = new StaticFunc(qname, params, type, expr, anns, doc, vs, ii);
+    final StaticFunc sf = new StaticFunc(qname, params, expr, anns, doc, vs, ii);
     funcCache(sf.id()).setFunc(sf);
     return sf;
   }
