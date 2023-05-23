@@ -125,8 +125,7 @@ public final class TableMemAccess extends TableAccess {
     updateFirstPre(c + 1, -count);
 
     // decrease table size; update dense flag
-    int size = meta.size;
-    size -= count;
+    final int size = meta.size - count;
     if(pre < size) dense = false;
     else if(size == 0) dense = true;
     meta.size = size;
@@ -163,8 +162,12 @@ public final class TableMemAccess extends TableAccess {
 
   @Override
   public String toString() {
-    return Util.className(this) + "[size: " + meta.size + ", current: " + current +
-        ", blocks: " + blocks + ']';
+    final StringBuilder sb = new StringBuilder(Util.className(this));
+    sb.append("[size: " + meta.size + "; current: " + current + "; " + blocks.size() + " blocks: ");
+    for(final TableMemBlock block : blocks) {
+      sb.append(block.firstPre).append(' ');
+    }
+    return sb.append(']').toString();
   }
 
   // PRIVATE METHODS ==============================================================================
