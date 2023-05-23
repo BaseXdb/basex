@@ -90,7 +90,9 @@ public final class IndexInfo {
       final Stats stats = data.elemNames.stats(data.elemNames.id(test.qname.local()));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
-    } else if(last.test.type != NodeType.ATTRIBUTE) {
+    } else if(last.test.type == NodeType.ATTRIBUTE) {
+      text = false;
+    } else {
       // other tests cannot be rewritten for index access
       return null;
     }
