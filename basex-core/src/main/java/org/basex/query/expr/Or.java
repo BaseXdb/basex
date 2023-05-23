@@ -60,7 +60,7 @@ public final class Or extends Logical {
     // use summarized costs for estimation
     ii.costs = costs;
     // no expressions means no costs: expression will later be pre-evaluated
-    ii.expr = list.size() == 1 ? list.get(0) : new Union(info, list.finish());
+    ii.expr = list.size() == 1 ? list.get(0) : new Union(info, list.finish()).optimize(ii.cc);
     return true;
   }
 
