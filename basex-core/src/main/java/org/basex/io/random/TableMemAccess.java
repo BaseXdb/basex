@@ -126,7 +126,7 @@ public final class TableMemAccess extends TableAccess {
 
     // decrease table size; update dense flag
     final int size = meta.size - count;
-    if(pre < size) dense = false;
+    if(pre <= size) dense = false;
     else if(size == 0) dense = true;
     meta.size = size;
   }

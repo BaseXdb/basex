@@ -133,4 +133,29 @@ public final class StoreTest extends SandboxTest {
     query(_DB_PUT.args(NAME, GH1711, "/"));
     query(_DB_GET.args(NAME));
   }
+
+  /**
+   * Update, replace nodes: AIOOB.
+   */
+  @Test public void gh2208() {
+    query(_DB_CREATE.args(NAME, " <a xmlns:a='a'>{ (1 to 4095) ! <b/> }</a>", "x.xml"));
+    query(_DB_GET.args(NAME) +
+        " update { replace node /a with <c>{ (1 to 4096) ! <d/> }</c> }");
+
+    query(_DB_CREATE.args(NAME, " <a xmlns:a='a'>{ (1 to 4095) ! <b/> }</a>", "x.xml"));
+    query(_DB_GET.args(NAME) +
+        " update { replace node /a with <c xmlns:c='c'>{ (1 to 4096) ! <d/> }</c> }");
+
+    query(_DB_CREATE.args(NAME, " <a xmlns:a='a'>{ (1 to 4095) ! <b/> }</a>", "x.xml"));
+    query(_DB_GET.args(NAME) +
+        " update { replace node /a with <c xmlns:c='c'>{ (1 to 4096) ! <d/> }</c> }");
+
+    query(_DB_CREATE.args(NAME, " <a>{ (1 to 40950) ! <b/> }</a>", "x.xml"));
+    query(_DB_GET.args(NAME) +
+        " update { replace node /a with <c xmlns:c='c'>{ (1 to 40960) ! <d/> }</c> }");
+
+    query(_DB_CREATE.args(NAME, " <a><b/></a>", "x.xml"));
+    query(_DB_GET.args(NAME) +
+        " update { replace node /a with <c xmlns:c='c'>{ (1 to 40960) ! <d/> }</c> }");
+  }
 }
