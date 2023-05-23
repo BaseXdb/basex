@@ -296,6 +296,15 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     indexCheck("let $db :=" + _DB_GET.args(NAME, "a") + " return $db/a[@b = 'c']", doc);
   }
 
+  /** Index Rewritings: Mixture of text and attribute comparisons. */
+  @Test public void gh2211() {
+    final String first = "<a>A</a>";
+    final String second = "<b b=\"A\"/>";
+    execute(new CreateDB(NAME, "<x>" + first + second + "</x>"));
+    query("//*[text() = 'A' or @b = 'A']", first + '\n' + second);
+    query("//*[@b = 'A' or text() = 'A']", first + '\n' + second);
+  }
+
   /**
    * Creates a test database.
    */
