@@ -48,8 +48,8 @@ public final class GUIOptions extends Options {
   public static final StringOption MONOFONT = new StringOption("MONOFONT", GUIConstants.MONOFONT);
   /** Font size. */
   public static final NumberOption FONTSIZE = new NumberOption("FONTSIZE", 15);
-  /** Only display monospace fonts. */
-  public static final BooleanOption ONLYMONO = new BooleanOption("ONLYMONO", false);
+  /** List monospace fonts. */
+  public static final BooleanOption LISTMONO = new BooleanOption("LISTMONO", true);
   /** Anti-aliasing type. */
   public static final StringOption ANTIALIAS = new StringOption("ANTIALIAS", "System");
 

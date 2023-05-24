@@ -62,7 +62,7 @@ final class TextIterator {
     pos = p;
     if(p >= l) return false;
 
-    // find next token boundary
+    // find next token boundary (excessively long tokens will be wrapped later on)
     final int e = pos + max;
     final byte[] txt = text;
     int ch = cp(txt, p);
@@ -84,6 +84,16 @@ final class TextIterator {
    */
   String currString() {
     return posEnd <= length ? string(text, pos, posEnd - pos) : "";
+  }
+
+  /**
+   * Returns a substring.
+   * @param s start position
+   * @param e end position
+   * @return string
+   */
+  String substring(final int s, final int e) {
+    return string(text, s, e - s);
   }
 
   /**
@@ -113,6 +123,14 @@ final class TextIterator {
    */
   int pos() {
     return pos;
+  }
+
+  /**
+   * Returns the iterator end position.
+   * @return iterator end position
+   */
+  int posEnd() {
+    return posEnd;
   }
 
   /**
@@ -166,52 +184,41 @@ final class TextIterator {
   }
 
   /**
-   * Tests if the current text position is selected.
-   * @return result of check
+   * Returns a selection range.
+   * @return range or {@code null}
    */
-  boolean selectStart() {
-    return start != end && (inSelect() ||
-        (start < end ? start >= pos && start < posEnd : end >= pos && end < posEnd));
-  }
-
-  /**
-   * Tests if the current text position is selected.
-   * @return result of check
-   */
-  boolean inSelect() {
-    return start < end ? pos >= start && pos < end : pos >= end && pos < start;
-  }
-
-  /**
-   * Returns true if the cursor focuses a search string.
-   * @return result of check
-   */
-  boolean searchStart() {
-    if(searchResults == null || searchIndex == searchResults[0].size()) return false;
-    while(pos > searchResults[1].get(searchIndex)) {
-      if(++searchIndex == searchResults[0].size()) return false;
+  int[] selection() {
+    if(start != end) {
+      final boolean asc = start < end;
+      final int s = asc ? start : end, e = asc ? end : start;
+      if(pos >= s && pos < e || s >= pos && s < posEnd) return new int[] { s, e };
     }
-    return posEnd > searchResults[0].get(searchIndex);
+    return null;
   }
 
   /**
-   * Tests if the current position is within a search term.
-   * @return result of check
+   * Returns the next search result range.
+   * @return range or {@code null}
    */
-  boolean inSearch() {
-    final IntList starts = searchResults[0], ends = searchResults[1];
-    final int i = searchIndex;
-    if(i >= starts.size() || pos < starts.get(i)) return false;
-    final boolean in = pos < ends.get(i);
-    if(!in) searchIndex++;
-    return in;
+  int[] searchResult() {
+    if(searchResults != null) {
+      final IntList starts = searchResults[0], ends = searchResults[1];
+      final int ss = starts.size();
+      while(searchIndex < ss) {
+        final int s = starts.get(searchIndex), e = ends.get(searchIndex);
+        if(posEnd <= s) return null;
+        ++searchIndex;
+        if(pos < e) return new int[] { s, e };
+      }
+    }
+    return null;
   }
 
   /**
    * Tests if the current token is erroneous.
    * @return result of check
    */
-  boolean erroneous() {
+  boolean error() {
     return errPos >= pos && errPos < posEnd;
   }
 
@@ -219,7 +226,7 @@ final class TextIterator {
    * Returns the error position.
    * @return error position
    */
-  int error() {
+  int errorPos() {
     return errPos;
   }
 
