@@ -84,6 +84,7 @@ public final class DualMap extends SimpleMap {
         qf.value = item;
         item = exprs[1].item(qc, info);
         if(!item.isEmpty()) vb.add(item);
+        qf.value = qv;
       }
       return vb.value(this);
     } finally {

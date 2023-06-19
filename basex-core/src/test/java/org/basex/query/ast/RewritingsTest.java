@@ -3189,4 +3189,12 @@ public final class RewritingsTest extends QueryPlanTest {
     query("<x/>/* ! nilled() = false()", false);
     query("<x/>/* ! nilled() = true()", false);
   }
+
+  /** Bug on consecutive map with distinct-values. */
+  @Test public void gh2217() {
+    query("<F/>[(distinct-values((true(), (. = ''))) ! 1 castable as xs:boolean)]",
+        "<F/>");
+    query("<F/>[(distinct-values(. ! (boolean(.), . = <A/>)) ! count(.)) castable as xs:boolean]",
+        "<F/>");
+  }
 }
