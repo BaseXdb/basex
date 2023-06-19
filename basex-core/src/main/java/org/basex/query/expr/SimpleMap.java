@@ -424,7 +424,12 @@ public abstract class SimpleMap extends Arr {
   private Expr toPath(final Simplify mode, final CompileContext cc) throws QueryException {
     final ExprList steps = new ExprList();
 
-    Expr root = exprs[0].simplifyFor(mode, cc);
+    final int el = exprs.length;
+    final QueryFunction<Integer, Expr> simplify = e -> {
+      final Expr expr = exprs[e];
+      return mode == Simplify.DISTINCT || e + 1 == el ? expr.simplifyFor(mode, cc) : expr;
+    };
+    Expr root = simplify.apply(0);
     cc.pushFocus(root);
     if(root instanceof AxisPath) {
       final AxisPath path = (AxisPath) root;
@@ -432,9 +437,8 @@ public abstract class SimpleMap extends Arr {
       steps.add(path.steps);
     }
     try {
-      final int el = exprs.length;
       for(int e = 1; e < el; e++) {
-        final Expr expr = exprs[e].simplifyFor(mode, cc);
+        final Expr expr = simplify.apply(e);
         if(!(expr instanceof AxisPath)) return this;
         final AxisPath path = (AxisPath) expr;
         if(path.root != null) return this;

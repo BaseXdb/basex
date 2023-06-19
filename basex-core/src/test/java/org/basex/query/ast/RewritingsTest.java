@@ -3048,6 +3048,10 @@ public final class RewritingsTest extends QueryPlanTest {
     // GH-2182: EBV tests, rewriting to descendant::text()
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
     check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(ItemMap.class));
+
+    // GH-2215: Unexpected exception of mapping double attributes
+    check("boolean((<a/> ! (a, b)))", false, exists(IterPath.class));
+    check("boolean(count(<T/>//*[@id = '1'] ! (@a, @b)))", false, exists(IterPath.class));
   }
 
   /** Simplified if expression yields errors. */
