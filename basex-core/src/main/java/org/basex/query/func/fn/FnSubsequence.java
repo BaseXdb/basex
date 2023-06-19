@@ -231,7 +231,7 @@ public class FnSubsequence extends StandardFunc {
       }
       // subsequence((I1, I2, I3, I4), 2, 2)  ->  (I2, I3)
       // subsequence((I, E1, E2), 2, 2)  ->  subsequence((E1, E2), 1, 2)
-      if(input instanceof List) {
+      if(input instanceof List && sr.start > 0) {
         final Expr[] args = input.args();
         if(((Checks<Expr>) ex -> ex.seqType().one()).all(args)) {
           return List.get(cc, info, Arrays.copyOfRange(args, (int) sr.start, (int) sr.end));

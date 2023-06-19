@@ -2030,6 +2030,12 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" ('x', (1 to 3)[.])", 2, 2), "1\n2", empty(Str.class), empty(List.class));
     check(func.args(" ('x', (1 to 3)[.], 4 to 6)", 2, 2), "1\n2", empty(Str.class));
     check(func.args(" ('x', (1 to 3)[.], 4 to 6)", 2, 4), "1\n2\n3\n4", empty(Str.class));
+
+    // GH-2214
+    query("<x/> ! subsequence((., *), 1)", "<x/>");
+    query("<x/> ! subsequence((., *), 1, 1)", "<x/>");
+    query("<x/> ! subsequence((., *), 1, 2)", "<x/>");
+    query("<x/> ! subsequence((., *), 1, 3)", "<x/>");
   }
 
   /** Test method. */
