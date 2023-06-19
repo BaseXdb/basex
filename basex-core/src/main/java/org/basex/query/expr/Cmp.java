@@ -237,7 +237,7 @@ public abstract class Cmp extends Arr {
             final int al = args.length;
             final Expr last = args[al - 1];
             final Expr[] ops = last.args();
-            if(ops != null && ops[0] instanceof ContextValue) {
+            if(ops != null && ops.length > 0 && ops[0] instanceof ContextValue) {
               final QuerySupplier<Expr> op1 = () ->
                 SimpleMap.get(cc, info, Arrays.copyOf(args, al - 1));
               if(last instanceof CmpG) {

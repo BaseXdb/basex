@@ -3172,4 +3172,12 @@ public final class RewritingsTest extends QueryPlanTest {
     query("boolean(<_>x</_> ! text() ! data())", true);
     query("boolean(<_>x</_> ! text() ! string())", true);
   }
+
+  /** Internal crash on has-children() result comparison. */
+  @Test public void gh2213() {
+    query("<x/>/* ! has-children() = false()", false);
+    query("<x/>/* ! has-children() = true()", false);
+    query("<x/>/* ! nilled() = false()", false);
+    query("<x/>/* ! nilled() = true()", false);
+  }
 }
