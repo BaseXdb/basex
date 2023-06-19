@@ -2820,7 +2820,7 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** Simple maps and comparisons. */
   @Test public void gh2078() {
-    check("<_ c='1'/>/(every $c in @c satisfies contains($c, '1'))", true, root(BOOLEAN));
+    check("<_ c='1'/>/(every $c in @c satisfies contains($c, '1'))", true, root(NOT));
     check("<_ c='1'/>/(some $c in @c satisfies contains($c, '1'))", true, root(BOOLEAN));
     check("<_ c='1'/>/((@c ! contains(., '1')) = true())", true, root(BOOLEAN));
     check("<_ c='1'/>/(@c ! contains(., '1')) = true()", true, root(BOOLEAN));
@@ -2858,6 +2858,11 @@ public final class RewritingsTest extends QueryPlanTest {
     check("let $seq := (1 to 1000000000) ! string() return"
         + "  some $a in $seq satisfies (some $b in $seq satisfies $b = $a)",
         true, root(Bln.class));
+
+    // GH-2216: Bug on map operation of empty sequence
+    query("<x><y/></x>/y[(@a ! (. >= 0)) = false()]", "");
+    query("<x><y/></x>/y[(@a ! (. >= 0)) = true()]", "");
+    check("<_ c='1'/>/(every $c in @d satisfies contains($c, '1'))", true, root(NOT));
   }
 
   /** where false(). */

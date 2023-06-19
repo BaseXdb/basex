@@ -211,7 +211,7 @@ public abstract class Cmp extends Arr {
         final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
         final Expr ex1 = st1.one() ? expr1 : st1.zeroOrOne() ? cc.function(BOOLEAN, info, expr1) :
           null;
-        if(ex1 != null) {
+        if(ex1 != null && (success || st1.one())) {
           final QuerySupplier<Expr> not = () -> cc.function(NOT, info, ex1);
           switch(op) {
             case EQ: return ok ? ex1       : not.get();
