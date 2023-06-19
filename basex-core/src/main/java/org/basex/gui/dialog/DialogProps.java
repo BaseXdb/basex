@@ -149,6 +149,7 @@ public final class DialogProps extends BaseXDialog {
     nsPanel.add(new BaseXLabel(NAMESPACES).border(0, 0, 6, 0).large(), BorderLayout.NORTH);
 
     nsInfo = new TextPanel(this, "", false);
+    nsInfo.setPreferredSize(new Dimension(600, 1));
     nsPanel.add(new SearchEditor(gui, nsInfo), BorderLayout.CENTER);
 
     infoPanel.add(dbPanel);
