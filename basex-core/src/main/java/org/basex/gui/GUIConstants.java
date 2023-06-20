@@ -264,9 +264,6 @@ public final class GUIConstants {
 
   /** Name of monospace font. */
   public static final String MONOFONT = Prop.WIN ? "Consolas" : Font.MONOSPACED;
-  /** Characters for monospace detection. */
-  public static final char[] MONOSPACE =  " !,-.01:<ILMWilmw".toCharArray();
-
   /** Font. */
   public static Font font;
   /** Bold Font. */
@@ -280,6 +277,8 @@ public final class GUIConstants {
 
   /** Names of available fonts. */
   private static String[] fonts;
+  /** Characters for monospace detection. */
+  private static final char[] MONOSPACE =  " !,-.01:<ILMWilmw".toCharArray();
 
   /**
    * Returns the names of all fonts that are available on the system.
