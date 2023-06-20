@@ -262,13 +262,10 @@ public final class GUIConstants {
 
   // FONTS ========================================================================================
 
-  /** Names of available fonts. */
-  public static final String[] FONTS = GraphicsEnvironment.getLocalGraphicsEnvironment().
-      getAvailableFontFamilyNames();
   /** Name of monospace font. */
   public static final String MONOFONT = Prop.WIN ? "Consolas" : Font.MONOSPACED;
   /** Characters for monospace detection. */
-  public static final char[] MONOSPACE = new char[] { ' ', '!', '<', 'i', 'm', 'M' };
+  public static final char[] MONOSPACE =  " !,-.01:<ILMWilmw".toCharArray();
 
   /** Font. */
   public static Font font;
@@ -280,6 +277,60 @@ public final class GUIConstants {
   public static Font dmfont;
   /** Current font size. */
   public static int fontSize;
+
+  /** Names of available fonts. */
+  private static String[] fonts;
+
+  /**
+   * Returns the names of all fonts that are available on the system.
+   * @return fonts
+   */
+  public static String[] fonts() {
+    if(fonts == null) {
+      final StringList list = new StringList();
+      for(final String name : GraphicsEnvironment.getLocalGraphicsEnvironment().
+          getAvailableFontFamilyNames()) {
+        boolean add = true;
+        final Font f = new Font(name, Font.PLAIN, 100);
+        for(final char ch : MONOSPACE) {
+          if(!f.canDisplay(ch)) {
+            add = false;
+            break;
+          }
+        }
+        if(add) list.add(name);
+      }
+      fonts = list.finish();
+    }
+    return fonts;
+  }
+
+  /**
+   * Returns the names of all monospace fonts that are available on the system.
+   * @return fonts
+   */
+  public static String[] monoFonts() {
+    final StringList monos = new StringList();
+    for(final String name : fonts()) {
+      if(isMono(LABEL.getFontMetrics(new Font(name, Font.PLAIN, 100)))) monos.add(name);
+    }
+    return monos.finish();
+  }
+
+  /**
+   * Checks if the font metrics refer to a monospaced font.
+   * Slight deviations are tolerated.
+   * @param fm font metrics
+   * @return result of check
+   */
+  public static boolean isMono(final FontMetrics fm) {
+    final IntSet set = new IntSet(4);
+    for(final char ch : MONOSPACE) {
+      final int w = fm.charWidth(ch);
+      if(w == 0 || set.add(w) && set.size() > 2) return false;
+    }
+    return true;
+  }
 
   // KEYS =========================================================================================
 
@@ -360,33 +411,6 @@ public final class GUIConstants {
    */
   public static int fontSize() {
     return LABEL.getFont().getSize();
-  }
-
-  /**
-   * Checks if the font metrics refer to a monospaced font.
-   * Slight deviations are tolerated.
-   * @param fm font metrics
-   * @return result of check
-   */
-  public static boolean isMono(final FontMetrics fm) {
-    final IntSet set = new IntSet(4);
-    for(final char ch : MONOSPACE) {
-      if(set.add(fm.charWidth(ch)) && set.size() > 2) return false;
-    }
-    return true;
-  }
-
-  /**
-   * Returns the names of all monospace fonts.
-   * @param g graphics reference
-   * @return fonts
-   */
-  public static String[] monos(final Graphics g) {
-    final StringList monos = new StringList();
-    for(final String name : FONTS) {
-      if(isMono(g.getFontMetrics(new Font(name, Font.PLAIN, 100)))) monos.add(name);
-    }
-    return monos.finish();
   }
 
   // PRIVATE METHODS ==============================================================================

@@ -49,10 +49,11 @@ public final class DialogFonts extends BaseXDialog {
     antiAlias.setSelectedItem(gopts.get(GUIOptions.ANTIALIAS));
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 3, 8, 8));
-    font = new BaseXList(this, GUIConstants.FONTS);
+    final String[] fonts = GUIConstants.fonts();
+    font = new BaseXList(this, fonts);
     font.setWidth(200);
     p.add(font);
-    font2 = new BaseXList(this, GUIConstants.FONTS);
+    font2 = new BaseXList(this, fonts);
     font2.setWidth(200);
     p.add(font2);
     size = new BaseXList(this, SIZES);
@@ -69,13 +70,13 @@ public final class DialogFonts extends BaseXDialog {
     pp.add(antiAlias);
     p.add(pp);
 
-    onlyMono = new BaseXCheckBox(this, "Monospace", GUIOptions.ONLYMONO, gopts);
+    onlyMono = new BaseXCheckBox(this, "Monospace", GUIOptions.LISTMONO, gopts);
     p.add(onlyMono);
 
     set(p, BorderLayout.CENTER);
     finish();
 
-    monoFonts();
+    monoFonts = GUIConstants.monoFonts();
     action(onlyMono);
   }
 
@@ -99,14 +100,14 @@ public final class DialogFonts extends BaseXDialog {
       changed = true;
     } else if(cmp == onlyMono) {
       final boolean selected = onlyMono.isSelected();
-      gopts.set(GUIOptions.ONLYMONO, selected);
+      gopts.set(GUIOptions.LISTMONO, selected);
       if(selected) {
         final boolean ready = monoFonts != null;
         font2.setEnabled(ready);
         font2.setData(ready ? monoFonts : new String[] { PLEASE_WAIT_D });
       } else {
         font2.setEnabled(true);
-        font2.setData(GUIConstants.FONTS);
+        font2.setData(GUIConstants.fonts());
       }
       font2.setValue(gopts.get(GUIOptions.MONOFONT));
     } else {
@@ -135,23 +136,5 @@ public final class DialogFonts extends BaseXDialog {
       font2.setFont(gopts.get(GUIOptions.MONOFONT));
       gui.updateLayout();
     }
-  }
-
-  /**
-   * Creates a list of monospaced fonts in a separate thread.
-   */
-  private void monoFonts() {
-    new GUIWorker<Boolean>() {
-      @Override
-      protected Boolean doInBackground() {
-        monoFonts = GUIConstants.monos(getGraphics());
-        return gui.gopts.get(GUIOptions.ONLYMONO);
-      }
-
-      @Override
-      protected void done(final Boolean mono) {
-        if(mono) action(onlyMono);
-      }
-    }.execute();
   }
 }

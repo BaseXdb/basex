@@ -108,7 +108,6 @@ public class TextPanel extends BaseXPanel {
       @Override
       public void focusLost(final FocusEvent e) {
         caret(false);
-        rend.caret(false);
       }
     });
 
@@ -523,14 +522,16 @@ public class TextPanel extends BaseXPanel {
     } else {
       return false;
     }
-    e.consume();
     return true;
   }
 
   @Override
   public void keyPressed(final KeyEvent e) {
     // ignore modifier keys
-    if(specialKey(e) || modifier(e)) return;
+    if(specialKey(e) || modifier(e)) {
+      e.consume();
+      return;
+    }
 
     // re-animate cursor
     caret(true);

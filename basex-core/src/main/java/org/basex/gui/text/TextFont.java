@@ -11,6 +11,7 @@ import java.util.stream.*;
 import javax.swing.*;
 
 import org.basex.gui.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -31,17 +32,21 @@ final class TextFont {
   private static List<Font> cachedFonts;
 
   /** Cached fallback fonts. */
-  private final Map<String, FontBox> fallbacks = new LinkedHashMap<>();
+  private final Map<String, FontFamily> fallbacks = new LinkedHashMap<>();
   /** Component. */
   private final JComponent comp;
-  /** Font container. */
-  private final FontBox font;
+  /** Font family. */
+  private final FontFamily family;
+  /** Tab indentation. */
+  private final int indent;
+  /** Font size. */
+  private int size;
 
   /** Current style. */
   private int style;
 
   static {
-    final Set<String> set = new HashSet<>(Arrays.asList(GUIConstants.FONTS));
+    final Set<String> set = new HashSet<>(Arrays.asList(GUIConstants.fonts()));
     final BiConsumer<StringList, String[]> add = (list, fonts) -> {
       for(final String font : fonts) {
         if(set.contains(font)) list.add(font);
@@ -56,28 +61,29 @@ final class TextFont {
    * Constructor.
    * @param font font
    * @param comp component
+   * @param indent indentation
    */
-  TextFont(final Font font, final JComponent comp) {
+  TextFont(final Font font, final int indent, final JComponent comp) {
     this.comp = comp;
-    this.font = new FontBox(font);
-    final StringList fonts = GUIConstants.isMono(this.font.plainMetrics) ? MONO : VARS;
-    for(final String name : fonts) new FontBox(name);
+    this.indent = indent;
+    family = new FontFamily(font, comp);
+    size = font.getSize();
   }
 
   /**
-   * Assigns a style and returns the font.
+   * Assigns a style.
    * @param s style
    */
-  void assign(final int s) {
+  void style(final int s) {
     style = s;
   }
 
   /**
    * Returns the font size.
-   * @return size
+   * @return font size
    */
   int size() {
-    return font.plain.getSize();
+    return size;
   }
 
   /**
@@ -86,19 +92,8 @@ final class TextFont {
    * @return width
    */
   int stringWidth(final String string) {
-    final int i = font().canDisplayUpTo(string);
-    final FontBox box = i == -1 ? font : fallback(string.charAt(i));
-    return (style == 0 ? box.plainMetrics : box.boldMetrics).stringWidth(string);
-  }
-
-  /**
-   * Returns the pixel width of the specified codepoint.
-   * @param cp codepoint
-   * @return width
-   */
-  int charWidth(final int cp) {
-    final FontBox box = font().canDisplay(cp) ? font : fallback(cp);
-    return (style == 0 ? box.plainMetrics : box.boldMetrics).charWidth(cp);
+    return string.length() == 1 ? charWidth(string.codePointAt(0)) :
+      family(string).metrics(style).stringWidth(string);
   }
 
   /**
@@ -107,37 +102,64 @@ final class TextFont {
    * @return font
    */
   Font font(final String string) {
-    final int i = font().canDisplayUpTo(string);
-    final FontBox box = i == -1 ? font : fallback(string.codePointAt(i));
-    return style == 0 ? box.plain : box.bold;
+    return family(string).font(style);
   }
 
   /**
-   * Returns a fallback font for the specified codepoint.
-   * @param cp codepoint
-   * @return font
+   * Returns an font family for the specified string.
+   * @param string string
+   * @return font family
    */
-  private FontBox fallback(final int cp) {
+  private FontFamily family(final String string) {
+    final int i = family.font(style).canDisplayUpTo(string);
+    return i == -1 ? family : fallback(string.codePointAt(i));
+  }
+
+  /**
+   * Returns the pixel width of the specified codepoint.
+   * @param cp codepoint
+   * @return width
+   */
+  int charWidth(final int cp) {
+    if(cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END) return 0;
+
+    final FontFamily ff = family.font(style).canDisplay(cp) ? family : fallback(cp);
+    final FontMetrics fm = ff.metrics(style);
+    return cp == '\t' ? fm.charWidth(' ') * indent : fm.charWidth(cp);
+  }
+
+  /**
+   * Returns a fallback font family for the specified codepoint.
+   * @param cp codepoint
+   * @return font family
+   */
+  private FontFamily fallback(final int cp) {
+    if(fallbacks.isEmpty()) {
+      final StringList fonts = GUIConstants.isMono(family.metrics(PLAIN)) ? MONO : VARS;
+      for(final String name : fonts) fallback(name);
+    }
+
     // check if a fallback has already been registered
     final String fb = FALLBACK.get(cp);
     if(fb != null) {
-      final FontBox box = fallbacks.get(fb);
-      return box != null ? box : new FontBox(fb);
+      final FontFamily ff = fallbacks.get(fb);
+      return ff != null ? ff : fallback(fb);
     }
 
     // check for codepoint in existing fallback fonts
-    for(final Map.Entry<String, FontBox> entry : fallbacks.entrySet()) {
-      final FontBox box = entry.getValue();
-      if(box.plain.canDisplay(cp)) {
+    for(final Map.Entry<String, FontFamily> entry : fallbacks.entrySet()) {
+      final FontFamily ff = entry.getValue();
+      if(ff.font(PLAIN).canDisplay(cp)) {
         FALLBACK.put(cp, entry.getKey());
-        return box;
+        return ff;
       }
     }
 
     // find new font (first call: sort fonts by number of glyphs)
     if(cachedFonts == null) {
-      final Map<Font, Integer> map = new HashMap<>(GUIConstants.FONTS.length);
-      for(final String name : GUIConstants.FONTS) {
+      final String[] names = GUIConstants.fonts();
+      final Map<Font, Integer> map = new HashMap<>(names.length);
+      for(final String name : names) {
         final Font f = newFont(name);
         map.put(f, f.getNumGlyphs());
       }
@@ -150,21 +172,24 @@ final class TextFont {
       if(f.canDisplay(cp)) {
         final String nm = f.getName();
         FALLBACK.put(cp, nm);
-        return new FontBox(nm);
+        return fallback(nm);
       }
     }
 
     // no font found: use standard font
-    FALLBACK.put(cp, font.plain.getName());
-    return font;
+    FALLBACK.put(cp, family.font(PLAIN).getName());
+    return family;
   }
 
   /**
-   * Returns the current font.
-   * @return font
+   * Registers a fallback font family.
+   * @param name name of font
+   * @return font family
    */
-  private Font font() {
-    return style == 0 ? font.plain : font.bold;
+  private FontFamily fallback(final String name) {
+    final FontFamily ff = new FontFamily(newFont(name), comp);
+    fallbacks.put(ff.font(PLAIN).getName(), ff);
+    return ff;
   }
 
   /**
@@ -173,40 +198,43 @@ final class TextFont {
    * @return font
    */
   private Font newFont(final String nm) {
-    return new Font(nm, PLAIN, size());
+    return new Font(nm, PLAIN, size);
   }
 
-  /**
-   * Fonts and font metrics.
-   */
-  private final class FontBox {
-    /** Plain font. */
-    private final Font plain;
-    /** Bold font. */
-    private final Font bold;
-    /** Plain font metrics. */
-    private final FontMetrics plainMetrics;
-    /** Bold font metrics. */
-    private final FontMetrics boldMetrics;
+  /** Fonts (plain and bold) and metrics. */
+  private static final class FontFamily {
+    /** Fonts (plain, bold). */
+    private final Font[] fonts;
+    /** Font metrics (plain, bold). */
+    private final FontMetrics[] metrics;
 
     /**
      * Constructor.
-     * @param name name of font
+     * @param font font
+     * @param comp component
      */
-    private FontBox(final String name) {
-      this(newFont(name));
+    private FontFamily(final Font font, final JComponent comp) {
+      final Font bold = font.deriveFont(BOLD);
+      fonts = new Font[] { font, bold };
+      metrics = new FontMetrics[] { comp.getFontMetrics(font), comp.getFontMetrics(bold) };
     }
 
     /**
-     * Constructor.
-     * @param plain plain font
+     * Returns the font for the specified style.
+     * @param style style
+     * @return font
      */
-    private FontBox(final Font plain) {
-      this.plain = plain;
-      bold = plain.deriveFont(BOLD);
-      plainMetrics = comp.getFontMetrics(plain);
-      boldMetrics = comp.getFontMetrics(bold);
-      fallbacks.put(plain.getName(), this);
+    private Font font(final int style) {
+      return fonts[style];
+    }
+
+    /**
+     * Returns the font metrics for the specified style.
+     * @param style style
+     * @return font metrics
+     */
+    private FontMetrics metrics(final int style) {
+      return metrics[style];
     }
   }
 }
