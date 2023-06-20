@@ -444,6 +444,14 @@ public final class RewritingsTest extends QueryPlanTest {
         "<a/>", root(CElem.class));
     check("<a/>[position() = -1 to 9223372036854775807]",
         "<a/>", root(CElem.class));
+
+    // GH-2219: Bug on node selection with position()
+    check("<a><b/></a>/*[position()  = position()]", "<b/>", empty(POSITION));
+    check("<a><b/></a>/*[position() >= position()]", "<b/>", empty(POSITION));
+    check("<a><b/></a>/*[position() <= position()]", "<b/>", empty(POSITION));
+    check("<a><b/></a>/*[position() >  position()]", "", empty());
+    check("<a><b/></a>/*[position() <  position()]", "", empty());
+    check("<a><b/></a>/*[position() != position()]", "", empty());
   }
 
   /** Predicates. */

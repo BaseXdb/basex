@@ -36,6 +36,6 @@ public final class FnPosition extends StandardFunc {
 
   @Override
   public Expr optimizePos(final OpV op, final CompileContext cc) {
-    return Bln.TRUE;
+    return Bln.get(op == OpV.EQ || op == OpV.GE || op == OpV.LE);
   }
 }
