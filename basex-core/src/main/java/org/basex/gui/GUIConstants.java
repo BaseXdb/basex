@@ -392,7 +392,7 @@ public final class GUIConstants {
     font  = new Font(name, Font.PLAIN, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, fontSize());
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, LABEL.getFont().getSize());
   }
 
   /**
@@ -402,14 +402,6 @@ public final class GUIConstants {
    */
   public static Color color(final int i) {
     return COLORS[Math.min(COLORS.length - 1, i)];
-  }
-
-  /**
-   * Returns the standard font size.
-   * @return font size
-   */
-  public static int fontSize() {
-    return LABEL.getFont().getSize();
   }
 
   // PRIVATE METHODS ==============================================================================

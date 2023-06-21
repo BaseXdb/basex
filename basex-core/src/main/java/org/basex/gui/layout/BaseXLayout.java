@@ -366,7 +366,7 @@ public final class BaseXLayout {
       } else if(DECFONT.is(e)) {
         nfs = Math.min(fs - 1, Math.round(fs / 1.05));
       } else if(NORMFONT.is(e)) {
-        nfs = (long) (fontSize() * 1.5);
+        nfs = (long) (dmfont.getSize() * 1.4);
       }
       if(fs != nfs) {
         gui.gopts.set(GUIOptions.FONTSIZE, (int) Math.max(1, Math.min(128, nfs)));
