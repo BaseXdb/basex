@@ -110,7 +110,7 @@ public enum Function implements AFunction {
   CEILING(FnCeiling::new, "ceiling(value)",
       params(NUMERIC_ZO), NUMERIC_ZO),
   /** XQuery function. */
-  CHAR(FnChar::new, "char(name)", params(STRING_O), STRING_O),
+  CHAR(FnChar::new, "char(value)", params(STRING_O), STRING_O),
   /** XQuery function. */
   CHARACTERS(FnCharacters::new, "characters(value)", params(STRING_ZO), STRING_ZM),
   /** XQuery function. */
@@ -218,7 +218,7 @@ public enum Function implements AFunction {
   EXISTS(FnExists::new, "exists(input)",
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
-  EXPANDED_QNAME(FnExpandedQName::new, "expanded-QName(qname)",
+  EXPANDED_QNAME(FnExpandedQName::new, "expanded-QName(value)",
       params(QNAME_ZO), STRING_O),
   /** XQuery function. */
   FALSE(FnFalse::new, "false()",
@@ -356,7 +356,7 @@ public enum Function implements AFunction {
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  JSON_TO_XML(FnJsonToXml::new, "json-to-xml(json[,options])",
+  JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
       params(STRING_ZO, MAP_O), NODE_ZO, flag(CNS)),
   /** XQuery function. */
   LANG(FnLang::new, "lang(language[,node])",
@@ -410,7 +410,7 @@ public enum Function implements AFunction {
   NAMESPACE_URI(FnNamespaceUri::new, "namespace-uri([node])",
       params(NODE_ZO), ANY_URI_O),
   /** XQuery function. */
-  NAMESPACE_URI_FOR_PREFIX(FnNamespaceUriForPrefix::new, "namespace-uri-for-prefix(prefix,element)",
+  NAMESPACE_URI_FOR_PREFIX(FnNamespaceUriForPrefix::new, "namespace-uri-for-prefix(value,element)",
       params(STRING_ZO, ELEMENT_O), ANY_URI_ZO),
   /** XQuery function. */
   NAMESPACE_URI_FROM_QNAME(FnNamespaceUriFromQName::new, "namespace-uri-from-QName(value)",
@@ -449,10 +449,10 @@ public enum Function implements AFunction {
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_O, INTEGER_O), INTEGER_O),
   /** XQuery function. */
-  PARSE_JSON(FnParseJson::new, "parse-json(json[,options])",
+  PARSE_JSON(FnParseJson::new, "parse-json(value[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO),
   /** XQuery function. */
-  PARSE_QNAME(FnParseQName::new, "parse-QName(eqname)",
+  PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_O), QNAME_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
@@ -492,10 +492,10 @@ public enum Function implements AFunction {
   REPLICATE(FnReplicate::new, "replicate(input,count[,multiple])",
       params(ITEM_ZM, INTEGER_O, BOOLEAN_O), ITEM_ZM),
   /** XQuery function. */
-  RESOLVE_QNAME(FnResolveQName::new, "resolve-QName(qname,element)",
+  RESOLVE_QNAME(FnResolveQName::new, "resolve-QName(value,element)",
       params(STRING_ZO, ELEMENT_O), QNAME_ZO),
   /** XQuery function. */
-  RESOLVE_URI(FnResolveUri::new, "resolve-uri(relative[,base])",
+  RESOLVE_URI(FnResolveUri::new, "resolve-uri(uri[,base])",
       params(STRING_ZO, STRING_ZO), ANY_URI_ZO),
   /** XQuery function. */
   REVERSE(FnReverse::new, "reverse(input)",
@@ -541,7 +541,7 @@ public enum Function implements AFunction {
   STATIC_BASE_URI(FnStaticBaseUri::new, "static-base-uri()",
       params(), ANY_URI_ZO),
   /** XQuery function. */
-  STRING(FnString::new, "string([item])",
+  STRING(FnString::new, "string([value])",
       params(ITEM_ZO), STRING_O),
   /** XQuery function. */
   STRING_JOIN(FnStringJoin::new, "string-join(values[,separator])",
@@ -583,7 +583,7 @@ public enum Function implements AFunction {
   TOKENIZE(FnTokenize::new, "tokenize(value[,pattern,flags])",
       params(STRING_ZO, STRING_ZO, STRING_O), STRING_ZM),
   /** XQuery function. */
-  TRACE(FnTrace::new, "trace(value[,label])",
+  TRACE(FnTrace::new, "trace(input[,label])",
       params(ITEM_ZM, STRING_ZO), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   TRANSLATE(FnTranslate::new, "translate(value,replace,with)",

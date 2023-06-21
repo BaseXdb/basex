@@ -16,8 +16,8 @@ import org.basex.util.*;
 public final class FnExpandedQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final QNm qname = toQNmOrNull(arg(0), qc);
-    return qname == null ? Empty.VALUE : Str.get(QNm.eqName(qname.uri(), qname.local()));
+    final QNm value = toQNmOrNull(arg(0), qc);
+    return value == null ? Empty.VALUE : Str.get(QNm.eqName(value.uri(), value.local()));
   }
 
   @Override

@@ -21,13 +21,13 @@ import org.basex.util.*;
 public class FnTrace extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = arg(0).value(qc);
+    final Value input = arg(0).value(qc);
     final byte[] label = toTokenOrNull(arg(1), qc);
 
-    if(value.isEmpty() || value instanceof RangeSeq || value instanceof SingletonSeq) {
-      trace(token(value.toString()), label, qc);
+    if(input.isEmpty() || input instanceof RangeSeq || input instanceof SingletonSeq) {
+      trace(token(input.toString()), label, qc);
     } else {
-      final Iter iter = value.iter();
+      final Iter iter = input.iter();
       try {
         for(Item item; (item = qc.next(iter)) != null;) {
           trace(item.serialize(SerializerMode.DEBUG.get()).finish(), label, qc);
@@ -36,7 +36,7 @@ public class FnTrace extends StandardFunc {
         throw ex.getCause(info);
       }
     }
-    return value;
+    return input;
   }
 
   @Override

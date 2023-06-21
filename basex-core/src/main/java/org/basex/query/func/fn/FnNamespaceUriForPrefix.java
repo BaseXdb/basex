@@ -19,12 +19,12 @@ import org.basex.util.*;
 public final class FnNamespaceUriForPrefix extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] prefix = toZeroToken(arg(0), qc);
+    final byte[] value = toZeroToken(arg(0), qc);
     final ANode element = toElem(arg(1), qc);
 
-    if(eq(prefix, XML)) return Uri.get(XML_URI, false);
+    if(eq(value, XML)) return Uri.get(XML_URI, false);
     final Atts at = element.nsScope(sc);
-    final byte[] uri = at.value(prefix);
+    final byte[] uri = at.value(value);
     return uri == null || uri.length == 0 ? Empty.VALUE : Uri.get(uri, false);
   }
 }

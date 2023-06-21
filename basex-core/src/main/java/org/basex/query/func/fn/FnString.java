@@ -18,13 +18,13 @@ import org.basex.util.*;
 public final class FnString extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = context(qc).item(qc, info);
+    final Item value = context(qc).item(qc, info);
 
-    if(item.isEmpty()) return Str.EMPTY;
-    if(item.type == AtomType.STRING) return item;
-    if(!(item instanceof FItem) || item instanceof XQJava) return Str.get(item.string(info));
+    if(value.isEmpty()) return Str.EMPTY;
+    if(value.type == AtomType.STRING) return value;
+    if(!(value instanceof FItem) || value instanceof XQJava) return Str.get(value.string(info));
 
-    throw FISTRING_X.get(info, item);
+    throw FISTRING_X.get(info, value);
   }
 
   @Override

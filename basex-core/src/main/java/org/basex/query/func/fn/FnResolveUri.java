@@ -19,22 +19,22 @@ import org.basex.util.*;
 public final class FnResolveUri extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] relative = toTokenOrNull(arg(0), qc);
+    final byte[] uri = toTokenOrNull(arg(0), qc);
     final byte[] base = toTokenOrNull(arg(1), qc);
-    if(relative == null) return Empty.VALUE;
+    if(uri == null) return Empty.VALUE;
 
     // check relative uri
-    final Uri rel = Uri.get(relative);
-    if(!rel.isValid()) throw URIARG_X.get(info, rel);
-    if(rel.isAbsolute()) return rel;
+    final Uri u = Uri.get(uri);
+    if(!u.isValid()) throw URIARG_X.get(info, u);
+    if(u.isAbsolute()) return u;
 
     // check base uri: reject invalid, relative, and non-hierarchical URIs and fragment identifiers
-    final Uri uri = base == null ? sc.baseURI() : Uri.get(base);
-    final byte[] string = uri.string();
-    if(!uri.isValid() || !uri.isAbsolute() || contains(string, '#') || !contains(string, '/'))
-      throw URIARG_X.get(info, uri);
+    final Uri b = base == null ? sc.baseURI() : Uri.get(base);
+    final byte[] string = b.string();
+    if(!b.isValid() || !b.isAbsolute() || contains(string, '#') || !contains(string, '/'))
+      throw URIARG_X.get(info, b);
 
-    return uri.resolve(rel, info);
+    return b.resolve(u, info);
   }
 
   @Override

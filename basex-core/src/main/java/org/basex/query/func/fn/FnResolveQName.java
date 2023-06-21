@@ -20,16 +20,16 @@ import org.basex.util.*;
 public final class FnResolveQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] qname = toTokenOrNull(arg(0), qc);
+    final byte[] value = toTokenOrNull(arg(0), qc);
     final ANode element = toElem(arg(1), qc);
-    if(qname == null) return Empty.VALUE;
-    if(!XMLToken.isQName(qname)) throw valueError(AtomType.QNAME, qname, info);
+    if(value == null) return Empty.VALUE;
+    if(!XMLToken.isQName(value)) throw valueError(AtomType.QNAME, value, info);
 
-    final byte[] prefix = Token.prefix(qname);
+    final byte[] prefix = Token.prefix(value);
     byte[] uri = element.uri(prefix);
     if(uri == null) uri = sc.ns.uri(prefix);
     if(uri == null) throw NSDECL_X.get(info, prefix);
-    return qc.shared.qname(qname, uri);
+    return qc.shared.qname(value, uri);
   }
 
   @Override

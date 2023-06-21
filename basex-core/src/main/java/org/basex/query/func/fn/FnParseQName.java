@@ -18,14 +18,14 @@ import org.basex.util.*;
 public final class FnParseQName extends StandardFunc {
   @Override
   public QNm item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] eqname = trim(toToken(arg(0), qc));
+    final byte[] value = trim(toToken(arg(0), qc));
     final QNm qnm;
-    if(XMLToken.isQName(eqname)) {
-      qnm = qc.shared.qname(eqname, sc.ns.uri(prefix(eqname)));
+    if(XMLToken.isQName(value)) {
+      qnm = qc.shared.qname(value, sc.ns.uri(prefix(value)));
     } else {
-      qnm = qc.shared.eqname(eqname);
+      qnm = qc.shared.eqname(value);
     }
-    if(qnm == null) throw valueError(AtomType.QNAME, eqname, info);
+    if(qnm == null) throw valueError(AtomType.QNAME, value, info);
     if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
     return qnm;
   }
