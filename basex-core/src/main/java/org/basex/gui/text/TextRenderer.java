@@ -320,9 +320,9 @@ final class TextRenderer extends BaseXBack {
    */
   private boolean more(final TextIterator iter, final Graphics g) {
     // no valid graphics reference, no more words found: quit
-    if(g == null || !iter.moreStrings(width >>> 2)) return false;
+    final int w = width, maxWidth = w - offset;
+    if(g == null || maxWidth <= 0 || !iter.moreStrings(w >> 2)) return false;
 
-    final int maxWidth = width - offset;
     String s = iter.currString();
     int sw = 0;
 
@@ -343,13 +343,15 @@ final class TextRenderer extends BaseXBack {
         final int cl = cps.length;
         for(sw = 0; c <= cl && sw <= maxWidth; c++) sw += font.charWidth(cps[c]);
         for(; c <= cl && font.stringWidth(new String(cps, 0, c)) <= maxWidth; c++);
-        s = new String(cps, 0, Math.max(0, c));
+        final TokenBuilder tb = new TokenBuilder(c);
+        for(int t = 0; t < c; t++) tb.add(cps[t]);
+        s = tb.toString();
         sw = font.stringWidth(s);
-        iter.posEnd(iter.pos() + s.length());
+        iter.posEnd(iter.pos() + tb.size());
       }
     }
     // no space left: move current string into next line
-    if(sw < maxWidth && sw > width - x) newline(true);
+    if(sw < maxWidth && sw > w - x) newline(true);
 
     currString = s;
     stringWidth = sw;
