@@ -455,6 +455,9 @@ public enum Function implements AFunction {
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_O), QNAME_O),
   /** XQuery function. */
+  PARSE_URI(FnParseUri::new, "parse-uri(value[,options])",
+      params(STRING_ZO, MAP_O), ITEM_ZO),
+  /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */

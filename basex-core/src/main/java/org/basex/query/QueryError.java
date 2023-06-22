@@ -760,6 +760,9 @@ public enum QueryError {
   UPDBERROR_X(FOUP, 2, "%"),
 
   /** Error code. */
+  PARSE_URI_X(FOUR, 1, "Invalid IPv6/IPvFuture authority: %."),
+
+  /** Error code. */
   RESNF_X(FOUT, 1170, "Resource '%' cannot be retrieved."),
   /** Error code. */
   FRAGID_X(FOUT, 1170, "URI contains a fragment identifier: %."),
@@ -1546,6 +1549,7 @@ public enum QueryError {
     /** Error type. */ FORX,
     /** Error type. */ FOTY,
     /** Error type. */ FOUP,
+    /** Error type. */ FOUR,
     /** Error type. */ FOUT,
     /** Error type. */ FTDY,
     /** Error type. */ FTST,
