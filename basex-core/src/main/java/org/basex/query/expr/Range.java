@@ -138,7 +138,7 @@ public final class Range extends Arr {
     if(expr instanceof Int) return ((Int) expr).itr();
     if(Function.LAST.is(expr)) return LAST;
     if(expr instanceof Arith && Function.LAST.is(expr.arg(0))) {
-      final long l = expr.arg(1) instanceof Int ? ((Int) expr.arg(1)).itr() : 0;
+      final double l = expr.arg(1) instanceof Int ? ((Int) expr.arg(1)).itr() : 0;
       if(l != 0) {
         switch(((Arith) expr).calc) {
           case PLUS : return LAST + l;
