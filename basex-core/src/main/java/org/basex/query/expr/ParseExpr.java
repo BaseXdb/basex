@@ -651,6 +651,21 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Converts an item to a map and checks its entries.
+   * @param item item to check
+   * @param keys record keys
+   * @return map
+   * @throws QueryException query exception
+   */
+  protected final XQMap toRecord(final Item item, final AStr... keys) throws QueryException {
+    final XQMap map = toMap(item);
+    for(final AStr key : keys) {
+      if(!map.contains(key, info)) throw INVCONVERT_X_X_X.get(info, item.type, "record()", item);
+    }
+    return map;
+  }
+
+  /**
    * Evaluates an expression to an array.
    * @param expr expression
    * @param qc query context

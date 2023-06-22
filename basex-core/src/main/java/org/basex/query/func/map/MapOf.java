@@ -1,10 +1,5 @@
 package org.basex.query.func.map;
 
-import static org.basex.query.QueryError.*;
-
-import java.util.AbstractMap.*;
-import java.util.Map.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -29,9 +24,10 @@ public final class MapOf extends StandardFunc {
 
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(pairs)) != null;) {
-      final Entry<Item, Value> pair = toPair(item, qc);
-      final Item key = pair.getKey();
-      Value value = pair.getValue();
+      // extract key/value record entries
+      final XQMap map = toRecord(item, Str.KEY, Str.VALUE);
+      final Item key = checkType(toItem(map.get(Str.KEY, info), qc), AtomType.ANY_ATOMIC_TYPE);
+      Value value = map.get(Str.VALUE, info);
       if(result.contains(key, info)) {
         final Value old = result.get(key, info);
         value = combine != null ? combine.invoke(qc, info, old, value) :
@@ -51,24 +47,5 @@ public final class MapOf extends StandardFunc {
       exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, st));
     }
     return this;
-  }
-
-  /**
-   * Returns a map entry.
-   * @param item item to check
-   * @param qc query context
-   * @return member
-   * @throws QueryException query exception
-   */
-  private Entry<Item, Value> toPair(final Item item, final QueryContext qc)
-      throws QueryException {
-    final XQMap map = toMap(item);
-    final Item key = toAtomItem(map.get(Str.KEY, info), qc);
-    final Value value = map.get(Str.VALUE, info);
-    if(map.mapSize() == 2 && (!key.isEmpty() || map.contains(Str.KEY, info)) &&
-        (!value.isEmpty() || map.contains(Str.VALUE, info))) {
-      return new SimpleEntry<>(key, value);
-    }
-    throw INVCONVERT_X_X_X.get(info, item.type, "record(value as item()*)", item);
   }
 }
