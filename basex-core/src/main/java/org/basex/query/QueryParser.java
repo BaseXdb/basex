@@ -1752,9 +1752,15 @@ public class QueryParser extends InputParser {
     if(expr != null) {
       for(boolean mapping; (mapping = wsConsume("=!>")) || consume("=>");) {
         skipWs();
-        final Expr ex = curr('(') ? parenthesized() :
-          curr('$') ? varRef() : checkReserved(eQName(sc.funcNS, ARROWSPEC));
-
+        Expr ex = null;
+        if(curr('$')) {
+          ex = varRef();
+        } else if(curr('(')) {
+          ex = parenthesized();
+        } else {
+          ex = functionItem();
+          if(ex == null) ex = checkReserved(eQName(sc.funcNS, ARROWSPEC));
+        }
         final InputInfo ii = info();
         final Expr arg;
         For fr = null;
