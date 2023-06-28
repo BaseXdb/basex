@@ -12,7 +12,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -21,29 +20,41 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class FnParseUri extends FnJsonDoc {
-  /** Merge options. */
-  public static final class ParseOptions extends Options {
-    /** Option. */
-    public static final StringOption PATH_SEPARATOR =
-        new StringOption("path-separator", "/");
-    /** Option. */
-    public static final StringOption QUERY_SEPARATOR =
-        new StringOption("query-separator", "&");
-    /** Option. */
-    public static final BooleanOption ALLOW_DEPRECATED_FEATURES =
-        new BooleanOption("allow-deprecated-features", false);
-    /** Option. */
-    public static final BooleanOption OMIT_DEFAULT_PORTS =
-        new BooleanOption("omit-default-ports", false);
-    /** Option. */
-    public static final BooleanOption UNC_PATH =
-        new BooleanOption("unc-path", false);
-  }
+  /** URI part. */
+  static final String URI = "uri";
+  /** URI part. */
+  static final String SCHEME = "scheme";
+  /** URI part. */
+  static final String HIERARCHICAL = "hierarchical";
+  /** URI part. */
+  static final String AUTHORITY = "authority";
+  /** URI part. */
+  static final String USERINFO = "userinfo";
+  /** URI part. */
+  static final String HOST = "host";
+  /** URI part. */
+  static final String PORT = "port";
+  /** URI part. */
+  static final String PATH = "path";
+  /** URI part. */
+  static final String QUERY = "query";
+  /** URI part. */
+  static final String FRAGMENT = "fragment";
+  /** URI part. */
+  static final String PATH_SEGMENTS = "path-segments";
+  /** URI part. */
+  static final String QUERY_SEGMENTS = "query-segments";
+  /** URI part. */
+  static final String FILEPATH = "filepath";
+  /** URI part. */
+  static final String KEY = "key";
+  /** URI part. */
+  static final String VALUE = "value";
 
   /** File scheme. */
-  private static final String FILE = "file";
+  static final String FILE = "file";
   /** Standard ports. */
-  private static HashMap<String, String> ports = new HashMap<>();
+  static HashMap<String, String> ports = new HashMap<>();
 
   static {
     ports.put("http", "80");
@@ -55,7 +66,7 @@ public class FnParseUri extends FnJsonDoc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String value = toString(arg(0), qc);
-    final ParseOptions options = toOptions(arg(1), new ParseOptions(), false, qc);
+    final UriOptions options = toOptions(arg(1), new UriOptions(), false, qc);
 
     String string = value.replace('\\', '/');
     String fragment = "", query = "", scheme = "", filepath = "", authority = "", userinfo = "";
@@ -84,7 +95,7 @@ public class FnParseUri extends FnJsonDoc {
         string = m.group(2);
       }
     }
-    if(options.get(ParseOptions.UNC_PATH) && scheme.isEmpty() && string.matches("^//[^/].*$")) {
+    if(options.get(UriOptions.UNC_PATH) && scheme.isEmpty() && string.matches("^//[^/].*$")) {
       scheme = FILE;
       filepath = string;
     }
@@ -105,7 +116,7 @@ public class FnParseUri extends FnJsonDoc {
     m = Pattern.compile("^(([^@]*)@)(.*)(:([^:]*))?$").matcher(authority);
     if(m.matches()) {
       userinfo = m.group(2);
-      if(!options.get(ParseOptions.ALLOW_DEPRECATED_FEATURES) && userinfo.contains(":")) {
+      if(!options.get(UriOptions.ALLOW_DEPRECATED_FEATURES) && userinfo.contains(":")) {
         userinfo = "";
       }
     }
@@ -127,9 +138,8 @@ public class FnParseUri extends FnJsonDoc {
       if(m.matches()) port = m.group(5);
     }
     if(port == null) port = "";
-    if(options.get(ParseOptions.OMIT_DEFAULT_PORTS) && Objects.equals(ports.get(scheme), port)) {
-      port = "";
-    }
+    if(omitPort(port, scheme, options))port = "";
+
     path = string;
     if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equals(FILE))) {
       filepath = string;
@@ -137,36 +147,35 @@ public class FnParseUri extends FnJsonDoc {
 
     ArrayBuilder segments = new ArrayBuilder();
     if(!string.isEmpty()) {
-      for(final String s : string.split(Pattern.quote(options.get(ParseOptions.PATH_SEPARATOR)))) {
-        // TODO: invalid Unicode?
-        segments.append(Str.get(decode(s)));
-      }
+      final String separator = Pattern.quote(options.get(UriOptions.PATH_SEPARATOR));
+      for(final String s : string.split(separator)) segments.append(Str.get(decode(s)));
     }
 
     ArrayBuilder queries = new ArrayBuilder();
     if(!query.isEmpty()) {
-      for(final String q : query.split(Pattern.quote(options.get(ParseOptions.QUERY_SEPARATOR)))) {
+      final String separator = Pattern.quote(options.get(UriOptions.QUERY_SEPARATOR));
+      for(final String q : query.split(separator)) {
         final int eq = q.indexOf('=');
         final String k = eq == -1 ? "" : q.substring(0, eq), v = q.substring(eq + 1);
-        queries.append(new MapBuilder(info).put("key", k).put("value", v).map());
+        queries.append(new MapBuilder(info).put(KEY, k).put(VALUE, v).map());
       }
     }
     filepath = decode(filepath);
 
     final MapBuilder map = new MapBuilder(info);
-    add(map, "uri", value);
-    add(map, "scheme", scheme);
-    add(map, "hierarchical", hierarchical);
-    add(map, "authority", authority);
-    add(map, "userinfo", userinfo);
-    add(map, "host", host);
-    add(map, "port", port);
-    add(map, "path", path);
-    add(map, "query", query);
-    add(map, "fragment", fragment);
-    add(map, "path-segments", segments.array());
-    add(map, "query-segments", queries.array());
-    add(map, "filepath", filepath);
+    add(map, URI, value);
+    add(map, SCHEME, scheme);
+    add(map, HIERARCHICAL, hierarchical);
+    add(map, AUTHORITY, authority);
+    add(map, USERINFO, userinfo);
+    add(map, HOST, host);
+    add(map, PORT, port);
+    add(map, PATH, path);
+    add(map, QUERY, query);
+    add(map, FRAGMENT, fragment);
+    add(map, PATH_SEGMENTS, segments.array());
+    add(map, QUERY_SEGMENTS, queries.array());
+    add(map, FILEPATH, filepath);
     return map.map();
   }
 
@@ -177,7 +186,7 @@ public class FnParseUri extends FnJsonDoc {
    * @param v value
    * @throws QueryException query exception
    */
-  private static void add(final MapBuilder map, final String k, final Object v)
+  static void add(final MapBuilder map, final String k, final Object v)
       throws QueryException {
 
     final Value value = v instanceof Value ? (Value) v : v.toString().isEmpty() ? Empty.VALUE :
@@ -194,7 +203,7 @@ public class FnParseUri extends FnJsonDoc {
    * @param string encoded string
    * @return decoded string
    */
-  private static String decode(final String string) {
+  static String decode(final String string) {
     final int sl = string.length();
     final TokenBuilder tb = new TokenBuilder(sl);
     for(int s = 0; s < sl; s++) {
@@ -216,5 +225,17 @@ public class FnParseUri extends FnJsonDoc {
       else tb.addByte((byte) b);
     }
     return tb.toString();
+  }
+
+  /**
+   * Checks if the port can be omitted.
+   * @param port port
+   * @param scheme scheme
+   * @param options options
+   * @return result of check
+   */
+  static boolean omitPort(final String port, final String scheme, final UriOptions options) {
+    return options.get(UriOptions.OMIT_DEFAULT_PORTS) &&
+        Objects.equals(ports.get(scheme), port);
   }
 }

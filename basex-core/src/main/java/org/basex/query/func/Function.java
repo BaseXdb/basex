@@ -107,6 +107,9 @@ public enum Function implements AFunction {
   BOOLEAN(FnBoolean::new, "boolean(input)",
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
+  BUILD_URI(FnBuildUri::new, "build-uri(parts[,options])",
+      params(STRING_ZO, MAP_O), ITEM_ZO),
+  /** XQuery function. */
   CEILING(FnCeiling::new, "ceiling(value)",
       params(NUMERIC_ZO), NUMERIC_ZO),
   /** XQuery function. */
