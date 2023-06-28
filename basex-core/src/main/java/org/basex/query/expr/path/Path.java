@@ -812,17 +812,30 @@ public abstract class Path extends ParseExpr {
         invertSteps(stepIndex)) {
       for(int s = stepIndex; s >= 0; s--) {
         final Axis axis = axisStep(s).axis.invert();
-        Expr expr = invSteps.isEmpty() ? indexRoot : invSteps.peek();
+        InputInfo ii;
+        Axis newAxis;
+        Test newTest;
+        Expr[] newPreds;
         if(s == 0) {
-          // add document test for collections and axes other than ancestors
-          expr = rootTest != KindTest.DOCUMENT_NODE || axis != ANCESTOR && axis != ANCESTOR_OR_SELF
-               ? Step.get(cc, expr, info, axis, rootTest) : null;
+          ii = info;
+          newAxis = axis;
+          newTest = rootTest;
+          newPreds = new Expr[0];
         } else {
-          final Step prevStep = axisStep(s - 1);
-          final Axis newAxis = prevStep.axis == ATTRIBUTE ? ATTRIBUTE : axis;
-          expr = Step.get(cc, expr, prevStep.info(), newAxis, prevStep.test, prevStep.exprs);
+          final Step step = axisStep(s - 1);
+          ii = step.info();
+          newAxis = step.axis == ATTRIBUTE ? ATTRIBUTE : axis;
+          newTest = step.test;
+          newPreds = step.exprs;
         }
-        if(expr != null) invSteps.add(expr);
+        // skip step if it is always successful
+        if(newAxis != ANCESTOR && newAxis != ANCESTOR_OR_SELF ||
+            newTest != KindTest.NODE && newTest != KindTest.DOCUMENT_NODE ||
+            newPreds.length > 0) {
+          final Expr expr = invSteps.isEmpty() ?
+            (indexStep != null ? indexStep : indexRoot) : invSteps.peek();
+          invSteps.add(Step.get(cc, expr, ii, newAxis, newTest, newPreds));
+        }
       }
     }
     // add created steps, followed by remaining predicates

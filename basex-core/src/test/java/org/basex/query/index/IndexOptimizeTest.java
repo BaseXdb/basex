@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.index.*;
 import org.basex.query.ast.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
@@ -303,6 +304,24 @@ public final class IndexOptimizeTest extends QueryPlanTest {
     execute(new CreateDB(NAME, "<x>" + first + second + "</x>"));
     query("//*[text() = 'A' or @b = 'A']", first + '\n' + second);
     query("//*[@b = 'A' or text() = 'A']", first + '\n' + second);
+  }
+
+  /** Bug on contains-token() with token index. */
+  @Test public void gh2222() {
+    final String xml = "<M v=\"a\">a</M>";
+    execute(new CreateDB(NAME, xml));
+    execute(new CreateIndex(IndexType.TOKEN));
+    query("//M/descendant-or-self::M[@v = 'a']", xml);
+    query("//M/descendant-or-self::M[text() = 'a']", xml);
+    query("//M/descendant-or-self::M[contains-token(@v, 'a')]", xml);
+
+    query("/M/descendant-or-self::M[@v = 'a']", xml);
+    query("/M/descendant-or-self::M[text() = 'a']", xml);
+    query("/M/descendant-or-self::M[contains-token(@v, 'a')]", xml);
+
+    query("M/descendant-or-self::M[@v = 'a']", xml);
+    query("M/descendant-or-self::M[text() = 'a']", xml);
+    query("M/descendant-or-self::M[contains-token(@v, 'a')]", xml);
   }
 
   /**
