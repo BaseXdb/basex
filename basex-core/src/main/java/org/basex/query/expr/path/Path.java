@@ -833,7 +833,7 @@ public abstract class Path extends ParseExpr {
             newTest != KindTest.NODE && newTest != KindTest.DOCUMENT_NODE ||
             newPreds.length > 0) {
           final Expr expr = invSteps.isEmpty() ?
-            (indexStep != null ? indexStep : indexRoot) : invSteps.peek();
+            indexStep != null ? indexStep : indexRoot : invSteps.peek();
           invSteps.add(Step.get(cc, expr, ii, newAxis, newTest, newPreds));
         }
       }
@@ -1056,42 +1056,32 @@ public abstract class Path extends ParseExpr {
     if(curr.axis != DESCENDANT_OR_SELF || curr.test != KindTest.NODE || curr.exprs.length > 0)
       return null;
 
-    // checks if an expression is a simple child or descendant step
-    final Predicate<Expr> simple = expr -> {
-      if(expr instanceof Step) {
-        final Step step = (Step) expr;
-        return (step.axis == CHILD || step.axis == DESCENDANT) && !step.mayBePositional();
-      }
-      return false;
-    };
-    // example: //child::*  ->  descendant::*
-    if(simple.test(nxt)) return Step.get(cc, prev, nxt.info(), DESCENDANT, nxt.test, nxt.exprs);
+    // examples:
+    // - descendant-or-self::node()/*  ->  descendant::*
+    // - descendant-or-self::node()/descendant::*  ->  descendant::*
+    // - descendant-or-self::node()/descendant-or-self::*  ->  descendant-or-self::*
+    final Axis merged = mergedAxis(nxt);
+    if(merged != null) return Step.get(cc, prev, nxt.info(), merged, nxt.test, nxt.exprs);
 
     // function for merging steps inside union expressions
     final QueryFunction<Expr, Expr> rewrite = expr -> {
-      final Checks<Expr> startWithChild = ex -> {
-        if(!(ex instanceof Path)) return false;
-        final Path path = (Path) ex;
-        return path.root == null && simple.test(path.steps[0]);
-      };
       if(expr instanceof Union) {
-        final Union union = (Union) expr;
-        if(startWithChild.all(union.exprs)) {
-          for(final Expr path : union.exprs) {
+        final Axis axis = commonAxis(expr.args());
+        if(axis != null) {
+          for(final Expr path : expr.args()) {
             final Path p = (Path) path;
             final Step s = (Step) p.steps[0];
-            p.steps[0] = Step.get(cc, prev, s.info(), DESCENDANT, s.test, s.exprs);
+            p.steps[0] = Step.get(cc, prev, s.info(), axis, s.test, s.exprs);
           }
-          return union.optimize(cc);
+          return expr.optimize(cc);
         }
       }
       return null;
     };
-    // example: //(text()|*)  ->  (descendant::text() | descendant::*)
-    if(next instanceof Union) {
-      return rewrite.apply(next);
-    }
-    // example: //(text()|*)[..]  ->  (/descendant::text() | /descendant::*)[..]
+    // descendant-or-self::node()/(* | text())  ->  (descendant::text() | (descendant::*)
+    if(next instanceof Union) return rewrite.apply(next);
+
+    // descendant-or-self::node()/(text()|*)[..]  ->  (descendant::text() | descendant::*)[..]
     if(next instanceof Filter) {
       final Filter filter = (Filter) next;
       if(!filter.mayBePositional()) {
@@ -1100,6 +1090,41 @@ public abstract class Path extends ParseExpr {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns a merged axis for a step preceded by descendant-or-self::node().
+   * @param expr step to test
+   * @return axis or {@code null}
+   */
+  private static Axis mergedAxis(final Expr expr) {
+    if(expr instanceof Step) {
+      final Step step = (Step) expr;
+      final Axis axis = step.axis;
+      if(!step.mayBePositional()) {
+        if(axis == CHILD || axis == DESCENDANT) return DESCENDANT;
+        if(axis == DESCENDANT_OR_SELF) return DESCENDANT_OR_SELF;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the common merged axis of multiple expressions.
+   * @param exprs expressions
+   * @return common axis or {@code null}
+   */
+  private static Axis commonAxis(final Expr... exprs) {
+    Axis common = null;
+    for(final Expr ex : exprs) {
+      if(!(ex instanceof Path)) return null;
+      final Path path = (Path) ex;
+      if(path.root != null) return null;
+      final Axis merged = mergedAxis(path.steps[0]);
+      common = common == merged || common == null ? merged : null;
+      if(common == null) return null;
+    }
+    return common;
   }
 
   @Override

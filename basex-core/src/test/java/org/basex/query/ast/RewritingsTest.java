@@ -3205,4 +3205,28 @@ public final class RewritingsTest extends QueryPlanTest {
     query("<F/>[(distinct-values(. ! (boolean(.), . = <A/>)) ! count(.)) castable as xs:boolean]",
         "<F/>");
   }
+
+  /** Simplify descendant-or-self steps. */
+  @Test public void gh2223() {
+    check("<A><B/></A>/descendant-or-self::node()/child::*", "<B/>",
+        count(IterStep.class, 1), "//@axis = 'descendant'");
+    check("<A><B/></A>/descendant-or-self::node()/descendant::*", "<B/>",
+        count(IterStep.class, 1), "//@axis = 'descendant'");
+    check("<A/>/descendant-or-self::node()/descendant-or-self::*", "<A/>",
+        count(IterStep.class, 1), "//@axis = 'descendant-or-self'");
+
+    check("<A><B/></A>/descendant-or-self::node()/(* | text())", "<B/>",
+        count(IterStep.class, 2), "//@axis = 'descendant'");
+    check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())", "<B/>",
+        count(IterStep.class, 2), "//@axis = 'descendant'");
+    check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())", "<B/>",
+        count(IterStep.class, 2), "//@axis = 'descendant'");
+
+    check("<A><B/></A>/descendant-or-self::node()/(* | text())[..]", "<B/>",
+        count(IterStep.class, 3), "//@axis = 'descendant'");
+    check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())[..]", "<B/>",
+        count(IterStep.class, 3), "//@axis = 'descendant'");
+    check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())[..]", "<B/>",
+        count(IterStep.class, 3), "//@axis = 'descendant'");
+  }
 }
