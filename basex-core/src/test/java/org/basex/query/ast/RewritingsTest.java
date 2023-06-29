@@ -452,6 +452,10 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a><b/></a>/*[position() >  position()]", "", empty());
     check("<a><b/></a>/*[position() <  position()]", "", empty());
     check("<a><b/></a>/*[position() != position()]", "", empty());
+
+    // GH-2224: Unexpected exception of arithmetic operations with positional expression
+    check("document { <X/> }//X[not(position() * 2 = last())]", "<X/>");
+    check("document { <X/> }//X[not(position() + position() = last())]", "<X/>");
   }
 
   /** Predicates. */

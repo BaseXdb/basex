@@ -116,8 +116,10 @@ final class Pos extends Single {
     final Value value = expr.value(qc);
     if(value.isEmpty()) return Bln.FALSE;
 
-    final long pos = qc.focus.pos, min = toLong(value.itemAt(0)), size = value.size();
-    return Bln.get(size == 1 ? pos == min : pos >= min && pos <= toLong(value.itemAt(size - 1)));
+    final long pos = qc.focus.pos, vs = value.size();
+    final double min = toDouble(value.itemAt(0));
+    final double max = vs == 1 ? min : toDouble(value.itemAt(vs - 1));
+    return Bln.get(pos >= min && pos <= max);
   }
 
   @Override
