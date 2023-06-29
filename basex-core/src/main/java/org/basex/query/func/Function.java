@@ -458,7 +458,7 @@ public enum Function implements AFunction {
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_O), QNAME_O),
   /** XQuery function. */
-  PARSE_URI(FnParseUri::new, "parse-uri(value[,options])",
+  PARSE_URI(FnParseUri::new, "parse-uri(uri[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
@@ -501,7 +501,7 @@ public enum Function implements AFunction {
   RESOLVE_QNAME(FnResolveQName::new, "resolve-QName(value,element)",
       params(STRING_ZO, ELEMENT_O), QNAME_ZO),
   /** XQuery function. */
-  RESOLVE_URI(FnResolveUri::new, "resolve-uri(uri[,base])",
+  RESOLVE_URI(FnResolveUri::new, "resolve-uri(href[,base])",
       params(STRING_ZO, STRING_ZO), ANY_URI_ZO),
   /** XQuery function. */
   REVERSE(FnReverse::new, "reverse(input)",
