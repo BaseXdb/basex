@@ -491,7 +491,7 @@ public enum Function implements AFunction {
   REMOVE(FnRemove::new, "remove(input,positions)",
       params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
   /** XQuery function. */
-  REPLACE(FnReplace::new, "replace(value,pattern,replacement[,flags,action])",
+  REPLACE(FnReplace::new, "replace(value,pattern[,replacement,flags,action])",
       params(STRING_ZO, STRING_O, STRING_ZO, STRING_ZO,
       FuncType.get(STRING_ZO, STRING_O, STRING_ZM).seqType()), STRING_O),
   /** XQuery function. */
