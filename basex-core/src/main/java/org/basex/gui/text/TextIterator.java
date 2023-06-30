@@ -3,6 +3,8 @@ package org.basex.gui.text;
 import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -196,22 +198,26 @@ final class TextIterator {
     return null;
   }
 
+  /** Search results. */
+  private final ArrayList<int[]> results = new ArrayList<>();
+
   /**
    * Returns the next search result range.
    * @return range or {@code null}
    */
-  int[] searchResult() {
+  ArrayList<int[]> searchResults() {
+    results.clear();
     if(searchResults != null) {
       final IntList starts = searchResults[0], ends = searchResults[1];
-      final int ss = starts.size();
-      while(searchIndex < ss) {
-        final int s = starts.get(searchIndex), e = ends.get(searchIndex);
-        if(posEnd <= s) return null;
-        ++searchIndex;
-        if(pos < e) return new int[] { s, e };
+      int si = searchIndex;
+      for(final int ss = starts.size(); si < ss; ++si) {
+        final int s = starts.get(si), e = ends.get(si);
+        if(s >= posEnd) break;
+        results.add(new int[] { s, e });
       }
+      searchIndex = results.isEmpty() ? si : si - 1;
     }
-    return null;
+    return results;
   }
 
   /**

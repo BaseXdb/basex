@@ -443,7 +443,8 @@ final class TextRenderer extends BaseXBack {
     if(y > 0) {
       // mark selected and found text
       mark(iter.selection(), iter, g);
-      for(int[] sr; (sr = iter.searchResult()) != null;) mark(sr, iter, g);
+      for(final int[] sr : iter.searchResults()) mark(sr, iter, g);
+      //for(int[] sr; (sr = iter.searchResult()) != null;) mark(sr, iter, g);
 
       // retrieve first character of current token
       if(iter.error()) drawError(g);
