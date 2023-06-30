@@ -51,10 +51,10 @@ public final class DialogFonts extends BaseXDialog {
     final BaseXBack p = new BaseXBack(new TableLayout(2, 3, 8, 8));
     final String[] fonts = GUIConstants.fonts();
     font = new BaseXList(this, fonts);
-    font.setWidth(200);
+    font.setWidth(250);
     p.add(font);
     font2 = new BaseXList(this, fonts);
-    font2.setWidth(200);
+    font2.setWidth(250);
     p.add(font2);
     size = new BaseXList(this, SIZES);
     size.setWidth(50);
