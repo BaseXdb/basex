@@ -65,14 +65,19 @@ public class FnBuildUri extends FnJsonDoc {
     final XQArray qurs = queries.isEmpty() ? XQArray.empty() : toArray(queries, qc);
     final long qs = qurs.arraySize();
     if(qs > 0) {
+      final TokenBuilder query = new TokenBuilder();
       final String sep = options.get(UriOptions.QUERY_SEPARATOR);
       for(int q = 0; q < qs; q++) {
-        uri.add(q == 0 ? "?" : sep);
         final XQMap map = toMap(qurs.get(q), qc);
         final byte[] key = encodeUri(token(get(map, KEY, qc)), false);
         final byte[] value = encodeUri(token(get(map, VALUE, qc)), false);
-        uri.add(key).add(key.length != 0 && value.length != 0 ? "=" : "").add(value);
+        final int kl = key.length, vl = value.length;
+        if(kl != 0 || vl != 0) {
+          query.add(query.isEmpty() ? "?" : sep);
+          query.add(key).add(kl != 0 && vl != 0 ? "=" : "").add(value);
+        }
       }
+      uri.add(query.finish());
     }
     final String fragment = get(parts, FRAGMENT, qc);
     if(!fragment.isEmpty()) uri.add('#').add(fragment);
