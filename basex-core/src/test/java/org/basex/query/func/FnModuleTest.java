@@ -2304,6 +2304,16 @@ public final class FnModuleTest extends QueryPlanTest {
         "<_>4</_>", root(CElem.class));
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 5, 1)"),
         "", empty());
+
+    // GH-2225:
+    check(func.args(" for $i at $p in 1 to 2 return <a>{ $i * $p }</a>"),
+        "<a>1</a>", root(HEAD));
+    check(func.args(func.args(" for $i at $p in 1 to 4 return <a>{ $i * $p }</a>")),
+        "<a>1</a>\n<a>4</a>", root(SUBSEQUENCE));
+    check(func.args(func.args(func.args(" for $i at $p in 1 to 5 return <a>{ $i * $p }</a>"))),
+        "<a>1</a>\n<a>4</a>", root(SUBSEQUENCE));
+
+    query(func.args(" subsequence(<x><a/><a/><a/></x>/*, 3)"), "");
   }
 
   /** Test method. */

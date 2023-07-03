@@ -58,7 +58,7 @@ public class FnSlice extends StandardFunc {
       // input size is unknown: exact range cannot be computed, check original properties
       final long start = toLong(1, 1, cc.qc), end = toLong(2, Long.MAX_VALUE, cc.qc);
       if(end == Long.MAX_VALUE && toLong(3, 1, cc.qc) == 1) {
-        // slice(E, -1)  ->  util:last(E)
+        // slice(E, -1)  ->  foot(E)
         if(start == -1) return cc.function(FOOT, info, input);
         // slice(E, 1)  ->  E
         if(start == 0 || start == 1) return input;

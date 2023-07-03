@@ -40,23 +40,23 @@ public class FnFoot extends StandardFunc {
     if(st.zeroOrOne()) return input;
 
     final long size = input.size();
-    // util:last(tail(E))  ->  util:last(E)
+    // foot(tail(E))  ->  foot(E)
     if(TAIL.is(input) && size > 1)
       return cc.function(FOOT, info, input.args());
-    // util:last(util:init(E))  ->  items-at(E, size)
+    // foot(trunk(E))  ->  items-at(E, size)
     if(TRUNK.is(input) && size > 0)
       return cc.function(ITEMS_AT, info, input.arg(0), Int.get(size));
-    // util:last(reverse(E))  ->  head(E)
+    // foot(reverse(E))  ->  head(E)
     if(REVERSE.is(input))
       return cc.function(HEAD, info, input.args());
-    // util:last(replicate(E, count))  ->  util:last(E)
+    // foot(replicate(E, count))  ->  foot(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
       if(input.arg(1) instanceof Int) return cc.function(FOOT, info, input.arg(0));
     }
 
-    // util:last((1, 2))  ->  2
-    // util:last((1, (2 to 3))  ->  util:last(2 to 3)
+    // foot((1, 2))  ->  2
+    // foot((1, (2 to 3))  ->  foot(2 to 3)
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr last = args[args.length - 1];
@@ -64,7 +64,7 @@ public class FnFoot extends StandardFunc {
       if(stl.one()) return last;
       if(stl.oneOrMore()) return cc.function(FOOT, info, last);
     }
-    // util:last(reverse(root)[test])  ->  head(root[test])
+    // foot(reverse(root)[test])  ->  head(root[test])
     if(input instanceof IterFilter) {
       final IterFilter filter = (IterFilter) input;
       final Expr root = cc.function(REVERSE, filter.info(), filter.root);

@@ -151,7 +151,7 @@ public abstract class Filter extends Preds {
             ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
           } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
               ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
-            // E[1 .. last() - 1]  ->  util:init(E)
+            // E[1 .. last() - 1]  ->  trunk(E)
             ex = cc.function(TRUNK, info, prepare.apply(expr));
           }
         }
@@ -163,7 +163,7 @@ public abstract class Filter extends Preds {
           ex = cc.function(REMOVE, info, prepare.apply(expr), op2);
         }
       } else if(LAST.is(pred)) {
-        // E[last()]  ->  util:last(E)
+        // E[last()]  ->  foot(E)
         ex = cc.function(FOOT, info, prepare.apply(expr));
       } else if(pred instanceof Arith && preds.isEmpty() && LAST.is(pred.arg(0))) {
         final long es = expr.size();

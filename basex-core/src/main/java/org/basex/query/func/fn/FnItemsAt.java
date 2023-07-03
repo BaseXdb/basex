@@ -102,7 +102,7 @@ public class FnItemsAt extends StandardFunc {
 
       final long size = input.size();
       if(size != -1) {
-        // items-at(E, last)  ->  util:last(E)
+        // items-at(E, last)  ->  foot(E)
         if(ps + 1 == size) return cc.function(FOOT, info, input);
         // items-at(E, too-large)  ->  ()
         if(ps + 1 > size) return Empty.VALUE;
@@ -150,7 +150,7 @@ public class FnItemsAt extends StandardFunc {
 
     final long diff = countInputDiff(arg(0), arg(1));
     if(diff != Long.MIN_VALUE) {
-      // items-at(E, count(E))  ->  util:last(E)
+      // items-at(E, count(E))  ->  foot(E)
       if(diff == 0) return cc.function(FOOT, info, input);
       // items-at(E, count(E) + 1)  ->  ()
       if(diff > 0) return Empty.VALUE;

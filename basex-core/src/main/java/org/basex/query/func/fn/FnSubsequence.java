@@ -197,11 +197,11 @@ public class FnSubsequence extends StandardFunc {
       final long size = sr.adjust(input.size());
       if(size != -1) {
         if(sr.length == size) return input;
-        // subsequence(E, last)  ->  util:last(E)
+        // subsequence(E, last)  ->  foot(E)
         if(sr.start == size - 1) return cc.function(FOOT, info, input);
         // subsequence(E, 2)  ->  tail(E)
         if(sr.start == 1 && sr.end == size) return cc.function(TAIL, info, input);
-        // subsequence(E, 1, last - 1)  ->  util:init(E)
+        // subsequence(E, 1, last - 1)  ->  trunk(E)
         if(sr.start == 0 && sr.end == size - 1) return cc.function(TRUNK, info, input);
         sz = sr.length;
       } else if(st.zeroOrOne()) {
@@ -252,7 +252,7 @@ public class FnSubsequence extends StandardFunc {
       final long diff = FnItemsAt.countInputDiff(arg(0), arg(2)) + start;
       if(diff == (int) diff) {
         if(start <= 1) {
-          // subsequence(E, 1, count(E) - 1)  ->  util:init(E)
+          // subsequence(E, 1, count(E) - 1)  ->  trunk(E)
           if(diff == 0) return cc.function(TRUNK, info, input);
           // subsequence(E, 1, count(E) + 10)  ->  E
           if(diff >= 1) return input;
