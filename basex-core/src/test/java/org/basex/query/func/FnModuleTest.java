@@ -957,6 +957,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (<a/>, <b/>)[. = '']", 2), "<b/>");
     query(func.args(" reverse((<a/>, <b/>)[. = ''])", 2), "<a/>");
 
+    query(func.args(" (head((1 to 6)[. < 2]), data(<a>A</a>/text()/..))", 2), "A");
+
     check(func.args(" (7 to 9)[. = 8]", -1), "", empty());
     check(func.args(" (7 to 9)[. = 8]", 0), "", empty());
     check(func.args(" 1[. = 1]", 1), 1, empty(func));

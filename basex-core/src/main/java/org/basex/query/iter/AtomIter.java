@@ -58,7 +58,7 @@ public final class AtomIter extends Iter {
 
   @Override
   public Item get(final long i) throws QueryException {
-    return iter.get(i);
+    return iter.get(i).atomItem(qc, info);
   }
 
   @Override
