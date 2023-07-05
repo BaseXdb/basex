@@ -1343,6 +1343,7 @@ public class QueryParser extends InputParser {
     final Expr cond = check(expr(), NOSWITCH);
     final ArrayList<SwitchGroup> groups = new ArrayList<>();
     wsCheck(")");
+    final boolean brace = wsConsume("{");
 
     // collect all cases
     ExprList exprs;
@@ -1358,6 +1359,8 @@ public class QueryParser extends InputParser {
       exprs.set(0, check(single(), NOSWITCH));
       groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
+
+    if(brace) wsCheck("}");
 
     return new Switch(ii, cond, groups.toArray(SwitchGroup[]::new));
   }
