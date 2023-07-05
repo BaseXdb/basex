@@ -148,18 +148,31 @@ class Session
      */
     public function readString()
     {
-        $com = "";
-        while (($d = $this->read()) != chr(0)) {
-            $com .= $d;
+        try {
+            $com = "";
+            while (($d = $this->read()) != chr(0)) {
+                $com .= $d;
+            }
+            return $com;
         }
-        return $com;
+        catch (BaseXException $e) {
+            return $e->getMessage();
+        }
     }
 
     private function read()
     {
         if ($this->bpos == $this->bsize) {
             $this->bsize = socket_recv($this->socket, $this->buffer, 4096, 0);
-            $this->bpos = 0;
+            if ($this->bsize === 0) {
+                throw new BaseXException("Server connection closed.");
+            }
+            else if ($this->bsize === false) {
+                throw new BaseXException("Can't read messages from server.");
+            }
+            else {
+                $this->bpos = 0;
+            }
         }
         return $this->buffer[$this->bpos++];
     }
