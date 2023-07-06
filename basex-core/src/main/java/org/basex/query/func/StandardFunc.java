@@ -291,7 +291,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Converts an item to a database node.
    * @param item item
-   * @param mainmem accept main-memory database nods
+   * @param mainmem accept main-memory database nodes
    * @return database node
    * @throws QueryException query exception
    */

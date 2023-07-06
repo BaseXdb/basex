@@ -19,7 +19,7 @@ final class TreeRects {
 
   /** Saved rectangles. */
   private TreeRect[][][] rects;
-  /** Displayed nods. */
+  /** Displayed nodes. */
   DBNodes nodes;
   /** Graphics reference. */
   Graphics g;
