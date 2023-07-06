@@ -87,9 +87,9 @@ class Query implements \Iterator
 
     public function exec($cmd, $arg)
     {
-        $this->session->send($cmd.$arg);
+        $this->session->send($cmd.$arg.chr(0));
         $s = $this->session->receive();
-        if ($this->session->ok() !== true) {
+        if (!$this->session->ok()) {
             throw new BaseXException($this->session->readString());
         }
         return $s;
