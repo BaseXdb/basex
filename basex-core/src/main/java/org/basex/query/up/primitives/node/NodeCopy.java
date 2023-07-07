@@ -61,9 +61,10 @@ abstract class NodeCopy extends NodeUpdate {
       final int kind = d.kind(p);
       if(kind != Data.ATTR && kind != Data.ELEM) continue;
       if(p > s && d.parent(p, kind) >= s) break;
-      final int uriId = d.uriId(p, kind);
       final QNm qnm = new QNm(d.name(p, kind));
-      if(uriId != 0) qnm.uri(d.nspaces.uri(uriId));
+      final int uriId = d.uriId(p, kind);
+      qnm.uri(uriId != 0 ? d.nspaces.uri(uriId) :
+        Token.eq(qnm.prefix(), Token.XML) ? QueryText.XML_URI : null);
       pool.add(qnm, ANode.type(kind));
     }
   }

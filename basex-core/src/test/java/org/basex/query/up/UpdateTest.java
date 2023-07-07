@@ -1337,4 +1337,12 @@ public final class UpdateTest extends SandboxTest {
     run.accept("json-to-xml('{\"A\":1}')/*/*", "http://www.w3.org/2005/xpath-functions");
     run.accept("analyze-string('a', 'a')/*", "http://www.w3.org/2005/xpath-functions");
   }
+
+  /** Updates: Nodes in the xml namespace. */
+  @Test public void gh2227() {
+    query("<e a=''/> update { insert node attribute xml:a { '' } into . }",
+        "<e xml:a=\"\" a=\"\"/>");
+    query("<e/> update { insert nodes (attribute a { '' }, attribute xml:a { '' }) into . }",
+        "<e a=\"\" xml:a=\"\"/>");
+  }
 }
