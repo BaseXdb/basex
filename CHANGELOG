@@ -1,3 +1,7 @@
+VERSION 9.7.4 (July 11, 2023) ------------------------------------------
+
+ - various bug fixes
+
 VERSION 9.7.3 (June 30, 2022) ------------------------------------------
 
  - DBA: Improved support for database backups
