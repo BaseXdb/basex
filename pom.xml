@@ -31,6 +31,8 @@
     <project.lib.directory>lib</project.lib.directory>
     <jettyVersion>9.4.48.v20220622</jettyVersion>
     <junit.version>5.8.2</junit.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencyManagement>
@@ -44,7 +46,7 @@
       <dependency>
         <groupId>org.junit.platform</groupId>
         <artifactId>junit-platform-commons</artifactId>
-        <version>1.8.2</version>
+        <version>1.9.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -85,7 +87,7 @@
       <dependency>
         <groupId>org.relaxng</groupId>
         <artifactId>jing</artifactId>
-        <version>20181222</version>
+        <version>20220510</version>
         <scope>runtime</scope>
         <optional>true</optional>
         <exclusions>
@@ -165,7 +167,7 @@
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
       </dependency>
       <dependency>
         <groupId>com.vividsolutions</groupId>
@@ -303,7 +305,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.3.0</version>
+            <version>3.5.0</version>
             <inherited>true</inherited>
             <executions>
               <execution>
@@ -346,7 +348,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.0</version>
             <inherited>true</inherited>
             <configuration>
               <doclint>none</doclint>
@@ -372,7 +374,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>javacc-maven-plugin</artifactId>
-          <version>2.6</version>
+          <version>3.0.1</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -391,7 +393,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.1</version>
+          <version>3.11.0</version>
           <inherited>true</inherited>
           <configuration>
             <source>${compileSource}</source>
@@ -404,7 +406,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.4</version>
+          <version>3.0.0</version>
           <executions>
             <execution>
               <phase>validate</phase>
@@ -423,7 +425,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.2.2</version>
+          <version>3.3.0</version>
           <inherited>true</inherited>
           <configuration>
             <archive>
@@ -440,14 +442,8 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.2</version>
+          <version>3.0.0</version>
           <inherited>true</inherited>
-          <configuration>
-            <!-- <skipTests>true</skipTests> -->
-            <!--<forkMode>always</forkMode>-->
-            <forkCount>1</forkCount>
-            <reuseForks>false</reuseForks>
-          </configuration>
         </plugin>
 
         <plugin>
@@ -472,7 +468,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.5.3</version>
+          <version>3.0.0</version>
           <configuration>
             <tagNameFormat>@{project.version}</tagNameFormat>
             <releaseProfiles>ossrh</releaseProfiles>
@@ -483,7 +479,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.5.0</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>
@@ -503,7 +499,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.1.0</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -517,14 +513,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
+          <version>3.1.1</version>
           <inherited>true</inherited>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>3.2.1</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -562,7 +558,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
-        <version>3.5.2</version>
+        <version>3.5.3</version>
       </extension>
     </extensions>
   </build>
