@@ -990,8 +990,8 @@ public final class EditorView extends View {
   public final GUICode posCode = new GUICode() {
     @Override
     public void execute(final Object arg) {
-      final int[] lc = getEditor().pos();
-      pos.setText(lc[0] + " : " + lc[1]);
+      final int[] cp = getEditor().caretPos();
+      pos.setText(cp[0] + " : " + cp[1]);
     }
   };
 

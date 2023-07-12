@@ -170,8 +170,8 @@ public class TextPanel extends BaseXPanel {
    * Returns the line and column of the current caret position.
    * @return line/column
    */
-  public final int[] pos() {
-    return rend.pos();
+  public final int[] caretPos() {
+    return rend.caretPos();
   }
 
   /**

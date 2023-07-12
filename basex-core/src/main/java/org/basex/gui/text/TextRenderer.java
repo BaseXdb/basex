@@ -216,14 +216,13 @@ final class TextRenderer extends BaseXBack {
 
   /**
    * Returns the line and column of the current caret position.
-   * @return line/column
+   * @return line and column
    */
-  int[] pos() {
+  int[] caretPos() {
     final Graphics g = getGraphics();
-    boolean more = true;
     int col = 1;
-    final TextIterator iter = init(g, true);
-    while(more(iter, g)) {
+    boolean more = true;
+    for(final TextIterator iter = init(g, true); more(iter, g);) {
       final int p = iter.pos();
       while(iter.more()) {
         more = iter.pos() < iter.caret();
@@ -239,10 +238,10 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Sets a new font.
-   * @param style font style (Font#PLAIN, Font#BOLD)
+   * Sets a new font style.
+   * @param style font style ({@link Font#PLAIN}, {@link Font#BOLD})
    */
-  private void setFont(final int style) {
+  private void setStyle(final int style) {
     if(font == null) {
       final int indent = gui != null ? Math.max(1, gui.gopts.get(GUIOptions.INDENT)) :
         GUIOptions.INDENT.value();
@@ -273,7 +272,7 @@ final class TextRenderer extends BaseXBack {
    */
   private TextIterator init(final Graphics g, final boolean start) {
     syntax.init(GUIConstants.TEXT);
-    setFont(Font.PLAIN);
+    setStyle(Font.PLAIN);
 
     offset = OFFSET;
     if(g != null && edit && showLines) {
@@ -328,9 +327,9 @@ final class TextRenderer extends BaseXBack {
 
     final int cp = s.codePointAt(0);
     if(cp == TokenBuilder.BOLD) {
-      setFont(Font.BOLD);
+      setStyle(Font.BOLD);
     } else if(cp == TokenBuilder.NORM) {
-      setFont(Font.PLAIN);
+      setStyle(Font.PLAIN);
     } else if(cp == TokenBuilder.ULINE) {
       link ^= true;
     } else {
@@ -417,7 +416,7 @@ final class TextRenderer extends BaseXBack {
     // choose color for enabled text, depending on highlighting, link, or current syntax
     final Color color = isEnabled() ? markNext ? GUIConstants.GREEN : link ?
       GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
-    int cp = iter.curr();
+    final int cp = iter.curr();
     markNext = cp == TokenBuilder.MARK;
 
     // retrieve first character of current token
@@ -537,43 +536,32 @@ final class TextRenderer extends BaseXBack {
   }
 
   /**
-   * Selects the text at the specified position.
-   * @param p mouse position
+   * Jumps to the text at the specified position.
+   * @param pos mouse position
    * @return text iterator
    */
-  TextIterator jump(final Point p) {
-    final int xx = p.x;
-    final int yy = p.y - fontHeight / 5;
-
+  TextIterator jump(final Point pos) {
     final Graphics g = getGraphics();
     final TextIterator iter = init(g, false);
-    if(yy > y - fontHeight) {
-      int s = iter.pos();
-      while(true) {
-        // end of line
-        if(xx > x && yy < y - fontHeight) {
-          iter.pos(s);
-          break;
-        }
-        // end of text - skip last characters
-        if(!more(iter, g)) {
-          while(iter.more()) iter.next();
-          break;
-        }
-        // beginning of line
-        if(xx <= x && yy < y) break;
-        // middle of line
-        if(xx > x && xx <= x + stringWidth && yy > y - fontHeight && yy <= y) {
-          while(iter.more()) {
-            final int ww = font.charWidth(iter.curr());
-            if(xx < x + ww) break;
-            x += ww;
-            iter.next();
+
+    for(final int xPos = pos.x, yPos = pos.y - fontHeight / 5;
+        yPos >= y - fontHeight && more(iter, g); next(iter)) {
+      // skip line
+      if(yPos >= y) continue;
+      // beginning of line
+      if(xPos < x) break;
+      // token found
+      if(xPos < x + stringWidth) {
+        final int p = iter.pos(), sw = xPos - x;
+        for(int caretP = iter.pos(); iter.more();) {
+          caretP = iter.pos();
+          iter.next();
+          if(sw < font.stringWidth(iter.substring(p, iter.pos()))) {
+            iter.pos(caretP);
+            break;
           }
-          break;
         }
-        s = iter.pos();
-        next(iter);
+        break;
       }
     }
     iter.link(link);
