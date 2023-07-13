@@ -210,6 +210,9 @@ class Session
             if ($this->bsize === false) {
                 throw $this->error("Read failed");
             }
+            if ($this->bsize === 0) {
+              throw $this->error("Connection closed unexpectedly");
+            }
         }
         return $this->buffer[$this->bpos++];
     }
