@@ -134,6 +134,7 @@ final class RestXqResponse extends WebResponse {
       if(singleton != null) singleton.unregister();
 
       if(forward != null) {
+        conn.log(SC_NO_CONTENT, "");
         conn.forward(forward);
       } else {
         qc.checkStop();
