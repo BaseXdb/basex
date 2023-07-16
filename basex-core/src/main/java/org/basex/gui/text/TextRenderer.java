@@ -553,13 +553,15 @@ final class TextRenderer extends BaseXBack {
       // token found
       if(xPos < x + stringWidth) {
         final int p = iter.pos(), sw = xPos - x;
-        for(int caretP = iter.pos(); iter.more();) {
+        for(int caretP = iter.pos(), oldFsw = 0; iter.more();) {
           caretP = iter.pos();
           iter.next();
-          if(sw < font.stringWidth(iter.substring(p, iter.pos()))) {
-            iter.pos(caretP);
+          final int fsw = font.stringWidth(iter.substring(p, iter.pos()));
+          if(sw < fsw) {
+            if(sw < (oldFsw + (fsw - oldFsw) / 2)) iter.pos(caretP);
             break;
           }
+          oldFsw = fsw;
         }
         break;
       }
