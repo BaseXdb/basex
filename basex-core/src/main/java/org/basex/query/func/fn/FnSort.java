@@ -102,7 +102,7 @@ public final class FnSort extends StandardFunc {
    * @param value2 second value
    * @param coll collation
    * @param info input info
-   * @return result of comparison
+   * @return result of comparison (greater than 0, smaller than 0, or 0)
    * @throws QueryException query exception
    */
   static int compare(final Value value1, final Value value2, final Collation coll,
