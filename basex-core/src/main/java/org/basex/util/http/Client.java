@@ -13,6 +13,10 @@ import java.time.*;
 import java.util.*;
 import java.util.Map.*;
 
+import org.basex.build.csv.*;
+import org.basex.build.html.*;
+import org.basex.build.json.*;
+import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
@@ -26,6 +30,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * HTTP Client.
@@ -66,12 +71,36 @@ public final class Client {
     final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
     final String status = req.attribute(STATUS_ONLY);
     final boolean body = status == null || !Strings.toBoolean(status);
+
+    final MainOptions mopts = new MainOptions(options);
     try {
-      return new Response(info, options).getResponse(send(uri, req), body, mediaType);
+      mopts.set(MainOptions.CSVPARSER,
+          assign(new CsvParserOptions(mopts.get(MainOptions.CSVPARSER)), req.attribute(CSV)));
+      mopts.set(MainOptions.JSONPARSER,
+          assign(new JsonParserOptions(mopts.get(MainOptions.JSONPARSER)), req.attribute(JSON)));
+      mopts.set(MainOptions.HTMLPARSER,
+          assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.attribute(HTML)));
+      mopts.set(MainOptions.TEXTPARSER,
+          assign(new TextOptions(mopts.get(MainOptions.TEXTPARSER)), req.attribute(TEXT)));
+
+      return new Response(info, mopts).getResponse(send(uri, req), body, mediaType);
     } catch(final IOException ex) {
       throw HC_ERROR_X.get(info, ex);
     }
   }
+  /**
+   * Assigns parser options.
+   * @param <O> option type
+   * @param opts options
+   * @param value value to assign (can be {@code null})
+   * @return supplied options
+   * @throws IOException I/O exception
+   */
+  private static <O extends Options> O assign(final O opts, final String value) throws IOException {
+    if(value != null) opts.assign(value);
+    return opts;
+  }
+
 
   /**
    * Returns a URI.

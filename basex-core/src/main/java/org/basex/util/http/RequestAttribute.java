@@ -10,9 +10,13 @@ import java.util.*;
  */
 public enum RequestAttribute {
   /** NC. */ NC,
+  /** CSV. */ CSV,
   /** QOP. */ QOP,
   /** URI. */ URI,
   /** Href. */ HREF,
+  /** JSON. */ JSON,
+  /** HTML. */ HTML,
+  /** Text. */ TEXT,
   /** Nonce. */ NONCE,
   /** Realm. */ REALM,
   /** Opaque. */ OPAQUE,
