@@ -1033,6 +1033,16 @@ public enum QueryError {
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
+  KEYWORDTWICE_X(XPST, 17, "Keyword supplied twice: %."),
+  /** Error code. */
+  ARGMISSING_X_X(XPST, 17, "%: No argument supplied for: %."),
+  /** Error code. */
+  ARGTWICE_X_X(XPST, 17, "%: Argument supplied twice for: %."),
+  /** Error code. */
+  KEYWORDUNKNOWN_X_X(XPST, 17, "%: Unknown keyword: %."),
+  /** Error code. */
+  KEYWORDSUPPORT_X(XPST, 17, "%: Keyword arguments not supported."),
+  /** Error code. */
   ABSTRACTFUNC_X(XPST, 17, "No function exists for abstract type: %."),
   /** Error code. */
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
@@ -1050,16 +1060,6 @@ public enum QueryError {
   NOURI_X(XPST, 81, "Namespace prefix not declared: %."),
   /** Error code. */
   NSMISS_X(XPST, 81, "QName '%' has no namespace."),
-  /** Error code. */
-  KEYWORDTWICE_X(XPST, 141, "Keyword supplied twice: %."),
-  /** Error code. */
-  ARGMISSING_X_X(XPST, 141, "%: No argument supplied for: %."),
-  /** Error code. */
-  ARGTWICE_X_X(XPST, 141, "%: Argument supplied twice for: %."),
-  /** Error code. */
-  KEYWORDUNKNOWN_X_X(XPST, 142, "%: Unknown keyword: %."),
-  /** Error code. */
-  KEYWORDSUPPORT_X(XPST, 142, "%: Keyword arguments not supported."),
 
   /** Error code. */
   JAVANOINSTANCE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
