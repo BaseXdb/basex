@@ -5,7 +5,6 @@ import java.io.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
-import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.*;
 import org.basex.core.cmd.*;
@@ -57,11 +56,6 @@ final class RESTPut {
       opts.assign(mt);
       options.set(MainOptions.HTMLPARSER, opts);
       options.set(MainOptions.PARSER, MainParser.HTML);
-    } else if(mt.isText()) {
-      final TextOptions opts = new TextOptions();
-      opts.assign(mt);
-      options.set(MainOptions.TEXTPARSER, opts);
-      options.set(MainOptions.PARSER, MainParser.TEXT);
     } else if(!mt.is(MediaType.ALL_ALL) && !mt.isXml()) {
       xml = false;
     }

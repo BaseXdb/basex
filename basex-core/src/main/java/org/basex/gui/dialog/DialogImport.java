@@ -228,13 +228,10 @@ final class DialogImport extends BaseXBack {
       if(eq(suf, gui.gopts.xmlSuffixes()) || eq(suf, IO.XSLSUFFIXES)) type = MainParser.XML;
       else if(eq(suf, IO.HTMLSUFFIXES)) type = MainParser.HTML;
       else if(eq(suf, IO.CSVSUFFIX)) type = MainParser.CSV;
-      else if(eq(suf, IO.TXTSUFFIXES)) type = MainParser.TEXT;
       else if(eq(suf, IO.JSONSUFFIX)) type = MainParser.JSON;
     }
     // unknown suffix: analyze first bytes
     if(type == null) type = guess(io);
-    // default parser: XML
-    if(type == null) type = MainParser.XML;
 
     // choose correct parser (default: XML)
     parsers.setSelectedItem(type.name());
@@ -243,27 +240,17 @@ final class DialogImport extends BaseXBack {
   /**
    * Guesses the content type of the specified input.
    * @param in input stream
-   * @return type or {@code null}
+   * @return type
    */
   private static MainParser guess(final IO in) {
-    if(!in.exists() || in instanceof IOUrl) return null;
-
-    try(BufferInput bi = BufferInput.get(in)) {
-      int b = bi.read();
-      // input starts with opening bracket: may be xml
-      if(b == '<') return MainParser.XML;
-
-      for(int c = 0; b >= 0 && ++c < IO.BLOCKSIZE;) {
-        // treat as binary data if characters are no ascii
-        if(b < ' ' && !Token.ws(b) || b >= 128) return MainParser.RAW;
-        b = bi.read();
+    if(in.exists() && !(in instanceof IOUrl)) {
+      try(BufferInput bi = BufferInput.get(in)) {
+        return bi.read() == '<' ? MainParser.XML : MainParser.RAW;
+      } catch(final IOException ex) {
+        Util.debug(ex);
       }
-      // all characters were of type ascii
-      return MainParser.TEXT;
-    } catch(final IOException ex) {
-      Util.debug(ex);
     }
-    // could not evaluate type
-    return null;
+    // assume default type
+    return MainParser.XML;
   }
 }

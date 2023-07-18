@@ -16,7 +16,6 @@ public enum RequestAttribute {
   /** Href. */ HREF,
   /** JSON. */ JSON,
   /** HTML. */ HTML,
-  /** Text. */ TEXT,
   /** Nonce. */ NONCE,
   /** Realm. */ REALM,
   /** Opaque. */ OPAQUE,

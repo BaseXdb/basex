@@ -346,7 +346,6 @@ skip_corrupt_files   = Алдаатай (буруу бичигдсэн) файл
 skip_empty           = Skip empty fields
 skipped              = Алгассан
 sort                 = Sort
-split_input_lines    = Мөрүүдэд хуваах
 srv_running          = Серверийн ажиллагаа эсвэл эрх олголт амжилтгүй
 srv_started          = Сервер ажиллаж байна
 srv_stopped          = Сервер зогссон

@@ -346,7 +346,6 @@ skip_corrupt_files   = 跳过错误（格式不良好的）文件
 skip_empty           = Skip empty fields
 skipped              = 已跳过
 sort                 = 排序
-split_input_lines    = 将输入分为多行
 srv_running          = 服务器已启动或者没有权限
 srv_started          = 服务器已启动
 srv_stopped          = 服务器已停止

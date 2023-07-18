@@ -46,8 +46,7 @@ final class DialogParsing extends BaseXBack {
 
     final MainOptions opts = gui.context.options;
     parsers = new DialogParser[] { new DialogXmlParser(dialog, opts),
-        new DialogHtmlParser(dialog, opts), new DialogJsonParser(dialog, opts),
-        new DialogCsvParser(dialog, opts), new DialogTextParser(dialog, opts)
+        new DialogHtmlParser(dialog, opts), new DialogJsonParser(dialog, opts)
     };
 
     setLayout(new BorderLayout());

@@ -16,7 +16,6 @@ import javax.servlet.http.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
-import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
@@ -149,9 +148,6 @@ public final class RestXqFunction extends WebFunction {
       } else if(def == _INPUT_HTML) {
         final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
         options.set(MainOptions.HTMLPARSER, parse(opts, ann));
-      } else if(def == _INPUT_TEXT) {
-        final TextOptions opts = new TextOptions(options.get(MainOptions.TEXTPARSER));
-        options.set(MainOptions.TEXTPARSER, parse(opts, ann));
       } else if(eq(def.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         final String name = string(def.local()), val = toString(value.itemAt(0));

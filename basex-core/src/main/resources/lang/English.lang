@@ -346,7 +346,6 @@ skip_corrupt_files   = Skip corrupt (non-well-formed) files
 skip_empty           = Skip empty fields
 skipped              = Skipped
 sort                 = Sort
-split_input_lines    = Splits input into lines
 srv_running          = Server is running or permission was denied
 srv_started          = Server was started
 srv_stopped          = Server was stopped

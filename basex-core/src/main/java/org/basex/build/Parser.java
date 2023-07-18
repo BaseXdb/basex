@@ -5,7 +5,6 @@ import java.io.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
-import org.basex.build.text.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
@@ -136,7 +135,6 @@ public class Parser extends Job {
     final MainParser mp = options.get(MainOptions.PARSER);
     switch(mp) {
       case HTML: p = new HtmlParser(source, options); break;
-      case TEXT: p = new TextParser(source, options); break;
       case JSON: p = new JsonParser(source, options); break;
       case CSV:  p = new CsvParser(source, options); break;
       default:   p = options.get(MainOptions.INTPARSE) ? new XMLParser(source, options) :

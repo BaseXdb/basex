@@ -346,7 +346,6 @@ skip_corrupt_files   = Ignorar ficheros corruptos (no bien formados)
 skip_empty           = Omitir campos vacíos
 skipped              = Ignorado
 sort                 = Ordenar
-split_input_lines    = Separar salida en varias líneas
 srv_running          = El servidor está ejecutándose o el permiso fue denegado
 srv_started          = El servidor ha arrancado
 srv_stopped          = El servidor ha parado

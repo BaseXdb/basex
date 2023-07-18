@@ -16,7 +16,6 @@ import java.util.Map.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
-import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
 import org.basex.io.*;
@@ -80,8 +79,6 @@ public final class Client {
           assign(new JsonParserOptions(mopts.get(MainOptions.JSONPARSER)), req.attribute(JSON)));
       mopts.set(MainOptions.HTMLPARSER,
           assign(new HtmlOptions(mopts.get(MainOptions.HTMLPARSER)), req.attribute(HTML)));
-      mopts.set(MainOptions.TEXTPARSER,
-          assign(new TextOptions(mopts.get(MainOptions.TEXTPARSER)), req.attribute(TEXT)));
 
       return new Response(info, mopts).getResponse(send(uri, req), body, mediaType);
     } catch(final IOException ex) {

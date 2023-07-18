@@ -38,8 +38,6 @@ public enum Annotation {
   _INPUT_HTML("html(option[,...])", params(STRING_O), INPUT_URI),
   /** XQuery annotation. */
   _INPUT_JSON("json(option[,...])", params(STRING_O), INPUT_URI),
-  /** XQuery annotation. */
-  _INPUT_TEXT("text(option[,...])", params(STRING_O), INPUT_URI),
 
   /** XQuery annotation. */
   _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", params(STRING_O), OUTPUT_URI),

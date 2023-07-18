@@ -6,7 +6,6 @@ import org.basex.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
-import org.basex.build.text.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.func.archive.*;
@@ -35,7 +34,6 @@ public final class OptionsTest extends SandboxTest {
     new JsonOptions();
     new JsonParserOptions();
     new JsonSerialOptions();
-    new TextOptions();
     new CreateOptions();
     new FtIndexOptions();
     new FtContainsOptions();

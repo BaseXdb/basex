@@ -346,7 +346,6 @@ skip_corrupt_files   = Игнорировать поврежденные (нев
 skip_empty           = Skip empty fields
 skipped              = Пропущено
 sort                 = Сортировка
-split_input_lines    = Разделять содержимое на строки
 srv_running          = Сервер уже запущен или недостаточно прав для выполнения операции
 srv_started          = Сервер запущен
 srv_stopped          = Сервер остановлен

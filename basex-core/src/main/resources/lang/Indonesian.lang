@@ -346,7 +346,6 @@ skip_corrupt_files   = Lewatkan berkas yang rusak (tidak sesuai format)
 skip_empty           = Skip empty fields
 skipped              = Terlewat
 sort                 = Sortir
-split_input_lines    = Potong masukan menjadi baris
 srv_running          = Servis sudah berjalan atau izin ditolak
 srv_started          = Server sudah dijalankan
 srv_stopped          = Server sudah dihentikan

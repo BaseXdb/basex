@@ -346,7 +346,6 @@ skip_corrupt_files   = Korrupt (nem jól formázott) fájlok
 skip_empty           = Skip empty fields
 skipped              = Kihagyva
 sort                 = Rendezés
-split_input_lines    = Bemenet sorokra tördelése
 srv_running          = Szerver fut vagy hozzáférés megtagadva
 srv_started          = Szerver elindult
 srv_stopped          = Szerver leállt

@@ -6,7 +6,6 @@ import java.util.stream.*;
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
-import org.basex.build.text.*;
 import org.basex.io.serial.*;
 import org.basex.util.options.*;
 
@@ -39,9 +38,6 @@ public final class MainOptions extends Options {
   /** Define CSV parser options. */
   public static final OptionsOption<CsvParserOptions> CSVPARSER =
       new OptionsOption<>("CSVPARSER", new CsvParserOptions());
-  /** Define text parser options. */
-  public static final OptionsOption<TextOptions> TEXTPARSER =
-      new OptionsOption<>("TEXTPARSER", new TextOptions());
   /** Define JSON parser options. */
   public static final OptionsOption<JsonParserOptions> JSONPARSER =
       new OptionsOption<>("JSONPARSER", new JsonParserOptions());
@@ -189,7 +185,7 @@ public final class MainOptions extends Options {
       CATALOG };
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
-      SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, TEXTPARSER, JSONPARSER, HTMLPARSER, PARSER };
+      SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };
   /** All parsing options. */
   public static final Option<?>[] PARSING = Stream.concat(Stream.of(XMLPARSING),
       Stream.of(EXTPARSING)).toArray(Option<?>[]::new);
@@ -200,7 +196,6 @@ public final class MainOptions extends Options {
     /** HTML. */ HTML,
     /** Json. */ JSON,
     /** CSV.  */ CSV,
-    /** Text. */ TEXT,
     /** RAW.  */ RAW;
 
     @Override

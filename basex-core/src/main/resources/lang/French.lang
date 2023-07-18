@@ -346,7 +346,6 @@ skip_corrupt_files   = Ignorer les fichiers corrompus (mal formés)
 skip_empty           = Ignorer les champs vides
 skipped              = Ignoré
 sort                 = Trier
-split_input_lines    = Éclater l’entrée en lignes
 srv_running          = Serveur déjà démarré ou permission refusée
 srv_started          = Serveur démarré
 srv_stopped          = Serveur arrêté
