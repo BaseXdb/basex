@@ -209,62 +209,6 @@ public final class UtilModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void duplicates() {
-    final Function func = _UTIL_DUPLICATES;
-
-    query(func.args(1), "");
-    query(func.args(" (1, 2)"), "");
-    query(func.args(" (1, 2, 1)"), 1);
-    query(func.args(" (1, 2, 1, 1)"), 1);
-    query(func.args(" (1, 2, 2, 1)"), "2\n1");
-    query(func.args(" (1, 'a', true())"), "");
-    query(func.args(" 1 to 5000000000"), "");
-    query(func.args(" (1 to 5000000000) ! 1"), 1);
-    query(func.args(wrap(1) + "to 5000000000"), "");
-
-    query(func.args(" (1 to 5) ! <_>1</_>"), 1);
-    query(func.args(" (<a>1</a>, <b>1</b>)"), 1);
-
-    query(func.args(" 'a'", "?lang=de"), "");
-    query(func.args(" ('a', 'a')", "?lang=de"), "a");
-    query(func.args(" ('a', 'a', 'a')", "?lang=de"), "a");
-
-    error(func.args(" (1, true#0)"), FIATOMIZE_X);
-    error(func.args(" (1 to 5) ! true#0"), FIATOMIZE_X);
-
-    // optimizations
-    String seq = "let $seq := (" + wrap(1) + ", 2, " + wrap(1) + ") return ";
-    check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
-    check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
-    check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
-    check(seq + "count($seq) >= count(distinct-values($seq))", true,  root(Bln.class));
-    check(seq + "count($seq) >  count(distinct-values($seq))", true,  root(EXISTS), exists(func));
-    check(seq + "count($seq) != count(distinct-values($seq))", true,  root(EXISTS), exists(func));
-
-    check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
-    check(seq + "count(distinct-values($seq)) <= count($seq)", true,  root(Bln.class));
-    check(seq + "count(distinct-values($seq)) <  count($seq)", true,  root(EXISTS), exists(func));
-    check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
-    check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
-    check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
-
-    seq = "let $seq := (<_>1</_>, 2, <_>1</_>)[. = 1] return ";
-    check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
-    check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
-    check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
-    check(seq + "count($seq) >= count(distinct-values($seq))", true,  root(Bln.class));
-    check(seq + "count($seq) >  count(distinct-values($seq))", true,  root(EXISTS), exists(func));
-    check(seq + "count($seq) != count(distinct-values($seq))", true,  root(EXISTS), exists(func));
-
-    check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
-    check(seq + "count(distinct-values($seq)) <= count($seq)", true,  root(Bln.class));
-    check(seq + "count(distinct-values($seq)) <  count($seq)", true,  root(EXISTS), exists(func));
-    check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
-    check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
-    check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
-  }
-
-  /** Test method. */
   @Test public void iff() {
     final Function func = _UTIL_IF;
     query(func.args(1, 1), 1);

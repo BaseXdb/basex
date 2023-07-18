@@ -8,10 +8,9 @@ import java.util.regex.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -86,11 +85,11 @@ public final class FnReplace extends RegEx {
         final StringBuilder sb = new StringBuilder();
         while(m.find()) {
           final int gc = m.groupCount();
-          final TokenList tl = new TokenList(gc);
-          for(int g = 0; g < gc; g++) tl.add(m.group(g + 1));
-          final Item rplc = action.invoke(qc, info, Str.get(m.group()), StrSeq.get(tl)).
+          final ValueBuilder groups = new ValueBuilder(qc);
+          for(int g = 0; g < gc; g++) groups.add(Atm.get(m.group(g + 1)));
+          final Item rplc = action.invoke(qc, info, Atm.get(m.group()), groups.value()).
               atomItem(qc, ii);
-          m.appendReplacement(sb, rplc.isEmpty() ? "" : string(toToken(rplc)));
+          m.appendReplacement(sb, rplc.isEmpty() ? "" : string(rplc.string(info)));
         }
         replaced = m.appendTail(sb).toString();
       }

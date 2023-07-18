@@ -399,6 +399,62 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void duplicateValues() {
+    final Function func = DUPLICATE_VALUES;
+
+    query(func.args(1), "");
+    query(func.args(" (1, 2)"), "");
+    query(func.args(" (1, 2, 1)"), 1);
+    query(func.args(" (1, 2, 1, 1)"), 1);
+    query(func.args(" (1, 2, 2, 1)"), "2\n1");
+    query(func.args(" (1, 'a', true())"), "");
+    query(func.args(" 1 to 5000000000"), "");
+    query(func.args(" (1 to 5000000000) ! 1"), 1);
+    query(func.args(wrap(1) + "to 5000000000"), "");
+
+    query(func.args(" (1 to 5) ! <_>1</_>"), 1);
+    query(func.args(" (<a>1</a>, <b>1</b>)"), 1);
+
+    query(func.args(" 'a'", "?lang=de"), "");
+    query(func.args(" ('a', 'a')", "?lang=de"), "a");
+    query(func.args(" ('a', 'a', 'a')", "?lang=de"), "a");
+
+    error(func.args(" (1, true#0)"), FIATOMIZE_X);
+    error(func.args(" (1 to 5) ! true#0"), FIATOMIZE_X);
+
+    // optimizations
+    String seq = "let $seq := (" + wrap(1) + ", 2, " + wrap(1) + ") return ";
+    check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
+    check(seq + "count($seq) >= count(distinct-values($seq))", true,  root(Bln.class));
+    check(seq + "count($seq) >  count(distinct-values($seq))", true,  root(EXISTS), exists(func));
+    check(seq + "count($seq) != count(distinct-values($seq))", true,  root(EXISTS), exists(func));
+
+    check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) <= count($seq)", true,  root(Bln.class));
+    check(seq + "count(distinct-values($seq)) <  count($seq)", true,  root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
+    check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
+
+    seq = "let $seq := (<_>1</_>, 2, <_>1</_>)[. = 1] return ";
+    check(seq + "count($seq)  = count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <= count(distinct-values($seq))", false, root(EMPTY), exists(func));
+    check(seq + "count($seq) <  count(distinct-values($seq))", false, root(Bln.class));
+    check(seq + "count($seq) >= count(distinct-values($seq))", true,  root(Bln.class));
+    check(seq + "count($seq) >  count(distinct-values($seq))", true,  root(EXISTS), exists(func));
+    check(seq + "count($seq) != count(distinct-values($seq))", true,  root(EXISTS), exists(func));
+
+    check(seq + "count(distinct-values($seq))  = count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) <= count($seq)", true,  root(Bln.class));
+    check(seq + "count(distinct-values($seq)) <  count($seq)", true,  root(EXISTS), exists(func));
+    check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
+    check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
+    check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
+  }
+
+  /** Test method. */
   @Test public void error() {
     final Function func = ERROR;
 
@@ -1571,9 +1627,14 @@ public final class FnModuleTest extends QueryPlanTest {
         + "let $function := function-lookup(xs:QName($name), 2) "
         + "return" + func.args("1234", ".(..)", " ()", " ()", " $function"),
         "14\n4");
+    query(func.args("X", ".", " ()", " ()", " contains#2"), true);
+    query(func.args("1", "(.)", " action := function($n, $_) { $n + 1 }"), 2);
+
+    query(func.args("bab", "a", " action := function($_, $__) { }"), "bb");
+    query(func.args("bab", "(a)", " action := function($_, $__) { }"), "bb");
+    query(func.args("bab", "(a)", " action := function($_, $__) { '' }"), "bb");
 
     error(func.args("W", ".*", " ()", " ()", " function($k, $g) { }"), REGEMPTY_X);
-    error(func.args("X", ".", " ()", " ()", " contains#2"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */

@@ -102,7 +102,7 @@ public final class FnDistinctValues extends StandardFunc {
     if(op == OpV.LT) return Bln.FALSE;
     if(op == OpV.GE) return Bln.TRUE;
 
-    final Expr dupl = cc.function(Function._UTIL_DUPLICATES, info, exprs);
+    final Expr dupl = cc.function(Function.DUPLICATE_VALUES, info, exprs);
     return cc.function(op == OpV.LE || op == OpV.EQ ? Function.EMPTY : Function.EXISTS, info, dupl);
   }
 
