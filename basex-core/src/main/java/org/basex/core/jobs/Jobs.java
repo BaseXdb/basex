@@ -48,6 +48,7 @@ public final class Jobs {
 
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
+      options.set(MainOptions.STRIPWS, true);
       final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
       final ANode root = children(doc, Q_JOBS).next();
       if(root == null) {

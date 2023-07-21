@@ -52,31 +52,32 @@ public final class Users {
     try {
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
+      options.set(MainOptions.STRIPWS, true);
       final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
       final ANode root = children(doc, Q_USERS).next();
       if(root == null) {
-        Util.errln(file + ": No '%' root element.", Q_USERS);
+        Util.errln("%: No <%/> root element.", file, Q_USERS);
       } else {
         for(final ANode child : children(root)) {
           final QNm qname = child.qname();
           if(qname.eq(Q_USER)) {
             try {
-              final User user = new User(child);
+              final User user = new User(child, file);
               final String name = user.name();
               if(users.get(name) != null) {
-                Util.errln(file + ": User '%' supplied more than once.", name);
+                Util.errln("%: User '%' supplied more than once.", file, name);
               } else {
                 users.put(name, user);
               }
             } catch(final BaseXException ex) {
               // reject users with faulty data
-              Util.errln(file + ": " + ex.getLocalizedMessage());
+              Util.errln("%: %", file, ex.getLocalizedMessage());
             }
           } else if(qname.eq(Q_INFO)) {
-            if(info != null) Util.errln(file + ": occurs more than once: %.", qname);
+            if(info != null) Util.errln("%: <%/> occurs more than once.", file, qname);
             else info = child.finish();
           } else {
-            Util.errln(file + ": invalid element: %.", qname);
+            Util.errln("%: invalid element <%/>.", file, qname);
           }
         }
       }

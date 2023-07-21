@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -62,39 +63,42 @@ public final class User {
   /**
    * Parses a single user from the specified node.
    * @param user user node
+   * @param file input file
    * @throws BaseXException database exception
    */
-  User(final ANode user) throws BaseXException {
+  User(final ANode user, final IOFile file) throws BaseXException {
     name = string(attribute(user, Q_NAME, "Root"));
     perm = attribute(name, user, Q_PERMISSION, Perm.values());
 
     for(final ANode child : children(user)) {
-      if(child.qname().eq(Q_PASSWORD)) {
+      final QNm qname = child.qname();
+      if(qname.eq(Q_PASSWORD)) {
         final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
         final Algorithm algorithm = attribute(name, child, Q_ALGORITHM, Algorithm.values());
         if(passwords.containsKey(algorithm)) throw new BaseXException(
-            name + ": Algorithm \"" + algorithm + "\" supplied more than once.");
+            "%: Algorithm % supplied more than once.", name, algorithm);
         passwords.put(algorithm, ec);
 
         for(final ANode code : children(child)) {
           final Code cd = value(name, code.qname().internal(), algorithm.codes);
           if(ec.containsKey(cd)) throw new BaseXException(
-              name + ", " + algorithm + ": Code \"" + code + "\" supplied more than once.");
+              "%, %: Code % supplied more than once.", name, algorithm, code);
           ec.put(cd, string(code.string()));
         }
         for(final Code code : algorithm.codes) {
           if(ec.get(code) == null)
-            throw new BaseXException(name + ", " + algorithm + ": Code \"" + code + "\" missing.");
+            throw new BaseXException("%, %: Code '%' missing.", name, algorithm, code);
         }
-      } else if(child.qname().eq(Q_DATABASE)) {
+      } else if(qname.eq(Q_DATABASE)) {
         // parse local permissions
         final String nm = string(attribute(child, Q_PATTERN, name));
         final Perm prm = attribute(name, child, Q_PERMISSION, Perm.values());
         patterns.put(nm, prm);
-      } else if(child.qname().eq(Q_INFO)) {
+      } else if(qname.eq(Q_INFO)) {
+        if(info != null) throw new BaseXException("%: <%/> occurs more than once.", file, qname);
         info = child.finish();
       } else {
-        throw new BaseXException(name + ": invalid element: <" + child.qname() + "/>.");
+        throw new BaseXException("%: invalid element <%/>.", file, qname);
       }
     }
   }
