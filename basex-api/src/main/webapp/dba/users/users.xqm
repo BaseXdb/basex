@@ -73,7 +73,7 @@ function dba:users(
           html:button('update', 'Update'),
           <div class='small'/>,
           <textarea name='info' id='editor' spellcheck='false'>{
-            serialize(user:info())
+            serialize(user:info(), map { 'indent': true() } )
           }</textarea>,
           html:js('loadCodeMirror("xml", true);')
         }</form>

@@ -7,8 +7,37 @@ module namespace dba = 'dba/users';
 
 import module namespace util = 'dba/util' at '../lib/util.xqm';
 
+(:~ Top category :)
+declare variable $dba:CAT := 'users';
 (:~ Sub category :)
 declare variable $dba:SUB := 'user';
+
+(:~
+ : Updates users information.
+ : @param  $info  users information
+ : @return redirection
+ :)
+declare
+  %updating
+  %rest:POST
+  %rest:path('/dba/users-info')
+  %rest:form-param('info', '{$info}')
+function dba:users-info(
+  $info  as xs:string
+) as empty-sequence() {
+  try {
+    (: change user info :)
+    let $xml := dba:user-info($info)
+    where not(deep-equal(user:info(), $xml))
+    return user:update-info($xml),
+
+    util:redirect($dba:CAT, map { 'info': 'User information was updated.' })
+  } catch err:FODC0006 {
+    util:redirect($dba:CAT, map { 'error': 'XML with "info" root element expected.' })
+  } catch * {
+    util:redirect($dba:CAT, map { 'error': $err:description })
+  }
+};
 
 (:~
  : Updates a user.
@@ -50,11 +79,7 @@ function dba:user-update(
       (: change permissions :)
       if($perm = $old/@permission) then () else user:grant($name, $perm),
       (: change user info :)
-      let $xml := if($info) then (
-        parse-xml($info)/*[self::info or error(xs:QName(err:FORC0006))]
-      ) else (
-        <info/>
-      )
+      let $xml := dba:user-info($info)
       where not(deep-equal(user:info($name), $xml))
       return user:update-info($xml, $name)
     ),
@@ -66,4 +91,21 @@ function dba:user-update(
       'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm, 'error': $error
     })
   }
+};
+
+(:~
+ : Converts a user info string to XML.
+ : @param  $info  user info
+ : @return info element
+ :)
+declare %private function dba:user-info(
+  $info  as xs:string
+) as element(info) {
+  if($info) then (
+    parse-xml($info)/*[self::info or error(xs:QName(err:FODC0006))] update {
+      delete node .//text()[not(normalize-space())]
+    }
+  ) else (
+    element info {}
+  )
 };

@@ -5,7 +5,6 @@
  :)
 module namespace dba = 'dba/files';
 
-import module namespace config = 'dba/config' at '../../lib/config.xqm';
 import module namespace util = 'dba/util' at '../../lib/util.xqm';
 
 (:~ Top category :)

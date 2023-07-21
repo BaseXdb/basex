@@ -103,9 +103,12 @@ function dba:databases(
           <h2>General Backups</h2>
           <div class='note'>
             Comprising:
-            <a target='_blank' href='https://docs.basex.org/wiki/User_Management'>registered users</a>;
-            <a target='_blank' href='https://docs.basex.org/wiki/Jobs_Module#Services'>scheduled services</a>;
-            <a target='_blank' href='https://docs.basex.org/wiki/Store_Module'>value stores</a>.
+            <a target='_blank'
+               href='https://docs.basex.org/wiki/User_Management'>registered users</a>;
+            <a target='_blank'
+               href='https://docs.basex.org/wiki/Jobs_Module#Services'>scheduled services</a>;
+            <a target='_blank'
+               href='https://docs.basex.org/wiki/Store_Module'>value stores</a>.
           </div>
           <div class='small'/>
           {

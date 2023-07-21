@@ -101,7 +101,7 @@ function dba:user(
                 <td>Information:</td>
                 <td>
                   <textarea name='info' id='editor' spellcheck='false'>{
-                    serialize(user:info($name))
+                    serialize(user:info($name), map { 'indent': true() } )
                   }</textarea>
                 </td>
               </tr>,
