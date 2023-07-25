@@ -115,6 +115,8 @@ public final class InlineTest extends QueryPlanTest {
 
   /** Tests the annotation {@link Annotation#_BASEX_INLINE}. */
   @Test public void annotation() {
+    inline(true);
+
     // deactivate inlining globally, activate locally
     check("declare option db:inlinelimit '0';"
         + "declare %basex:inline function local:x($x) { $x }; local:x(123)",
@@ -133,6 +135,12 @@ public final class InlineTest extends QueryPlanTest {
         + "declare %basex:inline(0) function local:x($x) { $x }; local:x(123)",
         123,
         exists(StaticFunc.class));
+
+    // locking flag: disable inlining
+    check("declare %basex:lock('x') function local:x($x) { $x }; local:x(123)",
+        123,
+        exists(StaticFunc.class));
+
   }
 
   /** Tests if all let clauses are removed. */

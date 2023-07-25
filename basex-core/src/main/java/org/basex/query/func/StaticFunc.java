@@ -299,13 +299,15 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   public static boolean inline(final CompileContext cc, final AnnList anns, final Expr expr) {
-    final Ann ann = anns.get(Annotation._BASEX_INLINE);
+    final Ann inline = anns.get(Annotation._BASEX_INLINE);
     final long limit;
-    if(ann == null) {
-      limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
-    } else {
-      final Value value = ann.value();
+    if(inline != null) {
+      final Value value = inline.value();
       limit = value.isEmpty() ? Long.MAX_VALUE : ((ANum) value.itemAt(0)).itr();
+    } else if(anns.get(Annotation._BASEX_LOCK) != null) {
+      limit = 0;
+    } else {
+      limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
     }
     return expr.exprSize() < limit;
   }
