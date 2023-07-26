@@ -63,31 +63,6 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void all() {
-    final Function func = ALL;
-
-    query(func.args(" (1 to 10) ! boolean(.)"), true);
-    query(func.args(" reverse(1 to 10) ! boolean(.)"), true);
-    query(func.args(" reverse(0 to 9) ! boolean(.)"), false);
-
-    query(func.args(" ()", " boolean#1"), true);
-    query(func.args(1, " boolean#1"), true);
-    query(func.args(" 0 to 1", " boolean#1"), false);
-    query(func.args(" (1, 3, 7)", " function($n) { $n mod 2 = 1 }"), true);
-    query(func.args(" -5 to 5", " function($n) { $n ge 0 }"), false);
-    query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
-        + "'November', 'December')", " contains(?, 'r')"), true);
-    check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
-        exists(CmpG.class), empty(ALL), exists(NOT));
-
-    final String lookup = "function-lookup(xs:QName(<?_ fn:all?>), 2)";
-    query(lookup + "(1 to 9, boolean#1)", true);
-    query(lookup + "(1 to 9, not#1)", false);
-    query(lookup + "(0 to 9, boolean#1)", false);
-    query(lookup + "(0 to 9, not#1)", false);
-  }
-
-  /** Test method. */
   @Test public void allDifferent() {
     final Function func = ALL_DIFFERENT;
 
@@ -471,6 +446,31 @@ public final class FnModuleTest extends QueryPlanTest {
     query("declare function local:e() { error() }; head((1, local:e()))", 1);
     query("declare function local:e() as empty-sequence() { error() }; head((1, local:e()))", 1);
     query("declare %basex:inline(0) function local:f() { error() }; head((1, local:f()))", 1);
+  }
+
+  /** Test method. */
+  @Test public void every() {
+    final Function func = EVERY;
+
+    query(func.args(" (1 to 10) ! boolean(.)"), true);
+    query(func.args(" reverse(1 to 10) ! boolean(.)"), true);
+    query(func.args(" reverse(0 to 9) ! boolean(.)"), false);
+
+    query(func.args(" ()", " boolean#1"), true);
+    query(func.args(1, " boolean#1"), true);
+    query(func.args(" 0 to 1", " boolean#1"), false);
+    query(func.args(" (1, 3, 7)", " function($n) { $n mod 2 = 1 }"), true);
+    query(func.args(" -5 to 5", " function($n) { $n ge 0 }"), false);
+    query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
+        + "'November', 'December')", " contains(?, 'r')"), true);
+    check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
+        exists(CmpG.class), empty(func), exists(NOT));
+
+    final String lookup = "function-lookup(xs:QName(<?_ fn:every?>), 2)";
+    query(lookup + "(1 to 9, boolean#1)", true);
+    query(lookup + "(1 to 9, not#1)", false);
+    query(lookup + "(0 to 9, boolean#1)", false);
+    query(lookup + "(0 to 9, not#1)", false);
   }
 
   /** Test method. */
@@ -1869,7 +1869,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ('January', 'February', 'March', 'April', 'September', 'October',"
         + "'November', 'December')", " contains(?, 'z')"), false);
     check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
-        exists(CmpG.class), empty(ALL));
+        exists(CmpG.class), empty(EVERY));
 
     final String lookup = "function-lookup(xs:QName(<?_ fn:some?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);

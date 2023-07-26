@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public class FnAll extends StandardFunc {
+public class FnEvery extends StandardFunc {
   @Override
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // implementation for dynamic function lookup

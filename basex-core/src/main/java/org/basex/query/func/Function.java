@@ -76,9 +76,6 @@ public enum Function implements AFunction {
   ADJUST_TIME_TO_TIMEZONE(FnAdjustTimeToTimezone::new, "adjust-time-to-timezone(value[,timezone])",
       params(TIME_ZO, DAY_TIME_DURATION_ZO), TIME_ZO),
   /** XQuery function. */
-  ALL(FnAll::new, "all(input[,predicate])",
-      params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
-  /** XQuery function. */
   ALL_DIFFERENT(FnAllDifferent::new, "all-different(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
   /** XQuery function. */
@@ -217,6 +214,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ESCAPE_HTML_URI(FnEscapeHtmlUri::new, "escape-html-uri(value)",
       params(STRING_ZO), STRING_O),
+  /** XQuery function. */
+  EVERY(FnEvery::new, "every(input[,predicate])",
+      params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   EXACTLY_ONE(FnExactlyOne::new, "exactly-one(input)",
       params(ITEM_ZM), ITEM_O),
