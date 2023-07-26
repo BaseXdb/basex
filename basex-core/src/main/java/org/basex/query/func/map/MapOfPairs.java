@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class MapOf extends StandardFunc {
+public final class MapOfPairs extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter pairs = arg(0).iter(qc);

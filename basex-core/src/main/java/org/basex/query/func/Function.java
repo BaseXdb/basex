@@ -675,9 +675,12 @@ public enum Function implements AFunction {
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_O), MAP_O, MAP_URI),
   /** XQuery function. */
-  _MAP_OF(MapOf::new, "of(pairs[,combine])",
+  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(pairs[,combine])",
       params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
       MAP_O, flag(HOF), MAP_URI),
+  /** XQuery function. */
+  _MAP_PAIR(MapPair::new, "pair(key,value)",
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */
   _MAP_PAIRS(MapPairs::new, "pairs(map)",
       params(MAP_O), MAP_ZM, MAP_URI),
@@ -752,7 +755,7 @@ public enum Function implements AFunction {
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
       params(ARRAY_O), MAP_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_OF(ArrayOf::new, "of(members)",
+  _ARRAY_OF_MEMBERS(ArrayOfMembers::new, "of-members(members)",
       params(MAP_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array,position,member)",
@@ -773,6 +776,9 @@ public enum Function implements AFunction {
   _ARRAY_SORT(ArraySort::new, "sort(array[,collation,key])",
       params(ARRAY_O, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()),
       ARRAY_O, ARRAY_URI),
+  /** XQuery function. */
+  _ARRAY_SPLIT(ArraySplit::new, "split(array)",
+      params(ARRAY_O), ARRAY_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SUBARRAY(ArraySubarray::new, "subarray(array,start[,length])",
       params(ARRAY_O, INTEGER_O, INTEGER_ZO), ARRAY_O, ARRAY_URI),

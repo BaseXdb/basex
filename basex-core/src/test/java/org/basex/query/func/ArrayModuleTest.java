@@ -248,8 +248,8 @@ public final class ArrayModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
-  @Test public void of() {
-    final Function func = _ARRAY_OF;
+  @Test public void ofMembers() {
+    final Function func = _ARRAY_OF_MEMBERS;
     query(func.args(" ()"), "[]");
     query(func.args(" map { 'value': 1 }"), "[1]");
     query(func.args(" (1 to 3) ! map { 'value': . }"), "[1,2,3]");

@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ArrayOf extends ArrayFn {
+public final class ArrayOfMembers extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter members = arg(0).iter(qc);
