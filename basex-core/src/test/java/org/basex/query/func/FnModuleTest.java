@@ -56,7 +56,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(1), 1, empty(func));
 
     // function is replaced by its argument (argument yields no result)
-    check(func.args(_PROF_VOID.args(" ()")), "", empty(func));
+    check(func.args(VOID.args(" ()")), "", empty(func));
     // check adjusted type
     check(func.args(wrap(1)), 1, type(func, "xs:double"));
     check(func.args(wrap(1) + "! array { . }"), 1, type(func, "xs:double"));
@@ -185,7 +185,7 @@ public final class FnModuleTest extends QueryPlanTest {
     final Function func = AVG;
 
     check(func.args(" ()"), "", empty());
-    check(func.args(_PROF_VOID.args("X")), "", empty(func));
+    check(func.args(VOID.args("X")), "", empty(func));
 
     check(func.args(" 1"), 1, empty(func));
     check(func.args(" 1.0"), 1, empty(func));
@@ -338,7 +338,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
-    check(func.args(_PROF_VOID.args(1)), "", root(_PROF_VOID));
+    check(func.args(VOID.args(1)), "", root(VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
 
     // remove duplicate expressions
@@ -500,7 +500,7 @@ public final class FnModuleTest extends QueryPlanTest {
         func.args("A", 1, " ."), "A");
 
     query(func.args(" ()", 1, " function($a, $b) { $b }"), 1);
-    query(func.args(_PROF_VOID.args(1), 1, " function($a, $b) { $b }"), 1);
+    query(func.args(VOID.args(1), 1, " function($a, $b) { $b }"), 1);
     query(func.args(2, 1, " function($a, $b) { $b }"), 2);
     query("sort(" + func.args(" <a/>", "a", " compare#2") + ")", 1);
 
@@ -578,7 +578,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
     query(func.args(" (<a/>, <b/>)"), "<b/>");
 
-    check(func.args(_PROF_VOID.args(" ()")), "", empty(func));
+    check(func.args(VOID.args(" ()")), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
     check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "element(b)|element(a)?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
@@ -1049,7 +1049,7 @@ public final class FnModuleTest extends QueryPlanTest {
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) - 1"),
         9, root(GFLWOR.class));
 
-    check(func.args(_PROF_VOID.args(" ()"), 0), "", empty(func));
+    check(func.args(VOID.args(" ()"), 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
   }
 
@@ -1152,6 +1152,12 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void log() {
+    final Function func = LOG;
+    query(func.args("a"), "");
+  }
+
+  /** Test method. */
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");
@@ -1245,7 +1251,7 @@ public final class FnModuleTest extends QueryPlanTest {
 
     // query plan checks
     check(func.args(" ()"), "", empty());
-    check(func.args(_PROF_VOID.args(123)), "", empty(func));
+    check(func.args(VOID.args(123)), "", empty(func));
     check(func.args(" 123"), 123, empty(func));
     check(func.args(wrap(1)), 1, exists(func));
     check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Int.class));
@@ -1514,7 +1520,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // known result size
     query(func.args(wrap(1) + "+ 1", 1), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3), 1"), 3);
-    query(func.args(_PROF_VOID.args(" ()"), 1), "");
+    query(func.args(VOID.args(" ()"), 1), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]", 1), "");
@@ -1537,7 +1543,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // known result size, dynamic position
     query(func.args(wrap(1) + "+ 1", wrap(1)), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3), 1"), 3);
-    query(func.args(_PROF_VOID.args(" ()"), wrap(1)), "");
+    query(func.args(VOID.args(" ()"), wrap(1)), "");
 
     // unknown result size, dynamic position
     query(func.args(wrap(1) + "[. = 0]", wrap(1)), "");
@@ -1837,17 +1843,17 @@ public final class FnModuleTest extends QueryPlanTest {
     check(func.args(" (" + wrap("1") + " + 1, 3)", 1, 2), "2\n3", root(List.class));
     check(func.args(" replicate(" + wrap("1") + " + 1, 3)", 2), "2\n2", root(REPLICATE));
 
-    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + _PROF_VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + VOID.args(),
         "", empty(func));
-    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + _PROF_VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + VOID.args(),
         "", empty(func), exists(TAIL));
-    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + _PROF_VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + VOID.args(),
         "", empty(func), exists(_UTIL_RANGE));
-    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + _PROF_VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + VOID.args(),
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + _PROF_VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + VOID.args(),
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + _PROF_VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + VOID.args(),
         "", empty(func), exists(_UTIL_RANGE));
   }
 
@@ -2012,8 +2018,8 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" (" + wrap(1) + "+ 1, 2)", 2), 2);
     query(func.args(" (" + wrap(1) + "+ 1, 2)", 3), "");
     query(func.args(" (" + wrap(1) + "+ 1, 2, 3)", 2) + "[2]", 3);
-    query(func.args(_PROF_VOID.args(" ()"), 1), "");
-    query(func.args(_PROF_VOID.args(" ()"), 2), "");
+    query(func.args(VOID.args(" ()"), 1), "");
+    query(func.args(VOID.args(" ()"), 2), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]", 1), "");
@@ -2183,14 +2189,14 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args(" ()", "A"), "A");
     query(func.args(" ()", " 1"), 1);
     query(func.args(" ()", " ()"), "");
-    query(func.args(" ()", _PROF_VOID.args("x")), "");
+    query(func.args(" ()", VOID.args("x")), "");
 
-    query("for $i in 1 to 2 return " + func.args(_PROF_VOID.args("x"), " $i"), "1\n2");
-    query(func.args(_PROF_VOID.args("x"), wrap(0)), 0);
-    query(func.args(_PROF_VOID.args("x"), "A"), "A");
-    query(func.args(_PROF_VOID.args("x"), " 1"), 1);
-    query(func.args(_PROF_VOID.args("x"), " ()"), "");
-    query(func.args(_PROF_VOID.args("x"), _PROF_VOID.args("x")), "");
+    query("for $i in 1 to 2 return " + func.args(VOID.args("x"), " $i"), "1\n2");
+    query(func.args(VOID.args("x"), wrap(0)), 0);
+    query(func.args(VOID.args("x"), "A"), "A");
+    query(func.args(VOID.args("x"), " 1"), 1);
+    query(func.args(VOID.args("x"), " ()"), "");
+    query(func.args(VOID.args("x"), VOID.args("x")), "");
 
     query(func.args(" 2 to 10"), 54);
     query(func.args(" 9 to 10"), 19);
@@ -2230,7 +2236,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // known result size
     query(func.args(wrap(1) + "+ 1"), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3)"), 3);
-    query(func.args(_PROF_VOID.args(" ()")), "");
+    query(func.args(VOID.args(" ()")), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]"), "");
@@ -2317,7 +2323,7 @@ public final class FnModuleTest extends QueryPlanTest {
     // known result size
     query(func.args(wrap(1) + "+ 1"), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3)"), 2);
-    query(func.args(_PROF_VOID.args(" ()")), "");
+    query(func.args(VOID.args(" ()")), "");
 
     // unknown result size
     query(func.args(" 1[. = 0]"), "");
@@ -2390,6 +2396,22 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void unparsedTextLines() {
     final Function func = UNPARSED_TEXT_LINES;
     query(func.args(" ()"), "");
+  }
+
+  /** Test method. */
+  @Test public void voidd() {
+    final Function func = VOID;
+    query(func.args(" ()"), "");
+    query(func.args(1), "");
+    query(func.args("1, 2"), "");
+    query(func.args("1, 2", true), "");
+
+    check(func.args("(1 to 10000000000000) ! string()", true), "", empty());
+    error(func.args(" 1 + <a/>", false), FUNCCAST_X_X);
+    query(func.args(" 1 + <a/>", true), "");
+
+    // GH-2139: Simplify inlined non-deterministic code
+    check("let $doc := doc('" + TEXT + "') let $a := 1 return $a", 1, root(Int.class));
   }
 
   /** Test method. */

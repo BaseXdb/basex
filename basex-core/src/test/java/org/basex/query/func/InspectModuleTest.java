@@ -99,8 +99,8 @@ public final class InspectModuleTest extends SandboxTest {
         + func.args() + "[function-name(.) = xs:QName('hello:closure')]()", 1);
 
     // ensure that a module will only be parsed once
-    query(_PROF_VOID.args(func.args(url)), "");
-    query(_PROF_VOID.args(" (" + func.args(url) + ", " + func.args(url) + ')'), "");
+    query(VOID.args(func.args(url)), "");
+    query(VOID.args(" (" + func.args(url) + ", " + func.args(url) + ')'), "");
 
     error(func.args("non-existent"), WHICHRES_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);

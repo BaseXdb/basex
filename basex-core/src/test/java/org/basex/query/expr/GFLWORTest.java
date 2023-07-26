@@ -432,7 +432,7 @@ public final class GFLWORTest extends QueryPlanTest {
   /** Allowing empty. */
   @Test public void allowingEmpty() {
     check("for $x allowing empty in () return $x", "", empty());
-    check("for $x allowing empty in" + _PROF_VOID.args(1) + " return $x", "", exists(GFLWOR.class));
+    check("for $x allowing empty in" + VOID.args(1) + " return $x", "", exists(GFLWOR.class));
   }
 
   /** Merge for/let clauses. */
@@ -452,6 +452,6 @@ public final class GFLWORTest extends QueryPlanTest {
   /** Remove clauses that will never be executed. */
   @Test public void gh1999() {
     check("for $a in () return delete node a", "", empty());
-    check("for $a in" + _PROF_VOID.args(1) + " return delete node a", "", root(_PROF_VOID));
+    check("for $a in" + VOID.args(1) + " return delete node a", "", root(VOID));
   }
 }

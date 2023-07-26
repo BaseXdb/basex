@@ -34,7 +34,7 @@ public final class LazyModuleTest extends SandboxTest {
     query(func.args(_LAZY_CACHE.args(_FILE_READ_TEXT.args(FILE))), "true");
 
     query("let $bin := " + _FILE_READ_BINARY.args(FILE) + " return (" +
-        func.args(" $bin") + ',' + _PROF_VOID.args(" $bin") + ',' + func.args(" $bin") + ')',
+        func.args(" $bin") + ',' + VOID.args(" $bin") + ',' + func.args(" $bin") + ')',
         "false\ntrue");
   }
 

@@ -1111,7 +1111,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh1430() {
     query("let $f := "
         + "function($arg as %updating function(item()*) as empty-sequence()) { $arg } "
-        + "return" + _PROF_VOID.args(" $f(function($e) { $e ! (delete node .) })"), "");
+        + "return" + VOID.args(" $f(function($e) { $e ! (delete node .) })"), "");
   }
 
   /** Test method. */
@@ -1185,7 +1185,7 @@ public final class UpdateTest extends SandboxTest {
 
   /** Simple map, update checks. */
   @Test public void gh1957() {
-    query("declare %updating function local:f() { (1, 2) !" + _PROF_VOID.args(" .") + " }; "
+    query("declare %updating function local:f() { (1, 2) !" + VOID.args(" .") + " }; "
         + "local:f()", "");
   }
 

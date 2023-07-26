@@ -56,7 +56,7 @@ public final class UpdateModuleTest extends SandboxTest {
   @Test public void forEachPair() {
     final Function func = _UPDATE_FOR_EACH_PAIR;
     query(func.args(1, 2, " function($a, $b) {" + _UPDATE_OUTPUT.args(" $a + $b") + " }"), 3);
-    query(func.args(1, 2, " function($a, $b) {" + _PROF_VOID.args(" $a + $b") + " }"), "");
+    query(func.args(1, 2, " function($a, $b) {" + VOID.args(" $a + $b") + " }"), "");
     error(func.args("A", "B", " compare#2"), FUNCNOTUP_X);
   }
 
@@ -66,7 +66,7 @@ public final class UpdateModuleTest extends SandboxTest {
     query(func.args(" map { 1: 2 }", " %updating function($a, $b) {"
         + _UPDATE_OUTPUT.args(" $a + $b") + " }"), 3);
     query(func.args(" map { 1: 2 }", " function($a, $b) {"
-        + _PROF_VOID.args(" $a + $b") + " }"), "");
+        + VOID.args(" $a + $b") + " }"), "");
     error(func.args(" map { 1: 2 }", " compare#2"), FUNCNOTUP_X);
   }
 

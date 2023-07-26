@@ -1,10 +1,8 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.ast.*;
-import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -14,15 +12,6 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class ProfModuleTest extends QueryPlanTest {
-  /** Input file. */
-  private static final String FILE = "src/test/resources/input.xml";
-
-  /** Test method. */
-  @Test public void dump() {
-    final Function func = _PROF_DUMP;
-    query(func.args("a"), "");
-  }
-
   /** Test method. */
   @Test public void human() {
     final Function func = _PROF_HUMAN;
@@ -84,21 +73,5 @@ public final class ProfModuleTest extends QueryPlanTest {
     final Function func = _PROF_VARIABLES;
     query("for $x in 1 to 2 return " + func.args(), "");
     query(func.args() + ", let $x := " + _RANDOM_DOUBLE.args() + " return floor($x * $x)", 0);
-  }
-
-  /** Test method. */
-  @Test public void voidd() {
-    final Function func = _PROF_VOID;
-    query(func.args(" ()"), "");
-    query(func.args(1), "");
-    query(func.args("1, 2"), "");
-    query(func.args("1, 2", true), "");
-
-    check(func.args("(1 to 10000000000000) ! string()", true), "", empty());
-    error(func.args(" 1 + <a/>", false), FUNCCAST_X_X);
-    query(func.args(" 1 + <a/>", true), "");
-
-    // GH-2139: Simplify inlined non-deterministic code
-    check("let $doc := doc('" + FILE + "') let $a := 1 return $a", 1, root(Int.class));
   }
 }

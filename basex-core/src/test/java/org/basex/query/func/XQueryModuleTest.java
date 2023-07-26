@@ -127,8 +127,8 @@ public final class XQueryModuleTest extends QueryPlanTest {
     query(func.args(" (false#0, true#0)"), "false\ntrue");
     query(func.args(" function() { 123 }"), 123);
     query("count(" + func.args(" (1 to 100) ! false#0") + ')', 100);
-    query(func.args(_PROF_VOID.args(1)), "");
-    query(func.args(" (true#0," + _PROF_VOID.args(1) + ')'), true);
+    query(func.args(VOID.args(1)), "");
+    query(func.args(" (true#0," + VOID.args(1) + ')'), true);
     query(func.args(" true#0[" + wrap(1) + " = '1']"), true);
     query(func.args(" true#0[" + wrap(1) + " = '']"), "");
 

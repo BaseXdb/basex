@@ -60,8 +60,8 @@ public final class JobModuleTest extends SandboxTest {
     // database creation
     final Function func = _JOB_EVAL;
     error(_DB_GET.args("db"), DB_OPEN2_X);
-    query(_PROF_VOID.args(func.args("db:get('db')")) + ',' + _DB_CREATE.args("db"));
-    query(func.args("db:drop('db')") + ',' + _PROF_VOID.args(_DB_GET.args("db")));
+    query(VOID.args(func.args("db:get('db')")) + ',' + _DB_CREATE.args("db"));
+    query(func.args("db:drop('db')") + ',' + VOID.args(_DB_GET.args("db")));
     query(func.args("delete node <a/>"));
   }
 
@@ -74,7 +74,7 @@ public final class JobModuleTest extends SandboxTest {
     query(func.args("1, delete node <a/>"));
 
     // error in List implementation
-    query("trace(true()) and (" + _PROF_VOID.args(
+    query("trace(true()) and (" + VOID.args(
         func.args("prof:sleep(100)", " ()", " map { 'id': 'eval4' }"))  + ", true())",
         "true");
   }

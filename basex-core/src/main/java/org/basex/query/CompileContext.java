@@ -382,7 +382,7 @@ public final class CompileContext {
   public Expr merge(final Expr expr, final Expr result, final InputInfo ii) throws QueryException {
     // a non-deterministic expression may get deterministic when optimizing the query
     return expr.has(Flag.NDT) ?
-      List.get(this, ii, function(Function._PROF_VOID, ii, expr, Bln.TRUE), result) : result;
+      List.get(this, ii, function(Function.VOID, ii, expr, Bln.TRUE), result) : result;
   }
 
   /**

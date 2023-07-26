@@ -915,8 +915,8 @@ public final class RewritingsTest extends QueryPlanTest {
     check("<a/>[path() instance of xs:string]", "<a/>", root(CElem.class));
     check("<a/>[name() = 'a']", "<a/>", exists(CmpSimpleG.class));
 
-    check("node-name(" + _PROF_VOID.args(" ()") + ")", "", root(_PROF_VOID));
-    check("prefix-from-QName(" + _PROF_VOID.args(" ()") + ")", "", root(_PROF_VOID));
+    check("node-name(" + VOID.args(" ()") + ")", "", root(VOID));
+    check("prefix-from-QName(" + VOID.args(" ()") + ")", "", root(VOID));
   }
 
   /** Rewrite name tests to self steps. */
@@ -1083,8 +1083,8 @@ public final class RewritingsTest extends QueryPlanTest {
   @Test public void gh1809() {
     check("if(" + wrap(1) + "[. = 1]) then () else ()",
         "", empty());
-    check("if(" + _PROF_VOID.args(1) + ") then () else ()", "",
-        root(_PROF_VOID), count(_PROF_VOID, 1));
+    check("if(" + VOID.args(1) + ") then () else ()", "",
+        root(VOID), count(VOID, 1));
   }
 
   /** Redundant predicates in paths. */
@@ -1102,7 +1102,7 @@ public final class RewritingsTest extends QueryPlanTest {
     check("(1, 2) ! boolean(if(.) then 'a' else <a/>)", "true\ntrue", root(SingletonSeq.class));
     check("(1 to 2) ! boolean(if(.) then '' else ())", "false\nfalse", root(SingletonSeq.class));
     check("boolean(if(" + _RANDOM_DOUBLE.args() + ") then '' else 0)", "false",
-        root(List.class), exists(_PROF_VOID));
+        root(List.class), exists(VOID));
 
     check("(1, 2)[if(.) then 0.0e0 else 0.0]", "", empty());
     check("(1, 2)[if(.) then '' else xs:anyURI('')]", "", empty());
@@ -1148,8 +1148,8 @@ public final class RewritingsTest extends QueryPlanTest {
       "  default return x\n" +
       ")/z", "", empty());
 
-    check("(x," + _PROF_VOID.args(" ()") + ")/z", "", empty());
-    check("(x |" + _PROF_VOID.args(" ()") + ")/z", "", empty());
+    check("(x," + VOID.args(" ()") + ")/z", "", empty());
+    check("(x |" + VOID.args(" ()") + ")/z", "", empty());
     check("(if(" + _RANDOM_DOUBLE.args() + ") then x)/z", "", empty());
   }
 
@@ -1175,17 +1175,17 @@ public final class RewritingsTest extends QueryPlanTest {
   /** FLWOR, no results, non-deterministic expressions. */
   @Test public void gh1819() {
     check("for $_ in () return <x/>", "", empty());
-    check("for $_ in" + _PROF_VOID.args(1) + " return 1", "", root(_PROF_VOID));
+    check("for $_ in" + VOID.args(1) + " return 1", "", root(VOID));
     check("let $_ := 1 return <x/>", "<x/>", root(CElem.class));
-    check("let $_ :=" + _PROF_VOID.args(1) + " return 1", 1, root(List.class), exists(_PROF_VOID));
+    check("let $_ :=" + VOID.args(1) + " return 1", 1, root(List.class), exists(VOID));
     check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
     check("for $_ in 1 to 2 return ()", "", empty());
 
-    check("let $_ :=" + _PROF_VOID.args(1) + " return 1", 1, root(List.class), exists(_PROF_VOID));
+    check("let $_ :=" + VOID.args(1) + " return 1", 1, root(List.class), exists(VOID));
 
     // rewrite to simple map
     check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(REPLICATE));
-    check("for $_ in 1 to 2 return" + _PROF_VOID.args(1), "", root(REPLICATE));
+    check("for $_ in 1 to 2 return" + VOID.args(1), "", root(REPLICATE));
   }
 
   /** Merge and/or expressions. */
@@ -1748,7 +1748,7 @@ public final class RewritingsTest extends QueryPlanTest {
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
     check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(REPLICATE));
-    check("(3 to 13) !" + _PROF_VOID.args(" ."), "", root(DualMap.class));
+    check("(3 to 13) !" + VOID.args(" ."), "", root(DualMap.class));
   }
 
   /** Rewrite FLWOR to simple map. */
@@ -2879,10 +2879,10 @@ public final class RewritingsTest extends QueryPlanTest {
 
   /** where false(). */
   @Test public void gh2080() {
-    check("let $_ :=" + _PROF_VOID.args(1) + " where false() return ()",
-        "", root(_PROF_VOID));
-    check("let $_ :=" + _PROF_VOID.args(1) + " where false() return" + _PROF_VOID.args(2),
-        "", root(_PROF_VOID));
+    check("let $_ :=" + VOID.args(1) + " where false() return ()",
+        "", root(VOID));
+    check("let $_ :=" + VOID.args(1) + " where false() return" + VOID.args(2),
+        "", root(VOID));
   }
 
   /** Rewrite value to general comparison. */
