@@ -1127,15 +1127,14 @@ public final class FnModuleTest extends QueryPlanTest {
         " function($map) { characters($map?string) = $map?remove }",
         " function($map) { map { 'string': replace($map?string, $map?remove, ''),"
         + "'remove': $map?remove =!> string-to-codepoints() "
-        + "  =!> ($n -> { $n + 2 })() =!> codepoints-to-string() } }")
+        + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }")
         + "?string", "unhdrduhul");
 
     query("let $s := (1 to 1000) return " +
-        func.args(1, " function($n) { $n = $s }",
-        " function($n) { $n + 1 }"), 1001);
+        func.args(1, " fn { . = $s }", " fn { . + 1 }"), 1001);
     query("let $i := 3936256 return " +
-        func.args(" $i", " function($n) { abs($n * $n - $i) >= 0.0000000001 }",
-        " function($n) { ($n + $i div $n) div 2 }"), 1984);
+        func.args(" $i", " fn($n) { abs($n * $n - $i) >= 0.0000000001 }",
+        " fn($n) { ($n + $i div $n) div 2 }"), 1984);
   }
 
   /** Test method. */

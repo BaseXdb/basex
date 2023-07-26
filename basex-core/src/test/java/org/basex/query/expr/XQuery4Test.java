@@ -64,19 +64,19 @@ public final class XQuery4Test extends QueryPlanTest {
   }
 
   /** Function item, arrow. */
-  @Test public void functionItemArrow() {
-    query("() -> { }()", "");
-    query("$a -> { $a }(())", "");
-    query("($a) -> { $a }(1)", 1);
-    query("($a) -> { $a }(1 to 2)", "1\n2");
-    query("($a, $b) -> { $a + $b }(1, 2)", 3);
-    query("sum((1 to 6) ! ($a) -> { $a * $a }(.))", 91);
-    query("sum(for $i in 1 to 6  return ($a) -> { $a * $a }($i))", 91);
+  @Test public void fn() {
+    query("fn() { }()", "");
+    query("fn($a) { $a }(())", "");
+    query("fn($a) { $a }(1)", 1);
+    query("fn($a) { $a }(1 to 2)", "1\n2");
+    query("fn($a, $b) { $a + $b }(1, 2)", 3);
+    query("sum((1 to 6) ! fn($a) { $a * $a }(.))", 91);
+    query("sum(for $i in 1 to 6  return fn($a) { $a * $a }($i))", 91);
 
-    query("- () -> { 1 }()", -1);
-    query("--() -> { 1 }()", 1);
-    query("1-() -> { 2 }()", -1);
-    query("1--() -> { 2 }()", 3);
+    query("- fn() { 1 }()", -1);
+    query("--fn() { 1 }()", 1);
+    query("1-fn() { 2 }()", -1);
+    query("1--fn() { 2 }()", 3);
   }
 
   /** Function item, no parameter list. */
@@ -155,7 +155,7 @@ public final class XQuery4Test extends QueryPlanTest {
         41);
     query("'Happy families are all alike; every unhappy family is unhappy in its own way.'"
       + "=> tokenize()"
-      + "=!> ($s -> { upper-case(substring($s, 1, 1)) || lower-case(substring($s, 2)) })()"
+      + "=!> fn { upper-case(substring(., 1, 1)) || lower-case(substring(., 2)) }()"
       + "=> string-join(' ')",
       "Happy Families Are All Alike; Every Unhappy Family Is Unhappy In Its Own Way.");
 

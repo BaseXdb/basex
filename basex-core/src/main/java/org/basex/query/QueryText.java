@@ -65,6 +65,7 @@ public interface QueryText {
   /** Parser token. */ String EXCEPT = "except";
   /** Parser token. */ String EXTERNAL = "external";
   /** Parser token. */ String FIRST = "first";
+  /** Parser token. */ String FN = "fn";
   /** Parser token. */ String FOR = "for";
   /** Parser token. */ String FROM = "from";
   /** Parser token. */ String FT_OPTION = "ft-option";

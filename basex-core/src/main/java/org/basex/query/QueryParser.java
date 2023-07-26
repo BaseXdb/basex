@@ -904,11 +904,7 @@ public class QueryParser extends InputParser {
     if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
 
     localVars.pushContext(false);
-    final Params params = paramList(true, true);
-    wsCheck(")");
-    params.type = optAsType();
-    params.finish(qc, sc, localVars);
-
+    final Params params = paramList(true);
     final Expr expr = wsConsumeWs(EXTERNAL) ? null : enclosedExpr();
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
@@ -938,25 +934,26 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a ParamList.
-   * @param sttc static functions
-   * @param types parse types
-   * @return declared variables or {@code null}
+   * @param sttc static function
+   * @return declared variables
    * @throws QueryException query exception
    */
-  private Params paramList(final boolean sttc, final boolean types) throws QueryException {
+  private Params paramList(final boolean sttc) throws QueryException {
     final Params params = new Params();
     do {
       skipWs();
-      if(curr() != '$') {
-        if(params.isEmpty()) break;
-        if(!sttc) return null;
-      }
+      if(curr() != '$' && params.isEmpty()) break;
       final InputInfo ii = info();
       final QNm name = varName();
-      final SeqType type = types ? optAsType() : null;
+      final SeqType type = optAsType();
       final Expr dflt = sttc && wsConsume(":=") ? single() : null;
       params.add(name, type, dflt, ii);
     } while(consume(','));
+
+    wsCheck(")");
+    params.type = optAsType();
+    params.finish(qc, sc, localVars);
+
     return params;
   }
 
@@ -2325,49 +2322,38 @@ public class QueryParser extends InputParser {
    */
   private Expr functionItem() throws QueryException {
     skipWs();
-    final int p = pos;
 
     // inline function
+    final int p = pos;
     final AnnList anns = annotations(false).check(false, true);
-    final boolean inline = wsConsume(FUNCTION) && wsConsume("("), single = !inline && curr('$');
-    if(inline || single || consume("(")) {
-      if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
-        throw error(NOVISALLOWED);
-
-      final HashMap<Var, Expr> global = localVars.pushContext(true);
-      final Params params = paramList(false, inline);
-      Expr expr = null;
-      if(params != null) {
-        if(single || wsConsume(")")) {
-          if(inline || wsConsume("->")) {
-            if(inline) params.type = optAsType();
-            params.finish(qc, sc, localVars);
-            expr = enclosedExpr();
-          }
+    if(wsConsume(FUNCTION) || wsConsume(FN)) {
+      final boolean args = wsConsume("("), focus = !args && curr('{');
+      if(args || focus) {
+        final HashMap<Var, Expr> global = localVars.pushContext(true);
+        Params params = null;
+        Expr expr = null;
+        if(args) {
+          params = paramList(false);
+          expr = enclosedExpr();
+        } else if(focus) {
+          // focus function
+          final InputInfo ii = info();
+          final QNm name = new QNm("arg");
+          params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, sc, localVars);
+          expr = new CachedMap(ii, localVars.resolve(name, ii), enclosedExpr());
         }
+        final VarScope vs = localVars.popContext();
+        if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
+          throw error(NOVISALLOWED);
+        return new Closure(info(), params, expr, anns, global, vs);
       }
-      final VarScope vs = localVars.popContext();
-      if(expr != null) return new Closure(info(), params, expr, anns, global, vs);
     }
     pos = p;
 
     // annotations not allowed here
     if(!anns.isEmpty()) throw error(NOANN);
 
-    // focus function
-    if(wsConsumeWs(FUNCTION, "{", null)) {
-      final HashMap<Var, Expr> global = localVars.pushContext(true);
-      final InputInfo ii = info();
-      final QNm name = new QNm("arg");
-      final Params params = new Params().add(name, SeqType.ITEM_ZM, null, ii).
-          finish(qc, sc, localVars);
-      final Expr expr = new CachedMap(ii, localVars.resolve(name, ii), enclosedExpr());
-      final VarScope vs = localVars.popContext();
-      return new Closure(info(), params, expr, anns, global, vs);
-    }
-
     // named function reference
-    pos = p;
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && wsConsumeWs("#")) {
       checkReserved(name);
