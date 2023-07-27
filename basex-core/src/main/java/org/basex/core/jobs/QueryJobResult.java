@@ -20,6 +20,15 @@ public final class QueryJobResult {
   public long time;
 
   /**
+   * Initializes the job result.
+   */
+  public void init() {
+    value = null;
+    exception = null;
+    time = 0;
+  }
+
+  /**
    * Job.
    * @param job job
    */

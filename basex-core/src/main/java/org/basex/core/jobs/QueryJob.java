@@ -186,6 +186,8 @@ public final class QueryJob extends Job implements Runnable {
 
   @Override
   public void run() {
+    result.init();
+
     final JobContext jc = jc();
     final String id = jc.id();
     final Context ctx = jc.context;
