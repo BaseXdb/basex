@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -279,37 +280,25 @@ final class DataUpdates {
     final byte[][] ns = names.nsOK();
     if(ns != null) throw UPNSCONFL2_X_X.get(null, ns[0], ns[1]);
 
-    // pre values of attributes that have already been added to the name pool
+    // check pre values of attributes that have already been added to the name pool
     final IntSet set = new IntSet();
+    final IntConsumer addAttribute = p -> {
+      final byte[][] qname = data.qname(p, Data.ATTR);
+      names.add(new QNm(qname[0], qname[1]), NodeType.ATTRIBUTE);
+    };
+    // pre values consist exclusively of element and attribute nodes
     for(final int pre : pres) {
-      // pre values consist exclusively of element and attribute nodes
       if(data.kind(pre) == Data.ATTR) {
-        addToPool(pre, names);
+        addAttribute.accept(pre);
         set.add(pre);
       } else {
         final int ps = pre + data.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; ++p) {
-          if(!set.contains(p)) addToPool(p, names);
+          if(!set.contains(p)) addAttribute.accept(p);
         }
       }
     }
     final QNm dup = names.duplicate();
     if(dup != null) throw UPATTDUPL_X.get(null, dup);
   }
-
-  /**
-   * Adds an attribute to the pool.
-   * @param pre pre value
-   * @param names name pool
-   */
-  private void addToPool(final int pre, final NamePool names) {
-    final byte[] nm = data.name(pre, Data.ATTR);
-    final QNm name = new QNm(nm);
-    if(name.hasPrefix()) {
-      final int uriId = data.nspaces.uriIdForPrefix(Token.prefix(nm), pre, data);
-      if(uriId != 0) name.uri(data.nspaces.uri(uriId));
-    }
-    names.add(name, NodeType.ATTRIBUTE);
-  }
-
 }

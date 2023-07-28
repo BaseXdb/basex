@@ -1342,7 +1342,14 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh2227() {
     query("<e a=''/> update { insert node attribute xml:a { '' } into . }",
         "<e xml:a=\"\" a=\"\"/>");
+    query("<e xml:a=''/> update { insert node attribute a { '' } into . }",
+        "<e a=\"\" xml:a=\"\"/>");
     query("<e/> update { insert nodes (attribute a { '' }, attribute xml:a { '' }) into . }",
         "<e a=\"\" xml:a=\"\"/>");
+
+    error("<e a=''/> update { insert node attribute a { '' } into . }",
+        UPATTDUPL_X);
+    error("<e xml:a=''/> update { insert node attribute xml:a { 'b' } into . }",
+        UPATTDUPL_X);
   }
 }
