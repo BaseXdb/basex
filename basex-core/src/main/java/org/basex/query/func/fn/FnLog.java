@@ -23,4 +23,9 @@ public class FnLog extends FnTrace {
     // overwrite fn:trace optimization
     return this;
   }
+
+  @Override
+  public boolean ddo() {
+    return true;
+  }
 }

@@ -19,12 +19,12 @@ import org.basex.util.*;
 public class FnVoid extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr value = arg(0);
+    final Expr input = arg(0);
     final boolean skip = toBooleanOrFalse(arg(1), qc);
 
     // ensure that deterministic input will be evaluated
-    if(!skip || value.has(Flag.NDT)) {
-      final Iter iter = value.iter(qc);
+    if(!skip || input.has(Flag.NDT)) {
+      final Iter iter = input.iter(qc);
       if(iter.valueIter()) {
         iter.value(qc, null).cache(false, info);
       } else {

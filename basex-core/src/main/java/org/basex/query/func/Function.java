@@ -377,7 +377,7 @@ public enum Function implements AFunction {
   LOCAL_NAME_FROM_QNAME(FnLocalNameFromQName::new, "local-name-from-QName(value)",
       params(QNAME_ZO), NCNAME_ZO),
   /** XQuery function. */
-  LOG(FnLog::new, "log(value[,label])",
+  LOG(FnLog::new, "log(input[,label])",
       params(ITEM_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   LOWER_CASE(FnLowerCase::new, "lower-case(value)",
@@ -625,7 +625,7 @@ public enum Function implements AFunction {
   URI_COLLECTION(FnUriCollection::new, "uri-collection([uri])",
       params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
-  VOID(FnVoid::new, "void(value[,skip])",
+  VOID(FnVoid::new, "void(input[,skip])",
       params(ITEM_ZM, BOOLEAN_O), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
@@ -1597,7 +1597,7 @@ public enum Function implements AFunction {
   _PROF_CURRENT_NS(ProfCurrentNs::new, "current-ns()",
       params(), INTEGER_O, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_DUMP(ProfDump::new, "dump(value[,label])",
+  _PROF_DUMP(ProfDump::new, "dump(input[,label])",
       params(ITEM_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_GC(ProfGc::new, "gc([count])",
@@ -1627,7 +1627,7 @@ public enum Function implements AFunction {
   _PROF_VARIABLES(ProfVariables::new, "variables()",
       params(), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_VOID(ProfVoid::new, "void(value[,skip])",
+  _PROF_VOID(ProfVoid::new, "void(input[,skip])",
       params(ITEM_ZM, BOOLEAN_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
 
   // Random Module
