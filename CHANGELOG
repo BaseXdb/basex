@@ -1,3 +1,13 @@
+VERSION 10.7 (August 4, 2023) ------------------------------------------
+
+ - GUI, Editor: Full support for Unicode characters
+ - GUI, Editor: Faster font rendering (font dialog: anti-aliasing)
+ - XQuery 4: New features, functions, operators
+ - BaseX 11 preview features (see the documentation)
+ - bug fix: web:forward, write concluding log entry
+ - bug fix: job:eval, re-initialize scheduled jobs
+ - various other bug fixes
+
 VERSION 10.6 (May 4, 2023) ---------------------------------------------
 
  - XQuery: Much more memory-efficient representation of XML fragments
