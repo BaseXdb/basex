@@ -26,9 +26,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
-  /** Static context. */
-  private final StaticContext sc;
-
   /** Updating flag. */
   private final boolean updating;
   /** Non-deterministic flag. */
@@ -60,8 +57,7 @@ public final class DynFuncCall extends FuncCall {
   public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
       final boolean ndt, final Expr expr, final Expr... args) {
 
-    super(info, ExprList.concat(args, expr));
-    this.sc = sc;
+    super(info, sc, ExprList.concat(args, expr));
     this.updating = updating;
     this.ndt = ndt;
   }

@@ -55,30 +55,30 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /**
    * Constructor.
    * @param info input info
-   * @param params parameters
    * @param expr function body
+   * @param params parameters
    * @param anns annotations
    * @param global bindings for non-local variables
    * @param vs scope
    */
-  public Closure(final InputInfo info, final Params params, final Expr expr,
+  public Closure(final InputInfo info, final Expr expr, final Params params,
       final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    this(info, null, params.type, params.vars(), expr, anns, global, vs);
+    this(info, expr, params.type, null, params.vars(), anns, global, vs);
   }
 
   /**
    * Package-private constructor allowing a name.
    * @param info input info
-   * @param name name of the function (can be {@code null})
-   * @param declType declared type (can be {@code null})
-   * @param params formal parameters
    * @param expr function expression
+   * @param declType declared type (can be {@code null})
+   * @param name function name (can be {@code null})
+   * @param params formal parameters
    * @param anns annotations
    * @param global bindings for non-local variables (can be {@code null})
    * @param vs variable scope
    */
-  Closure(final InputInfo info, final QNm name, final SeqType declType, final Var[] params,
-      final Expr expr, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
+  Closure(final InputInfo info, final Expr expr, final SeqType declType, final QNm name,
+      final Var[] params, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
     super(info, expr, SeqType.FUNCTION_O);
     this.name = name;
     this.params = params;
@@ -251,7 +251,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
       final Expr ex = expr.copy(cc, innerVars);
       ex.markTailCalls(null);
-      return copyType(new Closure(info, name, declType, prms, ex, anns, nl, cc.vs()));
+      return copyType(new Closure(info, ex, declType, name, prms, anns, nl, cc.vs()));
     } finally {
       cc.removeScope();
     }
@@ -412,11 +412,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   /**
-   * Fixes the function type of this closure after it was generated for a function literal during
-   * parsing.
+   * Sets the type of this closure that has been generated for a function literal.
    * @param ft function type
    */
-  void adoptSignature(final FuncType ft) {
+  void setSignature(final FuncType ft) {
     anns = ft.anns;
     final int pl = params.length;
     for(int p = 0; p < pl; p++) params[p].declType = ft.argTypes[p];
@@ -436,30 +435,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       if(!annUpdating) anns.add(new Ann(info, Annotation.UPDATING, Empty.VALUE));
       else if(!expr.vacuous()) throw UPEXPECTF.get(info);
     }
-  }
-
-  /**
-   * Creates a function literal for a function that was not yet encountered while parsing.
-   * @param name function name
-   * @param arity function arity
-   * @param qc query context
-   * @param sc static context
-   * @param ii input info
-   * @return function literal
-   * @throws QueryException query exception
-   */
-  public static Closure undeclaredLiteral(final QNm name, final int arity, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
-
-    final VarScope vs = new VarScope(sc);
-    final Var[] params = new Var[arity];
-    final Expr[] args = new Expr[arity];
-    for(int a = 0; a < arity; a++) {
-      params[a] = vs.addNew(new QNm(ARG + (a + 1), ""), null, true, qc, ii);
-      args[a] = new VarRef(ii, params[a]);
-    }
-    final TypedFunc tf = qc.functions.undeclaredFuncCall(name, args, sc, ii);
-    return new Closure(ii, name, null, params, tf.func, new AnnList(), null, vs);
   }
 
   @Override

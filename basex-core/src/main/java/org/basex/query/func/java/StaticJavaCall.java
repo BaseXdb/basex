@@ -120,8 +120,8 @@ public final class StaticJavaCall extends JavaCall {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof StaticJavaCall)) return false;
-    final StaticJavaCall j = (StaticJavaCall) obj;
-    return module.equals(j.module) && method.equals(j.method) && Array.equals(params, j.params) &&
-        super.equals(obj);
+    final StaticJavaCall java = (StaticJavaCall) obj;
+    return module.equals(java.module) && method.equals(java.method) &&
+        Array.equals(params, java.params) && super.equals(obj);
   }
 }

@@ -88,13 +88,20 @@ public final class JavaFunctionTest extends SandboxTest {
         "let $a := (Set:add(128), Set:add(128)) return Set:size()", 1);
     query("import module namespace Set = 'java.util.HashSet'; " +
         "let $a := Set:add\u00b7java.lang.Object(128) return Set:size()", 1);
+  }
 
+  /** Tests importing a Java class. */
+  @Test public void importClass2() {
     // use class with capital and lower case
     query("import module namespace String = 'http://lang.java/String'; " +
         "String:length()", 0);
     query("import module namespace String = 'http://lang.java/string'; " +
         "String:length()", 0);
+  }
 
+
+  /** Tests importing a Java class. */
+  @Test public void importClass3() {
     // handle {@link Jav} type
     query("declare namespace Set = 'java.util.HashSet';" +
         "Set:add(Set:new(), Q{java.awt.Point}new())", true);

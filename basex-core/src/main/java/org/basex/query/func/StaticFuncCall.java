@@ -20,12 +20,12 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class StaticFuncCall extends FuncCall {
-  /** Static context of this function call. */
-  private final StaticContext sc;
   /** Function name. */
   final QNm name;
-  /** Function reference. */
+  /** Function reference (can be {@code null}). */
   StaticFunc func;
+  /** Placeholder for a Java call (if not {@code null}, will be returned by the compiler). */
+  ParseExpr external;
 
   /**
    * Function call constructor.
@@ -49,14 +49,15 @@ public final class StaticFuncCall extends FuncCall {
    */
   private StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
       final StaticFunc func, final InputInfo info) {
-    super(info, args);
-    this.sc = sc;
+    super(info, sc, args);
     this.name = name;
     this.func = func;
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
+    if(external != null) return external.compile(cc);
+
     super.compile(cc);
     checkVisible();
 
@@ -83,15 +84,19 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   /**
-   * Initializes the function and checks for visibility.
+   * Adopts the function to be called.
    * @param sf function reference
-   * @return self reference
-   * @throws QueryException query exception
    */
-  public StaticFuncCall init(final StaticFunc sf) throws QueryException {
+  public void setFunc(final StaticFunc sf) {
     func = sf;
-    checkVisible();
-    return this;
+  }
+
+  /**
+   * Assigns an external function call.
+   * @param ext external function call
+   */
+  public void setExternal(final ParseExpr ext) {
+    external = ext;
   }
 
   /**
@@ -100,8 +105,8 @@ public final class StaticFuncCall extends FuncCall {
    * @throws QueryException query exception
    */
   private void checkVisible() throws QueryException {
-    if(func.anns.contains(Annotation.PRIVATE) && !func.sc.baseURI().eq(sc.baseURI()))
-      throw FUNCPRIVATE_X.get(info, name.string());
+    if(func != null && func.anns.contains(Annotation.PRIVATE) &&
+        !func.sc.baseURI().eq(sc.baseURI())) throw FUNCPRIVATE_X.get(info, name.string());
   }
 
   /**
@@ -114,11 +119,13 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean vacuous() {
-    return func.vacuousBody();
+    return func != null && func.vacuousBody() || external != null && external.vacuous();
   }
 
   @Override
   public boolean has(final Flag... flags) {
+    if(external != null) return external.has(flags);
+
     // check arguments, which will be evaluated previous to the function body
     if(super.has(flags)) return true;
     // function code: position or context references of expression body have no effect
@@ -153,7 +160,8 @@ public final class StaticFuncCall extends FuncCall {
     if(this == obj) return true;
     if(!(obj instanceof StaticFuncCall)) return false;
     final StaticFuncCall call = (StaticFuncCall) obj;
-    return name.eq(call.name) && func == call.func && super.equals(obj);
+    return name.eq(call.name) && (func == call.func || external == call.external) &&
+        super.equals(obj);
   }
 
   @Override

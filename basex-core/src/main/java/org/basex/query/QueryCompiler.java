@@ -53,10 +53,10 @@ final class QueryCompiler {
 
       @Override
       public boolean staticFuncCall(final StaticFuncCall call) {
-        final StaticFunc f = call.func();
-        if(map.put(f, f) == null) {
-          f.visit(this);
-          scopes.add(f);
+        final StaticFunc func = call.func();
+        if(func != null && map.put(func, func) == null) {
+          func.visit(this);
+          scopes.add(func);
         }
         return true;
       }
@@ -223,7 +223,8 @@ final class QueryCompiler {
 
       @Override
       public boolean staticFuncCall(final StaticFuncCall call) {
-        return neighbor(call.func());
+        final StaticFunc func = call.func();
+        return func == null || neighbor(func);
       }
 
       @Override

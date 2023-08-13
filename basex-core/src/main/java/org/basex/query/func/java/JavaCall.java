@@ -48,12 +48,12 @@ public abstract class JavaCall extends Arr {
   /** Placeholder for invalid Java arguments. */
   private static final Object INVALID = new Object();
 
+  /** Updating flag. */
+  public final boolean updating;
   /** Static context. */
   final StaticContext sc;
   /** Permission. */
   final Perm perm;
-  /** Updating flag. */
-  final boolean updating;
   /** Indicates if function parameters are XQuery types. */
   boolean[] xquery;
 

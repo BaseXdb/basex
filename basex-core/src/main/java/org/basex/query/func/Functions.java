@@ -66,7 +66,7 @@ public final class Functions {
    * @return cast type if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Type getCast(final QNm name, final long arity, final InputInfo ii)
+  private static Type cast(final QNm name, final long arity, final InputInfo ii)
       throws QueryException {
 
     Type type = ListType.find(name);
@@ -193,54 +193,49 @@ public final class Functions {
   }
 
   /**
-   * Creates either a {@link FuncItem} or a {@link Closure} depending on when the method is called.
-   * At parse and compile time a closure is generated to enable inlining and compilation, at
-   * runtime we directly generate a function item.
-   * @param anns function annotations
-   * @param name function name, may be {@code null}
-   * @param params formal parameters
-   * @param ft function type
-   * @param expr function body
-   * @param vs variable scope
+   * Creates either a {@link Closure} or a {@link FuncItem} depending on when the method is called.
+   * At parse and compile time, a closure is generated to enable inlining and compilation.
+   * At runtime, we directly generate a function item.
    * @param ii input info
+   * @param expr function body
+   * @param ft function type
+   * @param name function name, may be {@code null}
+   * @param lit literal data
    * @param runtime runtime flag
    * @param updating flag for updating functions
    * @return the function expression
    */
-  private static Expr closureOrFItem(final AnnList anns, final QNm name, final Var[] params,
-      final FuncType ft, final Expr expr, final VarScope vs, final InputInfo ii,
-      final boolean runtime, final boolean updating) {
-    return runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize(), ii) :
-      new Closure(ii, name, updating ? SeqType.EMPTY_SEQUENCE_Z : ft.declType,
-        params, expr, anns, null, vs);
+  private static Expr closureOrFuncItem(final InputInfo ii, final Expr expr, final FuncType ft,
+      final QNm name, final Literal lit, final boolean runtime, final boolean updating) {
+    return runtime ? new FuncItem(lit.vs.sc, lit.anns(), name, lit.params, ft, expr,
+        lit.vs.stackSize(), ii) :
+      new Closure(ii, expr, updating ? SeqType.EMPTY_SEQUENCE_Z : ft.declType,
+        name, lit.params, lit.anns(), null, lit.vs);
   }
 
   /**
-   * Gets a function literal for a known function.
+   * Creates a function literal for a known function.
    * @param name function name
    * @param arity number of arguments
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @param runtime {@code true} if this method is called at runtime, {@code false} otherwise
+   * @param runtime {@code true} if this method is called at runtime
    * @return function literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public static Expr getLiteral(final QNm name, final int arity, final QueryContext qc,
+  public static Expr literal(final QNm name, final int arity, final QueryContext qc,
       final StaticContext sc, final InputInfo ii, final boolean runtime) throws QueryException {
 
-    // parse type constructor
+    final Literal lit = new Literal(sc, arity);
+
+    // type constructor
     if(eq(name.uri(), XS_URI)) {
-      final Type type = getCast(name, arity, ii);
-      final VarScope vs = new VarScope(sc);
-      final Var[] params = {
-        vs.addNew(new QNm(ITEM, ""), SeqType.ANY_ATOMIC_TYPE_ZO, true, qc, ii)
-      };
-      final SeqType st = SeqType.get(type, Occ.ZERO_OR_ONE);
-      final Expr expr = new Cast(sc, ii, new VarRef(ii, params[0]), st);
-      final AnnList anns = new AnnList();
-      final FuncType ft = FuncType.get(anns, expr.seqType(), params);
-      return closureOrFItem(anns, name, params, ft, expr, vs, ii, runtime, false);
+      lit.add(new QNm(ITEM, ""), SeqType.ANY_ATOMIC_TYPE_ZO, qc, ii);
+      final Type type = cast(name, arity, ii);
+      final Expr expr = new Cast(sc, ii, lit.args[0], SeqType.get(type, Occ.ZERO_OR_ONE));
+      final FuncType ft = FuncType.get(lit.anns(), null, lit.params);
+      return closureOrFuncItem(ii, expr, ft, name, lit, runtime, false);
     }
 
     // built-in function
@@ -248,91 +243,84 @@ public final class Functions {
     if(fd != null) {
       if(arity < fd.minMax[0] || arity > fd.minMax[1]) throw wrongArity(fd, arity, ii);
 
-      final AnnList anns = new AnnList();
-      final VarScope vs = new VarScope(sc);
-      final FuncType ft = fd.type(arity, anns);
+      final FuncType ft = fd.type(arity, lit.anns());
       final QNm[] names = fd.paramNames(arity);
-      final Var[] params = new Var[arity];
-      final Expr[] args = new Expr[arity];
-      for(int i = 0; i < arity; i++) {
-        params[i] = vs.addNew(names[i], ft.argTypes[i], true, qc, ii);
-        args[i] = new VarRef(ii, params[i]);
-      }
-
-      final StandardFunc sf = fd.get(sc, ii, args);
-      final boolean upd = sf.has(Flag.UPD);
-      if(upd) {
-        anns.add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
+      for(int a = 0; a < arity; a++) lit.add(names[a], ft.argTypes[a], qc, ii);
+      final StandardFunc sf = fd.get(sc, ii, lit.args);
+      final boolean updating = sf.has(Flag.UPD);
+      if(updating) {
+        lit.anns().add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
       }
       // context/positional access must be bound to original focus
-      // example for invalid query: let $f := last#0 return (1,2)[$f()]
+      // example for invalid query: let $f := last#0 return (1, 2)[$f()]
       return sf.has(Flag.CTX)
-          ? new FuncLit(anns, name, params, sf, ft.seqType(), vs, ii)
-          : closureOrFItem(anns, name, params, fd.type(arity, anns), sf, vs, ii, runtime, upd);
+          ? new FuncLit(ii, sf, ft.seqType(), name, lit.params, lit.anns(), lit.vs)
+          : closureOrFuncItem(ii, sf, fd.type(arity, lit.anns()), name, lit, runtime, updating);
     }
 
     // user-defined function
     final StaticFunc sf = qc.functions.get(name, arity);
     if(sf != null) {
-      final FuncType ft = sf.funcType();
-      final VarScope vs = new VarScope(sc);
-      final Var[] params = new Var[arity];
-      final Expr[] args = new Expr[arity];
-      for(int a = 0; a < arity; a++) {
-        params[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, ii);
-        args[a] = new VarRef(ii, params[a]);
-      }
-      final boolean upd = sf.updating;
-      final TypedFunc tf = qc.functions.undeclaredFuncCall(sf.name, args, sc, ii);
-      final Expr func = closureOrFItem(tf.anns, sf.name, params, ft, tf.func, vs, ii,
-          runtime, upd);
-      if(upd) qc.updating();
+      final Expr func = userDefined(sf, qc, sc, ii, runtime, lit);
+      if(sf.updating) qc.updating();
       return func;
     }
 
+    for(int a = 0; a < arity; a++) lit.add(new QNm(ARG + (a + 1), ""), null, qc, ii);
+
     // Java function
-    final SeqType[] sts = new SeqType[arity];
-    Arrays.fill(sts, SeqType.ITEM_ZM);
-    final AnnList anns = new AnnList();
-    final SeqType st = FuncType.get(anns, SeqType.ITEM_ZM, sts).seqType();
-    final VarScope vs = new VarScope(sc);
-    final Var[] params = new Var[arity];
-    final Expr[] args = new Expr[arity];
-    final int vl = params.length;
-    for(int v = 0; v < vl; v++) {
-      params[v] = vs.addNew(new QNm(ARG + (v + 1), ""), null, true, qc, ii);
-      args[v] = new VarRef(ii, params[v]);
+    final JavaCall java = JavaCall.get(name, lit.args, qc, sc, ii);
+    if(java != null) {
+      final SeqType[] sts = new SeqType[arity];
+      Arrays.fill(sts, SeqType.ITEM_ZM);
+      final SeqType st = FuncType.get(lit.anns(), null, sts).seqType();
+      return new FuncLit(ii, java, st, name, lit.params, lit.anns(), lit.vs);
     }
-    final JavaCall jf = JavaCall.get(name, args, qc, sc, ii);
-    return jf == null ? null : new FuncLit(anns, name, params, jf, st, vs, ii);
+    if(runtime) return null;
+
+    // literal
+    final StaticFuncCall call = funcCall(name, lit.args, qc, sc, ii);
+    final Closure closure = new Closure(ii, call, null, name, lit.params, lit.anns(), null, lit.vs);
+    return qc.functions.register(closure);
   }
 
   /**
-   * Returns a function item for a user-defined function.
+   * Creates a function item for a user-defined function.
    * @param sf static function
    * @param qc query context
    * @param sc static context
    * @param ii input info
-   * @return resulting value
+   * @return function item
    * @throws QueryException query exception
    */
-  public static FuncItem getUser(final StaticFunc sf, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public static FuncItem userDefined(final StaticFunc sf, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
+    return (FuncItem) userDefined(sf, qc, sc, ii, true, new Literal(sc, sf.params.length));
+  }
+
+  /**
+   * Creates a function literal for a user-defined function.
+   * @param sf static function
+   * @param qc query context
+   * @param sc static context
+   * @param ii input info
+   * @param runtime {@code true} if this method is called at runtime
+   * @param lit literal data
+   * @return function item
+   * @throws QueryException query exception
+   */
+  public static Expr userDefined(final StaticFunc sf, final QueryContext qc, final StaticContext sc,
+      final InputInfo ii, final boolean runtime, final Literal lit) throws QueryException {
 
     final FuncType ft = sf.funcType();
-    final VarScope vs = new VarScope(sc);
     final int arity = sf.params.length;
-    final Var[] args = new Var[arity];
-    final int al = args.length;
-    final Expr[] calls = new Expr[al];
-    for(int a = 0; a < al; a++) {
-      args[a] = vs.addNew(sf.paramName(a), ft.argTypes[a], true, qc, ii);
-      calls[a] = new VarRef(ii, args[a]);
-    }
-    final TypedFunc tf = qc.functions.undeclaredFuncCall(sf.name, calls, sc, ii);
-    return new FuncItem(sc, tf.anns, sf.name, args, ft, tf.func, vs.stackSize(), ii);
+    for(int a = 0; a < arity; a++) lit.add(sf.paramName(a), ft.argTypes[a], qc, ii);
+    final StaticFuncCall call = funcCall(sf.name, lit.args, qc, sc, ii);
+    if(call.func != null) lit.anns = call.func.anns;
+    return closureOrFuncItem(ii, call, ft, sf.name, lit, runtime, sf.updating);
   }
+
 
   /**
    * Returns a function call with the specified name and number of arguments.
@@ -350,9 +338,8 @@ public final class Functions {
 
     // type constructor
     if(keywords == null && eq(name.uri(), XS_URI)) {
-      final Type type = getCast(name, args.length, ii);
-      final SeqType st = SeqType.get(type, Occ.ZERO_OR_ONE);
-      return new Cast(sc, ii, args[0], st);
+      final Type type = cast(name, args.length, ii);
+      return new Cast(sc, ii, args[0], SeqType.get(type, Occ.ZERO_OR_ONE));
     }
 
     // built-in function
@@ -362,24 +349,12 @@ public final class Functions {
       return sf;
     }
 
-    // reject keyword parameters for other function types
-    if(keywords == null) {
-      // user-defined function
-      final TypedFunc tf = qc.functions.funcCall(name, args, sc, ii);
-      if(tf != null) {
-        if(tf.anns.contains(Annotation.UPDATING)) qc.updating();
-        return tf.func;
-      }
-
-      // Java function
-      final JavaCall jf = JavaCall.get(name, args, qc, sc, ii);
-      if(jf != null) return jf;
-    } else if(!NSGlobal.reserved(name.uri())) {
+    // temporary: reject keyword parameters for other function types
+    if(keywords != null && !NSGlobal.reserved(name.uri()))
       throw KEYWORDSUPPORT_X.get(ii, name.prefixString());
-    }
 
-    // user-defined function that has not been declared yet
-    return qc.functions.undeclaredFuncCall(name, args, sc, ii).func;
+    // user-defined function
+    return funcCall(name, args, qc, sc, ii);
   }
 
   /**
@@ -388,7 +363,7 @@ public final class Functions {
    * @return info string
    */
   static byte[] similar(final QNm qname) {
-    // find similar function in three runs
+    // find similar function in several attempts
     final ArrayList<QNm> qnames = new ArrayList<>(CACHE.size());
     for(final QNm qnm : CACHE.values()) qnames.add(qnm);
     final byte[] local = lc(qname.local()), uri = qname.uri();
@@ -406,5 +381,77 @@ public final class Functions {
     }
     return QueryError.similar(qname.prefixString(),
         similar != null ? ((QNm) similar).prefixString() : null);
+  }
+
+  /**
+   * Returns a cached function call.
+   * @param name function name
+   * @param args arguments
+   * @param qc query context
+   * @param sc static context
+   * @param ii input info
+   * @return function call
+   * @throws QueryException query exception
+   */
+  private static StaticFuncCall funcCall(final QNm name, final Expr[] args, final QueryContext qc,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
+
+    if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, ii);
+    final StaticFuncCall call = new StaticFuncCall(name, args, sc, ii);
+    qc.functions.register(call);
+    return call;
+  }
+
+  /**
+   * Container for function literals.
+   *
+   * @author BaseX Team 2005-23, BSD License
+   * @author Christian Gruen
+   */
+  private static class Literal {
+    /** Variable scope. */
+    final VarScope vs;
+    /** Parameters. */
+    final Var[] params;
+    /** Arguments. */
+    final Expr[] args;
+    /** Annotations. */
+    AnnList anns;
+    /** Parameter counter. */
+    int a;
+
+    /**
+     * Constructor.
+     * @param sc static context
+     * @param arity arity
+     */
+    Literal(final StaticContext sc, final int arity) {
+      vs = new VarScope(sc);
+      params = new Var[arity];
+      args = new Expr[arity];
+    }
+
+    /**
+     * Adds a parameter and argument.
+     * @param name parameter name
+     * @param st parameter type
+     * @param qc query context
+     * @param ii input info
+     */
+    void add(final QNm name, final SeqType st, final QueryContext qc, final InputInfo ii) {
+      final Var var = vs.addNew(name, st, true, qc, ii);
+      params[a] = var;
+      args[a] = new VarRef(ii, var);
+      a++;
+    }
+
+    /**
+     * Returns the annotations.
+     * @return annotations
+     */
+    AnnList anns() {
+      if(anns == null) anns = new AnnList();
+      return anns;
+    }
   }
 }

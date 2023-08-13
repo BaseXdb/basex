@@ -29,21 +29,21 @@ public final class FuncLit extends Single implements Scope {
 
   /**
    * Constructor.
-   * @param anns annotations
-   * @param name function name
-   * @param params formal parameters
+   * @param info input info
    * @param expr function body
    * @param seqType sequence type
+   * @param name function name
+   * @param params formal parameters
+   * @param anns annotations
    * @param vs variable scope
-   * @param info input info
    */
-  FuncLit(final AnnList anns, final QNm name, final Var[] params, final Expr expr,
-      final SeqType seqType, final VarScope vs, final InputInfo info) {
+  FuncLit(final InputInfo info, final Expr expr, final SeqType seqType, final QNm name,
+      final Var[] params, final AnnList anns, final VarScope vs) {
 
     super(info, expr, seqType);
-    this.anns = anns;
     this.name = name;
     this.params = params;
+    this.anns = anns;
     this.vs = vs;
   }
 
@@ -81,7 +81,7 @@ public final class FuncLit extends Single implements Scope {
       final Var[] vars = new Var[pl];
       for(int p = 0; p < pl; p++) vars[p] = cc.copy(params[p], vm);
       final Expr ex = expr.copy(cc, vm);
-      return copyType(new FuncLit(anns, name, vars, ex, seqType(), vsc, info));
+      return copyType(new FuncLit(info, ex, seqType(), name, vars, anns, vsc));
     } finally {
       cc.removeScope();
     }

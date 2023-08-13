@@ -224,7 +224,7 @@ public final class ServerLockingTest extends SandboxTest {
    * @throws Exception none expected
    */
   @Test public void xqueryWrite() throws Exception {
-    final String prolog = "import module namespace qm='java:org.basex.query.func.QueryModuleTest';";
+    final String prolog = "import module namespace qm = 'org.basex.query.func.QueryModuleTest';";
     testQueries(
       f(prolog + "qm:write-lock(), %s", Q),
       f(prolog + "qm:write-lock(), %s", Q),

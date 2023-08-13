@@ -107,7 +107,7 @@ abstract class DynJavaCall extends JavaCall {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof DynJavaCall)) return false;
-    final DynJavaCall j = (DynJavaCall) obj;
-    return clazz.equals(j.clazz) && Array.equals(types, j.types) && super.equals(obj);
+    final DynJavaCall java = (DynJavaCall) obj;
+    return clazz.equals(java.clazz) && Array.equals(types, java.types) && super.equals(obj);
   }
 }

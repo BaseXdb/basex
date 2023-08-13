@@ -16,8 +16,8 @@ import org.basex.query.var.*;
  * @author Christian Gruen
  */
 public final class LockVisitor extends ASTVisitor {
-  /** Already visited scopes. */
-  private final IdentityHashMap<Scope, Object> funcs = new IdentityHashMap<>();
+  /** Visited scopes. */
+  private final IdentityHashMap<Scope, Object> scopes = new IdentityHashMap<>();
   /** Reference to lock list. */
   private final LockList ll;
   /** Focus level. */
@@ -63,27 +63,34 @@ public final class LockVisitor extends ASTVisitor {
 
   @Override
   public boolean staticVar(final StaticVar var) {
-    if(funcs.containsKey(var)) return true;
-    funcs.put(var, null);
-    return var.visit(this);
+    return cached(var) || var.visit(this);
   }
 
   @Override
   public boolean staticFuncCall(final StaticFuncCall call) {
-    return func(call.func());
+    final StaticFunc func = call.func();
+    return cached(func) || focusAndVisit(func);
   }
 
   @Override
   public boolean inlineFunc(final Scope scope) {
-    enterFocus();
-    final boolean ac = scope.visit(this);
-    exitFocus();
-    return ac;
+    return focusAndVisit(scope);
   }
 
   @Override
   public boolean funcItem(final FuncItem func) {
-    return func(func);
+    return cached(func) || focusAndVisit(func);
+  }
+
+  /**
+   * Caches a scope.
+   * @param scope scope (ignored if {@code null})
+   * @return if scope has already been cached
+   */
+  private boolean cached(final Scope scope) {
+    if(scope == null || scopes.containsKey(scope)) return true;
+    scopes.put(scope, null);
+    return false;
   }
 
   /**
@@ -91,12 +98,10 @@ public final class LockVisitor extends ASTVisitor {
    * @param scope scope
    * @return if more expressions should be visited
    */
-  private boolean func(final Scope scope) {
-    if(funcs.containsKey(scope)) return true;
-    funcs.put(scope, null);
+  private boolean focusAndVisit(final Scope scope) {
     enterFocus();
-    final boolean ac = scope.visit(this);
+    final boolean more = scope.visit(this);
     exitFocus();
-    return ac;
+    return more;
   }
 }

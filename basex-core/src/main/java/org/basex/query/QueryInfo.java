@@ -193,10 +193,10 @@ public final class QueryInfo {
 
       @Override
       public boolean staticFuncCall(final StaticFuncCall call) {
-        final StaticFunc f = call.func();
-        if(map.put(f, f) == null) {
-          f.visit(this);
-          sb.append(f).append(NL);
+        final StaticFunc func = call.func();
+        if(func != null && map.put(func, func) == null) {
+          func.visit(this);
+          sb.append(func).append(NL);
         }
         return true;
       }

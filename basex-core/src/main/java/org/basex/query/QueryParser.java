@@ -2345,7 +2345,7 @@ public class QueryParser extends InputParser {
         final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
           throw error(NOVISALLOWED);
-        return new Closure(info(), params, expr, anns, global, vs);
+        return new Closure(info(), expr, params, anns, global, vs);
       }
     }
     pos = p;
@@ -2362,26 +2362,10 @@ public class QueryParser extends InputParser {
       if(Function.ERROR.is(num)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, ch == 0 ? "" : ch);
       final int arity = (int) ((Int) num).itr();
-      final Expr expr = Functions.getLiteral(name, arity, qc, sc, info(), false);
-      return expr != null ? expr : undeclaredLiteral(name, arity, info());
+      return Functions.literal(name, arity, qc, sc, info(), false);
     }
     pos = p;
     return null;
-  }
-
-  /**
-   * Creates and registers a function literal.
-   * @param name function name
-   * @param arity arity
-   * @param ii input info
-   * @return the literal
-   * @throws QueryException query exception
-   */
-  private Closure undeclaredLiteral(final QNm name, final int arity, final InputInfo ii)
-      throws QueryException {
-    final Closure expr = Closure.undeclaredLiteral(name, arity, qc, sc, ii);
-    qc.functions.registerFuncLiteral(expr);
-    return expr;
   }
 
   /**
@@ -2615,8 +2599,8 @@ public class QueryParser extends InputParser {
 
     // partial function
     final int arity = exprs.length + holes.length;
-    final Expr func = Functions.getLiteral(name, arity, qc, sc, ii, false);
-    return dynFuncCall(func == null ? undeclaredLiteral(name, arity, ii) : func, ii, exprs, holes);
+    final Expr expr = Functions.literal(name, arity, qc, sc, ii, false);
+    return dynFuncCall(expr, ii, exprs, holes);
   }
 
   /**
