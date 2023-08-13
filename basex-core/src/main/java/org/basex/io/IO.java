@@ -65,7 +65,7 @@ public abstract class IO {
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
-    { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery" };
+    { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery", ".xpath" };
   /** Archive suffixes. */
   public static final String[] ZIPSUFFIXES = {
     ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, TARSUFFIX, XARSUFFIX,
