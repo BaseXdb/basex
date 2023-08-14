@@ -155,8 +155,9 @@ public final class Functions {
     if(type.oneOf(AtomType.NOTATION, AtomType.ANY_ATOMIC_TYPE))
       throw ABSTRACTFUNC_X.get(ii, name.prefixId());
 
-    final Expr arg = prepareArgs(args, keywords, CAST_PARAM, 1, 1, name.string(), ii)[0];
-    return new Cast(sc, ii, arg, SeqType.get(type, Occ.ZERO_OR_ONE));
+    final Expr[] prepared = prepareArgs(args, keywords, CAST_PARAM, 0, 1, name.string(), ii);
+    return new Cast(sc, ii, prepared.length != 0 ? prepared[0] :
+      new ContextValue(ii), SeqType.get(type, Occ.ZERO_OR_ONE));
   }
 
   /**
@@ -191,14 +192,23 @@ public final class Functions {
    * @param lit literal data
    * @param runtime runtime flag
    * @param updating flag for updating functions
+   * @param ctx context-dependent flag
    * @return the function expression
    */
   private static Expr closureOrFuncItem(final InputInfo ii, final Expr expr, final FuncType ft,
-      final QNm name, final Literal lit, final boolean runtime, final boolean updating) {
-    return runtime ? new FuncItem(lit.vs.sc, lit.anns(), name, lit.params, ft, expr,
-        lit.vs.stackSize(), ii) :
-      new Closure(ii, expr, updating ? SeqType.EMPTY_SEQUENCE_Z : ft.declType,
-        name, lit.params, lit.anns(), null, lit.vs);
+      final QNm name, final Literal lit, final boolean runtime, final boolean updating,
+      final boolean ctx) {
+
+    final VarScope vs = lit.vs;
+    final Var[] params = lit.params;
+    final AnnList anns = lit.anns();
+
+    // context/positional access must be bound to original focus
+    // example for invalid query: let $f := last#0 return (1, 2)[$f()]
+    return ctx ? new FuncLit(ii, expr, ft.seqType(), name, params, anns, vs) :
+      runtime ? new FuncItem(lit.vs.sc, anns, name, params, ft, expr, vs.stackSize(), ii) :
+      new Closure(ii, expr, updating ? SeqType.EMPTY_SEQUENCE_Z : ft.declType, name, params,
+        anns, null, vs);
   }
 
   /**
@@ -217,12 +227,12 @@ public final class Functions {
 
     final Literal lit = new Literal(sc, arity);
 
-    // type constructor
+    // constructor function
     if(eq(name.uri(), XS_URI)) {
-      lit.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc, ii);
+      if(arity > 0) lit.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc, ii);
       final Expr expr = cast(name, lit.args, null, sc, ii);
       final FuncType ft = FuncType.get(lit.anns(), null, lit.params);
-      return closureOrFuncItem(ii, expr, ft, name, lit, runtime, false);
+      return closureOrFuncItem(ii, expr, ft, name, lit, runtime, false, arity == 0);
     }
 
     // built-in function
@@ -234,16 +244,12 @@ public final class Functions {
       final QNm[] names = fd.paramNames(arity);
       for(int a = 0; a < arity; a++) lit.add(names[a], ft.argTypes[a], qc, ii);
       final StandardFunc sf = fd.get(sc, ii, lit.args);
-      final boolean updating = sf.has(Flag.UPD);
+      final boolean updating = sf.has(Flag.UPD), ctx = sf.has(Flag.CTX);
       if(updating) {
         lit.anns().add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
       }
-      // context/positional access must be bound to original focus
-      // example for invalid query: let $f := last#0 return (1, 2)[$f()]
-      return sf.has(Flag.CTX)
-          ? new FuncLit(ii, sf, ft.seqType(), name, lit.params, lit.anns(), lit.vs)
-          : closureOrFuncItem(ii, sf, fd.type(arity, lit.anns()), name, lit, runtime, updating);
+      return closureOrFuncItem(ii, sf, ft, name, lit, runtime, updating, ctx);
     }
 
     // user-defined function
@@ -305,7 +311,7 @@ public final class Functions {
     for(int a = 0; a < arity; a++) lit.add(sf.paramName(a), ft.argTypes[a], qc, ii);
     final StaticFuncCall call = funcCall(sf.name, lit.args, qc, sc, ii);
     if(call.func != null) lit.anns = call.func.anns;
-    return closureOrFuncItem(ii, call, ft, sf.name, lit, runtime, sf.updating);
+    return closureOrFuncItem(ii, call, ft, sf.name, lit, runtime, sf.updating, false);
   }
 
 
@@ -323,7 +329,7 @@ public final class Functions {
   public static Expr get(final QNm name, final Expr[] args, final QNmMap<Expr> keywords,
       final QueryContext qc, final StaticContext sc, final InputInfo ii) throws QueryException {
 
-    // type constructor
+    // constructor function
     if(eq(name.uri(), XS_URI)) return cast(name, args, keywords, sc, ii);
 
     // built-in function

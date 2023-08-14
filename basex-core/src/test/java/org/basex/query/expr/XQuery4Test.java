@@ -241,10 +241,11 @@ public final class XQuery4Test extends QueryPlanTest {
     error("if(0) { } else if(0) { } else", WRONGCHAR_X_X);
   }
 
-  /** Keyword arguments. */
-  @Test public void keywords() {
-    query("string(value := 1)", 1);
+  /** Constructor functions. */
+  @Test public void constructors() {
     query("xs:string(value := 1)", 1);
+    query("1 ! xs:string()", 1);
+    query("(1 to 6) ! xs:string()", "1\n2\n3\n4\n5\n6");
   }
 
   /** String templates. */
