@@ -180,7 +180,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
    */
   private TokenMgrError error(final String before, final int curr) {
     final int[] lc = lineCol(pos);
-    return new TokenMgrError(curr < 0, state, lc[1], lc[3],
+    return new TokenMgrError(curr < 0, lc[1], lc[3],
         before, (char) curr, TokenMgrError.LEXICAL_ERROR);
   }
 

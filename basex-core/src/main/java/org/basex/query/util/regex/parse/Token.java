@@ -2,12 +2,13 @@
 /* JavaCCOptions:TOKEN_EXTENDS=,KEEP_LINE_COLUMN=true,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package org.basex.query.util.regex.parse;
 
+import java.io.*;
+
 /**
  * Describes the input token stream.
  */
 
-public class Token implements java.io.Serializable {
-
+public class Token implements Serializable {
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the
@@ -67,39 +68,37 @@ public class Token implements java.io.Serializable {
    * interpreter. This attribute value is often different from the image.
    * Any subclass of Token that actually wants to return a non-null value can
    * override this method as appropriate.
+   * @return attribute value
    */
   public Object getValue() {
     return null;
   }
 
   /**
-   * No-argument constructor
+   * No-argument constructor.
    */
-  public Token() {}
+  public Token() { /* empty */ }
 
   /**
    * Constructs a new token for the specified Image.
+   * @param k token kind
    */
-  public Token(int kind)
-  {
-    this(kind, null);
+  public Token(final int k) {
+    this(k, null);
   }
 
   /**
    * Constructs a new token for the specified Image and Kind.
+   * @param kind token kind
+   * @param image token image string
    */
-  public Token(int kind, String image)
-  {
+  public Token(final int kind, final String image) {
     this.kind = kind;
     this.image = image;
   }
 
-  /**
-   * Returns the image.
-   */
   @Override
-  public String toString()
-  {
+  public String toString() {
     return image;
   }
 
@@ -114,17 +113,20 @@ public class Token implements java.io.Serializable {
    *
    * to the following switch statement. Then you can cast matchedToken
    * variable to the appropriate type and use sit in your lexical actions.
+   * @param ofKind token kind
+   * @param image image string
+   * @return token
    */
-  public static Token newToken(int ofKind, String image)
-  {
-    switch(ofKind)
-    {
-      default : return new Token(ofKind, image);
-    }
+  public static Token newToken(final int ofKind, final String image) {
+    return new Token(ofKind, image);
   }
 
-  public static Token newToken(int ofKind)
-  {
+  /**
+   * Creates a token without image string.
+   * @param ofKind token kind
+   * @return token
+   */
+  public static Token newToken(final int ofKind) {
     return newToken(ofKind, null);
   }
 

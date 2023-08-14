@@ -3,9 +3,7 @@
 package org.basex.query.util.regex.parse;
 
 /** Token Manager Error. */
-public class TokenMgrError extends Error
-{
-
+public class TokenMgrError extends Error {
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the
@@ -20,39 +18,40 @@ public class TokenMgrError extends Error
   /**
    * Lexical error occurred.
    */
-  public static final int LEXICAL_ERROR = 0;
+  static final int LEXICAL_ERROR = 0;
 
   /**
    * An attempt was made to create a second instance of a static token manager.
    */
-  public static final int STATIC_LEXER_ERROR = 1;
+  static final int STATIC_LEXER_ERROR = 1;
 
   /**
    * Tried to change to an invalid lexical state.
    */
-  public static final int INVALID_LEXICAL_STATE = 2;
+  static final int INVALID_LEXICAL_STATE = 2;
 
   /**
    * Detected (and bailed out of) an infinite loop in the token manager.
    */
-  public static final int LOOP_DETECTED = 3;
+  static final int LOOP_DETECTED = 3;
 
   /**
    * Indicates the reason why the exception is thrown. It will have
    * one of the above 4 values.
    */
-  int errorCode;
+  final int errorCode;
 
   /**
    * Replaces unprintable characters by their escaped (or unicode escaped)
    * equivalents in the given string
+   * @param str string to be escaped
+   * @return escaped string
    */
-  protected static final String addEscapes(String str) {
-    StringBuilder retval = new StringBuilder();
+  protected static String addEscapes(final String str) {
+    final StringBuilder retval = new StringBuilder();
     char ch;
     for (int i = 0; i < str.length(); i++) {
-      switch (str.charAt(i))
-      {
+      switch (str.charAt(i)) {
         case '\b':
           retval.append("\\b");
           continue;
@@ -72,19 +71,18 @@ public class TokenMgrError extends Error
           retval.append("\\\"");
           continue;
         case '\'':
-          retval.append("\\\'");
+          retval.append("\\'");
           continue;
         case '\\':
           retval.append("\\\\");
           continue;
         default:
           if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-            String s = "0000" + Integer.toString(ch, 16);
-            retval.append("\\u" + s.substring(s.length() - 4, s.length()));
+            final String s = "0000" + Integer.toString(ch, 16);
+            retval.append("\\u" + s.substring(s.length() - 4));
           } else {
             retval.append(ch);
           }
-          continue;
       }
     }
     return retval.toString();
@@ -93,22 +91,22 @@ public class TokenMgrError extends Error
   /**
    * Returns a detailed message for the Error when it is thrown by the
    * token manager to indicate a lexical error.
-   * Parameters :
-   *    EOFSeen     : indicates if EOF caused the lexical error
-   *    curLexState : lexical state in which this error occurred
-   *    errorLine   : line number when the error occurred
-   *    errorColumn : column number when the error occurred
-   *    errorAfter  : prefix that was seen before this error occurred
-   *    curchar     : the offending character
    * Note: You can customize the lexical error message by modifying this method.
+   * @param EOFSeen   indicates if EOF caused the lexical error
+   * @param errorLine  line number when the error occurred
+   * @param errorColumn   column number when the error occurred
+   * @param errorAfter prefix that was seen before this error occurred
+   * @param curChar  the offending character
+   * @return error message
    */
-  protected static String LexicalErr(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, int curChar) {
-    char curChar1 = (char)curChar;
-    return("Lexical error at line " +
-          errorLine + ", column " +
-          errorColumn + ".  Encountered: " +
-          (EOFSeen ? "<EOF> " : ("\"" + addEscapes(String.valueOf(curChar1)) + "\"") + " (" + curChar + "), ") +
-          "after : \"" + addEscapes(errorAfter) + "\"");
+  protected static String LexicalErr(final boolean EOFSeen, final int errorLine,
+                                     final int errorColumn, final String errorAfter, final int curChar) {
+    final char curChar1 = (char)curChar;
+    return "Lexical error at line " +
+      errorLine + ", column " +
+      errorColumn + ".  Encountered: " +
+      (EOFSeen ? "<EOF> " : "\"" + addEscapes(String.valueOf(curChar1)) + "\"" + " (" + curChar + "), ") +
+      "after : \"" + addEscapes(errorAfter) + "\"";
   }
 
   /**
@@ -129,19 +127,29 @@ public class TokenMgrError extends Error
    * Constructors of various flavors follow.
    */
 
-  /** No arg constructor. */
-  public TokenMgrError() {
-  }
-
-  /** Constructor with message and reason. */
-  public TokenMgrError(String message, int reason) {
+  /**
+   * Constructor with message and reason.
+   * @param message error message
+   * @param reason one of {@link #LEXICAL_ERROR}, {@link #INVALID_LEXICAL_STATE},
+   *   {@link #STATIC_LEXER_ERROR}, {@link #LOOP_DETECTED}
+   */
+  public TokenMgrError(final String message, final int reason) {
     super(message);
     errorCode = reason;
   }
 
-  /** Full Constructor. */
-  public TokenMgrError(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, int curChar, int reason) {
-    this(LexicalErr(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
+  /**
+   * Full Constructor.
+   * @param EOFSeen   indicates if EOF caused the lexical error
+   * @param errorLine  line number when the error occurred
+   * @param errorColumn   column number when the error occurred
+   * @param errorAfter prefix that was seen before this error occurred
+   * @param curChar  the offending character
+   * @param reason reason
+   */
+  public TokenMgrError(final boolean EOFSeen, final int errorLine, final int errorColumn,
+      final String errorAfter, final int curChar, final int reason) {
+    this(LexicalErr(EOFSeen, errorLine, errorColumn, errorAfter, curChar), reason);
   }
 }
 /* JavaCC - OriginalChecksum=54b27e40521c30b96bfc2a264418f148 (do not edit this line) */

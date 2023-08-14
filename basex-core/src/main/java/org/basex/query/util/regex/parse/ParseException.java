@@ -12,7 +12,6 @@ package org.basex.query.util.regex.parse;
  * mechanisms so long as you retain the public fields.
  */
 public class ParseException extends Exception {
-
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the
@@ -23,19 +22,19 @@ public class ParseException extends Exception {
   /**
    * The end of line string for this machine.
    */
-  protected static String EOL = System.getProperty("line.separator", "\n");
+  protected static final String EOL = System.getProperty("line.separator", "\n");
 
   /**
    * This constructor is used by the method "generateParseException"
    * in the generated parser.  Calling this constructor generates
    * a new object of this type with the fields "currentToken",
    * "expectedTokenSequences", and "tokenImage" set.
+   * @param currentTokenVal current token
+   * @param expectedTokenSequencesVal expected token sequences
+   * @param tokenImageVal image strings
    */
-  public ParseException(Token currentTokenVal,
-                        int[][] expectedTokenSequencesVal,
-                        String[] tokenImageVal
-                       )
-  {
+  public ParseException(final Token currentTokenVal, final int[][] expectedTokenSequencesVal,
+      final String[] tokenImageVal) {
     super(initialise(currentTokenVal, expectedTokenSequencesVal, tokenImageVal));
     currentToken = currentTokenVal;
     expectedTokenSequences = expectedTokenSequencesVal;
@@ -53,14 +52,14 @@ public class ParseException extends Exception {
    */
 
   public ParseException() {
-    super();
   }
 
-  /** Constructor with message. */
-  public ParseException(String message) {
+  /** Constructor with message.
+   * @param message error message
+   */
+  public ParseException(final String message) {
     super(message);
   }
-
 
   /**
    * This is the last token that has been consumed successfully.  If
@@ -89,71 +88,74 @@ public class ParseException extends Exception {
    * due to a parse error, and you do not catch it (it gets thrown
    * from the parser) the correct error message
    * gets displayed.
+   * @param currentToken current token
+   * @param expectedTokenSequences expected token sequences
+   * @param tokenImage token images
+   * @return error description
    */
-  private static String initialise(Token currentToken,
-                           int[][] expectedTokenSequences,
-                           String[] tokenImage) {
+  private static String initialise(final Token currentToken, final int[][] expectedTokenSequences,
+      final String[] tokenImage) {
 
-    StringBuilder expected = new StringBuilder();
+    final StringBuilder expected = new StringBuilder();
     int maxSize = 0;
-    for (int i = 0; i < expectedTokenSequences.length; i++) {
-      if (maxSize < expectedTokenSequences[i].length) {
-        maxSize = expectedTokenSequences[i].length;
+    for(final int[] element : expectedTokenSequences) {
+      if (maxSize < element.length) {
+        maxSize = element.length;
       }
-      for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-        expected.append(tokenImage[expectedTokenSequences[i][j]]).append(' ');
+      for (int j = 0; j < element.length; j++) {
+        expected.append(tokenImage[element[j]]).append(' ');
       }
-      if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
+      if (element[element.length - 1] != 0) {
         expected.append("...");
       }
       expected.append(EOL).append("    ");
     }
-    String retval = "Encountered \"";
+    StringBuilder retval = new StringBuilder("Encountered \"");
     Token tok = currentToken.next;
     for (int i = 0; i < maxSize; i++) {
-      if (i != 0) retval += " ";
+      if (i != 0) retval.append(" ");
       if (tok.kind == 0) {
-        retval += tokenImage[0];
+        retval.append(tokenImage[0]);
         break;
       }
-      retval += " " + tokenImage[tok.kind];
-      retval += " \"";
-      retval += add_escapes(tok.image);
-      retval += " \"";
+      retval.append(" ").append(tokenImage[tok.kind]);
+      retval.append(" \"");
+      retval.append(add_escapes(tok.image));
+      retval.append(" \"");
       tok = tok.next;
     }
     if (currentToken.next != null) {
-      retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
+      retval.append("\" at line ").append(currentToken.next.beginLine).append(", column ").append(currentToken.next.beginColumn);
     }
-    retval += "." + EOL;
-    
-    
+    retval.append(".").append(EOL);
+
+
     if (expectedTokenSequences.length == 0) {
         // Nothing to add here
     } else {
 	    if (expectedTokenSequences.length == 1) {
-	      retval += "Was expecting:" + EOL + "    ";
+	      retval.append("Was expecting:").append(EOL).append("    ");
 	    } else {
-	      retval += "Was expecting one of:" + EOL + "    ";
+	      retval.append("Was expecting one of:").append(EOL).append("    ");
 	    }
-	    retval += expected.toString();
+	    retval.append(expected);
     }
-    
-    return retval;
-  }
 
+    return retval.toString();
+  }
 
   /**
    * Used to convert raw characters to their escaped version
    * when these raw version cannot be used as part of an ASCII
    * string literal.
+   * @param str string to escape
+   * @return escaped string
    */
-  static String add_escapes(String str) {
-      StringBuilder retval = new StringBuilder();
+  static String add_escapes(final String str) {
+      final StringBuilder retval = new StringBuilder();
       char ch;
       for (int i = 0; i < str.length(); i++) {
-        switch (str.charAt(i))
-        {
+        switch (str.charAt(i)) {
            case '\b':
               retval.append("\\b");
               continue;
@@ -173,15 +175,15 @@ public class ParseException extends Exception {
               retval.append("\\\"");
               continue;
            case '\'':
-              retval.append("\\\'");
+              retval.append("\\'");
               continue;
            case '\\':
               retval.append("\\\\");
               continue;
            default:
               if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-                 String s = "0000" + Integer.toString(ch, 16);
-                 retval.append("\\u" + s.substring(s.length() - 4, s.length()));
+                 final String s = "0000" + Integer.toString(ch, 16);
+                 retval.append("\\u" + s.substring(s.length() - 4));
               } else {
                  retval.append(ch);
               }

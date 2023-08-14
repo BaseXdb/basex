@@ -7,13 +7,13 @@ package org.basex.query.util.regex.parse;
  * JavaCCParser.  The user is free to use any implementation
  * of their choice.
  */
-
 public interface TokenManager {
-
-  /** This gets the next token from the input stream.
-   *  A token of kind 0 (<EOF>) should be returned on EOF.
+  /**
+   * This gets the next token from the input stream.
+   * A token of kind 0 (&lt;EOF&gt;) should be returned on EOF.
+   * @return the next token
    */
-  public Token getNextToken();
+  Token getNextToken();
 
 }
 /* JavaCC - OriginalChecksum=1cc5e7e90d2d427d037a58c264d41d39 (do not edit this line) */
