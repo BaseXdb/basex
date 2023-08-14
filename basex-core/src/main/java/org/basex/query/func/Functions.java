@@ -38,6 +38,8 @@ public final class Functions {
   private static final TokenObjMap<QNm> CACHE = new TokenObjMap<>();
   /** URIs of built-in functions. */
   private static final TokenSet URIS = new TokenSet();
+  /** Cast parameter. */
+  private static final QNm[] CAST_PARAM = { new QNm("value") };
 
   /** Private constructor. */
   private Functions() { }
@@ -56,26 +58,6 @@ public final class Functions {
       final QNm qnm = new QNm(fd.local(), fd.uri());
       CACHE.put(qnm.internal(), qnm);
     }
-  }
-
-  /**
-   * Tries to resolve the specified function with xs namespace as a cast.
-   * @param arity number of arguments
-   * @param name function name
-   * @param ii input info
-   * @return cast type if found, {@code null} otherwise
-   * @throws QueryException query exception
-   */
-  private static Type cast(final QNm name, final long arity, final InputInfo ii)
-      throws QueryException {
-
-    Type type = ListType.find(name);
-    if(type == null) type = AtomType.find(name, false);
-    if(type == null) throw WHICHFUNC_X.get(ii, AtomType.similar(name));
-    if(type.oneOf(AtomType.NOTATION, AtomType.ANY_ATOMIC_TYPE))
-      throw ABSTRACTFUNC_X.get(ii, name.prefixId());
-    if(arity != 1) throw FUNCARITY_X_X_X.get(ii, name.string(), arguments(arity), 1);
-    return type;
   }
 
   /**
@@ -102,31 +84,35 @@ public final class Functions {
 
   /**
    * Raises an error for the wrong number of function arguments.
-   * @param fd function definition
    * @param arity number of supplied arguments
+   * @param min minimum number of allowed arguments
+   * @param max maximum number of allowed arguments
+   * @param function function
    * @param ii input info
-   * @return query exception
+   * @throws QueryException query exception
    */
-  public static QueryException wrongArity(final FuncDefinition fd, final int arity,
-      final InputInfo ii) {
-    final IntList arities = new IntList();
-    if(!fd.variadic()) {
-      final int min = fd.minMax[0], max = fd.minMax[1];
-      for(int m = min; m <= max; m++) arities.add(m);
+  private static void checkArity(final int arity, final int min, final int max,
+      final Object function, final InputInfo ii) throws QueryException {
+
+    if(arity < min || arity > max) {
+      final IntList arities = new IntList();
+      if(max != Integer.MAX_VALUE) {
+        for(int m = min; m <= max; m++) arities.add(m);
+      }
+      throw wrongArity(arity, arities, function, ii);
     }
-    return wrongArity(fd, arity, arities, ii);
   }
 
   /**
    * Raises an error for the wrong number of function arguments.
-   * @param function function
    * @param arity number of supplied arguments
    * @param arities expected arities
+   * @param function function
    * @param ii input info
    * @return error
    */
-  public static QueryException wrongArity(final Object function, final int arity,
-      final IntList arities, final InputInfo ii) {
+  public static QueryException wrongArity(final int arity, final IntList arities,
+      final Object function, final InputInfo ii) {
 
     final int as = arities.ddo().size();
     if(as == 0) return FUNCARITY_X_X.get(ii, function, arguments(arity));
@@ -151,6 +137,29 @@ public final class Functions {
   }
 
   /**
+   * Tries to resolve the specified function with xs namespace as a cast.
+   * @param name function name
+   * @param args positional arguments
+   * @param keywords keyword arguments (can be {@code null})
+   * @param sc static context
+   * @param ii input info
+   * @return cast type if found, {@code null} otherwise
+   * @throws QueryException query exception
+   */
+  private static Cast cast(final QNm name, final Expr[] args, final QNmMap<Expr> keywords,
+      final StaticContext sc, final InputInfo ii) throws QueryException {
+
+    Type type = ListType.find(name);
+    if(type == null) type = AtomType.find(name, false);
+    if(type == null) throw WHICHFUNC_X.get(ii, AtomType.similar(name));
+    if(type.oneOf(AtomType.NOTATION, AtomType.ANY_ATOMIC_TYPE))
+      throw ABSTRACTFUNC_X.get(ii, name.prefixId());
+
+    final Expr arg = prepareArgs(args, keywords, CAST_PARAM, 1, 1, name.string(), ii)[0];
+    return new Cast(sc, ii, arg, SeqType.get(type, Occ.ZERO_OR_ONE));
+  }
+
+  /**
    * Returns an instance of a built-in function.
    * @param name function qname
    * @param args positional arguments
@@ -167,29 +176,8 @@ public final class Functions {
     final FuncDefinition fd = builtIn(name);
     if(fd == null) return null;
 
-    final int arity = args.length, min = fd.minMax[0], max = fd.minMax[1];
-    if(arity <= max) {
-      if(keywords != null) {
-        final ExprList list = new ExprList().add(args);
-        for(final QNm qnm : keywords) {
-          final int i = fd.indexOf(qnm);
-          if(i == -1) throw KEYWORDUNKNOWN_X_X.get(ii, fd, qnm);
-          if(list.get(i) != null) throw ARGTWICE_X_X.get(ii, fd, qnm);
-          list.set(i, keywords.get(qnm));
-        }
-        // assign dummy arguments
-        for(int l = list.size() - 1; l >= 0; l--) {
-          if(list.get(l) == null) {
-            if(l < min) throw ARGMISSING_X_X.get(ii, fd, fd.names[l].prefixString());
-            list.set(l, Empty.UNDEFINED);
-          }
-        }
-        return fd.get(sc, ii, list.finish());
-      } else if(arity >= min) {
-        return fd.get(sc, ii, args);
-      }
-    }
-    throw wrongArity(fd, arity, ii);
+    final int min = fd.minMax[0], max = fd.minMax[1];
+    return fd.get(sc, ii, prepareArgs(args, keywords, fd.names, min, max, fd, ii));
   }
 
   /**
@@ -231,9 +219,8 @@ public final class Functions {
 
     // type constructor
     if(eq(name.uri(), XS_URI)) {
-      lit.add(new QNm(ITEM, ""), SeqType.ANY_ATOMIC_TYPE_ZO, qc, ii);
-      final Type type = cast(name, arity, ii);
-      final Expr expr = new Cast(sc, ii, lit.args[0], SeqType.get(type, Occ.ZERO_OR_ONE));
+      lit.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc, ii);
+      final Expr expr = cast(name, lit.args, null, sc, ii);
       final FuncType ft = FuncType.get(lit.anns(), null, lit.params);
       return closureOrFuncItem(ii, expr, ft, name, lit, runtime, false);
     }
@@ -241,7 +228,7 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      if(arity < fd.minMax[0] || arity > fd.minMax[1]) throw wrongArity(fd, arity, ii);
+      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, ii);
 
       final FuncType ft = fd.type(arity, lit.anns());
       final QNm[] names = fd.paramNames(arity);
@@ -337,10 +324,7 @@ public final class Functions {
       final QueryContext qc, final StaticContext sc, final InputInfo ii) throws QueryException {
 
     // type constructor
-    if(keywords == null && eq(name.uri(), XS_URI)) {
-      final Type type = cast(name, args.length, ii);
-      return new Cast(sc, ii, args[0], SeqType.get(type, Occ.ZERO_OR_ONE));
-    }
+    if(eq(name.uri(), XS_URI)) return cast(name, args, keywords, sc, ii);
 
     // built-in function
     final StandardFunc sf = builtIn(name, args, keywords, sc, ii);
@@ -381,6 +365,46 @@ public final class Functions {
     }
     return QueryError.similar(qname.prefixString(),
         similar != null ? ((QNm) similar).prefixString() : null);
+  }
+
+  /**
+   * Incorporates keywords in the argument list and checks the arity.
+   * @param args positional arguments
+   * @param keywords keyword arguments (can be {@code null})
+   * @param names parameter names
+   * @param min minimum number of allowed arguments
+   * @param max maximum number of allowed arguments
+   * @param function function
+   * @param ii input info
+   * @return arguments
+   * @throws QueryException query exception
+   */
+  private static Expr[] prepareArgs(final Expr[] args, final QNmMap<Expr> keywords,
+      final QNm[] names, final int min, final int max, final Object function,
+      final InputInfo ii) throws QueryException {
+
+    Expr[] tmp = args;
+    if(keywords != null) {
+      final ExprList list = new ExprList().add(args);
+      for(final QNm qnm : keywords) {
+        int i = names.length;
+        while(--i >= 0 && !qnm.eq(names[i]));
+        if(i == -1) throw KEYWORDUNKNOWN_X_X.get(ii, function, qnm);
+        if(list.get(i) != null) throw ARGTWICE_X_X.get(ii, function, qnm);
+        list.set(i, keywords.get(qnm));
+      }
+      // assign dummy arguments
+      for(int l = list.size() - 1; l >= 0; l--) {
+        if(list.get(l) == null) {
+          if(l < min) throw ARGMISSING_X_X.get(ii, function, names[l].prefixString());
+          list.set(l, Empty.UNDEFINED);
+        }
+      }
+      tmp = list.finish();
+    }
+    checkArity(tmp.length, min, max, function, ii);
+
+    return tmp;
   }
 
   /**

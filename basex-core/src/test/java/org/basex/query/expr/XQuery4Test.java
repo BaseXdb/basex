@@ -241,6 +241,12 @@ public final class XQuery4Test extends QueryPlanTest {
     error("if(0) { } else if(0) { } else", WRONGCHAR_X_X);
   }
 
+  /** Keyword arguments. */
+  @Test public void keywords() {
+    query("string(value := 1)", 1);
+    query("xs:string(value := 1)", 1);
+  }
+
   /** String templates. */
   @Test public void stringTemplates() {
     query("``", "");

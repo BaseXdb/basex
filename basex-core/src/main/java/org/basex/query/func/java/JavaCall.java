@@ -466,7 +466,7 @@ public abstract class JavaCall extends Arr {
   static QueryException noMember(final String name, final String[] types, final int arity,
       final String full, final IntList arities, final byte[][] names, final InputInfo info) {
     // functions with different arities
-    if(!arities.isEmpty()) return Functions.wrongArity(full, arity, arities, info);
+    if(!arities.isEmpty()) return Functions.wrongArity(arity, arities, full, info);
 
     // find similar field/method names
     final byte[] nm = token(name);

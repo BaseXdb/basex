@@ -98,7 +98,7 @@ public final class StaticFuncs extends ExprInfo {
           if(name.eq(fc.qname())) arities.add(fc.func.arity());
         }
         throw arities.isEmpty() ? similarError(name, call.info()) :
-          Functions.wrongArity(name.prefixString(), call.exprs.length, arities, call.info());
+          Functions.wrongArity(call.exprs.length, arities, name.prefixString(), call.info());
       }
 
       // function defined, but not implemented
