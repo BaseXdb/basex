@@ -315,7 +315,8 @@ PARSER_END(RegExParser)
   RegExp charRange() : {
     int a = -1, b = -1;
   } {
-    ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image) })
+    ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image)
+               && getToken(3).kind == CHAR && !"]".equals(getToken(3).image) })
       (a = charOrEsc() <CHAR> b = charOrEsc()) {
         if(a > b) throw new ParseException("Illegal range: " +
             Literal.escape(a) + " > " + Literal.escape(b));
