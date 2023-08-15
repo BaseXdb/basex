@@ -40,7 +40,7 @@ public final class WsFunction extends WebFunction {
 
   @Override
   public boolean parseAnnotations(final Context ctx) throws QueryException {
-    final boolean[] declared = new boolean[function.params.length];
+    final boolean[] declared = new boolean[function.arity()];
     // counter for annotations that should occur only once
     boolean found = false;
     final AnnList starts = new AnnList();
@@ -90,7 +90,7 @@ public final class WsFunction extends WebFunction {
   Expr[] bind(final Object msg, final Map<String, Value> values,
       final QueryContext qc) throws QueryException {
 
-    final Expr[] args = new Expr[function.params.length];
+    final Expr[] args = new Expr[function.arity()];
     if(msg != null) values.put("message", msg instanceof byte[] ?
       B64.get((byte[]) msg) : Str.get((String) msg));
 

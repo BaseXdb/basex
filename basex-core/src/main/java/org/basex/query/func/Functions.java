@@ -178,11 +178,12 @@ public final class Functions {
     if(fd == null) return null;
 
     final int min = fd.minMax[0], max = fd.minMax[1];
-    return fd.get(sc, ii, prepareArgs(args, keywords, fd.names, min, max, fd, ii));
+    final Expr[] prepared = prepareArgs(args, keywords, fd.names, min, max, fd, ii);
+    return fd.get(sc, ii, prepared);
   }
 
   /**
-   * Creates either a {@link Closure} or a {@link FuncItem} depending on when the method is called.
+   * Creates a {@link Closure}, a {@link FuncItem} or a {@link FuncLit}.
    * At parse and compile time, a closure is generated to enable inlining and compilation.
    * At runtime, we directly generate a function item.
    * @param ii input info
@@ -206,7 +207,7 @@ public final class Functions {
     // context/positional access must be bound to original focus
     // example for invalid query: let $f := last#0 return (1, 2)[$f()]
     return ctx ? new FuncLit(ii, expr, ft.seqType(), name, params, anns, vs) :
-      runtime ? new FuncItem(lit.vs.sc, anns, name, params, ft, expr, vs.stackSize(), ii) :
+      runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize(), ii) :
       new Closure(ii, expr, updating ? SeqType.EMPTY_SEQUENCE_Z : ft.declType, name, params,
         anns, null, vs);
   }
@@ -273,9 +274,10 @@ public final class Functions {
     if(runtime) return null;
 
     // literal
-    final StaticFuncCall call = funcCall(name, lit.args, qc, sc, ii);
+    final StaticFuncCall call = funcCall(name, lit.args, null, qc, sc, ii);
     final Closure closure = new Closure(ii, call, null, name, lit.params, lit.anns(), null, lit.vs);
-    return qc.functions.register(closure);
+    qc.functions.register(closure);
+    return closure;
   }
 
   /**
@@ -289,7 +291,7 @@ public final class Functions {
    */
   public static FuncItem userDefined(final StaticFunc sf, final QueryContext qc,
       final StaticContext sc, final InputInfo ii) throws QueryException {
-    return (FuncItem) userDefined(sf, qc, sc, ii, true, new Literal(sc, sf.params.length));
+    return (FuncItem) userDefined(sf, qc, sc, ii, true, new Literal(sc, sf.arity()));
   }
 
   /**
@@ -306,10 +308,12 @@ public final class Functions {
   public static Expr userDefined(final StaticFunc sf, final QueryContext qc, final StaticContext sc,
       final InputInfo ii, final boolean runtime, final Literal lit) throws QueryException {
 
-    final FuncType ft = sf.funcType();
-    final int arity = sf.params.length;
-    for(int a = 0; a < arity; a++) lit.add(sf.paramName(a), ft.argTypes[a], qc, ii);
-    final StaticFuncCall call = funcCall(sf.name, lit.args, qc, sc, ii);
+    final FuncType sft = sf.funcType();
+    final int arity = lit.params.length;
+    for(int a = 0; a < arity; a++) lit.add(sf.paramName(a), sft.argTypes[a], qc, ii);
+    final FuncType ft = FuncType.get(lit.anns(), sft.declType, Arrays.copyOf(sft.argTypes, arity));
+
+    final StaticFuncCall call = funcCall(sf.name, lit.args, null, qc, sc, ii);
     if(call.func != null) lit.anns = call.func.anns;
     return closureOrFuncItem(ii, call, ft, sf.name, lit, runtime, sf.updating, false);
   }
@@ -339,12 +343,8 @@ public final class Functions {
       return sf;
     }
 
-    // temporary: reject keyword parameters for other function types
-    if(keywords != null && !NSGlobal.reserved(name.uri()))
-      throw KEYWORDSUPPORT_X.get(ii, name.prefixString());
-
     // user-defined function
-    return funcCall(name, args, qc, sc, ii);
+    return funcCall(name, args, keywords, qc, sc, ii);
   }
 
   /**
@@ -374,6 +374,31 @@ public final class Functions {
   }
 
   /**
+   * Incorporates keywords in the argument list.
+   * @param args positional arguments
+   * @param keywords keyword arguments
+   * @param names parameter names
+   * @param function function
+   * @param ii input info
+   * @return arguments
+   * @throws QueryException query exception
+   */
+  static Expr[] prepareArgs(final Expr[] args, final QNmMap<Expr> keywords, final QNm[] names,
+      final Object function, final InputInfo ii) throws QueryException {
+
+    final ExprList list = new ExprList().add(args);
+    final int nl = names.length;
+    for(final QNm qnm : keywords) {
+      int n = nl;
+      while(--n >= 0 && !qnm.eq(names[n]));
+      if(n == -1) throw KEYWORDUNKNOWN_X_X.get(ii, function, qnm);
+      if(list.get(n) != null) throw ARGTWICE_X_X.get(ii, function, qnm);
+      list.set(n, keywords.get(qnm));
+    }
+    return list.finish();
+  }
+
+  /**
    * Incorporates keywords in the argument list and checks the arity.
    * @param args positional arguments
    * @param keywords keyword arguments (can be {@code null})
@@ -389,45 +414,37 @@ public final class Functions {
       final QNm[] names, final int min, final int max, final Object function,
       final InputInfo ii) throws QueryException {
 
-    Expr[] tmp = args;
-    if(keywords != null) {
-      final ExprList list = new ExprList().add(args);
-      for(final QNm qnm : keywords) {
-        int i = names.length;
-        while(--i >= 0 && !qnm.eq(names[i]));
-        if(i == -1) throw KEYWORDUNKNOWN_X_X.get(ii, function, qnm);
-        if(list.get(i) != null) throw ARGTWICE_X_X.get(ii, function, qnm);
-        list.set(i, keywords.get(qnm));
+    final Expr[] tmp = keywords != null ? prepareArgs(args, keywords, names, function, ii) :
+      args;
+    final int arity = tmp.length;
+    for(int a = arity - 1; a >= 0; a--) {
+      if(tmp[a] == null) {
+        if(a < min) throw ARGMISSING_X_X.get(ii, function, names[a].prefixString());
+        tmp[a] = Empty.UNDEFINED;
       }
-      // assign dummy arguments
-      for(int l = list.size() - 1; l >= 0; l--) {
-        if(list.get(l) == null) {
-          if(l < min) throw ARGMISSING_X_X.get(ii, function, names[l].prefixString());
-          list.set(l, Empty.UNDEFINED);
-        }
-      }
-      tmp = list.finish();
     }
-    checkArity(tmp.length, min, max, function, ii);
-
+    checkArity(arity, min, max, function, ii);
     return tmp;
   }
 
   /**
    * Returns a cached function call.
    * @param name function name
-   * @param args arguments
+   * @param args positional arguments
+   * @param keywords keyword arguments (can be {@code null})
    * @param qc query context
    * @param sc static context
    * @param ii input info
    * @return function call
    * @throws QueryException query exception
    */
-  private static StaticFuncCall funcCall(final QNm name, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+  private static StaticFuncCall funcCall(final QNm name, final Expr[] args,
+      final QNmMap<Expr> keywords, final QueryContext qc, final StaticContext sc,
+      final InputInfo ii) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, ii);
-    final StaticFuncCall call = new StaticFuncCall(name, args, sc, ii);
+
+    final StaticFuncCall call = new StaticFuncCall(name, args, keywords, sc, ii);
     qc.functions.register(call);
     return call;
   }

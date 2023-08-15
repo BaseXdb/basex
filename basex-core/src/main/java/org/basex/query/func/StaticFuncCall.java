@@ -3,10 +3,13 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -24,19 +27,24 @@ public final class StaticFuncCall extends FuncCall {
   final QNm name;
   /** Function reference (can be {@code null}). */
   StaticFunc func;
-  /** Placeholder for a Java call (if not {@code null}, will be returned by the compiler). */
+
+  /** Keywords (can be {@code null}, will be dropped after parsing). */
+  QNmMap<Expr> keywords;
+  /** Placeholder for an external call (if not {@code null}, will be returned by the compiler). */
   ParseExpr external;
 
   /**
    * Function call constructor.
    * @param name function name
-   * @param args arguments
+   * @param args positional arguments
+   * @param keywords keyword arguments (can be {@code null})
    * @param sc static context
    * @param info input info
    */
-  public StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
-      final InputInfo info) {
+  public StaticFuncCall(final QNm name, final Expr[] args, final QNmMap<Expr> keywords,
+      final StaticContext sc, final InputInfo info) {
     this(name, args, sc, null, info);
+    this.keywords = keywords;
   }
 
   /**
@@ -84,11 +92,38 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   /**
-   * Adopts the function to be called.
-   * @param sf function reference
+   * Assigns the function to be called and evaluates keyword arguments.
+   * @param sf static function
+   * @throws QueryException query exception
    */
-  public void setFunc(final StaticFunc sf) {
+  public void setFunc(final StaticFunc sf) throws QueryException {
     func = sf;
+
+    // assign keywords arguments
+    final int arity = sf.arity();
+    if(keywords != null) {
+      final QNm[] names = new QNm[arity];
+      for(int n = 0; n < arity; n++) names[n] = sf.paramName(n);
+      exprs = Functions.prepareArgs(exprs, keywords, names, this, info);
+      keywords = null;
+    }
+    // adopt default expressions
+    if(arity > exprs.length) exprs = Arrays.copyOf(exprs, arity);
+    for(int a = arity - 1; a >= 0; a--) {
+      if(exprs[a] == null) {
+        final Expr dflt = sf.defaults[a];
+        if(dflt == null) throw ARGMISSING_X_X.get(info, this, sf.paramName(a).prefixString());
+        exprs[a] = dflt;
+      }
+    }
+  }
+
+  /**
+   * Returns the function arity.
+   * @return function arity
+   */
+  public int arity() {
+    return exprs.length + (keywords != null ? keywords.size() : 0);
   }
 
   /**

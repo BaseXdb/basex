@@ -90,7 +90,7 @@ public final class RestXqFunction extends WebFunction {
   @Override
   public boolean parseAnnotations(final Context ctx) throws QueryException, IOException {
     // parse all annotations
-    final boolean[] declared = new boolean[function.params.length];
+    final boolean[] declared = new boolean[function.arity()];
     boolean found = false;
     final MainOptions options = ctx.options;
 
@@ -191,7 +191,7 @@ public final class RestXqFunction extends WebFunction {
       final QueryContext qc) throws QueryException, IOException {
 
     // bind variables from segments
-    final Expr[] args = new Expr[function.params.length];
+    final Expr[] args = new Expr[function.arity()];
     if(path != null) {
       final QNmMap<String> qnames = path.values(conn);
       for(final QNm qname : qnames) {

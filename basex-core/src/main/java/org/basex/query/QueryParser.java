@@ -934,20 +934,27 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a ParamList.
-   * @param sttc static function
+   * @param dflt allow default values
    * @return declared variables
    * @throws QueryException query exception
    */
-  private Params paramList(final boolean sttc) throws QueryException {
+  private Params paramList(final boolean dflt) throws QueryException {
     final Params params = new Params();
+    boolean defaults = false;
     do {
       skipWs();
       if(curr() != '$' && params.isEmpty()) break;
       final InputInfo ii = info();
       final QNm name = varName();
       final SeqType type = optAsType();
-      final Expr dflt = sttc && wsConsume(":=") ? single() : null;
-      params.add(name, type, dflt, ii);
+      Expr expr = null;
+      if(dflt && wsConsume(":=")) {
+        defaults = true;
+        expr = single();
+      } else if(defaults) {
+        throw error(PARAMOPTIONAL_X, name);
+      }
+      params.add(name, type, expr, ii);
     } while(consume(','));
 
     wsCheck(")");

@@ -252,7 +252,7 @@ public final class QueryContext extends Job implements Closeable {
         // inline arguments of called function
         sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
         // create and assign function call
-        final StaticFuncCall call = new StaticFuncCall(sf.name, args, sf.sc, sf.info);
+        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.sc, sf.info);
         call.setFunc(sf);
         main = new MainModule(call, new VarScope(sf.sc));
         updating = sf.updating();

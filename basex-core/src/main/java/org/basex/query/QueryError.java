@@ -1033,15 +1033,15 @@ public enum QueryError {
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
+  PARAMOPTIONAL_X(XPST, 17, "Parameter must be declared as optional: $%."),
+  /** Error code. */
   KEYWORDTWICE_X(XPST, 17, "Keyword supplied twice: %."),
   /** Error code. */
-  ARGMISSING_X_X(XPST, 17, "%: No argument supplied for: %."),
+  ARGMISSING_X_X(XPST, 17, "%: No argument supplied: %."),
   /** Error code. */
-  ARGTWICE_X_X(XPST, 17, "%: Argument supplied twice for: %."),
+  ARGTWICE_X_X(XPST, 17, "%: Argument supplied twice: %."),
   /** Error code. */
   KEYWORDUNKNOWN_X_X(XPST, 17, "%: Unknown keyword: %."),
-  /** Error code. */
-  KEYWORDSUPPORT_X(XPST, 17, "%: Keyword arguments not supported."),
   /** Error code. */
   ABSTRACTFUNC_X(XPST, 17, "No function exists for abstract type: %."),
   /** Error code. */
@@ -1210,7 +1210,7 @@ public enum QueryError {
   /** Error code. */
   DUPLNSDECL_X(XQST, 33, "Duplicate declaration of prefix '%'."),
   /** Error code. */
-  FUNCDEFINED_X(XQST, 34, "Duplicate declaration of function '%'."),
+  DUPLFUNC_X(XQST, 34, "Duplicate declaration of function '%'."),
   /** Error code. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** Error code. */

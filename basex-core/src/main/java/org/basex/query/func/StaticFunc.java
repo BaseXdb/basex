@@ -35,6 +35,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public final Var[] params;
   /** Default expressions (entries can be {@code null} references). */
   public final Expr[] defaults;
+  /** Minimum number of arguments. */
+  public final int min;
   /** Updating flag. */
   final boolean updating;
 
@@ -59,6 +61,12 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     this.defaults = params.defaults();
     this.expr = expr;
     updating = anns.contains(Annotation.UPDATING);
+
+    int mn = defaults.length;
+    for(final Expr dflt : defaults) {
+      if(dflt != null) mn--;
+    }
+    min = mn;
   }
 
   @Override
@@ -123,6 +131,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     });
   }
 
+  /**
+   * Returns the maximum arity.
+   */
   @Override
   public int arity() {
     return params.length;
@@ -259,24 +270,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   @Override
-  public byte[] id() {
-    return id(name, params.length);
-  }
-
-  /**
-   * Returns the id of the function with the given name and arity.
-   * @param qname function name
-   * @param arity function arity
-   * @return the function signature
-   */
-  public static byte[] id(final QNm qname, final long arity) {
-    return concat(qname.prefixId(), '#', arity);
-  }
-
-  @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!inline(cc, anns, expr) || has(Flag.CTX) || dontEnter || selfRecursive()) return null;
-    cc.info(OPTINLINE_X, (Supplier<?>) this::id);
+    cc.info(OPTINLINE_X, (Supplier<?>) () -> concat(name.prefixId(), '#', params.length));
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();

@@ -45,12 +45,6 @@ public abstract class StaticDecl extends StaticScope {
   }
 
   /**
-   * Returns a unique identifier for this declaration.
-   * @return a byte sequence that uniquely identifies this declaration
-   */
-  public abstract byte[] id();
-
-  /**
    * Returns the type of this expression. If no type has been declared in the expression,
    * it is derived from the expression type.
    * @return return type

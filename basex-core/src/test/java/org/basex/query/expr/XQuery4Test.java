@@ -248,6 +248,14 @@ public final class XQuery4Test extends QueryPlanTest {
     query("(1 to 6) ! xs:string()", "1\n2\n3\n4\n5\n6");
   }
 
+  /** Keyword arguments. */
+  @Test public void keywords() {
+    query("count(input := 1)", 1);
+    query("declare function local:inc($x) { $x + 1 }; local:inc(x := 1)", 2);
+    query("declare function local:inc($x, $y) { $x + $y }; local:inc(x := 1, y := 1)", 2);
+    query("declare function local:inc($x, $y) { $x + $y }; local:inc(1, y := 1)", 2);
+  }
+
   /** String templates. */
   @Test public void stringTemplates() {
     query("``", "");

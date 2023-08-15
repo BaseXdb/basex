@@ -121,7 +121,10 @@ public final class StaticVar extends StaticDecl {
     return expr == null || expr.accept(visitor);
   }
 
-  @Override
+  /**
+   * Returns a unique identifier for this variable.
+   * @return identifier
+   */
   public byte[] id() {
     return Token.concat(Token.DOLLAR, name.internal());
   }

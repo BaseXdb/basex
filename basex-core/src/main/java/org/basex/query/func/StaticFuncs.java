@@ -26,9 +26,9 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 public final class StaticFuncs extends ExprInfo {
-  /** User-defined functions. */
-  private final TokenObjMap<FuncCache> funcs = new TokenObjMap<>();
-  /** User-defined function calls. */
+  /** Function caches. */
+  private final TokenObjMap<FuncCache> caches = new TokenObjMap<>();
+  /** Function calls. */
   private Map<StaticFunc, ArrayList<StaticFuncCall>> callsMap;
 
   /**
@@ -53,27 +53,25 @@ public final class StaticFuncs extends ExprInfo {
       throw FNRESERVED_X.get(ii, qname.string());
 
     final StaticFunc sf = new StaticFunc(qname, params, expr, anns, doc, vs, ii);
-    if(!cache(sf.id()).setFunc(sf)) throw FUNCDEFINED_X.get(sf.info, qname.string());
+    if(!cache(qname.prefixId()).register(sf)) throw DUPLFUNC_X.get(sf.info, qname.string());
     return sf;
   }
 
   /**
    * Registers a function call.
    * @param call name function name
-   * @return function call
+   * @throws QueryException query exception
    */
-  StaticFuncCall register(final StaticFuncCall call) {
-    return cache(StaticFunc.id(call.name, call.exprs.length)).add(call);
+  void register(final StaticFuncCall call) throws QueryException {
+    cache(call.name.prefixId()).add(call);
   }
 
   /**
    * Registers a function literal.
    * @param literal wrapped literal
-   * @return literal
    */
-  public Closure register(final Closure literal) {
-    cache(StaticFunc.id(literal.funcName(), literal.arity())).add(literal);
-    return literal;
+  public void register(final Closure literal) {
+    cache(literal.funcName().prefixId()).add(literal);
   }
 
   /**
@@ -82,31 +80,7 @@ public final class StaticFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public void check(final QueryContext qc) throws QueryException {
-    for(final FuncCache cache : funcs.values()) {
-      final boolean ok = cache.init(qc);
-      // ignore unreferenced functions
-      if(cache.calls.isEmpty()) continue;
-
-      final StaticFuncCall call = cache.calls.get(0);
-      final QNm name = cache.qname();
-
-      // function not defined
-      if(!ok) {
-        // function is unknown: raise error
-        final IntList arities = new IntList();
-        for(final FuncCache fc : caches()) {
-          if(name.eq(fc.qname())) arities.add(fc.func.arity());
-        }
-        throw arities.isEmpty() ? similarError(name, call.info()) :
-          Functions.wrongArity(call.exprs.length, arities, name.prefixString(), call.info());
-      }
-
-      // function defined, but not implemented
-      if(cache.func != null && cache.func.expr == null)
-        throw FUNCNOIMPL_X.get(call.info(), name.prefixString());
-      // set updating flag
-      if(cache.updating) qc.updating = true;
-    }
+    for(final FuncCache cache : caches.values()) cache.init(qc);
   }
 
   /**
@@ -114,7 +88,9 @@ public final class StaticFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    for(final FuncCache cache : caches()) cache.func.checkUp();
+    for(final FuncCache cache : caches()) {
+      for(final StaticFunc func : cache.funcs) func.checkUp();
+    }
   }
 
   /**
@@ -122,7 +98,9 @@ public final class StaticFuncs extends ExprInfo {
    * @param cc compilation context
    */
   public void compileAll(final CompileContext cc) {
-    for(final FuncCache cache : caches()) cache.func.compile(cc);
+    for(final FuncCache cache : caches()) {
+      for(final StaticFunc func : cache.funcs) func.compile(cc);
+    }
   }
 
   /**
@@ -132,8 +110,13 @@ public final class StaticFuncs extends ExprInfo {
    * @return function if found, {@code null} otherwise
    */
   public StaticFunc get(final QNm qname, final long arity) {
-    final FuncCache cache = funcs.get(StaticFunc.id(qname, arity));
-    return cache != null ? cache.func : null;
+    final FuncCache cache = caches.get(qname.prefixId());
+    if(cache != null) {
+      for(final StaticFunc func : cache.funcs) {
+        if(arity >= func.min && arity <= func.arity()) return func;
+      }
+    }
+    return null;
   }
 
   /**
@@ -142,18 +125,23 @@ public final class StaticFuncs extends ExprInfo {
    * @return sequence types or {@code null}
    */
   SeqType[] seqTypes(final StaticFunc func) {
+    final int sl = func.arity();
+    if(sl == 0) return null;
+
     // initialize cache for direct lookups of function calls
     if(callsMap == null) {
       callsMap = new IdentityHashMap<>();
       for(final FuncCache cache : caches()) {
-        if(func.params.length > 0 && !cache.calls.isEmpty()) callsMap.put(cache.func, cache.calls);
+        for(final StaticFuncCall call : cache.calls) {
+          callsMap.computeIfAbsent(call.func, k -> new ArrayList<>(1)).add(call);
+        }
       }
     }
-    if(!callsMap.containsKey(func)) return null;
+    final ArrayList<StaticFuncCall> calls = callsMap.get(func);
+    if(calls == null) return null;
 
-    final int sl = func.params.length;
     final SeqType[] seqTypes = new SeqType[sl];
-    for(final StaticFuncCall call : callsMap.get(func)) {
+    for(final StaticFuncCall call : calls) {
       for(int s = 0; s < sl; s++) {
         final SeqType st = call.arg(s).seqType(), stOld = seqTypes[s];
         seqTypes[s] = stOld == null ? st : stOld.union(st);
@@ -172,7 +160,12 @@ public final class StaticFuncs extends ExprInfo {
     // check local functions
     final ArrayList<QNm> list = new ArrayList<>();
     for(final FuncCache cache : caches()) {
-      if(cache.func.expr != null) list.add(cache.qname());
+      for(final StaticFunc func : cache.funcs) {
+        if(func.expr != null) {
+          list.add(cache.qname());
+          break;
+        }
+      }
     }
     final Object similar = Levenshtein.similar(qname.local(),
         list.toArray(QNm[]::new), o -> ((QNm) o).local());
@@ -189,19 +182,23 @@ public final class StaticFuncs extends ExprInfo {
    */
   public StaticFunc[] funcs() {
     final ArrayList<StaticFunc> list = new ArrayList<>();
-    for(final FuncCache cache : caches()) list.add(cache.func);
+    for(final FuncCache cache : caches()) {
+      for(final StaticFunc func : cache.funcs) list.add(func);
+    }
     return list.toArray(StaticFunc[]::new);
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    if(!funcs.isEmpty()) plan.add(plan.create(this), funcs());
+    if(!caches.isEmpty()) plan.add(plan.create(this), funcs());
   }
 
   @Override
   public void toString(final QueryString qs) {
     for(final FuncCache cache : caches()) {
-      if(cache.func.compiled()) qs.token(cache.func).token(Text.NL);
+      for(final StaticFunc func : cache.funcs) {
+        if(func.compiled()) qs.token(func).token(Text.NL);
+      }
     }
   }
 
@@ -211,8 +208,8 @@ public final class StaticFuncs extends ExprInfo {
    */
   private ArrayList<FuncCache> caches() {
     final ArrayList<FuncCache> list = new ArrayList<>();
-    for(final FuncCache cache : funcs.values()) {
-      if(cache.func != null) list.add(cache);
+    for(final FuncCache cache : caches.values()) {
+      if(!cache.funcs.isEmpty()) list.add(cache);
     }
     return list;
   }
@@ -223,7 +220,7 @@ public final class StaticFuncs extends ExprInfo {
    * @return function cache
    */
   private FuncCache cache(final byte[] id) {
-    return funcs.computeIfAbsent(id, FuncCache::new);
+    return caches.computeIfAbsent(id, FuncCache::new);
   }
 
   /**
@@ -233,73 +230,116 @@ public final class StaticFuncs extends ExprInfo {
    * @author Christian Gruen
    */
   private static class FuncCache {
+    /** Functions. */
+    final ArrayList<StaticFunc> funcs = new ArrayList<>(1);
     /** Function calls. */
     final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
     /** Function literals. */
     final ArrayList<Closure> literals = new ArrayList<>(0);
-    /** Static function (can be {@code null}). */
-    StaticFunc func;
-    /** Updating flag. */
-    boolean updating;
 
     /**
      * Initializes the function calls and literals.
      * @param qc query context
+     * @throws QueryException query exception
+     */
+    void init(final QueryContext qc) throws QueryException {
+      // assign functions to function calls
+      for(final StaticFuncCall call : calls) {
+        if(call.func == null && !setFunc(call) && !setJava(call, qc)) {
+          // function is unknown: raise error
+          if(!calls.isEmpty()) {
+            final IntList arities = new IntList();
+            for(final StaticFunc func : funcs) arities.add(func.min).add(func.arity());
+            throw arities.isEmpty() ? qc.functions.similarError(qname(), call.info()) :
+              Functions.wrongArity(call.arity(), arities, qname().prefixString(), call.info());
+          }
+        } else {
+          // check if all implementations exist for all functions, set updating flag
+          final StaticFunc func = call.func;
+          if(func != null) {
+            if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
+            if(func.updating) qc.updating();
+          } else {
+            if(((JavaCall) call.external).updating) qc.updating();
+          }
+        }
+      }
+
+      // assign function signatures to function literals
+      for(final Closure literal : literals) {
+        final int arity = literal.arity();
+        for(final StaticFunc func : funcs) {
+          if(arity < func.min || arity > func.arity()) {
+            literal.setSignature(func.funcType());
+            break;
+          }
+        }
+      }
+    }
+
+    /**
+     * Registers the specified function.
+     * @param func function to assign
+     * @return success flag
+     */
+    boolean register(final StaticFunc func) {
+      /* Reject a function with a conflicting arity range. Examples:
+       * f($a), f($b)
+       * f($a), f($a, $b := ()) */
+      for(final StaticFunc sf : funcs) {
+        if(func.arity() >= sf.min && func.min <= sf.arity()) return false;
+      }
+      funcs.add(func);
+      return true;
+    }
+
+    /**
+     * Adds a function call.
+     * @param call function call
+     * @throws QueryException query exception
+     */
+    void add(final StaticFuncCall call) throws QueryException {
+      calls.add(call);
+      setFunc(call);
+    }
+
+    /**
+     * Tries to assign a function to a static function call.
+     * @param call static function call
      * @return success flag
      * @throws QueryException query exception
      */
-    boolean init(final QueryContext qc) throws QueryException {
-      // no user-defined function defined, no literals: try to find Java function
-      if(func == null) {
-        if(literals.isEmpty()) {
-          for(final StaticFuncCall call : calls) {
-            final JavaCall java = JavaCall.get(call.name, call.exprs, qc, call.sc, call.info());
-            if(java == null) return false;
-            call.setExternal(java);
-            updating = java.updating;
-          }
+    boolean setFunc(final StaticFuncCall call) throws QueryException {
+      final int arity = call.arity();
+      for(final StaticFunc func : funcs) {
+        if(arity >= func.min && arity <= func.arity()) {
+          call.setFunc(func);
           return true;
         }
-        return false;
       }
-
-      for(final StaticFuncCall call : calls) call.setFunc(func);
-      final FuncType ft = func.funcType();
-      for(final Closure literal : literals) literal.setSignature(ft);
-      updating = func.updating;
-      return true;
+      return false;
     }
 
     /**
-     * Assigns the specified function.
-     * @param sf function to assign
+     * Tries to assign a Java function to a static function call.
+     * @param call static function call
+     * @param qc query context
      * @return success flag
+     * @throws QueryException query exception
      */
-    boolean setFunc(final StaticFunc sf) {
-      if(func != null) return false;
-      func = sf;
-      return true;
+    boolean setJava(final StaticFuncCall call, final QueryContext qc) throws QueryException {
+      final JavaCall java = literals.isEmpty() ?
+        JavaCall.get(call.name, call.exprs, qc, call.sc, call.info()) : null;
+      call.setExternal(java);
+      return java != null;
     }
 
     /**
-     * Caches a new function call.
-     * @param call function call
-     * @return function call
-     */
-    StaticFuncCall add(final StaticFuncCall call) {
-      calls.add(call);
-      call.setFunc(func);
-      return call;
-    }
-
-    /**
-     * Caches a new function literal.
+     * Adds a function literal.
      * @param literal literal
-     * @return literal
      */
-    Closure add(final Closure literal) {
+    void add(final Closure literal) {
       literals.add(literal);
-      return literal;
     }
 
     /**
@@ -307,7 +347,7 @@ public final class StaticFuncs extends ExprInfo {
      * @return function name
      */
     QNm qname() {
-      return func != null ? func.name : calls.get(0).name;
+      return funcs.isEmpty() ? calls.get(0).name : funcs.get(0).name;
     }
   }
 }

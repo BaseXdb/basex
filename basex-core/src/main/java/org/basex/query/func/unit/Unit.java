@@ -93,7 +93,7 @@ final class Unit {
 
         // Unit function:
         if(anns.contains(PRIVATE)) throw UNIT_PRIVATE_X.get(null, sf.name.local());
-        if(sf.params.length > 0) throw UNIT_NOARGS_X.get(null, sf.name.local());
+        if(sf.arity() > 0) throw UNIT_NOARGS_X.get(null, sf.name.local());
 
         if(anns.contains(_UNIT_BEFORE_MODULE)) beforeModule.add(sf);
         if(anns.contains(_UNIT_AFTER_MODULE)) afterModule.add(sf);
