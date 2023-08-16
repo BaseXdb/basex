@@ -134,9 +134,8 @@ final class PlainDoc extends Inspect {
       }
     }
 
-    final SeqType st = sf != null ? sf.seqType() : ft.declType;
     final FBuilder rtrn = element("return");
-    type(st, rtrn);
+    type(ft.declType, rtrn);
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
     if(returns != null) {
       for(final byte[] val : returns) add(val, rtrn);

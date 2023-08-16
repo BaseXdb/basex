@@ -1492,7 +1492,7 @@ public enum Function implements AFunction {
       params(), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
-      params(STRING_O), ELEMENT_O, INSPECT_URI),
+      params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations::new, "function-annotations(function)",
       params(FUNCTION_O), MAP_ZO, INSPECT_URI),
