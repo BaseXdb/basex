@@ -63,10 +63,14 @@ public final class FnData extends ContextFn {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     final Expr input = contextAccess() ? ContextValue.get(cc, info) : arg(0);
-    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT)) {
+    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
       // data(<a/>) = ''  ->  <a/> = ''
       // A[B ! data() = '']  ->  A[B ! . = '']
       expr = input;
+    } else if(mode == Simplify.COUNT) {
+      // count(data($x))  ->  count($x)
+      // do not simplify array input: count(data([ 1, 2, 3 ]))
+      if(!input.seqType().mayBeArray()) expr = input;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // if(data($node))  ->  if($node/descendant::text())
       expr = simplifyEbv(input, cc, null);

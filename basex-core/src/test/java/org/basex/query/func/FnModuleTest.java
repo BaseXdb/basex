@@ -321,6 +321,8 @@ public final class FnModuleTest extends QueryPlanTest {
 
     query(func.args(" count(array { <a/>, <b/> }) "), 1);
     query(func.args(" count([ <a/>, <b/> ]) "), 1);
+
+    query(func.args(" data( [ (1 to 6) ! <_>{ 1 }</_> ][. > 0 ] )"), 6);
   }
 
   /** Test method. */
