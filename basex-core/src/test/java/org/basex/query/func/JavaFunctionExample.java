@@ -2,7 +2,10 @@ package org.basex.query.func;
 
 import java.util.*;
 
+import javax.xml.parsers.*;
+
 import org.basex.util.list.*;
+import org.w3c.dom.*;
 
 /**
  * Java binding example.
@@ -148,5 +151,59 @@ public class JavaFunctionExample {
    */
   public static void error() {
     throw new RuntimeException("ERROR");
+  }
+
+  /**
+   * Creates a document.
+   * @return document
+   * @throws Exception exception
+   */
+  public Document doc() throws Exception {
+    return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+  }
+
+  /**
+   * Creates a text node.
+   * @return text node
+   * @throws Exception exception
+   */
+  public Node text() throws Exception {
+    return doc().createTextNode("t");
+  }
+
+  /**
+   * Creates a processing instruction.
+   * @return processing instruction
+   * @throws Exception exception
+   */
+  public Node pi() throws Exception {
+    return doc().createProcessingInstruction("a", "b");
+  }
+
+  /**
+   * Creates a comment.
+   * @return comment
+   * @throws Exception exception
+   */
+  public Node comment() throws Exception {
+    return doc().createComment("c");
+  }
+
+  /**
+   * Creates an element.
+   * @return element
+   * @throws Exception exception
+   */
+  public Node element() throws Exception {
+    return doc().createElement("e");
+  }
+
+  /**
+   * Creates an attribute.
+   * @return attribute
+   * @throws Exception exception
+   */
+  public Node attribute() throws Exception {
+    return doc().createAttribute("a");
   }
 }

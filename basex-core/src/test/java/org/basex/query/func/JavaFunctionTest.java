@@ -158,42 +158,36 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Pass on empty sequences. */
   @Test public void emptyDecl() {
-    query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:string(n:new(), ())", "");
-    query("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:ambiguous1(n:new(), ())", "");
+    final String ns = "declare namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    query(ns + "n:string(n:new(), ())", "");
+    query(ns + "n:ambiguous1(n:new(), ())", "");
 
-    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:bool(n:new(), ())", JAVAARGS_X_X_X);
-    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:ambiguous2(n:new(), ())", JAVAMULTIPLE_X_X);
+    error(ns + "n:bool(n:new(), ())", JAVAARGS_X_X_X);
+    error(ns + "n:ambiguous2(n:new(), ())", JAVAMULTIPLE_X_X);
   }
 
   /** Pass on empty sequences. */
   @Test public void emptyImport() {
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:string(())", "");
+    final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    query(mod + "n:string(())", "");
 
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:bool(())", JAVAARGS_X_X_X);
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:ambiguous1(())", JAVAMULTIPLE_X_X);
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:ambiguous2(())", JAVAMULTIPLE_X_X);
+    error(mod + "n:bool(())", JAVAARGS_X_X_X);
+    error(mod + "n:ambiguous1(())", JAVAMULTIPLE_X_X);
+    error(mod + "n:ambiguous2(())", JAVAMULTIPLE_X_X);
   }
 
   /** Address invisible code. */
   @Test public void notVisible() {
-    error("declare namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:var(n:new())", WHICHFUNC_X);
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:var()", JAVAMEMBER_X);
+    final String ns = "declare namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    error(ns + "n:var(n:new())", WHICHFUNC_X);
+    error(mod + "n:var()", JAVAMEMBER_X);
   }
 
   /** Error cases. */
   @Test public void errors() {
-    error("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:null-array()", JAVANULL);
+    final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    error(mod + "n:null-array()", JAVANULL);
   }
 
   /** Instance errors. */
@@ -204,14 +198,11 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Process arrays. */
   @Test public void array() {
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:strings(array { })", "");
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:strings(array { '1' })", 1);
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:longs(array { 1 })", 1);
-    query("import module namespace n = 'org.basex.query.func.JavaFunctionExample'; " +
-        "n:chars() => codepoints-to-string()", "ab");
+    final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    query(mod + "n:strings(array { })", "");
+    query(mod + "n:strings(array { '1' })", 1);
+    query(mod + "n:longs(array { 1 })", 1);
+    query(mod + "n:chars() => codepoints-to-string()", "ab");
   }
 
   /** Character parameters. */
@@ -284,12 +275,11 @@ public final class JavaFunctionTest extends SandboxTest {
 
   /** Test method. */
   @Test public void fromJava() {
-    query("import module namespace jfe = 'org.basex.query.func.JavaFunctionExample'; "
-        + "jfe:data() ! (if(. instance of function(*)) then .() else .)",
+    final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    query(mod + "n:data() ! (if(. instance of function(*)) then .() else .)",
         "a\nb\nc\nmap{\"d\":\"e\"}\nf");
 
-    query("import module namespace jfe = 'org.basex.query.func.JavaFunctionExample'; "
-        + "let $c := jfe:data() ! (if(. instance of function(*)) then .() else .) "
+    query(mod + "let $c := n:data() ! (if(. instance of function(*)) then .() else .) "
         + "return ($c[1], $c[2], $c[3], map:keys($c[4]), $c[4]?*, $c[5])",
         "a\nb\nc\nd\ne\nf");
 
@@ -348,8 +338,8 @@ public final class JavaFunctionTest extends SandboxTest {
     query(Util.info(pattern, "none", ""), true);
     query(Util.info(pattern, "void", ""), false);
 
-    pattern = "import module namespace jfe = 'org.basex.query.func.JavaFunctionExample'; " +
-        "let $s := (# db:wrapjava % #) { jfe:bool(true()) } return $s%";
+    final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample';";
+    pattern = mod + "let $s := (# db:wrapjava % #) { n:bool(true()) } return $s%";
     query(Util.info(pattern, "all", "()"), true);
     query(Util.info(pattern, "instance", " instance of function(*)"), true);
     query(Util.info(pattern, "some", ""), true);
@@ -406,5 +396,17 @@ public final class JavaFunctionTest extends SandboxTest {
     assertEquals("http-/-gg", JavaCall.uri2path("http://%gg"));
 
     assertEquals("a/b/c", JavaCall.uri2path("a:b:c"));
+  }
+
+
+  /** DOM tests. */
+  @Test public void dom() {
+    final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
+    query(mod + "n:doc()", "");
+    query(mod + "n:text()", "t");
+    query(mod + "n:pi()", "<?a b?>");
+    query(mod + "n:comment()", "<!--c-->");
+    query(mod + "n:element()", "<e/>");
+    query(mod + "n:attribute()", "a=\"\"");
   }
 }

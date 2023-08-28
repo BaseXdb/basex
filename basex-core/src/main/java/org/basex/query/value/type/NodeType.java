@@ -16,6 +16,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.w3c.dom.*;
 import org.w3c.dom.Text;
 
@@ -57,7 +58,7 @@ public enum NodeType implements Type {
     public ANode cast(final Object value, final QueryContext qc, final InputInfo ii)
       throws QueryException {
       if(value instanceof BXElem)  return ((BXNode) value).getNode();
-      if(value instanceof Element) return FElem.build((Element) value, null).finish();
+      if(value instanceof Element) return FElem.build((Element) value, new TokenMap()).finish();
       try {
         return new DBNode(new IOContent(Token.token(value))).childIter().next();
       } catch(final IOException ex) {
