@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -80,7 +79,11 @@ public class BaseX extends CLI {
             break;
           case 'c':
             console = false;
-            if(!execute(input(value))) return;
+            if(!execute(commands(value))) return;
+            break;
+          case 'C':
+            console = false;
+            if(!execute(script(value))) return;
             break;
           case 'i':
             execute(new Set(MainOptions.MAINMEM, true), false);
@@ -103,10 +106,9 @@ public class BaseX extends CLI {
             execute(new XQuery(value), verbose);
             break;
           case 'Q':
-            // hidden: run query with base uri
             console = false;
-            final Entry<String, String> input = input(value);
-            execute(new XQuery(input.getValue()).baseURI(input.getKey()), verbose);
+            final IO io = IO.get(value);
+            execute(new XQuery(io.string()).baseURI(io.path()), verbose);
             break;
           case 'r':
             execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
@@ -214,7 +216,7 @@ public class BaseX extends CLI {
           // activate debug mode
           Prop.debug = true;
         } else if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' || c == 'o' ||
-            c == 'q' || c == 'r' || c == 's' || c == 't' && local()) {
+            c == 'q' || c == 'Q' || c == 'r' || c == 's' || c == 't' && local()) {
           // options followed by a string
           v = arg.string();
         } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
@@ -239,8 +241,7 @@ public class BaseX extends CLI {
         }
       } else {
         v = arg.string().trim();
-        // interpret as command file if input string ends with command script suffix
-        c = v.endsWith(IO.BXSSUFFIX) ? 'c' : 'Q';
+        c = isFile(v) ? v.endsWith(IO.BXSSUFFIX) ? 'C' : 'Q' : 'q';
       }
       if(v != null) {
         ops.add(c);

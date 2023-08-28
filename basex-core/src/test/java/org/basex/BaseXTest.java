@@ -29,16 +29,6 @@ public abstract class BaseXTest extends SandboxTest {
   }
 
   /**
-   * Tests a query file.
-   * @throws IOException I/O exception
-   */
-  @Test public void queryFile() throws IOException {
-    final String query = "1";
-    INPUT.write(query);
-    equals(query, INPUT.path());
-  }
-
-  /**
    * Test variable bindings.
    * @throws IOException I/O exception
    */
@@ -105,12 +95,20 @@ public abstract class BaseXTest extends SandboxTest {
   }
 
   /**
-   * Tests command scripts.
+   * Tests commands.
    * @throws IOException I/O exception
    */
   @Test public void commands() throws IOException {
+    equals("12", "-c XQUERY 1", "-c XQUERY 2");
+  }
+
+  /**
+   * Tests command scripts.
+   * @throws IOException I/O exception
+   */
+  @Test public void commandFile() throws IOException {
     INPUT.write("xquery 1" + Prop.NL + "xquery 2" + Prop.NL);
-    equals("12", "-c" + INPUT.path());
+    equals("12", "-C" + INPUT.path());
   }
 
   /**
@@ -119,6 +117,15 @@ public abstract class BaseXTest extends SandboxTest {
    */
   @Test public void query() throws IOException {
     equals("3", "-q1+2");
+  }
+
+  /**
+   * Tests a query file.
+   * @throws IOException I/O exception
+   */
+  @Test public void queryFile() throws IOException {
+    INPUT.write("1");
+    equals("1", "-Q", INPUT.path());
   }
 
   /**

@@ -87,15 +87,17 @@ public interface Text {
   String S_STANDALONE = "Standalone";
   /** Start information. */
   String  S_LOCALINFO =
-    " [-bcdiIoqrRstuvVwWxz] [input]" + NL +
+    " [-bcCdiIoqQrRstuvVwWxz] [input]" + NL +
     "  [input]    XQuery or command file, or query string" + NL +
     "  -b<args>   Bind external query variables" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
+    "  -C<file>   Execute command script file" + NL +
     "  -d         Toggle debugging output" + NL +
     "  -i<input>  Bind file or database to context" + NL +
     "  -I<input>  Bind input string to context" + NL +
     "  -o<path>   Write output to local file" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
+    "  -Q<file>   Execute XQuery file" + NL +
     "  -r<num>    Run query multiple times" + NL +
     "  -R         Toggle query execution" + NL +
     "  -s<args>   Set serialization parameters" + NL +
@@ -112,10 +114,11 @@ public interface Text {
   String S_CLIENT = "Client";
   /** Client start information. */
   String S_CLIENTINFO =
-    " [-bcdiInopPqrRsUvVwWxz] [input]" + NL +
+    " [-bcCdiInopPqQrRsUvVwWxz] [input]" + NL +
     "  [input]    XQuery or command file, or query string" + NL +
     "  -b<args>   Bind external query variables" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
+    "  -C<file>   Execute command script file" + NL +
     "  -d         Toggle debugging output" + NL +
     "  -i<input>  Bind file or database to context" + NL +
     "  -I<input>  Bind input string to context" + NL +
@@ -124,6 +127,7 @@ public interface Text {
     "  -p<port>   Set server port" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -q<expr>   Execute XQuery expression" + NL +
+    "  -Q<file>   Execute XQuery file" + NL +
     "  -r<num>    Run query multiple times" + NL +
     "  -R         Toggle query execution" + NL +
     "  -s<args>   Set serialization parameters" + NL +
@@ -139,9 +143,10 @@ public interface Text {
   String S_SERVER = "Server";
   /** Server start information. */
   String S_SERVERINFO =
-    " [-cdnpSz] [stop]" + NL +
+    " [-cCdnpSz] [stop]" + NL +
     "  stop       Stop running server" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
+    "  -C<file>   Execute command script file" + NL +
     "  -d         Enable debugging output" + NL +
     "  -n<name>   Set host the server is bound to" + NL +
     "  -p<port>   Set server port" + NL +
@@ -160,9 +165,10 @@ public interface Text {
   String S_HTTP_SERVER = "HTTP Server";
   /** HTTP information. */
   String S_HTTPINFO =
-    " [-cdhlnpsSUz] [stop]" + NL +
+    " [-cCdghlnpsSUz] [stop]" + NL +
     "  stop       Stop running server" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
+    "  -C<file>   Execute command script file" + NL +
     "  -d         Enable debugging output" + NL +
     "  -g         Enable GZIP support" + NL +
     "  -h<port>   Set port of HTTP server" + NL +

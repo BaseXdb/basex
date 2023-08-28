@@ -137,15 +137,35 @@ public abstract class CLI extends Main {
   }
 
   /**
-   * Returns the base URI and the query string for the specified input.
+   * Returns the base URI and the query string for the specified command input.
+   * @param input command string or command script reference
+   * @return return base URI and query string
+   * @throws IOException I/O exception
+   */
+  protected static Entry<String, String> commands(final String input) throws IOException {
+    return isFile(input) ? script(input) : new SimpleEntry<>("", input);
+
+  }
+
+  /**
+   * Returns the base URI and the contents for the specified command script.
    * @param input input
    * @return return base URI and query string
    * @throws IOException I/O exception
    */
-  protected static Entry<String, String> input(final String input) throws IOException {
+  protected static Entry<String, String> script(final String input) throws IOException {
     final IO io = IO.get(input);
-    final boolean file = !(io instanceof IOContent) && io.exists() && !io.isDir();
-    return new SimpleEntry<>(file ? io.path() : "", file ? io.string() : input);
+    return new SimpleEntry<>(io.path(), io.string());
+  }
+
+  /**
+   * Indicates if the specified string points to an existing file.
+   * @param input string
+   * @return return result of check
+   */
+  protected static boolean isFile(final String input) {
+    final IO io = IO.get(input);
+    return !(io instanceof IOContent) && io.exists() && !io.isDir();
   }
 
   /**

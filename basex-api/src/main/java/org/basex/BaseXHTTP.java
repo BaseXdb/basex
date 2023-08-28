@@ -236,8 +236,11 @@ public final class BaseXHTTP extends CLI {
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // gather database commands
-            commands.add(input(arg.string()));
+          case 'c': // database command
+            commands.add(commands(arg.string()));
+            break;
+          case 'C': // command script
+            commands.add(script(arg.string()));
             break;
           case 'd': // activate debug mode
             Prop.put(StaticOptions.DEBUG, Boolean.toString(true));
