@@ -39,9 +39,9 @@ function dba:job-result(
 
 (:~
  : Returns a job result.
- : @param $id      job id
- : @param $ok      ok flag
- : @param $result  job result
+ : @param  $id      job id
+ : @param  $ok      ok flag
+ : @param  $result  job result
  : @return rest response and file content
  :)
 declare %private function dba:job-result(

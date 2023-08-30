@@ -70,7 +70,7 @@ function dba:jobs(
               'user': $details/@user,
               'you': if($id = $curr) then '✓' else '–',
               'time': $time,
-              'start': $start ?: $time
+              'start': $start otherwise $time
             }
           let $buttons := (
             html:button('job-remove', 'Remove', true())

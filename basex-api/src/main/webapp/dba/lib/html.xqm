@@ -349,7 +349,7 @@ declare function html:table(
   let $count-option := $options?count[not($sort)]
   let $page-option := $options?page
 
-  let $entries := $count-option ?: count($sorted-entries)
+  let $entries := $count-option otherwise count($sorted-entries)
   let $last-page := ($entries - 1) idiv $max-option + 1
   let $curr-page := min((max(($page-option, 1)), $last-page))
   return (
