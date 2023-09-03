@@ -305,10 +305,18 @@ public final class FuncItemTest extends QueryPlanTest {
     query("fold-right(" + seq + ", 1, fn($i, $r) { if($r > 10) then $r else $r + $i })",
         1000000000000000001L);
 
+    // bug fix
+    query("fold-right(1 to 100000, 1, fn($a, $b) { if($b > 10000000) then $b else $a + $b })",
+        10094951);
+
     final String array = "array { 1 to 100000 }";
 
     // return unchanged result
     check("array:fold-left(" + array + ", 456, fn($r, $i) { $r })", 456, root(Int.class));
     check("array:fold-right(" + array + ", 456, fn($i, $r) { $r })", 456, root(Int.class));
+
+    // bug fix
+    query("array:fold-right(" + array + ", 1, fn($a, $b) { if($b > 10000000) then $b else $a+$b })",
+        10094951);
   }
 }

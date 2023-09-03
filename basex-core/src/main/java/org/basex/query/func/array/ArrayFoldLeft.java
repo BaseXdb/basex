@@ -21,7 +21,7 @@ public class ArrayFoldLeft extends FnFoldLeft {
 
     Value result = arg(1).value(qc);
     for(final Value value : array.members()) {
-      if(skip(result, value, qc)) break;
+      if(skip(qc, result, value)) break;
       result = action.invoke(qc, info, result, value);
     }
     return result;

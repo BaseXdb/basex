@@ -28,13 +28,13 @@ public final class FnFoldRight extends FnFoldLeft {
       for(final ListIterator<Item> iter = seq.iterator(input.size()); iter.hasPrevious();) {
         final Item item = iter.previous();
         result = action.invoke(qc, info, item, result);
-        if(skip(result, item, qc)) break;
+        if(skip(qc, item, result)) break;
       }
     } else {
       for(long i = input.size(); --i >= 0;) {
         final Item item = input.itemAt(i);
         result = action.invoke(qc, info, item, result);
-        if(skip(result, item, qc)) break;
+        if(skip(qc, item, result)) break;
       }
     }
     return result;

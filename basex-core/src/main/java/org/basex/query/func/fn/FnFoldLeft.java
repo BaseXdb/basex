@@ -27,7 +27,7 @@ public class FnFoldLeft extends StandardFunc {
 
     Value result = arg(1).value(qc);
     for(Item item; (item = input.next()) != null;) {
-      if(skip(result, item, qc)) break;
+      if(skip(qc, result, item)) break;
       result = action.invoke(qc, info, result, item);
     }
     return result;
@@ -35,15 +35,14 @@ public class FnFoldLeft extends StandardFunc {
 
   /**
    * Checks if the evaluation can be exited early.
-   * @param result current result
-   * @param curr current value
    * @param qc query context
+   * @param args arguments
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean skip(final Value result, final Value curr, final QueryContext qc)
+  public final boolean skip(final QueryContext qc, final Value... args)
       throws QueryException {
-    return iff != null && toBoolean(iff[0].invoke(qc, info, result, curr).item(qc, info));
+    return iff != null && toBoolean(iff[0].invoke(qc, info, args).item(qc, info));
   }
 
   /**
