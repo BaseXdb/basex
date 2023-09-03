@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -19,22 +20,32 @@ import org.basex.query.value.seq.tree.*;
 public final class FnFoldRight extends FnFoldLeft {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value input = arg(0).value(qc);
     final FItem action = action(qc);
-
     Value result = arg(1).value(qc);
-    if(input instanceof TreeSeq) {
-      final TreeSeq seq = (TreeSeq) input;
-      for(final ListIterator<Item> iter = seq.iterator(input.size()); iter.hasPrevious();) {
-        final Item item = iter.previous();
+
+    final Iter input = arg(0).iter(qc);
+    final long size = input.size();
+    if(size != -1) {
+      for(long s = size - 1; s >= 0; s--) {
+        final Item item = input.get(s);
         result = action.invoke(qc, info, item, result);
         if(skip(qc, item, result)) break;
       }
     } else {
-      for(long i = input.size(); --i >= 0;) {
-        final Item item = input.itemAt(i);
-        result = action.invoke(qc, info, item, result);
-        if(skip(qc, item, result)) break;
+      final Value value = input.value(qc, arg(0));
+      if(value instanceof TreeSeq) {
+        final TreeSeq seq = (TreeSeq) value;
+        for(final ListIterator<Item> iter = seq.iterator(input.size()); iter.hasPrevious();) {
+          final Item item = iter.previous();
+          result = action.invoke(qc, info, item, result);
+          if(skip(qc, item, result)) break;
+        }
+      } else {
+        for(long i = input.size(); --i >= 0;) {
+          final Item item = value.itemAt(i);
+          result = action.invoke(qc, info, item, result);
+          if(skip(qc, item, result)) break;
+        }
       }
     }
     return result;

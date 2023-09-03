@@ -298,7 +298,7 @@ public final class FuncItem extends FItem implements Scope {
       if(expr instanceof If) {
         final If iff = (If) expr;
         Expr cond = iff.cond, thn = iff.exprs[0], els = iff.exprs[1];
-        if(!cond.uses(actionVar)) {
+        if(!(cond.uses(actionVar) || cond.has(Flag.NDT))) {
           Expr cnd = cond, action = null;
           if(result.test(thn)) {
             // if(COND) then $result else ACTION
