@@ -282,4 +282,33 @@ public final class FuncItemTest extends QueryPlanTest {
     check("map { 'a': 0 }(data(<_>a</_>))", 0, empty(DATA));
     check("map { 1: 0 }(data(<_>1</_>))", "", empty(DATA));
   }
+
+  /** Fold optimizations. */
+  @Test public void fold() {
+    final String seq = "1 to 1000000000000000000";
+
+    // return unchanged result
+    check("fold-left(" + seq + ", 456, fn($r, $i) { $r })", 456, root(Int.class));
+    check("fold-right(" + seq + ", 456, fn($i, $r) { $r })", 456, root(Int.class));
+
+    // return constant value
+    check("fold-left(" + seq + ", 1, fn($r, $i) { 123 })", 123, root(Int.class));
+    check("fold-right(" + seq + ", 1, fn($i, $r) { 123 })", 123, root(Int.class));
+
+    // exit if result will not change anymore
+    query("fold-left(" + seq + ", 1, fn($r, $i) { if($r < 100) then $r + $i else $r })",
+        106);
+    query("fold-left(" + seq + ", 1, fn($r, $i) { if($r > 100) then $r + $i else $r })",
+        1);
+    query("fold-right(" + seq + ", 1, fn($i, $r) { if($r < 10) then $r + $i else $r })",
+        1000000000000000001L);
+    query("fold-right(" + seq + ", 1, fn($i, $r) { if($r > 10) then $r else $r + $i })",
+        1000000000000000001L);
+
+    final String array = "array { 1 to 100000 }";
+
+    // return unchanged result
+    check("array:fold-left(" + array + ", 456, fn($r, $i) { $r })", 456, root(Int.class));
+    check("array:fold-right(" + array + ", 456, fn($i, $r) { $r })", 456, root(Int.class));
+  }
 }

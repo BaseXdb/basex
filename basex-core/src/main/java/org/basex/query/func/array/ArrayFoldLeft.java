@@ -13,14 +13,15 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ArrayFoldLeft extends ArrayFn {
+public class ArrayFoldLeft extends FnFoldLeft {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    Value result = arg(1).value(qc);
-    final FItem action = toFunction(arg(2), 2, qc);
+    final FItem action = action(qc);
 
+    Value result = arg(1).value(qc);
     for(final Value value : array.members()) {
+      if(skip(result, value, qc)) break;
       result = action.invoke(qc, info, result, value);
     }
     return result;
@@ -28,10 +29,6 @@ public final class ArrayFoldLeft extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = arg(0), zero = arg(1);
-    if(array == XQArray.empty()) return zero;
-
-    FnFoldLeft.opt(this, cc, true, true);
-    return this;
+    return opt(cc, true, true);
   }
 }

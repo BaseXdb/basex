@@ -13,6 +13,12 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class HigherOrderTest extends SandboxTest {
+  /** Resets optimizations. */
+  @AfterEach public void init() {
+    inline(false);
+    unroll(false);
+  }
+
   /**
    * Test for name shadowing.
    */
@@ -56,9 +62,24 @@ public final class HigherOrderTest extends SandboxTest {
       "  fold-right($input, ()," +
       "    function($x, $xs) { if($pred($x)) then () else ($x, $xs) })" +
       "};" +
-      "local:before-first((<h1/>, <p/>, <h1/>, <h2/>, <h3/>)," +
-      "  function($it) { name($it) = 'h2' })",
+      "local:before-first((<h1/>, <p/>, <h1/>, <h2/>, <h3/>), fn { name() = 'h2' })",
       "<h1/>\n<p/>\n<h1/>");
+  }
+
+  /**
+   * Test for name heavy currying.
+   */
+  @Test public void foldRightTestUnrolled() {
+    unroll(true);
+    query("declare function local:before-first(" +
+        "  $input as item()*," +
+        "  $pred as function(item()) as item()*" +
+        ") as item()* {" +
+        "  fold-right($input, ()," +
+        "    function($x, $xs) { if($pred($x)) then () else ($x, $xs) })" +
+        "};" +
+        "local:before-first((<h1/>, <p/>, <h1/>, <h2/>, <h3/>), fn { name() = 'h2' })",
+        "<h1/>\n<p/>\n<h1/>");
   }
 
   /**

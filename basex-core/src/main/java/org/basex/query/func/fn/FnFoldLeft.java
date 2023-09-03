@@ -6,6 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
@@ -15,52 +16,57 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class FnFoldLeft extends StandardFunc {
+public class FnFoldLeft extends StandardFunc {
+  /** Optimized condition and else branch. */
+  public FuncItem[] iff;
+
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final Item item = input.next();
-    return item != null ? value(input, item, qc) : arg(1).value(qc);
-  }
+    final FItem action = action(qc);
 
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).iter(qc);
-    final Item item = input.next();
-    return item != null ? value(input, item, qc).iter() : arg(1).iter(qc);
+    Value result = arg(1).value(qc);
+    for(Item item; (item = input.next()) != null;) {
+      if(skip(result, item, qc)) break;
+      result = action.invoke(qc, info, result, item);
+    }
+    return result;
   }
 
   /**
-   * Evaluates the expression.
-   * @param input input iterator
-   * @param item first item
+   * Checks if the evaluation can be exited early.
+   * @param result current result
+   * @param curr current value
    * @param qc query context
-   * @return result
+   * @return result of check
    * @throws QueryException query exception
    */
-  private Value value(final Iter input, final Item item, final QueryContext qc)
+  public final boolean skip(final Value result, final Value curr, final QueryContext qc)
       throws QueryException {
-    Value value = arg(1).value(qc);
-    final FItem action = toFunction(arg(2), 2, qc);
-    Item it = item;
-    do {
-      value = action.invoke(qc, info, value, it);
-    } while((it = input.next()) != null);
-    return value;
+    return iff != null && toBoolean(iff[0].invoke(qc, info, result, curr).item(qc, info));
+  }
+
+  /**
+   * Returns the action.
+   * @param qc query context
+   * @return action
+   * @throws QueryException query exception
+   */
+  public final FItem action(final QueryContext qc) throws QueryException {
+    return iff != null ? iff[1] : toFunction(arg(2), 2, qc);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = arg(0), zero = arg(1), action = arg(2);
-    if(input.seqType().zero()) return zero;
-
-    opt(this, cc, false, true);
+    Expr expr = opt(cc, false, true);
+    if(expr != this) return expr;
 
     // unroll fold
+    final Expr input = arg(0), zero = arg(1), action = arg(2);
     if(action instanceof Value) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        Expr expr = zero;
+        expr = zero;
         for(final Expr ex : unroll) {
           expr = new DynFuncCall(info, sc, action, expr, ex).optimize(cc);
         }
@@ -72,48 +78,58 @@ public final class FnFoldLeft extends StandardFunc {
 
   /**
    * Refines the types of a fold function.
-   * @param sf function
    * @param cc compilation context
-   * @param array indicates if this is an array function
+   * @param array indicates if an array is processed
    * @param left indicates if this is a left/right fold
+   * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public static void opt(final StandardFunc sf, final CompileContext cc, final boolean array,
-      final boolean left) throws QueryException {
+  public final Expr opt(final CompileContext cc, final boolean array, final boolean left)
+      throws QueryException {
 
-    final Expr[] args = sf.args();
-    final Expr action = args[2];
+    final Expr input = arg(0), zero = arg(1), action = arg(2);
+    final SeqType ist = input.seqType();
+    // fold-left((), ZERO, $f)  ->  ZERO
+    if(array ? input == XQArray.empty() : ist.zero()) return zero;
+
     if(action instanceof FuncItem) {
+      if(iff == null) {
+        final Object fold = ((FuncItem) action).fold(input, array, left, cc);
+        if(fold instanceof Expr) return (Expr) fold;
+        if(fold instanceof String) return zero;
+        if(fold instanceof FuncItem[]) iff = (FuncItem[]) fold;
+      }
+
       // function argument is a single function item
-      final SeqType seq = args[0].seqType(), zero = args[1].seqType(), curr = array &&
-          seq.type instanceof ArrayType ? ((ArrayType) seq.type).declType :
-            seq.with(Occ.EXACTLY_ONE);
+      final SeqType zst = zero.seqType(), curr = array && ist.type instanceof ArrayType ?
+        ((ArrayType) ist.type).declType : ist.with(Occ.EXACTLY_ONE);
 
       // assign item type of iterated value, optimize function
-      final SeqType[] st = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
-      Expr optFunc = sf.coerceFunc(action, cc, SeqType.ITEM_ZM, st);
+      final SeqType[] c = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
+      Expr optFunc = coerceFunc(action, cc, SeqType.ITEM_ZM, c);
 
       final FuncType ft = optFunc.funcType();
       final int i = left ? 0 : 1;
-      SeqType input = zero, output = ft.declType;
+      SeqType st = zst, output = ft.declType;
 
       // if initial item has more specific type, assign it and check optimized result type
       final SeqType at = ft.argTypes[i];
-      if(!input.eq(at) && input.instanceOf(at)) {
+      if(!st.eq(at) && st.instanceOf(at)) {
         while(true) {
-          st[i] = input;
-          optFunc = sf.coerceFunc(action, cc, ft.declType, st);
+          c[i] = st;
+          optFunc = coerceFunc(action, cc, ft.declType, c);
           output = optFunc.funcType().declType;
 
           // optimized type is instance of input type: abort
-          if(output.instanceOf(input)) break;
+          if(output.instanceOf(st)) break;
           // combine input and output type, optimize again
-          input = input.union(output);
+          st = st.union(output);
         }
       }
 
-      sf.exprType.assign(array || !seq.oneOrMore() ? output.union(zero) : output);
-      args[2] = optFunc;
+      exprType.assign(!array && ist.oneOrMore() ? output : output.union(zst));
+      exprs[2] = optFunc;
     }
+    return this;
   }
 }

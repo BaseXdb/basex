@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -15,25 +14,23 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ArrayFoldRight extends ArrayFn {
+public final class ArrayFoldRight extends ArrayFoldLeft {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    Value result = arg(1).value(qc);
-    final FItem action = toFunction(arg(2), 2, qc);
+    final FItem action = action(qc);
 
+    Value result = arg(1).value(qc);
     for(final ListIterator<Value> iter = array.iterator(array.arraySize()); iter.hasPrevious();) {
-      result = action.invoke(qc, info, iter.previous(), result);
+      final Value value = iter.previous();
+      result = action.invoke(qc, info, value, result);
+      if(skip(result, value, qc)) break;
     }
     return result;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr array = arg(0), zero = arg(1);
-    if(array == XQArray.empty()) return zero;
-
-    FnFoldLeft.opt(this, cc, true, false);
-    return this;
+    return opt(cc, true, false);
   }
 }

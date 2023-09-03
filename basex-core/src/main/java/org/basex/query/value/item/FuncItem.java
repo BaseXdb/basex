@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -271,6 +272,52 @@ public final class FuncItem extends FItem implements Scope {
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
     qs.token(anns).token(FUNCTION).params(params);
     qs.token(AS).token(funcType().declType).brace(expr);
+  }
+
+  /**
+   * Optimizes the function item for a fold operation.
+   * @param input input sequence
+   * @param array indicates if an array is processed
+   * @param left indicates if this is a left/right fold
+   * @param cc compilation context
+   * @return optimized expression or {@code null}
+   * @throws QueryException query exception
+   */
+  public Object fold(final Expr input, final boolean array, final boolean left,
+      final CompileContext cc) throws QueryException {
+    if(arity() == 2 && !input.has(Flag.NDT)) {
+      final Var actionVar = params[left ? 1 : 0], resultVar = params[left ? 0 : 1];
+      final Predicate<Expr> result = ex -> ex instanceof VarRef &&
+          ((VarRef) ex).var.equals(resultVar);
+
+      // fold-left(SEQ, ZERO, f($result, $value) { VALUE })  ->  VALUE
+      if(!array && input.seqType().oneOrMore() && expr instanceof Value) return expr;
+      // fold-left(SEQ, ZERO, f($result, $value) { $result })  ->  $result
+      if(result.test(expr)) return "";
+
+      if(expr instanceof If) {
+        final If iff = (If) expr;
+        Expr cond = iff.cond, thn = iff.exprs[0], els = iff.exprs[1];
+        if(!cond.uses(actionVar)) {
+          Expr cnd = cond, action = null;
+          if(result.test(thn)) {
+            // if(COND) then $result else ACTION
+            // -> if COND($result): break; else $result = ACTION($result, $value)
+            action = els;
+          } else if(result.test(els)) {
+            // if(COND) then ACTION else $result
+            // -> if not(COND(result)): break; else $result = ACTION($result, $value)
+            action = thn;
+            cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
+          }
+          if(action != null) return new FuncItem[] {
+              new FuncItem(sc, anns, null, params, funcType(), cnd, stackSize, info, focus),
+              new FuncItem(sc, anns, null, params, funcType(), action, stackSize, info, focus)
+          };
+        }
+      }
+    }
+    return null;
   }
 
   /**
