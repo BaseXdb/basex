@@ -292,7 +292,7 @@ public enum QueryError {
   /** Error code. */
   GEO_WHICH(GEO, 1, "Unrecognized geometry type: %."),
   /** Error code. */
-  GEO_READ(GEO, 2, "Parsing GML 2.0: %."),
+  GEO_READ(GEO, 2, "Parsing GML: %."),
   /** Error code. */
   GEO_TYPE(GEO, 3, "Wrong geometry: % expected, % found."),
   /** Error code. */
