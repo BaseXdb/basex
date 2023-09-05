@@ -351,4 +351,14 @@ public final class Util {
     }
     return map;
   }
+
+  /**
+   * Checks if long values are small enough to be multiplied without overflow.
+   * @param value1 first value
+   * @param value2 second value
+   * @return result of check
+   */
+  public static boolean inBounds(final long value1, final long value2) {
+    return value2 == 0 || value1 <= Long.MAX_VALUE / value2;
+  }
 }

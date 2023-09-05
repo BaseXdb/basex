@@ -13,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -112,7 +113,7 @@ public class FnReplicate extends StandardFunc {
       // replicate(<a/>, 1)  ->  <a/>
       if(c == 1) return input;
       sz = input.size();
-      if(sz != -1) sz *= c;
+      if(sz != -1) sz = Util.inBounds(sz, c) ? sz * c : -1;
     }
     // replicate(prof:void(<a/>), 2)  ->  prof:void(<a/>)
     if(input == Empty.VALUE || sz == 0 && single) return input;
@@ -147,6 +148,12 @@ public class FnReplicate extends StandardFunc {
       return cc.function(REPLICATE, info, args);
     }
     return this;
+  }
+
+  @Override
+  protected boolean allAreValues(final boolean limit) {
+    return super.allAreValues(limit) && arg(1) instanceof Int &&
+        Util.inBounds(arg(0).size(), ((Int) arg(1)).itr());
   }
 
   /**

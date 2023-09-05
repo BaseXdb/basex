@@ -99,7 +99,7 @@ public abstract class Arr extends ParseExpr {
    * @param limit check if result size of any expression exceeds {@link CompileContext#MAX_PREEVAL}
    * @return result of check
    */
-  protected final boolean allAreValues(final boolean limit) {
+  protected boolean allAreValues(final boolean limit) {
     for(final Expr expr : exprs) {
       if(!(expr instanceof Value) || limit && expr.size() > CompileContext.MAX_PREEVAL)
         return false;
