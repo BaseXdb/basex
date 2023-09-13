@@ -204,27 +204,7 @@ public class FnParseUri extends FnJsonDoc {
    * @return decoded string
    */
   static String decode(final String string) {
-    final int sl = string.length();
-    final TokenBuilder tb = new TokenBuilder(sl);
-    for(int s = 0; s < sl; s++) {
-      int b = string.codePointAt(s);
-      if(b == '+') {
-        b = ' ';
-      } else if(b == '%') {
-        b = Token.REPLACEMENT;
-        final int b1 = s + 1 < sl ? Token.dec(string.charAt(s + 1)) : -1;
-        final int b2 = s + 2 < sl ? Token.dec(string.charAt(s + 2)) : -1;
-        if(b1 != -1 && b2 != -1) {
-          b = b1 << 4 | b2;
-          s += 2;
-        } else if(b2 == -1) {
-          s += 1;
-        }
-      }
-      if(b == Token.REPLACEMENT) tb.add(Token.REPLACEMENT);
-      else tb.addByte((byte) b);
-    }
-    return tb.toString();
+    return new String(XMLToken.decodeUri(Token.token(string), true));
   }
 
   /**

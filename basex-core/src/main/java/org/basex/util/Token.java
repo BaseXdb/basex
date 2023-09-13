@@ -1408,7 +1408,7 @@ public final class Token {
   }
 
   /**
-   * Returns a URI encoded token.
+   * Returns a URI-encoded token.
    * @param token token
    * @param iri input
    * @return encoded token
@@ -1484,30 +1484,6 @@ public final class Token {
   public static int dec(final int ch1, final int ch2) {
     final int n1 = dec(ch1), n2 = dec(ch2);
     return n1 < 0 || n2 < 0 ? -1 : n1 << 4 | n2;
-  }
-
-  /**
-   * Returns a URI decoded token.
-   * @param token token
-   * @param plus decode + character
-   * @return decoded token, or {@code null} if input was invalid
-   */
-  public static byte[] decodeUri(final byte[] token, final boolean plus) {
-    final int tl = token.length;
-    final TokenBuilder tb = new TokenBuilder(tl);
-    for(int t = 0; t < tl; t++) {
-      byte b = token[t];
-      if(plus && b == '+') {
-        b = ' ';
-      } else if(b == '%') {
-        final int n = t + 2 < tl ? dec(token[t + 1], token[t + 2]) : -1;
-        if(n < 0) return null;
-        b = (byte) n;
-        t += 2;
-      }
-      tb.addByte(b);
-    }
-    return tb.finish();
   }
 
   /**

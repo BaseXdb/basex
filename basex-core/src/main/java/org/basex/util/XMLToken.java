@@ -159,7 +159,7 @@ public final class XMLToken {
   }
 
   /**
-   * Encodes a string to a valid NCName.
+   * Encodes a token to a valid NCName.
    * @param name token to be encoded
    * @param lax lax encoding (lossy, but better readable)
    * @return valid NCName
@@ -217,10 +217,10 @@ public final class XMLToken {
   }
 
   /**
-   * Decodes an NCName to a string.
+   * Decodes an NCName to a token.
    * @param name name
    * @param lax lax decoding
-   * @return cached QName, or {@code null} if not successful
+   * @return token
    */
   public static byte[] decode(final byte[] name, final boolean lax) {
     final int nl = name.length;
@@ -296,9 +296,40 @@ public final class XMLToken {
   }
 
   /**
-   * Returns the unicode string for the specified entity or {@code null}.
+   * Returns a URI-decoded token.
+   * @param token encoded token
+   * @param plus decode '+' character
+   * @return decoded token
+   */
+  public static byte[] decodeUri(final byte[] token, final boolean plus) {
+    final int tl = token.length;
+    final TokenBuilder tb = new TokenBuilder(tl);
+    for(int t = 0; t < tl; t++) {
+      int b = token[t];
+      if(plus && b == '+') {
+        b = ' ';
+      } else if(b == '%') {
+        final int b1 = ++t < tl ? dec(token[t]) : -1, b2 = ++t < tl ? dec(token[t]) : -1;
+        b = b1 != -1 && b2 != -1 ? b1 << 4 | b2 : -1;
+      }
+      if(b == -1) tb.add(Token.REPLACEMENT);
+      else tb.addByte((byte) b);
+    }
+
+    final byte[] decoded = Token.token(new String(tb.toArray()));
+    tb.reset();
+    final int dl = decoded.length;
+    for(int d = 0; d < dl; d += cl(decoded, d)) {
+      final int cp = cp(decoded, d);
+      tb.add(XMLToken.valid(cp) ? cp : Token.REPLACEMENT);
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Returns the unicode token for the specified entity or {@code null}.
    * @param key key
-   * @return unicode string
+   * @return unicode token
    */
   public static byte[] getEntity(final byte[] key) {
     return entities().get(key);

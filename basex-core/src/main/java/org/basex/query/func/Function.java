@@ -166,6 +166,9 @@ public enum Function implements AFunction {
   DAYS_FROM_DURATION(FnDayFromDuration::new, "days-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
   /** XQuery function. */
+  DECODE_FROM_URI(FnDecodeFromUri::new, "decode-from-uri(value)",
+      params(STRING_ZO), STRING_O),
+  /** XQuery function. */
   DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation,options])",
       params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_O), BOOLEAN_O),
   /** XQuery function. */

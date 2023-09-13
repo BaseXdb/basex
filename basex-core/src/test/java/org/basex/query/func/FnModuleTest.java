@@ -326,6 +326,45 @@ public final class FnModuleTest extends QueryPlanTest {
   }
 
   /** Test method. */
+  @Test public void decodeFromUri() {
+    final Function func = DECODE_FROM_URI;
+
+    query(func.args(""), "");
+    query(func.args("A"), "A");
+
+    query(func.args("+"), " ");
+    query(func.args("%41"), "A");
+    query(func.args("A%42+C"), "AB C");
+    query(func.args("%F0%9F%92%A1"), "\uD83D\uDCA1");
+
+    query(func.args("%"), "\uFFFD");
+
+    query(func.args("%X"), "\uFFFD");
+    query(func.args("%XX"), "\uFFFD");
+    query(func.args("%XX!"), "\uFFFD!");
+    query(func.args("%4"), "\uFFFD");
+    query(func.args("%4X"), "\uFFFD");
+
+    query(func.args("%\u00FC"), "\uFFFD");
+    query(func.args("%\u00FC!"), "\uFFFD!");
+    query(func.args("%\u00FC\u00FC"), "\uFFFD\u00FC");
+
+    query(func.args("%F0%9F%92%41"), "\uFFFDA");
+    query(func.args("%F0%F0%9F%92%A1"), "\uFFFD\uD83D\uDCA1");
+
+    query(func.args("%00"), "\uFFFD");
+    query(func.args("%01"), "\uFFFD");
+    query(func.args("%09"), "\t");
+    query(func.args("%22"), "\"");
+    query(func.args("%25"), "%");
+
+    query(func.args("%F0"), "\uFFFD");
+    query(func.args("%F0%F0"), "\uFFFD\uFFFD");
+    query(func.args("%F0%F0%F0"), "\uFFFD\uFFFD\uFFFD");
+    query(func.args("%F0%F0%F0%F0"), "\uFFFD\uFFFD\uFFFD\uFFFD");
+  }
+
+  /** Test method. */
   @Test public void deepEqual() {
     final Function func = DEEP_EQUAL;
 
