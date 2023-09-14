@@ -126,8 +126,8 @@ public enum Function implements AFunction {
   COMPARE(FnCompare::new, "compare(value1,value2[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), INTEGER_ZO),
   /** XQuery function. */
-  CONCAT(FnConcat::new, "concat(value1,value2[,...])",
-      params(ANY_ATOMIC_TYPE_ZO, ANY_ATOMIC_TYPE_ZO), STRING_O),
+  CONCAT(FnConcat::new, "concat(values...)",
+      params(ANY_ATOMIC_TYPE_ZM), STRING_O),
   /** XQuery function. */
   CONTAINS(FnContains::new, "contains(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
@@ -1737,7 +1737,7 @@ public enum Function implements AFunction {
   _STRING_CR(StringCr::new, "cr()",
       params(), STRING_O, STRING_URI),
   /** XQuery function. */
-  _STRING_FORMAT(StringFormat::new, "format(format,value1[,...])",
+  _STRING_FORMAT(StringFormat::new, "format(pattern[,values...])",
       params(STRING_O, ITEM_O), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(value1,value2)",
