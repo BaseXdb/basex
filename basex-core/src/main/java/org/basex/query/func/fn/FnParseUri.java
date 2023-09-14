@@ -12,6 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -75,13 +76,13 @@ public class FnParseUri extends FnJsonDoc {
 
     Matcher m = Pattern.compile("^(.*)#([^#]*)$").matcher(string);
     if(m.matches()) {
-      fragment = m.group(2);
       string = m.group(1);
+      fragment = m.group(2);
     }
     m = Pattern.compile("^(.*)\\?([^?]*)$").matcher(string);
     if(m.matches()) {
-      query = m.group(2);
       string = m.group(1);
+      query = m.group(2);
     }
     if(string.matches("^[a-zA-Z][:|].*$")) {
       scheme = FILE;
@@ -95,7 +96,7 @@ public class FnParseUri extends FnJsonDoc {
         string = m.group(2);
       }
     }
-    if(options.get(UriOptions.UNC_PATH) && scheme.isEmpty() && string.matches("^//[^/].*$")) {
+    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && string.matches("^//[^/].*$")) {
       scheme = FILE;
       filepath = string;
     }
@@ -145,10 +146,10 @@ public class FnParseUri extends FnJsonDoc {
       filepath = string;
     }
 
-    ArrayBuilder segments = new ArrayBuilder();
+    TokenList segments = new TokenList();
     if(!string.isEmpty()) {
       final String separator = Pattern.quote(options.get(UriOptions.PATH_SEPARATOR));
-      for(final String s : string.split(separator)) segments.append(Str.get(decode(s)));
+      for(final String s : string.split(separator)) segments.add(decode(s));
     }
 
     ArrayBuilder queries = new ArrayBuilder();
@@ -173,7 +174,7 @@ public class FnParseUri extends FnJsonDoc {
     add(map, PATH, path);
     add(map, QUERY, query);
     add(map, FRAGMENT, fragment);
-    add(map, PATH_SEGMENTS, segments.array());
+    add(map, PATH_SEGMENTS, StrSeq.get(segments));
     add(map, QUERY_SEGMENTS, queries.array());
     add(map, FILEPATH, filepath);
     return map.map();

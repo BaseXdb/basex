@@ -49,13 +49,12 @@ public class FnBuildUri extends FnJsonDoc {
     }
 
     final Value segments = parts.get(Str.get(PATH_SEGMENTS), info);
-    final XQArray sgmnts = segments.isEmpty() ? XQArray.empty() : toArray(segments, qc);
-    final long as = sgmnts.arraySize();
-    if(as > 0) {
+    if(!segments.isEmpty()) {
       final String sep = options.get(UriOptions.PATH_SEPARATOR);
-      for(int a = 0; a < as; a++) {
-        if(a != 0) uri.add(sep);
-        uri.add(encodeUri(toToken(sgmnts.get(a), qc), false));
+      int a = 0;
+      for(final Item segment : segments) {
+        if(a++ != 0) uri.add(sep);
+        uri.add(encodeUri(toToken(segment, qc), false));
       }
     } else {
       uri.add(get(parts, PATH, qc));
