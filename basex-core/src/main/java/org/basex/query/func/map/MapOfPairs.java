@@ -30,7 +30,7 @@ public final class MapOfPairs extends StandardFunc {
       Value value = map.get(Str.VALUE, info);
       if(result.contains(key, info)) {
         final Value old = result.get(key, info);
-        value = combine != null ? combine.invoke(qc, info, old, value) :
+        value = combine != null ? eval(combine, qc, old, value) :
           ValueBuilder.concat(old, value, qc);
       }
       result = result.put(key, value, info);

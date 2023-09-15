@@ -22,7 +22,7 @@ public final class ArrayFilter extends ArrayFn {
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
+      if(toBoolean(eval(predicate, qc, value).item(qc, info))) {
         ab.append(value);
       }
     }

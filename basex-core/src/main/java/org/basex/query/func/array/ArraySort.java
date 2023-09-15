@@ -28,7 +28,7 @@ public final class ArraySort extends StandardFunc {
 
     final ValueList values = new ValueList(array.arraySize());
     for(final Value value : array.members()) {
-      values.add((key == null ? value : key.invoke(qc, info, value)).atomValue(qc, info));
+      values.add((key == null ? value : eval(key, qc, value)).atomValue(qc, info));
     }
 
     final ArrayBuilder ab = new ArrayBuilder();

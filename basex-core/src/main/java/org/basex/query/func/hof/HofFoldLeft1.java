@@ -25,7 +25,7 @@ public final class HofFoldLeft1 extends StandardFunc {
 
     Value value = checkNoEmpty(input.next());
     for(Item item; (item = input.next()) != null;) {
-      value = action.invoke(qc, info, value, item);
+      value = eval(action, qc, value, item);
     }
     return value;
   }

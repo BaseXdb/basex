@@ -37,14 +37,6 @@ public abstract class FuncCall extends Arr {
    */
   abstract XQFunction evalFunc(QueryContext qc) throws QueryException;
 
-  /**
-   * Evaluates and returns the arguments for this call.
-   * @param qc query context
-   * @return the function
-   * @throws QueryException query exception
-   */
-  abstract Value[] evalArgs(QueryContext qc) throws QueryException;
-
   @Override
   public final void markTailCalls(final CompileContext cc) {
     if(cc != null) cc.info(QueryText.OPTTCE_X, this);
@@ -54,7 +46,9 @@ public abstract class FuncCall extends Arr {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final XQFunction func = evalFunc(qc);
-    final Value[] args = evalArgs(qc);
+    final int arity = func.arity();
+    final Value[] args = new Value[arity];
+    for(int a = 0; a < arity; ++a) args[a] = exprs[a].value(qc);
     return tco ? func.invokeTail(qc, info, args) : func.invoke(qc, info, args);
   }
 }

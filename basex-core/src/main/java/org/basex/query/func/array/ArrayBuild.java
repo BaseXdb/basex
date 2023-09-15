@@ -23,7 +23,7 @@ public final class ArrayBuild extends StandardFunc {
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.append(action != null ? action.invoke(qc, info, item) : item);
+      ab.append(action != null ? eval(action, qc, item) : item);
     }
     return ab.array();
   }

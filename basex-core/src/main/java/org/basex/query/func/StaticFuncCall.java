@@ -10,7 +10,6 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -180,14 +179,6 @@ public final class StaticFuncCall extends FuncCall {
   @Override
   public StaticFunc evalFunc(final QueryContext qc) {
     return func;
-  }
-
-  @Override
-  Value[] evalArgs(final QueryContext qc) throws QueryException {
-    final int al = exprs.length;
-    final Value[] args = new Value[al];
-    for(int a = 0; a < al; ++a) args[a] = exprs[a].value(qc);
-    return args;
   }
 
   @Override

@@ -53,7 +53,7 @@ public final class FnSort extends StandardFunc {
     final ValueList values = new ValueList(size);
     final Iter iter = input.iter();
     for(Item item; (item = iter.next()) != null;) {
-      values.add((key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info));
+      values.add((key == null ? item : eval(key, qc, item)).atomValue(qc, info));
     }
 
     final Integer[] order = sort(values, this, coll, qc);

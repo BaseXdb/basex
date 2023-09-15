@@ -25,7 +25,7 @@ public final class ArrayIndexWhere extends ArrayFn {
     final LongList list = new LongList();
     for(final Value value : array.members()) {
       ++c;
-      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
+      if(toBoolean(eval(predicate, qc, value).item(qc, info))) {
         list.add(c);
       }
     }

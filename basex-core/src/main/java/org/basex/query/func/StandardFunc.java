@@ -565,7 +565,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Evaluates an expression to a function item.
    * @param expr expression
-   * @param arity required number of arguments (arity)
+   * @param arity minimum number of required arguments (arity)
    * @param qc query context
    * @param updating updating flag
    * @return function item
@@ -576,7 +576,7 @@ public abstract class StandardFunc extends Arr {
 
     final FItem func = checkUp(toFunction(expr, qc), updating, sc);
     final int farity = func.arity();
-    if(farity == arity) return func;
+    if(farity <= arity) return func;
     throw FUNARITY_X_X.get(info, arguments(farity), arity);
   }
 
@@ -608,6 +608,21 @@ public abstract class StandardFunc extends Arr {
     if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }
+
+  /**
+   * Evaluates a function.
+   * @param func function
+   * @param qc query context
+   * @param args arguments (possibly more than required)
+   * @return result
+   * @throws QueryException query exception
+   */
+  protected final Value eval(final FItem func, final QueryContext qc, final Value... args)
+      throws QueryException {
+    final int arity = func.arity();
+    return arity < args.length ? func.invoke(qc, info, Arrays.copyOf(args, arity)) :
+      func.invoke(qc, info, args);
+  };
 
   /**
    * Indicates if the supplied argument is defined.

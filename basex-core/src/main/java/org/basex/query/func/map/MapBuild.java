@@ -26,12 +26,12 @@ public final class MapBuild extends StandardFunc {
 
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(input)) != null;) {
-      final Item k = (key != null ? key.invoke(qc, info, item) : item).atomItem(qc, info);
+      final Item k = (key != null ? eval(key, qc, item) : item).atomItem(qc, info);
       if(!k.isEmpty()) {
-        Value v = value != null ? value.invoke(qc, info, item) : item;
+        Value v = value != null ? eval(value, qc, item) : item;
         if(result.contains(k, info)) {
           final Value old = result.get(k, info);
-          v = combine != null ? combine.invoke(qc, info, old, v) : ValueBuilder.concat(old, v, qc);
+          v = combine != null ? eval(combine, qc, old, v) : ValueBuilder.concat(old, v, qc);
         }
         result = result.put(k, v, info);
       }
