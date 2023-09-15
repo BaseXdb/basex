@@ -565,19 +565,19 @@ public abstract class StandardFunc extends Arr {
   /**
    * Evaluates an expression to a function item.
    * @param expr expression
-   * @param arity minimum number of required arguments (arity)
+   * @param nargs maximum number of supplied arguments
    * @param qc query context
    * @param updating updating flag
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem toFunction(final Expr expr, final int arity, final boolean updating,
+  protected final FItem toFunction(final Expr expr, final int nargs, final boolean updating,
       final QueryContext qc) throws QueryException {
 
     final FItem func = checkUp(toFunction(expr, qc), updating, sc);
-    final int farity = func.arity();
-    if(farity <= arity) return func;
-    throw FUNARITY_X_X.get(info, arguments(farity), arity);
+    final int arity = func.arity();
+    if(nargs < arity) throw arityError(func, arity, nargs, true, info);
+    return func;
   }
 
   /**

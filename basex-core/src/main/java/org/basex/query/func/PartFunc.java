@@ -53,12 +53,12 @@ public final class PartFunc extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(allAreValues(false)) return cc.preEval(this);
 
-    final Expr body = body();
-    final FuncType ft = body.funcType();
+    final Expr func = body();
+    final FuncType ft = func.funcType();
     if(ft != null && ft != SeqType.FUNCTION) {
-      final int nargs = exprs.length + holes.length - 1;
-      if(ft.argTypes.length > nargs)
-        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, body);
+      final int nargs = exprs.length + holes.length - 1, arity = ft.argTypes.length;
+      if(nargs < arity) throw arityError(func, arity, nargs, false, info);
+
       final SeqType[] args = new SeqType[holes.length];
       final int hl = holes.length;
       for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
@@ -72,8 +72,8 @@ public final class PartFunc extends Arr {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem func = toFunction(body(), qc);
 
-    final int hl = holes.length, nargs = exprs.length + hl - 1;
-    if(func.arity() > nargs) throw INVARITY_X_X_X.get(info, arguments(nargs), func.arity(), func);
+    final int hl = holes.length, nargs = exprs.length + hl - 1, arity = func.arity();
+    if(nargs < arity) throw arityError(func, arity, nargs, false, info);
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];

@@ -134,7 +134,7 @@ public final class JavaFunctionTest extends SandboxTest {
     error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
         "qm:xyz()", JAVAMEMBER_X);
     error("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
-        "qm:fast()", FUNCARITY_X_X_X);
+        "qm:fast()", INVNARGS_X_X_X);
 
     query("declare namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
         "try{ qm:error(qm:new()) } catch * { $err:code }", "basex:error");

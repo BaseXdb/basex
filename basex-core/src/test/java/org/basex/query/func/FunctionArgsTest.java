@@ -31,7 +31,7 @@ public final class FunctionArgsTest extends SandboxTest {
    */
   private static void run(final FuncDefinition fd) {
     final String desc = fd.toString(), name = desc.replaceAll("\\(.*", "");
-    final int min = fd.minMax[0], max = fd.minMax[1];
+    final int min = fd.minMax[0], max = fd.variadic() ? min - 2 : fd.minMax[1];
 
     // test too few, too many, and wrong argument types
     for(int al = Math.max(min - 1, 0); al <= max + 1; al++) {
@@ -57,10 +57,10 @@ public final class FunctionArgsTest extends SandboxTest {
       if((min > 0 || al != 0) && (any == 0 || any != al)) {
         final String query = qu.append(')').toString();
         // wrong types: XPTY0004, FORG0006, FODC0002, BXDB0001, BXDB0004, FORG0001
-        if(in) error(query, INVCONVERT_X_X_X, NONUMBER_X_X, INVFUNCITEM_X_X, ZEROFUNCS_X_X, NODOC_X,
-            BINARY_X, STRBIN_X_X, WHICHRES_X, DB_NODE_X, MAP_X_X, FUNCARITY_X_X, FUNCCAST_X_X);
+        if(in) error(query, INVCONVERT_X_X_X, NONUMBER_X_X, INVFUNCITEM_X_X, NODOC_X,
+            BINARY_X, STRBIN_X_X, WHICHRES_X, DB_NODE_X, MAP_X_X, FUNCCAST_X_X);
         // wrong number of arguments: XPST0017
-        else error(query, FUNCARITY_X_X_X);
+        else error(query, INVNARGS_X_X_X);
       }
     }
   }

@@ -132,8 +132,8 @@ public final class FuncItem extends FItem implements Scope {
   public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean optimize) throws QueryException {
 
-    final int pl = params.length, al = ft.argTypes.length;
-    if(pl != ft.argTypes.length) throw FUNARITY_X_X.get(info, arguments(pl), al);
+    final int arity = params.length, nargs = ft.argTypes.length;
+    if(arity != nargs) throw arityError(this, arity, nargs, true, info);
 
     // optimize: continue with coercion if current type is only an instance of new type
     FuncType tp = funcType();
@@ -142,23 +142,23 @@ public final class FuncItem extends FItem implements Scope {
     // create new compilation context and variable scope
     final CompileContext cc = new CompileContext(qc, false);
     final VarScope vs = new VarScope(sc);
-    final Var[] vars = new Var[pl];
-    final Expr[] args = new Expr[pl];
-    for(int p = pl; p-- > 0;) {
-      vars[p] = vs.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
-      args[p] = new VarRef(ii, vars[p]).optimize(cc);
+    final Var[] vars = new Var[arity];
+    final Expr[] args = new Expr[arity];
+    for(int a = arity; a-- > 0;) {
+      vars[a] = vs.addNew(params[a].name, ft.argTypes[a], true, qc, info);
+      args[a] = new VarRef(info, vars[a]).optimize(cc);
     }
     cc.pushScope(vs);
 
     // create new function call (will immediately be inlined/simplified when being optimized)
     final boolean updating = anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
-    Expr body = new DynFuncCall(ii, sc, updating, false, this, args);
+    Expr body = new DynFuncCall(info, sc, updating, false, this, args);
     if(optimize) body = body.optimize(cc);
 
     // add type check if return types differ
     final SeqType dt = ft.declType;
     if(!tp.declType.instanceOf(dt)) {
-      body = new TypeCheck(sc, ii, body, dt, true);
+      body = new TypeCheck(sc, info, body, dt, true);
       if(optimize) body = body.optimize(cc);
     }
 
@@ -166,7 +166,7 @@ public final class FuncItem extends FItem implements Scope {
     final SeqType bt = body.seqType();
     tp = optimize && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
     body.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vars, tp, body, vs.stackSize(), ii);
+    return new FuncItem(sc, anns, name, vars, tp, body, vs.stackSize(), info);
   }
 
   @Override

@@ -167,8 +167,8 @@ public final class StaticFuncs extends ExprInfo {
         }
       }
     }
-    final Object similar = Levenshtein.similar(qname.local(),
-        list.toArray(QNm[]::new), o -> ((QNm) o).local());
+    final Object similar = Levenshtein.similar(qname.local(), list.toArray(QNm[]::new),
+        o -> ((QNm) o).local());
 
     // return error for local or global function
     return WHICHFUNC_X.get(ii, similar != null ?
@@ -250,8 +250,9 @@ public final class StaticFuncs extends ExprInfo {
           if(!calls.isEmpty()) {
             final IntList arities = new IntList();
             for(final StaticFunc func : funcs) arities.add(func.min).add(func.arity());
-            throw arities.isEmpty() ? qc.functions.similarError(qname(), call.info()) :
-              Functions.wrongArity(call.arity(), arities, qname().prefixString(), call.info());
+            final InputInfo info = call.info();
+            throw arities.isEmpty() ? qc.functions.similarError(qname(), info) :
+              Functions.wrongArity(call.arity(), arities, qname().prefixString(), info, false);
           }
         } else {
           // check if all implementations exist for all functions, set updating flag

@@ -148,7 +148,6 @@ public final class FuncDefinition {
     final SeqType[] st = new SeqType[arity];
     if(arity != 0 && variadic()) {
       final int tl = types.length;
-      System.out.println(Arrays.toString(types));
       Array.copy(types, tl, st);
       final SeqType var = types[tl - 1];
       for(int t = tl; t < arity; t++) st[t] = var;

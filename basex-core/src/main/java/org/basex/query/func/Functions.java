@@ -134,7 +134,7 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, ii);
+      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, ii, true);
 
       final FuncType ft = fd.type(arity, lit.anns());
       final QNm[] names = fd.paramNames(arity);
@@ -193,35 +193,39 @@ public final class Functions {
 
   /**
    * Raises an error for the wrong number of function arguments.
-   * @param arity number of supplied arguments
-   * @param arities expected arities
+   * @param nargs number of supplied arguments
+   * @param arities available arities (if first arity is negative, function is variadic)
    * @param function function
    * @param ii input info
+   * @param literal literal
    * @return error
    */
-  public static QueryException wrongArity(final int arity, final IntList arities,
-      final Object function, final InputInfo ii) {
+  public static QueryException wrongArity(final int nargs, final IntList arities,
+      final Object function, final InputInfo ii, final boolean literal) {
 
-    final int as = arities.ddo().size();
-    if(as == 0) return FUNCARITY_X_X.get(ii, function, arguments(arity));
-
-    int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-    for(int a = 0; a < as; a++) {
-      final int m = arities.get(a);
-      if(m < min) min = m;
-      if(m > max) max = m;
-    }
-
-    final TokenBuilder ext = new TokenBuilder();
-    if(as > 2 && max - min + 1 == as) {
-      ext.addInt(min).add('-').addInt(max);
+    final String supplied = literal ? "Arity " + nargs : arguments(nargs), expected;
+    if(!arities.isEmpty() && arities.peek() < 0) {
+      expected = "at least " + -arities.peek();
     } else {
+      final int as = arities.ddo().size();
+      int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
       for(int a = 0; a < as; a++) {
-        if(a != 0) ext.add(a + 1 < as ? ", " : " or ");
-        ext.addInt(arities.get(a));
+        final int m = arities.get(a);
+        if(m < min) min = m;
+        if(m > max) max = m;
       }
+      final TokenBuilder tb = new TokenBuilder();
+      if(as > 2 && max - min + 1 == as) {
+        tb.addInt(min).add('-').addInt(max);
+      } else {
+        for(int a = 0; a < as; a++) {
+          if(a != 0) tb.add(a + 1 < as ? ", " : " or ");
+          tb.addInt(arities.get(a));
+        }
+      }
+      expected = tb.toString();
     }
-    return FUNCARITY_X_X_X.get(ii, function, arguments(arity), ext);
+    return INVNARGS_X_X_X.get(ii, function, supplied, expected);
   }
 
   /**
@@ -357,22 +361,25 @@ public final class Functions {
 
   /**
    * Raises an error for the wrong number of function arguments.
-   * @param arity number of supplied arguments
+   * @param nargs number of supplied arguments
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
    * @param function function
    * @param ii input info
+   * @param literal literal
    * @throws QueryException query exception
    */
-  private static void checkArity(final int arity, final int min, final int max,
-      final Object function, final InputInfo ii) throws QueryException {
+  private static void checkArity(final int nargs, final int min, final int max,
+      final Object function, final InputInfo ii, final boolean literal) throws QueryException {
 
-    if(arity < min || arity > max) {
+    if(nargs < min || nargs > max) {
       final IntList arities = new IntList();
       if(max != Integer.MAX_VALUE) {
         for(int m = min; m <= max; m++) arities.add(m);
+      } else {
+        arities.add(-min);
       }
-      throw wrongArity(arity, arities, function, ii);
+      throw wrongArity(nargs, arities, function, ii, literal);
     }
   }
 
@@ -431,7 +438,7 @@ public final class Functions {
         tmp[a] = Empty.UNDEFINED;
       }
     }
-    checkArity(arity, min, max, function, ii);
+    checkArity(arity, min, max, function, ii, false);
     return tmp;
   }
 

@@ -1027,9 +1027,7 @@ public enum QueryError {
   /** Error code. */
   FUNCPRIVATE_X(XPST, 17, "Function not visible: %."),
   /** Error code. */
-  FUNCARITY_X_X(XPST, 17, "%: % supplied."),
-  /** Error code. */
-  FUNCARITY_X_X_X(XPST, 17, "%: % supplied, % expected."),
+  INVNARGS_X_X_X(XPST, 17, "%: % supplied, % expected."),
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
@@ -1077,8 +1075,6 @@ public enum QueryError {
   JAVAARGS_X_X(XPTY, 4, "% cannot be called with %."),
 
   /** Error code. */
-  ZEROFUNCS_X_X(XPTY, 4, "Function with 0 arguments expected, % found: %."),
-  /** Error code. */
   NONAME_X(XPTY, 4, "Name expected, '%' found."),
   /** Error code. */
   EMPTYFOUND(XPTY, 4, "Item expected, empty sequence found."),
@@ -1116,8 +1112,6 @@ public enum QueryError {
   DOCNS_X(XPTY, 4, "Cannot add namespaces to a document node: %."),
   /** Error code. */
   INVARITY_X_X_X(XPTY, 4, "% supplied, % expected: %."),
-  /** Error code. */
-  FUNARITY_X_X(XPTY, 4, "Function with % supplied, % expected."),
   /** Error code. */
   INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** Error code. */
@@ -1655,7 +1649,7 @@ public enum QueryError {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
-    return error.get(ii, expr.seqType(), st, tb.add(expr).finish());
+    return error.get(ii, expr.seqType(), st, tb.add(expr.toErrorString()).finish());
   }
 
   /**
@@ -1667,6 +1661,21 @@ public enum QueryError {
    */
   public static QueryException typeError(final Value value, final Type type, final InputInfo ii) {
     return INVCONVERT_X_X_X.get(ii, value.type, type, value);
+  }
+
+  /**
+   * Throws an arity exception.
+   * @param ii input info
+   * @param expr expression
+   * @param arity expected arity
+   * @param nargs supplied arity
+   * @param param parameter/argument flag
+   * @return query exception
+   */
+  public static QueryException arityError(final Expr expr, final int arity, final int nargs,
+      final boolean param, final InputInfo ii) {
+    final String string = param ? "Function with " + plural(arity, "parameter") : arguments(arity);
+    return INVARITY_X_X_X.get(ii, string, nargs, expr.toErrorString());
   }
 
   /**
@@ -1723,12 +1732,22 @@ public enum QueryError {
   /**
    * Returns a plural suffix or an empty string.
    * @param number long number
-   * @return suffix
+   * @return string
    */
-  public static byte[] arguments(final long number) {
-    final TokenBuilder tb = new TokenBuilder().addLong(number).add(" argument");
+  public static String arguments(final long number) {
+    return plural(number, "argument");
+  }
+
+  /**
+   * Returns the correct singular/plural form for the specified number and string.
+   * @param number number
+   * @param string string
+   * @return string
+   */
+  private static String plural(final long number, final String string) {
+    final TokenBuilder tb = new TokenBuilder().addLong(number).add(' ').add(string);
     if(number != 1) tb.add('s');
-    return tb.finish();
+    return tb.toString();
   }
 
   /**
