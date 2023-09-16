@@ -1146,9 +1146,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException parse exception
    */
   private void forClause(final LinkedList<Clause> clauses) throws QueryException {
-    boolean member = false;
     do {
-      if(!member) member = wsConsumeWs(MEMBER);
+      final boolean member = wsConsumeWs(MEMBER);
       final Var fr = newVar();
       final boolean empty = !member && wsConsume(ALLOWING);
       if(empty) wsCheck(EMPTYY);
