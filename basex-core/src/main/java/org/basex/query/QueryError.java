@@ -899,6 +899,10 @@ public enum QueryError {
   /** Error code. */
   INCOMPLETE(XPST, 3, "Incomplete expression."),
   /** Error code. */
+  MAPCONSTR(XPST, 3, "Incomplete map constructor."),
+  /** Error code. */
+  ARRAYCONSTR(XPST, 3, "Incomplete array constructor."),
+  /** Error code. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
   /** Error code. */
   STEPMISS_X(XPST, 3, "Expecting valid step%."),
@@ -930,8 +934,6 @@ public enum QueryError {
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** Error code. */
   NOSWITCH(XPST, 3, "Incomplete switch expression."),
-  /** Error code. */
-  TYPEPAR(XPST, 3, "Expecting '(' after 'typeswitch'."),
   /** Error code. */
   PRAGMAINV(XPST, 3, "Invalid pragma expression."),
   /** Error code. */

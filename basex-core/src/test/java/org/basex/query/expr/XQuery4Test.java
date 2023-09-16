@@ -79,6 +79,19 @@ public final class XQuery4Test extends QueryPlanTest {
     query("1--fn() { 2 }()", 3);
   }
 
+  /** GFLWOR: for key/value. */
+  @Test public void forKeyValue() {
+    query("for key $k value $v in map { } return $k * $v", "");
+
+    query("for key $k in map { 2: 3 } return $k", 2);
+    query("for value $v in map { 2: 3 } return $v", 3);
+    query("for key $k value $v in map { 2: 3 } return $k * $v", 6);
+
+    error("for key $k allowing empty in 1 return ()", WRONGCHAR_X_X);
+    error("for value $v allowing empty in 1 return ()", WRONGCHAR_X_X);
+    error("for key $k value $v allowing empty in 1 return ()", WRONGCHAR_X_X);
+  }
+
   /** GFLWOR: for member. */
   @Test public void forMember() {
     query("for member $m in [] return $m", "");

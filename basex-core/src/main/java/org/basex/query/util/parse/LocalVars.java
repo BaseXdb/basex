@@ -42,6 +42,14 @@ public final class LocalVars {
   }
 
   /**
+   * Creates and registers local variables in the current scope.
+   * @param vrs variables to be added (can be {@code null})
+   */
+  public void add(final Var... vrs) {
+    for(final Var var : vrs) add(var);
+  }
+
+  /**
    * Tries to resolve a local variable reference.
    * @param name variable name
    * @param ii input info
