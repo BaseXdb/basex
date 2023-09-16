@@ -31,7 +31,7 @@ public class Dur extends ADateDur {
       "(-?)P(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+(\\.\\d+)?)S)?)?");
   /** Duration pattern. */
   public static final Pattern DUR = Pattern.compile("(-?)P(" + DP + "Y)?(" + DP +
-      "M)?(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+|\\d*\\.\\d+)?S)?)?");
+      "M)?(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+(?:\\d*\\.\\d+)?)?S)?)?");
 
   /** Number of months. */
   long mon;
