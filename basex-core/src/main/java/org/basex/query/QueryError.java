@@ -931,7 +931,7 @@ public enum QueryError {
   /** Error code. */
   NOSWITCH(XPST, 3, "Incomplete switch expression."),
   /** Error code. */
-  TYPEPAR(XPST, 3, "Expecting '(' after 'switch' or 'typeswitch'."),
+  TYPEPAR(XPST, 3, "Expecting '(' after 'typeswitch'."),
   /** Error code. */
   PRAGMAINV(XPST, 3, "Invalid pragma expression."),
   /** Error code. */

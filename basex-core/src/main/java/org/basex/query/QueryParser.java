@@ -1341,30 +1341,36 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!wsConsumeWs(SWITCH, "(", TYPEPAR)) return null;
+    final int p = pos;
+    if(!wsConsumeWs(SWITCH)) return null;
+
     final InputInfo ii = info();
-    wsCheck("(");
-    final Expr cond = check(expr(), NOSWITCH);
-    final ArrayList<SwitchGroup> groups = new ArrayList<>();
-    wsCheck(")");
+    Expr cond = Bln.TRUE;
+    if(consume('(')) {
+      cond = check(expr(), NOSWITCH);
+      wsCheck(")");
+    }
     final boolean brace = wsConsume("{");
+    final int p2 = pos;
+    if(!wsConsume(CASE)) {
+      pos = p;
+      return null;
+    }
+    pos = p2;
 
     // collect all cases
+    final ArrayList<SwitchGroup> groups = new ArrayList<>();
     ExprList exprs;
     do {
       exprs = new ExprList((Expr) null);
       while(wsConsumeWs(CASE)) add(exprs, check(expr(), NOSWITCH));
-      if(exprs.size() == 1) {
-        // add default case
-        if(groups.isEmpty()) throw error(WRONGCHAR_X_X, CASE, found());
-        wsCheck(DEFAULT);
-      }
+      if(exprs.size() == 1) wsCheck(DEFAULT);
       wsCheck(RETURN);
       exprs.set(0, check(single(), NOSWITCH));
       groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
-    if(brace) wsCheck("}");
 
+    if(brace) wsCheck("}");
     return new Switch(ii, cond, groups.toArray(SwitchGroup[]::new));
   }
 
