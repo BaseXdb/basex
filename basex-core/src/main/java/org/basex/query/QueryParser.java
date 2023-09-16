@@ -1128,11 +1128,12 @@ public class QueryParser extends InputParser {
       cls.add(windowClause(slide));
     } else {
       // ForClause / LetClause
-      final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, "$", NOLET);
-      if(let || wsConsumeWs(FOR, "$", NOFOR)) {
+      final boolean lt = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, "$", NOLET);
+      final boolean fr = !lt && (wsConsumeWs(FOR, MEMBER, NOFOR) || wsConsumeWs(FOR, "$", NOFOR));
+      if(lt || fr) {
         if(cls == null) cls = new LinkedList<>();
-        if(let) letClause(cls);
-        else    forClause(cls);
+        if(lt) letClause(cls);
+        else   forClause(cls);
       }
     }
     return cls;
@@ -1145,22 +1146,36 @@ public class QueryParser extends InputParser {
    * @throws QueryException parse exception
    */
   private void forClause(final LinkedList<Clause> clauses) throws QueryException {
+    boolean member = false;
     do {
-      final Var var = newVar();
-      final boolean emp = wsConsume(ALLOWING);
-      if(emp) wsCheck(EMPTYY);
+      if(!member) member = wsConsumeWs(MEMBER);
+      final Var fr = newVar();
+      final boolean empty = !member && wsConsume(ALLOWING);
+      if(empty) wsCheck(EMPTYY);
       final Var at = wsConsumeWs(AT) ? newVar(SeqType.INTEGER_O) : null;
       final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DOUBLE_O) : null;
       // check for duplicate variable names
       if(at != null) {
-        if(var.name.eq(at.name)) throw error(DUPLVAR_X, at);
+        if(fr.name.eq(at.name)) throw error(DUPLVAR_X, at);
         if(score != null && at.name.eq(score.name)) throw error(DUPLVAR_X, score);
       }
-      if(score != null && var.name.eq(score.name)) throw error(DUPLVAR_X, score);
+      if(score != null && fr.name.eq(score.name)) throw error(DUPLVAR_X, score);
       wsCheck(IN);
-      final Expr expr = check(single(), NOVARDECL);
-      // declare late because otherwise it would shadow the wrong variables
-      clauses.add(new For(localVars.add(var), localVars.add(at), localVars.add(score), expr, emp));
+      final InputInfo info = info();
+      Expr expr = check(single(), NOVARDECL);
+      // declare variables after the expression
+      localVars.add(at);
+      localVars.add(score);
+      // for member $m in $a  ->  for $m in array:split($a) let $m := array:values($a)
+      if(member) {
+        final Var memberFr = localVars.add(new Var(fr.name, null, qc, sc, info));
+        clauses.add(new For(memberFr, at, score, Function._ARRAY_SPLIT.get(sc, info, expr), empty));
+        final Var memberLt = localVars.add(new Var(fr.name, fr.declType, qc, sc, info));
+        final Expr memberExpr = Function._ARRAY_VALUES.get(sc, info, new VarRef(info, memberFr));
+        clauses.add(new Let(memberLt, memberExpr, false));
+      } else {
+        clauses.add(new For(localVars.add(fr), at, score, expr, empty));
+      }
     } while(wsConsumeWs(","));
   }
 
@@ -1173,10 +1188,10 @@ public class QueryParser extends InputParser {
   private void letClause(final LinkedList<Clause> clauses) throws QueryException {
     do {
       final boolean score = wsConsumeWs(SCORE);
-      final Var var = score ? newVar(SeqType.DOUBLE_O) : newVar();
+      final Var lt = score ? newVar(SeqType.DOUBLE_O) : newVar();
       wsCheck(":=");
       final Expr expr = check(single(), NOVARDECL);
-      clauses.add(new Let(localVars.add(var), expr, score));
+      clauses.add(new Let(localVars.add(lt), expr, score));
     } while(wsConsume(","));
   }
 

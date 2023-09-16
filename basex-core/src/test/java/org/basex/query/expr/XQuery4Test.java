@@ -79,6 +79,17 @@ public final class XQuery4Test extends QueryPlanTest {
     query("1--fn() { 2 }()", 3);
   }
 
+  /** GFLWOR: for member. */
+  @Test public void forMember() {
+    query("for member $m in [] return $m", "");
+    query("for member $m in [ 5 ] return $m", 5);
+    query("for member $m in [ 5, 6 ] return $m", "5\n6");
+    query("for member $m at $p in [ 1, 2 ] return $m", "1\n2");
+    query("for member $m at $p in [ (3, 2), 1, () ] return count($m)", "2\n1\n0");
+
+    error("for member $m allowing empty in 1 return $m", WRONGCHAR_X_X);
+  }
+
   /** Function item, no parameter list. */
   @Test public void functionContextItem() {
     query("function { . + 1 }(1)", 2);
