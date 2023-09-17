@@ -136,9 +136,10 @@ public abstract class Seq extends Value {
    * @param qc query context
    * @return resulting value
    */
-  public final Value insertBefore(final long pos, final Value value, final QueryContext qc) {
+  public final Value insert(final long pos, final Value value, final QueryContext qc) {
     final long n = value.size();
-    return n == 0 ? this : n == 1 ? insert(pos, (Item) value, qc) : copyInsert(pos, value, qc);
+    return n == 0 ? this : n == 1 ? insertBefore(pos, (Item) value, qc) :
+      copyInsert(pos, value, qc);
   }
 
   /**
@@ -148,10 +149,10 @@ public abstract class Seq extends Value {
    * @param qc query context
    * @return resulting value
    */
-  public abstract Value insert(long pos, Item item, QueryContext qc);
+  public abstract Value insertBefore(long pos, Item item, QueryContext qc);
 
   /**
-   * Helper for {@link #insertBefore(long, Value, QueryContext)} that copies all items into a
+   * Helper for {@link #insert(long, Value, QueryContext)} that copies all items into a
    * {@link TreeSeq}.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
    * @param value value to insert

@@ -27,12 +27,12 @@ final class SingletonArray extends XQArray {
   }
 
   @Override
-  public XQArray cons(final Value head) {
+  public XQArray prepend(final Value head) {
     return new SmallArray(new Value[] { head, member }, union(head));
   }
 
   @Override
-  public XQArray snoc(final Value last) {
+  public XQArray append(final Value last) {
     return new SmallArray(new Value[] { member, last }, union(last));
   }
 
@@ -53,7 +53,7 @@ final class SingletonArray extends XQArray {
 
   @Override
   public XQArray concat(final XQArray other) {
-    return other.isEmptyArray() ? this : other.cons(member);
+    return other.isEmptyArray() ? this : other.prepend(member);
   }
 
   @Override
@@ -62,12 +62,12 @@ final class SingletonArray extends XQArray {
   }
 
   @Override
-  public Value last() {
+  public Value foot() {
     return member;
   }
 
   @Override
-  public XQArray init() {
+  public XQArray trunk() {
     return empty();
   }
 
@@ -88,7 +88,7 @@ final class SingletonArray extends XQArray {
 
   @Override
   public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return pos == 0 ? cons(value) : snoc(value);
+    return pos == 0 ? prepend(value) : append(value);
   }
 
   @Override
@@ -161,6 +161,6 @@ final class SingletonArray extends XQArray {
 
   @Override
   XQArray prepend(final SmallArray array) {
-    return array.snoc(member);
+    return array.append(member);
   }
 }

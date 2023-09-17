@@ -16,14 +16,14 @@ import org.junit.jupiter.api.*;
  */
 public final class VariousArrayTest extends ArrayTest {
   /**
-   * Test for {@link XQArray#cons(Value)} and {@link XQArray#snoc(Value)}.
+   * Test for {@link XQArray#prepend(Value)} and {@link XQArray#append(Value)}.
    */
   @Test public void consSnocTest() {
     final int n = 200_000;
     XQArray array = XQArray.empty();
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
-      array = array.cons(val).snoc(val);
+      array = array.prepend(val).append(val);
     }
 
     assertEquals(2 * n, array.arraySize());
@@ -39,19 +39,19 @@ public final class VariousArrayTest extends ArrayTest {
   @Test public void queueTest() {
     final int n = 2_000_000, k = n / 100;
     XQArray array = XQArray.empty();
-    for(int i = 0; i < k; i++) array = array.cons(Int.get(i));
+    for(int i = 0; i < k; i++) array = array.prepend(Int.get(i));
 
     for(int i = k; i < n; i++) {
       assertEquals(k, array.arraySize());
-      assertEquals(i - k, ((Int) array.last()).itr());
-      array = array.init();
-      array = array.cons(Int.get(i));
+      assertEquals(i - k, ((Int) array.foot()).itr());
+      array = array.trunk();
+      array = array.prepend(Int.get(i));
     }
 
     assertEquals(k, array.arraySize());
     for(int i = 0; i < k; i++) {
-      assertEquals(n - k + i, ((Int) array.last()).itr());
-      array = array.init();
+      assertEquals(n - k + i, ((Int) array.foot()).itr());
+      array = array.trunk();
       assertEquals(k - i - 1, array.arraySize());
     }
 
@@ -68,7 +68,7 @@ public final class VariousArrayTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       assertEquals(i, array.arraySize());
       final Int val = Int.get(i);
-      array = array.cons(val).cons(val);
+      array = array.prepend(val).prepend(val);
       assertEquals(i, ((Int) array.head()).itr());
       array = array.tail();
     }
@@ -94,7 +94,7 @@ public final class VariousArrayTest extends ArrayTest {
 
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
-      array = array.cons(val).snoc(val);
+      array = array.prepend(val).append(val);
       final int k = 2 * (i + 1);
       final Iterator<Value> iter = array.iterator(0);
       for(int j = 0; j < k; j++) {
@@ -111,7 +111,7 @@ public final class VariousArrayTest extends ArrayTest {
   @Test public void tailTest() {
     XQArray array = XQArray.empty();
     for(int i = 0; i < 15; i++) {
-      array = array.snoc(Int.get(i));
+      array = array.append(Int.get(i));
     }
 
     assertEquals(0, ((Int) array.head()).itr());

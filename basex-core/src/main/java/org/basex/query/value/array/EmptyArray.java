@@ -28,12 +28,12 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray cons(final Value head) {
+  public XQArray prepend(final Value head) {
     return new SingletonArray(head);
   }
 
   @Override
-  public XQArray snoc(final Value last) {
+  public XQArray append(final Value last) {
     return new SingletonArray(last);
   }
 
@@ -63,12 +63,12 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public Value last() {
+  public Value foot() {
     throw Util.notExpected();
   }
 
   @Override
-  public XQArray init() {
+  public XQArray trunk() {
     throw Util.notExpected();
   }
 

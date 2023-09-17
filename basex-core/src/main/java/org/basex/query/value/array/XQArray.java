@@ -70,15 +70,15 @@ public abstract class XQArray extends XQData {
    * @param head value to prepend
    * @return resulting array
    */
-  public abstract XQArray cons(Value head);
+  public abstract XQArray prepend(Value head);
 
   /**
-   * Appends a member to the back of this array.
+   * Appends a member to the end of this array.
    * Running time: <i>O(1)*</i>
    * @param last value to append
    * @return resulting array
    */
-  public abstract XQArray snoc(Value last);
+  public abstract XQArray append(Value last);
 
   /**
    * Gets the member at the given position in this array.
@@ -113,32 +113,31 @@ public abstract class XQArray extends XQData {
   public abstract XQArray concat(XQArray other);
 
   /**
-   * First member of this array, equivalent to {@code array.get(0)}.
+   * Returns the first member of this array.
    * Running time: <i>O(1)</i>
-   * @return the first member
+   * @return first member
    */
   public abstract Value head();
 
   /**
-   * Last member of this array, equivalent to {@code array.get(array.arraySize() - 1)}.
+   * Returns the last member of this array.
    * Running time: <i>O(1)</i>
    * @return last member
    */
-  public abstract Value last();
+  public abstract Value foot();
 
   /**
-   * Initial segment of this array, i.e. an array containing all members of this array (in the
-   * same order), except for the last one.
+   * Returns the array without the last member.
    * Running time: <i>O(1)*</i>
-   * @return initial segment
+   * @return new array
    */
-  public abstract XQArray init();
+  public abstract XQArray trunk();
 
   /**
-   * Tail segment of this array, i.e. an array containing all members of this array (in the
+   * Returns the array without the first member.
    * same order), except for the first one.
    * Running time: <i>O(1)*</i>
-   * @return tail segment
+   * @return new array
    */
   public abstract XQArray tail();
 

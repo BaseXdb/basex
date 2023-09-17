@@ -84,7 +84,7 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item, final QueryContext qc) {
+  public Value insertBefore(final long pos, final Item item, final QueryContext qc) {
     return item.equals(value) ? get(value, size + 1) : copyInsert(pos, item, qc);
   }
 

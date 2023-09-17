@@ -47,7 +47,7 @@ public final class ArrayInsertTest extends ArrayTest {
     final int n = 1_000;
     XQArray array = XQArray.empty();
 
-    for(int i = 0; i < n; i++) array = array.snoc(Int.get(i));
+    for(int i = 0; i < n; i++) array = array.append(Int.get(i));
     assertEquals(n, array.arraySize());
 
     final Int val = Int.get(n);

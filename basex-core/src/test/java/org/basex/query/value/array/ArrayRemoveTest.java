@@ -36,9 +36,9 @@ public final class ArrayRemoveTest extends ArrayTest {
         }
         assertFalse(iter2.hasNext());
       }
-      array1 = array1.snoc(Int.get(k));
+      array1 = array1.append(Int.get(k));
       assertEquals(k + 1, array1.arraySize());
-      assertEquals(k, ((Int) array1.last()).itr());
+      assertEquals(k, ((Int) array1.foot()).itr());
     }
   }
 
@@ -51,12 +51,12 @@ public final class ArrayRemoveTest extends ArrayTest {
     array2 = array2.remove(2, qc);
     assertContains(array2, 1, 2, 4, 6, 7, 8);
 
-    array2 = array.cons(Int.get(-1)).snoc(Int.get(9));
+    array2 = array.prepend(Int.get(-1)).append(Int.get(9));
     array2 = array2.remove(5, qc);
     array2 = array2.remove(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8, 9);
 
-    array2 = array.cons(Int.get(-1));
+    array2 = array.prepend(Int.get(-1));
     array2 = array2.remove(5, qc);
     array2 = array2.remove(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8);
@@ -81,7 +81,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     array = array.remove(5, qc);
     assertContains(array, 0, 1, 2, 3, 4);
 
-    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).cons(Int.ZERO);
+    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).prepend(Int.ZERO);
     for(int i = 9; i >= 4; i--) {
       array = array.remove(i, qc);
     }
@@ -167,8 +167,8 @@ public final class ArrayRemoveTest extends ArrayTest {
     array = from(
         5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
-    for(int i = 4; i >= 0; i--) array = array.cons(Int.get(i));
-    for(int i = 31; i <= 35; i++) array = array.snoc(Int.get(i));
+    for(int i = 4; i >= 0; i--) array = array.prepend(Int.get(i));
+    for(int i = 31; i <= 35; i++) array = array.append(Int.get(i));
     for(int i = 22; i >= 16; i--) array = array.remove(i, qc);
     assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
             14, 15, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
@@ -237,7 +237,7 @@ public final class ArrayRemoveTest extends ArrayTest {
         }
         assertFalse(iter2.hasNext());
       }
-      array1 = array1.snoc(Int.get(k));
+      array1 = array1.append(Int.get(k));
     }
   }
 

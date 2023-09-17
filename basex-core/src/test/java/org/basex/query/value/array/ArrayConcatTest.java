@@ -63,8 +63,8 @@ public final class ArrayConcatTest extends ArrayTest {
     final int n = 200_000;
     for(int i = 0; i < n; i++) {
       final Value value = Int.get(i);
-      array1 = array1.cons(value);
-      array2 = array2.snoc(value);
+      array1 = array1.prepend(value);
+      array2 = array2.append(value);
     }
 
     assertEquals(n, array1.arraySize());

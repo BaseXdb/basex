@@ -32,12 +32,12 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> cons(final Node<N, E> fst) {
+  public FingerTree<N, E> prepend(final Node<N, E> fst) {
     return new SingletonTree<>(fst);
   }
 
   @Override
-  public FingerTree<N, E> snoc(final Node<N, E> lst) {
+  public FingerTree<N, E> append(final Node<N, E> lst) {
     return new SingletonTree<>(lst);
   }
 
@@ -47,12 +47,12 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public Node<N, E> last() {
+  public Node<N, E> foot() {
     throw Util.notExpected();
   }
 
   @Override
-  public FingerTree<N, E> init() {
+  public FingerTree<N, E> trunk() {
     throw Util.notExpected();
   }
 
