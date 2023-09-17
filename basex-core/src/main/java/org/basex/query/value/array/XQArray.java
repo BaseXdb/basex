@@ -475,14 +475,15 @@ public abstract class XQArray extends XQData {
   public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Value member : members()) {
+      if(!tb.moreInfo()) break;
       tb.add(tb.isEmpty() ? " " : ", ");
-      final long vs = member.size();
-      if(vs != 1) tb.add('(');
-      for(int i = 0; i < vs; i++) {
-        if(i != 0) tb.add(", ");
-        tb.add(member.itemAt(i));
+      final long ms = member.size();
+      if(ms != 1) tb.add('(');
+      for(int m = 0; m < ms; m++) {
+        if(m != 0) tb.add(", ");
+        tb.add(member.itemAt(m));
       }
-      if(vs != 1) tb.add(')');
+      if(ms != 1) tb.add(')');
     }
     qs.bracket(tb.add(' ').finish());
   }

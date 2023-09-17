@@ -361,21 +361,19 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  StringBuilder append(final StringBuilder sb, final String indent) {
-    sb.append(indent).append("`-- Collision (").append(Integer.toHexString(hash)).append("):\n");
+  void add(final TokenBuilder tb, final String indent) {
+    tb.add(indent).add("`-- Collision (").add(Integer.toHexString(hash)).add("):\n");
     final int kl = keys.length;
     for(int k = 0; k < kl; k++) {
-      sb.append(indent).append("      ").append(keys[k]).append(" => ");
-      sb.append(values[k]).append('\n');
+      tb.add(indent).add("      ").add(keys[k]).add(" => ").add(values[k]).add('\n');
     }
-    return sb;
   }
 
   @Override
-  StringBuilder append(final StringBuilder sb) {
-    for(int i = size; --i >= 0 && more(sb);) {
-      sb.append(keys[i]).append(MAPASG).append(values[i]).append(SEP);
+  void add(final TokenBuilder tb) {
+    final int kl = keys.length;
+    for(int k = 0; k < kl && tb.moreInfo(); k++) {
+      tb.add(keys[k]).add(MAPASG).add(values[k]).add(SEP);
     }
-    return sb;
   }
 }

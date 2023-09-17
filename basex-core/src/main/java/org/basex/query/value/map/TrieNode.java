@@ -1,7 +1,5 @@
 package org.basex.query.value.map;
 
-import static org.basex.query.QueryText.*;
-
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -70,9 +68,9 @@ abstract class TrieNode {
     @Override
     void apply(final QueryBiConsumer<Item, Value> func) { }
     @Override
-    StringBuilder append(final StringBuilder sb, final String indent) { return sb.append("{ }"); }
+    void add(final TokenBuilder tb, final String indent) { tb.add("{ }"); }
     @Override
-    StringBuilder append(final StringBuilder sb) { return sb; }
+    void add(final TokenBuilder tb) { }
   };
 
   /** Size of this node. */
@@ -266,32 +264,21 @@ abstract class TrieNode {
 
   /**
    * Recursive {@link #toString()} helper.
-   * @param sb string builder
+   * @param tb token builder
    * @param indent indentation string
-   * @return string builder for convenience
    */
-  abstract StringBuilder append(StringBuilder sb, String indent);
+  abstract void add(TokenBuilder tb, String indent);
 
   /**
    * Recursive helper for {@link XQMap#toString()}.
-   * @param sb string builder
-   * @return reference to {@code sb}
+   * @param tb token builder
    */
-  abstract StringBuilder append(StringBuilder sb);
+  abstract void add(TokenBuilder tb);
 
   @Override
   public String toString() {
-    return append(new StringBuilder(), "").toString();
-  }
-
-  /**
-   * Checks if string building should be continued.
-   * @param sb string builder
-   * @return result of check
-   */
-  static boolean more(final StringBuilder sb) {
-    if(sb.length() <= 32) return true;
-    if(!sb.substring(sb.length() - DOTS.length()).equals(DOTS)) sb.append(DOTS);
-    return false;
+    final TokenBuilder tb = new TokenBuilder();
+    add(tb, "");
+    return tb.toString();
   }
 }

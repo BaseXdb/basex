@@ -237,13 +237,12 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  StringBuilder append(final StringBuilder sb, final String indent) {
-    return sb.append(indent).append("`-- ").append(key).append(" => ").append(value).append('\n');
+  void add(final TokenBuilder tb, final String indent) {
+    tb.add(indent).add("`-- ").add(key).add(" => ").add(value).add('\n');
   }
 
   @Override
-  StringBuilder append(final StringBuilder sb) {
-    if(more(sb)) sb.append(key).append(MAPASG).append(value).append(SEP);
-    return sb;
+  void add(final TokenBuilder tb) {
+    if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
   }
 }

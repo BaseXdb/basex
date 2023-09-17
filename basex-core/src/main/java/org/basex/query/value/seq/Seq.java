@@ -324,13 +324,9 @@ public abstract class Seq extends Value {
    */
   private TokenBuilder build(final boolean error) {
     final TokenBuilder tb = new TokenBuilder().add('(');
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < size && tb.moreInfo(); ++i) {
       if(i > 0) tb.add(SEP);
       tb.add(error ? itemAt(i).toErrorString() : itemAt(i).toString());
-      if(tb.size() <= 40 || i + 1 == size) continue;
-      // chop output to prevent too long error strings
-      tb.add(SEP).add(DOTS);
-      break;
     }
     return tb.add(')');
   }
