@@ -186,7 +186,7 @@ public abstract class XQArray extends XQData {
   public abstract XQArray remove(long pos, QueryContext qc);
 
   @Override
-  public void write(final DataOutput out) throws IOException, QueryException {
+  public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(arraySize());
     for(final Value member : members()) {
       Store.write(out, member);
@@ -333,8 +333,8 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public final Item materialize(final Predicate<Data> test, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
     if(materialized(test, ii)) return this;
 
@@ -347,7 +347,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     if(!funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       for(final Value value : members()) {
@@ -358,7 +358,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean instanceOf(final Type tp) {
+  public final boolean instanceOf(final Type tp) {
     if(type.instanceOf(tp)) return true;
     if(!(tp instanceof FuncType) || tp instanceof MapType) return false;
 
@@ -376,7 +376,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+  public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
     if(item instanceof XQArray) {
       final XQArray array = (XQArray) item;
@@ -472,7 +472,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public void toString(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Value member : members()) {
       if(!tb.moreInfo()) break;
