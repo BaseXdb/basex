@@ -274,7 +274,7 @@ public enum Function implements AFunction {
       params(TIME_ZO, STRING_O, STRING_ZO, STRING_ZO, STRING_ZO), STRING_ZO),
   /** XQuery function. */
   FUNCTION_ANNOTATIONS(FnFunctionAnnotations::new, "function-annotations(function)",
-      params(FUNCTION_O), MAP_O, INSPECT_URI),
+      params(FUNCTION_O), MAP_O),
   /** XQuery function. */
   FUNCTION_ARITY(FnFunctionArity::new, "function-arity(function)",
       params(FUNCTION_O), INTEGER_O),
