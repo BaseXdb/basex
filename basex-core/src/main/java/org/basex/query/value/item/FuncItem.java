@@ -40,16 +40,17 @@ public final class FuncItem extends FItem implements Scope {
   private final int stackSize;
   /** Input information. */
   private final InputInfo info;
-
   /** Query focus. */
   private final QueryFocus focus;
+  /** Annotations (lazy instantiation). */
+  private AnnList anns;
   /** Indicates if the query focus is accessed or modified. */
   private Boolean fcs;
 
   /**
    * Constructor.
    * @param sc static context
-   * @param anns function annotations
+   * @param anns function annotations (can be {@code null})
    * @param name function name (can be {@code null})
    * @param params formal parameters
    * @param type function type
@@ -65,7 +66,7 @@ public final class FuncItem extends FItem implements Scope {
   /**
    * Constructor.
    * @param sc static context
-   * @param anns function annotations
+   * @param anns function annotations (can be {@code null})
    * @param name function name (can be {@code null})
    * @param params formal parameters
    * @param type function type
@@ -78,7 +79,7 @@ public final class FuncItem extends FItem implements Scope {
       final FuncType type, final Expr expr, final int stackSize, final InputInfo info,
       final QueryFocus focus) {
 
-    super(type, anns);
+    super(type);
     this.name = name;
     this.params = params;
     this.expr = expr;
@@ -86,6 +87,7 @@ public final class FuncItem extends FItem implements Scope {
     this.sc = sc;
     this.info = info;
     this.focus = focus;
+    this.anns = anns;
   }
 
   @Override
@@ -101,6 +103,12 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public QNm paramName(final int ps) {
     return params[ps].name;
+  }
+
+  @Override
+  public AnnList annotations() {
+    if(anns == null) anns = new AnnList();
+    return anns;
   }
 
   @Override
@@ -151,7 +159,8 @@ public final class FuncItem extends FItem implements Scope {
     cc.pushScope(vs);
 
     // create new function call (will immediately be inlined/simplified when being optimized)
-    final boolean updating = anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
+    final boolean updating = anns != null && anns.contains(Annotation.UPDATING) ||
+        expr.has(Flag.UPD);
     Expr body = new DynFuncCall(info, sc, updating, false, this, args);
     if(optimize) body = body.optimize(cc);
 
@@ -261,7 +270,8 @@ public final class FuncItem extends FItem implements Scope {
     } else {
       final StringList list = new StringList(params.length);
       for(final Var param : params) list.add(param.toErrorString());
-      qs.token(anns).token(FUNCTION).params(list.finish()).token(AS);
+      if(anns != null) qs.token(anns);
+      qs.token(FUNCTION).params(list.finish()).token(AS);
       qs.token(funcType().declType).brace(expr);
     }
     return qs.toString();
@@ -270,7 +280,8 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public void toString(final QueryString qs) {
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    qs.token(anns).token(FUNCTION).params(params);
+    if(anns != null) qs.token(anns);
+    qs.token(FUNCTION).params(params);
     qs.token(AS).token(funcType().declType).brace(expr);
   }
 
@@ -311,8 +322,8 @@ public final class FuncItem extends FItem implements Scope {
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
           }
           if(action != null) return new FuncItem[] {
-              new FuncItem(sc, anns, null, params, funcType(), cnd, stackSize, info, focus),
-              new FuncItem(sc, anns, null, params, funcType(), action, stackSize, info, focus)
+            new FuncItem(sc, anns, null, params, funcType(), cnd, stackSize, info, focus),
+            new FuncItem(sc, anns, null, params, funcType(), action, stackSize, info, focus)
           };
         }
       }

@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -12,7 +13,15 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class AnnList extends ObjectList<Ann, AnnList> {
+public class AnnList extends ObjectList<Ann, AnnList> {
+  /** Empty annotations. */
+  public static final AnnList EMPTY = new AnnList() {
+    @Override
+    public AnnList add(final Ann element) {
+      throw Util.notExpected();
+    }
+  };
+
   /**
    * Checks if the specified signature is found in the list.
    * @param def signature to be found

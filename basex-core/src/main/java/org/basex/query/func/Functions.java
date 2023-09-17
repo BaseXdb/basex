@@ -127,7 +127,7 @@ public final class Functions {
     if(eq(name.uri(), XS_URI)) {
       if(arity > 0) lit.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc, ii);
       final Expr expr = constructor(name, lit.args, null, sc, ii);
-      final FuncType ft = FuncType.get(lit.anns(), null, lit.params);
+      final FuncType ft = FuncType.get(lit.annotations(), null, lit.params);
       return literal(ii, expr, ft, name, lit, runtime, false, arity == 0);
     }
 
@@ -136,13 +136,13 @@ public final class Functions {
     if(fd != null) {
       checkArity(arity, fd.minMax[0], fd.minMax[1], fd, ii, true);
 
-      final FuncType ft = fd.type(arity, lit.anns());
+      final FuncType ft = fd.type(arity, lit.annotations());
       final QNm[] names = fd.paramNames(arity);
       for(int a = 0; a < arity; a++) lit.add(names[a], ft.argTypes[a], qc, ii);
       final StandardFunc sf = fd.get(sc, ii, lit.args);
       final boolean updating = sf.updating(), ctx = sf.has(Flag.CTX);
       if(updating) {
-        lit.anns().add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
+        lit.annotations().add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
       }
       return literal(ii, sf, ft, name, lit, runtime, updating, ctx);
@@ -163,8 +163,8 @@ public final class Functions {
     if(java != null) {
       final SeqType[] sts = new SeqType[arity];
       Arrays.fill(sts, SeqType.ITEM_ZM);
-      final SeqType st = FuncType.get(lit.anns(), null, sts).seqType();
-      return new FuncLit(ii, java, st, name, lit.params, lit.anns(), lit.vs);
+      final SeqType st = FuncType.get(lit.annotations(), null, sts).seqType();
+      return new FuncLit(ii, java, st, name, lit.params, lit.annotations(), lit.vs);
     }
     if(runtime) return null;
 
@@ -352,10 +352,11 @@ public final class Functions {
     final FuncType sft = sf.funcType();
     final int arity = lit.params.length;
     for(int a = 0; a < arity; a++) lit.add(sf.paramName(a), sft.argTypes[a], qc, ii);
-    final FuncType ft = FuncType.get(lit.anns(), sft.declType, Arrays.copyOf(sft.argTypes, arity));
+    final FuncType ft = FuncType.get(lit.annotations(), sft.declType,
+        Arrays.copyOf(sft.argTypes, arity));
 
     final StaticFuncCall call = userDefined(sf.name, lit.args, null, qc, sc, ii);
-    if(call.func != null) lit.anns = call.func.anns;
+    if(call.func != null) lit.annotations = call.func.anns;
     return literal(ii, call, ft, sf.name, lit, runtime, sf.updating, false);
   }
 
@@ -403,7 +404,7 @@ public final class Functions {
 
     final VarScope vs = lit.vs;
     final Var[] params = lit.params;
-    final AnnList anns = lit.anns();
+    final AnnList anns = lit.annotations();
 
     // context/positional access must be bound to original focus
     // example for invalid query: let $f := last#0 return (1, 2)[$f()]
@@ -456,7 +457,7 @@ public final class Functions {
     /** Arguments. */
     final Expr[] args;
     /** Annotations. */
-    AnnList anns;
+    AnnList annotations;
     /** Parameter counter. */
     int a;
 
@@ -489,9 +490,9 @@ public final class Functions {
      * Returns the annotations.
      * @return annotations
      */
-    AnnList anns() {
-      if(anns == null) anns = new AnnList();
-      return anns;
+    AnnList annotations() {
+      if(annotations == null) annotations = new AnnList();
+      return annotations;
     }
   }
 }

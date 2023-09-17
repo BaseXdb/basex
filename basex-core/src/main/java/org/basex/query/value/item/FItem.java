@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -22,22 +21,12 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class FItem extends Item implements XQFunction {
-  /** Annotations. */
-  final AnnList anns;
-
   /**
    * Constructor.
    * @param type function type
-   * @param anns this function item's annotations
    */
-  protected FItem(final Type type, final AnnList anns) {
+  protected FItem(final Type type) {
     super(type);
-    this.anns = anns;
-  }
-
-  @Override
-  public final AnnList annotations() {
-    return anns;
   }
 
   @Override

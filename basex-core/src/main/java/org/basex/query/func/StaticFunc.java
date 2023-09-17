@@ -290,17 +290,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /**
    * Checks if inlining conditions are given.
    * @param cc compilation context
-   * @param anns annotations
+   * @param anns annotations (can be {@code null})
    * @param expr expression
    * @return result of check
    */
   public static boolean inline(final CompileContext cc, final AnnList anns, final Expr expr) {
-    final Ann inline = anns.get(Annotation._BASEX_INLINE);
+    final Ann inline = anns != null ? anns.get(Annotation._BASEX_INLINE) : null;
     final long limit;
     if(inline != null) {
       final Value value = inline.value();
       limit = value.isEmpty() ? Long.MAX_VALUE : ((ANum) value.itemAt(0)).itr();
-    } else if(anns.get(Annotation._BASEX_LOCK) != null) {
+    } else if(anns != null && anns.get(Annotation._BASEX_LOCK) != null) {
       limit = 0;
     } else {
       limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
