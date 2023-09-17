@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -60,23 +59,18 @@ public class FnBuildUri extends FnJsonDoc {
       uri.add(get(parts, PATH, qc));
     }
 
-    final Value queries = parts.get(Str.get(QUERY_SEGMENTS), info);
-    final XQArray qurs = queries.isEmpty() ? XQArray.empty() : toArray(queries, qc);
-    final long qs = qurs.arraySize();
-    if(qs > 0) {
+    final Value qp = parts.get(Str.get(QUERY_PARAMETERS), info);
+    if(!qp.isEmpty()) {
       final TokenBuilder query = new TokenBuilder();
       final String sep = options.get(UriOptions.QUERY_SEPARATOR);
-      for(int q = 0; q < qs; q++) {
-        final XQMap map = toMap(qurs.get(q), qc);
-        final byte[] key = encodeUri(token(get(map, KEY, qc)), false);
-        final byte[] value = encodeUri(token(get(map, VALUE, qc)), false);
-        final int kl = key.length, vl = value.length;
-        if(kl != 0 || vl != 0) {
+      toMap(qp, qc).apply((key, value) -> {
+        for(final Item item : value) {
           query.add(query.isEmpty() ? "?" : sep);
-          query.add(key).add(kl != 0 && vl != 0 ? "=" : "").add(value);
+          query.add(encodeUri(toToken(key), false)).add('=');
+          query.add(encodeUri(toToken(item), false));
         }
-      }
-      uri.add(query.finish());
+      });
+      uri.add(query);
     }
     final String fragment = get(parts, FRAGMENT, qc);
     if(!fragment.isEmpty()) uri.add('#').add(fragment);

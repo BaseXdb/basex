@@ -44,7 +44,7 @@ public class FnParseUri extends FnJsonDoc {
   /** URI part. */
   static final String PATH_SEGMENTS = "path-segments";
   /** URI part. */
-  static final String QUERY_SEGMENTS = "query-segments";
+  static final String QUERY_PARAMETERS = "query-parameters";
   /** URI part. */
   static final String FILEPATH = "filepath";
   /** URI part. */
@@ -152,13 +152,14 @@ public class FnParseUri extends FnJsonDoc {
       for(final String s : string.split(separator)) segments.add(decode(s));
     }
 
-    ArrayBuilder queries = new ArrayBuilder();
+    XQMap queries = XQMap.empty();
     if(!query.isEmpty()) {
       final String separator = Pattern.quote(options.get(UriOptions.QUERY_SEPARATOR));
       for(final String q : query.split(separator)) {
         final int eq = q.indexOf('=');
-        final String k = eq == -1 ? "" : q.substring(0, eq), v = q.substring(eq + 1);
-        queries.append(new MapBuilder(info).put(KEY, k).put(VALUE, v).map());
+        final Str key = eq == -1 ? Str.EMPTY : Str.get(q.substring(0, eq));
+        final Str val = Str.get(q.substring(eq + 1));
+        queries = queries.put(key, ValueBuilder.concat(queries.get(key, info), val, qc), info);
       }
     }
     filepath = decode(filepath);
@@ -175,7 +176,7 @@ public class FnParseUri extends FnJsonDoc {
     add(map, QUERY, query);
     add(map, FRAGMENT, fragment);
     add(map, PATH_SEGMENTS, StrSeq.get(segments));
-    add(map, QUERY_SEGMENTS, queries.array());
+    add(map, QUERY_PARAMETERS, queries);
     add(map, FILEPATH, filepath);
     return map.map();
   }
