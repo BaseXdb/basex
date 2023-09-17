@@ -170,9 +170,9 @@ public final class SeqType {
   /** Java function type. */
   public static final FuncType JAVA = new FuncType(null);
   /** The general map type. */
-  public static final MapType MAP = new MapType(ANY_ATOMIC_TYPE, ITEM_ZM);
+  public static final MapType MAP = ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
   /** The general array type. */
-  public static final ArrayType ARRAY = new ArrayType(ITEM_ZM);
+  public static final ArrayType ARRAY = ITEM_ZM.arrayType();
 
   /** Single function. */
   public static final SeqType FUNCTION_O = FUNCTION.seqType();
@@ -203,6 +203,10 @@ public final class SeqType {
   public final Occ occ;
   /** Node kind test (can be {@code null}). */
   private final Test test;
+  /** Array type (lazy instantiation). */
+  private ArrayType arrayType;
+  /** Map types (lazy instantiation). */
+  private EnumMap<AtomType, MapType> mapTypes;
 
   /**
    * Constructor.
@@ -245,6 +249,25 @@ public final class SeqType {
   public static SeqType get(final Type type, final Occ occ, final Test test) {
     return occ == ZERO || test == null || !(type instanceof NodeType) ?
       get(type, occ) : new SeqType(type, occ, test);
+  }
+
+  /**
+   * Returns an array type for this sequence type.
+   * @return array type
+   */
+  public ArrayType arrayType() {
+    if(arrayType == null) arrayType = new ArrayType(this);
+    return arrayType;
+  }
+
+  /**
+   * Returns an array type for this sequence type and the specified key type.
+   * @param keyType key type
+   * @return map type
+   */
+  public MapType mapType(final AtomType keyType) {
+    if(mapTypes == null) mapTypes = new EnumMap<>(AtomType.class);
+    return mapTypes.computeIfAbsent(keyType, o -> new MapType(keyType, this));
   }
 
   /**

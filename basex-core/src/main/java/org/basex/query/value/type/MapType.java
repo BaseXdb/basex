@@ -30,6 +30,16 @@ public final class MapType extends FuncType {
     super(declType, keyType.seqType());
   }
 
+  /**
+   * Creates a new map type.
+   * @param keyType key type
+   * @param declType declared return type
+   * @return map type
+   */
+  public static MapType get(final AtomType keyType, final SeqType declType) {
+    return declType.mapType(keyType);
+  }
+
   @Override
   public XQMap cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
@@ -113,17 +123,6 @@ public final class MapType extends FuncType {
   @Override
   public ID id() {
     return ID.MAP;
-  }
-
-  /**
-   * Creates a new map type.
-   * @param keyType key type
-   * @param declType declared return type
-   * @return map type
-   */
-  public static MapType get(final AtomType keyType, final SeqType declType) {
-    return keyType == AtomType.ANY_ATOMIC_TYPE && declType.eq(SeqType.ITEM_ZM) ? SeqType.MAP :
-      new MapType(keyType, declType);
   }
 
   @Override
