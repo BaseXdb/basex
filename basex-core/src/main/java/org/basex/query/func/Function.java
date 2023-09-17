@@ -273,6 +273,9 @@ public enum Function implements AFunction {
   FORMAT_TIME(FnFormatTime::new, "format-time(value,picture[,language,calendar,place])",
       params(TIME_ZO, STRING_O, STRING_ZO, STRING_ZO, STRING_ZO), STRING_ZO),
   /** XQuery function. */
+  FUNCTION_ANNOTATIONS(FnFunctionAnnotations::new, "function-annotations(function)",
+      params(FUNCTION_O), MAP_O, INSPECT_URI),
+  /** XQuery function. */
   FUNCTION_ARITY(FnFunctionArity::new, "function-arity(function)",
       params(FUNCTION_O), INTEGER_O),
   /** XQuery function. */
@@ -1496,7 +1499,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations::new, "function-annotations(function)",
       params(FUNCTION_O), MAP_ZO, INSPECT_URI),
   /** XQuery function. */

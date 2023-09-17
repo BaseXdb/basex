@@ -67,18 +67,6 @@ public final class InspectModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void functionAnnotations() {
-    final Function func = _INSPECT_FUNCTION_ANNOTATIONS;
-    // queries
-    query(func.args(" true#0"), "map{}");
-    query(func.args(" %local:x function() { }") +
-        "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
-    query(func.args(" %Q{uri}name('a', 'b') function() {}") +
-        " (QName('uri', 'name'))", "a\nb");
-    query(_MAP_SIZE.args(func.args(" %basex:inline %basex:lazy function() {}")), 2);
-  }
-
-  /** Test method. */
   @Test public void functions() {
     final Function func = _INSPECT_FUNCTIONS;
     // queries
