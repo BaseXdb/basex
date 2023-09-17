@@ -29,7 +29,10 @@ public final class ArrayRemove extends ArrayFn {
     pos.ddo();
 
     // delete entries backwards
-    for(int l = pos.size() - 1; l >= 0; l--) array = array.remove(pos.get(l), qc);
+    for(int l = pos.size() - 1; l >= 0; l--) {
+      final long p = pos.get(l);
+      if(p < array.arraySize()) array = array.remove(p, qc);
+    }
     return array;
   }
 

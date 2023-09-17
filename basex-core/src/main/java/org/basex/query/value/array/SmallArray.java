@@ -25,20 +25,21 @@ final class SmallArray extends XQArray {
   SmallArray(final Value[] members, final Type type) {
     super(type);
     this.members = members;
-    assert members.length >= 1 && members.length <= MAX_SMALL;
+    assert members.length >= 2 && members.length <= MAX_SMALL;
   }
 
   @Override
   public XQArray cons(final Value head) {
     final Type tp = union(head);
-    if(members.length < MAX_SMALL) {
-      final Value[] newMembers = slice(members, -1, members.length);
+    final int n = members.length;
+    if(n < MAX_SMALL) {
+      final Value[] newMembers = slice(members, -1, n);
       newMembers[0] = head;
       return new SmallArray(newMembers, tp);
     }
 
     final int mid = MIN_DIGIT - 1;
-    final Value[] left = slice(members, -1, mid), right = slice(members, mid, members.length);
+    final Value[] left = slice(members, -1, mid), right = slice(members, mid, n);
     left[0] = head;
     return new BigArray(left, right, tp);
   }
@@ -46,14 +47,14 @@ final class SmallArray extends XQArray {
   @Override
   public XQArray snoc(final Value last) {
     final Type tp = union(last);
-    if(members.length < MAX_SMALL) {
-      final Value[] newMembers = slice(members, 0, members.length + 1);
+    final int n = members.length;
+    if(n < MAX_SMALL) {
+      final Value[] newMembers = slice(members, 0, n + 1);
       newMembers[newMembers.length - 1] = last;
       return new SmallArray(newMembers, tp);
     }
 
-    final Value[] left = slice(members, 0, MIN_DIGIT),
-        right = slice(members, MIN_DIGIT, members.length + 1);
+    final Value[] left = slice(members, 0, MIN_DIGIT), right = slice(members, MIN_DIGIT, n + 1);
     right[right.length - 1] = last;
     return new BigArray(left, right, tp);
   }
@@ -92,14 +93,18 @@ final class SmallArray extends XQArray {
 
   @Override
   public XQArray init() {
-    if(members.length == 1) return empty();
-    return new SmallArray(slice(members, 0, members.length - 1), type);
+    final int n = members.length;
+    return n == 1 ? empty() :
+           n == 2 ? new SingletonArray(members[0]) :
+           new SmallArray(slice(members, 0, n - 1), type);
   }
 
   @Override
   public XQArray tail() {
-    if(members.length == 1) return empty();
-    return new SmallArray(slice(members, 1, members.length), type);
+    final int n = members.length;
+    return n == 1 ? empty() :
+           n == 2 ? new SingletonArray(members[1]) :
+           new SmallArray(slice(members, 1, n), type);
   }
 
   @Override
@@ -111,7 +116,6 @@ final class SmallArray extends XQArray {
   public XQArray reverseArray(final QueryContext qc) {
     qc.checkStop();
     final int n = members.length;
-    if(n == 1) return this;
     final Value[] values = new Value[n];
     for(int i = 0; i < n; i++) values[i] = members[n - 1 - i];
     return new SmallArray(values, type);
@@ -121,7 +125,7 @@ final class SmallArray extends XQArray {
   public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
     final Type tp = union(value);
     qc.checkStop();
-    final int p = (int) pos, n = members.length;
+    final int n = members.length, p = (int) pos;
     final Value[] out = new Value[n + 1];
     Array.copy(members, p, out);
     out[p] = value;
@@ -134,8 +138,9 @@ final class SmallArray extends XQArray {
   @Override
   public XQArray remove(final long pos, final QueryContext qc) {
     qc.checkStop();
-    final int p = (int) pos, n = members.length;
+    final int n = members.length, p = (int) pos;
     if(n == 1) return empty();
+    if(n == 2) return new SingletonArray(members[p == 1 ? 0 : 1]);
 
     final Value[] out = new Value[n - 1];
     Array.copy(members, p, out);
@@ -147,7 +152,9 @@ final class SmallArray extends XQArray {
   public XQArray subArray(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
     final int p = (int) pos, n = (int) length;
-    return n == 0 ? XQArray.empty() : new SmallArray(slice(members, p, p + n), type);
+    return n == 0 ? empty() :
+           n == 1 ? new SingletonArray(members[p]) :
+           new SmallArray(slice(members, p, p + n), type);
   }
 
   @Override

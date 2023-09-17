@@ -171,15 +171,17 @@ public final class ArrayBuilder {
    * @return resulting array
    */
   public XQArray array(final ArrayType type) {
-    final int n = inLeft + inRight;
-    if(n == 0) return XQArray.empty();
-
+    // invalidate data structures
+    final FingerTreeBuilder<Value> builder = tree;
     final Value[] values = members;
     members = null;
-    final FingerTreeBuilder<Value> builder = tree;
     tree = null;
 
+    final int n = inLeft + inRight;
+    if(n == 0) return XQArray.empty();
     final int start = (mid - inLeft + CAP) % CAP;
+    if(n == 1) return new SingletonArray(values[start]);
+
     if(n <= XQArray.MAX_SMALL) {
       // small int array, fill directly
       final Value[] small = new Value[n];

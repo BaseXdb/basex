@@ -61,7 +61,7 @@ public abstract class XQArray extends XQData {
    * @return array
    */
   public static XQArray member(final Value value) {
-    return new SmallArray(new Value[] { value }, ArrayType.get(value.seqType()));
+    return new SingletonArray(value);
   }
 
   /**

@@ -29,12 +29,12 @@ final class EmptyArray extends XQArray {
 
   @Override
   public XQArray cons(final Value head) {
-    return new SmallArray(new Value[] { head }, ArrayType.get(head.seqType()));
+    return new SingletonArray(head);
   }
 
   @Override
   public XQArray snoc(final Value last) {
-    return new SmallArray(new Value[] { last }, ArrayType.get(last.seqType()));
+    return new SingletonArray(last);
   }
 
   @Override
@@ -94,7 +94,7 @@ final class EmptyArray extends XQArray {
 
   @Override
   public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return new SmallArray(new Value[] { value }, ArrayType.get(value.seqType()));
+    return new SingletonArray(value);
   }
 
   @Override
