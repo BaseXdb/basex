@@ -1276,6 +1276,7 @@ public final class FnModuleTest extends QueryPlanTest {
     error(func.args("a", "+"), REGINVALID_X);
     error(func.args("a", "+", "j"), REGINVALID_X);
     error(func.args("a", "[a-\\\\]"), REGINVALID_X);
+    error(func.args("-", "([\\d-z]+)"), REGINVALID_X);
   }
 
   /** Test method. */

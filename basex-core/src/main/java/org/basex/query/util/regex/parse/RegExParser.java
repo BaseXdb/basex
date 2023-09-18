@@ -456,7 +456,7 @@ group.negative = true;
     label_4:
     while (true) {
       if (jj_2_3(3)) {
-        sub = charRange();
+        sub = charRange(cg.isEmpty());
 cg.add(sub);
       } else {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -505,7 +505,7 @@ for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
    * @return expression
    * @throws ParseException parsing exception
    */
-  final public   RegExp charRange() throws ParseException {int a = -1, b = -1;
+  final public   RegExp charRange(boolean isBegin) throws ParseException {int a = -1, b = -1;
     if (getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE) {
       a = charOrEsc();
       jj_consume_token(CHAR);
@@ -517,6 +517,8 @@ if(a > b) {if (true) throw new ParseException("Illegal range: " +
       case CHAR:
       case DIGIT:{
         a = XmlChar();
+if(a == '-' && ! (isBegin || getToken(1).kind == BR_CLOSE)) {if (true) throw new ParseException(
+          "The - character is a valid character range only at the beginning or end of a positive character group.");}
         break;
         }
       default:
@@ -611,30 +613,13 @@ cp = Escape.getCp(token.image);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_charOrEsc_337_7_12()
- {
-    if (jj_3R_XmlChar_350_5_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_charOrEsc_337_5_10()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_337_7_12()) {
-    jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_338_7_13()) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3_2()
  {
     if (jj_3R_posCharGroup_301_5_5()) return true;
     return false;
   }
 
-  private boolean jj_3R_XmlChar_350_5_11()
+  private boolean jj_3R_XmlChar_353_5_11()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -678,7 +663,7 @@ cp = Escape.getCp(token.image);
 
   private boolean jj_3R_charRange_323_7_9()
  {
-    if (jj_3R_XmlChar_350_5_11()) return true;
+    if (jj_3R_XmlChar_353_5_11()) return true;
     return false;
   }
 
@@ -693,11 +678,23 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
+  private boolean jj_3R_charOrEsc_341_7_13()
+ {
+    if (jj_scan_token(SINGLE_ESC)) return true;
+    return false;
+  }
+
   private boolean jj_3R_charRange_318_7_8()
  {
-    if (jj_3R_charOrEsc_337_5_10()) return true;
+    if (jj_3R_charOrEsc_340_5_10()) return true;
     if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_337_5_10()) return true;
+    if (jj_3R_charOrEsc_340_5_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_charOrEsc_340_7_12()
+ {
+    if (jj_3R_XmlChar_353_5_11()) return true;
     return false;
   }
 
@@ -721,9 +718,14 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_338_7_13()
+  private boolean jj_3R_charOrEsc_340_5_10()
  {
-    if (jj_scan_token(SINGLE_ESC)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_charOrEsc_340_7_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_charOrEsc_341_7_13()) return true;
+    }
     return false;
   }
 
