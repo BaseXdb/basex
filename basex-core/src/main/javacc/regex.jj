@@ -298,7 +298,7 @@ PARSER_END(RegExParser)
     final RegExpList cg = new RegExpList();
     RegExp sub = null;
   } {
-    ( LOOKAHEAD(3) sub = charRange() { cg.add(sub); }
+    ( LOOKAHEAD(3) sub = charRange(cg.isEmpty()) { cg.add(sub); }
     | (<SINGLE_ESC> | <MULTI_ESC>| <CAT_ESC>) {
         for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
       }
@@ -312,7 +312,7 @@ PARSER_END(RegExParser)
    * @return expression
    * @throws ParseException parsing exception
    */
-  RegExp charRange() : {
+  RegExp charRange(boolean isBegin) : {
     int a = -1, b = -1;
   } {
     ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE })
@@ -320,7 +320,10 @@ PARSER_END(RegExParser)
         if(a > b) throw new ParseException("Illegal range: " +
             Literal.escape(a) + " > " + Literal.escape(b));
       }
-    | a = XmlChar()
+    | a = XmlChar() {
+        if(a == '-' && ! (isBegin || getToken(1).kind == BR_CLOSE)) throw new ParseException(
+          "The - character is a valid character range only at the beginning or end of a positive character group.");
+      }
     ) {
       return b == -1 ? new Literal(a) : new CharRange(a, b);
     }
