@@ -3,6 +3,7 @@ package org.basex.query.func.array;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -62,5 +63,13 @@ public class ArrayValues extends StandardFunc {
     final FuncType ft = arg(0).funcType();
     if(ft instanceof ArrayType) exprType.assign(ft.declType.with(Occ.ZERO_OR_MORE));
     return this;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    final Expr array = arg(0);
+    final Expr expr = mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA) &&
+        array.funcType() instanceof ArrayType ? array : this;
+    return cc.simplify(this, expr, mode);
   }
 }
