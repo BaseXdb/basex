@@ -2,6 +2,8 @@ package org.basex.query;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryText.FALSE;
+import static org.basex.query.QueryText.TRUE;
 import static org.basex.util.Token.*;
 import static org.basex.util.Token.normalize;
 import static org.basex.util.ft.FTFlag.*;
@@ -428,16 +430,24 @@ public class QueryParser extends InputParser {
         final QNm name = eQName(XQ_URI, QNAME_X);
 
         final ItemList items = new ItemList();
-        if(wsConsumeWs("(")) {
+        if(wsConsume("(")) {
           do {
-            final Expr expr = literal();
-            if(!(expr instanceof Item)) {
-              if(Function.ERROR.is(expr)) expr.item(qc, ii);
-              throw error(ANNVALUE);
+            final Expr expr;
+            final boolean truee = wsConsume(TRUE);
+            if(truee || consume(FALSE)) {
+              wsCheck("(");
+              wsCheck(")");
+              expr = Bln.get(truee);
+            } else {
+              expr = quote(curr()) ? Str.get(stringLiteral()) : numericLiteral(0, true);
+              if(!(expr instanceof Item)) {
+                if(Function.ERROR.is(expr)) expr.item(qc, ii);
+                throw error(ANNVALUE_X, curr());
+              }
             }
             items.add((Item) expr);
-          } while(wsConsumeWs(","));
-          check(')');
+          } while(wsConsume(","));
+          wsCheck(")");
         }
 
         // check if annotation is a pre-defined one
@@ -2313,7 +2323,7 @@ public class QueryParser extends InputParser {
     if(ch == '(') return parenthesized();
     if(ch == '$') return varRef();
     if(quote(ch)) return Str.get(stringLiteral());
-    final Expr num = numericLiteral(ch, Long.MAX_VALUE);
+    final Expr num = numericLiteral(Long.MAX_VALUE, false);
     if(num != null) {
       if(Function.ERROR.is(num) || num instanceof Int) return num;
       throw error(NUMBERITR_X_X, num.seqType(), num);
@@ -2401,10 +2411,9 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && wsConsumeWs("#")) {
       checkReserved(name);
-      final char ch = curr();
-      final Expr num = numericLiteral(ch, Integer.MAX_VALUE);
+      final Expr num = numericLiteral(Integer.MAX_VALUE, false);
       if(Function.ERROR.is(num)) return num;
-      if(!(num instanceof Int)) throw error(ARITY_X, ch == 0 ? "" : ch);
+      if(!(num instanceof Int)) throw error(ARITY_X, num);
       final int arity = (int) ((Int) num).itr();
       return Functions.literal(name, arity, qc, sc, info(), false);
     }
@@ -2418,21 +2427,23 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
-    final char ch = curr();
-    final Expr num = numericLiteral(ch, 0);
-    return num != null ? num : quote(ch) ? Str.get(stringLiteral()) : null;
+    return quote(curr()) ? Str.get(stringLiteral()) : numericLiteral(0, false);
   }
 
   /**
    * Parses the "NumericLiteral" rule.
    * Parses the "DecimalLiteral" rule.
    * Parses the "IntegerLiteral" rule.
-   * @param ch current character
    * @param max maximum value for integers (if 0, parse all numeric types)
+   * @param mns parse minus character
    * @return numeric literal or {@code null}
    * @throws QueryException query exception
    */
-  private Expr numericLiteral(final char ch, final long max) throws QueryException {
+  private Expr numericLiteral(final long max, final boolean mns) throws QueryException {
+    final boolean negate = mns && consume('-');
+    if(negate) skipWs();
+
+    final char ch = curr();
     if(!digit(ch) && ch != '.') return null;
     token.reset();
 
@@ -2486,17 +2497,23 @@ public class QueryParser extends InputParser {
         else throw error(NUMBER_X, token);
 
         if(XMLToken.isNCStartChar(curr())) throw error(NUMBER_X, token);
-        return Dbl.get(token.toArray(), info());
+        final double d = Dbl.parse(token.toArray(), info());
+        return Dbl.get(negate ? -d : d);
       }
       // decimal value
-      if(dec) return Dec.get(new BigDecimal(string(token.toArray())));
+      if(dec) {
+        final BigDecimal d = new BigDecimal(string(token.toArray()));
+        return Dec.get(negate ? d.negate() : d);
+      }
     }
 
     // integer value
     if(token.isEmpty()) throw error(NUMBER_X, token);
+    // out of range
+    if(range || max != 0 && l > max) return FnError.get(RANGE_X.get(info(), token),
+        SeqType.INTEGER_O, sc);
 
-    return !range && (max == 0 || l <= max) ? Int.get(l) :
-      FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
+    return Int.get(negate ? -l : l);
   }
 
   /**
@@ -2520,17 +2537,17 @@ public class QueryParser extends InputParser {
    */
   private byte[] stringLiteral() throws QueryException {
     skipWs();
-    final char del = curr();
-    if(!quote(del)) throw error(NOQUOTE_X, found());
+    final char quote = curr();
+    if(!quote(quote)) throw error(NOQUOTE_X, found());
     consume();
     token.reset();
     while(true) {
-      while(!consume(del)) {
+      while(!consume(quote)) {
         if(!more()) throw error(NOQUOTE_X, found());
         entity(token);
       }
-      if(!consume(del)) break;
-      token.add(del);
+      if(!consume(quote)) break;
+      token.add(quote);
     }
     return token.toArray();
   }

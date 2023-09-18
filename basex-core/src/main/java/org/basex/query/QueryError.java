@@ -1003,7 +1003,7 @@ public enum QueryError {
   /** Error code. */
   NOCATCH(XPST, 3, "Expecting catch clause."),
   /** Error code. */
-  ANNVALUE(XPST, 3, "Literal expected, ')' found."),
+  ANNVALUE_X(XPST, 3, "Literal expected, '%' found."),
   /** Error code. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** Error code. */

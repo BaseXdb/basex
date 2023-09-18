@@ -30,8 +30,8 @@ public final class AnnotationsTest extends SandboxTest {
 
   /** Parsing errors and conflicts. */
   @Test public void conflicts() {
-    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE);
-    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE);
+    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE_X);
+    error("declare namespace a='a';declare %a:a() variable $x:=1; $x", ANNVALUE_X);
     error("declare %pfff:public variable $x := 1; $x", NOURI_X);
     error("declare %public %public variable $x := 1; $x", DUPLVARVIS);
     error("declare %public %private variable $x := 1; $x", DUPLVARVIS);
@@ -55,5 +55,16 @@ public final class AnnotationsTest extends SandboxTest {
     error("declare %output:xx function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
     error("declare %output:method function local:x() { 1 }; 1", BASEX_ANN2_X_X);
     error("declare %output:method(1) function local:x() { 1 }; 1", BASEX_ANN_X_X_X);
+  }
+
+
+  /** Literals. */
+  @Test public void literals() {
+    query("%Q{_}_ fn { . }(1)", 1);
+    query("%Q{_}_('') fn { . }(1)", 1);
+    query("%Q{_}_( '' ) fn { . }(1)", 1);
+    query("%Q{_}_('',1,-2,-3.4,-5.6e7,true(),false()) fn { . }(1)", 1);
+    query("%Q{_}_(  ''  ,  1  ,  -  2  ,  -  3.4  ,  -  5.6e7  , " +
+        "true  (  )  , false  (  )  )  %Q{_}__  %Q{_}___ fn { . }(1)", 1);
   }
 }
