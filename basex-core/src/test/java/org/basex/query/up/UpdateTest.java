@@ -1352,4 +1352,18 @@ public final class UpdateTest extends SandboxTest {
     error("<e xml:a=''/> update { insert node attribute xml:a { 'b' } into . }",
         UPATTDUPL_X);
   }
+
+  /** Update text nodes. */
+  @Test public void gh2246() {
+    query("text { '' } update { replace value of node . with '' }", "");
+    query("text { 'a' } update { replace value of node . with 'a' }", "a");
+
+    query("text { '' } update { replace value of node . with 'a' }", "a");
+    query("text { 'a' } update { replace value of node . with '' }", "");
+    query("text { 'a' } update { replace value of node . with 'A' }", "A");
+
+    query("<x>{ 'a' }</x> update { replace value of node . with 'a' }", "<x>a</x>");
+    query("<x>{ 'a' }</x> update { replace value of node . with '' }", "<x/>");
+    query("<x>{ 'a' }</x> update { replace value of node . with 'A' }", "<x>A</x>");
+  }
 }
