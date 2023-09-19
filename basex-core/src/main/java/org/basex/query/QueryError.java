@@ -1123,6 +1123,8 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPT_X(XPTY, 4, "%"),
   /** Error code. */
+  EXP_FOUND_X(XPTY, 4, "% expected, % found."),
+  /** Error code. */
   BINARY_X(XPTY, 4, "Binary expected, % found."),
   /** Error code. */
   STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),

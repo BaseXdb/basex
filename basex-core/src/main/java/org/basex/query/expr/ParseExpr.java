@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 import static org.basex.query.value.type.NodeType.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -663,6 +665,23 @@ public abstract class ParseExpr extends Expr {
       if(!map.contains(key, info)) throw INVCONVERT_X_X_X.get(info, item.type, "record()", item);
     }
     return map;
+  }
+
+  /**
+   * Returns an enumeration value.
+   * @param <T> enumeration type
+   * @param item item to check
+   * @param keys record keys
+   * @return enum value
+   * @throws QueryException query exception
+   */
+  protected final <T extends Enum<T>> T toEnum(final Item item, final Class<T> keys)
+      throws QueryException {
+    final String value = toString(item);
+    for(final T key : keys.getEnumConstants()) {
+      if(value.equals(key.toString())) return key;
+    }
+    throw EXP_FOUND_X.get(info, Arrays.toString(keys.getEnumConstants()), value);
   }
 
   /**
