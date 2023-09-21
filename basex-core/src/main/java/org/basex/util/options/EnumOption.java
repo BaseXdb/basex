@@ -1,5 +1,7 @@
 package org.basex.util.options;
 
+import java.util.*;
+
 import org.basex.util.list.*;
 
 /**
@@ -72,5 +74,14 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
     final StringList sl = new StringList(values.length);
     for(final V v : values) sl.add(v.toString());
     return sl.finish();
+  }
+
+  /**
+   * Helper function for converting enumeration names to strings.
+   * @param name name
+   * @return lower-case string with '-' replaced by '-';
+   */
+  public static String string(final String name) {
+    return name.toLowerCase(Locale.ENGLISH).replace('_', '-');
   }
 }

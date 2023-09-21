@@ -64,6 +64,7 @@ public interface QueryText {
   /** Parser token. */ String EXACTLY = "exactly";
   /** Parser token. */ String EXCEPT = "except";
   /** Parser token. */ String EXTERNAL = "external";
+  /** Parser token. */ String FALSE = "false";
   /** Parser token. */ String FIRST = "first";
   /** Parser token. */ String FN = "fn";
   /** Parser token. */ String FOR = "for";
@@ -157,6 +158,7 @@ public interface QueryText {
   /** Parser token. */ String TO = "to";
   /** Parser token. */ String TRANSFORM = "transform";
   /** Parser token. */ String TREAT = "treat";
+  /** Parser token. */ String TRUE = "true";
   /** Parser token. */ String TRY = "try";
   /** Parser token. */ String TUMBLING = "tumbling";
   /** Parser token. */ String TYPE = "type";

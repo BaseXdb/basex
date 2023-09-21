@@ -97,8 +97,14 @@ public final class XQuery4Test extends QueryPlanTest {
     query("for member $m in [] return $m", "");
     query("for member $m in [ 5 ] return $m", 5);
     query("for member $m in [ 5, 6 ] return $m", "5\n6");
-    query("for member $m at $p in [ 1, 2 ] return $m", "1\n2");
+
+    query("for member $m at $p in [ 3, 4 ] return $m", "3\n4");
     query("for member $m at $p in [ (3, 2), 1, () ] return count($m)", "2\n1\n0");
+    query("for member $m at $p in [ 3, 4 ] return $p", "1\n2");
+    query("for member $m at $p in [ (3, 2), 1, () ] return count($p)", "1\n1\n1");
+
+    check("for member $m in [ (3, 2), 1, () ] return sum($m)", "5\n1\n0", empty(_ARRAY_VALUES));
+    check("for member $m in [ (3, 2), 1, () ] return count($m)", "2\n1\n0", exists(_ARRAY_VALUES));
 
     error("for member $m allowing empty in 1 return $m", WRONGCHAR_X_X);
   }

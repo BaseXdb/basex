@@ -1003,7 +1003,7 @@ public enum QueryError {
   /** Error code. */
   NOCATCH(XPST, 3, "Expecting catch clause."),
   /** Error code. */
-  ANNVALUE(XPST, 3, "Literal expected, ')' found."),
+  ANNVALUE_X(XPST, 3, "Literal expected, '%' found."),
   /** Error code. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
   /** Error code. */
@@ -1122,6 +1122,8 @@ public enum QueryError {
   LOOKUP_X(XPTY, 4, "Input of lookup operator must be map or array: %."),
   /** Error code. */
   INVALIDOPT_X(XPTY, 4, "%"),
+  /** Error code. */
+  EXP_FOUND_X(XPTY, 4, "% expected, % found."),
   /** Error code. */
   BINARY_X(XPTY, 4, "Binary expected, % found."),
   /** Error code. */
