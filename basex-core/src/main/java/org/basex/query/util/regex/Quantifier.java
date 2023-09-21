@@ -26,6 +26,14 @@ public final class Quantifier extends RegExp {
     this.lazy = lazy;
   }
 
+  /**
+   * Get minimum number of occurences.
+   * @return the minimum.
+   */
+  public int getMin() {
+    return min;
+  }
+
   @Override
   void toRegEx(final StringBuilder sb) {
     sb.append(string()).append(lazy ? "?" : "");

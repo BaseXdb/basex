@@ -12,6 +12,7 @@ package org.basex.query.util.regex.parse;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -30,10 +31,8 @@ import static java.util.regex.Pattern.*;
 public class RegExParser {
   /** Group counter. */
   private int groups;
-  /** Current backref's number. */
-  private int backref;
   /** Closed groups. */
-  private final BitArray closed = new BitArray();
+  private final Map<Integer, Group> closed = new HashMap<Integer, Group>();
   /** If the wildcard {@code .} matches any character. */
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
@@ -188,8 +187,9 @@ PARSER_END(RegExParser)
     | (<PAR_OPEN> { final int grp = ++groups; }
         nd = regExp()
       <PAR_CLOSE>) {
-        closed.set(grp);
-        nd = new Group(nd, true);
+        final Group g = new Group(nd, true);
+        closed.put(grp, g);
+        nd = g;
       }
     | nd = backReference()
     ) {
@@ -216,9 +216,9 @@ PARSER_END(RegExParser)
    * @throws ParseException parsing exception
    */
   BackRef backReference() : {
-    Token tok;
+    int backref;
   } {
-    tok = <BACK_REF> {
+      <BACK_REF> {
       backref = token.image.charAt(1) - '0';
     }
     (
@@ -227,8 +227,10 @@ PARSER_END(RegExParser)
         backref = 10 * backref + token.image.charAt(0) - '0';
       }
     )* {
-      if(!closed.get(backref))
+      final Group g = closed.get(backref);
+      if(g == null)
         throw new ParseException("Illegal back-reference: \\" + backref);
+      g.setHasBackRef();
       return new BackRef(backref);
     }
   }
