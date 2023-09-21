@@ -33,6 +33,8 @@ public class RegExParser {
   private int groups;
   /** Closed groups. */
   private final Map<Integer, Group> closed = new HashMap<Integer, Group>();
+  /** Path of current atom: sequence numbers of branches and atoms currently being processed. */ 
+  private Stack<Integer> atomPath = new Stack<Integer>();
   /** If the wildcard {@code .} matches any character. */
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
@@ -83,13 +85,17 @@ PARSER_END(RegExParser)
    */
   RegExp regExp() : {
     final RegExpList brs = new RegExpList();
+    RegExp br;
+    atomPath.push(0);
   } {
     (
-      { brs.add(branch()); }
+      br = branch() { brs.add(br); }
       (
-        <OR> { brs.add(branch()); }
+        <OR> { atomPath.push(atomPath.pop() + 1); }
+        br = branch() { brs.add(br); }
       )*
     ) {
+      atomPath.pop();
       return brs.size() == 1 ? brs.get(0) : new Disjunction(brs.finish());
     }
   }
@@ -104,13 +110,16 @@ PARSER_END(RegExParser)
     RegExp atom;
     final RegExpList pieces = new RegExpList();
     Quantifier qu = null;
+    atomPath.push(0);
   } {
     (
       ( atom = atom() [ qu = quantifier() ] ) {
         pieces.add(qu == null ? atom : new Piece(atom, qu));
         qu = null;
+        atomPath.push(atomPath.pop() + 1);
       }
     )* {
+      atomPath.pop();
       return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());
     }
   }
@@ -182,12 +191,12 @@ PARSER_END(RegExParser)
     ( nd = Char()
     | nd = charClass()
     | (<NPAR_OPEN> nd = regExp() <PAR_CLOSE>) {
-        nd = new Group(nd, false);
+        nd = new Group(nd, false, atomPath.toArray(new Integer[atomPath.size()]));
       }
     | (<PAR_OPEN> { final int grp = ++groups; }
         nd = regExp()
       <PAR_CLOSE>) {
-        final Group g = new Group(nd, true);
+        final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()]));
         closed.put(grp, g);
         nd = g;
       }
@@ -231,7 +240,15 @@ PARSER_END(RegExParser)
       if(g == null)
         throw new ParseException("Illegal back-reference: \\" + backref);
       g.setHasBackRef();
-      return new BackRef(backref);
+      int diff = 0;
+      while (atomPath.get(diff) == g.getAtomPath()[diff]) {
+        ++diff;
+      }
+      // If the atom paths of group and backref differ in a branch (even index), the backref is in
+      // a different branch than the group, so the backref can be flagged accordingly, and later be
+      // omitted at serialization time.
+      final boolean isDifferentBranch = (diff & 1) == 0;
+      return new BackRef(backref, isDifferentBranch);
     }
   }
 
