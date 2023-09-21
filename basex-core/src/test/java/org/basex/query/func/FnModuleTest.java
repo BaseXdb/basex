@@ -1274,6 +1274,7 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("\\", "[A-\\\\]"), true);
 
     query(func.args("babadad", "^((.)?a\\2)+$"), true);
+    query(func.args("x", "(a)|\\1"), true);
 
     error(func.args("a", "+"), REGINVALID_X);
     error(func.args("a", "+", "j"), REGINVALID_X);

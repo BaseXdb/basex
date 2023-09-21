@@ -25,6 +25,8 @@ public class RegExParser implements RegExParserConstants {
   private int groups;
   /** Closed groups. */
   private final Map<Integer, Group> closed = new HashMap<Integer, Group>();
+  /** Path of current atom: sequence numbers of branches and atoms currently being processed. */
+  private Stack<Integer> atomPath = new Stack<Integer>();
   /** If the wildcard {@code .} matches any character. */
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
@@ -70,7 +72,10 @@ public class RegExParser implements RegExParserConstants {
    * @throws ParseException parsing exception
    */
   final public   RegExp regExp() throws ParseException {final RegExpList brs = new RegExpList();
-brs.add(branch());
+    RegExp br;
+    atomPath.push(0);
+    br = branch();
+brs.add(br);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -83,9 +88,12 @@ brs.add(branch());
         break label_1;
       }
       jj_consume_token(OR);
-brs.add(branch());
+atomPath.push(atomPath.pop() + 1);
+      br = branch();
+brs.add(br);
     }
-{if ("" != null) return brs.size() == 1 ? brs.get(0) : new Disjunction(brs.finish());}
+atomPath.pop();
+      {if ("" != null) return brs.size() == 1 ? brs.get(0) : new Disjunction(brs.finish());}
     throw new Error("Missing return statement in function");
 }
 
@@ -98,6 +106,7 @@ brs.add(branch());
   final public   RegExp branch() throws ParseException {RegExp atom;
     final RegExpList pieces = new RegExpList();
     Quantifier qu = null;
+    atomPath.push(0);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -135,8 +144,10 @@ brs.add(branch());
       }
 pieces.add(qu == null ? atom : new Piece(atom, qu));
         qu = null;
+        atomPath.push(atomPath.pop() + 1);
     }
-{if ("" != null) return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());}
+atomPath.pop();
+      {if ("" != null) return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());}
     throw new Error("Missing return statement in function");
 }
 
@@ -261,7 +272,7 @@ try {
       jj_consume_token(NPAR_OPEN);
       nd = regExp();
       jj_consume_token(PAR_CLOSE);
-nd = new Group(nd, false);
+nd = new Group(nd, false, atomPath.toArray(new Integer[atomPath.size()]));
       break;
       }
     case PAR_OPEN:{
@@ -269,7 +280,7 @@ nd = new Group(nd, false);
 final int grp = ++groups;
       nd = regExp();
       jj_consume_token(PAR_CLOSE);
-final Group g = new Group(nd, true);
+final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()]));
         closed.put(grp, g);
         nd = g;
       break;
@@ -333,7 +344,15 @@ final Group g = closed.get(backref);
       if(g == null)
         {if (true) throw new ParseException("Illegal back-reference: \\" + backref);}
       g.setHasBackRef();
-      {if ("" != null) return new BackRef(backref);}
+      int diff = 0;
+      while (atomPath.get(diff) == g.getAtomPath()[diff]) {
+        ++diff;
+      }
+      // If the atom paths of group and backref differ in a branch (even index), the backref is in
+      // a different branch than the group, so the backref can be flagged accordingly, and later be
+      // omitted at serialization time.
+      final boolean isDifferentBranch = (diff & 1) == 0;
+      {if ("" != null) return new BackRef(backref, isDifferentBranch);}
     throw new Error("Missing return statement in function");
 }
 
@@ -615,13 +634,64 @@ cp = Escape.getCp(token.image);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3_2()
+  private boolean jj_3R_charOrEsc_360_7_13()
  {
-    if (jj_3R_posCharGroup_303_5_5()) return true;
+    if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
-  private boolean jj_3R_XmlChar_355_5_11()
+  private boolean jj_3R_charRange_337_7_8()
+ {
+    if (jj_3R_charOrEsc_359_5_10()) return true;
+    if (jj_scan_token(CHAR)) return true;
+    if (jj_3R_charOrEsc_359_5_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_charOrEsc_359_7_12()
+ {
+    if (jj_3R_XmlChar_372_5_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_charRange_337_5_6()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    jj_lookingAhead = true;
+    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE;
+    jj_lookingAhead = false;
+    if (!jj_semLA || jj_3R_charRange_337_7_8()) {
+    jj_scanpos = xsp;
+    if (jj_3R_charRange_342_7_9()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_charOrEsc_359_5_10()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_charOrEsc_359_7_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_charOrEsc_360_7_13()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_posCharGroup_320_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_scan_token(DIGIT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_XmlChar_372_5_11()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -632,7 +702,7 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_304_7_7()
+  private boolean jj_3R_posCharGroup_321_7_7()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -648,7 +718,7 @@ cp = Escape.getCp(token.image);
 
   private boolean jj_3_3()
  {
-    if (jj_3R_charRange_320_5_6()) return true;
+    if (jj_3R_charRange_337_5_6()) return true;
     return false;
   }
 
@@ -658,18 +728,18 @@ cp = Escape.getCp(token.image);
     xsp = jj_scanpos;
     if (jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_posCharGroup_304_7_7()) return true;
+    if (jj_3R_posCharGroup_321_7_7()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_charRange_325_7_9()
+  private boolean jj_3R_charRange_342_7_9()
  {
-    if (jj_3R_XmlChar_355_5_11()) return true;
+    if (jj_3R_XmlChar_372_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_303_5_5()
+  private boolean jj_3R_posCharGroup_320_5_5()
  {
     Token xsp;
     if (jj_3_4()) return true;
@@ -677,57 +747,6 @@ cp = Escape.getCp(token.image);
       xsp = jj_scanpos;
       if (jj_3_4()) { jj_scanpos = xsp; break; }
     }
-    return false;
-  }
-
-  private boolean jj_3R_charOrEsc_343_7_13()
- {
-    if (jj_scan_token(SINGLE_ESC)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_charRange_320_7_8()
- {
-    if (jj_3R_charOrEsc_342_5_10()) return true;
-    if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_342_5_10()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_charOrEsc_342_7_12()
- {
-    if (jj_3R_XmlChar_355_5_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_charRange_320_5_6()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    jj_lookingAhead = true;
-    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE;
-    jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_charRange_320_7_8()) {
-    jj_scanpos = xsp;
-    if (jj_3R_charRange_325_7_9()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_charOrEsc_342_5_10()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_342_7_12()) {
-    jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_343_7_13()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_1()
- {
-    if (jj_scan_token(DIGIT)) return true;
     return false;
   }
 
