@@ -1,5 +1,7 @@
 package org.basex.io.in;
 
+import java.nio.charset.*;
+
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -94,7 +96,7 @@ public final class TarEntry {
    */
   static String name(final ByteList result) {
     try {
-      return new String(result.toArray());
+      return new String(result.toArray(), StandardCharsets.UTF_8);
     } catch(final Exception ex) {
       // fallback: UTF8
       Util.debug(ex);

@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
+import java.nio.charset.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -206,7 +207,7 @@ public class FnParseUri extends FnJsonDoc {
    * @return decoded string
    */
   static String decode(final String string) {
-    return new String(XMLToken.decodeUri(Token.token(string), true));
+    return new String(XMLToken.decodeUri(Token.token(string), true), StandardCharsets.UTF_8);
   }
 
   /**
