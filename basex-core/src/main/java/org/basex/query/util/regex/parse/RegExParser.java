@@ -4,6 +4,7 @@ package org.basex.query.util.regex.parse;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -22,10 +23,8 @@ import static java.util.regex.Pattern.*;
 public class RegExParser implements RegExParserConstants {
   /** Group counter. */
   private int groups;
-  /** Current backref's number. */
-  private int backref;
   /** Closed groups. */
-  private final BitArray closed = new BitArray();
+  private final Map<Integer, Group> closed = new HashMap<Integer, Group>();
   /** If the wildcard {@code .} matches any character. */
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
@@ -270,8 +269,9 @@ nd = new Group(nd, false);
 final int grp = ++groups;
       nd = regExp();
       jj_consume_token(PAR_CLOSE);
-closed.set(grp);
-        nd = new Group(nd, true);
+final Group g = new Group(nd, true);
+        closed.put(grp, g);
+        nd = g;
       break;
       }
     case BACK_REF:{
@@ -316,8 +316,8 @@ closed.set(grp);
    * @return expression
    * @throws ParseException parsing exception
    */
-  final public   BackRef backReference() throws ParseException {Token tok;
-    tok = jj_consume_token(BACK_REF);
+  final public   BackRef backReference() throws ParseException {int backref;
+    jj_consume_token(BACK_REF);
 backref = token.image.charAt(1) - '0';
     label_3:
     while (true) {
@@ -329,8 +329,10 @@ backref = token.image.charAt(1) - '0';
       jj_consume_token(DIGIT);
 backref = 10 * backref + token.image.charAt(0) - '0';
     }
-if(!closed.get(backref))
+final Group g = closed.get(backref);
+      if(g == null)
         {if (true) throw new ParseException("Illegal back-reference: \\" + backref);}
+      g.setHasBackRef();
       {if ("" != null) return new BackRef(backref);}
     throw new Error("Missing return statement in function");
 }
@@ -615,11 +617,11 @@ cp = Escape.getCp(token.image);
 
   private boolean jj_3_2()
  {
-    if (jj_3R_posCharGroup_301_5_5()) return true;
+    if (jj_3R_posCharGroup_303_5_5()) return true;
     return false;
   }
 
-  private boolean jj_3R_XmlChar_353_5_11()
+  private boolean jj_3R_XmlChar_355_5_11()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -630,7 +632,7 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_302_7_7()
+  private boolean jj_3R_posCharGroup_304_7_7()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -646,7 +648,7 @@ cp = Escape.getCp(token.image);
 
   private boolean jj_3_3()
  {
-    if (jj_3R_charRange_318_5_6()) return true;
+    if (jj_3R_charRange_320_5_6()) return true;
     return false;
   }
 
@@ -656,18 +658,18 @@ cp = Escape.getCp(token.image);
     xsp = jj_scanpos;
     if (jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_posCharGroup_302_7_7()) return true;
+    if (jj_3R_posCharGroup_304_7_7()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_charRange_323_7_9()
+  private boolean jj_3R_charRange_325_7_9()
  {
-    if (jj_3R_XmlChar_353_5_11()) return true;
+    if (jj_3R_XmlChar_355_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_301_5_5()
+  private boolean jj_3R_posCharGroup_303_5_5()
  {
     Token xsp;
     if (jj_3_4()) return true;
@@ -678,54 +680,54 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_341_7_13()
+  private boolean jj_3R_charOrEsc_343_7_13()
  {
     if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
-  private boolean jj_3R_charRange_318_7_8()
+  private boolean jj_3R_charRange_320_7_8()
  {
-    if (jj_3R_charOrEsc_340_5_10()) return true;
+    if (jj_3R_charOrEsc_342_5_10()) return true;
     if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_340_5_10()) return true;
+    if (jj_3R_charOrEsc_342_5_10()) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_340_7_12()
+  private boolean jj_3R_charOrEsc_342_7_12()
  {
-    if (jj_3R_XmlChar_353_5_11()) return true;
+    if (jj_3R_XmlChar_355_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3_1()
- {
-    if (jj_scan_token(DIGIT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_charRange_318_5_6()
+  private boolean jj_3R_charRange_320_5_6()
  {
     Token xsp;
     xsp = jj_scanpos;
     jj_lookingAhead = true;
     jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE;
     jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_charRange_318_7_8()) {
+    if (!jj_semLA || jj_3R_charRange_320_7_8()) {
     jj_scanpos = xsp;
-    if (jj_3R_charRange_323_7_9()) return true;
+    if (jj_3R_charRange_325_7_9()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_340_5_10()
+  private boolean jj_3R_charOrEsc_342_5_10()
  {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_340_7_12()) {
+    if (jj_3R_charOrEsc_342_7_12()) {
     jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_341_7_13()) return true;
+    if (jj_3R_charOrEsc_343_7_13()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_scan_token(DIGIT)) return true;
     return false;
   }
 

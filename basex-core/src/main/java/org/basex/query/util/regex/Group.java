@@ -11,6 +11,8 @@ public final class Group extends RegExp {
   private final RegExp encl;
   /** Capture flag. */
   private final boolean capture;
+  /** Back-reference flag. */
+  private boolean hasBackRef;
 
   /**
    * Constructor.
@@ -20,6 +22,30 @@ public final class Group extends RegExp {
   public Group(final RegExp encl, final boolean capture) {
     this.encl = encl;
     this.capture = capture;
+    this.hasBackRef = false;
+  }
+
+  /**
+   * Return the enclosed expression.
+   * @return the expression.
+   */
+  public RegExp getEncl() {
+    return encl;
+  }
+
+  /**
+   * Set the back-reference flag.
+   */
+  public void setHasBackRef() {
+    this.hasBackRef = true;
+  }
+
+  /**
+   * Get the back-reference flag.
+   * @return the flag value.
+   */
+  public boolean hasBackRef() {
+    return hasBackRef;
   }
 
   @Override
