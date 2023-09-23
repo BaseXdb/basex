@@ -10,7 +10,7 @@ public final class ProcOptions extends Options {
   /** Timeout in seconds. */
   public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
   /** Encoding of result. */
-  public static final StringOption ENCODING = new StringOption("encoding", Prop.ENCODING);
+  public static final StringOption ENCODING = new StringOption("encoding", Prop.CHARSET.name());
   /** Process input. */
   public static final StringOption INPUT = new StringOption("input");
   /** Process directory. */

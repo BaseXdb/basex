@@ -109,7 +109,7 @@ public class XsltTransform extends XsltFn {
       };
       for(Throwable th = ex; th != null; th = th.getCause()) add.accept(th.getMessage());
       try {
-        add.accept(new String(err.toArray(), Prop.ENCODING));
+        add.accept(new String(err.toArray(), Prop.CHARSET));
       } catch(final Exception e) {
         Util.debug(e);
         add.accept(e.getMessage());

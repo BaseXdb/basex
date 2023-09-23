@@ -94,7 +94,7 @@ public final class TarEntry {
    */
   static String name(final ByteList result) {
     try {
-      return new String(result.toArray());
+      return new String(result.toArray(), Prop.CHARSET);
     } catch(final Exception ex) {
       // fallback: UTF8
       Util.debug(ex);

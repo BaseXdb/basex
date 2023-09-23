@@ -206,7 +206,7 @@ public class FnParseUri extends FnJsonDoc {
    * @return decoded string
    */
   static String decode(final String string) {
-    return new String(XMLToken.decodeUri(Token.token(string), true));
+    return Token.string(XMLToken.decodeUri(Token.token(string), true));
   }
 
   /**

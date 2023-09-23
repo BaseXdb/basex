@@ -30,8 +30,8 @@ public final class Prop {
 
   /** System-specific newline string. */
   public static final String NL = System.lineSeparator();
-  /** Returns the system's default encoding. */
-  public static final String ENCODING = Charset.defaultCharset().displayName();
+  /** Returns the system's default character set. */
+  public static final Charset CHARSET = Charset.defaultCharset();
   /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
   private static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
