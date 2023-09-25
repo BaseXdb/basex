@@ -195,12 +195,15 @@ public final class Constr {
       // check declaration of default namespace
       final int defaultNS = dNs != 0 ? dynamicNs.get(EMPTY) : -1;
       if(defaultNS != -1) {
-        if(!nm.hasURI()) throw EMPTYNSCONS.get(info);
+        if(nm.uri().length == 0) throw EMPTYNSCONS.get(info);
         final int scope = inscopeNS.get(EMPTY);
         final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : sc.ns.uri(EMPTY);
         final byte[] uri = dynamicNs.value(defaultNS);
-        if(scopeUri != null && !eq(scopeUri, uri)) throw DUPLNSCONS_X.get(info, uri);
+        if(scopeUri != null && scopeUri.length != 0 && !eq(scopeUri, uri)) {
+          throw DUPLNSCONS_X.get(info, uri);
+        }
       }
+
       // add new namespace to in-scope namespaces
       if(nm.hasURI() && !inscopeNS.contains(nmPrefix)) add(inscopeNS, nmPrefix, nmUri);
     }

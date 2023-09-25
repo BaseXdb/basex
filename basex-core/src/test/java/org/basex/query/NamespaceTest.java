@@ -52,6 +52,81 @@ public final class NamespaceTest extends SandboxTest {
     { "d21", "<n><a xmlns:p1='u1'><b xmlns:p2='u2'/></a><c/></n>"}
   };
 
+  /** Simple tests. */
+  @Test public void simple() {
+    query("string(namespace-uri-for-prefix('xml', <X/>))", "http://www.w3.org/XML/1998/namespace");
+    query("string(namespace-uri-for-prefix('xs', <X/>))", "");
+    query("string(namespace-uri-for-prefix('xs', <xs:X/>))", "http://www.w3.org/2001/XMLSchema");
+    query("count(string(namespace-uri-for-prefix((), <X/>)))", 1);
+    query("count(string(namespace-uri-for-prefix('', <X/>)))", 1);
+    query("count(namespace-uri-for-prefix('', <a/>))", 0);
+    query("count(namespace-uri-for-prefix((), <a/>))", 0);
+    query("count(namespace-uri-for-prefix('', <a xmlns=''/>))", 0);
+    query("count(namespace-uri-for-prefix((), <a xmlns=''/>))", 0);
+    query("string(<x xmlns:n='U' a='{ namespace-uri-for-prefix('n', <n:x/>) }'/>/@a)", "U");
+    query("string(<x a='{ namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)", "U");
+
+    query("string(<e xmlns:p='u'>{ namespace-uri(<p:e/>) }</e>)", "u");
+    query("string(<e xmlns='u'>{ namespace-uri(<a/>) }</e>)", "u");
+    query("string(<e>{ namespace-uri(<a/>) }</e>)", "");
+    query("declare default element namespace 'u'; string(<e>{ namespace-uri(<a/>) }</e>)", "u");
+    query("string(<e xmlns='u'>{namespace-uri-from-QName(xs:QName('a'))}</e>)", "u");
+
+    query("string(element { QName('U', 'p:e') } { in-scope-prefixes(<e/>) })", "xml");
+    query("number(<e xmlns:p='u'>{count(in-scope-prefixes(<e p:x='a'/>))}</e>)", 2);
+    query("declare default element namespace 'x'; count(in-scope-prefixes(<a/>))", 2);
+    query("declare default element namespace 'x'; count(in-scope-prefixes(<a/>))", 2);
+    query("declare default element namespace 'x'; count(in-scope-prefixes(<a xmlns=''/>))", 1);
+    query("declare default element namespace 'x'; count(in-scope-prefixes(<a xmlns=''/>))", 1);
+
+    query("exists(<e xmlns:p='u'>{ <a/>/p:x }</e>)", true);
+    query("count(namespace p { 'u' })", 1);
+
+    query("string(<e a='{ <e>X</e>/self::e }' xmlns='A'/>/@*)", "X");
+
+    query("<_ xmlns='a'>{ namespace { '' } { 'a' } }</_> ! name()", "_");
+    query("<_ xmlns='a'>{ element E { namespace { '' } { 'a' } } }</_> ! name()", "_");
+    query("<_:_ xmlns:_='_'>{ namespace { '' } { 'b' } }</_:_> ! name()", "_:_");
+
+    query("declare namespace p = 'A'; <p:l>{ namespace p { 'B' } }</p:l> => in-scope-prefixes()",
+        "p_1\np\nxml");
+  }
+
+  /** Simple tests. */
+  @Test public void invalidNamespaces() {
+    error("namespace p { '' }", CNINVNS_X);
+    error("namespace p { 'http://www.w3.org/2000/xmlns/' }", CNINVNS_X);
+
+    error("namespace xml {'' }", CNXML);
+    error("namespace xml { 'http://www.w3.org//XML/1998/namespace' }", CNXML);
+
+    error("namespace xmlns { 'u' }", CNINV_X);
+
+    error("declare copy-namespaces no-preserve no-inherit; 1", WRONGCHAR_X_X);
+  }
+
+  /** Duplicate namespaces. */
+  @Test public void duplicateNamespaces() {
+    error("<e xmlns='x'>{ namespace { '' } { 'B' } }</e>",
+        DUPLNSCONS_X);
+    error("<_ xmlns='a'>{ namespace { '' } { 'B' } }</_>",
+        DUPLNSCONS_X);
+    error("<_ xmlns='A'>{ element E { namespace { '' } { 'B' } } }</_>",
+        DUPLNSCONS_X);
+
+    error("element e { namespace {''} {'u'} }",
+        EMPTYNSCONS);
+    error("<e xmlns=''>{ namespace { '' } { 'B' } }</e>",
+        EMPTYNSCONS);
+    error("let $e := element E { namespace { '' } { 'B' } } return <_ xmlns='A'>{ $e }</_>",
+        EMPTYNSCONS);
+
+    query("element Q{x}a { attribute a {}," +
+        "element Q{x}b { namespace { '' } { 'x' } } } ! local-name(.)", "a");
+    query("element Q{x}a { attribute a {} update {}," +
+        "element Q{x}b { namespace { '' } { 'x' } } } ! local-name(.)", "a");
+  }
+
   /**
    * Checks if namespace hierarchy structure is updated correctly on the
    * descendant axis after a NSNode has been inserted.
@@ -739,7 +814,7 @@ public final class NamespaceTest extends SandboxTest {
   /**
    * Test query.
    */
-  @Test public void duplicateNamespaces() {
+  @Test public void duplicateNamespaceUpdates() {
     query("copy $c := <a xmlns='X'/> modify (" +
           "  rename node $c as QName('X', 'b')," +
           "  insert node attribute c { 'a' } into $c" +
@@ -797,17 +872,14 @@ public final class NamespaceTest extends SandboxTest {
   /**
    * Runs an updating query and matches the result of the second query
    * against the expected output.
-   * @param first first query
+   * @param first first query (can be {@code null})
    * @param second second query
    * @param expected expected output
    */
   private static void query(final String first, final String second, final String expected) {
     if(first != null) Sandbox.query(first);
-    final String result = Sandbox.query(second).trim();
-
-    // quotes are replaced by apostrophes to simplify comparison
-    final String res = result.replace('"', '\'');
+    final String res = Sandbox.query(second).trim().replace('"', '\'');
     final String exp = expected.replace('"', '\'');
-    if(!exp.equals(res)) fail("\n[E] " + exp + "\n[F] " + res);
+    compare(second, res, exp, null);
   }
 }
