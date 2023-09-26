@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 public final class FTNot extends FTExpr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    */
   public FTNot(final InputInfo info, final FTExpr expr) {

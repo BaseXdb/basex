@@ -36,7 +36,7 @@ public final class DBCreate extends NameUpdate {
    * @param inputs inputs (ANode and QueryInput references)
    * @param qopts query options
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public DBCreate(final String name, final NewInput[] inputs, final HashMap<String, String> qopts,

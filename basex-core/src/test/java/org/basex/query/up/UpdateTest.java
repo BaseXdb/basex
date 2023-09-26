@@ -481,7 +481,7 @@ public final class UpdateTest extends SandboxTest {
       "then (delete node $w/@id," + _DB_OPTIMIZE.args(NAME) + ") else ())");
   }
 
-  /** Variable from the inner scope shouldn't be visible. */
+  /** Variable from the inner scope should not be visible. */
   @Test public void outOfScope() {
     error("let $d := copy $e := <a/> modify () return $e return $e", VARUNDEF_X);
   }

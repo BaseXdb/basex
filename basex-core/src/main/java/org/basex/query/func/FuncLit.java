@@ -29,7 +29,7 @@ public final class FuncLit extends Single implements Scope {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr function body
    * @param seqType sequence type
    * @param name function name

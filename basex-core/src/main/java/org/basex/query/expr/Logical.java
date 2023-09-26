@@ -16,7 +16,7 @@ import org.basex.util.*;
 public abstract class Logical extends Arr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   Logical(final InputInfo info, final Expr[] exprs) {

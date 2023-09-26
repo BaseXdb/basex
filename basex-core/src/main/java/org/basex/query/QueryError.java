@@ -1455,12 +1455,13 @@ public enum QueryError {
   /**
    * Throws a query exception. If {@link InputInfo#internal()} returns {@code true},
    * a static error instance ({@link QueryException#ERROR}) will be returned.
-   * @param ii input info (can be {@code null})
+   * @param info input info (can be {@code null})
    * @param ext extended info
    * @return query exception
    */
-  public QueryException get(final InputInfo ii, final Object... ext) {
-    return ii != null && ii.internal() ? QueryException.ERROR : new QueryException(ii, this, ext);
+  public QueryException get(final InputInfo info, final Object... ext) {
+    return info != null && info.internal() ? QueryException.ERROR :
+      new QueryException(info, this, ext);
   }
 
   /**
@@ -1602,12 +1603,12 @@ public enum QueryError {
    * Returns an error for the specified name.
    * @param name error name
    * @param msg error message
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return exception or {@code null}
    */
-  public static QueryException get(final String name, final String msg, final InputInfo ii) {
+  public static QueryException get(final String name, final String msg, final InputInfo info) {
     for(final QueryError err : VALUES) {
-      if(err.toString().equals(name)) return new QueryException(ii, err.qname(), msg).error(err);
+      if(err.toString().equals(name)) return new QueryException(info, err.qname(), msg).error(err);
     }
     return null;
   }
@@ -1616,18 +1617,18 @@ public enum QueryError {
    * Throws a comparison exception.
    * @param item1 first item
    * @param item2 second item
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException diffError(final Item item1, final Item item2, final InputInfo ii) {
+  public static QueryException diffError(final Item item1, final Item item2, final InputInfo info) {
     final Type type1 = item1.type, type2 = item2.type;
-    return type1.eq(type2) ? CMPTYPE_X_X_X.get(ii, type1, item1, item2) :
-      CMPTYPES_X_X_X_X.get(ii, type1, type2, item1, item2);
+    return type1.eq(type2) ? CMPTYPE_X_X_X.get(info, type1, item1, item2) :
+      CMPTYPES_X_X_X_X.get(info, type1, type2, item1, item2);
   }
 
   /**
    * Throws a type exception.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param st target type
    * @param name name (can be {@code null})
@@ -1635,13 +1636,13 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
-      final InputInfo ii, final boolean promote) {
-    return typeError(expr, st, name, ii, promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X);
+      final InputInfo info, final boolean promote) {
+    return typeError(expr, st, name, info, promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X);
   }
 
   /**
    * Throws a type exception.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param st target type
    * @param name variable name (can be {@code null})
@@ -1649,27 +1650,27 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
-      final InputInfo ii, final QueryError error) {
+      final InputInfo info, final QueryError error) {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
-    return error.get(ii, expr.seqType(), st, tb.add(expr.toErrorString()).finish());
+    return error.get(info, expr.seqType(), st, tb.add(expr.toErrorString()).finish());
   }
 
   /**
    * Throws a type cast exception.
    * @param value value
    * @param type target type
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException typeError(final Value value, final Type type, final InputInfo ii) {
-    return INVCONVERT_X_X_X.get(ii, value.type, type, value);
+  public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
+    return INVCONVERT_X_X_X.get(info, value.type, type, value);
   }
 
   /**
    * Throws an arity exception.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param arity expected arity
    * @param nargs supplied arity
@@ -1677,18 +1678,18 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException arityError(final Expr expr, final int arity, final int nargs,
-      final boolean param, final InputInfo ii) {
+      final boolean param, final InputInfo info) {
     final String string = param ? "Function with " + plural(arity, "parameter") : arguments(arity);
-    return INVARITY_X_X_X.get(ii, string, nargs, expr.toErrorString());
+    return INVARITY_X_X_X.get(info, string, nargs, expr.toErrorString());
   }
 
   /**
    * Throws an EBV exception.
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException ebvError(final Value value, final InputInfo ii) {
+  public static QueryException ebvError(final Value value, final InputInfo info) {
     final String expected, found;
     final Type type = value.seqType().type;
     if(type.instanceOf(AtomType.NUMERIC) || type.instanceOf(AtomType.STRING) ||
@@ -1699,7 +1700,7 @@ public enum QueryError {
       expected = "Number, string, boolean, URI or nodes";
       found = value.itemAt(0).seqType().toString();
     }
-    return ARGTYPE_X_X_X.get(ii, expected, found, value);
+    return ARGTYPE_X_X_X.get(info, expected, found, value);
   }
 
   /**
@@ -1715,22 +1716,23 @@ public enum QueryError {
   /**
    * Throws a number exception.
    * @param item found item
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException numberError(final Item item, final InputInfo ii) {
-    return NONUMBER_X_X.get(ii, item.type, item);
+  public static QueryException numberError(final Item item, final InputInfo info) {
+    return NONUMBER_X_X.get(info, item.type, item);
   }
 
   /**
    * Throws an invalid value exception.
    * @param type expected type
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException valueError(final Type type, final byte[] value, final InputInfo ii) {
-    return INVALUE_X_X.get(ii, type, value);
+  public static QueryException valueError(final Type type, final byte[] value,
+      final InputInfo info) {
+    return INVALUE_X_X.get(info, type, value);
   }
 
   /**
@@ -1767,12 +1769,12 @@ public enum QueryError {
   /**
    * Removes whitespaces and chops the specified value to a maximum size.
    * @param value value
-   * @param ii input info (can be {@code null}; an empty token will be returned if
+   * @param info input info (can be {@code null}; an empty token will be returned if
    * {@link InputInfo#internal()} returns {@code true})
    * @return chopped or empty token
    */
-  public static byte[] normalize(final Object value, final InputInfo ii) {
-    if(ii != null && ii.internal()) return Token.EMPTY;
+  public static byte[] normalize(final Object value, final InputInfo info) {
+    if(info != null && info.internal()) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     int last = 0, c = 0;

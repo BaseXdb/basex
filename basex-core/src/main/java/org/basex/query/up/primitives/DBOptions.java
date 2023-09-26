@@ -24,7 +24,7 @@ public final class DBOptions {
    * Constructor.
    * @param options query options
    * @param supported supported options
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public DBOptions(final HashMap<String, String> options, final List<Option<?>> supported,
@@ -36,7 +36,7 @@ public final class DBOptions {
    * Constructor.
    * @param qopts query options
    * @param supported supported options
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public DBOptions(final HashMap<String, String> qopts, final Option<?>[] supported,

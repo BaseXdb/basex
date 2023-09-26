@@ -53,33 +53,33 @@ public final class GDt extends ADate {
    * Constructor.
    * @param date date
    * @param type item type
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public GDt(final byte[] date, final Type type, final InputInfo ii) throws QueryException {
+  public GDt(final byte[] date, final Type type, final InputInfo info) throws QueryException {
     super(type);
 
     final String dt = Token.string(date).trim();
     final int i = type(type);
     final Matcher mt = PATTERNS[i].matcher(dt);
-    if(!mt.matches()) throw dateError(date, EXAMPLES[i], ii);
+    if(!mt.matches()) throw dateError(date, EXAMPLES[i], info);
 
     if(i < 2) {
-      yea = toLong(mt.group(1), false, ii);
+      yea = toLong(mt.group(1), false, info);
       // +1 is added to BC values to simplify computations
       if(yea < 0) yea++;
-      if(yea < MIN_YEAR || yea >= MAX_YEAR) throw DATERANGE_X_X.get(ii, type, date);
+      if(yea < MIN_YEAR || yea >= MAX_YEAR) throw DATERANGE_X_X.get(info, type, date);
     }
     if(i > 0 && i < 4) {
       mon = (byte) (Strings.toLong(mt.group(i == 1 ? 3 : 1)) - 1);
-      if(mon < 0 || mon > 11) throw dateError(date, EXAMPLES[i], ii);
+      if(mon < 0 || mon > 11) throw dateError(date, EXAMPLES[i], info);
     }
     if(i > 2) {
       day = (byte) (Strings.toLong(mt.group(i == 3 ? 2 : 1)) - 1);
       final int m = Math.max(mon, 0);
-      if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) throw dateError(date, EXAMPLES[i], ii);
+      if(day < 0 || day >= DAYS[m] + (m == 1 ? 1 : 0)) throw dateError(date, EXAMPLES[i], info);
     }
-    zone(mt, ZONES[i], date, ii);
+    zone(mt, ZONES[i], date, info);
   }
 
   /**
@@ -96,7 +96,7 @@ public final class GDt extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo ii) {
+  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo info) {
     throw Util.notExpected();
   }
 

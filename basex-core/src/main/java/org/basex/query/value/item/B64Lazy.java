@@ -35,8 +35,8 @@ public final class B64Lazy extends B64 implements Lazy {
   }
 
   @Override
-  public byte[] binary(final InputInfo ii) throws QueryException {
-    cache(ii);
+  public byte[] binary(final InputInfo info) throws QueryException {
+    cache(info);
     return data;
   }
 

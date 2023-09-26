@@ -35,7 +35,7 @@ abstract class FormatParser extends FormatUtil {
 
   /**
    * Constructor for formatting integers.
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   FormatParser(final InputInfo info) {
     this.info = info;

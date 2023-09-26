@@ -37,7 +37,7 @@ public final class Params {
    * @param name name
    * @param st sequence type
    * @param expr default expression (can be {@code null})
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return self reference
    */
   public Params add(final QNm name, final SeqType st, final Expr expr, final InputInfo info) {
@@ -109,7 +109,7 @@ public final class Params {
    * Parameter.
    */
   private static final class Param {
-    /** Input info. */
+    /** Input info (can be {@code null}). */
     private InputInfo info;
     /** Name. */
     private QNm name;

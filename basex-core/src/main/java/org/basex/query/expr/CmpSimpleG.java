@@ -21,7 +21,7 @@ public final class CmpSimpleG extends CmpG {
    * @param op operator
    * @param coll collation (can be {@code null})
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param check check flag
    */
   CmpSimpleG(final Expr expr1, final Expr expr2, final OpG op, final Collation coll,

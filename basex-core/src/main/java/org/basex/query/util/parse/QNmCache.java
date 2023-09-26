@@ -19,20 +19,20 @@ public final class QNmCache {
   /**
    * Adds a QName to the cache.
    * @param name QName
-   * @param ii input info
+   * @param info input info (can be {@code null})
    */
-  public void add(final QNm name, final InputInfo ii) {
-    add(name, true, ii);
+  public void add(final QNm name, final InputInfo info) {
+    add(name, true, info);
   }
 
   /**
    * Constructor.
    * @param name qname
    * @param nsElem default check
-   * @param ii input info
+   * @param info input info (can be {@code null})
    */
-  public void add(final QNm name, final boolean nsElem, final InputInfo ii) {
-    names.add(new QNmCheck(name, nsElem, ii));
+  public void add(final QNm name, final boolean nsElem, final InputInfo info) {
+    names.add(new QNmCheck(name, nsElem, info));
   }
 
   /**

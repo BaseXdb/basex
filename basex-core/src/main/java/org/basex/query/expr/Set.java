@@ -29,7 +29,7 @@ abstract class Set extends Arr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   Set(final InputInfo info, final Expr[] exprs) {

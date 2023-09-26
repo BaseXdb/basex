@@ -46,7 +46,7 @@ public final class Client {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param options main options
    */
   public Client(final InputInfo info, final MainOptions options) {

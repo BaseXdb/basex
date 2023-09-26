@@ -32,7 +32,7 @@ public final class Switch extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param cond condition
    * @param groups case groups (last one is default case)
    */

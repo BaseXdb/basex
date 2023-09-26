@@ -31,11 +31,11 @@ public final class QueryIOException extends IOException {
 
   /**
    * Returns the query exception.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public QueryException getCause(final InputInfo ii) {
-    if(ii != null) cause.info(ii);
+  public QueryException getCause(final InputInfo info) {
+    if(info != null) cause.info(info);
     return cause;
   }
 

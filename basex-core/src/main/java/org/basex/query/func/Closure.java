@@ -54,7 +54,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr function body
    * @param params parameters
    * @param anns annotations
@@ -68,7 +68,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   /**
    * Package-private constructor allowing a name.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr function expression
    * @param declType declared type (can be {@code null})
    * @param name function name (can be {@code null})

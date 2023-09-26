@@ -24,7 +24,7 @@ import org.basex.util.list.*;
 public final class List extends Arr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   public List(final InputInfo info, final Expr... exprs) {
@@ -34,15 +34,15 @@ public final class List extends Arr {
   /**
    * Creates a new, optimized list expression.
    * @param cc compilation context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    * @return list, single expression or empty sequence
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr... exprs)
+  public static Expr get(final CompileContext cc, final InputInfo info, final Expr... exprs)
       throws QueryException {
     final int el = exprs.length;
-    return el > 1 ? new List(ii, exprs).optimize(cc) : el > 0 ? exprs[0] : Empty.VALUE;
+    return el > 1 ? new List(info, exprs).optimize(cc) : el > 0 ? exprs[0] : Empty.VALUE;
   }
 
   @Override

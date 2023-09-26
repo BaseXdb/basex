@@ -49,7 +49,7 @@ public final class CmpR extends Single {
    * @param expr (compiled) expression
    * @param min minimum value
    * @param max maximum value
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   private CmpR(final Expr expr, final double min, final double max, final InputInfo info) {
     super(info, expr, SeqType.BOOLEAN_O);
@@ -60,7 +60,7 @@ public final class CmpR extends Single {
   /**
    * Tries to convert the specified expression into a range expression.
    * @param cc compilation context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression to be compared
    * @param min minimum position
    * @param max minimum position (inclusive)

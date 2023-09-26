@@ -25,7 +25,7 @@ abstract class ForLet extends Clause {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param seqType sequence type
    * @param var variables
    * @param expr expression

@@ -184,7 +184,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
   }
 
-  /** Tests if let clauses are moved out of any loop they don't depend on. */
+  /** Tests if let clauses are moved out of any loop they do not depend on. */
   @Test public void slideLet() {
     check("for $i in 0 to 3, $j in 0 to 3 where (<x/>)[$i + $j] " +
         "let $foo := $i * $i return $foo * $foo",
@@ -206,7 +206,7 @@ public final class GFLWORTest extends QueryPlanTest {
     );
   }
 
-  /** Tests if let clauses are moved out of any loop they don't depend on. */
+  /** Tests if let clauses are moved out of any loop they do not depend on. */
   @Test public void replicate() {
     check("for $r in 1 to 2 return (3, 4)",
         "3\n4\n3\n4",

@@ -23,7 +23,7 @@ public final class Var extends ExprInfo {
   public final QNm name;
   /** Variable ID. */
   public final int id;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   public final InputInfo info;
 
   /** Declared type, {@code null} if not specified. */
@@ -48,7 +48,7 @@ public final class Var extends ExprInfo {
    * @param declType declared type, {@code null} for no check
    * @param qc query context, used for generating a variable ID
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param param function parameter flag
    * @param slot stack slot ({@code -1} if unused)
    * @param exprType expression type (can be {@code null})
@@ -72,7 +72,7 @@ public final class Var extends ExprInfo {
    * @param declType declared sequence type, {@code null} for no check
    * @param qc query context, used for generating a variable ID
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public Var(final QNm name, final SeqType declType, final QueryContext qc, final StaticContext sc,
       final InputInfo info) {
@@ -85,7 +85,7 @@ public final class Var extends ExprInfo {
    * @param declType declared sequence type, {@code null} for no check
    * @param qc query context, used for generating a variable ID
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param param function parameter flag
    */
   public Var(final QNm name, final SeqType declType, final QueryContext qc, final StaticContext sc,

@@ -100,40 +100,42 @@ public abstract class ADate extends ADateDur {
    * Initializes the date format.
    * @param date input
    * @param exp example format
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void date(final byte[] date, final String exp, final InputInfo ii) throws QueryException {
+  final void date(final byte[] date, final String exp, final InputInfo info) throws QueryException {
     final Matcher mt = DATE.matcher(Token.string(date).trim());
-    if(!mt.matches()) throw dateError(date, exp, ii);
-    yea = toLong(mt.group(1), false, ii);
+    if(!mt.matches()) throw dateError(date, exp, info);
+    yea = toLong(mt.group(1), false, info);
     // +1 is added to BC values to simplify computations
     if(yea < 0) yea++;
     mon = (byte) (Strings.toInt(mt.group(3)) - 1);
     day = (byte) (Strings.toInt(mt.group(4)) - 1);
 
-    if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) throw dateError(date, exp, ii);
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE_X_X.get(ii, type, date);
-    zone(mt, 5, date, ii);
+    if(mon < 0 || mon >= 12 || day < 0 || day >= dpm(yea, mon)) throw dateError(date, exp, info);
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw DATERANGE_X_X.get(info, type, date);
+    zone(mt, 5, date, info);
   }
 
   /**
    * Initializes the time format.
    * @param time input format
    * @param exp expected format
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void time(final byte[] time, final String exp, final InputInfo ii) throws QueryException {
+  final void time(final byte[] time, final String exp, final InputInfo info) throws QueryException {
     final Matcher mt = TIME.matcher(Token.string(time).trim());
-    if(!mt.matches()) throw dateError(time, exp, ii);
+    if(!mt.matches()) throw dateError(time, exp, info);
 
     hou = (byte) Strings.toInt(mt.group(1));
     min = (byte) Strings.toInt(mt.group(2));
-    sec = toDecimal(mt.group(3), false, ii);
+    sec = toDecimal(mt.group(3), false, info);
     if(min >= 60 || sec.compareTo(BD_60) >= 0 || hou > 24 ||
-       hou == 24 && (min > 0 || sec.compareTo(BigDecimal.ZERO) > 0)) throw dateError(time, exp, ii);
-    zone(mt, 5, time, ii);
+       hou == 24 && (min > 0 || sec.compareTo(BigDecimal.ZERO) > 0)) {
+      throw dateError(time, exp, info);
+    }
+    zone(mt, 5, time, info);
     if(hou == 24) {
       hou = 0;
       add(BD_864000);
@@ -145,10 +147,10 @@ public abstract class ADate extends ADateDur {
    * @param matcher matcher
    * @param pos first matching position
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void zone(final Matcher matcher, final int pos, final byte[] value, final InputInfo ii)
+  final void zone(final Matcher matcher, final int pos, final byte[] value, final InputInfo info)
       throws QueryException {
 
     final String z = matcher.group(pos);
@@ -158,7 +160,7 @@ public abstract class ADate extends ADateDur {
     } else {
       final int th = Strings.toInt(matcher.group(pos + 2));
       final int tm = Strings.toInt(matcher.group(pos + 3));
-      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE_X.get(ii, value);
+      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE_X.get(info, value);
       final int mn = th * 60 + tm;
       tz = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);
     }
@@ -177,17 +179,17 @@ public abstract class ADate extends ADateDur {
    * Adds/subtracts the specified yearMonth duration.
    * @param dur duration
    * @param plus plus/minus flag
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  final void calc(final YMDur dur, final boolean plus, final InputInfo ii) throws QueryException {
+  final void calc(final YMDur dur, final boolean plus, final InputInfo info) throws QueryException {
     final long m = plus ? dur.mon : -dur.mon;
     final long mn = mon + m;
     mon = (byte) mod(mn, 12);
     yea += div(mn, 12);
     day = (byte) Math.min(dpm(yea, mon) - 1, day);
 
-    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(ii, yea);
+    if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(info, yea);
   }
 
   /**
@@ -238,10 +240,10 @@ public abstract class ADate extends ADateDur {
    * Adjusts the timezone.
    * @param dur duration to add to the timezone (if {@code null}, assign implicit timezone)
    * @param undefined invalidate timezone
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo ii)
+  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
     final short t;
     if(undefined) {
@@ -252,8 +254,8 @@ public abstract class ADate extends ADateDur {
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
         t = (short) (dur.minute() + dur.hour() * 60);
-        if(dur.sec().signum() != 0) throw ZONESEC_X.get(ii, dur);
-        if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALZONE_X.get(ii, dur);
+        if(dur.sec().signum() != 0) throw ZONESEC_X.get(info, dur);
+        if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALZONE_X.get(info, dur);
       }
 
       // change time if two competing time zones exist
@@ -382,12 +384,12 @@ public abstract class ADate extends ADateDur {
    * Returns the difference between the current and the specified item.
    * See {@link Item#diff(Item, Collation, InputInfo)}.
    * @param item item to be compared
-   * @param ii input info (can be {@code null})
+   * @param info input info (can be {@code null})
    * @return difference
    * @throws QueryException query exception
    */
-  private int df(final Item item, final InputInfo ii) throws QueryException {
-    final ADate d = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, ii));
+  private int df(final Item item, final InputInfo info) throws QueryException {
+    final ADate d = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, info));
     final BigDecimal d1 = seconds().add(days().multiply(BD_864000));
     final BigDecimal d2 = d.seconds().add(d.days().multiply(BD_864000));
     return d1.compareTo(d2);

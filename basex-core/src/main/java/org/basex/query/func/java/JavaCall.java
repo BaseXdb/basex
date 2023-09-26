@@ -63,7 +63,7 @@ public abstract class JavaCall extends Arr {
    * @param perm required permission to run the function
    * @param updating updating flag
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   JavaCall(final Expr[] args, final Perm perm, final boolean updating, final StaticContext sc,
       final InputInfo info) {
@@ -337,7 +337,7 @@ public abstract class JavaCall extends Arr {
    * @param args arguments
    * @param qc query context
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return Java function or {@code null}
    * @throws QueryException query exception
    */
@@ -424,7 +424,7 @@ public abstract class JavaCall extends Arr {
    * @param types types provided in the query (can be {@code null})
    * @param qname original name
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return method if found
    * @throws QueryException query exception
    */
@@ -460,7 +460,7 @@ public abstract class JavaCall extends Arr {
    * @param full full name of field or method
    * @param arities arities of found methods
    * @param names list of available names
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return exception
    */
   static QueryException noMember(final String name, final String[] types, final int arity,

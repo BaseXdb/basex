@@ -21,7 +21,7 @@ public final class FTOptions extends FTExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param opt full-text options
    */

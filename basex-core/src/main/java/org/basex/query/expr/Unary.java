@@ -24,7 +24,7 @@ public final class Unary extends Single {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param minus minus flag
    */

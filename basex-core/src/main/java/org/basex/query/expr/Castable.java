@@ -20,7 +20,7 @@ public final class Castable extends Convert {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param seqType sequence type to check
    */

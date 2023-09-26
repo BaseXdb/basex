@@ -31,7 +31,7 @@ public final class ReplaceDoc extends NodeUpdate {
    * @param input new document
    * @param qopts query options
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public ReplaceDoc(final int pre, final Data data, final NewInput input,

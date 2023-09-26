@@ -48,7 +48,8 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public FComm materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
+  public FComm materialize(final Predicate<Data> test, final InputInfo ii,
+      final QueryContext qc) {
     return materialized(test, ii) ? this : new FComm(value);
   }
 
@@ -66,12 +67,12 @@ public final class FComm extends FNode {
   /**
    * Checks the specified token for validity.
    * @param str token to be checked
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return token
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] str, final InputInfo ii) throws QueryException {
-    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(ii);
+  public static byte[] parse(final byte[] str, final InputInfo info) throws QueryException {
+    if(contains(str, DASHES) || endsWith(str, '-')) throw COMINVALID.get(info);
     return str;
   }
 }

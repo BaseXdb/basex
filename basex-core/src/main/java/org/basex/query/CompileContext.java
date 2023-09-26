@@ -361,43 +361,44 @@ public final class CompileContext {
   /**
    * Creates and returns an optimized instance of the specified function.
    * @param function function
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    * @return function
    * @throws QueryException query exception
    */
-  public Expr function(final AFunction function, final InputInfo ii, final Expr... exprs)
+  public Expr function(final AFunction function, final InputInfo info, final Expr... exprs)
       throws QueryException {
-    return function.get(sc(), ii, exprs).optimize(this);
+    return function.get(sc(), info, exprs).optimize(this);
   }
 
   /**
    * Creates a list expression from an expression to be swallowed and a result expression.
    * @param expr expression to be swallowed
    * @param result result expression
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return function
    * @throws QueryException query exception
    */
-  public Expr merge(final Expr expr, final Expr result, final InputInfo ii) throws QueryException {
+  public Expr merge(final Expr expr, final Expr result, final InputInfo info)
+      throws QueryException {
     // a non-deterministic expression may get deterministic when optimizing the query
     return expr.has(Flag.NDT) ?
-      List.get(this, ii, function(Function.VOID, ii, expr, Bln.TRUE), result) : result;
+      List.get(this, info, function(Function.VOID, info, expr, Bln.TRUE), result) : result;
   }
 
   /**
    * Replicates an expression.
    * @param expr expression
    * @param count count expression
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return function
    * @throws QueryException query exception
    */
-  public Expr replicate(final Expr expr, final Expr count, final InputInfo ii)
+  public Expr replicate(final Expr expr, final Expr count, final InputInfo info)
       throws QueryException {
     final ExprList args = new ExprList().add(expr).add(count);
     if(expr.has(Flag.NDT, Flag.CNS)) args.add(Bln.TRUE);
-    return function(Function.REPLICATE, ii, args.finish());
+    return function(Function.REPLICATE, info, args.finish());
   }
 
   /**

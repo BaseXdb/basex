@@ -20,7 +20,7 @@ public abstract class FTFilter extends FTExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    */
   FTFilter(final InputInfo info, final FTExpr expr) {
@@ -29,7 +29,7 @@ public abstract class FTFilter extends FTExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param unit unit
    */

@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 public abstract class IndexDb extends ParseExpr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   IndexDb(final InputInfo info) {
     super(info, SeqType.ITEM_ZM);

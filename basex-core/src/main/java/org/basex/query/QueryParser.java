@@ -777,10 +777,10 @@ public class QueryParser extends InputParser {
    * Parses the specified module, checking function and variable references at the end.
    * @param path file path
    * @param uri base URI of module
-   * @param ii input info
+   * @param info input info
    * @throws QueryException query exception
    */
-  public final void module(final String path, final String uri, final InputInfo ii)
+  public final void module(final String path, final String uri, final InputInfo info)
       throws QueryException {
 
     // get absolute path
@@ -790,7 +790,7 @@ public class QueryParser extends InputParser {
     // check if module has already been parsed
     final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
     if(pUri != null) {
-      if(!eq(tUri, pUri)) throw error(WRONGMODULE_X_X_X, ii, io.name(), uri, pUri);
+      if(!eq(tUri, pUri)) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, pUri);
       return;
     }
     qc.modParsed.put(tPath, tUri);
@@ -801,7 +801,7 @@ public class QueryParser extends InputParser {
       query = io.string();
     } catch(final IOException expr) {
       Util.debug(expr);
-      throw error(WHICHMODFILE_X, ii, io);
+      throw error(WHICHMODFILE_X, info, io);
     }
 
     qc.modStack.push(tPath);
@@ -810,7 +810,7 @@ public class QueryParser extends InputParser {
     // check if import and declaration uri match
     final LibraryModule lib = qp.parseLibrary(false);
     final byte[] muri = lib.sc.module.uri();
-    if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, ii, io.name(), uri, muri);
+    if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, muri);
 
     // check if context value declaration types are compatible to each other
     final StaticContext sctx = qp.sc;
@@ -851,11 +851,8 @@ public class QueryParser extends InputParser {
     localVars.pushContext(false);
     final Expr expr = check(single(), NOCIDECL);
     final VarScope vs = localVars.popContext();
-    final SeqType st = sc.contextType;
-    qc.contextScope = new ContextScope(expr, st != null ? st : SeqType.ITEM_O, vs);
-    final StaticScope cs =  qc.contextScope;
-    cs.info = info();
-    cs.doc(docBuilder.toString());
+    final SeqType st = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
+    qc.contextValue = new ContextScope(expr, st, vs, info(), docBuilder.toString());
 
     if(sc.module != null) throw error(DECITEM);
     if(!sc.mixUpdates && expr.has(Flag.UPD)) throw error(UPCTX, expr);
@@ -880,7 +877,7 @@ public class QueryParser extends InputParser {
     }
     final VarScope vs = localVars.popContext();
     final String doc = docBuilder.toString();
-    final StaticVar sv = qc.vars.declare(var, expr, anns, doc, external, vs);
+    final StaticVar sv = qc.vars.declare(var, expr, anns, external, vs, doc);
     vars.add(sv);
   }
 
@@ -1373,10 +1370,10 @@ public class QueryParser extends InputParser {
     final Expr rtrn = Function.BOOLEAN.get(sc, info(), check(single(), NOSOME));
     localVars.closeScope(s);
 
-    final InputInfo info = clauses.peek().info();
-    final GFLWOR flwor = new GFLWOR(info, clauses, rtrn);
-    final CmpG cmp = new CmpG(info, flwor, Bln.get(some), OpG.EQ, null, sc);
-    return some ? cmp : Function.NOT.get(sc, info, cmp);
+    final InputInfo ii = clauses.peek().info();
+    final GFLWOR flwor = new GFLWOR(ii, clauses, rtrn);
+    final CmpG cmp = new CmpG(ii, flwor, Bln.get(some), OpG.EQ, null, sc);
+    return some ? cmp : Function.NOT.get(sc, ii, cmp);
   }
 
   /**
@@ -2646,36 +2643,36 @@ public class QueryParser extends InputParser {
   /**
    * Returns a function call.
    * @param name function name
-   * @param ii input info
+   * @param info input info
    * @param args function arguments
    * @return function call
    * @throws QueryException query exception
    */
-  private Expr funcCall(final QNm name, final InputInfo ii, final FuncArgs args)
+  private Expr funcCall(final QNm name, final InputInfo info, final FuncArgs args)
       throws QueryException {
 
     final int[] holes = args.holes();
     final Expr[] exprs = args.exprs();
-    if(holes == null) return Functions.get(name, exprs, args.keywords(), qc, sc, ii);
+    if(holes == null) return Functions.get(name, exprs, args.keywords(), qc, sc, info);
 
     // partial function
     final int arity = exprs.length + holes.length;
-    final Expr expr = Functions.literal(name, arity, qc, sc, ii, false);
-    return dynFuncCall(expr, ii, exprs, holes);
+    final Expr expr = Functions.literal(name, arity, qc, sc, info, false);
+    return dynFuncCall(expr, info, exprs, holes);
   }
 
   /**
    * Generates a dynamic function call or a partial function application.
    * @param expr function expression
-   * @param ii input info
+   * @param info input info
    * @param args arguments
    * @param holes positions of the placeholders
    * @return function call
    */
-  private Expr dynFuncCall(final Expr expr, final InputInfo ii, final Expr[] args,
+  private Expr dynFuncCall(final Expr expr, final InputInfo info, final Expr[] args,
       final int[] holes) {
-    return holes == null ? new DynFuncCall(ii, sc, expr, args) :
-      new PartFunc(ii, sc, ExprList.concat(args, expr), holes);
+    return holes == null ? new DynFuncCall(info, sc, expr, args) :
+      new PartFunc(info, sc, ExprList.concat(args, expr), holes);
   }
 
   /**
@@ -4330,12 +4327,12 @@ public class QueryParser extends InputParser {
   /**
    * Creates the specified error.
    * @param error error to be thrown
-   * @param ii input info
+   * @param info input info
    * @param arg error arguments
    * @return error
    */
-  public QueryException error(final QueryError error, final InputInfo ii, final Object... arg) {
-    return error.get(ii, arg);
+  public QueryException error(final QueryError error, final InputInfo info, final Object... arg) {
+    return error.get(info, arg);
   }
 
   /**

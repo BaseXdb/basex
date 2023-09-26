@@ -32,7 +32,7 @@ public final class Range extends Arr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param range (min/max) expressions
    */
   public Range(final InputInfo info, final Expr... range) {

@@ -39,11 +39,11 @@ public class Dur extends ADateDur {
   /**
    * Constructor.
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public Dur(final byte[] value, final InputInfo ii) throws QueryException {
-    this(value, AtomType.DURATION, ii);
+  public Dur(final byte[] value, final InputInfo info) throws QueryException {
+    this(value, AtomType.DURATION, info);
   }
 
   /**
@@ -77,36 +77,37 @@ public class Dur extends ADateDur {
    * Constructor.
    * @param value value
    * @param type item type
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private Dur(final byte[] value, final Type type, final InputInfo ii) throws QueryException {
+  private Dur(final byte[] value, final Type type, final InputInfo info) throws QueryException {
     this(type);
     final String val = Token.string(value).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
-      throw dateError(value, XDURR, ii);
-    yearMonth(value, mt, ii);
-    dayTime(value, mt, 6, ii);
+      throw dateError(value, XDURR, info);
+    yearMonth(value, mt, info);
+    dayTime(value, mt, 6, info);
   }
 
   /**
    * Initializes the yearMonth component.
    * @param vl value
    * @param mt matcher
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  void yearMonth(final byte[] vl, final Matcher mt, final InputInfo ii) throws QueryException {
-    final long y = mt.group(2) != null ? toLong(mt.group(3), true, ii) : 0;
-    final long m = mt.group(4) != null ? toLong(mt.group(5), true, ii) : 0;
+  final void yearMonth(final byte[] vl, final Matcher mt, final InputInfo info)
+      throws QueryException {
+    final long y = mt.group(2) != null ? toLong(mt.group(3), true, info) : 0;
+    final long m = mt.group(4) != null ? toLong(mt.group(5), true, info) : 0;
     mon = y * 12 + m;
     double v = y * 12.0d + m;
     if(!mt.group(1).isEmpty()) {
       mon = -mon;
       v = -v;
     }
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, vl);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, vl);
   }
 
   /**
@@ -114,23 +115,23 @@ public class Dur extends ADateDur {
    * @param value value
    * @param match matcher
    * @param pos first matching position
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  void dayTime(final byte[] value, final Matcher match, final int pos, final InputInfo ii)
+  final void dayTime(final byte[] value, final Matcher match, final int pos, final InputInfo info)
       throws QueryException {
 
-    final long d = match.group(pos) != null ? toLong(match.group(pos + 1), true, ii) : 0;
-    final long h = match.group(pos + 3) != null ? toLong(match.group(pos + 4), true, ii) : 0;
-    final long m = match.group(pos + 5) != null ? toLong(match.group(pos + 6), true, ii) : 0;
+    final long d = match.group(pos) != null ? toLong(match.group(pos + 1), true, info) : 0;
+    final long h = match.group(pos + 3) != null ? toLong(match.group(pos + 4), true, info) : 0;
+    final long m = match.group(pos + 5) != null ? toLong(match.group(pos + 6), true, info) : 0;
     final BigDecimal s = match.group(pos + 7) != null ?
-      toDecimal(match.group(pos + 8), true, ii) : BigDecimal.ZERO;
+      toDecimal(match.group(pos + 8), true, info) : BigDecimal.ZERO;
     sec = s.add(BigDecimal.valueOf(d).multiply(BD_864000)).
         add(BigDecimal.valueOf(h).multiply(BD_3600)).
         add(BigDecimal.valueOf(m).multiply(BD_60));
     if(!match.group(1).isEmpty()) sec = sec.negate();
     final double v = sec.doubleValue();
-    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(ii, type, value);
+    if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, value);
   }
 
   @Override

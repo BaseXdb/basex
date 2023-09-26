@@ -170,11 +170,11 @@ public final class QueryResources {
   /**
    * Opens a new database or returns a reference to an already opened database.
    * @param name name of database
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return database instance
    * @throws QueryException query exception
    */
-  public synchronized Data database(final String name, final InputInfo ii) throws QueryException {
+  public synchronized Data database(final String name, final InputInfo info) throws QueryException {
     final Context ctx = qc.context;
     final boolean mainmem = ctx.options.get(MainOptions.MAINMEM);
 
@@ -186,11 +186,11 @@ public final class QueryResources {
     }
 
     // open and register database
-    if(!ctx.perm(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(ii, Perm.READ, name);
+    if(!ctx.perm(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
     try {
       return addData(Open.open(name, ctx, ctx.options, true, false));
     } catch(final IOException ex) {
-      throw DB_OPEN2_X.get(ii, ex);
+      throw DB_OPEN2_X.get(info, ex);
     }
   }
 
@@ -198,11 +198,11 @@ public final class QueryResources {
    * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
    * database and node.
    * @param qi query input
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return document
    * @throws QueryException query exception
    */
-  public synchronized DBNode doc(final QueryInput qi, final InputInfo ii) throws QueryException {
+  public synchronized DBNode doc(final QueryInput qi, final InputInfo info) throws QueryException {
     final MainOptions options = qc.context.options;
     // favor default database
     if(options.get(MainOptions.WITHDB) && options.get(MainOptions.DEFAULTDB)) {
@@ -214,22 +214,22 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(true, qi, ii);
+    final Data data = data(true, qi, info);
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
-    throw (docs.isEmpty() ? BASEX_DBPATH1_X : BASEX_DBPATH2_X).get(ii, qi.original);
+    throw (docs.isEmpty() ? BASEX_DBPATH1_X : BASEX_DBPATH2_X).get(info, qi.original);
   }
 
   /**
    * Evaluates {@code fn:collection()}: opens an existing collection,
    * or creates a new data reference.
    * @param qi query input (set to {@code null} if default collection is requested)
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return collection
    * @throws QueryException query exception
    */
-  public synchronized Value collection(final QueryInput qi, final InputInfo ii)
+  public synchronized Value collection(final QueryInput qi, final InputInfo info)
       throws QueryException {
 
     final Context ctx = qc.context;
@@ -237,7 +237,7 @@ public final class QueryResources {
 
     // return default collection
     if(qi == null) {
-      if(!withdb || colls.isEmpty()) throw NODEFCOLL.get(ii);
+      if(!withdb || colls.isEmpty()) throw NODEFCOLL.get(info);
       return colls.get(0);
     }
 
@@ -260,7 +260,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(false, qi, ii);
+    final Data data = data(false, qi, info);
     final IntList docs = data.resources.docs(qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
   }
@@ -391,11 +391,11 @@ public final class QueryResources {
    * Returns an already open database for the specified input or creates a new one.
    * @param single single document
    * @param qi query input
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return document
    * @throws QueryException query exception
    */
-  private Data data(final boolean single, final QueryInput qi, final InputInfo ii)
+  private Data data(final boolean single, final QueryInput qi, final InputInfo info)
       throws QueryException {
 
     final Context ctx = qc.context;
@@ -422,17 +422,17 @@ public final class QueryResources {
 
     // try to open existing database
     if(withdb && dbName != null) {
-      if(!ctx.perm(Perm.READ, dbName)) throw BASEX_PERMISSION_X_X.get(ii, Perm.READ, dbName);
+      if(!ctx.perm(Perm.READ, dbName)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, dbName);
       try {
         final Data data = Open.open(dbName, ctx, ctx.options, false, false);
         if(data != null) return addData(data);
       } catch(final IOException ex) {
-        throw IOERR_X.get(ii, ex);
+        throw IOERR_X.get(info, ex);
       }
     }
 
     // otherwise, create new instance
-    final Data data = create(qi, ii, single);
+    final Data data = create(qi, info, single);
     // reset database path: indicates that all documents were parsed
     qi.dbPath = "";
     return data;
@@ -441,12 +441,12 @@ public final class QueryResources {
   /**
    * Creates a new database instance.
    * @param input query input
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param single expect single document
    * @return data reference
    * @throws QueryException query exception
    */
-  private Data create(final QueryInput input, final InputInfo ii, final boolean single)
+  private Data create(final QueryInput input, final InputInfo info, final boolean single)
       throws QueryException {
 
     // check if new databases can be created
@@ -454,12 +454,12 @@ public final class QueryResources {
 
     // do not check for existence of input if user has no read permissions
     if(!context.user().has(Perm.READ))
-      throw XQUERY_PERMISSION1_X.get(ii, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
+      throw XQUERY_PERMISSION1_X.get(info, Util.info(Text.PERM_REQUIRED_X, Perm.READ));
 
     // check if input points to a single file
     final IO io = input.io;
-    if(!io.exists()) throw WHICHRES_X.get(ii, io.path());
-    if(single && io instanceof IOFile && io.isDir()) throw RESDIR_X.get(ii, io.path());
+    if(!io.exists()) throw WHICHRES_X.get(info, io.path());
+    if(single && io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io.path());
 
     // overwrite parsing options with default values
     final boolean mem = !context.options.get(MainOptions.FORCECREATE);
@@ -470,7 +470,7 @@ public final class QueryResources {
     try {
       data = CreateDB.create(io.dbName(), parser, context, opts, mem);
     } catch(final IOException ex) {
-      throw IOERR_X.get(ii, ex);
+      throw IOERR_X.get(info, ex);
     }
     return addData(data);
   }

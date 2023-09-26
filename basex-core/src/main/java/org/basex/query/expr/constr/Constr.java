@@ -48,7 +48,7 @@ public final class Constr {
   /**
    * Creates the children of the constructor.
    * @param builder node builder
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param sc static context
    * @param qc query context
    */

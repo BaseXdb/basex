@@ -35,7 +35,7 @@ public final class DynFuncCall extends FuncCall {
 
   /**
    * Function constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param sc static context
    * @param expr function expression
    * @param args arguments
@@ -47,7 +47,7 @@ public final class DynFuncCall extends FuncCall {
 
   /**
    * Function constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param sc static context
    * @param updating updating flag
    * @param ndt non-deterministic flag

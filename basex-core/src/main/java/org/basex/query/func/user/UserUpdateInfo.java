@@ -36,7 +36,7 @@ public final class UserUpdateInfo extends UserFn {
      * @param user user ({@code null} if operation is global)
      * @param node info element
      * @param qc query context
-     * @param info input info
+     * @param info input info (can be {@code null})
      */
     private UpdateInfo(final ANode node, final User user, final QueryContext qc,
         final InputInfo info) {

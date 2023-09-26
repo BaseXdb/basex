@@ -23,7 +23,7 @@ public abstract class UserUpdate extends Update {
    * @param type type of this operation
    * @param user user ({@code null} if operation is global)
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   protected UserUpdate(final UpdateType type, final User user, final QueryContext qc,
       final InputInfo info) {

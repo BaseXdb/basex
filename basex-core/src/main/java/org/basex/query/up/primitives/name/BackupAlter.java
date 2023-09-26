@@ -25,7 +25,7 @@ public final class BackupAlter extends NameUpdate {
    * @param name backup to be renamed
    * @param newname name of new backup
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public BackupAlter(final String name, final String newname, final QueryContext qc,
       final InputInfo info) {

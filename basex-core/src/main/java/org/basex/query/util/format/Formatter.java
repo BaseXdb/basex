@@ -113,12 +113,12 @@ public abstract class Formatter extends FormatUtil {
    * @param calendar calendar (can be {@code null})
    * @param place place
    * @param sc static context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return formatted string
    * @throws QueryException query exception
    */
   public final byte[] formatDate(final ADate date, final byte[] language, final byte[] picture,
-      final byte[] calendar, final byte[] place, final StaticContext sc, final InputInfo ii)
+      final byte[] calendar, final byte[] place, final StaticContext sc, final InputInfo info)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
@@ -129,26 +129,26 @@ public abstract class Formatter extends FormatUtil {
         qnm = QNm.resolve(trim(calendar), sc);
       } catch(final QueryException ex) {
         Util.debug(ex);
-        throw CALWHICH_X.get(ii, calendar);
+        throw CALWHICH_X.get(info, calendar);
       }
       if(qnm.uri().length == 0) {
         int c = -1;
         final byte[] ln = qnm.local();
         final int cl = CALENDARS.length;
         while(++c < cl && !eq(CALENDARS[c], ln));
-        if(c == cl) throw CALWHICH_X.get(ii, calendar);
+        if(c == cl) throw CALWHICH_X.get(info, calendar);
         if(c > 1) tb.add("[Calendar: AD]");
       }
     }
     if(place.length != 0) tb.add("[Place: ]");
 
-    final DateParser dp = new DateParser(ii, picture);
+    final DateParser dp = new DateParser(info, picture);
     while(dp.more()) {
       final int ch = dp.literal();
       if(ch == -1) {
         // retrieve variable marker
         final byte[] marker = dp.marker();
-        if(marker.length == 0) throw PICDATE_X.get(ii, picture);
+        if(marker.length == 0) throw PICDATE_X.get(info, picture);
 
         // parse component specifier
         final int compSpec = ch(marker, 0);
@@ -194,7 +194,7 @@ public abstract class Formatter extends FormatUtil {
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             // first week of month: fix value, according to ISO 8601
             if(num == 0) num = new Dtm(new Dtm(date), new DTDur(date.day() * 24, 0),
-                false, ii).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
+                false, info).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             err = tim;
             break;
           case 'H':
@@ -239,13 +239,13 @@ public abstract class Formatter extends FormatUtil {
             err = tim;
             break;
           default:
-            throw INVCOMPSPEC_X.get(ii, marker);
+            throw INVCOMPSPEC_X.get(info, marker);
         }
-        if(err) throw PICINVCOMP_X_X_X.get(ii, marker, type, date);
+        if(err) throw PICINVCOMP_X_X_X.get(info, marker, type, date);
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier
-        final DateFormat fp = new DateFormat(substring(marker, 1), pres, ii);
+        final DateFormat fp = new DateFormat(substring(marker, 1), pres, info);
         if(max && fp.max == Integer.MAX_VALUE) {
           // limit maximum length of numeric output
           int mx = 0;

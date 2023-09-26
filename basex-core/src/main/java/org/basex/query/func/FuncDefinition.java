@@ -238,13 +238,13 @@ public final class FuncDefinition {
   /**
    * Creates a new function instance.
    * @param sc static context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param args function arguments
    * @return function
    */
-  public StandardFunc get(final StaticContext sc, final InputInfo ii, final Expr... args) {
+  public StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... args) {
     final StandardFunc sf = supplier.get();
-    sf.init(sc, ii, this, args);
+    sf.init(sc, info, this, args);
     return sf;
   }
 

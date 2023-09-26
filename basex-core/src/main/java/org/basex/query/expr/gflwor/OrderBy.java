@@ -34,7 +34,7 @@ public final class OrderBy extends Clause {
    * Constructor.
    * @param refs variables to sort
    * @param keys sort keys
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public OrderBy(final VarRef[] refs, final OrderKey[] keys, final InputInfo info) {
     super(info, SeqType.ITEM_ZM);

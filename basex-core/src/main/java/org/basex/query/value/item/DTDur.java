@@ -53,17 +53,17 @@ public final class DTDur extends Dur {
   /**
    * Constructor.
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DTDur(final byte[] value, final InputInfo ii) throws QueryException {
+  public DTDur(final byte[] value, final InputInfo info) throws QueryException {
     super(AtomType.DAY_TIME_DURATION);
 
     final String val = Token.string(value).trim();
     final Matcher mt = DTD.matcher(val);
     if(!mt.matches() || Strings.endsWith(val, 'P') || Strings.endsWith(val, 'T'))
-      throw dateError(value, XDTD, ii);
-    dayTime(value, mt, 2, ii);
+      throw dateError(value, XDTD, info);
+    dayTime(value, mt, 2, info);
   }
 
   /**
@@ -71,16 +71,16 @@ public final class DTDur extends Dur {
    * @param dur duration item
    * @param add duration to be added/subtracted
    * @param plus plus/minus flag
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DTDur(final DTDur dur, final DTDur add, final boolean plus, final InputInfo ii)
+  public DTDur(final DTDur dur, final DTDur add, final boolean plus, final InputInfo info)
       throws QueryException {
 
     this(dur);
     sec = plus ? sec.add(add.sec) : sec.subtract(add.sec);
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE_X.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE_X.get(info, d);
   }
 
   /**
@@ -88,15 +88,15 @@ public final class DTDur extends Dur {
    * @param dur  duration item
    * @param factor factor
    * @param mult multiplication flag
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DTDur(final Dur dur, final double factor, final boolean mult, final InputInfo ii)
+  public DTDur(final Dur dur, final double factor, final boolean mult, final InputInfo info)
       throws QueryException {
 
     this(dur);
-    if(Double.isNaN(factor)) throw DATECALC_X_X.get(ii, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(ii, type, factor);
+    if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, description(), factor);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
     if(mult ? factor == 0 : Double.isInfinite(factor)) {
       sec = BigDecimal.ZERO;
     } else {
@@ -118,15 +118,15 @@ public final class DTDur extends Dur {
    * Constructor for subtracting two date/time items.
    * @param date date item
    * @param sub date/time to be subtracted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DTDur(final ADate date, final ADate sub, final InputInfo ii) throws QueryException {
+  public DTDur(final ADate date, final ADate sub, final InputInfo info) throws QueryException {
     super(AtomType.DAY_TIME_DURATION);
     sec = date.days().subtract(sub.days()).multiply(BD_864000).add(
         date.seconds().subtract(sub.seconds()));
     final double d = sec.doubleValue();
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);
   }
 
   @Override

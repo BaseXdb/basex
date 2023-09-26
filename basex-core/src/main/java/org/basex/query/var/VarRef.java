@@ -22,7 +22,7 @@ public final class VarRef extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param var variable
    */
   public VarRef(final InputInfo info, final Var var) {

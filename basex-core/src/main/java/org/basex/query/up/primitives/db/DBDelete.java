@@ -24,7 +24,7 @@ public final class DBDelete extends DBUpdate {
    * Constructor.
    * @param data data
    * @param path path to binaries
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBDelete(final Data data, final IOFile path, final InputInfo info) {
     super(UpdateType.DBDELETE, data, info);

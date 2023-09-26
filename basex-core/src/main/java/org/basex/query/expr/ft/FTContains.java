@@ -33,7 +33,7 @@ public final class FTContains extends Single {
    * Constructor.
    * @param expr expression
    * @param ftexpr full-text expression
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public FTContains(final Expr expr, final FTExpr ftexpr, final InputInfo info) {
     super(info, expr, SeqType.BOOLEAN_O);

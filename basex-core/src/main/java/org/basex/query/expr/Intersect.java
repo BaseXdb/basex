@@ -26,7 +26,7 @@ import org.basex.util.hash.*;
 public final class Intersect extends Set {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   public Intersect(final InputInfo info, final Expr... exprs) {

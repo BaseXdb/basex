@@ -51,7 +51,7 @@ public final class FTWords extends FTExpr {
 
   /**
    * Constructor for sequential evaluation.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param query query expression
    * @param mode search mode
    * @param occ occurrences
@@ -65,7 +65,7 @@ public final class FTWords extends FTExpr {
 
   /**
    * Constructor for index-based evaluation.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param db index database
    * @param query query terms
    * @param mode search mode

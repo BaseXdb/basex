@@ -99,10 +99,10 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo ii)
+  public final int diff(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
-    return comparable(item) ? Token.diff(string(), item.string(ii), coll) :
-      -item.diff(this, coll, ii);
+    return comparable(item) ? Token.diff(string(), item.string(info), coll) :
+      -item.diff(this, coll, info);
   }
 
   @Override

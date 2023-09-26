@@ -18,7 +18,7 @@ public final class IndexStaticDb extends IndexDb {
   /**
    * Constructor.
    * @param data data reference
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public IndexStaticDb(final Data data, final InputInfo info) {
     super(info);

@@ -52,10 +52,10 @@ public final class LocalVars {
   /**
    * Tries to resolve a local variable reference.
    * @param name variable name
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return variable reference or {@code null}
    */
-  public VarRef resolveLocal(final QNm name, final InputInfo ii) {
+  public VarRef resolveLocal(final QNm name, final InputInfo info) {
     int l = vars.size();
     Var var = null;
 
@@ -72,27 +72,27 @@ public final class LocalVars {
     final int ls = vars.size();
     while(++l < ls) {
       final VarContext vctx = vars.get(l);
-      final Var local = new Var(var.name, var.seqType(), parser.qc, parser.sc, ii);
+      final Var local = new Var(var.name, var.seqType(), parser.qc, parser.sc, info);
       vctx.add(local);
-      vctx.bindings.put(local, new VarRef(ii, var));
+      vctx.bindings.put(local, new VarRef(info, var));
       var = local;
     }
 
     // return the properly propagated variable reference
-    return new VarRef(ii, var);
+    return new VarRef(info, var);
   }
 
   /**
    * Resolves the referenced variable as a local or static variable and returns a reference to it.
    * IF the variable is not declared, the specified error is thrown.
    * @param name variable name
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return referenced variable
-   * @throws QueryException if the variable isn't defined
+   * @throws QueryException if the variable is not defined
    */
-  public ParseExpr resolve(final QNm name, final InputInfo ii) throws QueryException {
+  public ParseExpr resolve(final QNm name, final InputInfo info) throws QueryException {
     // local variable
-    final VarRef ref = resolveLocal(name, ii);
+    final VarRef ref = resolveLocal(name, info);
     if(ref != null) return ref;
 
     // static variable
@@ -103,9 +103,9 @@ public final class LocalVars {
     // - if it is specified in the main module
     final QNm module = parser.sc.module;
     if(module == null || eq(module.uri(), uri) || parser.moduleURIs.contains(uri))
-      return parser.qc.vars.newRef(name, parser.sc, ii);
+      return parser.qc.vars.newRef(name, parser.sc, info);
 
-    throw parser.error(VARUNDEF_X, ii, '$' + string(name.string()));
+    throw parser.error(VARUNDEF_X, info, '$' + string(name.string()));
   }
 
   /**

@@ -51,7 +51,7 @@ public final class FnParseIetfDate extends StandardFunc {
 
     /** Original string. */
     private final byte[] original;
-    /** Input info. */
+    /** Input info (can be {@code null}). */
     private final InputInfo info;
 
     /** Day. */
@@ -72,7 +72,7 @@ public final class FnParseIetfDate extends StandardFunc {
     /**
      * Constructor.
      * @param input input
-     * @param info input info
+     * @param info input info (can be {@code null})
      */
     private DateParser(final byte[] input, final InputInfo info) {
       super(string(lc(input)).trim());

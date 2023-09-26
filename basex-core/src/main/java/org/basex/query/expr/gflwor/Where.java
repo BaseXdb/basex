@@ -26,7 +26,7 @@ public final class Where extends Clause {
   /**
    * Constructor.
    * @param expr predicate expression
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public Where(final Expr expr, final InputInfo info) {
     super(info, SeqType.BOOLEAN_O);

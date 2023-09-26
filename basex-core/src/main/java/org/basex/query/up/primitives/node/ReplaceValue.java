@@ -40,11 +40,11 @@ public final class ReplaceValue extends NodeUpdate {
    * Constructor.
    * @param pre target node PRE value
    * @param data target data reference
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param value new value
    */
-  public ReplaceValue(final int pre, final Data data, final InputInfo ii, final byte[] value) {
-    super(UpdateType.REPLACEVALUE, pre, data, ii);
+  public ReplaceValue(final int pre, final Data data, final InputInfo info, final byte[] value) {
+    super(UpdateType.REPLACEVALUE, pre, data, info);
     this.value = value;
     rec = data.kind(pre) == Data.ELEM;
   }

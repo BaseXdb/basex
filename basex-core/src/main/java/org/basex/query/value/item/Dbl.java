@@ -47,12 +47,12 @@ public final class Dbl extends ANum {
   /**
    * Returns an instance of this class.
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return instance
    * @throws QueryException query exception
    */
-  public static Dbl get(final byte[] value, final InputInfo ii) throws QueryException {
-    return get(parse(value, ii));
+  public static Dbl get(final byte[] value, final InputInfo info) throws QueryException {
+    return get(parse(value, info));
   }
 
   @Override
@@ -168,11 +168,11 @@ public final class Dbl extends ANum {
   /**
    * Converts the given token into a double value.
    * @param value value to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return double value
    * @throws QueryException query exception
    */
-  public static double parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static double parse(final byte[] value, final InputInfo info) throws QueryException {
     final double d = Token.toDouble(value);
     if(!Double.isNaN(d)) return d;
 
@@ -181,6 +181,6 @@ public final class Dbl extends ANum {
     if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NEGATVE_INF)) return Double.NEGATIVE_INFINITY;
 
-    throw AtomType.DOUBLE.castError(value, ii);
+    throw AtomType.DOUBLE.castError(value, info);
   }
 }

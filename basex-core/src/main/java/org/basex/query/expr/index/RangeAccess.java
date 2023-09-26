@@ -31,7 +31,7 @@ public final class RangeAccess extends IndexAccess {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param index index token
    * @param db index database
    */

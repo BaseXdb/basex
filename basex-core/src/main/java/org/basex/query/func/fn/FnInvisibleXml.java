@@ -44,7 +44,7 @@ public final class FnInvisibleXml extends StandardFunc {
       }
       generator = new Generator();
     }
-    return generator.generate(qc, ii, sc, toString(arg(0), qc));
+    return generator.generate(qc, info, sc, toString(arg(0), qc));
   }
 
   /**
@@ -54,28 +54,28 @@ public final class FnInvisibleXml extends StandardFunc {
     /**
      * Generate a parser from an invisible XML grammar.
      * @param qc query context
-     * @param ii input info
+     * @param info input info (can be {@code null})
      * @param sc static context
      * @param grammar the invisible XML grammar
      * @return the parsing function
      * @throws QueryException query exception
      */
-    public FuncItem generate(final QueryContext qc, final InputInfo ii, final StaticContext sc,
+    public FuncItem generate(final QueryContext qc, final InputInfo info, final StaticContext sc,
         final String grammar) throws QueryException {
       final InvisibleXmlParser parser = new InvisibleXml().getParserFromIxml(grammar);
       if(!parser.constructed()) {
         final Exception ex = parser.getException();
-        if(ex != null) throw IXML_GEN_X.get(ii, ex);
+        if(ex != null) throw IXML_GEN_X.get(info, ex);
         final InvisibleXmlDocument doc = parser.getFailedParse();
         final GearleyResult result = doc.getResult();
-        throw IXML_GRM_X_X_X.get(ii, result.getLastToken(), doc.getLineNumber(),
+        throw IXML_GRM_X_X_X.get(info, result.getLastToken(), doc.getLineNumber(),
             doc.getColumnNumber());
       }
-      final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, ii) };
-      final Expr arg = new VarRef(ii, params[0]);
-      final ParseInvisibleXml parseFunction = new ParseInvisibleXml(ii, parser, arg);
+      final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info) };
+      final Expr arg = new VarRef(info, params[0]);
+      final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
       final FuncType type = FuncType.get(parseFunction.seqType(), STRING_O);
-      return new FuncItem(sc, null, null, params, type, parseFunction, params.length, ii);
+      return new FuncItem(sc, null, null, params, type, parseFunction, params.length, info);
     }
   }
 
@@ -88,7 +88,7 @@ public final class FnInvisibleXml extends StandardFunc {
 
     /**
      * Constructor.
-     * @param info input info
+     * @param info input info (can be {@code null})
      * @param args function arguments
      * @param parser generated invisible XML parser
      */

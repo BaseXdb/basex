@@ -77,21 +77,21 @@ public abstract class XQData extends FItem {
   /**
    * Gets a value from this item.
    * @param key key to look for (must not be {@code null})
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return bound value if found, the empty sequence {@code ()} otherwise
    * @throws QueryException query exception
    */
-  public abstract Value get(Item key, InputInfo ii) throws QueryException;
+  public abstract Value get(Item key, InputInfo info) throws QueryException;
 
   /**
    * Returns a string representation of the item.
    * @param indent indent output
    * @param tb token builder
    * @param level current level
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public abstract void string(boolean indent, TokenBuilder tb, int level, InputInfo ii)
+  public abstract void string(boolean indent, TokenBuilder tb, int level, InputInfo info)
       throws QueryException;
 
   @Override

@@ -34,7 +34,7 @@ public final class FuncOptions {
   private final QNm root;
   /** Root node test (can be {@code null}). */
   private final NameTest test;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
 
   /** Raise error if a supplied option is unknown. */
@@ -42,7 +42,7 @@ public final class FuncOptions {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public FuncOptions(final InputInfo info) {
     this(null, info);
@@ -51,7 +51,7 @@ public final class FuncOptions {
   /**
    * Constructor.
    * @param root name of root node (can be {@code null})
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public FuncOptions(final QNm root, final InputInfo info) {
     test = root == null ? null : new NameTest(root);
@@ -196,27 +196,27 @@ public final class FuncOptions {
   /**
    * Converts the specified output parameter item to serialization parameters.
    * @param item input item
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return serialization parameters
    * @throws QueryException query exception
    */
-  public static SerializerOptions serializer(final Item item, final InputInfo ii)
+  public static SerializerOptions serializer(final Item item, final InputInfo info)
       throws QueryException {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
-    return serializer(item, sopts, ii);
+    return serializer(item, sopts, info);
   }
 
   /**
    * Converts the specified output parameter item to serializer options.
    * @param item input item
    * @param sopts serialization parameters
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return serialization parameters
    * @throws QueryException query exception
    */
   public static SerializerOptions serializer(final Item item, final SerializerOptions sopts,
-      final InputInfo ii) throws QueryException {
-    return new FuncOptions(Q_SERIALIZTION_PARAMETERS, ii).assign(item, sopts, SEROPT_X);
+      final InputInfo info) throws QueryException {
+    return new FuncOptions(Q_SERIALIZTION_PARAMETERS, info).assign(item, sopts, SEROPT_X);
   }
 }

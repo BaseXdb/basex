@@ -12,25 +12,25 @@ import org.basex.query.expr.path.*;
  */
 abstract class IndexPred {
   /** Index info. */
-  final IndexInfo ii;
+  final IndexInfo info;
 
   /**
    * Constructor.
-   * @param ii index info
+   * @param info index info
    */
-  IndexPred(final IndexInfo ii) {
-    this.ii = ii;
+  IndexPred(final IndexInfo info) {
+    this.info = info;
   }
 
   /**
    * Creates an index predicate instance.
    * @param expr predicate expression
-   * @param ii index info
+   * @param info index info
    * @return index predicate or {@code null}
    */
-  static IndexPred get(final Expr expr, final IndexInfo ii) {
-    if(expr instanceof ContextValue) return new IndexContext(ii);
-    if(expr instanceof AxisPath) return new IndexPath((AxisPath) expr, ii);
+  static IndexPred get(final Expr expr, final IndexInfo info) {
+    if(expr instanceof ContextValue) return new IndexContext(info);
+    if(expr instanceof AxisPath) return new IndexPath((AxisPath) expr, info);
     return null;
   }
 

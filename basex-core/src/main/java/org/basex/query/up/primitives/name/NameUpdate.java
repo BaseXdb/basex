@@ -24,7 +24,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * @param type type of this operation
    * @param name name of database (empty string for general data)
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   NameUpdate(final UpdateType type, final String name, final QueryContext qc,
       final InputInfo info) {
@@ -95,15 +95,15 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
    * Closes an existing database.
    * @param name name of database
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  static void close(final String name, final QueryContext qc, final InputInfo ii)
+  static void close(final String name, final QueryContext qc, final InputInfo info)
       throws QueryException {
 
     // close data instance in query processor
     qc.resources.remove(name);
     // check if database is stilled pinned by another process
-    if(qc.context.pinned(name)) throw DB_LOCK1_X.get(ii, name);
+    if(qc.context.pinned(name)) throw DB_LOCK1_X.get(info, name);
   }
 }

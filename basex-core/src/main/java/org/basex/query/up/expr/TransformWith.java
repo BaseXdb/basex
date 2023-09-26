@@ -24,7 +24,7 @@ import org.basex.util.hash.*;
 public final class TransformWith extends Copy {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param source source expression
    * @param modify modify expression
    */

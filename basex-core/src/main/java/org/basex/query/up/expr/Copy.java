@@ -17,7 +17,7 @@ import org.basex.util.*;
 abstract class Copy extends Arr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param seqType sequence type
    * @param exprs expressions
    */

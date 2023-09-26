@@ -19,7 +19,7 @@ public final class SessionSet extends SessionFn {
     final String name = toString(arg(0), qc);
     final Value value = arg(1).value(qc);
 
-    session.set(name, value.materialize(n -> false, ii, qc));
+    session.set(name, value.materialize(n -> false, info, qc));
     return Empty.VALUE;
   }
 }

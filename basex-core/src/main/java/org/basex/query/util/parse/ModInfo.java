@@ -14,6 +14,6 @@ public final class ModInfo {
   public final TokenList paths = new TokenList(1);
   /** URI. */
   public byte[] uri;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   public InputInfo info;
 }

@@ -24,7 +24,7 @@ import org.basex.util.hash.*;
 public final class CMap extends Arr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr key and value expression, interleaved
    */
   public CMap(final InputInfo info, final Expr[] expr) {

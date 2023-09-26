@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 public final class SingleIterPath extends AxisPath {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param step axis step
    */
   SingleIterPath(final InputInfo info, final Expr step) {

@@ -26,7 +26,7 @@ public final class FTWeight extends FTExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param weight weight
    */

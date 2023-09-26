@@ -33,7 +33,7 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param clauses FLWOR clauses
    * @param rtrn return expression
    */
@@ -45,7 +45,7 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param clause single clause
    * @param rtrn return expression
    */

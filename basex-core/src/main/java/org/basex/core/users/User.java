@@ -106,7 +106,7 @@ public final class User {
   /**
    * Returns user information as XML.
    * @param qc query context ({@code null} if element will only be created for serialization)
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return user element
    * @throws QueryException query exception
    */

@@ -27,7 +27,7 @@ public final class InlineContext {
 
   /**
    * Constructor.
-   * @param var variable ({@link Var} reference) or context ({@code null}) to replace
+   * @param var variable ({@link Var} reference), or {@code null} for context reference
    * @param expr expression to inline
    * @param cc compilation context
    */

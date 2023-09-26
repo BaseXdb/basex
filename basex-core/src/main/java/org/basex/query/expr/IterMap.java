@@ -21,7 +21,7 @@ public final class IterMap extends SimpleMap {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   IterMap(final InputInfo info, final Expr... exprs) {

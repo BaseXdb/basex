@@ -338,7 +338,7 @@ public final class DataBuilder {
    * @param node node to be copied
    * @param prefixes prefixes of namespaces to be stripped (if empty, strips all namespaces)
    * @param ctx database context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return new node
    * @throws QueryException query exception
    */

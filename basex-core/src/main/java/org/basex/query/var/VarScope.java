@@ -50,12 +50,12 @@ public final class VarScope {
    * @param st type of the variable (can be {@code null})
    * @param param function parameter flag
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return the variable
    */
   public Var addNew(final QNm name, final SeqType st, final boolean param, final QueryContext qc,
-      final InputInfo ii) {
-    return add(new Var(name, st, qc, sc, ii, param));
+      final InputInfo info) {
+    return add(new Var(name, st, qc, sc, info, param));
   }
 
   /**

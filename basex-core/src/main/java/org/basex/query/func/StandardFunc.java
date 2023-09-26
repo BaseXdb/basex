@@ -57,7 +57,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Initializes the function.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @param sctx static context
    * @param df function definition
    * @param args function arguments

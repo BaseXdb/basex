@@ -23,7 +23,7 @@ public final class CTxt extends CNode {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param value value
    */
   public CTxt(final StaticContext sc, final InputInfo info, final Expr value) {

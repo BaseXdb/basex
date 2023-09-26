@@ -48,13 +48,13 @@ public abstract class AStr extends Item {
 
   /**
    * Checks if the string only consists of ASCII characters.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean ascii(final InputInfo ii) throws QueryException {
+  public boolean ascii(final InputInfo info) throws QueryException {
     if(offsets == null) {
-      final byte[] token = string(ii);
+      final byte[] token = string(info);
       if(Token.ascii(token)) {
         offsets = ASCII;
       } else {
@@ -69,27 +69,28 @@ public abstract class AStr extends Item {
 
   /**
    * Returns the string length.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public int length(final InputInfo ii) throws QueryException {
-    return ascii(ii) ? string(ii).length : offsets.length;
+  public int length(final InputInfo info) throws QueryException {
+    return ascii(info) ? string(info).length : offsets.length;
   }
 
   /**
    * Returns a substring.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param start start position
    * @param end end position
    * @return substring
    * @throws QueryException query exception
    */
-  public AStr substring(final InputInfo ii, final int start, final int end) throws QueryException {
-    if(start == 0 && end == length(ii)) return this;
+  public AStr substring(final InputInfo info, final int start, final int end)
+      throws QueryException {
+    if(start == 0 && end == length(info)) return this;
 
-    final byte[] token = string(ii);
-    final boolean ascii =  ascii(ii);
+    final byte[] token = string(info);
+    final boolean ascii =  ascii(info);
     final int s = ascii ? start : offsets[start];
     final int e = ascii ? end : end < offsets.length ? offsets[end] : token.length;
     return Str.get(Arrays.copyOfRange(token, s, e));
@@ -112,9 +113,9 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo ii)
+  public final int diff(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
-    return Token.diff(string(ii), item.string(ii), coll);
+    return Token.diff(string(info), item.string(info), coll);
   }
 
   @Override

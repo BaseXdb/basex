@@ -83,7 +83,8 @@ public abstract class Expr extends ExprInfo {
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * If this method is not implemented, {@link #value(QueryContext)} must be implemented instead.
    * @param qc query context
-   * @param ii input info (only required by {@link Seq} instances, which have no input info)
+   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
+   *   which have no input info)
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
@@ -92,7 +93,8 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
-   * @param ii input info
+   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
+   *   which have no input info)
    * @return iterator
    * @throws QueryException query exception
    */
@@ -109,7 +111,8 @@ public abstract class Expr extends ExprInfo {
    * Evaluates the expression and returns the resulting, atomized item,
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * @param qc query context
-   * @param ii input info (only required by {@link Seq} instances, which have no input info)
+   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
+   *   which have no input info)
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
@@ -120,7 +123,8 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the atomized items.
    * @param qc query context
-   * @param ii input info (only required by {@link Seq} instances, which have no input info)
+   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
+   *   which have no input info)
    * @return atomized item
    * @throws QueryException query exception
    */
@@ -136,7 +140,8 @@ public abstract class Expr extends ExprInfo {
    * </ul>
    * <p>A single numeric item may later be evaluated as positional predicate.</p>
    * @param qc query context
-   * @param ii input info (required for {@link Seq} instances, which have no input info)
+   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
+   *   which have no input info)
    * @return item
    * @throws QueryException query exception
    */
@@ -146,7 +151,8 @@ public abstract class Expr extends ExprInfo {
    * Performs a predicate test and returns the item if the test was successful.
    * The returned item is required for full-text scoring.
    * @param qc query context
-   * @param ii input info (required for {@link Seq} instances, which have no input info)
+   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
+   *   which have no input info)
    * @return item or {@code null}
    * @throws QueryException query exception
    */
@@ -369,7 +375,7 @@ public abstract class Expr extends ExprInfo {
    * Checks if an expression can be rewritten to an index access.
    * If so, the index expression will be bound to {@link IndexInfo#expr}.
    * This method will be called by the {@link Path} expression.
-   * @param ii index info
+   * @param ii index info (can be {@code null})
    * @return true if an index can be used
    * @throws QueryException query exception
    */

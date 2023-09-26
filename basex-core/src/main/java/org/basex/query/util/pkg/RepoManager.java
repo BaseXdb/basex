@@ -29,7 +29,7 @@ public final class RepoManager {
   private static final Pattern MAIN_CLASS = Pattern.compile("^Main-Class: *(.+?) *$");
   /** Context. */
   private final Context context;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
 
   /**
@@ -43,7 +43,7 @@ public final class RepoManager {
   /**
    * Constructor.
    * @param context database context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public RepoManager(final Context context, final InputInfo info) {
     this.context = context;

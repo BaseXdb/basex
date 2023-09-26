@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 final class Pos extends Single {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression yielding an empty sequence, an integer or an integer range
    */
   private Pos(final InputInfo info, final Expr expr) {
@@ -32,13 +32,13 @@ final class Pos extends Single {
    * Tries to rewrite {@code fn:position() CMP number(s)} to a positional expression.
    * @param pos positions to be matched
    * @param op comparison operator
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param cc compilation context
    * @param create create create new instance of this class
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  static Expr get(final Expr pos, final OpV op, final InputInfo ii, final CompileContext cc,
+  static Expr get(final Expr pos, final OpV op, final InputInfo info, final CompileContext cc,
       final boolean create) throws QueryException {
 
     // static result. example: position() > 0  ->  true
@@ -46,14 +46,14 @@ final class Pos extends Single {
     if(ps instanceof Bln) return ps;
 
     // value range. example: position() = 5 to 10
-    final Expr ex = IntPos.get(ps, op, ii);
+    final Expr ex = IntPos.get(ps, op, info);
     if(ex != null) return ex;
 
     // equality check, range: position() = RANGE
     if(op == OpV.EQ && ps instanceof Range) {
       if(((Range) ps).ints) {
-        if(ps.isSimple()) return new SimplePos(ii, ps.args());
-        if(create) return new Pos(ii, ps);
+        if(ps.isSimple()) return new SimplePos(info, ps.args());
+        if(create) return new Pos(info, ps);
       }
       return null;
     }
@@ -71,15 +71,15 @@ final class Pos extends Single {
           minMax = new Expr[] { ps, Int.MAX };
           break;
         case GT:
-          minMax = new Expr[] { new Arith(ii, type.instanceOf(AtomType.INTEGER) ? ps :
-            cc.function(Function.FLOOR, ii, ps), Int.ONE, Calc.PLUS).optimize(cc), Int.MAX };
+          minMax = new Expr[] { new Arith(info, type.instanceOf(AtomType.INTEGER) ? ps :
+            cc.function(Function.FLOOR, info, ps), Int.ONE, Calc.PLUS).optimize(cc), Int.MAX };
           break;
         case LE:
           minMax = new Expr[] { Int.ONE, ps };
           break;
         case LT:
-          minMax = new Expr[] { Int.ONE, new Arith(ii, type.instanceOf(AtomType.INTEGER) ?
-            ps : cc.function(Function.CEILING, ii, ps), Int.ONE, Calc.MINUS).optimize(cc) };
+          minMax = new Expr[] { Int.ONE, new Arith(info, type.instanceOf(AtomType.INTEGER) ?
+            ps : cc.function(Function.CEILING, info, ps), Int.ONE, Calc.MINUS).optimize(cc) };
           break;
         default:
       }
@@ -88,12 +88,12 @@ final class Pos extends Single {
     // position() = 'xyz', position() != 2
     if(minMax == null) return null;
     // position() <= $pos  ->  position() = 1 to $pos
-    if(ps.isSimple()) return new SimplePos(ii, minMax);
+    if(ps.isSimple()) return new SimplePos(info, minMax);
     // position() = last()
-    if(minMax[0] == minMax[1]) return create ? new Pos(ii, minMax[0]) : null;
+    if(minMax[0] == minMax[1]) return create ? new Pos(info, minMax[0]) : null;
     // rewritten to equality range: position() < last()  ->  position() = 1 to last() - 1
     return type.instanceOf(AtomType.INTEGER) ?
-      get(new Range(ii, minMax).optimize(cc), OpV.EQ, ii, cc, create) : null;
+      get(new Range(info, minMax).optimize(cc), OpV.EQ, info, cc, create) : null;
   }
 
   @Override

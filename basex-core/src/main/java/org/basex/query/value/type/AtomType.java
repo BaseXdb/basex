@@ -43,11 +43,11 @@ public enum AtomType implements Type {
   ANY_ATOMIC_TYPE("anyAtomicType", ITEM, XS_URI, false, false, false, false, Type.ID.AAT) {
     @Override
     public Atm cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Atm.get(item.string(ii));
+        final InputInfo info) throws QueryException {
+      return Atm.get(item.string(info));
     }
     @Override
-    public Atm cast(final Object value, final QueryContext qc, final InputInfo ii) {
+    public Atm cast(final Object value, final QueryContext qc, final InputInfo info) {
       return Atm.get(token(value));
     }
   },
@@ -56,11 +56,11 @@ public enum AtomType implements Type {
   UNTYPED_ATOMIC("untypedAtomic", ANY_ATOMIC_TYPE, XS_URI, false, true, false, true, Type.ID.ATM) {
     @Override
     public Atm cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Atm.get(item.string(ii));
+        final InputInfo info) throws QueryException {
+      return Atm.get(item.string(info));
     }
     @Override
-    public Atm cast(final Object value, final QueryContext qc, final InputInfo ii) {
+    public Atm cast(final Object value, final QueryContext qc, final InputInfo info) {
       return Atm.get(token(value));
     }
     @Override
@@ -73,13 +73,13 @@ public enum AtomType implements Type {
   STRING("string", ANY_ATOMIC_TYPE, XS_URI, false, false, true, true, Type.ID.STR) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Str.get(item.string(ii));
+        final InputInfo info) throws QueryException {
+      return Str.get(item.string(info));
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return Str.get(value, qc, ii);
+      return Str.get(value, qc, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -91,16 +91,16 @@ public enum AtomType implements Type {
   NORMALIZED_STRING("normalizedString", STRING, XS_URI, false, false, true, true, Type.ID.NST) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      final byte[] token = item.string(ii);
+        final InputInfo info) throws QueryException {
+      final byte[] token = item.string(info);
       final ByteList bl = new ByteList(token.length);
       for(final byte b : token) bl.add(b == '\t' || b == '\r' || b == '\n' ? ' ' : b);
       return Str.get(bl.finish(), this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -112,13 +112,13 @@ public enum AtomType implements Type {
   TOKEN("token", NORMALIZED_STRING, XS_URI, false, false, true, true, Type.ID.TOK) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Str.get(normalize(item.string(ii)), this);
+        final InputInfo info) throws QueryException {
+      return Str.get(normalize(item.string(info)), this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -130,15 +130,15 @@ public enum AtomType implements Type {
   LANGUAGE("language", TOKEN, XS_URI, false, false, true, true, Type.ID.LAN) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      final byte[] v = normalize(item.string(ii));
-      if(!LANGPATTERN.matcher(string(v)).matches()) throw castError(item, ii);
+        final InputInfo info) throws QueryException {
+      final byte[] v = normalize(item.string(info));
+      if(!LANGPATTERN.matcher(string(v)).matches()) throw castError(item, info);
       return Str.get(v, this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -150,15 +150,15 @@ public enum AtomType implements Type {
   NMTOKEN("NMTOKEN", TOKEN, XS_URI, false, false, true, true, Type.ID.NMT) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      final byte[] v = normalize(item.string(ii));
-      if(!XMLToken.isNMToken(v)) throw castError(item, ii);
+        final InputInfo info) throws QueryException {
+      final byte[] v = normalize(item.string(info));
+      if(!XMLToken.isNMToken(v)) throw castError(item, info);
       return Str.get(v, this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -170,15 +170,15 @@ public enum AtomType implements Type {
   NAME("Name", TOKEN, XS_URI, false, false, true, true, Type.ID.NAM) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      final byte[] v = normalize(item.string(ii));
-      if(!XMLToken.isName(v)) throw castError(item, ii);
+        final InputInfo info) throws QueryException {
+      final byte[] v = normalize(item.string(info));
+      if(!XMLToken.isName(v)) throw castError(item, info);
       return Str.get(v, this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -190,13 +190,13 @@ public enum AtomType implements Type {
   NCNAME("NCName", NAME, XS_URI, false, false, true, true, Type.ID.NCN) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Str.get(checkName(item, ii), this);
+        final InputInfo info) throws QueryException {
+      return Str.get(checkName(item, info), this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -208,13 +208,13 @@ public enum AtomType implements Type {
   ID("ID", NCNAME, XS_URI, false, false, true, true, Type.ID.ID) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Str.get(checkName(item, ii), this);
+        final InputInfo info) throws QueryException {
+      return Str.get(checkName(item, info), this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -226,13 +226,13 @@ public enum AtomType implements Type {
   IDREF("IDREF", NCNAME, XS_URI, false, false, true, true, Type.ID.IDR) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Str.get(checkName(item, ii), this);
+        final InputInfo info) throws QueryException {
+      return Str.get(checkName(item, info), this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -244,13 +244,13 @@ public enum AtomType implements Type {
   ENTITY("ENTITY", NCNAME, XS_URI, false, false, true, true, Type.ID.ENT) {
     @Override
     public Str cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Str.get(checkName(item, ii), this);
+        final InputInfo info) throws QueryException {
+      return Str.get(checkName(item, info), this);
     }
     @Override
-    public Str cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Str cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
@@ -262,15 +262,15 @@ public enum AtomType implements Type {
   NUMERIC("numeric", ANY_ATOMIC_TYPE, XS_URI, true, false, false, true, Type.ID.NUM) {
     @Override
     public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       // return double
-      return item.type.isNumber() ? item : Dbl.get(checkNum(item, ii).dbl(ii));
+      return item.type.isNumber() ? item : Dbl.get(checkNum(item, info).dbl(info));
     }
     @Override
-    public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Item cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       // return double
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
   },
 
@@ -278,13 +278,13 @@ public enum AtomType implements Type {
   FLOAT("float", NUMERIC, XS_URI, true, false, false, true, Type.ID.FLT) {
     @Override
     public Flt cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Flt.get(checkNum(item, ii).flt(ii));
+        final InputInfo info) throws QueryException {
+      return Flt.get(checkNum(item, info).flt(info));
     }
     @Override
-    public Flt cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Flt cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Flt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -296,13 +296,13 @@ public enum AtomType implements Type {
   DOUBLE("double", NUMERIC, XS_URI, true, false, false, true, Type.ID.DBL) {
     @Override
     public Dbl cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Dbl.get(checkNum(item, ii).dbl(ii));
+        final InputInfo info) throws QueryException {
+      return Dbl.get(checkNum(item, info).dbl(info));
     }
     @Override
-    public Dbl cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Dbl cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Dbl read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -314,11 +314,11 @@ public enum AtomType implements Type {
   DECIMAL("decimal", NUMERIC, XS_URI, true, false, false, true, Type.ID.DEC) {
     @Override
     public Dec cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return Dec.get(checkNum(item, ii).dec(ii));
+        final InputInfo info) throws QueryException {
+      return Dec.get(checkNum(item, info).dec(info));
     }
     @Override
-    public Dec cast(final Object value, final QueryContext qc, final InputInfo ii) {
+    public Dec cast(final Object value, final QueryContext qc, final InputInfo info) {
       return Dec.get(value instanceof BigDecimal ? (BigDecimal) value :
         new BigDecimal(string(token(value))));
     }
@@ -335,13 +335,13 @@ public enum AtomType implements Type {
   INTEGER("integer", DECIMAL, XS_URI, true, false, false, true, Type.ID.ITR) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return Int.get(checkLong(value, 0, 0, ii));
+      return Int.get(checkLong(value, 0, 0, info));
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -354,13 +354,13 @@ public enum AtomType implements Type {
       Type.ID.NPI) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, Long.MIN_VALUE, 0, ii), this);
+      return new Int(checkLong(value, Long.MIN_VALUE, 0, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -373,13 +373,13 @@ public enum AtomType implements Type {
       Type.ID.NIN) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, Long.MIN_VALUE, -1, ii), this);
+      return new Int(checkLong(value, Long.MIN_VALUE, -1, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -391,13 +391,13 @@ public enum AtomType implements Type {
   LONG("long", INTEGER, XS_URI, true, false, false, true, Type.ID.LNG) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0, ii), this);
+      return new Int(checkLong(value, 0, 0, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -409,13 +409,13 @@ public enum AtomType implements Type {
   INT("int", LONG, XS_URI, true, false, false, true, Type.ID.INT) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, -0x80000000, 0x7FFFFFFF, ii), this);
+      return new Int(checkLong(value, -0x80000000, 0x7FFFFFFF, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -427,13 +427,13 @@ public enum AtomType implements Type {
   SHORT("short", INT, XS_URI, true, false, false, true, Type.ID.SHR) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, -0x8000, 0x7FFF, ii), this);
+      return new Int(checkLong(value, -0x8000, 0x7FFF, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -445,13 +445,13 @@ public enum AtomType implements Type {
   BYTE("byte", SHORT, XS_URI, true, false, false, true, Type.ID.BYT) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, -0x80, 0x7F, ii), this);
+      return new Int(checkLong(value, -0x80, 0x7F, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -464,13 +464,13 @@ public enum AtomType implements Type {
       Type.ID.NNI) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, Long.MAX_VALUE, ii), this);
+      return new Int(checkLong(value, 0, Long.MAX_VALUE, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -483,18 +483,18 @@ public enum AtomType implements Type {
       Type.ID.ULN) {
     @Override
     public Uln cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Uln cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Uln cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
 
-      final Item item = checkNum(value, ii);
-      final BigDecimal v = item.dec(ii), i = v.setScale(0, RoundingMode.DOWN);
+      final Item item = checkNum(value, info);
+      final BigDecimal v = item.dec(info), i = v.setScale(0, RoundingMode.DOWN);
       // equals() used to also test fractional digits
       if(v.signum() < 0 || v.compareTo(Uln.MAXULN) > 0 ||
-        item.type.isStringOrUntyped() && !v.equals(i)) throw castError(item, ii);
+        item.type.isStringOrUntyped() && !v.equals(i)) throw castError(item, info);
       return new Uln(i.toBigInteger());
     }
     @Override
@@ -507,13 +507,13 @@ public enum AtomType implements Type {
   UNSIGNED_INT("unsignedInt", UNSIGNED_LONG, XS_URI, true, false, false, true, Type.ID.UIN) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0xFFFFFFFFL, ii), this);
+      return new Int(checkLong(value, 0, 0xFFFFFFFFL, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -525,13 +525,13 @@ public enum AtomType implements Type {
   UNSIGNED_SHORT("unsignedShort", UNSIGNED_INT, XS_URI, true, false, false, true, Type.ID.USH) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0xFFFF, ii), this);
+      return new Int(checkLong(value, 0, 0xFFFF, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -543,13 +543,13 @@ public enum AtomType implements Type {
   UNSIGNED_BYTE("unsignedByte", UNSIGNED_SHORT, XS_URI, true, false, false, true, Type.ID.UBY) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0xFF, ii), this);
+      return new Int(checkLong(value, 0, 0xFF, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -562,13 +562,13 @@ public enum AtomType implements Type {
       Type.ID.PIN) {
     @Override
     public Int cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      return cast(item, qc, ii);
+        final InputInfo info) throws QueryException {
+      return cast(item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 1, Long.MAX_VALUE, ii), this);
+      return new Int(checkLong(value, 1, Long.MAX_VALUE, info), this);
     }
     @Override
     public Int read(final DataInput in, final QueryContext qc) throws IOException {
@@ -580,15 +580,15 @@ public enum AtomType implements Type {
   DURATION("duration", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.DUR) {
     @Override
     public Dur cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item instanceof Dur) return new Dur((Dur) item);
-      if(isString(item)) return new Dur(item.string(ii), ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new Dur(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public Dur cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Dur cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Dur read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -601,15 +601,15 @@ public enum AtomType implements Type {
       Type.ID.YMD) {
     @Override
     public YMDur cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item instanceof Dur) return new YMDur((Dur) item);
-      if(isString(item)) return new YMDur(item.string(ii), ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new YMDur(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public YMDur cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public YMDur cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public YMDur read(final DataInput in, final QueryContext qc)
@@ -622,15 +622,15 @@ public enum AtomType implements Type {
   DAY_TIME_DURATION("dayTimeDuration", DURATION, XS_URI, false, false, false, true, Type.ID.DTD) {
     @Override
     public DTDur cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item instanceof Dur) return new DTDur((Dur) item);
-      if(isString(item)) return new DTDur(item.string(ii), ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new DTDur(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public DTDur cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public DTDur cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public DTDur read(final DataInput in, final QueryContext qc)
@@ -643,15 +643,15 @@ public enum AtomType implements Type {
   DATE_TIME("dateTime", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.DTM) {
     @Override
     public Dtm cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type == DATE) return new Dtm((ADate) item);
-      if(isString(item)) return new Dtm(item.string(ii), ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new Dtm(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public Dtm cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Dtm cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Dtm read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -666,15 +666,15 @@ public enum AtomType implements Type {
   DATE("date", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.DAT) {
     @Override
     public Dat cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type == DATE_TIME) return new Dat((ADate) item);
-      if(isString(item)) return new Dat(item.string(ii), ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new Dat(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public Dat cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Dat cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Dat read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -686,15 +686,15 @@ public enum AtomType implements Type {
   TIME("time", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.TIM) {
     @Override
     public Tim cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type == DATE_TIME) return new Tim((ADate) item);
-      if(isString(item)) return new Tim(item.string(ii), ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new Tim(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public Tim cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Tim cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Tim read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -706,15 +706,15 @@ public enum AtomType implements Type {
   G_YEAR_MONTH("gYearMonth", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.YMO) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
-      if(isString(item)) return new GDt(item.string(ii), this, ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new GDt(item.string(info), this, info);
+      throw typeError(item, this, info);
     }
     @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -726,15 +726,15 @@ public enum AtomType implements Type {
   G_YEAR("gYear", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.YEA) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
-      if(isString(item)) return new GDt(item.string(ii), this, ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new GDt(item.string(info), this, info);
+      throw typeError(item, this, info);
     }
     @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -746,15 +746,15 @@ public enum AtomType implements Type {
   G_MONTH_DAY("gMonthDay", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.MDA) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
-      if(isString(item)) return new GDt(item.string(ii), this, ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new GDt(item.string(info), this, info);
+      throw typeError(item, this, info);
     }
     @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -766,15 +766,15 @@ public enum AtomType implements Type {
   G_DAY("gDay", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.DAY) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
-      if(isString(item)) return new GDt(item.string(ii), this, ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new GDt(item.string(info), this, info);
+      throw typeError(item, this, info);
     }
     @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -786,15 +786,15 @@ public enum AtomType implements Type {
   G_MONTH("gMonth", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.MON) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
       if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
-      if(isString(item)) return new GDt(item.string(ii), this, ii);
-      throw typeError(item, this, ii);
+      if(isString(item)) return new GDt(item.string(info), this, info);
+      throw typeError(item, this, info);
     }
     @Override
-    public GDt cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public GDt cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return cast(Str.get(value, qc, ii), qc, null, ii);
+      return cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public GDt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
@@ -806,16 +806,16 @@ public enum AtomType implements Type {
   BOOLEAN("boolean", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.BLN) {
     @Override
     public Bln cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      if(item instanceof ANum) return Bln.get(item.bool(ii));
-      if(isString(item)) return Bln.get(Bln.parse(item, ii));
-      throw typeError(item, this, ii);
+        final InputInfo info) throws QueryException {
+      if(item instanceof ANum) return Bln.get(item.bool(info));
+      if(isString(item)) return Bln.get(Bln.parse(item, info));
+      throw typeError(item, this, info);
     }
     @Override
-    public Bln cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Bln cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return value instanceof Boolean ? Bln.get((Boolean) value) :
-        cast(Str.get(value, qc, ii), qc, null, ii);
+        cast(Str.get(value, qc, info), qc, null, info);
     }
     @Override
     public Bln read(final DataInput in, final QueryContext qc) throws IOException {
@@ -830,15 +830,15 @@ public enum AtomType implements Type {
   BASE64_BINARY("base64Binary", BINARY, XS_URI, false, false, false, true, Type.ID.B64) {
     @Override
     public B64 cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      if(item instanceof Bin) return B64.get((Bin) item, ii);
-      if(isString(item)) return B64.get(item.string(ii), ii);
-      throw typeError(item, this, ii);
+        final InputInfo info) throws QueryException {
+      if(item instanceof Bin) return B64.get((Bin) item, info);
+      if(isString(item)) return B64.get(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public B64 cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public B64 cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return value instanceof byte[] ? B64.get((byte[]) value) : B64.get(token(value), ii);
+      return value instanceof byte[] ? B64.get((byte[]) value) : B64.get(token(value), info);
     }
     @Override
     public B64 read(final DataInput in, final QueryContext qc) throws IOException {
@@ -850,15 +850,15 @@ public enum AtomType implements Type {
   HEX_BINARY("hexBinary", BINARY, XS_URI, false, false, false, true, Type.ID.HEX) {
     @Override
     public Hex cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
-      if(item instanceof Bin) return new Hex((Bin) item, ii);
-      if(isString(item)) return new Hex(item.string(ii), ii);
-      throw typeError(item, this, ii);
+        final InputInfo info) throws QueryException {
+      if(item instanceof Bin) return new Hex((Bin) item, info);
+      if(isString(item)) return new Hex(item.string(info), info);
+      throw typeError(item, this, info);
     }
     @Override
-    public Hex cast(final Object value, final QueryContext qc, final InputInfo ii)
+    public Hex cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Hex(value instanceof byte[] ? (byte[]) value : token(value), ii);
+      return new Hex(value instanceof byte[] ? (byte[]) value : token(value), info);
     }
     @Override
     public Hex read(final DataInput in, final QueryContext qc) throws IOException {
@@ -870,15 +870,15 @@ public enum AtomType implements Type {
   ANY_URI("anyURI", ANY_ATOMIC_TYPE, XS_URI, false, false, true, true, Type.ID.URI) {
     @Override
     public Uri cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
 
-      if(!item.type.isStringOrUntyped()) throw typeError(item, this, ii);
-      final Uri u = Uri.get(item.string(ii));
-      if(!u.isValid()) throw castError(item, ii);
+      if(!item.type.isStringOrUntyped()) throw typeError(item, this, info);
+      final Uri u = Uri.get(item.string(info));
+      if(!u.isValid()) throw castError(item, info);
       return u;
     }
     @Override
-    public Uri cast(final Object value, final QueryContext qc, final InputInfo ii) {
+    public Uri cast(final Object value, final QueryContext qc, final InputInfo info) {
       return Uri.get(token(value));
     }
     @Override
@@ -891,20 +891,20 @@ public enum AtomType implements Type {
   QNAME("QName", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.QNM) {
     @Override
     public QNm cast(final Item item, final QueryContext qc, final StaticContext sc,
-        final InputInfo ii) throws QueryException {
+        final InputInfo info) throws QueryException {
 
       final Type type = item.type;
-      if(type != STRING && !type.isUntyped()) throw typeError(item, this, ii);
-      final byte[] name = trim(item.string(ii));
+      if(type != STRING && !type.isUntyped()) throw typeError(item, this, info);
+      final byte[] name = trim(item.string(info));
       if(XMLToken.isQName(name)) {
         final QNm qnm = qc.shared.qname(name, sc.ns.uri(prefix(name)));
-        if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
+        if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(info, qnm.prefix());
         return qnm;
       }
-      throw castError(item, ii);
+      throw castError(item, info);
     }
     @Override
-    public QNm cast(final Object value, final QueryContext qc, final InputInfo ii) {
+    public QNm cast(final Object value, final QueryContext qc, final InputInfo info) {
       return value instanceof QName ? new QNm((QName) value) : new QNm(value.toString());
     }
     @Override
@@ -970,15 +970,15 @@ public enum AtomType implements Type {
 
   @Override
   public Item cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
     if(item.type == this) return item;
-    throw typeError(item, this, ii);
+    throw typeError(item, this, info);
   }
 
   @Override
-  public Item cast(final Object value, final QueryContext qc, final InputInfo ii)
+  public Item cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    throw FUNCCAST_X_X.get(ii, this, value);
+    throw FUNCCAST_X_X.get(info, this, value);
   }
 
   @Override
@@ -1071,15 +1071,15 @@ public enum AtomType implements Type {
   /**
    * Throws an exception if the specified item cannot be converted to a number.
    * @param item item
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return item argument
    * @throws QueryException query exception
    */
-  final Item checkNum(final Item item, final InputInfo ii) throws QueryException {
+  final Item checkNum(final Item item, final InputInfo info) throws QueryException {
     final Type type = item.type;
     if(item instanceof ANum || type.isStringOrUntyped() && type != ANY_URI || type == BOOLEAN)
       return item;
-    throw typeError(item, this, ii);
+    throw typeError(item, this, info);
   }
 
   /**
@@ -1087,40 +1087,40 @@ public enum AtomType implements Type {
    * @param value value to be checked
    * @param min minimum value
    * @param max maximum value (no limit if identical to min)
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return integer value
    * @throws QueryException query exception
    */
-  final long checkLong(final Object value, final long min, final long max, final InputInfo ii)
+  final long checkLong(final Object value, final long min, final long max, final InputInfo info)
       throws QueryException {
 
-    final Item item = checkNum(value, ii);
+    final Item item = checkNum(value, info);
     final Type type = item.type;
     if(type.oneOf(DOUBLE, FLOAT)) {
-      final double d = item.dbl(ii);
-      if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(this, item.string(ii), ii);
-      if(min != max && (d < min || d > max)) throw castError(item, ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE_X.get(ii, d);
+      final double d = item.dbl(info);
+      if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(this, item.string(info), info);
+      if(min != max && (d < min || d > max)) throw castError(item, info);
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE_X.get(info, d);
       return (long) d;
     }
 
-    final long l = item.itr(ii);
-    if(min != max && (l < min || l > max)) throw castError(item, ii);
+    final long l = item.itr(info);
+    if(min != max && (l < min || l > max)) throw castError(item, info);
     return l;
   }
 
   /**
    * Checks the validity of the specified object and returns it as item.
    * @param value value to be checked
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return integer value
    * @throws QueryException query exception
    */
-  final Item checkNum(final Object value, final InputInfo ii) throws QueryException {
+  final Item checkNum(final Object value, final InputInfo info) throws QueryException {
     final Item item;
     if(value instanceof Value) {
       final Value val = (Value) value;
-      if(val.size() != 1) throw typeError(val, this, ii);
+      if(val.size() != 1) throw typeError(val, this, info);
       item = (Item) val;
     } else if(value instanceof Double || value instanceof Float) {
       item = Dbl.get(((Number) value).doubleValue());
@@ -1131,40 +1131,40 @@ public enum AtomType implements Type {
     } else {
       item = Str.get(token(value));
     }
-    return checkNum(item, ii);
+    return checkNum(item, info);
   }
 
   /**
    * Checks the validity of the specified name.
    * @param item value to be checked
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return name
    * @throws QueryException query exception
    */
-  final byte[] checkName(final Item item, final InputInfo ii) throws QueryException {
-    final byte[] v = normalize(item.string(ii));
-    if(!XMLToken.isNCName(v)) throw castError(item, ii);
+  final byte[] checkName(final Item item, final InputInfo info) throws QueryException {
+    final byte[] v = normalize(item.string(info));
+    if(!XMLToken.isNCName(v)) throw castError(item, info);
     return v;
   }
 
   /**
    * Returns a cast exception.
    * @param item item to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public final QueryException castError(final Item item, final InputInfo ii)  {
-    return FUNCCAST_X_X_X.get(ii, item.type, this, item);
+  public final QueryException castError(final Item item, final InputInfo info)  {
+    return FUNCCAST_X_X_X.get(info, item.type, this, item);
   }
 
   /**
    * Returns a cast exception.
    * @param value value to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return query exception
    */
-  public final QueryException castError(final byte[] value, final InputInfo ii)  {
-    return FUNCCAST_X_X.get(ii, this, value);
+  public final QueryException castError(final byte[] value, final InputInfo info)  {
+    return FUNCCAST_X_X.get(info, this, value);
   }
 
   @Override

@@ -32,7 +32,7 @@ public final class DBPut extends DBUpdate {
    * @param data data
    * @param value value to be stored
    * @param path target path
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBPut(final Data data, final Value value, final String path, final InputInfo info) {
     super(UpdateType.DBPUT, data, info);

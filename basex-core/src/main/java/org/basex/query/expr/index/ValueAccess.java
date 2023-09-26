@@ -43,7 +43,7 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param tokens tokens
    * @param type index type
    * @param test name test (can be {@code null})
@@ -56,7 +56,7 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr search expression
    * @param type index type
    * @param test test (can be {@code null})
@@ -69,7 +69,7 @@ public final class ValueAccess extends IndexAccess {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param type index type ({@link IndexType#TEXT}, {@link IndexType#TOKEN},
    *   {@link IndexType#ATTRIBUTE})
    * @param test test (can be {@code null})

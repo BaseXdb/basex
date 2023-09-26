@@ -29,7 +29,7 @@ import org.basex.util.hash.*;
 public abstract class SimpleMap extends Arr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   SimpleMap(final InputInfo info, final Expr... exprs) {
@@ -39,15 +39,15 @@ public abstract class SimpleMap extends Arr {
   /**
    * Creates a new, optimized map expression.
    * @param cc compilation context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    * @return list, single expression or empty sequence
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr... exprs)
+  public static Expr get(final CompileContext cc, final InputInfo info, final Expr... exprs)
       throws QueryException {
     final int el = exprs.length;
-    return el > 1 ? new CachedMap(ii, exprs).optimize(cc) : el > 0 ? exprs[0] : Empty.VALUE;
+    return el > 1 ? new CachedMap(info, exprs).optimize(cc) : el > 0 ? exprs[0] : Empty.VALUE;
   }
 
   @Override

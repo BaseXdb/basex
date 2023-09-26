@@ -20,7 +20,7 @@ public abstract class Clause extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param seqType sequence type
    * @param vars declared variables
    */

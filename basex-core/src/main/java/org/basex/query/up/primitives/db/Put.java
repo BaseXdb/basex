@@ -38,7 +38,7 @@ public final class Put extends DBUpdate {
    * @param data target data reference
    * @param path target path
    * @param sopts serializer options
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public Put(final int id, final Data data, final String path, final SerializerOptions sopts,
       final InputInfo info) {

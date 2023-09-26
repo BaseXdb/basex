@@ -404,7 +404,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   /**
    * Displays the specified runtime.
-   * @param info info string with measured time;
+   * @param info info string with measured time
    */
   private void setTime(final String info) {
     final StringBuilder sb = new StringBuilder().append(info);

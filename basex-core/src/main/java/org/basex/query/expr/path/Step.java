@@ -36,61 +36,61 @@ public abstract class Step extends Preds {
    * Returns a new optimized self::node() step.
    * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param preds predicates
    * @return step
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
+  public static Expr get(final CompileContext cc, final Expr root, final InputInfo info,
       final Expr... preds) throws QueryException {
-    return get(cc, root, ii, KindTest.NODE, preds);
+    return get(cc, root, info, KindTest.NODE, preds);
   }
 
   /**
    * Returns a new optimized self step.
    * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param test test
    * @param preds predicates
    * @return step
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
+  public static Expr get(final CompileContext cc, final Expr root, final InputInfo info,
       final Test test, final Expr... preds) throws QueryException {
-    return get(cc, root, ii, SELF, test, preds);
+    return get(cc, root, info, SELF, test, preds);
   }
 
   /**
    * Returns a new optimized step.
    * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param axis axis
    * @param test node test
    * @param preds predicates
    * @return step
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final Expr root, final InputInfo ii,
+  public static Expr get(final CompileContext cc, final Expr root, final InputInfo info,
       final Axis axis, final Test test, final Expr... preds) throws QueryException {
-    return new CachedStep(ii, axis, test, preds).optimize(root, cc);
+    return new CachedStep(info, axis, test, preds).optimize(root, cc);
   }
 
   /**
    * Returns a new step.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param axis axis
    * @param test node test
    * @param preds predicates
    * @return step
    */
-  public static Step get(final InputInfo ii, final Axis axis, final Test test,
+  public static Step get(final InputInfo info, final Axis axis, final Test test,
       final Expr... preds) {
 
     // optimize single last() functions
     if(preds.length == 1 && Function.LAST.is(preds[0]))
-      return new IterLastStep(ii, axis, test, preds);
+      return new IterLastStep(info, axis, test, preds);
 
     // check for simple positional predicates
     boolean pos = false;
@@ -100,17 +100,17 @@ public abstract class Step extends Preds {
         pos = true;
       } else if(mayBePositional(pred)) {
         // predicate **may** be positional: choose cached evaluation
-        return new CachedStep(ii, axis, test, preds);
+        return new CachedStep(info, axis, test, preds);
       }
     }
     return pos ?
-      new IterPosStep(ii, axis, test, preds) :
-      new IterStep(ii, axis, test, preds);
+      new IterPosStep(info, axis, test, preds) :
+      new IterStep(info, axis, test, preds);
   }
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param axis axis
    * @param test node test
    * @param preds predicates

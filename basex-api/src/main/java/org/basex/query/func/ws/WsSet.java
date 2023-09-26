@@ -20,7 +20,7 @@ public final class WsSet extends WsFn {
     final String key = toString(arg(1), qc);
     final Value value = arg(2).value(qc);
 
-    client.atts.put(key, value.materialize(n -> false, ii, qc));
+    client.atts.put(key, value.materialize(n -> false, info, qc));
     return Empty.VALUE;
   }
 }

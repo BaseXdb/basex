@@ -115,11 +115,11 @@ public final class DecFormatter extends FormatUtil {
    * Returns a formatted number.
    * @param number number to be formatted
    * @param picture picture
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return string representation
    * @throws QueryException query exception
    */
-  public byte[] format(final ANum number, final byte[] picture, final InputInfo ii)
+  public byte[] format(final ANum number, final byte[] picture, final InputInfo info)
       throws QueryException {
 
     // find pattern separator and sub-patterns
@@ -132,16 +132,16 @@ public final class DecFormatter extends FormatUtil {
       tl.add(substring(pic, 0, i));
       pic = substring(pic, i + cl(pic, i));
       // "A picture-string must not contain more than one instance of the pattern-separator"
-      if(contains(pic, pattern)) throw PICNUM_X.get(ii, picture);
+      if(contains(pic, pattern)) throw PICNUM_X.get(info, picture);
     }
     final byte[][] patterns = tl.add(pic).finish();
 
     // check and analyze patterns
-    if(!checkSyntax(patterns)) throw PICNUM_X.get(ii, picture);
+    if(!checkSyntax(patterns)) throw PICNUM_X.get(info, picture);
     final Picture[] pics = analyze(patterns);
 
     // return formatted string
-    return format(number, pics, ii);
+    return format(number, pics, info);
   }
 
   /**
@@ -370,15 +370,15 @@ public final class DecFormatter extends FormatUtil {
    * Formats the specified number and returns a string representation.
    * @param item item
    * @param pics pictures
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return picture variables
    * @throws QueryException query exception
    */
-  private byte[] format(final ANum item, final Picture[] pics, final InputInfo ii)
+  private byte[] format(final ANum item, final Picture[] pics, final InputInfo info)
       throws QueryException {
 
     // Rule 1: return results for NaN
-    final double d = item.dbl(ii);
+    final double d = item.dbl(info);
     if(Double.isNaN(d)) return nan;
 
     // Rule 2: check if value is negative (smaller than zero or -0)
@@ -389,16 +389,16 @@ public final class DecFormatter extends FormatUtil {
 
     // Rule 3: percent/permille
     ANum num = item;
-    if(pic.pc) num = (ANum) Calc.MULT.eval(num, Int.get(100), ii);
-    if(pic.pm) num = (ANum) Calc.MULT.eval(num, Int.get(1000), ii);
+    if(pic.pc) num = (ANum) Calc.MULT.eval(num, Int.get(100), info);
+    if(pic.pm) num = (ANum) Calc.MULT.eval(num, Int.get(1000), info);
 
-    if(Double.isInfinite(num.dbl(ii))) {
+    if(Double.isInfinite(num.dbl(info))) {
       // Rule 4: infinity
       intgr.add(new TokenParser(inf).toArray());
     } else {
       // Rule 5: exponent
       if(pic.minExp != 0 && d != 0) {
-        BigDecimal dec = num.dec(ii).abs().stripTrailingZeros();
+        BigDecimal dec = num.dec(info).abs().stripTrailingZeros();
         int scl = 0;
         if(dec.compareTo(BigDecimal.ONE) >= 0) {
           scl = dec.setScale(0, RoundingMode.HALF_DOWN).precision();
@@ -413,14 +413,14 @@ public final class DecFormatter extends FormatUtil {
         if(exp != 0) {
           final BigDecimal n = BigDecimal.TEN.pow(Math.abs(exp));
           num = (ANum) Calc.MULT.eval(num, Dec.get(
-              exp > 0 ? BigDecimal.ONE.divide(n, MathContext.DECIMAL64) : n), ii);
+              exp > 0 ? BigDecimal.ONE.divide(n, MathContext.DECIMAL64) : n), info);
         }
       }
       num = num.round(pic.maxFrac, true).abs();
 
       // convert positive number to string; chop leading 0
       String s = (num instanceof Dbl || num instanceof Flt ?
-          Dec.get(BigDecimal.valueOf(num.dbl(ii))) : num).toString();
+          Dec.get(BigDecimal.valueOf(num.dbl(info))) : num).toString();
       if(Strings.startsWith(s, '0')) s = s.substring(1);
 
       // integer/fractional separator

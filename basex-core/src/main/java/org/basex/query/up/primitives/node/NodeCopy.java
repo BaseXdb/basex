@@ -28,12 +28,12 @@ abstract class NodeCopy extends NodeUpdate {
    * @param type type
    * @param pre target node pre value
    * @param data data
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence
    */
-  NodeCopy(final UpdateType type, final int pre, final Data data, final InputInfo ii,
+  NodeCopy(final UpdateType type, final int pre, final Data data, final InputInfo info,
       final ANodeList nodes) {
-    super(type, pre, data, ii);
+    super(type, pre, data, info);
     this.nodes = nodes;
   }
 

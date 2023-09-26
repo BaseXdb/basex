@@ -87,8 +87,7 @@ public final class FnReplace extends RegEx {
           final int gc = m.groupCount();
           final ValueBuilder groups = new ValueBuilder(qc);
           for(int g = 0; g < gc; g++) groups.add(Atm.get(m.group(g + 1)));
-          final Item rplc = eval(action, qc, Atm.get(m.group()), groups.value()).
-              atomItem(qc, ii);
+          final Item rplc = eval(action, qc, Atm.get(m.group()), groups.value()).atomItem(qc, info);
           m.appendReplacement(sb, rplc.isEmpty() ? "" : string(rplc.string(info)));
         }
         replaced = m.appendTail(sb).toString();

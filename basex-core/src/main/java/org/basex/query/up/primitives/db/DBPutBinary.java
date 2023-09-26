@@ -31,7 +31,7 @@ public final class DBPutBinary extends DBUpdate {
    * @param data data
    * @param item item to be stored
    * @param path target path
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBPutBinary(final Data data, final Item item, final String path, final InputInfo info) {
     super(UpdateType.DBPUTBINARY, data, info);

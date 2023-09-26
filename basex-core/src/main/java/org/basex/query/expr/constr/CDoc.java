@@ -22,7 +22,7 @@ public final class CDoc extends CNode {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param expr expression
    */

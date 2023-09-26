@@ -27,12 +27,12 @@ public abstract class Bin extends Item {
 
   /**
    * Returns the binary content.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return content
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public byte[] binary(final InputInfo ii) throws QueryException {
+  public byte[] binary(final InputInfo info) throws QueryException {
     return data;
   }
 

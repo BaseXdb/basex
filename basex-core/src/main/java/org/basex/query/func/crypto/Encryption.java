@@ -33,7 +33,7 @@ final class Encryption {
   /** String: hex. */
   private static final String HEX = "hex";
 
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
 
   static {
@@ -45,7 +45,7 @@ final class Encryption {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   Encryption(final InputInfo info) {
     this.info = info;

@@ -19,11 +19,11 @@ public final class InsertBefore extends NodeCopy {
    * Constructor.
    * @param pre pre
    * @param data data
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence
    */
-  public InsertBefore(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
-    super(UpdateType.INSERTBEFORE, pre, data, ii, nodes);
+  public InsertBefore(final int pre, final Data data, final InputInfo info, final ANodeList nodes) {
+    super(UpdateType.INSERTBEFORE, pre, data, info, nodes);
   }
 
   @Override

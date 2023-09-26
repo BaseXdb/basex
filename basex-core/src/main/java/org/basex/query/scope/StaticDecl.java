@@ -24,12 +24,12 @@ public abstract class StaticDecl extends StaticScope {
    * @param name name
    * @param declType declared return type (can be {@code null})
    * @param anns annotations
-   * @param doc xqdoc documentation
    * @param vs variable scope
-   * @param info input info
+   * @param info input info (can be {@code null})
+   * @param doc xqdoc string
    */
   protected StaticDecl(final QNm name, final SeqType declType, final AnnList anns,
-      final String doc, final VarScope vs, final InputInfo info) {
+      final VarScope vs, final InputInfo info, final String doc) {
     super(vs.sc);
     this.name = name;
     this.declType = declType;

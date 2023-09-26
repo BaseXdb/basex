@@ -25,7 +25,7 @@ public final class Delete extends Update {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param trg target expression
    */
   public Delete(final StaticContext sc, final InputInfo info, final Expr trg) {

@@ -38,7 +38,7 @@ public final class StaticFuncCall extends FuncCall {
    * @param args positional arguments
    * @param keywords keyword arguments (can be {@code null})
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public StaticFuncCall(final QNm name, final Expr[] args, final QNmMap<Expr> keywords,
       final StaticContext sc, final InputInfo info) {
@@ -52,7 +52,7 @@ public final class StaticFuncCall extends FuncCall {
    * @param args arguments
    * @param sc static context
    * @param func referenced function (can be {@code null})
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   private StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
       final StaticFunc func, final InputInfo info) {

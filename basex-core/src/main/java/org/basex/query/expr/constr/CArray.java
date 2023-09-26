@@ -26,7 +26,7 @@ public final class CArray extends Arr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param sequences create sequences
    * @param exprs array expressions
    */

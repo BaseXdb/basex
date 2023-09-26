@@ -29,7 +29,7 @@ public final class OrderKey extends Single {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param key sort key expression
    * @param desc descending order
    * @param least empty least

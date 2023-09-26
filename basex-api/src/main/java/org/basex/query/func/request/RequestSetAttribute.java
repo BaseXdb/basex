@@ -19,7 +19,7 @@ public final class RequestSetAttribute extends ApiFunc {
     final String name = toString(arg(0), qc);
     final Value value = arg(1).value(qc);
 
-    request(qc).setAttribute(name, value.materialize(n -> false, ii, qc));
+    request(qc).setAttribute(name, value.materialize(n -> false, info, qc));
     return Empty.VALUE;
   }
 }

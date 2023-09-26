@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 public final class FTMildNot extends FTExpr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr1 first expression
    * @param expr2 second expression
    */

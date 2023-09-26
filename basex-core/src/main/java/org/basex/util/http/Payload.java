@@ -43,7 +43,7 @@ public final class Payload {
   private final ItemList payloads;
   /** Input stream. */
   private final InputStream input;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Database options. */
   private final MainOptions options;
@@ -52,7 +52,7 @@ public final class Payload {
    * Constructor.
    * @param input input stream
    * @param body create body
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param options main options
    */
   public Payload(final InputStream input, final boolean body, final InputInfo info,

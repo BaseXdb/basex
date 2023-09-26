@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 public final class CachedStep extends Step {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param axis axis
    * @param test node test
    * @param preds predicates

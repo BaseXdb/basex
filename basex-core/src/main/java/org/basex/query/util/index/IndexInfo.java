@@ -123,12 +123,12 @@ public final class IndexInfo {
    * @param search expression to find (can be {@code null})
    * @param type index type (can be {@code null})
    * @param trim normalize second string
-   * @param ii input info (can be {@code null})
+   * @param info input info (can be {@code null})
    * @return success flag
    * @throws QueryException query exception
    */
   public boolean create(final Expr search, final IndexType type, final boolean trim,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     // no index or no search value: no optimization
     if(type == null || search == null) return false;
@@ -145,7 +145,7 @@ public final class IndexInfo {
         // only strings and untyped items are supported
         if(!item.type.isStringOrUntyped()) return false;
         // do not use text/attribute index if string is empty or too long
-        byte[] token = item.string(ii);
+        byte[] token = item.string(info);
         if(trim) token = Token.trim(token);
         final int sl = token.length;
         if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
@@ -175,7 +175,7 @@ public final class IndexInfo {
       }
 
       // create expression for index access
-      va = new ValueAccess(ii, tokens, type, test, db);
+      va = new ValueAccess(info, tokens, type, test, db);
       va.exprType.assign(va.seqType(), size);
 
     } else {
@@ -190,10 +190,10 @@ public final class IndexInfo {
       // estimate costs for dynamic query terms
       costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
         IndexCosts.get(Math.max(1, data.meta.size / 10));
-      va = new ValueAccess(ii, search, type, test, db);
+      va = new ValueAccess(info, search, type, test, db);
     }
 
-    create(va, false, Util.info(OPTINDEX_X_X, type, search), ii);
+    create(va, false, Util.info(OPTINDEX_X_X, type, search), info);
     return true;
   }
 
@@ -202,18 +202,18 @@ public final class IndexInfo {
    * @param root new root expression
    * @param parent add parent step
    * @param opt optimization info
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public void create(final ParseExpr root, final boolean parent, final String opt,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     final Expr rt;
     if(test == null || !parent) {
       rt = root;
     } else {
-      final Expr st = Step.get(cc, root, ii, Axis.PARENT, test);
-      rt = Path.get(cc, ii, root, st);
+      final Expr st = Step.get(cc, root, info, Axis.PARENT, test);
+      rt = Path.get(cc, info, root, st);
     }
     expr = pred.invert(rt);
     optInfo = opt;

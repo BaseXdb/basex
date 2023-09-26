@@ -20,7 +20,7 @@ final class UnitException extends QueryException {
 
   /**
    * Default constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param err error reference
    * @param expected expected result
    * @param returned returned result

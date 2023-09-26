@@ -34,7 +34,7 @@ public final class DBOptimize extends DBUpdate {
    * @param all optimize all database structures flag
    * @param opts query options
    * @param qc database context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public DBOptimize(final Data data, final boolean all, final HashMap<String, String> opts,

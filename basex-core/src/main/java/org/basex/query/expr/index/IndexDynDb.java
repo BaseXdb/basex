@@ -26,7 +26,7 @@ public final class IndexDynDb extends IndexDb {
   /**
    * Constructor.
    * @param expr expression
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public IndexDynDb(final Expr expr, final InputInfo info) {
     super(info);
