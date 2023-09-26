@@ -39,7 +39,7 @@ public final class FnInvisibleXml extends StandardFunc {
           "org.nineml.coffeefilter.InvisibleXmlDocument",
           "org.nineml.coffeefilter.InvisibleXmlParser", "org.nineml.coffeefilter.InvisibleXml")) {
         if(!Reflect.available(className)) {
-          throw BASEX_CLASSPATH_X_X.get(ii, definition.local(), className);
+          throw BASEX_CLASSPATH_X_X.get(info, definition.local(), className);
         }
       }
       generator = new Generator();
@@ -104,7 +104,7 @@ public final class FnInvisibleXml extends StandardFunc {
       final InvisibleXmlDocument doc = parser.parse(input);
       if(!doc.succeeded()) {
         final GearleyResult result = doc.getResult();
-        throw IXML_INP_X_X_X.get(ii, result.getLastToken(), doc.getLineNumber(),
+        throw IXML_INP_X_X_X.get(info, result.getLastToken(), doc.getLineNumber(),
             doc.getColumnNumber());
       }
       final MemBuilder builder = new MemBuilder(Parser.emptyParser(new MainOptions())).init();
@@ -112,7 +112,7 @@ public final class FnInvisibleXml extends StandardFunc {
         doc.getTree(new SAXHandler(builder));
         return new DBNode(builder.data());
       } catch(final IxmlException ex) {
-        throw IXML_RESULT_X.get(ii, ex);
+        throw IXML_RESULT_X.get(info, ex);
       }
     }
 

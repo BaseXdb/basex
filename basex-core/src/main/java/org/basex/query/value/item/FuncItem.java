@@ -232,7 +232,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(ii, this);
+    throw FIATOMIZE_X.get(info, this);
   }
 
   @Override

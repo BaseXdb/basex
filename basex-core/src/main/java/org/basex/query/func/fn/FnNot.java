@@ -68,8 +68,7 @@ public final class FnNot extends StandardFunc {
         tmp.add(inverted);
       }
       args = tmp.finish();
-      final InputInfo ii = input.info();
-      return (input instanceof And ? new Or(ii, args) : new And(ii, args)).optimize(cc);
+      return (input instanceof And ? new Or(info, args) : new And(info, args)).optimize(cc);
     }
     return input;
   }

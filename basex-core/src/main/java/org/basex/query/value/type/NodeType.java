@@ -270,15 +270,15 @@ public enum NodeType implements Type {
    * Creates a matcher for the specified pattern or raises an error.
    * @param pattern pattern
    * @param value value
-   * @param ii info info
+   * @param info input info (can be {@code null})
    * @return matcher
    * @throws QueryException query exception
    */
-  final Matcher matcher(final String pattern, final Object value, final InputInfo ii)
+  final Matcher matcher(final String pattern, final Object value, final InputInfo info)
       throws QueryException {
     final Matcher m = Pattern.compile(pattern).matcher(Token.string(Token.token(value)));
     if(m.find()) return m;
-    throw NODEERR_X_X.get(ii, this, value);
+    throw NODEERR_X_X.get(info, this, value);
   }
 
   /**

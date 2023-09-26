@@ -36,7 +36,7 @@ public class FnOp extends StandardFunc {
     final Expr[] args = new Expr[pl];
     for(int p = 0; p < pl; p++) {
       params[p] = vs.addNew(p == 0 ? Q_X : Q_Y, null, true, qc, info);
-      args[p] = new VarRef(ii, params[p]);
+      args[p] = new VarRef(info, params[p]);
     }
     final Expr arg1 = args[0], arg2 = args[1], body;
     final Collation coll = sc.collation;
