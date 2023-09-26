@@ -102,7 +102,7 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return Token.eq(string(ii), item.string(ii), coll);
   }

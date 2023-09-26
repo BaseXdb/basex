@@ -24,6 +24,6 @@ public final class BackRef extends RegExp {
 
   @Override
   void toRegEx(final StringBuilder sb) {
-    if (!isDifferentBranch) sb.append('\\').append(num);
+    if(!isDifferentBranch) sb.append('\\').append(num);
   }
 }

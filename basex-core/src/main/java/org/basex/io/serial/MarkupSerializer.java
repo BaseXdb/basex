@@ -162,9 +162,9 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws IOException I/O exception
    */
   protected void delimitAttribute() throws IOException {
-    if (indAttr && out.lineLength() > indAttrLength) {
+    if(indAttr && out.lineLength() > indAttrLength) {
       out.print('\n');
-      for (int i = 0; i < indAttrLength; ++i) out.print(' ');
+      for(int i = 0; i < indAttrLength; ++i) out.print(' ');
     }
     out.print(' ');
   }
@@ -351,7 +351,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     if(atomic) {
       atomic = false;
     } else if(indent) {
-      if (inline()) return;
+      if(inline()) return;
       for(final QNm qname : opened) {
         if(suppressIndentation(qname)) return;
       }

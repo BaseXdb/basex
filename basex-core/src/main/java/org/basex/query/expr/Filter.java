@@ -229,7 +229,7 @@ public abstract class Filter extends Preds {
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
-    } else if (mode == Simplify.COUNT && exprs.length == 1) {
+    } else if(mode == Simplify.COUNT && exprs.length == 1) {
       // $nodes[@attr]  ->  $nodes ! @attr
       final Expr pred = exprs[0];
       if(pred.seqType().instanceOf(SeqType.NODE_ZO)) {

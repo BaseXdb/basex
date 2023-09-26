@@ -84,10 +84,10 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item.type == AtomType.UNSIGNED_LONG ? value.equals(((Uln) item).value) :
-      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ? item.eq(this, coll, sc, ii) :
+      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ? item.equal(this, coll, sc, ii) :
       value.compareTo(BigInteger.valueOf(item.itr(ii))) == 0;
   }
 

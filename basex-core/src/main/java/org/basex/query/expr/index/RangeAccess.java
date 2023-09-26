@@ -47,11 +47,11 @@ public final class RangeAccess extends IndexAccess {
 
     return new DBNodeIter(data) {
       final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-      final IndexIterator ii = data.iter(index);
+      final IndexIterator iter = data.iter(index);
 
       @Override
       public DBNode next() {
-        return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
+        return iter.more() ? new DBNode(data, iter.pre(), kind) : null;
       }
     };
   }
@@ -61,9 +61,9 @@ public final class RangeAccess extends IndexAccess {
     final IndexType it = index.type();
     final Data data = db.data(qc, it);
 
-    final IndexIterator ii = data.iter(index);
+    final IndexIterator iter = data.iter(index);
     final IntList list = new IntList();
-    while(ii.more()) list.add(ii.pre());
+    while(iter.more()) list.add(iter.pre());
     return DBNodeSeq.get(list.finish(), data, this);
   }
 

@@ -158,11 +158,11 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item instanceof Int ? value == ((Int) item).value :
-            item instanceof Dec ? item.eq(this, coll, sc, ii) :
-            value == item.dbl(ii);
+           item instanceof Dec ? item.equal(this, coll, sc, ii) :
+           value == item.dbl(ii);
   }
 
   @Override

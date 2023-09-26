@@ -364,20 +364,21 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return df(item, ii) == 0;
   }
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return comparable(item) && eq(item, deep.coll, null, deep.info) &&
+    return comparable(item) && equal(item, deep.coll, null, deep.info) &&
       (!deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
   }
 
   @Override
   public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
-    return item instanceof ADate && eq(item, null, null, ii) && hasTz() == ((ADate) item).hasTz();
+    return item instanceof ADate && equal(item, null, null, ii) &&
+        hasTz() == ((ADate) item).hasTz();
   }
 
   /**

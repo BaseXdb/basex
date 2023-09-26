@@ -146,7 +146,7 @@ public final class ValueAccess extends IndexAccess {
         tl > 0 && tl <= data.meta.maxlen
     );
 
-    final IndexIterator ii = index ? data.iter(new StringToken(type, term)) : scan(term, data);
+    final IndexIterator iter = index ? data.iter(new StringToken(type, term)) : scan(term, data);
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
 
@@ -155,8 +155,8 @@ public final class ValueAccess extends IndexAccess {
       return new DBNodeIter(data) {
         @Override
         public DBNode next() {
-          while(ii.more()) {
-            tmp.pre(data.parent(ii.pre(), kind));
+          while(iter.more()) {
+            tmp.pre(data.parent(iter.pre(), kind));
             if(test.matches(tmp)) return tmp.finish();
           }
           return null;
@@ -169,8 +169,8 @@ public final class ValueAccess extends IndexAccess {
       return new DBNodeIter(data) {
         @Override
         public DBNode next() {
-          if(ii.more()) {
-            tmp.pre(ii.pre());
+          if(iter.more()) {
+            tmp.pre(iter.pre());
             return tmp.finish();
           }
           return null;
@@ -184,8 +184,8 @@ public final class ValueAccess extends IndexAccess {
 
       @Override
       public DBNode next() {
-        if(ii.more()) {
-          final int pre = ii.pre();
+        if(iter.more()) {
+          final int pre = iter.pre();
           tmp.pre(pre);
           list.add(pre);
           return tmp.finish();
@@ -200,7 +200,7 @@ public final class ValueAccess extends IndexAccess {
       }
       @Override
       public long size() {
-        return ii.size();
+        return iter.size();
       }
     };
   }

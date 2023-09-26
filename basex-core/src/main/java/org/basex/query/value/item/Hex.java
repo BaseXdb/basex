@@ -56,7 +56,7 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
     return Token.eq(binary(ii), bin);

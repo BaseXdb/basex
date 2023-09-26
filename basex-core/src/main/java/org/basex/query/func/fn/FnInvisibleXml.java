@@ -44,24 +44,21 @@ public final class FnInvisibleXml extends StandardFunc {
       }
       generator = new Generator();
     }
-    return generator.generate(qc, info, sc, toString(arg(0), qc));
+    return generator.generate(qc, toString(arg(0), qc));
   }
 
   /**
    * Invisible XML parser generator.
    */
-  private static final class Generator {
+  private final class Generator {
     /**
      * Generate a parser from an invisible XML grammar.
      * @param qc query context
-     * @param info input info (can be {@code null})
-     * @param sc static context
      * @param grammar the invisible XML grammar
      * @return the parsing function
      * @throws QueryException query exception
      */
-    public FuncItem generate(final QueryContext qc, final InputInfo info, final StaticContext sc,
-        final String grammar) throws QueryException {
+    public FuncItem generate(final QueryContext qc, final String grammar) throws QueryException {
       final InvisibleXmlParser parser = new InvisibleXml().getParserFromIxml(grammar);
       if(!parser.constructed()) {
         final Exception ex = parser.getException();

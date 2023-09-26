@@ -53,7 +53,7 @@ public class WeakTokenSetTest {
       // remove some strong references, verify those get garbage collected in the set's references
       Collections.shuffle(strings, random);
       final int count = random.nextInt(strings.size() + 1);
-      for (int i = 0; i < count; ++i) {
+      for(int i = 0; i < count; ++i) {
         assertNotNull(strongRefs.remove(strings.get(i)), msgPrefix + "unexpected removal failure");
       }
       System.gc();

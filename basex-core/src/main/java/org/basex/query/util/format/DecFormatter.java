@@ -339,11 +339,11 @@ public final class DecFormatter extends FormatUtil {
           pic.minInt = 1;
         }
       }
-      // If all the following conditions are true...
+      // if all the following conditions are true...
       if(exp && pic.minInt == 0 && optInt > 0) {
         pic.minInt = 1;
       }
-      // If (after making the above adjustments)...
+      // if (after making the above adjustments)...
       if(pic.minInt == 0 && pic.minFrac == 0) {
         pic.minFrac = 1;
       }

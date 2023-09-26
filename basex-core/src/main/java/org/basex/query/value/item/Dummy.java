@@ -51,7 +51,7 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) {
     throw Util.notExpected();
   }

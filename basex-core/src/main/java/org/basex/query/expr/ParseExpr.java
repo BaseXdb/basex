@@ -233,7 +233,7 @@ public abstract class ParseExpr extends Expr {
    * Evaluates an expression to a token.
    * @param expr expression
    * @param qc query context
-   * @return token (zero-length if result is an empty sequence)
+   * @return token (zero-length if the expression yields an empty sequence)
    * @throws QueryException query exception
    */
   protected final byte[] toZeroToken(final Expr expr, final QueryContext qc) throws QueryException {

@@ -24,7 +24,7 @@ public final class Piece extends RegExp {
 
   @Override
   void toRegEx(final StringBuilder sb) {
-    if (quant.getMin() == 0 && atom instanceof Group && ((Group) atom).hasBackRef()) {
+    if(quant.getMin() == 0 && atom instanceof Group && ((Group) atom).hasBackRef()) {
       // #2240: replace an optional capturing group by a mandatory one, and wrap its content
       // into an optional non-capturing group
       sb.append("((?:");
@@ -32,8 +32,7 @@ public final class Piece extends RegExp {
       sb.append(')');
       quant.toRegEx(sb);
       sb.append(')');
-    }
-    else {
+    } else {
       atom.toRegEx(sb);
       quant.toRegEx(sb);
     }

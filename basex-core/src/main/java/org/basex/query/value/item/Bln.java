@@ -97,7 +97,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return value == (item.type == type ? item.bool(ii) : parse(item, ii));
   }

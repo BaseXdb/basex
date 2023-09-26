@@ -111,9 +111,9 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type == AtomType.DOUBLE ? item.eq(this, coll, sc, ii) : value == item.flt(ii);
+    return item.type == AtomType.DOUBLE ? item.equal(this, coll, sc, ii) : value == item.flt(ii);
   }
 
   @Override

@@ -96,7 +96,7 @@ public class B64 extends Bin {
   }
 
   @Override
-  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
     return Token.eq(binary(ii), bin);

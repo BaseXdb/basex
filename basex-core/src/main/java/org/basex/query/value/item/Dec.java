@@ -129,11 +129,11 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final Type t = item.type;
     return t.isUntyped() ? dbl() == item.dbl(ii) :
-      t == AtomType.DOUBLE || t == AtomType.FLOAT ? item.eq(this, coll, sc, ii) :
+      t == AtomType.DOUBLE || t == AtomType.FLOAT ? item.equal(this, coll, sc, ii) :
       value.compareTo(item.dec(ii)) == 0;
   }
 

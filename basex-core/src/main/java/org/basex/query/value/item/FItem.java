@@ -30,7 +30,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     throw FIATOMIZE_X.get(ii, this);
   }

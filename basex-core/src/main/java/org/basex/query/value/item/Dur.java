@@ -219,7 +219,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, null, ii));
     final BigDecimal dec1 = sec == null ? BigDecimal.ZERO : sec;

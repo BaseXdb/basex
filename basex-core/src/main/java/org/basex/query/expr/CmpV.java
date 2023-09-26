@@ -94,7 +94,7 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        return item1.eq(item2, coll, sc, info);
+        return item1.equal(item2, coll, sc, info);
       }
       @Override
       public OpV swap() { return EQ; }
@@ -109,7 +109,7 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        return !item1.eq(item2, coll, sc, info);
+        return !item1.equal(item2, coll, sc, info);
       }
       @Override
       public OpV swap() { return NE; }

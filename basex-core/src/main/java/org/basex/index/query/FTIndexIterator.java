@@ -130,20 +130,20 @@ public abstract class FTIndexIterator implements IndexIterator {
       final int dis) {
 
     return new FTIndexIterator() {
-      private FTIndexIterator ii1, ii2;
+      private FTIndexIterator iter1, iter2;
       private FTMatches all;
 
       @Override
       public boolean more() {
         int d = 0;
         while(true) {
-          if(d <= 0) ii1 = i1.more() ? i1 : null;
-          if(d >= 0) ii2 = i2.more() ? i2 : null;
-          if(ii1 == null || ii2 == null) return false;
-          d = ii1.pre() - ii2.pre();
+          if(d <= 0) iter1 = i1.more() ? i1 : null;
+          if(d >= 0) iter2 = i2.more() ? i2 : null;
+          if(iter1 == null || iter2 == null) return false;
+          d = iter1.pre() - iter2.pre();
           if(d != 0) continue;
-          all = ii1.matches();
-          final FTMatches all2 = ii2.matches();
+          all = iter1.matches();
+          final FTMatches all2 = iter2.matches();
           if(dis == 0) {
             for(final FTMatch m1 : all) {
               for(final FTMatch m2 : all2) m1.add(m2);
@@ -162,7 +162,7 @@ public abstract class FTIndexIterator implements IndexIterator {
 
       @Override
       public int pre() {
-        return ii1.pre();
+        return iter1.pre();
       }
 
       @Override
