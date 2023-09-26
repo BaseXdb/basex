@@ -421,7 +421,7 @@ public final class QueryContext extends Job implements Closeable {
    * </ul>
    * @param name name of variable; context value if empty string or {@code null}
    * @param value value to be bound (object or XQuery {@link Value})
-   * @param type type (may be {@code null})
+   * @param type type (can be {@code null})
    * @param sc static context
    * @throws QueryException query exception
    */
@@ -674,7 +674,7 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Casts a value to the specified type.
    * @param value value to be cast
-   * @param type type (may be {@code null})
+   * @param type type (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */

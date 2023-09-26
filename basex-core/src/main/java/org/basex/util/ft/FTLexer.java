@@ -188,7 +188,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
 
   /**
    * Returns the full-text options.
-   * @return full-text options (may be {@code null})
+   * @return full-text options (can be {@code null})
    */
   public FTOpt ftOpt() {
     return ftOpt;

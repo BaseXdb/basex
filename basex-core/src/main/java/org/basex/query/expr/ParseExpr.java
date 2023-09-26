@@ -142,7 +142,7 @@ public abstract class ParseExpr extends Expr {
    * Ensures that the specified function expression is (not) updating.
    * Otherwise, throws an exception.
    * @param <T> expression type
-   * @param expr expression (may be {@code null})
+   * @param expr expression (can be {@code null})
    * @param updating indicates if expression is expected to be updating
    * @param sc static context
    * @return specified expression
@@ -161,7 +161,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Ensures that the specified expression performs no updates.
    * Otherwise, throws an exception.
-   * @param expr expression (may be {@code null})
+   * @param expr expression (can be {@code null})
    * @throws QueryException query exception
    */
   protected final void checkNoUp(final Expr expr) throws QueryException {
@@ -173,7 +173,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Ensures that none of the specified expressions performs an update.
    * Otherwise, throws an exception.
-   * @param exprs expressions (may be {@code null})
+   * @param exprs expressions (can be {@code null})
    * @throws QueryException query exception
    */
   protected final void checkNoneUp(final Expr... exprs) throws QueryException {

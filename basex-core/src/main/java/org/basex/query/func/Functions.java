@@ -391,7 +391,7 @@ public final class Functions {
    * @param ii input info
    * @param expr function body
    * @param ft function type
-   * @param name function name, may be {@code null}
+   * @param name function name (can be {@code null})
    * @param lit literal data
    * @param runtime runtime flag
    * @param updating flag for updating functions

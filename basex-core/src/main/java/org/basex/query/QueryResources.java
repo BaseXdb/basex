@@ -335,7 +335,7 @@ public final class QueryResources {
 
   /**
    * Adds a document with the specified path. Only called from the test APIs.
-   * @param name document identifier (may be {@code null})
+   * @param name document identifier (can be {@code null})
    * @param path document path
    * @param sc static context (can be {@code null})
    * @throws QueryException query exception

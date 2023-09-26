@@ -31,7 +31,7 @@ public final class SearchEditor extends BaseXBack {
    * Constructor.
    * @param gui gui reference
    * @param center centered component
-   * @param editor editor (may be {@code null})
+   * @param editor editor (can be {@code null})
    */
   public SearchEditor(final GUI gui, final JComponent center, final TextPanel editor) {
     super(false);

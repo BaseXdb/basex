@@ -303,8 +303,8 @@ public abstract class Data {
   }
 
   /**
-   * Returns the node kind, which may be {@link #DOC}, {@link #ELEM}, {@link #TEXT},
-   * {@link #ATTR}, {@link #COMM} or {@link #PI}.
+   * Returns the node kind ({@link #DOC}, {@link #ELEM}, {@link #TEXT}, {@link #ATTR},
+   * {@link #COMM}, {@link #PI}).
    * @param pre pre value
    * @return node kind
    */

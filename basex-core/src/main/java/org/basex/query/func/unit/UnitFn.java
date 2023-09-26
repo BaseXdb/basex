@@ -15,7 +15,7 @@ import org.basex.query.value.item.*;
 abstract class UnitFn extends StandardFunc {
   /**
    * Returns an error with the specified item as value.
-   * @param item item (may be {@code null})
+   * @param item item (can be {@code null})
    * @return error
    * @throws QueryException query exception
    */

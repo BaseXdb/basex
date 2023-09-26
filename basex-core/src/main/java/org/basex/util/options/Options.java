@@ -164,7 +164,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the option with the specified name.
    * @param name name of the option
-   * @return value (may be {@code null})
+   * @return value (can be {@code null})
    */
   public final synchronized Option<?> option(final String name) {
     return options.get(name);
@@ -173,7 +173,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the value of the specified option.
    * @param option option
-   * @return value (may be {@code null})
+   * @return value (can be {@code null})
    */
   public final synchronized Object get(final Option<?> option) {
     return values.get(option.name());

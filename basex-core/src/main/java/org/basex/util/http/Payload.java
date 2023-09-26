@@ -39,7 +39,7 @@ public final class Payload {
   /** XML declaration (end). */
   private static final byte[] DECLEND = token("?>");
 
-  /** Payloads (may be {@code null}). */
+  /** Payloads (can be {@code null}). */
   private final ItemList payloads;
   /** Input stream. */
   private final InputStream input;

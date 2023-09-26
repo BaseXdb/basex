@@ -15,7 +15,7 @@ public abstract class GUICode {
 
   /**
    * Code to be run.
-   * @param arg argument (may be {@code null})
+   * @param arg argument (can be {@code null})
    */
   public abstract void execute(Object arg);
 
