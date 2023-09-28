@@ -387,7 +387,7 @@ public class QueryParser extends InputParser {
       if(!wsConsumeWs(DECLARE)) break;
 
       if(wsConsumeWs(CONTEXT)) {
-        contextItemDecl();
+        contextValueDecl();
       } else if(wsConsumeWs(OPTION)) {
         optionDecl();
       } else if(wsConsumeWs(DEFAULT)) {
@@ -818,27 +818,27 @@ public class QueryParser extends InputParser {
       if(sc.contextType == null) {
         sc.contextType = sctx.contextType;
       } else if(!sctx.contextType.eq(sc.contextType)) {
-        throw error(CITYPES_X_X, sctx.contextType, sc.contextType);
+        throw error(VALUETYPES_X_X, sctx.contextType, sc.contextType);
       }
     }
     qc.modStack.pop();
   }
 
   /**
-   * Parses the "ContextItemDecl" rule.
+   * Parses the "ContextValueDecl" rule.
    * @throws QueryException query exception
    */
-  private void contextItemDecl() throws QueryException {
-    wsCheck(ITEM);
-    if(!decl.add(ITEM)) throw error(DUPLITEM);
+  private void contextValueDecl() throws QueryException {
+    final boolean item = wsConsume(ITEM);
+    if(!item) wsCheck(VALUEE);
+    if(!decl.add(VALUEE)) throw error(DUPLVALUE);
 
+    final SeqType cst = sc.contextType;
+    SeqType st = cst != null ? cst : item ? SeqType.ITEM_O : SeqType.ITEM_ZM;
     if(wsConsumeWs(AS)) {
-      final SeqType st = itemType();
-      if(sc.contextType == null) {
-        sc.contextType = st;
-      } else if(!sc.contextType.eq(st)) {
-        throw error(CITYPES_X_X, sc.contextType, st);
-      }
+      st = item ? itemType() : sequenceType();
+      sc.contextType = st;
+      if(cst != null && !cst.eq(st)) throw error(VALUETYPES_X_X, cst, st);
     }
 
     final boolean external = wsConsumeWs(EXTERNAL);
@@ -849,9 +849,8 @@ public class QueryParser extends InputParser {
     if(!external) qc.finalContext = true;
 
     localVars.pushContext(false);
-    final Expr expr = check(single(), NOCIDECL);
+    final Expr expr = check(single(), NOEXPR);
     final VarScope vs = localVars.popContext();
-    final SeqType st = sc.contextType != null ? sc.contextType : SeqType.ITEM_O;
     qc.contextValue = new ContextScope(expr, st, vs, info(), docBuilder.toString());
 
     if(sc.module != null) throw error(DECITEM);
@@ -1164,7 +1163,7 @@ public class QueryParser extends InputParser {
       final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DOUBLE_O) : null;
       wsCheck(IN);
       final InputInfo ii = info();
-      Expr expr = check(single(), NOVARDECL);
+      final Expr expr = check(single(), NOVARDECL);
 
       // declare variables after the expression, check for duplicates
       final QNmSet names = new QNmSet();

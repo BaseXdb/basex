@@ -919,8 +919,6 @@ public enum QueryError {
   /** Error code. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
   /** Error code. */
-  NOCIDECL(XPST, 3, "Expecting context item."),
-  /** Error code. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** Error code. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
@@ -1117,7 +1115,7 @@ public enum QueryError {
   /** Error code. */
   INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** Error code. */
-  CITYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
+  VALUETYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
   /** Error code. */
   LOOKUP_X(XPTY, 4, "Input of lookup operator must be map or array: %."),
   /** Error code. */
@@ -1298,7 +1296,7 @@ public enum QueryError {
   /** Error code. */
   DUPLDECFORM_X(XQST, 98, "Clash of decimal format properties: '%'."),
   /** Error code. */
-  DUPLITEM(XQST, 99, "Duplicate declaration of context value."),
+  DUPLVALUE(XQST, 99, "Duplicate context value declaration."),
   /** Error code. */
   DUPLWIND_X(XQST, 103, "Duplicate declaration of %."),
   /** Error code. */
