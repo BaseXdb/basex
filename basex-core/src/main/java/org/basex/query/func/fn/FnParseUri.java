@@ -12,6 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -43,7 +44,7 @@ public class FnParseUri extends FnJsonDoc {
   /** URI part. */
   static final String PATH_SEGMENTS = "path-segments";
   /** URI part. */
-  static final String QUERY_SEGMENTS = "query-segments";
+  static final String QUERY_PARAMETERS = "query-parameters";
   /** URI part. */
   static final String FILEPATH = "filepath";
   /** URI part. */
@@ -75,13 +76,13 @@ public class FnParseUri extends FnJsonDoc {
 
     Matcher m = Pattern.compile("^(.*)#([^#]*)$").matcher(string);
     if(m.matches()) {
-      fragment = m.group(2);
       string = m.group(1);
+      fragment = m.group(2);
     }
     m = Pattern.compile("^(.*)\\?([^?]*)$").matcher(string);
     if(m.matches()) {
-      query = m.group(2);
       string = m.group(1);
+      query = m.group(2);
     }
     if(string.matches("^[a-zA-Z][:|].*$")) {
       scheme = FILE;
@@ -95,7 +96,7 @@ public class FnParseUri extends FnJsonDoc {
         string = m.group(2);
       }
     }
-    if(options.get(UriOptions.UNC_PATH) && scheme.isEmpty() && string.matches("^//[^/].*$")) {
+    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && string.matches("^//[^/].*$")) {
       scheme = FILE;
       filepath = string;
     }
@@ -145,19 +146,20 @@ public class FnParseUri extends FnJsonDoc {
       filepath = string;
     }
 
-    ArrayBuilder segments = new ArrayBuilder();
+    TokenList segments = new TokenList();
     if(!string.isEmpty()) {
       final String separator = Pattern.quote(options.get(UriOptions.PATH_SEPARATOR));
-      for(final String s : string.split(separator)) segments.append(Str.get(decode(s)));
+      for(final String s : string.split(separator)) segments.add(decode(s));
     }
 
-    ArrayBuilder queries = new ArrayBuilder();
+    XQMap queries = XQMap.empty();
     if(!query.isEmpty()) {
       final String separator = Pattern.quote(options.get(UriOptions.QUERY_SEPARATOR));
       for(final String q : query.split(separator)) {
         final int eq = q.indexOf('=');
-        final String k = eq == -1 ? "" : q.substring(0, eq), v = q.substring(eq + 1);
-        queries.append(new MapBuilder(info).put(KEY, k).put(VALUE, v).map());
+        final Str key = eq == -1 ? Str.EMPTY : Str.get(q.substring(0, eq));
+        final Str val = Str.get(q.substring(eq + 1));
+        queries = queries.put(key, ValueBuilder.concat(queries.get(key, info), val, qc), info);
       }
     }
     filepath = decode(filepath);
@@ -173,8 +175,8 @@ public class FnParseUri extends FnJsonDoc {
     add(map, PATH, path);
     add(map, QUERY, query);
     add(map, FRAGMENT, fragment);
-    add(map, PATH_SEGMENTS, segments.array());
-    add(map, QUERY_SEGMENTS, queries.array());
+    add(map, PATH_SEGMENTS, StrSeq.get(segments));
+    add(map, QUERY_PARAMETERS, queries);
     add(map, FILEPATH, filepath);
     return map.map();
   }
@@ -204,27 +206,7 @@ public class FnParseUri extends FnJsonDoc {
    * @return decoded string
    */
   static String decode(final String string) {
-    final int sl = string.length();
-    final TokenBuilder tb = new TokenBuilder(sl);
-    for(int s = 0; s < sl; s++) {
-      int b = string.codePointAt(s);
-      if(b == '+') {
-        b = ' ';
-      } else if(b == '%') {
-        b = Token.REPLACEMENT;
-        final int b1 = s + 1 < sl ? Token.dec(string.charAt(s + 1)) : -1;
-        final int b2 = s + 2 < sl ? Token.dec(string.charAt(s + 2)) : -1;
-        if(b1 != -1 && b2 != -1) {
-          b = b1 << 4 | b2;
-          s += 2;
-        } else if(b2 == -1) {
-          s += 1;
-        }
-      }
-      if(b == Token.REPLACEMENT) tb.add(Token.REPLACEMENT);
-      else tb.addByte((byte) b);
-    }
-    return tb.toString();
+    return new String(XMLToken.decodeUri(Token.token(string), true));
   }
 
   /**

@@ -73,7 +73,8 @@ public final class ReplaceValue extends NodeUpdate {
    * @return true if application of primitive results in empty text node
    */
   private boolean deleteText() {
-    return value.length == 0 && data.kind(pre) == Data.TEXT;
+    final int kind = data.kind(pre);
+    return value.length == 0 && kind == Data.TEXT && data.parent(pre, kind) >= 0;
   }
 
   /**

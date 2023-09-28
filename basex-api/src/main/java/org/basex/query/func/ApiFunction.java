@@ -142,7 +142,7 @@ public enum ApiFunction implements AFunction {
   _SESSIONS_ACCESSED(SessionsAccessed::new, "accessed(id)",
       params(STRING_O), DATE_TIME_O, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
-  _SESSIONS_CLOSE(SessionsClose::new, "close(id,)",
+  _SESSIONS_CLOSE(SessionsClose::new, "close(id)",
       params(STRING_O), EMPTY_SEQUENCE_Z, SESSIONS_URI, Perm.ADMIN),
   /** XQuery function. */
   _SESSIONS_CREATED(SessionsCreated::new, "created(id)",

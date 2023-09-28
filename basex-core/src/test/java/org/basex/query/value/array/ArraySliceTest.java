@@ -35,7 +35,7 @@ public final class ArraySliceTest extends ArrayTest {
           }
         }
       }
-      array = array.snoc(Int.get(len));
+      array = array.append(Int.get(len));
     }
   }
 }

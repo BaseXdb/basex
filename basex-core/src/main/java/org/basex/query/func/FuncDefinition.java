@@ -66,12 +66,11 @@ public final class FuncDefinition {
     this.flags = flags;
     this.uri = uri;
     this.perm = perm;
-    minMax = minMax(desc, types);
+    minMax = minMax(desc);
 
     // extract parameter names from function descriptions
     final int p = desc.indexOf('(');
-    final String[] tmp = Strings.split(desc.substring(p + 1).replace(",...", "").
-        replaceAll("[\\[\\])\\s]", ""), ',');
+    final String[] tmp = Strings.split(desc.substring(p + 1).replaceAll("[\\.\\[\\])]", ""), ',');
     final int tl = tmp.length == 1 && tmp[0].isEmpty() ? 0 : tmp.length;
     names = new QNm[tl];
     for(int n = 0; n < tl; n++) names[n] = new QNm(tmp[n]);
@@ -83,19 +82,42 @@ public final class FuncDefinition {
   /**
    * Computes the minimum and maximum number of parameters by analyzing the description string.
    * @param desc description
-   * @param params arguments
    * @return min/max values
    */
-  public static int[] minMax(final String desc, final SeqType[] params) {
-    // count number of minimum and maximum arguments by analyzing the description
-    final int optional = desc.indexOf('['), pl = params.length;
-    if(optional == -1) return new int[] { pl, pl };
-
-    int c = desc.charAt(optional + 1) == ',' ? 1 : 0;
-    for(int i = 0; i < optional; i++) {
-      if(desc.charAt(i) == ',') c++;
+  public static int[] minMax(final String desc) {
+    boolean optional = false;
+    int min = 0, max = -1;
+    for(int d = desc.indexOf('(') + 1;; d++) {
+      if(d == desc.length()) {
+        throw Util.notExpected(desc);
+      }
+      final char ch = desc.charAt(d);
+      if(ch == ',') {
+        if(optional) {
+          max++;
+        } else {
+          min++;
+        }
+        d++;
+      } else if(ch == '[') {
+        optional = true;
+        max = min;
+      } else if(ch == '.') {
+        if(!optional) min -= 1;
+        max = Integer.MAX_VALUE;
+        break;
+      } else if(ch == ')') {
+        break;
+      } else {
+        if(optional) {
+          if(max == min) max++;
+        } else {
+          if(min == 0) min = 1;
+        }
+      }
     }
-    return new int[] { c, desc.contains(DOTS) ? Integer.MAX_VALUE : pl };
+    if(max == -1) max = min;
+    return new int[] { min, max };
   }
 
   /**
@@ -141,15 +163,19 @@ public final class FuncDefinition {
    * @return names of parameters
    */
   QNm[] paramNames(final int arity) {
-    final QNm[] qnms = new QNm[arity];
-    final int nl = names.length;
-    for(int n = Math.min(arity, nl); --n >= 0;) qnms[n] = names[n];
-    if(arity > nl) {
-      final String[] parts = Token.string(names[nl - 1].local()).split("(?=\\d+$)", 2);
-      final int start = Integer.parseInt(parts[1]);
-      for(int n = nl; n < arity; n++) qnms[n] = new QNm(parts[0] + (start + n - nl + 1), "");
+    final QNm[] qnames = new QNm[arity];
+    final int params = names.length;
+    for(int n = Math.min(arity, params); --n >= 0;) {
+      qnames[n] = names[n];
     }
-    return qnms;
+    if(arity > params) {
+      final String name = Token.string(names[params - 1].local());
+      final int start = 1;
+      for(int n = params; n < arity; n++) {
+        qnames[n] = new QNm(name + (start + n - params), "");
+      }
+    }
+    return qnames;
   }
 
   /**

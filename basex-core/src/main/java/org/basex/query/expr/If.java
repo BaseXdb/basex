@@ -99,9 +99,9 @@ public final class If extends Arr {
     final boolean ndt = cond.has(Flag.NDT);
     if(ct.zero() && !ndt) return br2;
 
-    // rewrite to elvis operator:
-    //   if(exists(VALUE)) then VALUE else DEFAULT  ->  VALUE ?: DEFAULT
-    //   if(NODES) then NODES else DEFAULT  ->  NODES ?: DEFAULT
+    // rewrite to otherwise:
+    //   if(exists(VALUE)) then VALUE else DEFAULT  ->  VALUE otherwise DEFAULT
+    //   if(NODES) then NODES else DEFAULT  ->  NODES otherwise DEFAULT
     final Expr cmp = EXISTS.is(cond) ? cond.arg(0) : ct.type instanceof NodeType ? cond : null;
     if(!ndt && cmp != null && cmp.equals(br1)) return new Otherwise(info, br1, br2).optimize(cc);
 

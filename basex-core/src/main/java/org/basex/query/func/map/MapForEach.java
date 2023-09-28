@@ -34,7 +34,7 @@ public class MapForEach extends StandardFunc {
           if(item != null) return item;
           final Item key = keys.next();
           if(key == null) return null;
-          iter = action.invoke(qc, info, key, map.get(key, info)).iter();
+          iter = eval(action, qc, key, map.get(key, info)).iter();
         }
       }
     };
@@ -46,7 +46,7 @@ public class MapForEach extends StandardFunc {
     final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> vb.add(action.invoke(qc, info, key, value)));
+    map.apply((key, value) -> vb.add(eval(action, qc, key, value)));
     return vb.value(this);
   }
 

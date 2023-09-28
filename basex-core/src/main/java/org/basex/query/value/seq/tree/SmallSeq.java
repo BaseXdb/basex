@@ -39,40 +39,43 @@ public final class SmallSeq extends TreeSeq {
 
   @Override
   public TreeSeq reverse(final QueryContext qc) {
-    final int el = items.length;
-    final Item[] es = new Item[el];
-    for(int e = 0; e < el; e++) es[e] = items[el - 1 - e];
-    return new SmallSeq(es, type);
+    final int il = items.length;
+    final Item[] tmp = new Item[il];
+    for(int i = 0; i < il; i++) tmp[i] = items[il - 1 - i];
+    return new SmallSeq(tmp, type);
   }
 
   @Override
-  public TreeSeq insert(final long pos, final Item item, final QueryContext qc) {
-    final int p = (int) pos, n = items.length;
-    final Item[] out = new Item[n + 1];
+  public TreeSeq insertBefore(final long pos, final Item item, final QueryContext qc) {
+    qc.checkStop();
+    final Type tp = type.union(item.type);
+    final int p = (int) pos, il = items.length;
+    final Item[] out = new Item[il + 1];
     Array.copy(items, p, out);
     out[p] = item;
-    Array.copy(items, p, n - p, out, p + 1);
+    Array.copy(items, p, il - p, out, p + 1);
 
-    final Type tp = type.union(item.type);
-    return n < MAX_SMALL ? new SmallSeq(out, tp) :
-      new BigSeq(slice(out, 0, MIN_DIGIT), slice(out, MIN_DIGIT, n + 1), tp);
+    return il < MAX_SMALL ? new SmallSeq(out, tp) :
+      new BigSeq(slice(out, 0, MIN_DIGIT), slice(out, MIN_DIGIT, il + 1), tp);
   }
 
   @Override
   public Value remove(final long pos, final QueryContext qc) {
-    final int p = (int) pos, n = items.length;
-    if(n == 2) return items[pos == 0 ? 1 : 0];
+    qc.checkStop();
+    final int il = items.length, p = (int) pos;
+    if(il == 2) return items[p == 0 ? 1 : 0];
 
-    final Item[] out = new Item[n - 1];
+    final Item[] out = new Item[il - 1];
     Array.copy(items, p, out);
-    Array.copy(items, p + 1, n - 1 - p, out, p);
+    Array.copy(items, p + 1, il - 1 - p, out, p);
     return new SmallSeq(out, type);
   }
 
   @Override
   protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
-    final int o = (int) pos, l = (int) length;
-    return new SmallSeq(slice(items, o, o + l), type);
+    qc.checkStop();
+    final int p = (int) pos, n = (int) length;
+    return new SmallSeq(slice(items, p, p + n), type);
   }
 
   @Override
@@ -153,15 +156,15 @@ public final class SmallSeq extends TreeSeq {
   @Override
   TreeSeq prepend(final SmallSeq seq) {
     final Type tp = type.union(seq.type);
-    final Item[] itms = seq.items;
-    final int a = itms.length, b = items.length, n = a + b;
+    final Item[] tmp = seq.items;
+    final int tl = tmp.length, il = items.length, n = tl + il;
 
     // both arrays can be used as digits
-    if(Math.min(a, b) >= MIN_DIGIT) return new BigSeq(itms, items, tp);
+    if(Math.min(tl, il) >= MIN_DIGIT) return new BigSeq(tmp, items, tp);
 
     final Item[] out = new Item[n];
-    Array.copy(itms, a, out);
-    Array.copyFromStart(items, b, out, a);
+    Array.copy(tmp, tl, out);
+    Array.copyFromStart(items, il, out, tl);
     if(n <= MAX_SMALL) return new SmallSeq(out, tp);
 
     final int mid = n / 2;

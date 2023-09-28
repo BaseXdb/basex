@@ -40,16 +40,17 @@ public final class FuncItem extends FItem implements Scope {
   private final int stackSize;
   /** Input information. */
   private final InputInfo info;
-
   /** Query focus. */
   private final QueryFocus focus;
+  /** Annotations (lazy instantiation). */
+  private AnnList anns;
   /** Indicates if the query focus is accessed or modified. */
   private Boolean fcs;
 
   /**
    * Constructor.
    * @param sc static context
-   * @param anns function annotations
+   * @param anns function annotations (can be {@code null})
    * @param name function name (can be {@code null})
    * @param params formal parameters
    * @param type function type
@@ -65,7 +66,7 @@ public final class FuncItem extends FItem implements Scope {
   /**
    * Constructor.
    * @param sc static context
-   * @param anns function annotations
+   * @param anns function annotations (can be {@code null})
    * @param name function name (can be {@code null})
    * @param params formal parameters
    * @param type function type
@@ -78,7 +79,7 @@ public final class FuncItem extends FItem implements Scope {
       final FuncType type, final Expr expr, final int stackSize, final InputInfo info,
       final QueryFocus focus) {
 
-    super(type, anns);
+    super(type);
     this.name = name;
     this.params = params;
     this.expr = expr;
@@ -86,6 +87,7 @@ public final class FuncItem extends FItem implements Scope {
     this.sc = sc;
     this.info = info;
     this.focus = focus;
+    this.anns = anns;
   }
 
   @Override
@@ -101,6 +103,12 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public QNm paramName(final int ps) {
     return params[ps].name;
+  }
+
+  @Override
+  public AnnList annotations() {
+    if(anns == null) anns = new AnnList();
+    return anns;
   }
 
   @Override
@@ -132,8 +140,8 @@ public final class FuncItem extends FItem implements Scope {
   public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean optimize) throws QueryException {
 
-    final int pl = params.length, al = ft.argTypes.length;
-    if(pl != ft.argTypes.length) throw FUNARITY_X_X.get(info, arguments(pl), al);
+    final int arity = params.length, nargs = ft.argTypes.length;
+    if(arity != nargs) throw arityError(this, arity, nargs, true, info);
 
     // optimize: continue with coercion if current type is only an instance of new type
     FuncType tp = funcType();
@@ -142,23 +150,24 @@ public final class FuncItem extends FItem implements Scope {
     // create new compilation context and variable scope
     final CompileContext cc = new CompileContext(qc, false);
     final VarScope vs = new VarScope(sc);
-    final Var[] vars = new Var[pl];
-    final Expr[] args = new Expr[pl];
-    for(int p = pl; p-- > 0;) {
-      vars[p] = vs.addNew(params[p].name, ft.argTypes[p], true, qc, ii);
-      args[p] = new VarRef(ii, vars[p]).optimize(cc);
+    final Var[] vars = new Var[arity];
+    final Expr[] args = new Expr[arity];
+    for(int a = arity; a-- > 0;) {
+      vars[a] = vs.addNew(params[a].name, ft.argTypes[a], true, qc, info);
+      args[a] = new VarRef(info, vars[a]).optimize(cc);
     }
     cc.pushScope(vs);
 
     // create new function call (will immediately be inlined/simplified when being optimized)
-    final boolean updating = anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
-    Expr body = new DynFuncCall(ii, sc, updating, false, this, args);
+    final boolean updating = anns != null && anns.contains(Annotation.UPDATING) ||
+        expr.has(Flag.UPD);
+    Expr body = new DynFuncCall(info, sc, updating, false, this, args);
     if(optimize) body = body.optimize(cc);
 
     // add type check if return types differ
     final SeqType dt = ft.declType;
     if(!tp.declType.instanceOf(dt)) {
-      body = new TypeCheck(sc, ii, body, dt, true);
+      body = new TypeCheck(sc, info, body, dt, true);
       if(optimize) body = body.optimize(cc);
     }
 
@@ -166,7 +175,7 @@ public final class FuncItem extends FItem implements Scope {
     final SeqType bt = body.seqType();
     tp = optimize && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
     body.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vars, tp, body, vs.stackSize(), ii);
+    return new FuncItem(sc, anns, name, vars, tp, body, vs.stackSize(), info);
   }
 
   @Override
@@ -261,7 +270,8 @@ public final class FuncItem extends FItem implements Scope {
     } else {
       final StringList list = new StringList(params.length);
       for(final Var param : params) list.add(param.toErrorString());
-      qs.token(anns).token(FUNCTION).params(list.finish()).token(AS);
+      if(anns != null) qs.token(anns);
+      qs.token(FUNCTION).params(list.finish()).token(AS);
       qs.token(funcType().declType).brace(expr);
     }
     return qs.toString();
@@ -270,7 +280,8 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public void toString(final QueryString qs) {
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    qs.token(anns).token(FUNCTION).params(params);
+    if(anns != null) qs.token(anns);
+    qs.token(FUNCTION).params(params);
     qs.token(AS).token(funcType().declType).brace(expr);
   }
 
@@ -311,8 +322,8 @@ public final class FuncItem extends FItem implements Scope {
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
           }
           if(action != null) return new FuncItem[] {
-              new FuncItem(sc, anns, null, params, funcType(), cnd, stackSize, info, focus),
-              new FuncItem(sc, anns, null, params, funcType(), action, stackSize, info, focus)
+            new FuncItem(sc, anns, null, params, funcType(), cnd, stackSize, info, focus),
+            new FuncItem(sc, anns, null, params, funcType(), action, stackSize, info, focus)
           };
         }
       }

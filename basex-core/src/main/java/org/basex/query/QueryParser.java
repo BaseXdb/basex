@@ -2,6 +2,8 @@ package org.basex.query;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryText.FALSE;
+import static org.basex.query.QueryText.TRUE;
 import static org.basex.util.Token.*;
 import static org.basex.util.Token.normalize;
 import static org.basex.util.ft.FTFlag.*;
@@ -33,6 +35,7 @@ import org.basex.query.up.expr.Insert.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.format.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
@@ -142,7 +145,7 @@ public class QueryParser extends InputParser {
       versionDecl();
 
       final int p = pos;
-      if(wsConsumeWs(MODULE, NAMESPACE, null)) throw error(MAINMOD);
+      if(wsConsumeWs(MODULE, null, NAMESPACE)) throw error(MAINMOD);
       pos = p;
 
       prolog1();
@@ -427,16 +430,24 @@ public class QueryParser extends InputParser {
         final QNm name = eQName(XQ_URI, QNAME_X);
 
         final ItemList items = new ItemList();
-        if(wsConsumeWs("(")) {
+        if(wsConsume("(")) {
           do {
-            final Expr expr = literal();
-            if(!(expr instanceof Item)) {
-              if(Function.ERROR.is(expr)) expr.item(qc, ii);
-              throw error(ANNVALUE);
+            final Expr expr;
+            final boolean truee = wsConsume(TRUE);
+            if(truee || consume(FALSE)) {
+              wsCheck("(");
+              wsCheck(")");
+              expr = Bln.get(truee);
+            } else {
+              expr = quote(curr()) ? Str.get(stringLiteral()) : numericLiteral(0, true);
+              if(!(expr instanceof Item)) {
+                if(Function.ERROR.is(expr)) expr.item(qc, ii);
+                throw error(ANNVALUE_X, curr());
+              }
             }
             items.add((Item) expr);
-          } while(wsConsumeWs(","));
-          check(')');
+          } while(wsConsume(","));
+          wsCheck(")");
         }
 
         // check if annotation is a pre-defined one
@@ -1098,7 +1109,7 @@ public class QueryParser extends InputParser {
         clauses.add(new OrderBy(vs, keys, keys[0].info()));
       }
 
-      if(wsConsumeWs(COUNT, "$", NOCOUNT)) {
+      if(wsConsumeWs(COUNT, NOCOUNT, "$")) {
         final Var var = localVars.add(newVar(SeqType.INTEGER_O));
         curr.put(var.name.internal(), var);
         clauses.add(new Count(var));
@@ -1115,24 +1126,24 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "InitialClause" rule.
-   * @param clauses FLWOR clauses
-   * @return query expression
+   * @param clauses list of clauses (can be {@code null})
+   * @return clauses
    * @throws QueryException query exception
    */
   private LinkedList<Clause> initialClause(final LinkedList<Clause> clauses) throws QueryException {
     LinkedList<Clause> cls = clauses;
     // WindowClause
-    final boolean slide = wsConsumeWs(FOR, SLIDING, NOWINDOW);
-    if(slide || wsConsumeWs(FOR, TUMBLING, NOWINDOW)) {
+    if(wsConsumeWs(FOR, NOWINDOW, SLIDING, TUMBLING)) {
       if(cls == null) cls = new LinkedList<>();
-      cls.add(windowClause(slide));
+      cls.add(windowClause());
     } else {
       // ForClause / LetClause
-      final boolean let = wsConsumeWs(LET, SCORE, NOLET) || wsConsumeWs(LET, "$", NOLET);
-      if(let || wsConsumeWs(FOR, "$", NOFOR)) {
+      final boolean lt = wsConsumeWs(LET, NOLET, "$", SCORE);
+      final boolean fr = !lt && wsConsumeWs(FOR, NOFOR, "$", MEMBER, KEY, VALUEE);
+      if(lt || fr) {
         if(cls == null) cls = new LinkedList<>();
-        if(let) letClause(cls);
-        else    forClause(cls);
+        if(lt) letClause(cls);
+        else   forClause(cls);
       }
     }
     return cls;
@@ -1146,21 +1157,54 @@ public class QueryParser extends InputParser {
    */
   private void forClause(final LinkedList<Clause> clauses) throws QueryException {
     do {
-      final Var var = newVar();
-      final boolean emp = wsConsume(ALLOWING);
-      if(emp) wsCheck(EMPTYY);
+      final Var member = wsConsumeWs(MEMBER) ? newVar() : null;
+      final Var key = member == null && wsConsumeWs(KEY) ? newVar() : null;
+      final Var value = member == null && wsConsumeWs(VALUEE) ? newVar() : null;
+      final Var fr = member == null && key == null && value == null ? newVar() : null;
+      final boolean empty = fr != null && wsConsume(ALLOWING);
+      if(empty) wsCheck(EMPTYY);
       final Var at = wsConsumeWs(AT) ? newVar(SeqType.INTEGER_O) : null;
       final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DOUBLE_O) : null;
-      // check for duplicate variable names
-      if(at != null) {
-        if(var.name.eq(at.name)) throw error(DUPLVAR_X, at);
-        if(score != null && at.name.eq(score.name)) throw error(DUPLVAR_X, score);
-      }
-      if(score != null && var.name.eq(score.name)) throw error(DUPLVAR_X, score);
       wsCheck(IN);
-      final Expr expr = check(single(), NOVARDECL);
-      // declare late because otherwise it would shadow the wrong variables
-      clauses.add(new For(localVars.add(var), localVars.add(at), localVars.add(score), expr, emp));
+      final InputInfo ii = info();
+      Expr expr = check(single(), NOVARDECL);
+
+      // declare variables after the expression, check for duplicates
+      final QNmSet names = new QNmSet();
+      for(final Var var  : new Var[] { member, key, value, fr, at, score }) {
+        if(var != null && !names.add(var.name)) throw error(DUPLVAR_X, var);
+      }
+
+      localVars.add(fr, at, score);
+      if(fr != null) {
+        clauses.add(new For(fr, at, score, expr, empty));
+      } else if(member != null) {
+        // for member $m in EXPR  ->  for $m in array:split(EXPR) let $m := array:values($a)
+        final Var split = new Var(member.name, null, qc, sc, ii);
+        localVars.add(split, member);
+        clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(sc, ii, expr), empty));
+        clauses.add(new Let(member, Function._ARRAY_VALUES.get(sc, ii, new VarRef(ii, split))));
+      } else if(value == null) {
+        // for key $k in EXPR
+        // ->  for $k in map:keys(EXPR)
+        localVars.add(key);
+        clauses.add(new For(key, at, score, Function._MAP_KEYS.get(sc, ii, expr), empty));
+      } else if(key == null) {
+        // for value in EXPR
+        // ->  for $v in map:entries(EXPR) let $v := map:values($v)
+        final Var entries = new Var(value.name, null, qc, sc, ii);
+        localVars.add(entries, value);
+        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), empty));
+        clauses.add(new Let(value, Function._MAP_VALUES.get(sc, ii, new VarRef(ii, entries))));
+      } else {
+        // for key $k value $v in EXPR
+        // ->  for $v in map:entries(EXPR) let $k := map:keys($v) let $v := map:values($v)
+        final Var entries = localVars.add(new Var(value.name, null, qc, sc, ii));
+        localVars.add(entries, key, value);
+        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), empty));
+        clauses.add(new Let(key, Function._MAP_KEYS.get(sc, ii, new VarRef(ii, entries))));
+        clauses.add(new Let(value, Function._MAP_VALUES.get(sc, ii, new VarRef(ii, entries))));
+      }
     } while(wsConsumeWs(","));
   }
 
@@ -1173,22 +1217,21 @@ public class QueryParser extends InputParser {
   private void letClause(final LinkedList<Clause> clauses) throws QueryException {
     do {
       final boolean score = wsConsumeWs(SCORE);
-      final Var var = score ? newVar(SeqType.DOUBLE_O) : newVar();
+      final Var lt = score ? newVar(SeqType.DOUBLE_O) : newVar();
       wsCheck(":=");
       final Expr expr = check(single(), NOVARDECL);
-      clauses.add(new Let(localVars.add(var), expr, score));
+      clauses.add(new Let(localVars.add(lt), expr, score));
     } while(wsConsume(","));
   }
 
   /**
    * Parses the "TumblingWindowClause" rule.
    * Parses the "SlidingWindowClause" rule.
-   * @param sliding sliding window flag
    * @return the window clause
    * @throws QueryException parse exception
    */
-  private Window windowClause(final boolean sliding) throws QueryException {
-    wsCheck(sliding ? SLIDING : TUMBLING);
+  private Window windowClause() throws QueryException {
+    final boolean sliding = !wsConsume(TUMBLING) && wsConsume(SLIDING);
     wsCheck(WINDOW);
     skipWs();
 
@@ -1313,8 +1356,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr quantified() throws QueryException {
-    final boolean some = wsConsumeWs(SOME, "$", NOSOME);
-    if(!some && !wsConsumeWs(EVERY, "$", NOSOME)) return null;
+    final boolean some = wsConsumeWs(SOME, NOSOME, "$");
+    final boolean every = !some && wsConsumeWs(EVERY, NOSOME, "$");
+    if(!some && !every) return null;
 
     final int s = localVars.openScope();
     final LinkedList<Clause> clauses = new LinkedList<>();
@@ -1341,15 +1385,18 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!wsConsumeWs(SWITCH, "(", TYPEPAR)) return null;
+    if(!wsConsumeWs(SWITCH, NOSWITCH, "(", "{", CASE)) return null;
+
     final InputInfo ii = info();
-    wsCheck("(");
-    final Expr cond = check(expr(), NOSWITCH);
-    final ArrayList<SwitchGroup> groups = new ArrayList<>();
-    wsCheck(")");
+    Expr cond = Bln.TRUE;
+    if(consume('(')) {
+      cond = check(expr(), NOSWITCH);
+      wsCheck(")");
+    }
     final boolean brace = wsConsume("{");
 
     // collect all cases
+    final ArrayList<SwitchGroup> groups = new ArrayList<>();
     ExprList exprs;
     do {
       exprs = new ExprList((Expr) null);
@@ -1363,8 +1410,8 @@ public class QueryParser extends InputParser {
       exprs.set(0, check(single(), NOSWITCH));
       groups.add(new SwitchGroup(info(), exprs.finish()));
     } while(exprs.size() != 1);
-    if(brace) wsCheck("}");
 
+    if(brace) wsCheck("}");
     return new Switch(ii, cond, groups.toArray(SwitchGroup[]::new));
   }
 
@@ -1374,7 +1421,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr typeswitch() throws QueryException {
-    if(!wsConsumeWs(TYPESWITCH, "(", TYPEPAR)) return null;
+    if(!wsConsumeWs(TYPESWITCH, NOTYPESWITCH, "(")) return null;
     final InputInfo ii = info();
     wsCheck("(");
     final Expr ts = check(expr(), NOTYPESWITCH);
@@ -1420,7 +1467,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr iff() throws QueryException {
-    if(!wsConsumeWs(IF, "(", IFPAR)) return null;
+    if(!wsConsumeWs(IF, IFPAR, "(")) return null;
 
     final LinkedList<InputInfo> infos = new LinkedList<>();
     infos.add(info());
@@ -2234,9 +2281,9 @@ public class QueryParser extends InputParser {
       pos = p;
     }
     // map constructor
-    if(wsConsumeWs(MAP, "{", INCOMPLETE)) return new CMap(info(), keyValues());
+    if(wsConsumeWs(MAP, MAPCONSTR, "{")) return new CMap(info(), keyValues());
     // curly array constructor
-    if(wsConsumeWs(ARRAY, "{", INCOMPLETE)) {
+    if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
       wsCheck("{");
       final Expr exp = expr();
       wsCheck("}");
@@ -2248,8 +2295,8 @@ public class QueryParser extends InputParser {
     p = pos;
     if(consume("?")) {
       if(!wsConsume(",") && !consume(")")) {
-        final InputInfo info = info();
-        return new Lookup(info, new ContextValue(info), keySpecifier());
+        final InputInfo ii = info();
+        return new Lookup(ii, new ContextValue(ii), keySpecifier());
       }
       pos = p;
     }
@@ -2276,7 +2323,7 @@ public class QueryParser extends InputParser {
     if(ch == '(') return parenthesized();
     if(ch == '$') return varRef();
     if(quote(ch)) return Str.get(stringLiteral());
-    final Expr num = numericLiteral(ch, Long.MAX_VALUE);
+    final Expr num = numericLiteral(Long.MAX_VALUE, false);
     if(num != null) {
       if(Function.ERROR.is(num) || num instanceof Int) return num;
       throw error(NUMBERITR_X_X, num.seqType(), num);
@@ -2364,10 +2411,9 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && wsConsumeWs("#")) {
       checkReserved(name);
-      final char ch = curr();
-      final Expr num = numericLiteral(ch, Integer.MAX_VALUE);
+      final Expr num = numericLiteral(Integer.MAX_VALUE, false);
       if(Function.ERROR.is(num)) return num;
-      if(!(num instanceof Int)) throw error(ARITY_X, ch == 0 ? "" : ch);
+      if(!(num instanceof Int)) throw error(ARITY_X, num);
       final int arity = (int) ((Int) num).itr();
       return Functions.literal(name, arity, qc, sc, info(), false);
     }
@@ -2381,21 +2427,23 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
-    final char ch = curr();
-    final Expr num = numericLiteral(ch, 0);
-    return num != null ? num : quote(ch) ? Str.get(stringLiteral()) : null;
+    return quote(curr()) ? Str.get(stringLiteral()) : numericLiteral(0, false);
   }
 
   /**
    * Parses the "NumericLiteral" rule.
    * Parses the "DecimalLiteral" rule.
    * Parses the "IntegerLiteral" rule.
-   * @param ch current character
    * @param max maximum value for integers (if 0, parse all numeric types)
+   * @param mns parse minus character
    * @return numeric literal or {@code null}
    * @throws QueryException query exception
    */
-  private Expr numericLiteral(final char ch, final long max) throws QueryException {
+  private Expr numericLiteral(final long max, final boolean mns) throws QueryException {
+    final boolean negate = mns && consume('-');
+    if(negate) skipWs();
+
+    final char ch = curr();
     if(!digit(ch) && ch != '.') return null;
     token.reset();
 
@@ -2449,17 +2497,23 @@ public class QueryParser extends InputParser {
         else throw error(NUMBER_X, token);
 
         if(XMLToken.isNCStartChar(curr())) throw error(NUMBER_X, token);
-        return Dbl.get(token.toArray(), info());
+        final double d = Dbl.parse(token.toArray(), info());
+        return Dbl.get(negate ? -d : d);
       }
       // decimal value
-      if(dec) return Dec.get(new BigDecimal(string(token.toArray())));
+      if(dec) {
+        final BigDecimal d = new BigDecimal(string(token.toArray()));
+        return Dec.get(negate ? d.negate() : d);
+      }
     }
 
     // integer value
     if(token.isEmpty()) throw error(NUMBER_X, token);
+    // out of range
+    if(range || max != 0 && l > max) return FnError.get(RANGE_X.get(info(), token),
+        SeqType.INTEGER_O, sc);
 
-    return !range && (max == 0 || l <= max) ? Int.get(l) :
-      FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O, sc);
+    return Int.get(negate ? -l : l);
   }
 
   /**
@@ -2483,17 +2537,17 @@ public class QueryParser extends InputParser {
    */
   private byte[] stringLiteral() throws QueryException {
     skipWs();
-    final char del = curr();
-    if(!quote(del)) throw error(NOQUOTE_X, found());
+    final char quote = curr();
+    if(!quote(quote)) throw error(NOQUOTE_X, found());
     consume();
     token.reset();
     while(true) {
-      while(!consume(del)) {
+      while(!consume(quote)) {
         if(!more()) throw error(NOQUOTE_X, found());
         entity(token);
       }
-      if(!consume(del)) break;
-      token.add(del);
+      if(!consume(quote)) break;
+      token.add(quote);
     }
     return token.toArray();
   }
@@ -3147,7 +3201,7 @@ public class QueryParser extends InputParser {
    */
   private SeqType sequenceType() throws QueryException {
     // empty sequence
-    if(wsConsumeWs(EMPTY_SEQUENCE, "(", null)) {
+    if(wsConsumeWs(EMPTY_SEQUENCE, INCOMPLETE, "(")) {
       wsCheck("(");
       wsCheck(")");
       return SeqType.EMPTY_SEQUENCE_Z;
@@ -3859,7 +3913,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr copyModify() throws QueryException {
-    if(!wsConsumeWs(COPY, "$", INCOMPLETE)) return null;
+    if(!wsConsumeWs(COPY, INCOMPLETE, "$")) return null;
 
     final int s = localVars.openScope();
     Let[] fl = { };
@@ -4132,23 +4186,28 @@ public class QueryParser extends InputParser {
   /**
    * Consumes the specified two strings or jumps back to the old query position. If the strings are
    * found, the cursor is placed after the first token.
-   * @param string1 string to consume (words must not be followed by letters)
-   * @param string2 second string
+   * @param string string to consume (words must not be followed by letters)
    * @param expr alternative error message (can be {@code null})
+   * @param strings second string
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean wsConsumeWs(final String string1, final String string2, final QueryError expr)
+  private boolean wsConsumeWs(final String string, final QueryError expr, final String... strings)
       throws QueryException {
 
     final int p1 = pos;
-    if(!wsConsumeWs(string1)) return false;
+    if(!wsConsumeWs(string)) return false;
     final int p2 = pos;
     alter = expr;
     alterPos = p2;
-    final boolean ok = wsConsume(string2);
-    pos = ok ? p2 : p1;
-    return ok;
+    for(final String s : strings) {
+      if(wsConsume(s)) {
+        pos = p2;
+        return true;
+      }
+    }
+    pos = p1;
+    return false;
   }
 
   /**

@@ -23,7 +23,7 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
     Value result = arg(1).value(qc);
     for(final ListIterator<Value> iter = array.iterator(array.arraySize()); iter.hasPrevious();) {
       final Value value = iter.previous();
-      result = action.invoke(qc, info, value, result);
+      result = eval(action, qc, value, result);
       if(skip(qc, value, result)) break;
     }
     return result;

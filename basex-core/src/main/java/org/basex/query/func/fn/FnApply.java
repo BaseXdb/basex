@@ -31,7 +31,7 @@ public class FnApply extends StandardFunc {
 
     final ValueList values = new ValueList(as);
     for(final Value value : args.members()) values.add(value);
-    return func.invoke(qc, info, values.finish());
+    return eval(func, qc, values.finish());
   }
 
   @Override

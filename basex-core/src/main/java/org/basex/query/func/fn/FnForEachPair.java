@@ -34,13 +34,13 @@ public class FnForEachPair extends StandardFunc {
           if(item != null) return item;
           final Item item1 = input1.next(), item2 = input2.next();
           if(item1 == null || item2 == null) return null;
-          iter = action.invoke(qc, info, item1, item2).iter();
+          iter = eval(action, qc, item1, item2).iter();
         }
       }
 
       @Override
       public Item get(final long i) throws QueryException {
-        return action.invoke(qc, info, input1.get(i), input2.get(i)).item(qc, info);
+        return eval(action, qc, input1.get(i), input2.get(i)).item(qc, info);
       }
 
       @Override
@@ -57,7 +57,7 @@ public class FnForEachPair extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item1, item2; (item1 = input1.next()) != null && (item2 = input2.next()) != null;) {
-      vb.add(action.invoke(qc, info, item1, item2));
+      vb.add(eval(action, qc, item1, item2));
     }
     return vb.value(this);
   }

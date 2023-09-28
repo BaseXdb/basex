@@ -30,8 +30,7 @@ public final class Concat extends Arr {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
-      final Item item = expr.atomItem(qc, info);
-      if(!item.isEmpty()) tb.add(item.string(info));
+      for(final Item item : expr.atomValue(qc, info)) tb.add(item.string(info));
     }
     return Str.get(tb.finish());
   }
@@ -44,8 +43,7 @@ public final class Concat extends Arr {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       if(expr instanceof Value) {
-        final Item item = expr.atomItem(cc.qc, info);
-        if(!item.isEmpty()) tb.add(item.string(info));
+        for(final Item item : expr.atomValue(cc.qc, info)) tb.add(item.string(info));
       } else {
         if(!tb.isEmpty()) list.add(Str.get(tb.next()));
         list.add(expr);
@@ -56,7 +54,12 @@ public final class Concat extends Arr {
 
     // single expression left: replace with string call
     final int ls = list.size();
-    if(ls == 1) return cc.replaceWith(this, cc.function(Function.STRING, info, list.peek()));
+    if(ls == 1) {
+      final Expr arg = list.peek();
+      if(arg.seqType().zeroOrOne()) {
+        return cc.replaceWith(this, cc.function(Function.STRING, info, arg));
+      }
+    }
 
     // replace old with new expressions
     if(ls != el) cc.info(QueryText.OPTMERGE_X, this);

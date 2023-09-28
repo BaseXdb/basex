@@ -19,7 +19,7 @@ public final class ArrayTrunk extends ArrayFn {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     if(array.isEmptyArray()) throw ARRAYEMPTY.get(info);
-    return array.init();
+    return array.trunk();
   }
 
   @Override

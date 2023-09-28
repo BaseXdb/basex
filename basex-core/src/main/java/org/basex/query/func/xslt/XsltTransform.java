@@ -53,8 +53,8 @@ public class XsltTransform extends XsltFn {
    * @throws QueryException query exception
    */
   final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
-    final IO in = read(arg(0), qc), xsl = read(arg(1), qc);
-    final HashMap<String, String> params = toOptions(arg(2), qc);
+    final IO input = read(arg(0), qc), stylesheet = read(arg(1), qc);
+    final HashMap<String, String> arguments = toOptions(arg(2), qc);
     final XsltOptions options = toOptions(arg(3), new XsltOptions(), true, qc);
 
     final ArrayOutput result = new ArrayOutput();
@@ -64,7 +64,7 @@ public class XsltTransform extends XsltFn {
     try {
       // redirect errors
       System.setErr(new PrintStream(err));
-      final StreamSource ss = xsl.streamSource();
+      final StreamSource ss = stylesheet.streamSource();
       final String key = options.get(XsltOptions.CACHE) ? ss.getSystemId() : null;
 
       // retrieve new or cached templates object
@@ -84,16 +84,16 @@ public class XsltTransform extends XsltFn {
       if(ur != null) tr.setURIResolver(ur);
 
       // bind parameters
-      params.forEach(tr::setParameter);
+      arguments.forEach(tr::setParameter);
 
       // do transformation and return result
       if(simple) {
-        tr.transform(in.streamSource(), new StreamResult(result));
+        tr.transform(input.streamSource(), new StreamResult(result));
         return Str.get(result.finish());
       }
 
       xr.register(tr);
-      tr.transform(in.streamSource(), new StreamResult(result));
+      tr.transform(input.streamSource(), new StreamResult(result));
       xr.addMessage();
     } catch(final IllegalArgumentException ex) {
       // Saxon raises runtime exceptions for illegal parameters

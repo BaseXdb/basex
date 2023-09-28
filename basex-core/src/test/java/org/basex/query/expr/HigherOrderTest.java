@@ -121,7 +121,7 @@ public final class HigherOrderTest extends SandboxTest {
 
   /**  Tests the creation of a cast function as function item. */
   @Test public void wrongArityTest() {
-    error("count(concat#2('1', '2', '3'))", INVARITY_X_X_X);
+    error("count(concat#2('1'))", INVARITY_X_X_X);
   }
 
   /** Tests using a partial function application as the context value. */

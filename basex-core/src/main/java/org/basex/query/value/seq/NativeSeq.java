@@ -48,7 +48,7 @@ abstract class NativeSeq extends Seq {
    * will be called, because its runtime outweighs the possibly higher memory consumption.
    */
   @Override
-  public final Value insert(final long pos, final Item item, final QueryContext qc) {
+  public final Value insertBefore(final long pos, final Item item, final QueryContext qc) {
     return copyInsert(pos, item, qc);
   }
 

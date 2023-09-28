@@ -29,6 +29,15 @@ public final class ArrayType extends FuncType {
     super(declType, SeqType.INTEGER_O);
   }
 
+  /**
+   * Creates an array type.
+   * @param declType declared return type
+   * @return array type
+   */
+  public static ArrayType get(final SeqType declType) {
+    return declType.arrayType();
+  }
+
   @Override
   public XQArray cast(final Item item, final QueryContext qc, final StaticContext sc,
       final InputInfo ii) throws QueryException {
@@ -102,15 +111,6 @@ public final class ArrayType extends FuncType {
   @Override
   public ID id() {
     return ID.ARRAY;
-  }
-
-  /**
-   * Creates a new array type.
-   * @param declType declared return type
-   * @return array type
-   */
-  public static ArrayType get(final SeqType declType) {
-    return declType.eq(SeqType.ITEM_ZM) ? SeqType.ARRAY : new ArrayType(declType);
   }
 
   @Override

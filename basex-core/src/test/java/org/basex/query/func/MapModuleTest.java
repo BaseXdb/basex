@@ -104,7 +104,9 @@ public final class MapModuleTest extends QueryPlanTest {
         " =>" + func.args(" ends-with#2") +
         " => map:keys()", "aba");
 
-    error(func.args(" map { 'abc': 'a', 'def': 'g' }", " true#0"), FUNARITY_X_X);
+    // function coercion: allow function with lower arity
+    query(func.args(" map { 1: 2 }", " true#0"), "map{1:2}");
+    // reject function with higher arity
     error(func.args(" map { 'abc': 'a', 'def': 'g' }", " substring#2"), INVPROMOTE_X_X_X);
   }
 

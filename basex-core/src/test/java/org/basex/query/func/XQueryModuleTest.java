@@ -158,8 +158,8 @@ public final class XQueryModuleTest extends QueryPlanTest {
 
     error(func.args(" count#1"), INVARITY_X_X_X);
     error(func.args(" 123"), INVFUNCITEM_X_X);
-    error(func.args(" (count#1, count#1)"), ZEROFUNCS_X_X);
-    error(func.args(" (123, 123)"), ZEROFUNCS_X_X);
+    error(func.args(" (count#1, count#1)"), INVARITY_X_X_X);
+    error(func.args(" (123, 123)"), INVCONVERT_X_X_X);
     error(func.args(" error#0"), FUNERR1);
     error(func.args(" replicate(error#0, 100)"), FUNERR1);
   }

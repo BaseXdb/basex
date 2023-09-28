@@ -29,7 +29,7 @@ public final class FnPartition extends ArrayFn {
       public Item next() throws QueryException {
         while(value != null) {
           final Item item = input.next();
-          if(item == null || toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
+          if(item == null || toBoolean(eval(breakWhen, qc, value, item), qc)) {
             final Value v = value;
             value = item;
             if(!v.isEmpty()) {

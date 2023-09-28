@@ -24,7 +24,7 @@ public final class MapGet extends StandardFunc {
 
     final Value value = map.get(key, info);
     return !value.isEmpty() || fallback == null || map.contains(key, info) ? value :
-      fallback.invoke(qc, info, key);
+      eval(fallback, qc, key);
   }
 
   @Override

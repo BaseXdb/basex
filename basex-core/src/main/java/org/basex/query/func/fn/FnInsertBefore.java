@@ -57,7 +57,7 @@ public final class FnInsertBefore extends StandardFunc {
     // prepend, append or insert new value
     return pos == 0 ? ValueBuilder.concat(insert, input, qc) :
            pos == osize ? ValueBuilder.concat(input, insert, qc) :
-           ((Seq) input).insertBefore(pos, insert, qc);
+           ((Seq) input).insert(pos, insert, qc);
   }
 
   /**

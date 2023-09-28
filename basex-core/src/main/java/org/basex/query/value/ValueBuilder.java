@@ -59,8 +59,8 @@ public final class ValueBuilder {
     final long size2 = value2.size();
     if(size2 == 0) return value1;
     // prepend or append values
-    if(size1 > 1) return ((Seq) value1).insertBefore(size1, value2, qc);
-    if(size2 > 1) return ((Seq) value2).insert(0, (Item) value1, qc);
+    if(size1 > 1) return ((Seq) value1).insert(size1, value2, qc);
+    if(size2 > 1) return ((Seq) value2).insertBefore(0, (Item) value1, qc);
     // concatenate single items
     return TreeSeqBuilder.concat((Item) value1, (Item) value2);
   }

@@ -24,7 +24,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public DeepTree<N, E> cons(final Node<N, E> fst) {
+  public DeepTree<N, E> prepend(final Node<N, E> fst) {
     final long leftSize = fst.size();
     @SuppressWarnings("unchecked")
     final Node<N, E>[] left = new Node[] { fst }, right = new Node[] { elem };
@@ -32,7 +32,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public DeepTree<N, E> snoc(final Node<N, E> lst) {
+  public DeepTree<N, E> append(final Node<N, E> lst) {
     final long leftSize = elem.size();
     @SuppressWarnings("unchecked")
     final Node<N, E>[] left = new Node[] { elem }, right = new Node[] { lst };
@@ -45,12 +45,12 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public Node<N, E> last() {
+  public Node<N, E> foot() {
     return elem;
   }
 
   @Override
-  public FingerTree<N, E> init() {
+  public FingerTree<N, E> trunk() {
     return EmptyTree.getInstance();
   }
 
@@ -67,7 +67,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   @Override
   public FingerTree<N, E> concat(final Node<N, E>[] mid, final long size,
       final FingerTree<N, E> other) {
-    return other.isEmpty() ? addAll(mid, size, false) : other.addAll(mid, size, true).cons(elem);
+    return other.isEmpty() ? addAll(mid, size, false) : other.addAll(mid, size, true).prepend(elem);
   }
 
   @Override
@@ -117,7 +117,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
     }
 
     final FingerTree<N, E> tree = buildTree(nodes, nodes.length, size);
-    return left ? tree.snoc(elem) : tree.cons(elem);
+    return left ? tree.append(elem) : tree.prepend(elem);
   }
 
   @Override

@@ -61,7 +61,7 @@ public abstract class XQArray extends XQData {
    * @return array
    */
   public static XQArray member(final Value value) {
-    return new SmallArray(new Value[] { value }, ArrayType.get(value.seqType()));
+    return new SingletonArray(value);
   }
 
   /**
@@ -70,15 +70,15 @@ public abstract class XQArray extends XQData {
    * @param head value to prepend
    * @return resulting array
    */
-  public abstract XQArray cons(Value head);
+  public abstract XQArray prepend(Value head);
 
   /**
-   * Appends a member to the back of this array.
+   * Appends a member to the end of this array.
    * Running time: <i>O(1)*</i>
    * @param last value to append
    * @return resulting array
    */
-  public abstract XQArray snoc(Value last);
+  public abstract XQArray append(Value last);
 
   /**
    * Gets the member at the given position in this array.
@@ -113,32 +113,31 @@ public abstract class XQArray extends XQData {
   public abstract XQArray concat(XQArray other);
 
   /**
-   * First member of this array, equivalent to {@code array.get(0)}.
+   * Returns the first member of this array.
    * Running time: <i>O(1)</i>
-   * @return the first member
+   * @return first member
    */
   public abstract Value head();
 
   /**
-   * Last member of this array, equivalent to {@code array.get(array.arraySize() - 1)}.
+   * Returns the last member of this array.
    * Running time: <i>O(1)</i>
    * @return last member
    */
-  public abstract Value last();
+  public abstract Value foot();
 
   /**
-   * Initial segment of this array, i.e. an array containing all members of this array (in the
-   * same order), except for the last one.
+   * Returns the array without the last member.
    * Running time: <i>O(1)*</i>
-   * @return initial segment
+   * @return new array
    */
-  public abstract XQArray init();
+  public abstract XQArray trunk();
 
   /**
-   * Tail segment of this array, i.e. an array containing all members of this array (in the
+   * Returns the array without the first member.
    * same order), except for the first one.
    * Running time: <i>O(1)*</i>
-   * @return tail segment
+   * @return new array
    */
   public abstract XQArray tail();
 
@@ -186,7 +185,7 @@ public abstract class XQArray extends XQData {
   public abstract XQArray remove(long pos, QueryContext qc);
 
   @Override
-  public void write(final DataOutput out) throws IOException, QueryException {
+  public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(arraySize());
     for(final Value member : members()) {
       Store.write(out, member);
@@ -333,8 +332,8 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public final Item materialize(final Predicate<Data> test, final InputInfo ii,
+      final QueryContext qc) throws QueryException {
 
     if(materialized(test, ii)) return this;
 
@@ -347,7 +346,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     if(!funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       for(final Value value : members()) {
@@ -358,7 +357,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean instanceOf(final Type tp) {
+  public final boolean instanceOf(final Type tp) {
     if(type.instanceOf(tp)) return true;
     if(!(tp instanceof FuncType) || tp instanceof MapType) return false;
 
@@ -376,7 +375,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+  public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
     if(item instanceof XQArray) {
       final XQArray array = (XQArray) item;
@@ -472,17 +471,18 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public void toString(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Value member : members()) {
+      if(!tb.moreInfo()) break;
       tb.add(tb.isEmpty() ? " " : ", ");
-      final long vs = member.size();
-      if(vs != 1) tb.add('(');
-      for(int i = 0; i < vs; i++) {
-        if(i != 0) tb.add(", ");
-        tb.add(member.itemAt(i));
+      final long ms = member.size();
+      if(ms != 1) tb.add('(');
+      for(int m = 0; m < ms; m++) {
+        if(m != 0) tb.add(", ");
+        tb.add(member.itemAt(m));
       }
-      if(vs != 1) tb.add(')');
+      if(ms != 1) tb.add(')');
     }
     qs.bracket(tb.add(' ').finish());
   }

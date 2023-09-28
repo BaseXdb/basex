@@ -31,6 +31,8 @@ public final class TokenBuilder {
   /** Underline flag. */
   public static final int ULINE = PRIVATE_END - 4;
 
+  /** Limit for info strings. */
+  private static final int LIMIT = 100;
   /** Byte array, storing all characters as UTF8. */
   private byte[] chars;
   /** Current token size. */
@@ -402,6 +404,16 @@ public final class TokenBuilder {
     chars = null;
     final int s = size;
     return s == 0 ? EMPTY : s == chrs.length ? chrs : Arrays.copyOf(chrs, s);
+  }
+
+  /**
+   * Checks if the building of an info string should be continued.
+   * @return result of check
+   */
+  public boolean moreInfo() {
+    if(size <= LIMIT) return true;
+    if(chars[size - 1] != '.' || chars[size - 2] != '.' || chars[size - 3] != '.') add("...");
+    return false;
   }
 
   @Override

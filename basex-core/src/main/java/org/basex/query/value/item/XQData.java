@@ -21,7 +21,12 @@ public abstract class XQData extends FItem {
    * @param type function type
    */
   protected XQData(final Type type) {
-    super(type, new AnnList());
+    super(type);
+  }
+
+  @Override
+  public final AnnList annotations() {
+    return AnnList.EMPTY;
   }
 
   @Override

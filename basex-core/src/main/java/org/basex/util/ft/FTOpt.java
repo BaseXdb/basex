@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.util.*;

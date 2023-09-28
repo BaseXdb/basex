@@ -34,7 +34,7 @@ public final class HofTopKBy extends StandardFunc {
 
     try {
       for(Item item; (item = input.next()) != null;) {
-        heap.insert(checkNoEmpty(key.invoke(qc, info, item).item(qc, info)), item);
+        heap.insert(checkNoEmpty(eval(key, qc, item).item(qc, info)), item);
         if(heap.size() > k) heap.removeMin();
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }

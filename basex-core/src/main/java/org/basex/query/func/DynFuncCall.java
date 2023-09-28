@@ -75,9 +75,8 @@ public final class DynFuncCall extends FuncCall {
     final int nargs = exprs.length - 1;
     final FuncType ft = func.funcType();
     if(ft != null) {
-      if(ft.argTypes != null && ft.argTypes.length != nargs) {
-        throw INVARITY_X_X_X.get(info, arguments(nargs), ft.argTypes.length, func.toErrorString());
-      }
+      final int arity = ft.argTypes != null ? ft.argTypes.length : -1;
+      if(nargs < arity) throw arityError(func, arity, nargs, false, info);
       if(!sc.mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
@@ -168,18 +167,9 @@ public final class DynFuncCall extends FuncCall {
     if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.type, item);
 
     final FItem func = checkUp((FItem) item, updating, sc);
-    final int nargs = exprs.length - 1;
-    if(func.arity() != nargs) throw INVARITY_X_X_X.get(
-        info, arguments(nargs), func.arity(), func.toErrorString());
+    final int nargs = exprs.length - 1, arity = func.arity();
+    if(nargs < arity) throw arityError(func, arity, nargs, false, info);
     return func;
-  }
-
-  @Override
-  Value[] evalArgs(final QueryContext qc) throws QueryException {
-    final int el = exprs.length - 1;
-    final Value[] args = new Value[el];
-    for(int e = 0; e < el; e++) args[e] = exprs[e].value(qc);
-    return args;
   }
 
   @Override

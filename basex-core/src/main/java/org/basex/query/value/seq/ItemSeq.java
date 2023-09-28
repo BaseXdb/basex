@@ -47,7 +47,7 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Value insert(final long pos, final Item item, final QueryContext qc) {
+  public Value insertBefore(final long pos, final Item item, final QueryContext qc) {
     return copyInsert(pos, item, qc);
   }
 

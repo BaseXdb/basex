@@ -268,22 +268,20 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  StringBuilder append(final StringBuilder sb, final String indent) {
+  void add(final TokenBuilder tb, final String indent) {
     final int s = Integer.bitCount(used);
     for(int i = 0, j = 0; i < s; i++, j++) {
       while((used & 1 << j) == 0) j++;
       final int e = i == s - 1 ? 2 : 0;
-      sb.append(indent).append(ENDS[e]).append(String.format("%x", j)).append('\n');
-      kids[j].append(sb, indent + ENDS[e + 1]);
+      tb.add(indent).add(ENDS[e]).add(String.format("%x", j)).add('\n');
+      kids[j].add(tb, indent + ENDS[e + 1]);
     }
-    return sb;
   }
 
   @Override
-  StringBuilder append(final StringBuilder sb) {
-    for(int i = 0; i < KIDS && more(sb); i++) {
-      if(kids[i] != null) kids[i].append(sb);
+  void add(final TokenBuilder tb) {
+    for(int k = 0; k < KIDS && tb.moreInfo(); k++) {
+      if(kids[k] != null) kids[k].add(tb);
     }
-    return sb;
   }
 }

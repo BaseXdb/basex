@@ -79,6 +79,36 @@ public final class XQuery4Test extends QueryPlanTest {
     query("1--fn() { 2 }()", 3);
   }
 
+  /** GFLWOR: for key/value. */
+  @Test public void forKeyValue() {
+    query("for key $k value $v in map { } return $k * $v", "");
+
+    query("for key $k in map { 2: 3 } return $k", 2);
+    query("for value $v in map { 2: 3 } return $v", 3);
+    query("for key $k value $v in map { 2: 3 } return $k * $v", 6);
+
+    error("for key $k allowing empty in 1 return ()", WRONGCHAR_X_X);
+    error("for value $v allowing empty in 1 return ()", WRONGCHAR_X_X);
+    error("for key $k value $v allowing empty in 1 return ()", WRONGCHAR_X_X);
+  }
+
+  /** GFLWOR: for member. */
+  @Test public void forMember() {
+    query("for member $m in [] return $m", "");
+    query("for member $m in [ 5 ] return $m", 5);
+    query("for member $m in [ 5, 6 ] return $m", "5\n6");
+
+    query("for member $m at $p in [ 3, 4 ] return $m", "3\n4");
+    query("for member $m at $p in [ (3, 2), 1, () ] return count($m)", "2\n1\n0");
+    query("for member $m at $p in [ 3, 4 ] return $p", "1\n2");
+    query("for member $m at $p in [ (3, 2), 1, () ] return count($p)", "1\n1\n1");
+
+    check("for member $m in [ (3, 2), 1, () ] return sum($m)", "5\n1\n0", empty(_ARRAY_VALUES));
+    check("for member $m in [ (3, 2), 1, () ] return count($m)", "2\n1\n0", exists(_ARRAY_VALUES));
+
+    error("for member $m allowing empty in 1 return $m", WRONGCHAR_X_X);
+  }
+
   /** Function item, no parameter list. */
   @Test public void functionContextItem() {
     query("function { . + 1 }(1)", 2);

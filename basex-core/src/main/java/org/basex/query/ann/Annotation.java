@@ -33,11 +33,11 @@ public enum Annotation {
   _BASEX_LOCK("lock(key)", params(STRING_O), BASEX_URI),
 
   /** XQuery annotation. */
-  _INPUT_CSV("csv(option[,...])", params(STRING_O), INPUT_URI),
+  _INPUT_CSV("csv(options...)", params(STRING_O), INPUT_URI),
   /** XQuery annotation. */
-  _INPUT_HTML("html(option[,...])", params(STRING_O), INPUT_URI),
+  _INPUT_HTML("html(options...)", params(STRING_O), INPUT_URI),
   /** XQuery annotation. */
-  _INPUT_JSON("json(option[,...])", params(STRING_O), INPUT_URI),
+  _INPUT_JSON("json(options...)", params(STRING_O), INPUT_URI),
 
   /** XQuery annotation. */
   _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", params(STRING_O), OUTPUT_URI),
@@ -97,30 +97,30 @@ public enum Annotation {
   /** XQuery annotation. */
   _PERM_CHECK("check([path[,map]])", params(STRING_O, STRING_O), PERM_URI),
   /** XQuery annotation. */
-  _PERM_ALLOW("allow(name[,...])", params(STRING_O), PERM_URI, false),
+  _PERM_ALLOW("allow(names...)", params(STRING_O), PERM_URI, false),
 
   /** XQuery annotation. */
   _REST_PATH("path(path)", params(STRING_O), REST_URI),
   /** XQuery annotation. */
-  _REST_ERROR("error(code[,...])", params(STRING_O), REST_URI, false),
+  _REST_ERROR("error(codes...)", params(STRING_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_CONSUMES("consumes(type[,...])", params(STRING_O), REST_URI, false),
+  _REST_CONSUMES("consumes(types...)", params(STRING_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_PRODUCES("produces(type[,...])", params(STRING_O), REST_URI, false),
+  _REST_PRODUCES("produces(types...)", params(STRING_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_QUERY_PARAM("query-param(name,variable[,default,...])",
+  _REST_QUERY_PARAM("query-param(name,variable[,defaults...])",
       params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_FORM_PARAM("form-param(name,variable[,default,...])",
+  _REST_FORM_PARAM("form-param(name,variable[,defaults...])",
       params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_HEADER_PARAM("header-param(name,variable[,default,...])",
+  _REST_HEADER_PARAM("header-param(name,variable[,defaults...])",
       params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_COOKIE_PARAM("cookie-param(name,variable[,default,...])",
+  _REST_COOKIE_PARAM("cookie-param(name,variable[,defaults...])",
       params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
-  _REST_ERROR_PARAM("error-param(name,variable[,default,...])",
+  _REST_ERROR_PARAM("error-param(name,variable[,defaults...])",
       params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
   /** XQuery annotation. */
   _REST_METHOD("method(name[,body])", params(STRING_O, STRING_O), REST_URI, false),
@@ -159,7 +159,7 @@ public enum Annotation {
   /** XQuery annotation. */
   _WS_CLOSE("close(path)", params(STRING_O), WS_URI),
   /** XQuery annotation. */
-  _WS_HEADER_PARAM("header-param(name,variable[,default,...])",
+  _WS_HEADER_PARAM("header-param(name,variable[,defaults...])",
       params(STRING_O, STRING_O, ITEM_O), WS_URI, false),
   /** XQuery annotation. */
   _WS_ERROR("error(path,message)", params(STRING_O, STRING_O), WS_URI);
@@ -209,7 +209,7 @@ public enum Annotation {
     this.params = params;
     this.uri = uri;
     this.single = single;
-    minMax = FuncDefinition.minMax(desc, params);
+    minMax = FuncDefinition.minMax(desc);
   }
 
   /**

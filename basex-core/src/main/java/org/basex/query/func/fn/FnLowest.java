@@ -35,7 +35,7 @@ public class FnLowest extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  Value value(final boolean min, final QueryContext qc) throws QueryException {
+  final Value value(final boolean min, final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final Collation coll = toCollation(arg(1), qc);
     final FItem key = defined(2) ? toFunction(arg(2), 1, qc) : null;
@@ -44,7 +44,7 @@ public class FnLowest extends StandardFunc {
     Value lowest = null;
     for(Item item; (item = input.next()) != null;) {
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(final Item it : (key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info)) {
+      for(final Item it : (key == null ? item : eval(key, qc, item)).atomValue(qc, info)) {
         vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
       }
       final Value low = vb.value();

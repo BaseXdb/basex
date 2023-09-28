@@ -126,8 +126,8 @@ public enum Function implements AFunction {
   COMPARE(FnCompare::new, "compare(value1,value2[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), INTEGER_ZO),
   /** XQuery function. */
-  CONCAT(FnConcat::new, "concat(value1,value2[,...])",
-      params(ANY_ATOMIC_TYPE_ZO, ANY_ATOMIC_TYPE_ZO), STRING_O),
+  CONCAT(FnConcat::new, "concat(values...)",
+      params(ANY_ATOMIC_TYPE_ZM), STRING_O),
   /** XQuery function. */
   CONTAINS(FnContains::new, "contains(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
@@ -165,6 +165,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   DAYS_FROM_DURATION(FnDayFromDuration::new, "days-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
+  /** XQuery function. */
+  DECODE_FROM_URI(FnDecodeFromUri::new, "decode-from-uri(value)",
+      params(STRING_ZO), STRING_O),
   /** XQuery function. */
   DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation,options])",
       params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_O), BOOLEAN_O),
@@ -269,6 +272,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   FORMAT_TIME(FnFormatTime::new, "format-time(value,picture[,language,calendar,place])",
       params(TIME_ZO, STRING_O, STRING_ZO, STRING_ZO, STRING_ZO), STRING_ZO),
+  /** XQuery function. */
+  FUNCTION_ANNOTATIONS(FnFunctionAnnotations::new, "function-annotations(function)",
+      params(FUNCTION_O), MAP_O),
   /** XQuery function. */
   FUNCTION_ARITY(FnFunctionArity::new, "function-arity(function)",
       params(FUNCTION_O), INTEGER_O),
@@ -540,8 +546,9 @@ public enum Function implements AFunction {
   SOME(FnSome::new, "some(input[,predicate])",
       params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
-  SORT(FnSort::new, "sort(input[,collation,key])",
-      params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()), ITEM_ZM),
+  SORT(FnSort::new, "sort(input[,collation,key,order])",
+      params(ITEM_ZM, STRING_ZM,
+      FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_MORE), STRING_ZM), ITEM_ZM),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
@@ -779,8 +786,9 @@ public enum Function implements AFunction {
   _ARRAY_SLICE(ArraySlice::new, "slice(array[,start,end,step])",
       params(ARRAY_O, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_SORT(ArraySort::new, "sort(array[,collation,key])",
-      params(ARRAY_O, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()),
+  _ARRAY_SORT(ArraySort::new, "sort(array[,collation,key,order])",
+      params(ARRAY_O, STRING_ZM,
+      FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_MORE), STRING_ZM),
       ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SPLIT(ArraySplit::new, "split(array)",
@@ -1493,7 +1501,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations::new, "function-annotations(function)",
       params(FUNCTION_O), MAP_ZO, INSPECT_URI),
   /** XQuery function. */
@@ -1734,7 +1742,7 @@ public enum Function implements AFunction {
   _STRING_CR(StringCr::new, "cr()",
       params(), STRING_O, STRING_URI),
   /** XQuery function. */
-  _STRING_FORMAT(StringFormat::new, "format(format,value1[,...])",
+  _STRING_FORMAT(StringFormat::new, "format(pattern[,values...])",
       params(STRING_O, ITEM_O), STRING_O, STRING_URI),
   /** XQuery function. */
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(value1,value2)",

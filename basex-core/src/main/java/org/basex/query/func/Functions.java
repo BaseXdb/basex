@@ -127,22 +127,22 @@ public final class Functions {
     if(eq(name.uri(), XS_URI)) {
       if(arity > 0) lit.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc, ii);
       final Expr expr = constructor(name, lit.args, null, sc, ii);
-      final FuncType ft = FuncType.get(lit.anns(), null, lit.params);
+      final FuncType ft = FuncType.get(lit.annotations(), null, lit.params);
       return literal(ii, expr, ft, name, lit, runtime, false, arity == 0);
     }
 
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, ii);
+      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, ii, true);
 
-      final FuncType ft = fd.type(arity, lit.anns());
+      final FuncType ft = fd.type(arity, lit.annotations());
       final QNm[] names = fd.paramNames(arity);
       for(int a = 0; a < arity; a++) lit.add(names[a], ft.argTypes[a], qc, ii);
       final StandardFunc sf = fd.get(sc, ii, lit.args);
       final boolean updating = sf.updating(), ctx = sf.has(Flag.CTX);
       if(updating) {
-        lit.anns().add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
+        lit.annotations().add(new Ann(ii, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
       }
       return literal(ii, sf, ft, name, lit, runtime, updating, ctx);
@@ -163,8 +163,8 @@ public final class Functions {
     if(java != null) {
       final SeqType[] sts = new SeqType[arity];
       Arrays.fill(sts, SeqType.ITEM_ZM);
-      final SeqType st = FuncType.get(lit.anns(), null, sts).seqType();
-      return new FuncLit(ii, java, st, name, lit.params, lit.anns(), lit.vs);
+      final SeqType st = FuncType.get(lit.annotations(), null, sts).seqType();
+      return new FuncLit(ii, java, st, name, lit.params, lit.annotations(), lit.vs);
     }
     if(runtime) return null;
 
@@ -193,35 +193,39 @@ public final class Functions {
 
   /**
    * Raises an error for the wrong number of function arguments.
-   * @param arity number of supplied arguments
-   * @param arities expected arities
+   * @param nargs number of supplied arguments
+   * @param arities available arities (if first arity is negative, function is variadic)
    * @param function function
    * @param ii input info
+   * @param literal literal
    * @return error
    */
-  public static QueryException wrongArity(final int arity, final IntList arities,
-      final Object function, final InputInfo ii) {
+  public static QueryException wrongArity(final int nargs, final IntList arities,
+      final Object function, final InputInfo ii, final boolean literal) {
 
-    final int as = arities.ddo().size();
-    if(as == 0) return FUNCARITY_X_X.get(ii, function, arguments(arity));
-
-    int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-    for(int a = 0; a < as; a++) {
-      final int m = arities.get(a);
-      if(m < min) min = m;
-      if(m > max) max = m;
-    }
-
-    final TokenBuilder ext = new TokenBuilder();
-    if(as > 2 && max - min + 1 == as) {
-      ext.addInt(min).add('-').addInt(max);
+    final String supplied = literal ? "Arity " + nargs : arguments(nargs), expected;
+    if(!arities.isEmpty() && arities.peek() < 0) {
+      expected = "at least " + -arities.peek();
     } else {
+      final int as = arities.ddo().size();
+      int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
       for(int a = 0; a < as; a++) {
-        if(a != 0) ext.add(a + 1 < as ? ", " : " or ");
-        ext.addInt(arities.get(a));
+        final int m = arities.get(a);
+        if(m < min) min = m;
+        if(m > max) max = m;
       }
+      final TokenBuilder tb = new TokenBuilder();
+      if(as > 2 && max - min + 1 == as) {
+        tb.addInt(min).add('-').addInt(max);
+      } else {
+        for(int a = 0; a < as; a++) {
+          if(a != 0) tb.add(a + 1 < as ? ", " : " or ");
+          tb.addInt(arities.get(a));
+        }
+      }
+      expected = tb.toString();
     }
-    return FUNCARITY_X_X_X.get(ii, function, arguments(arity), ext);
+    return INVNARGS_X_X_X.get(ii, function, supplied, expected);
   }
 
   /**
@@ -348,31 +352,35 @@ public final class Functions {
     final FuncType sft = sf.funcType();
     final int arity = lit.params.length;
     for(int a = 0; a < arity; a++) lit.add(sf.paramName(a), sft.argTypes[a], qc, ii);
-    final FuncType ft = FuncType.get(lit.anns(), sft.declType, Arrays.copyOf(sft.argTypes, arity));
+    final FuncType ft = FuncType.get(lit.annotations(), sft.declType,
+        Arrays.copyOf(sft.argTypes, arity));
 
     final StaticFuncCall call = userDefined(sf.name, lit.args, null, qc, sc, ii);
-    if(call.func != null) lit.anns = call.func.anns;
+    if(call.func != null) lit.annotations = call.func.anns;
     return literal(ii, call, ft, sf.name, lit, runtime, sf.updating, false);
   }
 
   /**
    * Raises an error for the wrong number of function arguments.
-   * @param arity number of supplied arguments
+   * @param nargs number of supplied arguments
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
    * @param function function
    * @param ii input info
+   * @param literal literal
    * @throws QueryException query exception
    */
-  private static void checkArity(final int arity, final int min, final int max,
-      final Object function, final InputInfo ii) throws QueryException {
+  private static void checkArity(final int nargs, final int min, final int max,
+      final Object function, final InputInfo ii, final boolean literal) throws QueryException {
 
-    if(arity < min || arity > max) {
+    if(nargs < min || nargs > max) {
       final IntList arities = new IntList();
       if(max != Integer.MAX_VALUE) {
         for(int m = min; m <= max; m++) arities.add(m);
+      } else {
+        arities.add(-min);
       }
-      throw wrongArity(arity, arities, function, ii);
+      throw wrongArity(nargs, arities, function, ii, literal);
     }
   }
 
@@ -396,7 +404,7 @@ public final class Functions {
 
     final VarScope vs = lit.vs;
     final Var[] params = lit.params;
-    final AnnList anns = lit.anns();
+    final AnnList anns = lit.annotations();
 
     // context/positional access must be bound to original focus
     // example for invalid query: let $f := last#0 return (1, 2)[$f()]
@@ -431,7 +439,7 @@ public final class Functions {
         tmp[a] = Empty.UNDEFINED;
       }
     }
-    checkArity(arity, min, max, function, ii);
+    checkArity(arity, min, max, function, ii, false);
     return tmp;
   }
 
@@ -449,7 +457,7 @@ public final class Functions {
     /** Arguments. */
     final Expr[] args;
     /** Annotations. */
-    AnnList anns;
+    AnnList annotations;
     /** Parameter counter. */
     int a;
 
@@ -482,9 +490,9 @@ public final class Functions {
      * Returns the annotations.
      * @return annotations
      */
-    AnnList anns() {
-      if(anns == null) anns = new AnnList();
-      return anns;
+    AnnList annotations() {
+      if(annotations == null) annotations = new AnnList();
+      return annotations;
     }
   }
 }

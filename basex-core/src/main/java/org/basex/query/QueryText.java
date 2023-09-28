@@ -64,6 +64,7 @@ public interface QueryText {
   /** Parser token. */ String EXACTLY = "exactly";
   /** Parser token. */ String EXCEPT = "except";
   /** Parser token. */ String EXTERNAL = "external";
+  /** Parser token. */ String FALSE = "false";
   /** Parser token. */ String FIRST = "first";
   /** Parser token. */ String FN = "fn";
   /** Parser token. */ String FOR = "for";
@@ -88,6 +89,7 @@ public interface QueryText {
   /** Parser token. */ String INTO = "into";
   /** Parser token. */ String INVOKE = "invoke";
   /** Parser token. */ String ITEM = "item";
+  /** Parser token. */ String KEY = "key";
   /** Parser token. */ String LANGUAGE = "language";
   /** Parser token. */ String LAST = "last";
   /** Parser token. */ String LAX = "lax";
@@ -96,6 +98,7 @@ public interface QueryText {
   /** Parser token. */ String LEVELS = "levels";
   /** Parser token. */ String LOWERCASE = "lowercase";
   /** Parser token. */ String MAP = "map";
+  /** Parser token. */ String MEMBER = "member";
   /** Parser token. */ String MOD = "mod";
   /** Parser token. */ String MODIFY = "modify";
   /** Parser token. */ String MODULE = "module";
@@ -155,6 +158,7 @@ public interface QueryText {
   /** Parser token. */ String TO = "to";
   /** Parser token. */ String TRANSFORM = "transform";
   /** Parser token. */ String TREAT = "treat";
+  /** Parser token. */ String TRUE = "true";
   /** Parser token. */ String TRY = "try";
   /** Parser token. */ String TUMBLING = "tumbling";
   /** Parser token. */ String TYPE = "type";

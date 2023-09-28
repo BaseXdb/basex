@@ -80,7 +80,7 @@ public class HofTakeWhile extends StandardFunc {
    */
   final boolean test(final Item item, final FItem predicate, final QueryContext qc)
       throws QueryException {
-    return toBoolean(predicate.invoke(qc, info, item), qc);
+    return toBoolean(eval(predicate, qc, item), qc);
   }
 
   @Override

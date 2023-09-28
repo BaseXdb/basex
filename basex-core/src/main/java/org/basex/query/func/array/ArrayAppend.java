@@ -19,7 +19,7 @@ public final class ArrayAppend extends ArrayFn {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Value member = arg(1).value(qc);
-    return array.snoc(member);
+    return array.append(member);
   }
 
   @Override

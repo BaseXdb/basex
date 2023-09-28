@@ -30,8 +30,13 @@ public final class XQJava extends FItem {
    * @param value value (can be {@code null})
    */
   public XQJava(final Object value) {
-    super(SeqType.JAVA, new AnnList());
+    super(SeqType.JAVA);
     this.value = value;
+  }
+
+  @Override
+  public AnnList annotations() {
+    return AnnList.EMPTY;
   }
 
   @Override
