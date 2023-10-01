@@ -31,7 +31,7 @@ public final class Response {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param options main options
    */
   public Response(final InputInfo info, final MainOptions options) {

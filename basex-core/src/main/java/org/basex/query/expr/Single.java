@@ -21,7 +21,7 @@ public abstract class Single extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param seqType sequence type
    */

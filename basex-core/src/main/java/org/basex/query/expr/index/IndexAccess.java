@@ -20,7 +20,7 @@ public abstract class IndexAccess extends Simple {
   /**
    * Constructor.
    * @param db index database
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param type type
    */
   IndexAccess(final IndexDb db, final InputInfo info, final Type type) {

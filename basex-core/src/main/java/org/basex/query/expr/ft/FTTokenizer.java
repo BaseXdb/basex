@@ -41,7 +41,7 @@ public final class FTTokenizer {
    * Constructor.
    * @param opt full-text options
    * @param errors levenshtein errors
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   FTTokenizer(final FTOpt opt, final int errors, final InputInfo info) {
     this.opt = opt;

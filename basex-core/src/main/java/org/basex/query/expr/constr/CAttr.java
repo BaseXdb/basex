@@ -29,7 +29,7 @@ public final class CAttr extends CName {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param name name
    * @param computed computed construction flag
    * @param value attribute value

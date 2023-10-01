@@ -54,13 +54,13 @@ public abstract class Inspect {
 
   /** Query context. */
   final QueryContext qc;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   final InputInfo info;
 
   /**
    * Constructor.
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   Inspect(final QueryContext qc, final InputInfo info) {
     this.qc = qc;

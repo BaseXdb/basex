@@ -18,7 +18,7 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
    * Constructor.
    * @param type type of this operation
    * @param data target data reference
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   DBUpdate(final UpdateType type, final Data data, final InputInfo info) {
     super(type, data, info);

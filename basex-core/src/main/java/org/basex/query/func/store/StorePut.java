@@ -17,7 +17,7 @@ public final class StorePut extends StoreFn {
     final byte[] key = toKey(qc);
     final Value value = arg(1).value(qc);
 
-    store(qc).put(key, value.materialize(n -> false, ii, qc));
+    store(qc).put(key, value.materialize(n -> false, info, qc));
     return Empty.VALUE;
   }
 }

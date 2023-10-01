@@ -19,7 +19,7 @@ public final class DBDrop extends NameUpdate {
    * Constructor.
    * @param name name of database
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBDrop(final String name, final QueryContext qc, final InputInfo info) {
     super(UpdateType.DBDROP, name, qc, info);

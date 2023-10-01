@@ -16,12 +16,12 @@ public interface XQFunction extends XQFunctionExpr {
    * Calls the function with the given arguments and takes care of tail calls.
    * Must not be overwritten.
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param args arguments for the call
    * @return result of the function call
    * @throws QueryException query exception
    */
-  default Value invoke(final QueryContext qc, final InputInfo ii, final Value... args)
+  default Value invoke(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
 
     XQFunction fn = this;
@@ -30,14 +30,14 @@ public interface XQFunction extends XQFunctionExpr {
     try {
       while(true) {
         qc.checkStop();
-        final Value value = fn.invokeInternal(qc, ii, values);
+        final Value value = fn.invokeInternal(qc, info, values);
         fn = qc.pollTailCall();
         if(fn == null) return value;
         qc.stack.reuseFrame(fn.stackFrameSize());
         values = qc.pollTailArgs();
       }
     } catch(final QueryException ex) {
-      throw ex.add(ii);
+      throw ex.add(info);
     } finally {
       qc.stack.exitFrame(fp);
     }
@@ -47,12 +47,12 @@ public interface XQFunction extends XQFunctionExpr {
    * Tail-calls the given function with the given arguments.
    * Must not be overwritten.
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param args arguments for the call
    * @return result of the function call
    * @throws QueryException query exception
    */
-  default Value invokeTail(final QueryContext qc, final InputInfo ii, final Value... args)
+  default Value invokeTail(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
 
     qc.checkStop();
@@ -66,9 +66,9 @@ public interface XQFunction extends XQFunctionExpr {
     qc.tailCalls++;
     final int fp = qc.stack.enterFrame(stackFrameSize());
     try {
-      return invokeInternal(qc, ii, args);
+      return invokeInternal(qc, info, args);
     } catch(final QueryException ex) {
-      throw ex.add(ii);
+      throw ex.add(info);
     } finally {
       qc.tailCalls = calls;
       qc.stack.exitFrame(fp);
@@ -78,12 +78,12 @@ public interface XQFunction extends XQFunctionExpr {
   /**
    * Internally invokes this function with the given arguments.
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param args arguments
    * @return resulting value
    * @throws QueryException query exception
    */
-  Value invokeInternal(QueryContext qc, InputInfo ii, Value[] args) throws QueryException;
+  Value invokeInternal(QueryContext qc, InputInfo info, Value[] args) throws QueryException;
 
   /**
    * Size of this function's stack frame.

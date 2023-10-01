@@ -123,7 +123,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * The arguments will be ignored if a value has already been assigned.
    * @param name name of variable; context value if empty string or {@code null}
    * @param value value to be bound (object or XQuery {@link Value})
-   * @param type type (may be {@code null})
+   * @param type type (can be {@code null})
    * @return self reference
    * @see QueryContext#bind(String, Object, String, StaticContext)
    * @throws QueryException query exception
@@ -159,7 +159,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * Binds the context value with a specified type,
    * using the same rules as for {@link #variable binding variables}.
    * @param value value to be bound
-   * @param type type (may be {@code null})
+   * @param type type (can be {@code null})
    * @return self reference
    * @throws QueryException query exception
    */

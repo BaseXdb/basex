@@ -29,7 +29,7 @@ public final class Rename extends Update {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param trg target expression
    * @param name new name expression
    */

@@ -31,7 +31,7 @@ public final class StringRangeAccess extends IndexAccess {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param index index token
    * @param db index database
    */
@@ -47,12 +47,12 @@ public final class StringRangeAccess extends IndexAccess {
 
     return new DBNodeIter(data) {
       final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-      final IndexIterator ii = index.min.length <= data.meta.maxlen &&
+      final IndexIterator iter = index.min.length <= data.meta.maxlen &&
           index.max.length <= data.meta.maxlen ? data.iter(index) : scan(data);
 
       @Override
       public DBNode next() {
-        return ii.more() ? new DBNode(data, ii.pre(), kind) : null;
+        return iter.more() ? new DBNode(data, iter.pre(), kind) : null;
       }
     };
   }
@@ -62,10 +62,10 @@ public final class StringRangeAccess extends IndexAccess {
     final IndexType it = index.type();
     final Data data = db.data(qc, it);
 
-    final IndexIterator ii = index.min.length <= data.meta.maxlen &&
+    final IndexIterator iter = index.min.length <= data.meta.maxlen &&
         index.max.length <= data.meta.maxlen ? data.iter(index) : scan(data);
     final IntList list = new IntList();
-    while(ii.more()) list.add(ii.pre());
+    while(iter.more()) list.add(iter.pre());
     return DBNodeSeq.get(list.finish(), data, this);
   }
 

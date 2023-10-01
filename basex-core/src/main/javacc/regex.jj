@@ -12,6 +12,7 @@ package org.basex.query.util.regex.parse;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -30,10 +31,10 @@ import static java.util.regex.Pattern.*;
 public class RegExParser {
   /** Group counter. */
   private int groups;
-  /** Current backref's number. */
-  private int backref;
   /** Closed groups. */
-  private final BitArray closed = new BitArray();
+  private final Map<Integer, Group> closed = new HashMap<Integer, Group>();
+  /** Path of current atom: sequence numbers of branches and atoms currently being processed. */ 
+  private Stack<Integer> atomPath = new Stack<Integer>();
   /** If the wildcard {@code .} matches any character. */
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
@@ -84,13 +85,17 @@ PARSER_END(RegExParser)
    */
   RegExp regExp() : {
     final RegExpList brs = new RegExpList();
+    RegExp br;
+    atomPath.push(0);
   } {
     (
-      { brs.add(branch()); }
+      br = branch() { brs.add(br); }
       (
-        <OR> { brs.add(branch()); }
+        <OR> { atomPath.push(atomPath.pop() + 1); }
+        br = branch() { brs.add(br); }
       )*
     ) {
+      atomPath.pop();
       return brs.size() == 1 ? brs.get(0) : new Disjunction(brs.finish());
     }
   }
@@ -105,13 +110,16 @@ PARSER_END(RegExParser)
     RegExp atom;
     final RegExpList pieces = new RegExpList();
     Quantifier qu = null;
+    atomPath.push(0);
   } {
     (
       ( atom = atom() [ qu = quantifier() ] ) {
         pieces.add(qu == null ? atom : new Piece(atom, qu));
         qu = null;
+        atomPath.push(atomPath.pop() + 1);
       }
     )* {
+      atomPath.pop();
       return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());
     }
   }
@@ -183,13 +191,14 @@ PARSER_END(RegExParser)
     ( nd = Char()
     | nd = charClass()
     | (<NPAR_OPEN> nd = regExp() <PAR_CLOSE>) {
-        nd = new Group(nd, false);
+        nd = new Group(nd, false, atomPath.toArray(new Integer[atomPath.size()]));
       }
     | (<PAR_OPEN> { final int grp = ++groups; }
         nd = regExp()
       <PAR_CLOSE>) {
-        closed.set(grp);
-        nd = new Group(nd, true);
+        final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()]));
+        closed.put(grp, g);
+        nd = g;
       }
     | nd = backReference()
     ) {
@@ -216,9 +225,9 @@ PARSER_END(RegExParser)
    * @throws ParseException parsing exception
    */
   BackRef backReference() : {
-    Token tok;
+    int backref;
   } {
-    tok = <BACK_REF> {
+      <BACK_REF> {
       backref = token.image.charAt(1) - '0';
     }
     (
@@ -227,9 +236,19 @@ PARSER_END(RegExParser)
         backref = 10 * backref + token.image.charAt(0) - '0';
       }
     )* {
-      if(!closed.get(backref))
+      final Group g = closed.get(backref);
+      if(g == null)
         throw new ParseException("Illegal back-reference: \\" + backref);
-      return new BackRef(backref);
+      g.setHasBackRef();
+      int diff = 0;
+      while (atomPath.get(diff) == g.getAtomPath()[diff]) {
+        ++diff;
+      }
+      // If the atom paths of group and backref differ in a branch (even index), the backref is in
+      // a different branch than the group, so the backref can be flagged accordingly, and later be
+      // omitted at serialization time.
+      final boolean isDifferentBranch = (diff & 1) == 0;
+      return new BackRef(backref, isDifferentBranch);
     }
   }
 
@@ -298,7 +317,7 @@ PARSER_END(RegExParser)
     final RegExpList cg = new RegExpList();
     RegExp sub = null;
   } {
-    ( LOOKAHEAD(3) sub = charRange() { cg.add(sub); }
+    ( LOOKAHEAD(3) sub = charRange(cg.isEmpty()) { cg.add(sub); }
     | (<SINGLE_ESC> | <MULTI_ESC>| <CAT_ESC>) {
         for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
       }
@@ -312,7 +331,7 @@ PARSER_END(RegExParser)
    * @return expression
    * @throws ParseException parsing exception
    */
-  RegExp charRange() : {
+  RegExp charRange(boolean isBegin) : {
     int a = -1, b = -1;
   } {
     ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE })
@@ -320,7 +339,10 @@ PARSER_END(RegExParser)
         if(a > b) throw new ParseException("Illegal range: " +
             Literal.escape(a) + " > " + Literal.escape(b));
       }
-    | a = XmlChar()
+    | a = XmlChar() {
+        if(a == '-' && ! (isBegin || getToken(1).kind == BR_CLOSE)) throw new ParseException(
+          "The - character is a valid character range only at the beginning or end of a positive character group.");
+      }
     ) {
       return b == -1 ? new Literal(a) : new CharRange(a, b);
     }

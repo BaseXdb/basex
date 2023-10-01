@@ -18,10 +18,10 @@ class IndexPath extends IndexPred {
   /**
    * Constructor.
    * @param path path expression
-   * @param ii index info
+   * @param info index info
    */
-  IndexPath(final AxisPath path, final IndexInfo ii) {
-    super(ii);
+  IndexPath(final AxisPath path, final IndexInfo info) {
+    super(info);
     this.path = path;
   }
 
@@ -61,12 +61,12 @@ class IndexPath extends IndexPred {
   Step qname() {
     final int s = path.steps.length - 1;
     final Step st = step(s);
-    return ii.text && st.axis == Axis.CHILD && st.test == KindTest.TEXT ? step(s - 1) : st;
+    return info.text && st.axis == Axis.CHILD && st.test == KindTest.TEXT ? step(s - 1) : st;
   }
 
   @Override
   Expr invert(final Expr root) throws QueryException {
-    final CompileContext cc = ii.cc;
+    final CompileContext cc = info.cc;
     final ExprList steps = new ExprList();
 
     // choose new root expression: add predicates of last step to root
@@ -75,7 +75,7 @@ class IndexPath extends IndexPred {
     final Expr rt = last.exprs.length > 0 ? Filter.get(cc, path.info(), root, last.exprs) : root;
 
     // attribute index request: start inverted path with attribute step
-    if(!ii.text && (last.test instanceof NameTest || last.test instanceof UnionTest)) {
+    if(!info.text && (last.test instanceof NameTest || last.test instanceof UnionTest)) {
       steps.add(Step.get(cc, rt, last.info(), last.test));
     }
     // add inverted steps in reverse order
@@ -96,6 +96,6 @@ class IndexPath extends IndexPred {
    * @return step
    */
   private Step step(final int index) {
-    return index < 0 ? ii.step : path.step(index);
+    return index < 0 ? info.step : path.step(index);
   }
 }

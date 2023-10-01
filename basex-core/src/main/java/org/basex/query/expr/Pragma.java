@@ -32,7 +32,7 @@ public abstract class Pragma extends ExprInfo {
   /**
    * Initializes the pragma expression.
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return state before pragmas was set
    * @throws QueryException query exception
    */

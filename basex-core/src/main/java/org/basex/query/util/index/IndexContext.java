@@ -13,10 +13,10 @@ import org.basex.query.expr.path.*;
 class IndexContext extends IndexPred {
   /**
    * Constructor.
-   * @param ii index info
+   * @param info index info
    */
-  IndexContext(final IndexInfo ii) {
-    super(ii);
+  IndexContext(final IndexInfo info) {
+    super(info);
   }
 
   /**
@@ -29,7 +29,7 @@ class IndexContext extends IndexPred {
    */
   @Override
   Step step() {
-    return ii.step;
+    return info.step;
   }
 
   /**
@@ -42,16 +42,16 @@ class IndexContext extends IndexPred {
    */
   @Override
   Step qname() {
-    return ii.step;
+    return info.step;
   }
 
   @Override
   Expr invert(final Expr root) throws QueryException {
-    final Step st = ii.step;
-    if(ii.text || !(st.test instanceof NameTest || st.test instanceof UnionTest)) return root;
+    final Step st = info.step;
+    if(info.text || !(st.test instanceof NameTest || st.test instanceof UnionTest)) return root;
 
     // attribute index request: add attribute step
-    final Expr step = Step.get(ii.cc, root, st.info(), st.test);
+    final Expr step = Step.get(info.cc, root, st.info(), st.test);
     return Path.get(root.info(), root, step);
   }
 }

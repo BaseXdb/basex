@@ -162,7 +162,7 @@ public class CmpG extends Cmp {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator

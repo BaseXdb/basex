@@ -33,7 +33,7 @@ public final class Replace extends Update {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param trg target expression
    * @param src source expression
    * @param value replace value of

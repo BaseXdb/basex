@@ -20,7 +20,7 @@ public final class FTExtension extends FTExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param pragma pragma
    * @param expr enclosed FTSelection
    */

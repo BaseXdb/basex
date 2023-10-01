@@ -22,7 +22,7 @@ public final class FTScope extends FTFilter {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param same same flag
    * @param unit unit

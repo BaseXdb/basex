@@ -32,7 +32,7 @@ public final class UserPassword extends UserFn {
      * @param user user
      * @param password password
      * @param qc query context
-     * @param info input info
+     * @param info input info (can be {@code null})
      */
     private Password(final User user, final String password, final QueryContext qc,
         final InputInfo info) {

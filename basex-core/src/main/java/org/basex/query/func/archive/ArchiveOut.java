@@ -25,20 +25,20 @@ abstract class ArchiveOut implements Closeable {
   /**
    * Returns a new instance of an archive writer.
    * @param format archive format
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param os output stream
    * @return writer
    * @throws QueryException query exception
    */
-  static ArchiveOut get(final String format, final InputInfo ii, final OutputStream os)
+  static ArchiveOut get(final String format, final InputInfo info, final OutputStream os)
       throws QueryException {
     try {
       if(format.equals(ZIP)) return new ZIPOut(os);
       if(format.equals(GZIP)) return new GZIPOut(os);
     } catch(final IOException ex) {
-      throw ARCHIVE_ERROR_X.get(ii, ex);
+      throw ARCHIVE_ERROR_X.get(info, ex);
     }
-    throw ARCHIVE_FORMAT.get(ii);
+    throw ARCHIVE_FORMAT.get(info);
   }
 
   /**
@@ -66,7 +66,7 @@ abstract class ArchiveOut implements Closeable {
    * Writes the specified entry.
    * @param entry zip entry
    * @param bin binary data
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
@@ -90,7 +90,7 @@ abstract class ArchiveOut implements Closeable {
    * Writes data from the specified binary to the specified output stream.
    * @param bin binary item
    * @param out output stream
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */

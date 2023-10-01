@@ -44,7 +44,7 @@ public final class UserGrant extends UserFn {
      * @param perms permissions
      * @param patterns patterns
      * @param qc query context
-     * @param info input info
+     * @param info input info (can be {@code null})
      * @throws QueryException query exception
      */
     private Grant(final User user, final ArrayList<Perm> perms, final StringList patterns,

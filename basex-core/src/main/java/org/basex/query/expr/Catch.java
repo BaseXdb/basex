@@ -53,7 +53,7 @@ public final class Catch extends Single {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param tests error tests
    * @param vars variables to be bound
    */

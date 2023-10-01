@@ -28,7 +28,7 @@ public final class FTIndexAccess extends Simple {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param ftexpr contains, select and optional ignore expression
    * @param db index database
    */

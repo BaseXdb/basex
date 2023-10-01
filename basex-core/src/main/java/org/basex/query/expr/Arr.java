@@ -29,7 +29,7 @@ public abstract class Arr extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param seqType sequence type
    * @param exprs expressions
    */

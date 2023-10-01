@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 public final class ItemMap extends SimpleMap {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   ItemMap(final InputInfo info, final Expr... exprs) {

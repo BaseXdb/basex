@@ -115,7 +115,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
   }
 
   /**
-   * Sets the Levenshtein error if it hasn't been assigned yet.
+   * Sets the Levenshtein error if it has not been assigned yet.
    * @param err error
    * @return self reference
    */
@@ -188,7 +188,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
 
   /**
    * Returns the full-text options.
-   * @return full-text options (may be {@code null})
+   * @return full-text options (can be {@code null})
    */
   public FTOpt ftOpt() {
     return ftOpt;

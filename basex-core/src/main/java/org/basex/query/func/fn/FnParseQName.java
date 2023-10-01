@@ -26,7 +26,7 @@ public final class FnParseQName extends StandardFunc {
       qnm = qc.shared.eqname(value);
     }
     if(qnm == null) throw valueError(AtomType.QNAME, value, info);
-    if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
+    if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(info, qnm.prefix());
     return qnm;
   }
 }

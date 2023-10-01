@@ -29,13 +29,13 @@ public final class StaticVar extends StaticDecl {
    * @param var variable
    * @param expr expression to be bound
    * @param anns annotations
-   * @param doc xqdoc string
    * @param external external flag
    * @param vs variable scope
+   * @param doc xqdoc string
    */
-  StaticVar(final Var var, final Expr expr, final AnnList anns, final String doc,
-      final boolean external, final VarScope vs) {
-    super(var.name, var.declType, anns, doc, vs, var.info);
+  StaticVar(final Var var, final Expr expr, final AnnList anns, final boolean external,
+      final VarScope vs, final String doc) {
+    super(var.name, var.declType, anns, vs, var.info, doc);
     this.expr = expr;
     this.external = external;
     lazy = anns.contains(Annotation._BASEX_LAZY);
@@ -159,7 +159,7 @@ public final class StaticVar extends StaticDecl {
    */
   private static QueryFocus pushFocus(final QueryContext qc) {
     final QueryFocus focus = qc.focus, qf = new QueryFocus();
-    qf.value = qc.finalContext ? qc.contextScope.value : null;
+    qf.value = qc.finalContext ? qc.contextValue.value : null;
     qc.focus = qf;
     return focus;
   }

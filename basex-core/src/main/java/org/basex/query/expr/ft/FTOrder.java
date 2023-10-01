@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 public final class FTOrder extends FTFilter {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    */
   public FTOrder(final InputInfo info, final FTExpr expr) {

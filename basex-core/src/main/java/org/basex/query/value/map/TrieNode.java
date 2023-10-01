@@ -26,26 +26,26 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    TrieNode delete(final int hash, final Item key, final int level, final InputInfo ii) {
+    TrieNode delete(final int hash, final Item key, final int level, final InputInfo info) {
       return this; }
     @Override
-    Value get(final int hash, final Item key, final int level, final InputInfo ii) {
+    Value get(final int hash, final Item key, final int level, final InputInfo info) {
       return null; }
     @Override
-    boolean contains(final int hash, final Item key, final int level, final InputInfo ii) {
+    boolean contains(final int hash, final Item key, final int level, final InputInfo info) {
       return false; }
     @Override
     TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo ii) { return node; }
+        final QueryContext qc, final InputInfo info) { return node; }
     @Override
     TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo ii) { return leaf; }
+        final QueryContext qc, final InputInfo info) { return leaf; }
     @Override
     TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo ii) { return list; }
+        final QueryContext qc, final InputInfo info) { return list; }
     @Override
     TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo ii) { return branch; }
+        final QueryContext qc, final InputInfo info) { return branch; }
     @Override
     boolean verify() { return true; }
     @Override
@@ -53,18 +53,18 @@ abstract class TrieNode {
     @Override
     void values(final ValueBuilder vs) { }
     @Override
-    void cache(final boolean lazy, final InputInfo ii) { }
+    void cache(final boolean lazy, final InputInfo info) { }
     @Override
-    boolean materialized(final Predicate<Data> test, final InputInfo ii) { return true; }
+    boolean materialized(final Predicate<Data> test, final InputInfo info) { return true; }
     @Override
     boolean instanceOf(final AtomType kt, final SeqType dt) { return true; }
     @Override
-    int hash(final InputInfo ii) { return 0; }
+    int hash(final InputInfo info) { return 0; }
     @Override
     boolean equal(final TrieNode node, final DeepEqual deep) { return this == node; }
     @Override
     public TrieNode put(final int hash, final Item key, final Value value, final int level,
-        final InputInfo ii) { return new TrieLeaf(hash, key, value); }
+        final InputInfo info) { return new TrieLeaf(hash, key, value); }
     @Override
     void apply(final QueryBiConsumer<Item, Value> func) { }
     @Override
@@ -90,11 +90,11 @@ abstract class TrieNode {
    * @param key key to insert
    * @param value value to insert
    * @param level level
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode put(int hash, Item key, Value value, int level, InputInfo ii)
+  abstract TrieNode put(int hash, Item key, Value value, int level, InputInfo info)
       throws QueryException;
 
   /**
@@ -102,88 +102,87 @@ abstract class TrieNode {
    * @param hash hash code of the key
    * @param key key to delete
    * @param level level
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code null} if deleted, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode delete(int hash, Item key, int level, InputInfo ii) throws QueryException;
+  abstract TrieNode delete(int hash, Item key, int level, InputInfo info) throws QueryException;
 
   /**
    * Looks up the value associated with the given key.
    * @param hash hash code
    * @param key key to look up
    * @param level level
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return bound value if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  abstract Value get(int hash, Item key, int level, InputInfo ii) throws QueryException;
+  abstract Value get(int hash, Item key, int level, InputInfo info) throws QueryException;
 
   /**
    * Checks if the given key exists in the map.
    * @param hash hash code
    * @param key key to look for
    * @param level level
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return {@code true} if the key exists, {@code false} otherwise
    * @throws QueryException query exception
    */
-  abstract boolean contains(int hash, Item key, int level, InputInfo ii) throws QueryException;
+  abstract boolean contains(int hash, Item key, int level, InputInfo info) throws QueryException;
 
   /**
    * <p> Inserts all bindings from the given node into this one.
    * <p> This method is part of the <i>double dispatch</i> pattern and
-   *     should be implemented as {@code return o.add(this, lvl, ii);}.
+   *     should be implemented as {@code return o.add(this, lvl, info);}.
    * @param node other node
    * @param level level
    * @param merge merge duplicates
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   abstract TrieNode addAll(TrieNode node, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo ii) throws QueryException;
+      InputInfo info) throws QueryException;
 
   /**
-   * Add a leaf to this node if the key isn't already used.
+   * Add a leaf to this node if the key is not already used.
    * @param leaf leaf to insert
    * @param level level
    * @param merge merge duplicates
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   abstract TrieNode add(TrieLeaf leaf, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo ii) throws QueryException;
+      InputInfo info) throws QueryException;
 
   /**
-   * Add an overflow list to this node if the key isn't already used.
+   * Add an overflow list to this node if the key is not already used.
    * @param list leaf to insert
    * @param level level
    * @param merge merge duplicates
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   abstract TrieNode add(TrieList list, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo ii) throws QueryException;
+      InputInfo info) throws QueryException;
 
   /**
-   * Add all bindings of the given branch to this node for which the key isn't
-   * already used.
+   * Add all bindings of the given branch to this node for which the key is not already used.
    * @param branch leaf to insert
    * @param level level
    * @param merge merge duplicates
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   abstract TrieNode add(TrieBranch branch, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo ii) throws QueryException;
+      InputInfo info) throws QueryException;
 
   /**
    * Verifies the tree.
@@ -206,19 +205,19 @@ abstract class TrieNode {
   /**
    * Caches all keys and values.
    * @param lazy lazy caching
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  abstract void cache(boolean lazy, InputInfo ii) throws QueryException;
+  abstract void cache(boolean lazy, InputInfo info) throws QueryException;
 
   /**
    * Checks if all value of this node are materialized.
    * @param test test for copying nodes
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean materialized(Predicate<Data> test, InputInfo ii) throws QueryException;
+  abstract boolean materialized(Predicate<Data> test, InputInfo info) throws QueryException;
 
   /**
    * Applies a function on all entries.
@@ -247,11 +246,11 @@ abstract class TrieNode {
 
   /**
    * Calculates the hash code of this node.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return hash value
    * @throws QueryException query exception
    */
-  abstract int hash(InputInfo ii) throws QueryException;
+  abstract int hash(InputInfo info) throws QueryException;
 
   /**
    * Checks if this node is indistinguishable from the given node.

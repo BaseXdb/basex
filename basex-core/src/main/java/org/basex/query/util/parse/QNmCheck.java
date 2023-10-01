@@ -17,14 +17,14 @@ final class QNmCheck {
   private final QNm name;
   /** Flag for assigning default element namespace. */
   private final boolean nsElem;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
 
   /**
    * Constructor.
    * @param name qname
    * @param nsElem default check
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   QNmCheck(final QNm name, final boolean nsElem, final InputInfo info) {
     this.name = name;

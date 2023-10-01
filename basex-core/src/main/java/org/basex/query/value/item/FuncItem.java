@@ -32,7 +32,7 @@ public final class FuncItem extends FItem implements Scope {
   public final StaticContext sc;
   /** Function expression. */
   private final Expr expr;
-  /** Function name (may be {@code null}). */
+  /** Function name (can be {@code null}). */
   private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
@@ -56,7 +56,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param type function type
    * @param expr function body
    * @param stackSize stack-frame size
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
       final FuncType type, final Expr expr, final int stackSize, final InputInfo info) {
@@ -72,7 +72,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param type function type
    * @param expr function body
    * @param stackSize stack-frame size
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param focus query focus (can be {@code null})
    */
   public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
@@ -232,7 +232,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public byte[] string(final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(ii, this);
+    throw FIATOMIZE_X.get(info, this);
   }
 
   @Override

@@ -144,12 +144,12 @@ public final class QNm extends Item {
    * @param name name to resolve
    * @param def default namespace (can be {@code null})
    * @param sc static context (can be {@code null})
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return string
    * @throws QueryException query exception
    */
   public static QNm resolve(final byte[] name, final byte[] def, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     // check for namespace declaration
     final Matcher m = EQNAME.matcher(Token.string(name));
@@ -164,10 +164,10 @@ public final class QNm extends Item {
       } else {
         final byte[] prefix = substring(nm, 0, i);
         if(sc != null) uri = sc.ns.uri(prefix);
-        if(uri == null) throw NOURI_X.get(ii, prefix);
+        if(uri == null) throw NOURI_X.get(info, prefix);
       }
     }
-    if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(ii, name);
+    if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(info, name);
     return new QNm(nm, uri);
   }
 
@@ -209,7 +209,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
 
     final QNm qnm;

@@ -87,7 +87,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Returns a materialized version of this value without dependencies to persistent data.
    * Raises an error if the value contains function items
    * @param test check if a contained node can be adopted unchanged
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @param qc query context
    * @return materialized value
    * @throws QueryException query exception
@@ -99,7 +99,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Checks if this value is materialized, i.e., contains no persistent database nodes or
    * function items.
    * @param test check if a contained node can be adopted unchanged
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
@@ -139,7 +139,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Caches lazy values.
    * @param lazy lazy caching
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @throws QueryException query exception
    */
   public abstract void cache(boolean lazy, InputInfo ii) throws QueryException;
@@ -178,9 +178,9 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a hash code for this value.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return hash code
-   * @throws QueryException if atomization can't be applied (e.g. function item)
+   * @throws QueryException if atomization cannot be applied (e.g. function item)
    */
   public abstract int hash(InputInfo ii) throws QueryException;
 

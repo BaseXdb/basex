@@ -36,11 +36,11 @@ public final class QueryThreads {
   /**
    * Returns local thread for the given expression.
    * @param expr expression
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return cache
    */
-  public ThreadLocal<CmpCache> get(final CmpHashG expr, final InputInfo ii) {
-    return cmpCache.computeIfAbsent(expr, p -> ThreadLocal.withInitial(() -> new CmpCache(ii)));
+  public ThreadLocal<CmpCache> get(final CmpHashG expr, final InputInfo info) {
+    return cmpCache.computeIfAbsent(expr, p -> ThreadLocal.withInitial(() -> new CmpCache(info)));
   }
 
   /**

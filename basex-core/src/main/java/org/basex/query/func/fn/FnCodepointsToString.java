@@ -54,26 +54,26 @@ public final class FnCodepointsToString extends StandardFunc {
   /**
    * Converts a single codepoint to a string.
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return codepoint as string
    * @throws QueryException query exception
    */
-  private static Str toStr(final long value, final InputInfo ii) throws QueryException {
-    return Str.get(Token.cpToken(toCodepoint(value, ii)));
+  private static Str toStr(final long value, final InputInfo info) throws QueryException {
+    return Str.get(Token.cpToken(toCodepoint(value, info)));
   }
 
   /**
    * Checks if the specified value is valid codepoint.
    * @param value codepoint
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return codepoint as integer
    * @throws QueryException query exception
    */
-  private static int toCodepoint(final long value, final InputInfo ii) throws QueryException {
+  private static int toCodepoint(final long value, final InputInfo info) throws QueryException {
     if(value >= 0 && value <= Integer.MAX_VALUE) {
       final int cp = (int) value;
       if(XMLToken.valid(cp)) return cp;
     }
-    throw INVCODE_X.get(ii, Long.toHexString(value));
+    throw INVCODE_X.get(info, Long.toHexString(value));
   }
 }

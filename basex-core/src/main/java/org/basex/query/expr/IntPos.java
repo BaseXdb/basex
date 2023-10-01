@@ -32,7 +32,7 @@ public final class IntPos extends Simple implements CmpPos {
    * Constructor.
    * @param min minimum value (1 or larger)
    * @param max minimum value (inclusive, 1 or larger)
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   private IntPos(final long min, final long max, final InputInfo info) {
     super(info, SeqType.BOOLEAN_O);
@@ -43,25 +43,25 @@ public final class IntPos extends Simple implements CmpPos {
   /**
    * Returns a position expression for the specified position, or an optimized boolean item.
    * @param pos position
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return expression
    */
-  public static Expr get(final double pos, final InputInfo ii) {
+  public static Expr get(final double pos, final InputInfo info) {
     final long p = (long) pos;
-    return p != pos || p < 1 ? Bln.FALSE : get(p, p, ii);
+    return p != pos || p < 1 ? Bln.FALSE : get(p, p, info);
   }
 
   /**
    * Returns a position expression for the specified range, or an optimized boolean item.
    * @param min minimum position
    * @param max minimum position (inclusive)
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return expression
    */
-  public static Expr get(final long min, final long max, final InputInfo ii) {
+  public static Expr get(final long min, final long max, final InputInfo info) {
     // assumption: positions do not exceed bounds of long values
     return min > max || max < 1 ? Bln.FALSE : min <= 1 && max == MAX_VALUE ? Bln.TRUE :
-      new IntPos(Math.max(1, min), Math.max(1, max), ii);
+      new IntPos(Math.max(1, min), Math.max(1, max), info);
   }
 
   /**
@@ -69,26 +69,26 @@ public final class IntPos extends Simple implements CmpPos {
    * Returns an instance of this class, an optimized expression, or {@code null}
    * @param pos positions to be matched
    * @param op comparison operator
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return optimized expression or {@code null}
    */
-  static Expr get(final Expr pos, final OpV op, final InputInfo ii) {
+  static Expr get(final Expr pos, final OpV op, final InputInfo info) {
     if(pos == Empty.VALUE) return Bln.FALSE;
     if(pos instanceof RangeSeq && op == OpV.EQ) {
       final long[] range = ((RangeSeq) pos).range(false);
-      return get(range[0], range[1], ii);
+      return get(range[0], range[1], info);
     }
     if(pos instanceof ANum) {
       final ANum num = (ANum) pos;
       final long p = num.itr();
       final boolean exact = p == num.dbl();
       switch(op) {
-        case EQ: return exact ? get(p, p, ii) : Bln.FALSE;
-        case GE: return get(exact ? p : p + 1, MAX_VALUE, ii);
-        case GT: return get(p + 1, MAX_VALUE, ii);
-        case LE: return get(1, p, ii);
-        case LT: return get(1, exact ? p - 1 : p, ii);
-        case NE: return exact ? p < 2 ? get(p + 1, MAX_VALUE, ii) : null : Bln.TRUE;
+        case EQ: return exact ? get(p, p, info) : Bln.FALSE;
+        case GE: return get(exact ? p : p + 1, MAX_VALUE, info);
+        case GT: return get(p + 1, MAX_VALUE, info);
+        case LE: return get(1, p, info);
+        case LT: return get(1, exact ? p - 1 : p, info);
+        case NE: return exact ? p < 2 ? get(p + 1, MAX_VALUE, info) : null : Bln.TRUE;
         default:
       }
     }

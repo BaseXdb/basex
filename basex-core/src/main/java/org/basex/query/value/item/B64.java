@@ -66,23 +66,23 @@ public class B64 extends Bin {
   /**
    * Returns an instance of this class.
    * @param bin binary input
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return instance
    * @throws QueryException query exception
    */
-  public static B64 get(final Bin bin, final InputInfo ii) throws QueryException {
-    return get(bin.binary(ii));
+  public static B64 get(final Bin bin, final InputInfo info) throws QueryException {
+    return get(bin.binary(info));
   }
 
   /**
    * Returns an instance of this class.
    * @param value textual representation
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return instance
    * @throws QueryException query exception
    */
-  public static B64 get(final byte[] value, final InputInfo ii) throws QueryException {
-    return get(parse(value, ii));
+  public static B64 get(final byte[] value, final InputInfo info) throws QueryException {
+    return get(parse(value, info));
   }
 
   @Override
@@ -96,48 +96,48 @@ public class B64 extends Bin {
   }
 
   @Override
-  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
     return Token.eq(binary(ii), bin);
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo ii)
+  public final int diff(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
-    return Token.diff(binary(ii), bin);
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
+    return Token.diff(binary(info), bin);
   }
 
   /**
    * Converts the given item to a byte array.
    * @param item item to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final Item item, final InputInfo ii) throws QueryException {
+  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
     try {
-      return Base64.decode(item.string(ii));
+      return Base64.decode(item.string(info));
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
-      throw AtomType.BASE64_BINARY.castError(item, ii);
+      throw AtomType.BASE64_BINARY.castError(item, info);
     }
   }
 
   /**
    * Converts the given token into a byte array.
    * @param value value to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
     try {
       return Base64.decode(value);
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
-      throw AtomType.BASE64_BINARY.castError(value, ii);
+      throw AtomType.BASE64_BINARY.castError(value, info);
     }
   }
 

@@ -23,7 +23,7 @@ public abstract class NodeUpdate extends DataUpdate {
    * @param type update type
    * @param pre target node pre value
    * @param data target data reference
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   NodeUpdate(final UpdateType type, final int pre, final Data data, final InputInfo info) {
     super(type, data, info);
@@ -69,7 +69,7 @@ public abstract class NodeUpdate extends DataUpdate {
    *
    * When a primitive is substituted it is still added to the list itself to be able to
    * throw exceptions when necessary. I.e. for multiple replaces on the same target node.
-   * These update primitives don't produce atomic updates, hence this won't affect the
+   * These update primitives don't produce atomic updates, hence this will not affect the
    * database.
    *
    * @param tmp temporary mem data

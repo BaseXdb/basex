@@ -28,7 +28,7 @@ final class StaticVarRef extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param name variable name
    * @param sc static context
    */

@@ -28,21 +28,21 @@ public final class Hex extends Bin {
   /**
    * Constructor.
    * @param value textual representation
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public Hex(final byte[] value, final InputInfo ii) throws QueryException {
-    this(parse(Token.trim(value), ii));
+  public Hex(final byte[] value, final InputInfo info) throws QueryException {
+    this(parse(Token.trim(value), info));
   }
 
   /**
    * Constructor.
    * @param bin binary data
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public Hex(final Bin bin, final InputInfo ii) throws QueryException {
-    this(bin.binary(ii));
+  public Hex(final Bin bin, final InputInfo info) throws QueryException {
+    this(bin.binary(info));
   }
 
   @Override
@@ -56,7 +56,7 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
     return Token.eq(binary(ii), bin);
@@ -71,27 +71,27 @@ public final class Hex extends Bin {
   /**
    * Converts the given item to a byte array.
    * @param item item to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final Item item, final InputInfo ii) throws QueryException {
-    final byte[] bytes = parse(item.string(ii));
+  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
+    final byte[] bytes = parse(item.string(info));
     if(bytes != null) return bytes;
-    throw AtomType.HEX_BINARY.castError(item, ii);
+    throw AtomType.HEX_BINARY.castError(item, info);
   }
 
   /**
    * Converts the given token into a byte array.
    * @param value value to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return byte array
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
     final byte[] bytes = parse(value);
     if(bytes != null) return bytes;
-    throw AtomType.HEX_BINARY.castError(value, ii);
+    throw AtomType.HEX_BINARY.castError(value, info);
   }
 
   /**

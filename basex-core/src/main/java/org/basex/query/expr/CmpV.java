@@ -29,8 +29,8 @@ public final class CmpV extends Cmp {
     LE("le") {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = item1.diff(item2, coll, ii);
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        final int v = item1.diff(item2, coll, info);
         return v != Item.UNDEF && v <= 0;
       }
       @Override
@@ -45,8 +45,8 @@ public final class CmpV extends Cmp {
     LT("lt") {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        final int v = item1.diff(item2, coll, ii);
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        final int v = item1.diff(item2, coll, info);
         return v != Item.UNDEF && v < 0;
       }
       @Override
@@ -61,9 +61,9 @@ public final class CmpV extends Cmp {
     GE("ge") {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
+          final StaticContext sc, final InputInfo info) throws QueryException {
         // includes UNDEF check
-        return item1.diff(item2, coll, ii) >= 0;
+        return item1.diff(item2, coll, info) >= 0;
       }
       @Override
       public OpV swap() { return LE; }
@@ -77,9 +77,9 @@ public final class CmpV extends Cmp {
     GT("gt") {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
+          final StaticContext sc, final InputInfo info) throws QueryException {
         // includes UNDEF check
-        return item1.diff(item2, coll, ii) > 0;
+        return item1.diff(item2, coll, info) > 0;
       }
       @Override
       public OpV swap() { return LT; }
@@ -93,8 +93,8 @@ public final class CmpV extends Cmp {
     EQ("eq") {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        return item1.eq(item2, coll, sc, ii);
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        return item1.equal(item2, coll, sc, info);
       }
       @Override
       public OpV swap() { return EQ; }
@@ -108,8 +108,8 @@ public final class CmpV extends Cmp {
     NE("ne") {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
-          final StaticContext sc, final InputInfo ii) throws QueryException {
-        return !item1.eq(item2, coll, sc, ii);
+          final StaticContext sc, final InputInfo info) throws QueryException {
+        return !item1.equal(item2, coll, sc, info);
       }
       @Override
       public OpV swap() { return NE; }
@@ -138,12 +138,12 @@ public final class CmpV extends Cmp {
      * @param item2 second item
      * @param coll collation (can be {@code null})
      * @param sc static context
-     * @param ii input info
+     * @param info input info (can be {@code null})
      * @return result
      * @throws QueryException query exception
      */
     public abstract boolean eval(Item item1, Item item2, Collation coll, StaticContext sc,
-        InputInfo ii) throws QueryException;
+        InputInfo info) throws QueryException;
 
     /**
      * Swaps the comparator.
@@ -174,7 +174,7 @@ public final class CmpV extends Cmp {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr1 first expression
    * @param expr2 second expression
    * @param opV operator

@@ -61,7 +61,8 @@ public final class FAttr extends FNode {
   }
 
   @Override
-  public FAttr materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
+  public FAttr materialize(final Predicate<Data> test, final InputInfo ii,
+      final QueryContext qc) {
     return materialized(test, ii) ? this : new FAttr(name, value);
   }
 

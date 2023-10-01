@@ -27,7 +27,7 @@ public final class Try extends Single {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr try expression
    * @param catches catch expressions
    */

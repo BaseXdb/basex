@@ -44,21 +44,21 @@ public abstract class Collation {
    * @param uri collation uri (can be {@code null})
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param err error code for unknown collation uris
    * @return collator instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
   public static Collation get(final byte[] uri, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii, final QueryError err) throws QueryException {
+      final InputInfo info, final QueryError err) throws QueryException {
 
     // return default collation
     if(uri == null) return sc.collation;
 
     final Uri u = Uri.get(uri);
-    if(!u.isValid()) throw INVURI_X.get(ii, uri);
+    if(!u.isValid()) throw INVURI_X.get(info, uri);
     final byte[] url = u.isAbsolute() ? uri :
-      Token.startsWith(uri, '?') ? concat(URL, uri) : sc.baseURI().resolve(u, ii).string();
+      Token.startsWith(uri, '?') ? concat(URL, uri) : sc.baseURI().resolve(u, info).string();
 
     // return unicode point collation
     if(eq(COLLATION_URI, url)) return null;
@@ -67,7 +67,7 @@ public abstract class Collation {
     if(qc.collations == null) qc.collations = new TokenObjMap<>();
     Collation coll = qc.collations.get(url);
     if(coll == null) {
-      coll = get(url, ii, err);
+      coll = get(url, info, err);
       qc.collations.put(url, coll);
     }
     return coll;
@@ -76,12 +76,12 @@ public abstract class Collation {
   /**
    * Returns a collation instance for the specified URI.
    * @param uri collation URI
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param err error code for unknown collation URIs
    * @return collation instance or {@code null} if uri is invalid
    * @throws QueryException query exception
    */
-  private static Collation get(final byte[] uri, final InputInfo ii, final QueryError err)
+  private static Collation get(final byte[] uri, final InputInfo info, final QueryError err)
       throws QueryException {
 
     // case-insensitive collation
@@ -102,14 +102,14 @@ public abstract class Collation {
         opts = new BaseXCollationOptions(true);
       }
     }
-    if(opts == null) throw err.get(ii, Util.inf("Unknown collation '%'", uri));
+    if(opts == null) throw err.get(info, Util.inf("Unknown collation '%'", uri));
 
     try {
       final Collation coll = opts.get(args);
       coll.uri = uri;
       return coll;
     } catch(final IllegalArgumentException | BaseXException ex) {
-      throw err.get(ii, ex.getMessage());
+      throw err.get(info, ex.getMessage());
     }
   }
 
@@ -131,54 +131,54 @@ public abstract class Collation {
    * Checks if a string is contained in another.
    * @param string string
    * @param sub substring to be found
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean contains(final byte[] string, final byte[] sub, final InputInfo ii)
+  public final boolean contains(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), Mode.INDEX_OF, ii) != -1;
+    return indexOf(string(string), string(sub), Mode.INDEX_OF, info) != -1;
   }
 
   /**
    * Checks if a string starts with another.
    * @param string string
    * @param sub substring to be found
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean startsWith(final byte[] string, final byte[] sub, final InputInfo ii)
+  public final boolean startsWith(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), Mode.STARTS_WITH, ii) != -1;
+    return indexOf(string(string), string(sub), Mode.STARTS_WITH, info) != -1;
   }
 
   /**
    * Checks if a string ends with another.
    * @param string string
    * @param sub substring to be found
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean endsWith(final byte[] string, final byte[] sub, final InputInfo ii)
+  public final boolean endsWith(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
-    return indexOf(string(string), string(sub), Mode.ENDS_WITH, ii) != -1;
+    return indexOf(string(string), string(sub), Mode.ENDS_WITH, info) != -1;
   }
 
   /**
    * Returns the substring after a specified string.
    * @param string string
    * @param sub substring to be found
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return substring
    * @throws QueryException query exception
    */
-  public final byte[] after(final byte[] string, final byte[] sub, final InputInfo ii)
+  public final byte[] after(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
 
     final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.INDEX_AFTER, ii);
+    final int i = indexOf(st, string(sub), Mode.INDEX_AFTER, info);
     return i == -1 ? EMPTY : token(st.substring(i));
   }
 
@@ -186,15 +186,15 @@ public abstract class Collation {
    * Returns the substring before a specified string.
    * @param string string
    * @param sub substring to be found
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return substring
    * @throws QueryException query exception
    */
-  public final byte[] before(final byte[] string, final byte[] sub, final InputInfo ii)
+  public final byte[] before(final byte[] string, final byte[] sub, final InputInfo info)
       throws QueryException {
 
     final String st = string(string);
-    final int i = indexOf(st, string(sub), Mode.INDEX_OF, ii);
+    final int i = indexOf(st, string(sub), Mode.INDEX_OF, info);
     return i == -1 ? EMPTY : token(st.substring(0, i));
   }
 
@@ -219,7 +219,7 @@ public abstract class Collation {
    * @param string string
    * @param sub substring to be found
    * @param mode search mode
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return string index
    * @throws QueryException query exception
    */

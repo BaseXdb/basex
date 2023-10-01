@@ -19,7 +19,7 @@ public final class BackupDrop extends NameUpdate {
    * Constructor.
    * @param name name of backup file to be dropped
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public BackupDrop(final String name, final QueryContext qc, final InputInfo info) {
     super(UpdateType.BACKUPDROP, name, qc, info);

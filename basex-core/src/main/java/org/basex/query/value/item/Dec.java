@@ -129,11 +129,11 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final Type t = item.type;
     return t.isUntyped() ? dbl() == item.dbl(ii) :
-      t == AtomType.DOUBLE || t == AtomType.FLOAT ? item.eq(this, coll, sc, ii) :
+      t == AtomType.DOUBLE || t == AtomType.FLOAT ? item.equal(this, coll, sc, ii) :
       value.compareTo(item.dec(ii)) == 0;
   }
 
@@ -160,15 +160,15 @@ public final class Dec extends ANum {
   /**
    * Converts the given token into a decimal value.
    * @param value value to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return double value
    * @throws QueryException query exception
    */
-  public static BigDecimal parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static BigDecimal parse(final byte[] value, final InputInfo info) throws QueryException {
     try {
       if(!contains(value, 'e') && !contains(value, 'E'))
         return new BigDecimal(Token.string(value).trim());
     } catch(final NumberFormatException ex) { Util.debug(ex); }
-    throw AtomType.DECIMAL.castError(value, ii);
+    throw AtomType.DECIMAL.castError(value, info);
   }
 }

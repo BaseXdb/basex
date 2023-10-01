@@ -164,7 +164,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the option with the specified name.
    * @param name name of the option
-   * @return value (may be {@code null})
+   * @return value (can be {@code null})
    */
   public final synchronized Option<?> option(final String name) {
     return options.get(name);
@@ -173,7 +173,7 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Returns the value of the specified option.
    * @param option option
-   * @return value (may be {@code null})
+   * @return value (can be {@code null})
    */
   public final synchronized Object get(final Option<?> option) {
     return values.get(option.name());
@@ -372,18 +372,18 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value to be assigned
    * @param error raise error if a supplied option is unknown
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   public synchronized void assign(final Item name, final Value value, final boolean error,
-      final InputInfo ii) throws BaseXException, QueryException {
+      final InputInfo info) throws BaseXException, QueryException {
 
     final String nm;
     if(name instanceof QNm) {
       nm = string(((QNm) name).internal());
     } else if(name.type.isStringOrUntyped()) {
-      nm = string(name.string(ii));
+      nm = string(name.string(info));
     } else {
       throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STRING, name.type, name);
     }
@@ -397,7 +397,7 @@ public class Options implements Iterable<Option<?>> {
       final TokenBuilder tb = new TokenBuilder();
       for(final Item it : value) {
         if(!tb.isEmpty()) tb.add(' ');
-        tb.add(serialize(it, ii));
+        tb.add(serialize(it, info));
       }
       item = Str.get(tb.finish());
     } else {
@@ -405,21 +405,21 @@ public class Options implements Iterable<Option<?>> {
     }
 
     if(options.isEmpty()) {
-      free.put(nm, serialize(item, ii));
+      free.put(nm, serialize(item, info));
     } else {
-      assign(nm, item, error, ii);
+      assign(nm, item, error, info);
     }
   }
 
   /**
    * Creates a string representation of the specified item.
    * @param item item
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return string
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private static String serialize(final Item item, final InputInfo ii)
+  private static String serialize(final Item item, final InputInfo info)
       throws BaseXException, QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
@@ -427,16 +427,16 @@ public class Options implements Iterable<Option<?>> {
       final XQMap map = (XQMap) item;
       for(final Item key : map.keys()) {
         if(!tb.isEmpty()) tb.add(',');
-        tb.add(key.string(ii)).add('=');
-        final Value value = map.get(key, ii);
+        tb.add(key.string(info)).add('=');
+        final Value value = map.get(key, info);
         if(!value.isItem()) throw new BaseXException(
             Text.OPT_EXPECT_X_X_X, AtomType.STRING, value.seqType(), value);
-        tb.add(string(((Item) value).string(ii)).replace(",", ",,"));
+        tb.add(string(((Item) value).string(info)).replace(",", ",,"));
       }
     } else if(item instanceof QNm) {
       tb.add(((QNm) item).internal());
     } else {
-      tb.add(item.string(ii));
+      tb.add(item.string(info));
     }
     return tb.toString();
   }
@@ -570,15 +570,15 @@ public class Options implements Iterable<Option<?>> {
    * Parses and assigns options from the specified map.
    * @param map map
    * @param error raise error if a supplied option is unknown
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final boolean error, final InputInfo ii)
+  public final synchronized void assign(final XQMap map, final boolean error, final InputInfo info)
       throws BaseXException, QueryException {
 
     for(final Item name : map.keys()) {
-      assign(name, map.get(name, ii), error, ii);
+      assign(name, map.get(name, info), error, info);
     }
   }
 
@@ -747,12 +747,12 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param item value to be assigned
    * @param error raise error if option is unknown
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   private synchronized void assign(final String name, final Item item, final boolean error,
-      final InputInfo ii) throws BaseXException, QueryException {
+      final InputInfo info) throws BaseXException, QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
@@ -765,25 +765,25 @@ public class Options implements Iterable<Option<?>> {
     final Type type = item.type;
     if(option instanceof BooleanOption) {
       if(type == AtomType.BOOLEAN) {
-        value = item.bool(ii);
+        value = item.bool(info);
       } else {
-        final String s = string(item.string(ii));
+        final String s = string(item.string(info));
         value = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
       }
       if(value == null) expected = Text.OPT_BOOLEAN_X_X;
     } else if(option instanceof NumberOption) {
-      value = (int) item.itr(ii);
+      value = (int) item.itr(info);
     } else if(option instanceof StringOption) {
-      value = serialize(item, ii);
+      value = serialize(item, info);
     } else if(option instanceof EnumOption) {
       byte[] token;
       if(type == AtomType.BOOLEAN) {
-        token = item.string(ii);
+        token = item.string(info);
       } else if(type.isNumber()) {
-        final long l = item.itr(ii);
+        final long l = item.itr(info);
         token = l == 1 ? TRUE : l == 0 ? FALSE : null;
       } else {
-        token = item.string(ii);
+        token = item.string(info);
       }
       if(token == null) {
         expected = Text.OPT_BOOLEAN_X_X;
@@ -796,7 +796,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       if(item instanceof XQMap) {
         value = ((OptionsOption<?>) option).newInstance();
-        ((Options) value).assign((XQMap) item, error, ii);
+        ((Options) value).assign((XQMap) item, error, info);
       } else {
         expected = Text.OPT_MAP_X_X;
       }

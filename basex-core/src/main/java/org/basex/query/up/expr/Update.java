@@ -25,7 +25,7 @@ abstract class Update extends Arr {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expressions
    */
   Update(final StaticContext sc, final InputInfo info, final Expr... expr) {

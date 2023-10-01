@@ -29,7 +29,7 @@ public final class Lookup extends Arr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr key specifier and (for postfix lookups) context expression
    */
   public Lookup(final InputInfo info, final Expr... expr) {

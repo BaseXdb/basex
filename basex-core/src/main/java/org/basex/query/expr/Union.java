@@ -26,7 +26,7 @@ import org.basex.util.hash.*;
 public final class Union extends Set {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   public Union(final InputInfo info, final Expr... exprs) {

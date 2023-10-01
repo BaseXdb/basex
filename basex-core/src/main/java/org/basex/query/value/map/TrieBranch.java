@@ -50,12 +50,12 @@ final class TrieBranch extends TrieNode {
 
   @Override
   TrieNode put(final int hs, final Item key, final Value value, final int level,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
     final int k = key(hs, level);
     final TrieNode sub = kids[k], nsub;
     final int bs, rem;
     if(sub != null) {
-      nsub = sub.put(hs, key, value, level + 1, ii);
+      nsub = sub.put(hs, key, value, level + 1, info);
       if(nsub == sub) return this;
       bs = used;
       rem = sub.size;
@@ -70,12 +70,12 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hash, final Item key, final int level, final InputInfo ii)
+  TrieNode delete(final int hash, final Item key, final int level, final InputInfo info)
       throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
     if(sub == null) return this;
-    final TrieNode nsub = sub.delete(hash, key, level + 1, ii);
+    final TrieNode nsub = sub.delete(hash, key, level + 1, info);
     if(nsub == sub) return this;
 
     final int nu;
@@ -96,19 +96,19 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  Value get(final int hash, final Item key, final int level, final InputInfo ii)
+  Value get(final int hash, final Item key, final int level, final InputInfo info)
       throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
-    return sub == null ? null : sub.get(hash, key, level + 1, ii);
+    return sub == null ? null : sub.get(hash, key, level + 1, info);
   }
 
   @Override
-  boolean contains(final int hash, final Item key, final int level, final InputInfo ii)
+  boolean contains(final int hash, final Item key, final int level, final InputInfo info)
       throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
-    return sub != null && sub.contains(hash, key, level + 1, ii);
+    return sub != null && sub.contains(hash, key, level + 1, info);
   }
 
   /** End strings. */
@@ -116,20 +116,20 @@ final class TrieBranch extends TrieNode {
 
   @Override
   TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo ii) throws QueryException {
-    return node.add(this, level, merge, qc, ii);
+      final QueryContext qc, final InputInfo info) throws QueryException {
+    return node.add(this, level, merge, qc, info);
   }
 
   @Override
   TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
     qc.checkStop();
     final int k = key(leaf.hash, level);
     final TrieNode ch = kids[k], kid;
     int n = 1;
     if(ch != null) {
-      final TrieNode ins = ch.add(leaf, level + 1, merge, qc, ii);
+      final TrieNode ins = ch.add(leaf, level + 1, merge, qc, info);
       if(ins == ch) return this;
       n = ins.size - ch.size;
       kid = ins;
@@ -144,14 +144,14 @@ final class TrieBranch extends TrieNode {
 
   @Override
   TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
     qc.checkStop();
     final int k = key(list.hash, level);
     final TrieNode ch = kids[k], kid;
     int n = list.size;
     if(ch != null) {
-      final TrieNode ins = ch.add(list, level + 1, merge, qc, ii);
+      final TrieNode ins = ch.add(list, level + 1, merge, qc, info);
       if(ins == ch) return this;
       n = ins.size - ch.size;
       kid = ins;
@@ -166,7 +166,7 @@ final class TrieBranch extends TrieNode {
 
   @Override
   TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo ii) throws QueryException {
+      final QueryContext qc, final InputInfo info) throws QueryException {
 
     TrieNode[] ch = null;
     int nu = used, ns = size;
@@ -174,7 +174,7 @@ final class TrieBranch extends TrieNode {
     for(int k = 0; k < kl; k++) {
       final TrieNode n = kids[k], ok = branch.kids[k];
       if(ok != null) {
-        final TrieNode kid = n == null ? ok : ok.addAll(n, level + 1, merge, qc, ii);
+        final TrieNode kid = n == null ? ok : ok.addAll(n, level + 1, merge, qc, info);
         if(kid != n) {
           if(ch == null) ch = copyKids();
           ch[k] = kid;
@@ -212,17 +212,17 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+  void cache(final boolean lazy, final InputInfo info) throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null) nd.cache(lazy, ii);
+      if(nd != null) nd.cache(lazy, info);
     }
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+  public boolean materialized(final Predicate<Data> test, final InputInfo info)
       throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null && !nd.materialized(test, ii)) return false;
+      if(nd != null && !nd.materialized(test, info)) return false;
     }
     return true;
   }
@@ -243,10 +243,10 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  int hash(final InputInfo ii) throws QueryException {
+  int hash(final InputInfo info) throws QueryException {
     int hash = 0;
     for(final TrieNode nd : kids) {
-      if(nd != null) hash = (hash << 5) - hash + nd.hash(ii);
+      if(nd != null) hash = (hash << 5) - hash + nd.hash(info);
     }
     return hash;
   }

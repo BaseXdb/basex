@@ -21,7 +21,7 @@ public final class CmpHashG extends CmpG {
    * @param expr2 second expression
    * @param op operator
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final StaticContext sc,
       final InputInfo info) {

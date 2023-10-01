@@ -26,7 +26,7 @@ public final class DBCopy extends NameUpdate {
    * @param name database to be copied
    * @param target name of new database
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBCopy(final String name, final String target, final QueryContext qc,
       final InputInfo info) {

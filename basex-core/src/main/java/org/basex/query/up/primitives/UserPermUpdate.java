@@ -28,7 +28,7 @@ public abstract class UserPermUpdate extends UserUpdate {
    * @param perms permissions (can be {@code null})
    * @param patterns patterns
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   protected UserPermUpdate(final UpdateType type, final User user, final ArrayList<Perm> perms,

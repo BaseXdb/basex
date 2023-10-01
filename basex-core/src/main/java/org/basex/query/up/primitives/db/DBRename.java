@@ -27,7 +27,7 @@ public final class DBRename extends DBUpdate {
    * @param data target data
    * @param src source path
    * @param trg target path
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBRename(final Data data, final String src, final String trg, final InputInfo info) {
     super(UpdateType.DBRENAME, data, info);

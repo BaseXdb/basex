@@ -158,11 +158,11 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return item instanceof Int ? value == ((Int) item).value :
-            item instanceof Dec ? item.eq(this, coll, sc, ii) :
-            value == item.dbl(ii);
+           item instanceof Dec ? item.equal(this, coll, sc, ii) :
+           value == item.dbl(ii);
   }
 
   @Override
@@ -203,13 +203,13 @@ public final class Int extends ANum {
   /**
    * Converts the given token to a long value.
    * @param value value to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return long value
    * @throws QueryException query exception
    */
-  public static long parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static long parse(final byte[] value, final InputInfo info) throws QueryException {
     final long l = Token.toLong(value);
     if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MIN_LONG)) return l;
-    throw AtomType.INTEGER.castError(value, ii);
+    throw AtomType.INTEGER.castError(value, info);
   }
 }

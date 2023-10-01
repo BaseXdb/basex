@@ -155,7 +155,7 @@ public final class DialogProgress extends BaseXDialog implements ActionListener 
    * {@link BaseXDialog#action} if the dialog is closed.
    * @param gui reference to the main window
    * @param dialog reference to the dialog window (can be {@code null})
-   * @param post post-processing step (may be {@code null})
+   * @param post post-processing step (can be {@code null})
    * @param cmds commands to be run
    */
   private static void execute(final GUI gui, final BaseXDialog dialog, final Runnable post,

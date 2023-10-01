@@ -18,7 +18,7 @@ public interface Lazy {
 
   /**
    * Caches the value.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   void cache(InputInfo info) throws QueryException;

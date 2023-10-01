@@ -183,44 +183,44 @@ public final class SerializerOptions extends Options {
    * @param name name of option
    * @param value value
    * @param sc static context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public void parse(final String name, final byte[] value, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     try {
       assign(name, string(value));
     } catch(final BaseXException ex) {
       for(final Option<?> o : this) {
-        if(o.name().equals(name)) throw SER_X.get(ii, ex);
+        if(o.name().equals(name)) throw SER_X.get(info, ex);
       }
-      throw OUTINVALID_X.get(ii, ex);
+      throw OUTINVALID_X.get(info, ex);
     }
 
     // parse parameters and character map
     if(name.equals(PARAMETER_DOCUMENT.name())) {
       Uri uri = Uri.get(value);
-      if(!uri.isValid()) throw INVURI_X.get(ii, value);
-      if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, ii);
+      if(!uri.isValid()) throw INVURI_X.get(info, value);
+      if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, info);
       final IO io = IO.get(string(uri.string()));
       final ANode root;
       try {
         root = new DBNode(io).childIter().next();
       } catch(final IOException ex) {
-        throw OUTDOC_X.get(ii, ex);
+        throw OUTDOC_X.get(info, ex);
       }
 
-      if(root != null) FuncOptions.serializer(root, this, ii);
+      if(root != null) FuncOptions.serializer(root, this, info);
 
       final HashMap<String, String> free = free();
-      if(!free.isEmpty()) throw SEROPTION_X.get(ii, free.keySet().iterator().next());
+      if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
 
       for(final ANode child : root.childIter()) {
         if(child.type != NodeType.ELEMENT) continue;
         if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
           final String map = characterMap(child);
-          if(map == null) throw SEROPTION_X.get(ii, USE_CHARACTER_MAPS.name());
+          if(map == null) throw SEROPTION_X.get(info, USE_CHARACTER_MAPS.name());
           set(USE_CHARACTER_MAPS, map);
         }
       }

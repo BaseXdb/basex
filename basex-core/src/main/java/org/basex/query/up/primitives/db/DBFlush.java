@@ -21,7 +21,7 @@ public final class DBFlush extends DBUpdate {
    * Constructor.
    * @param data data
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBFlush(final Data data, final QueryContext qc, final InputInfo info) {
     super(UpdateType.DBFLUSH, data, info);

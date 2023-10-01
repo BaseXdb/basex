@@ -15,7 +15,7 @@ import org.basex.util.*;
 final class TaskContext {
   /** Functions to evaluate in parallel. */
   final ArrayList<FItem> funcs;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   final InputInfo info;
   /** Query context. */
   final QueryContext qc;
@@ -29,7 +29,7 @@ final class TaskContext {
    * @param funcs functions to evaluate
    * @param options task options
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   TaskContext(final ArrayList<FItem> funcs, final TaskOptions options, final QueryContext qc,
       final InputInfo info) {

@@ -31,7 +31,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   /** Resulting value (can be {@code null}). */
   public Value value;
 
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   public InputInfo info;
   /** Name of the declaration (can be {@code null}). */
   public QNm name;
@@ -57,10 +57,10 @@ public abstract class StaticScope extends ExprInfo implements Scope {
 
   /**
    * Assigns a documentation string.
-   * @param string documentation string
+   * @param string xqdoc string (can be {@code null})
    */
   public void doc(final String string) {
-    doc = Token.token(string.trim());
+    if(string != null) doc = Token.token(string.trim());
   }
 
   @Override

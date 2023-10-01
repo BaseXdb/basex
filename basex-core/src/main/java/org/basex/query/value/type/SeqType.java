@@ -328,28 +328,28 @@ public final class SeqType {
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */
   public Value cast(final Value value, final boolean error, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii) throws QueryException {
+      final StaticContext sc, final InputInfo info) throws QueryException {
 
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) {
-      if(error) throw INVCONVERT_X_X_X.get(ii, value.seqType(), this, value);
+      if(error) throw INVCONVERT_X_X_X.get(info, value.seqType(), this, value);
       return null;
     }
     if(size == 0) return Empty.VALUE;
 
     try {
       // enable light-weight error handling
-      if(!error && ii != null) ii.internal(true);
+      if(!error && info != null) info.internal(true);
       // cast single items
       if(size == 1) {
         final Item item = (Item) value;
-        return item.type.eq(type) ? item : type.cast(item, qc, sc, ii);
+        return item.type.eq(type) ? item : type.cast(item, qc, sc, info);
       }
       // cast sequences
       final ValueBuilder vb = new ValueBuilder(qc);
@@ -358,7 +358,7 @@ public final class SeqType {
           vb.add(item);
         } else {
           qc.checkStop();
-          vb.add(type.cast(item, qc, sc, ii));
+          vb.add(type.cast(item, qc, sc, info));
         }
       }
       return vb.value(type);
@@ -366,7 +366,7 @@ public final class SeqType {
       if(error) throw ex;
       return null;
     } finally {
-      if(!error && ii != null) ii.internal(false);
+      if(!error && info != null) info.internal(false);
     }
   }
 
@@ -376,13 +376,13 @@ public final class SeqType {
    * @param name variable name (can be {@code null})
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value promote(final Value value, final QNm name, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
+      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
 
     final long size = value.size();
     ItemList items = null;
@@ -396,11 +396,11 @@ public final class SeqType {
           items = new ItemList(Seq.initialCapacity(size));
           for(int j = 0; j < i; j++) items.add(value.itemAt(j));
         }
-        promote(item, name, items, qc, sc, ii, opt);
+        promote(item, name, items, qc, sc, info, opt);
       }
     }
     final long is = items != null ? items.size() : value.size();
-    if(!occ.check(is)) throw typeError(value, this, name, ii, true);
+    if(!occ.check(is)) throw typeError(value, this, name, info, true);
     return items != null ? items.value(type) : value;
   }
 
@@ -411,39 +411,39 @@ public final class SeqType {
    * @param items item cache
    * @param qc query context
    * @param sc static context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param opt if the result should be optimized
    * @throws QueryException query exception
    */
   public void promote(final Item item, final QNm name, final ItemList items, final QueryContext qc,
-      final StaticContext sc, final InputInfo ii, final boolean opt) throws QueryException {
+      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {
-      final Iter iter = item.atomValue(qc, ii).iter();
+      final Iter iter = item.atomValue(qc, info).iter();
       for(Item item1; (item1 = qc.next(iter)) != null;) {
         final Type tp = item1.type;
         if(tp.instanceOf(type)) {
           items.add(item1);
         } else if(tp == UNTYPED_ATOMIC) {
-          if(type.nsSensitive()) throw NSSENS_X_X.get(ii, item.type, type);
-          final Iter iter2 = type.cast(item1, qc, sc, ii).iter();
+          if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
+          final Iter iter2 = type.cast(item1, qc, sc, info).iter();
           for(Item item2; (item2 = qc.next(iter2)) != null;) {
             items.add(item2);
           }
         } else if(type == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL))) {
-          items.add(Dbl.get(item1.dbl(ii)));
+          items.add(Dbl.get(item1.dbl(info)));
         } else if(type == FLOAT && tp.instanceOf(DECIMAL)) {
-          items.add(Flt.get(item1.flt(ii)));
+          items.add(Flt.get(item1.flt(info)));
         } else if(type == STRING && item1 instanceof Uri) {
-          items.add(Str.get(item1.string(ii)));
+          items.add(Str.get(item1.string(info)));
         } else {
-          throw typeError(item, with(EXACTLY_ONE), name, ii, true);
+          throw typeError(item, with(EXACTLY_ONE), name, info, true);
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
-      items.add(((FItem) item).coerceTo((FuncType) type, qc, ii, opt));
+      items.add(((FItem) item).coerceTo((FuncType) type, qc, info, opt));
     } else {
-      throw typeError(item, with(EXACTLY_ONE), name, ii, true);
+      throw typeError(item, with(EXACTLY_ONE), name, info, true);
     }
   }
 

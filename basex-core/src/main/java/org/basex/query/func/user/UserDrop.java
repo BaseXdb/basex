@@ -33,7 +33,7 @@ public final class UserDrop extends UserFn {
      * @param user user
      * @param patterns database (optional)
      * @param qc query context
-     * @param info input info
+     * @param info input info (can be {@code null})
      * @throws QueryException query exception
      */
     private Drop(final User user, final StringList patterns, final QueryContext qc,

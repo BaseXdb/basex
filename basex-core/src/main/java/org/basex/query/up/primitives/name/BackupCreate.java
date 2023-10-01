@@ -28,7 +28,7 @@ public final class BackupCreate extends NameUpdate {
    * @param comment comment
    * @param compress compress data
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public BackupCreate(final String name, final String comment, final boolean compress,
       final QueryContext qc, final InputInfo info) {

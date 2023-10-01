@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 public final class IterPath extends AxisPath {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param root root expression
    * @param steps axis steps
    */

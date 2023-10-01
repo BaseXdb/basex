@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class AtomIter extends Iter {
   /** Query context. */
   private final QueryContext qc;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Atomizing iterator. */
   private final Iter iter;
@@ -26,7 +26,7 @@ public final class AtomIter extends Iter {
    * Constructor.
    * @param iter input iterator
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param size iterator size (can be {@code -1})
    */
   public AtomIter(final Iter iter, final QueryContext qc, final InputInfo info, final long size) {

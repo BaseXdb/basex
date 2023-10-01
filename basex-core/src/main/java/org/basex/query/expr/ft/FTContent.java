@@ -21,7 +21,7 @@ public final class FTContent extends FTFilter {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param content contents type
    */

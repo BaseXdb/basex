@@ -25,7 +25,7 @@ final class PlainDoc extends Inspect {
   /**
    * Constructor.
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   PlainDoc(final QueryContext qc, final InputInfo info) {
     super(qc, info);

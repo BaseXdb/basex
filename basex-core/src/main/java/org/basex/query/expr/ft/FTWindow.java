@@ -24,7 +24,7 @@ public final class FTWindow extends FTFilter {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param win window
    * @param unit unit

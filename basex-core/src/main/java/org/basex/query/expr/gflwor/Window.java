@@ -64,7 +64,7 @@ public final class Window extends Clause {
    * @param st start condition
    * @param nd end condition, might be {@code null}
    * @return non-{@code null} variables
-   * @throws QueryException query exception if the variable names aren't unique
+   * @throws QueryException query exception if the variable names are not unique
    */
   private static Var[] vars(final Var vr, final Condition st, final Condition nd)
       throws QueryException {

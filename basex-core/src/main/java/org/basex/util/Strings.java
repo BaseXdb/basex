@@ -68,9 +68,9 @@ public final class Strings {
   }
 
   /**
-   * Compares two strings for equality. The arguments may be {@code null}.
-   * @param string1 first string
-   * @param string2 strings to be compared
+   * Compares two strings for equality.
+   * @param string1 first string (can be {@code null})
+   * @param string2 strings to be compared (can be {@code null})
    * @return {@code true} if test is successful
    */
   public static boolean eq(final String string1, final String string2) {
@@ -78,9 +78,9 @@ public final class Strings {
   }
 
   /**
-   * Compares several strings for equality. The arguments may be {@code null}.
-   * @param string first string
-   * @param strings strings to be compared
+   * Compares several strings for equality.
+   * @param string first string (can be {@code null})
+   * @param strings strings to be compared (can be {@code null})
    * @return {@code true} if one test is successful
    */
   public static boolean eq(final String string, final String... strings) {

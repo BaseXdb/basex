@@ -25,7 +25,7 @@ public final class CNSpace extends CName {
   /**
    * Constructor.
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param name name
    * @param value value

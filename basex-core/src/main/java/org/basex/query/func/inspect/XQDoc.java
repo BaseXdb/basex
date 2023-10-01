@@ -33,7 +33,7 @@ final class XQDoc extends Inspect {
   /**
    * Constructor.
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   XQDoc(final QueryContext qc, final InputInfo info) {
     super(qc, info);

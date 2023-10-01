@@ -37,7 +37,7 @@ final class DynJavaFunc extends DynJavaCall {
    * @param types types provided in the parsed expression string (can be {@code null})
    * @param args arguments
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   DynJavaFunc(final Class<?> clazz, final String name, final String[] types,
       final Expr[] args, final StaticContext sc, final InputInfo info) {

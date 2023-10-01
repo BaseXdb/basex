@@ -26,7 +26,7 @@ import org.basex.util.*;
 public abstract class Preds extends Arr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param seqType sequence type
    * @param preds predicates
    */

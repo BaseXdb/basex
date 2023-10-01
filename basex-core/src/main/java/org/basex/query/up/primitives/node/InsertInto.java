@@ -19,11 +19,11 @@ public class InsertInto extends NodeCopy {
    * Constructor for an insertInto.
    * @param pre target pre value
    * @param data target data instance
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence
    */
-  public InsertInto(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
-    super(UpdateType.INSERTINTO, pre, data, ii, nodes);
+  public InsertInto(final int pre, final Data data, final InputInfo info, final ANodeList nodes) {
+    super(UpdateType.INSERTINTO, pre, data, info, nodes);
   }
 
   @Override

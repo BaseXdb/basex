@@ -19,12 +19,12 @@ public final class InsertIntoAsFirst extends NodeCopy {
    * Constructor.
    * @param pre target node pre value
    * @param data target data reference
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param nodes insertion sequence node list
    */
-  public InsertIntoAsFirst(final int pre, final Data data, final InputInfo ii,
+  public InsertIntoAsFirst(final int pre, final Data data, final InputInfo info,
       final ANodeList nodes) {
-    super(UpdateType.INSERTINTOFIRST, pre, data, ii, nodes);
+    super(UpdateType.INSERTINTOFIRST, pre, data, info, nodes);
   }
 
   @Override

@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 public final class DualMap extends SimpleMap {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   DualMap(final InputInfo info, final Expr... exprs) {

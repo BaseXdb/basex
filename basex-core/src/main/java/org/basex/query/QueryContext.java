@@ -118,7 +118,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Main module (root expression). */
   public MainModule main;
   /** Context scope. */
-  public ContextScope contextScope;
+  public ContextScope contextValue;
   /** Indicates if context scope exists and is final. */
   public boolean finalContext;
 
@@ -305,8 +305,10 @@ public final class QueryContext extends Job implements Closeable {
         if(nodes != null) bind(null, resources.compile(nodes), null, sc);
       }
       final Value value = bindings.get(QNm.EMPTY);
-      if(value != null) contextScope = new ContextScope(value, sc.contextType, new VarScope(sc));
-      if(contextScope != null) finalContext = true;
+      if(value != null) {
+        contextValue = new ContextScope(value, sc.contextType, new VarScope(sc), null, null);
+      }
+      if(contextValue != null) finalContext = true;
 
       return compile(true);
     });
@@ -324,10 +326,10 @@ public final class QueryContext extends Job implements Closeable {
     info.runtime = false;
     try {
       final CompileContext cc = new CompileContext(this, dynamic);
-      if(contextScope != null && dynamic) {
+      if(contextValue != null && dynamic) {
         try {
-          contextScope.compile(cc);
-          focus.value = contextScope.value(this);
+          contextValue.compile(cc);
+          focus.value = contextValue.value(this);
         } catch(final QueryException ex) {
           Util.debug(ex);
           throw ex.error() == NOCTX_X ? CIRCCTX.get(ex.info()) : ex;
@@ -395,12 +397,12 @@ public final class QueryContext extends Job implements Closeable {
     final LockList list = updating ? l.writes : l.reads;
 
     // locks in main module (can be null if parsing failed)
-    boolean local = main == null || main.databases(new LockVisitor(list, contextScope == null));
+    boolean local = main == null || main.databases(new LockVisitor(list, contextValue == null));
     // locks in context expression
-    if(local && contextScope != null) {
+    if(local && contextValue != null) {
       // check if scope may still be overwritten by dynamic context
       if(!finalContext) list.add(Locking.CONTEXT);
-      local = contextScope.databases(new LockVisitor(list, true));
+      local = contextValue.databases(new LockVisitor(list, true));
     }
     if(local) {
       list.add(locks);
@@ -421,7 +423,7 @@ public final class QueryContext extends Job implements Closeable {
    * </ul>
    * @param name name of variable; context value if empty string or {@code null}
    * @param value value to be bound (object or XQuery {@link Value})
-   * @param type type (may be {@code null})
+   * @param type type (can be {@code null})
    * @param sc static context
    * @throws QueryException query exception
    */
@@ -674,7 +676,7 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Casts a value to the specified type.
    * @param value value to be cast
-   * @param type type (may be {@code null})
+   * @param type type (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */

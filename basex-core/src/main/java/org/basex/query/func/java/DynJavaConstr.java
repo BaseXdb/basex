@@ -32,7 +32,7 @@ final class DynJavaConstr extends DynJavaCall {
    * @param types types provided in the parsed expression string (can be {@code null})
    * @param args arguments
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   DynJavaConstr(final Class<?> clazz, final String[] types, final Expr[] args,
       final StaticContext sc, final InputInfo info) {

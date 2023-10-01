@@ -51,7 +51,7 @@ public final class FTWords extends FTExpr {
 
   /**
    * Constructor for sequential evaluation.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param query query expression
    * @param mode search mode
    * @param occ occurrences
@@ -65,7 +65,7 @@ public final class FTWords extends FTExpr {
 
   /**
    * Constructor for index-based evaluation.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param db index database
    * @param query query terms
    * @param mode search mode
@@ -166,7 +166,7 @@ public final class FTWords extends FTExpr {
             if(!lexer.hasNext()) return null;
 
             int d = 0;
-            FTIndexIterator ii = null;
+            FTIndexIterator iter = null;
             final StopWords sw = ftOpt.sw;
             do {
               final byte[] token = lexer.nextToken();
@@ -174,31 +174,31 @@ public final class FTWords extends FTExpr {
               if(sw != null && sw.contains(token)) {
                 ++d;
               } else {
-                final FTIndexIterator iter = lexer.token().length > data.meta.maxlen ?
+                final FTIndexIterator ir = lexer.token().length > data.meta.maxlen ?
                   scan(lexer, ftt, data) : (FTIndexIterator) data.iter(lexer);
-                iter.pos(++qc.ftPos);
-                if(ii == null) {
-                  ii = iter;
+                ir.pos(++qc.ftPos);
+                if(iter == null) {
+                  iter = ir;
                 } else {
-                  ii = FTIndexIterator.intersect(ii, iter, ++d);
+                  iter = FTIndexIterator.intersect(iter, ir, ++d);
                   d = 0;
                 }
               }
             } while(lexer.hasNext());
 
-            if(ii != null) {
+            if(iter != null) {
               // create or combine iterator
               if(ftiter == null) {
                 length = len;
-                ftiter = ii;
+                ftiter = iter;
               } else if(mode == FTMode.ALL || mode == FTMode.ALL_WORDS) {
-                if(ii.size() == 0) return null;
+                if(iter.size() == 0) return null;
                 length += len;
-                ftiter = FTIndexIterator.intersect(ftiter, ii, 0);
+                ftiter = FTIndexIterator.intersect(ftiter, iter, 0);
               } else {
-                if(ii.size() == 0) continue;
+                if(iter.size() == 0) continue;
                 length = Math.max(len, length);
-                ftiter = FTIndexIterator.union(ftiter, ii);
+                ftiter = FTIndexIterator.union(ftiter, iter);
               }
             }
           }

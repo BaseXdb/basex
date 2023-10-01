@@ -54,7 +54,7 @@ public final class AtomicUpdateCache {
    * inconsistencies on-the-fly eliminating the need to traverse all updates. */
   private BasicUpdate recent;
   /** Most recently added structural atomic update - if there is any. Used to calculate accumulated
-   * pre value shifts on-the-fly, as {@link BasicUpdate} don't carry this information. */
+   * pre value shifts on-the-fly, as {@link BasicUpdate} do not carry this information. */
   private BasicUpdate recentStruct;
   /** Target data reference. */
   public final Data data;

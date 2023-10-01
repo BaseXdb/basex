@@ -60,10 +60,10 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
         public void execute() {
           final ProjectNode node = selectedNode();
           final GUI gui = view.gui;
-          if (BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
+          if(BaseXDialog.confirm(gui, Util.info(DELETE_FILE_X, node.file))) {
             final ProjectNode parent = (ProjectNode) node.getParent();
             // delete file or show error dialog
-            if (gui.editor.delete(node.file)) {
+            if(gui.editor.delete(node.file)) {
               parent.refresh();
               setSelectionPath(parent.path());
               view.refresh();
@@ -104,19 +104,19 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
           String name = '(' + NEW_DIR + ')';
           IOFile file = new IOFile(dir.file, name);
           int c = 1;
-          while (file.exists()) {
+          while(file.exists()) {
             name = '(' + NEW_DIR + ' ' + ++c + ')';
             file = new IOFile(dir.file, name);
           }
-          if (file.md()) {
+          if(file.md()) {
             dir.expand();
 
             final String fn = name;
             new Thread(() -> {
               final Enumeration<?> children = dir.children();
-              while (children.hasMoreElements()) {
+              while(children.hasMoreElements()) {
                 final ProjectNode child = (ProjectNode) children.nextElement();
-                if (child.file != null && child.file.name().equals(fn)) {
+                if(child.file != null && child.file.name().equals(fn)) {
                   final TreePath tp = child.path();
                   setSelectionPath(tp);
                   startEditingAtPath(tp);

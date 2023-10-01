@@ -87,7 +87,7 @@ public final class EditorView extends View {
   private final AtomicInteger parseID = new AtomicInteger();
   /** Parse query context. */
   private final AtomicBoolean parsing = new AtomicBoolean();
-  /** Input info. */
+  /** Current input info (can be {@code null}). */
   private InputInfo inputInfo;
 
   /**

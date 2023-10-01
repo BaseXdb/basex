@@ -78,11 +78,11 @@ public final class StrLazy extends AStr implements Lazy {
 
   /**
    * Returns an input stream for the item.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return stream
    * @throws QueryException query exception
    */
-  private TextInput get(final InputInfo ii) throws QueryException {
+  private TextInput get(final InputInfo info) throws QueryException {
     TextInput ti = null;
     try {
       ti = new TextInput(input);
@@ -90,7 +90,7 @@ public final class StrLazy extends AStr implements Lazy {
       return ti;
     } catch(final IOException ex) {
       if(ti != null) try { ti.close(); } catch(final IOException e) { Util.debug(e); }
-      throw error.get(ii, ex);
+      throw error.get(info, ex);
     }
   }
 

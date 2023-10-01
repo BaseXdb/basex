@@ -37,7 +37,7 @@ public final class UserAlter extends UserFn {
      * @param user user
      * @param newname new name
      * @param qc query context
-     * @param info input info
+     * @param info input info (can be {@code null})
      */
     private Alter(final User user, final String newname, final QueryContext qc,
         final InputInfo info) {

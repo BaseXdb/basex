@@ -23,7 +23,7 @@ public abstract class FTExpr extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   FTExpr(final InputInfo info, final FTExpr... exprs) {

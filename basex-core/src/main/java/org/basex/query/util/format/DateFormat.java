@@ -22,7 +22,7 @@ final class DateFormat extends FormatParser {
    * Constructor.
    * @param picture variable marker (info picture)
    * @param def default presentation modifier
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   DateFormat(final byte[] picture, final byte[] def, final InputInfo info) throws QueryException {

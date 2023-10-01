@@ -22,12 +22,12 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 public final class PkgParser {
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public PkgParser(final InputInfo info) {
     this.info = info;

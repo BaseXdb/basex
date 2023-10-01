@@ -42,7 +42,7 @@ public abstract class Path extends ParseExpr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param type type
    * @param root root expression (can be {@code null})
    * @param steps steps
@@ -56,26 +56,26 @@ public abstract class Path extends ParseExpr {
   /**
    * Creates a new, optimized path expression.
    * @param cc compilation context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param root root expression (can be temporary {@link Dummy} node or {@code null})
    * @param steps steps
    * @return path instance
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr root,
+  public static Expr get(final CompileContext cc, final InputInfo info, final Expr root,
       final Expr... steps) throws QueryException {
-    return get(ii, root, steps).optimize(cc);
+    return get(info, root, steps).optimize(cc);
   }
 
   /**
    * Returns a new path instance.
    * A path implementation is chosen that works fastest for the given steps.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param root root expression (can be temporary {@link Dummy} node or {@code null})
    * @param steps steps
    * @return path instance
    */
-  public static Expr get(final InputInfo ii, final Expr root, final Expr... steps) {
+  public static Expr get(final InputInfo info, final Expr root, final Expr... steps) {
     // add steps of input array
     boolean axes = true;
     final ExprList tmp = new ExprList(steps.length);
@@ -100,18 +100,18 @@ public abstract class Path extends ParseExpr {
     if(axes) {
       if(iterative(root, stps)) {
         // example: a
-        if(single && !stps[0].has(Flag.POS)) return new SingleIterPath(ii, stps[0]);
+        if(single && !stps[0].has(Flag.POS)) return new SingleIterPath(info, stps[0]);
         // example: a/b
-        return new IterPath(ii, rt, stps);
+        return new IterPath(info, rt, stps);
       }
       // example: a/b/..
-      return new CachedPath(ii, rt, stps);
+      return new CachedPath(info, rt, stps);
     }
 
     // example: 'text'
     if(single && stps[0].seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM)) return stps[0];
     // example: (1 to 10)/<xml/>
-    return new MixedPath(ii, rt, stps);
+    return new MixedPath(info, rt, stps);
   }
 
   @Override

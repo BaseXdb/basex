@@ -21,7 +21,7 @@ public final class Extension extends Single {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param pragma pragma
    * @param expr enclosed expression
    */

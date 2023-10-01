@@ -31,7 +31,7 @@ public final class GroupSpec extends Single {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param var grouping variable
    * @param expr grouping expression
    * @param coll collation (can be {@code null})
@@ -44,7 +44,7 @@ public final class GroupSpec extends Single {
 
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return expr.atomItem(qc, ii);
+    return expr.atomItem(qc, info);
   }
 
   @Override

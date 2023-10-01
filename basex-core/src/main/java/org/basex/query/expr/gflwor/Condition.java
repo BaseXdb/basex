@@ -42,7 +42,7 @@ public final class Condition extends Single {
    * @param prev previous variable (can be {@code null})
    * @param next next variable (can be {@code null})
    * @param expr condition
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public Condition(final boolean start, final Var item, final Var pos, final Var prev,
       final Var next, final Expr expr, final InputInfo info) {

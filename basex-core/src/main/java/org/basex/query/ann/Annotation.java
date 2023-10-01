@@ -95,7 +95,7 @@ public enum Annotation {
   _OUTPUT_VERSION("version(value)", params(STRING_O), OUTPUT_URI),
 
   /** XQuery annotation. */
-  _PERM_CHECK("check([path[,map]])", params(STRING_O, STRING_O), PERM_URI),
+  _PERM_CHECK("check([path,map])", params(STRING_O, STRING_O), PERM_URI),
   /** XQuery annotation. */
   _PERM_ALLOW("allow(names...)", params(STRING_O), PERM_URI, false),
 

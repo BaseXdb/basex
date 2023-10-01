@@ -35,15 +35,15 @@ public final class YMDur extends Dur {
    * @param value duration item
    * @param dur duration to be added/subtracted
    * @param plus plus/minus flag
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public YMDur(final YMDur value, final YMDur dur, final boolean plus, final InputInfo ii)
+  public YMDur(final YMDur value, final YMDur dur, final boolean plus, final InputInfo info)
       throws QueryException {
 
     this(value);
     final double d = (double) mon + (plus ? dur.mon : -dur.mon);
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(info, d);
     mon += plus ? dur.mon : -dur.mon;
   }
 
@@ -52,32 +52,32 @@ public final class YMDur extends Dur {
    * @param value duration item
    * @param factor factor
    * @param mult multiplication/division flag
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public YMDur(final Dur value, final double factor, final boolean mult, final InputInfo ii)
+  public YMDur(final Dur value, final double factor, final boolean mult, final InputInfo info)
       throws QueryException {
 
     this(value);
-    if(Double.isNaN(factor)) throw DATECALC_X_X.get(ii, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(ii, type, factor);
+    if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, description(), factor);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
     final double d = mult ? mon * factor : mon / factor;
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(ii, d);
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(info, d);
     mon = StrictMath.round(d);
   }
 
   /**
    * Constructor.
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public YMDur(final byte[] value, final InputInfo ii) throws QueryException {
+  public YMDur(final byte[] value, final InputInfo info) throws QueryException {
     super(AtomType.YEAR_MONTH_DURATION);
     final String val = Token.string(value).trim();
     final Matcher mt = YMD.matcher(val);
-    if(!mt.matches() || Strings.endsWith(val, 'P')) throw dateError(value, XYMD, ii);
-    yearMonth(value, mt, ii);
+    if(!mt.matches() || Strings.endsWith(val, 'P')) throw dateError(value, XYMD, info);
+    yearMonth(value, mt, info);
     sec = BigDecimal.ZERO;
   }
 

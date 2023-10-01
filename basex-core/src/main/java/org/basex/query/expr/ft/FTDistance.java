@@ -28,7 +28,7 @@ public final class FTDistance extends FTFilter {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param expr expression
    * @param min minimum
    * @param max maximum

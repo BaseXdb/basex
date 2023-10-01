@@ -82,7 +82,7 @@ public final class DeepEqual {
   }
 
   /**
-   * Checks values for deep equality.
+   * Checks iterated values for deep equality.
    * @param iter1 first iterator
    * @param iter2 second iterator
    * @return result of check

@@ -39,20 +39,20 @@ public final class StaticFuncs extends ExprInfo {
    * @param anns annotations
    * @param doc xqdoc string
    * @param vs variable scope
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return static function reference
    * @throws QueryException query exception
    */
   public StaticFunc declare(final QNm qname, final Params params, final Expr expr,
-      final AnnList anns, final String doc, final VarScope vs, final InputInfo ii)
+      final AnnList anns, final String doc, final VarScope vs, final InputInfo info)
           throws QueryException {
 
     final byte[] uri = qname.uri();
-    if(uri.length == 0) throw FUNNONS_X.get(ii, qname.string());
+    if(uri.length == 0) throw FUNNONS_X.get(info, qname.string());
     if(NSGlobal.reserved(uri) || Functions.builtIn(qname) != null)
-      throw FNRESERVED_X.get(ii, qname.string());
+      throw FNRESERVED_X.get(info, qname.string());
 
-    final StaticFunc sf = new StaticFunc(qname, params, expr, anns, doc, vs, ii);
+    final StaticFunc sf = new StaticFunc(qname, params, expr, anns, vs, info, doc);
     if(!cache(qname.prefixId()).register(sf)) throw DUPLFUNC_X.get(sf.info, qname.string());
     return sf;
   }
@@ -153,10 +153,10 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Throws an exception if the name of a function is similar to the specified function name.
    * @param qname function name
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return exception
    */
-  public QueryException similarError(final QNm qname, final InputInfo ii) {
+  public QueryException similarError(final QNm qname, final InputInfo info) {
     // check local functions
     final ArrayList<QNm> list = new ArrayList<>();
     for(final FuncCache cache : caches()) {
@@ -171,7 +171,7 @@ public final class StaticFuncs extends ExprInfo {
         o -> ((QNm) o).local());
 
     // return error for local or global function
-    return WHICHFUNC_X.get(ii, similar != null ?
+    return WHICHFUNC_X.get(info, similar != null ?
       similar(qname.prefixString(), ((QNm) similar).prefixString()) :
       Functions.similar(qname));
   }

@@ -16,7 +16,7 @@ public final class IntFormat extends FormatParser {
   /**
    * Constructor.
    * @param picture picture
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public IntFormat(final byte[] picture, final InputInfo info) throws QueryException {

@@ -110,7 +110,7 @@ public final class QueryPlan {
       attachType(elem, ((StaticDecl) expr).seqType(), -1, null);
     }
     final InputInfo info = expr.info();
-    if(info != null) attachInputInfo(elem, info);
+    if(info != null) attach(elem, info);
 
     return elem;
   }
@@ -123,7 +123,7 @@ public final class QueryPlan {
    */
   public FBuilder create(final String name, final Var var) {
     final FBuilder elem = FElem.build(new QNm(Strings.capitalize(name)));
-    if(var != null) attachInputInfo(attachVariable(elem, var, true), var.info);
+    if(var != null) attach(attachVariable(elem, var, true), var.info);
     return elem;
   }
 
@@ -173,13 +173,13 @@ public final class QueryPlan {
   /**
    * Attaches input information to the specified element.
    * @param elem element to which attributes will be added
-   * @param ii input info
+   * @param info input info (can be {@code null})
    */
-  private void attachInputInfo(final FBuilder elem, final InputInfo ii) {
+  private void attach(final FBuilder elem, final InputInfo info) {
     if(full) {
-      addAttribute(elem, LINE, ii.line());
-      addAttribute(elem, COLUMN, ii.column());
-      addAttribute(elem, PATH, ii.path());
+      addAttribute(elem, LINE, info.line());
+      addAttribute(elem, COLUMN, info.column());
+      addAttribute(elem, PATH, info.path());
     }
   }
 }

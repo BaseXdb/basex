@@ -15,7 +15,7 @@ import org.basex.util.*;
 public abstract class Simple extends ParseExpr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param seqType sequence type
    */
   protected Simple(final InputInfo info, final SeqType seqType) {

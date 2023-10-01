@@ -19,12 +19,12 @@ public final class InsertIntoAsLast extends NodeCopy {
    * Constructor for an insertInto which is part of a replaceElementContent substitution.
    * @param pre target pre value
    * @param data target data instance
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence
    */
-  public InsertIntoAsLast(final int pre, final Data data, final InputInfo ii,
+  public InsertIntoAsLast(final int pre, final Data data, final InputInfo info,
       final ANodeList nodes) {
-    super(UpdateType.INSERTINTOLAST, pre, data, ii, nodes);
+    super(UpdateType.INSERTINTOLAST, pre, data, info, nodes);
   }
 
   @Override

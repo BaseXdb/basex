@@ -30,7 +30,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     throw FIATOMIZE_X.get(ii, this);
   }
@@ -67,7 +67,7 @@ public abstract class FItem extends Item implements XQFunction {
    * Coerces this function item to the given function type.
    * @param ft function type
    * @param qc query context
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @param optimize optimize resulting item
    * @return coerced item
    * @throws QueryException query exception

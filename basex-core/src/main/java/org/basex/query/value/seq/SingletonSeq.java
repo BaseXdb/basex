@@ -118,7 +118,8 @@ public final class SingletonSeq extends Seq {
   @Override
   public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
-    return materialized(test, ii) ? this : new SingletonSeq(size, value.materialize(test, ii, qc));
+    return materialized(test, ii) ? this :
+      new SingletonSeq(size, value.materialize(test, ii, qc));
   }
 
   @Override

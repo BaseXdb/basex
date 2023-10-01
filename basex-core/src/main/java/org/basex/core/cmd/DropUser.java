@@ -26,7 +26,7 @@ public final class DropUser extends AUser {
   /**
    * Constructor for dropping local database users.
    * @param name name of user
-   * @param pattern database pattern (may be {@code null})
+   * @param pattern database pattern (can be {@code null})
    */
   public DropUser(final String name, final String pattern) {
     super(name, pattern == null ? "" : pattern);

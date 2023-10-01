@@ -32,7 +32,7 @@ public final class DBNew {
 
   /** Query context. */
   private final QueryContext qc;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Main options for all inputs to be added. */
   private final List<MainOptions> options;
@@ -43,7 +43,7 @@ public final class DBNew {
    * Constructor.
    * @param qc query context
    * @param opts main options
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param inputs list of inputs
    */
   public DBNew(final QueryContext qc, final MainOptions opts, final InputInfo info,

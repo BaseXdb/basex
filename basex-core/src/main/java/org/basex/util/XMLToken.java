@@ -2,6 +2,8 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
+import java.nio.charset.*;
+
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 import org.basex.util.similarity.*;
@@ -316,7 +318,7 @@ public final class XMLToken {
       else tb.addByte((byte) b);
     }
 
-    final byte[] decoded = Token.token(new String(tb.toArray()));
+    final byte[] decoded = Token.token(new String(tb.toArray(), StandardCharsets.UTF_8));
     tb.reset();
     final int dl = decoded.length;
     for(int d = 0; d < dl; d += cl(decoded, d)) {

@@ -183,7 +183,7 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(Item item, Collation coll, StaticContext sc, InputInfo ii)
+  public abstract boolean equal(Item item, Collation coll, StaticContext sc, InputInfo ii)
       throws QueryException;
 
   /**
@@ -206,7 +206,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
-    return comparable(item) && eq(item, null, null, ii);
+    return comparable(item) && equal(item, null, null, ii);
   }
 
   /**

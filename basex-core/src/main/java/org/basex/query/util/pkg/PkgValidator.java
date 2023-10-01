@@ -19,13 +19,13 @@ import org.basex.util.*;
 public final class PkgValidator {
   /** Repository context. */
   private final EXPathRepo repo;
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
 
   /**
    * Constructor.
    * @param repo repository context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public PkgValidator(final EXPathRepo repo, final InputInfo info) {
     this.repo = repo;

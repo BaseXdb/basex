@@ -118,7 +118,7 @@ public final class MinHeap<K, V> {
 
   /**
    * Verifies the inner structure of the heap.
-   * @throws IllegalStateException if the invariants don't hold
+   * @throws IllegalStateException if the invariants do not hold
    */
   void verify() {
     verify(0);
@@ -127,7 +127,7 @@ public final class MinHeap<K, V> {
   /**
    * Checks if the heap invariant holds for the node at position {@code i}.
    * @param i position of the node
-   * @throws IllegalStateException if the invariants don't hold
+   * @throws IllegalStateException if the invariants do not hold
    */
   private void verify(final int i) {
     if(2 * i + 1 < size) {

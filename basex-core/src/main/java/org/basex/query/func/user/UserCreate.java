@@ -47,7 +47,7 @@ public final class UserCreate extends UserFn {
      * @param perms permissions
      * @param patterns database patterns
      * @param qc query context
-     * @param info input info
+     * @param info input info (can be {@code null})
      * @throws QueryException query exception
      */
     private Create(final User user, final ArrayList<Perm> perms, final StringList patterns,

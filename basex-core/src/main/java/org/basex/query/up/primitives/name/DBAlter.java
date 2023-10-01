@@ -24,7 +24,7 @@ public final class DBAlter extends NameUpdate {
    * @param name database to be renamed
    * @param newname name of new database
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBAlter(final String name, final String newname, final QueryContext qc,
       final InputInfo info) {

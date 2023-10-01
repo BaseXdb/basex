@@ -49,13 +49,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @param params parameters
    * @param expr function body (can be {@code null})
    * @param anns annotations
-   * @param doc xqdoc string
    * @param vs variable scope
-   * @param info input info
+   * @param info input info (can be {@code null})
+   * @param doc xqdoc string
    */
   StaticFunc(final QNm name, final Params params, final Expr expr, final AnnList anns,
-      final String doc, final VarScope vs, final InputInfo info) {
-    super(name, params.type, anns, doc, vs, info);
+      final VarScope vs, final InputInfo info, final String doc) {
+    super(name, params.type, anns, vs, info, doc);
 
     this.params = params.vars();
     this.defaults = params.defaults();
@@ -192,7 +192,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     if(updating) {
       // updating function
       if(!(exprUpdating || expr.vacuous())) throw UPEXPECTF.get(ii);
-      if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(info);
+      if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(ii);
     } else {
       // uses updates, but is not declared as such
       if(exprUpdating) throw UPNOT_X.get(ii, description());

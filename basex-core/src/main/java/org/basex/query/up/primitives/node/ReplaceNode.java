@@ -21,11 +21,11 @@ public final class ReplaceNode extends NodeCopy {
    * Constructor.
    * @param pre target node pre value
    * @param data target data instance
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence
    */
-  public ReplaceNode(final int pre, final Data data, final InputInfo ii, final ANodeList nodes) {
-    super(UpdateType.REPLACENODE, pre, data, ii, nodes);
+  public ReplaceNode(final int pre, final Data data, final InputInfo info, final ANodeList nodes) {
+    super(UpdateType.REPLACENODE, pre, data, info, nodes);
   }
 
   @Override

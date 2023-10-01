@@ -97,7 +97,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     return value == (item.type == type ? item.bool(ii) : parse(item, ii));
   }
@@ -133,14 +133,14 @@ public final class Bln extends Item {
   /**
    * Converts the specified item to a boolean.
    * @param item item to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return resulting boolean value
    * @throws QueryException query exception
    */
-  public static boolean parse(final Item item, final InputInfo ii) throws QueryException {
-    final Boolean b = parse(item.string(ii));
+  public static boolean parse(final Item item, final InputInfo info) throws QueryException {
+    final Boolean b = parse(item.string(info));
     if(b != null) return b;
-    throw AtomType.BOOLEAN.castError(item, ii);
+    throw AtomType.BOOLEAN.castError(item, info);
   }
 
   /**

@@ -47,12 +47,12 @@ public final class Flt extends ANum {
   /**
    * Returns an instance of this class.
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return instance
    * @throws QueryException query exception
    */
-  public static Flt get(final byte[] value, final InputInfo ii) throws QueryException {
-    return get(parse(value, ii));
+  public static Flt get(final byte[] value, final InputInfo info) throws QueryException {
+    return get(parse(value, info));
   }
 
   @Override
@@ -111,9 +111,9 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public boolean eq(final Item item, final Collation coll, final StaticContext sc,
+  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return item.type == AtomType.DOUBLE ? item.eq(this, coll, sc, ii) : value == item.flt(ii);
+    return item.type == AtomType.DOUBLE ? item.equal(this, coll, sc, ii) : value == item.flt(ii);
   }
 
   @Override
@@ -139,11 +139,11 @@ public final class Flt extends ANum {
   /**
    * Converts the given item to a float value.
    * @param value value to be converted
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return float value
    * @throws QueryException query exception
    */
-  public static float parse(final byte[] value, final InputInfo ii) throws QueryException {
+  public static float parse(final byte[] value, final InputInfo info) throws QueryException {
     final byte[] v = Token.trim(value);
     if(!Token.eq(v, Token.INFINITY, Token.NEGATIVE_INFINITY)) {
       try {
@@ -155,6 +155,6 @@ public final class Flt extends ANum {
 
     if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NEGATVE_INF)) return Float.NEGATIVE_INFINITY;
-    throw AtomType.FLOAT.castError(value, ii);
+    throw AtomType.FLOAT.castError(value, info);
   }
 }

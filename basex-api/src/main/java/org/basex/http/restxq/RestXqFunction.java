@@ -298,13 +298,13 @@ public final class RestXqFunction extends WebFunction {
 
   /**
    * Creates an exception with the specified message.
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param msg error message
    * @param ext error extension
    * @return QueryException query exception
    */
-  static QueryException error(final InputInfo ii, final String msg, final Object... ext) {
-    return BASEX_RESTXQ_X.get(ii, Util.info(msg, ext));
+  static QueryException error(final InputInfo info, final String msg, final Object... ext) {
+    return BASEX_RESTXQ_X.get(info, Util.info(msg, ext));
   }
 
   @Override
@@ -346,19 +346,19 @@ public final class RestXqFunction extends WebFunction {
    * @param method HTTP method as a string
    * @param body variable to which the HTTP request body to be bound (optional)
    * @param declared variable declaration flags
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   private void addMethod(final String method, final Item body, final boolean[] declared,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     if(body != null) {
       final Method m = Method.get(method);
-      if(m != null && !m.body) throw error(ii, METHOD_VALUE_X, m);
-      if(requestBody != null) throw error(ii, ANN_BODYVAR);
+      if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
+      if(requestBody != null) throw error(info, ANN_BODYVAR);
       requestBody = checkVariable(toString(body), declared);
     }
-    if(methods.contains(method)) throw error(ii, ANN_TWICE_X_X, "%", method);
+    if(methods.contains(method)) throw error(info, ANN_TWICE_X_X, "%", method);
     methods.add(method);
   }
 

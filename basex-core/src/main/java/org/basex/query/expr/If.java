@@ -27,7 +27,7 @@ public final class If extends Arr {
 
   /**
    * Constructor with empty 'else' branch.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param cond condition
    * @param branch1 'then' branch
    */
@@ -37,7 +37,7 @@ public final class If extends Arr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param cond condition
    * @param branch1 'then' branch
    * @param branch2 'else' branch

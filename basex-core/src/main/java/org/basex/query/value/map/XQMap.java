@@ -59,13 +59,13 @@ public final class XQMap extends XQData {
    * Creates a map with a single entry.
    * @param key key
    * @param value value
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return map
    * @throws QueryException query exception
    */
-  public static XQMap entry(final Item key, final Value value, final InputInfo ii)
+  public static XQMap entry(final Item key, final Value value, final InputInfo info)
       throws QueryException {
-    return new XQMap(new TrieLeaf(key.hash(ii), key, value),
+    return new XQMap(new TrieLeaf(key.hash(info), key, value),
         MapType.get((AtomType) key.type, value.seqType()));
   }
 
@@ -96,30 +96,30 @@ public final class XQMap extends XQData {
   /**
    * Deletes a key from this map.
    * @param key key to delete (must not be {@code null})
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public XQMap delete(final Item key, final InputInfo ii) throws QueryException {
-    final TrieNode del = root.delete(key.hash(ii), key, 0, ii);
+  public XQMap delete(final Item key, final InputInfo info) throws QueryException {
+    final TrieNode del = root.delete(key.hash(info), key, 0, info);
     return del == root ? this : del == null ? EMPTY : new XQMap(del, type);
   }
 
   @Override
-  public Value get(final Item key, final InputInfo ii) throws QueryException {
-    final Value value = root.get(key.hash(ii), key, 0, ii);
+  public Value get(final Item key, final InputInfo info) throws QueryException {
+    final Value value = root.get(key.hash(info), key, 0, info);
     return value == null ? Empty.VALUE : value;
   }
 
   /**
    * Checks if the given key exists in the map.
    * @param key key to look for (must not be {@code null})
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return {@code true()} if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
-  public boolean contains(final Item key, final InputInfo ii) throws QueryException {
-    return root.contains(key.hash(ii), key, 0, ii);
+  public boolean contains(final Item key, final InputInfo info) throws QueryException {
+    return root.contains(key.hash(info), key, 0, info);
   }
 
   /**
@@ -127,16 +127,16 @@ public final class XQMap extends XQData {
    * @param map map to add
    * @param merge merge duplicate keys
    * @param qc query context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   public XQMap addAll(final XQMap map, final MergeDuplicates merge, final QueryContext qc,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     if(this == EMPTY) return map;
     if(map == EMPTY) return this;
-    final TrieNode upd = root.addAll(map.root, 0, merge, qc, ii);
+    final TrieNode upd = root.addAll(map.root, 0, merge, qc, info);
     if(upd == map.root) return map;
 
     final Type tp;
@@ -205,13 +205,13 @@ public final class XQMap extends XQData {
    * Puts the given value into this map and replaces existing keys.
    * @param key key to insert (must not be {@code null})
    * @param value value to insert
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public XQMap put(final Item key, final Value value, final InputInfo ii) throws QueryException {
-    if(this == EMPTY) return entry(key, value, ii);
-    final TrieNode ins = root.put(key.hash(ii), key, value, 0, ii);
+  public XQMap put(final Item key, final Value value, final InputInfo info) throws QueryException {
+    if(this == EMPTY) return entry(key, value, info);
+    final TrieNode ins = root.put(key.hash(info), key, value, 0, info);
     return ins == root ? this : new XQMap(ins, union(key.type, value.seqType()));
   }
 
@@ -283,7 +283,7 @@ public final class XQMap extends XQData {
 
   @Override
   public void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     tb.add("map{");
     int c = 0;
@@ -298,7 +298,7 @@ public final class XQMap extends XQData {
       }
       tb.add(key).add(':');
       if(indent) tb.add(' ');
-      final Value value = get(key, ii);
+      final Value value = get(key, info);
       final boolean par = value.size() != 1;
       if(par) tb.add('(');
       int cc = 0;
@@ -307,8 +307,8 @@ public final class XQMap extends XQData {
           tb.add(',');
           if(indent) tb.add(' ');
         }
-        if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, ii);
-        else if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, ii);
+        if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
+        else if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
         else tb.add(item);
       }
       if(par) tb.add(')');

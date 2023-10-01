@@ -274,14 +274,14 @@ public abstract class XQArray extends XQData {
   abstract void checkInvariants();
 
   @Override
-  public final Value get(final Item key, final InputInfo ii) throws QueryException {
+  public final Value get(final Item key, final InputInfo info) throws QueryException {
     final Type tp = key.type;
     if(!tp.instanceOf(AtomType.INTEGER) && !tp.isUntyped())
-      throw typeError(key, AtomType.INTEGER, ii);
+      throw typeError(key, AtomType.INTEGER, info);
 
-    final long pos = key.itr(ii), size = arraySize();
+    final long pos = key.itr(info), size = arraySize();
     if(pos > 0 && pos <= size) return get(pos - 1);
-    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
+    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, size);
   }
 
   @Override
@@ -304,7 +304,7 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo ii) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     tb.add('[');
     int c = 0;
@@ -322,8 +322,8 @@ public abstract class XQArray extends XQData {
           if(indent) tb.add(' ');
         }
         final Item item = value.itemAt(i);
-        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, ii);
-        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, ii);
+        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
+        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
         else tb.add(item.toString());
       }
       if(vs != 1) tb.add(')');

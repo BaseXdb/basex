@@ -25,7 +25,7 @@ public final class DBRestore extends NameUpdate {
    * @param name name of database (empty string for general data)
    * @param backup backup file
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public DBRestore(final String name, final String backup, final QueryContext qc,
       final InputInfo info) {

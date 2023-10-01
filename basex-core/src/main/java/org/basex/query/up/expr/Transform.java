@@ -30,7 +30,7 @@ public final class Transform extends Copy {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param copies copy expressions
    * @param modify modify expression
    * @param rtrn return expression

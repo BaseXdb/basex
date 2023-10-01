@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Ann {
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   public final InputInfo info;
   /** Annotation definition ({@code null} if {@link #name} is assigned). */
   public final Annotation definition;
@@ -26,7 +26,7 @@ public final class Ann {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param definition definition
    * @param value value
    */
@@ -39,7 +39,7 @@ public final class Ann {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param name name
    * @param value value
    */

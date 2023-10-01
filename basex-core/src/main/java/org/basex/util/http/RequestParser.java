@@ -30,7 +30,7 @@ public final class RequestParser {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public RequestParser(final InputInfo info) {
     this.info = info;

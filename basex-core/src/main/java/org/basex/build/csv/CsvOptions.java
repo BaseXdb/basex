@@ -75,8 +75,8 @@ public class CsvOptions extends Options {
 
   @Override
   public synchronized void assign(final Item name, final Value value, final boolean error,
-      final InputInfo ii) throws BaseXException, QueryException {
-    super.assign(name, value, error, ii);
+      final InputInfo info) throws BaseXException, QueryException {
+    super.assign(name, value, error, info);
     check();
   }
 

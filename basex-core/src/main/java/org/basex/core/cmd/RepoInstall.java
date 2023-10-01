@@ -17,13 +17,13 @@ import org.basex.util.*;
  * @author Rositsa Shadura
  */
 public final class RepoInstall extends ARepo {
-  /** Input info. */
+  /** Input info (can be {@code null}). */
   private final InputInfo info;
 
   /**
    * Constructor.
    * @param perm package
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public RepoInstall(final String perm, final InputInfo info) {
     super(Perm.CREATE, perm);

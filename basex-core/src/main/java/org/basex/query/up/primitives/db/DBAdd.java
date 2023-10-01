@@ -33,7 +33,7 @@ public final class DBAdd extends DBUpdate {
    * @param qopts query options
    * @param replace replace flag
    * @param qc query context
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public DBAdd(final Data data, final NewInput input, final HashMap<String, String> qopts,

@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 public final class ContextValue extends Simple {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public ContextValue(final InputInfo info) {
     super(info, SeqType.ITEM_ZM);
@@ -27,11 +27,11 @@ public final class ContextValue extends Simple {
   /**
    * Creates a new, optimized context value expression.
    * @param cc compilation context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @return optimized expression
    */
-  public static Expr get(final CompileContext cc, final InputInfo ii) {
-    return new ContextValue(ii).optimize(cc);
+  public static Expr get(final CompileContext cc, final InputInfo info) {
+    return new ContextValue(info).optimize(cc);
   }
 
   @Override

@@ -27,7 +27,7 @@ public abstract class Filter extends Preds {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param root root expression
    * @param preds predicate expressions
    */
@@ -39,15 +39,15 @@ public abstract class Filter extends Preds {
   /**
    * Creates a new, optimized filter expression, or the root expression if no predicates exist.
    * @param cc compilation context
-   * @param ii input info
+   * @param info input info (can be {@code null})
    * @param root root expression
    * @param preds predicate expressions
    * @return filter root, path or filter expression
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final InputInfo ii, final Expr root,
+  public static Expr get(final CompileContext cc, final InputInfo info, final Expr root,
       final Expr... preds) throws QueryException {
-    return preds.length == 0 ? root : new CachedFilter(ii, root, preds).optimize(cc);
+    return preds.length == 0 ? root : new CachedFilter(info, root, preds).optimize(cc);
   }
 
   @Override
@@ -229,7 +229,7 @@ public abstract class Filter extends Preds {
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
-    } else if (mode == Simplify.COUNT && exprs.length == 1) {
+    } else if(mode == Simplify.COUNT && exprs.length == 1) {
       // $nodes[@attr]  ->  $nodes ! @attr
       final Expr pred = exprs[0];
       if(pred.seqType().instanceOf(SeqType.NODE_ZO)) {

@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 public final class FTAnd extends FTExpr {
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs expressions
    */
   public FTAnd(final InputInfo info, final FTExpr[] exprs) {

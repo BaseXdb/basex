@@ -29,7 +29,7 @@ public final class PartFunc extends Arr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param sc static context
    * @param exprs expressions (arguments, body)
    * @param holes positions of the placeholders

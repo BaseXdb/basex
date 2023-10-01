@@ -29,7 +29,7 @@ public final class Grant extends AUser {
    * Constructor, specifying a database.
    * @param permission permission
    * @param user username
-   * @param pattern database pattern (may be {@code null})
+   * @param pattern database pattern (can be {@code null})
    */
   public Grant(final Object permission, final String user, final String pattern) {
     super(permission.toString(), user, pattern == null ? "" : pattern);

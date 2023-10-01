@@ -52,7 +52,7 @@ public final class CmpSR extends Single {
    * @param max maximum value (can be {@code null} if {@code min} is assigned)
    * @param mxi include maximum value
    * @param coll collation (can be {@code null})
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
       final boolean mxi, final Collation coll, final InputInfo info) {

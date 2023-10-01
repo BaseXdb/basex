@@ -40,7 +40,7 @@ public final class StaticJavaCall extends JavaCall {
    * @param perm required permission
    * @param updating updating flag
    * @param sc static context
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   StaticJavaCall(final Object module, final Method method, final Expr[] args, final Perm perm,
       final boolean updating, final StaticContext sc, final InputInfo info) {

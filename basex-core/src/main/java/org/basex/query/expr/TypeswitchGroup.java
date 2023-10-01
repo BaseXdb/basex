@@ -32,7 +32,7 @@ public final class TypeswitchGroup extends Single {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param var variable (can be {@code null})
    * @param seqTypes sequence types this case matches, the empty array means {@code default}
    * @param rtrn return expression

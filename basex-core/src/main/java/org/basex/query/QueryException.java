@@ -135,7 +135,7 @@ public class QueryException extends Exception {
 
   /**
    * Adds an input info to the stack.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return self reference
    */
   public final QueryException add(final InputInfo ii) {
@@ -145,7 +145,7 @@ public class QueryException extends Exception {
 
   /**
    * Sets input info.
-   * @param ii input info
+   * @param ii input info (can be {@code null})
    * @return self reference
    */
   public final QueryException info(final InputInfo ii) {
@@ -155,7 +155,7 @@ public class QueryException extends Exception {
 
   /**
    * Returns the input info.
-   * @return input info
+   * @return input info (can be {@code null})
    */
   public final InputInfo info() {
     return info;

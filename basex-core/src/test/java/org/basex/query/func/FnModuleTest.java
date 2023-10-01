@@ -970,16 +970,25 @@ public final class FnModuleTest extends QueryPlanTest {
         + func.args("s: ~[]*.")
         + "(codepoints-to-string((9,13,10,9,10,13,9,10,9,13,9))))",
         "9\n13\n10\n9\n10\n13\n9\n10\n9\n13\n9");
+    // invalid input
+    query("let $parser := " + func.args("s: ~[\"x\"]*.") + "\n"
+        + "return $parser('x')",
+        "<ixml xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"failed\">"
+        + "Failed to parse input:\n"
+        + "lexical analysis failed\n"
+        + "while expecting [$, #0...]\n"
+        + "at line 1, column 1:\n"
+        + "...x...</ixml>");
+    // result processing error
+    query("let $parser := " + func.args("-s: 'x'.") + "\n"
+        + "return $parser('x')",
+        "<ixml xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"failed\" "
+        + "ixml:error-code=\"D06\">"
+        + "[D06] The parse tree does not contain exactly one top-level element.</ixml>");
     // invalid grammar
     error(func.args("?%$"), IXML_GRM_X_X_X);
     // parser generation failure
     error(func.args("s: ~[#10ffff]."), IXML_GEN_X);
-    // invalid input
-    error("let $parser := " + func.args("s: ~[\"x\"]*.") + "\n"
-        + "return $parser('x')", IXML_INP_X_X_X);
-    // result processing error
-    error("let $parser := " + func.args("-s: 'x'.") + "\n"
-        + "return $parser('x')", IXML_RESULT_X);
   }
 
   /** Test method. */
@@ -1273,9 +1282,13 @@ public final class FnModuleTest extends QueryPlanTest {
     query(func.args("a", "[A-\\\\]"), false);
     query(func.args("\\", "[A-\\\\]"), true);
 
+    query(func.args("babadad", "^((.)?a\\2)+$"), true);
+    query(func.args("x", "(a)|\\1"), true);
+
     error(func.args("a", "+"), REGINVALID_X);
     error(func.args("a", "+", "j"), REGINVALID_X);
     error(func.args("a", "[a-\\\\]"), REGINVALID_X);
+    error(func.args("-", "([\\d-z]+)"), REGINVALID_X);
   }
 
   /** Test method. */

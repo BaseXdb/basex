@@ -36,7 +36,7 @@ public final class GroupBy extends Clause {
    * @param specs grouping specs
    * @param pre references to pre-grouping variables
    * @param post post-grouping variables
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   public GroupBy(final GroupSpec[] specs, final VarRef[] pre, final Var[] post,
       final InputInfo info) {
@@ -58,7 +58,7 @@ public final class GroupBy extends Clause {
    * @param pre pre-grouping expressions
    * @param post post-grouping variables
    * @param nonOcc number of non-occluded grouping variables
-   * @param info input info
+   * @param info input info (can be {@code null})
    */
   private GroupBy(final GroupSpec[] specs, final Expr[] pre, final Var[] post, final int nonOcc,
       final InputInfo info) {

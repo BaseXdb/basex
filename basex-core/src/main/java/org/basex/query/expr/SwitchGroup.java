@@ -24,7 +24,7 @@ public final class SwitchGroup extends Arr {
 
   /**
    * Constructor.
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @param exprs return expression (placed first) and cases (default branch has 0 cases)
    */
   public SwitchGroup(final InputInfo info, final Expr... exprs) {
