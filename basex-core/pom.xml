@@ -47,14 +47,8 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.nineml</groupId>
-      <artifactId>coffeefilter</artifactId>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.nineml</groupId>
-      <artifactId>coffeegrinder</artifactId>
+      <groupId>de.bottlecaps</groupId>
+      <artifactId>markup-blitz</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>

@@ -3,11 +3,10 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.SeqType.*;
 
+import java.io.*;
 import java.util.*;
 
-import org.basex.build.*;
-import org.basex.build.xml.*;
-import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -17,9 +16,8 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.nineml.coffeefilter.*;
-import org.nineml.coffeefilter.exceptions.*;
-import org.nineml.coffeegrinder.parser.*;
+
+import de.bottlecaps.markup.*;
 
 /**
  * Function implementation.
@@ -34,10 +32,8 @@ public final class FnInvisibleXml extends StandardFunc {
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(generator == null) {
-      for(final String className : Arrays.asList("org.nineml.coffeegrinder.parser.GearleyResult",
-          "org.nineml.coffeefilter.exceptions.IxmlException",
-          "org.nineml.coffeefilter.InvisibleXmlDocument",
-          "org.nineml.coffeefilter.InvisibleXmlParser", "org.nineml.coffeefilter.InvisibleXml")) {
+      for(final String className : Arrays.asList("de.bottlecaps.markup.Blitz",
+          "de.bottlecaps.markup.BlitzException", "de.bottlecaps.markup.BlitzParseException")) {
         if(!Reflect.available(className)) {
           throw BASEX_CLASSPATH_X_X.get(info, definition.local(), className);
         }
@@ -59,14 +55,15 @@ public final class FnInvisibleXml extends StandardFunc {
      * @throws QueryException query exception
      */
     public FuncItem generate(final QueryContext qc, final String grammar) throws QueryException {
-      final InvisibleXmlParser parser = new InvisibleXml().getParserFromIxml(grammar);
-      if(!parser.constructed()) {
-        final Exception ex = parser.getException();
-        if(ex != null) throw IXML_GEN_X.get(info, ex);
-        final InvisibleXmlDocument doc = parser.getFailedParse();
-        final GearleyResult result = doc.getResult();
-        throw IXML_GRM_X_X_X.get(info, result.getLastToken(), doc.getLineNumber(),
-            doc.getColumnNumber());
+      final de.bottlecaps.markup.blitz.Parser parser;
+      try {
+        parser = Blitz.generate(grammar);
+      }
+      catch (BlitzParseException ex) {
+        throw IXML_GRM_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
+      }
+      catch (BlitzException ex) {
+        throw IXML_GEN_X.get(info, ex);
       }
       final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info) };
       final Expr arg = new VarRef(info, params[0]);
@@ -81,7 +78,7 @@ public final class FnInvisibleXml extends StandardFunc {
    */
   private static final class ParseInvisibleXml extends Arr {
     /** Generated invisible XML parser. */
-    private final InvisibleXmlParser parser;
+    private final de.bottlecaps.markup.blitz.Parser parser;
 
     /**
      * Constructor.
@@ -89,7 +86,7 @@ public final class FnInvisibleXml extends StandardFunc {
      * @param args function arguments
      * @param parser generated invisible XML parser
      */
-    private ParseInvisibleXml(final InputInfo info, final InvisibleXmlParser parser,
+    private ParseInvisibleXml(final InputInfo info, final de.bottlecaps.markup.blitz.Parser parser,
         final Expr... args) {
       super(info, DOCUMENT_NODE_O, args);
       this.parser = parser;
@@ -98,17 +95,14 @@ public final class FnInvisibleXml extends StandardFunc {
     @Override
     public DBNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
       final String input = toString(arg(0), qc);
-      final InvisibleXmlDocument doc = parser.parse(input);
-      if(!doc.succeeded()) {
-        final GearleyResult result = doc.getResult();
-        throw IXML_INP_X_X_X.get(info, result.getLastToken(), doc.getLineNumber(),
-            doc.getColumnNumber());
-      }
-      final MemBuilder builder = new MemBuilder(Parser.emptyParser(new MainOptions())).init();
       try {
-        doc.getTree(new SAXHandler(builder));
-        return new DBNode(builder.data());
-      } catch(final IxmlException ex) {
+        final String output = parser.parse(input);
+        return new DBNode(IO.get(output));
+      }
+      catch (BlitzParseException ex) {
+        throw IXML_INP_X_X_X.get(ii, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
+      }
+      catch (BlitzException | IOException ex) {
         throw IXML_RESULT_X.get(info, ex);
       }
     }
