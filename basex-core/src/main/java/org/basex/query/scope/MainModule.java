@@ -46,6 +46,11 @@ public class MainModule extends AModule {
   public Iter iter(final QueryContext qc) throws QueryException {
     final int fp = vs.enter(qc);
     final Iter iter = expr.iter(qc);
+    if(iter.valueIter()) {
+      vs.exit(fp, qc);
+      return iter;
+    }
+
     return new Iter() {
       boolean more = true;
 
@@ -55,7 +60,7 @@ public class MainModule extends AModule {
           final Item item = iter.next();
           if(item != null) return item;
           more = false;
-          VarScope.exit(fp, qc);
+          vs.exit(fp, qc);
         }
         return null;
       }

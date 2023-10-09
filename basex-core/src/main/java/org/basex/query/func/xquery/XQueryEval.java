@@ -117,12 +117,12 @@ public class XQueryEval extends StandardFunc {
           if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATE2.get(info);
         }
 
-        final ValueBuilder vb = new ValueBuilder(qc);
         final Iter iter = qctx.iter();
-        for(Item item; (item = qctx.next(iter)) != null;) {
-          qc.checkStop();
-          vb.add(item);
-        }
+        // value-based iterator: return result unchanged
+        if(iter.valueIter()) return iter.value(qctx, this);
+        // collect resulting items
+        final ValueBuilder vb = new ValueBuilder(qc);
+        for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
         return vb.value();
       } catch(final JobException ex) {
         if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);

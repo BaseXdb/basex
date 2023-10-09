@@ -84,7 +84,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
         }
         value = val;
       } finally {
-        VarScope.exit(fp, qc);
+        vs.exit(fp, qc);
       }
     }
     return value;
