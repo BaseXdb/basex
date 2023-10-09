@@ -454,4 +454,10 @@ public final class GFLWORTest extends QueryPlanTest {
     check("for $a in () return delete node a", "", empty());
     check("for $a in" + VOID.args(1) + " return delete node a", "", root(VOID));
   }
+
+  /** Sliding windows. */
+  @Test public void gh2252() {
+    query("for sliding window $w in 1 to 3 start at $p when true()"
+        + "only end when $p = 2 return <w>{ $w }</w>", "<w>2</w>");
+  }
 }

@@ -189,7 +189,7 @@ public final class Window extends Clause {
 
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
-        while(true) {
+        do {
           Item curr, next = null;
           while((curr = advance()) != null) {
             next = queue.peekFirst();
@@ -226,11 +226,10 @@ public final class Window extends Clause {
               return true;
             }
           }
+        } while(!queue.isEmpty() || prepareNext(qc, sub));
 
-          // abort if no more tuples from above
-          if(!prepareNext(qc, sub)) return false;
-          queue.clear();
-        }
+        // abort if queue is empty and stream is exhausted
+        return false;
       }
 
       /**
