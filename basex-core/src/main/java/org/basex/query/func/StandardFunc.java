@@ -622,7 +622,7 @@ public abstract class StandardFunc extends Arr {
     final int arity = func.arity();
     return arity < args.length ? func.invoke(qc, info, Arrays.copyOf(args, arity)) :
       func.invoke(qc, info, args);
-  };
+  }
 
   /**
    * Indicates if the supplied argument is defined.

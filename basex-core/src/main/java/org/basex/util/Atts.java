@@ -89,7 +89,7 @@ public final class Atts extends ElementList {
    * @return self reference
    */
   public Atts remove(final int index) {
-    byte[][] lst = list;
+    final byte[][] lst = list;
     final int s = size;
     Array.remove(lst, index, 2, s);
     lst[s - 2] = null;
@@ -113,7 +113,7 @@ public final class Atts extends ElementList {
    * @return offset or -1
    */
   public int get(final byte[] name) {
-    byte[][] lst = list;
+    final byte[][] lst = list;
     for(int p = 0; p < size; p += 2) {
       if(eq(lst[p], name)) return p >>> 1;
     }

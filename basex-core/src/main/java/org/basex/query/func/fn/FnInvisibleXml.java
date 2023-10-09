@@ -58,14 +58,12 @@ public final class FnInvisibleXml extends StandardFunc {
       final de.bottlecaps.markup.blitz.Parser parser;
       try {
         parser = Blitz.generate(grammar);
-      }
-      catch (BlitzParseException ex) {
+      } catch(final BlitzParseException ex) {
         throw IXML_GRM_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
-      }
-      catch (BlitzException ex) {
+      } catch(final BlitzException ex) {
         throw IXML_GEN_X.get(info, ex);
       }
-      final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info) };
+      final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info)};
       final Expr arg = new VarRef(info, params[0]);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
       final FuncType type = FuncType.get(parseFunction.seqType(), STRING_O);
@@ -98,11 +96,9 @@ public final class FnInvisibleXml extends StandardFunc {
       try {
         final String output = parser.parse(input);
         return new DBNode(IO.get(output));
-      }
-      catch (BlitzParseException ex) {
+      } catch(final BlitzParseException ex) {
         throw IXML_INP_X_X_X.get(ii, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
-      }
-      catch (BlitzException | IOException ex) {
+      } catch(BlitzException | IOException ex) {
         throw IXML_RESULT_X.get(info, ex);
       }
     }

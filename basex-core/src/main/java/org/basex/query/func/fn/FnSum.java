@@ -156,7 +156,7 @@ public class FnSum extends StandardFunc {
     if(item == null) return null;
 
     Item result = item.type.isUntyped() ? Dbl.get(item.dbl(info)) : item;
-    Type type = result.type;
+    final Type type = result.type;
     final boolean num = result instanceof ANum;
     final boolean dtd = type == DAY_TIME_DURATION, ymd = type == YEAR_MONTH_DURATION;
     if(!num && !dtd && !ymd) throw NUMDUR_X_X.get(info, type, result);

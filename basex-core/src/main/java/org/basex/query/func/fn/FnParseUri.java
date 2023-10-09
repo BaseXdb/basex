@@ -146,7 +146,7 @@ public class FnParseUri extends FnJsonDoc {
       filepath = string;
     }
 
-    TokenList segments = new TokenList();
+    final TokenList segments = new TokenList();
     if(!string.isEmpty()) {
       final String separator = Pattern.quote(options.get(UriOptions.PATH_SEPARATOR));
       for(final String s : string.split(separator)) segments.add(decode(s));

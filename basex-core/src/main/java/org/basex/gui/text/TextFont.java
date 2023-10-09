@@ -40,7 +40,7 @@ final class TextFont {
   /** Tab indentation. */
   private final int indent;
   /** Font size. */
-  private int size;
+  private final int size;
 
   /** Current style. */
   private int style;

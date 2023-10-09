@@ -182,9 +182,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   public StaticFunc[] funcs() {
     final ArrayList<StaticFunc> list = new ArrayList<>();
-    for(final FuncCache cache : caches()) {
-      for(final StaticFunc func : cache.funcs) list.add(func);
-    }
+    for(final FuncCache cache : caches()) list.addAll(cache.funcs);
     return list.toArray(StaticFunc[]::new);
   }
 
@@ -260,9 +258,7 @@ public final class StaticFuncs extends ExprInfo {
           if(func != null) {
             if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
             if(func.updating) qc.updating();
-          } else {
-            if(((JavaCall) call.external).updating) qc.updating();
-          }
+          } else if(((JavaCall) call.external).updating) qc.updating();
         }
       }
 

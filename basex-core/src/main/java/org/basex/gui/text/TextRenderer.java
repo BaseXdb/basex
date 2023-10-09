@@ -558,7 +558,7 @@ final class TextRenderer extends BaseXBack {
           iter.next();
           final int fsw = font.stringWidth(iter.substring(p, iter.pos()));
           if(sw < fsw) {
-            if(sw < (oldFsw + (fsw - oldFsw) / 2)) iter.pos(caretP);
+            if(sw < oldFsw + (fsw - oldFsw) / 2) iter.pos(caretP);
             break;
           }
           oldFsw = fsw;

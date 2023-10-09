@@ -58,7 +58,7 @@ public class WeakTokenSetTest {
       }
       System.gc();
       Thread.sleep(2); // allow some time for gc'ed references to appear in reference queue
-      for(String string : strings) {
+      for(final String string : strings) {
         final byte[] key = Token.token(string);
         if(strongRefs.containsKey(string)) {
           final byte[] stored = strongRefs.get(string);
@@ -69,9 +69,9 @@ public class WeakTokenSetTest {
         }
       }
 
-    } catch(AssertionFailedError e) {
+    } catch(final AssertionFailedError e) {
       throw e;
-    } catch(Throwable t) {
+    } catch(final Throwable t) {
       throw new AssertionFailedError(msgPrefix + "caught " + t.getClass().getSimpleName(), t);
     }
   }

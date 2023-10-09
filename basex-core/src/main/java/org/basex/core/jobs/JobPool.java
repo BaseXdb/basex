@@ -84,8 +84,7 @@ public final class JobPool {
    * @return sorted id list
    */
   public TokenList ids() {
-    final Set<String> set = new HashSet<>();
-    set.addAll(results.keySet());
+    final Set<String> set = new HashSet<>(results.keySet());
     set.addAll(active.keySet());
     set.addAll(tasks.keySet());
     final TokenList ids = new TokenList(set.size());

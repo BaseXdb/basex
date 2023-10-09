@@ -23,7 +23,7 @@ public final class DialogFonts extends BaseXDialog {
   private static DialogFonts dialog;
 
   /** Monospace fonts. */
-  private String[] monoFonts;
+  private final String[] monoFonts;
 
   /** Font name chooser. */
   private final BaseXList font;
@@ -110,25 +110,23 @@ public final class DialogFonts extends BaseXDialog {
         font2.setData(GUIConstants.fonts());
       }
       font2.setValue(gopts.get(GUIOptions.MONOFONT));
-    } else {
-      if(cmp == font) {
-        final String name = font.getValue();
-        if(!name.isEmpty()) {
-          gopts.set(GUIOptions.FONT, name);
-          changed = true;
-        }
-      } else if(cmp == font2) {
-        final String name = font2.getValue();
-        if(!name.isEmpty()) {
-          gopts.set(GUIOptions.MONOFONT, name);
-          changed = true;
-        }
-      } else if(cmp == size) {
-        final int num = size.getNum();
-        if(num > 0) {
-          gopts.set(GUIOptions.FONTSIZE, num);
-          changed = true;
-        }
+    } else if(cmp == font) {
+      final String name = font.getValue();
+      if(!name.isEmpty()) {
+        gopts.set(GUIOptions.FONT, name);
+        changed = true;
+      }
+    } else if(cmp == font2) {
+      final String name = font2.getValue();
+      if(!name.isEmpty()) {
+        gopts.set(GUIOptions.MONOFONT, name);
+        changed = true;
+      }
+    } else if(cmp == size) {
+      final int num = size.getNum();
+      if(num > 0) {
+        gopts.set(GUIOptions.FONTSIZE, num);
+        changed = true;
       }
     }
     if(changed) {
