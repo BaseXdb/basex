@@ -2,8 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
-import org.basex.query.ast.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class PathTest extends QueryPlanTest {
+public final class PathTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** First result. */

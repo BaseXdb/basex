@@ -26,23 +26,23 @@ public final class ArchiveModuleTest extends SandboxTest {
     final Function func = _ARCHIVE_CREATE;
 
     // simple zip files
-    count(func.args("X", ""), 1);
+    countEntries(func.args("X", ""), 1);
 
     // simple zip files
-    count(func.args(" <archive:entry>X</archive:entry>", ""), 1);
-    count(func.args(" <archive:entry level='9'>X</archive:entry>", ""), 1);
-    count(func.args(" <archive:entry encoding='US-ASCII'>X</archive:entry>", ""), 1);
-    count(func.args(" <archive:entry " +
+    countEntries(func.args(" <archive:entry>X</archive:entry>", ""), 1);
+    countEntries(func.args(" <archive:entry level='9'>X</archive:entry>", ""), 1);
+    countEntries(func.args(" <archive:entry encoding='US-ASCII'>X</archive:entry>", ""), 1);
+    countEntries(func.args(" <archive:entry " +
         "last-modified='2000-01-01T12:12:12'>X</archive:entry>", ""), 1);
-    count(func.args(" <archive:entry>X</archive:entry>", "", " map { }"), 1);
-    count(func.args(" <archive:entry>X</archive:entry>", "",
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "", " map { }"), 1);
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "",
         " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
-    count(func.args("X", "", " map {}"), 1);
-    count(func.args(" <archive:entry>X</archive:entry>", "",
+    countEntries(func.args("X", "", " map {}"), 1);
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "",
         " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
-    count(func.args(" <archive:entry>X</archive:entry>", "",
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "",
         " map { 'format': 'zip' }"), 1);
-    count(func.args(" <archive:entry>X</archive:entry>", "",
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "",
         " map { 'format': 'gzip' }"), 1);
 
     // different number of entries and contents
@@ -81,11 +81,11 @@ public final class ArchiveModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void createFrom() {
     final Function func = _ARCHIVE_CREATE_FROM;
-    count(func.args(DIR), 5);
-    count(func.args(DIR, " map { }"), 5);
-    count(func.args(DIR, " map { 'algorithm': 'stored' }"), 5);
+    countEntries(func.args(DIR), 5);
+    countEntries(func.args(DIR, " map { }"), 5);
+    countEntries(func.args(DIR, " map { 'algorithm': 'stored' }"), 5);
 
-    count(func.args(DIR, " map { 'recursive': false() }"), 4);
+    countEntries(func.args(DIR, " map { 'recursive': false() }"), 4);
     query(_ARCHIVE_ENTRIES.args(func.args(DIR, " map { 'root-dir': true() }")) +
         "[not(starts-with(., 'dir/'))]", "");
 
@@ -179,11 +179,11 @@ public final class ArchiveModuleTest extends SandboxTest {
     final String tmp = new IOFile(sandbox(), "tmp").path();
     // write archive and count number of entries
     query(func.args(tmp, _FILE_READ_BINARY.args(ZIP)));
-    count(_FILE_READ_BINARY.args(ZIP), 5);
+    countEntries(_FILE_READ_BINARY.args(ZIP), 5);
     // write archive and count number of entries
     query(func.args(tmp, _FILE_READ_BINARY.args(ZIP),
         _ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP))));
-    count(_FILE_READ_BINARY.args(ZIP), 5);
+    countEntries(_FILE_READ_BINARY.args(ZIP), 5);
 
     query("let $a := " + _ARCHIVE_ENTRIES.args(
       _FILE_READ_BINARY.args(ZIP)) + "/string() " +
@@ -238,7 +238,7 @@ public final class ArchiveModuleTest extends SandboxTest {
    * @param archive archive
    * @param exp expected number of results
    */
-  private static void count(final String archive, final int exp) {
+  private static void countEntries(final String archive, final int exp) {
     query(COUNT.args(_ARCHIVE_ENTRIES.args(archive)), exp);
   }
 }

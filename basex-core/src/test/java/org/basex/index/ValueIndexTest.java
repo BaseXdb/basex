@@ -14,8 +14,8 @@ import org.basex.index.query.*;
 import org.basex.index.value.*;
 import org.basex.util.hash.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 /**
  * Tests for the value index.

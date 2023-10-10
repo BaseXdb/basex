@@ -1,9 +1,9 @@
 package org.basex.query.func;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ArrayModuleTest extends QueryPlanTest {
+public final class ArrayModuleTest extends SandboxTest {
   /** Months. */
   private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
       + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";

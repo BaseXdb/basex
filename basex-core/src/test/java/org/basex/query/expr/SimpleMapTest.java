@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class SimpleMapTest extends QueryPlanTest {
+public final class SimpleMapTest extends SandboxTest {
   /** Resets optimizations. */
   @AfterEach public void init() {
     inline(false);

@@ -7,12 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.core.parse.Commands.*;
 import org.basex.io.*;
-import org.basex.query.ast.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class DbModuleTest extends QueryPlanTest {
+public final class DbModuleTest extends SandboxTest {
   /** Invalid characters for database names. */
   private static final char[] INVALID = ",*?;\\/:\"<>|".toCharArray();
   /** Test file. */

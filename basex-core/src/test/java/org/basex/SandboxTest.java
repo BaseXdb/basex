@@ -23,21 +23,4 @@ public abstract class SandboxTest extends Sandbox {
   @AfterAll public static void finishTests() {
     finishSandbox();
   }
-
-  /**
-   * Returns a context value reference string that will not be optimized at compile time.
-   * @return container
-   */
-  public static String wrapContext() {
-    return " data(attribute _ { . })";
-  }
-
-  /**
-   * Returns a value string that will not be optimized at compile time.
-   * @param value value to return
-   * @return container
-   */
-  public static String wrap(final Object value) {
-    return " data(attribute _ { '" + value + "' })";
-  }
 }

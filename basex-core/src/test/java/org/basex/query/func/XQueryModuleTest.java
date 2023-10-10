@@ -3,8 +3,8 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.core.*;
-import org.basex.query.ast.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class XQueryModuleTest extends QueryPlanTest {
+public final class XQueryModuleTest extends SandboxTest {
   /** Path to test file. */
   private static final String PATH = "src/test/resources/input.xml";
 

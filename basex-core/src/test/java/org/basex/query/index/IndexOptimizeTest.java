@@ -2,10 +2,10 @@ package org.basex.query.index;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.index.*;
-import org.basex.query.ast.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
 import org.basex.util.*;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class IndexOptimizeTest extends QueryPlanTest {
+public final class IndexOptimizeTest extends SandboxTest {
   /** Creates a test database. */
   @BeforeAll public static void start() {
     execute(new DropDB(NAME));

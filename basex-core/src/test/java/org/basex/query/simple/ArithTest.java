@@ -2,7 +2,7 @@ package org.basex.query.simple;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ArithTest extends QueryPlanTest {
+public final class ArithTest extends SandboxTest {
   /** Test method. */
   @Test public void plus() {
     check("for $i in (1 to 2)[. != 0] return ($i * $i) + 1", "2\n5", exists(Arith.class));

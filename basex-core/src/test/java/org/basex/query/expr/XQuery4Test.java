@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class XQuery4Test extends QueryPlanTest {
+public final class XQuery4Test extends SandboxTest {
   /** Version declaration. */
   @Test public void version40() {
     query("xquery version '1.0'; ()", "");

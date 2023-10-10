@@ -3,6 +3,7 @@ package org.basex.query.ast;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
-public final class FuncItemTest extends QueryPlanTest {
+public final class FuncItemTest extends SandboxTest {
   /** Resets optimizations. */
   @BeforeEach public void init() {
     inline(true);

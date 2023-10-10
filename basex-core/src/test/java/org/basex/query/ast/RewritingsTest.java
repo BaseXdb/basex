@@ -3,6 +3,7 @@ package org.basex.query.ast;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
@@ -27,7 +28,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class RewritingsTest extends QueryPlanTest {
+public final class RewritingsTest extends SandboxTest {
   /** Input file. */
   private static final String FILE = "src/test/resources/input.xml";
 

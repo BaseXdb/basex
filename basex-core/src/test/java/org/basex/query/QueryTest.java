@@ -133,7 +133,7 @@ public abstract class QueryTest extends SandboxTest {
    * Creates a container for the specified node values.
    * @return node array
    */
-  protected static Value empty() {
+  protected static Value emptySequence() {
     return Empty.VALUE;
   }
 

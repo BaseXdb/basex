@@ -30,8 +30,8 @@ public final class XQueryExtensionsTest extends QueryTest {
       { "IfWithoutElse 2", integers(3), "if(1) then if(2) then 3" },
       { "IfWithoutElse 3", integers(2), "if(1) then 2 else if(3) then 4" },
 
-      { "IfWithoutElse 4", empty(), "if(()) then 2" },
-      { "IfWithoutElse 5", empty(), "if(()) then if(2) then 3" },
+      { "IfWithoutElse 4", emptySequence(), "if(()) then 2" },
+      { "IfWithoutElse 5", emptySequence(), "if(()) then if(2) then 3" },
       { "IfWithoutElse 6", integers(4), "if(()) then 2 else if(3) then 4" },
 
       {}

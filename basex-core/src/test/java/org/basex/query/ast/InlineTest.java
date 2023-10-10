@@ -1,5 +1,6 @@
 package org.basex.query.ast;
 
+import org.basex.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
-public final class InlineTest extends QueryPlanTest {
+public final class InlineTest extends SandboxTest {
   /** Resets optimizations. */
   @BeforeEach public void init() {
     inline(false);

@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
-public final class MapTest extends QueryPlanTest {
+public final class MapTest extends SandboxTest {
   /** A map as key should lead to FOTY0013. */
   @Test public void mapAsKeyTest() {
     error("declare variable $m := map { 'a': 'b' };" +

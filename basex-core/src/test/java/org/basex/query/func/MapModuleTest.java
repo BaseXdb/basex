@@ -4,8 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.basex.*;
 import org.basex.query.*;
-import org.basex.query.ast.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class MapModuleTest extends QueryPlanTest {
+public final class MapModuleTest extends SandboxTest {
   /** Months. */
   private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
       + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";

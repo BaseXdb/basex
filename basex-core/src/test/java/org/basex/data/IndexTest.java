@@ -6,8 +6,8 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 /**
  * This class tests the {@link MainOptions#UPDINDEX} and {@link MainOptions#AUTOOPTIMIZE} options.
@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.ValueSource;
  * @author Christian Gruen
  */
 public final class IndexTest extends SandboxTest {
-
   /**
    * Finalize test.
    */

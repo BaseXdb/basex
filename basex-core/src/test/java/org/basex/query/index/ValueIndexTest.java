@@ -2,16 +2,16 @@ package org.basex.query.index;
 
 import java.util.*;
 
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.query.ast.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.value.node.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
 
 /**
  * This class tests if value indexes will be used.
@@ -19,7 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ValueIndexTest extends QueryPlanTest {
+public final class ValueIndexTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/selective.xml";
 

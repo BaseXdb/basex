@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class FnModuleTest extends QueryPlanTest {
+public final class FnModuleTest extends SandboxTest {
   /** Text file. */
   private static final String TEXT = "src/test/resources/input.xml";
   /** Document. */
@@ -1805,8 +1805,8 @@ public final class FnModuleTest extends QueryPlanTest {
   @Test public void serialize() {
     final Function func = SERIALIZE;
     contains(func.args(" <x/>"), "<x/>");
-    contains(func.args(" <x/>", " " + serialParams("")), "<x/>");
-    contains(func.args(" <x>a</x>", " " + serialParams("<method value='text'/>")), "a");
+    contains(func.args(" <x/>", " map {}"), "<x/>");
+    contains(func.args(" <x>a</x>", " map { 'method': 'text' }"), "a");
 
     // character maps
     query(func.args("1;2", " map { 'use-character-maps': ';=,,' }"), "1,2");

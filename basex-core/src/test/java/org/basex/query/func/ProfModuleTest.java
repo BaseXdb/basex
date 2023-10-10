@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ProfModuleTest extends QueryPlanTest {
+public final class ProfModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void human() {
     final Function func = _PROF_HUMAN;

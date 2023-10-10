@@ -1,5 +1,6 @@
 package org.basex.query.ast;
 
+import org.basex.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
-public final class TCOTest extends QueryPlanTest {
+public final class TCOTest extends SandboxTest {
   /** Checks if tail-call optimization was applied. */
   @Test public void facTest() {
     check("declare function local:fac($n, $f) {" +

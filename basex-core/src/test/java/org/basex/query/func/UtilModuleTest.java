@@ -3,7 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class UtilModuleTest extends QueryPlanTest {
+public final class UtilModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void arrayMember() {
     final Function func = _UTIL_ARRAY_MEMBER;

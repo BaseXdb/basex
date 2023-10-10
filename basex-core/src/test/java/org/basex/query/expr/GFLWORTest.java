@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.basex.query.ast.*;
+import org.basex.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.up.expr.*;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
-public final class GFLWORTest extends QueryPlanTest {
+public final class GFLWORTest extends SandboxTest {
   /** Tests shadowing of outer variables. */
   @Test public void shadowTest() {
     assertEquals("<x>1</x>",

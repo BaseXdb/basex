@@ -60,7 +60,7 @@ public final class CsvParserTest extends SandboxTest {
   /**
    * Adds an empty CSV file.
    */
-  @Test public void empty() {
+  @Test public void emptyFile() {
     write(new IOFile(TEMP), "");
     execute(new CreateDB(NAME, TEMP));
     assertEquals("<csv/>", query("."));

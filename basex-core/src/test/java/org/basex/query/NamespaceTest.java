@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -877,8 +876,8 @@ public final class NamespaceTest extends SandboxTest {
    * @param expected expected output
    */
   private static void query(final String first, final String second, final String expected) {
-    if(first != null) Sandbox.query(first);
-    final String res = Sandbox.query(second).trim().replace('"', '\'');
+    if(first != null) query(first);
+    final String res = query(second).trim().replace('"', '\'');
     final String exp = expected.replace('"', '\'');
     compare(second, res, exp, null);
   }
