@@ -171,9 +171,9 @@ function dba:log(
   )
   let $entries := (
     let $ignore-logs := options:get($options:IGNORE-LOGS)
-    let $regex := matches($input, '[+*?^$(){}|\[\]\\]')
-    let $terms := $regex ?? $input !! tokenize($input)
-    let $joined-terms := $regex ?? $input !! string-join($terms, '|')
+    let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
+    let $terms := if($regex-string) then $input else tokenize($input)
+    let $joined-terms := if($regex-string) then $input else string-join($terms, '|')
 
     for $log in reverse(admin:logs($name, true()))
     let $text := string($log)
@@ -192,7 +192,7 @@ function dba:log(
           map:merge(
             map:for-each($map, function($k, $v) {
               map:entry($k, (
-                if (matches($v, $joined-terms)) then function() {
+                if (matches($v, $joined-terms, 'i')) then function() {
                   for $match in analyze-string($v, $joined-terms, 'i')/*
                   let $value := string($match)
                   return if($match/self::fn:match) then element b { $value } else $value

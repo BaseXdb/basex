@@ -28,7 +28,7 @@ function dba:backup-drop(
   $name     as xs:string,
   $backups  as xs:string*
 ) as empty-sequence() {
-  let $target := $name ?? $dba:SUB !! $dba:CAT
+  let $target := if($name) then $dba:SUB else $dba:CAT
   return try {
     $backups ! db:drop-backup($name || '-' || .),
     util:redirect($target, map { 'name': $name, 'info': util:info($backups, 'backup', 'dropped') })

@@ -28,7 +28,7 @@ function dba:backup-restore(
   $name     as xs:string,
   $backups  as xs:string+
 ) as empty-sequence() {
-  let $target := $name ?? $dba:SUB !! $dba:CAT
+  let $target := if($name) then $dba:SUB else $dba:CAT
   return try {
     db:restore($name || '-' || head($backups)),
     util:redirect($target, map { 'name': $name, 'info': util:info($backups, 'backup', 'restored') })
