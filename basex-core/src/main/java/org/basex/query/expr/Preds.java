@@ -237,7 +237,7 @@ public abstract class Preds extends Arr {
     // only single predicate can be rewritten; root must yield nodes; no positional predicates
     final SeqType rst = root.seqType();
     final int el = exprs.length;
-    if(el == 0 || mayBePositional() || ebv && !(rst.type instanceof NodeType)) return this;
+    if(el == 0 || mayBePositional()) return this;
 
     final Expr last = exprs[el - 1];
     final QuerySupplier<Expr> createRoot = () ->
@@ -249,6 +249,14 @@ public abstract class Preds extends Arr {
       rhs instanceof ContextValue ? createRoot.get() :
       rhs instanceof Path         ? Path.get(cc, info, createRoot.get(), rhs) :
       compare                     ? createSimpleMap.apply(rhs) : this;
+
+    if(rst.type instanceof NodeType) {
+      // rewrite to path: root[path]  ->  root/path
+      final Expr expr = createExpr.apply(last, false);
+      if(expr != this) return expr;
+    } else if(ebv) {
+      return this;
+    }
 
     // rewrite to general comparison
     // a[. = 'x']           ->  a = 'x'
@@ -280,12 +288,6 @@ public abstract class Preds extends Arr {
         final Expr expr = createExpr.apply(cmp.expr, true);
         if(expr != this) return new FTContains(expr, ftexpr, cmp.info).optimize(cc);
       }
-    }
-
-    // rewrite to path: root[path]  ->  root/path
-    if(rst.type instanceof NodeType) {
-      final Expr expr = createExpr.apply(last, false);
-      if(expr != this) return expr;
     }
 
     // rewrite to simple map: $node[string()]  ->  $node ! string()
