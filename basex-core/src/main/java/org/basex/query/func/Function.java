@@ -479,7 +479,7 @@ public enum Function implements AFunction {
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
-  PARTITION(FnPartition::new, "partition(input,break-when)",
+  PARTITION(FnPartition::new, "partition(input,split-when)",
       params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
   PATH(FnPath::new, "path([node])",
