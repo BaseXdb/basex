@@ -196,6 +196,9 @@ public enum Function implements AFunction {
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
       params(STRING_ZM, NODE_O), ELEMENT_ZM),
   /** XQuery function. */
+  ELEMENTS_TO_MAP(FnElementsToMaps::new, "elements-to-maps(elements[,options])",
+      params(ELEMENT_ZM, MAP_O), MAP_ZM),
+  /** XQuery function. */
   EMPTY(FnEmpty::new, "empty(input)",
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */

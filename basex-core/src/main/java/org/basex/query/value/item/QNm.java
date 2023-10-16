@@ -275,7 +275,6 @@ public final class QNm extends Item {
    * Returns a unique representation of the QName.
    * <ul>
    * <li> If a URI exists, the EQName notation is used.</li>
-   * <li> Otherwise, if a prefix exists, the prefix and local name is returned.</li>
    * <li> Otherwise, the local name is returned.</li>
    * </ul>
    * @return QName as token

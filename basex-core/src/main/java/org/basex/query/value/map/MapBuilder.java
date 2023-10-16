@@ -46,6 +46,28 @@ public final class MapBuilder {
   }
 
   /**
+   * Adds a key and a value token to the map.
+   * @param key key
+   * @param value value
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public MapBuilder put(final Item key, final byte[] value) throws QueryException {
+    return put(key, Str.get(value));
+  }
+
+  /**
+   * Adds a key string and a value to the map.
+   * @param key key
+   * @param value value
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public MapBuilder put(final byte[] key, final Value value) throws QueryException {
+    return put(Str.get(key), value);
+  }
+
+  /**
    * Adds a key string and a value to the map.
    * @param key key
    * @param value value
@@ -53,7 +75,18 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final String key, final Value value) throws QueryException {
-    return put(Str.get(key), value);
+    return put(Token.token(key), value);
+  }
+
+  /**
+   * Adds key/value tokens to the map.
+   * @param key key
+   * @param value value (can be {@code null})
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public MapBuilder put(final byte[] key, final byte[] value) throws QueryException {
+    return put(key, value != null ? Str.get(value) : Empty.VALUE);
   }
 
   /**
@@ -64,7 +97,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final String key, final byte[] value) throws QueryException {
-    return put(key, value != null ? Str.get(value) : Empty.VALUE);
+    return put(Token.token(key), value);
   }
 
   /**
@@ -75,7 +108,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final String key, final String value) throws QueryException {
-    return put(key, value != null ? Str.get(value) : Empty.VALUE);
+    return put(Token.token(key), value != null ? Token.token(value) : null);
   }
 
   /**
