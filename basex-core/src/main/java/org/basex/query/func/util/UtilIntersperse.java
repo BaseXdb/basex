@@ -1,4 +1,6 @@
-package org.basex.query.func.fn;
+package org.basex.query.func.util;
+
+import org.basex.query.func.fn.*;
 
 /**
  * Function implementation.
