@@ -608,6 +608,9 @@ public enum Function implements AFunction {
   TRACE(FnTrace::new, "trace(input[,label])",
       params(ITEM_ZM, STRING_ZO), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
+  TRANSITIVE_CLOSURE(FnTransitiveClosure::new, "transitive-closure(node,step[,min,max])",
+      params(NODE_O, FUNCTION_O, INTEGER_O, INTEGER_O), NODE_ZM),
+  /** XQuery function. */
   TRANSLATE(FnTranslate::new, "translate(value,replace,with)",
       params(STRING_ZO, STRING_O, STRING_O), STRING_O),
   /** XQuery function. */
