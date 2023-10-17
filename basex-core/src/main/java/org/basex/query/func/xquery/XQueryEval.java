@@ -129,13 +129,11 @@ public class XQueryEval extends StandardFunc {
         if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);
         throw ex;
       } catch(final QueryException ex) {
+        Util.debug(ex);
         final QueryError error = ex.error();
-        if(error == BASEX_PERMISSION_X || error == BASEX_PERMISSION_X_X) {
-          Util.debug(ex);
-          throw XQUERY_PERMISSION1_X.get(info, ex.getLocalizedMessage());
-        }
-        if(!options.get(XQueryOptions.PASS)) ex.info(info);
-        throw ex;
+        final QueryException qe = error == BASEX_PERMISSION_X || error == BASEX_PERMISSION_X_X ?
+          XQUERY_PERMISSION1_X.get(info, ex.getLocalizedMessage()) : ex;
+        throw qe.info(options.get(XQueryOptions.PASS) ? ex.info() : info);
       }
     } finally {
       if(to != null) to.cancel();
