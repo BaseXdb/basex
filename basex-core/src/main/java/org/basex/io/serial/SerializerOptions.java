@@ -43,6 +43,9 @@ public final class SerializerOptions extends Options {
   public static final StringOption ENCODING =
       new StringOption("encoding", Strings.UTF8);
   /** Serialization parameter: yes/no. */
+  public static final EnumOption<YesNo> ESCAPE_SOLIDUS =
+      new EnumOption<>("escape-solidus", YesNo.YES);
+  /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> ESCAPE_URI_ATTRIBUTES =
       new EnumOption<>("escape-uri-attributes", YesNo.NO);
   /** Serialization parameter: yes/no. */

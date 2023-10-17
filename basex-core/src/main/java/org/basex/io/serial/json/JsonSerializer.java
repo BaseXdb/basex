@@ -29,6 +29,8 @@ public abstract class JsonSerializer extends StandardSerializer {
 
   /** Escape special characters. */
   private final boolean escape;
+  /** Escape special solidus. */
+  private final boolean escapeSolidus;
   /** Allow duplicate names. */
   private final boolean nodups;
 
@@ -42,6 +44,7 @@ public abstract class JsonSerializer extends StandardSerializer {
     super(os, sopts);
     jopts = sopts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
+    escapeSolidus = escape && sopts.get(SerializerOptions.ESCAPE_SOLIDUS) == YesNo.YES;
     nodups = sopts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
     final Boolean ji = jopts.get(JsonSerialOptions.INDENT);
     if(ji != null) indent = ji;
@@ -164,7 +167,7 @@ public abstract class JsonSerializer extends StandardSerializer {
         case '\r': out.print("\\r");  break;
         case '\t': out.print("\\t");  break;
         case '"' : out.print("\\\""); break;
-        case '/' : out.print("\\/");  break;
+        case '/' : out.print(escapeSolidus ? "\\/" : "/");  break;
         case '\\': out.print("\\\\"); break;
         default  : out.print(cp);     break;
       }
