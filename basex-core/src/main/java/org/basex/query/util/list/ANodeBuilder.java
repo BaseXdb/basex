@@ -127,6 +127,12 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
     return super.contains(node);
   }
 
+  @Override
+  public ANode[] finish() {
+    ddo();
+    return super.finish();
+  }
+
   /**
    * Performs a binary search on the given range of this sequence iterator.
    * This works if {@link #data} is assigned.
