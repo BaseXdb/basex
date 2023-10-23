@@ -1439,6 +1439,20 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void parseHtml() {
+    final Function func = PARSE_HTML;
+
+    query(func.args("42"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
+    query(func.args(" xs:hexBinary('3432')"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
+    query(func.args(" xs:base64Binary('NDI=')"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
+
+    error(func.args(42), STRBIN_X_X);
+  }
+
+  /** Test method. */
   @Test public void parseIetfDate() {
     final Function func = PARSE_IETF_DATE;
 

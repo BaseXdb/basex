@@ -464,6 +464,9 @@ public enum Function implements AFunction {
   PARSE_IETF_DATE(FnParseIetfDate::new, "parse-ietf-date(value)",
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
+  PARSE_HTML(FnParseHtml::new, "parse-html(html[,options])",
+      params(ITEM_ZO, MAP_O), DOCUMENT_NODE_ZO),
+  /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_O, INTEGER_O), INTEGER_O),
   /** XQuery function. */

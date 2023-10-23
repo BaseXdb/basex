@@ -615,6 +615,10 @@ public enum QueryError {
   SAXERR_X(FODC, 6, "SAX: %"),
   /** Error code. */
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
+  /** Error code. */
+  INVHTML_X(FODC, 11, "String passed to fn:parse-html is not a well-formed HTML document: %"),
+  /** Error code. */
+  INVHTMLOPT_X(FODC, 12, "Unsupported HTML parser option: %"),
 
   /** Error code. */
   FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),
