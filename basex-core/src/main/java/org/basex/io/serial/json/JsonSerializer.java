@@ -26,13 +26,12 @@ import org.basex.util.options.Options.YesNo;
 public abstract class JsonSerializer extends StandardSerializer {
   /** JSON options. */
   final JsonSerialOptions jopts;
-
   /** Escape special characters. */
-  private final boolean escape;
+  final boolean escape;
   /** Escape special solidus. */
-  private final boolean escapeSolidus;
+  final boolean escapeSolidus;
   /** Allow duplicate names. */
-  private final boolean nodups;
+  final boolean nodups;
 
   /**
    * Constructor.
