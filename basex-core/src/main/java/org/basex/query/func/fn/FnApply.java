@@ -22,16 +22,13 @@ import java.util.Arrays;
  */
 public class FnApply extends StandardFunc {
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    final FItem func = toFunction(arg(0), qc);
-    final XQArray args = toArray(arg(1), qc);
+  public Value value(final QueryContext qc) throws QueryException {
+    final FItem function = checkUp(toFunction(arg(0), qc), this instanceof UpdateApply, sc);
+    final XQArray arguments = toArray(arg(1), qc);
 
-    final long ar = checkUp(func, this instanceof UpdateApply, sc).arity(), as = args.arraySize();
-    if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, args);
-
-    final ValueList values = new ValueList(as);
-    for(final Value value : args.members()) values.add(value);
-    return eval(func, qc, values.finish());
+    final ValueList args = new ValueList(arguments.arraySize());
+    for(final Value arg : arguments.members()) args.add(arg);
+    return apply(function, args, qc);
   }
 
   @Override
@@ -63,5 +60,20 @@ public class FnApply extends StandardFunc {
     ft = arg(0).funcType();
     if(ft != null) exprType.assign(ft.declType);
     return this;
+  }
+
+  /**
+   * Applies a function with the specified arguments.
+   * @param func function
+   * @param args arguments
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  protected final Value apply(final FItem func, final ValueList args, final QueryContext qc)
+      throws QueryException {
+    final long ar = func.arity(), as = args.size();
+    if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, args);
+    return eval(func, qc, args.finish());
   }
 }
