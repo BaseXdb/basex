@@ -71,7 +71,7 @@ public class FnEmpty extends StandardFunc {
 
     // exists(map:keys(E))  ->  map:size(E) > 0
     // empty(util:array-members(E))  ->  array:size(E) = 0
-    final boolean map = _MAP_KEYS.is(input), array = _UTIL_ARRAY_MEMBERS.is(input);
+    final boolean map = _MAP_KEYS.is(input), array = _ARRAY_MEMBERS.is(input);
     if(map || array) {
       input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
       return new CmpG(info, input, Int.ZERO, exists ? OpG.NE : OpG.EQ, null, sc).optimize(cc);

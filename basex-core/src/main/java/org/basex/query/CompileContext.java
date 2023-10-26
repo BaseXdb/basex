@@ -12,7 +12,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
-import org.basex.query.func.util.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -55,21 +54,21 @@ public final class CompileContext {
      * String arguments.
      * Requested by {@link Cast}, {@link CmpG}, {@link StandardFunc} and others.
      * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
-     * {@link FnString}, {@link UtilReplicate}.
+     * {@link FnString}, {@link FnReplicate}.
      */
     STRING,
     /**
      * Numeric arguments.
      * Requested by {@link Arith}, {@link CmpIR}, {@link Range}, {@link StandardFunc} and others.
      * Evaluated by {@link Cast}, {@link TypeCheck}, {@link CNode}, {@link FnData},
-     * {@link FnNumber}, {@link UtilReplicate}.
+     * {@link FnNumber}, {@link FnReplicate}.
      */
     NUMBER,
     /**
      * Predicate checks.
      * Requested by {@link Preds}.
      * Evaluated by {@link Expr}, {@link FnData}, {@link Cast}, {@link TypeCheck},
-     * {@link SimpleMap}, {@link FnNumber}, {@link UtilReplicate}.
+     * {@link SimpleMap}, {@link FnNumber}, {@link FnReplicate}.
      */
     PREDICATE,
     /**

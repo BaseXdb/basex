@@ -192,7 +192,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   DOCUMENT_URI(FnDocumentUri::new, "document-uri([node])",
       params(NODE_ZO), ANY_URI_ZO),
-  /** XQuery function (obsolete). */
+  /** XQuery function. */
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
@@ -1510,9 +1510,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI),
-  /** XQuery function (obsolete). */
-  _INSPECT_FUNCTION_ANNOTATIONS(InspectFunctionAnnotations::new, "function-annotations(function)",
-      params(FUNCTION_O), MAP_ZO, INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([href])",
       params(STRING_O), FUNCTION_ZM, flag(POS, CTX, CNS, NDT), INSPECT_URI, Perm.ADMIN),
@@ -1849,48 +1846,15 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_ARRAY_MEMBER(UtilArrayMember::new, "array-member(input)",
       params(ITEM_ZM), ARRAY_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_ARRAY_MEMBERS(UtilArrayMembers::new, "array-members(array)",
-      params(ARRAY_O), ARRAY_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_ARRAY_VALUES(UtilArrayValues::new, "array-values(array)",
-      params(ARRAY_O), ITEM_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_CHARS(UtilChars::new, "chars(value)",
-      params(STRING_O), STRING_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_DDO(UtilDdo::new, "ddo(nodes)",
       params(NODE_ZM), NODE_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_DUPLICATES(UtilDuplicates::new, "duplicates(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_INIT(UtilInit::new, "init(input)",
-      params(ITEM_ZM), ITEM_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_INTERSPERSE(UtilIntersperse::new, "intersperse(input,separator)",
-      params(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_ITEM(UtilItem::new, "item(input,position)",
-      params(ITEM_ZM, DOUBLE_O), ITEM_ZO, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_LAST(UtilLast::new, "last(input)",
-      params(ITEM_ZM), ITEM_ZO, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_MAP_ENTRIES(UtilMapEntries::new, "map-entries(map)",
-      params(MAP_O), MAP_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_MAP_VALUES(UtilMapValues::new, "map-values(map)",
-      params(MAP_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_REPLICATE(UtilReplicate::new, "replicate(input,count[,repeat])",
-      params(ITEM_ZM, INTEGER_O, BOOLEAN_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
       params(NODE_ZM), DOCUMENT_NODE_ZM, UTIL_URI),
