@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
@@ -76,6 +77,44 @@ public final class XQuery4Test extends SandboxTest {
     query("(1 to 10)[. = 0] otherwise (1 to 6) ! string()", "1\n2\n3\n4\n5\n6");
     query("count((1 to 10)[. = 0] otherwise (1 to 6) ! string())", 6);
     query("count((1 to 10)[. = 0] otherwise sort((1 to 6)[. = 3]) otherwise 1)", 1);
+
+    query("1 otherwise 2", 1);
+    query("<x/> otherwise 2", "<x/>");
+    query("(1 to 2)[. = 1] otherwise 2", 1);
+    // test if second branch will be evaluated
+    query("(1 to 2)[. != 0] otherwise (1 to 1000000000000)[. != 0]", "1\n2");
+
+    query("() otherwise 2", 2);
+    query("() otherwise <x/>", "<x/>");
+    query("(1 to 2)[. = 0] otherwise <x/>", "<x/>");
+
+    query("tokenize(<a/>) otherwise 2", 2);
+    query("tokenize(<a>1</a>) otherwise 2", 1);
+    query("sort(tokenize(<a>1</a>) otherwise 2)", 1);
+    query("sort(tokenize(<a/>) otherwise 2)", 2);
+
+    query("count(<_>1</_>[. = 1] otherwise 2)", 1);
+    query("count((1, 2)[. = 1] otherwise 3)", 1);
+    query("count((1, 2, 3)[. = 1] otherwise 4)", 1);
+    query("count((1, 2, 3)[. = 4] otherwise 4)", 1);
+    query("count((1, 2, 3)[. = 4] otherwise (4, 5))", 2);
+
+    check("() otherwise ()", "", empty());
+    check("() otherwise 1", 1, root(Int.class));
+    check("1 otherwise ()", 1, root(Int.class));
+    check("() otherwise <x/>", "<x/>", root(CElem.class));
+    check("<x/> otherwise ()", "<x/>", root(CElem.class));
+
+    check("(1, <_>2</_>[. = 3]) otherwise ()", 1, root(List.class));
+    check("(2, <_>3</_>[. = 4]) otherwise <z/>", 2, root(List.class));
+
+    check("(3, <_>4</_>)[. = 3] otherwise ()", 3, root(IterFilter.class));
+    check("(4, <_>5</_>)[. = 4] otherwise <z/>", 4, root(Otherwise.class));
+
+    check(VOID.args(1) + " otherwise 2", 2, root(Otherwise.class));
+    check(VOID.args(2) + " otherwise " + VOID.args(3), "", root(Otherwise.class));
+
+    check("<_>6</_>[. = 6] otherwise 7", "<_>6</_>", root(Otherwise.class));
   }
 
   /** Function item, arrow. */

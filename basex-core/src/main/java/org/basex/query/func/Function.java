@@ -1868,9 +1868,6 @@ public enum Function implements AFunction {
   _UTIL_DUPLICATES(UtilDuplicates::new, "duplicates(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZM, UTIL_URI),
   /** XQuery function (obsolete). */
-  _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
-      params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
   _UTIL_INIT(UtilInit::new, "init(input)",
       params(ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function (obsolete). */
@@ -1888,9 +1885,6 @@ public enum Function implements AFunction {
   /** XQuery function (obsolete). */
   _UTIL_MAP_VALUES(UtilMapValues::new, "map-values(map)",
       params(MAP_O), ITEM_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
-  _UTIL_OR(UtilOr::new, "or(input,default)",
-      params(ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
