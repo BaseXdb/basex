@@ -46,7 +46,7 @@ public final class FnCount extends StandardFunc {
     if(_MAP_KEYS.is(input))
       return cc.function(_MAP_SIZE, info, input.args());
     // count(util:array-members(E))  ->  array:size(E)
-    if(_UTIL_ARRAY_MEMBERS.is(input))
+    if(_ARRAY_MEMBERS.is(input))
       return cc.function(_ARRAY_SIZE, info, input.args());
     // count(string-to-codepoints(E))  ->  string-length(E)
     // count(characters(E))  ->  string-length(E)

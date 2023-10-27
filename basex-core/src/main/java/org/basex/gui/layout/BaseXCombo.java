@@ -23,8 +23,8 @@ import org.basex.util.options.*;
 public class BaseXCombo extends JComboBox<Object> {
   /** Options. */
   private Options options;
-  /** Option. */
-  private Option<?> option;
+  /** Key to values. */
+  private Option<?> optionKey;
   /** History. */
   private BaseXHistory history;
   /** Hint. */
@@ -73,44 +73,6 @@ public class BaseXCombo extends JComboBox<Object> {
   }
 
   /**
-   * Attaches a history and enables a listener for cursor down/up keys.
-   * @param opt strings option
-   * @param opts options
-   * @return self reference
-   */
-  public final BaseXCombo history(final StringsOption opt, final Options opts) {
-    if(!isEditable()) throw Util.notExpected("Combobox is not editable.");
-
-    options = opts;
-    option = opt;
-    history = new BaseXHistory(opt, options);
-    setItems(opts.get(opt));
-
-    // store input if enter is pressed; scroll between history entries
-    final JTextComponent comp = textField();
-    comp.removeKeyListener(keys);
-    keys = (KeyPressedListener) e -> {
-      final boolean next = NEXTLINE.is(e), prev = PREVLINE.is(e);
-      if((next || prev) && e.isShiftDown()) {
-        final String value = history.get(next);
-        if(value != null) {
-          setText(value);
-          final BaseXDialog dialog = win.dialog();
-          if(dialog != null) dialog.action(this);
-        }
-      }
-    };
-    comp.addKeyListener(keys);
-
-    // store input if focus is lost
-    comp.removeFocusListener(focus);
-    focus = (FocusLostListener) e -> updateHistory();
-    comp.addFocusListener(focus);
-
-    return this;
-  }
-
-  /**
    * Constructor.
    * @param win parent window
    * @param option option
@@ -122,7 +84,7 @@ public class BaseXCombo extends JComboBox<Object> {
       final boolean editable, final String... values) {
     this(win, editable, values);
     this.options = options;
-    this.option = option;
+    this.optionKey = option;
   }
 
   /**
@@ -167,6 +129,44 @@ public class BaseXCombo extends JComboBox<Object> {
         });
       }
     });
+  }
+
+  /**
+   * Attaches a history and enables a listener for cursor down/up keys.
+   * @param key key to history values
+   * @param opts options
+   * @return self reference
+   */
+  public final BaseXCombo history(final StringsOption key, final Options opts) {
+    if(!isEditable()) throw Util.notExpected("Combobox is not editable.");
+
+    options = opts;
+    optionKey = key;
+    history = new BaseXHistory(key, opts);
+    setItems(opts.get(key));
+
+    // store input if enter is pressed; scroll between history entries
+    final JTextComponent comp = textField();
+    comp.removeKeyListener(keys);
+    keys = (KeyPressedListener) e -> {
+      final boolean next = NEXTLINE.is(e), prev = PREVLINE.is(e);
+      if((next || prev) && e.isShiftDown()) {
+        final String value = history.get(next);
+        if(value != null) {
+          setText(value);
+          final BaseXDialog dialog = win.dialog();
+          if(dialog != null) dialog.action(this);
+        }
+      }
+    };
+    comp.addKeyListener(keys);
+
+    // store input if focus is lost
+    comp.removeFocusListener(focus);
+    focus = (FocusLostListener) e -> updateHistory();
+    comp.addFocusListener(focus);
+
+    return this;
   }
 
   /**
@@ -249,6 +249,7 @@ public class BaseXCombo extends JComboBox<Object> {
     final String value = object.toString();
     if(isEditable()) {
       getEditor().setItem(value);
+      updateHistory();
     } else {
       final ComboBoxModel<Object> model = getModel();
       final int ms = model.getSize();
@@ -309,18 +310,18 @@ public class BaseXCombo extends JComboBox<Object> {
    * Assigns the current checkbox value to the option specified in the constructor.
    */
   public void assign() {
-    if(option instanceof NumberOption) {
-      options.set((NumberOption) option, getSelectedIndex());
-    } else if(option instanceof EnumOption) {
-      options.set((EnumOption<?>) option, getSelectedItem());
-    } else if(option instanceof StringOption) {
-      options.set((StringOption) option, getSelectedItem());
-    } else if(option instanceof BooleanOption) {
-      options.set((BooleanOption) option, Boolean.parseBoolean(getSelectedItem()));
-    } else if(option instanceof StringsOption) {
+    if(optionKey instanceof NumberOption) {
+      options.set((NumberOption) optionKey, getSelectedIndex());
+    } else if(optionKey instanceof EnumOption) {
+      options.set((EnumOption<?>) optionKey, getSelectedItem());
+    } else if(optionKey instanceof StringOption) {
+      options.set((StringOption) optionKey, getSelectedItem());
+    } else if(optionKey instanceof BooleanOption) {
+      options.set((BooleanOption) optionKey, Boolean.parseBoolean(getSelectedItem()));
+    } else if(optionKey instanceof StringsOption) {
       updateHistory();
     } else {
-      throw Util.notExpected("Option type not supported: " + option);
+      throw Util.notExpected("Option type not supported: " + optionKey);
     }
   }
 

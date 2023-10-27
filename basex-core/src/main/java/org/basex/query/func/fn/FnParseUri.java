@@ -74,6 +74,7 @@ public class FnParseUri extends FnJsonDoc {
     String host = "", port = "", path = "";
     Item hierarchical = Empty.VALUE;
 
+    // strip off the fragment identifier and any query
     Matcher m = Pattern.compile("^(.*)#([^#]*)$").matcher(string);
     if(m.matches()) {
       string = m.group(1);
@@ -84,6 +85,8 @@ public class FnParseUri extends FnJsonDoc {
       string = m.group(1);
       query = m.group(2);
     }
+
+    // attempt to identify the scheme
     if(string.matches("^[a-zA-Z][:|].*$")) {
       scheme = FILE;
       string = string.replaceAll("^(.)\\|", "$1:");
@@ -96,24 +99,31 @@ public class FnParseUri extends FnJsonDoc {
         string = m.group(2);
       }
     }
-    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && string.matches("^//[^/].*$")) {
-      scheme = FILE;
-      filepath = string;
-    }
+
+    // determine if the URI is hierarchical
     if(!string.isEmpty()) {
       hierarchical = Bln.get(string.startsWith("/"));
     }
-    m = Pattern.compile("^//*([a-zA-Z]:.*)$").matcher(string);
-    if(m.matches()) {
-      string = m.group(1);
+
+    // examine the remaining parts of the string
+    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && string.matches("^//[^/].*$")) {
+      scheme = FILE;
+      filepath = string;
     } else {
-      m = Pattern.compile("^///*([^/]+)(/.*)?$").matcher(string);
-      if(m.matches()) {
-        authority = m.group(1);
-        string = m.group(2);
+      m = Pattern.compile("^//*([a-zA-Z]:.*)$").matcher(string);
+      if((scheme.isEmpty() || scheme.equals(FILE)) && m.matches()) {
+        string = m.group(1);
+      } else {
+        m = Pattern.compile("^///*([^/]+)?(/.*)?$").matcher(string);
+        if(m.matches()) {
+          authority = m.group(1);
+          string = m.group(2);
+        }
       }
     }
     if(string == null) string = "";
+
+    // parse userinfo
     m = Pattern.compile("^(([^@]*)@)(.*)(:([^:]*))?$").matcher(authority);
     if(m.matches()) {
       userinfo = m.group(2);
@@ -121,6 +131,7 @@ public class FnParseUri extends FnJsonDoc {
         userinfo = "";
       }
     }
+    // parse host
     m = Pattern.compile("^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$").matcher(authority);
     if(m.matches()) {
       host = m.group(3);
@@ -131,6 +142,7 @@ public class FnParseUri extends FnJsonDoc {
       if(m.matches()) host = m.group(3);
     }
     if(host == null) host = "";
+    // an IPv6/IPvFuture address may contain a colon
     m = Pattern.compile("^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$").matcher(authority);
     if(m.matches()) {
       port = m.group(5);

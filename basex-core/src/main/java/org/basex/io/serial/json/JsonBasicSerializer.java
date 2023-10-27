@@ -124,8 +124,6 @@ public final class JsonBasicSerializer extends JsonSerializer {
       } else {
         throw error("Invalid element: '%'", name);
       }
-    //} else {
-    //  throw error("Node must be an element.");
     }
   }
 
@@ -217,16 +215,16 @@ public final class JsonBasicSerializer extends JsonSerializer {
   /**
    * Returns a possibly escaped value.
    * @param value value to escape
-   * @param escape escape flag
+   * @param escaped indicates if value is already escaped
    * @param key key
    * @return escaped value
    * @throws QueryIOException I/O exception
    */
-  private byte[] escape(final byte[] value, final boolean escape, final boolean key)
+  private byte[] escape(final byte[] value, final boolean escaped, final boolean key)
       throws QueryIOException {
 
     // parse escaped strings, check for errors
-    final byte[] unescaped = escape && contains(value, '\\') ? unescape(value) : value;
+    final byte[] unescaped = escaped && contains(value, '\\') ? unescape(value) : value;
     if(key && !printedKeys.add(unescaped)) throw error("Duplicate key: %.", value);
 
     // create result, based on escaped string (contains unicode sequences)
@@ -252,7 +250,8 @@ public final class JsonBasicSerializer extends JsonSerializer {
             tb.add('u').add('0').add('0').add(HEX_TABLE[cp >> 4]).add(HEX_TABLE[cp & 0xF]); break;
         }
       } else {
-        if((cp == '\\' || cp == '"' || cp == '/') && (!escape || !bs && cp != '\\')) tb.add('\\');
+        if((cp == '\\' || cp == '"' || cp == '/' && escapeSolidus) &&
+            (!escaped || !bs && cp != '\\')) tb.add('\\');
         tb.add(cp);
       }
       bs = !bs && cp == '\\';

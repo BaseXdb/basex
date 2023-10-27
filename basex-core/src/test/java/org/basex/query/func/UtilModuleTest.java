@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
@@ -206,60 +205,6 @@ public final class UtilModuleTest extends SandboxTest {
         "<a><b/></a>\n<b/>", empty(SORT), empty(REVERSE));
 
     error(func.args(1), INVCONVERT_X_X_X);
-  }
-
-  /** Test method. */
-  @Test public void iff() {
-    final Function func = _UTIL_IF;
-    query(func.args(1, 1), 1);
-    query(func.args(" ()", 1), "");
-
-    query(func.args(1, 1, 2), 1);
-    query(func.args(" ()", 1, 2), 2);
-    query(func.args(" (<a/>, <b/>)", 1, 2), 1);
-    error(func.args(" (1, 2)", 1, 2), ARGTYPE_X_X_X);
-  }
-
-  /** Test method. */
-  @Test public void or() {
-    final Function func = _UTIL_OR;
-    query(func.args(1, 2), 1);
-    query(func.args(" <x/>", 2), "<x/>");
-    query(func.args(" (1 to 2)[. = 1]", 2), 1);
-    // test if second branch will be evaluated
-    query(func.args(" (1 to 2)[. != 0]", " (1 to 1000000000000)[. != 0]"), "1\n2");
-
-    query(func.args(" ()", 2), 2);
-    query(func.args(" ()", " <x/>"), "<x/>");
-    query(func.args(" (1 to 2)[. = 0]", " <x/>"), "<x/>");
-
-    query(func.args(" tokenize(<a/>)", 2), 2);
-    query(func.args(" tokenize(<a>1</a>)", 2), 1);
-    query("sort(" + func.args(" tokenize(<a>1</a>)", 2) + ")", 1);
-    query("sort(" + func.args(" tokenize(<a/>)", 2) + ")", 2);
-
-    query("count(" + func.args(" <_>1</_>[. = 1]", 2) + ')', 1);
-    query("count(" + func.args(" (1, 2)[. = 1]", 3) + ')', 1);
-    query("count(" + func.args(" (1, 2, 3)[. = 1]", 4) + ')', 1);
-    query("count(" + func.args(" (1, 2, 3)[. = 4]", 4) + ')', 1);
-    query("count(" + func.args(" (1, 2, 3)[. = 4]", " (4, 5)") + ')', 2);
-
-    check(func.args(" ()", " ()"), "", empty());
-    check(func.args(" ()", 1), 1, root(Int.class));
-    check(func.args(1, " ()"), 1, root(Int.class));
-    check(func.args(" ()", " <x/>"), "<x/>", root(CElem.class));
-    check(func.args(" <x/>", " ()"), "<x/>", root(CElem.class));
-
-    check(func.args(" (1, <_>2</_>[. = 3])", " ()"), 1, root(List.class));
-    check(func.args(" (2, <_>3</_>[. = 4])", "<z/>"), 2, root(List.class));
-
-    check(func.args(" (3, <_>4</_>)[. = 3]", " ()"), 3, root(IterFilter.class));
-    check(func.args(" (4, <_>5</_>)[. = 4]", "<z/>"), 4, root(Otherwise.class));
-
-    check(func.args(VOID.args(1), 2), 2, root(Otherwise.class));
-    check(func.args(VOID.args(2), VOID.args(3)), "", root(Otherwise.class));
-
-    check(func.args(" <_>6</_>[. = 6]", 7), "<_>6</_>", root(Otherwise.class));
   }
 
   /** Test method. */

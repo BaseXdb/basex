@@ -17,19 +17,19 @@ public final class BaseXHistory {
 
   /** Options. */
   private final Options options;
-  /** History option. */
-  private final StringsOption history;
+  /** Key to history values. */
+  private final StringsOption key;
   /** History index. */
   private int index;
 
   /**
    * Constructor.
-   * @param history history values
+   * @param key key to history values
    * @param options options
    */
-  public BaseXHistory(final StringsOption history, final Options options) {
+  public BaseXHistory(final StringsOption key, final Options options) {
+    this.key = key;
     this.options = options;
-    this.history = history;
   }
 
   /**
@@ -43,7 +43,7 @@ public final class BaseXHistory {
     for(final String value : values()) {
       if(list.size() < MAX && !input.equals(value)) list.add(value);
     }
-    options.set(history, list.finish());
+    options.set(key, list.finish());
     index = 0;
   }
 
@@ -64,6 +64,6 @@ public final class BaseXHistory {
    * @return history values
    */
   public String[] values() {
-    return options.get(history);
+    return options.get(key);
   }
 }
