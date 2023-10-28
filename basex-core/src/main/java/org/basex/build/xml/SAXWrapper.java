@@ -88,10 +88,33 @@ public final class SAXWrapper extends SingleParser {
    */
   @SuppressWarnings("resource")
   private InputSource inputSource() throws IOException {
+    length = source.length();
+
+    if (source.hasReader()) {
+      length = Math.max(0, length);
+      final Reader r = source.reader();
+      final InputSource rs = new InputSource(new Reader() {
+
+        @Override
+        public int read(final char[] cbuf, final int off, final int len) throws IOException {
+          final int i = r.read(cbuf, off, len);
+          if(i == '\n') ++lines;
+          ++bytes;
+          return i;
+        }
+
+        @Override
+        public void close() throws IOException {
+          r.close();
+        }
+      });
+      rs.setSystemId(source.url());
+      return rs;
+    }
+
     final InputStream input = source.inputStream();
 
     // retrieve/estimate number of bytes to be read
-    length = source.length();
     try {
       if(length <= 0) length = input.available();
     } catch(final IOException ex) {

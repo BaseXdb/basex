@@ -7,7 +7,6 @@ import java.io.*;
 import org.basex.*;
 import org.basex.io.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -18,9 +17,8 @@ import org.junit.jupiter.api.*;
  */
 public class MemDataTest extends SandboxTest {
   /** XML document. */
-  static final String XMLSTR = "<a><b>test</b><c/><f>test1</f><f>test3</f></a>";
-  /** XML document. */
-  private static final byte[] XML = Token.token(XMLSTR);
+  static final String XMLSTR = "<?xml version='1.0' encoding='utf-16'?>"
+      + "<a><b>test</b><c/><f>test1</f><f>test3</f></a>";
   /** Tested {@link MemData} instance. */
   private Data data;
 
@@ -29,7 +27,7 @@ public class MemDataTest extends SandboxTest {
    * @throws IOException should never be thrown
    */
   @BeforeEach public void setUp() throws IOException {
-    data = new DBNode(new IOContent(XML)).data();
+    data = new DBNode(new IOContent(XMLSTR)).data();
     context.openDB(data);
   }
 

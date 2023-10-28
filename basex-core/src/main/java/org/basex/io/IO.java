@@ -234,6 +234,24 @@ public abstract class IO {
   public abstract InputStream inputStream() throws IOException;
 
   /**
+   * Returns a reader.
+   * @return reader
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  public Reader reader() throws IOException {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Returns true, if the IO instance can supply a reader.
+   * @return true, if the IO instance can supply a reader
+   */
+  public boolean hasReader()  {
+    return false;
+  }
+
+  /**
    * Merges two paths.
    * @param path path to be merged
    * @return resulting reference

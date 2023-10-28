@@ -1,5 +1,8 @@
 package org.basex.io;
 
+import java.io.*;
+import java.nio.charset.*;
+
 import javax.xml.transform.stream.*;
 
 import org.basex.io.in.*;
@@ -72,6 +75,16 @@ public final class IOContent extends IO {
   @Override
   public ArrayInput inputStream() {
     return new ArrayInput(content);
+  }
+
+  @Override
+  public boolean hasReader() {
+    return true;
+  }
+
+  @Override
+  public Reader reader() {
+    return new InputStreamReader(inputStream(), StandardCharsets.UTF_8);
   }
 
   @Override
