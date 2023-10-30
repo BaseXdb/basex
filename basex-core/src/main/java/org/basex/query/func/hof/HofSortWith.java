@@ -19,16 +19,13 @@ import org.basex.query.value.seq.*;
 public final class HofSortWith extends HofFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value input = arg(0).value(qc);
+    final Iter input = arg(0).iter(qc);
     final Comparator<Item> comparator = comparator(qc);
-    if(input.size() < 2) return input;
 
     final ItemList items = new ItemList(Seq.initialCapacity(input.size()));
-    final Iter iter = input.iter();
-    for(Item item; (item = qc.next(iter)) != null;) {
+    for(Item item; (item = qc.next(input)) != null;) {
       items.add(item);
     }
-
     try {
       Arrays.sort(items.list, 0, items.size(), comparator);
     } catch(final QueryRTException ex) {
