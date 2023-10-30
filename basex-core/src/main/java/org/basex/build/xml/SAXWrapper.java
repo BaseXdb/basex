@@ -119,6 +119,8 @@ public final class SAXWrapper extends SingleParser {
     };
 
     final InputSource is = new InputSource(wrapped);
+    if (source.encoding() != null)
+      is.setEncoding(source.encoding());
     is.setSystemId(source.url());
     return is;
   }
