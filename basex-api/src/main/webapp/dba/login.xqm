@@ -21,10 +21,10 @@ function dba:check(
 ) as element(rest:response)? {
   let $path := $perm?path
   let $allow := $perm?allow
-  return if ($allow = 'public') then (
+  return if($allow = 'public') then (
     (: public function, register id for better log entries :)
     request:set-attribute('id', $allow)
-  ) else if (session:get($config:SESSION-KEY)) then (
+  ) else if(session:get($config:SESSION-KEY)) then (
     (: everything fine, user is logged in :)
   ) else (
     (: normalize login path :)

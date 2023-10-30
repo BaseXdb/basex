@@ -54,15 +54,12 @@ public class FnParseUri extends FnJsonDoc {
 
   /** File scheme. */
   static final String FILE = "file";
-  /** Standard ports. */
-  static HashMap<String, String> ports = new HashMap<>();
-
-  static {
-    ports.put("http", "80");
-    ports.put("https", "443");
-    ports.put("ftp", "21");
-    ports.put("ssh", "22");
-  }
+  /** Non-hierarchical schemes. */
+  static final HashSet<String> NON_HIERARCHICAL = new HashSet<>(
+      Arrays.asList("jar", "mailto", "news", "tag", "tel", "urn"));
+  /** Scheme/port mappings. */
+  static final Map<String, String> PORTS = Map.of(
+      "http", "80", "https", "443", "ftp", "21", "ssh", "22");
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -72,7 +69,6 @@ public class FnParseUri extends FnJsonDoc {
     String string = value.replace('\\', '/');
     String fragment = "", query = "", scheme = "", filepath = "", authority = "", userinfo = "";
     String host = "", port = "", path = "";
-    Item hierarchical = Empty.VALUE;
 
     // strip off the fragment identifier and any query
     Matcher m = Pattern.compile("^(.*)#([^#]*)$").matcher(string);
@@ -101,9 +97,8 @@ public class FnParseUri extends FnJsonDoc {
     }
 
     // determine if the URI is hierarchical
-    if(!string.isEmpty()) {
-      hierarchical = Bln.get(string.startsWith("/"));
-    }
+    final Item hierarchical = NON_HIERARCHICAL.contains(scheme) ? Bln.FALSE :
+      string.isEmpty() ? Empty.VALUE : Bln.get(string.startsWith("/"));
 
     // examine the remaining parts of the string
     if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && string.matches("^//[^/].*$")) {
@@ -230,6 +225,6 @@ public class FnParseUri extends FnJsonDoc {
    */
   static boolean omitPort(final String port, final String scheme, final UriOptions options) {
     return options.get(UriOptions.OMIT_DEFAULT_PORTS) &&
-        Objects.equals(ports.get(scheme), port);
+        Objects.equals(PORTS.get(scheme), port);
   }
 }

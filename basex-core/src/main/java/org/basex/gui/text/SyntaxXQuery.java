@@ -95,7 +95,7 @@ final class SyntaxXQuery extends Syntax {
     }
 
     // quotes
-    if(ch == '"' || ch == '\'') {
+    if(ch == '"' || ch == '\'' || ch == '`') {
       quote = ch;
       return DGRAY;
     }
