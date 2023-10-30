@@ -237,7 +237,6 @@ public abstract class IO {
    * Returns the encoding, or null if unknown.
    * @return encoding
    */
-  @SuppressWarnings("unused")
   public String encoding() {
     return null;
   }
