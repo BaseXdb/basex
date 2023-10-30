@@ -1,8 +1,5 @@
 package org.basex.io;
 
-import java.io.*;
-import java.nio.charset.*;
-
 import javax.xml.transform.stream.*;
 
 import org.basex.io.in.*;
@@ -18,6 +15,8 @@ import org.xml.sax.*;
 public final class IOContent extends IO {
   /** Content. */
   private final byte[] content;
+  /** Encoding. */
+  private final String encoding;
 
   /**
    * Constructor.
@@ -32,7 +31,7 @@ public final class IOContent extends IO {
    * @param content content
    */
   public IOContent(final String content) {
-    this(Token.token(content));
+    this(Token.token(content), "", Strings.UTF8);
   }
 
   /**
@@ -41,7 +40,7 @@ public final class IOContent extends IO {
    * @param path content path
    */
   public IOContent(final String content, final String path) {
-    this(Token.token(content), path);
+    this(Token.token(content), path, Strings.UTF8);
   }
 
   /**
@@ -50,8 +49,19 @@ public final class IOContent extends IO {
    * @param path content path
    */
   public IOContent(final byte[] content, final String path) {
+    this(content, path, null);
+  }
+
+  /**
+   * Constructor.
+   * @param content content
+   * @param path content path
+   * @param encoding encoding
+   */
+  public IOContent(final byte[] content, final String path, final String encoding) {
     super(path);
     this.content = content;
+    this.encoding = encoding;
     len = content.length;
   }
 
@@ -78,13 +88,8 @@ public final class IOContent extends IO {
   }
 
   @Override
-  public boolean hasReader() {
-    return true;
-  }
-
-  @Override
-  public Reader reader() {
-    return new InputStreamReader(inputStream(), StandardCharsets.UTF_8);
+  public String encoding() {
+    return encoding;
   }
 
   @Override

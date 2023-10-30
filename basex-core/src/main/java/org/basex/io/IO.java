@@ -234,21 +234,12 @@ public abstract class IO {
   public abstract InputStream inputStream() throws IOException;
 
   /**
-   * Returns a reader.
-   * @return reader
-   * @throws IOException I/O exception
+   * Returns the encoding, or null if unknown.
+   * @return encoding
    */
   @SuppressWarnings("unused")
-  public Reader reader() throws IOException {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Returns true, if the IO instance can supply a reader.
-   * @return true, if the IO instance can supply a reader
-   */
-  public boolean hasReader()  {
-    return false;
+  public String encoding() {
+    return null;
   }
 
   /**
