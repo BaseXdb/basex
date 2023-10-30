@@ -11,6 +11,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -1434,7 +1435,7 @@ public final class FnModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void outermost() {
-    final Function func = INNERMOST;
+    final Function func = OUTERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
   }
 
@@ -1444,12 +1445,21 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args("42"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
-    query(func.args(" xs:hexBinary('3432')"),
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
-    query(func.args(" xs:base64Binary('NDI=')"),
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
+    query(func.args(_CONVERT_STRING_TO_HEX.args("<html><head><meta charset='" + Strings.UTF16LE
+        + "'></head><body>42</body>", Strings.UTF16LE),
+        " map {'encoding': '" + Strings.UTF16LE + "', 'xml-policy': 'ALTER_INFOSET'}"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"" + Strings.UTF16LE
+        + "\"/></head><body>42</body></html>");
+    query(func.args(_CONVERT_STRING_TO_BASE64.args("<html><head><meta charset='" + Strings.UTF16BE
+        + "'></head><body>42</body>", Strings.UTF16BE),
+        " map {'encoding': '" + Strings.UTF16BE + "', 'heuristics': 'NONE'}"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"" + Strings.UTF16BE
+        + "\"/></head><body>42</body></html>");
 
     error(func.args(42), STRBIN_X_X);
+    error(func.args(" \"42\"", 42), MAP_X_X);
+    error(func.args(" \"42\"", " map {'1234': ()}"), INVALIDOPT_X);
+    error(func.args(" \"42\"", " map {'heuristics': '5678'}"), INVALIDOPT_X);
   }
 
   /** Test method. */
