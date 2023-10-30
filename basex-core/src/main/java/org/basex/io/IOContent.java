@@ -15,7 +15,7 @@ import org.xml.sax.*;
 public final class IOContent extends IO {
   /** Content. */
   private final byte[] content;
-  /** Encoding. */
+  /** Encoding (can be {@code null}). */
   private final String encoding;
 
   /**
@@ -31,7 +31,7 @@ public final class IOContent extends IO {
    * @param content content
    */
   public IOContent(final String content) {
-    this(Token.token(content), "", Strings.UTF8);
+    this(content, "");
   }
 
   /**
@@ -56,7 +56,7 @@ public final class IOContent extends IO {
    * Constructor.
    * @param content content
    * @param path content path
-   * @param encoding encoding
+   * @param encoding encoding (can be {@code null})
    */
   public IOContent(final byte[] content, final String path, final String encoding) {
     super(path);

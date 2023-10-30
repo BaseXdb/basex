@@ -234,8 +234,8 @@ public abstract class IO {
   public abstract InputStream inputStream() throws IOException;
 
   /**
-   * Returns the encoding, or null if unknown.
-   * @return encoding
+   * Returns the encoding.
+   * @return encoding, or {@code null} if unknown
    */
   public String encoding() {
     return null;

@@ -78,6 +78,16 @@ public final class CreateTest extends SandboxTest {
   }
 
   /**
+   * CREATE DB {DB} {<?xml version='1.0' encoding='utf-16'?>INPUT}.
+   */
+  @Test public void createDBWithVersionDeclaration() {
+    execute(new CreateDB(NAME, "<xml/>"));
+    execute(new CreateDB(NAME, "<?xml version='1.0' encoding='UTF-8'?><xml/>"));
+    execute(new CreateDB(NAME, "<?xml version='1.0' encoding='utf-16'?><xml/>"));
+    execute(new CreateDB(NAME, "<?xml version='1.0' encoding='Shift-JIS'?><xml/>"));
+  }
+
+  /**
    * CREATE DB {DB}; ADD {INPUT[]}.
    */
   @Test public void createDBandAdd() {

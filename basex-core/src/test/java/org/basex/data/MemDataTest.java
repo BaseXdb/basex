@@ -17,8 +17,7 @@ import org.junit.jupiter.api.*;
  */
 public class MemDataTest extends SandboxTest {
   /** XML document. */
-  static final String XMLSTR = "<?xml version='1.0' encoding='utf-16'?>"
-      + "<a><b>test</b><c/><f>test1</f><f>test3</f></a>";
+  static final String XMLSTR = "<a><b>test</b><c/><f>test1</f><f>test3</f></a>";
   /** Tested {@link MemData} instance. */
   private Data data;
 
