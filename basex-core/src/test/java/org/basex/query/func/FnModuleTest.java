@@ -1443,7 +1443,10 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void parseHtml() {
     final Function func = PARSE_HTML;
 
+    query(func.args(" ()"), "");
     query(func.args("42"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
+    query(func.args("42", " map {'encoding': '" + Strings.UTF16LE + "'}"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
     query(func.args(_CONVERT_STRING_TO_HEX.args("<html><head><meta charset='" + Strings.UTF16LE
         + "'></head><body>42</body>", Strings.UTF16LE),

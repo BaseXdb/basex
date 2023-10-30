@@ -36,7 +36,9 @@ public class FnParseHtml extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), true, qc);
-    return value.isEmpty() ? Empty.VALUE : parse(new IOContent(toBytes(value)), options);
+    final IO io = value instanceof Bin ? new IOContent(toBytes(value))
+                                       : new IOContent(toBytes(value), "", Strings.UTF8);
+    return value.isEmpty() ? Empty.VALUE : parse(io, options);
   }
 
   @Override
@@ -148,11 +150,15 @@ public class FnParseHtml extends StandardFunc {
           reader.setHeuristics(Heuristics.valueOf(hopts.get(HEURISTICS).name()));
         // end Validator.nu options
 
-        if (hopts.contains(ENCODING)) {
-          String enc = hopts.get(HtmlOptions.ENCODING);
+        String enc = io.encoding() != null
+            ? io.encoding()
+            : hopts.contains(ENCODING)
+              ? hopts.get(HtmlOptions.ENCODING)
+              : null; // TODO: sniff encoding
+        if (enc != null) {
           if (!Strings.supported(enc))
             throw INVALIDOPT_X.get(info, "Unsupported encoding: " + enc + '.');
-          is.setEncoding(Strings.supported(enc) ? Strings.normEncoding(enc) : Strings.UTF8);
+          is.setEncoding(Strings.normEncoding(enc));
         }
 
         reader.parse(is);
