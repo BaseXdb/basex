@@ -372,7 +372,7 @@ declare function html:table(
         for $page at $pos in $pages
         let $suffix := (if($page = $last-page) then ')' else ' ') ||
           (if($pages[$pos + 1] > $page + 1) then ' … ' else ())
-        return if ($curr-page = $page) then (
+        return if($curr-page = $page) then (
           $page || $suffix
         ) else (
           html:link(string($page), '', ($params, map { 'page': $page, 'sort': $sort })),

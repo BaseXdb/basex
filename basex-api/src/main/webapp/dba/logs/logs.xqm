@@ -99,7 +99,7 @@ function dba:logs(
                     (: enrich link targets with current search string :)
                     insert node attribute onclick { 'addInput(this);' } into .
                   }
-                  return if ($name = $entry) then element b { $link } else $link
+                  return if($name = $entry) then element b { $link } else $link
                 },
                 'size': $entry/@size
               }
@@ -159,7 +159,7 @@ function dba:log(
   $time   as xs:string?
 ) as element()+ {
   (: check if input is a valid regular expression :)
-  if ($input) then prof:void(analyze-string('', $input)),
+  if($input) then prof:void(analyze-string('', $input)),
 
   let $headers := (
     map { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },

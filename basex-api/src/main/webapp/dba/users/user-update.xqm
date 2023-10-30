@@ -85,7 +85,7 @@ function dba:user-update(
     ),
     util:redirect($dba:SUB, map { 'name': $newname, 'info': 'User was updated.' })
   } catch * {
-    let $error := if ($err:code != xs:QName('err:FODC0006')) then $err:description else
+    let $error := if($err:code != xs:QName('err:FODC0006')) then $err:description else
       'XML with "info" root element expected.'
     return util:redirect($dba:SUB, map {
       'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm, 'error': $error
