@@ -389,9 +389,6 @@ public enum Function implements AFunction {
   LOCAL_NAME_FROM_QNAME(FnLocalNameFromQName::new, "local-name-from-QName(value)",
       params(QNAME_ZO), NCNAME_ZO),
   /** XQuery function. */
-  LOG(FnLog::new, "log(input[,label])",
-      params(ITEM_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT)),
-  /** XQuery function. */
   LOWER_CASE(FnLowerCase::new, "lower-case(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
@@ -403,6 +400,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   MAX(FnMax::new, "max(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZO),
+  /** XQuery function. */
+  MESSAGE(FnMessage::new, "message(input[,label])",
+      params(ITEM_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   MIN(FnMin::new, "min(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZO),

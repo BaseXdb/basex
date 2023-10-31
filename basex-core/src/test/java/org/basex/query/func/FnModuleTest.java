@@ -1214,12 +1214,6 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void log() {
-    final Function func = LOG;
-    query(func.args("a"), "");
-  }
-
-  /** Test method. */
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");
@@ -1289,6 +1283,12 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("a", "+", "j"), REGINVALID_X);
     error(func.args("a", "[a-\\\\]"), REGINVALID_X);
     error(func.args("-", "([\\d-z]+)"), REGINVALID_X);
+  }
+
+  /** Test method. */
+  @Test public void message() {
+    final Function func = MESSAGE;
+    query(func.args("a"), "");
   }
 
   /** Test method. */
