@@ -1508,7 +1508,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr ternaryIf() throws QueryException {
-    final Expr iff = elvis();
+    final Expr iff = or();
     if(!wsConsume("??")) return iff;
 
     final InputInfo ii = info();
@@ -1516,16 +1516,6 @@ public class QueryParser extends InputParser {
     if(!wsConsume("!!")) throw error(NOTERNARY);
     final Expr els = check(single(), NOTERNARY);
     return new If(ii, iff, thn, els);
-  }
-
-  /**
-   * Parses the "ElvisExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr elvis() throws QueryException {
-    final Expr expr = or();
-    return wsConsume("?:") ? new Otherwise(info(), expr, check(single(), NODEFAULT)) : expr;
   }
 
   /**
