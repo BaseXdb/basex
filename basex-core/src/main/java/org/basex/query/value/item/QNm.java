@@ -25,8 +25,8 @@ import org.basex.util.list.*;
 public final class QNm extends Item {
   /** QName: empty. */
   public static final QNm EMPTY = new QNm(Token.EMPTY);
-  /** URL pattern (matching Clark and EQName notation). */
-  public static final Pattern EQNAME = Pattern.compile("^Q?\\{(.*?)\\}(.+)$");
+  /** EQName syntax. */
+  public static final Pattern EQNAME = Pattern.compile("^Q\\{([^{}]*)\\}(.+)$");
 
   /** Name with optional prefix. */
   private final byte[] name;
@@ -83,12 +83,12 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param prefix prefix
+   * @param prefix non-empty prefix
    * @param local local name
    * @param uri namespace uri
    */
   public QNm(final byte[] prefix, final String local, final byte[] uri) {
-    this(name(prefix, token(local)), uri);
+    this(concat(prefix, COLON, token(local)), uri);
   }
 
   /**
@@ -116,59 +116,6 @@ public final class QNm extends Item {
     out.writeToken(name);
     out.writeBool(uri != null);
     if(uri != null) out.writeToken(uri);
-  }
-
-  /**
-   * Creates the name string.
-   * @param prefix prefix
-   * @param local local name
-   * @return name
-   */
-  private static byte[] name(final byte[] prefix, final byte[] local) {
-    return prefix.length == 0 ? local : concat(prefix, COLON, local);
-  }
-
-  /**
-   * Resolves a QName string.
-   * @param name name to resolve
-   * @param sc static context (can be {@code null})
-   * @return string
-   * @throws QueryException query exception
-   */
-  public static QNm resolve(final byte[] name, final StaticContext sc) throws QueryException {
-    return resolve(name, null, sc, null);
-  }
-
-  /**
-   * Resolves a QName string.
-   * @param name name to resolve
-   * @param def default namespace (can be {@code null})
-   * @param sc static context (can be {@code null})
-   * @param info input info (can be {@code null})
-   * @return string
-   * @throws QueryException query exception
-   */
-  public static QNm resolve(final byte[] name, final byte[] def, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-
-    // check for namespace declaration
-    final Matcher m = EQNAME.matcher(Token.string(name));
-    byte[] uri = null, nm = name;
-    if(m.find()) {
-      uri = token(m.group(1));
-      nm = token(m.group(2));
-    } else {
-      final int i = indexOf(nm, ':');
-      if(i == -1) {
-        uri = def;
-      } else {
-        final byte[] prefix = substring(nm, 0, i);
-        if(sc != null) uri = sc.ns.uri(prefix);
-        if(uri == null) throw NOURI_X.get(info, prefix);
-      }
-    }
-    if(!XMLToken.isQName(nm)) throw BINDNAME_X.get(info, name);
-    return new QNm(nm, uri);
   }
 
   /**
@@ -355,6 +302,49 @@ public final class QNm extends Item {
   // STATIC METHODS ===============================================================================
 
   /**
+   * Converts a value to a QName.
+   * @param value value to parse
+   * @param sc static context (can be {@code null})
+   * @return string
+   * @throws QueryException query exception
+   */
+  public static QNm parse(final byte[] value, final StaticContext sc) throws QueryException {
+    return parse(value, null, sc, null);
+  }
+
+  /**
+   * Converts a value to a QName.
+   * @param value value to parse
+   * @param dflt default namespace (can be {@code null})
+   * @param sc static context (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return string
+   * @throws QueryException query exception
+   */
+  public static QNm parse(final byte[] value, final byte[] dflt, final StaticContext sc,
+      final InputInfo info) throws QueryException {
+
+    byte[] uri = null, name = value;
+    final Matcher matcher = EQNAME.matcher(Token.string(value));
+    if(matcher.matches()) {
+      uri = token(matcher.group(1));
+      name = token(matcher.group(2));
+    } else {
+      final int i = indexOf(name, ':');
+      if(i == -1) {
+        uri = dflt;
+      } else {
+        final byte[] prefix = substring(name, 0, i);
+        if(sc != null) uri = sc.ns.uri(prefix);
+        if(uri == null) throw NOURI_X.get(info, prefix);
+      }
+    }
+    if(XMLToken.isQName(name)) return new QNm(name, uri);
+
+    throw INVNAME_X.get(info, value);
+  }
+
+  /**
    * Returns an EQName representation.
    * @param uri URI
    * @param local local name
@@ -372,21 +362,6 @@ public final class QNm extends Item {
    */
   public static String eqName(final String uri, final String local) {
     return Strings.concat("Q{", uri, "}", local);
-  }
-
-  /**
-   * Parses a QName.
-   * @param string string
-   * @return QNm instance, or {@code null} if it could not be parsed
-   */
-  public static QNm parse(final byte[] string) {
-    if(XMLToken.isNCName(string)) return new QNm(string, Token.EMPTY);
-    final Matcher m = EQNAME.matcher(Token.string(string));
-    if(m.matches()) {
-      final byte[] uri = token(m.group(1)), ncname = Token.token(m.group(2));
-      if(XMLToken.isNCName(ncname)) return new QNm(ncname, uri);
-    }
-    return null;
   }
 
   /**

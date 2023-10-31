@@ -1,9 +1,8 @@
 package org.basex.query.util;
 
-import static org.basex.util.Token.*;
-
 import java.util.regex.*;
 
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -15,20 +14,41 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class SharedData {
-  /** EQName syntax. */
-  private static final Pattern EQNAME = Pattern.compile("Q\\{([^{}]*)\\}(.*)$");
   /** Cached QNames. */
   private final TokenObjMap<QNm> qnames = new TokenObjMap<>();
   /** Cached tokens. */
   private final WeakTokenSet tokens = new WeakTokenSet();
 
   /**
+   * Parses and returns a shared QName.
+   * @param token QName token
+   * @param elem always resolve URI
+   * @param sc static context
+   * @return QName, or {@code null} if QName cannot be parsed.
+   * @see QNm#parse(byte[], byte[], StaticContext, InputInfo)
+   */
+  public QNm parseQName(final byte[] token, final boolean elem, final StaticContext sc) {
+    final byte[] name = Token.trim(token);
+    if(XMLToken.isQName(name)) {
+      final byte[] prefix = Token.prefix(name);
+      final byte[] uri = prefix.length != 0 || elem ? sc.ns.uri(prefix) : null;
+      return qName(name, uri);
+    }
+    final Matcher matcher = QNm.EQNAME.matcher(Token.string(name));
+    if(matcher.matches()) {
+      final byte[] nm = Token.token(matcher.group(2)), uri = Token.token(matcher.group(1));
+      if(XMLToken.isNCName(nm)) return qName(nm, uri);
+    }
+    return null;
+  }
+
+  /**
    * Returns a shared QName.
    * @param name local name with optional prefix
    * @return QName
    */
-  public QNm qname(final byte[] name) {
-    return qname(name, null);
+  public QNm qName(final byte[] name) {
+    return qName(name, null);
   }
 
   /**
@@ -37,25 +57,11 @@ public final class SharedData {
    * @param uri URI (can be {@code null})
    * @return QName
    */
-  public QNm qname(final byte[] name, final byte[] uri) {
+  public QNm qName(final byte[] name, final byte[] uri) {
     return qnames.computeIfAbsent(
       uri != null ? Token.concat(name, Token.SPACE, uri) : name,
       () -> new QNm(name, uri)
     );
-  }
-
-  /**
-   * Returns a shared QName.
-   * @param eqname EQname string
-   * @return QName or {@code null}
-   */
-  public QNm eqname(final byte[] eqname) {
-    final Matcher m = EQNAME.matcher(string(eqname));
-    if(m.matches()) {
-      final byte[] ncname = Token.token(m.group(2)), uri = Token.token(m.group(1));
-      if(XMLToken.isNCName(ncname)) return qname(ncname, uri);
-    }
-    return null;
   }
 
   /**

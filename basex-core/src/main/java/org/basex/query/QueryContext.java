@@ -780,6 +780,6 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query context
    */
   private static QNm qname(final String name, final StaticContext sc) throws QueryException {
-    return QNm.resolve(token(Strings.startsWith(name, '$') ? name.substring(1) : name), sc);
+    return QNm.parse(token(Strings.startsWith(name, '$') ? name.substring(1) : name), sc);
   }
 }

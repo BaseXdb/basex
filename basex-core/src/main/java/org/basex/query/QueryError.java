@@ -977,7 +977,7 @@ public enum QueryError {
   /** Error code. */
   WHICHTYPE_X(XPST, 3, "Unknown type: %."),
   /** Error code. */
-  BINDNAME_X(XPST, 3, "Invalid name: '%'."),
+  INVNAME_X(XPST, 3, "Invalid QName: '%'."),
   /** Error code. */
   PIXML_X(XPST, 3, "Processing instruction has illegal name: %."),
   /** Error code. */

@@ -48,7 +48,7 @@ final class CsvDirectConverter extends CsvConverter {
     if(attributes) {
       elem = FElem.build(Q_ENTRY).add(Q_NAME, name);
     } else {
-      elem = FElem.build(name != null ? shared.qname(name) : Q_ENTRY);
+      elem = FElem.build(name != null ? shared.qName(name) : Q_ENTRY);
     }
     record.add(elem.add(shared.token(value)));
   }

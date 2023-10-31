@@ -135,7 +135,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
    * @return the element
    */
   private FBuilder element(final byte[] type) {
-    final FBuilder elem = FElem.build(shared.qname(name));
+    final FBuilder elem = FElem.build(shared.qName(name));
     processType(elem, type);
     return elem;
   }
