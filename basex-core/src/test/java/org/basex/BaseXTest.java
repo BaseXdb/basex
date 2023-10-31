@@ -44,8 +44,8 @@ public abstract class BaseXTest extends SandboxTest {
     equals("5,6;7'", "-ba=5,6;7'", "-qdeclare variable $a external; $a");
 
     // bind variables with namespaces
-    equals("8", "-b{}a=8", "-qdeclare variable $a external; $a");
-    equals("9", "-b{URI}a=9", "-qdeclare namespace a='URI'; declare variable $a:a external; $a:a");
+    equals("8", "-bQ{}a=8", "-qdeclare variable $a external; $a");
+    equals("9", "-bQ{URI}a=9", "-qdeclare namespace a='URI'; declare variable $a:a external; $a:a");
 
     // check if parameters are evaluated in given order
     equals("12", "-ba=1", "-qdeclare variable $a external; $a",
