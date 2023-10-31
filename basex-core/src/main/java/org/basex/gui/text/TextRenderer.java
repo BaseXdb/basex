@@ -101,7 +101,6 @@ final class TextRenderer extends BaseXBack {
 
   @Override
   public void setFont(final Font f) {
-    font = null;
     super.setFont(f);
     if(gui == null) return;
 
@@ -242,11 +241,6 @@ final class TextRenderer extends BaseXBack {
    * @param style font style ({@link Font#PLAIN}, {@link Font#BOLD})
    */
   private void setStyle(final int style) {
-    if(font == null) {
-      final int indent = gui != null ? Math.max(1, gui.gopts.get(GUIOptions.INDENT)) :
-        GUIOptions.INDENT.value();
-      font = new TextFont(getFont(), indent, this);
-    }
     font.style(style);
     fontHeight = font.size() * 5 / 4;
   }
@@ -271,8 +265,11 @@ final class TextRenderer extends BaseXBack {
    * @return text iterator
    */
   private TextIterator init(final Graphics g, final boolean start) {
-    syntax.init(GUIConstants.TEXT);
+    final int indent = gui != null ? Math.max(1, gui.gopts.get(GUIOptions.INDENT)) :
+      GUIOptions.INDENT.value();
+    font = new TextFont(getFont(), indent, this);
     setStyle(Font.PLAIN);
+    syntax.init(GUIConstants.TEXT);
 
     offset = OFFSET;
     if(g != null && edit && showLines) {
