@@ -243,7 +243,7 @@ public final class GFLWORTest extends SandboxTest {
     );
   }
 
-  /** Tests if where clauses containing non-deterministic expressions are left alone. */
+  /** Tests if where clauses containing nondeterministic expressions are left alone. */
   @Test public void dontSlideWhereNDT() {
     check("for $x in 1 to 100 where " + _RANDOM_DOUBLE.args() + " gt 0.5 return $x",
         null,
@@ -251,7 +251,7 @@ public final class GFLWORTest extends SandboxTest {
     );
   }
 
-  /** Tests if let clauses containing non-deterministic expressions are left alone. */
+  /** Tests if let clauses containing nondeterministic expressions are left alone. */
   @Test public void dontSlideLetNDT() {
     check("for $i in 1 to 10 let $rnd := " + _RANDOM_DOUBLE.args() + " return $i * $rnd",
         null,
@@ -311,7 +311,7 @@ public final class GFLWORTest extends SandboxTest {
     );
   }
 
-  /** FLWOR expressions containing updates or non-determinism. */
+  /** FLWOR expressions containing updates or nondeterminism. */
   @Test public void updatesNdt() {
     check("copy $x := <x/> modify (" +
         "  for $i in 1 to 6" +
@@ -357,7 +357,7 @@ public final class GFLWORTest extends SandboxTest {
     );
   }
 
-  /** Ensures that non-deterministic expressions are rewritten to a simple map. */
+  /** Ensures that nondeterministic expressions are rewritten to a simple map. */
   @Test public void inlineNDTTest() {
     check("let $rnd := " + _RANDOM_DOUBLE.args() + " return (1 to 10) ! $rnd",
         null,

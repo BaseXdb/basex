@@ -3939,7 +3939,7 @@ public class QueryParser extends InputParser {
   private Expr updatingFunctionCall() throws QueryException {
     final int p = pos;
     wsConsume(INVOKE);
-    final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NON_DETERMINISTIC);
+    final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NONDETERMINISTIC);
     if(upd || ndt) {
       final Expr func = primary();
       if(wsConsume("(")) {

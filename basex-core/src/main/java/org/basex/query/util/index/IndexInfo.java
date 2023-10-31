@@ -180,7 +180,7 @@ public final class IndexInfo {
 
     } else {
       /* index access is not possible if returned type is not a string or untyped; if
-       * expression depends on context; or if it is non-deterministic. examples:
+       * expression depends on context; or if it is nondeterministic. examples:
        * - for $x in ('a', 1) return //*[text() = $x]
        * - //*[text() = .]
        * - //*[text() = (if(random:double() < .5) then 'X' else 'Y')] */

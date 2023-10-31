@@ -2483,7 +2483,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" 1 + <a/>", false), FUNCCAST_X_X);
     query(func.args(" 1 + <a/>", true), "");
 
-    // GH-2139: Simplify inlined non-deterministic code
+    // GH-2139: Simplify inlined nondeterministic code
     check("let $doc := doc('" + TEXT + "') let $a := 1 return $a", 1, root(Int.class));
   }
 

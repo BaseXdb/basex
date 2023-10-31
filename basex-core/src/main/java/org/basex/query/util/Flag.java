@@ -21,7 +21,7 @@ public enum Flag {
    */
   CTX,
   /**
-   * Non-deterministic code. Cannot be relocated, pre-evaluated or optimized away.
+   * Nondeterministic code. Cannot be relocated, pre-evaluated or optimized away.
    * Examples: random:double(), file:write().
    */
   NDT,
@@ -34,7 +34,7 @@ public enum Flag {
   /**
    * Performs updates. Checked to detect if an expression is updating or not, or if code
    * can be optimized away when using {@link MainOptions#MIXUPDATES}.
-   * All updating expressions are non-deterministic.
+   * All updating expressions are nondeterministic.
    * Example: delete node.
    */
   UPD,

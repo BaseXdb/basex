@@ -48,7 +48,8 @@ public final class Extension extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) {
-    return expr instanceof Value && !expr.seqType().mayBeFunction() ? expr : adoptType(expr);
+    return pragma.simplify() && expr instanceof Value &&
+        !expr.seqType().mayBeFunction() ? expr : adoptType(expr);
   }
 
   @Override

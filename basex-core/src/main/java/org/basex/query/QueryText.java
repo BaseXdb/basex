@@ -110,7 +110,7 @@ public interface QueryText {
   /** Parser token. */ String NO = "no";
   /** Parser token. */ String NODE = "node";
   /** Parser token. */ String NODES = "nodes";
-  /** Parser token. */ String NON_DETERMINISTIC = "non-deterministic";
+  /** Parser token. */ String NONDETERMINISTIC = "nondeterministic";
   /** Parser token. */ String NOT = "not";
   /** Parser token. */ String OCCURS = "occurs";
   /** Parser token. */ String OF = "of";
@@ -203,7 +203,7 @@ public interface QueryText {
   /** Parser token. */ String DECIMAL_FORMATS = "decimal-formats";
 
   /** Parser token. */ String LOCK = "lock";
-  /** Parser token. */ String NON_DETERMNISTIC = "non-deterministic";
+  /** Parser token. */ String NONDETERMNISTIC = "nondeterministic";
 
   /** Parsed by the syntax highlighter (don’t remove): remaining constants will be ignored. */
   String IGNORE = null;

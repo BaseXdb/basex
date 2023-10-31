@@ -49,7 +49,7 @@ public final class UtilCountWithin extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
 
-    // return statically known size (ignore non-deterministic expressions, e.g. count(error()))
+    // return statically known size (ignore nondeterministic expressions, e.g. count(error()))
     final long[] minMax = minMaxValues(cc.qc);
     if(minMax != null) {
       final long min = minMax[0], max = minMax[1];

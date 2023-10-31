@@ -67,6 +67,12 @@ public abstract class Pragma extends ExprInfo {
   public abstract Pragma copy();
 
   /**
+   * Indicates if the pragma can be simplified.
+   * @return result of check
+   */
+  public abstract boolean simplify();
+
+  /**
    * {@inheritDoc}
    * Must be overwritten by implementing class.
    */

@@ -1146,7 +1146,7 @@ public final class UpdateTest extends SandboxTest {
         UPNOT_X);
   }
 
-  /** Checks if updating expressions are treated like non-deterministic code. */
+  /** Checks if updating expressions are treated like nondeterministic code. */
   @Test public void noOptimization() {
     query("<a/> update { . ! (insert node text { '1' } into .) }", "<a>1</a>");
     query("<a/> update { for $a in (1, 2) return insert node text { '1' } into . }", "<a>11</a>");

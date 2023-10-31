@@ -28,7 +28,7 @@ import org.basex.util.hash.*;
 public final class DynFuncCall extends FuncCall {
   /** Updating flag. */
   private final boolean updating;
-  /** Non-deterministic flag. */
+  /** Nondeterministic flag. */
   private boolean ndt;
   /** Hash values of all function items that this call was copied from, possibly {@code null}. */
   private int[] inlinedFrom;
@@ -50,7 +50,7 @@ public final class DynFuncCall extends FuncCall {
    * @param info input info (can be {@code null})
    * @param sc static context
    * @param updating updating flag
-   * @param ndt non-deterministic flag
+   * @param ndt nondeterministic flag
    * @param expr function expression
    * @param args arguments
    */

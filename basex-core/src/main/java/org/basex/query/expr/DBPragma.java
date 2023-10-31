@@ -58,13 +58,18 @@ public final class DBPragma extends Pragma {
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof DBPragma && option.equals(((DBPragma) obj).option) &&
-        super.equals(obj);
+  public Pragma copy() {
+    return new DBPragma(name, option, value);
   }
 
   @Override
-  public Pragma copy() {
-    return new DBPragma(name, option, value);
+  public boolean simplify() {
+    return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof DBPragma && option.equals(((DBPragma) obj).option) &&
+        super.equals(obj);
   }
 }

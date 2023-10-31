@@ -329,9 +329,9 @@ public final class RewritingsTest extends SandboxTest {
     check("((), <x/>, ())", "<x/>", empty(List.class), empty(Empty.class), exists(CElem.class));
   }
 
-  /** Checks that expressions marked as non-deterministic will not be rewritten. */
+  /** Checks that expressions marked as nondeterministic will not be rewritten. */
   @Test public void nonDeterministic() {
-    check("count((# basex:non-deterministic #) { <x/> })", 1, exists(COUNT));
+    check("count((# basex:nondeterministic #) { <x/> })", 1, exists(COUNT));
   }
 
   /** Ensures that fn:doc with URLs will not be rewritten. */
@@ -1173,7 +1173,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>[(b, c) = (b, c)]", "", empty(List.class), count(SingleIterPath.class, 2));
   }
 
-  /** FLWOR, no results, non-deterministic expressions. */
+  /** FLWOR, no results, nondeterministic expressions. */
   @Test public void gh1819() {
     check("for $_ in () return <x/>", "", empty());
     check("for $_ in" + VOID.args(1) + " return 1", "", root(VOID));
@@ -1986,7 +1986,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Rewrite side-effecting let expressions. */
   @Test public void gh1917() {
-    check("let $a := (# basex:non-deterministic #) { <a/> } return $a ! name()",
+    check("let $a := (# basex:nondeterministic #) { <a/> } return $a ! name()",
         "a", root(ItemMap.class));
   }
 
