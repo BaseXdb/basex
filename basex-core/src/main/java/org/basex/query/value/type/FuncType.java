@@ -117,11 +117,10 @@ public class FuncType implements Type {
     if(type.getClass() != FuncType.class) return false;
     final FuncType ft = (FuncType) type;
 
-    if(this == SeqType.FUNCTION || ft == SeqType.FUNCTION || argTypes.length != ft.argTypes.length)
-      return false;
+    final int arity = argTypes.length, nargs = ft.argTypes.length;
+    if(this == SeqType.FUNCTION || ft == SeqType.FUNCTION || arity != nargs) return false;
 
-    final int al = argTypes.length;
-    for(int a = 0; a < al; a++) {
+    for(int a = 0; a < arity; a++) {
       if(!argTypes[a].eq(ft.argTypes[a])) return false;
     }
     return declType.eq(ft.declType);
@@ -134,9 +133,9 @@ public class FuncType implements Type {
         type instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) type;
-    final int al = argTypes.length;
-    if(al != ft.argTypes.length) return false;
-    for(int a = 0; a < al; a++) {
+    final int arity = argTypes.length, nargs = ft.argTypes.length;
+    if(arity != nargs) return false;
+    for(int a = 0; a < arity; a++) {
       if(!ft.argTypes[a].instanceOf(argTypes[a])) return false;
     }
     for(final Ann ann : ft.anns) {
@@ -153,11 +152,11 @@ public class FuncType implements Type {
     if(!(type instanceof FuncType)) return AtomType.ITEM;
 
     final FuncType ft = (FuncType) type;
-    final int al = argTypes.length;
-    if(al != ft.argTypes.length) return SeqType.FUNCTION;
+    final int arity = argTypes.length, nargs = ft.argTypes.length;
+    if(arity != nargs) return SeqType.FUNCTION;
 
-    final SeqType[] arg = new SeqType[al];
-    for(int a = 0; a < al; a++) {
+    final SeqType[] arg = new SeqType[arity];
+    for(int a = 0; a < arity; a++) {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return SeqType.FUNCTION;
     }
@@ -177,16 +176,16 @@ public class FuncType implements Type {
     final FuncType ft = (FuncType) type;
     if(ft instanceof MapType || ft instanceof ArrayType) return ft.intersect(this);
 
-    final int al = argTypes.length;
-    if(al != ft.argTypes.length) return null;
+    final int arity = argTypes.length, nargs = ft.argTypes.length;
+    if(arity != nargs) return null;
 
     final AnnList an = anns.intersect(ft.anns);
     if(an == null) return null;
     final SeqType dt = declType.intersect(ft.declType);
     if(dt == null) return null;
 
-    final SeqType[] arg = new SeqType[al];
-    for(int a = 0; a < al; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
+    final SeqType[] arg = new SeqType[arity];
+    for(int a = 0; a < arity; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
     return get(an, dt, arg);
   }
 

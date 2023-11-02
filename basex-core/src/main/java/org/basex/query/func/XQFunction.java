@@ -17,7 +17,7 @@ public interface XQFunction extends XQFunctionExpr {
    * Must not be overwritten.
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @param args arguments for the call
+   * @param args arguments for the call (possibly more than required)
    * @return result of the function call
    * @throws QueryException query exception
    */

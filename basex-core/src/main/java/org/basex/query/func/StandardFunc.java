@@ -602,21 +602,6 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates a function.
-   * @param func function
-   * @param qc query context
-   * @param args arguments (possibly more than required)
-   * @return result
-   * @throws QueryException query exception
-   */
-  protected final Value eval(final FItem func, final QueryContext qc, final Value... args)
-      throws QueryException {
-    final int arity = func.arity();
-    return arity < args.length ? func.invoke(qc, info, Arrays.copyOf(args, arity)) :
-      func.invoke(qc, info, args);
-  }
-
-  /**
    * Indicates if the supplied argument is defined.
    * @param i index of argument
    * @return result of check

@@ -33,7 +33,7 @@ public final class HofScanLeft extends StandardFunc {
           final Item out = input.next();
           if(out == null) return null;
 
-          acc = eval(action, qc, acc, out);
+          acc = action.invoke(qc, info, acc, out);
           inner = acc.iter();
         }
       }

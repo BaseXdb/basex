@@ -22,7 +22,7 @@ public final class MapFilter extends StandardFunc {
 
     final MapBuilder mb = new MapBuilder(info);
     map.apply((key, value) -> {
-      if(toBoolean(eval(predicate, qc, key, value).item(qc, info))) {
+      if(toBoolean(predicate.invoke(qc, info, key, value).item(qc, info))) {
         mb.put(key, value);
       }
     });

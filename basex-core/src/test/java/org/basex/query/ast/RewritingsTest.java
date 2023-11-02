@@ -845,8 +845,8 @@ public final class RewritingsTest extends SandboxTest {
     check("data(string(<_/>)) instance of xs:string", true, root(Bln.class));
     check("data(xs:NMTOKENS(<_/>) ! xs:untypedAtomic(.)) instance of xs:untypedAtomic*",
         true, root(Bln.class));
-    error("data(data(" + wrap("a") + ") promote to element(e))", INVPROMOTE_X_X_X);
-    error("data(" + wrap("a") + "promote to element(e))", INVPROMOTE_X_X_X);
+    error("data(data(" + wrap("a") + ") coerce to element(e))", INVCONVERT_X_X_X);
+    error("data(" + wrap("a") + "coerce to element(e))", INVCONVERT_X_X_X);
   }
 
   /** Remove redundant atomizations. */
@@ -999,20 +999,20 @@ public final class RewritingsTest extends SandboxTest {
     check("--xs:byte(" + wrap("-128") + ")", -128, empty(Unary.class), count(Cast.class, 2));
   }
 
-  /** Promote to expression. */
+  /** Coerce to expression. */
   @Test public void gh1798() {
-    check("<a>1</a> promote to xs:string", 1, root(Str.class));
-    check(wrap(1) + "promote to xs:string", 1, root(TypeCheck.class));
-    check("(1, 2) promote to xs:double+", "1\n2",
+    check("<a>1</a> coerce to xs:string", 1, root(Str.class));
+    check(wrap(1) + "coerce to xs:string", 1, root(TypeCheck.class));
+    check("(1, 2) coerce to xs:double+", "1\n2",
         empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
 
-    error("<a/> promote to empty-sequence()", INVPROMOTE_X_X_X);
-    error("(1, 2) promote to xs:byte+", INVPROMOTE_X_X_X);
+    error("<a/> coerce to empty-sequence()", INVCONVERT_X_X_X);
+    error("(1, 2) coerce to xs:byte+", INVCONVERT_X_X_X);
   }
 
-  /** Treats and promotions, error messages. */
+  /** Treat and coerce, error messages. */
   @Test public void gh1799() {
-    error("'a' promote to node()", INVPROMOTE_X_X_X);
+    error("'a' coerce to node()", INVCONVERT_X_X_X);
     error("'a' treat as  node()", NOTREAT_X_X_X);
   }
 
@@ -1928,7 +1928,7 @@ public final class RewritingsTest extends SandboxTest {
         "<a/>", root(CElem.class));
     check("function() as element(xml:a)? { <xml:a/>/self::xml:* }()",
         "<xml:a/>", root(CElem.class));
-    error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVPROMOTE_X_X_X);
+    error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVCONVERT_X_X_X);
   }
 
   /** Axis followed by attribute step. */
@@ -2103,7 +2103,7 @@ public final class RewritingsTest extends SandboxTest {
 
     check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",
         "1\n2", root(DISTINCT_VALUES), exists(DualMap.class));
-    check("for $a in (1 to 2)[. >= 0] group by $a return $a promote to xs:double",
+    check("for $a in (1 to 2)[. >= 0] group by $a return $a coerce to xs:double",
         "1\n2", root(DualMap.class));
 
     check("for $a in (1 to 2)[. >= 0] group by $b := string($a) return $b || 'x'",
@@ -2409,21 +2409,21 @@ public final class RewritingsTest extends SandboxTest {
     check("xs:decimal(exactly-one((1 to 2)[. = 2]))", 2, exists(EXACTLY_ONE));
     check("xs:decimal(one-or-more((1 to 2)[. = 2]))", 2, exists(ONE_OR_MORE));
 
-    check("zero-or-one((1 to 2)[. = 3]) promote to empty-sequence()", "", empty(ZERO_OR_ONE));
-    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(ZERO_OR_ONE));
-    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal?", 2, empty(ZERO_OR_ONE));
-    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal+", 2, empty(ZERO_OR_ONE));
-    check("zero-or-one((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 3]) coerce to empty-sequence()", "", empty(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) coerce to xs:decimal" , 2, empty(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) coerce to xs:decimal?", 2, empty(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) coerce to xs:decimal+", 2, empty(ZERO_OR_ONE));
+    check("zero-or-one((1 to 2)[. = 2]) coerce to xs:decimal*", 2, exists(ZERO_OR_ONE));
 
-    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(EXACTLY_ONE));
-    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal?", 2, exists(EXACTLY_ONE));
-    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal+", 2, exists(EXACTLY_ONE));
-    check("exactly-one((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(EXACTLY_ONE));
+    check("exactly-one((1 to 2)[. = 2]) coerce to xs:decimal" , 2, empty(EXACTLY_ONE));
+    check("exactly-one((1 to 2)[. = 2]) coerce to xs:decimal?", 2, exists(EXACTLY_ONE));
+    check("exactly-one((1 to 2)[. = 2]) coerce to xs:decimal+", 2, exists(EXACTLY_ONE));
+    check("exactly-one((1 to 2)[. = 2]) coerce to xs:decimal*", 2, exists(EXACTLY_ONE));
 
-    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal" , 2, empty(ONE_OR_MORE));
-    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal?", 2, empty(ONE_OR_MORE));
-    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal+", 2, empty(ONE_OR_MORE));
-    check("one-or-more((1 to 2)[. = 2]) promote to xs:decimal*", 2, exists(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) coerce to xs:decimal" , 2, empty(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) coerce to xs:decimal?", 2, empty(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) coerce to xs:decimal+", 2, empty(ONE_OR_MORE));
+    check("one-or-more((1 to 2)[. = 2]) coerce to xs:decimal*", 2, exists(ONE_OR_MORE));
   }
 
   /** Inline transform-with expression. */

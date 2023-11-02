@@ -25,24 +25,24 @@ import org.basex.util.hash.*;
 public class TypeCheck extends Single {
   /** Static context. */
   final StaticContext sc;
-  /** Flag for function conversion. */
-  public final boolean promote;
+  /** Flag for function coercion. */
+  public final boolean coerce;
   /** Only check occurrence indicator. */
   private boolean occ;
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
+   * @param sc static context
    * @param expr expression to be promoted
-   * @param seqType type to promote to
-   * @param promote flag for function promotion
+   * @param seqType target type
+   * @param coerce flag for function coercion
    */
-  public TypeCheck(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType seqType, final boolean promote) {
+  public TypeCheck(final InputInfo info, final StaticContext sc, final Expr expr,
+      final SeqType seqType, final boolean coerce) {
     super(info, expr, seqType);
     this.sc = sc;
-    this.promote = promote;
+    this.coerce = coerce;
   }
 
   @Override
@@ -53,7 +53,8 @@ public class TypeCheck extends Single {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     final SeqType st = seqType();
-    if(st.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+    final Type type = st.type;
+    if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
 
@@ -63,12 +64,12 @@ public class TypeCheck extends Single {
     }
 
     final SeqType et = expr.seqType();
-    occ = et.type.instanceOf(st.type) && et.kindInstanceOf(st);
+    occ = et.type.instanceOf(type) && et.kindInstanceOf(st);
 
     // remove redundant type check
     if(expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
-      if(promote == tc.promote && st.instanceOf(et)) {
+      if(coerce == tc.coerce && st.instanceOf(et)) {
         return cc.replaceWith(this, get(tc.expr, st).optimize(cc));
       }
     }
@@ -80,10 +81,9 @@ public class TypeCheck extends Single {
     }
 
     // function item coercion
-    final FuncType ft = expr.funcType();
-    if(ft != null && expr instanceof FuncItem) {
+    if(expr instanceof FuncItem && type instanceof FuncType) {
       if(!st.occ.check(1)) throw error(expr, st);
-      return cc.replaceWith(this, ((FuncItem) expr).coerceTo(ft, cc.qc, info, true));
+      return cc.replaceWith(this, ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, info, true));
     }
 
     // pre-evaluate (check value and result size)
@@ -100,11 +100,11 @@ public class TypeCheck extends Single {
     }
 
     // refine occurrence indicator and result size
-    if(!expr.seqType().mayBeArray()) {
+    if(!et.mayBeArray()) {
       final Occ o = et.occ.intersect(st.occ);
       if(o == null) throw error(expr, st);
       exprType.assign(st, o, et.occ == st.occ ? es : -1).
-        data(st.type instanceof NodeType ? expr : null);
+        data(type instanceof NodeType ? expr : null);
     }
 
     return this;
@@ -117,7 +117,7 @@ public class TypeCheck extends Single {
     if(iter.valueIter()) {
       final Value value = iter.value(qc, null);
       if(st.instance(value)) return iter;
-      if(!promote) throw error(value, st);
+      if(!coerce) throw error(value, st);
     }
 
     // only check occurrence indicator
@@ -149,8 +149,8 @@ public class TypeCheck extends Single {
           if(item == null || st.instance(item)) {
             items.add(item);
           } else {
-            if(!promote) throw error(expr, st);
-            st.promote(item, null, items, qc, sc, info, false);
+            if(!coerce) throw error(expr, st);
+            st.coerce(item, null, items, qc, sc, info, false);
           }
         }
 
@@ -175,14 +175,14 @@ public class TypeCheck extends Single {
 
     // check occurrence indicator and item type
     if(st.instance(value)) return value;
-    if(promote) return st.promote(value, null, qc, sc, info, false);
+    if(coerce) return st.coerce(value, null, qc, sc, info, false);
     throw error(value, st);
   }
 
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    return promote ? simplifyForCast(mode, cc) : super.simplifyFor(mode, cc);
+    return coerce ? simplifyForCast(mode, cc) : super.simplifyFor(mode, cc);
   }
 
   /**
@@ -191,7 +191,7 @@ public class TypeCheck extends Single {
    * @return result of check
    */
   public final boolean isRedundant(final Var var) {
-    return (!promote || var.promotes()) && var.declaredType().instanceOf(seqType());
+    return (!coerce || var.coerce) && var.declaredType().instanceOf(seqType());
   }
 
   /**
@@ -211,7 +211,7 @@ public class TypeCheck extends Single {
    * @return error code
    */
   public QueryError error() {
-    return promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X;
+    return coerce ? INVCONVERT_X_X_X : INVTREAT_X_X_X;
   }
 
   /**
@@ -231,7 +231,7 @@ public class TypeCheck extends Single {
    * @return error code
    */
   TypeCheck get(final Expr ex, final SeqType st) {
-    return new TypeCheck(sc, info, ex, st, promote);
+    return new TypeCheck(info, sc, ex, st, coerce);
   }
 
   @Override
@@ -246,20 +246,20 @@ public class TypeCheck extends Single {
     if(this == obj) return true;
     if(!(obj instanceof TypeCheck)) return false;
     final TypeCheck tc = (TypeCheck) obj;
-    return seqType().eq(tc.seqType()) && promote == tc.promote && super.equals(obj);
+    return seqType().eq(tc.seqType()) && coerce == tc.coerce && super.equals(obj);
   }
 
   @Override
   public final void toXml(final QueryPlan plan) {
     final FBuilder elem = plan.create(this, AS, seqType());
-    if(promote) plan.addAttribute(elem, PROMOTE, true);
+    if(coerce) plan.addAttribute(elem, COERCE, true);
     plan.add(elem, expr);
   }
 
   @Override
   public final void toString(final QueryString qs) {
     qs.token("(").token(expr);
-    if(promote) qs.token(PROMOTE).token(TO);
+    if(coerce) qs.token(COERCE).token(TO);
     else qs.token(TREAT).token(AS);
     qs.token(seqType()).token(')');
   }

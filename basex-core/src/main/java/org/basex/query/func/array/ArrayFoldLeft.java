@@ -22,7 +22,7 @@ public class ArrayFoldLeft extends FnFoldLeft {
     Value result = arg(1).value(qc);
     for(final Value value : array.members()) {
       if(skip(qc, result, value)) break;
-      result = eval(action, qc, result, value);
+      result = action.invoke(qc, info, result, value);
     }
     return result;
   }

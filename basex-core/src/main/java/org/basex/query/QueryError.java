@@ -1095,8 +1095,6 @@ public enum QueryError {
   /** Error code. */
   INVCONVERT_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
   /** Error code. */
-  INVPROMOTE_X_X_X(XPTY, 4, "Cannot promote % to %: %."),
-  /** Error code. */
   INVTREAT_X_X_X(XPTY, 4, "Cannot treat % as %: %."),
   /** Error code. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
@@ -1630,12 +1628,12 @@ public enum QueryError {
    * @param expr expression
    * @param st target type
    * @param name name (can be {@code null})
-   * @param promote promote or treat as
+   * @param coerce coerce or treat as
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
-      final InputInfo info, final boolean promote) {
-    return typeError(expr, st, name, info, promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X);
+      final InputInfo info, final boolean coerce) {
+    return typeError(expr, st, name, info, coerce ? INVCONVERT_X_X_X : INVTREAT_X_X_X);
   }
 
   /**
@@ -1670,15 +1668,16 @@ public enum QueryError {
    * Throws an arity exception.
    * @param info input info (can be {@code null})
    * @param expr expression
-   * @param arity expected arity
-   * @param nargs supplied arity
+   * @param supplied expected arity
+   * @param expected supplied arity
    * @param param parameter/argument flag
    * @return query exception
    */
-  public static QueryException arityError(final Expr expr, final int arity, final int nargs,
+  public static QueryException arityError(final Expr expr, final int supplied, final int expected,
       final boolean param, final InputInfo info) {
-    final String string = param ? "Function with " + plural(arity, "parameter") : arguments(arity);
-    return INVARITY_X_X_X.get(info, string, nargs, expr.toErrorString());
+    final String string = param ? "Function with " + plural(supplied, "parameter") :
+      arguments(supplied);
+    return INVARITY_X_X_X.get(info, string, expected, expr.toErrorString());
   }
 
   /**

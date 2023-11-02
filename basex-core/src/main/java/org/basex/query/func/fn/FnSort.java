@@ -114,7 +114,7 @@ public class FnSort extends StandardFunc {
               Value v = cached[ll][i];
               if(v == null) {
                 final FItem k = keys[ll];
-                v = (k == null ? values[i] : eval(k, qc, values[i])).atomValue(qc, info);
+                v = (k == null ? values[i] : k.invoke(qc, info, values[i])).atomValue(qc, info);
                 cached[ll][i] = v;
               }
               return v;

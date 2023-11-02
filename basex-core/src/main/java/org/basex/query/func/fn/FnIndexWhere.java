@@ -32,7 +32,7 @@ public final class FnIndexWhere extends StandardFunc {
     final LongList list = new LongList();
     for(Item item; (item = input.next()) != null;) {
       ++c;
-      if(toBoolean(eval(predicate, qc, item).item(qc, info))) {
+      if(toBoolean(predicate.invoke(qc, info, item).item(qc, info))) {
         list.add(c);
       }
     }

@@ -66,7 +66,7 @@ public final class Let extends ForLet {
     // skip redundant type check
     if(!scoring && expr instanceof TypeCheck) {
       final TypeCheck tc = (TypeCheck) expr;
-      if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.promote)) {
+      if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.coerce)) {
         cc.info(OPTTYPE_X, this);
         expr = tc.expr;
       }

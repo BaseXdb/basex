@@ -23,7 +23,7 @@ public class FnContainsSequence extends StandardFunc {
     final QueryBiFunction<Item, Item, Boolean> cmp;
     if(defined(2)) {
       final FItem compare = toFunction(arg(2), 2, qc);
-      cmp = (item1, item2) -> toBoolean(eval(compare, qc, item1, item2).item(qc, info));
+      cmp = (item1, item2) -> toBoolean(compare.invoke(qc, info, item1, item2).item(qc, info));
     } else {
       cmp = new DeepEqual(info, sc.collation, qc)::equal;
     }

@@ -36,7 +36,7 @@ public final class XQueryForkJoin extends StandardFunc {
       list.add(checkUp(toFunction(function, 0, qc), false, sc));
     }
     // single function: invoke directly
-    if(size == 1) return eval(list.get(0), qc);
+    if(size == 1) return list.get(0).invoke(qc, info);
 
     final ForkJoinPool pool = new ForkJoinPool(options.parallel());
     final TaskContext tc = new TaskContext(list, options, qc, info);

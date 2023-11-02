@@ -28,7 +28,7 @@ public final class FnFoldRight extends FnFoldLeft {
     if(size != -1) {
       for(long s = size - 1; s >= 0; s--) {
         final Item item = input.get(s);
-        result = eval(action, qc, item, result);
+        result = action.invoke(qc, info, item, result);
         if(skip(qc, item, result)) break;
       }
     } else {
@@ -37,13 +37,13 @@ public final class FnFoldRight extends FnFoldLeft {
         final TreeSeq seq = (TreeSeq) value;
         for(final ListIterator<Item> iter = seq.iterator(input.size()); iter.hasPrevious();) {
           final Item item = iter.previous();
-          result = eval(action, qc, item, result);
+          result = action.invoke(qc, info, item, result);
           if(skip(qc, item, result)) break;
         }
       } else {
         for(long i = input.size(); --i >= 0;) {
           final Item item = value.itemAt(i);
-          result = eval(action, qc, item, result);
+          result = action.invoke(qc, info, item, result);
           if(skip(qc, item, result)) break;
         }
       }

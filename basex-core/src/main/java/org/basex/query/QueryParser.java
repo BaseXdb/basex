@@ -1742,22 +1742,22 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr treat() throws QueryException {
-    final Expr expr = promote();
+    final Expr expr = coerce();
     if(!wsConsumeWs(TREAT)) return expr;
     wsCheck(AS);
     return new Treat(sc, info(), expr, sequenceType());
   }
 
   /**
-   * Parses the "TreatExpr" rule.
+   * Parses the "CoerceExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr promote() throws QueryException {
+  private Expr coerce() throws QueryException {
     final Expr expr = castable();
-    if(!wsConsumeWs(PROMOTE)) return expr;
+    if(!wsConsumeWs(COERCE)) return expr;
     wsCheck(TO);
-    return new TypeCheck(sc, info(), expr, sequenceType(), true);
+    return new TypeCheck(info(), sc, expr, sequenceType(), true);
   }
 
   /**

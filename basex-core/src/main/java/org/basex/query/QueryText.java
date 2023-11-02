@@ -362,7 +362,7 @@ public interface QueryText {
   /** Query Info. */ String INF = "inf";
   /** Query Info. */ String TAILCALL = "tailCall";
   /** Query Info. */ String ENTRIES = "entries";
-  /** Query Info. */ String PROMOTE = "promote";
+  /** Query Info. */ String COERCE = "coerce";
   /** Query Info. */ String DATABASE = "database";
   /** Query Info. */ String ITERATIVE = "iterative";
   /** Query Info. */ String SINGLE = "single";

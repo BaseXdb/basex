@@ -22,7 +22,7 @@ public final class Treat extends TypeCheck {
    */
   public Treat(final StaticContext sc, final InputInfo info, final Expr expr,
       final SeqType seqType) {
-    super(sc, info, expr, seqType, false);
+    super(info, sc, expr, seqType, false);
   }
 
   @Override

@@ -27,7 +27,7 @@ public class FnEvery extends StandardFunc {
 
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
-      final Item it = predicate != null ? eval(predicate, qc, item).item(qc, info) : item;
+      final Item it = predicate != null ? predicate.invoke(qc, info, item).item(qc, info) : item;
       if(toBoolean(it) == some) return Bln.get(some);
     }
     return Bln.get(!some);

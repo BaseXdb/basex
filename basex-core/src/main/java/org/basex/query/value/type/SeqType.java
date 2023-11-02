@@ -371,7 +371,7 @@ public final class SeqType {
   }
 
   /**
-   * Promotes the specified value to this sequence type.
+   * Converts the specified value to this type.
    * @param value value to promote
    * @param name variable name (can be {@code null})
    * @param qc query context
@@ -381,7 +381,7 @@ public final class SeqType {
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
-  public Value promote(final Value value, final QNm name, final QueryContext qc,
+  public Value coerce(final Value value, final QNm name, final QueryContext qc,
       final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
 
     final long size = value.size();
@@ -396,7 +396,7 @@ public final class SeqType {
           items = new ItemList(Seq.initialCapacity(size));
           for(int j = 0; j < i; j++) items.add(value.itemAt(j));
         }
-        promote(item, name, items, qc, sc, info, opt);
+        coerce(item, name, items, qc, sc, info, opt);
       }
     }
     final long is = items != null ? items.size() : value.size();
@@ -405,7 +405,7 @@ public final class SeqType {
   }
 
   /**
-   * Promotes the specified item to this item type.
+   * Converts the specified item to this type.
    * @param item item to promote
    * @param name variable name (can be {@code null})
    * @param items item cache
@@ -415,7 +415,7 @@ public final class SeqType {
    * @param opt if the result should be optimized
    * @throws QueryException query exception
    */
-  public void promote(final Item item, final QNm name, final ItemList items, final QueryContext qc,
+  public void coerce(final Item item, final QNm name, final ItemList items, final QueryContext qc,
       final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
 
     if(type instanceof AtomType) {

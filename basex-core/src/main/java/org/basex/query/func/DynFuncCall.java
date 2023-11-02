@@ -75,8 +75,10 @@ public final class DynFuncCall extends FuncCall {
     final int nargs = exprs.length - 1;
     final FuncType ft = func.funcType();
     if(ft != null) {
-      final int arity = ft.argTypes != null ? ft.argTypes.length : -1;
-      if(nargs < arity) throw arityError(func, arity, nargs, false, info);
+      if(ft.argTypes != null) {
+        final int arity = ft.argTypes.length;
+        if(nargs < arity) throw arityError(func, nargs, arity, false, info);
+      }
       if(!sc.mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
@@ -168,7 +170,7 @@ public final class DynFuncCall extends FuncCall {
 
     final FItem func = checkUp((FItem) item, updating, sc);
     final int nargs = exprs.length - 1, arity = func.arity();
-    if(nargs < arity) throw arityError(func, arity, nargs, false, info);
+    if(nargs < arity) throw arityError(func, nargs, arity, false, info);
     return func;
   }
 

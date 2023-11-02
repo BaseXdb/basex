@@ -20,7 +20,7 @@ public final class FnItemsBefore extends FnItemsStartingWhere {
       @Override
       public Item next() throws QueryException {
         Item item = input.next();
-        if(item != null && toBoolean(eval(predicate, qc, item).item(qc, info))) item = null;
+        if(item != null && toBoolean(predicate.invoke(qc, info, item).item(qc, info))) item = null;
         return item;
       }
     };
