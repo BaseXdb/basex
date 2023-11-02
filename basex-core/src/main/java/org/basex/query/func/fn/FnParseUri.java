@@ -71,12 +71,12 @@ public class FnParseUri extends FnJsonDoc {
     String host = "", port = "", path = "";
 
     // strip off the fragment identifier and any query
-    Matcher m = Pattern.compile("^(.*)#([^#]*)$").matcher(string);
+    Matcher m = Pattern.compile("^(.*?)#(.*)$").matcher(string);
     if(m.matches()) {
       string = m.group(1);
       fragment = m.group(2);
     }
-    m = Pattern.compile("^(.*)\\?([^?]*)$").matcher(string);
+    m = Pattern.compile("^(.*?)\\?(.*)$").matcher(string);
     if(m.matches()) {
       string = m.group(1);
       query = m.group(2);
@@ -105,7 +105,7 @@ public class FnParseUri extends FnJsonDoc {
       scheme = FILE;
       filepath = string;
     } else {
-      m = Pattern.compile("^//*([a-zA-Z]:.*)$").matcher(string);
+      m = Pattern.compile("^/*(/[a-zA-Z]:.*)$").matcher(string);
       if((scheme.isEmpty() || scheme.equals(FILE)) && m.matches()) {
         string = m.group(1);
       } else {
@@ -146,7 +146,7 @@ public class FnParseUri extends FnJsonDoc {
       if(m.matches()) port = m.group(5);
     }
     if(port == null) port = "";
-    if(omitPort(port, scheme, options))port = "";
+    if(omitPort(port, scheme, options)) port = "";
 
     path = string;
     if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equals(FILE))) {
