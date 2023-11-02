@@ -206,6 +206,17 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Returns a coerced function item argument.
+   * @param i index of argument
+   * @param cc compilation context
+   * @return coerced argument
+   * @throws QueryException query exception
+   */
+  public final Expr coerce(final int i, final CompileContext cc) throws QueryException {
+    return new TypeCheck(info, sc, arg(i), definition.types[i], true).optimize(cc);
+  }
+
+  /**
    * Refines the type of a function item argument.
    * @param expr function
    * @param cc compilation context

@@ -39,7 +39,7 @@ public final class HofFoldLeft1 extends StandardFunc {
     if(arg(1) instanceof Value) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final FItem func = toFunction(arg(1), 2, cc.qc);
+        final Expr func = coerce(1, cc);
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {

@@ -20,7 +20,9 @@ public final class ArrayOfMembers extends ArrayFn {
     final Iter members = arg(0).iter(qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(Item item; (item = qc.next(members)) != null;) ab.append(toRecord(item, Str.VALUE));
+    for(Item item; (item = qc.next(members)) != null;) {
+      ab.append(toRecord(item, Str.VALUE).get(Str.VALUE, info));
+    }
     return ab.array(this);
   }
 

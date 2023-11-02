@@ -61,9 +61,10 @@ public final class FnFoldRight extends FnFoldLeft {
     if(action instanceof Value) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
+        final Expr func = coerce(2, cc);
         expr = zero;
         for(int es = unroll.size() - 1; es >= 0; es--) {
-          expr = new DynFuncCall(info, sc, action, unroll.get(es), expr).optimize(cc);
+          expr = new DynFuncCall(info, sc, func, unroll.get(es), expr).optimize(cc);
         }
         return expr;
       }

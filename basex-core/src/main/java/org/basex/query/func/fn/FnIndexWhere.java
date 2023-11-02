@@ -54,8 +54,7 @@ public final class FnIndexWhere extends StandardFunc {
     final Var p = cc.copy(new Var(new QNm("p"), SeqType.INTEGER_O, cc.qc, sc, info), vm);
     clauses.add(new For(i, p, null, input, false).optimize(cc));
 
-    final Expr pred = coerceFunc(arg(1), cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE));
-    final Expr arg = new VarRef(info, i).optimize(cc);
+    final Expr pred = coerce(1, cc), arg = new VarRef(info, i).optimize(cc);
     clauses.add(new Where(new DynFuncCall(info, sc, pred, arg).optimize(cc), info).optimize(cc));
 
     return new GFLWOR(info, clauses, new VarRef(info, p).optimize(cc)).optimize(cc);

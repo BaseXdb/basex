@@ -36,10 +36,9 @@ public final class FnFilter extends StandardFunc {
 
     // create filter expression
     // filter(INPUT, PREDICATE)  ->  INPUT[PREDICATE(.)]
-    final Expr predicate = cc.get(input, () -> {
-      final Expr dfc = new DynFuncCall(info, sc, arg(1), ContextValue.get(cc, info)).optimize(cc);
-      return new TypeCheck(info, sc, dfc, SeqType.BOOLEAN_O, true).optimize(cc);
-    });
-    return Filter.get(cc, info, input, cc.function(Function.BOOLEAN, info, predicate));
+    final Expr predicate = cc.get(input, () ->
+      new DynFuncCall(info, sc, coerce(1, cc), ContextValue.get(cc, info)).optimize(cc)
+    );
+    return Filter.get(cc, info, input, predicate);
   }
 }

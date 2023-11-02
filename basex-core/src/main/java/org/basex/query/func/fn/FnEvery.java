@@ -40,19 +40,21 @@ public class FnEvery extends StandardFunc {
     final boolean some = some();
     if(st.zero()) return cc.merge(input, Bln.get(!some), info);
 
-    // create FLWOR expression
-    // some(INPUT, PREDICATE)  ->  (for $i in INPUT return PREDICATE($i)) = true()
-    // all(INPUT, PREDICATE)  ->  not((for $i in INPUT return PREDICATE($i)) = false())
-    final Var var = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), new IntObjMap<>());
-    final For fr = new For(var, input).optimize(cc);
-
-    final Expr func = defined(1) ?
-      coerceFunc(arg(1), cc, SeqType.BOOLEAN_O, st.with(Occ.EXACTLY_ONE)) : null;
-    final Expr ref = new VarRef(info, var).optimize(cc);
-    final Expr rtrn = func != null ? new DynFuncCall(info, sc, func, ref).optimize(cc) : ref;
-    final Expr flwor = new GFLWOR(info, fr, rtrn).optimize(cc);
-
-    final Expr cmp = new CmpG(info, flwor, Bln.get(some), OpG.EQ, null, sc).optimize(cc);
+    final Expr result;
+    if(defined(1)) {
+      // some(INPUT, PREDICATE)  ->  (for $i in INPUT return PREDICATE($i)) = true()
+      // all(INPUT, PREDICATE)  ->  not((for $i in INPUT return PREDICATE($i)) = false())
+      final Var var = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), new IntObjMap<>());
+      final For fr = new For(var, input).optimize(cc);
+      final Expr ref = new VarRef(info, var).optimize(cc);
+      final Expr rtrn = new DynFuncCall(info, sc, coerce(1, cc), ref).optimize(cc);
+      result = new GFLWOR(info, fr, rtrn).optimize(cc);
+    } else {
+      // some(INPUT)  ->  INPUT = true()
+      // every(INPUT)  ->  not(INPUT = false())
+      result = input;
+    }
+    final Expr cmp = new CmpG(info, result, Bln.get(some), OpG.EQ, null, sc).optimize(cc);
     return some ? cmp : cc.function(Function.NOT, info, cmp);
   }
 

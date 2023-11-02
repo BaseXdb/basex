@@ -157,7 +157,7 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args(" (" + updating + ", " + updating + ")[" + wrap(1) + ']'), FUNCUP_X);
 
     error(func.args(" count#1"), INVARITY_X_X_X);
-    error(func.args(" 123"), INVFUNCITEM_X_X);
+    error(func.args(" 123"), INVCONVERT_X_X_X);
     error(func.args(" (count#1, count#1)"), INVARITY_X_X_X);
     error(func.args(" (123, 123)"), INVCONVERT_X_X_X);
     error(func.args(" error#0"), FUNERR1);

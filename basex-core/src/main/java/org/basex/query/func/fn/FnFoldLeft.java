@@ -65,9 +65,10 @@ public class FnFoldLeft extends StandardFunc {
     if(action instanceof Value) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
+        final Expr func = coerce(2, cc);
         expr = zero;
         for(final Expr ex : unroll) {
-          expr = new DynFuncCall(info, sc, action, expr, ex).optimize(cc);
+          expr = new DynFuncCall(info, sc, func, expr, ex).optimize(cc);
         }
         return expr;
       }
