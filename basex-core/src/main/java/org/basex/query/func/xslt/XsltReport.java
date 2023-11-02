@@ -41,7 +41,7 @@ final class XsltReport {
   private static final Method MW_SMW = Reflect.method(XC, "setMessageFactory", Supplier.class);
 
   /** Report map builder. */
-  private final MapBuilder rb = new MapBuilder();
+  private final MapBuilder report = new MapBuilder();
   /** Saxon-specific: Message collector. */
   private final Stack<Object> messages = new Stack<>();
   /** Query context. */
@@ -80,7 +80,7 @@ final class XsltReport {
    * @throws QueryException query exception
    */
   void addResult(final byte[] result) throws QueryException {
-    rb.put("result", convert(new IOContent(result), true));
+    report.put("result", convert(new IOContent(result), true));
   }
 
   /**
@@ -100,7 +100,7 @@ final class XsltReport {
     } catch(final Exception ex) {
       Util.debug(ex);
     }
-    rb.put("messages", vb.value());
+    report.put("messages", vb.value());
   }
 
   /**
@@ -109,7 +109,7 @@ final class XsltReport {
    * @throws QueryException query exception
    */
   void addError(final Str error) throws QueryException {
-    rb.put("error", error);
+    report.put("error", error);
   }
 
   /**
@@ -117,7 +117,7 @@ final class XsltReport {
    * @return report
    */
   XQMap finish() {
-    return rb.map();
+    return report.map();
   }
 
   /**
