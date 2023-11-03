@@ -681,7 +681,6 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   private Value cast(final Object value, final String type) throws QueryException {
-    // interpret string input
     Object object = value;
     if(object instanceof String) {
       final String string = (String) object;
@@ -740,9 +739,9 @@ public final class QueryContext extends Job implements Closeable {
     }
 
     // cast sequences
-    if(object instanceof String[]) {
+    if(object instanceof Object[]) {
       final ValueBuilder vb = new ValueBuilder(this);
-      for(final String string : (String[]) object) vb.add(tp.cast(string, this, null));
+      for(final Object obj : (Object[]) object) vb.add(tp.cast(obj, this, null));
       return vb.value(tp);
     }
 

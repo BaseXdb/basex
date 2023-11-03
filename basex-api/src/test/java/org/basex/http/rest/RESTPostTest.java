@@ -72,10 +72,29 @@ public final class RESTPostTest extends RESTTest {
    * POST Test: execute a query with an initial context.
    * @throws IOException I/O exception
    */
-  @Test public void post6() throws IOException {
+  @Test public void postContext() throws IOException {
     assertEquals("<a/>", post("<query xmlns=\"" + URI + "\">"
         + "<text>.</text>"
         + "<context><a/></context>"
+        + "</query>",
+        MediaType.APPLICATION_XML, ""));
+  }
+
+  /**
+   * POST Test: execute a query with variables.
+   * @throws IOException I/O exception
+   */
+  @Test public void postVariable() throws IOException {
+    assertEquals("123", post("<query xmlns=\"" + URI + "\">"
+        + "<text>declare variable $a as xs:integer external; $a</text>"
+        + "<variable name='a' value='123'/>"
+        + "</query>",
+        MediaType.APPLICATION_XML, ""));
+
+    assertEquals("1000", post("<query xmlns=\"" + URI + "\">"
+        + "<text>declare variable $a as xs:integer* external; sum($a)</text>"
+        + "<variable name='a' value='123'/>"
+        + "<variable name='a' value='877'/>"
         + "</query>",
         MediaType.APPLICATION_XML, ""));
   }

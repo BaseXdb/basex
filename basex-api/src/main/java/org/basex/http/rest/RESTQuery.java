@@ -2,6 +2,7 @@ package org.basex.http.rest;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -20,12 +21,12 @@ class RESTQuery extends RESTCmd {
    * @param session REST Session
    * @param bindings external bindings
    */
-  RESTQuery(final RESTSession session, final Map<String, String[]> bindings) {
+  RESTQuery(final RESTSession session, final Map<String, Entry<Object, String>> bindings) {
     super(session);
     for(final Command cmd : session) {
       if(cmd instanceof XQuery) {
         final XQuery xq = (XQuery) cmd;
-        bindings.forEach((key, value) -> xq.bind(key, value[0], value[1]));
+        bindings.forEach((key, value) -> xq.bind(key, value));
       }
     }
   }
@@ -67,7 +68,7 @@ class RESTQuery extends RESTCmd {
    */
   @SuppressWarnings("unused")
   static RESTQuery get(final RESTSession session, final String query,
-      final Map<String, String[]> bindings) throws IOException {
+      final Map<String, Map.Entry<Object, String>> bindings) throws IOException {
 
     final String uri = session.conn.context.soptions.get(StaticOptions.WEBPATH);
     return new RESTQuery(session.add(new XQuery(query).baseURI(uri)), bindings);

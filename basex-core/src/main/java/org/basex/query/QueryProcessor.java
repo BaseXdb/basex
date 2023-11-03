@@ -119,10 +119,21 @@ public final class QueryProcessor extends Job implements Closeable {
   }
 
   /**
+   * Binds a value to a global variable.
+   * @param name name of variable
+   * @param value value to be bound
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public QueryProcessor variable(final String name, final Object value) throws QueryException {
+    return variable(name, value, null);
+  }
+
+  /**
    * Binds a value to a global variable or the context value.
    * The arguments will be ignored if a value has already been assigned.
    * @param name name of variable; context value if empty string or {@code null}
-   * @param value value to be bound (object or XQuery {@link Value})
+   * @param value value to be bound (object or XDM {@link Value})
    * @param type type (can be {@code null})
    * @return self reference
    * @see QueryContext#bind(String, Object, String, StaticContext)
@@ -132,17 +143,6 @@ public final class QueryProcessor extends Job implements Closeable {
       throws QueryException {
     qc.bind(name, value, type, sc);
     return this;
-  }
-
-  /**
-   * Binds a value to a global variable.
-   * @param name name of variable
-   * @param value value to be bound
-   * @return self reference
-   * @throws QueryException query exception
-   */
-  public QueryProcessor variable(final String name, final Object value) throws QueryException {
-    return variable(name, value, null);
   }
 
   /**

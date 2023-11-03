@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -25,7 +26,7 @@ final class RESTRun extends RESTQuery {
    * @param session REST session
    * @param bindings external bindings
    */
-  private RESTRun(final RESTSession session, final Map<String, String[]> bindings) {
+  private RESTRun(final RESTSession session, final Map<String, Entry<Object, String>> bindings) {
     super(session, bindings);
   }
 
@@ -38,7 +39,7 @@ final class RESTRun extends RESTQuery {
    * @throws IOException I/O exception
    */
   static RESTRun get(final RESTSession session, final String path,
-      final Map<String, String[]> bindings) throws IOException {
+      final Map<String, Map.Entry<Object, String>> bindings) throws IOException {
 
     // get root directory for files
     final Context context = session.conn.context;
@@ -47,7 +48,12 @@ final class RESTRun extends RESTQuery {
     final IOFile root = new IOFile(webpath).resolve(rpath);
 
     // check if file is not found, is a folder or points to parent folder
-    final IOFile file = new IOFile(root, path);
+    IOFile file = new IOFile(root, path);
+    if(!file.exists() && !file.hasSuffix(IO.BXSSUFFIX) && !file.hasSuffix(IO.XQSUFFIXES)) {
+      file = new IOFile(root, path + IO.XQSUFFIX);
+      if(!file.exists()) file = new IOFile(root, path + IO.BXSSUFFIX);
+    }
+
     if(!file.exists() || file.isDir() || !file.path().startsWith(root.path()))
       throw HTTPStatus.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, path));
 
