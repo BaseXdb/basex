@@ -16,6 +16,7 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 import de.bottlecaps.markup.*;
 
@@ -40,7 +41,7 @@ public final class FnInvisibleXml extends StandardFunc {
       }
       generator = new Generator();
     }
-    return generator.generate(qc, toString(arg(0), qc));
+    return generator.generate(qc);
   }
 
   /**
@@ -50,14 +51,20 @@ public final class FnInvisibleXml extends StandardFunc {
     /**
      * Generate a parser from an invisible XML grammar.
      * @param qc query context
-     * @param grammar the invisible XML grammar
      * @return the parsing function
      * @throws QueryException query exception
      */
-    public FuncItem generate(final QueryContext qc, final String grammar) throws QueryException {
+    public FuncItem generate(final QueryContext qc) throws QueryException {
+      final Item value = arg(0).atomItem(qc, info);
+      final String grammar = value.isEmpty()
+          ? Blitz.ixmlGrammar()
+          : FnInvisibleXml.this.toString(value);
+      final IxmlOptions opts = toOptions(arg(1), new IxmlOptions(), true, qc);
       final de.bottlecaps.markup.blitz.Parser parser;
       try {
-        parser = Blitz.generate(grammar);
+        parser = opts.get(IxmlOptions.FAIL_ON_ERROR)
+            ? Blitz.generate(grammar, Blitz.Option.FAIL_ON_ERROR)
+            : Blitz.generate(grammar);
       } catch(final BlitzParseException ex) {
         throw IXML_GRM_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException ex) {
@@ -113,4 +120,13 @@ public final class FnInvisibleXml extends StandardFunc {
       qs.token("parse-invisible-xml").params(exprs);
     }
   }
+
+  /**
+   * Options for fn:invisible-xml.
+   */
+  public static final class IxmlOptions extends Options {
+    /** Invisible XML option fail-on-error. */
+    public static final BooleanOption FAIL_ON_ERROR = new BooleanOption("fail-on-error", false);
+  }
+
 }
