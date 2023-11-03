@@ -985,10 +985,17 @@ public final class FnModuleTest extends SandboxTest {
         "<ixml xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"failed\" "
         + "ixml:error-code=\"D06\">"
         + "[D06] The parse tree does not contain exactly one top-level element.</ixml>");
+    // empty $grammar
+    query(func.args(" ()") + "(\"s: 'x'.\")",
+        "<ixml><rule name=\"s\"><alt><literal string=\"x\"/></alt></rule></ixml>");
+
     // invalid grammar
     error(func.args("?%$"), IXML_GRM_X_X_X);
     // parser generation failure
     error(func.args("s: ~[#10ffff]."), IXML_GEN_X);
+    // invalid input with fail option
+    error("let $parser := " + func.args("s: ~[\"x\"]*.", " map {'fail-on-error': true()}") + "\n"
+        + "return $parser('x')", IXML_INP_X_X_X);
   }
 
   /** Test method. */

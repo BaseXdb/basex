@@ -796,13 +796,13 @@ public enum QueryError {
   FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
 
   /** Error code. */
-  IXML_GRM_X_X_X(IXML, 1, "Failed to parse ixml grammar: cannot match % at line %, column %."),
+  IXML_GRM_X_X_X(FOIX, 1, "Failed to parse ixml grammar: cannot match % at line %, column %."),
   /** Error code. */
-  IXML_GEN_X(IXML, 2, "Failed to generate ixml parser: %"),
+  IXML_GEN_X(FOIX, 1, "Failed to generate ixml parser: %"),
   /** Error code. */
-  IXML_INP_X_X_X(IXML, 3, "Failed to parse ixml input: cannot match % at line %, column %."),
+  IXML_INP_X_X_X(FOIX, 2, "Failed to parse ixml input: cannot match % at line %, column %."),
   /** Error code. */
-  IXML_RESULT_X(IXML, 4, "Failed to process ixml parser result: %"),
+  IXML_RESULT_X(FOIX, 2, "Failed to process ixml parser result: %"),
 
   /** Error code. */
   SERATTR_X(SENR, 1, "Attributes cannot be serialized:%."),
@@ -1538,6 +1538,7 @@ public enum QueryError {
     /** Error type. */ FODT,
     /** Error type. */ FOFD,
     /** Error type. */ FOER,
+    /** Error type. */ FOIX,
     /** Error type. */ FOJS,
     /** Error type. */ FONS,
     /** Error type. */ FORG,
@@ -1548,7 +1549,6 @@ public enum QueryError {
     /** Error type. */ FOUT,
     /** Error type. */ FTDY,
     /** Error type. */ FTST,
-    /** Error type. */ IXML,
     /** Error type. */ SENR,
     /** Error type. */ SEPM,
     /** Error type. */ SERE,
