@@ -76,8 +76,8 @@ public final class Empty extends Item {
   }
 
   @Override
-  public Item test(final QueryContext qc, final InputInfo ii) {
-    return null;
+  public boolean test(final QueryContext qc, final InputInfo ii) {
+    return false;
   }
 
   @Override

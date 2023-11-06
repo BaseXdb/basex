@@ -148,15 +148,14 @@ public abstract class Expr extends ExprInfo {
   public abstract Item ebv(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
-   * Performs a predicate test and returns the item if the test was successful.
-   * The returned item is required for full-text scoring.
+   * Performs a predicate test.
    * @param qc query context
    * @param ii input info (can be {@code null}); required for {@link Seq} instances,
    *   which have no input info)
-   * @return item or {@code null}
+   * @return result of check
    * @throws QueryException query exception
    */
-  public abstract Item test(QueryContext qc, InputInfo ii) throws QueryException;
+  public abstract boolean test(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).

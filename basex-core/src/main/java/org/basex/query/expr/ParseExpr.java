@@ -83,9 +83,9 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final boolean test(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = ebv(qc, info);
-    return (item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info)) ? item : null;
+    return item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
   }
 
   @Override
