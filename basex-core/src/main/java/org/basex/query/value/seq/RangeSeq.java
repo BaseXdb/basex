@@ -1,6 +1,5 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.io.*;
@@ -91,11 +90,6 @@ public final class RangeSeq extends Seq {
     final long[] obj = new long[(int) size];
     for(int s = 0; s < size; ++s) obj[s] = start + (asc ? s : -s);
     return obj;
-  }
-
-  @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw ebvError(this, ii);
   }
 
   @Override

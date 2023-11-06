@@ -131,31 +131,15 @@ public abstract class Expr extends ExprInfo {
   public abstract Value atomValue(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
-   * <p>Checks if the effective boolean value can be computed for this expression:</p>
-   * <ul>
-   *   <li> If it yields an empty sequence, {@link Bln#FALSE} will be returned.
-   *   <li> If it yields a single item, this item will be returned.
-   *   <li> If it yields nodes, the first node will be returned.
-   *   <li> Otherwise, an error will be raised.
-   * </ul>
-   * <p>A single numeric item may later be evaluated as positional predicate.</p>
+   * Computes the effective boolean value for this expression.
    * @param qc query context
    * @param ii input info (can be {@code null}); required for {@link Seq} instances,
    *   which have no input info)
+   * @param pred predicate test
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item ebv(QueryContext qc, InputInfo ii) throws QueryException;
-
-  /**
-   * Performs a predicate test.
-   * @param qc query context
-   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
-   *   which have no input info)
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public abstract boolean test(QueryContext qc, InputInfo ii) throws QueryException;
+  public abstract boolean test(QueryContext qc, InputInfo ii, boolean pred) throws QueryException;
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).

@@ -47,7 +47,7 @@ public final class CachedStep extends Step {
           final ANode node = list.get(n);
           qf.value = node;
           qf.pos = n + 1;
-          if(expr.test(qc, info)) list.set(c++, node);
+          if(expr.test(qc, info, true)) list.set(c++, node);
         }
         list.size(c);
       }

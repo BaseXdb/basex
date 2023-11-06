@@ -1,7 +1,5 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -22,11 +20,6 @@ abstract class NativeSeq extends Seq {
    */
   NativeSeq(final int size, final Type type) {
     super(size, type);
-  }
-
-  @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw ebvError(this, ii);
   }
 
   @Override

@@ -74,7 +74,7 @@ public final class IterPosStep extends Step {
             final Expr pred = exprs[p];
             final CmpPos pos = posExpr[p];
             if(pos == null) {
-              if(!pred.test(qc, info)) return false;
+              if(!pred.test(qc, info, true)) return false;
             } else {
               final long ps = ++cPos[p];
               final int t = pos.test(ps, qc);

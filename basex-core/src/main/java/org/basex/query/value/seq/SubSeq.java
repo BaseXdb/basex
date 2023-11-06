@@ -1,11 +1,8 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -59,13 +56,6 @@ public final class SubSeq extends Seq {
   @Override
   public Item itemAt(final long pos) {
     return sub.itemAt(start + pos);
-  }
-
-  @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item head = itemAt(0);
-    if(head instanceof ANode) return head;
-    throw ebvError(this, ii);
   }
 
   @Override

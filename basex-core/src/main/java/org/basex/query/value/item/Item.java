@@ -88,12 +88,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) {
-    return this;
-  }
-
-  @Override
-  public boolean test(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+      throws QueryException {
     return bool(ii);
   }
 

@@ -51,11 +51,6 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) {
-    return itemAt(0);
-  }
-
-  @Override
   public boolean ddo() {
     return true;
   }
