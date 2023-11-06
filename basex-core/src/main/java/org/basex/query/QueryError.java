@@ -1031,8 +1031,6 @@ public enum QueryError {
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
-  PARAMOPTIONAL_X(XPST, 17, "Parameter must be declared as optional: $%."),
-  /** Error code. */
   KEYWORDTWICE_X(XPST, 17, "Keyword supplied twice: %."),
   /** Error code. */
   ARGMISSING_X_X(XPST, 17, "%: No argument supplied: %."),
@@ -1323,6 +1321,8 @@ public enum QueryError {
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** Error code. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
+  /** Error code. */
+  PARAMOPTIONAL_X(XQST, 148, "Parameter must be declared as optional: $%."),
 
   /** Error code. */
   NOATTALL_X(XQTY, 24, "Attribute does not follow root element: %."),
