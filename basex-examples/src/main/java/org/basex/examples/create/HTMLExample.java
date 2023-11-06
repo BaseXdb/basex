@@ -6,7 +6,7 @@ import org.basex.core.cmd.*;
 /**
  * This example demonstrates how to import a file in the HTML format
  * into the database. The specified input file will be converted to XML
- * if TagSoup is found in the classpath.
+ * if Validator.nu is found in the classpath.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen

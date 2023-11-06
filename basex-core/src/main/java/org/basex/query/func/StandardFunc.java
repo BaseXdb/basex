@@ -507,7 +507,22 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final Expr expr, final E options,
       final boolean enforce, final QueryContext qc) throws QueryException {
-    return new FuncOptions(info).assign(expr.item(qc, info), options, enforce);
+    return new FuncOptions(info, enforce).assign(expr.item(qc, info), options, INVALIDOPT_X);
+  }
+
+  /**
+   * Evaluates an expression, if it exists, and returns options.
+   * @param <E> options type
+   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param options options template
+   * @param error error to raise, if a supplied option is unknown
+   * @param qc query context
+   * @return options
+   * @throws QueryException query exception
+   */
+  protected final <E extends Options> E toOptions(final Expr expr, final E options,
+      final QueryError error, final QueryContext qc) throws QueryException {
+    return new FuncOptions(info, true).assign(expr.item(qc, info), options, error);
   }
 
   /**

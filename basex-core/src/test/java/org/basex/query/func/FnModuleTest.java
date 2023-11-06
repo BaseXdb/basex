@@ -1468,8 +1468,8 @@ public final class FnModuleTest extends SandboxTest {
 
     error(func.args(42), STRBIN_X_X);
     error(func.args(" \"42\"", 42), MAP_X_X);
-    error(func.args(" \"42\"", " map {'1234': ()}"), INVALIDOPT_X);
-    error(func.args(" \"42\"", " map {'heuristics': '5678'}"), INVALIDOPT_X);
+    error(func.args(" \"42\"", " map {'1234': ()}"), INVHTMLOPT_X);
+    error(func.args(" \"42\"", " map {'heuristics': '5678'}"), INVHTMLOPT_X);
   }
 
   /** Test method. */

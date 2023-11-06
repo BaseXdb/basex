@@ -41,7 +41,7 @@ public final class MainOptions extends Options {
   /** Define JSON parser options. */
   public static final OptionsOption<JsonParserOptions> JSONPARSER =
       new OptionsOption<>("JSONPARSER", new JsonParserOptions());
-  /** Define TagSoup HTML options. */
+  /** Define Validator.nu HTML options. */
   public static final OptionsOption<HtmlOptions> HTMLPARSER =
       new OptionsOption<>("HTMLPARSER", new HtmlOptions());
   /** Define import parser. */

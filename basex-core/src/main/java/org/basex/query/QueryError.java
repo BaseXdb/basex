@@ -307,11 +307,6 @@ public enum QueryError {
   /** Error code. */
   HASH_ALGORITHM_X(HASH, "algorithm", "Algorithm not supported: '%'."),
 
-  // HTML Module
-
-  /** Error code. */
-  HTML_PARSE_X(HTML, "parse", "%"),
-
   // HTTP Module
 
   /** Invalid URI. */
@@ -616,9 +611,9 @@ public enum QueryError {
   /** Error code. */
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
   /** Error code. */
-  INVHTML_X(FODC, 11, "String passed to fn:parse-html is not a well-formed HTML document: %"),
+  INVHTML_X(FODC, 11, "HTML parsing failed: %"),
   /** Error code. */
-  INVHTMLOPT_X(FODC, 12, "Unsupported HTML parser option: %"),
+  INVHTMLOPT_X(FODC, 12, "HTML option processing failed: %"),
 
   /** Error code. */
   FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),

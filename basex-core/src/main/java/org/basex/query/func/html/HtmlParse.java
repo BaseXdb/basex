@@ -25,7 +25,10 @@ public class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? Empty.VALUE : parse(new IOContent(toBytes(value)), qc);
+    if (value.isEmpty()) return Empty.VALUE;
+    final IO io = value instanceof Bin ? new IOContent(toBytes(value))
+                                       : new IOContent(toBytes(value), "", Strings.UTF8);
+    return parse(io, qc);
   }
 
   @Override
@@ -41,11 +44,11 @@ public class HtmlParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), true, qc);
+    final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), INVHTMLOPT_X, qc);
     try {
       return new DBNode(new org.basex.build.html.HtmlParser(io, new MainOptions(), options));
     } catch(final IOException ex) {
-      throw HTML_PARSE_X.get(info, ex);
+      throw INVHTML_X.get(info, ex);
     }
   }
 }

@@ -38,14 +38,15 @@ public final class FuncOptions {
   private final InputInfo info;
 
   /** Raise error if a supplied option is unknown. */
-  private boolean enforceKnown;
+  private final boolean enforceKnown;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
+   * @param enforceKnown raise error, if a supplied options is unknown
    */
-  public FuncOptions(final InputInfo info) {
-    this(null, info);
+  public FuncOptions(final InputInfo info, final boolean enforceKnown) {
+    this(null, info, enforceKnown);
   }
 
   /**
@@ -54,24 +55,20 @@ public final class FuncOptions {
    * @param info input info (can be {@code null})
    */
   public FuncOptions(final QNm root, final InputInfo info) {
-    test = root == null ? null : new NameTest(root);
-    this.root = root;
-    this.info = info;
+    this(root, info, false);
   }
 
   /**
-   * Assigns values to the specified options.
-   * @param item item to be converted (can be {@link Empty#VALUE})
-   * @param options options
-   * @param <T> option type
-   * @param enforce raise error if a supplied option is unknown
-   * @return specified options
-   * @throws QueryException query exception
+   * Constructor.
+   * @param root name of root node (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @param enforceKnown raise error, if a supplied options is unknown
    */
-  public <T extends Options> T assign(final Item item, final T options, final boolean enforce)
-      throws QueryException {
-    enforceKnown = enforce;
-    return assign(item, options, INVALIDOPT_X);
+  private FuncOptions(final QNm root, final InputInfo info, final boolean enforceKnown) {
+    test = root == null ? null : new NameTest(root);
+    this.root = root;
+    this.info = info;
+    this.enforceKnown = enforceKnown;
   }
 
   /**
@@ -83,7 +80,7 @@ public final class FuncOptions {
    * @return specified options
    * @throws QueryException query exception
    */
-  private <T extends Options> T assign(final Item item, final T options, final QueryError error)
+  public <T extends Options> T assign(final Item item, final T options, final QueryError error)
       throws QueryException {
 
     if(!item.isEmpty()) {

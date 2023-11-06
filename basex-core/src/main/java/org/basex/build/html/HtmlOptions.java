@@ -3,12 +3,22 @@ package org.basex.build.html;
 import org.basex.util.options.*;
 
 /**
- * Options for parsing and serializing HTML documents with TagSoup.
+ * Options for parsing and serializing HTML documents with Validator.nu.
  *
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
 public final class HtmlOptions extends Options {
+  /** fn:parse-html option encoding. */
+  public static final StringOption ENCODING = new StringOption("encoding");
+  /** fn:parse-html option method. */
+  public static final StringOption METHOD = new StringOption("method");
+  /** fn:parse-html option html-version. */
+  public static final StringOption HTML_VERSION = new StringOption("html-version");
+  /** fn:parse-html option include-template-content. */
+  public static final BooleanOption INCLUDE_TEMPLATE_CONTENT =
+      new BooleanOption("include-template-content");
+
   /** Validator.nu option unicode-normalization-checking. */
   public static final BooleanOption UNICODE_NORMALIZATION_CHECKING =
       new BooleanOption("unicode-normalization-checking", false);
@@ -18,7 +28,6 @@ public final class HtmlOptions extends Options {
   /** Validator.nu option scripting-enabled. */
   public static final BooleanOption SCRIPTING_ENABLED =
       new BooleanOption("scripting-enabled", false);
-
   /** Validator.nu option content-space-policy. */
   public static final EnumOption<XmlViolationPolicy> CONTENT_SPACE_POLICY =
       new EnumOption<>("content-space-policy", XmlViolationPolicy.class);
@@ -44,43 +53,6 @@ public final class HtmlOptions extends Options {
   public static final EnumOption<Heuristics> HEURISTICS =
       new EnumOption<>("heuristics", Heuristics.class);
 
-  /** TagSoup option: html. */
-  public static final BooleanOption HTML = new BooleanOption("html", false);
-  /** TagSoup option: omit-xml-declaration. */
-  public static final BooleanOption OMIT_XML_DECLARATION =
-      new BooleanOption("omit-xml-declaration", false);
-  /** TagSoup option: nons. */
-  public static final BooleanOption NONS = new BooleanOption("nons", true);
-  /** TagSoup option: nobogons. */
-  public static final BooleanOption NOBOGONS = new BooleanOption("nobogons", false);
-  /** TagSoup option: nodefaults. */
-  public static final BooleanOption NODEFAULTS = new BooleanOption("nodefaults", false);
-  /** TagSoup option: nocolons. */
-  public static final BooleanOption NOCOLONS = new BooleanOption("nocolons", false);
-  /** TagSoup option: norestart. */
-  public static final BooleanOption NORESTART = new BooleanOption("norestart", false);
-  /** TagSoup option: nobogons. */
-  public static final BooleanOption IGNORABLE = new BooleanOption("ignorable", false);
-  /** TagSoup option: emptybogons. */
-  public static final BooleanOption EMPTYBOGONS = new BooleanOption("emptybogons", false);
-  /** TagSoup option: any. */
-  public static final BooleanOption ANY = new BooleanOption("any", false);
-  /** TagSoup option: norootbogons. */
-  public static final BooleanOption NOROOTBOGONS = new BooleanOption("norootbogons", false);
-  /** TagSoup option: nocdata. */
-  public static final BooleanOption NOCDATA = new BooleanOption("nocdata", false);
-  /** TagSoup option: lexical. */
-  public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
-
-  /** TagSoup option: method (html). */
-  public static final StringOption METHOD = new StringOption("method", "xml");
-  /** TagSoup option: doctype-system=systemid. */
-  public static final StringOption DOCTYPE_SYSTEM = new StringOption("doctype-system");
-  /** TagSoup option: doctype-public=publicid. */
-  public static final StringOption DOCTYPE_PUBLIC = new StringOption("doctype-public");
-  /** TagSoup option: encoding=encoding. */
-  public static final StringOption ENCODING = new StringOption("encoding");
-
   /**
    * Default constructor.
    */
@@ -97,7 +69,7 @@ public final class HtmlOptions extends Options {
 
   /**
    * Copied from nu.validator.htmlparser.common.XmlViolationPolicy in order to avoid the
-   * dependency on Validator.nu in the classpath.
+   * class path dependency of HtmlOptions on Validator.nu.
    *
    * Copyright (c) 2007 Henri Sivonen
    *
@@ -147,7 +119,7 @@ public final class HtmlOptions extends Options {
 
   /**
    * Copied from nu.validator.htmlparser.common.XmlViolationPolicy in order to avoid the
-   * dependency on Validator.nu in the classpath.
+   * class path dependency of HtmlOptions on Validator.nu.
    *
    * Permission is hereby granted, free of charge, to any person obtaining a
    * copy of this software and associated documentation files (the "Software"),

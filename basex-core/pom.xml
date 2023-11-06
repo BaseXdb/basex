@@ -30,9 +30,9 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.ccil.cowan.tagsoup</groupId>
-      <artifactId>tagsoup</artifactId>
-      <scope>compile</scope>
+      <groupId>nu.validator</groupId>
+      <artifactId>htmlparser</artifactId>
+      <scope>provided</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -49,12 +49,6 @@
     <dependency>
       <groupId>de.bottlecaps</groupId>
       <artifactId>markup-blitz</artifactId>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>nu.validator</groupId>
-      <artifactId>htmlparser</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
