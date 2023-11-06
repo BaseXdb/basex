@@ -107,7 +107,7 @@ abstract class DbAccess extends StandardFunc {
 
     // parse and compile the name test
     final byte[] name = toToken(expr, qc);
-    final QNm qnm = qc.shared.qname(name, sc.ns.uri(prefix(name)));
+    final QNm qnm = qc.shared.qName(name, sc.ns.uri(prefix(name)));
 
     // return empty sequence if test will yield no results
     final NameTest nt = new NameTest(qnm, NamePart.FULL, NodeType.ATTRIBUTE, sc.elemNS);

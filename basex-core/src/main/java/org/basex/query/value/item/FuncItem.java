@@ -115,7 +115,7 @@ public final class FuncItem extends FItem implements Scope {
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 
-    final int pl = params.length;
+    final int pl = arity();
     for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
 
     // use shortcut if focus is not accessed
@@ -140,8 +140,8 @@ public final class FuncItem extends FItem implements Scope {
   public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
       final boolean optimize) throws QueryException {
 
-    final int arity = params.length, nargs = ft.argTypes.length;
-    if(arity != nargs) throw arityError(this, arity, nargs, true, info);
+    final int arity = arity(), nargs = ft.argTypes.length;
+    if(nargs < arity) throw arityError(this, arity, nargs, false, info);
 
     // optimize: continue with coercion if current type is only an instance of new type
     FuncType tp = funcType();
@@ -152,7 +152,7 @@ public final class FuncItem extends FItem implements Scope {
     final VarScope vs = new VarScope(sc);
     final Var[] vars = new Var[arity];
     final Expr[] args = new Expr[arity];
-    for(int a = arity; a-- > 0;) {
+    for(int a = 0; a < arity; a++) {
       vars[a] = vs.addNew(params[a].name, ft.argTypes[a], true, qc, info);
       args[a] = new VarRef(info, vars[a]).optimize(cc);
     }
@@ -167,7 +167,7 @@ public final class FuncItem extends FItem implements Scope {
     // add type check if return types differ
     final SeqType dt = ft.declType;
     if(!tp.declType.instanceOf(dt)) {
-      body = new TypeCheck(sc, info, body, dt, true);
+      body = new TypeCheck(info, sc, body, dt, true);
       if(optimize) body = body.optimize(cc);
     }
 
@@ -209,7 +209,7 @@ public final class FuncItem extends FItem implements Scope {
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
-    final int pl = params.length;
+    final int pl = arity();
     for(int p = 0; p < pl; p++) {
       clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
     }
@@ -268,7 +268,7 @@ public final class FuncItem extends FItem implements Scope {
     if(name != null) {
       qs.concat(name.prefixId(), "#", arity());
     } else {
-      final StringList list = new StringList(params.length);
+      final StringList list = new StringList(arity());
       for(final Var param : params) list.add(param.toErrorString());
       if(anns != null) qs.token(anns);
       qs.token(FUNCTION).params(list.finish()).token(AS);

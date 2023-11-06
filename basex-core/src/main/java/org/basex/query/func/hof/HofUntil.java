@@ -19,8 +19,8 @@ public final class HofUntil extends StandardFunc {
     final FItem predicate = toFunction(arg(0), 1, qc), action = toFunction(arg(1), 1, qc);
     Value value = arg(2).value(qc);
 
-    while(!toBoolean(eval(predicate, qc, value).item(qc, info))) {
-      value = eval(action, qc, value);
+    while(!toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
+      value = action.invoke(qc, info, value);
     }
     return value;
   }

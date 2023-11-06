@@ -4,6 +4,7 @@ import static org.basex.http.rest.RESTText.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.AbstractMap.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -16,6 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * REST-based evaluation of POST operations.
@@ -79,13 +81,23 @@ final class RESTPost {
       }
 
       // handle variables
-      final Map<String, String[]> bindings = new HashMap<>();
+      final Map<String, Map.Entry<Object, String>> bindings = new HashMap<>();
       try(QueryProcessor qp = new QueryProcessor("*/*:variable", ctx).context(doc)) {
         for(final Item item : qp.value()) {
           final String name = value("@name", item, ctx);
           final String value = value("@value", item, ctx);
           final String type = value("@type", item, ctx);
-          bindings.put(name, new String[] { value, type });
+          bindings.compute(name, (k, v) -> {
+            final StringList list = new StringList();
+            if(v != null) {
+              if(v.getKey() instanceof String[]) {
+                for(final String obj : (String[]) v.getKey()) list.add(obj);
+              } else if(v.getKey() instanceof String) {
+                list.add(k);
+              }
+            }
+            return new SimpleEntry<>(list.add(value).finish(), type);
+          });
         }
       }
 
@@ -100,7 +112,7 @@ final class RESTPost {
         }
       }
       if(value != null) {
-        bindings.put(null, new String[] { value, NodeType.DOCUMENT_NODE.toString() });
+        bindings.put(null, new SimpleEntry<>(value, NodeType.DOCUMENT_NODE.toString()));
       }
 
       // command body

@@ -94,7 +94,7 @@ public abstract class HTTPTest extends SandboxTest {
    */
   protected static String get(final int status, final String request, final Object... params)
       throws IOException {
-    return send(status, GET.name(), null, null, request, params);
+    return send(status, GET.name(), null, null, request, params).replaceAll("\\r", "");
   }
 
   /**

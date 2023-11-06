@@ -74,6 +74,6 @@ public class FnApply extends StandardFunc {
       throws QueryException {
     final long ar = func.arity(), as = args.size();
     if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, args);
-    return eval(func, qc, args.finish());
+    return func.invoke(qc, info, args.finish());
   }
 }

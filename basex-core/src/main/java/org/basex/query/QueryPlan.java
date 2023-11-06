@@ -149,7 +149,7 @@ public final class QueryPlan {
       addAttribute(elem, NAME, var.toErrorString());
       addAttribute(elem, ID, var.id);
       if(var.declType != null) addAttribute(elem, AS, var.declType);
-      if(var.promote) addAttribute(elem, PROMOTE, true);
+      if(var.coerce) addAttribute(elem, COERCE, true);
       if(type) attachType(elem, var.seqType(), var.size(), var.data());
     }
     return elem;

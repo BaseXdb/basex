@@ -206,6 +206,17 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Returns a coerced function item argument.
+   * @param i index of argument
+   * @param cc compilation context
+   * @return coerced argument
+   * @throws QueryException query exception
+   */
+  public final Expr coerce(final int i, final CompileContext cc) throws QueryException {
+    return new TypeCheck(info, sc, arg(i), definition.types[i], true).optimize(cc);
+  }
+
+  /**
    * Refines the type of a function item argument.
    * @param expr function
    * @param cc compilation context
@@ -513,15 +524,7 @@ public abstract class StandardFunc extends Arr {
     final Item item = expr.item(qc, info);
     final XQMap map = item.size() == 0 ? XQMap.empty() : toMap(item);
     map.apply((key, value) -> {
-      final byte[] k;
-      if(key.type.isStringOrUntyped()) {
-        k = key.string(null);
-      } else {
-        final QNm qnm = toQNm(key);
-        final TokenBuilder tb = new TokenBuilder();
-        if(qnm.uri() != null) tb.add('{').add(qnm.uri()).add('}');
-        k = tb.add(qnm.local()).finish();
-      }
+      final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key).internal();
       hm.put(string(k), value);
     });
     return hm;
@@ -610,21 +613,6 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Evaluates a function.
-   * @param func function
-   * @param qc query context
-   * @param args arguments (possibly more than required)
-   * @return result
-   * @throws QueryException query exception
-   */
-  protected final Value eval(final FItem func, final QueryContext qc, final Value... args)
-      throws QueryException {
-    final int arity = func.arity();
-    return arity < args.length ? func.invoke(qc, info, Arrays.copyOf(args, arity)) :
-      func.invoke(qc, info, args);
-  }
-
-  /**
    * Indicates if the supplied argument is defined.
    * @param i index of argument
    * @return result of check
@@ -645,7 +633,7 @@ public abstract class StandardFunc extends Arr {
     return visitor.lock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
       String name = expr instanceof Str ? string(((Str) expr).string()) :
-        expr instanceof Atm ? string(((Atm) expr).string(null)) : null;
+        expr instanceof Atm ? string(((Atm) expr).string(info)) : null;
       if(name != null) {
         if(backup) {
           final String db = Databases.name(name);

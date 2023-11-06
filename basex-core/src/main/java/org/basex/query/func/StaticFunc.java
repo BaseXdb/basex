@@ -79,7 +79,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
-        if(declType != null) expr = new TypeCheck(sc, info, expr, declType, true).optimize(cc);
+        if(declType != null) expr = new TypeCheck(info, sc, expr, declType, true).optimize(cc);
       } catch(final QueryException qe) {
         expr = cc.error(qe, expr);
       } finally {

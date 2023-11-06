@@ -123,7 +123,7 @@ final class Unit {
         // expected error code
         QNm code = null;
         if(vs == 2 && eq(Q_EXPECTED.string(), value.itemAt(0).string(null))) {
-          code = QNm.resolve(value.itemAt(1).string(null), QueryText.ERROR_URI, sf.sc, sf.info);
+          code = QNm.parse(value.itemAt(1).string(null), QueryText.ERROR_URI, sf.sc, sf.info);
         } else if(vs != 0) {
           throw BASEX_ANN2_X_X.get(ann.info, ann, arguments(vs));
         }
@@ -200,7 +200,7 @@ final class Unit {
     final Value value = ann.value();
     if(!value.isEmpty()) {
       final byte[] name = value.itemAt(0).string(null);
-      if(name.length != 0) return QNm.resolve(name, sf.name.uri(), sf.sc, sf.info);
+      if(name.length != 0) return QNm.parse(name, sf.name.uri(), sf.sc, sf.info);
     }
     return null;
   }

@@ -19,13 +19,6 @@ public final class XQueryExtensionsTest extends QueryTest {
       { "Ternary 6", integers(3), "1 ?? (2 ?? 3 !! 4) !! 5" },
       { "Ternary 7", integers(3), "1 ?? 2 ?? 3 !! 4 !! 5" },
 
-      { "Elvis 1", integers(1), "() ?: 1" },
-      { "Elvis 2", integers(0), "0 ?: 1" },
-      { "Elvis 3", strings(""), "'' ?: '!'" },
-      { "Elvis 4", integers(1), "(() ?: 1) ?: 2" },
-      { "Elvis 5", integers(1), "() ?: (1 ?: 2)" },
-      { "Elvis 6", integers(1), "() ?: 1 ?: 2" },
-
       { "IfWithoutElse 1", integers(2), "if(1) then 2" },
       { "IfWithoutElse 2", integers(3), "if(1) then if(2) then 3" },
       { "IfWithoutElse 3", integers(2), "if(1) then 2 else if(3) then 4" },

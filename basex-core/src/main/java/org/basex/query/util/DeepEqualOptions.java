@@ -2,6 +2,8 @@ package org.basex.query.util;
 
 import java.text.*;
 
+import org.basex.query.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -71,16 +73,26 @@ public final class DeepEqualOptions extends Options {
   public static final StringOption UNORDERED_ELEMENTS =
       new StringOption("unordered-elements", "");
 
+  /** QNames. */
+  private final QNmSet qnames = new QNmSet();
+
+  /**
+   * Resolves QNames.
+   * @param sc static context
+   * @throws QueryException query exception
+   */
+  public void finish(final StaticContext sc) throws QueryException {
+    for(final byte[] name : Token.split(Token.token(get(UNORDERED_ELEMENTS)), ' ')) {
+      qnames.add(QNm.parse(name, sc));
+    }
+  }
+
   /**
    * Checks if the specified QName is among the unordered element names.
    * @param qname QName
    * @return element names
    */
   public boolean unordered(final QNm qname) {
-    for(final byte[] name : Token.split(Token.token(get(UNORDERED_ELEMENTS)), ' ')) {
-      final QNm qnm = QNm.parse(name);
-      if(qnm != null && qname.eq(qnm)) return true;
-    }
-    return false;
+    return qnames.contains(qname);
   }
 }

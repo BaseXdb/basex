@@ -1508,7 +1508,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr ternaryIf() throws QueryException {
-    final Expr iff = elvis();
+    final Expr iff = or();
     if(!wsConsume("??")) return iff;
 
     final InputInfo ii = info();
@@ -1516,16 +1516,6 @@ public class QueryParser extends InputParser {
     if(!wsConsume("!!")) throw error(NOTERNARY);
     final Expr els = check(single(), NOTERNARY);
     return new If(ii, iff, thn, els);
-  }
-
-  /**
-   * Parses the "ElvisExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr elvis() throws QueryException {
-    final Expr expr = or();
-    return wsConsume("?:") ? new Otherwise(info(), expr, check(single(), NODEFAULT)) : expr;
   }
 
   /**
@@ -1752,22 +1742,22 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr treat() throws QueryException {
-    final Expr expr = promote();
+    final Expr expr = coerce();
     if(!wsConsumeWs(TREAT)) return expr;
     wsCheck(AS);
     return new Treat(sc, info(), expr, sequenceType());
   }
 
   /**
-   * Parses the "TreatExpr" rule.
+   * Parses the "CoerceExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr promote() throws QueryException {
+  private Expr coerce() throws QueryException {
     final Expr expr = castable();
-    if(!wsConsumeWs(PROMOTE)) return expr;
+    if(!wsConsumeWs(COERCE)) return expr;
     wsCheck(TO);
-    return new TypeCheck(sc, info(), expr, sequenceType(), true);
+    return new TypeCheck(info(), sc, expr, sequenceType(), true);
   }
 
   /**
@@ -3939,7 +3929,7 @@ public class QueryParser extends InputParser {
   private Expr updatingFunctionCall() throws QueryException {
     final int p = pos;
     wsConsume(INVOKE);
-    final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NON_DETERMINISTIC);
+    final boolean upd = wsConsumeWs(UPDATING), ndt = wsConsumeWs(NONDETERMINISTIC);
     if(upd || ndt) {
       final Expr func = primary();
       if(wsConsume("(")) {

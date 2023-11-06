@@ -19,7 +19,7 @@ import org.basex.query.iter.*;
  *   <li>Java functions can only be executed by users with {@code ADMIN} permissions.
  *       You may annotate a function with {@link Requires}({@link Permission}) to
  *       also make it accessible to users with less privileges.</li>
- *   <li>Java code is treated as "non-deterministic", as its behavior cannot
+ *   <li>Java code is treated as "nondeterministic", as its behavior cannot
  *       be predicted by the XQuery processor. You may annotate a function as
  *       {@link Deterministic} if you know that it will have no side effects and will
  *       always yield the same result.</li>
@@ -86,7 +86,7 @@ public abstract class QueryModule {
   public @interface Updating { }
 
   /**
-   * Java code is treated as "non-deterministic", as its behavior cannot be predicted from
+   * Java code is treated as "nondeterministic", as its behavior cannot be predicted from
    * the XQuery processor. You may annotate a function as {@link Deterministic} if you
    * know that it will have no side effects and will always yield the same result.
    */

@@ -107,7 +107,7 @@ public final class MapModuleTest extends SandboxTest {
     // function coercion: allow function with lower arity
     query(func.args(" map { 1: 2 }", " true#0"), "map{1:2}");
     // reject function with higher arity
-    error(func.args(" map { 'abc': 'a', 'def': 'g' }", " substring#2"), INVPROMOTE_X_X_X);
+    error(func.args(" map { 'abc': 'a', 'def': 'g' }", " substring#2"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */

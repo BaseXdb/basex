@@ -7,7 +7,6 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -71,12 +70,12 @@ public class FnParseUri extends FnJsonDoc {
     String host = "", port = "", path = "";
 
     // strip off the fragment identifier and any query
-    Matcher m = Pattern.compile("^(.*)#([^#]*)$").matcher(string);
+    Matcher m = Pattern.compile("^(.*?)#(.*)$").matcher(string);
     if(m.matches()) {
       string = m.group(1);
       fragment = m.group(2);
     }
-    m = Pattern.compile("^(.*)\\?([^?]*)$").matcher(string);
+    m = Pattern.compile("^(.*?)\\?(.*)$").matcher(string);
     if(m.matches()) {
       string = m.group(1);
       query = m.group(2);
@@ -105,7 +104,7 @@ public class FnParseUri extends FnJsonDoc {
       scheme = FILE;
       filepath = string;
     } else {
-      m = Pattern.compile("^//*([a-zA-Z]:.*)$").matcher(string);
+      m = Pattern.compile("^/*(/[a-zA-Z]:.*)$").matcher(string);
       if((scheme.isEmpty() || scheme.equals(FILE)) && m.matches()) {
         string = m.group(1);
       } else {
@@ -146,7 +145,7 @@ public class FnParseUri extends FnJsonDoc {
       if(m.matches()) port = m.group(5);
     }
     if(port == null) port = "";
-    if(omitPort(port, scheme, options))port = "";
+    if(omitPort(port, scheme, options)) port = "";
 
     path = string;
     if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equals(FILE))) {
@@ -171,39 +170,35 @@ public class FnParseUri extends FnJsonDoc {
     }
     filepath = decode(filepath);
 
-    final MapBuilder map = new MapBuilder(info);
-    add(map, URI, value);
-    add(map, SCHEME, scheme);
-    add(map, HIERARCHICAL, hierarchical);
-    add(map, AUTHORITY, authority);
-    add(map, USERINFO, userinfo);
-    add(map, HOST, host);
-    add(map, PORT, port);
-    add(map, PATH, path);
-    add(map, QUERY, query);
-    add(map, FRAGMENT, fragment);
-    add(map, PATH_SEGMENTS, StrSeq.get(segments));
-    add(map, QUERY_PARAMETERS, queries);
-    add(map, FILEPATH, filepath);
-    return map.map();
+    final MapBuilder mb = new MapBuilder(info);
+    add(mb, URI, value);
+    add(mb, SCHEME, scheme);
+    add(mb, HIERARCHICAL, hierarchical);
+    add(mb, AUTHORITY, authority);
+    add(mb, USERINFO, userinfo);
+    add(mb, HOST, host);
+    add(mb, PORT, port);
+    add(mb, PATH, path);
+    add(mb, QUERY, query);
+    add(mb, FRAGMENT, fragment);
+    add(mb, PATH_SEGMENTS, StrSeq.get(segments));
+    add(mb, QUERY_PARAMETERS, queries);
+    add(mb, FILEPATH, filepath);
+    return mb.map();
   }
 
   /**
    * Adds a non-empty map entry.
-   * @param map map
+   * @param mb map
    * @param k key
    * @param v value
    * @throws QueryException query exception
    */
-  static void add(final MapBuilder map, final String k, final Object v)
-      throws QueryException {
-
+  static void add(final MapBuilder mb, final String k, final Object v) throws QueryException {
     final Value value = v instanceof Value ? (Value) v : v.toString().isEmpty() ? Empty.VALUE :
       Str.get(v.toString());
-    if(!(value.isEmpty() ||
-        value instanceof XQMap && ((XQMap) value).mapSize() == 0 ||
-        value instanceof XQArray && ((XQArray) value).arraySize() == 0)) {
-      map.put(k, value);
+    if(!(value.isEmpty() || value instanceof XQMap && ((XQMap) value).mapSize() == 0)) {
+      mb.put(k, value);
     }
   }
 

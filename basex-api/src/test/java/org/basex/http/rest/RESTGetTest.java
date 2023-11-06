@@ -70,6 +70,8 @@ public final class RESTGetTest extends RESTTest {
   @Test public void input() throws Exception {
     get("<a/>", "", "query", ".", "context", "<a/>");
     get(500, "", "query", ".", "context", "<");
+
+    get("<a/>\n<b/>", "", "query", ".", "context", "<a/>", "context", "<b/>");
   }
 
   /**
@@ -85,6 +87,9 @@ public final class RESTGetTest extends RESTTest {
         "declare variable $a as xs:integer external;"
         + "declare variable $b as xs:integer external;"
         + "declare variable $c as xs:integer external; $a * $b * $c");
+
+    get("1000", "", "x", 123, "x", 877, "query",
+        "declare variable $x as xs:integer* external; sum($x)");
   }
 
   /**
@@ -143,24 +148,27 @@ public final class RESTGetTest extends RESTTest {
    */
   @Test public void runOption() throws IOException {
     final String path = context.soptions.get(StaticOptions.WEBPATH);
-    new IOFile(path, "x.xq").write("1");
-    get("1", "", "run", "x.xq");
 
-    new IOFile(path, "x.bxs").write("xquery 2");
-    get("2", "", "run", "x.bxs");
+    new IOFile(path, "query.xq").write("1");
+    get("1", "", "run", "query.xq");
+    get("1", "", "run", "query");
 
-    new IOFile(path, "x.bxs").write("xquery 3\nxquery 4");
-    get("34", "", "run", "x.bxs");
+    new IOFile(path, "script.bxs").write("xquery 2");
+    get("2", "", "run", "script.bxs");
+    get("2", "", "run", "script");
 
-    new IOFile(path, "x.bxs").write("<commands><xquery>5</xquery></commands>");
-    get("5", "", "run", "x.bxs");
+    new IOFile(path, "script.bxs").write("xquery 3\nxquery 4");
+    get("34", "", "run", "script.bxs");
 
-    new IOFile(path, "x.bxs").write("<set option='maxlen'>123</set>");
-    get(200, "", "run", "x.bxs");
+    new IOFile(path, "script.bxs").write("<commands><xquery>5</xquery></commands>");
+    get("5", "", "run", "script.bxs");
+
+    new IOFile(path, "script.bxs").write("<set option='maxlen'>123</set>");
+    get(200, "", "run", "script.bxs");
 
     get(404, "", "run", "unknown.abc");
 
-    new IOFile(path, "x.bxs").write("<set option='unknown'>123</set>");
-    get(500, "", "run", "x.bxs");
+    new IOFile(path, "script.bxs").write("<set option='unknown'>123</set>");
+    get(500, "", "run", "script.bxs");
   }
 }

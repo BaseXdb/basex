@@ -287,12 +287,12 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     add(COMMAND, command, tb, list);
     add(Text.ERROR, error, tb, list);
     add(EVALUATING, eval, tb, list);
-    add(COMPILING, comp, tb, list);
-    add(OPTIMIZING, opt, tb, list);
-    add(OPTIMIZED_QUERY, optqu, tb, list);
-    add(QUERY, origqu, tb, list);
     add(RESULT, result, tb, list);
     add(TIMING, strings, tb, list);
+    add(OPTIMIZED_QUERY, optqu, tb, list);
+    add(OPTIMIZING, opt, tb, list);
+    add(COMPILING, comp, tb, list);
+    add(QUERY, origqu, tb, list);
     add(QUERY_PLAN, plan, tb, list);
     if(inf != null) tb.add(inf).nline();
     clear = reset;

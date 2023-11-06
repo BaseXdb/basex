@@ -135,7 +135,7 @@ public final class HigherOrderTest extends SandboxTest {
           "declare function local:b($b) { $b }; local:a(1)", 1);
   }
 
-  /** Do not pre-evaluate function items with non-deterministic expressions. */
+  /** Do not pre-evaluate function items with nondeterministic expressions. */
   @Test public void gh1191() {
     final IOFile sandbox = sandbox();
     query(
@@ -150,17 +150,17 @@ public final class HigherOrderTest extends SandboxTest {
     );
   }
 
-  /** Tests the %non-deterministic annotation. */
+  /** Tests the %nondeterministic annotation. */
   @Test public void gh1212() {
     // FLWOR will be optimized away (empty result)
     query("for $f in (prof:void#1(?), error#0) let $ignore := $f() return ()", "");
-    // FLWOR expression will be evaluated (due to non-deterministic keyword)
+    // FLWOR expression will be evaluated (due to nondeterministic keyword)
     query("try {"
-        + "  let $f := error#0 let $err := non-deterministic $f() return ()"
+        + "  let $f := error#0 let $err := nondeterministic $f() return ()"
         + "} catch * { 'ERR' }", "ERR");
     query("try {"
         + "  for $f in (prof:void#1(?), error#0)"
-        + "  let $err := non-deterministic $f() return ()"
+        + "  let $err := nondeterministic $f() return ()"
         + "} catch * { 'ERR' }", "ERR");
     query("try {"
         + "  let $f := error#0 let $err := $f() return ()"

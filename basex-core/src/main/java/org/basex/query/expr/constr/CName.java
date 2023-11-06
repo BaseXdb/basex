@@ -63,16 +63,7 @@ abstract class CName extends CNode {
     if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
       throw STRQNM_X_X.get(info, type, item);
 
-    // check for QName
-    final byte[] token = normalize(item.string(info));
-    if(XMLToken.isQName(token)) {
-      final byte[] prefix = prefix(token);
-      final byte[] uri = prefix.length != 0 || elem ? sc.ns.uri(prefix) : null;
-      return qc.shared.qname(token, uri);
-    }
-
-    // check for EQName
-    final QNm qnm = qc.shared.eqname(token);
+    final QNm qnm = qc.shared.parseQName(item.string(info), elem, sc);
     if(qnm != null) return qnm;
 
     throw INVQNAME_X.get(info, item);

@@ -35,7 +35,7 @@ public final class FnFormatNumber extends StandardFunc {
       format = toQNm(name);
     } else if(!name.isEmpty()) {
       try {
-        format = QNm.resolve(trim(toToken(name)), sc);
+        format = QNm.parse(trim(toToken(name)), sc);
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw FORMNUM_X.get(info, name);

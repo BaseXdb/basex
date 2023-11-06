@@ -305,7 +305,7 @@ public final class PackageAPITest extends SandboxTest {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.value();
     } catch(final QueryException ex) {
-      assertEquals(INVPROMOTE_X_X_X, ex.error());
+      assertEquals(INVCONVERT_X_X_X, ex.error());
     }
 
     // ensure that all files were deleted

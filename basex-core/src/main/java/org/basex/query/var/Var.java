@@ -28,8 +28,8 @@ public final class Var extends ExprInfo {
 
   /** Declared type, {@code null} if not specified. */
   public SeqType declType;
-  /** Flag for function conversion. */
-  public boolean promote;
+  /** Flag for function coercion. */
+  public boolean coerce;
   /** Stack slot ({@code -1} if unused). */
   int slot;
 
@@ -62,7 +62,7 @@ public final class Var extends ExprInfo {
     this.slot = slot;
     this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     this.exprType = exprType != null ? exprType : new ExprType(SeqType.ITEM_ZM);
-    promote = param;
+    coerce = param;
     id = qc.varIDs++;
   }
 
@@ -101,7 +101,7 @@ public final class Var extends ExprInfo {
    */
   public Var(final Var var, final QueryContext qc, final StaticContext sc) {
     this(var.name, var.declType, qc, sc, var.info, var.param, -1, new ExprType(var.exprType));
-    promote = var.promote;
+    coerce = var.coerce;
   }
 
   /**
@@ -211,7 +211,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
-    return checkType() ? new TypeCheck(sc, info, expr, declType, promote).optimize(cc) : expr;
+    return checkType() ? new TypeCheck(info, sc, expr, declType, coerce).optimize(cc) : expr;
   }
 
   /**
@@ -226,7 +226,7 @@ public final class Var extends ExprInfo {
       throws QueryException {
 
     if(!checkType() || declType.instance(value)) return value;
-    if(promote) return declType.promote(value, name, qc, sc, info, opt);
+    if(coerce) return declType.coerce(value, name, qc, sc, info, opt);
     throw typeError(value, declType, name, info, false);
   }
 
@@ -250,9 +250,9 @@ public final class Var extends ExprInfo {
     if(!checkType() || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
-    if(!promote || !(et.type instanceof NodeType) && !et.promotable(vt)) {
+    if(!coerce || !(et.type instanceof NodeType) && !et.promotable(vt)) {
       throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) :
-        typeError(expr, vt, name, info, promote);
+        typeError(expr, vt, name, info, coerce);
     }
   }
 
@@ -265,14 +265,6 @@ public final class Var extends ExprInfo {
     return id == var.id;
   }
 
-  /**
-   * Checks if this variable performs function conversion on its bound values.
-   * @return result of check
-   */
-  public boolean promotes() {
-    return promote;
-  }
-
   @Override
   public int hashCode() {
     return id;
@@ -281,16 +273,16 @@ public final class Var extends ExprInfo {
   /**
    * Tries to adopt the given type check.
    * @param st type to check
-   * @param prom if function conversion should be applied
+   * @param crc if function coercion should be applied
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
-  public boolean adoptCheck(final SeqType st, final boolean prom) {
+  public boolean adoptCheck(final SeqType st, final boolean crc) {
     if(declType == null || st.instanceOf(declType)) {
       declType = st;
     } else if(!declType.instanceOf(st)) {
       return false;
     }
-    promote |= prom;
+    coerce |= crc;
     return true;
   }
 

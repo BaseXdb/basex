@@ -709,7 +709,7 @@ public final class GFLWOR extends ParseExpr {
       for(int d = c + 1; d < clauses.size(); d++) {
         final Clause cl = clauses.get(d);
         if(!(cl instanceof Where)) {
-          // stop if clause is no 'for' or 'let' expression or non-deterministic
+          // stop if clause is no 'for' or 'let' expression or nondeterministic
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
           continue;
         }

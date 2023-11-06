@@ -11,7 +11,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public class FnLog extends FnTrace {
+public class FnMessage extends FnTrace {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     super.value(qc);

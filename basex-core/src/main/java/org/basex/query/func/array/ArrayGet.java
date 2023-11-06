@@ -24,7 +24,7 @@ public final class ArrayGet extends StandardFunc {
     if(fallback == null) return array.get(position, info);
 
     final long pos = toLong(position), size = array.arraySize();
-    return pos > 0 && pos <= size ? array.get(pos - 1) : eval(fallback, qc, position);
+    return pos > 0 && pos <= size ? array.get(pos - 1) : fallback.invoke(qc, info, position);
   }
 
   @Override

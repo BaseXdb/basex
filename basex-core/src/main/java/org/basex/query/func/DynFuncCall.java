@@ -28,7 +28,7 @@ import org.basex.util.hash.*;
 public final class DynFuncCall extends FuncCall {
   /** Updating flag. */
   private final boolean updating;
-  /** Non-deterministic flag. */
+  /** Nondeterministic flag. */
   private boolean ndt;
   /** Hash values of all function items that this call was copied from, possibly {@code null}. */
   private int[] inlinedFrom;
@@ -50,7 +50,7 @@ public final class DynFuncCall extends FuncCall {
    * @param info input info (can be {@code null})
    * @param sc static context
    * @param updating updating flag
-   * @param ndt non-deterministic flag
+   * @param ndt nondeterministic flag
    * @param expr function expression
    * @param args arguments
    */
@@ -75,8 +75,10 @@ public final class DynFuncCall extends FuncCall {
     final int nargs = exprs.length - 1;
     final FuncType ft = func.funcType();
     if(ft != null) {
-      final int arity = ft.argTypes != null ? ft.argTypes.length : -1;
-      if(nargs < arity) throw arityError(func, arity, nargs, false, info);
+      if(ft.argTypes != null) {
+        final int arity = ft.argTypes.length;
+        if(nargs != arity) throw arityError(func, nargs, arity, false, info);
+      }
       if(!sc.mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
@@ -168,7 +170,7 @@ public final class DynFuncCall extends FuncCall {
 
     final FItem func = checkUp((FItem) item, updating, sc);
     final int nargs = exprs.length - 1, arity = func.arity();
-    if(nargs < arity) throw arityError(func, arity, nargs, false, info);
+    if(nargs != arity) throw arityError(func, nargs, arity, false, info);
     return func;
   }
 

@@ -38,7 +38,7 @@ public final class DbInfo extends DbAccess {
       if(cols[0].isEmpty()) continue;
 
       final String col = cols[0].replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
-      final FBuilder node = FElem.build(qc.shared.qname(Token.token(col)));
+      final FBuilder node = FElem.build(qc.shared.qName(Token.token(col)));
       if(Strings.startsWith(cols[0], ' ')) {
         header.add(node.add(cols[1]));
       } else {

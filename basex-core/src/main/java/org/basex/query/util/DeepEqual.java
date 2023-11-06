@@ -57,7 +57,7 @@ public final class DeepEqual {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param coll collation (can be {@code null})
-   * @param qc query context (to interrupt process, can be {@code null})
+   * @param qc query context (can be {@code null})
    * @param options options (can be {@code null})
    */
   public DeepEqual(final InputInfo info, final Collation coll, final  QueryContext qc,

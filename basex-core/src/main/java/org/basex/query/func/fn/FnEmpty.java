@@ -35,7 +35,7 @@ public class FnEmpty extends StandardFunc {
     Expr input = arg(0);
     final SeqType st = input.seqType();
 
-    // ignore non-deterministic expressions (e.g.: empty(error()))
+    // ignore nondeterministic expressions (e.g.: empty(error()))
     if(!input.has(Flag.NDT)) {
       if(st.zero()) return Bln.get(!exists);
       if(st.oneOrMore()) return Bln.get(exists);

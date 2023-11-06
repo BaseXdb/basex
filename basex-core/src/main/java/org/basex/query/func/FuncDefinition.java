@@ -75,7 +75,7 @@ public final class FuncDefinition {
     names = new QNm[tl];
     for(int n = 0; n < tl; n++) names[n] = new QNm(tmp[n]);
 
-    // treat updating expressions as non-deterministic
+    // treat updating expressions as nondeterministic
     if(flags.contains(Flag.UPD)) flags.add(Flag.NDT);
   }
 

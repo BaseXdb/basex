@@ -8,5 +8,5 @@ import org.basex.query.func.fn.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class ProfDump extends FnLog {
+public final class ProfDump extends FnMessage {
 }

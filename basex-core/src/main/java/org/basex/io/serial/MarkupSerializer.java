@@ -458,7 +458,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    */
   private QNm resolve(final byte[] name) throws QueryIOException {
     try {
-      return QNm.resolve(name, sc == null ? null : sc.elemNS, sc, null);
+      return QNm.parse(name, sc == null ? null : sc.elemNS, sc, null);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

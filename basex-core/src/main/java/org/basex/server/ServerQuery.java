@@ -55,7 +55,6 @@ public final class ServerQuery extends Job {
     try {
       qp().variable(name, value, type);
     } catch(final QueryException ex) {
-      Util.stack(ex);
       throw new BaseXException(ex);
     }
   }

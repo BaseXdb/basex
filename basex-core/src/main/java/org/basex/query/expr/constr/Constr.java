@@ -224,7 +224,7 @@ public final class Constr {
 
         final byte[] auri = qnm.uri(), npref = addNS(inscopeNS, prefix, auri);
         if(npref != null) {
-          final QNm aname = qc.shared.qname(concat(npref, COLON, qnm.local()), auri);
+          final QNm aname = qc.shared.qName(concat(npref, COLON, qnm.local()), auri);
           attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
         }
       }

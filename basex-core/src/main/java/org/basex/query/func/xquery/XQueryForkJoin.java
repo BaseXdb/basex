@@ -36,7 +36,7 @@ public final class XQueryForkJoin extends StandardFunc {
       list.add(checkUp(toFunction(function, 0, qc), false, sc));
     }
     // single function: invoke directly
-    if(size == 1) return eval(list.get(0), qc);
+    if(size == 1) return list.get(0).invoke(qc, info);
 
     final ForkJoinPool pool = new ForkJoinPool(options.parallel());
     final TaskContext tc = new TaskContext(list, options, qc, info);
@@ -58,7 +58,7 @@ public final class XQueryForkJoin extends StandardFunc {
     final Expr functions = arg(0), options = arg(1);
     final SeqType st = functions.seqType();
     if(st.zero()) return functions;
-    if(st.one()) return new DynFuncCall(info, sc, functions).optimize(cc);
+    if(st.one()) return new DynFuncCall(info, sc, coerce(0, cc)).optimize(cc);
 
     final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
       options instanceof Value ? toOptions(arg(1), new TaskOptions(), true, cc.qc).get(RESULTS) :

@@ -28,7 +28,7 @@ public final class FnFoldRight extends FnFoldLeft {
     if(size != -1) {
       for(long s = size - 1; s >= 0; s--) {
         final Item item = input.get(s);
-        result = eval(action, qc, item, result);
+        result = action.invoke(qc, info, item, result);
         if(skip(qc, item, result)) break;
       }
     } else {
@@ -37,13 +37,13 @@ public final class FnFoldRight extends FnFoldLeft {
         final TreeSeq seq = (TreeSeq) value;
         for(final ListIterator<Item> iter = seq.iterator(input.size()); iter.hasPrevious();) {
           final Item item = iter.previous();
-          result = eval(action, qc, item, result);
+          result = action.invoke(qc, info, item, result);
           if(skip(qc, item, result)) break;
         }
       } else {
         for(long i = input.size(); --i >= 0;) {
           final Item item = value.itemAt(i);
-          result = eval(action, qc, item, result);
+          result = action.invoke(qc, info, item, result);
           if(skip(qc, item, result)) break;
         }
       }
@@ -61,9 +61,10 @@ public final class FnFoldRight extends FnFoldLeft {
     if(action instanceof Value) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
+        final Expr func = coerce(2, cc);
         expr = zero;
         for(int es = unroll.size() - 1; es >= 0; es--) {
-          expr = new DynFuncCall(info, sc, action, unroll.get(es), expr).optimize(cc);
+          expr = new DynFuncCall(info, sc, func, unroll.get(es), expr).optimize(cc);
         }
         return expr;
       }

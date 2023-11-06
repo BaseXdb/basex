@@ -23,7 +23,7 @@ public final class FnFilter extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
-      if(toBoolean(eval(predicate, qc, item).item(qc, info))) vb.add(item);
+      if(toBoolean(predicate.invoke(qc, info, item).item(qc, info))) vb.add(item);
     }
     return vb.value(this);
   }
@@ -35,11 +35,10 @@ public final class FnFilter extends StandardFunc {
     if(st.zero()) return input;
 
     // create filter expression
-    // filter(INPUT, PREDICATE)  ->  INPUT[FUNCTION(.)]
-    final Expr predicate = cc.get(input, () -> {
-      final Expr dfc = new DynFuncCall(info, sc, arg(1), ContextValue.get(cc, info)).optimize(cc);
-      return new TypeCheck(sc, info, dfc, SeqType.BOOLEAN_O, true).optimize(cc);
-    });
-    return Filter.get(cc, info, input, cc.function(Function.BOOLEAN, info, predicate));
+    // filter(INPUT, PREDICATE)  ->  INPUT[PREDICATE(.)]
+    final Expr predicate = cc.get(input, () ->
+      new DynFuncCall(info, sc, coerce(1, cc), ContextValue.get(cc, info)).optimize(cc)
+    );
+    return Filter.get(cc, info, input, predicate);
   }
 }

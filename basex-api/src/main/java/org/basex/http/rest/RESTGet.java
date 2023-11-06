@@ -4,6 +4,7 @@ import static org.basex.http.rest.RESTText.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.AbstractMap.*;
 import java.util.Map.*;
 
 import org.basex.http.*;
@@ -28,10 +29,10 @@ final class RESTGet {
    * @throws IOException I/O exception
    */
   public static RESTCmd get(final RESTSession session) throws IOException {
-    final Map<String, String[]> bindings = new HashMap<>();
+    final Map<String, Entry<Object, String>> bindings = new HashMap<>();
 
     // parse query string
-    String op = null, input = null, value = null;
+    String op = null, input = null;
     final HTTPConnection conn = session.conn;
     final Options sopts = conn.sopts(), mopts = conn.context.options;
     for(final Entry<String, String[]> param : conn.requestCtx.queryStrings().entrySet()) {
@@ -45,14 +46,11 @@ final class RESTGet {
         input = values[0];
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
-        value = values[0];
+        bindings.put(null, new SimpleEntry<>(values, NodeType.DOCUMENT_NODE.toString()));
       } else if(!RESTCmd.assign(sopts, param, false) && !RESTCmd.assign(mopts, param, false)) {
         // assign database option, serialization parameter or external variable
-        bindings.put(key, new String[] { values[0], null });
+        bindings.put(key, new SimpleEntry<>(values, null));
       }
-    }
-    if(value != null) {
-      bindings.put(null, new String[] { value, NodeType.DOCUMENT_NODE.toString() });
     }
 
     if(op == null) return RESTRetrieve.get(session);

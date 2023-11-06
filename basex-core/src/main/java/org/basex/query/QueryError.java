@@ -800,13 +800,13 @@ public enum QueryError {
   FTDUP_X(FTST, 19, "Match option '%' is declared twice."),
 
   /** Error code. */
-  IXML_GRM_X_X_X(IXML, 1, "Failed to parse ixml grammar: cannot match % at line %, column %."),
+  IXML_GRM_X_X_X(FOIX, 1, "Failed to parse ixml grammar: cannot match % at line %, column %."),
   /** Error code. */
-  IXML_GEN_X(IXML, 2, "Failed to generate ixml parser: %"),
+  IXML_GEN_X(FOIX, 1, "Failed to generate ixml parser: %"),
   /** Error code. */
-  IXML_INP_X_X_X(IXML, 3, "Failed to parse ixml input: cannot match % at line %, column %."),
+  IXML_INP_X_X_X(FOIX, 2, "Failed to parse ixml input: cannot match % at line %, column %."),
   /** Error code. */
-  IXML_RESULT_X(IXML, 4, "Failed to process ixml parser result: %"),
+  IXML_RESULT_X(FOIX, 2, "Failed to process ixml parser result: %"),
 
   /** Error code. */
   SERATTR_X(SENR, 1, "Attributes cannot be serialized:%."),
@@ -981,7 +981,7 @@ public enum QueryError {
   /** Error code. */
   WHICHTYPE_X(XPST, 3, "Unknown type: %."),
   /** Error code. */
-  BINDNAME_X(XPST, 3, "Invalid name: '%'."),
+  INVNAME_X(XPST, 3, "Invalid QName: '%'."),
   /** Error code. */
   PIXML_X(XPST, 3, "Processing instruction has illegal name: %."),
   /** Error code. */
@@ -1098,8 +1098,6 @@ public enum QueryError {
   STRNCN_X_X(XPTY, 4, "String or NCName expected, % found: %."),
   /** Error code. */
   INVCONVERT_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
-  /** Error code. */
-  INVPROMOTE_X_X_X(XPTY, 4, "Cannot promote % to %: %."),
   /** Error code. */
   INVTREAT_X_X_X(XPTY, 4, "Cannot treat % as %: %."),
   /** Error code. */
@@ -1544,6 +1542,7 @@ public enum QueryError {
     /** Error type. */ FODT,
     /** Error type. */ FOFD,
     /** Error type. */ FOER,
+    /** Error type. */ FOIX,
     /** Error type. */ FOJS,
     /** Error type. */ FONS,
     /** Error type. */ FORG,
@@ -1554,7 +1553,6 @@ public enum QueryError {
     /** Error type. */ FOUT,
     /** Error type. */ FTDY,
     /** Error type. */ FTST,
-    /** Error type. */ IXML,
     /** Error type. */ SENR,
     /** Error type. */ SEPM,
     /** Error type. */ SERE,
@@ -1634,12 +1632,12 @@ public enum QueryError {
    * @param expr expression
    * @param st target type
    * @param name name (can be {@code null})
-   * @param promote promote or treat as
+   * @param coerce coerce or treat as
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
-      final InputInfo info, final boolean promote) {
-    return typeError(expr, st, name, info, promote ? INVPROMOTE_X_X_X : INVTREAT_X_X_X);
+      final InputInfo info, final boolean coerce) {
+    return typeError(expr, st, name, info, coerce ? INVCONVERT_X_X_X : INVTREAT_X_X_X);
   }
 
   /**
@@ -1674,15 +1672,16 @@ public enum QueryError {
    * Throws an arity exception.
    * @param info input info (can be {@code null})
    * @param expr expression
-   * @param arity expected arity
-   * @param nargs supplied arity
+   * @param supplied expected arity
+   * @param expected supplied arity
    * @param param parameter/argument flag
    * @return query exception
    */
-  public static QueryException arityError(final Expr expr, final int arity, final int nargs,
+  public static QueryException arityError(final Expr expr, final int supplied, final int expected,
       final boolean param, final InputInfo info) {
-    final String string = param ? "Function with " + plural(arity, "parameter") : arguments(arity);
-    return INVARITY_X_X_X.get(info, string, nargs, expr.toErrorString());
+    final String string = param ? "Function with " + plural(supplied, "parameter") :
+      arguments(supplied);
+    return INVARITY_X_X_X.get(info, string, expected, expr.toErrorString());
   }
 
   /**

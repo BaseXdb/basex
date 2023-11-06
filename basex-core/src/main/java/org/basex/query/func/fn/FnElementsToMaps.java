@@ -44,7 +44,7 @@ public final class FnElementsToMaps extends StandardFunc {
     final QNmMap<Layout> layouts = new QNmMap<>();
     for(final Map.Entry<String, String> entry : options.get(ElementsOptions.LAYOUTS).
         free().entrySet()) {
-      final QNm name = QNm.parse(Token.token(entry.getKey()));
+      final QNm name = QNm.parse(Token.token(entry.getKey()), sc);
       if(name == null) throw INVALIDOPT_X.get(info, "Unknown name: " + entry.getKey() + '.');
       final Layout layout = Layout.get(entry.getValue());
       if(layout == null) throw INVALIDOPT_X.get(info, "Unknown layout: " + entry.getValue() + '.');
@@ -131,11 +131,11 @@ public final class FnElementsToMaps extends StandardFunc {
    * @throws QueryException query exception
    */
   static MapBuilder attributes(final ANode node) throws QueryException {
-    final MapBuilder map = new MapBuilder();
+    final MapBuilder mb = new MapBuilder();
     for(final ANode attr : node.attributeIter()) {
-      map.put(nodeName(attr, "@"), attr.string());
+      mb.put(nodeName(attr, "@"), attr.string());
     }
-    return map;
+    return mb;
   }
 
   /**
@@ -263,10 +263,10 @@ public final class FnElementsToMaps extends StandardFunc {
         if(!LIST_PLUS.matches(node)) return MIXED.apply(node, qc);
         for(final ANode child : node.childIter()) {
           if(element(child)) {
-            final MapBuilder map = attributes(node);
+            final MapBuilder mb = attributes(node);
             final Value list = LIST.apply(node, qc);
-            if(!list.isEmpty()) map.put(nodeName(child), list);
-            return map.map();
+            if(!list.isEmpty()) mb.put(nodeName(child), list);
+            return mb.map();
           }
         }
         throw Util.notExpected();
@@ -288,11 +288,11 @@ public final class FnElementsToMaps extends StandardFunc {
         if(((Checks<ANode>) FnElementsToMaps::nonEmptyText).any(node.childIter())) {
           return MIXED.apply(node, qc);
         }
-        final MapBuilder map = attributes(node);
+        final MapBuilder mb = attributes(node);
         for(final ANode child : node.childIter()) {
-          if(element(child)) map.put(nodeName(child), child.string());
+          if(element(child)) mb.put(nodeName(child), child.string());
         }
-        return map.map();
+        return mb.map();
      }
     },
     /** Layout 'sequence': empty(text()[normalize-space()]). */

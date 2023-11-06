@@ -99,7 +99,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    * @return new element
    */
   private FBuilder element(final byte[] type) {
-    final FBuilder elem = FElem.build(shared.qname(type, QueryText.FN_URI));
+    final FBuilder elem = FElem.build(shared.qName(type, QueryText.FN_URI));
     if(name != null) {
       elem.add(Q_KEY, name);
       if(escape && contains(name, '\\')) elem.add(Q_ESCAPED_KEY, TRUE);

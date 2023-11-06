@@ -57,7 +57,7 @@ public final class PartFunc extends Arr {
     final FuncType ft = func.funcType();
     if(ft != null && ft != SeqType.FUNCTION) {
       final int nargs = exprs.length + holes.length - 1, arity = ft.argTypes.length;
-      if(nargs < arity) throw arityError(func, arity, nargs, false, info);
+      if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
       final SeqType[] args = new SeqType[holes.length];
       final int hl = holes.length;
@@ -73,7 +73,7 @@ public final class PartFunc extends Arr {
     final FItem func = toFunction(body(), qc);
 
     final int hl = holes.length, nargs = exprs.length + hl - 1, arity = func.arity();
-    if(nargs < arity) throw arityError(func, arity, nargs, false, info);
+    if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];

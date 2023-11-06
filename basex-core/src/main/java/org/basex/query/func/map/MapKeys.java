@@ -23,7 +23,7 @@ public final class MapKeys extends StandardFunc {
     final FItem predicate = toFunction(arg(1), 1, qc);
     final ValueBuilder vb = new ValueBuilder(qc);
     map.apply((key, value) -> {
-      if(toBoolean(eval(predicate, qc, value).item(qc, info))) vb.add(key);
+      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) vb.add(key);
     });
     return vb.value(this);
   }

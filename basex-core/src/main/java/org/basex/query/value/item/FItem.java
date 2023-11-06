@@ -64,7 +64,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   /**
-   * Coerces this function item to the given function type.
+   * Converts this function item to the given function type.
    * @param ft function type
    * @param qc query context
    * @param ii input info (can be {@code null})

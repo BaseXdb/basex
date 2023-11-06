@@ -28,7 +28,7 @@ public class FnFoldLeft extends StandardFunc {
     Value result = arg(1).value(qc);
     for(Item item; (item = input.next()) != null;) {
       if(skip(qc, result, item)) break;
-      result = eval(action, qc, result, item);
+      result = action.invoke(qc, info, result, item);
     }
     return result;
   }
@@ -42,7 +42,7 @@ public class FnFoldLeft extends StandardFunc {
    */
   public final boolean skip(final QueryContext qc, final Value... args)
       throws QueryException {
-    return iff != null && toBoolean(eval(iff[0], qc, args).item(qc, info));
+    return iff != null && toBoolean(iff[0].invoke(qc, info, args).item(qc, info));
   }
 
   /**
@@ -65,9 +65,10 @@ public class FnFoldLeft extends StandardFunc {
     if(action instanceof Value) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
+        final Expr func = coerce(2, cc);
         expr = zero;
         for(final Expr ex : unroll) {
-          expr = new DynFuncCall(info, sc, action, expr, ex).optimize(cc);
+          expr = new DynFuncCall(info, sc, func, expr, ex).optimize(cc);
         }
         return expr;
       }
