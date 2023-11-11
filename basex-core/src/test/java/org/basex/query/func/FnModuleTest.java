@@ -742,8 +742,8 @@ public final class FnModuleTest extends SandboxTest {
 
     inline(true);
     check(func.args(" xs:QName('fn:count')", 1) + "((1, 2))", 2, root(Int.class));
-    check(func.args(" xs:QName('hof:id')", 1) + "(1)", 1, root(Int.class));
-    check(func.args(" xs:QName('hof:id')", 1) + "(<a/>)", "<a/>", root(CElem.class));
+    check(func.args(" xs:QName('fn:identity')", 1) + "(1)", 1, root(Int.class));
+    check(func.args(" xs:QName('fn:identity')", 1) + "(<a/>)", "<a/>", root(CElem.class));
   }
 
   /** Test method. */
@@ -1134,6 +1134,14 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), 1);
     query(func.args(MONTHS, " contains(?, 'Feb')"), "January");
     query(func.args(MONTHS, " starts-with(?, 'Jan')"), "");
+
+    query(func.args(" (1)", " fn { . >= 2 }"), 1);
+    query(func.args(" (1, 2)", " fn { . >= 2 }"), 1);
+    query(func.args(" (1, 2, 3)", " fn { . >= 3 }"), "1\n2");
+    query(func.args(" (1, 2, 3)", " fn { . >= 3 }") + " => sort()", "1\n2");
+    query(func.args(" (1 to 10)", " fn { . >= 3 }") + " => sort()", "1\n2");
+    query(func.args(" (1 to 10)[. > 1]", " fn { . >= 3 }") + " => sort()", 2);
+    query(func.args(" (1 to 10)", " fn { . >= 3 }") + " => count()", 2);
   }
 
   /** Test method. */
@@ -1162,6 +1170,14 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "2\n3");
     query(func.args(MONTHS, " contains(?, 'z')"), "");
     query(func.args(MONTHS, " starts-with(?, 'Nov')"), "November\nDecember");
+
+    query(func.args(" (1)", " fn { . >= 2 }"), "");
+    query(func.args(" (1, 2)", " fn { . >= 2 }"), 2);
+    query(func.args(" (1, 2, 3)", " fn { . >= 2 }"), "2\n3");
+    query(func.args(" (1, 2, 3)", " fn { . >= 2 }") + " => sort()", "2\n3");
+    query(func.args(" (8 to 10)", " fn { . >= 10 }") + " => sort()", 10);
+    query(func.args(" (8 to 10)[. > 9]", " fn { . >= 9 }") + " => sort()", 10);
+    query(func.args(" (8 to 10)", " fn { . >= 10 }") + " => count()", 1);
   }
 
   /** Test method. */
@@ -1204,6 +1220,10 @@ public final class FnModuleTest extends SandboxTest {
     query("let $i := 3936256 return " +
         func.args(" $i", " fn($n) { abs($n * $n - $i) >= 0.0000000001 }",
         " fn($n) { ($n + $i div $n) div 2 }"), 1984);
+
+    query(func.args(1, " function($x) { $x < 1000 }", " function($x) { $x * 2 }"), 1024);
+    query(func.args(1, " function($xs) { count($xs) <= 3 }", " function($x) { $x, $x }"),
+        "1\n1\n1\n1");
   }
 
   /** Test method. */

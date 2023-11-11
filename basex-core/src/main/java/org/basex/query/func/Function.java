@@ -1430,15 +1430,9 @@ public enum Function implements AFunction {
   _HOF_CONST(HofConst::new, "const(input,ignore)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
-  _HOF_DROP_WHILE(HofDropWhile::new, "drop-while(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF), HOF_URI),
-  /** XQuery function. */
   _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(input,action)",
       params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
       ITEM_ZM, flag(HOF), HOF_URI),
-  /** XQuery function. */
-  _HOF_ID(HofId::new, "id(input)",
-      params(ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
   _HOF_SCAN_LEFT(HofScanLeft::new, "scan-left(input,zero,action)",
       params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
@@ -1448,9 +1442,6 @@ public enum Function implements AFunction {
       params(ITEM_ZM, BIPREDICATE_O),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_TAKE_WHILE(HofTakeWhile::new, "take-while(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF), HOF_URI),
-  /** XQuery function. */
   _HOF_TOP_K_BY(HofTopKBy::new, "top-k-by(input,key,k)",
       params(ITEM_ZM, FuncType.get(ITEM_O, ITEM_O).seqType(), INTEGER_O),
       ITEM_ZM, flag(HOF), HOF_URI),
@@ -1458,10 +1449,6 @@ public enum Function implements AFunction {
   _HOF_TOP_K_WITH(HofTopKWith::new, "top-k-with(input,comparator,k)",
       params(ITEM_ZM, BIPREDICATE_O, INTEGER_O),
       ITEM_ZM, flag(HOF), HOF_URI),
-  /** XQuery function. */
-  _HOF_UNTIL(HofUntil::new, "until(predicate,action,zero)",
-      params(PREDICATE_ZM,
-      FuncType.get(ITEM_ZM, ITEM_ZM).seqType(), ITEM_ZM), ITEM_ZM, flag(HOF), HOF_URI),
 
   // HTML Module
 
