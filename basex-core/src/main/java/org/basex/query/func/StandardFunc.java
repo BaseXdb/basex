@@ -213,7 +213,23 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   public final Expr coerce(final int i, final CompileContext cc) throws QueryException {
-    return new TypeCheck(info, sc, arg(i), definition.types[i], true).optimize(cc);
+    return coerce(i, cc, -1);
+  }
+
+  /**
+   * Returns a coerced function item argument.
+   * @param i index of function argument
+   * @param cc compilation context
+   * @param arity arity of target function (ignored if {@code -1})
+   * @return coerced argument
+   * @throws QueryException query exception
+   */
+  public final Expr coerce(final int i, final CompileContext cc, final int arity)
+      throws QueryException {
+
+    FuncType ft = (FuncType) definition.types[i].type;
+    if(arity != -1 && arity != ft.argTypes.length) ft = ft.with(arity);
+    return new TypeCheck(info, sc, arg(i), ft.seqType(), true).optimize(cc);
   }
 
   /**
@@ -233,13 +249,13 @@ public abstract class StandardFunc extends Arr {
 
     // check number of arguments
     final FuncItem func = (FuncItem) expr;
-    final int al = argTypes.length, fargs = func.arity();
-    if(fargs != al) return expr;
+    final int arity = argTypes.length, nargs = func.arity();
+    if(arity < nargs) return expr;
 
     // select most specific argument and return types
     final FuncType oldType = func.funcType();
-    final SeqType[] oldArgs = oldType.argTypes, newArgs = new SeqType[al];
-    for(int a = 0; a < al; a++) {
+    final SeqType[] oldArgs = oldType.argTypes, newArgs = new SeqType[nargs];
+    for(int a = 0; a < nargs; a++) {
       newArgs[a] = argTypes[a].instanceOf(oldArgs[a]) ? argTypes[a] : oldArgs[a];
     }
     final SeqType newDecl = declType.instanceOf(oldType.declType) ? declType : oldType.declType;

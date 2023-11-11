@@ -18,11 +18,12 @@ public final class ArrayForEach extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final FItem action = toFunction(arg(1), 1, qc);
+    final FItem action = toFunction(arg(1), 2, qc);
 
+    int p = 0;
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      ab.append(action.invoke(qc, info, value));
+      ab.append(action.invoke(qc, info, value, Int.get(++p)));
     }
     return ab.array(this);
   }
@@ -34,7 +35,8 @@ public final class ArrayForEach extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ((ArrayType) type).declType));
+      arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ((ArrayType) type).declType,
+          SeqType.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)

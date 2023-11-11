@@ -16,13 +16,15 @@ import org.basex.query.value.type.*;
 public final class FnIterateWhile extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem predicate = toFunction(arg(1), 1, qc), action = toFunction(arg(2), 1, qc);
+    final FItem predicate = toFunction(arg(1), 2, qc), action = toFunction(arg(2), 2, qc);
     Value value = arg(0).value(qc);
 
-    while(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
-      value = action.invoke(qc, info, value);
+    int p = 0;
+    while(true) {
+      final Int pos = Int.get(++p);
+      if(!toBoolean(predicate.invoke(qc, info, value, pos).item(qc, info))) return value;
+      value = action.invoke(qc, info, value, pos);
     }
-    return value;
   }
 
   @Override
@@ -32,13 +34,13 @@ public final class FnIterateWhile extends StandardFunc {
     // compute function types
     if(action instanceof FuncItem) {
       SeqType ist = input.seqType(), ost = SeqType.ITEM_ZM;
-      Expr optAction = coerceFunc(action, cc, ost, ist);
+      Expr optAction = coerceFunc(action, cc, ost, ist, SeqType.INTEGER_O);
 
       // repeat coercion until output types are equal and output type is instance of input type
       SeqType nst = optAction.funcType().declType;
       while(!ost.eq(nst) || !nst.instanceOf(ist)) {
         ist = ist.union(nst);
-        optAction = coerceFunc(action, cc, SeqType.ITEM_ZM, ist);
+        optAction = coerceFunc(action, cc, SeqType.ITEM_ZM, ist, SeqType.INTEGER_O);
         ost = nst;
         nst = nst.union(optAction.funcType().declType);
       }
@@ -48,7 +50,7 @@ public final class FnIterateWhile extends StandardFunc {
 
       if(predicate instanceof FuncItem) {
         final SeqType is = ist;
-        arg(1, arg -> coerceFunc(predicate, cc, SeqType.BOOLEAN_O, is));
+        arg(1, arg -> coerceFunc(predicate, cc, SeqType.BOOLEAN_O, is, SeqType.INTEGER_O));
       }
     }
     return this;

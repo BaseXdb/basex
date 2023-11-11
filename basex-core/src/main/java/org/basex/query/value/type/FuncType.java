@@ -211,6 +211,15 @@ public class FuncType implements Type {
   }
 
   /**
+   * Return function type with fewer arguments.
+   * @param arity arity of target type
+   * @return function type
+   */
+  public FuncType with(final int arity) {
+    return get(anns, declType, Arrays.copyOf(argTypes, arity));
+  }
+
+  /**
    * Finds and returns the specified function type.
    * @param name name of type
    * @return type or {@code null}

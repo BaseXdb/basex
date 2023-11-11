@@ -246,21 +246,21 @@ public enum Function implements AFunction {
       params(NUMERIC_ZO), NUMERIC_ZO),
   /** XQuery function. */
   FOLD_LEFT(FnFoldLeft::new, "fold-left(input,zero,action)",
-      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
+      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOLD_RIGHT(FnFoldRight::new, "fold-right(input,zero,action)",
-      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM).seqType()),
+      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOOT(FnFoot::new, "foot(input)",
       params(ITEM_ZM), ITEM_ZO),
   /** XQuery function. */
   FOR_EACH(FnForEach::new, "for-each(input,action)",
-      params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ITEM_ZM, flag(HOF)),
+      params(ITEM_ZM, ACTION_O), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FOR_EACH_PAIR(FnForEachPair::new, "for-each-pair(input1,input2,action)",
-      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()),
+      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   FORMAT_DATE(FnFormatDate::new, "format-date(value,picture[,language,calendar,place])",
@@ -369,7 +369,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ITERATE_WHILE(FnIterateWhile::new, "iterate-while(input,predicate,action)",
       params(ITEM_ZM, PREDICATE_ZM,
-      FuncType.get(ITEM_ZM, ITEM_ZM).seqType()), ITEM_ZM, flag(HOF)),
+      FuncType.get(ITEM_ZM, ITEM_ZM, INTEGER_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
       params(STRING_ZO, MAP_O), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
@@ -486,7 +486,8 @@ public enum Function implements AFunction {
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARTITION(FnPartition::new, "partition(input,split-when)",
-      params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_ZM, flag(HOF)),
+      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
+      ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
   PATH(FnPath::new, "path([node])",
       params(NODE_ZO), STRING_ZO),
@@ -664,7 +665,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _MAP_BUILD(MapBuild::new, "build(input[,key,value,combine])",
       params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(),
-      FuncType.get(ITEM_ZM, ITEM_O).seqType(), FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
+      FuncType.get(ITEM_ZM, ITEM_O).seqType(),
+      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_CONTAINS(MapContains::new, "contains(map,key)",
@@ -692,7 +694,7 @@ public enum Function implements AFunction {
       ITEM_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map[,predicate])",
-      params(MAP_O, PREDICATE_ZM), ANY_ATOMIC_TYPE_ZM, MAP_URI),
+      params(MAP_O, FuncType.get(BOOLEAN_O, ITEM_O).seqType()), ANY_ATOMIC_TYPE_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_O), MAP_O, MAP_URI),
@@ -742,21 +744,21 @@ public enum Function implements AFunction {
       params(ITEM_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOLD_LEFT(ArrayFoldLeft::new, "fold-left(array,zero,action)",
-      params(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
+      params(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOLD_RIGHT(ArrayFoldRight::new, "fold-right(array,zero,action)",
-      params(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM).seqType()),
+      params(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOOT(ArrayFoot::new, "foot(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOR_EACH(ArrayForEach::new, "for-each(array,action)",
-      params(ARRAY_O, FuncType.get(ITEM_ZM, ITEM_O).seqType()), ARRAY_O, flag(HOF), ARRAY_URI),
+      params(ARRAY_O, ACTION_O), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FOR_EACH_PAIR(ArrayForEachPair::new, "for-each-pair(array1,array2,action)",
-      params(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()),
+      params(ARRAY_O, ARRAY_O, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O, INTEGER_O).seqType()),
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_GET(ArrayGet::new, "get(array,position[,fallback])",
@@ -1431,7 +1433,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM, HOF_URI),
   /** XQuery function. */
   _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(input,action)",
-      params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
+      params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
   _HOF_SCAN_LEFT(HofScanLeft::new, "scan-left(input,zero,action)",
@@ -1774,11 +1776,10 @@ public enum Function implements AFunction {
       params(BOOLEAN_O), ITEM_ZM, flag(NDT), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_FOR_EACH(UpdateForEach::new, "for-each(input,action)",
-      params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType()),
-      EMPTY_SEQUENCE_Z, flag(UPD, HOF), UPDATE_URI),
+      params(ITEM_ZM, ACTION_O), EMPTY_SEQUENCE_Z, flag(UPD, HOF), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_FOR_EACH_PAIR(UpdateForEachPair::new, "for-each-pair(input1,input2,action)",
-      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O).seqType()),
+      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_O, INTEGER_O).seqType()),
       EMPTY_SEQUENCE_Z, flag(UPD, HOF), UPDATE_URI),
   /** XQuery function. */
   _UPDATE_MAP_FOR_EACH(UpdateMapForEach::new, "map-for-each(map,action)",

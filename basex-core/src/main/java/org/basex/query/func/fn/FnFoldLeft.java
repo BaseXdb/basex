@@ -25,10 +25,11 @@ public class FnFoldLeft extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = action(qc);
 
+    int p = 0;
     Value result = arg(1).value(qc);
     for(Item item; (item = input.next()) != null;) {
       if(skip(qc, result, item)) break;
-      result = action.invoke(qc, info, result, item);
+      result = action.invoke(qc, info, result, item, Int.get(++p));
     }
     return result;
   }
@@ -52,7 +53,7 @@ public class FnFoldLeft extends StandardFunc {
    * @throws QueryException query exception
    */
   public final FItem action(final QueryContext qc) throws QueryException {
-    return iff != null ? iff[1] : toFunction(arg(2), 2, qc);
+    return iff != null ? iff[1] : toFunction(arg(2), 3, qc);
   }
 
   @Override
@@ -62,10 +63,11 @@ public class FnFoldLeft extends StandardFunc {
 
     // unroll fold
     final Expr input = arg(0), zero = arg(1), action = arg(2);
-    if(action instanceof Value) {
+    final int al = action.funcType() != null ? action.funcType().argTypes.length : -1;
+    if(action instanceof Value && al == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final Expr func = coerce(2, cc);
+        final Expr func = coerce(2, cc, al);
         expr = zero;
         for(final Expr ex : unroll) {
           expr = new DynFuncCall(info, sc, func, expr, ex).optimize(cc);
@@ -105,8 +107,9 @@ public class FnFoldLeft extends StandardFunc {
         ((ArrayType) ist.type).declType : ist.with(Occ.EXACTLY_ONE);
 
       // assign item type of iterated value, optimize function
-      final SeqType[] c = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM };
-      Expr optFunc = coerceFunc(action, cc, SeqType.ITEM_ZM, c);
+      final SeqType[] types = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM,
+        SeqType.INTEGER_O };
+      Expr optFunc = coerceFunc(action, cc, SeqType.ITEM_ZM, types);
 
       final FuncType ft = optFunc.funcType();
       final int i = left ? 0 : 1;
@@ -116,8 +119,8 @@ public class FnFoldLeft extends StandardFunc {
       final SeqType at = ft.argTypes[i];
       if(!st.eq(at) && st.instanceOf(at)) {
         while(true) {
-          c[i] = st;
-          optFunc = coerceFunc(action, cc, ft.declType, c);
+          types[i] = st;
+          optFunc = coerceFunc(action, cc, ft.declType, types);
           output = optFunc.funcType().declType;
 
           // optimized type is instance of input type: abort

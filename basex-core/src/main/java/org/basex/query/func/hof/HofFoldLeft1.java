@@ -21,25 +21,27 @@ public final class HofFoldLeft1 extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final FItem action = toFunction(arg(1), 2, qc);
+    final FItem action = toFunction(arg(1), 3, qc);
 
+    int p = 0;
     Value value = checkNoEmpty(input.next());
     for(Item item; (item = input.next()) != null;) {
-      value = action.invoke(qc, info, value, item);
+      value = action.invoke(qc, info, value, item, Int.get(++p));
     }
     return value;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = arg(0);
+    final Expr input = arg(0), action = arg(1);
     if(input.seqType().zero()) throw EMPTYFOUND.get(info);
 
     // unroll fold
-    if(arg(1) instanceof Value) {
+    final int al = action.funcType() != null ? action.funcType().argTypes.length : -1;
+    if(action instanceof Value && al == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final Expr func = coerce(1, cc);
+        final Expr func = coerce(1, cc, al);
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {

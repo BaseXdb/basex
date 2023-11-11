@@ -24,16 +24,15 @@ import org.basex.util.list.*;
 public final class FnIndexWhere extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
-    final FItem predicate = toFunction(arg(1), 1, qc);
+    final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int c = 0;
+    int p = 0;
     final LongList list = new LongList();
     for(Item item; (item = input.next()) != null;) {
-      ++c;
-      if(toBoolean(predicate.invoke(qc, info, item).item(qc, info))) {
-        list.add(c);
+      final Int pos = Int.get(++p);
+      if(toBoolean(predicate.invoke(qc, info, item, pos).item(qc, info))) {
+        list.add(p);
       }
     }
     return IntSeq.get(list);
@@ -41,22 +40,28 @@ public final class FnIndexWhere extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = arg(0);
+    final Expr input = arg(0), predicate = arg(1);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    // rewrite to FLWOR expression
-    // index-where(INPUT, PREDICATE)  ->  for $i at $p in INPUT where PREDICATE($i) return $p
-    final IntObjMap<Var> vm = new IntObjMap<>();
-    final LinkedList<Clause> clauses = new LinkedList<>();
+    final int al = predicate.funcType() != null ? predicate.funcType().argTypes.length : -1;
+    if(al >= 1) {
+      // for $i at $p in INPUT where PREDICATE($i, $p) return $p
+      final IntObjMap<Var> vm = new IntObjMap<>();
+      final LinkedList<Clause> clauses = new LinkedList<>();
 
-    final Var i = cc.copy(new Var(new QNm("i"), null, cc.qc, sc, info), vm);
-    final Var p = cc.copy(new Var(new QNm("p"), SeqType.INTEGER_O, cc.qc, sc, info), vm);
-    clauses.add(new For(i, p, null, input, false).optimize(cc));
+      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
+      final Var p = cc.copy(new Var(new QNm("pos"), SeqType.INTEGER_O, cc.qc, sc, info), vm);
+      clauses.add(new For(i, p, null, input, false).optimize(cc));
 
-    final Expr pred = coerce(1, cc), arg = new VarRef(info, i).optimize(cc);
-    clauses.add(new Where(new DynFuncCall(info, sc, pred, arg).optimize(cc), info).optimize(cc));
+      final Expr item = new VarRef(info, i).optimize(cc);
+      final Expr pos = new VarRef(info, p).optimize(cc);
+      final Expr[] args = al == 1 ? new Expr[] { item } : new Expr[] { item, pos };
+      final Expr dfc = new DynFuncCall(info, sc, coerce(1, cc, al), args).optimize(cc);
+      clauses.add(new Where(dfc, info).optimize(cc));
 
-    return new GFLWOR(info, clauses, new VarRef(info, p).optimize(cc)).optimize(cc);
+      return new GFLWOR(info, clauses, new VarRef(info, p).optimize(cc)).optimize(cc);
+    }
+    return this;
   }
 }

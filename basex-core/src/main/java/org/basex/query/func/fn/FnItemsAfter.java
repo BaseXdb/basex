@@ -13,16 +13,19 @@ import org.basex.query.value.item.*;
 public final class FnItemsAfter extends FnItemsStartingWhere {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter input = arg(0).iter(qc);
+    final FItem predicate = toFunction(arg(1), 2, qc);
     return new Iter() {
-      final Iter input = arg(0).iter(qc);
-      final FItem predicate = toFunction(arg(1), 1, qc);
       boolean started;
+      int p;
 
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = input.next()) != null;) {
           if(started) return item;
-          if(toBoolean(predicate.invoke(qc, info, item).item(qc, info))) started = true;
+          if(toBoolean(predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info))) {
+            started = true;
+          }
         }
         return null;
       }

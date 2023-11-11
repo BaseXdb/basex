@@ -15,14 +15,17 @@ public final class FnItemsEndingWhere extends FnItemsStartingWhere {
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       final Iter input = arg(0).iter(qc);
-      final FItem predicate = toFunction(arg(1), 1, qc);
+      final FItem predicate = toFunction(arg(1), 2, qc);
       boolean ended;
+      int p;
 
       @Override
       public Item next() throws QueryException {
         final Item item = ended ? null : input.next();
-        if(item != null && toBoolean(predicate.invoke(qc, info, item).item(qc, info))) {
-          ended  = true;
+        if(item != null) {
+          if(toBoolean(predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info))) {
+            ended  = true;
+          }
         }
         return item;
       }

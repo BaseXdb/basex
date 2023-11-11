@@ -20,16 +20,17 @@ import org.basex.query.value.type.*;
 public final class FnPartition extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter input = arg(0).iter(qc);
+    final FItem splitWhen = toFunction(arg(1), 3, qc);
     return new Iter() {
-      final Iter input = arg(0).iter(qc);
-      final FItem breakWhen = toFunction(arg(1), 2, qc);
       Value value = Empty.VALUE;
+      int p;
 
       @Override
       public Item next() throws QueryException {
         while(value != null) {
           final Item item = input.next();
-          if(item == null || toBoolean(breakWhen.invoke(qc, info, value, item), qc)) {
+          if(item == null || toBoolean(splitWhen.invoke(qc, info, value, item, Int.get(++p)), qc)) {
             final Value v = value;
             value = item;
             if(!v.isEmpty()) {
@@ -56,11 +57,13 @@ public final class FnPartition extends ArrayFn {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
-    if(st.one() && arg(1) instanceof FuncItem)
+    if(st.one() && arg(1) instanceof FuncItem) {
       return cc.function(_UTIL_ARRAY_MEMBER, info, input);
+    }
 
     final SeqType so = st.with(Occ.EXACTLY_ONE);
-    arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, st.with(Occ.ZERO_OR_MORE), so));
+    arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, st.with(Occ.ZERO_OR_MORE), so,
+        SeqType.INTEGER_O));
     exprType.assign(ArrayType.get(so));
     return this;
   }

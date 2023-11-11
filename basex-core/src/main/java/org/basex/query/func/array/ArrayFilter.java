@@ -18,11 +18,12 @@ public final class ArrayFilter extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final FItem predicate = toFunction(arg(1), 1, qc);
+    final FItem predicate = toFunction(arg(1), 2, qc);
 
+    int p = 0;
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
+      if(toBoolean(predicate.invoke(qc, info, value, Int.get(++p)).item(qc, info))) {
         ab.append(value);
       }
     }
@@ -36,7 +37,8 @@ public final class ArrayFilter extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType));
+      arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType,
+          SeqType.INTEGER_O));
       exprType.assign(type);
     }
     return this;

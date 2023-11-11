@@ -57,6 +57,10 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1]", " function($a) { false() }"), "[]");
     query(func.args(" [ 1, -2 ]", " function($a) { $a > 0 }"), "[1]");
     query(func.args(" [ 0, 1 ]", " boolean#1"), "[1]");
+
+    query(func.args(" array { 2 to 7 }", " op('=')"), "[]");
+    query(func.args(" array { 1 to 9 }", " op('=')"), "[1,2,3,4,5,6,7,8,9]");
+    query(func.args(" array { reverse(1 to 9) }", " op('=')"), "[5]");
   }
 
   /** Test method. */
@@ -120,12 +124,16 @@ public final class ArrayModuleTest extends SandboxTest {
   @Test public void foldLeft() {
     final Function func = _ARRAY_FOLD_LEFT;
     query(func.args(" [ 1, 2 ]", 0, " function($a, $b) { $a + $b }"), 3);
+    query(func.args(" array { 1 to 6 }", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
+    query(func.args(" array { 2 to 7 }", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
   }
 
   /** Test method. */
   @Test public void foldRight() {
     final Function func = _ARRAY_FOLD_RIGHT;
     query(func.args(" [ 1, 2 ]", " ()", " function($a, $b) { $b, $a }"), "2\n1");
+    query(func.args(" array { 1 to 6 }", "ok", " fn($i, $r, $p) { $r[$i = $p] }"), "ok");
+    query(func.args(" array { 2 to 7 }", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
   }
 
   /** Test method. */
@@ -151,6 +159,9 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1 ]", " function($a) { $a }"), "[1]");
     query(func.args(" [ 1, 2 ]", " function($a) { $a + 1 }"), "[2,3]");
     query(func.args(" [ 1, 2, 3 ]", " function($a) { () }"), "[(),(),()]");
+
+    query(func.args(" [ 5 ]", " op('*')"), "[5]");
+    query(func.args(" array { reverse(1 to 6) }", " op('*')"), "[6,10,12,12,10,6]");
   }
 
   /** Test method. */
@@ -169,6 +180,10 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1, 2 ]", " []", " function($a, $b) { $a + $b }"), "[]");
     query(func.args(" [ 1 ]", " [2]", " function($a, $b) { $a + $b }"), "[3]");
     query(func.args(" [ 1, 2, 3 ]", " [2]", " function($a, $b) { $a + $b }"), "[3]");
+
+    query(func.args(" [ 5 ]", " [ 8 ]", " fn($a, $b, $p) { ($b - $a) * $p }"), "[3]");
+    query(func.args(" array { 0 to 5 }", " array { 1 to 6 }", " fn($a, $b, $p) { ($b - $a) * $p }"),
+        "[1,2,3,4,5,6]");
   }
 
   /** Test method. */
@@ -204,6 +219,9 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" array { " + MONTHS + " }", " contains(?, 'v')"), 11);
     query(func.args(" array { " + MONTHS + " }", " starts-with(?, 'J')"), "1\n6\n7");
     query(func.args(" [ 1, (2, 3), 4, (5, 6) ]", " function($n) { count($n) > 1 }"), "2\n4");
+
+    query(func.args(" array { 1 to 6 }", " fn($n, $p) { $n = $p }"), "1\n2\n3\n4\n5\n6");
+    query(func.args(" array { reverse(1 to 6) }", " fn($n, $p) { $n = $p }"), "");
   }
 
   /** Test method. */

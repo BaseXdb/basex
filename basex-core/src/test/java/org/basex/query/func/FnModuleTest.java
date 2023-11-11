@@ -507,6 +507,12 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
         exists(CmpG.class), empty(func), exists(NOT));
 
+    query(func.args(1, " op('=')"), true);
+    query(func.args(2, " op('=')"), false);
+    query(func.args(" 1 to 6", " op('=')"), true);
+    query(func.args(" 2 to 7", " op('=')"), false);
+    query(func.args(" reverse(1 to 9)", " op('=')"), false);
+
     final String lookup = "function-lookup(xs:QName(<?_ fn:every?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);
     query(lookup + "(1 to 9, not#1)", false);
@@ -518,6 +524,10 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void filter() {
     final Function func = FILTER;
     query(func.args(" (0, 1)", " boolean#1"), 1);
+
+    query(func.args(" 2 to 7", " op('=')"), "");
+    query(func.args(" 1 to 9", " op('=')"), "1\n2\n3\n4\n5\n6\n7\n8\n9");
+    query(func.args(" reverse(1 to 9)", " op('=')"), 5);
 
     check(func.args(" ()", " boolean#1"), "", empty());
     check(func.args(" 1 to 9", " function($n) { $n = 0 }"), "", exists(IterFilter.class));
@@ -544,6 +554,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(VOID.args(1), 1, " function($a, $b) { $b }"), 1);
     query(func.args(2, 1, " function($a, $b) { $b }"), 2);
     query("sort(" + func.args(" <a/>", "a", " compare#2") + ")", 1);
+
+    query(func.args(" 1 to 6", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
+    query(func.args(" 2 to 7", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
@@ -586,6 +599,8 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void foldRight() {
     final Function func = FOLD_RIGHT;
+    query(func.args(" 1 to 6", "ok", " fn($i, $r, $p) { $r[$i = $p] }"), "ok");
+    query(func.args(" 2 to 7", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
@@ -655,6 +670,9 @@ public final class FnModuleTest extends SandboxTest {
     query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
     check(func.args(" ()", " boolean#1"), "", empty());
 
+    query(func.args(5, " op('*')"), 5);
+    query(func.args(" reverse(1 to 6)", " op('*')"), "6\n10\n12\n12\n10\n6");
+
     inline(true);
     // pre-compute result size
     query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
@@ -701,6 +719,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("aa", "a", " matches#2"), true);
     query(func.args(" ('aa', 'bb')", "a", " matches#2"), true);
     query(func.args("aa", " ('a', 'b')", " matches#2"), true);
+
+    query(func.args(5, 8, " fn($a, $b, $p) { ($b - $a) * $p }"), 3);
+    query(func.args(" (0 to 5)", " (1 to 6)", " fn($a, $b, $p) { ($b - $a) * $p }"),
+        "1\n2\n3\n4\n5\n6");
   }
 
   /** Test method. */
@@ -872,6 +894,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(MONTHS, " contains(?, 'v')"), 11);
     query(func.args(MONTHS, " starts-with(?, 'J')"), "1\n6\n7");
 
+    query(func.args(" 1 to 6", " fn($n, $p) { $n = $p }"), "1\n2\n3\n4\n5\n6");
+    query(func.args(" reverse(1 to 6)", " fn($n, $p) { $n = $p }"), "");
+
     check(func.args(" (0 to 5)[. = 0]", " not#1"), 1, root(GFLWOR.class));
     check(func.args(" (0 to 5)[. = 6]", " not#1"), "", root(GFLWOR.class));
 
@@ -1029,6 +1054,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), 3);
     query(func.args(MONTHS, " contains(?, 'Nov')"), "December");
     query(func.args(MONTHS, " starts-with(?, 'Dec')"), "");
+
+    query(func.args(" 10 to 15", " fn($n, $p) { $p = 3 }"), "13\n14\n15");
   }
 
   /** Test method. */
@@ -1142,6 +1169,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (1 to 10)", " fn { . >= 3 }") + " => sort()", "1\n2");
     query(func.args(" (1 to 10)[. > 1]", " fn { . >= 3 }") + " => sort()", 2);
     query(func.args(" (1 to 10)", " fn { . >= 3 }") + " => count()", 2);
+
+    query(func.args(" 10 to 15", " fn($n, $p) { $p = 3 }"), "10\n11");
   }
 
   /** Test method. */
@@ -1156,6 +1185,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "1\n2");
     query(func.args(MONTHS, " contains(?, '')"), "January");
     query(func.args(MONTHS, " starts-with(?, 'Feb')"), "January\nFebruary");
+
+    query(func.args(" 10 to 15", " fn($n, $p) { $p = 3 }"), "10\n11\n12");
   }
 
   /** Test method. */
@@ -1178,6 +1209,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (8 to 10)", " fn { . >= 10 }") + " => sort()", 10);
     query(func.args(" (8 to 10)[. > 9]", " fn { . >= 9 }") + " => sort()", 10);
     query(func.args(" (8 to 10)", " fn { . >= 10 }") + " => count()", 1);
+
+    query(func.args(" 10 to 15", " fn($n, $p) { $p = 3 }"), "12\n13\n14\n15");
   }
 
   /** Test method. */
@@ -1224,6 +1257,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(1, " function($x) { $x < 1000 }", " function($x) { $x * 2 }"), 1024);
     query(func.args(1, " function($xs) { count($xs) <= 3 }", " function($x) { $x, $x }"),
         "1\n1\n1\n1");
+
+    query(func.args(1, " fn($_, $p) { $p <= 10 }", " op('*')"), 3628800);
   }
 
   /** Test method. */
@@ -1582,6 +1617,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (1, 2, 3, 6, 7, 9, 10)",
         " function($seq, $new) { not($new = $seq[last()] + 1) }"),
         "[1,2,3]\n[6,7]\n[9,10]");
+
+    query(func.args(" 1 to 5", " fn($a, $n, $p) { $p mod 2 = 1 }"), "[1,2]\n[3,4]\n[5]");
   }
 
   /** Test method. */
@@ -1976,6 +2013,12 @@ public final class FnModuleTest extends SandboxTest {
         + "'November', 'December')", " contains(?, 'z')"), false);
     check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
         exists(CmpG.class), empty(EVERY));
+
+    query(func.args(1, " op('=')"), true);
+    query(func.args(2, " op('=')"), false);
+    query(func.args(" 1 to 6", " op('=')"), true);
+    query(func.args(" 2 to 7", " op('=')"), false);
+    query(func.args(" reverse(1 to 9)", " op('=')"), true);
 
     final String lookup = "function-lookup(xs:QName(<?_ fn:some?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);

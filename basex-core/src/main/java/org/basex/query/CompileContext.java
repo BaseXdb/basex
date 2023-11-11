@@ -409,16 +409,16 @@ public final class CompileContext {
    */
   public ExprList unroll(final Expr expr, final boolean items) {
     final long size = expr.size(), limit = qc.context.options.get(MainOptions.UNROLLLIMIT);
-    final boolean seq = expr instanceof Seq && size <= limit;
+    final boolean value = expr instanceof Seq && size <= limit;
     final boolean list = expr instanceof List && (
         items ? size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args())
               : expr.args().length <= limit
     );
-    if(!(seq || list)) return null;
+    if(!(value || list)) return null;
 
     info(QueryText.OPTUNROLL_X, expr);
     final ExprList exprs = new ExprList((int) size);
-    if(seq) {
+    if(value) {
       for(final Item item : (Value) expr) exprs.add(item);
     } else {
       for(final Expr arg : expr.args()) exprs.add(arg);
