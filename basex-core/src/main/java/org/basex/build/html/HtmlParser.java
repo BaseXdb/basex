@@ -104,9 +104,6 @@ public final class HtmlParser extends XMLParser {
       reader.setContentHandler(writer);
       reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
 
-      // define input
-      final InputSource is = new InputSource(io.inputStream());
-
       // set Validator.nu options
       if(hopts.get(UNICODE_NORMALIZATION_CHECKING))
         reader.setCheckingNormalization(true);
@@ -135,11 +132,13 @@ public final class HtmlParser extends XMLParser {
         reader.setHeuristics(Heuristics.valueOf(hopts.get(HEURISTICS).name()));
       // end Validator.nu options
 
+      // define input
+      final InputSource is = new InputSource(io.inputStream());
       String enc = io.encoding() != null
           ? io.encoding()
           : hopts.contains(ENCODING)
             ? hopts.get(HtmlOptions.ENCODING)
-            : null; // TODO: sniff encoding
+            : null;
       if (enc != null) {
         if (!Strings.supported(enc))
           throw INVALIDOPT_X.getIO("Unsupported encoding: " + enc + '.');

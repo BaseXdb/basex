@@ -23,9 +23,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class HtmlParse extends StandardFunc {
-  /** Class needed for heuristics=ICU. */
+  /** Class needed for option heuristics=ICU. */
   private static final String ICU_CLASS_NAME = "com.ibm.icu.text.CharsetDetector";
-  /** Class needed for heuristics=CHARDET. */
+  /** Class needed for option heuristics=CHARDET. */
   private static final String CHARDET_CLASS_NAME =
       "org.mozilla.intl.chardet.nsICharsetDetectionObserver";
 

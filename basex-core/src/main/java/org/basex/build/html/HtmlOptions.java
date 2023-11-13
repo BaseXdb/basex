@@ -9,47 +9,47 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class HtmlOptions extends Options {
-  /** fn:parse-html option encoding. */
+  /** fn:parse-html option: encoding. */
   public static final StringOption ENCODING = new StringOption("encoding");
-  /** fn:parse-html option method. */
+  /** fn:parse-html option: method. */
   public static final StringOption METHOD = new StringOption("method");
-  /** fn:parse-html option html-version. */
+  /** fn:parse-html option: html-version. */
   public static final StringOption HTML_VERSION = new StringOption("html-version");
-  /** fn:parse-html option include-template-content. */
+  /** fn:parse-html option: include-template-content. */
   public static final BooleanOption INCLUDE_TEMPLATE_CONTENT =
       new BooleanOption("include-template-content");
 
-  /** Validator.nu option unicode-normalization-checking. */
+  /** Validator.nu option: unicode-normalization-checking. */
   public static final BooleanOption UNICODE_NORMALIZATION_CHECKING =
       new BooleanOption("unicode-normalization-checking", false);
-  /** Validator.nu option mapping-lang-to-xml-lang. */
+  /** Validator.nu option: mapping-lang-to-xml-lang. */
   public static final BooleanOption MAPPING_LANG_TO_XML_LANG =
       new BooleanOption("mapping-lang-to-xml-lang", false);
-  /** Validator.nu option scripting-enabled. */
+  /** Validator.nu option: scripting-enabled. */
   public static final BooleanOption SCRIPTING_ENABLED =
       new BooleanOption("scripting-enabled", false);
-  /** Validator.nu option content-space-policy. */
+  /** Validator.nu option: content-space-policy. */
   public static final EnumOption<XmlViolationPolicy> CONTENT_SPACE_POLICY =
       new EnumOption<>("content-space-policy", XmlViolationPolicy.class);
-  /** Validator.nu option content-non-xml-char-policy. */
+  /** Validator.nu option: content-non-xml-char-policy. */
   public static final EnumOption<XmlViolationPolicy> CONTENT_NON_XML_CHAR_POLICY =
       new EnumOption<>("content-non-xml-char-policy", XmlViolationPolicy.class);
-  /** Validator.nu option comment-policy. */
+  /** Validator.nu option: comment-policy. */
   public static final EnumOption<XmlViolationPolicy> COMMENT_POLICY =
       new EnumOption<>("comment-policy", XmlViolationPolicy.class);
-  /** Validator.nu option xmlns-policy. */
+  /** Validator.nu option: xmlns-policy. */
   public static final EnumOption<XmlViolationPolicy> XMLNS_POLICY =
       new EnumOption<>("xmlns-policy", XmlViolationPolicy.class);
-  /** Validator.nu option name-policy. */
+  /** Validator.nu option: name-policy. */
   public static final EnumOption<XmlViolationPolicy> NAME_POLICY =
       new EnumOption<>("name-policy", XmlViolationPolicy.class);
-  /** Validator.nu option streamability-violation-policy. */
+  /** Validator.nu option: streamability-violation-policy. */
   public static final EnumOption<XmlViolationPolicy> STREAMABILITY_VIOLATION_POLICY =
       new EnumOption<>("streamability-violation-policy", XmlViolationPolicy.class);
-  /** Validator.nu option xml-policy. */
+  /** Validator.nu option: xml-policy. */
   public static final EnumOption<XmlViolationPolicy> XML_POLICY =
       new EnumOption<>("xml-policy", XmlViolationPolicy.class);
-  /** Validator.nu option heuristics. */
+  /** Validator.nu option: heuristics. */
   public static final EnumOption<Heuristics> HEURISTICS =
       new EnumOption<>("heuristics", Heuristics.class);
 
