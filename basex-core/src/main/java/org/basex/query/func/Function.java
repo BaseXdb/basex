@@ -468,7 +468,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
   PARSE_HTML(FnParseHtml::new, "parse-html(html[,options])",
-      params(ITEM_ZO, MAP_O), DOCUMENT_NODE_ZO),
+      params(ANY_ATOMIC_TYPE_ZO, MAP_O), DOCUMENT_NODE_ZO),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_O, INTEGER_O), INTEGER_O),

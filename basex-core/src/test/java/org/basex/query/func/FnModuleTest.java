@@ -1480,16 +1480,18 @@ public final class FnModuleTest extends SandboxTest {
         " map {'encoding': '" + Strings.UTF16LE + "', 'xml-policy': 'ALTER_INFOSET'}"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"" + Strings.UTF16LE
         + "\"/></head><body>42</body></html>");
-    query(func.args(_CONVERT_STRING_TO_BASE64.args("<html><head><meta charset='" + Strings.UTF16BE
-        + "'></head><body>42</body>", Strings.UTF16BE),
-        " map {'encoding': '" + Strings.UTF16BE + "', 'heuristics': 'NONE'}"),
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"" + Strings.UTF16BE
-        + "\"/></head><body>42</body></html>");
+    query(func.args(_CONVERT_STRING_TO_BASE64.args("<html><head><meta charset='ISO-8859-7'></head>"
+        + "<body>\u20AC</body>", "ISO-8859-7"), " map {'heuristics': 'NONE'}"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"ISO-8859-7\"/></head>"
+        + "<body>\u20AC</body></html>");
 
     error(func.args(42), STRBIN_X_X);
-    error(func.args(" \"42\"", 42), MAP_X_X);
-    error(func.args(" \"42\"", " map {'1234': ()}"), INVHTMLOPT_X);
-    error(func.args(" \"42\"", " map {'heuristics': '5678'}"), INVHTMLOPT_X);
+    error(func.args("42", 42), MAP_X_X);
+    error(func.args("42", " map {'1234': ''}"), INVHTMLOPT_X);
+    error(func.args("42", " map {'heuristics': '5678'}"), INVHTMLOPT_X);
+    error(func.args("42", " map {'heuristics': 'CHARDET'}"), BASEX_CLASSPATH_X_X);
+    error(func.args("42", " map {'heuristics': 'ICU'}"), BASEX_CLASSPATH_X_X);
+    error(func.args("42", " map {'heuristics': 'ALL'}"), BASEX_CLASSPATH_X_X);
   }
 
   /** Test method. */
