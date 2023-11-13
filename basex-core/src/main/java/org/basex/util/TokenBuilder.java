@@ -168,6 +168,15 @@ public final class TokenBuilder {
   }
 
   /**
+   * Removes the last character.
+   * @return self reference
+   */
+  public TokenBuilder removeLast() {
+    while(--size > 0 && (chars[size] & 0xC0) == 0x80);
+    return this;
+  }
+
+  /**
    * Returns the codepoint stored at the specified position.
    * @param pos position
    * @return character

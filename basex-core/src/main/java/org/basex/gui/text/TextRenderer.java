@@ -334,14 +334,16 @@ final class TextRenderer extends BaseXBack {
       sw = font.stringWidth(s);
       if(sw > maxWidth) {
         if(x != offset) newline(true);
-        final int[] cps = s.codePoints().toArray();
-        int c = 0;
-        final int cl = cps.length;
-        for(sw = 0; c <= cl && sw <= maxWidth; c++) sw += font.charWidth(cps[c]);
-        for(; c <= cl && font.stringWidth(new String(cps, 0, c)) <= maxWidth; c++);
-        final TokenBuilder tb = new TokenBuilder(c);
-        for(int t = 0; t < c; t++) tb.add(cps[t]);
-        s = tb.toString();
+
+        final TokenBuilder tb = new TokenBuilder();
+        sw = 0;
+        for(final int scp : s.codePoints().toArray()) {
+          if(sw >= maxWidth) break;
+          tb.add(scp);
+          sw += font.charWidth(scp);
+          if(sw > maxWidth) sw = font.stringWidth(tb.toString());
+        }
+        s = tb.removeLast().toString();
         sw = font.stringWidth(s);
         iter.posEnd(iter.pos() + tb.size());
       }
