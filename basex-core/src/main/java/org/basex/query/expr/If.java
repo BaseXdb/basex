@@ -170,7 +170,7 @@ public final class If extends Arr {
    * @throws QueryException query exception
    */
   private Expr expr(final QueryContext qc) throws QueryException {
-    return exprs[cond.ebv(qc, info).bool(info) ? 0 : 1];
+    return exprs[cond.test(qc, info, false) ? 0 : 1];
   }
 
   @Override

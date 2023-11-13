@@ -71,18 +71,18 @@ public final class Empty extends Item {
   }
 
   @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) {
-    return Bln.FALSE;
-  }
-
-  @Override
-  public Item test(final QueryContext qc, final InputInfo ii) {
-    return null;
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred) {
+    return false;
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
     throw Util.notExpected();
+  }
+
+  @Override
+  public boolean bool(final InputInfo ii) throws QueryException {
+    return false;
   }
 
   @Override

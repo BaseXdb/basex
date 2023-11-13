@@ -31,18 +31,6 @@ public final class HofModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void dropWhile() {
-    final Function func = _HOF_DROP_WHILE;
-    query(func.args(" (1)", " function($x) { $x < 2 }"), "");
-    query(func.args(" (1, 2)", " function($x) { $x < 2 }"), 2);
-    query(func.args(" (1, 2, 3)", " function($x) { $x < 2 }"), "2\n3");
-    query(func.args(" (1, 2, 3)", " function($x) { $x < 2 }") + " => sort()", "2\n3");
-    query(func.args(" (8 to 10)", " function($x) { $x < 10 }") + " => sort()", 10);
-    query(func.args(" (8 to 10)[. > 9]", " function($x) { $x < 9 }") + " => sort()", 10);
-    query(func.args(" (8 to 10)", " function($x) { $x < 10 }") + " => count()", 1);
-  }
-
-  /** Test method. */
   @Test public void foldLeft1() {
     final Function func = _HOF_FOLD_LEFT1;
     query(func.args(" 1 to 10", " function($x, $y) { $x + $y }"), 55);
@@ -85,29 +73,10 @@ public final class HofModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void takeWhile() {
-    final Function func = _HOF_TAKE_WHILE;
-    query(func.args(" (1)", " function($x) { $x < 2 }"), 1);
-    query(func.args(" (1, 2)", " function($x) { $x < 2 }"), 1);
-    query(func.args(" (1, 2, 3)", " function($x) { $x < 3 }"), "1\n2");
-    query(func.args(" (1, 2, 3)", " function($x) { $x < 3 }") + " => sort()", "1\n2");
-    query(func.args(" (1 to 10)", " function($x) { $x < 3 }") + " => sort()", "1\n2");
-    query(func.args(" (1 to 10)[. > 1]", " function($x) { $x < 3 }") + " => sort()", 2);
-    query(func.args(" (1 to 10)", " function($x) { $x < 3 }") + " => count()", 2);
-  }
-
-  /** Test method. */
   @Test public void topKWith() {
     final Function func = _HOF_TOP_K_WITH;
     query(func.args(" 1 to 1000", " function($x, $y) { $x > $y }", 0), "");
     query(func.args(" ()", " function($x, $y) { $x > $y }", 5), "");
     query(func.args(" 1 to 5", " function($x, $y) { $x > $y }", 5), "1\n2\n3\n4\n5");
-  }
-
-  /** Test method. */
-  @Test public void until() {
-    final Function func = _HOF_UNTIL;
-    query(func.args(" function($x) { $x >= 1000 }, function($x) { $x * 2 }, 1"), 1024);
-    query(func.args(" function($xs) { count($xs) > 3 }, function($x) { $x, $x }, 1"), "1\n1\n1\n1");
   }
 }

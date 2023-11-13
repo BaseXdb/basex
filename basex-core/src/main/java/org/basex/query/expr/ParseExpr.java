@@ -64,28 +64,24 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+      throws QueryException {
+
+    Item item;
     if(seqType().zeroOrOne()) {
-      final Item item = item(qc, info);
-      return item.isEmpty() ? Bln.FALSE : item;
+      item = item(qc, info);
+    } else {
+      final Iter iter = iter(qc);
+      item = iter.next();
+      if(item == null) return false;
+
+      // effective boolean value is only defined for node sequences or single items
+      if(!(item instanceof ANode)) {
+        final Item next = iter.next();
+        if(next != null) throw ebvError(ValueBuilder.concat(item, next, qc), info);
+      }
     }
-
-    final Iter iter = iter(qc);
-    final Item item = iter.next();
-    if(item == null) return Bln.FALSE;
-
-    // effective boolean value is only defined for node sequences or single items
-    if(!(item instanceof ANode)) {
-      final Item next = iter.next();
-      if(next != null) throw ebvError(ValueBuilder.concat(item, next, qc), info);
-    }
-    return item;
-  }
-
-  @Override
-  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item item = ebv(qc, info);
-    return (item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info)) ? item : null;
+    return pred && item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
   }
 
   @Override

@@ -82,8 +82,10 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item test(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return ebv(qc, ii);
+  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+      throws QueryException {
+    if(itemAt(0) instanceof ANode) return true;
+    throw ebvError(this, ii);
   }
 
   @Override
@@ -248,13 +250,6 @@ public abstract class Seq extends Value {
   @Override
   public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
     for(final Item item : this) item.cache(lazy, ii);
-  }
-
-  @Override
-  public Item ebv(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item head = itemAt(0);
-    if(head instanceof ANode) return head;
-    throw ebvError(this, ii);
   }
 
   @Override

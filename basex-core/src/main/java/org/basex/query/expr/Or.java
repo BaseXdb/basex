@@ -35,7 +35,7 @@ public final class Or extends Logical {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     for(final Expr expr : exprs) {
-      if(expr.ebv(qc, info).bool(info)) return Bln.TRUE;
+      if(expr.test(qc, info, false)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }

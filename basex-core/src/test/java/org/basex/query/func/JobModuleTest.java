@@ -245,10 +245,10 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void result() throws Exception {
     // receive result of asynchronous execution
     final Function func = _JOB_RESULT;
-    query("let $q := " + _JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
-        " return ("
-        + _HOF_UNTIL.args(" function($r) { " + _JOB_FINISHED.args(" $q") + " },"
-            + "function($c) { prof:sleep(1) }, ()") + ',' + func.args(" $q") + ')', 1);
+    query("let $q :=" + _JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
+      " return (" + ITERATE_WHILE.args(" ()",
+        " function($_) { not(" + _JOB_FINISHED.args(" $q") + ") }",
+        " function($_) { " + _PROF_SLEEP.args(1) + " }") + "," + func.args(" $q") + ")", 1);
 
     // ensure that the result will not be cached
     String id = query(_JOB_EVAL.args(SLOW_QUERY));

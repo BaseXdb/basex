@@ -190,13 +190,9 @@ public abstract class Filter extends Preds {
         preds.add(pred);
       }
     }
-    // return optimized expression
-    if(opt) return cc.replaceWith(this, prepare.apply(expr));
-
-    // choose best filter implementation
-    return copyType(
-      exprs.length == 1 && exprs[0].isSimple() ? new SimpleFilter(info, root, exprs) :
-      new CachedFilter(info, root, exprs));
+    // return optimized or filter expression
+    return opt ? cc.replaceWith(this, prepare.apply(expr)) :
+      copyType(new CachedFilter(info, root, exprs));
   }
 
   @Override

@@ -108,7 +108,7 @@ public abstract class Preds extends Arr {
     qf.value = item;
     try {
       for(final Expr expr : exprs) {
-        if(expr.test(qc, info) == null) return false;
+        if(!expr.test(qc, info, true)) return false;
       }
       return true;
     } finally {
