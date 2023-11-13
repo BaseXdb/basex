@@ -33,7 +33,7 @@ public final class HtmlParser extends XMLParser {
   private static final String NAME = "Validator.nu";
 
   /**
-   * Checks if a Validator.nu is available.
+   * Checks if Validator.nu is available.
    * @return result of check
    */
   public static boolean available() {
