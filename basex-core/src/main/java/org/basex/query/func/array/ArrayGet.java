@@ -36,8 +36,8 @@ public final class ArrayGet extends StandardFunc {
     if(type instanceof ArrayType) {
       SeqType st = ((ArrayType) type).declType;
       if(defined(2)) {
-        final Type ftype = arg(2).seqType().type;
-        if(ftype instanceof FuncType) st = st.union(((FuncType) ftype).declType);
+        final FuncType ft = arg(2).funcType();
+        if(ft != null) st = st.union(ft.declType);
       }
       exprType.assign(st);
     }

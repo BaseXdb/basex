@@ -49,7 +49,8 @@ abstract class XsltFn extends StandardFunc {
         if(!impl.equals(property)) System.setProperty(clazz, impl);
         final Class<?> vrsn = find("net.sf.saxon.Version");
         final Object se = get(field(vrsn, "softwareEdition"), null);
-        if(se != null) processor += " " + se;
+        if(se != null) {
+        }
         final Object xsl = invoke(method(vrsn, "getXSLVersionString"), null);
         processor = "Saxon";
         version = xsl != null ? xsl.toString() : "3.0";

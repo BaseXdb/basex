@@ -305,7 +305,7 @@ public final class QNm extends Item {
    * Converts a value to a QName.
    * @param value value to parse
    * @param sc static context (can be {@code null})
-   * @return string
+   * @return QName
    * @throws QueryException query exception
    */
   public static QNm parse(final byte[] value, final StaticContext sc) throws QueryException {
@@ -318,7 +318,7 @@ public final class QNm extends Item {
    * @param dflt default namespace (can be {@code null})
    * @param sc static context (can be {@code null})
    * @param info input info (can be {@code null})
-   * @return string
+   * @return QName
    * @throws QueryException query exception
    */
   public static QNm parse(final byte[] value, final byte[] dflt, final StaticContext sc,

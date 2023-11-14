@@ -163,7 +163,8 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.className(this));
-    sb.append("[size: " + meta.size + "; current: " + current + "; " + blocks.size() + " blocks: ");
+    sb.append("[size: ").append(meta.size).append("; current: ").append(current).append("; ");
+    sb.append(blocks.size()).append(" blocks: ");
     for(final TableMemBlock block : blocks) {
       sb.append(block.firstPre).append(' ');
     }

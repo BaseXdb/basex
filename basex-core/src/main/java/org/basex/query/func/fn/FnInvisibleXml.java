@@ -73,8 +73,8 @@ public final class FnInvisibleXml extends StandardFunc {
       final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info)};
       final Expr arg = new VarRef(info, params[0]);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
-      final FuncType type = FuncType.get(parseFunction.seqType(), STRING_O);
-      return new FuncItem(sc, null, null, params, type, parseFunction, params.length, info);
+      final FuncType ft = FuncType.get(parseFunction.seqType(), STRING_O);
+      return new FuncItem(sc, null, null, params, ft, parseFunction, params.length, info);
     }
   }
 

@@ -1051,11 +1051,11 @@ public class TextPanel extends BaseXPanel {
 
     // add matches that start with the input string
     final int ll = LISTS.size();
-    for(int l = 0; l < ll; l++) {
+    for (ArrayList<Entry<String, String>> list : LISTS) {
       pairs.add(null);
-      for(final Entry<String, String> pair : LISTS.get(l)) {
+      for (final Entry<String, String> pair : list) {
         final String name = pair.getKey();
-        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
+        if (name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
       }
     }
     // add matches that contain the input string
@@ -1135,9 +1135,8 @@ public class TextPanel extends BaseXPanel {
       final String func = fd.toString();
       final String name = func.replaceAll("^fn:|\\(.*", "");
       final String value = name + (func.contains("()") ? "()" : "(_)");
-      final BiConsumer<Integer, String> add = (i, string) -> {
+      final BiConsumer<Integer, String> add = (i, string) ->
         LISTS.get(i).add(new SimpleEntry<>(string.toLowerCase(Locale.ENGLISH), value));
-      };
       if(fd.uri() == QueryText.FN_URI) {
         add.accept(1, name.replaceAll("(.)[^-A-Z]*-?", "$1"));
         add.accept(2, name);

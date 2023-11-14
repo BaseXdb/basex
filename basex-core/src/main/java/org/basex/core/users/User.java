@@ -119,9 +119,8 @@ public final class User {
       });
       user.add(pw.finish());
     });
-    patterns.forEach((key, value) -> {
-      user.add(FElem.build(Q_DATABASE).add(Q_PATTERN, key).add(Q_PERMISSION, value).finish());
-    });
+    patterns.forEach((key, value) -> user.add(FElem.build(Q_DATABASE).add(Q_PATTERN, key).
+        add(Q_PERMISSION, value).finish()));
     if(info != null) {
       if(qc != null) {
         // create copy of the info node if query context is available

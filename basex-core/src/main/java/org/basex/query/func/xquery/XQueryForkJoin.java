@@ -64,9 +64,9 @@ public final class XQueryForkJoin extends StandardFunc {
       options instanceof Value ? toOptions(arg(1), new TaskOptions(), true, cc.qc).get(RESULTS) :
       null;
     if(results == Boolean.TRUE) {
-      final Type type = st.type;
-      if(type instanceof FuncType) {
-        final SeqType dt = ((FuncType) type).declType;
+      final FuncType ft = functions.funcType();
+      if(ft != null) {
+        final SeqType dt = ft.declType;
         exprType.assign(dt.with(dt.occ.multiply(st.occ)));
       }
     } else if(results == Boolean.FALSE) {

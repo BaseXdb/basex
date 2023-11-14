@@ -56,7 +56,7 @@ public final class InspectFunctions extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     if(!defined(0)) cc.qc.functions.compileAll(cc);
     return this;
   }

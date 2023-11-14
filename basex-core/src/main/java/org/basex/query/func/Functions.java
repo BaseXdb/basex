@@ -97,10 +97,8 @@ public final class Functions {
       final int min = fd.minMax[0], max = fd.minMax[1];
       final Expr[] prepared = prepareArgs(args, keywords, fd.names, min, max, fd, info);
       final StandardFunc sf = fd.get(sc, info, prepared);
-      if(sf != null) {
-        if(sf.updating()) qc.updating();
-        return sf;
-      }
+      if(sf.updating()) qc.updating();
+      return sf;
     }
 
     // user-defined function
@@ -171,7 +169,7 @@ public final class Functions {
     // literal
     final StaticFuncCall call = userDefined(name, lit.args, null, qc, sc, info);
     // safe cast (no context dependency, no runtime evaluation)
-    final Closure closure = (Closure) literal(info, call, null, name, lit, runtime, false, false);
+    final Closure closure = (Closure) literal(info, call, null, name, lit, false, false, false);
     qc.functions.register(closure);
     return closure;
   }

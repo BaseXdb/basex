@@ -1178,26 +1178,26 @@ public class QueryParser extends InputParser {
         // for member $m in EXPR  ->  for $m in array:split(EXPR) let $m := array:values($a)
         final Var split = new Var(member.name, null, qc, sc, ii);
         localVars.add(split, member);
-        clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(sc, ii, expr), empty));
+        clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(sc, ii, expr), false));
         clauses.add(new Let(member, Function._ARRAY_VALUES.get(sc, ii, new VarRef(ii, split))));
       } else if(value == null) {
         // for key $k in EXPR
         // ->  for $k in map:keys(EXPR)
         localVars.add(key);
-        clauses.add(new For(key, at, score, Function._MAP_KEYS.get(sc, ii, expr), empty));
+        clauses.add(new For(key, at, score, Function._MAP_KEYS.get(sc, ii, expr), false));
       } else if(key == null) {
         // for value in EXPR
         // ->  for $v in map:entries(EXPR) let $v := map:values($v)
         final Var entries = new Var(value.name, null, qc, sc, ii);
         localVars.add(entries, value);
-        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), empty));
+        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), false));
         clauses.add(new Let(value, Function._MAP_VALUES.get(sc, ii, new VarRef(ii, entries))));
       } else {
         // for key $k value $v in EXPR
         // ->  for $v in map:entries(EXPR) let $k := map:keys($v) let $v := map:values($v)
         final Var entries = localVars.add(new Var(value.name, null, qc, sc, ii));
         localVars.add(entries, key, value);
-        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), empty));
+        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), false));
         clauses.add(new Let(key, Function._MAP_KEYS.get(sc, ii, new VarRef(ii, entries))));
         clauses.add(new Let(value, Function._MAP_VALUES.get(sc, ii, new VarRef(ii, entries))));
       }
@@ -1794,7 +1794,7 @@ public class QueryParser extends InputParser {
     if(expr != null) {
       for(boolean mapping; (mapping = wsConsume("=!>")) || consume("=>");) {
         skipWs();
-        Expr ex = null;
+        Expr ex;
         if(curr('$')) {
           ex = varRef();
         } else if(curr('(')) {
@@ -2375,7 +2375,7 @@ public class QueryParser extends InputParser {
         if(args) {
           params = paramList(false);
           expr = enclosedExpr();
-        } else if(focus) {
+        } else {
           // focus function
           final InputInfo ii = info();
           final QNm name = new QNm("arg");

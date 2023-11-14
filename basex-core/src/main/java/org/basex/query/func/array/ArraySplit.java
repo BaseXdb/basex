@@ -50,7 +50,7 @@ public class ArraySplit extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return Empty.VALUE;
 

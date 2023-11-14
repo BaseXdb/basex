@@ -26,7 +26,7 @@ class RESTQuery extends RESTCmd {
     for(final Command cmd : session) {
       if(cmd instanceof XQuery) {
         final XQuery xq = (XQuery) cmd;
-        bindings.forEach((key, value) -> xq.bind(key, value));
+        bindings.forEach(xq::bind);
       }
     }
   }

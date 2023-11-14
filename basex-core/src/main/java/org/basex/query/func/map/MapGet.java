@@ -43,8 +43,8 @@ public final class MapGet extends StandardFunc {
     if(type instanceof MapType) {
       SeqType st = ((MapType) type).declType;
       if(fallback) {
-        final Type ftype = arg(2).seqType().type;
-        if(ftype instanceof FuncType) st = st.union(((FuncType) ftype).declType);
+        final FuncType ft = arg(2).funcType();
+        if(ft != null) st = st.union(ft.declType);
       } else {
         st = st.union(Occ.ZERO);
       }

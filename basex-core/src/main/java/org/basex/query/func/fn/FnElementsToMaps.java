@@ -45,7 +45,6 @@ public final class FnElementsToMaps extends StandardFunc {
     for(final Map.Entry<String, String> entry : options.get(ElementsOptions.LAYOUTS).
         free().entrySet()) {
       final QNm name = QNm.parse(Token.token(entry.getKey()), sc);
-      if(name == null) throw INVALIDOPT_X.get(info, "Unknown name: " + entry.getKey() + '.');
       final Layout layout = Layout.get(entry.getValue());
       if(layout == null) throw INVALIDOPT_X.get(info, "Unknown layout: " + entry.getValue() + '.');
       layouts.put(name, layout);
@@ -72,7 +71,7 @@ public final class FnElementsToMaps extends StandardFunc {
         if(!layouts.contains(name)) {
           final ANodeList nodes = names.get(name);
           for(final Layout l : Layout.VALUES) {
-            if(((Checks<ANode>) c -> l.matches(c)).all(nodes)) {
+            if(((Checks<ANode>) l::matches).all(nodes)) {
               layouts.put(name, l);
               break;
             }
@@ -185,7 +184,7 @@ public final class FnElementsToMaps extends StandardFunc {
         return EMPTY_PLUS.matches(node) && node.attributeIter().next() == null;
       }
       @Override
-      Value apply(final ANode node, final QueryContext qc) throws QueryException {
+      Value apply(final ANode node, final QueryContext qc) {
         return Str.EMPTY;
       }
     },
@@ -208,7 +207,7 @@ public final class FnElementsToMaps extends StandardFunc {
         return SIMPLE_PLUS.matches(node) && node.attributeIter().next() == null;
       }
       @Override
-      Value apply(final ANode node, final QueryContext qc) throws QueryException {
+      Value apply(final ANode node, final QueryContext qc) {
         return Str.get(node.string());
       }
     },

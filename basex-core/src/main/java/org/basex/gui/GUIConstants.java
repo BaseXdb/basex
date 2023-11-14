@@ -1,6 +1,5 @@
 package org.basex.gui;
 
-import static org.basex.gui.GUICommand.*;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;

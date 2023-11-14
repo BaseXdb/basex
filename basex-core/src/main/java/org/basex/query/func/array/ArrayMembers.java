@@ -53,9 +53,7 @@ public final class ArrayMembers extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final FuncType ft = arg(0).funcType();
-    if(ft instanceof ArrayType) {
-      exprType.assign(MapType.get(AtomType.STRING, ft.declType));
-    }
+    if(ft instanceof ArrayType) exprType.assign(MapType.get(AtomType.STRING, ft.declType));
     return this;
   }
 

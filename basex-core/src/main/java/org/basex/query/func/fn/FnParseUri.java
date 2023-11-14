@@ -67,7 +67,7 @@ public class FnParseUri extends FnJsonDoc {
 
     String string = value.replace('\\', '/');
     String fragment = "", query = "", scheme = "", filepath = "", authority = "", userinfo = "";
-    String host = "", port = "", path = "";
+    String host = "", port = "", path;
 
     // strip off the fragment identifier and any query
     Matcher m = Pattern.compile("^(.*?)#(.*)$").matcher(string);

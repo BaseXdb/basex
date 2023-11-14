@@ -96,7 +96,7 @@ public class FnSort extends StandardFunc {
       collations[l] = l < collation.size() ? toCollation(collation.itemAt(l), qc) :
         l > 0 ? collations[l - 1] : null;
       invert[l] = l < order.size() ? toEnum(order.itemAt(l), Order.class) == Order.DESCENDING :
-        l > 0 ? invert[l - 1] : false;
+        l > 0 && invert[l - 1];
     }
 
     // single value: atomize to check type

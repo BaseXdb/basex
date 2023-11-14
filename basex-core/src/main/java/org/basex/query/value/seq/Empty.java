@@ -81,7 +81,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) throws QueryException {
+  public boolean bool(final InputInfo ii) {
     return false;
   }
 
