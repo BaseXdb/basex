@@ -401,7 +401,7 @@ public final class ArrayModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void sort() {
     final Function func = _ARRAY_SORT;
-    query("([ 2, 1 ], 1)[. instance of array(*)] ! " + func.args(" .", " ()", " hof:id#1"),
+    query("([ 2, 1 ], 1)[. instance of array(*)] ! " + func.args(" .", " ()", " identity#1"),
         "[1,2]");
 
     query(func.args(" [ 1, 4, 6, 5, 3 ]"), "[1,3,4,5,6]");
