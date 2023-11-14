@@ -38,9 +38,9 @@ public class FnVoid extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr value = arg(0);
-    if(value.has(Flag.NDT)) {
-      if(value.size() == 0) return value;
+    final Expr input = arg(0);
+    if(input.has(Flag.NDT)) {
+      if(input.size() == 0) return input;
     } else if(defined(1) && arg(1) instanceof Value && toBoolean(arg(1), cc.qc)) {
       return Empty.VALUE;
     }

@@ -61,6 +61,16 @@ public final class Empty extends Item {
   }
 
   @Override
+  public boolean isEmpty() {
+    return true;
+  }
+
+  @Override
+  public boolean isItem() {
+    return false;
+  }
+
+  @Override
   public Object toJava() {
     return null;
   }

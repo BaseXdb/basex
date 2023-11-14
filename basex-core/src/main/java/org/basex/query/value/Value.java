@@ -109,16 +109,16 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Tests if this is an empty sequence.
    * @return result of check
    */
-  public final boolean isEmpty() {
-    return size() == 0;
+  public boolean isEmpty() {
+    return false;
   }
 
   /**
    * Tests if this is an item.
    * @return result of check
    */
-  public final boolean isItem() {
-    return size() == 1;
+  public boolean isItem() {
+    return false;
   }
 
   /**
