@@ -154,7 +154,7 @@ public abstract class SimpleMap extends Arr {
             args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
           if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(true)) {
             // replicate(E, C) ! replicate(., D)  ->  replicate(E, C * D)
-            final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
+            final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULTIPLY).optimize(cc);
             return cc.function(REPLICATE, info, expr.arg(0), cnt);
           }
           if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
@@ -193,7 +193,7 @@ public abstract class SimpleMap extends Arr {
       // (1 to 5) ! (. + 1)  ->  2 to 6
       if(expr instanceof RangeSeq && next instanceof Arith) {
         final Arith arith = (Arith) next;
-        final boolean plus = arith.calc == Calc.PLUS, minus = arith.calc == Calc.MINUS;
+        final boolean plus = arith.calc == Calc.ADD, minus = arith.calc == Calc.SUBTRACT;
         if((plus || minus) && next.arg(0) instanceof ContextValue && next.arg(1) instanceof Int) {
           final RangeSeq seq = (RangeSeq) expr;
           final long diff = ((Int) next.arg(1)).itr();

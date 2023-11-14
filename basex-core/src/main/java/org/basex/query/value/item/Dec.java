@@ -17,6 +17,8 @@ import org.basex.util.*;
  */
 public final class Dec extends ANum {
   /** Maximum long value. */
+  public static final BigDecimal BD_MINLONG = BigDecimal.valueOf(Long.MIN_VALUE);
+ /** Maximum long value. */
   public static final BigDecimal BD_MAXLONG = BigDecimal.valueOf(Long.MAX_VALUE);
   /** Decimal representing a million. */
   public static final BigDecimal BD_1000000 = BigDecimal.valueOf(1000000);

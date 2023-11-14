@@ -99,7 +99,7 @@ public class FnReplicate extends StandardFunc {
     // merge replicate functions
     if(REPLICATE.is(input) && single == ((FnReplicate) input).singleEval(true)) {
       final ExprList args = new ExprList(2).add(input.arg(0));
-      args.add(new Arith(info, count, input.arg(1), Calc.MULT).optimize(cc));
+      args.add(new Arith(info, count, input.arg(1), Calc.MULTIPLY).optimize(cc));
       if(!single) args.add(Bln.TRUE);
       return cc.function(REPLICATE, info, args.finish());
     }

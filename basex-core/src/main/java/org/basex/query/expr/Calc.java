@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.expr.CalcOpt.*;
 
 import java.math.*;
 
@@ -20,7 +21,7 @@ import org.basex.util.*;
  */
 public enum Calc {
   /** Addition. */
-  PLUS("+") {
+  ADD("+") {
     @Override
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
@@ -28,18 +29,14 @@ public enum Calc {
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 ^ num2) throw numberError(num1 ? item2 : item1, info);
 
+      // numbers or untyped values
       if(num1) {
-        // numbers or untyped values
-        final Type type = numType(type1, type2);
-        if(type == INTEGER) {
-          final long itr1 = item1.itr(info), itr2 = item2.itr(info);
-          if(itr2 > 0 ? itr1 > Long.MAX_VALUE - itr2 : itr1 < Long.MIN_VALUE - itr2)
-            throw RANGE_X.get(info, itr1 + " + " + itr2);
-          return Int.get(itr1 + itr2);
+        switch(numType(type1, type2)) {
+          case INTEGER: return addInt(item1, item2, info);
+          case DOUBLE:  return addDbl(item1, item2, info);
+          case FLOAT: return addFlt(item1, item2, info);
+          default: return addDec(item1, item2, info);
         }
-        if(type == DOUBLE) return Dbl.get(item1.dbl(info) + item2.dbl(info));
-        if(type == FLOAT) return Flt.get(item1.flt(info) + item2.flt(info));
-        return Dec.get(item1.dec(info).add(item2.dec(info)));
       }
 
       // dates or durations
@@ -69,16 +66,17 @@ public enum Calc {
       }
       // merge arithmetical expressions
       if(expr1.equals(expr2)) {
-        return new Arith(info, expr1, Int.get(2), MULT).optimize(cc);
+        return new Arith(info, expr1, Int.get(2), MULTIPLY).optimize(cc);
       }
       if(expr2 instanceof Unary) {
-        return new Arith(info, expr1, ((Unary) expr2).expr, MINUS).optimize(cc);
+        return new Arith(info, expr1, ((Unary) expr2).expr, SUBTRACT).optimize(cc);
       }
       if(expr1 instanceof Arith) {
         final Arith arith = (Arith) expr1;
-        if(arith.calc == MULT && arith.exprs[0].equals(expr2) && arith.exprs[1] instanceof Int) {
+        if(arith.calc == MULTIPLY && arith.exprs[0].equals(expr2) &&
+            arith.exprs[1] instanceof Int) {
           final long factor = ((Int) arith.exprs[1]).itr();
-          return new Arith(info, arith.exprs[0], Int.get(factor + 1), MULT).optimize(cc);
+          return new Arith(info, arith.exprs[0], Int.get(factor + 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -97,12 +95,12 @@ public enum Calc {
 
     @Override
     public Calc invert() {
-      return MINUS;
+      return SUBTRACT;
     }
   },
 
   /** Subtraction. */
-  MINUS("-") {
+  SUBTRACT("-") {
     @Override
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
@@ -110,18 +108,14 @@ public enum Calc {
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 ^ num2) throw numberError(num1 ? item2 : item1, info);
 
+      // numbers or untyped values
       if(num1) {
-        // numbers or untyped values
-        final Type type = numType(type1, type2);
-        if(type == INTEGER) {
-          final long itr1 = item1.itr(info), itr2 = item2.itr(info);
-          if(itr2 < 0 ? itr1 > Long.MAX_VALUE + itr2 : itr1 < Long.MIN_VALUE + itr2)
-            throw RANGE_X.get(info, itr1 + " - " + itr2);
-          return Int.get(itr1 - itr2);
+        switch(numType(type1, type2)) {
+          case INTEGER: return subtractInt(item1, item2, info);
+          case DOUBLE:  return subtractDbl(item1, item2, info);
+          case FLOAT: return subtractFlt(item1, item2, info);
+          default: return subtractDec(item1, item2, info);
         }
-        if(type == DOUBLE) return Dbl.get(item1.dbl(info) - item2.dbl(info));
-        if(type == FLOAT) return Flt.get(item1.flt(info) - item2.flt(info));
-        return Dec.get(item1.dec(info).subtract(item2.dec(info)));
       }
 
       // dates or durations
@@ -156,13 +150,14 @@ public enum Calc {
       }
       // merge arithmetical expressions; ignore floating numbers due to special cases (NaN, INF)
       if(expr2 instanceof Unary) {
-        return new Arith(info, expr1, ((Unary) expr2).expr, PLUS).optimize(cc);
+        return new Arith(info, expr1, ((Unary) expr2).expr, ADD).optimize(cc);
       }
       if(expr1 instanceof Arith) {
         final Arith arith = (Arith) expr1;
-        if(arith.calc == MULT && arith.exprs[0].equals(expr2) && arith.exprs[1] instanceof Int) {
+        if(arith.calc == MULTIPLY && arith.exprs[0].equals(expr2) &&
+            arith.exprs[1] instanceof Int) {
           final long factor = ((Int) arith.exprs[1]).itr();
-          return new Arith(info, arith.exprs[0], Int.get(factor - 1), MULT).optimize(cc);
+          return new Arith(info, arith.exprs[0], Int.get(factor - 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -181,17 +176,16 @@ public enum Calc {
 
     @Override
     public Calc invert() {
-      return PLUS;
+      return ADD;
     }
   },
 
   /** Multiplication. */
-  MULT("*") {
+  MULTIPLY("*") {
     @Override
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
-
       if(type1 == YEAR_MONTH_DURATION) {
         if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(info), true, info);
         throw numberError(item2, info);
@@ -211,19 +205,14 @@ public enum Calc {
 
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(num1 ^ num2) throw typeError(info, type1, type2);
+      // numbers or untyped values
       if(num1) {
-        final Type type = numType(type1, type2);
-        if(type == INTEGER) {
-          final long l1 = item1.itr(info), l2 = item2.itr(info);
-          if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
-                    : l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
-                              : l2 == -1 && l1 == Long.MIN_VALUE)
-            throw RANGE_X.get(info, l1 + " * " + l2);
-          return Int.get(l1 * l2);
+        switch(numType(type1, type2)) {
+          case INTEGER: return multiplyInt(item1, item2, info);
+          case DOUBLE:  return multiplyDbl(item1, item2, info);
+          case FLOAT: return multiplyFlt(item1, item2, info);
+          default: return multiplyDec(item1, item2, info);
         }
-        if(type == DOUBLE) return Dbl.get(item1.dbl(info) * item2.dbl(info));
-        if(type == FLOAT) return Flt.get(item1.flt(info) * item2.flt(info));
-        return Dec.get(item1.dec(info).multiply(item2.dec(info)));
       }
       throw numberError(item1, info);
     }
@@ -255,7 +244,7 @@ public enum Calc {
       }
       if(expr2 instanceof Arith) {
         final Arith arith = (Arith) expr2;
-        if(arith.calc == DIV && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
+        if(arith.calc == DIVIDE && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
           return new Cast(cc.sc(), info, arith.exprs[0], type.seqType()).optimize(cc);
         }
       }
@@ -271,12 +260,12 @@ public enum Calc {
 
     @Override
     public Calc invert() {
-      return DIV;
+      return DIVIDE;
     }
   },
 
   /** Division. */
-  DIV("div") {
+  DIVIDE("div") {
     @Override
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
@@ -284,13 +273,13 @@ public enum Calc {
       if(type1 == type2) {
         if(type1 == YEAR_MONTH_DURATION) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) item2).ymd());
-          if(bd.doubleValue() == 0.0) throw zeroError(info, item1);
+          if(bd.doubleValue() == 0.0) throw DIVZERO_X.get(info, item1);
           return Dec.get(BigDecimal.valueOf(((YMDur) item1).ymd()).
               divide(bd, MathContext.DECIMAL64));
         }
         if(type1 == DAY_TIME_DURATION) {
           final BigDecimal bd = ((DTDur) item2).dtd();
-          if(bd.doubleValue() == 0.0) throw zeroError(info, item1);
+          if(bd.doubleValue() == 0.0) throw DIVZERO_X.get(info, item1);
           return Dec.get(((DTDur) item1).dtd().divide(bd, MathContext.DECIMAL64));
         }
       }
@@ -303,15 +292,14 @@ public enum Calc {
         throw numberError(item2, info);
       }
 
-      checkNum(info, item1, item2);
-      final Type type = numType(type1, type2);
-      if(type == DOUBLE) return Dbl.get(item1.dbl(info) / item2.dbl(info));
-      if(type == FLOAT) return Flt.get(item1.flt(info) / item2.flt(info));
-
-      final BigDecimal dec1 = item1.dec(info), dec2 = item2.dec(info);
-      if(dec2.signum() == 0) throw zeroError(info, item1);
-      final int scale = Math.max(18, Math.max(dec1.scale(), dec2.scale()));
-      return Dec.get(dec1.divide(dec2, scale, RoundingMode.HALF_EVEN));
+      // numbers or untyped values
+      if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
+      if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
+      switch(numType(type1, type2)) {
+        case DOUBLE:  return divideDbl(item1, item2, info);
+        case FLOAT: return divideFlt(item1, item2, info);
+        default: return divideDec(item1, item2, info);
+      }
     }
 
     @Override
@@ -349,50 +337,26 @@ public enum Calc {
 
     @Override
     public Calc invert() {
-      return MULT;
+      return MULTIPLY;
     }
   },
 
   /** Integer division. */
-  IDIV("idiv") {
+  DIVIDEINT("idiv") {
     @Override
     public Int eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
 
-      checkNum(info, item1, item2);
-      final Type type = numType(item1.type, item2.type);
-      boolean inv = false, range, zero;
-      long l;
-
-      if(type == FLOAT) {
-        final float n1 = item1.flt(info), n2 = item2.flt(info), n = n1 / n2;
-        zero = n2 == 0;
-        inv = Float.isNaN(n) || Float.isInfinite(n);
-        range = n < Long.MIN_VALUE || n > Long.MAX_VALUE;
-        l = (long) n;
-      } else if(type == DOUBLE) {
-        final double n1 = item1.dbl(info), n2 = item2.dbl(info), n = n1 / n2;
-        zero = n2 == 0;
-        inv = Double.isNaN(n) || Double.isInfinite(n);
-        range = n < Long.MIN_VALUE || n > Long.MAX_VALUE;
-        l = (long) n;
-      } else if(type == INTEGER) {
-        final long n1 = item1.itr(info), n2 = item2.itr(info);
-        zero = n2 == 0;
-        range = n1 == Integer.MIN_VALUE && n2 == -1;
-        l = zero ? 0 : n1 / n2;
-      } else {
-        final BigDecimal n1 = item1.dec(info), n2 = item2.dec(info);
-        zero = n2.signum() == 0;
-        final BigDecimal n = zero ? BigDecimal.ZERO : n1.divideToIntegralValue(n2);
-        range = MIN_LONG.compareTo(n) > 0 || n.compareTo(MAX_LONG) > 0;
-        l = range ? Long.MAX_VALUE : n.longValueExact();
+      // numbers or untyped values
+      final Type type1 = item1.type, type2 = item2.type;
+      if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
+      if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
+      switch(numType(type1, type2)) {
+        case INTEGER: return divideIntInt(item1, item2, info);
+        case DOUBLE:  return divideIntDbl(item1, item2, info);
+        case FLOAT: return divideIntFlt(item1, item2, info);
+        default: return divideIntDec(item1, item2, info);
       }
-
-      if(zero) throw zeroError(info, item1);
-      if(inv) throw INVIDIV.get(info, item1 + " idiv " + item2);
-      if(range) throw RANGE_X.get(info, item1 + " idiv " + item2);
-      return Int.get(l);
     }
 
     @Override
@@ -423,24 +387,19 @@ public enum Calc {
   },
 
   /** Modulo. */
-  MOD("mod") {
+  MODULO("mod") {
     @Override
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
-      checkNum(info, item1, item2);
-      final Type type = numType(item1.type, item2.type);
-      if(type == DOUBLE) return Dbl.get(item1.dbl(info) % item2.dbl(info));
-      if(type == FLOAT) return Flt.get(item1.flt(info) % item2.flt(info));
-      if(type == INTEGER) {
-        final long itr1 = item1.itr(info), itr2 = item2.itr(info);
-        if(itr2 == 0) throw zeroError(info, item1);
-        return Int.get(itr1 % itr2);
+      final Type type1 = item1.type, type2 = item2.type;
+      if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
+      if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
+      switch(numType(type1, type2)) {
+        case INTEGER: return moduloInt(item1, item2, info);
+        case DOUBLE:  return moduloDbl(item1, item2, info);
+        case FLOAT: return moduloFlt(item1, item2, info);
+        default: return moduloDec(item1, item2, info);
       }
-
-      final BigDecimal dec1 = item1.dec(info), dec2 = item2.dec(info);
-      if(dec2.signum() == 0) throw zeroError(info, item1);
-      final BigDecimal sub = dec1.divide(dec2, 0, RoundingMode.DOWN);
-      return Dec.get(dec1.subtract(sub.multiply(dec2)));
     }
 
     @Override
@@ -464,11 +423,6 @@ public enum Calc {
       return null;
     }
   };
-
-  /** {@link Long#MIN_VALUE} as a {@link BigDecimal}. */
-  private static final BigDecimal MIN_LONG = BigDecimal.valueOf(Long.MIN_VALUE);
-  /** {@link Long#MAX_VALUE} as a {@link BigDecimal}. */
-  private static final BigDecimal MAX_LONG = BigDecimal.valueOf(Long.MAX_VALUE);
 
   /** Name of operation. */
   final String name;
@@ -535,23 +489,13 @@ public enum Calc {
    * @param type2 second item type
    * @return type
    */
-  public static Type numType(final Type type1, final Type type2) {
+  public static AtomType numType(final Type type1, final Type type2) {
     if(!type1.isNumberOrUntyped() || !type2.isNumberOrUntyped()) return ANY_ATOMIC_TYPE;
     if(type1 == DOUBLE || type2 == DOUBLE || type1.isUntyped() || type2.isUntyped()) return DOUBLE;
     if(type1 == FLOAT || type2 == FLOAT) return FLOAT;
     if(type1 == DECIMAL || type2 == DECIMAL) return DECIMAL;
     if(type1 == NUMERIC || type2 == NUMERIC) return NUMERIC;
     return INTEGER;
-  }
-
-  /**
-   * Throws a division by zero exception.
-   * @param info input info (can be {@code null})
-   * @param item item
-   * @return query exception (indicates that an error is raised)
-   */
-  private static QueryException zeroError(final InputInfo info, final Item item) {
-    return DIVZERO_X.get(info, item);
   }
 
   /**
@@ -579,19 +523,6 @@ public enum Calc {
       return (Dur) item;
     }
     throw NODUR_X_X.get(info, type, item);
-  }
-
-  /**
-   * Checks if the specified items are numeric or untyped.
-   * @param info input info (can be {@code null})
-   * @param item1 first item
-   * @param item2 second item
-   * @throws QueryException query exception
-   */
-  static void checkNum(final InputInfo info, final Item item1, final Item item2)
-      throws QueryException {
-    if(!item1.type.isNumberOrUntyped()) throw numberError(item1, info);
-    if(!item2.type.isNumberOrUntyped()) throw numberError(item2, info);
   }
 
   /**

@@ -55,7 +55,7 @@ public class FnSum extends StandardFunc {
     } else if(stZero != null && !stZero.zero() && !stZero.mayBeArray()) {
       // if input may be empty: consider default argument in static type
       final Occ occ = stZero.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
-      exprType.assign(Calc.PLUS.type(st.type, stZero.type), occ);
+      exprType.assign(Calc.ADD.type(st.type, stZero.type), occ);
     }
     return this;
   }
@@ -76,7 +76,7 @@ public class FnSum extends StandardFunc {
         Item item = seq.itemAt(0);
         final Type type = item.type;
         if(type.isUntyped()) item = Dbl.get(item.dbl(info));
-        if(type.isNumber()) return avg ? item : Calc.MULT.eval(item, Int.get(seq.size()), info);
+        if(type.isNumber()) return avg ? item : Calc.MULTIPLY.eval(item, Int.get(seq.size()), info);
       }
     } else if(values instanceof Path) {
       final ArrayList<Stats> list = ((Path) values).pathStats();
@@ -173,9 +173,9 @@ public class FnSum extends StandardFunc {
         t = DURATION;
       }
       if(t != null) throw ARGTYPE_X_X_X.get(info, t, tp, it);
-      result = Calc.PLUS.eval(result, it, info);
+      result = Calc.ADD.eval(result, it, info);
       c++;
     }
-    return avg ? Calc.DIV.eval(result, Int.get(c), info) : result;
+    return avg ? Calc.DIVIDE.eval(result, Int.get(c), info) : result;
   }
 }

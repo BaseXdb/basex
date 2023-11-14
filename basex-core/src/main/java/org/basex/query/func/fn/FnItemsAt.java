@@ -199,8 +199,8 @@ public class FnItemsAt extends StandardFunc {
       if(end instanceof Arith && countInput.test(end.arg(0)) && end.arg(1) instanceof Int) {
         final Calc calc = ((Arith) end).calc;
         final long sum = ((Int) end.arg(1)).itr();
-        if(calc == Calc.PLUS) return sum;
-        if(calc == Calc.MINUS) return -sum;
+        if(calc == Calc.ADD) return sum;
+        if(calc == Calc.SUBTRACT) return -sum;
       }
     }
     return Long.MIN_VALUE;

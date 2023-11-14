@@ -141,10 +141,10 @@ public final class Range extends Arr {
       final double l = expr.arg(1) instanceof Int ? ((Int) expr.arg(1)).itr() : 0;
       if(l != 0) {
         switch(((Arith) expr).calc) {
-          case PLUS : return LAST + l;
-          case MINUS: return LAST - l;
-          case MULT : return LAST * l;
-          case DIV  : return LAST / l;
+          case ADD : return LAST + l;
+          case SUBTRACT: return LAST - l;
+          case MULTIPLY : return LAST * l;
+          case DIVIDE  : return LAST / l;
           default: break;
         }
       }

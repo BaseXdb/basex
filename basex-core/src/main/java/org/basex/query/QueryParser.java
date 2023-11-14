@@ -1627,7 +1627,7 @@ public class QueryParser extends InputParser {
   private Expr additive() throws QueryException {
     Expr expr = multiplicative();
     while(expr != null) {
-      final Calc c = consume('+') ? Calc.PLUS : consume('-') ? Calc.MINUS : null;
+      final Calc c = consume('+') ? Calc.ADD : consume('-') ? Calc.SUBTRACT : null;
       if(c == null) break;
       expr = new Arith(info(), expr, check(multiplicative(), CALCEXPR), c);
     }
@@ -1642,10 +1642,10 @@ public class QueryParser extends InputParser {
   private Expr multiplicative() throws QueryException {
     Expr expr = otherwise();
     while(expr != null) {
-      final Calc c = consume('*') || consume('×') ? Calc.MULT :
-        consume('÷') || wsConsumeWs(DIV) ? Calc.DIV :
-        wsConsumeWs(IDIV) ? Calc.IDIV :
-        wsConsumeWs(MOD) ? Calc.MOD : null;
+      final Calc c = consume('*') || consume('×') ? Calc.MULTIPLY :
+        consume('÷') || wsConsumeWs(DIV) ? Calc.DIVIDE :
+        wsConsumeWs(IDIV) ? Calc.DIVIDEINT :
+        wsConsumeWs(MOD) ? Calc.MODULO : null;
       if(c == null) break;
       expr = new Arith(info(), expr, check(otherwise(), CALCEXPR), c);
     }

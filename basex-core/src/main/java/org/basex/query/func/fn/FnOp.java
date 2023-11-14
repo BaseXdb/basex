@@ -44,12 +44,12 @@ public class FnOp extends StandardFunc {
       case ","        : body = new List(info, arg1, arg2); break;
       case "and"      : body = new And(info, arg1, arg2); break;
       case "or"       : body = new Or(info, arg1, arg2); break;
-      case "+"        : body = new Arith(info, arg1, arg2, Calc.PLUS); break;
-      case "-"        : body = new Arith(info, arg1, arg2, Calc.MINUS); break;
-      case "*"        : body = new Arith(info, arg1, arg2, Calc.MULT); break;
-      case "div"      : body = new Arith(info, arg1, arg2, Calc.DIV); break;
-      case "idiv"     : body = new Arith(info, arg1, arg2, Calc.IDIV); break;
-      case "mod"      : body = new Arith(info, arg1, arg2, Calc.MOD); break;
+      case "+"        : body = new Arith(info, arg1, arg2, Calc.ADD); break;
+      case "-"        : body = new Arith(info, arg1, arg2, Calc.SUBTRACT); break;
+      case "*"        : body = new Arith(info, arg1, arg2, Calc.MULTIPLY); break;
+      case "div"      : body = new Arith(info, arg1, arg2, Calc.DIVIDE); break;
+      case "idiv"     : body = new Arith(info, arg1, arg2, Calc.DIVIDEINT); break;
+      case "mod"      : body = new Arith(info, arg1, arg2, Calc.MODULO); break;
       case "="        : body = new CmpG(info, arg1, arg2, OpG.EQ, coll, sc); break;
       case "<"        : body = new CmpG(info, arg1, arg2, OpG.LT, coll, sc); break;
       case "<="       : body = new CmpG(info, arg1, arg2, OpG.LE, coll, sc); break;
