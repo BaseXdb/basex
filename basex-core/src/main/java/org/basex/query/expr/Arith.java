@@ -100,9 +100,7 @@ public final class Arith extends Arr {
       }
     }
 
-    if(expr == this) {
-      calcOpt = CalcOpt.get(st1, st2, calc);
-    }
+    if(expr == this) calcOpt = CalcOpt.get(st1, st2, calc);
     return cc.replaceWith(this, expr);
   }
 

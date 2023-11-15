@@ -41,9 +41,6 @@ public final class MathPow extends MathFn {
       final Expr factor = new Arith(info, base.arg(1), exp, Calc.MULTIPLY).optimize(cc);
       return cc.function(_MATH_POW, info, base.arg(0), factor);
     }
-    final SeqType st = base.seqType();
-    if(st.one() && st.type.isNumberOrUntyped()) exprType.assign(st.with(Occ.EXACTLY_ONE));
-
     return super.opt(cc);
   }
 

@@ -51,7 +51,7 @@ public abstract class Logical extends Arr {
 
   @Override
   public final void markTailCalls(final CompileContext cc) {
-    // if the last expression surely returns a boolean, we can jump to it
+    // if the last expression returns a boolean for sure, we can jump to it
     final Expr last = exprs[exprs.length - 1];
     if(last.seqType().eq(SeqType.BOOLEAN_O)) last.markTailCalls(cc);
   }

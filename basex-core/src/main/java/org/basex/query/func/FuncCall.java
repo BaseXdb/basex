@@ -39,8 +39,10 @@ public abstract class FuncCall extends Arr {
 
   @Override
   public final void markTailCalls(final CompileContext cc) {
-    if(cc != null) cc.info(QueryText.OPTTCE_X, this);
-    tco = true;
+    if(!tco) {
+      if(cc != null) cc.info(QueryText.OPTTCE_X, this);
+      tco = true;
+    }
   }
 
   @Override

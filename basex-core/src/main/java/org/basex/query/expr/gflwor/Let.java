@@ -71,7 +71,7 @@ public final class Let extends ForLet {
         expr = tc.expr;
       }
     }
-    // promote at compile time
+    // coerce at compile time
     if(expr instanceof Value) {
       expr = var.checkType((Value) expr, cc.qc, true);
     }

@@ -95,22 +95,26 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
-   * Optimize the static function.
+   * Optimizes the static function, drops superfluous type checks.
    * @param cc compilation context
    */
   public void optimize(final CompileContext cc) {
-    // check function calls, drop superfluous type checks
-    final SeqType[] seqTypes = cc.qc.functions.seqTypes(this);
-    if(seqTypes != null) {
-      final int pl = arity();
-      for(int p = 0; p < pl; p++) {
-        if(seqTypes[p].instanceOf(params[p].seqType())) {
-          cc.info(OPTTYPE_X, params[p]);
-          params[p].declType = null;
+    if(cc.dynamic) {
+      if(((Checks<Var>) p -> p.declType != null).any(params)) {
+        final SeqType[] seqTypes = cc.qc.functions.seqTypes(this);
+        if(seqTypes != null) {
+          final int sl = seqTypes.length;
+          for(int s = 0; s < sl; s++) {
+            final Var param = params[s];
+            if(seqTypes[s].instanceOf(param.seqType())) {
+              cc.info(OPTTYPE_X, param);
+              param.declType = null;
+            }
+          }
         }
       }
+      declType = null;
     }
-    declType = null;
   }
 
   /**

@@ -105,7 +105,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
   BUILD_URI(FnBuildUri::new, "build-uri(parts[,options])",
-      params(STRING_ZO, MAP_O), ITEM_ZO),
+      params(MAP_O, MAP_O), STRING_O),
   /** XQuery function. */
   CEILING(FnCeiling::new, "ceiling(value)",
       params(NUMERIC_ZO), NUMERIC_ZO),
@@ -477,7 +477,7 @@ public enum Function implements AFunction {
       params(STRING_O), QNAME_O),
   /** XQuery function. */
   PARSE_URI(FnParseUri::new, "parse-uri(uri[,options])",
-      params(STRING_ZO, MAP_O), ITEM_ZO),
+      params(STRING_ZO, MAP_O), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
