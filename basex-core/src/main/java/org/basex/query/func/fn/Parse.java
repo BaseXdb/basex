@@ -63,11 +63,11 @@ public abstract class Parse extends StandardFunc {
       }
 
       // parse text
-      try(InputStream is = io.inputStream(); TextInput ti = new TextInput(io)) {
-        ti.encoding(enc).validate(true);
-        if(!check) return Str.get(ti.content());
+      try(InputStream is = io.inputStream(); NewlineInput nli = new NewlineInput(io)) {
+        nli.encoding(enc).validate(true);
+        if(!check) return Str.get(nli.content());
 
-        while(ti.read() != -1);
+        while(nli.read() != -1);
         return Bln.TRUE;
       } catch(final IOException ex) {
         if(check) return Bln.FALSE;
