@@ -116,17 +116,19 @@ public class FnFoldLeft extends StandardFunc {
       SeqType st = zst, output = ft.declType;
 
       // if initial item has more specific type, assign it and check optimized result type
-      final SeqType at = ft.argTypes[i];
-      if(!st.eq(at) && st.instanceOf(at)) {
-        while(true) {
-          types[i] = st;
-          optFunc = coerceFunc(action, cc, ft.declType, types);
-          output = optFunc.funcType().declType;
+      if(i < ft.argTypes.length) {
+        final SeqType at = ft.argTypes[i];
+        if(!st.eq(at) && st.instanceOf(at)) {
+          while(true) {
+            types[i] = st;
+            optFunc = coerceFunc(action, cc, ft.declType, types);
+            output = optFunc.funcType().declType;
 
-          // optimized type is instance of input type: abort
-          if(output.instanceOf(st)) break;
-          // combine input and output type, optimize again
-          st = st.union(output);
+            // optimized type is instance of input type: abort
+            if(output.instanceOf(st)) break;
+            // combine input and output type, optimize again
+            st = st.union(output);
+          }
         }
       }
 
