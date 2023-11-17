@@ -25,7 +25,7 @@ interface CalcOpt {
    */
   static CalcOpt get(final SeqType st1, final SeqType st2, final Calc calc) {
     final AtomType type = Calc.numType(st1.type, st2.type);
-    if(type.isNumber() && st1.one() && st2.one()) {
+    if(type.isNumber()) {
       switch(calc) {
         case ADD:
           switch(type) {

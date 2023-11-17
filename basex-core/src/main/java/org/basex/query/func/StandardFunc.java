@@ -106,7 +106,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Performs function specific optimizations.
+   * Performs function-specific optimizations.
    * @param cc compilation context
    * @return optimized or original expression
    * @throws QueryException query exception
@@ -124,7 +124,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Optimizes a function that returns an empty sequence when the first atomized argument is empty,
    * and adjusts the occurrence indicator if the argument will always yield one item.
-   * @return original expression or function argument
+   * @return original or optimized expression
    */
   protected final Expr optFirst() {
     return optFirst(true, true, null);
@@ -141,7 +141,7 @@ public abstract class StandardFunc extends Arr {
    *   ({@code true} if function will always yield a result if first argument is non-empty)
    * @param atom argument will be atomized
    * @param value context value (ignored if {@code null})
-   * @return original expression or function argument
+   * @return original or optimized expression
    */
   protected final Expr optFirst(final boolean occ, final boolean atom, final Value value) {
     final Expr expr = defined(0) ? arg(0) : value;

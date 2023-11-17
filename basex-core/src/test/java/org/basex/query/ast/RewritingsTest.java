@@ -582,9 +582,10 @@ public final class RewritingsTest extends SandboxTest {
     check("xs:string(''[. = <_/>])", "", empty(Cast.class), root(If.class));
 
     check("xs:string(<_/>[. = '']) = ''", true, empty(Cast.class), root(CmpSimpleG.class));
-    check("xs:double(" + wrap(1) + ") + 2", 3, empty(Cast.class), type(Arith.class, "xs:double"));
+    check("xs:double(" + wrap(1) + ") + 2", 3,
+        empty(Cast.class), type(ArithSimple.class, "xs:double"));
     check("(1, 2)[. != 0] ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
-        count(Cast.class, 1), type(Arith.class, "xs:integer"));
+        count(Cast.class, 1), type(ArithSimple.class, "xs:integer"));
 
     error("(if(" + wrap("!") + "= 'a') then 'b') cast as xs:string", INVCONVERT_X_X_X);
     error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVCONVERT_X_X_X);
@@ -2434,14 +2435,14 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Dynamic unroll limit.. */
   @Test public void gh2001() {
-    check("(1, 3) ! (. * 2)", "2\n6", exists(Arith.class));
-    check("sum((1, 3) ! (. * 2))", 8, exists(Arith.class));
-    check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(Arith.class));
+    check("(1, 3) ! (. * 2)", "2\n6", exists(ArithSimple.class));
+    check("sum((1, 3) ! (. * 2))", 8, exists(ArithSimple.class));
+    check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(ArithSimple.class));
     check("(1, 2)[. = 1]", 1, root(IterFilter.class));
 
     unroll(true);
-    check("(1, 3) ! (. * 2)", "2\n6", empty(Arith.class));
-    check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(Arith.class));
+    check("(1, 3) ! (. * 2)", "2\n6", empty(ArithSimple.class));
+    check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(ArithSimple.class));
     check("(1, 2)[. = 1]", 1, root(Int.class));
   }
 

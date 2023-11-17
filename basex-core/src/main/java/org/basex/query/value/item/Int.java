@@ -131,7 +131,7 @@ public final class Int extends ANum {
   }
 
   @Override
-  public ANum round(final int scale, final boolean even) {
+  public Int round(final int scale, final boolean even) {
     final long v = rnd(scale, even);
     return v == value ? this : get(v);
   }

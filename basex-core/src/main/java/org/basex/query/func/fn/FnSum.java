@@ -13,7 +13,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -26,7 +25,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public class FnSum extends StandardFunc {
+public class FnSum extends NumericFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = sum(false, qc);
@@ -38,24 +37,25 @@ public class FnSum extends StandardFunc {
     final Expr expr = opt(false);
     if(expr != null) return expr;
 
-    final Expr values = arg(0), zero = defined(1) ? arg(1) : null;
-    final SeqType st = values.seqType(), stZero = zero != null ? zero.seqType() : null;
-    if(st.zero()) {
-      // sequence is empty: check if it is also deterministic
-      if(!values.has(Flag.NDT)) {
-        if(zero == null) return Int.ZERO;
-        if(zero == Empty.VALUE) return values;
-        if(stZero.instanceOf(SeqType.INTEGER_O)) return zero;
+    final Expr values = arg(0), zero = arg(1);
+    final SeqType st = values.seqType(), stZero = zero.seqType();
+    if(zero == Empty.UNDEFINED) {
+      // no default value
+      if(st.zero()) return cc.merge(values, Int.ZERO, info);
+      if(!st.mayBeArray()) {
+        final SeqType ost = optType(values, false);
+        if(ost != null) exprType.assign(ost);
       }
-    } else if(st.oneOrMore() && !st.mayBeArray()) {
-      // sequence is not empty: assign result type
-      final Type type = st.type;
-      if(type.isNumber()) exprType.assign(type.seqType());
-      else if(type.isUntyped()) exprType.assign(SeqType.DOUBLE_O);
-    } else if(stZero != null && !stZero.zero() && !stZero.mayBeArray()) {
-      // if input may be empty: consider default argument in static type
+    } else if(st.zero()) {
+      if(zero == Empty.VALUE || stZero.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZO)) {
+        return cc.merge(values, zero, info);
+      }
+    } else if(!st.mayBeArray() && !stZero.mayBeArray()) {
+      if(st.oneOrMore()) return cc.function(Function.SUM, info, values);
+      final SeqType ost = optType(values, false), zst = optType(zero, false);
+      final Type type = ost != null && zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;
       final Occ occ = stZero.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
-      exprType.assign(Calc.ADD.type(st.type, stZero.type), occ);
+      exprType.assign(type, occ);
     }
     return this;
   }

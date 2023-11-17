@@ -19,11 +19,11 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class Arith extends Arr {
+public class Arith extends Arr {
   /** Calculation operator. */
   public final Calc calc;
   /** Optimized calculation. */
-  private CalcOpt calcOpt;
+  CalcOpt calcOpt;
 
   /**
    * Constructor.
@@ -100,18 +100,22 @@ public final class Arith extends Arr {
       }
     }
 
-    if(expr == this) calcOpt = CalcOpt.get(st1, st2, calc);
+    if(expr == this && calcOpt == null && !(expr instanceof CmpSimpleG)) {
+      calcOpt = CalcOpt.get(st1, st2, calc);
+      if(calcOpt != null && st1.zeroOrOne() && st2.zeroOrOne()) {
+        expr = new ArithSimple(info, expr1, expr2, calc, calcOpt);
+      }
+    }
     return cc.replaceWith(this, expr);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(calcOpt != null) return calcOpt.eval(exprs[0].item(qc, info), exprs[1].item(qc, info), info);
-
     final Item item1 = exprs[0].atomItem(qc, info);
     if(item1.isEmpty()) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
-    return item2.isEmpty() ? Empty.VALUE : calc.eval(item1, item2, info);
+    return item2.isEmpty() ? Empty.VALUE : calcOpt != null ? calcOpt.eval(item1, item2, info) :
+      calc.eval(item1, item2, info);
   }
 
   @Override
