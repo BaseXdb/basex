@@ -60,7 +60,7 @@ public class FnContainsSequence extends StandardFunc {
     if(sst.zero()) return Bln.TRUE;
 
     if(defined(2)) {
-      arg(2, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
+      arg(2, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
           sst.with(Occ.EXACTLY_ONE)));
     }
     return this;

@@ -48,7 +48,7 @@ public class FnItemsStartingWhere extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE),
+    arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE),
         SeqType.INTEGER_O));
     exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;

@@ -31,7 +31,8 @@ public final class FuncItem extends FItem implements Scope {
   /** Static context. */
   public final StaticContext sc;
   /** Function expression. */
-  private final Expr expr;
+  public final Expr expr;
+
   /** Function name (can be {@code null}). */
   private final QNm name;
   /** Formal parameters. */

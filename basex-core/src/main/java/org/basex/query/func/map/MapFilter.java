@@ -38,7 +38,7 @@ public final class MapFilter extends StandardFunc {
     if(type instanceof MapType) {
       final MapType mtype = (MapType) type;
       final SeqType declType = mtype.argTypes[0].with(Occ.EXACTLY_ONE);
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, declType, mtype.declType));
+      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, declType, mtype.declType));
       exprType.assign(type);
     }
     return this;

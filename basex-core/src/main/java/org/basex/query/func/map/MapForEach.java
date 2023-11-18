@@ -59,7 +59,7 @@ public class MapForEach extends StandardFunc {
     if(type instanceof MapType) {
       final MapType mtype = (MapType) type;
       final SeqType declType = mtype.argTypes[0].with(Occ.EXACTLY_ONE);
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, declType, mtype.declType));
+      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, declType, mtype.declType));
     }
 
     final FuncType ft = arg(1).funcType();

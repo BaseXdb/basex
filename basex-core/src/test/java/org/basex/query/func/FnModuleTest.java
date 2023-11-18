@@ -1259,6 +1259,15 @@ public final class FnModuleTest extends SandboxTest {
         "1\n1\n1\n1");
 
     query(func.args(1, " fn($_, $p) { $p <= 10 }", " op('*')"), 3628800);
+
+    check(func.args(1, " false#0", " identity#1"), 1, root(Int.class));
+    check(func.args(" (1, 2)", " false#0", " identity#1"), "1\n2", root(RangeSeq.class));
+
+    // GH-2257
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p = 2 }",
+        " identity#1") + ')', 1);
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p = 2 }",
+        " fn($s as xs:integer) { $s[2], 1 }") + ')', 1);
   }
 
   /** Test method. */
@@ -2516,7 +2525,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 5, 1)"),
         "", empty());
 
-    // GH-2225:
+    // GH-2225
     check(func.args(" for $i at $p in 1 to 2 return <a>{ $i * $p }</a>"),
         "<a>1</a>", root(HEAD));
     check(func.args(func.args(" for $i at $p in 1 to 4 return <a>{ $i * $p }</a>")),

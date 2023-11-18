@@ -30,6 +30,6 @@ public class ArrayFoldLeft extends FnFoldLeft {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return opt(cc, true, true);
+    return optType(cc, true, true);
   }
 }

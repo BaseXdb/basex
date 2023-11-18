@@ -58,7 +58,7 @@ public class FnFoldLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = opt(cc, false, true);
+    Expr expr = optType(cc, false, true);
     if(expr != this) return expr;
 
     // unroll fold
@@ -79,14 +79,14 @@ public class FnFoldLeft extends StandardFunc {
   }
 
   /**
-   * Refines the types of a fold function.
+   * Refines the types.
    * @param cc compilation context
    * @param array indicates if an array is processed
    * @param left indicates if this is a left/right fold
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public final Expr opt(final CompileContext cc, final boolean array, final boolean left)
+  public final Expr optType(final CompileContext cc, final boolean array, final boolean left)
       throws QueryException {
 
     final Expr input = arg(0), zero = arg(1), action = arg(2);
@@ -109,7 +109,7 @@ public class FnFoldLeft extends StandardFunc {
       // assign item type of iterated value, optimize function
       final SeqType[] types = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM,
         SeqType.INTEGER_O };
-      Expr optFunc = coerceFunc(action, cc, SeqType.ITEM_ZM, types);
+      Expr optFunc = refineFunc(action, cc, SeqType.ITEM_ZM, types);
 
       final FuncType ft = optFunc.funcType();
       final int i = left ? 0 : 1;
@@ -121,7 +121,7 @@ public class FnFoldLeft extends StandardFunc {
         if(!st.eq(at) && st.instanceOf(at)) {
           while(true) {
             types[i] = st;
-            optFunc = coerceFunc(action, cc, ft.declType, types);
+            optFunc = refineFunc(action, cc, ft.declType, types);
             output = optFunc.funcType().declType;
 
             // optimized type is instance of input type: abort

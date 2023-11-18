@@ -32,6 +32,6 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return opt(cc, true, false);
+    return optType(cc, true, false);
   }
 }

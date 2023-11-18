@@ -54,7 +54,7 @@ public final class FnFoldRight extends FnFoldLeft {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = opt(cc, false, false);
+    Expr expr = optType(cc, false, false);
     if(expr != this) return expr;
 
     // unroll fold

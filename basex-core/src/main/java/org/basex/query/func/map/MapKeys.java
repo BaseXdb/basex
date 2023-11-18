@@ -32,7 +32,7 @@ public final class MapKeys extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final FuncType ft = arg(0).funcType();
     if(ft instanceof MapType) {
-      if(defined(1)) arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ft.declType));
+      if(defined(1)) arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ft.declType));
       exprType.assign(((MapType) ft).keyType());
     }
     return this;

@@ -35,7 +35,7 @@ public final class ArrayForEach extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ((ArrayType) type).declType,
+      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, ((ArrayType) type).declType,
           SeqType.INTEGER_O));
     }
 

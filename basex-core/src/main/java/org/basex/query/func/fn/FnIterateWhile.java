@@ -34,23 +34,24 @@ public final class FnIterateWhile extends StandardFunc {
     // compute function types
     if(action instanceof FuncItem) {
       SeqType ist = input.seqType(), ost = SeqType.ITEM_ZM;
-      Expr optAction = coerceFunc(action, cc, ost, ist, SeqType.INTEGER_O);
+      Expr optAction = refineFunc(action, cc, ost, ist, SeqType.INTEGER_O);
 
       // repeat coercion until output types are equal and output type is instance of input type
       SeqType nst = optAction.funcType().declType;
       while(!ost.eq(nst) || !nst.instanceOf(ist)) {
         ist = ist.union(nst);
-        optAction = coerceFunc(action, cc, SeqType.ITEM_ZM, ist, SeqType.INTEGER_O);
+        optAction = refineFunc(action, cc, SeqType.ITEM_ZM, ist, SeqType.INTEGER_O);
         ost = nst;
         nst = nst.union(optAction.funcType().declType);
       }
-      exprType.assign(ost);
+      exprType.assign(ist.union(ost));
       final Expr oa = optAction;
       arg(2, arg -> oa);
 
       if(predicate instanceof FuncItem) {
         final SeqType is = ist;
-        arg(1, arg -> coerceFunc(predicate, cc, SeqType.BOOLEAN_O, is, SeqType.INTEGER_O));
+        arg(1, arg -> refineFunc(predicate, cc, SeqType.BOOLEAN_O, is, SeqType.INTEGER_O));
+        if(((FuncItem) predicate).expr == Bln.FALSE) return input;
       }
     }
     return this;

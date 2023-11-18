@@ -241,7 +241,7 @@ public abstract class StandardFunc extends Arr {
    * @return old or new expression
    * @throws QueryException query context
    */
-  public final Expr coerceFunc(final Expr expr, final CompileContext cc, final SeqType declType,
+  public final Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType declType,
       final SeqType... argTypes) throws QueryException {
 
     // check if argument is function item
@@ -249,17 +249,17 @@ public abstract class StandardFunc extends Arr {
 
     // check number of arguments
     final FuncItem func = (FuncItem) expr;
-    final int arity = argTypes.length, nargs = func.arity();
-    if(arity < nargs) return expr;
+    final int nargs = argTypes.length, arity = func.arity();
+    if(arity > nargs) return expr;
 
     // select most specific argument and return types
     final FuncType oldType = func.funcType();
-    final SeqType[] oldArgs = oldType.argTypes, newArgs = new SeqType[nargs];
-    for(int a = 0; a < nargs; a++) {
-      newArgs[a] = argTypes[a].instanceOf(oldArgs[a]) ? argTypes[a] : oldArgs[a];
+    final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
+    for(int a = 0; a < arity; a++) {
+      newArgTypes[a] = argTypes[a].instanceOf(oldArgTypes[a]) ? argTypes[a] : oldArgTypes[a];
     }
     final SeqType newDecl = declType.instanceOf(oldType.declType) ? declType : oldType.declType;
-    final FuncType newType = FuncType.get(newDecl, newArgs);
+    final FuncType newType = FuncType.get(newDecl, newArgTypes);
 
     // new type is more specific: coerce to new function type
     return !newType.eq(oldType) ? func.coerceTo(newType, cc.qc, info, true) : expr;

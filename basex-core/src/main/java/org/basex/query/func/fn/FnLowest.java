@@ -100,7 +100,7 @@ public class FnLowest extends StandardFunc {
         return cc.function(min ? LOWEST : HIGHEST, info, args);
       }
     } else if(defined(2)) {
-      arg(2, arg -> coerceFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
+      arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
     }
     return adoptType(input);
   }
