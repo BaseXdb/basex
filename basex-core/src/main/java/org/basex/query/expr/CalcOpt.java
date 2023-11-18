@@ -29,49 +29,49 @@ interface CalcOpt {
       switch(calc) {
         case ADD:
           switch(type) {
-            case DOUBLE:  return (item1, item2, info) -> addDbl(item1, item2, info);
-            case FLOAT:   return (item1, item2, info) -> addFlt(item1, item2, info);
-            case INTEGER: return (item1, item2, info) -> addInt(item1, item2, info);
+            case DOUBLE:  return CalcOpt::addDbl;
+            case FLOAT:   return CalcOpt::addFlt;
+            case INTEGER: return CalcOpt::addInt;
             default: break;
           }
           break;
         case SUBTRACT:
           switch(type) {
-            case DOUBLE:  return (item1, item2, info) -> subtractDbl(item1, item2, info);
-            case FLOAT:   return (item1, item2, info) -> subtractFlt(item1, item2, info);
-            case INTEGER: return (item1, item2, info) -> subtractInt(item1, item2, info);
+            case DOUBLE:  return CalcOpt::subtractDbl;
+            case FLOAT:   return CalcOpt::subtractFlt;
+            case INTEGER: return CalcOpt::subtractInt;
             default: break;
           }
           break;
         case MULTIPLY:
           switch(type) {
-            case DOUBLE:  return (item1, item2, info) -> multiplyDbl(item1, item2, info);
-            case FLOAT:   return (item1, item2, info) -> multiplyFlt(item1, item2, info);
-            case INTEGER: return (item1, item2, info) -> multiplyInt(item1, item2, info);
+            case DOUBLE:  return CalcOpt::multiplyDbl;
+            case FLOAT:   return CalcOpt::multiplyFlt;
+            case INTEGER: return CalcOpt::multiplyInt;
             default:
           }
           break;
         case DIVIDE:
           switch(type) {
-            case DOUBLE:  return (item1, item2, info) -> divideDbl(item1, item2, info);
-            case FLOAT:   return (item1, item2, info) -> divideFlt(item1, item2, info);
-            case INTEGER: return (item1, item2, info) -> divideDec(item1, item2, info);
+            case DOUBLE:  return CalcOpt::divideDbl;
+            case FLOAT:   return CalcOpt::divideFlt;
+            case INTEGER: return CalcOpt::divideDec;
             default:
           }
           break;
         case DIVIDEINT:
           switch(type) {
-            case DOUBLE:  return (item1, item2, info) -> divideIntDbl(item1, item2, info);
-            case FLOAT:   return (item1, item2, info) -> divideIntFlt(item1, item2, info);
-            case INTEGER: return (item1, item2, info) -> divideIntInt(item1, item2, info);
+            case DOUBLE:  return CalcOpt::divideIntDbl;
+            case FLOAT:   return CalcOpt::divideIntFlt;
+            case INTEGER: return CalcOpt::divideIntInt;
             default:
           }
           break;
         case MODULO:
           switch(type) {
-            case DOUBLE:  return (item1, item2, info) -> moduloDbl(item1, item2, info);
-            case FLOAT:   return (item1, item2, info) -> moduloFlt(item1, item2, info);
-            case INTEGER: return (item1, item2, info) -> moduloInt(item1, item2, info);
+            case DOUBLE:  return CalcOpt::moduloDbl;
+            case FLOAT:   return CalcOpt::moduloFlt;
+            case INTEGER: return CalcOpt::moduloInt;
             default:
           }
           break;

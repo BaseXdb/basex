@@ -1051,9 +1051,9 @@ public class TextPanel extends BaseXPanel {
 
     // add matches that start with the input string
     final int ll = LISTS.size();
-    for (ArrayList<Entry<String, String>> list : LISTS) {
+    for(final ArrayList<Entry<String, String>> list : LISTS) {
       pairs.add(null);
-      for (final Entry<String, String> pair : list) {
+      for(final Entry<String, String> pair : list) {
         final String name = pair.getKey();
         if (name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
       }
