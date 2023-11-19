@@ -122,12 +122,9 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Returns the unions of the sequences types for function calls of the specified function.
    * @param func function
-   * @return sequence types or {@code null}
+   * @return sequence types, or {@code null} if function is not referenced
    */
   SeqType[] seqTypes(final StaticFunc func) {
-    final int sl = func.arity();
-    if(sl == 0) return null;
-
     // initialize cache for direct lookups of function calls
     if(callsMap == null) {
       callsMap = new IdentityHashMap<>();
@@ -138,7 +135,8 @@ public final class StaticFuncs extends ExprInfo {
       }
     }
     final ArrayList<StaticFuncCall> calls = callsMap.get(func);
-    if(calls == null) return null;
+    final int sl = func.arity();
+    if(calls == null || calls.isEmpty() || sl == 0) return null;
 
     final SeqType[] seqTypes = new SeqType[sl];
     for(final StaticFuncCall call : calls) {

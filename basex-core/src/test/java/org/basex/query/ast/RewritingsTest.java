@@ -3235,4 +3235,10 @@ public final class RewritingsTest extends SandboxTest {
     check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())[..]", "<B/>",
         count(IterStep.class, 3), "//@axis = 'descendant'");
   }
+
+  /** Refine parameter types to arguments types of function call. */
+  @Test public void gh2259() {
+    check("declare function local:t($a) { if($a instance of xs:integer) then 1 else 's' };" +
+        "local:t('x')", "s", empty(If.class));
+  }
 }

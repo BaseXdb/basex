@@ -114,12 +114,12 @@ public class FuncType implements Type {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(type.getClass() != FuncType.class) return false;
+    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof FuncType) ||
+        type instanceof MapType || type instanceof ArrayType) return false;
+
     final FuncType ft = (FuncType) type;
-
     final int arity = argTypes.length, nargs = ft.argTypes.length;
-    if(this == SeqType.FUNCTION || ft == SeqType.FUNCTION || arity != nargs) return false;
-
+    if(arity != nargs) return false;
     for(int a = 0; a < arity; a++) {
       if(!argTypes[a].eq(ft.argTypes[a])) return false;
     }

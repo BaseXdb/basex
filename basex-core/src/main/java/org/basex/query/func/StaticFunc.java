@@ -72,9 +72,26 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Expr compile(final CompileContext cc) {
     if(!compiled && expr != null) {
-      compiled = dontEnter = true;
+      compiled = true;
+
+      // dynamic compilation: refine parameter types to arguments types of function call
+      final SeqType[] callTypes = cc.dynamic ? cc.qc.functions.seqTypes(this) : null;
+      final int pl = params.length;
+      if(callTypes != null) {
+        boolean refined = false;
+        for(int p = 0; p < pl; p++) {
+          final Var param = params[p];
+          final SeqType cst = callTypes[p], pst = param.seqType();
+          if(!cst.eq(pst) && cst.instanceOf(pst)) {
+            param.declType = cst;
+            refined = true;
+          }
+        }
+        if(refined) cc.info(OPTREFINED_X, concat(name.prefixId(), '#', pl));
+      }
 
       // compile function body, handle return type
+      dontEnter = true;
       cc.pushFocus(null);
       cc.pushScope(vs);
       try {
@@ -86,35 +103,20 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         cc.removeScope(this);
         cc.removeFocus();
       }
-
       // convert all function calls in tail position to proper tail calls
       expr.markTailCalls(cc);
       dontEnter = false;
-    }
-    return null;
-  }
 
-  /**
-   * Optimizes the static function, drops superfluous type checks.
-   * @param cc compilation context
-   */
-  public void optimize(final CompileContext cc) {
-    if(cc.dynamic) {
-      if(((Checks<Var>) p -> p.declType != null).any(params)) {
-        final SeqType[] seqTypes = cc.qc.functions.seqTypes(this);
-        if(seqTypes != null) {
-          final int sl = seqTypes.length;
-          for(int s = 0; s < sl; s++) {
-            final Var param = params[s];
-            if(seqTypes[s].instanceOf(param.seqType())) {
-              cc.info(OPTTYPE_X, param);
-              param.declType = null;
-            }
-          }
+      // dynamic compilation: remove redundant type declarations
+      if(callTypes != null) {
+        for(int p = 0; p < pl; p++) {
+          final Var param = params[p];
+          if(callTypes[p].instanceOf(param.seqType())) param.declType = null;
         }
       }
-      declType = null;
+      if(!cc.dynamic) declType = null;
     }
+    return null;
   }
 
   /**
