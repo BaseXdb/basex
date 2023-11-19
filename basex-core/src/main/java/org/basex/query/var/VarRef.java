@@ -1,9 +1,13 @@
 package org.basex.query.var;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -112,7 +116,10 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.attachVariable(plan.create(this), var, false));
+    final FBuilder elem = plan.create(this);
+    plan.addAttribute(elem, NAME, var.toErrorString());
+    plan.addAttribute(elem, ID, var.id);
+    plan.add(elem);
   }
 
   @Override

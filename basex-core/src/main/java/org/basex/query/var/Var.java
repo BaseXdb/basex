@@ -211,7 +211,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
-    return checkType() ? new TypeCheck(info, sc, expr, declType, coerce).optimize(cc) : expr;
+    return declType != null ? new TypeCheck(info, sc, expr, declType, coerce).optimize(cc) : expr;
   }
 
   /**
@@ -225,7 +225,7 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value value, final QueryContext qc, final boolean opt)
       throws QueryException {
 
-    if(!checkType() || declType.instance(value)) return value;
+    if(declType == null || declType.instance(value)) return value;
     if(coerce) return declType.coerce(value, name, qc, sc, info, opt);
     throw typeError(value, declType, name, info, false);
   }
@@ -247,7 +247,7 @@ public final class Var extends ExprInfo {
    */
   public void checkType(final Expr expr) throws QueryException {
     final SeqType et = expr.seqType(), vt = seqType();
-    if(!checkType() || vt.type.instanceOf(et.type) ||
+    if(declType == null || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
     if(!coerce || !(et.type instanceof NodeType) && !et.promotable(vt)) {

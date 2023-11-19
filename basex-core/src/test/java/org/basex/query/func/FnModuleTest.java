@@ -1264,10 +1264,12 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (1, 2)", " false#0", " identity#1"), "1\n2", root(RangeSeq.class));
 
     // GH-2257
-    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p = 2 }",
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
         " identity#1") + ')', 1);
-    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p = 2 }",
-        " fn($s as xs:integer) { $s[2], 1 }") + ')', 1);
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " fn($s as xs:integer+) { $s[2], $s[1] }") + ')', 2);
+    error("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " fn($s as xs:integer) { $s[2], 1 }") + ')', INVCONVERT_X_X_X);
   }
 
   /** Test method. */
