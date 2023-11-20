@@ -22,11 +22,15 @@ public final class IntFormat extends FormatParser {
   public IntFormat(final byte[] picture, final InputInfo info) throws QueryException {
     super(info);
 
-    final int rc = indexOf(picture, '^');
-    radix = rc == -1 ? 10 : toInt(substring(picture, 0, rc));
-    if(radix < 2 || radix > 36) throw PICNUM_X.get(info, picture);
-
     final int sc = lastIndexOf(picture, ';');
+    int rc = indexOf(picture, '^');
+    int xc = indexOf(picture, 'X', rc + 1);
+    if(xc == -1 || sc != -1 && xc > sc) xc = indexOf(picture, 'x', rc + 1);
+    if(sc != -1 && xc > sc) xc = -1;
+    radix = rc == -1 ? 10 : toInt(substring(picture, 0, rc));
+    if(radix < 2 || radix > 36 || xc == -1) rc = -1;
+    if(rc == -1) radix = 10;
+
     final byte[] pres = substring(picture, rc + 1, sc == -1 ? picture.length : sc);
     if(pres.length == 0) throw PICEMPTY.get(info, picture);
     finish(presentation(pres, ONE, false));
