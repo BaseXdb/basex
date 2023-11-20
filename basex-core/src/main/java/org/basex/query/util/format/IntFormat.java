@@ -13,6 +13,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class IntFormat extends FormatParser {
+  /** Whether the radix was specified explicitly. */
+  private boolean hasExplicitRadix;
+
   /**
    * Constructor.
    * @param picture picture
@@ -24,12 +27,24 @@ public final class IntFormat extends FormatParser {
 
     final int sc = lastIndexOf(picture, ';');
     int rc = indexOf(picture, '^');
-    int xc = indexOf(picture, 'X', rc + 1);
-    if(xc == -1 || sc != -1 && xc > sc) xc = indexOf(picture, 'x', rc + 1);
-    if(sc != -1 && xc > sc) xc = -1;
-    radix = rc == -1 ? 10 : toInt(substring(picture, 0, rc));
-    if(radix < 2 || radix > 36 || xc == -1) rc = -1;
-    if(rc == -1) radix = 10;
+    if(rc != -1) {
+      int xuc = indexOf(picture, 'X', rc + 1);
+      int xlc = indexOf(picture, 'x', rc + 1);
+      if(sc != -1 && xuc > sc) xuc = -1;
+      if(sc != -1 && xlc > sc) xlc = -1;
+      if(xuc == -1 && xlc == -1) {
+        rc = -1;
+      } else {
+        radix = toInt(substring(picture, 0, rc));
+        if(radix < 2 || radix > 36) {
+          rc = -1;
+          radix = 10;
+        } else if(xuc != -1 && xlc != -1) {
+          throw DIFFMAND_X.get(info, picture);
+        }
+      }
+    }
+    hasExplicitRadix = rc != -1;
 
     final byte[] pres = substring(picture, rc + 1, sc == -1 ? picture.length : sc);
     if(pres.length == 0) throw PICEMPTY.get(info, picture);
@@ -55,5 +70,35 @@ public final class IntFormat extends FormatParser {
     // parse alphabetical/traditional flag
     if(!tp.consume('a')) tp.consume('t');
     if(tp.more()) throw INVORDINAL_X.get(info, mod);
+  }
+
+  /**
+   * Returns the zero base for the specified code point, or {@code -1}.
+   * @param ch character
+   */
+  @Override
+  public int zeroes(final int ch) {
+    if(hasExplicitRadix && (ch == 'x' || ch == 'X')) return '0';
+    if(radix == 10) return super.zeroes(ch);
+    for(int r = 0; r < radix; r++) {
+      final int c = DIGITS[r];
+      if(ch == c || ch > '9' && ch == uc(c)) return '0';
+    }
+    return -1;
+  }
+
+  /**
+   * Checks if a character is a valid digit.
+   * @param ch character
+   * @param zero zero character
+   * @return result of check
+   */
+  @Override
+  public boolean digit(final int ch, final int zero) {
+    if(hasExplicitRadix && (ch == 'X' || ch == 'x')) return true;
+    if(radix == 10) return super.digit(ch, zero);
+    final int num = ch <= '9' ? ch : (ch & 0xDF) - 0x37;
+    return ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' &&
+        num < radix;
   }
 }

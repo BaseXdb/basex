@@ -732,12 +732,12 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(11, "1"), "11");
     query(func.args(11, "001"), "011");
 
-    query(func.args(1234, "16^ffff"), "04d2");
-    query(func.args(1234, "16^F"), "4D2");
-    query(func.args(12345678, "16^ffff_ffff"), "00bc_614e");
-    query(func.args(12345678, "16^#_ffff"), "bc_614e");
-    query(func.args(255, "2^1111 1111"), "1111 1111");
-    query(func.args(1023, "32^AAAA"), "00VV");
+    query(func.args(1234, "16^xxxx"), "04d2");
+    query(func.args(1234, "16^X"), "4D2");
+    query(func.args(12345678, "16^xxxx_xxxx"), "00bc_614e");
+    query(func.args(12345678, "16^#_xxxx"), "bc_614e");
+    query(func.args(255, "2^xxxx xxxx"), "1111 1111");
+    query(func.args(1023, "32^XXXX"), "00VV");
   }
 
   /** Test method. */
