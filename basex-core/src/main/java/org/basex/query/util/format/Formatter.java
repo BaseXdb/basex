@@ -601,7 +601,7 @@ public abstract class Formatter extends FormatUtil {
           // add remaining modifiers
           if(ch == '#') break;
           if(digit(ch, zero, fp.radix)) ch = zero;
-          if(regSep && modPos + 1 < digitPos) break;
+          if(modPos + 1 < digitPos) break;
         }
       } else if(inPos >= 0) {
         // add remaining numbers
