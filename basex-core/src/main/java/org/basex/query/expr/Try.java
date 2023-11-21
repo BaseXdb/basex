@@ -66,7 +66,7 @@ public final class Try extends Single {
 
     // remove duplicates and too specific catch clauses
     final ArrayList<Catch> list = new ArrayList<>();
-    final ArrayList<NameTest> tests = new ArrayList<>();
+    final ArrayList<Test> tests = new ArrayList<>();
 
     final Checks<Catch> global = Catch::global;
     if(!global.all(catches)) {

@@ -1298,8 +1298,9 @@ public class QueryParser extends InputParser {
     do {
       final Var var = newVar();
       final Expr by;
-      if(var.declType != null || wsConsume(":=")) {
-        if(var.declType != null) wsCheck(":=");
+      final boolean checksType = var.declType != null;
+      if(checksType || wsConsume(":=")) {
+        if(checksType) wsCheck(":=");
         by = check(single(), NOVARDECL);
       } else {
         final VarRef ref = localVars.resolveLocal(var.name, var.info);
@@ -3349,8 +3350,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test elemAttrTest(final NodeType type) throws QueryException {
-    final Test test = nodeTest(type, false);
-    if(test != null && wsConsumeWs(",")) {
+    final ArrayList<Test> tests = nameTestUnion(type);
+    if(tests == null) return null;
+
+    final Test test = Test.get(tests.toArray(Test[]::new));
+    if(wsConsumeWs(",")) {
       final QNm name = eQName(sc.elemNS, QNAME_X);
       Type ann = ListType.find(name);
       if(ann == null) ann = AtomType.find(name, true);
@@ -3397,13 +3401,8 @@ public class QueryParser extends InputParser {
 
     Catch[] catches = { };
     do {
-      NameTest[] codes = { };
-      do {
-        skipWs();
-        final Test test = nodeTest(NodeType.ELEMENT, false);
-        if(test == null) throw error(NOCATCH);
-        codes = Array.add(codes, test instanceof NameTest ? (NameTest) test : null);
-      } while(wsConsume("|"));
+      final ArrayList<Test> tests = nameTestUnion(NodeType.ELEMENT);
+      if(tests == null) throw error(NOCATCH);
 
       final int s = localVars.openScope();
       final int cl = Catch.QNAMES.length;
@@ -3412,7 +3411,7 @@ public class QueryParser extends InputParser {
       for(int c = 0; c < cl; c++) {
         vs[c] = localVars.add(new Var(Catch.QNAMES[c], Catch.TYPES[c], qc, sc, ii));
       }
-      final Catch c = new Catch(ii, codes, vs);
+      final Catch c = new Catch(ii, vs, tests);
       c.expr = enclosedExpr();
       localVars.closeScope(s);
 
@@ -3420,6 +3419,24 @@ public class QueryParser extends InputParser {
     } while(wsConsumeWs(CATCH));
 
     return new Try(info(), expr, catches);
+  }
+
+  /**
+   * Parses the "NameTestUnion" rule.
+   * @param type node type
+   * @return name tests or {@code null}
+   * @throws QueryException query exception
+   */
+  private ArrayList<Test> nameTestUnion(final NodeType type) throws QueryException {
+    ArrayList<Test> tests = null;
+    do {
+      skipWs();
+      final Test test = nodeTest(type, false);
+      if(test == null) return null;
+      if(tests == null) tests = new ArrayList<>(1);
+      tests.add(test);
+    } while(wsConsume("|"));
+    return tests;
   }
 
   /**

@@ -3,7 +3,6 @@ package org.basex.query.expr.path;
 
 import java.util.*;
 import java.util.List;
-import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
@@ -53,25 +52,23 @@ public abstract class Test extends ExprInfo {
     if(tl == 0) return null;
     if(tl == 1) return tests[0];
 
-    // check if tests can be merged or discarded
-    final List<Test> list = new ArrayList<>(tl);
-    final Consumer<Test> add = tst -> {
-      if(tst instanceof KindTest) {
-        list.removeIf(t -> t instanceof NameTest);
-      } else if(tst instanceof NameTest) {
-        if(((Checks<Test>) t -> t instanceof KindTest).any(list)) return;
-      }
-      if(!list.contains(tst)) list.add(tst);
-    };
-
+    // find common node type
     NodeType type = null;
     for(final Test test : tests) {
       if(test == null || type != null && type != test.type) return null;
       type = test.type;
+    }
+
+    // merge name tests
+    final List<Test> list = new ArrayList<>(tl);
+    for(final Test test : tests) {
+      if(test instanceof KindTest) return test;
       if(test instanceof UnionTest) {
-        for(final Test t : ((UnionTest) test).tests) add.accept(t);
-      } else {
-        add.accept(test);
+        for(final Test t : ((UnionTest) test).tests) {
+          if(!list.contains(t)) list.add(t);
+        }
+      } else if(!list.contains(test)) {
+        list.add(test);
       }
     }
     return list.size() == 1 ? list.get(0) : new UnionTest(type, list.toArray(Test[]::new));
