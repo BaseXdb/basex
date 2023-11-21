@@ -196,14 +196,6 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Determines if this variable checks the type of the expression bound to it.
-   * @return {@code true} if the type is checked or promoted, {@code false} otherwise
-   */
-  public boolean checkType() {
-    return declType != null;
-  }
-
-  /**
    * Returns an equivalent to the given expression that checks this variable's type.
    * @param expr expression
    * @param cc compilation context

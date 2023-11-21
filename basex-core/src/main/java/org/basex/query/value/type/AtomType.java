@@ -1009,7 +1009,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return type.oneOf(this, AtomType.ITEM) ||
+    return this == type || type == AtomType.ITEM ||
         type instanceof AtomType && parent != null && parent.instanceOf(type);
   }
 

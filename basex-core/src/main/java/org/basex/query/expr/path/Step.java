@@ -173,8 +173,9 @@ public abstract class Step extends Preds {
       // node test: adopt type of context expression: <a/>/self::node()
       if(test == KindTest.NODE) exprType.assign(seqType.type);
       // no predicates: step will yield single result: $elements/self::element()
-      if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE)
+      if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE) {
         exprType.assign(Occ.EXACTLY_ONE);
+      }
     }
     return expr;
   }
@@ -370,9 +371,9 @@ public abstract class Step extends Preds {
   /**
    * Checks if the step is redundant.
    * @param seqType type of incoming nodes
-   * @return {@code true} if the step can be ignored
+   * @return {@code true} if the step can be removed
    */
-  final boolean redundant(final SeqType seqType) {
+  final boolean remove(final SeqType seqType) {
     // <xml/>/.  ->  <xml/>
     // <xml/>/self::node()  ->  <xml/>
     // $text/descendant-or-self::text()  ->  $text

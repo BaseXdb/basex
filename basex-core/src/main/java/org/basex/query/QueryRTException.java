@@ -13,17 +13,11 @@ public final class QueryRTException extends RuntimeException {
    * @param cause query exception to wrap
    */
   public QueryRTException(final QueryException cause) {
-    super(cause);
+    super(null, cause, false, false);
   }
 
   @Override
   public synchronized QueryException getCause() {
     return (QueryException) super.getCause();
-  }
-
-  @Override
-  public synchronized Throwable fillInStackTrace() {
-    // do nothing for performance reasons, the stack's never used anyway
-    return this;
   }
 }

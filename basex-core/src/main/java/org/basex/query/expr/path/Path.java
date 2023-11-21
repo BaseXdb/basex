@@ -317,7 +317,7 @@ public abstract class Path extends ParseExpr {
       if(prev != null) {
         final SeqType seqType = prev.seqType();
         if(seqType.type instanceof NodeType && (step instanceof ContextValue ||
-            step instanceof Step && ((Step) step).redundant(seqType))) {
+            step instanceof Step && ((Step) step).remove(seqType))) {
           removed = true;
           continue;
         }
