@@ -197,7 +197,7 @@ public final class QueryJob extends Job implements Runnable {
     if(log != null && log.isEmpty()) log = null;
     if(log != null) ctx.log.write(LogType.REQUEST, log, null, "JOB:" + id, ctx);
 
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
     qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
     try {
       // parse, push and register query. order is important!
@@ -214,7 +214,8 @@ public final class QueryJob extends Job implements Runnable {
       // register job
       pushJob(qp);
       register(ctx);
-      perf = new Performance();
+      // reset timer
+      perf.ns();
       if(remove) ctx.jobs.tasks.remove(id);
 
       // retrieve result; copy persistent database nodes
@@ -257,6 +258,7 @@ public final class QueryJob extends Job implements Runnable {
         }
         ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
       }
+      jc.performance = null;
 
       if(remove) ctx.jobs.tasks.remove(id);
       if(notify != null) notify.accept(result);

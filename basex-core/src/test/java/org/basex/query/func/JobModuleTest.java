@@ -162,6 +162,14 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void evalSleep() {
+    final Function func = _JOB_EVAL;
+    query(func.args("1", " ()", " map { 'cache': true() }") + " ! (" +
+        _PROF_SLEEP.args(500) + ", " + _JOB_LIST_DETAILS.args(" .") + "/@duration = 'PT0S'"
+    + ")", true);
+  }
+
+  /** Test method. */
   @Test public void evalUri() {
     final Function func = _JOB_EVAL;
     final String uri = " xs:anyURI('src/test/resources/input.xq')";
