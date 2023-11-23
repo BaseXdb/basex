@@ -1840,6 +1840,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_DDO(UtilDdo::new, "ddo(nodes)",
       params(NODE_ZM), NODE_ZM, UTIL_URI),
+  /** XQuery function (obsolete). */
+  _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
+      params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
