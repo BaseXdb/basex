@@ -387,7 +387,7 @@ public final class HTTPConnection implements ClientInfo {
   public static String remoteAddress(final HttpServletRequest request) {
     for(final String header : FORWARDING_HEADERS) {
       final String addr = request.getHeader(header);
-      if (addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
+      if(addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
     }
     return request.getRemoteAddr();
   }
