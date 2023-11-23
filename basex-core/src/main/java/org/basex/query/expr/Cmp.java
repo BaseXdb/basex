@@ -139,39 +139,12 @@ public abstract class Cmp extends Arr {
    * Tries to simplify an expression with equal operands.
    * @param op operator
    * @param cc compilation context
-   * @return resulting expression
-   * @throws QueryException query exception
+   * @return optimized or original expression
    */
-  private Expr optEqual(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optEqual(final OpV op, final CompileContext cc) {
+    if(!(this instanceof CmpG)) return this;
+
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    Expr expr = optEqual(expr1, expr2, op, cc);
-    if(expr != this) return expr;
-
-    // (if(A) then 'B' else 'C') = C  ->  boolean(A)
-    if(expr1 instanceof If && !expr1.has(Flag.NDT)) {
-      final If iff = (If) expr1;
-      boolean invert = false;
-      for(final Expr ex : iff.exprs) {
-        expr = optEqual(ex, expr2, op, cc);
-        if(expr != this) {
-          invert ^= expr == Bln.FALSE;
-          return cc.function(invert ? NOT : BOOLEAN, info, iff.cond);
-        }
-        invert = true;
-      }
-    }
-    return this;
-  }
-
-  /**
-   * Tries to simplify an expression with equal operands.
-   * @param expr1 first operand
-   * @param expr2 second operand
-   * @param op operator
-   * @param cc compilation context
-   * @return resulting expression
-   */
-  private Expr optEqual(final Expr expr1, final Expr expr2, final OpV op, final CompileContext cc) {
     final SeqType st1 = expr1.seqType();
     final Type type1 = st1.type;
     if(expr1.equals(expr2) &&

@@ -1720,9 +1720,8 @@ public final class RewritingsTest extends SandboxTest {
     check("(0, 1) ! ((if(.) then (1, 2) else ()) = (1, 2))", "false\ntrue", empty(If.class));
     check("(if((1, 2)[. = 0]) then () else (1, 2)) = (1, 2)", true, empty(If.class), root(NOT));
 
-    // do not rewrite...
-    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
-    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", empty(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", empty(If.class));
   }
 
   /** Optimize inlined path steps. */
@@ -3240,5 +3239,32 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh2259() {
     check("declare function local:t($a) { if($a instance of xs:integer) then 1 else 's' };" +
         "local:t('x')", "s", empty(If.class));
+  }
+
+  /** if/then/else = else. */
+  @Test public void gh2261() {
+    query("(if ((1 to 6)[. = 1]) then 1 else 1.0) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 1.0 else 1) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 1 else 2.0) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 1.0 else 2) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 2 else 1.0) = 1", false);
+    query("(if ((1 to 6)[. = 1]) then 2.0 else 1) = 1", false);
+
+    query("(if ((1 to 6)[. = 0]) then 1 else 1.0) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 1.0 else 1) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 1 else 2.0) = 1", false);
+    query("(if ((1 to 6)[. = 0]) then 1.0 else 2) = 1", false);
+    query("(if ((1 to 6)[. = 0]) then 2 else 1.0) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 2.0 else 1) = 1", true);
+
+    query("(if ((1 to 6)[. = 0]) then 1 else xs:int(<?_ 1?>)) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then xs:int(<?_ 1?>) else 1) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 2 else xs:int(<?_ 1?>)) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then xs:int(<?_ 2?>) else 1) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 1 else xs:int(<?_ 2?>)) = 1", false);
+    query("(if ((1 to 6)[. = 0]) then xs:int(<?_ 1?>) else 2) = 1", false);
+
+    query("<d>1</d> ! ((if (text()) then xs:integer(.) else 1) = 1)", true);
+    query("<d>1</d> ! ((if (not(text())) then 1 else xs:integer(.)) = 1)", true);
   }
 }

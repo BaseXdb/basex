@@ -14,6 +14,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
@@ -205,7 +206,15 @@ public class CmpG extends Cmp {
     // optimize expression
     expr = opt(cc);
 
-    // range comparisons
+    // (if(A) then B else C) = X  ->  if(A) then B = X else C = X
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr == this && expr1 instanceof If && !expr1.has(Flag.NDT)) {
+      final If iff = (If) expr1;
+      final Expr thn = new CmpG(info, iff.arg(0), expr2, op, coll, sc);
+      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjMap<>()), op, coll, sc);
+      return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
+    }
+
     if(expr == this) expr = optArith(cc);
     if(expr == this) expr = CmpIR.get(cc, this, false);
     if(expr == this) expr = CmpR.get(cc, this);
@@ -213,7 +222,6 @@ public class CmpG extends Cmp {
 
     if(expr == this) {
       // determine types, choose best implementation
-      final Expr expr1 = exprs[0], expr2 = exprs[1];
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
       // skip type check if types are identical (and a child instance of any atomic type)
