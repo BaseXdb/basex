@@ -45,6 +45,7 @@ public final class MapBuild extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return cc.merge(input, XQMap.empty(), info);
 
+    SeqType rst = st;
     AtomType kt = null;
     if(defined(1)) {
       final FuncType ft = arg(1).funcType();
@@ -56,8 +57,12 @@ public final class MapBuild extends StandardFunc {
         }
       }
     }
+    if(defined(2)) {
+      final FuncType ft = arg(2).funcType();
+      rst = ft != null ? ft.declType : null;
+    }
     if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
-    exprType.assign(MapType.get(kt, st.with(Occ.ONE_OR_MORE)));
+    if(rst != null && !defined(3)) exprType.assign(MapType.get(kt, rst.with(Occ.ONE_OR_MORE)));
     return this;
   }
 }
