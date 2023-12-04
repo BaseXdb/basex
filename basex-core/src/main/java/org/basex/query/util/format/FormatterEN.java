@@ -64,15 +64,15 @@ final class FormatterEN extends Formatter {
   private static final byte[][] ERAS = tokens("Bc", "Ad");
 
   @Override
-  public byte[] word(final long n, final byte[] ordinal) {
+  public byte[] word(final long n, final boolean ordinal, final byte[] suffix) {
     final TokenBuilder tb = new TokenBuilder();
-    word(tb, n, ordinal != null);
+    word(tb, n, ordinal);
     return tb.finish();
   }
 
   @Override
-  public byte[] ordinal(final long n, final byte[] ordinal) {
-    if(ordinal == null) return EMPTY;
+  public byte[] suffix(final long n, final boolean ordinal) {
+    if(!ordinal) return EMPTY;
     final int f = (int) (n % 10);
     return ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3];
   }

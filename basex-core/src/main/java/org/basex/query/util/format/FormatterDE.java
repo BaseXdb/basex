@@ -71,16 +71,16 @@ final class FormatterDE extends Formatter {
   private static final byte[][] ERAS = tokens("v. Chr.", "n. Chr.");
 
   @Override
-  public byte[] word(final long n, final byte[] ordinal) {
+  public byte[] word(final long n, final boolean ordinal, final byte[] suffix) {
     final TokenBuilder tb = new TokenBuilder();
-    word(tb, n, ordinal);
+    word(tb, n, ordinal, suffix);
     if(!tb.isEmpty()) tb.set(0, (byte) uc(tb.get(0)));
     return tb.finish();
   }
 
   @Override
-  public byte[] ordinal(final long n, final byte[] ordinal) {
-    return ordinal == null ? EMPTY : E;
+  public byte[] suffix(final long n, final boolean ordinal) {
+    return ordinal ? E : EMPTY;
   }
 
   @Override
@@ -120,34 +120,36 @@ final class FormatterDE extends Formatter {
    * Creates a word character sequence for the specified number.
    * @param tb token builder
    * @param n number to be formatted
-   * @param ordinal ordinal suffix (can be {@code null} or empty)
+   * @param ordinal ordinal flag
+   * @param suffix suffix (can be {@code null} or empty)
    */
-  private static void word(final TokenBuilder tb, final long n, final byte[] ordinal) {
+  private static void word(final TokenBuilder tb, final long n, final boolean ordinal,
+      final byte[] suffix) {
     if(n == 0 && !tb.isEmpty()) {
-      if(ordinal != null) tb.add("st").add(ordinal.length == 0 ? E : ordinal);
+      if(ordinal) tb.add("st").add(suffix == null ? E : suffix);
     } else if(n < 20) {
-      if(ordinal == null) tb.add(WORDS[(int) n]);
-      else tb.add(ORDINALS[(int) n]).add(ordinal.length == 0 ? E : ordinal);
+      if(!ordinal) tb.add(WORDS[(int) n]);
+      else tb.add(ORDINALS[(int) n]).add(suffix == null ? E : suffix);
     } else if(n < 100) {
       final int r = (int) (n % 10);
       if(r != 0) tb.add(r == 1 ? EIN : WORDS[r]).add(UND);
       tb.add(WORDS20[(int) n / 10]);
-      if(ordinal != null) tb.add("st").add(ordinal.length == 0 ? E : ordinal);
+      if(ordinal) tb.add("st").add(suffix == null ? E : suffix);
     } else if(n < 1000) {
       if(n < 200) tb.add(EIN);
-      else word(tb, n / 100, null);
+      else word(tb, n / 100, false, null);
       tb.add(HUNDERT);
-      word(tb, n % 100, ordinal);
+      word(tb, n % 100, ordinal, suffix);
     } else if(n < 1000000) {
       final long m = n % 100000;
       if(m >= 1000 && m < 2000) {
-        word(tb, n / 1000, null);
+        word(tb, n / 1000, false, null);
         tb.delete(tb.size() - 1, tb.size());
       } else {
-        word(tb, n / 1000, null);
+        word(tb, n / 1000, false, null);
       }
       tb.add(TAUSEND);
-      word(tb, n % 1000, ordinal);
+      word(tb, n % 1000, ordinal, suffix);
     } else {
       int w = WORDS1000000.length;
       while(--w > 0 && n < UNITS100[w]);
@@ -155,17 +157,17 @@ final class FormatterDE extends Formatter {
 
       final long i = n / f;
       if(i == 1) tb.add(EINE);
-      else word(tb, i, null);
+      else word(tb, i, false, null);
       tb.add(' ').add(WORDS1000000[w]);
       final long r = n % f;
-      if(ordinal != null && r == 0) {
-        tb.add("st").add(ordinal.length == 0 ? E : ordinal);
+      if(ordinal && r == 0) {
+        tb.add("st").add(suffix == null ? E : suffix);
       } else if(i > 1) {
         tb.add(w % 2 == 0 ? "en" : "n");
       }
       if(r != 0) {
         tb.add(' ');
-        word(tb, r, ordinal);
+        word(tb, r, ordinal, suffix);
       }
     }
   }

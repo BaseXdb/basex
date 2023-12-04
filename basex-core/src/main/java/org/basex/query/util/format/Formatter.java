@@ -13,6 +13,8 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
+import com.ibm.icu.text.*;
+
 /**
  * Abstract class for formatting data in different languages.
  *
@@ -28,6 +30,8 @@ public abstract class Formatter extends FormatUtil {
   private static final byte[][] CALENDARS = tokens(
     "ISO", "AD", "AH", "AME", "AM", "AP", "AS", "BE", "CB", "CE", "CL", "CS", "EE", "FE",
     "JE", "KE", "KY", "ME", "MS", "NS", "OS", "RS", "SE", "SH", "SS", "TE", "VE", "VS");
+  /** Prefix of RuleSet names that are supported by ICU's SPELLOUT format. */
+  public static final byte[] ICU_SPELLOUT_PREFIX = token("%spellout-");
 
   /** Default language: English. */
   public static final byte[] EN = token("en");
@@ -54,18 +58,19 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Returns a word representation for the specified number.
    * @param n number to be formatted
-   * @param ordinal ordinal suffix
+   * @param ordinal ordinal flag
+   * @param suffix suffix
    * @return token
    */
-  protected abstract byte[] word(long n, byte[] ordinal);
+  protected abstract byte[] word(long n, boolean ordinal, byte[] suffix);
 
   /**
-   * Returns an ordinal representation for the specified number.
+   * Returns a suffix for the representation of the specified number.
    * @param n number to be formatted
-   * @param ordinal ordinal suffix
+   * @param ordinal ordinal flag
    * @return ordinal
    */
-  protected abstract byte[] ordinal(long n, byte[] ordinal);
+  protected abstract byte[] suffix(long n, boolean ordinal);
 
   /**
    * Returns the specified month (0-11).
@@ -329,7 +334,9 @@ public abstract class Formatter extends FormatUtil {
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
     if(ch == 'w') {
-      tb.add(word(n, fp.ordinal));
+      tb.add(fp.useIcu
+          ? icuWord(n, fp.locale, fp.cs, fp.modifier)
+          : word(n, fp.ordinal, fp.modifier));
     } else if(ch == KANJI[1]) {
       japanese(tb, n);
     } else if(ch == 'i') {
@@ -427,7 +434,7 @@ public abstract class Formatter extends FormatUtil {
 
     int n = c == 0 ? num / 60 : num % 60;
     if(num < 0) n = -n;
-    return number(n, new IntFormat(format.toArray(), null), format.cp(0));
+    return number(n, new IntFormat(format.toArray(), EMPTY, null), format.cp(0));
   }
 
   /**
@@ -541,7 +548,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private byte[] number(final long num, final FormatParser fp, final int first) {
     final byte[] n = number(token(num, fp.radix), fp, first);
-    return concat(n, ordinal(num, fp.ordinal));
+    return concat(n, suffix(num, fp.ordinal));
   }
 
   /**
@@ -639,5 +646,54 @@ public abstract class Formatter extends FormatUtil {
     while(++p < mx && tp.more()) tb.add(tp.next());
     while(p++ < min) tb.add(' ');
     return tb.finish();
+  }
+
+  /**
+   * Use ICU to spell out a number.
+   * @param n number
+   * @param locale locale
+   * @param cs case
+   * @param modifier modifier, either an ICU spell out rule set name, or a desired ending.
+   * @return the formatted number.
+   */
+  static byte[] icuWord(final long n, final Locale locale, final Case cs, final byte[] modifier) {
+    final RuleBasedNumberFormat rbnf =
+        new RuleBasedNumberFormat(locale, RuleBasedNumberFormat.SPELLOUT);
+    String formatted = null;
+    if (startsWith(modifier, ICU_SPELLOUT_PREFIX)) {
+      formatted = rbnf.format(n, string(modifier));
+    }
+    else {
+      String m = string(modifier);
+      for (String ruleSet : rbnf.getRuleSetNames()) {
+        String f = rbnf.format(n, ruleSet);
+        if (f.endsWith(m)) {
+          // found result with desired ending.
+          formatted = f;
+          break;
+        }
+        else if (ruleSet.equals(rbnf.getDefaultRuleSetName())) {
+          // fall back to default rule set
+          formatted = f;
+        }
+      }
+    }
+    // remove soft hyphen. Should we rather keep it?
+    byte[] result = token(formatted.replace("\u00ad", ""));
+    switch(cs) {
+    case LOWER:
+      return lc(result);
+    case UPPER:
+      return uc(result);
+    default:
+      if (!eq(token(rbnf.getLocale(com.ibm.icu.util.ULocale.ACTUAL_LOCALE).getLanguage()), EN)) {
+        result[0] = (byte) uc(result[0]);
+      } else {
+        for (int i = 0; i < result.length; ++i) {
+          if (i == 0 || result[i - 1] == ' ') result[i] = (byte) uc(result[i]);
+        }
+      }
+      return result;
+    }
   }
 }
