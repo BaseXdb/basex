@@ -1055,7 +1055,7 @@ public class TextPanel extends BaseXPanel {
       pairs.add(null);
       for(final Entry<String, String> pair : list) {
         final String name = pair.getKey();
-        if (name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
+        if(name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
       }
     }
     // add matches that contain the input string

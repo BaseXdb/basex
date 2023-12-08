@@ -46,6 +46,11 @@ public final class MapModuleTest extends SandboxTest {
         + "[function-arity(.) = 1] return " + func.args(5, " $f"), "map{5:5}");
     query("for $f in (1, 2, 3, 4, string#1, 6)"
         + "[. instance of function(*)] return " + func.args(8, " $f"), "map{\"8\":8}");
+
+    query("for $f in (1, 2, 3, 4, string#1, 6)"
+        + "[. instance of function(*)] return " + func.args(8, " $f"), "map{\"8\":8}");
+
+    query("map:for-each(map:build(1, fn { 'x' }, fn { 'y' }), concat#2)", "xy");
   }
 
   /** Test method. */

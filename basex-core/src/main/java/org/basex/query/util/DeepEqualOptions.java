@@ -72,6 +72,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: unordered-elements. */
   public static final StringOption UNORDERED_ELEMENTS =
       new StringOption("unordered-elements", "");
+  /** Option: unordered-elements. */
+  public static final BooleanOption UNORDERED =
+      new BooleanOption("unordered", false);
 
   /** QNames. */
   private final QNmSet qnames = new QNmSet();
