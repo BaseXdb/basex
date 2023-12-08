@@ -50,12 +50,12 @@ public final class InlineTest extends SandboxTest {
   }
 
   /** Test. */
-  @Test public void inlineWhitespaces() {
+  @Test public void inlineWhitespace() {
     // spaces
     run("     ");
     run("      ");
     run("         ");
-    // mixture of whitespaces
+    // mixture of whitespace
     run("\t\n\r  \t\n\r");
     run("\t\n\r  \t\r\n \n\r\t ");
     run("\t\t\t\t\t");
@@ -69,10 +69,10 @@ public final class InlineTest extends SandboxTest {
     reject("abcde");
     // too long string (and too large digit)
     reject("2147483648");
-    // mixture of whitespaces and non-whitespaces
+    // mixture of whitespace and non-whitespace
     reject("    1");
     reject("1    ");
-    // too many whitespaces
+    // too much whitespace
     reject("                ");
   }
 

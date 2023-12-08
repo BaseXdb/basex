@@ -1126,9 +1126,9 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified token has only whitespaces.
+   * Checks if the specified token has only whitespace.
    * @param token token
-   * @return true if all characters are whitespaces
+   * @return true if all characters are whitespace
    */
   public static boolean ws(final byte[] token) {
     for(final byte b : token) {
@@ -1157,7 +1157,7 @@ public final class Token {
   }
 
   /**
-   * Removes leading and trailing whitespaces from the specified token.
+   * Removes leading and trailing whitespace from the specified token.
    * @param token token to be trimmed
    * @return trimmed token
    */

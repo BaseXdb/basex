@@ -24,7 +24,7 @@ public final class FnTokenize extends RegEx {
   /** Default pattern. */
   private static final byte[] DEFAULT = { ' ' };
   /** Placeholder for default search. */
-  private static final byte[] WHITESPACES = Token.token("\\s+");
+  private static final byte[] WHITESPACE = Token.token("\\s+");
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
@@ -138,9 +138,9 @@ public final class FnTokenize extends RegEx {
    * Indicates if default whitespace tokenization is to be performed.
    * @return result of check
    */
-  public boolean whitespaces() {
+  public boolean whitespace() {
     final Expr pattern = arg(1);
     return pattern == Empty.VALUE || pattern == Empty.UNDEFINED ||
-        pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACES);
+        pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACE);
   }
 }

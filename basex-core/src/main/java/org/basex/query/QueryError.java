@@ -75,7 +75,7 @@ public enum QueryError {
   /** Error code. */
   ADMIN_TODAY(ADMIN, "today", "Today's log file cannot be deleted."),
   /** Error code. */
-  ADMIN_TYPE_X(ADMIN, "type", "Type string contains whitespaces: '%'."),
+  ADMIN_TYPE_X(ADMIN, "type", "Type string contains whitespace: '%'."),
 
   // Archive Module
 
@@ -1764,7 +1764,7 @@ public enum QueryError {
   }
 
   /**
-   * Removes whitespaces and chops the specified value to a maximum size.
+   * Removes whitespace and chops the specified value to a maximum size.
    * @param value value
    * @param info input info (can be {@code null}; an empty token will be returned if
    * {@link InputInfo#internal()} returns {@code true})

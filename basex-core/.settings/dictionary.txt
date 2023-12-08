@@ -190,7 +190,7 @@ url
 var
 warmups
 weiler
-whitespaces
+whitespace
 wildcard
 wildcards
 woerteler

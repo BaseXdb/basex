@@ -106,7 +106,7 @@ public interface Text {
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
     "  -w         Toggle whitespace stripping" + NL +
-    "  -W         Enable indentation with whitespaces" + NL +
+    "  -W         Enable indentation with whitespace" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
@@ -135,7 +135,7 @@ public interface Text {
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
     "  -w         Toggle whitespace stripping" + NL +
-    "  -W         Enable indentation with whitespaces" + NL +
+    "  -W         Enable indentation with whitespace" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
@@ -1111,7 +1111,7 @@ public interface Text {
 
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");
-  /** Strip whitespaces. */
+  /** Strip whitespace. */
   String STRIP_WS = lang("strip_ws");
   /** Strip namespaces. */
   String STRIP_NS = lang("strip_ns");
@@ -1391,7 +1391,7 @@ public interface Text {
   /** Out of memory error due to database creation. */
   String H_OUT_OF_MEM = NL + lang("h_out_of_mem");
 
-  /** Information on stripping whitespaces. */
+  /** Information on stripping whitespace. */
   String H_STRIP_WS = lang("h_strip_ws");
   /** Internal parser information. */
   String H_INT_PARSER = lang("h_int_parser");

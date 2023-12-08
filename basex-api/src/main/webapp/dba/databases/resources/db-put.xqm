@@ -74,7 +74,7 @@ function dba:db-put(
                 html:option('intparse', 'Use internal XML parser', $opts),
                 html:option('dtd', 'Parse DTDs and entities', $opts),
                 html:option('stripns', 'Strip namespaces', $opts),
-                html:option('stripws', 'Strip whitespaces', $opts),
+                html:option('stripws', 'Strip whitespace', $opts),
                 html:option('xinclude', 'Use XInclude', $opts)
               }</td>
             </tr>

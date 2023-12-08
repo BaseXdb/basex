@@ -348,7 +348,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Trims leading and trailing whitespaces.
+   * Trims leading and trailing whitespace.
    * @return self reference
    */
   public TokenBuilder trim() {

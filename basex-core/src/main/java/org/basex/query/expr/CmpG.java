@@ -571,7 +571,7 @@ public class CmpG extends Cmp {
     Expr expr1 = exprs[0];
     IndexType type = null;
     if(Function.TOKENIZE.is(expr1)) {
-      if(!(expr1.arg(0).seqType().zeroOrOne() && ((FnTokenize) expr1).whitespaces())) return false;
+      if(!(expr1.arg(0).seqType().zeroOrOne() && ((FnTokenize) expr1).whitespace())) return false;
       expr1 = expr1.arg(0);
       type = IndexType.TOKEN;
     }
