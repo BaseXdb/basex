@@ -34,14 +34,14 @@ public final class FnAnalyzeString extends RegEx {
     final String value = string(toZeroToken(arg(0), qc));
     final byte[] pattern = toToken(arg(1), qc);
     final Expr flags = defined(2) ? arg(2) : null;
-    final Matcher m = pattern(pattern, flags, qc, true).matcher(value);
 
+    final Matcher matcher = pattern(pattern, flags, qc, true).matcher(value);
     final FBuilder root = FElem.build(Q_ANALYZE).declareNS();
     int start = 0;
-    while(m.find()) {
-      if(start != m.start()) nonmatch(value.substring(start, m.start()), root);
-      match(m, value, root, 0);
-      start = m.end();
+    while(matcher.find()) {
+      if(start != matcher.start()) nonmatch(value.substring(start, matcher.start()), root);
+      match(matcher, value, root, 0);
+      start = matcher.end();
     }
     if(start != value.length()) nonmatch(value.substring(start), root);
     return root.finish();

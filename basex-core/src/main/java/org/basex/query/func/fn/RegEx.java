@@ -80,7 +80,7 @@ abstract class RegEx extends StandardFunc {
   /**
    * Tries to convert the regex pattern to a single character.
    * @param pattern pattern
-   * @return character
+   * @return character or {@code -1}
    */
   static int patternChar(final byte[] pattern) {
     final int sl = pattern.length, separator = sl > 0 && cl(pattern, 0) == sl ? cp(pattern, 0) : -1;
