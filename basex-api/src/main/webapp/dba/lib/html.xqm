@@ -65,7 +65,7 @@ declare function html:wrap(
                   </span>,
                   if($user) then (
                     <span style='float:right'>
-                      <b>{ $user }</b> (<a href='logout'>logout</a>)
+                      <b>{ $user }</b> · <a href='logout'>logout</a>
                     </span>
                   ) else ()
                 }</td>
@@ -557,9 +557,7 @@ declare function html:duration(
 declare function html:js(
   $js  as xs:string
 ) as element(script) {
-  <script type='text/javascript'>{
-    '(function() { ' || $js || ' })();'
-  }</script>
+  <script>{ '(function() { ' || $js || ' })();' }</script>
 };
 
 (:~
