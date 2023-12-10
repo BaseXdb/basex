@@ -50,8 +50,8 @@ declare function html:wrap(
       <meta name='author' content='BaseX Team 2005-23, BSD License'/>
       <link rel='stylesheet' type='text/css' href='static/style.css'/>
       { $options?css ! <link rel='stylesheet' type='text/css' href='static/{ . }'/> }
-      <script type='text/javascript' src='static/js.js'/>
-      { $options?scripts ! <script type='text/javascript' src='static/{ . }'/> }
+      <script src='static/js.js'/>
+      { $options?scripts ! <script src='static/{ . }'/> }
     </head>
     <body>
       <table cellpadding='0' cellspacing='0'>
