@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
@@ -726,6 +727,19 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void formatDate() {
+    final Function func = FORMAT_DATE;
+
+    query(func.args(" xs:date('2023-12-11')", "[Dwo] [MNn] ([FNn])", "zu"),
+        "[Language: en]eleventh December (Monday)");
+
+    if(IcuFormatter.available()) {
+      query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
+          "Dydd Llun, Rhagfyr 11, 2023");
+    }
+  }
+
+  /** Test method. */
   @Test public void formatInteger() {
     final Function func = FORMAT_INTEGER;
 
@@ -738,6 +752,14 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(12345678, "16^#_xxxx"), "bc_614e");
     query(func.args(255, "2^xxxx xxxx"), "1111 1111");
     query(func.args(1023, "32^XXXX"), "00VV");
+
+    query(func.args(1, "Ww", "de"), "Eins");
+    query(func.args(1, "Ww;o", "de"), "Erste");
+    if(IcuFormatter.available()) {
+      query(func.args(1, "Ww;c", "de"), "Ein");
+      query(func.args(1, "Ww;o(%spellout-cardinal-feminine-financial)", "bs"), "Jedinica");
+      query(func.args(1, "Ww;c(%spellout-ordinal-neuter)", "es"), "Primera");
+    }
   }
 
   /** Test method. */

@@ -3,8 +3,6 @@ package org.basex.query.util.format;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -24,8 +22,17 @@ abstract class FormatParser extends FormatUtil {
   byte[] primary;
   /** First character of format token, or mandatory digit. */
   int first = -1;
-  /** Cardinal vs. ordinal flag. */
-  boolean ordinal;
+  /** Numeral type. */
+  enum NumeralType {
+    /** Ordinal. */
+    ORDINAL,
+    /** Cardinal. */
+    CARDINAL,
+    /** Numbering. */
+    NUMBERING
+  };
+  /** Type of numeral. */
+  NumeralType numType = NumeralType.NUMBERING;
   /** Format modifier; {@code null} if not specified. */
   byte[] modifier;
   /** Traditional modifier. */
@@ -36,10 +43,6 @@ abstract class FormatParser extends FormatUtil {
   int max = Integer.MAX_VALUE;
   /** Radix. */
   int radix = 10;
-  /** Locale. */
-  Locale locale;
-  /** Whether to use ICU with this format. */
-  boolean useIcu;
 
   /**
    * Constructor for formatting integers.

@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.util.Token.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
@@ -16,8 +14,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class FnFormatInteger extends StandardFunc {
-  /** Format key separator. */
-  private static final byte[] SEPARATOR = token(";");
   /** Pattern cache. */
   private final TokenObjMap<IntFormat> formats = new TokenObjMap<>();
 
@@ -31,12 +27,11 @@ public final class FnFormatInteger extends StandardFunc {
     final long number = toLong(value);
     IntFormat format;
 
-    byte[] key = concat(picture, SEPARATOR, language);
     synchronized(formats) {
-      format = formats.get(key);
+      format = formats.get(picture);
       if(format == null) {
-        format = new IntFormat(picture, language, info);
-        formats.put(key, format);
+        format = new IntFormat(picture, info);
+        formats.put(picture, format);
       }
     }
     return Str.get(Formatter.get(language).formatInt(number, format));
