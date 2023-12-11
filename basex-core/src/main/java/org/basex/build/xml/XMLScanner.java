@@ -396,8 +396,8 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Scans whitespaces.
-   * @return true for whitespaces
+   * Scans whitespace.
+   * @return true for whitespace
    * @throws IOException I/O exception
    */
   private boolean s() throws IOException {
@@ -408,7 +408,7 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Checks input for whitespaces; if none are found, throws an exception.
+   * Checks input for whitespace; if none are found, throws an exception.
    * @throws IOException I/O exception
    */
   private void checkS() throws IOException {
@@ -435,9 +435,9 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Scans whitespaces.
+   * Scans whitespace.
    * @param ch current character
-   * @return true for whitespaces
+   * @return true for whitespace
    * @throws IOException I/O exception
    */
   private boolean s(final int ch) throws IOException {

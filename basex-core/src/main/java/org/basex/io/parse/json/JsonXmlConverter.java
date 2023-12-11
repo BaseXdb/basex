@@ -136,7 +136,7 @@ abstract class JsonXmlConverter extends JsonConverter {
    */
   final void processType(final FBuilder elem, final byte[] type) {
     // merge type information
-    // check if name exists and contains no whitespaces
+    // check if name exists and contains no whitespace
     if(merge && name != null && !contains(name, ' ')) {
       // check if name is already known
       if(names.contains(name)) {
@@ -159,7 +159,7 @@ abstract class JsonXmlConverter extends JsonConverter {
         names.put(name, new TypeCache(name, type, elem));
       }
     } else {
-      // no name, or name with whitespaces: add type attribute, ignore string type
+      // no name, or name with whitespace: add type attribute, ignore string type
       addType(elem, type);
     }
   }

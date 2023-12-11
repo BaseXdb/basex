@@ -40,7 +40,7 @@ import org.basex.util.*;
  *       additional, type-specific attributes in the root node. The attributes
  *       are named by their type in the plural (<i>numbers</i>, <i>booleans</i>,
  *       <i>nulls</i>, <i>objects</i> and <i>arrays</i>), and the attribute
- *       value contains all names with that type, separated by whitespaces.</li>
+ *       value contains all names with that type, separated by whitespace.</li>
  * </ol></li>
  * </ol>
  *

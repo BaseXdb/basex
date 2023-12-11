@@ -473,7 +473,7 @@ public final class TextEditor {
       end = s;
     }
 
-    // ignore whitespaces
+    // ignore whitespace
     while(start < end && ws(text[start])) ++start;
     while(end > start && ws(text[end - 1])) --end;
 
@@ -877,7 +877,7 @@ public final class TextEditor {
   }
 
   /**
-   * Closes a bracket and unindents leading whitespaces.
+   * Closes a bracket and unindents leading whitespace.
    */
   private void close() {
     int p = pos - 1;
@@ -1061,7 +1061,7 @@ public final class TextEditor {
     final TokenBuilder tb = new TokenBuilder();
     for(int p = s; p < e; p++) {
       if(p == 0 || text[p - 1] == '\n') {
-        // find leading whitespaces
+        // find leading whitespace
         int i = 0;
         do {
           final int cp = text[p];

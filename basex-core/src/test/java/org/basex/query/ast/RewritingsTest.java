@@ -2774,7 +2774,7 @@ public final class RewritingsTest extends SandboxTest {
     check("//(b, c, d) => avg()", 4, root(Dbl.class));
     execute(new Close());
 
-    // whitespaces will be preserved in categories, but numbers will still be detected
+    // whitespace will be preserved in categories, but numbers will still be detected
     query(_DB_CREATE.args(NAME, " <a><b>1</b><b>3 </b><b> 5</b></a>", NAME));
     final String query = _DB_GET.args(NAME) + "//b => ";
     check(query + "count()", 3, root(Int.class));

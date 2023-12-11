@@ -167,7 +167,7 @@ public final class XMLToken {
    * @return valid NCName
    */
   public static byte[] encode(final byte[] name, final boolean lax) {
-    // lax encoding: trim whitespaces
+    // lax encoding: trim whitespace
     final byte[] nm = lax ? trim(name) : name;
     final int nl = nm.length;
     if(nl == 0) return UNDERSCORE;

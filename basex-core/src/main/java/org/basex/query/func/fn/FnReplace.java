@@ -23,86 +23,76 @@ public final class FnReplace extends RegEx {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
-    final byte[] replacement = toZeroToken(arg(2), qc);
+    final Item replacement = arg(2).item(qc, info);
     final Expr flags = defined(3) ? arg(3) : null;
     final FItem action = defined(4) ? toFunction(arg(4), 2, qc) : null;
+    if(!replacement.isEmpty() && action != null) throw REGACTION_X.get(info, this);
 
     // shortcut for simple character replacements
+    final byte[] replace = replacement.isEmpty() ? EMPTY : toToken(replacement);
     if(flags == null) {
-      final int sp = patternChar(pattern), rp = patternChar(replacement);
+      final int sp = patternChar(pattern), rp = replace != null ? patternChar(replace) : -1;
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
-
     final RegExpr regExpr = regExpr(pattern, flags, qc, true);
-    String replace = string(replacement);
-    if(action == null && (regExpr.pattern.flags() & Pattern.LITERAL) == 0) {
+    final Matcher matcher = regExpr.pattern.matcher(string(value));
+
+    if(action != null) {
+      final StringBuilder sb = new StringBuilder();
+      while(matcher.find()) {
+        final Atm group = Atm.get(matcher.group());
+        final ValueBuilder groups = new ValueBuilder(qc);
+        final int gc = matcher.groupCount();
+        for(int g = 0; g < gc; g++) groups.add(Atm.get(matcher.group(g + 1)));
+        final Item item = action.invoke(qc, info, group, groups.value()).atomItem(qc, info);
+        matcher.appendReplacement(sb, item.isEmpty() ? "" :
+          string(item.string(info)).replace("\\", "\\\\").replace("$", "\\$"));
+      }
+      return Str.get(matcher.appendTail(sb).toString());
+    }
+
+    String string = string(replace);
+    if((regExpr.pattern.flags() & Pattern.LITERAL) != 0) {
+      // literal parsing: add backslashes
+      string = string.replace("\\", "\\\\").replace("$", "\\$");
+    } else {
       // standard parsing: raise errors for some special cases
-      final int rl = replacement.length;
+      final int rl = replace.length;
       for(int r = 0; r < rl; ++r) {
-        final int n = r + 1 == rl ? 0 : replacement[r + 1];
-        if(replacement[r] == '\\') {
-          if(n != '\\' && n != '$') throw REGBACKSLASH_X.get(info, replacement);
+        final int n = r + 1 == rl ? 0 : replace[r + 1];
+        if(replace[r] == '\\') {
+          if(n != '\\' && n != '$') throw REGBACKSLASH_X.get(info, replace);
           ++r;
-        } else if(replacement[r] == '$' && (r == 0 || replacement[r - 1] != '\\') && !digit(n)) {
-          throw REGDOLLAR_X.get(info, replacement);
+        } else if(replace[r] == '$' && (r == 0 || replace[r - 1] != '\\') && !digit(n)) {
+          throw REGDOLLAR_X.get(info, replace);
         }
       }
 
       // remove unused group references
-      if(Strings.contains(replace, '$')) {
+      if(contains(replace, '$')) {
         final StringBuilder sb = new StringBuilder();
-        final int sl = replace.length();
+        final int sl = string.length();
         for(int s = 0; s < sl;) {
-          int i = replace.indexOf('$', s);
+          int i = string.indexOf('$', s);
           if(i == -1) {
-            sb.append(replace, s, sl);
+            sb.append(string, s, sl);
             s = sl;
-          } else if(i == 0 || replace.charAt(i - 1) != '\\') {
-            sb.append(replace, s, i);
+          } else if(i == 0 || string.charAt(i - 1) != '\\') {
+            sb.append(string, s, i);
             s = ++i;
-            if(i < sl && Character.isDigit(replace.charAt(i))) i++;
-            final int n = Integer.parseInt(replace.substring(s, i));
+            if(i < sl && Character.isDigit(string.charAt(i))) i++;
+            final int n = Integer.parseInt(string.substring(s, i));
             if(n <= regExpr.groups) sb.append('$').append(n);
             s = i;
           } else {
-            sb.append(replace, s, i + 1);
+            sb.append(string, s, i + 1);
             s = i + 1;
           }
         }
-        replace = sb.toString();
+        string = sb.toString();
       }
-    } else {
-      // literal parsing: add backslashes
-      replace = replace.replace("\\", "\\\\").replace("$", "\\$");
     }
-
-    try {
-      final Matcher m = regExpr.pattern.matcher(string(value));
-      final String replaced;
-      if(action == null) {
-        replaced = m.replaceAll(replace);
-      } else {
-        final StringBuilder sb = new StringBuilder();
-        while(m.find()) {
-          final int gc = m.groupCount();
-          final ValueBuilder groups = new ValueBuilder(qc);
-          for(int g = 0; g < gc; g++) groups.add(Atm.get(m.group(g + 1)));
-          final Item rplc = action.invoke(qc, info, Atm.get(m.group()), groups.value()).
-              atomItem(qc, info);
-          m.appendReplacement(sb, rplc.isEmpty() ? "" : string(rplc.string(info)));
-        }
-        replaced = m.appendTail(sb).toString();
-      }
-      return Str.get(replaced);
-    } catch(final QueryException ex) {
-      throw ex;
-    } catch(final Exception ex) {
-      if(ex.getMessage().contains("No group")) {
-        Util.debug(ex);
-        throw REGEMPTY_X.get(info, pattern);
-      }
-      throw REGINVALID_X.get(info, ex);
-    }
+    return Str.get(matcher.replaceAll(string));
   }
 
   @Override

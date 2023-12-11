@@ -97,9 +97,9 @@ public final class MediaType implements Comparable<MediaType> {
     if(p != -1) {
       for(final String param : Strings.split(string.substring(p + 1), ';')) {
         final String[] kv = Strings.split(param, '=', 2);
-        // attribute: trim whitespaces, convert to lower case
+        // attribute: trim whitespace, convert to lower case
         final String k = kv[0].trim().toLowerCase(Locale.ENGLISH);
-        // value: trim whitespaces, remove quotes and backslashed characters
+        // value: trim whitespace, remove quotes and backslashed characters
         String v = kv.length < 2 ? "" : kv[1].trim();
         if(Strings.startsWith(v, '"')) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
         parameters.put(k, v);

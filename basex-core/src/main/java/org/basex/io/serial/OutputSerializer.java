@@ -94,7 +94,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Prints indentation whitespaces.
+   * Prints indentation whitespace.
    * @throws IOException I/O exception
    */
   protected void indent() throws IOException {

@@ -344,6 +344,7 @@ final class TextRenderer extends BaseXBack {
           if(sw > maxWidth) sw = font.stringWidth(tb.toString());
         }
         s = tb.removeLast().toString();
+        if(s.isEmpty()) return false;
         sw = font.stringWidth(s);
         iter.posEnd(iter.pos() + tb.size());
       }

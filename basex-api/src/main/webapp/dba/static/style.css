@@ -1,11 +1,49 @@
 body {
   font-family: Calibri, Helvetica, sans-serif;
-  overflow-y: scroll;
-  margin: .5em 1em .5em 1em;
   font-size: 16px;
+  overflow-y: scroll;
+  margin: .5em 1em 1em 1em;
 }
 
-ul, dd {
+p {
+  margin: 0 0 .6em 0;
+}
+
+h1 {
+  font-size: 220%;
+  color: #A22;
+  margin: -2px 0 0 0;
+}
+
+h2 {
+  font-size: 150%;
+  color: #C33;
+  margin: 0 0 0.2em 0;
+}
+
+h3 {
+  font-size: 120%;
+  color: #666;
+  margin: 0.2em 0 0.2em 0;
+}
+
+table {
+  table-layout: fixed;
+}
+
+th {
+  vertical-align: top;
+  text-align: left;
+  padding: 0 1em 0em 0;
+}
+
+td {
+  vertical-align: top;
+  padding: 0 1em 0 0;
+  border: 0;
+}
+
+ol, ul, dd {
   padding-left: 1.2em;
   margin-left: 0;
 }
@@ -19,21 +57,73 @@ dt {
   font-weight: bold;
 }
 
-table {
-  font-size: 100%;
-  padding: 0;
-  border: 0;
-  table-layout: fixed;
+a {
+  color: #C33;
+  text-decoration: none;
 }
 
-th {
-  padding: 0 1em 0em 0;
+a:hover {
+  text-decoration:underline;
 }
 
-td {
-  padding: 0 1em 0 0;
-  vertical-align: top;
+b {
+  color: #333;
+}
+
+code {
+  font-family: SFMono-Regular, Consolas, Menlo, monospace;
+  font-size: 90%;
+  border: 1px solid #DDD;
+  border-radius: 3px;
+  padding: 0 4px 0 4px;
+  margin: 0 2px 0 2px;
+}
+
+pre {
+  font-family: SFMono-Regular, Consolas, Menlo, monospace;
+  font-size: 90%;
+  border-color: #DDD;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 3px;
+  background-color: #F8F8F8;
+  padding: .5em;
+  margin: .2em 0 .5em 0;
+}
+
+textarea {
+  font-family: SFMono-Regular, Consolas, Menlo, monospace;
+  border: 1px solid #AAA;
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type=text], input[type=password], input[type=number], select, button {
+  padding: 4px;
+  border: 1px solid #AAA;
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type=submit], button {
+  padding: 4px 8px 4px 8px;
+  border: 1px solid #AAA;
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type=text], input[type=password], input[type=number], select {
+  width: 240;
+}
+
+input:focus, select:focus, button:focus {
+  outline: .5px solid black;
+}
+
+hr {
+  height: .7px;
   border: 0;
+  background-color: #AAA;
 }
 
 .img {
@@ -44,93 +134,17 @@ td {
   padding: 0 0 0 0;
 }
 
-textarea {
-  font-family: "Consolas", "Ubuntu Mono", Menlo, monospace;
-  font-size: 90%;
-  margin: 4px 0px 4px 0px;
-  width: 100%;
-  resize: vertical;
-}
-
-input[type=text] {
-  width: 240;
-}
-
-input[type=password] {
-  width: 240;
-}
-
-input[type=number] {
-  width: 240;
-}
-
-select {
-  width: 240;
-}
-
-code {
-  font-family: "Consolas", "Ubuntu Mono", Menlo, monospace;
-  border: 1px solid #E3E3FF;
-  border-radius: 3px;
-  padding: 0 4px 0 4px;
-  margin: 0 2px 0 2px;
-  font-size: 90%;
-}
-
-pre {
-  font-family: "Consolas", "Ubuntu Mono", Menlo, monospace;
-  font-size: 90%;
-}
-
-h1 {
-  font-size: 220%;
-  font-weight: bold;
-  color: #AA1818;
-  margin: -2px 0 0 0;
-}
-
-h2 {
-  font-size: 150%;
-  color: #CC3333;
-  margin: 0 0 0.2em 0;
-}
-
-h3 {
-  font-size: 120%;
-  color: #606060;
-  margin: 0.2em 0 0.2em 0;
-}
-
-hr {
-  height: 1px;
-  border: 0px;
-  background-color: #777;
-}
-
-a {
-  color: #CC3333;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration:underline;
-}
-
-p {
-  margin: 0 0 0.6em 0;
-}
-
 .right {
   float: right;
 }
 
 .error {
-  color: #FF3333;
+  color: #C33;
   font-weight: bold;
 }
 
 .info {
-  color: #009900;
+  color: #090;
   font-weight: bold;
 }
 
@@ -141,17 +155,17 @@ p {
 }
 
 .warning {
-  color: #999999;
+  color: #999;
   font-weight: bold;
 }
 
 .note {
-  color: #666666;
+  color: #666;
 }
 
 .footnote {
   font-size: 70%;
-  color: #666666;
+  color: #666;
 }
 
 .small {
@@ -159,11 +173,11 @@ p {
 }
 
 .variable {
-  font-family: "Calibri", "Trebuchet MS", sans-serif;
+  font-family: Calibri, Helvetica, sans-serif;
 }
 
 .vertical {
   width: 1px;
-  border-left: 1px solid #000000;
+  border-left: .7px solid #AAA;
   height: 100%;
 }

@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 public class XMLParser extends SingleParser {
   /** Strip namespaces. */
   private final boolean stripNS;
-  /** Strip whitespaces. */
+  /** Strip whitespace. */
   private final boolean stripWS;
   /** Whitespace handling. */
   private final BoolList strips = new BoolList();
@@ -212,7 +212,7 @@ public class XMLParser extends SingleParser {
   }
 
   /**
-   * Skips optional whitespaces.
+   * Skips optional whitespace.
    * @throws IOException I/O exception
    */
   private void skipSpace() throws IOException {

@@ -52,7 +52,7 @@ public final class MainOptions extends Options {
 
   /** Use internal XML parser. */
   public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
-  /** Strip whitespaces. */
+  /** Strip whitespace. */
   public static final BooleanOption STRIPWS = new BooleanOption("STRIPWS", false);
   /** Strip namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);

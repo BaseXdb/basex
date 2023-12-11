@@ -24,7 +24,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   /** Strip namespaces. */
   private final boolean stripNS;
-  /** Strip whitespaces. */
+  /** Strip whitespace. */
   private final boolean stripWS;
   /** Whitespace handling. */
   private final BoolList strips = new BoolList();
@@ -57,7 +57,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   /**
    * Constructor.
    * @param builder builder reference
-   * @param stripWS strip whitespaces
+   * @param stripWS strip whitespace
    * @param stripNS strip namespaces
    */
   public SAXHandler(final Builder builder, final boolean stripWS, final boolean stripNS) {

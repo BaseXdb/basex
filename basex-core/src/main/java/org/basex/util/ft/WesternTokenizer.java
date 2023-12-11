@@ -139,7 +139,7 @@ public final class WesternTokenizer extends Tokenizer {
     final byte[] txt = text;
     final int txtl = txt.length;
 
-    // parse whitespaces
+    // parse whitespace
     int cp = epos;
     boolean bs = false, pa = false, sn = false;
     for(; cp < txtl; cp += cl(txt, cp)) {
@@ -206,7 +206,7 @@ public final class WesternTokenizer extends Tokenizer {
     final byte[] txt = text;
     final int txtl = txt.length;
 
-    // parse whitespaces
+    // parse whitespace
     int cp = epos;
 
     final int lp = cp;

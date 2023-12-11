@@ -4147,7 +4147,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Skips whitespaces, raises an error if the specified string cannot be consumed.
+   * Skips whitespace, raises an error if the specified string cannot be consumed.
    * @param string expected string
    * @throws QueryException query exception
    */
@@ -4171,7 +4171,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Consumes the specified string and surrounding whitespaces.
+   * Consumes the specified string and surrounding whitespace.
    * @param string string to consume (words must not be followed by letters)
    * @return true if token was found
    * @throws QueryException query exception
@@ -4214,7 +4214,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Skips whitespaces, consumes the specified string and ignores trailing characters.
+   * Skips whitespace, consumes the specified string and ignores trailing characters.
    * @param string string to consume
    * @return true if string was found
    * @throws QueryException query exception
@@ -4226,7 +4226,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Consumes all whitespace characters from the remaining query.
-   * @return true if whitespaces were found
+   * @return true if whitespace was found
    * @throws QueryException query exception
    */
   private boolean skipWs() throws QueryException {
@@ -4286,7 +4286,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Consumes all following whitespace characters.
-   * @return true if whitespaces were found
+   * @return true if whitespace was found
    */
   private boolean consumeWS() {
     final int i = pos;

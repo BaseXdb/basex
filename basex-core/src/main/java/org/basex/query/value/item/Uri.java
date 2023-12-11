@@ -54,7 +54,7 @@ public final class Uri extends AStr {
   /**
    * Creates a new uri instance.
    * @param value value
-   * @param normalize remove leading and trailing whitespaces
+   * @param normalize remove leading and trailing whitespace
    * @return uri instance
    */
   public static Uri get(final byte[] value, final boolean normalize) {

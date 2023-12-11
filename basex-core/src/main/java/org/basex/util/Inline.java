@@ -14,7 +14,7 @@ import org.basex.data.*;
  * - Byte 4: integer value or inlined whitespace token
  * </pre>
  *
- * XML 1.0 whitespaces will be represented as follows:
+ * XML 1.0 whitespace will be represented as follows:
  *
  * <pre>
  * - 00: 0x0A (new line)
