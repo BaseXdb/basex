@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public class FnContainsSequence extends StandardFunc {
+public class FnContainsSubsequence extends StandardFunc {
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = arg(0).value(qc);

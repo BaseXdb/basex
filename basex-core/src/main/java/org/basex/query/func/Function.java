@@ -135,8 +135,8 @@ public enum Function implements AFunction {
   CONTAINS(FnContains::new, "contains(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
   /** XQuery function. */
-  CONTAINS_SEQUENCE(FnContainsSequence::new,
-      "contains-sequence(input,subsequence[,compare])",
+  CONTAINS_SUBSEQUENCE(FnContainsSubsequence::new,
+      "contains-subsequence(input,subsequence[,compare])",
       params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
   /** XQuery function. */
   CONTAINS_TOKEN(FnContainsToken::new, "contains-token(value,token[,collation])",
@@ -211,8 +211,8 @@ public enum Function implements AFunction {
   ENDS_WITH(FnEndsWith::new, "ends-with(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
   /** XQuery function. */
-  ENDS_WITH_SEQUENCE(FnEndsWithSequence::new,
-      "ends-with-sequence(input,subsequence[,compare])",
+  ENDS_WITH_SUBSEQUENCE(FnEndsWithSubsequence::new,
+      "ends-with-subsequence(input,subsequence[,compare])",
       params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
@@ -352,20 +352,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   IS_NAN(FnIsNaN::new, "is-NaN(value)", params(ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
-  ITEMS_AFTER(FnItemsAfter::new, "items-after(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
-  /** XQuery function. */
   ITEMS_AT(FnItemsAt::new, "items-at(input,at)",
       params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
-  /** XQuery function. */
-  ITEMS_BEFORE(FnItemsBefore::new, "items-before(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
-  /** XQuery function. */
-  ITEMS_ENDING_WHERE(FnItemsEndingWhere::new, "items-ending-where(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
-  /** XQuery function. */
-  ITEMS_STARTING_WHERE(FnItemsStartingWhere::new, "items-starting-where(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   ITERATE_WHILE(FnIterateWhile::new, "iterate-while(input,predicate,action)",
       params(ITEM_ZM, PREDICATE_ZM,
@@ -560,8 +548,8 @@ public enum Function implements AFunction {
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
   /** XQuery function. */
-  STARTS_WITH_SEQUENCE(FnStartsWithSequence::new,
-      "starts-with-sequence(input,subsequence[,compare])",
+  STARTS_WITH_SUBSEQUENCE(FnStartsWithSubsequence::new,
+      "starts-with-subsequence(input,subsequence[,compare])",
       params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
   /** XQuery function. */
   STATIC_BASE_URI(FnStaticBaseUri::new, "static-base-uri()",
@@ -581,6 +569,20 @@ public enum Function implements AFunction {
   /** XQuery function. */
   SUBSEQUENCE(FnSubsequence::new, "subsequence(input,start[,length])",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_ZO), ITEM_ZM),
+  /** XQuery function. */
+  SUBSEQUENCE_AFTER(FnSubsequenceAfter::new, "subsequence-after(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  SUBSEQUENCE_BEFORE(FnSubsequenceBefore::new, "subsequence-before(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  SUBSEQUENCE_ENDING_WHERE(FnSubsequenceEndingWhere::new,
+      "subsequence-ending-where(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
+  SUBSEQUENCE_STARTING_WHERE(FnSubsequenceStartingWhere::new,
+      "subsequence-starting-where(input,predicate)",
+      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   SUBSTRING(FnSubstring::new, "substring(value,start[,length])",
       params(STRING_ZO, DOUBLE_O, DOUBLE_ZO), STRING_O),

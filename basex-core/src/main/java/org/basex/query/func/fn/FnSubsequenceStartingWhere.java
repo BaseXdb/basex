@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public class FnItemsStartingWhere extends StandardFunc {
+public class FnSubsequenceStartingWhere extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {

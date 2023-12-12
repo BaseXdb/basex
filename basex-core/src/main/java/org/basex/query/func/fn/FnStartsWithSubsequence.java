@@ -10,16 +10,16 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Christian Gruen
  */
-public final class FnEndsWithSequence extends FnContainsSequence {
+public final class FnStartsWithSubsequence extends FnContainsSubsequence {
   @Override
   boolean compare(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 
-    final long is = input.size(), ss = subsequence.size(), ps = is - ss;
+    final long is = input.size(), ss = subsequence.size();
     if(is < ss) return false;
 
     for(long s = 0; s < ss; s++) {
-      if(!cmp.apply(input.itemAt(ps + s), subsequence.itemAt(s))) return false;
+      if(!cmp.apply(input.itemAt(s), subsequence.itemAt(s))) return false;
     }
     return true;
   }
