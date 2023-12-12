@@ -41,9 +41,8 @@ public class FnFoldLeft extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean skip(final QueryContext qc, final Value... args)
-      throws QueryException {
-    return iff != null && toBoolean(iff[0].invoke(qc, info, args).item(qc, info));
+  public final boolean skip(final QueryContext qc, final Value... args) throws QueryException {
+    return iff != null && toBoolean(qc, iff[0], args);
   }
 
   /**

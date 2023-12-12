@@ -22,11 +22,7 @@ public final class FnItemsEndingWhere extends FnItemsStartingWhere {
       @Override
       public Item next() throws QueryException {
         final Item item = ended ? null : input.next();
-        if(item != null) {
-          if(toBoolean(predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info))) {
-            ended  = true;
-          }
-        }
+        if(item != null && toBoolean(qc, predicate, item, Int.get(++p))) ended  = true;
         return item;
       }
     };

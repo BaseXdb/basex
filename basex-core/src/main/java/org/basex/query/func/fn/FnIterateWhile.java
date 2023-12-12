@@ -22,7 +22,7 @@ public final class FnIterateWhile extends StandardFunc {
     int p = 0;
     while(true) {
       final Int pos = Int.get(++p);
-      if(!toBoolean(predicate.invoke(qc, info, value, pos).item(qc, info))) return value;
+      if(!toBoolean(qc, predicate, value, pos)) return value;
       value = action.invoke(qc, info, value, pos);
     }
   }

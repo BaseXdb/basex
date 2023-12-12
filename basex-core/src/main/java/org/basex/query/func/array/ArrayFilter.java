@@ -23,9 +23,7 @@ public final class ArrayFilter extends ArrayFn {
     int p = 0;
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      if(toBoolean(predicate.invoke(qc, info, value, Int.get(++p)).item(qc, info))) {
-        ab.append(value);
-      }
+      if(toBoolean(qc, predicate, value, Int.get(++p))) ab.append(value);
     }
     return ab.array(this);
   }

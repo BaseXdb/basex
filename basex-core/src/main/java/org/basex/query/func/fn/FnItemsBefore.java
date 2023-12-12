@@ -22,9 +22,7 @@ public final class FnItemsBefore extends FnItemsStartingWhere {
       public Item next() throws QueryException {
         Item item = input.next();
         if(item != null) {
-          if(toBoolean(predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info))) {
-            item = null;
-          }
+          if(toBoolean(qc, predicate, item, Int.get(++p))) item = null;
         }
         return item;
       }

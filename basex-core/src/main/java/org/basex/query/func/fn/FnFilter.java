@@ -28,9 +28,7 @@ public final class FnFilter extends StandardFunc {
     int p = 0;
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
-      if(toBoolean(predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info))) {
-        vb.add(item);
-      }
+      if(toBoolean(qc, predicate, item, Int.get(++p))) vb.add(item);
     }
     return vb.value(this);
   }

@@ -27,7 +27,7 @@ public class FnItemsStartingWhere extends StandardFunc {
       public Item next() throws QueryException {
         for(Item item; (item = input.next()) != null;) {
           if(started) return item;
-          if(toBoolean(predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info))) {
+          if(toBoolean(qc, predicate, item, Int.get(++p))) {
             started = true;
             return item;
           }
