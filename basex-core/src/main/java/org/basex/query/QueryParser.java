@@ -307,9 +307,8 @@ public class QueryParser extends InputParser {
     final boolean version = wsConsumeWs(VERSION);
     if(version) {
       // parse xquery version
-      final String ver = string(stringLiteral());
-      if(!ver.equals("1.0") && !Strings.eq(ver, "1.1", "3.0", "3.1", "4.0"))
-        throw error(XQUERYVER_X, ver);
+      final String string = string(stringLiteral()).replaceAll("0+(\\d)", "$1");
+      if(!Strings.eq(string, "1.0", "1.1", "3.0", "3.1", "4.0")) throw error(XQUERYVER_X, string);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
     if(wsConsumeWs(ENCODING)) {
