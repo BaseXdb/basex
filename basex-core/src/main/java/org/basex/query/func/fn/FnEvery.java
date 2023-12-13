@@ -44,14 +44,14 @@ public class FnEvery extends StandardFunc {
 
     Expr result = null;
     if(defined(1)) {
-      final int al = predicate.funcType() != null ? predicate.funcType().argTypes.length : -1;
-      if(al == 1 || al == 2) {
+      final int arity = arity(predicate);
+      if(arity == 1 || arity == 2) {
         final IntObjMap<Var> vm = new IntObjMap<>();
         final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
         final Expr item = new VarRef(info, i).optimize(cc);
         final For fr;
         Expr pos = null;
-        if(al == 1) {
+        if(arity == 1) {
           // some : (for $i in INPUT return PREDICATE($i)) = true()
           // every:  not((for $i in INPUT return PREDICATE($i)) = false())
           fr = new For(i, input).optimize(cc);
@@ -62,8 +62,8 @@ public class FnEvery extends StandardFunc {
           fr = new For(i, p, null, input, false).optimize(cc);
           pos = new VarRef(info, p).optimize(cc);
         }
-        final Expr[] args = al == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-        final Expr rtrn = new DynFuncCall(info, sc, coerce(1, cc, al), args).optimize(cc);
+        final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
+        final Expr rtrn = new DynFuncCall(info, sc, coerce(1, cc, arity), args).optimize(cc);
         result = new GFLWOR(info, fr, rtrn).optimize(cc);
       }
     } else {

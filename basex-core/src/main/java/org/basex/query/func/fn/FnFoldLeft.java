@@ -62,11 +62,11 @@ public class FnFoldLeft extends StandardFunc {
 
     // unroll fold
     final Expr input = arg(0), zero = arg(1), action = arg(2);
-    final int al = action.funcType() != null ? action.funcType().argTypes.length : -1;
-    if(action instanceof Value && al == 2) {
+    final int arity = arity(action);
+    if(action instanceof Value && arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final Expr func = coerce(2, cc, al);
+        final Expr func = coerce(2, cc, arity);
         expr = zero;
         for(final Expr ex : unroll) {
           expr = new DynFuncCall(info, sc, func, expr, ex).optimize(cc);

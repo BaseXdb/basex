@@ -39,14 +39,14 @@ public final class FnFilter extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    final int al = predicate.funcType() != null ? predicate.funcType().argTypes.length : -1;
-    if(al == 1) {
+    final int arity = arity(predicate);
+    if(arity == 1) {
       // INPUT[PREDICATE(.)]
       final Expr pred = cc.get(input, () ->
         new DynFuncCall(info, sc, coerce(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
       );
       return Filter.get(cc, info, input, pred);
-    } else if(al == 2) {
+    } else if(arity == 2) {
       // for $i at $p in INPUT where PREDICATE($i, $p) return $i
       final IntObjMap<Var> vm = new IntObjMap<>();
       final LinkedList<Clause> clauses = new LinkedList<>();

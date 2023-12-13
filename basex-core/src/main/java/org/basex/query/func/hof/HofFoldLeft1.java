@@ -37,11 +37,11 @@ public final class HofFoldLeft1 extends StandardFunc {
     if(input.seqType().zero()) throw EMPTYFOUND.get(info);
 
     // unroll fold
-    final int al = action.funcType() != null ? action.funcType().argTypes.length : -1;
-    if(action instanceof Value && al == 2) {
+    final int arity = arity(action);
+    if(action instanceof Value && arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final Expr func = coerce(1, cc, al);
+        final Expr func = coerce(1, cc, arity);
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {

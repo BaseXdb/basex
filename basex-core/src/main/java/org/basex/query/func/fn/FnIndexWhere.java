@@ -41,8 +41,8 @@ public final class FnIndexWhere extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    final int al = predicate.funcType() != null ? predicate.funcType().argTypes.length : -1;
-    if(al >= 1) {
+    final int arity = arity(predicate);
+    if(arity >= 1) {
       // for $i at $p in INPUT where PREDICATE($i, $p) return $p
       final IntObjMap<Var> vm = new IntObjMap<>();
       final LinkedList<Clause> clauses = new LinkedList<>();
@@ -53,8 +53,8 @@ public final class FnIndexWhere extends StandardFunc {
 
       final Expr item = new VarRef(info, i).optimize(cc);
       final Expr pos = new VarRef(info, p).optimize(cc);
-      final Expr[] args = al == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-      final Expr dfc = new DynFuncCall(info, sc, coerce(1, cc, al), args).optimize(cc);
+      final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
+      final Expr dfc = new DynFuncCall(info, sc, coerce(1, cc, arity), args).optimize(cc);
       clauses.add(new Where(dfc, info).optimize(cc));
 
       return new GFLWOR(info, clauses, new VarRef(info, p).optimize(cc)).optimize(cc);

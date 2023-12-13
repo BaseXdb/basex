@@ -40,19 +40,19 @@ public class FnForEach extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    final int al = action.funcType() != null ? action.funcType().argTypes.length : -1;
-    if(al == 1 || al == 2) {
+    final int arity = arity(action);
+    if(arity == 1 || arity == 2) {
       // for $i in INPUT return ACTION($i)
       // for $i at $p in INPUT return ACTION($i, $p)
       final IntObjMap<Var> vm = new IntObjMap<>();
       final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
-      final Var p = al != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, sc, info), vm) : null;
+      final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, sc, info), vm) : null;
       final For fr = new For(i, p, null, input, false).optimize(cc);
 
-      final Expr act = coerce(1, cc, al);
+      final Expr act = coerce(1, cc, arity);
       final boolean updating = this instanceof UpdateForEach, ndt = act.has(Flag.NDT);
       final ExprList args = new ExprList(new VarRef(info, i).optimize(cc));
-      if(al == 2) args.add(new VarRef(info, p).optimize(cc));
+      if(arity == 2) args.add(new VarRef(info, p).optimize(cc));
       final Expr rtrn = new DynFuncCall(info, sc, updating, ndt, act, args.finish()).optimize(cc);
       return new GFLWOR(info, fr, rtrn).optimize(cc);
     }

@@ -266,6 +266,20 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Returns the arity of a function expression.
+   * @param expr function
+   * @return arity, or {@code -1} if unknown
+   */
+  public int arity(final Expr expr) {
+    final FuncType ft = expr.funcType();
+    if(ft != null) {
+      final SeqType[] at = ft.argTypes;
+      if(at != null) return at.length;
+    }
+    return -1;
+  }
+
+  /**
    * Opens a database at compile time.
    * @param cc compilation context
    * @return self reference
