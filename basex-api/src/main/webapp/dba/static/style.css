@@ -96,6 +96,8 @@ textarea {
   border: 1px solid #AAA;
   border-radius: 3px;
   outline: none;
+  width: 100%;
+  resize: vertical;
 }
 
 input[type=text], input[type=password], input[type=number], select, button {
