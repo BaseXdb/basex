@@ -629,7 +629,7 @@ public enum QueryError {
   /** Error code. */
   DIFFMAND_X(FODF, 1310, "Mandatory digits is not of the same group: '%'."),
   /** Error code. */
-  INVORDINAL_X(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
+  INVMODIFIER_X(FODF, 1310, "Invalid specification of ordinal/cardinal numbering: '%'."),
   /** Error code. */
   INVDDPATTERN_X(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
 

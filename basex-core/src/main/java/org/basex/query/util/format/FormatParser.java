@@ -22,8 +22,19 @@ abstract class FormatParser extends FormatUtil {
   byte[] primary;
   /** First character of format token, or mandatory digit. */
   int first = -1;
-  /** Ordinal suffix; {@code null} if not specified. */
-  byte[] ordinal;
+  /** Numeral type. */
+  enum NumeralType {
+    /** Ordinal. */
+    ORDINAL,
+    /** Cardinal. */
+    CARDINAL,
+    /** Numbering. */
+    NUMBERING
+  };
+  /** Type of numeral. */
+  NumeralType numType = NumeralType.NUMBERING;
+  /** Format modifier; {@code null} if not specified. */
+  byte[] modifier;
   /** Traditional modifier. */
   boolean trad;
   /** Minimum width. */

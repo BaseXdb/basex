@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public final class IntFormat extends FormatParser {
   /** Whether the radix was specified explicitly. */
-  private boolean hasExplicitRadix;
+  private final boolean hasExplicitRadix;
 
   /**
    * Constructor.
@@ -56,20 +56,30 @@ public final class IntFormat extends FormatParser {
 
     final TokenParser tp = new TokenParser(mod);
     // parse cardinal/ordinal flag
-    if(tp.consume('c') || tp.consume('o')) {
+    if(tp.consume('o')) numType = NumeralType.ORDINAL;
+    else if(tp.consume('c')) numType = NumeralType.CARDINAL;
+    if(numType != NumeralType.NUMBERING) {
       final TokenBuilder tb = new TokenBuilder();
       if(tp.consume('(')) {
         while(!tp.consume(')')) {
-          if(!tp.more()) throw INVORDINAL_X.get(info, mod);
-          final int cp = tp.next();
-          if(cp != '-') tb.add(cp);
+          if(!tp.more()) throw INVMODIFIER_X.get(info, mod);
+          tb.add(tp.next());
         }
+        if(tb.isEmpty()) throw INVMODIFIER_X.get(info, mod);
+        modifier = tb.finish();
       }
-      ordinal = tb.finish();
     }
     // parse alphabetical/traditional flag
     if(!tp.consume('a')) tp.consume('t');
-    if(tp.more()) throw INVORDINAL_X.get(info, mod);
+    if(tp.more()) throw INVMODIFIER_X.get(info, mod);
+  }
+
+  /**
+   * Checks if this format is a spell out format.
+   * @return true if this format is a spell out format
+   */
+  public boolean isSpelloutFormat() {
+    return first == 'w';
   }
 
   /**

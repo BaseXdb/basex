@@ -7,6 +7,7 @@ import java.math.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.util.format.FormatParser.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -47,25 +48,46 @@ public abstract class Formatter extends FormatUtil {
    * @return formatter instance
    */
   public static Formatter get(final byte[] language) {
-    final Formatter form = MAP.get(language);
-    return form != null ? form : MAP.get(EN);
+    if (IcuFormatter.available()) return IcuFormatter.get(language);
+    final Formatter form = getInternal(language);
+    return form != null ? form : getInternal(EN);
+  }
+
+  /**
+   * Returns an internal formatter for the specified language.
+   * @param language language
+   * @return formatter instance, or {@code null} if not implemented
+   */
+   protected static Formatter getInternal(final byte[] language) {
+    return MAP.get(language);
+  }
+
+  /**
+   * Checks whether a formatter is available for the specified language.
+   * @param language language
+   * @return true if the language is supported
+   */
+  public static boolean available(final byte[] language) {
+    if (IcuFormatter.available()) return IcuFormatter.available(language);
+    return getInternal(language) != null;
   }
 
   /**
    * Returns a word representation for the specified number.
    * @param n number to be formatted
-   * @param ordinal ordinal suffix
+   * @param numType numeral type
+   * @param suffix suffix
    * @return token
    */
-  protected abstract byte[] word(long n, byte[] ordinal);
+  protected abstract byte[] word(long n, NumeralType numType, byte[] suffix);
 
   /**
-   * Returns an ordinal representation for the specified number.
+   * Returns a suffix for the representation of the specified number.
    * @param n number to be formatted
-   * @param ordinal ordinal suffix
+   * @param numType numeral type
    * @return ordinal
    */
-  protected abstract byte[] ordinal(long n, byte[] ordinal);
+  protected abstract byte[] suffix(long n, NumeralType numType);
 
   /**
    * Returns the specified month (0-11).
@@ -122,7 +144,7 @@ public abstract class Formatter extends FormatUtil {
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    if(language.length != 0 && MAP.get(language) == null) tb.add("[Language: en]");
+    if(language.length != 0 && !available(language)) tb.add("[Language: en]");
     if(calendar != null) {
       final QNm qnm;
       try {
@@ -329,7 +351,7 @@ public abstract class Formatter extends FormatUtil {
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
     if(ch == 'w') {
-      tb.add(word(n, fp.ordinal));
+      tb.add(word(n, fp.numType, fp.modifier));
     } else if(ch == KANJI[1]) {
       japanese(tb, n);
     } else if(ch == 'i') {
@@ -541,7 +563,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private byte[] number(final long num, final FormatParser fp, final int first) {
     final byte[] n = number(token(num, fp.radix), fp, first);
-    return concat(n, ordinal(num, fp.ordinal));
+    return concat(n, suffix(num, fp.numType));
   }
 
   /**

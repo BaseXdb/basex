@@ -37,7 +37,7 @@ final class DateFormat extends FormatParser {
       final int p = pres[pl - 1];
       if(p == 'a' || p == 'c' || p == 'o' || p == 't') {
         pres = substring(pres, 0, pl - 1);
-        if(p == 'o') ordinal = EMPTY;
+        if(p == 'o') numType = NumeralType.ORDINAL;
         if(p == 't') trad = true;
       }
     }
