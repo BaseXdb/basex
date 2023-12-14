@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -23,18 +22,18 @@ public final class FnReplace extends RegEx {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
-    final Item replacement = arg(2).item(qc, info);
-    final Expr flags = defined(3) ? arg(3) : null;
-    final FItem action = defined(4) ? toFunction(arg(4), 2, qc) : null;
+    final Item replacement = arg(2).atomItem(qc, info);
+    final byte[] flags = toZeroToken(arg(3), qc);
+    final FItem action = toFunctionOrNull(arg(4), 2, qc);
     if(!replacement.isEmpty() && action != null) throw REGACTION_X.get(info, this);
 
     // shortcut for simple character replacements
     final byte[] replace = replacement.isEmpty() ? EMPTY : toToken(replacement);
-    if(flags == null) {
+    if(flags.length == 0) {
       final int sp = patternChar(pattern), rp = replace != null ? patternChar(replace) : -1;
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
-    final RegExpr regExpr = regExpr(pattern, flags, qc, true);
+    final RegExpr regExpr = regExpr(pattern, flags, true);
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
     if(action != null) {

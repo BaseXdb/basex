@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -33,9 +32,9 @@ public final class FnAnalyzeString extends RegEx {
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String value = string(toZeroToken(arg(0), qc));
     final byte[] pattern = toToken(arg(1), qc);
-    final Expr flags = defined(2) ? arg(2) : null;
+    final byte[] flags = toZeroToken(arg(2), qc);
 
-    final Matcher matcher = pattern(pattern, flags, qc, true).matcher(value);
+    final Matcher matcher = pattern(pattern, flags, true).matcher(value);
     final FBuilder root = FElem.build(Q_ANALYZE).declareNS();
     int start = 0;
     while(matcher.find()) {

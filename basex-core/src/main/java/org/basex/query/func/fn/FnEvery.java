@@ -23,7 +23,7 @@ public class FnEvery extends StandardFunc {
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
-    final FItem predicate = defined(1) ? toFunction(arg(1), 2, qc) : null;
+    final FItem predicate = toFunctionOrNull(arg(1), 2, qc);
 
     int p = 0;
     final boolean some = some();

@@ -19,7 +19,7 @@ public final class ArrayBuild extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final FItem action = defined(1) ? toFunction(arg(1), 1, qc) : null;
+    final FItem action = toFunctionOrNull(arg(1), 1, qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(Item item; (item = qc.next(input)) != null;) {

@@ -28,8 +28,10 @@ public final class FnTokenize extends RegEx {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] pattern = pattern(qc), value = input(pattern, qc);
-    final boolean simple = pattern == DEFAULT || !defined(2);
+    final byte[] pattern = pattern(qc);
+    final byte[] value = input(pattern, qc);
+    final byte[] flags = toZeroToken(arg(2), qc);
+    final boolean simple = pattern == DEFAULT || flags.length == 0;
     final int vl = value.length;
 
     if(simple) {
@@ -55,7 +57,7 @@ public final class FnTokenize extends RegEx {
       }
     }
 
-    final Pattern p = pattern(pattern, simple ? null : arg(2), qc, true);
+    final Pattern p = pattern(pattern, flags, true);
     return vl == 0 ? Empty.ITER : new Iter() {
       final String string = string(value);
       final Matcher matcher = p.matcher(string);
@@ -77,8 +79,10 @@ public final class FnTokenize extends RegEx {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] pattern = pattern(qc), value = input(pattern, qc);
-    final boolean simple = pattern == DEFAULT || !defined(2);
+    final byte[] pattern = pattern(qc);
+    final byte[] value = input(pattern, qc);
+    final byte[] flags = toZeroToken(arg(2), qc);
+    final boolean simple = pattern == DEFAULT || flags.length == 0;
     final int vl = value.length;
 
     if(simple) {
@@ -86,7 +90,7 @@ public final class FnTokenize extends RegEx {
       if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(split(value, ch, true));
     }
 
-    final Pattern p = pattern(pattern, simple ? null : arg(2), qc, true);
+    final Pattern p = pattern(pattern, flags, true);
     if(vl == 0) return Empty.VALUE;
 
     final TokenList tl = new TokenList();

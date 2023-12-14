@@ -18,9 +18,9 @@ public final class MapKeys extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    if(!defined(1)) return map.keys();
+    final FItem predicate = toFunctionOrNull(arg(1), 1, qc);
+    if(predicate == null) return map.keys();
 
-    final FItem predicate = toFunction(arg(1), 1, qc);
     final ValueBuilder vb = new ValueBuilder(qc);
     map.apply((key, value) -> {
       if(toBoolean(qc, predicate, value)) vb.add(key);

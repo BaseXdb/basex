@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.regex.parse.*;
 import org.basex.util.*;
@@ -41,36 +40,31 @@ abstract class RegEx extends StandardFunc {
    * Returns a regular expression pattern.
    * @param pattern pattern
    * @param flags flags (can be {@code null})
-   * @param qc query context
    * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final Pattern pattern(final byte[] pattern, final Expr flags, final QueryContext qc,
-      final boolean check) throws QueryException {
-    return regExpr(pattern, flags, qc, check).pattern;
+  final Pattern pattern(final byte[] pattern, final byte[] flags, final boolean check)
+      throws QueryException {
+    return regExpr(pattern, flags, check).pattern;
   }
 
   /**
    * Returns a regular expression pattern.
    * @param pattern pattern
-   * @param flags flags (can be {@code null})
-   * @param qc query context
+   * @param flags flags
    * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final RegExpr regExpr(final byte[] pattern, final Expr flags, final QueryContext qc,
-      final boolean check) throws QueryException {
+  final RegExpr regExpr(final byte[] pattern, final byte[] flags, final boolean check)
+      throws QueryException {
 
-    byte[] modifiers = flags != null ? toTokenOrNull(flags, qc) : null;
-    if(modifiers == null) modifiers = Token.EMPTY;
-    final byte[] key = Token.concat(pattern, '\b', modifiers);
-
+    final byte[] key = Token.concat(pattern, '\b', flags);
     synchronized(patterns) {
       RegExpr regExpr = patterns.get(key);
       if(regExpr == null) {
-        regExpr = parse(pattern, modifiers, check);
+        regExpr = parse(pattern, flags, check);
         patterns.put(key, regExpr);
       }
       return regExpr;

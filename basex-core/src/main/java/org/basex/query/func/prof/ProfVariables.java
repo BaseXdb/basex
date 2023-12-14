@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class ProfVariables extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    FnTrace.trace(token(qc.stack.dump()), null, qc);
+    FnTrace.trace(token(qc.stack.dump()), EMPTY, qc);
     return Empty.VALUE;
   }
 }

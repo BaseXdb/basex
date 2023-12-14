@@ -19,7 +19,7 @@ public final class ArrayGet extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Item position = toAtomItem(arg(1), qc);
-    final FItem fallback = defined(2) ? toFunction(arg(2), 1, qc) : null;
+    final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
     if(fallback == null) return array.get(position, info);
 
