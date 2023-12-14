@@ -38,7 +38,7 @@ public final class IcuFormatter extends Formatter {
   private static final ThreadLocal<TokenObjMap<IcuFormatter>> MAP = new ThreadLocal<>() {
     protected TokenObjMap<IcuFormatter> initialValue() {
       final TokenObjMap<IcuFormatter> map = new TokenObjMap<>();
-//    initialize hash map with English formatter as default
+      // initialize hash map with English formatter as default
       map.put(EN, forLanguage(EN));
       return map;
     }
@@ -52,8 +52,9 @@ public final class IcuFormatter extends Formatter {
   private final Set<String> ruleSetNames;
   /** Rule set cache: rule set name by format modifier for each NumeralType. */
   @SuppressWarnings("rawtypes")
-  private final TokenObjMap[] ruleSetByModifierForNumType =
-      {new TokenObjMap<>(), new TokenObjMap<>(), new TokenObjMap<>()};
+  private final TokenObjMap[] ruleSetByModifierForNumType = {
+    new TokenObjMap<>(), new TokenObjMap<>(), new TokenObjMap<>()
+  };
   /** Month names. */
   private final byte[][] months;
   /** Weekdays. */
@@ -70,7 +71,7 @@ public final class IcuFormatter extends Formatter {
    * @param s spellout format
    * @param o ordinal format
    * @param d date format symbols
-   * @param internal formatter used for specific abbeviations of weekdays (can be {@code null})
+   * @param internal formatter used for specific abbreviations of weekdays (can be {@code null})
    */
   private IcuFormatter(final RuleBasedNumberFormat s, final RuleBasedNumberFormat o,
       final DateFormatSymbols d, final Formatter internal) {
@@ -80,10 +81,10 @@ public final class IcuFormatter extends Formatter {
     this.internal = internal;
     final String[] weekdays = d.getWeekdays();
     days = Stream.concat(Arrays.stream(weekdays).skip(2), Stream.of(weekdays[1])).
-        map(n -> token(n)).toArray(byte[][]::new);
-    months = Arrays.stream(d.getMonths()).map(n -> token(n)).toArray(byte[][]::new);
-    ampm = Arrays.stream(d.getAmPmStrings()).map(n -> token(n)).toArray(byte[][]::new);
-    eras = Arrays.stream(d.getEras()).map(n -> token(n)).toArray(byte[][]::new);
+        map(Token::token).toArray(byte[][]::new);
+    months = Arrays.stream(d.getMonths()).map(Token::token).toArray(byte[][]::new);
+    ampm = Arrays.stream(d.getAmPmStrings()).map(Token::token).toArray(byte[][]::new);
+    eras = Arrays.stream(d.getEras()).map(Token::token).toArray(byte[][]::new);
   }
 
   /**
@@ -150,11 +151,11 @@ public final class IcuFormatter extends Formatter {
     // remove soft hyphen
     final byte[] result = token(formatted.replace("\u00ad", ""));
     // establish title case
-    if (!eq(token(spelloutFormat.getLocale(ULocale.ACTUAL_LOCALE).getLanguage()), EN)) {
+    if(!eq(token(spelloutFormat.getLocale(ULocale.ACTUAL_LOCALE).getLanguage()), EN)) {
       result[0] = (byte) uc(result[0]);
     } else {
-      for (int i = 0; i < result.length; ++i) {
-        if (i == 0 || result[i - 1] == ' ' || result[i - 1] == '-') {
+      for(int i = 0; i < result.length; ++i) {
+        if(i == 0 || result[i - 1] == ' ' || result[i - 1] == '-') {
           result[i] = (byte) uc(result[i]);
         }
       }
@@ -164,10 +165,10 @@ public final class IcuFormatter extends Formatter {
 
   @Override
   protected byte[] suffix(final long n, final NumeralType numType) {
-    if (numType != ORDINAL) return EMPTY;
+    if(numType != ORDINAL) return EMPTY;
     final byte[] f = token(ordinalFormat.format(n));
     int offset = f.length;
-    for (int i = offset - 1; i >= 0; --i) {
+    for(int i = offset - 1; i >= 0; --i) {
       if(f[i] >= '0' && f[i] <= '9') {
         offset = i + 1;
         break;
@@ -214,23 +215,23 @@ public final class IcuFormatter extends Formatter {
     final TokenObjMap<String> map = ruleSetByModifierForNumType[numType.ordinal()];
     final byte[] key = modifier == null ? EMPTY : modifier;
     String ruleSet = map.get(key);
-    if (ruleSet == null) {
-      if (modifier != null) {
-        if (startsWith(modifier, ICU_SPELLOUT_PREFIX)) {
+    if(ruleSet == null) {
+      if(modifier != null) {
+        if(startsWith(modifier, ICU_SPELLOUT_PREFIX)) {
           ruleSet = ruleSet(string(modifier));
         } else {
           // search for result with desired ending by trying all rule sets
           final String suffix = string(delete(modifier, '-'));
-          for (final String r : ruleSetNames) {
-            if (spelloutFormat.format(1, r).endsWith(suffix)) {
+          for(final String r : ruleSetNames) {
+            if(spelloutFormat.format(1, r).endsWith(suffix)) {
               ruleSet = r;
               break;
             }
           }
         }
       }
-      if (ruleSet == null) ruleSet = ruleSet(numType);
-      if (ruleSet == null) ruleSet = spelloutFormat.getDefaultRuleSetName();
+      if(ruleSet == null) ruleSet = ruleSet(numType);
+      if(ruleSet == null) ruleSet = spelloutFormat.getDefaultRuleSetName();
       map.put(key, ruleSet);
     }
     return ruleSet;
@@ -247,8 +248,8 @@ public final class IcuFormatter extends Formatter {
     if(ruleSetNames.contains(name)) return name;
     String ruleSet = null;
     // by  returning null here, test case format-integer-077 could be made to succeed
-    for(String r : ruleSetNames) {
-      if (name.startsWith(r)) {
+    for(final String r : ruleSetNames) {
+      if(name.startsWith(r)) {
         // use closest available more generic rule set,
         // e.g. %spellout-cardinal-feminine in Bosnian
         //  for %spellout-cardinal-feminine-financial
@@ -275,12 +276,12 @@ public final class IcuFormatter extends Formatter {
       case ORDINAL:
         if(ruleSetNames.contains(ICU_SPELLOUT_ORDINAL)) return ICU_SPELLOUT_ORDINAL;
         if(ruleSetNames.contains(ICU_SPELLOUT_ORDINAL_NEUTER)) return ICU_SPELLOUT_ORDINAL_NEUTER;
-        for (String r : ruleSetNames) if(r.startsWith(ICU_SPELLOUT_ORDINAL)) return r;
+        for(final String r : ruleSetNames) if(r.startsWith(ICU_SPELLOUT_ORDINAL)) return r;
         break;
       case CARDINAL:
         if(ruleSetNames.contains(ICU_SPELLOUT_CARDINAL)) return ICU_SPELLOUT_CARDINAL;
         if(ruleSetNames.contains(ICU_SPELLOUT_CARDINAL_NEUTER)) return ICU_SPELLOUT_CARDINAL_NEUTER;
-        for (String r : ruleSetNames) if(r.startsWith(ICU_SPELLOUT_CARDINAL)) return r;
+        for(final String r : ruleSetNames) if(r.startsWith(ICU_SPELLOUT_CARDINAL)) return r;
         break;
       default:
         break;

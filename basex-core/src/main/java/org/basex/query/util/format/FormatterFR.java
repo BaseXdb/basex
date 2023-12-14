@@ -44,7 +44,7 @@ final class FormatterFR extends Formatter {
 
   @Override
   public byte[] word(final long n, final NumeralType numType, final byte[] modifier) {
-    byte[] suffix = modifier == null || modifier[0] == '%' ? null : delete(modifier, '-');
+    final byte[] suffix = modifier == null || modifier[0] == '%' ? null : delete(modifier, '-');
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, numType, suffix, true);
     // create title case
@@ -183,7 +183,7 @@ final class FormatterFR extends Formatter {
       else if(c == 'f') tb.set(l, (byte) 'v');
       else if(c == 'q') tb.add('u');
       tb.add(ORDINAL);
-      if (suffix != null) tb.add(suffix);
+      if(suffix != null) tb.add(suffix);
     }
   }
 }

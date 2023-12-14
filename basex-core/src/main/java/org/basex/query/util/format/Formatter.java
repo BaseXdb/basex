@@ -48,7 +48,7 @@ public abstract class Formatter extends FormatUtil {
    * @return formatter instance
    */
   public static Formatter get(final byte[] language) {
-    if (IcuFormatter.available()) return IcuFormatter.get(language);
+    if(IcuFormatter.available()) return IcuFormatter.get(language);
     final Formatter form = getInternal(language);
     return form != null ? form : getInternal(EN);
   }
@@ -68,7 +68,7 @@ public abstract class Formatter extends FormatUtil {
    * @return true if the language is supported
    */
   public static boolean available(final byte[] language) {
-    if (IcuFormatter.available()) return IcuFormatter.available(language);
+    if(IcuFormatter.available()) return IcuFormatter.available(language);
     return getInternal(language) != null;
   }
 
