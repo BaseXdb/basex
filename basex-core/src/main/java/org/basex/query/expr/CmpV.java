@@ -30,7 +30,7 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        final int v = item1.compare(item2, coll, info);
+        final int v = item1.compare(item2, coll, false, info);
         return v != Item.NAN_DUMMY && v <= 0;
       }
       @Override
@@ -46,8 +46,8 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        final int v = item1.compare(item2, coll, info);
-        return v != Item.NAN_DUMMY && v < 0;
+        final int v = item1.compare(item2, coll, false, info);
+        return v != Item.NAN_DUMMY & v < 0;
       }
       @Override
       public OpV swap() { return GT; }
@@ -62,8 +62,7 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        // includes UNDEF check
-        return item1.compare(item2, coll, info) >= 0;
+        return item1.compare(item2, coll, false, info) >= 0;
       }
       @Override
       public OpV swap() { return LE; }
@@ -78,8 +77,7 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        // includes UNDEF check
-        return item1.compare(item2, coll, info) > 0;
+        return item1.compare(item2, coll, false, info) > 0;
       }
       @Override
       public OpV swap() { return LT; }

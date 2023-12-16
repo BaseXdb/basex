@@ -113,8 +113,8 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final int compare(final Item item, final Collation coll, final InputInfo info)
-      throws QueryException {
+  public final int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo info) throws QueryException {
     return Token.compare(string(info), item.string(info), coll);
   }
 

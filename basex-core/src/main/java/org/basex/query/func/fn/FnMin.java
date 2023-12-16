@@ -57,15 +57,11 @@ public class FnMin extends StandardFunc {
     if(!type.isSortable()) throw COMPARE_X_X.get(info, type, item);
 
     // strings and URIs
-    final QueryBiFunction<Item, Item, Boolean> cmp = (item1, item2) -> {
-      final int d = item1.compare(item2, coll, info);
-      return min ? d > 0 : d < 0 && d != Item.NAN_DUMMY;
-    };
     if(item instanceof AStr) {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(cmp.apply(item, it)) item = it;
+        if(min ^ (item.compare(it, coll, true, info) < 0)) item = it;
         if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, sc, info);
       }
       return item;
@@ -75,7 +71,7 @@ public class FnMin extends StandardFunc {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(type != type2) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(cmp.apply(item, it)) item = it;
+        if(min ^ (item.compare(it, coll, true, info) < 0)) item = it;
       }
       return item;
     }
@@ -83,7 +79,7 @@ public class FnMin extends StandardFunc {
     if(type.isUntyped()) item = DOUBLE.cast(item, qc, sc, info);
     for(Item it; (it = qc.next(iter)) != null;) {
       final AtomType tp = numType(item, it);
-      if((cmp.apply(item, it)) || Double.isNaN(it.dbl(info))) item = it;
+      if(min ^ item.compare(it, coll, true, info) < 0) item = it;
       if(tp != null) item = tp.cast(item, qc, sc, info);
     }
     return item;

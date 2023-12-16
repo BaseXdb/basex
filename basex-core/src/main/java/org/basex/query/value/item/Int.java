@@ -166,12 +166,11 @@ public final class Int extends ANum {
   }
 
   @Override
-  public int compare(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    if(item instanceof Int) return Long.compare(value, ((Int) item).value);
-    if(item.type == AtomType.DECIMAL) return -item.compare(this, coll, ii);
-    final double d = item.dbl(ii);
-    return Double.isNaN(d) ? NAN_DUMMY : value < d ? -1 : value > d ? 1 : 0;
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return item instanceof Int ? Long.compare(value, ((Int) item).value) :
+           item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
+           Dbl.compare(dbl(ii), item.dbl(ii), transitive);
   }
 
   @Override

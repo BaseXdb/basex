@@ -103,26 +103,8 @@ public class B64 extends Bin {
   }
 
   @Override
-  public final int compare(final Item item, final Collation coll, final InputInfo info)
-      throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
-    return Token.compare(binary(info), bin);
-  }
-
-  /**
-   * Converts the given item to a byte array.
-   * @param item item to be converted
-   * @param info input info (can be {@code null})
-   * @return byte array
-   * @throws QueryException query exception
-   */
-  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
-    try {
-      return Base64.decode(item.string(info));
-    } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
-      throw AtomType.BASE64_BINARY.castError(item, info);
-    }
+  public final byte[] parse(final Item item, final InputInfo info) throws QueryException {
+    return parse(item.string(info), info);
   }
 
   /**

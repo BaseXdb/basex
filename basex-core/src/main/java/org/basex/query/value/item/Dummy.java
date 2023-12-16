@@ -62,7 +62,8 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public int compare(final Item item, final Collation coll, final InputInfo info) {
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo info) throws QueryException {
     throw Util.notExpected();
   }
 

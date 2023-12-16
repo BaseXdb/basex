@@ -94,15 +94,15 @@ public abstract class ANode extends Item {
   @Override
   public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return comparable(item) ? Token.eq(string(), item.string(ii), coll) :
+    return item.type.isStringOrUntyped() ? Token.eq(string(), item.string(ii), coll) :
       item.equal(this, coll, sc, ii);
   }
 
   @Override
-  public final int compare(final Item item, final Collation coll, final InputInfo info)
-      throws QueryException {
-    return comparable(item) ? Token.compare(string(), item.string(info), coll) :
-      -item.compare(this, coll, info);
+  public final int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return item.type.isStringOrUntyped() ? Token.compare(string(), item.string(ii), coll) :
+      -item.compare(this, coll, transitive, ii);
   }
 
   @Override

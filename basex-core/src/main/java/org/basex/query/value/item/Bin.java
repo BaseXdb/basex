@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -35,6 +36,22 @@ public abstract class Bin extends Item {
   public byte[] binary(final InputInfo info) throws QueryException {
     return data;
   }
+
+  @Override
+  public final int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
+    return Token.compare(binary(ii), bin);
+  }
+
+  /**
+   * Converts the given item to a byte array.
+   * @param item item to be converted
+   * @param info input info (can be {@code null})
+   * @return byte array
+   * @throws QueryException query exception
+   */
+  public abstract byte[] parse(Item item, InputInfo info) throws QueryException;
 
   @Override
   public BufferInput input(final InputInfo ii) throws QueryException {

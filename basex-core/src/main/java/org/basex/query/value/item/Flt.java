@@ -117,12 +117,10 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public int compare(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    if(item instanceof Dbl) return -item.compare(this, coll, ii);
-    // cannot be replaced by Float.compare (different semantics)
-    final float n = item.flt(ii);
-    return Float.isNaN(n) || Float.isNaN(value) ? NAN_DUMMY : value < n ? -1 : value > n ? 1 : 0;
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return item instanceof Dbl || transitive && item instanceof Dec
+        ? -item.compare(this, coll, transitive, ii) : Dbl.compare(value, item.dbl(ii), transitive);
   }
 
   @Override

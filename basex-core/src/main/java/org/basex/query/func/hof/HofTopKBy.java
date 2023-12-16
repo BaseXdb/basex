@@ -1,8 +1,9 @@
 package org.basex.query.func.hof;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -26,7 +27,8 @@ public final class HofTopKBy extends StandardFunc {
 
     final MinHeap<Item, Item> heap = new MinHeap<>((item1, item2) -> {
       try {
-        return OpV.LT.eval(item1, item2, sc.collation, sc, info) ? -1 : 1;
+        if(!item1.comparable(item2)) throw compareError(item1, item2, info);
+        return item1.compare(item2, sc.collation, true, info);
       } catch(final QueryException qe) {
         throw new QueryRTException(qe);
       }
