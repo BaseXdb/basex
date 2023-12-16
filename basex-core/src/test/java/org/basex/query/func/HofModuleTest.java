@@ -23,14 +23,6 @@ public final class HofModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void constant() {
-    final Function func = _HOF_CONST;
-    query(func.args(" (), error()"), "");
-    query(func.args(" <x/>, 123"), "<x/>");
-    query(func.args(" 1 to 10", " error('foo')"), "1\n2\n3\n4\n5\n6\n7\n8\n9\n10");
-  }
-
-  /** Test method. */
   @Test public void foldLeft1() {
     final Function func = _HOF_FOLD_LEFT1;
     query(func.args(" 1 to 10", " function($x, $y) { $x + $y }"), 55);

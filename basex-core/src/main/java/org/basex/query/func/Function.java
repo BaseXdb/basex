@@ -1200,9 +1200,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _DB_NODE_PRE(DbNodePre::new, "node-pre(nodes)",
       params(NODE_ZM), INTEGER_ZM, DB_URI),
-  /** XQuery function (deprecated). */
-  _DB_OPEN(DbOpen::new, "open(database[,path])",
-      params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_OPTIMIZE(DbOptimize::new, "optimize(database[,all,options])",
       params(STRING_O, BOOLEAN_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1431,9 +1428,6 @@ public enum Function implements AFunction {
   // HOF Module
 
   /** XQuery function. */
-  _HOF_CONST(HofConst::new, "const(input,ignore)",
-      params(ITEM_ZM, ITEM_ZM), ITEM_ZM, HOF_URI),
-  /** XQuery function. */
   _HOF_FOLD_LEFT1(HofFoldLeft1::new, "fold-left1(input,action)",
       params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), HOF_URI),
@@ -1602,9 +1596,6 @@ public enum Function implements AFunction {
   _PROF_CURRENT_NS(ProfCurrentNs::new, "current-ns()",
       params(), INTEGER_O, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_DUMP(ProfDump::new, "dump(input[,label])",
-      params(ITEM_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
-  /** XQuery function. */
   _PROF_GC(ProfGc::new, "gc([count])",
       params(INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
   /** XQuery function. */
@@ -1631,9 +1622,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _PROF_VARIABLES(ProfVariables::new, "variables()",
       params(), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
-  /** XQuery function. */
-  _PROF_VOID(ProfVoid::new, "void(input[,skip])",
-      params(ITEM_ZM, BOOLEAN_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
 
   // Random Module
 
@@ -1841,7 +1829,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_DDO(UtilDdo::new, "ddo(nodes)",
       params(NODE_ZM), NODE_ZM, UTIL_URI),
-  /** XQuery function (obsolete). */
+  /** XQuery function. */
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
