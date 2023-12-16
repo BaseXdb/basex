@@ -168,7 +168,7 @@ public final class QNm extends Item {
       qnm = new QNm(nm, sc);
       if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
     } else {
-      throw diffError(this, item, ii);
+      throw compareError(this, item, ii);
     }
     return eq(qnm);
   }
@@ -190,8 +190,9 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    throw diffError(item, this, ii);
+  public int compare(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    throw compareError(item, this, ii);
   }
 
   /**

@@ -140,8 +140,9 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    if(item instanceof Dbl || item instanceof Flt) return -item.diff(this, coll, ii);
+  public int compare(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    if(item instanceof Dbl || item instanceof Flt) return -item.compare(this, coll, ii);
     final double d = item.dbl(ii);
     return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
       Double.isNaN(d) ? UNDEF : value.compareTo(item.dec(ii));

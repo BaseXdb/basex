@@ -147,9 +147,9 @@ public class FnSort extends StandardFunc {
     final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
     for(int i = 0; i < il; i++) {
       final Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
-      if(!item1.comparable(item2)) throw diffError(item1, item2, info);
+      if(!item1.comparable(item2)) throw compareError(item1, item2, info);
 
-      int diff = item1.diff(item2, coll, info);
+      int diff = item1.compare(item2, coll, info);
       if(diff == Item.UNDEF) {
         final boolean nan1 = item1 == Dbl.NAN || item1 == Flt.NAN;
         final boolean nan2 = item2 == Dbl.NAN || item2 == Flt.NAN;

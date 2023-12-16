@@ -780,7 +780,6 @@ public class FnHttpTest extends HTTPTest {
     }
   }
 
-
   /**
    * Returns the output stream of a fake connection.
    * @param request request

@@ -584,7 +584,7 @@ public class IntList extends ElementList {
    */
   private static int cmp(final byte[] value1, final byte[] value2) {
     return value1 == null ? value2 == null ? 0 : -1 : value2 == null ? 1 :
-      Token.diff(value1, value2);
+      Token.compare(value1, value2);
   }
 
   /**

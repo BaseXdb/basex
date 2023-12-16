@@ -366,7 +366,7 @@ public abstract class ADate extends ADateDur {
   @Override
   public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return df(item, ii) == 0;
+    return compare(item, ii) == 0;
   }
 
   @Override
@@ -381,29 +381,34 @@ public abstract class ADate extends ADateDur {
         hasTz() == ((ADate) item).hasTz();
   }
 
-  /**
-   * Returns the difference between the current and the specified item.
-   * See {@link Item#diff(Item, Collation, InputInfo)}.
-   * @param item item to be compared
-   * @param info input info (can be {@code null})
-   * @return difference
-   * @throws QueryException query exception
-   */
-  private int df(final Item item, final InputInfo info) throws QueryException {
-    final ADate d = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, info));
-    final BigDecimal d1 = seconds().add(days().multiply(BD_864000));
-    final BigDecimal d2 = d.seconds().add(d.days().multiply(BD_864000));
-    return d1.compareTo(d2);
-  }
-
   @Override
   public final int hash(final InputInfo ii) {
     return seconds().add(days().multiply(BD_864000)).intValue();
   }
 
+  /**
+   * {@inheritDoc}
+   * Overwritten by {@link GDt}.
+   */
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    return df(item, ii);
+  public int compare(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return compare(item, ii);
+  }
+
+  /**
+   * Compares the current and the specified item.
+   * See {@link Item#compare(Item, Collation, InputInfo)}.
+   * @param item item to be compared
+   * @param info input info (can be {@code null})
+   * @return difference
+   * @throws QueryException query exception
+   */
+  private int compare(final Item item, final InputInfo info) throws QueryException {
+    final ADate d = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, info));
+    final BigDecimal d1 = seconds().add(days().multiply(BD_864000));
+    final BigDecimal d2 = d.seconds().add(d.days().multiply(BD_864000));
+    return d1.compareTo(d2);
   }
 
   @Override

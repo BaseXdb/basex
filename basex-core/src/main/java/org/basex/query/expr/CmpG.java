@@ -368,7 +368,7 @@ public class CmpG extends Cmp {
   final boolean eval(final Item item1, final Item item2) throws QueryException {
     if(check) {
       final Type type1 = item1.type, type2 = item2.type;
-      if(type1 != type2 && !comparable(type1, type2)) throw diffError(item1, item2, info);
+      if(type1 != type2 && !comparable(type1, type2)) throw compareError(item1, item2, info);
     }
     return op.value().eval(item1, item2, coll, sc, info);
   }

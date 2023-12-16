@@ -57,7 +57,6 @@ public final class AnnotationsTest extends SandboxTest {
     error("declare %output:method(1) function local:x() { 1 }; 1", BASEX_ANN_X_X_X);
   }
 
-
   /** Literals. */
   @Test public void literals() {
     query("%Q{_}_ fn { . }(1)", 1);

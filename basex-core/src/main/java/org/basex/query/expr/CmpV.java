@@ -30,7 +30,7 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        final int v = item1.diff(item2, coll, info);
+        final int v = item1.compare(item2, coll, info);
         return v != Item.UNDEF && v <= 0;
       }
       @Override
@@ -46,7 +46,7 @@ public final class CmpV extends Cmp {
       @Override
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
-        final int v = item1.diff(item2, coll, info);
+        final int v = item1.compare(item2, coll, info);
         return v != Item.UNDEF && v < 0;
       }
       @Override
@@ -63,7 +63,7 @@ public final class CmpV extends Cmp {
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
         // includes UNDEF check
-        return item1.diff(item2, coll, info) >= 0;
+        return item1.compare(item2, coll, info) >= 0;
       }
       @Override
       public OpV swap() { return LE; }
@@ -79,7 +79,7 @@ public final class CmpV extends Cmp {
       public boolean eval(final Item item1, final Item item2, final Collation coll,
           final StaticContext sc, final InputInfo info) throws QueryException {
         // includes UNDEF check
-        return item1.diff(item2, coll, info) > 0;
+        return item1.compare(item2, coll, info) > 0;
       }
       @Override
       public OpV swap() { return LT; }
@@ -242,7 +242,7 @@ public final class CmpV extends Cmp {
     final Item item2 = exprs[1].atomItem(qc, info);
     if(item2.isEmpty()) return Empty.VALUE;
     if(item1.comparable(item2)) return Bln.get(opV.eval(item1, item2, coll, sc, info));
-    throw diffError(item1, item2, info);
+    throw compareError(item1, item2, info);
   }
 
   @Override

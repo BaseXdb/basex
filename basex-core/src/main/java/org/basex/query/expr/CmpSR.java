@@ -126,10 +126,10 @@ public final class CmpSR extends Single {
    * @throws QueryException query exception
    */
   private boolean eval(final Item item) throws QueryException {
-    if(!item.type.isStringOrUntyped()) throw diffError(item, Str.EMPTY, info);
+    if(!item.type.isStringOrUntyped()) throw compareError(item, Str.EMPTY, info);
     final byte[] s = item.string(info);
-    final int mn = min == null ?  1 : Token.diff(s, min, coll);
-    final int mx = max == null ? -1 : Token.diff(s, max, coll);
+    final int mn = min == null ?  1 : Token.compare(s, min, coll);
+    final int mx = max == null ? -1 : Token.compare(s, max, coll);
     return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
   }
 
@@ -175,7 +175,7 @@ public final class CmpSR extends Single {
     }
 
     if(newMin != null && newMax != null) {
-      final int diff = Token.diff(newMin, newMax);
+      final int diff = Token.compare(newMin, newMax);
       // return comparison for exact hit
       if(diff == 0 && newMni && newMxi) return
         new CmpG(info, expr, Str.get(newMin), OpG.EQ, null, cc.sc()).optimize(cc);

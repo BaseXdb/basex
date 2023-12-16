@@ -25,7 +25,7 @@ public final class FnCompare extends StandardFunc {
     final Collation coll = toCollation(arg(2), qc);
 
     if(value1 == null || value2 == null) return Empty.VALUE;
-    final long diff = diff(value1, value2, coll);
+    final long diff = compare(value1, value2, coll);
     return Int.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);
   }
 

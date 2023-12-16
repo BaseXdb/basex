@@ -27,7 +27,6 @@ public final class MapTest extends SandboxTest {
     check("map { <_>A</_>: 1, 2: 3 }?A", 1, root(Int.class));
   }
 
-
   /** Tests the new syntax for map literals. */
   @Test public void gh755() {
     query("(<x><y/></x> / map { 'test': y, 42: 'asdf' })('test')", "<y/>");

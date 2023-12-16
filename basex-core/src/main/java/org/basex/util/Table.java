@@ -74,7 +74,7 @@ public final class Table {
    * @return self reference
    */
   public Table sort() {
-    contents.sort((tl1, tl2) -> diff(lc(tl1.get(0)), lc(tl2.get(0))));
+    contents.sort((tl1, tl2) -> compare(lc(tl1.get(0)), lc(tl2.get(0))));
     return this;
   }
 

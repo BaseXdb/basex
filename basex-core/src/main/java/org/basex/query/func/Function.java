@@ -1754,7 +1754,6 @@ public enum Function implements AFunction {
   _STRING_TAB(StringTab::new, "tab()",
       params(), STRING_O, STRING_URI),
 
-
   // Unit Module
 
   /** XQuery function. */

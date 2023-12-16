@@ -3268,7 +3268,6 @@ public final class RewritingsTest extends SandboxTest {
     query("<d>1</d> ! ((if (not(text())) then 1 else xs:integer(.)) = 1)", true);
   }
 
-
   /** Function call with function(*) parameter type. */
   @Test public void gh2263() {
     query("let $f := fn($f as function(*)) { fold-left(1, (), $f) } return $f(true#0)", true);

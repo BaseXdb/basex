@@ -114,7 +114,7 @@ public final class Intersect extends Set {
 
         final int il = nodes.length;
         for(int i = 1; i < il;) {
-          final int d = nodes[0].diff(nodes[i]);
+          final int d = nodes[0].compare(nodes[i]);
           if(d > 0) {
             if(!next(i)) return null;
           } else if(d < 0) {

@@ -205,14 +205,14 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final int diff(final ANode node) {
+  public final int compare(final ANode node) {
     if(this == node) return 0;
     final Data ndata = node.data();
     return ndata != null ?
       // comparison of two databases: compare pre values or database ids
       data == ndata ? pre - ((DBNode) node).pre : data.dbid - ndata.dbid :
       // comparison of database and fragment: find LCA
-      diff(this, node);
+      compare(this, node);
   }
 
   @Override

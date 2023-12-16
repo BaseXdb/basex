@@ -208,7 +208,7 @@ public final class FTIndex extends ValueIndex {
     final int tl = ti + ENTRY;
     int s = 0, e = (end - start) / tl;
     while(s <= e) {
-      final int m = s + e >>> 1, pos = start + m * tl, d = diff(cache(pos, ti), token);
+      final int m = s + e >>> 1, pos = start + m * tl, d = compare(cache(pos, ti), token);
       if(d == 0) return start + m * tl;
       if(d < 0) s = m + 1;
       else e = m - 1;
@@ -288,7 +288,7 @@ public final class FTIndex extends ValueIndex {
     // binary search
     final int o = tl + ENTRY;
     while(s < e) {
-      final int m = s + (e - s >> 1) / o * o, d = diff(dataY.readBytes(m, tl), token);
+      final int m = s + (e - s >> 1) / o * o, d = compare(dataY.readBytes(m, tl), token);
       if(d == 0) return m;
       if(d < 0) s = m + o;
       else e = m - o;

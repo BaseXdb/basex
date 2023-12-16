@@ -9,7 +9,6 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -58,12 +57,15 @@ public class FnMin extends StandardFunc {
     if(!type.isSortable()) throw COMPARE_X_X.get(info, type, item);
 
     // strings and URIs
-    final OpV op = min ? OpV.GT : OpV.LT;
+    final QueryBiFunction<Item, Item, Boolean> cmp = (item1, item2) -> {
+      final int d = item1.compare(item2, coll, info);
+      return min ? d > 0 : d < 0 && d != Item.UNDEF;
+    };
     if(item instanceof AStr) {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(op.eval(item, it, coll, sc, info)) item = it;
+        if(cmp.apply(item, it)) item = it;
         if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, sc, info);
       }
       return item;
@@ -73,7 +75,7 @@ public class FnMin extends StandardFunc {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(type != type2) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(op.eval(item, it, coll, sc, info)) item = it;
+        if(cmp.apply(item, it)) item = it;
       }
       return item;
     }
@@ -81,7 +83,7 @@ public class FnMin extends StandardFunc {
     if(type.isUntyped()) item = DOUBLE.cast(item, qc, sc, info);
     for(Item it; (it = qc.next(iter)) != null;) {
       final AtomType tp = numType(item, it);
-      if(op.eval(item, it, coll, sc, info) || Double.isNaN(it.dbl(info))) item = it;
+      if((cmp.apply(item, it)) || Double.isNaN(it.dbl(info))) item = it;
       if(tp != null) item = tp.cast(item, qc, sc, info);
     }
     return item;

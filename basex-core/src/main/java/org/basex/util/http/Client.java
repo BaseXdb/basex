@@ -98,7 +98,6 @@ public final class Client {
     return opts;
   }
 
-
   /**
    * Returns a URI.
    * @param href URL to send the request to (can be empty string)

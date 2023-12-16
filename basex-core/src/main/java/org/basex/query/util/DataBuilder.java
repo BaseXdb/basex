@@ -332,7 +332,6 @@ public final class DataBuilder {
     return new DBNode(data);
   }
 
-
   /**
    * Returns a new node without the specified namespaces.
    * @param node node to be copied

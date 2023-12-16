@@ -1,6 +1,5 @@
 package org.basex.query.expr.path;
 
-
 import java.util.*;
 import java.util.List;
 

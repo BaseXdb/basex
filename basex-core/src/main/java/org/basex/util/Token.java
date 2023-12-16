@@ -71,9 +71,9 @@ public final class Token {
   public static final byte[] DOLLAR = { '$' };
 
   /** Comparator for byte arrays. */
-  public static final Comparator<byte[]> COMPARATOR = Token::diff;
+  public static final Comparator<byte[]> COMPARATOR = Token::compare;
   /** Case-insensitive comparator for byte arrays. */
-  public static final Comparator<byte[]> LC_COMPARATOR = (o1, o2) -> diff(lc(o1), lc(o2));
+  public static final Comparator<byte[]> LC_COMPARATOR = (o1, o2) -> compare(lc(o1), lc(o2));
   /** Unicode replacement codepoint (\\uFFFD). */
   public static final char REPLACEMENT = '\uFFFD';
 
@@ -787,7 +787,7 @@ public final class Token {
    * @return 0 if tokens are equal, negative if first token is smaller,
    *         positive if first token is bigger
    */
-  public static int diff(final byte[] token, final byte[] compare) {
+  public static int compare(final byte[] token, final byte[] compare) {
     final int tl = token.length, cl = compare.length, l = Math.min(tl, cl);
     for(int i = 0; i < l; ++i) {
       final int c = (token[i] & 0xFF) - (compare[i] & 0xFF);
@@ -804,8 +804,8 @@ public final class Token {
    * @return 0 if tokens are equal, negative if first token is smaller,
    *         positive if first token is bigger
    */
-  public static int diff(final byte[] token, final byte[] compare, final Collation coll) {
-    return coll != null ? coll.compare(token, compare) : diff(token, compare);
+  public static int compare(final byte[] token, final byte[] compare, final Collation coll) {
+    return coll != null ? coll.compare(token, compare) : compare(token, compare);
   }
 
   /**
@@ -815,7 +815,7 @@ public final class Token {
    * @return smaller token
    */
   public static byte[] min(final byte[] token, final byte[] compare) {
-    return diff(token, compare) < 0 ? token : compare;
+    return compare(token, compare) < 0 ? token : compare;
   }
 
   /**
@@ -825,7 +825,7 @@ public final class Token {
    * @return bigger token
    */
   public static byte[] max(final byte[] token, final byte[] compare) {
-    return diff(token, compare) > 0 ? token : compare;
+    return compare(token, compare) > 0 ? token : compare;
   }
 
   /**

@@ -715,9 +715,9 @@ public final class TextEditor {
       final Collator coll = Collator.getInstance();
       cc = (t1, t2) -> coll.compare(string(sub(t1, column)), string(sub(t2, column)));
     } else if(gopts.get(GUIOptions.CASESORT)) {
-      cc = (t1, t2) -> diff(sub(t1, column), sub(t2, column));
+      cc = (t1, t2) -> compare(sub(t1, column), sub(t2, column));
     } else {
-      cc = (t1, t2) -> diff(lc(sub(t1, column)), lc(sub(t2, column)));
+      cc = (t1, t2) -> compare(lc(sub(t1, column)), lc(sub(t2, column)));
     }
     tokens.sort(cc, gopts.get(GUIOptions.ASCSORT));
 

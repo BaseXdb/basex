@@ -1618,7 +1618,8 @@ public enum QueryError {
    * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException diffError(final Item item1, final Item item2, final InputInfo info) {
+  public static QueryException compareError(final Item item1, final Item item2,
+      final InputInfo info) {
     final Type type1 = item1.type, type2 = item2.type;
     return type1.eq(type2) ? CMPTYPE_X_X_X.get(info, type1, item1, item2) :
       CMPTYPES_X_X_X_X.get(info, type1, type2, item1, item2);

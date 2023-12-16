@@ -103,7 +103,8 @@ public final class Bln extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
+  public int compare(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     final boolean n = item.type == type ? item.bool(ii) : parse(item, ii);
     return value ? n ? 0 : 1 : n ? -1 : 0;
   }

@@ -97,7 +97,7 @@ public final class Union extends Set {
         final int il = nodes.length;
         for(int i = 0; i < il; i++) {
           if(nodes[i] == null) continue;
-          final int d = m == -1 ? 1 : nodes[m].diff(nodes[i]);
+          final int d = m == -1 ? 1 : nodes[m].compare(nodes[i]);
           if(d == 0) {
             next(i--);
           } else if(d > 0) {

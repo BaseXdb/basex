@@ -34,7 +34,7 @@ public final class CmpN extends Cmp {
     ET("<<") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
-        return node1.diff(node2) < 0;
+        return node1.compare(node2) < 0;
       }
     },
 
@@ -42,7 +42,7 @@ public final class CmpN extends Cmp {
     GT(">>") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
-        return node1.diff(node2) > 0;
+        return node1.compare(node2) > 0;
       }
     };
 

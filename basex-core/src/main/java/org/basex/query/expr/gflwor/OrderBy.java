@@ -108,7 +108,7 @@ public final class OrderBy extends Clause {
 
                 final int c = m.isEmpty()
                     ? n.isEmpty() ? 0             : key.least ? -1 : 1
-                    : n.isEmpty() ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info());
+                    : n.isEmpty() ? key.least ? 1 : -1 : m.compare(n, key.coll, key.info());
                 if(c != 0) return key.desc ? -c : c;
               }
               return 0;

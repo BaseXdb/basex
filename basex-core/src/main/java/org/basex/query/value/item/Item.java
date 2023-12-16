@@ -211,8 +211,7 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns the difference between the current and the specified item.
-   * This function is overwritten by the corresponding implementations.
+   * Compares the current and the specified item.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
    * @param ii input info (can be {@code null})
@@ -220,8 +219,9 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    throw diffError(this, item, ii);
+  public int compare(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    throw compareError(this, item, ii);
   }
 
   /**

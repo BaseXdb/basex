@@ -127,7 +127,6 @@ public final class IOUrl extends IO {
     return isJarURL(pth) ? new URL(pth).openStream() : response().body();
   }
 
-
   /**
    * Returns an HTTP response.
    * @return response

@@ -99,10 +99,10 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo info)
+  public final int compare(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
-    return comparable(item) ? Token.diff(string(), item.string(info), coll) :
-      -item.diff(this, coll, info);
+    return comparable(item) ? Token.compare(string(), item.string(info), coll) :
+      -item.compare(this, coll, info);
   }
 
   @Override
@@ -347,7 +347,7 @@ public abstract class ANode extends Item {
    * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
    * if the node appears after/before the argument
    */
-  public abstract int diff(ANode node);
+  public abstract int compare(ANode node);
 
   /**
    * Compares two nodes for their unique order.
@@ -356,7 +356,7 @@ public abstract class ANode extends Item {
    * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
    * if the first node appears after/before the second
    */
-  static int diff(final ANode node1, final ANode node2) {
+  static int compare(final ANode node1, final ANode node2) {
     // cache parents of first node
     final ANodeList nl = new ANodeList();
     for(ANode n = node1; n != null; n = n.parent()) {

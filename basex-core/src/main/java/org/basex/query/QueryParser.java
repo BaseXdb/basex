@@ -217,7 +217,6 @@ public class QueryParser extends InputParser {
     }
   }
 
-
   /**
    * Parses a sequence type.
    * @return sequence type

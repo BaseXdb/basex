@@ -62,7 +62,7 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info) {
+  public int compare(final Item item, final Collation coll, final InputInfo info) {
     throw Util.notExpected();
   }
 

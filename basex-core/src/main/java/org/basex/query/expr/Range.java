@@ -152,7 +152,6 @@ public final class Range extends Arr {
     return Double.NaN;
   }
 
-
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof Range && super.equals(obj);

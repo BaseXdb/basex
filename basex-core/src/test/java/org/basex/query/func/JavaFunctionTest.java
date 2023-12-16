@@ -99,7 +99,6 @@ public final class JavaFunctionTest extends SandboxTest {
         "String:length()", 0);
   }
 
-
   /** Tests importing a Java class. */
   @Test public void importClass3() {
     // handle {@link Jav} type
@@ -397,7 +396,6 @@ public final class JavaFunctionTest extends SandboxTest {
 
     assertEquals("a/b/c", JavaCall.uri2path("a:b:c"));
   }
-
 
   /** DOM tests. */
   @Test public void dom() {

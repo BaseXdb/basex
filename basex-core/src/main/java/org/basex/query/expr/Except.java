@@ -108,7 +108,7 @@ public final class Except extends Set {
         for(int i = 1; i < il; i++) {
           if(nodes[0] == null) return null;
           if(nodes[i] == null) continue;
-          final int d = nodes[0].diff(nodes[i]);
+          final int d = nodes[0].compare(nodes[i]);
 
           if(d < 0 && i + 1 == il) break;
           if(d == 0) {

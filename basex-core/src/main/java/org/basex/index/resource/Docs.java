@@ -269,7 +269,7 @@ final class Docs {
       final int[] order = order();
       int l = 0, h = order.length - 1;
       while(l <= h) {
-        final int m = l + h >>> 1, o = order[m], c = diff(paths.get(o), npth);
+        final int m = l + h >>> 1, o = order[m], c = compare(paths.get(o), npth);
         if(c == 0) return docs().get(o);
         if(c < 0) l = m + 1;
         else h = m - 1;

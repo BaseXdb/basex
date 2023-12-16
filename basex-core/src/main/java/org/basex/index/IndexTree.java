@@ -72,7 +72,7 @@ public class IndexTree {
 
     int n = root;
     while(true) {
-      final int diff = Token.diff(key, keys.get(n));
+      final int diff = Token.compare(key, keys.get(n));
       if(diff == 0) {
         if(exist) {
           addIds(id, pos, n);

@@ -103,10 +103,10 @@ public class B64 extends Bin {
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo info)
+  public final int compare(final Item item, final Collation coll, final InputInfo info)
       throws QueryException {
     final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
-    return Token.diff(binary(info), bin);
+    return Token.compare(binary(info), bin);
   }
 
   /**

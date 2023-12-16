@@ -126,7 +126,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
         ml.reset();
         for(int i = min; i < splits; ++i) {
           if(vm[i].values.length == 0) continue;
-          final int d = diff(vm[min].key, vm[i].key);
+          final int d = compare(vm[min].key, vm[i].key);
           if(d < 0) continue;
           if(d > 0) {
             min = i;
