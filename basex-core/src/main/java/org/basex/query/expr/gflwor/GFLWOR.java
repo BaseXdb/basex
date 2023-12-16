@@ -462,7 +462,7 @@ public final class GFLWOR extends ParseExpr {
     if(fl instanceof Let && expr.count(fl.var) == VarUsage.NEVER) {
       // rewrite let clause with unused variable
       //   let $_ := file:write(...) return ()  ->  file:write(...)
-      //   let $_ := prof:void(1) return 2  ->  prof:void(1), 2
+      //   let $_ := void(1) return 2  ->  void(1), 2
       return cc.merge(inline, expr, info);
     }
     if(fl.size() == 1) {

@@ -180,7 +180,7 @@ public class CmpG extends Cmp {
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate if one value is empty:
     // () eq local:expensive()  ->  ()
-    // prof:void(123) = 1  ->  boolean(prof:void('123'))
+    // void(123) = 1  ->  boolean(void('123'))
     Expr expr = emptyExpr();
     if(expr != this) return cc.replaceWith(this, cc.function(Function.BOOLEAN, info, expr));
 

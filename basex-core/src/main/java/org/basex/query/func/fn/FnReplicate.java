@@ -115,7 +115,7 @@ public class FnReplicate extends StandardFunc {
       sz = input.size();
       if(sz != -1) sz = Util.inBounds(sz, c) ? sz * c : -1;
     }
-    // replicate(prof:void(<a/>), 2)  ->  prof:void(<a/>)
+    // replicate(void(<a/>), 2)  ->  void(<a/>)
     if(input == Empty.VALUE || sz == 0 && single) return input;
 
     // adopt sequence type

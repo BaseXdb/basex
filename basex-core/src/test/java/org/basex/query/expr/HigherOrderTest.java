@@ -153,13 +153,13 @@ public final class HigherOrderTest extends SandboxTest {
   /** Tests the %nondeterministic annotation. */
   @Test public void gh1212() {
     // FLWOR will be optimized away (empty result)
-    query("for $f in (prof:void#1(?), error#0) let $ignore := $f() return ()", "");
+    query("for $f in (void#1(?), error#0) let $ignore := $f() return ()", "");
     // FLWOR expression will be evaluated (due to nondeterministic keyword)
     query("try {"
         + "  let $f := error#0 let $err := nondeterministic $f() return ()"
         + "} catch * { 'ERR' }", "ERR");
     query("try {"
-        + "  for $f in (prof:void#1(?), error#0)"
+        + "  for $f in (void#1(?), error#0)"
         + "  let $err := nondeterministic $f() return ()"
         + "} catch * { 'ERR' }", "ERR");
     query("try {"

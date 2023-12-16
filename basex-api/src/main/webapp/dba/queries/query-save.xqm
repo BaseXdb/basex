@@ -25,7 +25,7 @@ function dba:query-save(
   let $path := config:directory() || $name
   return (
     try {
-      prof:void(xquery:parse(string($query), map {
+      void(xquery:parse(string($query), map {
         'plan': false(), 'pass': true(), 'base-uri': $path
       }))
     } catch * {

@@ -66,11 +66,11 @@ public final class XQuery4Test extends SandboxTest {
 
     query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
 
-    check("1 otherwise prof:void(2)", 1, root(Int.class));
-    check("prof:void(1) otherwise 2", 2, root(Otherwise.class));
-    check("prof:void(1) otherwise prof:void(2)", "", root(Otherwise.class));
+    check("1 otherwise void(2)", 1, root(Int.class));
+    check("void(1) otherwise 2", 2, root(Otherwise.class));
+    check("void(1) otherwise void(2)", "", root(Otherwise.class));
 
-    check("count(prof:void(1) otherwise prof:void(2))", 0, root(COUNT));
+    check("count(void(1) otherwise void(2))", 0, root(COUNT));
     query("count((1 to 10)[. = 0] otherwise (1 to 10)[. = 2])", 1);
     query("count((1 to 10)[. = 1] otherwise (1 to 10)[. = 2])", 1);
 

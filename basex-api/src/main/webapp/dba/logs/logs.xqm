@@ -159,7 +159,7 @@ function dba:log(
   $time   as xs:string?
 ) as element()+ {
   (: check if input is a valid regular expression :)
-  if($input) then prof:void(analyze-string('', $input)),
+  if($input) then void(analyze-string('', $input)),
 
   let $headers := (
     map { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },

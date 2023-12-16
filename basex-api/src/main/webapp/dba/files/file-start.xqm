@@ -28,7 +28,7 @@ function dba:file-start(
     (: stop running job before starting new job :)
     job:remove($id),
     job:wait($id),
-    prof:void(job:eval($uri, (), map { 'cache': 'true', 'id': $id, 'log': 'DBA job' })),
+    void(job:eval($uri, (), map { 'cache': 'true', 'id': $id, 'log': 'DBA job' })),
     map { 'info': 'Job was started.', 'job': $id }
   } catch * {
     map { 'error': $err:description }

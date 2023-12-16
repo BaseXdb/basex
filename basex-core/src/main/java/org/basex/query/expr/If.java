@@ -105,7 +105,7 @@ public final class If extends Arr {
     final Expr cmp = EXISTS.is(cond) ? cond.arg(0) : ct.type instanceof NodeType ? cond : null;
     if(!ndt && cmp != null && cmp.equals(br1)) return new Otherwise(info, br1, br2).optimize(cc);
 
-    // if(A) then B else B  ->  prof:void(A), B
+    // if(A) then B else B  ->  void(A), B
     if(br1.equals(br2)) return cc.merge(cond, br1, info);
 
     // determine type

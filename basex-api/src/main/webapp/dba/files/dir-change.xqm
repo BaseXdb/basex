@@ -30,7 +30,7 @@ function dba:dir-change(
     )
     return (
       (: ensure that the directory can be accessed :)
-      prof:void(file:list($path)),
+      void(file:list($path)),
   
       config:directory($path),
       config:query('')

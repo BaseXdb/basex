@@ -29,7 +29,7 @@ function dba:file-upload(
     (: Parse all XQuery files; reject files that cannot be parsed :)
     map:for-each($files, function($file, $content) {
       if(matches($file, '\.xqm?$')) then (
-        prof:void(xquery:parse(
+        void(xquery:parse(
           convert:binary-to-string($content),
           map { 'plan': false(), 'pass': true(), 'base-uri': $dir || $file }
         ))
