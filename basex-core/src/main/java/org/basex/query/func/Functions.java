@@ -73,7 +73,7 @@ public final class Functions {
   }
 
   /**
-   * Returns a function call.
+   * Creates a function call or a function item expression.
    * @param name function name
    * @param fb function arguments
    * @param qc query context
@@ -83,11 +83,11 @@ public final class Functions {
   public static Expr get(final QNm name, final FuncBuilder fb, final QueryContext qc)
       throws QueryException {
 
-    // dynamic function call?
-    if(fb.partial()) return dynamic(literal(name, fb.arity(), false, fb.sc, fb.info, qc), fb);
+    // partial function call?
+    if(fb.partial()) return dynamic(item(name, fb.arity(), false, fb.sc, fb.info, qc), fb);
 
     // constructor function
-    if(eq(name.uri(), XS_URI)) return constructor(name, fb);
+    if(eq(name.uri(), XS_URI)) return constructorCall(name, fb);
 
     // built-in function
     final FuncDefinition fd = builtIn(name);
@@ -100,11 +100,11 @@ public final class Functions {
     }
 
     // user-defined function
-    return userDefined(name, fb, qc);
+    return staticCall(name, fb, qc);
   }
 
   /**
-   * Returns a dynamic function call.
+   * Creates a dynamic function call or a partial function expression.
    * @param expr function expression
    * @param fb function arguments
    * @return function call
@@ -117,17 +117,17 @@ public final class Functions {
   }
 
   /**
-   * Returns a function literal.
+   * Creates a function item expression.
    * @param name function name
    * @param arity number of arguments
    * @param runtime {@code true} if this method is called at runtime
    * @param sc static context
    * @param info input info (can be {@code null})
    * @param qc query context
-   * @return function literal if found, {@code null} otherwise
+   * @return literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public static Expr literal(final QNm name, final int arity, final boolean runtime,
+  public static Expr item(final QNm name, final int arity, final boolean runtime,
       final StaticContext sc, final InputInfo info, final QueryContext qc) throws QueryException {
 
     final FuncBuilder fb = new FuncBuilder(sc, info).initLiteral(arity, runtime);
@@ -135,9 +135,9 @@ public final class Functions {
     // constructor function
     if(eq(name.uri(), XS_URI)) {
       if(arity > 0) fb.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc);
-      final Expr expr = constructor(name, fb);
+      final Expr expr = constructorCall(name, fb);
       final FuncType ft = FuncType.get(fb.anns, null, fb.params);
-      return literal(expr, fb, ft, name, false, arity == 0);
+      return item(expr, fb, ft, name, false, arity == 0);
     }
 
     // built-in function
@@ -154,13 +154,13 @@ public final class Functions {
         fb.anns = fb.anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
       }
-      return literal(sf, fb, ft, name, updating, sf.has(Flag.CTX));
+      return item(sf, fb, ft, name, updating, sf.has(Flag.CTX));
     }
 
     // user-defined function
     final StaticFunc sf = qc.functions.get(name, arity);
     if(sf != null) {
-      final Expr func = userDefined(sf, fb, qc);
+      final Expr func = item(sf, fb, qc);
       if(sf.updating) qc.updating();
       return func;
     }
@@ -177,10 +177,10 @@ public final class Functions {
     }
     if(runtime) return null;
 
-    // literal
-    final StaticFuncCall call = userDefined(name, fb, qc);
+    // closure
+    final StaticFuncCall call = staticCall(name, fb, qc);
     // safe cast (no context dependency, no runtime evaluation)
-    final Closure closure = (Closure) literal(call, fb, null, name, false, false);
+    final Closure closure = (Closure) item(call, fb, null, name, false, false);
     qc.functions.register(closure);
     return closure;
   }
@@ -194,11 +194,11 @@ public final class Functions {
    * @return function item
    * @throws QueryException query exception
    */
-  public static FuncItem userDefined(final StaticFunc sf, final StaticContext sc,
+  public static FuncItem item(final StaticFunc sf, final StaticContext sc,
       final InputInfo info, final QueryContext qc) throws QueryException {
     // safe cast (no context dependency, runtime evaluation)
     final FuncBuilder fb = new FuncBuilder(sc, info).initLiteral(sf.arity(), true);
-    return (FuncItem) userDefined(sf, fb, qc);
+    return (FuncItem) item(sf, fb, qc);
   }
 
   /**
@@ -247,6 +247,7 @@ public final class Functions {
     final int id = CACHE.id(name.internal());
     return id != 0 ? DEFINITIONS.get(id - 1) : null;
   }
+
   /**
    * Returns an info message for a similar function.
    * @param qname name of type
@@ -297,13 +298,13 @@ public final class Functions {
   }
 
   /**
-   * Tries to resolve the specified function with xs namespace as a cast.
+   * Returns a constructor call.
    * @param name function name
    * @param fb function arguments
    * @return cast type if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  private static Cast constructor(final QNm name, final FuncBuilder fb) throws QueryException {
+  private static Cast constructorCall(final QNm name, final FuncBuilder fb) throws QueryException {
     Type type = ListType.find(name);
     if(type == null) type = AtomType.find(name, false);
     if(type == null) throw WHICHFUNC_X.get(fb.info, AtomType.similar(name));
@@ -316,14 +317,14 @@ public final class Functions {
   }
 
   /**
-   * Returns a cached function call.
+   * Creates a cached function call.
    * @param name function name
    * @param fb function arguments
    * @param qc query context
    * @return function call
    * @throws QueryException query exception
    */
-  private static StaticFuncCall userDefined(final QNm name, final FuncBuilder fb,
+  private static StaticFuncCall staticCall(final QNm name, final FuncBuilder fb,
       final QueryContext qc) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, fb.info);
@@ -334,14 +335,14 @@ public final class Functions {
   }
 
   /**
-   * Creates a function literal for a user-defined function.
+   * Creates a function item expression for a user-defined function.
    * @param sf static function
    * @param fb function arguments
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  private static Expr userDefined(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc)
+  private static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc)
       throws QueryException {
 
     final FuncType sft = sf.funcType();
@@ -349,9 +350,9 @@ public final class Functions {
     for(int a = 0; a < arity; a++) fb.add(sf.paramName(a), sft.argTypes[a], qc);
     final FuncType ft = FuncType.get(fb.anns, sft.declType, Arrays.copyOf(sft.argTypes, arity));
 
-    final StaticFuncCall call = userDefined(sf.name, fb, qc);
+    final StaticFuncCall call = staticCall(sf.name, fb, qc);
     if(call.func != null) fb.anns = call.func.anns;
-    return literal(call, fb, ft, sf.name, sf.updating, false);
+    return item(call, fb, ft, sf.name, sf.updating, false);
   }
 
   /**
@@ -379,7 +380,7 @@ public final class Functions {
   }
 
   /**
-   * Creates a {@link Closure}, a {@link FuncItem} or a {@link FuncLit}.
+   * Creates a function item expression ({@link Closure}, {@link FuncItem}, or {@link FuncLit}).
    * At parse and compile time, a closure is generated to enable inlining and compilation.
    * At runtime, we directly generate a function item.
    * @param expr function body
@@ -390,7 +391,7 @@ public final class Functions {
    * @param context context-dependent flag
    * @return the function expression
    */
-  private static Expr literal(final Expr expr, final FuncBuilder fb, final FuncType ft,
+  private static Expr item(final Expr expr, final FuncBuilder fb, final FuncType ft,
       final QNm name, final boolean updating, final boolean context) {
 
     final Var[] params = fb.params;

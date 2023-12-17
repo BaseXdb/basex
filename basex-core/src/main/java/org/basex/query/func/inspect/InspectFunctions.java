@@ -24,7 +24,7 @@ public final class InspectFunctions extends StandardFunc {
     if(!defined(0)) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final StaticFunc sf : qc.functions.funcs()) {
-        vb.add(Functions.userDefined(sf, sf.sc, info, qc));
+        vb.add(Functions.item(sf, sf.sc, info, qc));
       }
       return vb.value(this);
     }
@@ -48,7 +48,7 @@ public final class InspectFunctions extends StandardFunc {
     // collect new functions
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : qc.functions.funcs()) {
-      if(!old.contains(sf)) vb.add(Functions.userDefined(sf, sf.sc, info, qc));
+      if(!old.contains(sf)) vb.add(Functions.item(sf, sf.sc, info, qc));
     }
     funcs = vb.value(this);
     qc.resources.addFunctions(content.path(), funcs);

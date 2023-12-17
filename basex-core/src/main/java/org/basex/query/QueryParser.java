@@ -1776,15 +1776,16 @@ public class QueryParser extends InputParser {
     Expr expr = transformWith();
     if(expr != null) {
       for(boolean mapping; (mapping = wsConsume("=!>")) || consume("=>");) {
-        skipWs();
+        QNm name = null;
         Expr ex;
+        skipWs();
         if(curr('$')) {
           ex = varRef();
         } else if(curr('(')) {
           ex = parenthesized();
         } else {
           ex = functionItem();
-          if(ex == null) ex = checkReserved(eQName(sc.funcNS, ARROWSPEC));
+          if(ex == null) name = checkReserved(eQName(sc.funcNS, ARROWSPEC));
         }
         final InputInfo ii = info();
         final Expr arg;
@@ -1797,9 +1798,8 @@ public class QueryParser extends InputParser {
         } else {
           arg = expr;
         }
-        final boolean sttc = ex instanceof QNm;
-        final FuncBuilder fb = argumentList(sttc, new Expr[] { arg });
-        expr = sttc ? Functions.get((QNm) ex, fb, qc) : Functions.dynamic(ex, fb);
+        final FuncBuilder fb = argumentList(name != null, new Expr[] { arg });
+        expr = name != null ? Functions.get(name, fb, qc) : Functions.dynamic(ex, fb);
         if(mapping) {
           expr = new GFLWOR(ii, fr, expr);
           localVars.closeScope(s);
@@ -2380,7 +2380,7 @@ public class QueryParser extends InputParser {
       if(Function.ERROR.is(num)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, num);
       final int arity = (int) ((Int) num).itr();
-      return Functions.literal(name, arity, false, sc, info(), qc);
+      return Functions.item(name, arity, false, sc, info(), qc);
     }
     pos = p;
     return null;

@@ -22,8 +22,6 @@ public final class FuncBuilder {
   /** Input Info. */
   public final InputInfo info;
 
-  /** Keyword-based arguments (initialized if required). */
-  public QNmMap<Expr> keywords;
   /** Variable scope (literals). */
   public VarScope vs;
   /** Parameters (literals). */
@@ -32,9 +30,13 @@ public final class FuncBuilder {
   public AnnList anns = AnnList.EMPTY;
   /** Runtime flag (literals). */
   public boolean runtime;
-  /** Arity (literals). */
-  public int arity = -1;
+  /** Fixed argument list (literals). */
+  private Expr[] fixedArgs;
+  /** Argument counter (literals). */
+  private int c;
 
+  /** Keyword-based arguments (initialized if required). */
+  public QNmMap<Expr> keywords;
   /** Arguments. */
   private ExprList args;
   /** Placeholders (initialized if required). */
@@ -93,7 +95,7 @@ public final class FuncBuilder {
    * @return arguments
    */
   public Expr[] args() {
-    return args.toArray();
+    return fixedArgs != null ? fixedArgs : args.toArray();
   }
 
   /**
@@ -117,7 +119,7 @@ public final class FuncBuilder {
    * @return arity
    */
   public int arity() {
-    return arity != -1 ? arity : args.size() + holes.size();
+    return fixedArgs != null ? fixedArgs.length : args.size() + holes.size();
   }
 
   // LITERALS =====================================================================================
@@ -129,11 +131,10 @@ public final class FuncBuilder {
    * @return self reference
    */
   public FuncBuilder initLiteral(final int a, final boolean rt) {
-    args = new ExprList(a);
+    fixedArgs = new Expr[a];
     params = new Var[a];
     vs = new VarScope(sc);
     runtime = rt;
-    arity = a;
     return this;
   }
 
@@ -145,7 +146,7 @@ public final class FuncBuilder {
    */
   public void add(final QNm name, final SeqType st, final QueryContext qc) {
     final Var var = vs.addNew(name, st, true, qc, info);
-    params[args.size()] = var;
-    args.add(new VarRef(info, var));
+    params[c] = var;
+    fixedArgs[c++] = new VarRef(info, var);
   }
 }

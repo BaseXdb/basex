@@ -75,7 +75,7 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
+  public FuncItem item(final QueryContext qc, final InputInfo ii) {
     return new FuncItem(info, expr, params, anns, funcType(), vs.sc, vs.stackSize(),
         name, qc.focus.copy());
   }

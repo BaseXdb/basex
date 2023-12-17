@@ -68,7 +68,7 @@ public final class PartFunc extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem func = toFunction(body(), qc);
 
     final int hl = holes.length, nargs = exprs.length + hl - 1, arity = func.arity();

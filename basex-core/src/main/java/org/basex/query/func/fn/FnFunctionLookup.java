@@ -17,8 +17,8 @@ import org.basex.util.*;
 public final class FnFunctionLookup extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr lit = literal(qc);
-    return lit != null ? lit.item(qc, info) : Empty.VALUE;
+    final Expr expr = item(qc);
+    return expr != null ? expr.item(qc, info) : Empty.VALUE;
   }
 
   @Override
@@ -27,8 +27,8 @@ public final class FnFunctionLookup extends StandardFunc {
     cc.qc.functions.compileAll(cc);
 
     if(allAreValues(false)) {
-      final Expr lit = literal(cc.qc);
-      if(lit != null) return lit;
+      final Expr expr = item(cc.qc);
+      if(expr != null) return expr;
     }
     return this;
   }
@@ -40,17 +40,17 @@ public final class FnFunctionLookup extends StandardFunc {
   }
 
   /**
-   * Returns the requested function literal.
+   * Returns the requested function item.
    * @param qc query context
    * @return literal or {@code null}
    * @throws QueryException query exception
    */
-  private Expr literal(final QueryContext qc) throws QueryException {
+  private Expr item(final QueryContext qc) throws QueryException {
     final QNm name = toQNm(toItem(arg(0), qc));
     final long arity = toLong(arg(1), qc);
     if(arity >= 0 && arity <= Integer.MAX_VALUE) {
       try {
-        return Functions.literal(name, (int) arity, true, sc, info, qc);
+        return Functions.item(name, (int) arity, true, sc, info, qc);
       } catch(final QueryException ex) {
         Util.debug(ex);
       }
