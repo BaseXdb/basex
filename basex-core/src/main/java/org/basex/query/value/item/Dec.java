@@ -145,7 +145,7 @@ public final class Dec extends ANum {
     if(item instanceof Dbl || item instanceof Flt) return -item.compare(this, coll, ii);
     final double d = item.dbl(ii);
     return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
-      Double.isNaN(d) ? UNDEF : value.compareTo(item.dec(ii));
+      Double.isNaN(d) ? NAN_DUMMY : value.compareTo(item.dec(ii));
   }
 
   @Override

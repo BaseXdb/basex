@@ -150,7 +150,7 @@ public class FnSort extends StandardFunc {
       if(!item1.comparable(item2)) throw compareError(item1, item2, info);
 
       int diff = item1.compare(item2, coll, info);
-      if(diff == Item.UNDEF) {
+      if(diff == Item.NAN_DUMMY) {
         final boolean nan1 = item1 == Dbl.NAN || item1 == Flt.NAN;
         final boolean nan2 = item2 == Dbl.NAN || item2 == Flt.NAN;
         diff = nan1 ? nan2 ? 0 : -1 : 1;

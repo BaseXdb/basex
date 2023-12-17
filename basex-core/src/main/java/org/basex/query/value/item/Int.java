@@ -171,7 +171,7 @@ public final class Int extends ANum {
     if(item instanceof Int) return Long.compare(value, ((Int) item).value);
     if(item.type == AtomType.DECIMAL) return -item.compare(this, coll, ii);
     final double d = item.dbl(ii);
-    return Double.isNaN(d) ? UNDEF : value < d ? -1 : value > d ? 1 : 0;
+    return Double.isNaN(d) ? NAN_DUMMY : value < d ? -1 : value > d ? 1 : 0;
   }
 
   @Override

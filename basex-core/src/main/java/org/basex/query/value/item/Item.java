@@ -33,8 +33,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
-  /** Undefined item. */
-  public static final int UNDEF = Integer.MIN_VALUE;
+  /** NaN dummy item. */
+  public static final int NAN_DUMMY = Integer.MIN_VALUE;
 
   /**
    * Constructor.

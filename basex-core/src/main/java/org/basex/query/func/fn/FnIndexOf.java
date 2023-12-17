@@ -2,7 +2,6 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
@@ -31,7 +30,7 @@ public final class FnIndexOf extends StandardFunc {
       public Int next() throws QueryException {
         for(Item item; (item = qc.next(input)) != null;) {
           ++c;
-          if(equal(item, search, coll)) return Int.get(c);
+          if(item.comparable(search) && item.equal(search, coll, sc, info)) return Int.get(c);
         }
         return null;
       }
@@ -48,22 +47,9 @@ public final class FnIndexOf extends StandardFunc {
     int c = 0;
     for(Item item; (item = qc.next(input)) != null;) {
       ++c;
-      if(equal(item, search, coll)) list.add(c);
+      if(item.comparable(search) && item.equal(search, coll, sc, info)) list.add(c);
     }
     return IntSeq.get(list);
-  }
-
-  /**
-   * Checks the specified items for equality.
-   * @param item input input
-   * @param search search item
-   * @param coll collation
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  private boolean equal(final Item item, final Item search, final Collation coll)
-      throws QueryException {
-    return item.comparable(search) && OpV.EQ.eval(item, search, coll, sc, info);
   }
 
   @Override

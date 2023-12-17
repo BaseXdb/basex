@@ -122,7 +122,7 @@ public final class Flt extends ANum {
     if(item instanceof Dbl) return -item.compare(this, coll, ii);
     // cannot be replaced by Float.compare (different semantics)
     final float n = item.flt(ii);
-    return Float.isNaN(n) || Float.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
+    return Float.isNaN(n) || Float.isNaN(value) ? NAN_DUMMY : value < n ? -1 : value > n ? 1 : 0;
   }
 
   @Override

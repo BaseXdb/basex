@@ -59,7 +59,7 @@ public class FnMin extends StandardFunc {
     // strings and URIs
     final QueryBiFunction<Item, Item, Boolean> cmp = (item1, item2) -> {
       final int d = item1.compare(item2, coll, info);
-      return min ? d > 0 : d < 0 && d != Item.UNDEF;
+      return min ? d > 0 : d < 0 && d != Item.NAN_DUMMY;
     };
     if(item instanceof AStr) {
       for(Item it; (it = qc.next(iter)) != null;) {
