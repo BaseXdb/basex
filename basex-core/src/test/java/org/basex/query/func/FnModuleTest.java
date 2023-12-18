@@ -769,6 +769,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " ()", " map { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), "12.345,67");
+    query(func.args(" 12345.67", "#\u2019##0.00", "de_CH"), "12\u2019345.67");
 
     error(func.args(" 12345.67", "#.##0,00", "de", " map { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), FORMDUP_X);

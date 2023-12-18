@@ -124,7 +124,7 @@ public final class DecFormatter extends FormatUtil {
     final String l = string(language);
     if(IcuFormatter.available()) return IcuFormatter.decFormatter(l);
     for(final Locale locale : DecimalFormatSymbols.getAvailableLocales()) {
-      if(locale.getLanguage().equals(l)) {
+      if(locale.toString().equals(l)) {
         final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
         final TokenMap map = new TokenMap();
         map.put(token(DF_DEC), token(String.valueOf(dfs.getDecimalSeparator())));
