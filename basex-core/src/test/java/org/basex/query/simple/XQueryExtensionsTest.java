@@ -11,14 +11,6 @@ import org.basex.query.*;
 public final class XQueryExtensionsTest extends QueryTest {
   static {
     queries = new Object[][] {
-      { "Ternary 1", strings("ok"), "() ?? 'fail' !! 'ok'" },
-      { "Ternary 2", integers(2), "0??1!!2" },
-      { "Ternary 3", integers(1), "2 ?? 1 !! 0" },
-      { "Ternary 4", "(1, 2) ?? 'no-sequences' !! 'allowed'" },
-      { "Ternary 5", integers(3), "1 ?? (2 ?? 3 !! 4) !! 5" },
-      { "Ternary 6", integers(3), "1 ?? (2 ?? 3 !! 4) !! 5" },
-      { "Ternary 7", integers(3), "1 ?? 2 ?? 3 !! 4 !! 5" },
-
       { "IfWithoutElse 1", integers(2), "if(1) then 2" },
       { "IfWithoutElse 2", integers(3), "if(1) then if(2) then 3" },
       { "IfWithoutElse 3", integers(2), "if(1) then 2 else if(3) then 4" },

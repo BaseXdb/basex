@@ -1018,7 +1018,7 @@ public class QueryParser extends InputParser {
     if(expr == null) expr = replace();
     if(expr == null) expr = updatingFunctionCall();
     if(expr == null) expr = copyModify();
-    if(expr == null) expr = ternaryIf();
+    if(expr == null) expr = or();
     return expr;
   }
 
@@ -1499,22 +1499,6 @@ public class QueryParser extends InputParser {
     final Expr expr = check(expr(), NOIF);
     wsCheck(")");
     return expr;
-  }
-
-  /**
-   * Parses the "TernaryIfExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr ternaryIf() throws QueryException {
-    final Expr iff = or();
-    if(!wsConsume("??")) return iff;
-
-    final InputInfo ii = info();
-    final Expr thn = check(single(), NOTERNARY);
-    if(!wsConsume("!!")) throw error(NOTERNARY);
-    final Expr els = check(single(), NOTERNARY);
-    return new If(ii, iff, thn, els);
   }
 
   /**
@@ -2217,7 +2201,7 @@ public class QueryParser extends InputParser {
           expr = dynFuncCall(expr, ii, args.exprs(), args.holes());
         } else {
           final int p = pos;
-          if(consume("?") && !consume("?") && !consume(':')) {
+          if(consume("?") && !consume(':')) {
             // parses the "Lookup" rule
             expr = new Lookup(info(), expr, keySpecifier());
           } else {
