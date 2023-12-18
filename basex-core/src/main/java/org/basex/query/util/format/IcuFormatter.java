@@ -300,7 +300,7 @@ public final class IcuFormatter extends Formatter {
    */
   public static DecFormatter decFormatter(final String language) throws QueryException {
     for(final ULocale locale : DecimalFormatSymbols.getAvailableULocales()) {
-      if(locale.getLanguage().equals(language)) {
+      if(locale.toString().equals(language)) {
         final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
         final TokenMap map = new TokenMap();
         map.put(token(DF_DEC), token(String.valueOf(dfs.getDecimalSeparator())));
