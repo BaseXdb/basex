@@ -5,6 +5,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
+import java.text.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -109,6 +111,37 @@ public final class DecFormatter extends FormatUtil {
     // decimal-digit-family: added above. pattern-separator: will never occur at this stage
     actives = tb.add(decimal).add(exponent).add(grouping).add(optional).finish();
     // "all other characters (...) are classified as passive characters."
+  }
+
+  /**
+   * Returns a decimal formatter for the given language, or {@code null} if the language is not
+   * supported.
+   * @param language language
+   * @return a decimal formatter, or {@code null} if the language is not supported
+   * @throws QueryException query exception
+   */
+  public static DecFormatter forLanguage(final byte[] language) throws QueryException {
+    final String l = string(language);
+    if(IcuFormatter.available()) return IcuFormatter.decFormatter(l);
+    for(final Locale locale : DecimalFormatSymbols.getAvailableLocales()) {
+      if(locale.getLanguage().equals(l)) {
+        final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
+        final TokenMap map = new TokenMap();
+        map.put(token(DF_DEC), token(String.valueOf(dfs.getDecimalSeparator())));
+        map.put(token(DF_DIG), token(String.valueOf(dfs.getDigit())));
+        map.put(token(DF_GRP), token(String.valueOf(dfs.getGroupingSeparator())));
+        map.put(token(DF_EXP), token(dfs.getExponentSeparator()));
+        map.put(token(DF_INF), token(dfs.getInfinity()));
+        map.put(token(DF_MIN), token(String.valueOf(dfs.getMinusSign())));
+        map.put(token(DF_NAN), token(dfs.getNaN()));
+        map.put(token(DF_PAT), token(String.valueOf(dfs.getPatternSeparator())));
+        map.put(token(DF_PC), token(String.valueOf(dfs.getPercent())));
+        map.put(token(DF_PM), token(String.valueOf(dfs.getPerMill())));
+        map.put(token(DF_ZD), token(String.valueOf(dfs.getZeroDigit())));
+        return new DecFormatter(map, null);
+      }
+    }
+    return null;
   }
 
   /**
@@ -289,7 +322,8 @@ public final class DecFormatter extends FormatUtil {
             active = false;
           }
         } else if(ch == grouping) {
-          if(!frac) pic.groupInt.add(pic.minInt + optInt);
+          if(frac) pic.groupFrac.add(pic.minFrac + optFrac);
+          else pic.groupInt.add(pic.minInt + optInt);
         } else if(contains(digits, ch)) {
           if(exp) {
             pic.minExp++;
@@ -317,11 +351,12 @@ public final class DecFormatter extends FormatUtil {
 
       // check if integer-part-grouping-positions are regular
       // if yes, they are replaced with a single position
-      if(igl > 1) {
-        boolean reg = true;
+      if(igl >= 1) {
         final int i = ipgp.get(igl - 1);
-        for(int g = igl - 2; g >= 0; --g) reg &= i * igl == ipgp.get(g);
-        if(reg) {
+        // make sure that there is no digit where the first non-present grouping separator goes
+        pic.isRegular = ipgp.get(0) + i >= pic.minInt + optInt;
+        for(int g = igl - 2; g >= 0; --g) pic.isRegular &= i * (igl - g) == ipgp.get(g);
+        if(pic.isRegular) {
           pic.groupInt.reset();
           pic.groupInt.add(i);
         }
@@ -433,14 +468,14 @@ public final class DecFormatter extends FormatUtil {
       for(int i = 0; i < il; i++) intgr.add(zero + s.charAt(i) - '0');
 
       // squeeze in grouping separators
-      final int gil = pic.groupInt.size();
-      if(gil == 1 && pic.groupInt.get(0) > 0) {
+      if(pic.isRegular && pic.groupInt.get(0) > 0) {
         // regular pattern with repeating separators
         for(int i = intgr.size() - 1; i > 0; --i) {
           if(i % pic.groupInt.get(0) == 0) intgr.insert(intgr.size() - i, grouping);
         }
       } else {
         // irregular pattern, or no separators at all
+        final int gil = pic.groupInt.size();
         for(int g = 0; g < gil; g++) {
           final int pos = intgr.size() - pic.groupInt.get(g);
           if(pos > 0) intgr.insert(pos, grouping);
@@ -495,6 +530,8 @@ public final class DecFormatter extends FormatUtil {
     private final IntList groupFrac = new IntList();
     /** Scaling factor. */
     private int scaling;
+    /** Whether the integer part is regular. */
+    private boolean isRegular;
     /** Minimum-integer-part-size. */
     private int minInt;
     /** Minimum-fractional-part-size. */
