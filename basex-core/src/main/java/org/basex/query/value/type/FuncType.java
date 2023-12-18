@@ -44,7 +44,7 @@ public class FuncType implements Type {
    * @param argTypes argument types (can be {@code null})
    */
   FuncType(final SeqType declType, final SeqType... argTypes) {
-    this(new AnnList(), declType, argTypes);
+    this(AnnList.EMPTY, declType, argTypes);
   }
 
   /**
@@ -207,7 +207,7 @@ public class FuncType implements Type {
    * @return function type
    */
   public static FuncType get(final SeqType declType, final SeqType... args) {
-    return get(new AnnList(), declType, args);
+    return get(AnnList.EMPTY, declType, args);
   }
 
   /**

@@ -94,7 +94,7 @@ public final class RestXqFunction extends WebFunction {
     boolean found = false;
     final MainOptions options = ctx.options;
 
-    final AnnList starts = new AnnList();
+    AnnList starts = AnnList.EMPTY;
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
       if(def == null) continue;
@@ -104,7 +104,7 @@ public final class RestXqFunction extends WebFunction {
       if(def == _REST_PATH) {
         try {
           path = new RestXqPath(toString(value.itemAt(0)), ann.info);
-          starts.add(ann);
+          starts = starts.attach(ann);
         } catch(final IllegalArgumentException ex) {
           throw error(ann.info, ex.getMessage());
         }
@@ -114,7 +114,7 @@ public final class RestXqFunction extends WebFunction {
       } else if(def == _REST_ERROR) {
         error(ann);
         // function can have multiple error annotations
-        if(!starts.contains(def)) starts.add(ann);
+        if(!starts.contains(def)) starts = starts.attach(ann);
       } else if(def == _REST_CONSUMES) {
         strings(ann, consumes);
       } else if(def == _REST_PRODUCES) {
@@ -162,7 +162,7 @@ public final class RestXqFunction extends WebFunction {
         final String p = value.isEmpty() ? "" : toString(value.itemAt(0));
         final QNm v = value.size() > 1 ? checkVariable(toString(value.itemAt(1)), declared) : null;
         permission = new RestXqPerm(p, v);
-        starts.add(ann);
+        starts = starts.attach(ann);
       }
     }
 

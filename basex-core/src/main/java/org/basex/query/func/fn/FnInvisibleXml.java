@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -74,7 +75,7 @@ public final class FnInvisibleXml extends StandardFunc {
       final Expr arg = new VarRef(info, params[0]);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
       final FuncType ft = FuncType.get(parseFunction.seqType(), STRING_O);
-      return new FuncItem(sc, null, null, params, ft, parseFunction, params.length, info);
+      return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, sc, params.length, null);
     }
   }
 

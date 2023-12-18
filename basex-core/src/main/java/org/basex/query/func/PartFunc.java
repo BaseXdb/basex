@@ -64,7 +64,6 @@ public final class PartFunc extends Arr {
       for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
       exprType.assign(FuncType.get(ft.declType, args).seqType());
     }
-
     return this;
   }
 
@@ -95,7 +94,7 @@ public final class PartFunc extends Arr {
     final DynFuncCall expr = new DynFuncCall(info, sc, updating, false, func, args);
 
     final FuncType type = FuncType.get(anns, ft.declType, params);
-    return new FuncItem(sc, anns, null, params, type, expr, vs.stackSize(), info, qc.focus.copy());
+    return new FuncItem(info, expr, params, anns, type, sc, vs.stackSize(), null, qc.focus.copy());
   }
 
   @Override

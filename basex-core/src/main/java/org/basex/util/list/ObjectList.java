@@ -92,7 +92,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public final L add(final E... elements) {
+  public L add(final E... elements) {
     E[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {
@@ -110,7 +110,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public final L add(final L elements) {
+  public L add(final L elements) {
     for(final E e : elements) add(e);
     return (L) this;
   }

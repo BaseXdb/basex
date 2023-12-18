@@ -43,52 +43,52 @@ public final class FuncItem extends FItem implements Scope {
   private final InputInfo info;
   /** Query focus. */
   private final QueryFocus focus;
-  /** Annotations (lazy instantiation). */
+  /** Annotations. */
   private AnnList anns;
   /** Indicates if the query focus is accessed or modified. */
   private Boolean fcs;
 
   /**
    * Constructor.
-   * @param sc static context
-   * @param anns function annotations (can be {@code null})
-   * @param name function name (can be {@code null})
-   * @param params formal parameters
-   * @param type function type
-   * @param expr function body
-   * @param stackSize stack-frame size
    * @param info input info (can be {@code null})
+   * @param expr function body
+   * @param params formal parameters
+   * @param anns function annotations
+   * @param type function type
+   * @param sc static context
+   * @param stackSize stack-frame size
+   * @param name function name (can be {@code null})
    */
-  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final int stackSize, final InputInfo info) {
-    this(sc, anns, name, params, type, expr, stackSize, info, null);
+  public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
+      final FuncType type, final StaticContext sc, final int stackSize, final QNm name) {
+    this(info, expr, params, anns, type, sc, stackSize, name, null);
   }
 
   /**
    * Constructor.
-   * @param sc static context
-   * @param anns function annotations (can be {@code null})
-   * @param name function name (can be {@code null})
-   * @param params formal parameters
-   * @param type function type
-   * @param expr function body
-   * @param stackSize stack-frame size
    * @param info input info (can be {@code null})
+   * @param expr function body
+   * @param params formal parameters
+   * @param anns function annotations
+   * @param type function type
+   * @param sc static context
+   * @param stackSize stack-frame size
+   * @param name function name (can be {@code null})
    * @param focus query focus (can be {@code null})
    */
-  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final int stackSize, final InputInfo info,
+  public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
+      final FuncType type, final StaticContext sc, final int stackSize, final QNm name,
       final QueryFocus focus) {
 
     super(type);
-    this.name = name;
-    this.params = params;
-    this.expr = expr;
-    this.stackSize = stackSize;
-    this.sc = sc;
     this.info = info;
-    this.focus = focus;
+    this.expr = expr;
+    this.params = params;
     this.anns = anns;
+    this.sc = sc;
+    this.stackSize = stackSize;
+    this.name = name;
+    this.focus = focus;
   }
 
   @Override
@@ -108,7 +108,6 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public AnnList annotations() {
-    if(anns == null) anns = new AnnList();
     return anns;
   }
 
@@ -176,7 +175,7 @@ public final class FuncItem extends FItem implements Scope {
     final SeqType bt = body.seqType();
     tp = optimize && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
     body.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vars, tp, body, vs.stackSize(), info);
+    return new FuncItem(info, body, vars, anns, tp, sc, vs.stackSize(), name);
   }
 
   @Override
@@ -271,19 +270,17 @@ public final class FuncItem extends FItem implements Scope {
     } else {
       final StringList list = new StringList(arity());
       for(final Var param : params) list.add(param.toErrorString());
-      if(anns != null) qs.token(anns);
-      qs.token(FUNCTION).params(list.finish()).token(AS);
-      qs.token(funcType().declType).brace(expr);
+      qs.token(anns).token(FUNCTION).params(list.finish());
+      qs.token(AS).token(funcType().declType).brace(expr);
     }
     return qs.toString();
   }
 
   @Override
   public void toString(final QueryString qs) {
+    qs.token(anns);
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    if(anns != null) qs.token(anns);
-    qs.token(FUNCTION).params(params);
-    qs.token(AS).token(funcType().declType).brace(expr);
+    qs.token(FUNCTION).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 
   /**
@@ -323,8 +320,8 @@ public final class FuncItem extends FItem implements Scope {
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
           }
           if(action != null) return new FuncItem[] {
-            new FuncItem(sc, anns, null, params, funcType(), cnd, stackSize, info, focus),
-            new FuncItem(sc, anns, null, params, funcType(), action, stackSize, info, focus)
+            new FuncItem(info, cnd, params, anns, funcType(), sc, stackSize, null, focus),
+            new FuncItem(info, action, params, anns, funcType(), sc, stackSize, null, focus)
           };
         }
       }

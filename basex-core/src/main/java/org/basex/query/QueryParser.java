@@ -418,7 +418,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private AnnList annotations(final boolean updating) throws QueryException {
-    final AnnList anns = new AnnList();
+    AnnList anns = AnnList.EMPTY;
     while(true) {
       final Ann ann;
       if(updating && wsConsumeWs(UPDATING)) {
@@ -477,7 +477,7 @@ public class QueryParser extends InputParser {
         break;
       }
 
-      anns.add(ann);
+      anns = anns.attach(ann);
       if(ann.definition == Annotation.UPDATING) qc.updating();
     }
     return anns;
@@ -2199,10 +2199,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr postfix() throws QueryException {
-    Expr expr = primary(), old;
+    Expr expr = primary();
     if(expr != null) {
-      do {
-        old = expr;
+      while(true) {
         if(wsConsume("[")) {
           // parses the "Predicate" rule
           final ExprList el = new ExprList();
@@ -2223,9 +2222,10 @@ public class QueryParser extends InputParser {
             expr = new Lookup(info(), expr, keySpecifier());
           } else {
             pos = p;
+            break;
           }
         }
-      } while(expr != old);
+      }
     }
     return expr;
   }
@@ -2384,7 +2384,7 @@ public class QueryParser extends InputParser {
         final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))
           throw error(NOVISALLOWED);
-        return new Closure(info(), expr, params, anns, global, vs);
+        return new Closure(info(), expr, params, anns, vs, global);
       }
     }
     pos = p;
@@ -2659,8 +2659,8 @@ public class QueryParser extends InputParser {
    */
   private Expr dynFuncCall(final Expr expr, final InputInfo info, final Expr[] args,
       final int[] holes) {
-    return holes == null ? new DynFuncCall(info, sc, expr, args) :
-      new PartFunc(info, sc, ExprList.concat(args, expr), holes);
+    if(holes == null) return new DynFuncCall(info, sc, expr, args);
+    return args.length == 0 ? expr : new PartFunc(info, sc, ExprList.concat(args, expr), holes);
   }
 
   /**

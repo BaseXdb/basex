@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public abstract class StaticDecl extends StaticScope {
   /** Annotations. */
-  public final AnnList anns;
+  public AnnList anns;
 
   /** Indicates if code is currently being compiled or evaluated. */
   protected boolean dontEnter;

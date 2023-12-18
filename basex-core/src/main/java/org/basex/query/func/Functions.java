@@ -119,14 +119,14 @@ public final class Functions {
   public static Expr literal(final QNm name, final int arity, final QueryContext qc,
       final StaticContext sc, final InputInfo info, final boolean runtime) throws QueryException {
 
-    final Literal lit = new Literal(sc, arity);
+    final Literal literal = new Literal(sc, arity);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) {
-      if(arity > 0) lit.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc, info);
-      final Expr expr = constructor(name, lit.args, null, sc, info);
-      final FuncType ft = FuncType.get(lit.annotations(), null, lit.params);
-      return literal(info, expr, ft, name, lit, runtime, false, arity == 0);
+      if(arity > 0) literal.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc, info);
+      final Expr expr = constructor(name, literal.args, null, sc, info);
+      final FuncType ft = FuncType.get(literal.anns, null, literal.params);
+      return literal(info, expr, ft, name, literal, runtime, false, arity == 0);
     }
 
     // built-in function
@@ -134,42 +134,42 @@ public final class Functions {
     if(fd != null) {
       checkArity(arity, fd.minMax[0], fd.minMax[1], fd, info, true);
 
-      final FuncType ft = fd.type(arity, lit.annotations());
+      final FuncType ft = fd.type(arity, literal.anns);
       final QNm[] names = fd.paramNames(arity);
-      for(int a = 0; a < arity; a++) lit.add(names[a], ft.argTypes[a], qc, info);
-      final StandardFunc sf = fd.get(sc, info, lit.args);
-      final boolean updating = sf.updating(), ctx = sf.has(Flag.CTX);
+      for(int a = 0; a < arity; a++) literal.add(names[a], ft.argTypes[a], qc, info);
+      final StandardFunc sf = fd.get(sc, info, literal.args);
+      final boolean updating = sf.updating(), context = sf.has(Flag.CTX);
       if(updating) {
-        lit.annotations().add(new Ann(info, Annotation.UPDATING, Empty.VALUE));
+        literal.anns = literal.anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
       }
-      return literal(info, sf, ft, name, lit, runtime, updating, ctx);
+      return literal(info, sf, ft, name, literal, runtime, updating, context);
     }
 
     // user-defined function
     final StaticFunc sf = qc.functions.get(name, arity);
     if(sf != null) {
-      final Expr func = userDefined(sf, qc, sc, info, runtime, lit);
+      final Expr func = userDefined(sf, qc, sc, info, runtime, literal);
       if(sf.updating) qc.updating();
       return func;
     }
 
-    for(int a = 0; a < arity; a++) lit.add(new QNm(ARG + (a + 1), ""), null, qc, info);
+    for(int a = 0; a < arity; a++) literal.add(new QNm(ARG + (a + 1), ""), null, qc, info);
 
     // Java function
-    final JavaCall java = JavaCall.get(name, lit.args, qc, sc, info);
+    final JavaCall java = JavaCall.get(name, literal.args, qc, sc, info);
     if(java != null) {
       final SeqType[] sts = new SeqType[arity];
       Arrays.fill(sts, SeqType.ITEM_ZM);
-      final SeqType st = FuncType.get(lit.annotations(), null, sts).seqType();
-      return new FuncLit(info, java, st, name, lit.params, lit.annotations(), lit.vs);
+      final SeqType st = FuncType.get(literal.anns, null, sts).seqType();
+      return new FuncLit(info, java, literal.params, literal.anns, st, name, literal.vs);
     }
     if(runtime) return null;
 
     // literal
-    final StaticFuncCall call = userDefined(name, lit.args, null, qc, sc, info);
+    final StaticFuncCall call = userDefined(name, literal.args, null, qc, sc, info);
     // safe cast (no context dependency, no runtime evaluation)
-    final Closure closure = (Closure) literal(info, call, null, name, lit, false, false, false);
+    final Closure closure = (Closure) literal(info, call, null, name, literal, false, false, false);
     qc.functions.register(closure);
     return closure;
   }
@@ -339,23 +339,23 @@ public final class Functions {
    * @param sc static context
    * @param info input info (can be {@code null})
    * @param runtime {@code true} if this method is called at runtime
-   * @param lit literal data
+   * @param literal literal data
    * @return function item
    * @throws QueryException query exception
    */
   private static Expr userDefined(final StaticFunc sf, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean runtime, final Literal lit)
+      final StaticContext sc, final InputInfo info, final boolean runtime, final Literal literal)
           throws QueryException {
 
     final FuncType sft = sf.funcType();
-    final int arity = lit.params.length;
-    for(int a = 0; a < arity; a++) lit.add(sf.paramName(a), sft.argTypes[a], qc, info);
-    final FuncType ft = FuncType.get(lit.annotations(), sft.declType,
+    final int arity = literal.params.length;
+    for(int a = 0; a < arity; a++) literal.add(sf.paramName(a), sft.argTypes[a], qc, info);
+    final FuncType ft = FuncType.get(literal.anns, sft.declType,
         Arrays.copyOf(sft.argTypes, arity));
 
-    final StaticFuncCall call = userDefined(sf.name, lit.args, null, qc, sc, info);
-    if(call.func != null) lit.annotations = call.func.anns;
-    return literal(info, call, ft, sf.name, lit, runtime, sf.updating, false);
+    final StaticFuncCall call = userDefined(sf.name, literal.args, null, qc, sc, info);
+    if(call.func != null) literal.anns = call.func.anns;
+    return literal(info, call, ft, sf.name, literal, runtime, sf.updating, false);
   }
 
   /**
@@ -389,27 +389,27 @@ public final class Functions {
    * @param info input info (can be {@code null})
    * @param expr function body
    * @param ft function type
-   * @param name function name (can be {@code null})
-   * @param lit literal data
+   * @param name function name
+   * @param literal literal data
    * @param runtime runtime flag
    * @param updating flag for updating functions
-   * @param ctx context-dependent flag
+   * @param context context-dependent flag
    * @return the function expression
    */
   private static Expr literal(final InputInfo info, final Expr expr, final FuncType ft,
-      final QNm name, final Literal lit, final boolean runtime, final boolean updating,
-      final boolean ctx) {
+      final QNm name, final Literal literal, final boolean runtime, final boolean updating,
+      final boolean context) {
 
-    final VarScope vs = lit.vs;
-    final Var[] params = lit.params;
-    final AnnList anns = lit.annotations();
+    final VarScope vs = literal.vs;
+    final Var[] params = literal.params;
+    final AnnList anns = literal.anns;
 
     // context/positional access must be bound to original focus
     // example for invalid query: let $f := last#0 return (1, 2)[$f()]
-    return ctx ? new FuncLit(info, expr, ft.seqType(), name, params, anns, vs) :
-      runtime ? new FuncItem(vs.sc, anns, name, params, ft, expr, vs.stackSize(), info) :
-      new Closure(info, expr, updating ? SeqType.EMPTY_SEQUENCE_Z :
-        ft != null ? ft.declType : null, name, params, anns, null, vs);
+    return context ? new FuncLit(info, expr, params, anns, ft.seqType(), name, vs) :
+      runtime ? new FuncItem(info, expr, params, anns, ft, vs.sc, vs.stackSize(), name) :
+      new Closure(info, expr, params, anns, vs, null, updating ? SeqType.EMPTY_SEQUENCE_Z :
+          ft != null ? ft.declType : null, name);
   }
 
   /**
@@ -455,7 +455,7 @@ public final class Functions {
     /** Arguments. */
     final Expr[] args;
     /** Annotations. */
-    AnnList annotations;
+    AnnList anns = AnnList.EMPTY;
     /** Parameter counter. */
     int a;
 
@@ -482,15 +482,6 @@ public final class Functions {
       params[a] = var;
       args[a] = new VarRef(info, var);
       a++;
-    }
-
-    /**
-     * Returns the annotations.
-     * @return annotations
-     */
-    AnnList annotations() {
-      if(annotations == null) annotations = new AnnList();
-      return annotations;
     }
   }
 }

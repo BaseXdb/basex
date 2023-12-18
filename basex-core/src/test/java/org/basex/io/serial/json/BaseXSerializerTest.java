@@ -33,9 +33,10 @@ public final class BaseXSerializerTest extends SandboxTest {
     serialize("fn:exists#1", "fn:exists#1");
     serialize("Q{http://www.w3.org/2005/xpath-functions}exists#1", "fn:exists#1");
     serialize("function($a) { $a }", "(anonymous-function)#1");
-    serialize("exists(?)", "(anonymous-function)#1");
-    serialize("exists#1(?)", "(anonymous-function)#1");
+    serialize("exists(?)", "fn:exists#1");
+    serialize("exists#1(?)", "fn:exists#1");
     serialize("true#0", "fn:true#0");
+    serialize("contains(?, 'x')", "(anonymous-function)#1");
 
     // maps
     serialize("map { 'x': 'y' }", "map{'x':'y'}");

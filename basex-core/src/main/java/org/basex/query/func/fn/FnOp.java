@@ -9,6 +9,7 @@ import org.basex.query.expr.CmpN.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -75,6 +76,6 @@ public class FnOp extends StandardFunc {
       default         : throw UNKNOWNOP_X.get(info, operator);
     }
     final FuncType ft = FuncType.get(body.seqType(), SeqType.ITEM_ZM, SeqType.ITEM_ZM);
-    return new FuncItem(sc, null, null, params, ft, body, pl, info);
+    return new FuncItem(info, body, params, AnnList.EMPTY, ft, sc, pl, null);
   }
 }

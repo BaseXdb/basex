@@ -89,19 +89,20 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   /**
    * Checks parsed meta data.
    * @param found found flag
-   * @param list list of annotations
+   * @param anns list of annotations
    * @param declared declared parameters
    * @return found flag
    * @throws QueryException query exception
    */
-  protected final boolean checkParsed(final boolean found, final AnnList list,
+  protected final boolean checkParsed(final boolean found, final AnnList anns,
       final boolean[] declared) throws QueryException {
 
     if(found) {
-      if(list.isEmpty()) throw error(ANN_MISSING);
-      if(list.size() > 1) {
-        final StringList names = new StringList(list.size());
-        for(final Ann ann : list) names.add('%' + Token.string(ann.definition.id()));
+      final int as = anns.size();
+      if(as == 0) throw error(ANN_MISSING);
+      if(as > 1) {
+        final StringList names = new StringList(anns.size());
+        for(final Ann ann : anns) names.add('%' + Token.string(ann.definition.id()));
         throw error(ANN_CONFLICT_X, String.join(", ", names.finish()));
       }
 

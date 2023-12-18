@@ -1069,7 +1069,7 @@ public final class UpdateTest extends SandboxTest {
 
   /** Reject updating function items. */
   @Test public void updatingFuncItems() {
-    query(_UPDATE_OUTPUT.args(" ?"), "(anonymous-function)#1");
+    query(_UPDATE_OUTPUT.args(" ?"), "update:output#1");
     query("update:output#1", "update:output#1");
     query("update:output#1, update:output#1", "update:output#1\nupdate:output#1");
 
