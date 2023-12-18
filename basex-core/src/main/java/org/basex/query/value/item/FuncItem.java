@@ -33,20 +33,20 @@ public final class FuncItem extends FItem implements Scope {
   /** Function expression. */
   public final Expr expr;
 
-  /** Function name (can be {@code null}). */
-  private final QNm name;
   /** Formal parameters. */
   private final Var[] params;
+  /** Annotations. */
+  private final AnnList anns;
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
   /** Input information. */
   private final InputInfo info;
+  /** Function name (can be {@code null}). */
+  private final QNm name;
   /** Query focus. */
   private final QueryFocus focus;
-  /** Annotations. */
-  private AnnList anns;
   /** Indicates if the query focus is accessed or modified. */
-  private Boolean fcs;
+  private final boolean simple;
 
   /**
    * Constructor.
@@ -89,6 +89,7 @@ public final class FuncItem extends FItem implements Scope {
     this.stackSize = stackSize;
     this.name = name;
     this.focus = focus;
+    this.simple = !expr.has(Flag.CTX);
   }
 
   @Override
@@ -115,12 +116,11 @@ public final class FuncItem extends FItem implements Scope {
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 
-    final int pl = arity();
-    for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) qc.set(params[a], args[a]);
 
     // use shortcut if focus is not accessed
-    if(fcs == null) fcs = expr.has(Flag.FCS, Flag.CTX, Flag.POS);
-    if(!fcs) return expr.value(qc);
+    if(simple) return expr.value(qc);
 
     final QueryFocus qf = qc.focus;
     qc.focus = focus != null ? focus : new QueryFocus();
@@ -209,9 +209,9 @@ public final class FuncItem extends FItem implements Scope {
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
-    final int pl = arity();
-    for(int p = 0; p < pl; p++) {
-      clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) {
+      clauses.add(new Let(cc.copy(params[a], vm), exprs[a]).optimize(cc));
     }
 
     // create the return clause
