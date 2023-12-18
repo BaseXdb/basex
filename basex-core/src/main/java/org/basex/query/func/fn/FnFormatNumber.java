@@ -28,21 +28,30 @@ public final class FnFormatNumber extends StandardFunc {
 
     // retrieve picture
     final byte[] picture = toToken(arg(1), qc);
-    // retrieve format declaration
-    QNm format = QNm.EMPTY;
+    // retrieve format name declaration
     final Item name = arg(2).atomItem(qc, info);
-    if(name instanceof QNm) {
-      format = toQNm(name);
-    } else if(!name.isEmpty()) {
-      try {
-        format = QNm.parse(trim(toToken(name)), sc);
-      } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw FORMNUM_X.get(info, name);
+    // retrieve explicit format declaration
+    final Item format = arg(3).item(qc, info);
+    final DecFormatter df;
+    if(!format.isEmpty()) {
+      if(!name.isEmpty()) throw FORMDUP_X.get(info, name);
+      final DecFormatOptions options = toOptions(arg(3), new DecFormatOptions(), true, qc);
+      df = new DecFormatter(options.toTokenMap(), info);
+    } else {
+      QNm formatQNm = QNm.EMPTY;
+      if(name instanceof QNm) {
+        formatQNm = toQNm(name);
+      } else if(!name.isEmpty()) {
+        try {
+          formatQNm = QNm.parse(trim(toToken(name)), sc);
+        } catch(final QueryException ex) {
+          Util.debug(ex);
+          throw FORMNUM_X.get(info, name);
+        }
       }
+      df = sc.decFormat(formatQNm.internal());
+      if(df == null) throw FORMNUM_X.get(info, formatQNm.prefixId(XML));
     }
-    final DecFormatter df = sc.decFormat(format.internal());
-    if(df == null) throw FORMNUM_X.get(info, format.prefixId(XML));
 
     return Str.get(df.format((ANum) value, picture, info));
   }

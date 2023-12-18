@@ -172,10 +172,15 @@ public final class StaticContext {
    */
   public DecFormatter decFormat(final byte[] id) throws QueryException {
     DecFormatter df = decFormats.get(id);
-    if(df == null && eq(id, EMPTY)) {
-      // lazy instantiation of default decimal format
-      df = new DecFormatter(null, null);
-      decFormats.put(id, df);
+    if(df == null) {
+      if(eq(id, EMPTY)) {
+        // lazy instantiation of default decimal format
+        df = new DecFormatter(null, null);
+        decFormats.put(id, df);
+      } else {
+        df = DecFormatter.forLanguage(id);
+        if(df != null) decFormats.put(id, df);
+      }
     }
     return df;
   }

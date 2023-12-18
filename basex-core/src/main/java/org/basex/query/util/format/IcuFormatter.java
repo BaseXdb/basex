@@ -1,11 +1,13 @@
 package org.basex.query.util.format;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.format.FormatParser.NumeralType.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.stream.*;
 
+import org.basex.query.*;
 import org.basex.query.util.format.FormatParser.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -285,6 +287,35 @@ public final class IcuFormatter extends Formatter {
         break;
       default:
         break;
+    }
+    return null;
+  }
+
+  /**
+   * Returns a decimal formatter for the given language, or {@code null} if the language is not
+   * supported.
+   * @param language language
+   * @return a decimal formatter, or {@code null} if the language is not supported
+   * @throws QueryException query exception
+   */
+  public static DecFormatter decFormatter(final String language) throws QueryException {
+    for(final ULocale locale : DecimalFormatSymbols.getAvailableULocales()) {
+      if(locale.getLanguage().equals(language)) {
+        final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
+        final TokenMap map = new TokenMap();
+        map.put(token(DF_DEC), token(String.valueOf(dfs.getDecimalSeparator())));
+        map.put(token(DF_DIG), token(String.valueOf(dfs.getDigit())));
+        map.put(token(DF_GRP), token(String.valueOf(dfs.getGroupingSeparator())));
+        map.put(token(DF_EXP), token(String.valueOf(dfs.getExponentSeparator())));
+        map.put(token(DF_INF), token(dfs.getInfinity()));
+        map.put(token(DF_MIN), token(String.valueOf(dfs.getMinusSign())));
+        map.put(token(DF_NAN), token(dfs.getNaN()));
+        map.put(token(DF_PAT), token(String.valueOf(dfs.getPatternSeparator())));
+        map.put(token(DF_PC), token(String.valueOf(dfs.getPercentString())));
+        map.put(token(DF_PM), token(String.valueOf(dfs.getPerMillString())));
+        map.put(token(DF_ZD), token(String.valueOf(dfs.getZeroDigit())));
+        return new DecFormatter(map, null);
+      }
     }
     return null;
   }

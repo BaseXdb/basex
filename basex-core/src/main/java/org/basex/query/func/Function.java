@@ -273,8 +273,8 @@ public enum Function implements AFunction {
   FORMAT_INTEGER(FnFormatInteger::new, "format-integer(value,picture[,language])",
       params(INTEGER_ZO, STRING_O, STRING_ZO), STRING_O),
   /** XQuery function. */
-  FORMAT_NUMBER(FnFormatNumber::new, "format-number(value,picture[,decimal-format-name])",
-      params(NUMERIC_ZO, STRING_O, STRING_ZO), STRING_O),
+  FORMAT_NUMBER(FnFormatNumber::new, "format-number(value,picture[,decimal-format-name,format])",
+      params(NUMERIC_ZO, STRING_O, STRING_ZO, MAP_O), STRING_O),
   /** XQuery function. */
   FORMAT_TIME(FnFormatTime::new, "format-time(value,picture[,language,calendar,place])",
       params(TIME_ZO, STRING_O, STRING_ZO, STRING_ZO, STRING_ZO), STRING_ZO),

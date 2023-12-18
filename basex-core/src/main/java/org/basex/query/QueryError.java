@@ -619,6 +619,8 @@ public enum QueryError {
   /** Error code. */
   FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),
   /** Error code. */
+  FORMDUP_X(FODF, 1280, "Format name % must not be specified together with explicit format."),
+  /** Error code. */
   PICEMPTY(FODF, 1310, "The picture string must not be empty: '%'"),
   /** Error code. */
   PICNUM_X(FODF, 1310, "Invalid picture string: '%'."),
