@@ -66,13 +66,13 @@ public final class Atm extends Item {
   @Override
   public boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
-    return comparable(item) ? Token.eq(value, item.string(ii), coll) :
+    return item.type.isUntyped() ? Token.eq(value, item.string(ii), coll) :
       item.equal(this, coll, sc, ii);
   }
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return comparable(item) && Token.eq(string(deep.info), item.string(deep.info), deep);
+    return item.type.isUntyped() && Token.eq(string(deep.info), item.string(deep.info), deep);
   }
 
   @Override
