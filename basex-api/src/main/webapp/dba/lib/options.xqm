@@ -55,7 +55,7 @@ declare %basex:lazy %private variable $options:OPTIONS := (
       (: merge defaults with saved options :)
       let $options := fetch:doc($options:FILE)/options
       return map:merge(
-        map:for-each($options:DEFAULTS, function($key, $value) {
+        map:for-each($options:DEFAULTS, fn($key, $value) {
           map:entry($key,
             let $option := $options/*[name() = $key]
             return if($option) then (
@@ -97,7 +97,7 @@ declare function options:save(
   $options  as map(*)
 ) as empty-sequence() {
   file:write($options:FILE, element options {
-    map:for-each($options:DEFAULTS, function($key, $value) {
+    map:for-each($options:DEFAULTS, fn($key, $value) {
       element { $key } { ($options($key), $value)[1] }
     })
   })

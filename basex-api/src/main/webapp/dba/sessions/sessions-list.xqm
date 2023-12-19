@@ -7,7 +7,7 @@ module namespace dba = 'dba/sessions';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'sessions';
@@ -55,7 +55,7 @@ function dba:sessions(
             } catch sessions:get {
               '–' (: non-XQuery session value :)
             }
-            let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
+            let $string := utils:chop(serialize($value, map { 'method': 'basex' }), 20)
             order by $access descending
             return map {
               'id': $id || '|' || $name,

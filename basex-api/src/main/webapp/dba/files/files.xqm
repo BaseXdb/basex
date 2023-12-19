@@ -8,7 +8,7 @@ module namespace dba = 'dba/files';
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
 import module namespace options = 'dba/options' at '../lib/options.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -88,13 +88,13 @@ function dba:files(
             for $modified in try { file:last-modified($file) } catch * { }
             let $size := file:size($file)
             return map {
-              'name': function() {
+              'name': fn() {
                 if($dir) then html:link($name, 'dir-change', map { 'dir': $name }) else $name
               },
               'date': $modified,
               'bytes': $size,
-              'action': function() {
-                util:item-join(
+              'action': fn() {
+                intersperse(
                   if($dir) then () else (
                     html:link('Download', 'file/' || encode-for-uri($name)),
                     if(matches($name, '\.xqm?$')) then (

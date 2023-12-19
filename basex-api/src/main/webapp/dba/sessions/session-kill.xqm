@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/sessions';
 
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'sessions';
@@ -25,7 +25,7 @@ function dba:drop(
   try {
     for $id in $ids
     return sessions:delete(substring-before($id, '|'), substring-after($id, '|')),
-    web:redirect($dba:CAT, map { 'info': util:info($ids, 'session', 'killed') })
+    web:redirect($dba:CAT, map { 'info': utils:info($ids, 'session', 'killed') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })
   }

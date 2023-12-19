@@ -6,7 +6,7 @@
 module namespace dba = 'dba/jobs';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs';
@@ -106,7 +106,7 @@ function dba:jobs(
                   for $value in $details/@*
                   for $name in name($value)[. != 'id']
                   return <tr>
-                    <td><b>{ util:capitalize($name) }</b></td>
+                    <td><b>{ utils:capitalize($name) }</b></td>
                     <td>{ string($value) }</td>
                   </tr>
                 }</table>,
@@ -116,11 +116,11 @@ function dba:jobs(
                 return (
                   <h3>Query Bindings</h3>,
                   <table>{
-                    map:for-each($bindings, function($key, $value) {
+                    map:for-each($bindings, fn($key, $value) {
                       <tr>
                         <td><b>{ if($key) then '$' || $key else 'Context' }</b></td>
                         <td><code>{
-                          util:chop(serialize($value, map { 'method': 'basex' }), 1000)
+                          utils:chop(serialize($value, map { 'method': 'basex' }), 1000)
                         }</code></td>
                       </tr>
                     })
@@ -134,7 +134,7 @@ function dba:jobs(
                 }</textarea>,
   
                 if($cached) then (
-                  let $result := util:serialize(try {
+                  let $result := utils:serialize(try {
                     job:result($job, map { 'keep': true() })
                   } catch * {
                     'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||

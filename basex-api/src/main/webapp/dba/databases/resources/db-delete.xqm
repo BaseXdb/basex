@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~ Sub category :)
 declare variable $dba:SUB := 'database';
@@ -28,10 +28,10 @@ function dba:db-delete(
 ) as empty-sequence() {
   try {
     $resources ! db:delete($name, .),
-    util:redirect($dba:SUB,
-      map { 'name': $name, 'info': util:info($resources, 'resource', 'deleted') }
+    utils:redirect($dba:SUB,
+      map { 'name': $name, 'info': utils:info($resources, 'resource', 'deleted') }
     )
   } catch * {
-    util:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
+    utils:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
   }
 };

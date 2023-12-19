@@ -57,8 +57,7 @@ public final class FuncBuilder {
    * @return self reference
    */
   public FuncBuilder init(final Expr[] arguments, final QNmMap<Expr> kw) {
-    final int al = arguments.length;
-    args = al > 0 ? new ExprList(arguments) : new ExprList(4);
+    args = arguments != null ? new ExprList(arguments) : new ExprList(4);
     keywords = kw;
     return this;
   }

@@ -6,7 +6,7 @@
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../../lib/html.xqm';
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -124,12 +124,12 @@ function dba:db-put-post(
           ('intparse', 'dtd', 'stripns', 'stripws', 'xinclude') ! map:entry(., $opts = .))
         )
       ),
-      util:redirect($dba:SUB,
+      utils:redirect($dba:SUB,
         map { 'name': $name, 'path': $path, 'info': 'Resource was put.' }
       )
     )
   } catch * {
-    util:redirect('db-put', map {
+    utils:redirect('db-put', map {
       'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary, 'error': $err:description
     })
   }

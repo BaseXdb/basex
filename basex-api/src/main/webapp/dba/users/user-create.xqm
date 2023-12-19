@@ -7,7 +7,7 @@ module namespace dba = 'dba/users';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
 import module namespace options = 'dba/options' at '../lib/options.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -106,9 +106,9 @@ function dba:user-create(
     ) else (
       user:create($name, $pw, $perm)
     ),
-    util:redirect($dba:CAT, map { 'info': 'User was created.' })
+    utils:redirect($dba:CAT, map { 'info': 'User was created.' })
   } catch * {
-    util:redirect('user-create', map {
+    utils:redirect('user-create', map {
       'name': $name, 'pw': $pw, 'perm': $perm, 'error': $err:description
     })
   }

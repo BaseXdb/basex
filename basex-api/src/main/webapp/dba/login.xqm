@@ -63,7 +63,7 @@ function dba:login(
         <form action='login-check' method='post'>
           <input type='hidden' name='_page' value='{ $page }'/>
           {
-            map:for-each(html:parameters(), function($key, $value) {
+            map:for-each(html:parameters(), fn($key, $value) {
               <input type='hidden' name='{ $key }' value='{ $value }'/>
             })
           }

@@ -6,7 +6,7 @@
 module namespace dba = 'dba/files';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -27,7 +27,7 @@ function dba:file-upload(
   let $dir := config:directory()
   return try {
     (: Parse all XQuery files; reject files that cannot be parsed :)
-    map:for-each($files, function($file, $content) {
+    map:for-each($files, fn($file, $content) {
       if(matches($file, '\.xqm?$')) then (
         void(xquery:parse(
           convert:binary-to-string($content),
@@ -35,10 +35,10 @@ function dba:file-upload(
         ))
       ) else ()
     }),
-    map:for-each($files, function($file, $content) {
+    map:for-each($files, fn($file, $content) {
       file:write-binary($dir || $file, $content)
     }),
-    web:redirect($dba:CAT, map { 'info': util:info(map:keys($files), 'file', 'uploaded') })
+    web:redirect($dba:CAT, map { 'info': utils:info(map:keys($files), 'file', 'uploaded') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': 'Upload failed: ' || $err:description })
   }

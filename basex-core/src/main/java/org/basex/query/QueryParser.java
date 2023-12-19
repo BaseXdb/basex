@@ -1798,7 +1798,7 @@ public class QueryParser extends InputParser {
           arg = expr;
         }
         final boolean sttc = ex instanceof QNm;
-        final FuncBuilder fb = argumentList(sttc, arg);
+        final FuncBuilder fb = argumentList(sttc, new Expr[] { arg });
         expr = sttc ? Functions.get((QNm) ex, fb, qc) : Functions.dynamic(ex, fb);
         if(mapping) {
           expr = new GFLWOR(ii, fr, expr);
@@ -2194,7 +2194,7 @@ public class QueryParser extends InputParser {
           } while(wsConsume("["));
           expr = new CachedFilter(info(), expr, el.finish());
         } else if(curr('(')) {
-          expr = Functions.dynamic(expr, argumentList(true));
+          expr = Functions.dynamic(expr, argumentList(true, null));
         } else {
           final int p = pos;
           if(consume("?") && !consume(':')) {
@@ -2602,7 +2602,7 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && !reserved(name)) {
       skipWs();
-      if(curr('(')) return Functions.get(name, argumentList(true), qc);
+      if(curr('(')) return Functions.get(name, argumentList(true, null), qc);
     }
     pos = p;
     return null;
@@ -2611,11 +2611,11 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "ArgumentList" rule.
    * @param keywords allow keyword arguments
-   * @param args arguments
+   * @param args arguments (can be {@code null})
    * @return function arguments
    * @throws QueryException query exception
    */
-  private FuncBuilder argumentList(final boolean keywords, final Expr... args)
+  private FuncBuilder argumentList(final boolean keywords, final Expr[] args)
       throws QueryException {
     final FuncBuilder fb  = new FuncBuilder(sc, info()).init(args, null);
     wsCheck("(");

@@ -7,7 +7,7 @@ module namespace dba = 'dba/users';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
 import module namespace options = 'dba/options' at '../lib/options.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -95,9 +95,9 @@ function dba:create(
 ) as empty-sequence() {
   try {
     user:grant($name, $perm, $pattern),
-    util:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern was created.' })
+    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern was created.' })
   } catch * {
-    util:redirect('pattern-add', map {
+    utils:redirect('pattern-add', map {
       'name': $name, 'perm': $perm, 'pattern': $pattern, 'error': $err:description
     })
   }

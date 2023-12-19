@@ -7,7 +7,7 @@ module namespace html = 'dba/html';
 
 import module namespace options = 'dba/options' at 'options.xqm';
 import module namespace config = 'dba/config' at 'config.xqm';
-import module namespace util = 'dba/util' at 'util.xqm';
+import module namespace utils = 'dba/utils' at 'utils.xqm';
 
 (: Number formats. :)
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
@@ -40,7 +40,7 @@ declare function html:wrap(
   $options  as map(*),
   $rows     as element(tr)+
 ) as element(html) {
-  let $header := head($options?header) ! util:capitalize(.)
+  let $header := head($options?header) ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
   return <html xml:space='preserve'>
     <head>
@@ -173,7 +173,7 @@ declare function html:checkbox(
 ) as node()+ {
   element input {
     attribute type { 'checkbox' },
-    map:for-each($map, function($key, $value) { attribute { $key } { $value } })
+    map:for-each($map, fn($key, $value) { attribute { $key } { $value } })
   },
   text { $label },
   element br { }
@@ -228,7 +228,7 @@ declare function html:button(
       attribute onclick { 'return confirm("Are you sure?");' }
     ) else (),
     if(exists($atts)) then (
-      map:for-each($atts, function($key, $value) { attribute { $key } { $value } })
+      map:for-each($atts, fn($key, $value) { attribute { $key } { $value } })
     ) else (),
     $label
   }
@@ -327,16 +327,16 @@ declare function html:table(
         return switch($header?type)
           case 'decimal' case 'number' case 'bytes' return
             if($desc)
-            then function($v) { 0 - number($v) }
-            else function($v) { number($v) }
+            then fn { 0 - number() }
+            else fn { number() }
           case 'time' case 'dateTime' return
             if($desc)
-            then function($v) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($v) }
-            else function($v) { $v }
+            then fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime() }
+            else identity(?)
           case 'dynamic' return
-            function($v) { if($v instance of function(*)) then string-join($v()) else $v }
+            fn { if(. instance of function(*)) then string-join(.()) else . }
           default return
-            function($v) { $v }
+            identity(?)
       )
       for $entry in $entries
       order by $value($entry($key)) empty greatest collation '?lang=en'
@@ -582,7 +582,7 @@ declare function html:parameters(
 ) as map(*) {
   map:merge((
     html:parameters(),
-    map:for-each($map, function($name, $value) {
+    map:for-each($map, fn($name, $value) {
       map:entry('_' || $name, $value)
     })
   ))

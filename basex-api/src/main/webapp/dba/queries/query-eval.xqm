@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/queries';
 
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~
  : Evaluates a query and returns the result.
@@ -20,7 +20,7 @@ declare
 function dba:query-eval(
   $query  as xs:string?
 ) as xs:string {
-  util:query($query, ())
+  utils:query($query, ())
 };
 
 (:~
@@ -37,5 +37,5 @@ declare
 function dba:query-update(
   $query  as xs:string?
 ) as empty-sequence() {
-  util:update-query($query)
+  utils:update-query($query)
 };

@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/users';
 
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:SUB := 'user';
@@ -28,9 +28,9 @@ function dba:pattern-drop(
 ) as empty-sequence() {
   try {
     $patterns ! user:drop($name, .),
-    util:redirect($dba:SUB, map {
-      'name': $name, 'info': util:info($patterns, 'pattern', 'dropped') })
+    utils:redirect($dba:SUB, map {
+      'name': $name, 'info': utils:info($patterns, 'pattern', 'dropped') })
   } catch * {
-    util:redirect($dba:SUB, map { 'error': $err:description })
+    utils:redirect($dba:SUB, map { 'error': $err:description })
   }
 };

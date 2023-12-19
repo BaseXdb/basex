@@ -6,7 +6,7 @@
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -67,8 +67,8 @@ function dba:database(
                 map { 'key': 'size' , 'label': 'Size', 'type': 'number', 'order': 'desc' }
               )
               let $entries :=
-                let $start := util:start($page, $sort)
-                let $end := util:end($page, $sort)
+                let $start := utils:start($page, $sort)
+                let $end := utils:end($page, $sort)
                 for $res in db:list-details($name)[position() = $start to $end]
                 return map {
                   'resource': $res,
@@ -115,7 +115,7 @@ function dba:database(
                   'backup': substring-after($backup, $name || '-'),
                   'size': $backup/@size,
                   'comment': $backup/@comment,
-                  'action': function() {
+                  'action': fn() {
                     html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
                   }
                 }

@@ -6,7 +6,7 @@
 module namespace dba = 'dba/files';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'files';
@@ -28,7 +28,7 @@ function dba:file-delete(
     for $name in $names
     where $name != '..'
     return file:delete(config:directory() || $name),
-    web:redirect($dba:CAT, map { 'info': util:info($names, 'file', 'deleted') })
+    web:redirect($dba:CAT, map { 'info': utils:info($names, 'file', 'deleted') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })
   }

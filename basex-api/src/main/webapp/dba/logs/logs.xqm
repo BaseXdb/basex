@@ -92,7 +92,7 @@ function dba:logs(
             let $entries := 
               for $entry in $files
               return map {
-                'name': function() {
+                'name': fn() {
                   let $link := html:link(
                     $entry, $dba:CAT, (map { 'sort': $sort }, map { 'name': $entry })
                   ) update {
@@ -190,9 +190,9 @@ function dba:log(
           some $v in $map?* satisfies matches($v, $term, 'i')
         )) then (
           map:merge(
-            map:for-each($map, function($k, $v) {
+            map:for-each($map, fn($k, $v) {
               map:entry($k, (
-                if (matches($v, $joined-terms, 'i')) then function() {
+                if (matches($v, $joined-terms, 'i')) then fn() {
                   for $match in analyze-string($v, $joined-terms, 'i')/*
                   let $value := string($match)
                   return if($match/self::fn:match) then element b { $value } else $value
@@ -216,7 +216,7 @@ function dba:log(
         'address': string($log/@address),
         'ms': xs:decimal($log/@ms),
         'time': if($input or $sort != 'time') then (
-          function() {
+          fn() {
             html:link($id, $dba:CAT || '-jump', map { 'name': $name, 'time': $id })
           }
         ) else if($id = $time) then (

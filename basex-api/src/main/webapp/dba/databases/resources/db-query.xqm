@@ -5,7 +5,7 @@
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~
  : Runs a query on a document and returns the result as string.
@@ -26,7 +26,7 @@ function dba:db-query(
   $resource  as xs:string,
   $query     as xs:string?
 ) as xs:string {
-  util:query(
+  utils:query(
     if($query) then $query else '.',
     let $type := db:type($name, $resource)
     return head(if($type = 'xml') then (

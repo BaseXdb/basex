@@ -12,7 +12,6 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
 import org.basex.query.util.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
@@ -285,17 +284,14 @@ public final class Functions {
   static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final Object function)
       throws QueryException {
 
-    final QNmMap<Expr> keywords = fb.keywords;
-    if(keywords == null) return fb.args();
-
     final ExprList list = new ExprList(fb.args());
     final int nl = names.length;
-    for(final QNm qnm : keywords) {
+    for(final QNm qnm : fb.keywords) {
       int n = nl;
       while(--n >= 0 && !qnm.eq(names[n]));
       if(n == -1) throw KEYWORDUNKNOWN_X_X.get(fb.info, function, qnm);
       if(list.get(n) != null) throw ARGTWICE_X_X.get(fb.info, function, qnm);
-      list.set(n, keywords.get(qnm));
+      list.set(n, fb.keywords.get(qnm));
     }
     return list.finish();
   }
@@ -428,7 +424,7 @@ public final class Functions {
   private static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final int min,
       final int max, final Object function) throws QueryException {
 
-    final Expr[] tmp = prepareArgs(fb, names, function);
+    final Expr[] tmp = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
     final int arity = tmp.length;
     for(int a = arity - 1; a >= 0; a--) {
       if(tmp[a] == null) {

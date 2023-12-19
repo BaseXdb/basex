@@ -28,10 +28,10 @@ function dba:settings(
   $info   as xs:string?
 ) as element(html) {
   let $system := html:properties(db:system())
-  let $table-row := function($label, $items) {
+  let $table-row := fn($label, $items) {
     <tr><td>{ $label, <br/>, $items }</td></tr>
   }
-  let $option := function($key, $values, $label) {
+  let $option := fn($key, $values, $label) {
     $table-row($label,
       <select name='{ $key }'>{
         let $selected := options:get($key)
@@ -40,10 +40,10 @@ function dba:settings(
       }</select>
     )
   }
-  let $number := function($key, $label) {
+  let $number := fn($key, $label) {
     $table-row($label, <input type='number' name='{ $key }' value='{ options:get($key) }'/>)
   }
-  let $string := function($key, $label) {
+  let $string := fn($key, $label) {
     $table-row($label, <input type='text' name='{ $key }' value='{ options:get($key) }'/>)
   }
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
