@@ -248,7 +248,7 @@ public final class StaticFuncs extends ExprInfo {
             for(final StaticFunc func : funcs) arities.add(func.min).add(func.arity());
             final InputInfo info = call.info();
             throw arities.isEmpty() ? qc.functions.similarError(qname(), info) :
-              Functions.wrongArity(call.arity(), arities, qname().prefixString(), info, false);
+              Functions.wrongArity(call.arity(), arities, qname().prefixString(), false, info);
           }
         } else {
           // check if all implementations exist for all functions, set updating flag

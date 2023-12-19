@@ -10,6 +10,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -103,7 +104,7 @@ public final class StaticFuncCall extends FuncCall {
     if(keywords != null) {
       final QNm[] names = new QNm[arity];
       for(int n = 0; n < arity; n++) names[n] = sf.paramName(n);
-      exprs = Functions.prepareArgs(exprs, keywords, names, this, info);
+      exprs = Functions.prepareArgs(new FuncBuilder(sc, info).init(exprs, keywords), names, this);
       keywords = null;
     }
     // adopt default expressions

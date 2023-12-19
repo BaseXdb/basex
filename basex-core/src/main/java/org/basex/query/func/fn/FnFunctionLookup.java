@@ -50,7 +50,7 @@ public final class FnFunctionLookup extends StandardFunc {
     final long arity = toLong(arg(1), qc);
     if(arity >= 0 && arity <= Integer.MAX_VALUE) {
       try {
-        return Functions.literal(name, (int) arity, qc, sc, info, true);
+        return Functions.literal(name, (int) arity, true, sc, info, qc);
       } catch(final QueryException ex) {
         Util.debug(ex);
       }

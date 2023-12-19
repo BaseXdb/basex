@@ -1797,10 +1797,9 @@ public class QueryParser extends InputParser {
         } else {
           arg = expr;
         }
-        final boolean qname = ex instanceof QNm;
-        final FuncArgs args = argumentList(qname, arg);
-        expr = qname ? funcCall((QNm) ex, ii, args) :
-          dynFuncCall(ex, ii, args.exprs(), args.holes());
+        final boolean sttc = ex instanceof QNm;
+        final FuncBuilder fb = argumentList(sttc, arg);
+        expr = sttc ? Functions.get((QNm) ex, fb, qc) : Functions.dynamic(ex, fb);
         if(mapping) {
           expr = new GFLWOR(ii, fr, expr);
           localVars.closeScope(s);
@@ -2195,10 +2194,7 @@ public class QueryParser extends InputParser {
           } while(wsConsume("["));
           expr = new CachedFilter(info(), expr, el.finish());
         } else if(curr('(')) {
-          // parses the "ArgumentList" rule
-          final InputInfo ii = info();
-          final FuncArgs args = argumentList(true);
-          expr = dynFuncCall(expr, ii, args.exprs(), args.holes());
+          expr = Functions.dynamic(expr, argumentList(true));
         } else {
           final int p = pos;
           if(consume("?") && !consume(':')) {
@@ -2384,7 +2380,7 @@ public class QueryParser extends InputParser {
       if(Function.ERROR.is(num)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, num);
       final int arity = (int) ((Int) num).itr();
-      return Functions.literal(name, arity, qc, sc, info(), false);
+      return Functions.literal(name, arity, false, sc, info(), qc);
     }
     pos = p;
     return null;
@@ -2606,57 +2602,22 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && !reserved(name)) {
       skipWs();
-      if(curr('(')) return funcCall(name, info(), argumentList(true));
+      if(curr('(')) return Functions.get(name, argumentList(true), qc);
     }
     pos = p;
     return null;
   }
 
   /**
-   * Returns a function call.
-   * @param name function name
-   * @param info input info
-   * @param args function arguments
-   * @return function call
-   * @throws QueryException query exception
-   */
-  private Expr funcCall(final QNm name, final InputInfo info, final FuncArgs args)
-      throws QueryException {
-
-    final int[] holes = args.holes();
-    final Expr[] exprs = args.exprs();
-    if(holes == null) return Functions.get(name, exprs, args.keywords(), qc, sc, info);
-
-    // partial function
-    final int arity = exprs.length + holes.length;
-    final Expr expr = Functions.literal(name, arity, qc, sc, info, false);
-    return dynFuncCall(expr, info, exprs, holes);
-  }
-
-  /**
-   * Generates a dynamic function call or a partial function application.
-   * @param expr function expression
-   * @param info input info
-   * @param args arguments
-   * @param holes positions of the placeholders
-   * @return function call
-   */
-  private Expr dynFuncCall(final Expr expr, final InputInfo info, final Expr[] args,
-      final int[] holes) {
-    if(holes == null) return new DynFuncCall(info, sc, expr, args);
-    return args.length == 0 ? expr : new PartFunc(info, sc, ExprList.concat(args, expr), holes);
-  }
-
-  /**
    * Parses the "ArgumentList" rule.
    * @param keywords allow keyword arguments
-   * @param exprs arguments
+   * @param args arguments
    * @return function arguments
    * @throws QueryException query exception
    */
-  private FuncArgs argumentList(final boolean keywords, final Expr... exprs)
+  private FuncBuilder argumentList(final boolean keywords, final Expr... args)
       throws QueryException {
-    final FuncArgs args  = new FuncArgs(exprs);
+    final FuncBuilder fb  = new FuncBuilder(sc, info()).init(args, null);
     wsCheck("(");
     if(!wsConsumeWs(")")) {
       boolean kw = false;
@@ -2667,18 +2628,18 @@ public class QueryParser extends InputParser {
           if(name != null && wsConsume(":=")) {
             final Expr expr = single();
             if(expr == null) throw error(FUNCARG_X, found());
-            if(args.add(name, expr)) throw error(KEYWORDTWICE_X, name);
+            if(fb.add(name, expr)) throw error(KEYWORDTWICE_X, name);
             kw = true;
           } else {
             pos = p;
           }
         }
         if(p == pos && !kw) {
-          final Expr expr = single();
-          if(expr != null) {
-            args.add(expr);
+          final Expr arg = single();
+          if(arg != null) {
+            fb.add(arg);
           } else if(wsConsume("?")) {
-            args.add(null);
+            fb.add(null);
           } else {
             throw error(FUNCARG_X, found());
           }
@@ -2686,7 +2647,7 @@ public class QueryParser extends InputParser {
       } while(wsConsumeWs(","));
       if(!consume(")")) throw error(FUNCARG_X, found());
     }
-    return args;
+    return fb;
   }
 
   /**
