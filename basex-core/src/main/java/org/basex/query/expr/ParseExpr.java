@@ -370,6 +370,17 @@ public abstract class ParseExpr extends Expr {
 
   /**
    * Converts an item to a number.
+   * @param expr expression
+   * @param qc query context
+   * @return number
+   * @throws QueryException query exception
+   */
+  protected final ANum toNumber(final Expr expr, final QueryContext qc) throws QueryException {
+    return toNumber(expr.atomItem(qc, info));
+  }
+
+  /**
+   * Converts an item to a number.
    * @param item item to be converted
    * @return number
    * @throws QueryException query exception

@@ -140,12 +140,18 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public int compare(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    if(item instanceof Dbl || item instanceof Flt) return -item.compare(this, coll, ii);
-    final double d = item.dbl(ii);
-    return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
-      Double.isNaN(d) ? NAN_DUMMY : value.compareTo(item.dec(ii));
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+
+    if(!transitive && (item instanceof Dbl || item instanceof Flt))
+      return -item.compare(this, coll, transitive, ii);
+
+    final double n = item.dbl(ii);
+    if(transitive) {
+      if(n == Double.NEGATIVE_INFINITY || Double.isNaN(n)) return 1;
+      if(n == Double.POSITIVE_INFINITY) return -1;
+    }
+    return value.compareTo(item.dec(ii));
   }
 
   @Override

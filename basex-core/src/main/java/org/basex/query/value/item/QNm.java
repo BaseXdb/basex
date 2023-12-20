@@ -190,8 +190,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int compare(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
     throw compareError(item, this, ii);
   }
 

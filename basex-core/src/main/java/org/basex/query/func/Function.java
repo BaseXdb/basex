@@ -443,6 +443,9 @@ public enum Function implements AFunction {
   NUMBER(FnNumber::new, "number([value])",
       params(ANY_ATOMIC_TYPE_ZO), DOUBLE_O),
   /** XQuery function. */
+  NUMERIC_COMPARE(FnNumericCompare::new, "numeric-compare(value1,value2)",
+      params(NUMERIC_O, NUMERIC_O), INTEGER_ZO),
+  /** XQuery function. */
   ONE_OR_MORE(FnOneOrMore::new, "one-or-more(input)",
       params(ITEM_ZM), ITEM_OM),
   /** XQuery function. */

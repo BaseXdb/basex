@@ -391,14 +391,14 @@ public abstract class ADate extends ADateDur {
    * Overwritten by {@link GDt}.
    */
   @Override
-  public int compare(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
     return compare(item, ii);
   }
 
   /**
    * Compares the current and the specified item.
-   * See {@link Item#compare(Item, Collation, InputInfo)}.
+   * See {@link Item#compare(Item, Collation, boolean, InputInfo)}.
    * @param item item to be compared
    * @param info input info (can be {@code null})
    * @return difference

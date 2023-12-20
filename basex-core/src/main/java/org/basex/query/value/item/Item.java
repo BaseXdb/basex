@@ -214,13 +214,14 @@ public abstract class Item extends Value {
    * Compares the current and the specified item.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
+   * @param transitive transitive comparison
    * @param ii input info (can be {@code null})
    * @return difference
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public int compare(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
     throw compareError(this, item, ii);
   }
 

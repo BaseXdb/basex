@@ -76,10 +76,10 @@ public final class Atm extends Item {
   }
 
   @Override
-  public int compare(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return item.type.isUntyped() ? Token.compare(value, item.string(ii), coll) :
-      -item.compare(this, coll, ii);
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return comparable(item) ? Token.compare(value, item.string(ii), coll) :
+      -item.compare(this, coll, transitive, ii);
   }
 
   @Override
