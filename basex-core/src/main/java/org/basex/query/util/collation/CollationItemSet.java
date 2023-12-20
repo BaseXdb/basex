@@ -22,11 +22,21 @@ public final class CollationItemSet implements ItemSet {
   private final DeepEqual deep;
 
   /**
+   * Returns a hash item set.
+   * @param coll collation (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return item set
+   */
+  public static ItemSet get(final Collation coll, final InputInfo info) {
+    return coll == null ? new HashItemSet(false, info) : new CollationItemSet(coll, info);
+  }
+
+  /**
    * Constructor.
    * @param coll collation
    * @param info input info (can be {@code null})
    */
-  public CollationItemSet(final Collation coll, final InputInfo info) {
+  private CollationItemSet(final Collation coll, final InputInfo info) {
     deep = new DeepEqual(info, coll, null);
   }
 

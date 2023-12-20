@@ -26,8 +26,7 @@ public final class FnAllDifferent extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation coll = toCollation(arg(1), qc);
 
-    final ItemSet set = coll == null ? new HashItemSet(false, info) :
-      new CollationItemSet(coll, info);
+    final ItemSet set = CollationItemSet.get(coll, info);
     for(Item item; (item = qc.next(values)) != null;) {
       if(!set.add(item)) return Bln.FALSE;
     }
@@ -48,9 +47,9 @@ public final class FnAllDifferent extends StandardFunc {
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
         return cc.merge(values, Bln.TRUE, info);
 
-      // unique(1 to 10)  ->  true
+      // all-different(1 to 10)  ->  true
       if(values instanceof RangeSeq) return Bln.TRUE;
-      // unique(reverse($data))  ->  unique($data)
+      // all-different(reverse($data))  ->  all-different($data)
       if(REVERSE.is(values) || SORT.is(values)) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
