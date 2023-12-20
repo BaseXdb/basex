@@ -77,7 +77,10 @@ public class FnMin extends StandardFunc {
     }
     // numbers
     if(type.isUntyped()) item = DOUBLE.cast(item, qc, sc, info);
+    if(item == Dbl.NAN || item == Flt.NAN) return item;
     for(Item it; (it = qc.next(iter)) != null;) {
+      if(it.type.isUntyped()) it = DOUBLE.cast(it, qc, sc, info);
+      if(it == Dbl.NAN || it == Flt.NAN) return it;
       final AtomType tp = numType(item, it);
       if(min ^ item.compare(it, coll, true, info) < 0) item = it;
       if(tp != null) item = tp.cast(item, qc, sc, info);
