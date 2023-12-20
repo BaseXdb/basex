@@ -544,7 +544,7 @@ public enum Function implements AFunction {
   SOME(FnSome::new, "some(input[,predicate])",
       params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
-  SORT(FnSort::new, "sort(input[,collation,key,order])",
+  SORT(FnSort::new, "sort(input[,collations,keys,orders])",
       params(ITEM_ZM, STRING_ZM,
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_MORE), STRING_ZM), ITEM_ZM),
   /** XQuery function. */
@@ -802,7 +802,7 @@ public enum Function implements AFunction {
   _ARRAY_SLICE(ArraySlice::new, "slice(array[,start,end,step])",
       params(ARRAY_O, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_SORT(ArraySort::new, "sort(array[,collation,key,order])",
+  _ARRAY_SORT(ArraySort::new, "sort(array[,collations,keys,orders])",
       params(ARRAY_O, STRING_ZM,
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_MORE), STRING_ZM),
       ARRAY_O, ARRAY_URI),
