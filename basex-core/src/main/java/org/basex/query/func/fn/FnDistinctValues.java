@@ -30,9 +30,9 @@ public final class FnDistinctValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
-    final Collation coll = toCollation(arg(1), qc);
+    final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set = CollationItemSet.get(coll, info);
+    final ItemSet set = CollationItemSet.get(collation, info);
     return new Iter() {
       @Override
       public Item next() throws QueryException {

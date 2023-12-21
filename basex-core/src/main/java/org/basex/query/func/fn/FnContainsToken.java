@@ -22,12 +22,12 @@ public final class FnContainsToken extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] token = trim(toToken(arg(1), qc));
-    final Collation coll = toCollation(arg(2), qc);
+    final Collation collation = toCollation(arg(2), qc);
     if(token.length != 0) {
       final Iter value = arg(0).iter(qc);
       for(Item item; (item = qc.next(value)) != null;) {
         for(final byte[] distinct : distinctTokens(toToken(item))) {
-          if(eq(token, distinct, coll)) return Bln.TRUE;
+          if(eq(token, distinct, collation)) return Bln.TRUE;
         }
       }
     }

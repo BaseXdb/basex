@@ -37,7 +37,7 @@ public class FnLowest extends StandardFunc {
    */
   final Value value(final boolean min, final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final Collation coll = toCollation(arg(1), qc);
+    final Collation collation = toCollation(arg(1), qc);
     final FItem key = defined(2) ? toFunction(arg(2), 1, qc) : null;
 
     final ItemList result = new ItemList();
@@ -48,7 +48,7 @@ public class FnLowest extends StandardFunc {
         vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
       }
       final Value low = vb.value();
-      int diff = FnSort.compare(lowest != null ? lowest : low, low, coll, info);
+      int diff = FnSort.compare(lowest != null ? lowest : low, low, collation, info);
       if(min) diff = -diff;
       if(diff > 0) continue;
       if(diff < 0) result.reset();

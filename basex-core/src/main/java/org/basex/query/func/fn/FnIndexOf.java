@@ -23,14 +23,16 @@ public final class FnIndexOf extends StandardFunc {
     return new Iter() {
       final Iter input = arg(0).atomIter(qc, info);
       final Item search = toAtomItem(arg(1), qc);
-      final Collation coll = toCollation(arg(2), qc);
+      final Collation collation = toCollation(arg(2), qc);
       int c;
 
       @Override
       public Int next() throws QueryException {
         for(Item item; (item = qc.next(input)) != null;) {
           ++c;
-          if(item.comparable(search) && item.equal(search, coll, sc, info)) return Int.get(c);
+          if(item.comparable(search) && item.equal(search, collation, sc, info)) {
+            return Int.get(c);
+          }
         }
         return null;
       }
@@ -41,13 +43,13 @@ public final class FnIndexOf extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).atomIter(qc, info);
     final Item search = toAtomItem(arg(1), qc);
-    final Collation coll = toCollation(arg(2), qc);
+    final Collation collation = toCollation(arg(2), qc);
 
     final LongList list = new LongList();
     int c = 0;
     for(Item item; (item = qc.next(input)) != null;) {
       ++c;
-      if(item.comparable(search) && item.equal(search, coll, sc, info)) list.add(c);
+      if(item.comparable(search) && item.equal(search, collation, sc, info)) list.add(c);
     }
     return IntSeq.get(list);
   }

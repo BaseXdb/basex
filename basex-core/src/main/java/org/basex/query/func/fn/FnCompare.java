@@ -22,10 +22,10 @@ public final class FnCompare extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value1 = toTokenOrNull(arg(0), qc);
     final byte[] value2 = toTokenOrNull(arg(1), qc);
-    final Collation coll = toCollation(arg(2), qc);
+    final Collation collation = toCollation(arg(2), qc);
 
     if(value1 == null || value2 == null) return Empty.VALUE;
-    final long diff = compare(value1, value2, coll);
+    final long diff = compare(value1, value2, collation);
     return Int.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);
   }
 

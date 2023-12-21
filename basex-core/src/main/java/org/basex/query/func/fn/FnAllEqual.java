@@ -24,9 +24,9 @@ public final class FnAllEqual extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
-    final Collation coll = toCollation(arg(1), qc);
+    final Collation collation = toCollation(arg(1), qc);
 
-    final DeepEqual deep = new DeepEqual(info, coll, qc);
+    final DeepEqual deep = new DeepEqual(info, collation, qc);
     final Item first = values.next();
     if(first != null) {
       for(Item item; (item = qc.next(values)) != null;) {

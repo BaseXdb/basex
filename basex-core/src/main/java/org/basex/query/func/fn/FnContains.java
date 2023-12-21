@@ -20,10 +20,10 @@ public final class FnContains extends StandardFunc {
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] substring = toZeroToken(arg(1), qc);
-    final Collation coll = toCollation(arg(2), qc);
+    final Collation collation = toCollation(arg(2), qc);
 
-    return Bln.get(coll == null ? Token.contains(value, substring) :
-      coll.contains(value, substring, info));
+    return Bln.get(collation == null ? Token.contains(value, substring) :
+      collation.contains(value, substring, info));
   }
 
   @Override
