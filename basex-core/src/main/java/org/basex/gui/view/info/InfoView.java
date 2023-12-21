@@ -24,8 +24,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class InfoView extends View implements LinkListener, QueryTracer {
-  /** Categories. */
-  private static final String[] CATEGORIES = { ALL, COMMAND, Text.ERROR, EVALUATING, COMPILING,
+  /** Sections. */
+  private static final String[] SECTIONS = { ALL, COMMAND, Text.ERROR, EVALUATING, COMPILING,
       OPTIMIZING, OPTIMIZED_QUERY, QUERY, RESULT, TIMING, QUERY_PLAN
   };
 
@@ -34,8 +34,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   /** Header label. */
   private final BaseXHeader header;
-  /** Categories. */
-  private final BaseXCombo cats;
+  /** Sections a user can display. */
+  private final BaseXCombo sections;
   /** Info label for total time. */
   private final BaseXLabel label;
   /** Text Area. */
@@ -43,8 +43,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   /** Painting flag. */
   private boolean paint;
-  /** Category chosen by user. */
-  private String cat = ALL;
+  /** Currently selected section. */
+  private String section = ALL;
   /** Time measurements. */
   private IntList times = new IntList(4);
   /** Time strings. */
@@ -77,17 +77,17 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     header = new BaseXHeader(INFO);
 
     // first assign values, then assign maximal width
-    cats = new BaseXCombo(gui, ALL);
-    String maxString = "";
-    for(final String c : CATEGORIES) {
-      if(c.length() > maxString.length()) maxString = c;
+    sections = new BaseXCombo(gui, ALL);
+    String maxSection = "";
+    for(final String sctn : SECTIONS) {
+      if(sctn.length() > maxSection.length()) maxSection = sctn;
     }
-    cats.setPrototypeDisplayValue(maxString);
-    cats.addActionListener(ev -> {
+    sections.setPrototypeDisplayValue(maxSection);
+    sections.addActionListener(ev -> {
       while(paint) Thread.yield();
 
-      cat = cats.getSelectedItem();
-      final byte[] start = new TokenBuilder().bold().add(cat).add(COL).norm().nline().finish();
+      section = sections.getSelectedItem();
+      final byte[] start = new TokenBuilder().bold().add(section).add(COL).norm().nline().finish();
       final byte[] end = new TokenBuilder().bold().finish();
       final int s = Token.indexOf(all, start);
       if(s != -1) {
@@ -109,7 +109,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     buttons.add(editor.button());
 
     final BaseXBack center = new BaseXBack(false).layout(new ColumnLayout(10));
-    center.add(cats);
+    center.add(sections);
     center.add(label);
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 10));
@@ -283,17 +283,17 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
       }
     }
 
-    final StringList list = new StringList().add(ALL);
-    add(COMMAND, command, tb, list);
-    add(Text.ERROR, error, tb, list);
-    add(EVALUATING, eval, tb, list);
-    add(RESULT, result, tb, list);
-    add(TIMING, strings, tb, list);
-    add(OPTIMIZED_QUERY, optqu, tb, list);
-    add(OPTIMIZING, opt, tb, list);
-    add(COMPILING, comp, tb, list);
-    add(QUERY, origqu, tb, list);
-    add(QUERY_PLAN, plan, tb, list);
+    final StringList sctns = new StringList().add(ALL);
+    add(COMMAND, command, tb, sctns);
+    add(Text.ERROR, error, tb, sctns);
+    add(EVALUATING, eval, tb, sctns);
+    add(RESULT, result, tb, sctns);
+    add(OPTIMIZED_QUERY, optqu, tb, sctns);
+    add(OPTIMIZING, opt, tb, sctns);
+    add(COMPILING, comp, tb, sctns);
+    add(QUERY, origqu, tb, sctns);
+    add(QUERY_PLAN, plan, tb, sctns);
+    add(TIMING, strings, tb, sctns);
     if(inf != null) tb.add(inf).nline();
     clear = reset;
 
@@ -307,8 +307,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     newText = all;
 
     // refresh combo box, reassign old value
-    cats.setItems(list.toArray());
-    cats.setSelectedItem(cat);
+    sections.setItems(sctns.toArray());
+    sections.setSelectedItem(section);
 
     repaint();
     return total;
@@ -319,15 +319,15 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
    * @param head string header
    * @param list list reference
    * @param tb token builder
-   * @param cats categories to choose from
+   * @param sections sections a user can display
    */
   private static void add(final String head, final StringList list, final TokenBuilder tb,
-      final StringList cats) {
+      final StringList sections) {
     if(list.isEmpty()) return;
     tb.bold().add(head).add(COL).norm().nline();
     for(final String line : list) tb.add(line).nline();
     tb.hline();
-    cats.add(head);
+    sections.add(head);
   }
 
   @Override
