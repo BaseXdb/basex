@@ -184,18 +184,6 @@ public interface QueryText {
   /** Parser token. */ String WORDS = "words";
   /** Parser token. */ String XQUERY = "xquery";
 
-  /** Parser token. */ String DF_DEC = "decimal-separator";
-  /** Parser token. */ String DF_DIG = "digit";
-  /** Parser token. */ String DF_GRP = "grouping-separator";
-  /** Parser token. */ String DF_EXP = "exponent-separator";
-  /** Parser token. */ String DF_INF = "infinity";
-  /** Parser token. */ String DF_MIN = "minus-sign";
-  /** Parser token. */ String DF_NAN = "NaN";
-  /** Parser token. */ String DF_PAT = "pattern-separator";
-  /** Parser token. */ String DF_PC = "percent";
-  /** Parser token. */ String DF_PM = "per-mille";
-  /** Parser token. */ String DF_ZD = "zero-digit";
-
   /** Parser token. */ String NAMESPACES = "namespaces";
   /** Parser token. */ String ELEMENT_NAMESPACE = "element-namespace";
   /** Parser token. */ String FUNCTION_NAMESPACE = "function-namespace";

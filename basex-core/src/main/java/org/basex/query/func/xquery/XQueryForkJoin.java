@@ -61,7 +61,7 @@ public final class XQueryForkJoin extends StandardFunc {
     if(st.one()) return new DynFuncCall(info, sc, coerce(0, cc)).optimize(cc);
 
     final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
-      options instanceof Value ? toOptions(arg(1), new TaskOptions(), true, cc.qc).get(RESULTS) :
+      options instanceof Value ? toOptions(options, new TaskOptions(), true, cc.qc).get(RESULTS) :
       null;
     if(results == Boolean.TRUE) {
       final FuncType ft = functions.funcType();

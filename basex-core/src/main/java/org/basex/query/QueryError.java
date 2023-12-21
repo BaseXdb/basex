@@ -617,7 +617,7 @@ public enum QueryError {
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
 
   /** Error code. */
-  FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),
+  FORMNUM_X(FODF, 1280, "Unknown decimal format: %."),
   /** Error code. */
   FORMDUP_X(FODF, 1280, "Format name % must not be specified together with explicit format."),
   /** Error code. */
@@ -1013,6 +1013,8 @@ public enum QueryError {
   /** Error code. */
   ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
   /** Error code. */
+  FORMPROP_X(XPST, 3, "%."),
+  /** Error code. */
   CASTTYPE_X(XPST, 3, "%"),
   /** Error code. */
   STATIC_X(XPST, 5, "No XML Schema support: %."),
@@ -1288,11 +1290,11 @@ public enum QueryError {
   /** Error code. */
   INVDECFORM_X_X(XQST, 97, "Invalid decimal-format property: %='%'."),
   /** Error code. */
-  INVDECSINGLE_X_X(XQST, 97, "Decimal-format property is no single character: %='%'."),
+  INVDECSINGLE_X_X(XQST, 97, "Decimal-format property must be a single character: %='%'."),
   /** Error code. */
   INVDECZERO_X(XQST, 97, "Zero-digit property is no Unicode digit with value zero: %."),
   /** Error code. */
-  DUPLDECFORM_X(XQST, 98, "Clash of decimal format properties: '%'."),
+  DUPLDECFORM_X(XQST, 98, "Decimal-format character is assigned twice: '%'."),
   /** Error code. */
   DUPLVALUE(XQST, 99, "Duplicate context value declaration."),
   /** Error code. */
@@ -1312,7 +1314,7 @@ public enum QueryError {
   /** Error code. */
   DECITEM(XQST, 113, "Context value cannot be bound in library module."),
   /** Error code. */
-  DECDUPLPROP_X(XQST, 114, "Duplicate decimal-format property '%'."),
+  DECDUPLPROP_X(XQST, 114, "Property is defined twice: %."),
   /** Error code. */
   DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
   /** Error code. */

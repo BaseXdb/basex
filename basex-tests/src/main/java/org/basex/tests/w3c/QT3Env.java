@@ -7,6 +7,7 @@ import java.util.*;
 import javax.xml.namespace.*;
 
 import org.basex.core.*;
+import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.xdm.*;
@@ -34,7 +35,7 @@ final class QT3Env {
   /** Decimal Formats: decimal-separator, grouping-separator,
       digit, pattern-separator, infinity, NaN, per-mille,
       minus-sign, name, percent, zero-digit. */
-  final HashMap<QName, HashMap<String, String>> decFormats;
+  final HashMap<QName, DecFormatOptions> decFormats;
   /** Static Base URI: uri. */
   final String baseURI;
   /** Name. */
@@ -53,8 +54,9 @@ final class QT3Env {
    * Constructor.
    * @param ctx database context
    * @param env environment item
+   * @throws BaseXException database exception
    */
-  QT3Env(final Context ctx, final XdmValue env) {
+  QT3Env(final Context ctx, final XdmValue env) throws BaseXException {
     name = XQuery.string('@' + NNAME, env, ctx);
     sources = list(ctx, env, SOURCE);
     resources = list(ctx, env, RESOURCE);
@@ -84,11 +86,11 @@ final class QT3Env {
         "let $b := substring-before($n, ':') " +
         "return QName(if($b) then namespace-uri-for-prefix($b, .) else '', $n)",
         ctx).context(item).value();
-      final HashMap<String, String> hm = new HashMap<>();
+      final DecFormatOptions options = new DecFormatOptions();
       final QNm qnm = value.size() != 0 ? (QNm) value.internal() : QNm.EMPTY;
-      decFormats.put(qnm.toJava(), hm);
+      decFormats.put(qnm.toJava(), options);
       for(final XdmItem it2 : new XQuery("@*[name() != 'name']", ctx).context(item)) {
-        hm.put(it2.getName().getLocalPart(), it2.getString());
+        options.assign(it2.getName().getLocalPart(), it2.getString());
       }
     }
 

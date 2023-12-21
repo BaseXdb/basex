@@ -62,10 +62,6 @@ public class QueryParser extends InputParser {
   private static final byte[] SKIPCHECK = {};
   /** Reserved function names. */
   private static final TokenSet KEYWORDS;
-  /** Decimal declarations. */
-  private static final byte[][] DECFORMATS = tokens(
-    DF_DEC, DF_DIG, DF_GRP, DF_EXP, DF_INF, DF_MIN, DF_NAN, DF_PAT, DF_PC, DF_PM, DF_ZD
-  );
 
   // initialize keywords
   static {
@@ -620,30 +616,27 @@ public class QueryParser extends InputParser {
     if(def && !wsConsumeWs(DECIMAL_FORMAT)) return false;
 
     // use empty name for default declaration
-    final QNm name = def ? QNm.EMPTY : eQName(null, QNAME_X);
+    final byte[] name = (def ? QNm.EMPTY : eQName(null, QNAME_X)).internal();
 
     // check if format has already been declared
-    if(sc.decFormats.get(name.internal()) != null) throw error(DECDUPL);
+    if(sc.decFormats.get(name) != null) throw error(DECDUPL);
 
     // create new format
-    final TokenMap map = new TokenMap();
+    final DecFormatOptions options = new DecFormatOptions();
     // collect all property declarations
-    int n;
-    do {
-      n = map.size();
+    while(true) {
       skipWs();
-      final byte[] prop = ncName(null);
-      for(final byte[] s : DECFORMATS) {
-        if(!eq(prop, s)) continue;
-        if(map.get(s) != null) throw error(DECDUPLPROP_X, s);
-        wsCheck("=");
-        map.put(s, stringLiteral());
-        break;
+      final String prop = string(ncName(null));
+      if(prop.isEmpty()) break;
+      wsCheck("=");
+      if(options.get(prop) != null) throw error(DECDUPLPROP_X, prop);
+      try {
+        options.assign(prop, string(stringLiteral()));
+      } catch(final BaseXException ex) {
+        throw error(FORMPROP_X, ex);
       }
-    } while(n != map.size());
-
-    // completes the format declaration
-    sc.decFormats.put(name.internal(), new DecFormatter(map, info()));
+    }
+    sc.decFormats.put(name, new DecFormatter(options, info()));
     return true;
   }
 
@@ -3916,7 +3909,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "NCName" rule.
    * @param error optional error message
-   * @return string
+   * @return name (empty if no token was found)
    * @throws QueryException query exception
    */
   private byte[] ncName(final QueryError error) throws QueryException {

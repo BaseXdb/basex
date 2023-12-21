@@ -2,12 +2,10 @@ package org.basex.query.func.inspect;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
-import org.basex.query.util.format.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -72,24 +70,12 @@ public final class InspectStaticContext extends StandardFunc {
         tl.add(sctx.inheritNS ? INHERIT : NO_INHERIT);
         return StrSeq.get(tl);
       case DECIMAL_FORMATS:
-        mb = new MapBuilder(info);
         // enforce creation of default formatter
-        sctx.decFormat(EMPTY);
+        sctx.decFormat(QNm.EMPTY);
         // loop through all formatters
+        mb = new MapBuilder(info);
         for(final byte[] format : sctx.decFormats) {
-          final DecFormatter df = sctx.decFormats.get(format);
-          mb.put(Str.get(format), new MapBuilder(info).
-            put(DF_DEC, cpToken(df.decimal)).
-            put(DF_EXP, cpToken(df.exponent)).
-            put(DF_GRP, cpToken(df.grouping)).
-            put(DF_PC, cpToken(df.percent)).
-            put(DF_PM, cpToken(df.permille)).
-            put(DF_ZD, cpToken(df.zero)).
-            put(DF_DIG, cpToken(df.optional)).
-            put(DF_PAT, cpToken(df.pattern)).
-            put(DF_INF, df.inf).
-            put(DF_NAN, df.nan).
-            put(DF_MIN, cpToken(df.minus)).map());
+          mb.put(Str.get(format), sctx.decFormats.get(format).toMap());
         }
         return mb.map();
       default:

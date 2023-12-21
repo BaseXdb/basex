@@ -19,38 +19,35 @@ import org.basex.util.*;
 public final class FnFormatNumber extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // evaluate arguments
     Item value = arg(0).atomItem(qc, info);
+    final byte[] picture = toToken(arg(1), qc);
+    final Item name = arg(2).atomItem(qc, info);
+    final Item format = arg(3).item(qc, info);
+
     final Type type = value.type;
     if(value.isEmpty()) value = Dbl.NAN;
     else if(type.isUntyped()) value = Dbl.get(value.dbl(info));
     else if(!type.isNumberOrUntyped()) throw numberError(this, value);
 
-    // retrieve picture
-    final byte[] picture = toToken(arg(1), qc);
-    // retrieve format name declaration
-    final Item name = arg(2).atomItem(qc, info);
-    // retrieve explicit format declaration
-    final Item format = arg(3).item(qc, info);
     final DecFormatter df;
-    if(!format.isEmpty()) {
-      if(!name.isEmpty()) throw FORMDUP_X.get(info, name);
-      final DecFormatOptions options = toOptions(arg(3), new DecFormatOptions(), true, qc);
-      df = new DecFormatter(options.toTokenMap(), info);
-    } else {
-      QNm formatQNm = QNm.EMPTY;
+    if(format.isEmpty()) {
+      QNm qnm = QNm.EMPTY;
       if(name instanceof QNm) {
-        formatQNm = toQNm(name);
+        qnm = toQNm(name);
       } else if(!name.isEmpty()) {
         try {
-          formatQNm = QNm.parse(trim(toToken(name)), sc);
+          qnm = QNm.parse(trim(toToken(name)), sc);
         } catch(final QueryException ex) {
           Util.debug(ex);
           throw FORMNUM_X.get(info, name);
         }
       }
-      df = sc.decFormat(formatQNm.internal());
-      if(df == null) throw FORMNUM_X.get(info, formatQNm.prefixId(XML));
+      df = sc.decFormat(qnm);
+      if(df == null) throw FORMNUM_X.get(info, qnm.prefixId(XML));
+    } else if(name.isEmpty()) {
+      df = new DecFormatter(toOptions(format, new DecFormatOptions(), true, qc), info);
+    } else {
+      throw FORMDUP_X.get(info, name);
     }
 
     return Str.get(df.format((ANum) value, picture, info));

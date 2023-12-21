@@ -1,13 +1,11 @@
 package org.basex.query.util.format;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.format.FormatParser.NumeralType.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.stream.*;
 
-import org.basex.query.*;
 import org.basex.query.util.format.FormatParser.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -26,13 +24,13 @@ public final class IcuFormatter extends Formatter {
   private static final boolean AVAILABLE =
       Reflect.available("com.ibm.icu.text.RuleBasedNumberFormat");
   /** Prefix of RuleSet names that are supported by ICU's SPELLOUT format. */
-  private static final byte[] ICU_SPELLOUT_PREFIX = token("%spellout-");
+  private static final String ICU_SPELLOUT_PREFIX = "%spellout-";
   /** Name or prefix of ICU spell out ordinal rule set. */
-  private static final String ICU_SPELLOUT_ORDINAL = string(ICU_SPELLOUT_PREFIX) + "ordinal";
+  private static final String ICU_SPELLOUT_ORDINAL = ICU_SPELLOUT_PREFIX + "ordinal";
   /** Name of ICU spell out ordinal neuter rule set. */
   private static final String ICU_SPELLOUT_ORDINAL_NEUTER = ICU_SPELLOUT_ORDINAL + "-neuter";
   /** Name or prefix of ICU spell out cardinal rule set. */
-  private static final String ICU_SPELLOUT_CARDINAL = string(ICU_SPELLOUT_PREFIX) + "cardinal";
+  private static final String ICU_SPELLOUT_CARDINAL = ICU_SPELLOUT_PREFIX + "cardinal";
   /** Name of ICU spell out cardinal neuter rule set. */
   private static final String ICU_SPELLOUT_CARDINAL_NEUTER = ICU_SPELLOUT_CARDINAL + "-neuter";
 
@@ -219,7 +217,7 @@ public final class IcuFormatter extends Formatter {
     String ruleSet = map.get(key);
     if(ruleSet == null) {
       if(modifier != null) {
-        if(startsWith(modifier, ICU_SPELLOUT_PREFIX)) {
+        if(startsWith(modifier, token(ICU_SPELLOUT_PREFIX))) {
           ruleSet = ruleSet(string(modifier));
         } else {
           // search for result with desired ending by trying all rule sets
@@ -292,29 +290,27 @@ public final class IcuFormatter extends Formatter {
   }
 
   /**
-   * Returns a decimal formatter for the given language, or {@code null} if the language is not
-   * supported.
+   * Returns decimal-format properties for the given language.
    * @param language language
-   * @return a decimal formatter, or {@code null} if the language is not supported
-   * @throws QueryException query exception
+   * @return properties, or {@code null} if the language is not supported
    */
-  public static DecFormatter decFormatter(final String language) throws QueryException {
+  static DecFormatOptions decFormat(final String language) {
     for(final ULocale locale : DecimalFormatSymbols.getAvailableULocales()) {
       if(locale.toString().equals(language)) {
         final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
-        final TokenMap map = new TokenMap();
-        map.put(token(DF_DEC), token(String.valueOf(dfs.getDecimalSeparator())));
-        map.put(token(DF_DIG), token(String.valueOf(dfs.getDigit())));
-        map.put(token(DF_GRP), token(String.valueOf(dfs.getGroupingSeparator())));
-        map.put(token(DF_EXP), token(String.valueOf(dfs.getExponentSeparator())));
-        map.put(token(DF_INF), token(dfs.getInfinity()));
-        map.put(token(DF_MIN), token(String.valueOf(dfs.getMinusSign())));
-        map.put(token(DF_NAN), token(dfs.getNaN()));
-        map.put(token(DF_PAT), token(String.valueOf(dfs.getPatternSeparator())));
-        map.put(token(DF_PC), token(String.valueOf(dfs.getPercentString())));
-        map.put(token(DF_PM), token(String.valueOf(dfs.getPerMillString())));
-        map.put(token(DF_ZD), token(String.valueOf(dfs.getZeroDigit())));
-        return new DecFormatter(map, null);
+        final DecFormatOptions dfo = new DecFormatOptions();
+        dfo.put(DecFormatOptions.DECIMAL_SEPARATOR, dfs.getDecimalSeparatorString());
+        dfo.put(DecFormatOptions.DIGIT, String.valueOf(dfs.getDigit()));
+        dfo.put(DecFormatOptions.GROUPING_SEPARATOR, dfs.getGroupingSeparatorString());
+        dfo.put(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator());
+        dfo.put(DecFormatOptions.INFINITY, dfs.getInfinity());
+        dfo.put(DecFormatOptions.MINUS_SIGN, dfs.getMinusSignString());
+        dfo.put(DecFormatOptions.NAN, dfs.getNaN());
+        dfo.put(DecFormatOptions.PATTERN_SEPARATOR, String.valueOf(dfs.getPatternSeparator()));
+        dfo.put(DecFormatOptions.PERCENT, dfs.getPercentString());
+        dfo.put(DecFormatOptions.PER_MILLE, dfs.getPerMillString());
+        dfo.put(DecFormatOptions.ZERO_DIGIT, String.valueOf(dfs.getZeroDigit()));
+        return dfo;
       }
     }
     return null;

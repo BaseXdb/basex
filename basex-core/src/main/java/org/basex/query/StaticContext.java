@@ -166,21 +166,17 @@ public final class StaticContext {
 
   /**
    * Returns a decimal format.
-   * @param id format id
+   * @param name name
    * @return decimal format or {@code null}
    * @throws QueryException query exception
    */
-  public DecFormatter decFormat(final byte[] id) throws QueryException {
+  public synchronized DecFormatter decFormat(final QNm name) throws QueryException {
+    final byte[] id = name.internal();
     DecFormatter df = decFormats.get(id);
     if(df == null) {
-      if(eq(id, EMPTY)) {
-        // lazy instantiation of default decimal format
-        df = new DecFormatter(null, null);
-        decFormats.put(id, df);
-      } else {
-        df = DecFormatter.forLanguage(id);
-        if(df != null) decFormats.put(id, df);
-      }
+      // lazy instantiation of default decimal format
+      df = eq(id, EMPTY) ? new DecFormatter() : DecFormatter.forLanguage(id);
+      if(df != null) decFormats.put(id, df);
     }
     return df;
   }

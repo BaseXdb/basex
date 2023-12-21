@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QNm extends Item {
-  /** QName: empty. */
+  /** QName: empty (invalid). */
   public static final QNm EMPTY = new QNm(Token.EMPTY);
   /** EQName syntax. */
   public static final Pattern EQNAME = Pattern.compile("^Q\\{([^{}]*)\\}(.+)$");

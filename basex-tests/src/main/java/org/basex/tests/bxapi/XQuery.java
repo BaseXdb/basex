@@ -2,7 +2,6 @@ package org.basex.tests.bxapi;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
 
 import javax.xml.namespace.*;
 
@@ -14,7 +13,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -84,16 +82,12 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   /**
    * Declares a decimal format.
    * @param name qname
-   * @param map format
+   * @param format decimal format
    * @return self reference
    */
-  public XQuery decimalFormat(final QName name, final HashMap<String, String> map) {
+  public XQuery decimalFormat(final QName name, final DecFormatOptions format) {
     try {
-      final TokenMap tm = new TokenMap();
-      for(final Entry<String, String> e : map.entrySet()) {
-        tm.put(Token.token(e.getKey()), Token.token(e.getValue()));
-      }
-      qp.sc.decFormats.put(new QNm(name).internal(), new DecFormatter(tm, null));
+      qp.sc.decFormats.put(new QNm(name).internal(), new DecFormatter(format, null));
       return this;
     } catch(final QueryException ex) {
       throw new XQueryException(ex);

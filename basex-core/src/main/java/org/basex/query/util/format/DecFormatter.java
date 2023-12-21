@@ -1,7 +1,6 @@
 package org.basex.query.util.format;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
@@ -11,9 +10,11 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * Formatter for decimal numbers.
@@ -44,7 +45,7 @@ public final class DecFormatter extends FormatUtil {
   /** Grouping-separator character. */
   public int grouping = ',';
   /** Optional-digit character. */
-  public int optional = '#';
+  public int digit = '#';
 
   /** Minus character. */
   public int minus = '-';
@@ -55,37 +56,53 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Constructor.
-   * @param map decimal format (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public DecFormatter() throws QueryException {
+    this(new DecFormatOptions(), null);
+  }
+
+  /**
+   * Constructor.
+   * @param definition decimal format definition (can be {@code null})
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DecFormatter(final TokenMap map, final InputInfo info) throws QueryException {
+  public DecFormatter(final DecFormatOptions definition, final InputInfo info)
+      throws QueryException {
     // assign map values
     int z = '0';
-    if(map != null) {
-      for(final byte[] key : map) {
-        final String k = string(key);
-        final byte[] v = map.get(key);
-        if(k.equals(DF_INF)) {
+    if(definition != null) {
+      for(final Option<?> option : definition) {
+        if(!definition.contains(option)) continue;
+        final String k = option.name();
+        final byte[] v = token(definition.get((StringOption) option));
+        if(option == DecFormatOptions.INFINITY) {
           inf = v;
-        } else if(k.equals(DF_NAN)) {
+        } else if(option == DecFormatOptions.NAN) {
           nan = v;
         } else if(v.length != 0 && cl(v, 0) == v.length) {
           final int cp = cp(v, 0);
-          switch(k) {
-            case DF_DEC: decimal  = cp; break;
-            case DF_GRP: grouping = cp; break;
-            case DF_EXP: exponent = cp; break;
-            case DF_PAT: pattern  = cp; break;
-            case DF_MIN: minus    = cp; break;
-            case DF_DIG: optional = cp; break;
-            case DF_PC:  percent  = cp; break;
-            case DF_PM:  permille = cp; break;
-            case DF_ZD:
-              z = zeroes(cp);
-              if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
-              if(z != cp) throw INVDECZERO_X.get(info, (char) cp);
-              break;
+          if(option == DecFormatOptions.DECIMAL_SEPARATOR) {
+            decimal = cp;
+          } else if(option == DecFormatOptions.GROUPING_SEPARATOR) {
+            grouping = cp;
+          } else if(option == DecFormatOptions.EXPONENT_SEPARATOR) {
+            exponent = cp;
+          } else if(option == DecFormatOptions.PATTERN_SEPARATOR) {
+            pattern = cp;
+          } else if(option == DecFormatOptions.MINUS_SIGN) {
+            minus = cp;
+          } else if(option == DecFormatOptions.DIGIT) {
+            digit = cp;
+          } else if(option == DecFormatOptions.PERCENT) {
+            percent = cp;
+          } else if(option == DecFormatOptions.PER_MILLE) {
+            permille = cp;
+          } else if(option == DecFormatOptions.ZERO_DIGIT) {
+            z = zeroes(cp);
+            if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
+            if(z != cp) throw INVDECZERO_X.get(info, (char) cp);
           }
         } else {
           // signs must have single character
@@ -98,7 +115,7 @@ public final class DecFormatter extends FormatUtil {
     zero = z;
     final IntSet is = new IntSet();
     for(int i = 0; i < 10; i++) is.add(zero + i);
-    final int[] ss = { decimal, grouping, exponent, percent, permille, optional, pattern };
+    final int[] ss = { decimal, grouping, exponent, percent, permille, digit, pattern };
     for(final int s : ss) {
       if(!is.add(s)) throw DUPLDECFORM_X.get(info, (char) s);
     }
@@ -109,39 +126,69 @@ public final class DecFormatter extends FormatUtil {
     digits = tb.toArray();
     // decimal-separator, exponent-separator, ... , are classified as active characters.
     // decimal-digit-family: added above. pattern-separator: will never occur at this stage
-    actives = tb.add(decimal).add(exponent).add(grouping).add(optional).finish();
+    actives = tb.add(decimal).add(exponent).add(grouping).add(digit).finish();
     // "all other characters (...) are classified as passive characters."
   }
 
   /**
-   * Returns a decimal formatter for the given language, or {@code null} if the language is not
-   * supported.
+   * Returns a decimal formatter for the given language.
    * @param language language
    * @return a decimal formatter, or {@code null} if the language is not supported
    * @throws QueryException query exception
    */
   public static DecFormatter forLanguage(final byte[] language) throws QueryException {
     final String l = string(language);
-    if(IcuFormatter.available()) return IcuFormatter.decFormatter(l);
+    final DecFormatOptions dfo = IcuFormatter.available() ? IcuFormatter.decFormat(l) :
+      decFormatSymbols(l);
+    return dfo != null ? new DecFormatter(dfo, null) : null;
+  }
+
+  /**
+   * Returns a decimal format symbols for the given language.
+   * @param language language
+   * @return format symbols, or {@code null} if the language is not supported
+   */
+  private static DecFormatOptions decFormatSymbols(final String language) {
     for(final Locale locale : DecimalFormatSymbols.getAvailableLocales()) {
-      if(locale.toString().equals(l)) {
+      if(locale.toString().equals(language)) {
         final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
-        final TokenMap map = new TokenMap();
-        map.put(token(DF_DEC), token(String.valueOf(dfs.getDecimalSeparator())));
-        map.put(token(DF_DIG), token(String.valueOf(dfs.getDigit())));
-        map.put(token(DF_GRP), token(String.valueOf(dfs.getGroupingSeparator())));
-        map.put(token(DF_EXP), token(dfs.getExponentSeparator()));
-        map.put(token(DF_INF), token(dfs.getInfinity()));
-        map.put(token(DF_MIN), token(String.valueOf(dfs.getMinusSign())));
-        map.put(token(DF_NAN), token(dfs.getNaN()));
-        map.put(token(DF_PAT), token(String.valueOf(dfs.getPatternSeparator())));
-        map.put(token(DF_PC), token(String.valueOf(dfs.getPercent())));
-        map.put(token(DF_PM), token(String.valueOf(dfs.getPerMill())));
-        map.put(token(DF_ZD), token(String.valueOf(dfs.getZeroDigit())));
-        return new DecFormatter(map, null);
+        final DecFormatOptions dfo = new DecFormatOptions();
+        dfo.put(DecFormatOptions.DECIMAL_SEPARATOR, String.valueOf(dfs.getDecimalSeparator()));
+        dfo.put(DecFormatOptions.DIGIT, String.valueOf(dfs.getDigit()));
+        dfo.put(DecFormatOptions.GROUPING_SEPARATOR, String.valueOf(dfs.getGroupingSeparator()));
+        dfo.put(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator());
+        dfo.put(DecFormatOptions.INFINITY, dfs.getInfinity());
+        dfo.put(DecFormatOptions.MINUS_SIGN, String.valueOf(dfs.getMinusSign()));
+        dfo.put(DecFormatOptions.NAN, dfs.getNaN());
+        dfo.put(DecFormatOptions.PATTERN_SEPARATOR, String.valueOf(dfs.getPatternSeparator()));
+        dfo.put(DecFormatOptions.PERCENT, String.valueOf(dfs.getPercent()));
+        dfo.put(DecFormatOptions.PER_MILLE, String.valueOf(dfs.getPerMill()));
+        dfo.put(DecFormatOptions.ZERO_DIGIT, String.valueOf(dfs.getZeroDigit()));
+        return dfo;
       }
     }
     return null;
+  }
+
+  /**
+   * Convert these properties to an XQuery map.
+   * @return map
+   * @throws QueryException query exception
+   */
+  public XQMap toMap() throws QueryException {
+    final MapBuilder map = new MapBuilder();
+    map.put(DecFormatOptions.DECIMAL_SEPARATOR.name(), cpToken(decimal));
+    map.put(DecFormatOptions.EXPONENT_SEPARATOR.name(), cpToken(exponent));
+    map.put(DecFormatOptions.GROUPING_SEPARATOR.name(), cpToken(grouping));
+    map.put(DecFormatOptions.PERCENT.name(), cpToken(percent));
+    map.put(DecFormatOptions.PER_MILLE.name(), cpToken(permille));
+    map.put(DecFormatOptions.ZERO_DIGIT.name(), cpToken(zero));
+    map.put(DecFormatOptions.DIGIT.name(), cpToken(digit));
+    map.put(DecFormatOptions.PATTERN_SEPARATOR.name(), cpToken(pattern));
+    map.put(DecFormatOptions.INFINITY.name(), inf);
+    map.put(DecFormatOptions.NAN.name(), nan);
+    map.put(DecFormatOptions.MINUS_SIGN.name(), cpToken(minus));
+    return map.map();
   }
 
   /**
@@ -193,7 +240,7 @@ public final class DecFormatter extends FormatUtil {
       for(int i = 0; i < pl; i += cl) {
         final int ch = ch(pt, i);
         cl = cl(pt, i);
-        final boolean digit = contains(digits, ch);
+        final boolean containsDigit = contains(digits, ch);
         boolean active = contains(actives, ch), expon = false;
 
         if(ch == decimal) {
@@ -226,7 +273,7 @@ public final class DecFormatter extends FormatUtil {
           // and it must not contain one of each."
           if(per) return false;
           per = true;
-        } else if(ch == optional) {
+        } else if(ch == digit) {
           if(frac) {
             optFrac = true;
           } else {
@@ -235,7 +282,7 @@ public final class DecFormatter extends FormatUtil {
             if(digMant) return false;
             optInt = true;
           }
-        } else if(digit) {
+        } else if(containsDigit) {
           if(!exp) {
             // "The fractional part of a sub-picture must not contain an optional-digit-sign that
             // is followed by a member of the decimal-digit-family."
@@ -250,7 +297,7 @@ public final class DecFormatter extends FormatUtil {
           // decimal-digit-family, and it must not be followed by any active character that is not
           // a member of the decimal-digit-family." (*)
           if(exp) {
-            if(!digit) return false;
+            if(!containsDigit) return false;
             expAct = true;
           }
           act = true;
@@ -312,7 +359,7 @@ public final class DecFormatter extends FormatUtil {
         if(ch == decimal) {
           frac = true;
           act = false;
-        } else if(ch == optional) {
+        } else if(ch == digit) {
           if(frac) optFrac++;
           else optInt++;
         } else if(ch == exponent) {

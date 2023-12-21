@@ -90,8 +90,8 @@ public class Options implements Iterable<Option<?>> {
       for(final Option<?> opt : options(getClass())) {
         if(opt instanceof Comment) continue;
         final String name = opt.name();
-        values.put(name, opt.value());
         options.put(name, opt);
+        values.put(name, opt.value());
       }
     } catch(final Exception ex) {
       throw Util.notExpected(ex);
@@ -176,7 +176,16 @@ public class Options implements Iterable<Option<?>> {
    * @return value (can be {@code null})
    */
   public final synchronized Object get(final Option<?> option) {
-    return values.get(option.name());
+    return get(option.name());
+  }
+
+  /**
+   * Returns the value of the specified option.
+   * @param name name of option
+   * @return value (can be {@code null})
+   */
+  public final synchronized Object get(final String name) {
+    return values.get(name);
   }
 
   /**
