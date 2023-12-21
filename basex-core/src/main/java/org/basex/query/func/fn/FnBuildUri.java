@@ -86,7 +86,7 @@ public class FnBuildUri extends FnJsonDoc {
    * @return value
    * @throws QueryException query exception
    */
-  protected final String get(final XQMap map, final String key, final QueryContext qc)
+  private String get(final XQMap map, final String key, final QueryContext qc)
       throws QueryException {
     final Value value = map.get(Str.get(key), info);
     return value.isEmpty() ? "" : string(toToken(value, qc));

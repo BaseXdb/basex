@@ -26,7 +26,7 @@ public abstract class DBUpdate extends DataUpdate implements Comparable<DBUpdate
 
   @Override
   public final int compareTo(final DBUpdate o) {
-    return type.ordinal() - o.type.ordinal();
+    return Integer.signum(type.ordinal() - o.type.ordinal());
   }
 
   /**

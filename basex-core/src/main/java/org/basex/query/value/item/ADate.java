@@ -401,7 +401,7 @@ public abstract class ADate extends ADateDur {
    * See {@link Item#compare(Item, Collation, boolean, InputInfo)}.
    * @param item item to be compared
    * @param info input info (can be {@code null})
-   * @return difference
+   * @return result of comparison (-1, 0, 1)
    * @throws QueryException query exception
    */
   private int compare(final Item item, final InputInfo info) throws QueryException {

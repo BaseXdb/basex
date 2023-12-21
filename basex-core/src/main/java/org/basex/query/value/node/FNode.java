@@ -17,7 +17,7 @@ import org.w3c.dom.*;
  */
 public abstract class FNode extends ANode {
   /** Parent node (can be {@code null}). */
-  FNode parent;
+  private FNode parent;
 
   /**
    * Constructor.
@@ -40,7 +40,8 @@ public abstract class FNode extends ANode {
   @Override
   public final int compare(final ANode node) {
     // fragments: compare node ids. otherwise, find LCA
-    return this == node ? 0 : node instanceof FNode ? id - node.id : compare(this, node);
+    return this == node ? 0 : node instanceof FNode ? Integer.signum(id - node.id) :
+      compare(this, node);
   }
 
   @Override

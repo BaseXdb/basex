@@ -83,7 +83,7 @@ public abstract class Data {
 
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
-  /** Unique id. ID can get negative, as subtraction of ids is used for all comparisons. */
+  /** Unique id. Negative ID values are ok (IDs are subtracted when being compared). */
   public final int dbid = ID.incrementAndGet();
 
   /** Resource index. */

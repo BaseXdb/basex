@@ -42,7 +42,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   @Override
   public int compareTo(final FTStringMatch sm) {
     final int s = start - sm.start;
-    return s == 0 ? end - sm.end : s;
+    return Integer.signum(s == 0 ? end - sm.end : s);
   }
 
   @Override

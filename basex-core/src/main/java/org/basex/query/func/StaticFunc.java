@@ -34,9 +34,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Formal parameters. */
   public final Var[] params;
   /** Default expressions (entries can be {@code null} references). */
-  public final Expr[] defaults;
+  final Expr[] defaults;
   /** Minimum number of arguments. */
-  public final int min;
+  final int min;
   /** Updating flag. */
   final boolean updating;
 

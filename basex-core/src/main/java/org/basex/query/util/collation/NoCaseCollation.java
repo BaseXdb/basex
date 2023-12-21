@@ -19,7 +19,7 @@ final class NoCaseCollation extends Collation {
       final int diff = compare(str.charAt(i), comp.charAt(i));
       if(diff != 0) return diff;
     }
-    return tl - cl;
+    return Integer.signum(tl - cl);
   }
 
   @Override
@@ -44,13 +44,13 @@ final class NoCaseCollation extends Collation {
    * Compares two characters.
    * @param ch1 first character
    * @param ch2 second character
-   * @return difference
+   * @return result of comparison (-1, 0, 1)
    */
   private static int compare(final char ch1, final char ch2) {
     if(ch1 != ch2) {
       final int c1 = ch1 >= 'a' && ch1 <= 'z' ? ch1 - 0x20 : ch1;
       final int c2 = ch2 >= 'a' && ch2 <= 'z' ? ch2 - 0x20 : ch2;
-      if(c1 != c2) return c1 - c2;
+      if(c1 != c2) return Integer.signum(c1 - c2);
     }
     return 0;
   }

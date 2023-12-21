@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
  */
 public class FnFoldLeft extends StandardFunc {
   /** Optimized condition and else branch. */
-  public FuncItem[] iff;
+  private FuncItem[] iff;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {

@@ -75,7 +75,7 @@ public final class IndexCosts implements Comparable<IndexCosts> {
 
   @Override
   public int compareTo(final IndexCosts ic) {
-    return results - ic.results;
+    return Integer.signum(results - ic.results);
   }
 
   @Override

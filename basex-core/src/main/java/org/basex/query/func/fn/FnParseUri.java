@@ -46,10 +46,6 @@ public class FnParseUri extends FnJsonDoc {
   static final String QUERY_PARAMETERS = "query-parameters";
   /** URI part. */
   static final String FILEPATH = "filepath";
-  /** URI part. */
-  static final String KEY = "key";
-  /** URI part. */
-  static final String VALUE = "value";
 
   /** File scheme. */
   static final String FILE = "file";

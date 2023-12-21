@@ -158,7 +158,7 @@ public final class Dbl extends ANum {
    * @param d1 first double
    * @param d2 second double
    * @param transitive transitive comparison
-   * @return result of comparison
+   * @return result of comparison (-1, 0, 1)
    */
   static int compare(final double d1, final double d2, final boolean transitive) {
     final boolean nan = Double.isNaN(d1), dNan = Double.isNaN(d2);

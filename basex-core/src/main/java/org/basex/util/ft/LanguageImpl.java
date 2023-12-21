@@ -51,7 +51,7 @@ abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImp
 
   @Override
   public final int compareTo(final LanguageImpl o) {
-    return o.prec() - prec();
+    return Integer.signum(o.prec() - prec());
   }
 
   @Override

@@ -107,7 +107,6 @@ public final class YMDur extends Dur {
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     if(item.type != type) throw compareError(item, this, ii);
-    final long m = mon - ((Dur) item).mon;
-    return m < 0 ? -1 : m > 0 ? 1 : 0;
+    return Long.signum(mon - ((Dur) item).mon);
   }
 }

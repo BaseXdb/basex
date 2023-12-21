@@ -210,7 +210,7 @@ public abstract class Collation {
    * Compares two strings.
    * @param string string
    * @param compare string to be compared
-   * @return result of check
+   * @return result of comparison (-1, 0, 1)
    */
   public abstract int compare(byte[] string, byte[] compare);
 

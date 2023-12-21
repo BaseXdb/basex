@@ -1331,8 +1331,6 @@ public interface Text {
 
   /** Dialog title for choosing a font. */
   String CHOOSE_FONT = lang("choose_font");
-  /** Predefined font types. */
-  String[] FONT_TYPES = { lang("standard"), lang("bold"), lang("italics") };
 
   /** Dialog title for treemap color schema. */
   String COLOR_SCHEMA = lang("color_schema");

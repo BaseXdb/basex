@@ -225,7 +225,7 @@ public final class MediaType implements Comparable<MediaType> {
    * Compares the specified main or subtypes.
    * @param type1 first type
    * @param type2 second type
-   * @return result of check
+   * @return result of comparison (-1, 0, 1)
    */
   private static int compareTo(final String type1, final String type2) {
     return type1.equals(type2) ? 0 :

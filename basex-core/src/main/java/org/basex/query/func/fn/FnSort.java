@@ -139,7 +139,7 @@ public class FnSort extends StandardFunc {
    * @param value2 second value
    * @param coll collation
    * @param info input info (can be {@code null})
-   * @return result of comparison (greater than 0, smaller than 0, or 0)
+   * @return result of comparison (-1, 0, 1)
    * @throws QueryException query exception
    */
   static int compare(final Value value1, final Value value2, final Collation coll,
@@ -151,8 +151,7 @@ public class FnSort extends StandardFunc {
       final int diff = item1.compare(item2, coll, true, info);
       if(diff != 0) return diff;
     }
-    final long diff = size1 - size2;
-    return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+    return Long.signum(size1 - size2);
   }
 
   @Override

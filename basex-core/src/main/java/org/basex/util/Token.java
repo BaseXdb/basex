@@ -784,16 +784,15 @@ public final class Token {
    * Compares two tokens lexicographically.
    * @param token first token
    * @param compare token to be compared
-   * @return 0 if tokens are equal, negative if first token is smaller,
-   *         positive if first token is bigger
+   * @return result of comparison (-1, 0, 1)
    */
   public static int compare(final byte[] token, final byte[] compare) {
     final int tl = token.length, cl = compare.length, l = Math.min(tl, cl);
     for(int i = 0; i < l; ++i) {
       final int c = (token[i] & 0xFF) - (compare[i] & 0xFF);
-      if(c != 0) return c;
+      if(c != 0) return Integer.signum(c);
     }
-    return tl - cl;
+    return Integer.signum(tl - cl);
   }
 
   /**
@@ -801,8 +800,7 @@ public final class Token {
    * @param token first token
    * @param compare token to be compared
    * @param coll collation (can be {@code null})
-   * @return 0 if tokens are equal, negative if first token is smaller,
-   *         positive if first token is bigger
+   * @return result of comparison (-1, 0, 1)
    */
   public static int compare(final byte[] token, final byte[] compare, final Collation coll) {
     return coll != null ? coll.compare(token, compare) : compare(token, compare);

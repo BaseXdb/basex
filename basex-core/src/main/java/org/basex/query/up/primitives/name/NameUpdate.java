@@ -80,7 +80,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
 
   @Override
   public final int compareTo(final NameUpdate o) {
-    return type.ordinal() - o.type.ordinal();
+    return Integer.signum(type.ordinal() - o.type.ordinal());
   }
 
   /**

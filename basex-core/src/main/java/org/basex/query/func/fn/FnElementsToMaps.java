@@ -110,7 +110,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param node node
    * @return result of check
    */
-  static boolean nonEmptyText(final ANode node) {
+  private static boolean nonEmptyText(final ANode node) {
     return node.type == NodeType.TEXT && Token.normalize(node.string()).length != 0;
   }
 
@@ -119,7 +119,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param node node
    * @return result of check
    */
-  static boolean element(final ANode node) {
+  private static boolean element(final ANode node) {
     return node.type == NodeType.ELEMENT;
   }
 
@@ -129,7 +129,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @return attributes
    * @throws QueryException query exception
    */
-  static MapBuilder attributes(final ANode node) throws QueryException {
+  private static MapBuilder attributes(final ANode node) throws QueryException {
     final MapBuilder mb = new MapBuilder();
     for(final ANode attr : node.attributeIter()) {
       mb.put(nodeName(attr, "@"), attr.string());
@@ -142,7 +142,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param node node
    * @return name
    */
-  static Str nodeName(final ANode node) {
+  private static Str nodeName(final ANode node) {
     return nodeName(node, null);
   }
 
@@ -152,7 +152,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param prefix (can be {@code null})
    * @return name
    */
-  static Str nodeName(final ANode node, final String prefix) {
+  private static Str nodeName(final ANode node, final String prefix) {
     byte[] name = node.qname().internal();
     if(prefix != null) name = Token.concat(prefix, name);
     return Str.get(name);
@@ -165,7 +165,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @return name
    * @throws QueryException query exception
    */
-  static Str serialize(final ANode node, final String method) throws QueryException {
+  private static Str serialize(final ANode node, final String method) throws QueryException {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, method);
     try {

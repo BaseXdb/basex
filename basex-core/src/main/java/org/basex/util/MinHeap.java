@@ -93,7 +93,7 @@ public final class MinHeap<K, V> {
    * Compares the keys at position {@code i} and {@code j}.
    * @param i position of first key
    * @param j position of second key
-   * @return result of check
+   * @return result of comparison
    */
   @SuppressWarnings("unchecked")
   private int compare(final int i, final int j) {

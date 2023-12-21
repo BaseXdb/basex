@@ -20,7 +20,7 @@ import org.basex.util.*;
  */
 public final class Params {
   /** Parameters. */
-  public final ArrayList<Param> params = new ArrayList<>();
+  private final ArrayList<Param> params = new ArrayList<>();
   /** Return type. */
   public SeqType type;
 

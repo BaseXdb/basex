@@ -275,7 +275,7 @@ public final class GUIConstants {
   public static int fontSize;
 
   /** Names of available fonts. */
-  private static String[] fonts;
+  private static volatile String[] fonts;
   /** Characters for monospace detection. */
   private static final char[] MONOSPACE =  " !,-.01:<ILMWilmw".toCharArray();
 

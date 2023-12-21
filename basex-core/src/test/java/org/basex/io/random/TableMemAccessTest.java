@@ -280,8 +280,7 @@ public final class TableMemAccessTest extends SandboxTest {
     // delete and reinsert random sections in the array
     final Random rnd = new Random();
     for(int r = 0; r < 100; r++) {
-      final int pre = Math.abs(rnd.nextInt()) % n;
-      final int count = Math.abs(rnd.nextInt()) % (n - pre);
+      final int pre = rnd.nextInt(n), count = rnd.nextInt(n - pre);
       table.delete(pre, count);
       for(int i = 0; i < count; i++) table.insert(0, ENTRY);
     }
@@ -308,7 +307,7 @@ public final class TableMemAccessTest extends SandboxTest {
     // check table contents via random access
     final Random rnd = new Random();
     for(int r = 0; r < 100; r++) {
-      final int i = Math.abs(rnd.nextInt()) % n;
+      final int i = rnd.nextInt(n);
       assertEquals(i & 0xFF, table.read1(i, 0));
       assertEquals(255, table.read1(i, 15));
     }

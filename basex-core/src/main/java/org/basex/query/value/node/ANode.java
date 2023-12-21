@@ -353,8 +353,7 @@ public abstract class ANode extends Item {
    * Compares two nodes for their unique order.
    * @param node1 first node
    * @param node2 node to be compared
-   * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
-   * if the first node appears after/before the second
+   * @return result of comparison (-1, 0, 1)
    */
   static int compare(final ANode node1, final ANode node2) {
     // cache parents of first node
@@ -381,7 +380,7 @@ public abstract class ANode extends Item {
       }
       c2 = n;
     }
-    return node1.id - node2.id;
+    return Integer.signum(node1.id - node2.id);
   }
 
   /**
