@@ -114,10 +114,11 @@ public final class IcuFormatter extends Formatter {
     final String tag = string(languageTag);
     if(tag.isBlank()) return null;
     final ULocale l = ULocale.forLanguageTag(tag);
+    final String lang = l.getLanguage();
+    if(lang.isBlank()) return null;
     final RuleBasedNumberFormat s = new RuleBasedNumberFormat(l, RuleBasedNumberFormat.SPELLOUT);
     final RuleBasedNumberFormat o = new RuleBasedNumberFormat(l, RuleBasedNumberFormat.ORDINAL);
     final DateFormatSymbols d = new DateFormatSymbols(l);
-    final String lang = l.getLanguage();
     return s.getLocale(ULocale.ACTUAL_LOCALE).getLanguage().equals(lang) &&
            o.getLocale(ULocale.ACTUAL_LOCALE).getLanguage().equals(lang) &&
            d.getLocale(ULocale.ACTUAL_LOCALE).getLanguage().equals(lang)
