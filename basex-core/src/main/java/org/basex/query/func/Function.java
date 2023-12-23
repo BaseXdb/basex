@@ -1587,6 +1587,9 @@ public enum Function implements AFunction {
   _PROC_PROPERTY_NAMES(ProcPropertyNames::new, "property-names()",
       params(), STRING_ZM, flag(NDT), PROC_URI),
   /** XQuery function. */
+  _PROC_PROPERTY_MAP(ProcPropertyMap::new, "property-map()",
+      params(), MAP_O, flag(NDT), PROC_URI),
+  /** XQuery function. */
   _PROC_SYSTEM(ProcSystem::new, "system(command[,arguments,options])",
       params(STRING_O, STRING_ZM, ANY_ATOMIC_TYPE_O), STRING_O, flag(NDT), PROC_URI, Perm.ADMIN),
 
