@@ -226,7 +226,7 @@ public class CmpG extends Cmp {
       final Type type1 = st1.type, type2 = st2.type;
       // skip type check if types are identical (and a child instance of any atomic type)
       check = !(type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-          (type1.isSortable() || !op.oneOf(OpG.EQ, OpG.NE)) || comparable(type1, type2));
+          (type1.isSortable() || !op.oneOf(OpG.EQ, OpG.NE)) || comparable(type1, type2, true));
 
       CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
@@ -368,7 +368,7 @@ public class CmpG extends Cmp {
   final boolean eval(final Item item1, final Item item2) throws QueryException {
     if(check) {
       final Type type1 = item1.type, type2 = item2.type;
-      if(type1 != type2 && !comparable(type1, type2)) throw compareError(item1, item2, info);
+      if(!comparable(type1, type2, true)) throw compareError(item1, item2, info);
     }
     return op.value().eval(item1, item2, coll, sc, info);
   }
@@ -394,17 +394,15 @@ public class CmpG extends Cmp {
    * Checks if types can be compared.
    * @param type1 first type to compare
    * @param type2 second type to compare
+   * @param untyped allow untyped atomics
    * @return result of check
    */
-  private static boolean comparable(final Type type1, final Type type2) {
-    if(type1.isUntyped() || type2.isUntyped() ||
+  public static boolean comparable(final Type type1, final Type type2, final boolean untyped) {
+    return type1 == type2 ||
       type1.isNumber() && type2.isNumber() ||
-      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION)) return true;
-
-    final Type atom1 = type1.atomic(), atom2 = type2.atomic();
-    return atom1 != null && atom2 != null &&
-      (atom1.instanceOf(AtomType.STRING) || atom1 == AtomType.ANY_URI) &&
-      (atom2.instanceOf(AtomType.STRING) || atom2 == AtomType.ANY_URI);
+      type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+      untyped && (type1.isUntyped() || type2.isUntyped()) ||
+      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION);
   }
 
   @Override

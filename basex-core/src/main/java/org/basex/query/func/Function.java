@@ -127,7 +127,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DOCUMENT_NODE_ZM, flag(NDT)),
   /** XQuery function. */
   COMPARE(FnCompare::new, "compare(value1,value2[,collation])",
-      params(STRING_ZO, STRING_ZO, STRING_O), INTEGER_ZO),
+      params(ANY_ATOMIC_TYPE_ZO, ANY_ATOMIC_TYPE_ZO, STRING_ZO), INTEGER_ZO),
   /** XQuery function. */
   CONCAT(FnConcat::new, "concat(values...)",
       params(ANY_ATOMIC_TYPE_ZM), STRING_O),
