@@ -10,7 +10,7 @@ import org.basex.query.value.node.*;
 /**
  * <p>This class converts a JSON document to XML.</p>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JsonBasicConverter extends JsonXmlConverter {

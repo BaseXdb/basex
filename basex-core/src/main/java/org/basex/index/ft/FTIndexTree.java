@@ -9,7 +9,7 @@ import org.basex.util.list.*;
  * This class indexes full-text tokens in a balanced binary tree, including their pre and pos
  * values. An iterator returns all compressed pre and pos values in a sorted manner.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

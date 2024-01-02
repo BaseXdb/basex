@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * This class returns a Web Application Description Language (WADL) document
  * with available RESTXQ services.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RestXqWadl {

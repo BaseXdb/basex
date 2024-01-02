@@ -14,7 +14,7 @@ import org.basex.query.var.*;
 /**
  * Context-based function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class ContextFn extends StandardFunc {

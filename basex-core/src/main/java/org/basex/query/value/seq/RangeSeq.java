@@ -21,7 +21,7 @@ import org.basex.util.*;
 /**
  * Range sequence, containing at least two integers.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RangeSeq extends Seq {

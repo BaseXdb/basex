@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Storage tests for the selective index feature (#59).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class SelectiveIndexTest extends SandboxTest {

@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two nodes in distinct document order (DDO).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class DBNodeSeq extends NativeSeq {

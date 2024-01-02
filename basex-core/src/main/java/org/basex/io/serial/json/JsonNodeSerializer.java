@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * This class serializes items as JSON. The input must conform to the rules
  * defined in the {@link JsonDirectConverter} and {@link JsonAttsConverter} class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JsonNodeSerializer extends JsonSerializer {

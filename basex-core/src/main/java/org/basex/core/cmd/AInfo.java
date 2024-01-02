@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Abstract class for database info.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class AInfo extends Command {

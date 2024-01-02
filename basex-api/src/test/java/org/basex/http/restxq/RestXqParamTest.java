@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 /**
  * This test contains RESTXQ parameters.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RestXqParamTest extends RestXqTest {

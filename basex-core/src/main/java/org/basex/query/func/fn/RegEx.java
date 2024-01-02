@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Regular expression functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class RegEx extends StandardFunc {

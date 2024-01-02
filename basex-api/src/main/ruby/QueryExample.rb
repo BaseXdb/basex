@@ -1,7 +1,7 @@
 # This example shows how queries can be executed in an iterative manner.
 # Documentation: https://docs.basex.org/wiki/Clients
 #
-# (C) BaseX Team 2005-23, BSD License
+# (C) BaseX Team 2005-24, BSD License
 
 require './BaseXClient.rb'
 

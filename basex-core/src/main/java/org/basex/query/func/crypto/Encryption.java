@@ -17,7 +17,7 @@ import org.basex.util.Base64;
 /**
  * This class encrypts and decrypts textual inputs.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 final class Encryption {

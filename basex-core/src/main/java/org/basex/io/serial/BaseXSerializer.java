@@ -11,7 +11,7 @@ import org.basex.query.value.map.*;
 /**
  * This class serializes items in a project-specific mode.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class BaseXSerializer extends AdaptiveSerializer {

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Float item ({@code xs:float}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Flt extends ANum {

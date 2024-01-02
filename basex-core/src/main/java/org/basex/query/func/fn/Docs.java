@@ -15,7 +15,7 @@ import org.basex.query.value.item.*;
 /**
  * Document and collection functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Docs extends DynamicFn {

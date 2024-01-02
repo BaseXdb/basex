@@ -13,7 +13,7 @@ import org.basex.util.options.*;
 /**
  * Contains various helper variables and methods for database operations.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class DBOptions {

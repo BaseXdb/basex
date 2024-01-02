@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * This class organizes namespace scopes.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class NSScope {

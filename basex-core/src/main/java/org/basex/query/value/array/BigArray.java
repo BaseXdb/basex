@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * An array containing more members than fit into a {@link SingletonArray} or {@link SmallArray}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 final class BigArray extends XQArray {

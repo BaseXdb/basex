@@ -38,7 +38,7 @@ import org.basex.util.options.*;
 /**
  * This class represents a single RESTXQ function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RestXqFunction extends WebFunction {

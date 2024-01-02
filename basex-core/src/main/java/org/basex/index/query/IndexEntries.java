@@ -5,7 +5,7 @@ import org.basex.index.*;
 /**
  * This class contains information for returning index entries.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class IndexEntries implements IndexSearch {

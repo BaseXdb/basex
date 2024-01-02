@@ -18,7 +18,7 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API XMLResource implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class XMLResourceTest extends XMLDBBaseTest {

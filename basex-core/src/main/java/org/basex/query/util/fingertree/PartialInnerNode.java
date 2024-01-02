@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * A partial node containing one potentially partial sub-node.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  *
  * @param <N> node type

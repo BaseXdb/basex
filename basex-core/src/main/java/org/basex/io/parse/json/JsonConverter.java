@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
 /**
  * Interface for converters from JSON to XQuery values.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public abstract class JsonConverter {

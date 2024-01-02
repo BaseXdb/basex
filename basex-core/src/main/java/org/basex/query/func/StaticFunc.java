@@ -27,7 +27,7 @@ import org.basex.util.hash.*;
 /**
  * A static user-defined function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class StaticFunc extends StaticDecl implements XQFunction {

@@ -20,7 +20,7 @@ import org.basex.query.value.type.*;
  * New namespace mappings for function prefixes and URIs must be added to the static initializer of
  * the {@link NSGlobal} class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum ApiFunction implements AFunction {

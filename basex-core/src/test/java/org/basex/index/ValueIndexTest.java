@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.*;
 /**
  * Tests for the value index.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Jens Erat
  */
 public final class ValueIndexTest extends SandboxTest {

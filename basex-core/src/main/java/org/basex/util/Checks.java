@@ -3,7 +3,7 @@ package org.basex.util;
 /**
  * Functional interface for boolean array checks.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @param <T> the type of the input to the predicate
  */

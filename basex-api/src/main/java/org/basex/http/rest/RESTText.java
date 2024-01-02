@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 interface RESTText {

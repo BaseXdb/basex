@@ -22,7 +22,7 @@ import org.basex.util.similarity.*;
 /**
  * Container for user-defined functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class StaticFuncs extends ExprInfo {
@@ -222,7 +222,7 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Function cache.
    *
-   * @author BaseX Team 2005-23, BSD License
+   * @author BaseX Team 2005-24, BSD License
    * @author Christian Gruen
    */
   private static class FuncCache {

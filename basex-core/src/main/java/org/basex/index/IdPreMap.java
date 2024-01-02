@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Updatable ID-PRE mapping.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Dimitar Popov
  */
 public class IdPreMap {

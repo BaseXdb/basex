@@ -11,7 +11,7 @@ import org.basex.core.users.*;
 /**
  * Evaluates the 'help' command and returns help on the database commands.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Help extends Command {

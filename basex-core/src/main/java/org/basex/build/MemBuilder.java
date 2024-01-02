@@ -10,7 +10,7 @@ import org.basex.util.*;
  * This class creates a database instance in main memory.
  * The storage layout is described in the {@link Data} class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MemBuilder extends Builder {

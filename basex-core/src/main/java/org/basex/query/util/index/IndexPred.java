@@ -7,7 +7,7 @@ import org.basex.query.expr.path.*;
 /**
  * Index predicate.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class IndexPred {

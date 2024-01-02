@@ -29,7 +29,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for all items.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {

@@ -19,7 +19,7 @@ import org.w3c.dom.*;
 /**
  * Document node fragment.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FDoc extends FNode {

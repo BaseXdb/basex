@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Builder extends Job {

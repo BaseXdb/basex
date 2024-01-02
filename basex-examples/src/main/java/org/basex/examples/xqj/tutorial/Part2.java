@@ -11,7 +11,7 @@ import javax.xml.xquery.*;
  *
  * Part 2: Configuring XQJ Connections.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  */
 public final class Part2 extends Main {
   /**
