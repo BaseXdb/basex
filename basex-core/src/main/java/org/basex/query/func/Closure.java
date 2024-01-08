@@ -439,7 +439,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    // [CG] could be enhanced
     return this == obj;
   }
 

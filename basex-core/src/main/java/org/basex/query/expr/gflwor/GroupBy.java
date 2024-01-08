@@ -279,7 +279,6 @@ public final class GroupBy extends Clause {
 
   @Override
   boolean clean(final IntObjMap<Var> decl, final BitArray used) {
-    // [LW] does not fix {@link #vars}
     final int len = preExpr.length;
     for(int p = 0; p < post.length; p++) {
       if(!used.get(post[p].id)) {

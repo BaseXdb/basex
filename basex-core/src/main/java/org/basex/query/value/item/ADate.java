@@ -431,7 +431,6 @@ public abstract class ADate extends ADateDur {
   public final BigDecimal seconds() {
     int z = tz;
     if(z == Short.MAX_VALUE) {
-      // [CG] could be eliminated (XQuery, DateTime)
       final long n = System.currentTimeMillis();
       z = Calendar.getInstance().getTimeZone().getOffset(n) / 60000;
     }

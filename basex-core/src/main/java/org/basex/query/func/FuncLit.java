@@ -110,7 +110,6 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public boolean equals(final Object obj) {
-    // [CG] could be enhanced
     return this == obj;
   }
 
