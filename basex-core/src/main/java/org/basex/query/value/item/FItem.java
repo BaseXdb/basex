@@ -76,7 +76,12 @@ public abstract class FItem extends Item implements XQFunction {
       throws QueryException;
 
   @Override
-  public boolean equals(final Object obj) {
-    return this == obj;
+  public final boolean equals(final Object obj) {
+    try {
+      return obj instanceof FItem && deepEqual((FItem) obj, null);
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      return false;
+    }
   }
 }

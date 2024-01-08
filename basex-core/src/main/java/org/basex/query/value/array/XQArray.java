@@ -376,12 +376,14 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+    if(this == item) return true;
     if(item instanceof XQArray) {
       final XQArray array = (XQArray) item;
       if(arraySize() != array.arraySize()) return false;
       final Iterator<Value> iter1 = iterator(0), iter2 = array.iterator(0);
       while(iter1.hasNext()) {
-        if(!deep.equal(iter1.next(), iter2.next())) return false;
+        final Value value1 = iter1.next(), value2 = iter2.next();
+        if(!(deep != null ? deep.equal(value1, value2) : value1.equals(value2))) return false;
       }
       return true;
     }

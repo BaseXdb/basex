@@ -237,7 +237,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    if(equals(item)) return true;
+    if(this == item) return true;
     if(item instanceof FuncItem && !has(Flag.CTX)) {
       final FuncItem func = (FuncItem) item;
       final QNm fname = func.name;

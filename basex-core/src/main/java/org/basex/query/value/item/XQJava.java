@@ -90,18 +90,12 @@ public final class XQJava extends FItem {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return item instanceof XQJava && equals(item);
+    return this == item || item instanceof XQJava && Objects.equals(value, ((XQJava) item).value);
   }
 
   @Override
   public Object toJava() {
     return value;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return super.equals(obj) || obj instanceof XQJava &&
-        Objects.equals(value, ((XQJava) obj).value);
   }
 
   @Override

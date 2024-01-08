@@ -227,8 +227,12 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
-    return node instanceof TrieLeaf && key.atomicEqual(((TrieLeaf) node).key, deep.info) &&
-        deep.equal(value, ((TrieLeaf) node).value);
+    if(node instanceof TrieLeaf) {
+      final TrieLeaf leaf = (TrieLeaf) node;
+      return deep != null ? key.atomicEqual(leaf.key, deep.info) && deep.equal(value, leaf.value) :
+        key.equals(leaf.key) && value.equals(leaf.value);
+    }
+    return false;
   }
 
   @Override
