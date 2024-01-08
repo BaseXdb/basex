@@ -237,19 +237,20 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    if(deep.options.get(DeepEqualOptions.FALSE_ON_ERROR)) return false;
-    throw FICOMPARE_X.get(info, this);
+    if(equals(item)) return true;
+    if(item instanceof FuncItem && !has(Flag.CTX)) {
+      final FuncItem func = (FuncItem) item;
+      final QNm fname = func.name;
+      return arity() == func.arity() && expr.equals(func.expr) && (
+        name != null ? fname != null && name.eq(fname) : fname == null);
+    }
+    return false;
   }
 
   @Override
   public boolean vacuousBody() {
     final SeqType st = expr.seqType();
     return st != null && st.zero() && !expr.has(Flag.UPD);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj;
   }
 
   @Override

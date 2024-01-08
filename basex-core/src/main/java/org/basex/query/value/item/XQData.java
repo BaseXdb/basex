@@ -93,10 +93,4 @@ public abstract class XQData extends FItem {
    */
   public abstract void string(boolean indent, TokenBuilder tb, int level, InputInfo info)
       throws QueryException;
-
-  @Override
-  public final boolean equals(final Object obj) {
-    // [CG] could be enhanced
-    return this == obj;
-  }
 }

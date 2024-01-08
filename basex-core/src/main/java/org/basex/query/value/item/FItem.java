@@ -74,4 +74,9 @@ public abstract class FItem extends Item implements XQFunction {
    */
   public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo ii, boolean optimize)
       throws QueryException;
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj;
+  }
 }

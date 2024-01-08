@@ -743,8 +743,6 @@ public enum QueryError {
   FIATOMIZE_X(FOTY, 13, "Atomic value required, function item found: %."),
   /** Error code. */
   FISTRING_X(FOTY, 14, "Function item has no string value: %."),
-  /** Error code. */
-  FICOMPARE_X(FOTY, 15, "Function item cannot be compared: %."),
 
   /** Error code. */
   UPFOTYPE_X(FOUP, 1, "Document or element expected, % found."),
