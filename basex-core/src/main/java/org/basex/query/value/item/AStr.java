@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Abstract string item.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {

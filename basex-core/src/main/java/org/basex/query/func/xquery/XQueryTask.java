@@ -9,7 +9,7 @@ import org.basex.query.value.seq.*;
 /**
  * Forks a set of tasks, performing their computation in parallel followed by rejoining the results.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author James Wright
  */
 final class XQueryTask extends RecursiveTask<Value> {

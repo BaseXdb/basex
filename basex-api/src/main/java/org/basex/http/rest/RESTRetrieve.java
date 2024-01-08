@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * Retrieve resources via REST.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class RESTRetrieve extends RESTCmd {

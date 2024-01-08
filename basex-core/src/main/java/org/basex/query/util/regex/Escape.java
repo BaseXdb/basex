@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Escape sequence.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class Escape extends RegExp {

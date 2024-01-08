@@ -16,7 +16,7 @@ import com.ibm.icu.util.*;
 /**
  * Language formatter using ICU4J. Can be instantiated via {@link IcuFormatter#get}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
 public final class IcuFormatter extends Formatter {

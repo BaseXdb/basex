@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Insert after primitive.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public final class InsertAfter extends NodeCopy {

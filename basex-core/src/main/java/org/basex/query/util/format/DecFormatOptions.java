@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Properties for formatting decimal numbers.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
 public final class DecFormatOptions extends Options {

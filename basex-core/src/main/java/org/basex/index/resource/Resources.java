@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * This index organizes the resources of a database.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Resources implements Index {

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Optimized calculation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 interface CalcOpt {

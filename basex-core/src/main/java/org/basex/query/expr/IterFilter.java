@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative filter expression without numeric predicates.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class IterFilter extends Filter {

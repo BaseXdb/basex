@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests the command-line arguments of the starter class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXTest extends SandboxTest {

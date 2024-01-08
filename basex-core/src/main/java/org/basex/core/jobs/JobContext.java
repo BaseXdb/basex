@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Job context.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JobContext {

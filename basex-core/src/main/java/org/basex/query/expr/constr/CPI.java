@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Processing instruction constructor.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class CPI extends CName {

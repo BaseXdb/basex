@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This set indexes items under the terms of a collation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class CollationItemSet implements ItemSet {

@@ -10,7 +10,7 @@ import org.basex.query.value.seq.*;
 /**
  * This class stores the rectangles.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Wolfgang Miller
  */
 final class TreeRects {

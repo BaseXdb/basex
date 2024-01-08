@@ -1,7 +1,7 @@
 (:~
  : Code for logging in and out.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/login';
 

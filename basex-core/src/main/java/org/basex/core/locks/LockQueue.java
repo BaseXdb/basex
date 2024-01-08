@@ -3,7 +3,7 @@ package org.basex.core.locks;
 /**
  * Lock queue.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class LockQueue {

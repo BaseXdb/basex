@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * This class represents a single WebSocket function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Johannes Finckh
  */
 public final class WsFunction extends WebFunction {

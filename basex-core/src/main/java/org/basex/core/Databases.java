@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Provides central access to all databases and backups.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Jens Erat
  */
 public final class Databases {

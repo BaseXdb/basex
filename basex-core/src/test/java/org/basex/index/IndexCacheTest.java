@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for {@link IndexCache}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Dimitar Popov
  */
 public final class IndexCacheTest {

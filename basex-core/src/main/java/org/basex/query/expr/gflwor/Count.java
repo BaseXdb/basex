@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * GFLWOR {@code count} clause.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class Count extends Clause {

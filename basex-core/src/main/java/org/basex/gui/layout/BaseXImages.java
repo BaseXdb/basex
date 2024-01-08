@@ -18,7 +18,7 @@ import org.basex.util.http.*;
 /**
  * Organizes icons used all over the GUI.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class BaseXImages {

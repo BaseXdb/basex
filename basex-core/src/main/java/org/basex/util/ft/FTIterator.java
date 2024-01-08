@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Full-text iterator.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class FTIterator implements Iterator<FTSpan> {

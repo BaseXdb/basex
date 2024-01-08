@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Checks the argument expression's result type.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public class TypeCheck extends Single {

@@ -17,7 +17,7 @@ import org.basex.util.options.*;
 /**
  * Project specific text field implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class BaseXTextField extends JTextField {

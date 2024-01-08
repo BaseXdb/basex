@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * This is an efficient and memory-saving hash set for storing tokens.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class TokenSet extends ASet implements Iterable<byte[]> {

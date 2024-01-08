@@ -12,7 +12,7 @@ import org.basex.query.func.*;
 /**
  * This abstract class defines common methods of Web responses.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class WebResponse {

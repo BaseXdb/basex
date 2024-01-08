@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Replace document primitive.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ReplaceDoc extends NodeUpdate {

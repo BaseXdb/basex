@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * This class defines a parser, which is used to create new databases instances.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class Parser extends Job {
