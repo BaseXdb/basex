@@ -20,7 +20,7 @@ public final class MapOfPairs extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter pairs = arg(0).iter(qc);
-    final FItem combine = defined(1) ? toFunction(arg(1), 2, qc) : null;
+    final FItem combine = toFunctionOrNull(arg(1), 2, qc);
 
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(pairs)) != null;) {

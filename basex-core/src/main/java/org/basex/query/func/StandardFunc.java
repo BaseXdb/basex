@@ -477,7 +477,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates an expression to an encoding string.
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param err error to raise
    * @param qc query context
    * @return normalized encoding string or {@code null}
@@ -515,7 +515,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates an expression to user options.
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param qc query context
    * @return user options
    * @throws QueryException query exception
@@ -528,7 +528,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Evaluates an expression, if it exists, and returns options.
    * @param <E> options type
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param options options template
    * @param enforce raise error if a supplied option is unknown
    * @param qc query context
@@ -542,7 +542,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates an expression to variable bindings.
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param qc query context
    * @return variable bindings
    * @throws QueryException query exception
@@ -583,16 +583,30 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Evaluates an expression to a non-updating function item or {@code null}.
+   * @param expr expression
+   * @param nargs maximum number of supplied arguments
+   * @param qc query context
+   * @return function item or {@code null}
+   * @throws QueryException query exception
+   */
+  protected final FItem toFunctionOrNull(final Expr expr, final int nargs, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.item(qc, info);
+    return item.isEmpty() ? null : toFunction(toFunction(item, qc), nargs, false);
+  }
+
+  /**
    * Evaluates an expression to a non-updating function item.
    * @param expr expression
-   * @param arity required number of arguments (arity)
+   * @param nargs maximum number of supplied arguments
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem toFunction(final Expr expr, final int arity, final QueryContext qc)
+  protected final FItem toFunction(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
-    return toFunction(expr, arity, false, qc);
+    return toFunction(expr, nargs, false, qc);
   }
 
   /**
@@ -606,8 +620,21 @@ public abstract class StandardFunc extends Arr {
    */
   protected final FItem toFunction(final Expr expr, final int nargs, final boolean updating,
       final QueryContext qc) throws QueryException {
+    return toFunction(toFunction(expr, qc), nargs, updating);
+  }
 
-    final FItem func = checkUp(toFunction(expr, qc), updating, sc);
+  /**
+   * Evaluates an expression to a function item.
+   * @param func function
+   * @param nargs maximum number of supplied arguments
+   * @param updating updating flag
+   * @return function item
+   * @throws QueryException query exception
+   */
+  protected final FItem toFunction(final FItem func, final int nargs, final boolean updating)
+      throws QueryException {
+
+    checkUp(func, updating, sc);
     final int arity = func.arity();
     if(nargs < arity) throw arityError(func, arity, nargs, true, info);
     return func;

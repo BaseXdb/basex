@@ -30,7 +30,7 @@ public class FnReplicate extends StandardFunc {
     if(count == 1) return input.value(qc);
 
     // check if expression must be evaluated only once
-    final boolean once = input instanceof Value || !defined(2) || !toBoolean(arg(2), qc);
+    final boolean once = input instanceof Value || !defined(2) || !toBooleanOrFalse(arg(2), qc);
     if(once) return SingletonSeq.get(input.value(qc), count);
 
     // repeated evaluations

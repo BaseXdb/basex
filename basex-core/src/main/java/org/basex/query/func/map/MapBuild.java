@@ -20,9 +20,9 @@ public final class MapBuild extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final FItem key = defined(1) ? toFunction(arg(1), 1, qc) : null;
-    final FItem value = defined(2) ? toFunction(arg(2), 1, qc) : null;
-    final FItem combine = defined(3) ? toFunction(arg(3), 2, qc) : null;
+    final FItem key = toFunctionOrNull(arg(1), 1, qc);
+    final FItem value = toFunctionOrNull(arg(2), 1, qc);
+    final FItem combine = toFunctionOrNull(arg(3), 2, qc);
 
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(input)) != null;) {

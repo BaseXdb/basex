@@ -77,10 +77,10 @@ public enum Function implements AFunction {
       params(TIME_ZO, DAY_TIME_DURATION_ZO), TIME_ZO),
   /** XQuery function. */
   ALL_DIFFERENT(FnAllDifferent::new, "all-different(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
+      params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   ALL_EQUAL(FnAllEqual::new, "all-equal(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), BOOLEAN_O),
+      params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   ANALYZE_STRING(FnAnalyzeString::new, "analyze-string(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_ZO), ELEMENT_O, flag(CNS)),
@@ -105,7 +105,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
   BUILD_URI(FnBuildUri::new, "build-uri(parts[,options])",
-      params(MAP_O, MAP_O), STRING_O),
+      params(MAP_O, MAP_ZO), STRING_O),
   /** XQuery function. */
   CEILING(FnCeiling::new, "ceiling(value)",
       params(NUMERIC_ZO), NUMERIC_ZO),
@@ -127,20 +127,20 @@ public enum Function implements AFunction {
       params(STRING_ZO), DOCUMENT_NODE_ZM, flag(NDT)),
   /** XQuery function. */
   COMPARE(FnCompare::new, "compare(value1,value2[,collation])",
-      params(STRING_ZO, STRING_ZO, STRING_O), INTEGER_ZO),
+      params(STRING_ZO, STRING_ZO, STRING_ZO), INTEGER_ZO),
   /** XQuery function. */
   CONCAT(FnConcat::new, "concat(values...)",
       params(ANY_ATOMIC_TYPE_ZM), STRING_O),
   /** XQuery function. */
   CONTAINS(FnContains::new, "contains(value,substring[,collation])",
-      params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
+      params(STRING_ZO, STRING_ZO, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   CONTAINS_SUBSEQUENCE(FnContainsSubsequence::new,
       "contains-subsequence(input,subsequence[,compare])",
-      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O),
   /** XQuery function. */
   CONTAINS_TOKEN(FnContainsToken::new, "contains-token(value,token[,collation])",
-      params(STRING_ZM, STRING_O, STRING_O), BOOLEAN_O),
+      params(STRING_ZM, STRING_O, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   COUNT(FnCount::new, "count(input)",
       params(ITEM_ZM), INTEGER_O),
@@ -173,7 +173,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
   DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation,options])",
-      params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_O), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_ZO), BOOLEAN_O),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation::new, "default-collation()",
       params(), STRING_O),
@@ -182,7 +182,7 @@ public enum Function implements AFunction {
       params(), LANGUAGE_O),
   /** XQuery function. */
   DISTINCT_VALUES(FnDistinctValues::new, "distinct-values(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZM),
+      params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
   DOC(FnDoc::new, "doc(href)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(NDT)),
@@ -194,13 +194,13 @@ public enum Function implements AFunction {
       params(NODE_ZO), ANY_URI_ZO),
   /** XQuery function. */
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZM),
+      params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
-      params(STRING_ZM, NODE_O), ELEMENT_ZM),
+      params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
   /** XQuery function. */
   ELEMENTS_TO_MAP(FnElementsToMaps::new, "elements-to-maps(elements[,options])",
-      params(ELEMENT_ZM, MAP_O), MAP_ZM),
+      params(ELEMENT_ZM, MAP_ZO), MAP_ZM),
   /** XQuery function. */
   EMPTY(FnEmpty::new, "empty(input)",
       params(ITEM_ZM), BOOLEAN_O),
@@ -209,11 +209,11 @@ public enum Function implements AFunction {
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
   ENDS_WITH(FnEndsWith::new, "ends-with(value,substring[,collation])",
-      params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
+      params(STRING_ZO, STRING_ZO, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   ENDS_WITH_SUBSEQUENCE(FnEndsWithSubsequence::new,
       "ends-with-subsequence(input,subsequence[,compare])",
-      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
       params(STRING_O), STRING_ZO),
@@ -225,7 +225,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
   EVERY(FnEvery::new, "every(input[,predicate])",
-      params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
+      params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   EXACTLY_ONE(FnExactlyOne::new, "exactly-one(input)",
       params(ITEM_ZM), ITEM_O),
@@ -301,7 +301,8 @@ public enum Function implements AFunction {
       params(ITEM_ZM), ITEM_ZO),
   /** XQuery function. */
   HIGHEST(FnHighest::new, "highest(input[,collation,key])",
-      params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()), ITEM_ZM),
+      params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
+      ITEM_ZM),
   /** XQuery function. */
   HOURS_FROM_DATETIME(FnHoursFromDateTime::new, "hours-from-dateTime(value)",
       params(DATE_TIME_ZO), INTEGER_ZO),
@@ -313,12 +314,12 @@ public enum Function implements AFunction {
       params(TIME_ZO), INTEGER_ZO),
   /** XQuery function. */
   ID(FnId::new, "id(values[,node])",
-      params(STRING_ZM, NODE_O), ELEMENT_ZM),
+      params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
   /** XQuery function. */
   IDENTITY(FnIdentity::new, "identity(input)", params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   IDREF(FnIdref::new, "idref(values[,node])",
-      params(STRING_ZM, NODE_O), NODE_ZM),
+      params(STRING_ZM, NODE_ZO), NODE_ZM),
   /** XQuery function. */
   IMPLICIT_TIMEZONE(FnImplicitTimezone::new, "implicit-timezone()",
       params(), DAY_TIME_DURATION_O, flag(NDT)),
@@ -330,7 +331,7 @@ public enum Function implements AFunction {
       params(ELEMENT_O), STRING_ZM),
   /** XQuery function. */
   INDEX_OF(FnIndexOf::new, "index-of(input,search[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_O, STRING_O), INTEGER_ZM),
+      params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_O, STRING_ZO), INTEGER_ZM),
   /** XQuery function. */
   INDEX_WHERE(FnIndexWhere::new, "index-where(input,predicate)",
       params(ITEM_ZM, PREDICATE_O), INTEGER_ZM, flag(HOF)),
@@ -345,7 +346,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   INVISIBLE_XML(FnInvisibleXml::new, "invisible-xml(grammar[,options])",
-      params(STRING_ZO, MAP_O), FuncType.get(DOCUMENT_NODE_O, STRING_O).seqType(), flag(HOF)),
+      params(STRING_ZO, MAP_ZO), FuncType.get(DOCUMENT_NODE_O, STRING_O).seqType(), flag(HOF)),
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri::new, "iri-to-uri(value)",
       params(STRING_ZO), STRING_O),
@@ -360,13 +361,13 @@ public enum Function implements AFunction {
       FuncType.get(ITEM_ZM, ITEM_ZM, INTEGER_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
-      params(STRING_ZO, MAP_O), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
-      params(STRING_ZO, MAP_O), NODE_ZO, flag(CNS)),
+      params(STRING_ZO, MAP_ZO), NODE_ZO, flag(CNS)),
   /** XQuery function. */
   LANG(FnLang::new, "lang(language[,node])",
-      params(STRING_ZO, NODE_O), BOOLEAN_O),
+      params(STRING_ZO, NODE_ZO), BOOLEAN_O),
   /** XQuery function. */
   LAST(FnLast::new, "last()",
       params(), INTEGER_O, flag(POS, CTX)),
@@ -381,19 +382,20 @@ public enum Function implements AFunction {
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
   LOWEST(FnLowest::new, "lowest(input[,collation,key])",
-      params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()), ITEM_ZM),
+      params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
+      ITEM_ZM),
   /** XQuery function. */
   MATCHES(FnMatches::new, "matches(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   MAX(FnMax::new, "max(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZO),
+      params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZO),
   /** XQuery function. */
   MESSAGE(FnMessage::new, "message(input[,label])",
-      params(ITEM_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT)),
+      params(ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   MIN(FnMin::new, "min(values[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), ANY_ATOMIC_TYPE_ZO),
+      params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZO),
   /** XQuery function. */
   MINUTES_FROM_DATETIME(FnMinutesFromDateTime::new, "minutes-from-dateTime(value)",
       params(DATE_TIME_ZO), INTEGER_ZO),
@@ -435,7 +437,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
   NORMALIZE_UNICODE(FnNormalizeUnicode::new, "normalize-unicode(value[,form])",
-      params(STRING_ZO, STRING_O), STRING_O),
+      params(STRING_ZO, STRING_ZO), STRING_O),
   /** XQuery function. */
   NOT(FnNot::new, "not(input)",
       params(ITEM_ZM), BOOLEAN_O),
@@ -462,13 +464,13 @@ public enum Function implements AFunction {
       params(STRING_O, INTEGER_O), INTEGER_O),
   /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(value[,options])",
-      params(STRING_ZO, MAP_O), ITEM_ZO),
+      params(STRING_ZO, MAP_ZO), ITEM_ZO),
   /** XQuery function. */
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_O), QNAME_O),
   /** XQuery function. */
   PARSE_URI(FnParseUri::new, "parse-uri(uri[,options])",
-      params(STRING_ZO, MAP_O), MAP_O),
+      params(STRING_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
@@ -503,10 +505,10 @@ public enum Function implements AFunction {
   /** XQuery function. */
   REPLACE(FnReplace::new, "replace(value,pattern[,replacement,flags,action])",
       params(STRING_ZO, STRING_O, STRING_ZO, STRING_ZO,
-      FuncType.get(STRING_ZO, STRING_O, STRING_ZM).seqType()), STRING_O),
+      FuncType.get(STRING_ZO, STRING_O, STRING_ZM).seqType(Occ.ZERO_OR_ONE)), STRING_O),
   /** XQuery function. */
   REPLICATE(FnReplicate::new, "replicate(input,count[,multiple])",
-      params(ITEM_ZM, INTEGER_O, BOOLEAN_O), ITEM_ZM),
+      params(ITEM_ZM, INTEGER_O, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
   RESOLVE_QNAME(FnResolveQName::new, "resolve-QName(value,element)",
       params(STRING_ZO, ELEMENT_O), QNAME_ZO),
@@ -521,10 +523,10 @@ public enum Function implements AFunction {
       params(NODE_ZO), NODE_ZO),
   /** XQuery function. */
   ROUND(FnRound::new, "round(value[,precision])",
-      params(NUMERIC_ZO, INTEGER_O), NUMERIC_ZO),
+      params(NUMERIC_ZO, INTEGER_ZO), NUMERIC_ZO),
   /** XQuery function. */
   ROUND_HALF_TO_EVEN(FnRoundHalfToEven::new, "round-half-to-even(value[,precision])",
-      params(NUMERIC_ZO, INTEGER_O), NUMERIC_ZO),
+      params(NUMERIC_ZO, INTEGER_ZO), NUMERIC_ZO),
   /** XQuery function. */
   SECONDS_FROM_DATETIME(FnSecondsFromDateTime::new, "seconds-from-dateTime(value)",
       params(DATE_TIME_ZO), DECIMAL_ZO),
@@ -542,18 +544,18 @@ public enum Function implements AFunction {
       params(ITEM_ZM, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ITEM_ZM),
   /** XQuery function. */
   SOME(FnSome::new, "some(input[,predicate])",
-      params(ITEM_ZM, PREDICATE_O), BOOLEAN_O, flag(HOF)),
+      params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   SORT(FnSort::new, "sort(input[,collations,keys,orders])",
       params(ITEM_ZM, STRING_ZM,
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_MORE), STRING_ZM), ITEM_ZM),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
-      params(STRING_ZO, STRING_ZO, STRING_O), BOOLEAN_O),
+      params(STRING_ZO, STRING_ZO, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   STARTS_WITH_SUBSEQUENCE(FnStartsWithSubsequence::new,
       "starts-with-subsequence(input,subsequence[,compare])",
-      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O),
   /** XQuery function. */
   STATIC_BASE_URI(FnStaticBaseUri::new, "static-base-uri()",
       params(), ANY_URI_ZO),
@@ -562,7 +564,7 @@ public enum Function implements AFunction {
       params(ITEM_ZO), STRING_O),
   /** XQuery function. */
   STRING_JOIN(FnStringJoin::new, "string-join(values[,separator])",
-      params(ANY_ATOMIC_TYPE_ZM, STRING_O), STRING_O),
+      params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), STRING_O),
   /** XQuery function. */
   STRING_LENGTH(FnStringLength::new, "string-length([value])",
       params(STRING_ZO), INTEGER_O),
@@ -591,10 +593,10 @@ public enum Function implements AFunction {
       params(STRING_ZO, DOUBLE_O, DOUBLE_ZO), STRING_O),
   /** XQuery function. */
   SUBSTRING_AFTER(FnSubstringAfter::new, "substring-after(value,substring[,collation])",
-      params(STRING_ZO, STRING_ZO, STRING_O), STRING_O),
+      params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
   /** XQuery function. */
   SUBSTRING_BEFORE(FnSubstringBefore::new, "substring-before(value,substring[,collation])",
-      params(STRING_ZO, STRING_ZO, STRING_O), STRING_O),
+      params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
   /** XQuery function. */
   SUM(FnSum::new, "sum(values[,zero])",
       params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_ZO), ANY_ATOMIC_TYPE_ZO),
@@ -648,10 +650,10 @@ public enum Function implements AFunction {
       params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
   VOID(FnVoid::new, "void(input[,skip])",
-      params(ITEM_ZM, BOOLEAN_O), EMPTY_SEQUENCE_Z, flag(NDT)),
+      params(ITEM_ZM, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
-      params(NODE_ZO, MAP_O), STRING_ZO),
+      params(NODE_ZO, MAP_ZO), STRING_ZO),
   /** XQuery function. */
   YEAR_FROM_DATE(FnYearFromDate::new, "year-from-date(value)",
       params(DATE_ZO), INTEGER_ZO),
@@ -669,9 +671,9 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _MAP_BUILD(MapBuild::new, "build(input[,key,value,combine])",
-      params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(),
-      FuncType.get(ITEM_ZM, ITEM_O).seqType(),
-      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
+      params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(Occ.ZERO_OR_ONE),
+      FuncType.get(ITEM_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE),
+      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_CONTAINS(MapContains::new, "contains(map,key)",
@@ -695,17 +697,19 @@ public enum Function implements AFunction {
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_GET(MapGet::new, "get(map,key[,fallback])",
-      params(MAP_O, ANY_ATOMIC_TYPE_O, FuncType.get(ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
-      ITEM_ZM, MAP_URI),
+      params(MAP_O, ANY_ATOMIC_TYPE_O,
+      FuncType.get(ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
+      ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map[,predicate])",
-      params(MAP_O, FuncType.get(BOOLEAN_O, ITEM_O).seqType()), ANY_ATOMIC_TYPE_ZM, MAP_URI),
+      params(MAP_O, FuncType.get(BOOLEAN_O, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
+      ANY_ATOMIC_TYPE_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
-      params(MAP_ZM, MAP_O), MAP_O, MAP_URI),
+      params(MAP_ZM, MAP_ZO), MAP_O, MAP_URI),
   /** XQuery function. */
   _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(pairs[,combine])",
-      params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
+      params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_PAIR(MapPair::new, "pair(key,value)",
@@ -733,7 +737,7 @@ public enum Function implements AFunction {
       params(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_BUILD(ArrayBuild::new, "build(input[,action])",
-      params(ITEM_ZO, FuncType.get(ITEM_ZM, ITEM_O).seqType()),
+      params(ITEM_ZO, FuncType.get(ITEM_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_EMPTY(ArrayEmpty::new, "empty(array)",
@@ -767,7 +771,9 @@ public enum Function implements AFunction {
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_GET(ArrayGet::new, "get(array,position[,fallback])",
-      params(ARRAY_O, INTEGER_O, FuncType.get(INTEGER_O, ITEM_ZM).seqType()), ITEM_ZM, ARRAY_URI),
+      params(ARRAY_O, INTEGER_O,
+      FuncType.get(INTEGER_O, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
+      ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_HEAD(ArrayHead::new, "head(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
@@ -892,7 +898,7 @@ public enum Function implements AFunction {
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), ADMIN_URI, Perm.ADMIN),
   /** XQuery function. */
   _ADMIN_LOGS(AdminLogs::new, "logs([date,merge])",
-      params(STRING_O, BOOLEAN_O), ELEMENT_ZM, flag(NDT), ADMIN_URI, Perm.ADMIN),
+      params(STRING_O, BOOLEAN_ZO), ELEMENT_ZM, flag(NDT), ADMIN_URI, Perm.ADMIN),
   /** XQuery function. */
   _ADMIN_SESSIONS(AdminSessions::new, "sessions()",
       params(), ELEMENT_ZM, flag(NDT), ADMIN_URI, Perm.ADMIN),
@@ -926,7 +932,7 @@ public enum Function implements AFunction {
       EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",
-      params(BASE64_BINARY_O), MAP_O, flag(NDT), ARCHIVE_URI),
+      params(BASE64_BINARY_O), MAP_ZO, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate::new, "update(archive,entries,contents)",
       params(BASE64_BINARY_O, ITEM_ZM, ITEM_ZM),
@@ -1268,7 +1274,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _FILE_APPEND(FileAppend::new, "append(path,input[,options])",
-      params(STRING_O, ITEM_ZM, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, ITEM_ZM, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_APPEND_BINARY(FileAppendBinary::new, "append-binary(path,value)",
       params(STRING_O, BINARY_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
@@ -1369,7 +1375,7 @@ public enum Function implements AFunction {
       params(), STRING_O, FILE_URI),
   /** XQuery function. */
   _FILE_WRITE(FileWrite::new, "write(path,input[,options])",
-      params(STRING_O, ITEM_ZM, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, ITEM_ZM, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_WRITE_BINARY(FileWriteBinary::new, "write-binary(path,value[,offset])",
       params(STRING_O, BINARY_O, INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
@@ -1575,10 +1581,10 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _PROC_EXECUTE(ProcExecute::new, "execute(command[,arguments,options])",
-      params(STRING_O, STRING_ZM, ANY_ATOMIC_TYPE_O), ELEMENT_O, flag(NDT), PROC_URI, Perm.ADMIN),
+      params(STRING_O, STRING_ZM, MAP_ZO), ELEMENT_O, flag(NDT), PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_FORK(ProcFork::new, "fork(command[,arguments,options])",
-      params(STRING_O, STRING_ZM, ANY_ATOMIC_TYPE_O),
+      params(STRING_O, STRING_ZM, MAP_ZO),
       EMPTY_SEQUENCE_Z, flag(NDT), PROC_URI, Perm.ADMIN),
   /** XQuery function. */
   _PROC_PROPERTY(ProcProperty::new, "property(name)",
@@ -1591,7 +1597,7 @@ public enum Function implements AFunction {
       params(), MAP_O, flag(NDT), PROC_URI),
   /** XQuery function. */
   _PROC_SYSTEM(ProcSystem::new, "system(command[,arguments,options])",
-      params(STRING_O, STRING_ZM, ANY_ATOMIC_TYPE_O), STRING_O, flag(NDT), PROC_URI, Perm.ADMIN),
+      params(STRING_O, STRING_ZM, MAP_ZO), STRING_O, flag(NDT), PROC_URI, Perm.ADMIN),
 
   // Profiling Module
 

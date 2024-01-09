@@ -20,7 +20,7 @@ public final class MapGet extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
-    final FItem fallback = defined(2) ? toFunction(arg(2), 1, qc) : null;
+    final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
     final Value value = map.get(key, info);
     return !value.isEmpty() || fallback == null || map.contains(key, info) ? value :

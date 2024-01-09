@@ -26,7 +26,9 @@ public class FnRound extends NumericFn {
    */
   final Item round(final QueryContext qc, final boolean even) throws QueryException {
     final ANum value = toNumberOrNull(arg(0), qc);
-    final long prec = defined(1) ? Math.max(Integer.MIN_VALUE, toLong(arg(1), qc)) : 0;
+    final Item precision = arg(1).atomItem(qc, info);
+
+    final long prec = precision.isEmpty() ? 0 : Math.max(Integer.MIN_VALUE, toLong(precision));
     return value == null ? Empty.VALUE : prec > Integer.MAX_VALUE ? value :
       value.round((int) prec, even);
   }

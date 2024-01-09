@@ -20,9 +20,10 @@ public class FnContainsSubsequence extends StandardFunc {
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
+    final FItem compare = toFunctionOrNull(arg(2), 2, qc);
+
     final QueryBiFunction<Item, Item, Boolean> cmp;
-    if(defined(2)) {
-      final FItem compare = toFunction(arg(2), 2, qc);
+    if(compare != null) {
       cmp = (item1, item2) -> toBoolean(qc, compare, item1, item2);
     } else {
       cmp = new DeepEqual(info, sc.collation, qc)::equal;
