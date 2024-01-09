@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class QueryFocus {
-  /** Context value. */
+  /** Context value (can be {@code null}). */
   public Value value;
   /** Context position. */
   public long pos = 1;
