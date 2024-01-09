@@ -69,7 +69,7 @@ public abstract class Clause extends ParseExpr {
       @Override
       public boolean used(final VarRef ref) {
         for(final Var var : vars) {
-          if(var.is(ref.var)) return false;
+          if(var == ref.var) return false;
         }
         return true;
       }
@@ -91,7 +91,7 @@ public abstract class Clause extends ParseExpr {
    */
   public final boolean declares(final Var var) {
     for(final Var decl : vars) {
-      if(var.is(decl)) return true;
+      if(var == decl) return true;
     }
     return false;
   }

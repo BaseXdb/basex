@@ -138,7 +138,7 @@ public final class OrderBy extends Clause {
       // for $i in 1 to 2 order by 1 return $i  ->  for $i in 1 to 2 return $i
       if(expr instanceof Item) return true;
       // for $i in 1 to 2 order by $i return $i  ->  for $i in sort(1 to 2) return $i
-      if(fr != null && expr instanceof VarRef && ((VarRef) expr).var.is(fr.var)) {
+      if(fr != null && expr instanceof VarRef && ((VarRef) expr).var == fr.var) {
         fr.expr = cc.function(SORT, info, fr.expr);
         if(keys[0].desc) fr.expr = cc.function(REVERSE, info, fr.expr);
         return true;
@@ -183,7 +183,7 @@ public final class OrderBy extends Clause {
   public Clause inline(final InlineContext ic) throws QueryException {
     if(ic.var != null) {
       for(int r = refs.length; --r >= 0;) {
-        if(refs[r].var.is(ic.var)) refs = Array.remove(refs, r);
+        if(refs[r].var == ic.var) refs = Array.remove(refs, r);
       }
     }
     return ic.inline(keys) ? optimize(ic.cc) : null;

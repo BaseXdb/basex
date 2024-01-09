@@ -185,7 +185,7 @@ public abstract class Expr extends ExprInfo {
       @Override
       public boolean used(final VarRef ref) {
         // abort when the variable is used
-        return !ref.var.is(var);
+        return ref.var != var;
       }
     });
   }

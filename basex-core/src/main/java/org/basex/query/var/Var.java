@@ -31,7 +31,7 @@ public final class Var extends ExprInfo {
   /** Flag for function coercion. */
   public boolean coerce;
   /** Stack slot ({@code -1} if unused). */
-  int slot;
+  public int slot;
 
   /** Actual type (by type inference). */
   private final ExprType exprType;
@@ -249,20 +249,6 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Checks whether the given variable is identical to this one, i.e. has the same id.
-   * @param var variable to check
-   * @return {@code true} if the IDs are equal, {@code false} otherwise
-   */
-  public boolean is(final Var var) {
-    return id == var.id;
-  }
-
-  @Override
-  public int hashCode() {
-    return id;
-  }
-
-  /**
    * Tries to adopt the given type check.
    * @param st type to check
    * @param crc if function coercion should be applied
@@ -276,11 +262,6 @@ public final class Var extends ExprInfo {
     }
     coerce |= crc;
     return true;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof Var && is((Var) obj);
   }
 
   @Override

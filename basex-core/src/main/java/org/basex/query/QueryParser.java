@@ -1060,7 +1060,7 @@ public class QueryParser extends InputParser {
         VARS:
         for(final Var var : curr.values()) {
           for(final GroupSpec spec : specs) {
-            if(spec.var.is(var)) continue VARS;
+            if(spec.var == var) continue VARS;
           }
           ng.add(new VarRef(specs[0].info(), var));
         }
@@ -1309,7 +1309,7 @@ public class QueryParser extends InputParser {
           // check other grouping variables
           if(!dec && specs != null) {
             for(final GroupSpec spec : specs) {
-              if(spec.var.is(ref.var)) {
+              if(spec.var == ref.var) {
                 dec = true;
                 break;
               }

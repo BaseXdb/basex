@@ -162,7 +162,7 @@ public final class GFLWOR extends ParseExpr {
       //   for $_ allowing empty in () return $_  ->  ()
       final For fr = (For) first;
       if(cs == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof VarRef &&
-          ((VarRef) rtrn).var.is(fr.var)) return Empty.VALUE;
+          ((VarRef) rtrn).var == fr.var) return Empty.VALUE;
 
       // rewrite group by to distinct-values
       //   for $e in E group by $g := G return R
@@ -453,7 +453,7 @@ public final class GFLWOR extends ParseExpr {
   private Expr inline(final Expr inline, final Expr expr, final ForLet fl,
       final CompileContext cc) throws QueryException {
 
-    if(expr instanceof VarRef && ((VarRef) expr).var.is(fl.var)) {
+    if(expr instanceof VarRef && ((VarRef) expr).var == fl.var) {
       // replace return clause with expression
       //   for $c in (1, 2) return $c  ->  (1, 2)
       //   let $c := <a/> return $c  ->  <a/>
@@ -657,7 +657,7 @@ public final class GFLWOR extends ParseExpr {
             if(before instanceof ForLet) {
               final ForLet fl = (ForLet) before;
               final Predicate<Expr> varRef = expr ->
-                expr instanceof VarRef && ((VarRef) expr).var.is(fl.var);
+                expr instanceof VarRef && ((VarRef) expr).var == fl.var;
               final boolean let = before instanceof Let;
               if(let && before.seqType().instanceOf(SeqType.NODE_ZO) && varRef.test(where.expr)) {
                 // let $a := <a/>[text()] where $a  ->  for $a in <a/>[text()]
