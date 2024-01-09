@@ -48,6 +48,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: normalize-space. */
   public static final BooleanOption NORMALIZE_SPACE =
       new BooleanOption("normalize-space", false);
+  /** Option: ordered. */
+  public static final BooleanOption ORDERED =
+      new BooleanOption("ordered", false);
   /** Option: preserve-space. */
   public static final BooleanOption PRESERVE_SPACE =
       new BooleanOption("preserve-space", true);
@@ -72,9 +75,6 @@ public final class DeepEqualOptions extends Options {
   /** Option: unordered-elements. */
   public static final StringOption UNORDERED_ELEMENTS =
       new StringOption("unordered-elements", "");
-  /** Option: unordered-elements. */
-  public static final BooleanOption UNORDERED =
-      new BooleanOption("unordered", false);
 
   /** QNames. */
   private final QNmSet qnames = new QNmSet();

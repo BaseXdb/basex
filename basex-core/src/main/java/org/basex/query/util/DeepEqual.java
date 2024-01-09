@@ -91,7 +91,7 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Iter iter1, final Iter iter2) throws QueryException {
-    if(options.get(DeepEqualOptions.UNORDERED)) {
+    if(!options.get(DeepEqualOptions.ORDERED)) {
       final ItemList items2 = new ItemList();
       int size1 = 0, size2 = 0;
       OUTER:
