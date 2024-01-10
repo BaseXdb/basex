@@ -402,7 +402,8 @@ public class CmpG extends Cmp {
       type1.isNumber() && type2.isNumber() ||
       type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
       untyped && (type1.isUntyped() || type2.isUntyped()) ||
-      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION);
+      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION) ||
+      type1.instanceOf(AtomType.BINARY) && type2.instanceOf(AtomType.BINARY);
   }
 
   @Override
