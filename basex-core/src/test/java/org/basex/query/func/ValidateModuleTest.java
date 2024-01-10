@@ -192,6 +192,12 @@ public final class ValidateModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void xsdInit() {
+    final Function func = _VALIDATE_XSD_INIT;
+    assertTrue(query(func.args()).isEmpty());
+  }
+
+  /** Test method. */
   @Test public void xsdProcessor() {
     final Function func = _VALIDATE_XSD_PROCESSOR;
     assertFalse(query(func.args()).isEmpty());

@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.Map.*;
-import java.util.concurrent.*;
 
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
@@ -25,9 +24,6 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public class ValidateXsd extends ValidateFn {
-  /** Schema cache. */
-  private static final ConcurrentHashMap<String, Schema> MAP = new ConcurrentHashMap<>();
-
   /** Schema factory. */
   private static final String FACTORY = "http://www.w3.org/2001/XMLSchema";
   /** Saxon version URI. */

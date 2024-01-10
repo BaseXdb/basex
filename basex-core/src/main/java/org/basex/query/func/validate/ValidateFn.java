@@ -5,8 +5,10 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 import javax.xml.parsers.*;
+import javax.xml.validation.*;
 
 import org.basex.io.*;
 import org.basex.io.serial.*;
@@ -29,6 +31,9 @@ import org.xml.sax.*;
  * @author Marco Lettere (greedy/verbose validation)
  */
 abstract class ValidateFn extends StandardFunc {
+  /** Schema cache. */
+  static final ConcurrentHashMap<String, Schema> MAP = new ConcurrentHashMap<>();
+
   /** QName. */
   private static final QNm Q_REPORT = new QNm("report");
   /** QName. */

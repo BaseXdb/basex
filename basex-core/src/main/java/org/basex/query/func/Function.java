@@ -1881,6 +1881,9 @@ public enum Function implements AFunction {
   _VALIDATE_XSD_INFO(ValidateXsdInfo::new, "xsd-info(input[,schema,options])",
       params(ITEM_O, ITEM_O, MAP_ZO), STRING_ZM, flag(NDT), VALIDATE_URI, Perm.CREATE),
   /** XQuery function. */
+  _VALIDATE_XSD_INIT(ValidateXsdInit::new, "init()",
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), VALIDATE_URI, Perm.CREATE),
+  /** XQuery function. */
   _VALIDATE_XSD_PROCESSOR(ValidateXsdProcessor::new, "xsd-processor()",
       params(), STRING_O, VALIDATE_URI),
   /** XQuery function. */
@@ -1937,7 +1940,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _XSLT_INIT(XsltInit::new, "init()",
-      params(), NODE_O, flag(NDT), XSLT_URI, Perm.CREATE),
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), XSLT_URI, Perm.CREATE),
   /** XQuery function. */
   _XSLT_PROCESSOR(XsltProcessor::new, "processor()",
       params(), STRING_O, XSLT_URI),

@@ -14,6 +14,12 @@ import org.junit.jupiter.api.*;
  */
 public final class XsltModuleTest extends SandboxTest {
   /** Test method. */
+  @Test public void init() {
+    final Function func = _XSLT_INIT;
+    assertTrue(query(func.args()).isEmpty());
+  }
+
+  /** Test method. */
   @Test public void processor() {
     final Function func = _XSLT_PROCESSOR;
     assertFalse(query(func.args()).isEmpty());
