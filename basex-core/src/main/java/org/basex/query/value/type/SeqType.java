@@ -152,6 +152,8 @@ public final class SeqType {
   public static final SeqType DOCUMENT_NODE_ZM = DOCUMENT_NODE.seqType(ZERO_OR_MORE);
   /** One element node. */
   public static final SeqType ELEMENT_O = ELEMENT.seqType();
+  /** Zero or one element node. */
+  public static final SeqType ELEMENT_ZO = ELEMENT.seqType(ZERO_OR_ONE);
   /** Zero or more element nodes. */
   public static final SeqType ELEMENT_ZM = ELEMENT.seqType(ZERO_OR_MORE);
   /** Namespace node. */

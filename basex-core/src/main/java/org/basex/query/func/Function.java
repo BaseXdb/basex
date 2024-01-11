@@ -925,7 +925,7 @@ public enum Function implements AFunction {
       params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText::new, "extract-text(archive[,entries,encoding])",
-      params(BASE64_BINARY_O, ITEM_ZM, STRING_O), STRING_ZM, flag(NDT), ARCHIVE_URI),
+      params(BASE64_BINARY_O, ITEM_ZM, STRING_ZO), STRING_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TO(ArchiveExtractTo::new, "extract-to(path,archive[,entries])",
       params(STRING_O, BASE64_BINARY_O, ITEM_ZM),
@@ -951,10 +951,10 @@ public enum Function implements AFunction {
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_DECODE_STRING(BinDecodeString::new, "decode-string(binary[,encoding,offset,size])",
-      params(BASE64_BINARY_ZO, STRING_O, INTEGER_O, INTEGER_O), STRING_ZO, BIN_URI),
+      params(BASE64_BINARY_ZO, STRING_ZO, INTEGER_O, INTEGER_O), STRING_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_ENCODE_STRING(BinEncodeString::new, "encode-string(string[,encoding])",
-      params(STRING_ZO, STRING_O), BASE64_BINARY_ZO, BIN_URI),
+      params(STRING_ZO, STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_FIND(BinFind::new, "find(binary,offset,search)",
       params(BASE64_BINARY_ZO, INTEGER_O, BASE64_BINARY_ZO), INTEGER_ZO, BIN_URI),
@@ -1053,7 +1053,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _CONVERT_BINARY_TO_STRING(ConvertBinaryToString::new,
       "binary-to-string(value[,encoding,fallback])",
-      params(BINARY_O, STRING_O, BOOLEAN_O), STRING_O, CONVERT_URI),
+      params(BINARY_O, STRING_ZO, BOOLEAN_ZO), STRING_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_DATETIME_TO_INTEGER(ConvertDateTimeToInteger::new, "dateTime-to-integer(value)",
       params(DATE_TIME_O), INTEGER_O, CONVERT_URI),
@@ -1086,10 +1086,10 @@ public enum Function implements AFunction {
       params(INTEGER_ZM), HEX_BINARY_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_STRING_TO_BASE64(ConvertStringToBase64::new, "string-to-base64(value[,encoding])",
-      params(STRING_O, STRING_O), BASE64_BINARY_O, CONVERT_URI),
+      params(STRING_O, STRING_ZO), BASE64_BINARY_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_STRING_TO_HEX(ConvertStringToHex::new, "string-to-hex(value[,encoding])",
-      params(STRING_O, STRING_O), HEX_BINARY_O, CONVERT_URI),
+      params(STRING_O, STRING_ZO), HEX_BINARY_O, CONVERT_URI),
 
   // Cryptographic Module
 
@@ -1268,7 +1268,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_TEXT(FetchText::new, "text(href[,encoding,fallback])",
-      params(STRING_O, STRING_O, BOOLEAN_O), STRING_O, flag(NDT), FETCH_URI),
+      params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI),
 
   // File Module
 
@@ -1280,10 +1280,10 @@ public enum Function implements AFunction {
       params(STRING_O, BINARY_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_APPEND_TEXT(FileAppendText::new, "append-text(path,value[,encoding])",
-      params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_APPEND_TEXT_LINES(FileAppendTextLines::new, "append-text-lines(path,values[,encoding])",
-      params(STRING_O, STRING_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, STRING_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_BASE_DIR(FileBaseDir::new, "base-dir()",
       params(), STRING_O, flag(), FILE_URI, Perm.CREATE),
@@ -1358,11 +1358,11 @@ public enum Function implements AFunction {
       params(STRING_O, INTEGER_O, INTEGER_O), BASE64_BINARY_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_READ_TEXT(FileReadText::new, "read-text(path[,encoding,fallback])",
-      params(STRING_O, STRING_O, BOOLEAN_O), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_READ_TEXT_LINES(FileReadTextLines::new,
       "read-text-lines(path[,encoding,fallback,offset,length])",
-      params(STRING_O, STRING_O, BOOLEAN_O, INTEGER_O, INTEGER_O),
+      params(STRING_O, STRING_ZO, BOOLEAN_ZO, INTEGER_ZO, INTEGER_ZO),
       STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_RESOLVE_PATH(FileResolvePath::new, "resolve-path(path[,base])",
@@ -1381,10 +1381,10 @@ public enum Function implements AFunction {
       params(STRING_O, BINARY_O, INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_WRITE_TEXT(FileWriteText::new, "write-text(path,value[,encoding])",
-      params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_WRITE_TEXT_LINES(FileWriteTextLines::new, "write-text-lines(path,values[,encoding])",
-      params(STRING_O, STRING_ZM, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, STRING_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
 
   // Fulltext Module
 
@@ -1687,7 +1687,7 @@ public enum Function implements AFunction {
       params(INTEGER_O, STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.CREATE),
   /** XQuery function. */
   _SQL_EXECUTE_PREPARED(SqlExecutePrepared::new, "execute-prepared(id[,params,options])",
-      params(INTEGER_O, ELEMENT_O, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.CREATE),
+      params(INTEGER_O, ELEMENT_ZO, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.CREATE),
   /** XQuery function. */
   _SQL_INIT(SqlInit::new, "init(class)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
@@ -1900,7 +1900,7 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_O, WEB_URI),
   /** XQuery function. */
   _WEB_CREATE_URL(WebCreateUrl::new, "create-url(href[,params,anchor])",
-      params(STRING_O, MAP_O, STRING_O), STRING_O, WEB_URI),
+      params(STRING_O, MAP_ZO, STRING_ZO), STRING_O, WEB_URI),
   /** XQuery function. */
   _WEB_DECODE_URL(WebDecodeUrl::new, "decode-url(value)",
       params(STRING_O), STRING_O, WEB_URI),
@@ -1912,10 +1912,10 @@ public enum Function implements AFunction {
       params(INTEGER_O, STRING_O), ITEM_ZM, flag(NDT), WEB_URI),
   /** XQuery function. */
   _WEB_FORWARD(WebForward::new, "forward(href[,params])",
-      params(STRING_O, MAP_O), ELEMENT_O, WEB_URI),
+      params(STRING_O, MAP_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
   _WEB_REDIRECT(WebRedirect::new, "redirect(href[,params,anchor])",
-      params(STRING_O, MAP_O, STRING_O), ELEMENT_O, WEB_URI),
+      params(STRING_O, MAP_ZO, STRING_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
   _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header([output,headers,attributes])",
       params(MAP_ZO, MAP_ZO, MAP_ZO), ELEMENT_O, WEB_URI),
