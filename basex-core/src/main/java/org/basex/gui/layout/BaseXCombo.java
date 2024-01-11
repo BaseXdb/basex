@@ -249,7 +249,7 @@ public class BaseXCombo extends JComboBox<Object> {
     final String value = object.toString();
     if(isEditable()) {
       getEditor().setItem(value);
-      updateHistory();
+      if(!isFocusable()) updateHistory();
     } else {
       final ComboBoxModel<Object> model = getModel();
       final int ms = model.getSize();
