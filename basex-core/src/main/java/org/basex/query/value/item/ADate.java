@@ -511,4 +511,33 @@ public abstract class ADate extends ADateDur {
   public final void toString(final QueryString qs) {
     qs.quoted(string(null));
   }
+
+  /**
+   * Create a duplicate of this ADate.
+   * @return the duplicate
+   */
+  public ADate duplicate() {
+    final ADate date;
+    switch((AtomType) type) {
+      case DATE:
+        date = new Dat(this);
+        break;
+      case TIME:
+        date = new Tim(this);
+        break;
+      case DATE_TIME:
+        date = new Dtm(this);
+        break;
+      case G_DAY:
+      case G_MONTH:
+      case G_MONTH_DAY:
+      case G_YEAR:
+      case G_YEAR_MONTH:
+        date = new GDt(this, type);
+        break;
+      default:
+        throw new IllegalStateException("Unsupported type: " + type);
+    }
+    return date;
+  }
 }

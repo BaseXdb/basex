@@ -727,11 +727,35 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void formatDateTime() {
+    final Function func = FORMAT_DATETIME;
+
+    query(func.args(" xs:dateTime('2023-07-01T12:00:00Z')",
+        "[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]", " ()", " ()", "America/New_York"),
+        "2023-07-01T08:00:00-04:00");
+    query(func.args(" xs:dateTime('2023-07-01T12:00:00Z')",
+        "[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]", " ()", " ()", "Asia/Kolkata"),
+        "2023-07-01T17:30:00+05:30");
+  }
+
+  /** Test method. */
+  @Test public void formatTime() {
+    final Function func = FORMAT_TIME;
+
+    query(func.args(" xs:time('12:00:00Z')", "[H01]:[m01]:[s01][Z]", " ()", " ()",
+        "America/New_York"), "07:00:00-05:00");
+    query(func.args(" xs:time('12:00:00Z')", "[H01]:[m01]:[s01][Z]", " ()", " ()",
+        "Asia/Kolkata"), "17:30:00+05:30");
+  }
+
+  /** Test method. */
   @Test public void formatDate() {
     final Function func = FORMAT_DATE;
 
     query(func.args(" xs:date('2023-12-11')", "[Dwo] [MNn] ([FNn])", "zu"),
         "[Language: en]eleventh December (Monday)");
+    query(func.args(" xs:date('2024-01-12Z')", "[Y0001]-[M01]-[D01][Z]", " ()", " ()",
+        "America/New_York"), "2024-01-11-05:00");
 
     if(IcuFormatter.available()) {
       query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
