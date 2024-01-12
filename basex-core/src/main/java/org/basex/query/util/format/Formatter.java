@@ -44,32 +44,33 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Returns a formatter for the specified language.
-   * @param language language
+   * @param languageTag language tag
    * @return formatter instance
    */
-  public static Formatter get(final byte[] language) {
-    if(IcuFormatter.available()) return IcuFormatter.get(language);
-    final Formatter form = getInternal(language);
+  public static Formatter get(final byte[] languageTag) {
+    if(IcuFormatter.available()) return IcuFormatter.get(languageTag);
+    final Formatter form = getInternal(languageTag);
     return form != null ? form : getInternal(EN);
   }
 
   /**
    * Returns an internal formatter for the specified language.
-   * @param language language
+   * @param languageTag language tag
    * @return formatter instance, or {@code null} if not implemented
    */
-   protected static Formatter getInternal(final byte[] language) {
-    return MAP.get(language);
+  protected static Formatter getInternal(final byte[] languageTag) {
+    final int i = indexOf(languageTag, '-');
+    return i < 0 ? MAP.get(languageTag) : MAP.get(substring(languageTag, 0, i));
   }
 
   /**
    * Checks whether a formatter is available for the specified language.
-   * @param language language
+   * @param languageTag language tag
    * @return true if the language is supported
    */
-  public static boolean available(final byte[] language) {
-    if(IcuFormatter.available()) return IcuFormatter.available(language);
-    return getInternal(language) != null;
+  public static boolean available(final byte[] languageTag) {
+    if(IcuFormatter.available()) return IcuFormatter.available(languageTag);
+    return getInternal(languageTag) != null;
   }
 
   /**
@@ -130,7 +131,7 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Formats the specified date.
    * @param date date to be formatted
-   * @param language language
+   * @param languageTag language tag
    * @param picture picture
    * @param calendar calendar (can be {@code null})
    * @param place place
@@ -139,12 +140,12 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final ADate date, final byte[] language, final byte[] picture,
+  public final byte[] formatDate(final ADate date, final byte[] languageTag, final byte[] picture,
       final byte[] calendar, final byte[] place, final StaticContext sc, final InputInfo info)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    if(language.length != 0 && !available(language)) tb.add("[Language: en]");
+    if(languageTag.length != 0 && !available(languageTag)) tb.add("[Language: en]");
     if(calendar != null) {
       final QNm qnm;
       try {

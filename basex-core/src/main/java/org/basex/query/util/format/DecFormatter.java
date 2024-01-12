@@ -132,12 +132,12 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Returns a decimal formatter for the given language.
-   * @param language language
+   * @param languageTag language tag
    * @return a decimal formatter, or {@code null} if the language is not supported
    * @throws QueryException query exception
    */
-  public static DecFormatter forLanguage(final byte[] language) throws QueryException {
-    final String l = string(language);
+  public static DecFormatter forLanguage(final byte[] languageTag) throws QueryException {
+    final String l = string(languageTag);
     final DecFormatOptions dfo = IcuFormatter.available() ? IcuFormatter.decFormat(l) :
       decFormatSymbols(l);
     return dfo != null ? new DecFormatter(dfo, null) : null;
@@ -145,12 +145,12 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Returns a decimal format symbols for the given language.
-   * @param language language
+   * @param languageTag language tag
    * @return format symbols, or {@code null} if the language is not supported
    */
-  private static DecFormatOptions decFormatSymbols(final String language) {
+  private static DecFormatOptions decFormatSymbols(final String languageTag) {
     for(final Locale locale : DecimalFormatSymbols.getAvailableLocales()) {
-      if(locale.toString().equals(language)) {
+      if(locale.toLanguageTag().equals(languageTag)) {
         final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
         final DecFormatOptions dfo = new DecFormatOptions();
         dfo.put(DecFormatOptions.DECIMAL_SEPARATOR, String.valueOf(dfs.getDecimalSeparator()));

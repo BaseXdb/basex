@@ -736,6 +736,13 @@ public final class FnModuleTest extends SandboxTest {
     if(IcuFormatter.available()) {
       query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
           "Dydd Llun, Rhagfyr 11, 2023");
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es"), "septiembre");
+      // different wording for country
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-PE"), "setiembre");
+      // fallback to base language
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-CZ"), "septiembre");
+      // fallback to default language
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "zu-DE"), "[Language: en]September");
     }
   }
 
@@ -759,6 +766,13 @@ public final class FnModuleTest extends SandboxTest {
       query(func.args(1, "Ww;c", "de"), "Ein");
       query(func.args(1, "Ww;o(%spellout-cardinal-feminine-financial)", "bs"), "Jedinica");
       query(func.args(1, "Ww;c(%spellout-ordinal-neuter)", "es"), "Primera");
+      query(func.args(99, "w", "fr"), "quatre-vingt-dix-neuf");
+      // different wording for country
+      query(func.args(99, "w", "fr-CH"), "nonante-neuf");
+      // fallback to language code
+      query(func.args(99, "w", "fr-PL"), "quatre-vingt-dix-neuf");
+      // fallback to default language
+      query(func.args(99, "w", "zu-DE"), "ninety-nine");
     }
   }
 
@@ -769,10 +783,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " ()", " map { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), "12.345,67");
-    query(func.args(" 12345.67", "#\u2019##0.00", "de_CH"), "12\u2019345.67");
+    query(func.args(" 12345.67", "#\u2019##0.00", "de-CH"), "12\u2019345.67");
 
     error(func.args(" 12345.67", "#.##0,00", "de", " map { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), FORMDUP_X);
+    error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMNUM_X);
   }
 
   /** Test method. */

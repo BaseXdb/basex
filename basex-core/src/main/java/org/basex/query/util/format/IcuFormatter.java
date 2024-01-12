@@ -89,51 +89,53 @@ public final class IcuFormatter extends Formatter {
 
   /**
    * Returns a cached formatter instance for the specified language.
-   * @param language language
+   * @param languageTag language tag
    * @return formatter instance
    */
-  public static IcuFormatter get(final byte[] language) {
+  public static IcuFormatter get(final byte[] languageTag) {
     final TokenObjMap<IcuFormatter> map = MAP.get();
     final IcuFormatter form;
-    if(map.contains(language)) {
-      form = map.get(language);
+    if(map.contains(languageTag)) {
+      form = map.get(languageTag);
     } else {
-      form = forLanguage(language);
+      form = forLanguage(languageTag);
       // put null values as well, in order to avoid recalculation
-      map.put(language, form);
+      map.put(languageTag, form);
     }
     return form != null ? form : get(EN);
   }
 
   /**
    * Constructs a formatter for the specified language, if available.
-   * @param language language
+   * @param languageTag language tag
    * @return formatter instance, or {@code null} if not available
    */
-  private static IcuFormatter forLanguage(final byte[] language) {
-    final String lang = string(language);
+  private static IcuFormatter forLanguage(final byte[] languageTag) {
+    final String tag = string(languageTag);
+    if(tag.isBlank()) return null;
+    final ULocale l = ULocale.forLanguageTag(tag);
+    final String lang = l.getLanguage();
     if(lang.isBlank()) return null;
-    final Locale l = Locale.forLanguageTag(lang);
     final RuleBasedNumberFormat s = new RuleBasedNumberFormat(l, RuleBasedNumberFormat.SPELLOUT);
     final RuleBasedNumberFormat o = new RuleBasedNumberFormat(l, RuleBasedNumberFormat.ORDINAL);
     final DateFormatSymbols d = new DateFormatSymbols(l);
     return s.getLocale(ULocale.ACTUAL_LOCALE).getLanguage().equals(lang) &&
            o.getLocale(ULocale.ACTUAL_LOCALE).getLanguage().equals(lang) &&
            d.getLocale(ULocale.ACTUAL_LOCALE).getLanguage().equals(lang)
-        ? new IcuFormatter(s, o, d, getInternal(language))
+        ? new IcuFormatter(s, o, d, getInternal(languageTag))
         : null;
   }
 
   /**
    * Checks whether a formatter is available for the specified language.
-   * @param language language
+   * @param languageTag language tag
    * @return true if the language is supported
    */
-  public static boolean available(final byte[] language) {
+  public static boolean available(final byte[] languageTag) {
     // instantiate a formatter, if available
-    get(language);
+    get(languageTag);
     // check map using get rather than contains, as map contains null values
-    return MAP.get().get(language) != null;
+    return MAP.get().get(languageTag) != null;
   }
 
   /**
@@ -291,27 +293,26 @@ public final class IcuFormatter extends Formatter {
 
   /**
    * Returns decimal-format properties for the given language.
-   * @param language language
+   * @param languageTag language tag
    * @return properties, or {@code null} if the language is not supported
    */
-  static DecFormatOptions decFormat(final String language) {
-    for(final ULocale locale : DecimalFormatSymbols.getAvailableULocales()) {
-      if(locale.toString().equals(language)) {
-        final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
-        final DecFormatOptions dfo = new DecFormatOptions();
-        dfo.put(DecFormatOptions.DECIMAL_SEPARATOR, dfs.getDecimalSeparatorString());
-        dfo.put(DecFormatOptions.DIGIT, String.valueOf(dfs.getDigit()));
-        dfo.put(DecFormatOptions.GROUPING_SEPARATOR, dfs.getGroupingSeparatorString());
-        dfo.put(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator());
-        dfo.put(DecFormatOptions.INFINITY, dfs.getInfinity());
-        dfo.put(DecFormatOptions.MINUS_SIGN, dfs.getMinusSignString());
-        dfo.put(DecFormatOptions.NAN, dfs.getNaN());
-        dfo.put(DecFormatOptions.PATTERN_SEPARATOR, String.valueOf(dfs.getPatternSeparator()));
-        dfo.put(DecFormatOptions.PERCENT, dfs.getPercentString());
-        dfo.put(DecFormatOptions.PER_MILLE, dfs.getPerMillString());
-        dfo.put(DecFormatOptions.ZERO_DIGIT, String.valueOf(dfs.getZeroDigit()));
-        return dfo;
-      }
+  static DecFormatOptions decFormat(final String languageTag) {
+    final ULocale locale = ULocale.forLanguageTag(languageTag);
+    final DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance(locale);
+    if(dfs.getLocale(ULocale.ACTUAL_LOCALE).toLanguageTag().equals(languageTag)) {
+      final DecFormatOptions dfo = new DecFormatOptions();
+      dfo.put(DecFormatOptions.DECIMAL_SEPARATOR, dfs.getDecimalSeparatorString());
+      dfo.put(DecFormatOptions.DIGIT, String.valueOf(dfs.getDigit()));
+      dfo.put(DecFormatOptions.GROUPING_SEPARATOR, dfs.getGroupingSeparatorString());
+      dfo.put(DecFormatOptions.EXPONENT_SEPARATOR, dfs.getExponentSeparator());
+      dfo.put(DecFormatOptions.INFINITY, dfs.getInfinity());
+      dfo.put(DecFormatOptions.MINUS_SIGN, dfs.getMinusSignString());
+      dfo.put(DecFormatOptions.NAN, dfs.getNaN());
+      dfo.put(DecFormatOptions.PATTERN_SEPARATOR, String.valueOf(dfs.getPatternSeparator()));
+      dfo.put(DecFormatOptions.PERCENT, dfs.getPercentString());
+      dfo.put(DecFormatOptions.PER_MILLE, dfs.getPerMillString());
+      dfo.put(DecFormatOptions.ZERO_DIGIT, String.valueOf(dfs.getZeroDigit()));
+      return dfo;
     }
     return null;
   }
