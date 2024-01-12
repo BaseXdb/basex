@@ -100,7 +100,9 @@ public final class HTTPConnection implements ClientInfo {
     context.user(user);
 
     // generate log entry
-    final StringBuilder uri = new StringBuilder(request.getRequestURI());
+    final StringBuilder uri = new StringBuilder();
+    final String qu = request.getRequestURI();
+    if(qu != null) uri.append(qu);
     final String qs = request.getQueryString();
     if(qs != null) uri.append('?').append(qs);
     context.log.write(LogType.REQUEST, '[' + method + "] " + uri, null, context);
