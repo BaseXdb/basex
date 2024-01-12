@@ -100,9 +100,7 @@ public final class HTTPConnection implements ClientInfo {
     context.user(user);
 
     // generate log entry
-    final StringBuilder uri = new StringBuilder();
-    final String qu = request.getRequestURI();
-    if(qu != null) uri.append(qu);
+    final StringBuilder uri = new StringBuilder(uri());
     final String qs = request.getQueryString();
     if(qs != null) uri.append('?').append(qs);
     context.log.write(LogType.REQUEST, '[' + method + "] " + uri, null, context);
@@ -226,10 +224,19 @@ public final class HTTPConnection implements ClientInfo {
   public String resolve(final String location) {
     String loc = location;
     if(Strings.startsWith(location, '/')) {
-      final String uri = request.getRequestURI(), info = request.getPathInfo();
+      final String uri = uri(), info = request.getPathInfo();
       loc = (info == null ? uri : uri.substring(0, uri.length() - info.length())) + location;
     }
     return loc;
+  }
+
+  /**
+   * Returns the request URI.
+   * @return request URI
+   */
+  public String uri() {
+    final String uri = request.getRequestURI();
+    return uri != null ? uri : null;
   }
 
   /**
