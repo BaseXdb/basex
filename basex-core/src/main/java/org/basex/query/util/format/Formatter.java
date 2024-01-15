@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
+import java.time.*;
+import java.time.zone.*;
 import java.util.*;
 
 import org.basex.query.*;
@@ -130,7 +132,7 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Formats the specified date.
-   * @param date date to be formatted
+   * @param dt date to be formatted
    * @param languageTag language tag
    * @param picture picture
    * @param calendar calendar (can be {@code null})
@@ -140,7 +142,7 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final ADate date, final byte[] languageTag, final byte[] picture,
+  public final byte[] formatDate(final ADate dt, final byte[] languageTag, final byte[] picture,
       final byte[] calendar, final byte[] place, final StaticContext sc, final InputInfo info)
       throws QueryException {
 
@@ -163,7 +165,18 @@ public abstract class Formatter extends FormatUtil {
         if(c > 1) tb.add("[Calendar: AD]");
       }
     }
-    if(place.length != 0) tb.add("[Place: ]");
+    ADate date = dt;
+    if(contains(place, '/')) { // IANA time zone name
+      try {
+        final ZoneRules rules = ZoneId.of(string(place)).getRules();
+        final ZoneOffset offset = dt.type == AtomType.TIME
+            ? rules.getStandardOffset(Instant.now())
+            : rules.getOffset(dt.toJava().toGregorianCalendar().toInstant());
+        date = dt.duplicate();
+        date.timeZone(DTDur.get(offset.getTotalSeconds() * 1000), false, info);
+      } catch (@SuppressWarnings("unused") ZoneRulesException e) { // not a supported IANA time zone
+      }
+    }
 
     final DateParser dp = new DateParser(info, picture);
     while(dp.more()) {
