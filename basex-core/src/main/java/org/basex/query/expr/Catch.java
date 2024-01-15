@@ -148,7 +148,7 @@ public final class Catch extends Single {
       qe.file() != null ? Str.get(qe.file()) : Empty.VALUE,
       qe.line() != 0 ? Int.get(qe.line()) : Empty.VALUE,
       qe.column() != 0 ? Int.get(qe.column()) : Empty.VALUE,
-      Empty.VALUE,
+      StrSeq.get(qe.stack()),
       null
     };
     // assign map as last value

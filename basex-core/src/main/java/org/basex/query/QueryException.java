@@ -237,6 +237,17 @@ public class QueryException extends Exception {
   }
 
   /**
+   * Returns a stack trace.
+   * @return stack trace
+   */
+  public byte[][] stack() {
+    final TokenList list = new TokenList();
+    if(info != null) list.add(info.toString());
+    for(final InputInfo ii : stack) list.add(ii.toString());
+    return list.finish();
+  }
+
+  /**
    * Checks if this exception can be caught by a {@code try/catch} expression.
    * @return result of check
    */
