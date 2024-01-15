@@ -1808,7 +1808,10 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Rewritings of positional tests. */
   @Test public void gh1898() {
-    check("for $a in (1, 2) return $a[$a[.]]", 1, root(GFLWOR.class));
+    // argument of items-at can be a sequence of numbers
+    check("for $a in (1, 2) return $a[$a[.]]", 1, root(DualMap.class));
+    check("for $a in (1, 2) return $a[$a[.]]", 1, root(DualMap.class));
+    check("for $a in (2, 3) return $a[$a[.]]", "", root(DualMap.class));
   }
 
   /** Inline filter expressions. */

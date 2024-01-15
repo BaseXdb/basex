@@ -354,7 +354,7 @@ public enum Function implements AFunction {
   IS_NAN(FnIsNaN::new, "is-NaN(value)", params(ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
   ITEMS_AT(FnItemsAt::new, "items-at(input,at)",
-      params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
+      params(ITEM_ZM, NUMERIC_ZM), ITEM_ZM),
   /** XQuery function. */
   ITERATE_WHILE(FnIterateWhile::new, "iterate-while(input,predicate,action)",
       params(ITEM_ZM, PREDICATE_ZM,

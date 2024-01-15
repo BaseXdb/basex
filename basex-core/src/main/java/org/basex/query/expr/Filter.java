@@ -170,17 +170,9 @@ public abstract class Filter extends Preds {
         // E[last() - 1]  ->  items-at(E, size - 1)
         if(es != -1) ex = cc.function(ITEMS_AT, info, prepare.apply(expr),
             new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));
-      } else if(pred.isSimple()) {
+      } else if(pred.isSimple() && pred.seqType().instanceOf(SeqType.NUMERIC_ZO)) {
         // E[pos]  ->  items-at(E, pos)
-        Expr at = null;
-        if(pred.seqType().instanceOf(SeqType.INTEGER_O)) {
-          at = pred;
-        } else if(pred instanceof ANum) {
-          final ANum num = (ANum) pred;
-          final long p = num.itr();
-          if(p == num.dbl()) at = Int.get(p);
-        }
-        if(at != null) ex = cc.function(ITEMS_AT, info, prepare.apply(expr), at);
+        ex = cc.function(ITEMS_AT, info, prepare.apply(expr), pred);
       }
       // replace temporary result expression or add predicate to temporary list
       if(ex != null) {

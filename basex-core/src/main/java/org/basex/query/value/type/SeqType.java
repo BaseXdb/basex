@@ -43,10 +43,12 @@ public final class SeqType {
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType ANY_ATOMIC_TYPE_ZM = ANY_ATOMIC_TYPE.seqType(ZERO_OR_MORE);
 
-  /** Zero or one xs:numeric. */
+  /** Numeric. */
   public static final SeqType NUMERIC_O = NUMERIC.seqType();
-  /** Zero or one xs:numeric. */
+  /** Zero or one numeric. */
   public static final SeqType NUMERIC_ZO = NUMERIC.seqType(ZERO_OR_ONE);
+  /** Zero or more numerics. */
+  public static final SeqType NUMERIC_ZM = NUMERIC.seqType(ZERO_OR_MORE);
   /** Double number. */
   public static final SeqType DOUBLE_O = DOUBLE.seqType();
   /** Zero or one double. */
