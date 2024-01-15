@@ -172,9 +172,10 @@ public abstract class Formatter extends FormatUtil {
         final ZoneOffset offset = dt.type == AtomType.TIME
             ? rules.getStandardOffset(Instant.now())
             : rules.getOffset(dt.toJava().toGregorianCalendar().toInstant());
-        date = dt.duplicate();
-        date.timeZone(DTDur.get(offset.getTotalSeconds() * 1000), false, info);
-      } catch (@SuppressWarnings("unused") ZoneRulesException e) { // not a supported IANA time zone
+        date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000), false, info);
+      } catch(final ZoneRulesException ex) {
+        // not a supported IANA time zone
+        Util.debug(ex);
       }
     }
 

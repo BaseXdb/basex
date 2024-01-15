@@ -96,7 +96,7 @@ public final class GDt extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo info) {
+  public GDt timeZone(final DTDur dur, final boolean undefined, final InputInfo info) {
     throw Util.notExpected();
   }
 

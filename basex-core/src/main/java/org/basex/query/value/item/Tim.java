@@ -47,10 +47,12 @@ public final class Tim extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
+  public Tim timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
-    super.timeZone(dur, undefined, info);
-    clean();
+    final Tim tim = new Tim(this);
+    tim.tz(dur, undefined, info);
+    tim.clean();
+    return tim;
   }
 
   /**

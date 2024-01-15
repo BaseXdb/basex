@@ -237,13 +237,24 @@ public abstract class ADate extends ADateDur {
   }
 
   /**
+   * Creates a new item with an adjusted timezone.
+   * @param dur duration to add to the timezone (if {@code null}, assign implicit timezone)
+   * @param undefined invalidate timezone
+   * @param info input info (can be {@code null})
+   * @return new item
+   * @throws QueryException query exception
+   */
+  public abstract ADate timeZone(DTDur dur, boolean undefined, InputInfo info)
+      throws QueryException;
+
+  /**
    * Adjusts the timezone.
    * @param dur duration to add to the timezone (if {@code null}, assign implicit timezone)
    * @param undefined invalidate timezone
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
+  protected void tz(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
     final short t;
     if(undefined) {
@@ -510,34 +521,5 @@ public abstract class ADate extends ADateDur {
   @Override
   public final void toString(final QueryString qs) {
     qs.quoted(string(null));
-  }
-
-  /**
-   * Create a duplicate of this ADate.
-   * @return the duplicate
-   */
-  public ADate duplicate() {
-    final ADate date;
-    switch((AtomType) type) {
-      case DATE:
-        date = new Dat(this);
-        break;
-      case TIME:
-        date = new Tim(this);
-        break;
-      case DATE_TIME:
-        date = new Dtm(this);
-        break;
-      case G_DAY:
-      case G_MONTH:
-      case G_MONTH_DAY:
-      case G_YEAR:
-      case G_YEAR_MONTH:
-        date = new GDt(this, type);
-        break;
-      default:
-        throw new IllegalStateException("Unsupported type: " + type);
-    }
-    return date;
   }
 }

@@ -84,6 +84,14 @@ public final class Dtm extends ADate {
     }
   }
 
+  @Override
+  public Dtm timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
+      throws QueryException {
+    final Dtm dtm = new Dtm(this);
+    dtm.tz(dur, undefined, info);
+    return dtm;
+  }
+
   /**
    * Returns a dateTime item for the specified milliseconds.
    * @param ms milliseconds since January 1, 1970, 00:00:00 GMT

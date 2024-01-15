@@ -56,10 +56,12 @@ public final class Dat extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
+  public Dat timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
-    super.timeZone(dur, undefined, info);
-    clean();
+    final Dat dat = new Dat(this);
+    dat.tz(dur, undefined, info);
+    dat.clean();
+    return dat;
   }
 
   /**

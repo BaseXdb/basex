@@ -1,4 +1,4 @@
-package org.basex.query.value.item;
+ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
