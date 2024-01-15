@@ -532,7 +532,7 @@ public final class TableDiskAccess extends TableAccess {
         file.readFully(buffer.data);
       }
     } catch(final IOException ex) {
-      Util.stack(ex);
+      throw new RuntimeException(Util.info(ex));
     }
   }
 

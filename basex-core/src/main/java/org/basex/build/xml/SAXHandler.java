@@ -96,7 +96,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       nsp.reset();
       ++nodes;
     } catch(final IOException ex) {
-      error(ex);
+      throw error(ex);
     }
   }
 
@@ -108,7 +108,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       builder.closeElem();
       strips.pop();
     } catch(final IOException ex) {
-      error(ex);
+      throw error(ex);
     }
   }
 
@@ -124,7 +124,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       finishText();
       builder.pi(token(name + ' ' + content));
     } catch(final IOException ex) {
-      error(ex);
+      throw error(ex);
     }
   }
 
@@ -135,7 +135,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       finishText();
       builder.comment(token(new String(chars, start, length)));
     } catch(final IOException ex) {
-      error(ex);
+      throw error(ex);
     }
   }
 
@@ -154,12 +154,12 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   /**
    * Creates and throws a SAX exception for the specified exception.
    * @param ex exception
-   * @throws SAXException SAX exception
+   * @return SAX exception
    */
-  protected static void error(final IOException ex) throws SAXException {
+  protected static SAXException error(final IOException ex) {
     final SAXException ioe = new SAXException(Util.message(ex));
     ioe.setStackTrace(ex.getStackTrace());
-    throw ioe;
+    return ioe;
   }
 
   // EntityResolver

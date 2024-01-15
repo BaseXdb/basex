@@ -204,7 +204,7 @@ public final class BXXMLResource implements XMLResource {
       try {
         resource.content = new DBNode(((MemBuilder) builder).data()).serialize().finish();
       } catch(final QueryIOException ex) {
-        error(new BaseXException(ex));
+        throw error(new BaseXException(ex));
       }
     }
   }
