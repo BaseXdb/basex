@@ -25,8 +25,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 abstract class Ids extends ContextFn {
-  /** Hash map for data references and id flags. */
-  private final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
+  /** Map for data references and id flags. */
+  private final Map<Data, Boolean> indexed = Collections.synchronizedMap(new IdentityHashMap<>());
 
   /**
    * Returns referenced nodes.
@@ -75,10 +75,8 @@ abstract class Ids extends ContextFn {
     final Data data = root.data();
     if(data == null || (idref ? !data.meta.tokenindex : !data.meta.attrindex)) return false;
     // check if index names contain id attributes
-    synchronized(indexed) {
-      return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
-          containsIds(idref));
-    }
+    return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
+        containsIds(idref));
   }
 
   /**
@@ -116,7 +114,9 @@ abstract class Ids extends ContextFn {
   private TokenSet ids(final Iter iter, final QueryContext qc) throws QueryException {
     final TokenSet ts = new TokenSet();
     for(Item ids; (ids = qc.next(iter)) != null;) {
-      for(final byte[] id : distinctTokens(toToken(ids))) ts.put(id);
+      for(final byte[] id : distinctTokens(toToken(ids))) {
+        if(XMLToken.isNCName(id)) ts.put(id);
+      }
     }
     return ts;
   }

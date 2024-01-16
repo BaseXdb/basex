@@ -752,7 +752,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Returns an item if it is not empty.
    * @param item item
-   * @param type expected type
+   * @param type expected type (required for reporting errors)
    * @return specified item
    * @throws QueryException query exception
    */
