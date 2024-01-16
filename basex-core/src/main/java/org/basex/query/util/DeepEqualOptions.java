@@ -50,7 +50,7 @@ public final class DeepEqualOptions extends Options {
       new BooleanOption("normalize-space", false);
   /** Option: ordered. */
   public static final BooleanOption ORDERED =
-      new BooleanOption("ordered", false);
+      new BooleanOption("ordered", true);
   /** Option: preserve-space. */
   public static final BooleanOption PRESERVE_SPACE =
       new BooleanOption("preserve-space", true);
