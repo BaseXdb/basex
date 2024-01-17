@@ -42,7 +42,7 @@ declare function html:wrap(
 ) as element(html) {
   let $header := head($options?header) ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
-  return <html xml:space='preserve'>
+  return <html>
     <head>
       <meta charset='utf-8'/>
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
