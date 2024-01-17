@@ -31,6 +31,7 @@ declare
   %rest:query-param('binary', '{$binary}')
   %rest:query-param('error',  '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-put(
   $name    as xs:string,
   $opts    as xs:string*,

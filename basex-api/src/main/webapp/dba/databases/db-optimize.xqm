@@ -31,6 +31,7 @@ declare
   %rest:query-param('lang',  '{$lang}', 'en')
   %rest:query-param('error', '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-optimize(
   $name   as xs:string,
   $all    as xs:string?,

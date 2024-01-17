@@ -48,6 +48,7 @@ declare
   %rest:query-param('_error', '{$error}')
   %rest:query-param('_page',  '{$page}')
   %output:method('html')
+  %output:html-version('5')
   %perm:allow('public')
 function dba:login(
   $name   as xs:string?,

@@ -27,6 +27,7 @@ declare
   %rest:query-param('resource', '{$resource}')
   %rest:query-param('error',    '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-replace(
   $name      as xs:string,
   $resource  as xs:string,

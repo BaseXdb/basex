@@ -23,6 +23,7 @@ declare
   %rest:path('/dba/backup-create')
   %rest:query-param('name', '{$name}', '')
   %output:method('html')
+  %output:html-version('5')
 function dba:backup-create(
   $name  as xs:string
 ) as element(html) {

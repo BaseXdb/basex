@@ -23,6 +23,7 @@ declare
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
+  %output:html-version('5')
 function dba:settings(
   $error  as xs:string?,
   $info   as xs:string?

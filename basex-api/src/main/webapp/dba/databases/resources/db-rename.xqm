@@ -29,6 +29,7 @@ declare
   %rest:query-param('target',   '{$target}')
   %rest:query-param('error',    '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-rename(
   $name      as xs:string,
   $resource  as xs:string,

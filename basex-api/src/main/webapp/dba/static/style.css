@@ -2,11 +2,11 @@ body {
   font-family: Calibri, Helvetica, sans-serif;
   font-size: 16px;
   overflow-y: scroll;
-  margin: .5em 1em 1em 1em;
+  margin: .5rem 1rem 1rem 1rem;
 }
 
 p {
-  margin: 0 0 .6em 0;
+  margin: 0 0 .6rem 0;
 }
 
 h1 {
@@ -18,13 +18,13 @@ h1 {
 h2 {
   font-size: 150%;
   color: #C33;
-  margin: 0 0 0.2em 0;
+  margin: 0 0 .2rem 0;
 }
 
 h3 {
   font-size: 120%;
   color: #666;
-  margin: 0.2em 0 0.2em 0;
+  margin: .2rem 0 .2rem 0;
 }
 
 table {
@@ -34,17 +34,17 @@ table {
 th {
   vertical-align: top;
   text-align: left;
-  padding: 0 1em 0em 0;
+  padding: 0 1rem 0rem 0;
 }
 
 td {
   vertical-align: top;
-  padding: 0 1em 0 0;
+  padding: 0 1rem 0 0;
   border: 0;
 }
 
 ol, ul, dd {
-  padding-left: 1.2em;
+  padding-left: 1.2rem;
   margin-left: 0;
 }
 
@@ -53,7 +53,7 @@ dl {
 }
 
 dt {
-  margin: 0.6em 0 0.6em 0;
+  margin: .6rem 0 .6rem 0;
   font-weight: bold;
 }
 
@@ -87,8 +87,8 @@ pre {
   border-style: solid;
   border-radius: 3px;
   background-color: #F8F8F8;
-  padding: .5em;
-  margin: .2em 0 .5em 0;
+  padding: .5rem;
+  margin: .2rem 0 .5rem 0;
 }
 
 textarea {
@@ -115,7 +115,7 @@ input[type=submit], button {
 }
 
 input[type=text], input[type=password], input[type=number], select {
-  width: 240;
+  width: 240px;
 }
 
 input:focus, select:focus, button:focus {

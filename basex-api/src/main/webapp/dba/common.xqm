@@ -48,6 +48,7 @@ function dba:file(
 declare
   %rest:path('/dba/{$path}')
   %output:method('html')
+  %output:html-version('5')
 function dba:unknown(
   $path  as xs:string
 ) as element(html) {

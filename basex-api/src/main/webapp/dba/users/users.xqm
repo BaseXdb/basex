@@ -25,6 +25,7 @@ declare
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
+  %output:html-version('5')
 function dba:users(
   $sort   as xs:string,
   $error  as xs:string?,

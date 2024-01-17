@@ -28,6 +28,7 @@ declare
   %rest:query-param('perm',  '{$perm}', 'none')
   %rest:query-param('error', '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:user-create(
   $name   as xs:string?,
   $pw     as xs:string?,

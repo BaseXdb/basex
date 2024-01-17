@@ -25,6 +25,7 @@ declare
   %rest:query-param('info',  '{$info}')
   %rest:query-param('file',  '{$file}')
   %output:method('html')
+  %output:html-version('5')
 function dba:queries(
   $error  as xs:string?,
   $info   as xs:string?,
