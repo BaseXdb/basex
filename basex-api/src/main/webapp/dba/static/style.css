@@ -115,7 +115,7 @@ input[type=submit], button {
 }
 
 input[type=text], input[type=password], input[type=number], select {
-  width: 240px;
+  width: 200px;
 }
 
 input:focus, select:focus, button:focus {

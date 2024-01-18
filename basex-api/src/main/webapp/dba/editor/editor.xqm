@@ -38,49 +38,40 @@ function dba:editor(
       'scripts': ('editor.js', 'codemirror/lib/codemirror.js',
                   'codemirror/mode/xquery/xquery.js', 'codemirror/mode/xml/xml.js')
     },
-    <tr>
-      <td width='50%'>
-        <select id='mode' style='width:revert'>{
-          for $mode in ('Read-Only', 'Updating')
-          return element option { $mode }
-        }</select>{ ' ' }
-        <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>{ ' ' }
-        <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
-        <div class='right'>
-        </div>
-        <h2 class='right'>Editor</h2>
-        <textarea id='editor' name='editor'/>
-        <table width='100%'>
-          <form autocomplete='off' action='javascript:void(0);'>
-            <tr>
-              <td class='slick'>
-                <div align='right'>
-                  <input type='text' id='file' name='file' placeholder='Name of file'
-                         list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
-                  <datalist id='files'>{
-                    for $file in config:files()
-                    return element option { $file }
-                  }</datalist>{ ' ' }
-                  <button type='submit' name='open' id='open' disabled=''
-                          onclick='openFile()'>Open</button>{ ' ' }
-                  <button name='save' id='save' disabled=''
-                          onclick='saveFile()'>Save</button>{ ' ' }
-                  <button name='close' id='close' disabled=''
-                          onclick='closeFile()'>Close</button>
-                </div>
-              </td>
-            </tr>
-          </form>
-        </table>
-        { html:focus('editor') }
-      </td>
-      <td width='50%'>{
-        <h2 class='right'>Result</h2>,
-        <textarea name='output' id='output' readonly=''/>,
-        html:js('loadCodeMirror("xquery", true, true);'),
-        for $name in head(($file, config:file())[.])
-        return html:js('openFile("' || $name || '");')
-      }</td>
-    </tr>
+    (
+      <tr>
+        <td colspan='2'>
+          <form autocomplete='off' action='javascript:void(0);'>{
+            <datalist id='files'>{ config:files() ! element option { . } }</datalist>,
+            intersperse((
+              <input type='text' id='file' name='file' placeholder='Name of file'
+                     list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
+              <button type='submit' name='open' id='open' disabled='' onclick='openFile()'>Open</button>,
+              <button name='save' id='save' disabled='' onclick='saveFile()'>Save</button>,
+              <button name='close' id='close' disabled='' onclick='closeFile()'>Close</button>,
+              <span>  </span>,
+              <select id='mode' style='width:revert'>{
+                ('Read-Only', 'Updating') ! element option { . }
+              }</select>,
+              <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
+              <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
+            ), <span> </span>),
+            <h2 class='right'>Result</h2>
+          }</form>
+        </td>
+      </tr>,
+      <tr>
+        <td width='50%'>
+          <textarea id='editor' name='editor'/>
+          { html:focus('editor') }
+        </td>
+        <td width='50%'>{
+          <textarea name='output' id='output' readonly=''/>,
+          html:js('loadCodeMirror("xquery", true, true);'),
+          for $name in head(($file, config:file())[.])
+          return html:js('openFile("' || $name || '");')
+        }</td>
+      </tr>
+    )
   )
 };

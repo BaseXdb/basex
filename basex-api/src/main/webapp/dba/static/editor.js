@@ -62,7 +62,9 @@ function closeFile() {
  */
 function finishFile(name, info) {
   document.getElementById("file").value = name;
-  document.getElementById("run").disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
+  var disabled = name && !name.match(/\.xq(m|l|uery)?$/i)
+  document.getElementById("mode").disabled = disabled;
+  document.getElementById("run").disabled = disabled;
   checkButtons();
   setInfo(info);
   _editorMirror.focus();

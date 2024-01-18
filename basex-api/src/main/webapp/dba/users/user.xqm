@@ -53,7 +53,7 @@ function dba:user(
     <tr>
       <td>
         <form action='user-update' method='post' autocomplete='off'>
-          <!--  force chrome not to autocomplete form -->
+          <!--  prevent chrome from auto-completing form -->
           <input style='display:none' type='text' name='fake1'/>
           <input style='display:none' type='password' name='fake2'/>
           <h2>{

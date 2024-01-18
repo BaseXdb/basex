@@ -206,11 +206,13 @@ var _updating;
 
 /**
  * Evaluates a query.
- * @param {boolean} reverse reverse query execution mode (eval, update)
+ * @param {boolean} invert invert query execution mode (eval, update)
  */
-function runQuery(reverse) {
+function runQuery(invert) {
+  if(document.getElementById("run").disabled) return;
+
   // decide if query is read-only or updating
-  var updating = (document.getElementById("mode").selectedIndex === 1) ^ reverse;
+  var updating = (document.getElementById("mode").selectedIndex === 1) ^ invert;
   var path = updating ? "editor-update" : "editor-eval";
   var file = document.getElementById("file");
   if(file && file.value) path += "?file=" + encodeURIComponent(file.value);
