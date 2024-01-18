@@ -38,6 +38,16 @@ public abstract class Bin extends Item {
   }
 
   @Override
+  public final boolean comparable(final Item item) {
+    return item instanceof Bin;
+  }
+
+  @Override
+  public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
+    return type == item.type && super.atomicEqual(item, ii);
+  }
+
+  @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
