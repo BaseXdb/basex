@@ -162,8 +162,26 @@ class Session
     public function readString()
     {
         $com = "";
-        while (($d = $this->read()) != chr(0)) {
+        while (($d = $this->read()) != chr(0))
+        {
             $com .= $d;
+            $sUnread = substr($this->buffer, $this->bpos);
+            $sBeforeZero = strstr($sUnread, chr(0), true);
+
+            if ($sBeforeZero === false)
+            {
+               $com .= $sUnread;
+               $this->bpos = $this->bsize;
+            }
+            else
+            {
+                $iLen = strlen($sBeforeZero);
+                if ($iLen > 0)
+                {
+                    $com .= $sBeforeZero;
+                    $this->bpos += $iLen;
+                }
+            }
         }
         return $com;
     }
