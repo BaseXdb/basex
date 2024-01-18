@@ -330,7 +330,7 @@ declare function html:table(
             else fn { number() }
           case 'time' case 'dateTime' return
             if($desc)
-            then fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime() }
+            then fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
             else identity(?)
           case 'dynamic' return
             fn { if(. instance of function(*)) then string-join(.()) else . }

@@ -20,7 +20,7 @@ declare
 function dba:editor-eval(
   $query  as xs:string?
 ) as xs:string {
-  utils:query($query, ())
+  utils:query(string($query), ())
 };
 
 (:~
@@ -37,5 +37,5 @@ declare
 function dba:editor-update(
   $query  as xs:string?
 ) as empty-sequence() {
-  utils:update-query($query)
+  utils:update-query(string($query))
 };

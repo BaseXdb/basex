@@ -1,3 +1,11 @@
+/** Link to the mirrored editor component. */
+var _editorMirror;
+/** Link to the mirrored output component. */
+var _outputMirror;
+
+/** Editor. */
+var _edit;
+
 /**
  * Toggles the selection of all check boxes in the corresponding form.
  * @param {checkbox} clicked header checkbox
@@ -33,10 +41,9 @@ function buttons(source) {
       if(button.className === "global") continue;
 
       var values = [
-        "backup", "backup-drop", "backup-restore", "backup-create-all", "backup-restore-all",
-        "db-drop", "db-optimize", "db-optimize-all", "delete", "job-remove",
-        "file-delete", "job-stop", "log-delete", "session-kill",
-        "pattern-drop", "user-drop"
+        "backup", "backup-create-all", "backup-drop", "backup-restore", "backup-restore-all",
+        "db-drop", "db-optimize", "db-optimize-all", "delete", "file-delete", "job-remove",
+        "job-stop", "log-delete", "pattern-drop", "session-kill", "user-drop"
       ];
       for(var v = 0; v < values.length; v++) {
         if(button.value === values[v]) button.disabled = !checked;
@@ -213,6 +220,7 @@ function runQuery(reverse) {
   _updating = updating;
 
   // run query
+  if(_editorMirror) _editorMirror.focus();
   query(path, document.getElementById("editor").value, function(text) {
     _outputMirror.setValue(text);
   });
@@ -223,6 +231,7 @@ function runQuery(reverse) {
  */
 function stopQuery() {
   // stop query by sending empty sequence
+  if(_editorMirror) _editorMirror.focus();
   query(_updating ? "editor-update" : "editor-eval", "()", function(text) {
     setInfo("Query was stopped.");
   });
@@ -252,14 +261,6 @@ function request(method, url, data, success, failure) {
   request.setRequestHeader("Content-Type", "text/plain");
   request.send(data);
 }
-
-/** Link to the mirrored editor component. */
-var _editorMirror;
-/** Link to the mirrored output component. */
-var _outputMirror;
-
-/** Editor. */
-var _edit;
 
 /**
  * Loads the code mirror editor extension.

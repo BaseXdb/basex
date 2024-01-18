@@ -27,7 +27,7 @@ function dba:db-query(
   $query     as xs:string?
 ) as xs:string {
   utils:query(
-    if($query) then $query else '.',
+    $query[.] otherwise '.',
     let $type := db:type($name, $resource)
     return head(if($type = 'xml') then (
       db:get($name, $resource)
