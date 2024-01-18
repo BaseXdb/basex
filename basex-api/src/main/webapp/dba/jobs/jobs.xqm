@@ -129,8 +129,8 @@ function dba:jobs(
                   </table>
                 ),
   
-                <h3>Query</h3>,
-                <textarea readonly='' spellcheck='false' rows='5'>{
+                <h3>Job String</h3>,
+                <textarea readonly='' spellcheck='false' rows='20'>{
                   string($details)
                 }</textarea>,
   

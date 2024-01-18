@@ -1,48 +1,43 @@
 /**
- * Opens a query file.
+ * Opens a file.
  * @param {string} file optional file name
  */
-function openQuery(file) {
+function openFile(file) {
   if(_editorMirror.getValue().trim() && !confirm("Replace editor contents?")) return;
 
-  var name;
-  if(file) {
-    name = file;
-    document.getElementById("file").value = name;
-    checkButtons();
-  } else {
-    name = fileName();
-  }
-  request("POST", "query-open?name=" + encodeURIComponent(name),
+  var name = file || fileName();
+  request("POST", "editor-open?name=" + encodeURIComponent(name),
     null,
     function(request) {
-      setInfo("Query was opened.");
       _editorMirror.setValue(request.responseText);
       _editorMirror.focus();
+      document.getElementById("file").value = name;
+      checkButtons();
+      setInfo("File was opened.");
     },
     function(req) {
-      setError("Query could not be opened.");
+      setErrorFromResponse(req, name);
     }
   )
 }
 
 /**
- * Saves a query file.
+ * Saves a file.
  */
-function saveQuery() {
+function saveFile() {
   // append file suffix
   var value = fileName();
   if(value.indexOf(".") === -1) {
     value += ".xq";
     document.getElementById("file").value = value;
   }
-  if(queryExists() && !confirm("Overwrite existing query?")) return;
+  if(fileExists() && !confirm("Overwrite existing file?")) return;
 
-  request("POST", "query-save?name=" + encodeURIComponent(value),
+  request("POST", "editor-save?name=" + encodeURIComponent(value),
     document.getElementById("editor").value,
     function(req) {
       refreshDataList(req);
-      setInfo("Query was saved.");
+      setInfo("File was saved.");
     },
     function(req) {
       setErrorFromResponse(req);
@@ -51,16 +46,17 @@ function saveQuery() {
 }
 
 /**
- * Closes a query file.
+ * Closes a file.
  */
-function closeQuery() {
-  request("POST", "query-close?name=" + encodeURIComponent(fileName()),
+function closeFile() {
+  request("POST", "editor-close?name=" + encodeURIComponent(fileName()),
     null,
     function(req) {
       document.getElementById("file").value = "";
       _editorMirror.setValue("");
       _editorMirror.focus();
       checkButtons();
+      setInfo("File was closed.");
     },
     function(req) {
       setErrorFromResponse(req);
@@ -69,7 +65,7 @@ function closeQuery() {
 }
 
 /**
- * Refreshes the list of available query files.
+ * Refreshes the list of available files.
  * @param {object} request HTTP request
  */
 function refreshDataList(request) {
@@ -90,16 +86,16 @@ function refreshDataList(request) {
  * Refreshes the editor buttons.
  */
 function checkButtons() {
-  document.getElementById("open").disabled = !queryExists();
+  document.getElementById("open").disabled = !fileExists();
   document.getElementById("save").disabled = fileName().length === 0;
-  document.getElementById("close").disabled = !queryExists();
+  document.getElementById("close").disabled = !fileExists();
 }
 
 /**
- * Checks if the typed in query file exists.
+ * Checks if the typed in file exists.
  * @returns {boolean} result of check
  */
-function queryExists() {
+function fileExists() {
   var file = fileName();
   var files = document.getElementById("files").children;
   for (var f = 0; f < files.length; f++) {

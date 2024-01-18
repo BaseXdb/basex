@@ -141,8 +141,9 @@ function query(path, query, func, reset) {
 /**
  * Displays the error that is embedded in the HTTP response.
  * @param {object} request HTTP request
+ * @param {string} optional message
  */
-function setErrorFromResponse(request) {
+function setErrorFromResponse(request, message) {
   // normalize error message
   var msg = request.statusText.match(/\[\w+\]/g) ? request.statusText : request.responseText;
   var s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
@@ -151,7 +152,7 @@ function setErrorFromResponse(request) {
   // display correctly escaped feedback
   var html = document.createElement("div");
   html.innerHTML = msg;
-  setError(html.innerText || html.textContent);
+  setError((message ? message + ": " : "") + (html.innerText || html.textContent));
 }
 
 /** Most recent log entry search string. */
@@ -203,7 +204,7 @@ var _updating;
 function runQuery(reverse) {
   // decide if query is read-only or updating
   var updating = (document.getElementById("mode").selectedIndex === 1) ^ reverse;
-  var path = updating ? "query-update" : "query-eval";
+  var path = updating ? "editor-update" : "editor-eval";
   var file = document.getElementById("file");
   if(file && file.value) path += "?file=" + encodeURIComponent(file.value);
 
@@ -222,7 +223,7 @@ function runQuery(reverse) {
  */
 function stopQuery() {
   // stop query by sending empty sequence
-  query(_updating ? "query-update" : "query-eval", "()", function(text) {
+  query(_updating ? "editor-update" : "editor-eval", "()", function(text) {
     setInfo("Query was stopped.");
   });
 }

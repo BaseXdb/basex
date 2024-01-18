@@ -5,7 +5,6 @@
  :)
 module namespace html = 'dba/html';
 
-import module namespace options = 'dba/options' at 'options.xqm';
 import module namespace config = 'dba/config' at 'config.xqm';
 import module namespace utils = 'dba/utils' at 'utils.xqm';
 
@@ -75,7 +74,7 @@ declare function html:wrap(
                   <div class='ellipsis'>{
                     if($user) then (
                       let $cats := (
-                        for $cat in ('Logs', 'Databases', 'Queries', 'Files', 'Jobs',
+                        for $cat in ('Logs', 'Databases', 'Editor', 'Files', 'Jobs',
                           'Users', 'Sessions', 'Settings')
                         let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
                         return if($link = $header) then (
@@ -345,7 +344,7 @@ declare function html:table(
   )
 
   (: show results :)
-  let $max-option := options:get($options:MAXROWS)
+  let $max-option := config:get($config:MAXROWS)
   let $count-option := $options?count[not($sort)]
   let $page-option := $options?page
 

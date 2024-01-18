@@ -5,7 +5,6 @@
  :)
 module namespace utils = 'dba/utils';
 
-import module namespace options = 'dba/options' at 'options.xqm';
 import module namespace config = 'dba/config' at 'config.xqm';
 
 (:~ Regular expression for backups. :)
@@ -51,8 +50,8 @@ declare function utils:serialize(
   $result  as item()*
 ) as xs:string {
   (: serialize more characters than requested, because limit represents number of bytes :)
-  let $limit := options:get($options:MAXCHARS)
-  let $indent := options:get($options:INDENT)
+  let $limit := config:get($config:MAXCHARS)
+  let $indent := config:get($config:INDENT)
   let $string := serialize($result, map {
     'limit': $limit * 2 + 1,
     'method': 'basex',
@@ -67,10 +66,10 @@ declare function utils:serialize(
  :)
 declare %private function utils:query-options() as map(*) {
   map {
-    'timeout'   : options:get($options:TIMEOUT),
-    'memory'    : options:get($options:MEMORY),
-    'permission': options:get($options:PERMISSION),
-    'base-uri'  : config:directory() || '/' || config:query()
+    'timeout'   : config:get($config:TIMEOUT),
+    'memory'    : config:get($config:MEMORY),
+    'permission': config:get($config:PERMISSION),
+    'base-uri'  : config:directory() || '/' || config:file()
   }
 };
 
@@ -85,7 +84,7 @@ declare function utils:start(
   $sort  as xs:string
 ) as xs:integer {
   if($page and not($sort)) then (
-    ($page - 1) * options:get($options:MAXROWS) + 1
+    ($page - 1) * config:get($config:MAXROWS) + 1
   ) else (
     1
   )
@@ -102,7 +101,7 @@ declare function utils:end(
   $sort  as xs:string
 ) as xs:integer {
   if($page and not($sort)) then (
-    $page * options:get($options:MAXROWS)
+    $page * config:get($config:MAXROWS)
   ) else (
     999999999
   )

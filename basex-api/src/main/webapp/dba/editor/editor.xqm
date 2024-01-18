@@ -1,18 +1,18 @@
 (:~
- : Queries page.
+ : Editor page.
  :
  : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
-module namespace dba = 'dba/queries';
+module namespace dba = 'dba/editor';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
 
 (:~ Top category. :)
-declare variable $dba:CAT := 'queries';
+declare variable $dba:CAT := 'editor';
 
 (:~
- : Queries page.
+ : Editor page.
  : @param  $error  error string
  : @param  $info   info string
  : @param  $file   file to be opened
@@ -20,13 +20,13 @@ declare variable $dba:CAT := 'queries';
  :)
 declare
   %rest:GET
-  %rest:path('/dba/queries')
+  %rest:path('/dba/editor')
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %rest:query-param('file',  '{$file}')
   %output:method('html')
   %output:html-version('5')
-function dba:queries(
+function dba:editor(
   $error  as xs:string?,
   $info   as xs:string?,
   $file   as xs:string?
@@ -55,18 +55,18 @@ function dba:queries(
             <tr>
               <td class='slick'>
                 <div align='right'>
-                  <input type='text' id='file' name='file' placeholder='Name of query'
+                  <input type='text' id='file' name='file' placeholder='Name of file'
                          list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>
                   <datalist id='files'>{
-                    for $file in config:query-files()
+                    for $file in config:files()
                     return element option { $file }
                   }</datalist>{ ' ' }
                   <button type='submit' name='open' id='open' disabled=''
-                          onclick='openQuery()'>Open</button>{ ' ' }
+                          onclick='openFile()'>Open</button>{ ' ' }
                   <button name='save' id='save' disabled=''
-                          onclick='saveQuery()'>Save</button>{ ' ' }
+                          onclick='saveFile()'>Save</button>{ ' ' }
                   <button name='close' id='close' disabled=''
-                          onclick='closeQuery()'>Close</button>
+                          onclick='closeFile()'>Close</button>
                 </div>
               </td>
             </tr>
@@ -78,8 +78,8 @@ function dba:queries(
         <h2 class='right'>Result</h2>,
         <textarea name='output' id='output' readonly=''/>,
         html:js('loadCodeMirror("xquery", true, true);'),
-        for $name in head(($file, config:query())[.])
-        return html:js('openQuery("' || $name || '");')
+        for $name in head(($file, config:file())[.])
+        return html:js('openFile("' || $name || '");')
       }</td>
     </tr>
   )

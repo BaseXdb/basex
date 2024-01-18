@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/users';
 
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace options = 'dba/options' at '../lib/options.xqm';
 import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
@@ -69,7 +69,7 @@ function dba:user-create(
               <td>Permission:</td>
               <td>
                 <select name='perm' size='5'>{
-                  for $p in $options:PERMISSIONS
+                  for $p in $config:PERMISSIONS
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>
                 <div class='small'/>

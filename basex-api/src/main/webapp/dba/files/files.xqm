@@ -7,7 +7,6 @@ module namespace dba = 'dba/files';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace options = 'dba/options' at '../lib/options.xqm';
 import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
@@ -44,7 +43,7 @@ function dba:files(
           <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
             let $webapp := dba:dir(db:option('webpath'))[.]
             let $options := (
-              ['DBA'       , $options:DBA-DIRECTORY],
+              ['DBA'       , $config:DBA-DIRECTORY],
               ['Webapp'    , $webapp],
               ['RESTXQ'    , dba:dir($webapp ! file:resolve-path(db:option('restxqpath'), .))],
               ['Repository', dba:dir(db:option('repopath'))],
@@ -78,6 +77,7 @@ function dba:files(
             map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
           )
           let $entries :=
+            let $limit := config:get($config:MAXCHARS)
             let $jobs := job:list-details()
             let $parent := if(file:parent($dir)) then ($dir || '..') else ()
             for $file in ($parent, file:children($dir))
@@ -98,8 +98,8 @@ function dba:files(
                 intersperse(
                   if($dir) then () else (
                     html:link('Download', 'file/' || encode-for-uri($name)),
-                    if(matches($name, '\.xqm?$')) then (
-                      html:link('Edit', 'queries', map { 'file': $name })
+                    if($size <= $limit) then (
+                      html:link('Edit', 'editor', map { 'file': $name })
                     ) else (),
                     if(matches($name, '\.xq$')) then (
                       (: choose first running job :)

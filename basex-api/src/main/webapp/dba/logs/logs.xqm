@@ -5,8 +5,8 @@
  :)
 module namespace dba = 'dba/logs';
 
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace options = 'dba/options' at '../lib/options.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'logs';
@@ -27,8 +27,8 @@ function dba:logs-jump(
   $time  as xs:string
 ) as element(rest:response) {
   let $page := head((
-    let $ignore-logs := options:get($options:IGNORE-LOGS)
-    let $max := options:get($options:MAXROWS)
+    let $ignore-logs := config:get($config:IGNORE-LOGS)
+    let $max := config:get($config:MAXROWS)
     for $log at $pos in reverse(
       admin:logs($name, true())[not($ignore-logs and matches(., $ignore-logs, 'i'))]
     )
@@ -171,7 +171,7 @@ function dba:log(
     map { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
   )
   let $entries := (
-    let $ignore-logs := options:get($options:IGNORE-LOGS)
+    let $ignore-logs := config:get($config:IGNORE-LOGS)
     let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
     let $terms := if($regex-string) then $input else tokenize($input)
     let $joined-terms := if($regex-string) then $input else string-join($terms, '|')

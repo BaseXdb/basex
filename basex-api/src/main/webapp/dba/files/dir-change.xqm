@@ -33,7 +33,7 @@ function dba:dir-change(
       void(file:list($path)),
   
       config:directory($path),
-      config:query('')
+      config:file('')
     ),
     web:redirect($dba:CAT)
   } catch file:io-error {
