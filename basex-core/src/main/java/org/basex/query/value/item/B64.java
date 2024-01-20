@@ -6,7 +6,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
@@ -93,13 +92,6 @@ public class B64 extends Bin {
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {
     return Base64.encode(binary(ii));
-  }
-
-  @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
-    return Token.eq(binary(ii), bin);
   }
 
   @Override

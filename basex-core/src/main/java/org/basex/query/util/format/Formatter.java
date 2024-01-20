@@ -213,7 +213,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'd':
             final long y = date.yea();
-            for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.dpm(y, m);
+            for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.daysOfMonth(y, m);
             num += date.day();
             err = tim;
             break;

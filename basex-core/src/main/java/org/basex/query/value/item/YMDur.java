@@ -26,8 +26,8 @@ public final class YMDur extends Dur {
    */
   public YMDur(final Dur value) {
     super(AtomType.YEAR_MONTH_DURATION);
-    mon = value.mon;
-    sec = BigDecimal.ZERO;
+    months = value.months;
+    seconds = BigDecimal.ZERO;
   }
 
   /**
@@ -42,9 +42,9 @@ public final class YMDur extends Dur {
       throws QueryException {
 
     this(value);
-    final double d = (double) mon + (plus ? dur.mon : -dur.mon);
+    final double d = (double) months + (plus ? dur.months : -dur.months);
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(info, d);
-    mon += plus ? dur.mon : -dur.mon;
+    months += plus ? dur.months : -dur.months;
   }
 
   /**
@@ -61,9 +61,9 @@ public final class YMDur extends Dur {
     this(value);
     if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, description(), factor);
     if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
-    final double d = mult ? mon * factor : mon / factor;
+    final double d = mult ? months * factor : months / factor;
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(info, d);
-    mon = StrictMath.round(d);
+    months = StrictMath.round(d);
   }
 
   /**
@@ -78,7 +78,7 @@ public final class YMDur extends Dur {
     final Matcher mt = YMD.matcher(val);
     if(!mt.matches() || Strings.endsWith(val, 'P')) throw dateError(value, XYMD, info);
     yearMonth(value, mt, info);
-    sec = BigDecimal.ZERO;
+    seconds = BigDecimal.ZERO;
   }
 
   @Override
@@ -91,22 +91,22 @@ public final class YMDur extends Dur {
    * @return year
    */
   public long ymd() {
-    return mon;
+    return months;
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    if(mon < 0) tb.add('-');
+    if(months < 0) tb.add('-');
     date(tb);
-    if(mon == 0) tb.add("0M");
+    if(months == 0) tb.add("0M");
     return tb.finish();
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    if(item.type != type) throw compareError(item, this, ii);
-    return Long.signum(mon - ((Dur) item).mon);
+    return item.type == type ? Long.signum(months - ((Dur) item).months) :
+      super.compare(item, coll, transitive, ii);
   }
 }

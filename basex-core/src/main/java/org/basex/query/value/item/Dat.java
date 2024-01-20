@@ -48,7 +48,7 @@ public final class Dat extends ADate {
     this(value);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(info, yea);
+      if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);
     } else {
       calc((YMDur) dur, plus, info);
     }
@@ -68,8 +68,8 @@ public final class Dat extends ADate {
    * Cleans the item and removes invalid components.
    */
   private void clean() {
-    hou = -1;
-    min = -1;
-    sec = null;
+    hour = -1;
+    minute = -1;
+    seconds = null;
   }
 }

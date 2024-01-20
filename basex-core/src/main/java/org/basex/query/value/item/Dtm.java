@@ -23,10 +23,10 @@ public final class Dtm extends ADate {
    */
   public Dtm(final ADate date) {
     super(AtomType.DATE_TIME, date);
-    if(hou == -1) {
-      hou = 0;
-      min = 0;
-      sec = BigDecimal.ZERO;
+    if(hour == -1) {
+      hour = 0;
+      minute = 0;
+      seconds = BigDecimal.ZERO;
     }
   }
 
@@ -40,9 +40,9 @@ public final class Dtm extends ADate {
   public Dtm(final Dat date, final Tim time, final InputInfo info) throws QueryException {
     super(AtomType.DATE_TIME, date);
 
-    hou = time.hou;
-    min = time.min;
-    sec = time.sec;
+    hour = time.hour;
+    minute = time.minute;
+    seconds = time.seconds;
     if(tz == Short.MAX_VALUE) {
       tz = time.tz;
     } else if(tz != time.tz && time.tz != Short.MAX_VALUE) {
@@ -78,7 +78,7 @@ public final class Dtm extends ADate {
     this(date);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(info, yea);
+      if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);
     } else {
       calc((YMDur) dur, plus, info);
     }

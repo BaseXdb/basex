@@ -59,8 +59,8 @@ public final class Tim extends ADate {
    * Cleans the item and removes invalid components.
    */
   private void clean() {
-    yea = Long.MAX_VALUE;
-    mon = -1;
+    year = Long.MAX_VALUE;
+    month = -1;
     day = -1;
   }
 }

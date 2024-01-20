@@ -196,7 +196,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return comparable(item) && atomicEqual(item, deep.info);
+    return atomicEqual(item, deep.info);
   }
 
   /**

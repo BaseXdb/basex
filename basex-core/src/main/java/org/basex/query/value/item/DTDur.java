@@ -27,7 +27,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final Dur dur) {
     super(AtomType.DAY_TIME_DURATION);
-    sec = dur.sec == null ? BigDecimal.ZERO : dur.sec;
+    seconds = dur.seconds == null ? BigDecimal.ZERO : dur.seconds;
   }
 
   /**
@@ -37,7 +37,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final long hours, final long minutes) {
     super(AtomType.DAY_TIME_DURATION);
-    sec = BigDecimal.valueOf(hours).multiply(BD_60).add(BigDecimal.valueOf(minutes)).
+    seconds = BigDecimal.valueOf(hours).multiply(BD_60).add(BigDecimal.valueOf(minutes)).
         multiply(BD_60);
   }
 
@@ -47,7 +47,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final BigDecimal sec) {
     super(AtomType.DAY_TIME_DURATION);
-    this.sec = sec;
+    this.seconds = sec;
   }
 
   /**
@@ -78,8 +78,8 @@ public final class DTDur extends Dur {
       throws QueryException {
 
     this(dur);
-    sec = plus ? sec.add(add.sec) : sec.subtract(add.sec);
-    final double d = sec.doubleValue();
+    seconds = plus ? seconds.add(add.seconds) : seconds.subtract(add.seconds);
+    final double d = seconds.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECDURRANGE_X.get(info, d);
   }
 
@@ -98,20 +98,20 @@ public final class DTDur extends Dur {
     if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, description(), factor);
     if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
     if(mult ? factor == 0 : Double.isInfinite(factor)) {
-      sec = BigDecimal.ZERO;
+      seconds = BigDecimal.ZERO;
     } else {
       BigDecimal d = BigDecimal.valueOf(factor);
       try {
-        sec = mult ? sec.multiply(d) : sec.divide(d, MathContext.DECIMAL64);
+        seconds = mult ? seconds.multiply(d) : seconds.divide(d, MathContext.DECIMAL64);
       } catch(final ArithmeticException ex) {
         Util.debug(ex);
         // catch cases in which a computation yields no exact result; eg:
         // xs:dayTimeDuration("P1D") div xs:double("-1.7976931348623157E308")
         d = BigDecimal.valueOf(1 / factor);
-        sec = mult ? sec.divide(d, MathContext.DECIMAL64) : sec.multiply(d);
+        seconds = mult ? seconds.divide(d, MathContext.DECIMAL64) : seconds.multiply(d);
       }
     }
-    if(Math.abs(sec.doubleValue()) < 1.0E-13) sec = BigDecimal.ZERO;
+    if(Math.abs(seconds.doubleValue()) < 1.0E-13) seconds = BigDecimal.ZERO;
   }
 
   /**
@@ -123,9 +123,8 @@ public final class DTDur extends Dur {
    */
   public DTDur(final ADate date, final ADate sub, final InputInfo info) throws QueryException {
     super(AtomType.DAY_TIME_DURATION);
-    sec = date.days().subtract(sub.days()).multiply(BD_864000).add(
-        date.seconds().subtract(sub.seconds()));
-    final double d = sec.doubleValue();
+    seconds = date.seconds().subtract(sub.seconds());
+    final double d = seconds.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);
   }
 
@@ -139,13 +138,13 @@ public final class DTDur extends Dur {
    * @return year
    */
   public BigDecimal dtd() {
-    return sec;
+    return seconds;
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    final int ss = sec.signum();
+    final int ss = seconds.signum();
     if(ss < 0) tb.add('-');
     tb.add('P');
     if(day() != 0) { tb.addLong(Math.abs(day())); tb.add('D'); }
@@ -157,8 +156,8 @@ public final class DTDur extends Dur {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    if(item.type == type) return sec.subtract(((ADateDur) item).sec).signum();
-    throw compareError(item, this, ii);
+    return item.type == type ? seconds.subtract(((Dur) item).seconds).signum() :
+      super.compare(item, coll, transitive, ii);
   }
 
   /**

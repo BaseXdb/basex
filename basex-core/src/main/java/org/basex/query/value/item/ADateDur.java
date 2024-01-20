@@ -15,9 +15,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ADateDur extends Item {
-  /** Seconds and milliseconds. {@code null}: undefined. */
-  public BigDecimal sec;
-
   /**
    * Constructor.
    * @param type item type
