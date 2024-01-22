@@ -54,11 +54,11 @@ final class UCACollation extends Collation {
   private static int mask(final int strength) {
     switch(strength) {
       case Collator.PRIMARY:
-        return 0xffff0000;
+        return 0xFFFF0000;
       case Collator.SECONDARY:
-        return 0xffffff00;
+        return 0xFFFFFF00;
       default:
-        return 0xffffffff;
+        return 0xFFFFFFFF;
     }
   }
 
