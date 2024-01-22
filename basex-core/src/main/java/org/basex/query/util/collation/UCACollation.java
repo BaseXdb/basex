@@ -1,11 +1,14 @@
 package org.basex.query.util.collation;
 
+import static com.ibm.icu.text.CollationElementIterator.*;
+import static com.ibm.icu.text.Collator.*;
 import static org.basex.util.Token.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 import org.basex.util.*;
+
+import com.ibm.icu.text.*;
 
 /**
  * This collation is based on the ICU collator.
@@ -14,27 +17,49 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class UCACollation extends Collation {
-  /** Name of the Collator class. */
-  private static final Class<?> CEI = Reflect.find("com.ibm.icu.text.CollationElementIterator");
-  /** Method. */
-  private static final Method RBC_GCEI =
-      Reflect.method(UCAOptions.RBC, "getCollationElementIterator", String.class);
-  /** Method. */
-  private static final Method CEI_GET_OFFSET = Reflect.method(CEI, "getOffset");
-  /** Method. */
-  private static final Method CEI_SET_OFFSET = Reflect.method(CEI, "setOffset", int.class);
-  /** Method. */
-  private static final Method CEI_NEXT = Reflect.method(CEI, "next");
+  /** Primary order mask. */
+  private static final int PRIMARY_ORDER_MASK = mask(PRIMARY);
 
   /** Collator. */
-  private final Comparator<Object> collator;
+  private final RuleBasedCollator collator;
+  /** Collator strength. */
+  private final int strength;
+  /** Strength mask. */
+  private final int strengthMask;
+  /** Whether the the alternate handling behavior is "shifted". */
+  private final boolean isShifted;
+  /** Variable top. */
+  private final int variableTop;
 
   /**
    * Private Constructor.
    * @param collator collation options
    */
   UCACollation(final Comparator<Object> collator) {
-    this.collator = collator;
+    this.collator = (RuleBasedCollator) collator;
+    strength = this.collator.getStrength();
+    strengthMask = mask(strength);
+    isShifted = this.collator.isAlternateHandlingShifted();
+    variableTop = this.collator.getVariableTop();
+  }
+
+  /**
+   * Return a bit mask for the relevant parts of a collation element per the collator's strength.
+   * @see <a href=
+   *      "https://unicode-org.github.io/icu/userguide/collation/architecture#collation-elements"
+   *      >Collation Elements</a>
+   * @param strength collator strength
+   * @return bit mask
+   */
+  private static int mask(final int strength) {
+    switch(strength) {
+      case Collator.PRIMARY:
+        return 0xffff0000;
+      case Collator.SECONDARY:
+        return 0xffffff00;
+      default:
+        return 0xffffffff;
+    }
   }
 
   @Override
@@ -46,56 +71,71 @@ final class UCACollation extends Collation {
   protected int indexOf(final String string, final String contains, final Mode mode,
       final InputInfo ii) {
 
-    final Object iterS = Reflect.invoke(RBC_GCEI, collator, string);
-    final Object iterC = Reflect.invoke(RBC_GCEI, collator, contains);
+    final CollationElementIterator iterS = collator.getCollationElementIterator(string);
+    final CollationElementIterator iterC = collator.getCollationElementIterator(contains);
 
     final int elemC = next(iterC);
-    if(elemC == -1) return 0;
-    final int offC = (int) Reflect.invoke(CEI_GET_OFFSET, iterC);
+    if(elemC == NULLORDER) return 0;
+    final int offC = iterC.getOffset();
     while(true) {
       // find first equal character
       for(int elemS; (elemS = next(iterS)) != elemC;) {
-        if(elemS == -1 || mode == Mode.STARTS_WITH) return -1;
+        if(elemS == NULLORDER || mode == Mode.STARTS_WITH) return -1;
       }
 
-      final int offS = (Integer) Reflect.invoke(CEI_GET_OFFSET, iterS);
+      final int offS = iterS.getOffset();
       if(startsWith(iterS, iterC)) {
         if(mode == Mode.INDEX_AFTER) {
-          return (int) Reflect.invoke(CEI_GET_OFFSET, iterS);
+          return iterS.getOffset();
         } else if(mode == Mode.ENDS_WITH) {
-          if(next(iterS) == -1) return offS - 1;
+          if(next(iterS) == NULLORDER) return offS - 1;
         } else {
           return offS - 1;
         }
       }
-      Reflect.invoke(CEI_SET_OFFSET, iterC, offS);
-      Reflect.invoke(CEI_SET_OFFSET, iterC, offC);
+      iterS.setOffset(offS);
+      iterC.setOffset(offC);
     }
   }
 
   /**
    * Determines whether one string starts with another.
-   * @param string string iterator (of type CollationElementIterator)
-   * @param sub substring iterator (of type CollationElementIterator)
+   * @param string string iterator
+   * @param sub substring iterator
    * @return result of check
    */
-  private static boolean startsWith(final Object string, final Object sub) {
+  private boolean startsWith(final CollationElementIterator string,
+      final CollationElementIterator sub) {
     while(true) {
       final int s = next(sub);
-      if(s == -1) return true;
+      if(s == NULLORDER) return true;
       if(s != next(string)) return false;
     }
   }
 
   /**
-   * Returns the next element from an iterator.
-   * @param it iterator (of type CollationElementIterator)
-   * @return next element, or {@code -1}
+   * Returns the next element from an iterator, and transforms it according to the collator's
+   * properties. This was modeled after method getCE in {@link StringSearch}.
+   * @param it iterator
+   * @return next element, or {@link CollationElementIterator#NULLORDER}
    */
-  private static int next(final Object it) {
+  private int next(final CollationElementIterator it) {
     while(true) {
-      final int c = (int) Reflect.invoke(CEI_NEXT, it);
-      if(c != 0) return c;
+      int c = it.next();
+      if(c == NULLORDER) return c;
+      c &= strengthMask;
+      if(isShifted) {
+        if(variableTop > c) {
+          if(strength >= QUATERNARY) {
+            c &= PRIMARY_ORDER_MASK;
+          } else {
+            c = IGNORABLE;
+          }
+        }
+      } else if(strength >= QUATERNARY && c == IGNORABLE) {
+        c = 0xFFFF;
+      }
+      if(c != IGNORABLE) return c;
     }
   }
 
