@@ -98,6 +98,9 @@ public final class UCAOptions extends CollationOptions {
       else if(eq(v, "shifted", "blanked")) b = true;
       else throw error(ALTERNATE);
       invoke(method(RBC, "setAlternateHandlingShifted", boolean.class), coll, b);
+      if(eq(v, "blanked") && eq(get(STRENGTH), "quaternary")) {
+        invoke(method(RBC, "setStrength", int.class), coll, 2); // Collator.TERTIARY
+      }
     }
 
     if(contains(BACKWARDS)) {
