@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class FnIterateWhile extends StandardFunc {
+public class FnWhileDo extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem predicate = toFunction(arg(1), 2, qc), action = toFunction(arg(2), 2, qc);
@@ -29,7 +29,9 @@ public final class FnIterateWhile extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = arg(0), predicate = arg(1), action = arg(2);
+    final boolean until = this instanceof FnDoUntil;
+    final int p = until ? 2 : 1, a = until ? 1 : 2;
+    final Expr input = arg(0), predicate = arg(p), action = arg(a);
 
     // compute function types
     if(action instanceof FuncItem) {
@@ -46,12 +48,12 @@ public final class FnIterateWhile extends StandardFunc {
       }
       exprType.assign(ist.union(ost));
       final Expr oa = optAction;
-      arg(2, arg -> oa);
+      arg(a, arg -> oa);
 
       if(predicate instanceof FuncItem) {
         final SeqType is = ist;
-        arg(1, arg -> refineFunc(predicate, cc, SeqType.BOOLEAN_O, is, SeqType.INTEGER_O));
-        if(((FuncItem) predicate).expr == Bln.FALSE) return input;
+        arg(p, arg -> refineFunc(predicate, cc, SeqType.BOOLEAN_O, is, SeqType.INTEGER_O));
+        if(!until && ((FuncItem) predicate).expr == Bln.FALSE) return input;
       }
     }
     return this;

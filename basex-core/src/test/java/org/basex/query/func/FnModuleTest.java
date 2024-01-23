@@ -416,6 +416,66 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void doUntil() {
+    final Function func = DO_UNTIL;
+    error(func.args(1, " error#0", " boolean#1"), FUNERR1);
+    query(func.args(1, " identity#1", " exists#1"), 1);
+
+    query(func.args(" ()", " string#1", " exists#1"), "");
+    query(func.args(" (21 to 24)", " tail#1", " fn($s) { head($s) >= 23 }"), "23\n24");
+    query(func.args(" (6 to 8)", " fn($s) { $s ! (. - 1) }",
+        " fn($s) { sum($s) <= 10 }"), "2\n3\n4");
+    query(func.args(" reverse(1 to 100)", " fn($s) { tail($s) }",
+        " fn($s) { sum($s) <= 20 and head($s) <= 4 }"), "4\n3\n2\n1");
+
+    query(func.args(1, " fn($x) { $x + 1 }", " fn($x) { $x >= 10000 }"), 10000);
+    query(func.args(2, " fn($x) { $x * $x }", " fn($x) { $x >= 1000 }"), 65536);
+    query(func.args(1, " fn($x) { $x, $x }", " fn($x) { count($x) >= 3 }"),
+        "1\n1\n1\n1");
+    query(func.args(" (1 to 100)", " fn($s) { subsequence($s, 2, count($s) - 2) }",
+        " fn($s) { $s[last()] - $s[1] <= 1 }"),
+        "50\n51");
+
+    query(func.args(" 1e0",
+        " fn($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) }",
+        " fn($n) { $n instance of xs:double }"),
+        1);
+    query(func.args(1,
+        " fn($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }",
+        " fn($n) { $n instance of xs:byte }"),
+        1);
+
+    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
+        " fn($map) { map { 'string': replace($map?string, $map?remove, ''),"
+        + "'remove': $map?remove =!> string-to-codepoints() "
+        + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }",
+        " fn($map) { not(characters($map?string) = $map?remove) }")
+        + "?string", "unhdrduhul");
+
+    query("let $s := (1 to 1000) return " +
+        func.args(1, " fn { . + 1 }", " fn { not(. = $s) }"), 1001);
+    query("let $i := 3936256 return " + func.args(" $i", " fn($n) { ($n + $i div $n) div 2 }",
+        " fn($n) { abs($n * $n - $i) < 0.0000000001 }"), 1984);
+
+    query(func.args(1, " fn($x) { $x * 2 }", " fn($x) { $x >= 1000 }"), 1024);
+    query(func.args(1, " fn($x) { $x, $x }", " fn($xs) { count($xs) > 3 }"),
+        "1\n1\n1\n1");
+
+    query(func.args(1, " op('*')", " fn($_, $p) { $p >= 10 }"), 3628800);
+
+    check(func.args(1, " identity#1", " true#0"), 1, root(DO_UNTIL));
+    check(func.args(" (1, 2)", " identity#1", " true#0"), "1\n2", root(DO_UNTIL));
+
+    // GH-2257
+    query("head(" + func.args(" (1, 2)", " identity#1",
+        " fn($x, $p) { $p = 1 }") + ')', 1);
+    query("head(" + func.args(" (1, 2)", " fn($s as xs:integer+) { $s[2], $s[1] }",
+        " fn($x, $p) { $p = 1 }") + ')', 2);
+    error("head(" + func.args(" (1, 2)", " fn($s as xs:integer) { $s[2], 1 }",
+        " fn($x, $p) { $p = 1 }") + ')', INVCONVERT_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void duplicateValues() {
     final Function func = DUPLICATE_VALUES;
 
@@ -1205,65 +1265,6 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(VOID.args(" ()"), 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
-  }
-
-  /** Test method. */
-  @Test public void iterateWhile() {
-    final Function func = ITERATE_WHILE;
-    query(func.args(1, " not#1", " function($_) { error() }"), 1);
-    error(func.args(1, " boolean#1", " function($_) { error() }"), FUNERR1);
-    query(func.args(1, " empty#1", " identity#1"), 1);
-    query(func.args(" ()", " empty#1", " string#1"), "");
-    query(func.args(" (21 to 24)", " function($s) { head($s) < 23 }", " tail#1"), "23\n24");
-    query(func.args(" (6 to 8)", " function($s) { sum($s) > 10 }",
-        " function($s) { $s ! (. - 1) }"), "2\n3\n4");
-    query(func.args(" reverse(1 to 100)", " function($s) { sum($s) > 20 or head($s) > 4 }",
-        " function($s) { tail($s) }"), "4\n3\n2\n1");
-
-    query(func.args(1, " function($x) { $x < 10000 }", " function($x) { $x + 1 }"), 10000);
-    query(func.args(2, " function($x) { $x < 1000 }", " function($x) { $x * $x }"), 65536);
-    query(func.args(1, " function($x) { count($x) < 3 }", " function($x) { $x, $x }"),
-        "1\n1\n1\n1");
-    query(func.args(" (1 to 100)", " function($s) { $s[last()] - $s[1] > 1 }",
-        " function($s) { subsequence($s, 2, count($s) - 2) }"),
-        "50\n51");
-
-    query(func.args(" 1e0", " function($n) { $n instance of xs:float }",
-        " function($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) }"),
-        1);
-    query(func.args(1, " function($n) { not($n instance of xs:byte) }",
-        " function($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }"),
-        1);
-
-    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
-        " function($map) { characters($map?string) = $map?remove }",
-        " function($map) { map { 'string': replace($map?string, $map?remove, ''),"
-        + "'remove': $map?remove =!> string-to-codepoints() "
-        + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }")
-        + "?string", "unhdrduhul");
-
-    query("let $s := (1 to 1000) return " +
-        func.args(1, " fn { . = $s }", " fn { . + 1 }"), 1001);
-    query("let $i := 3936256 return " +
-        func.args(" $i", " fn($n) { abs($n * $n - $i) >= 0.0000000001 }",
-        " fn($n) { ($n + $i div $n) div 2 }"), 1984);
-
-    query(func.args(1, " function($x) { $x < 1000 }", " function($x) { $x * 2 }"), 1024);
-    query(func.args(1, " function($xs) { count($xs) <= 3 }", " function($x) { $x, $x }"),
-        "1\n1\n1\n1");
-
-    query(func.args(1, " fn($_, $p) { $p <= 10 }", " op('*')"), 3628800);
-
-    check(func.args(1, " false#0", " identity#1"), 1, root(Int.class));
-    check(func.args(" (1, 2)", " false#0", " identity#1"), "1\n2", root(RangeSeq.class));
-
-    // GH-2257
-    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
-        " identity#1") + ')', 1);
-    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
-        " fn($s as xs:integer+) { $s[2], $s[1] }") + ')', 2);
-    error("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
-        " fn($s as xs:integer) { $s[2], 1 }") + ')', INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -2640,6 +2641,65 @@ public final class FnModuleTest extends SandboxTest {
 
     // GH-2139: Simplify inlined nondeterministic code
     check("let $doc := doc('" + TEXT + "') let $a := 1 return $a", 1, root(Int.class));
+  }
+
+  /** Test method. */
+  @Test public void whileDo() {
+    final Function func = WHILE_DO;
+    query(func.args(1, " not#1", " fn($_) { error() }"), 1);
+    error(func.args(1, " boolean#1", " fn($_) { error() }"), FUNERR1);
+    query(func.args(1, " empty#1", " identity#1"), 1);
+    query(func.args(" ()", " empty#1", " string#1"), "");
+    query(func.args(" (21 to 24)", " fn($s) { head($s) < 23 }", " tail#1"), "23\n24");
+    query(func.args(" (6 to 8)", " fn($s) { sum($s) > 10 }",
+        " fn($s) { $s ! (. - 1) }"), "2\n3\n4");
+    query(func.args(" reverse(1 to 100)", " fn($s) { sum($s) > 20 or head($s) > 4 }",
+        " fn($s) { tail($s) }"), "4\n3\n2\n1");
+
+    query(func.args(1, " fn($x) { $x < 10000 }", " fn($x) { $x + 1 }"), 10000);
+    query(func.args(2, " fn($x) { $x < 1000 }", " fn($x) { $x * $x }"), 65536);
+    query(func.args(1, " fn($x) { count($x) < 3 }", " fn($x) { $x, $x }"),
+        "1\n1\n1\n1");
+    query(func.args(" (1 to 100)", " fn($s) { $s[last()] - $s[1] > 1 }",
+        " fn($s) { subsequence($s, 2, count($s) - 2) }"),
+        "50\n51");
+
+    query(func.args(" 1e0", " fn($n) { $n instance of xs:float }",
+        " fn($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) }"),
+        1);
+    query(func.args(1, " fn($n) { not($n instance of xs:byte) }",
+        " fn($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }"),
+        1);
+
+    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
+        " fn($map) { characters($map?string) = $map?remove }",
+        " fn($map) { map { 'string': replace($map?string, $map?remove, ''),"
+        + "'remove': $map?remove =!> string-to-codepoints() "
+        + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }")
+        + "?string", "unhdrduhul");
+
+    query("let $s := (1 to 1000) return " +
+        func.args(1, " fn { . = $s }", " fn { . + 1 }"), 1001);
+    query("let $i := 3936256 return " +
+        func.args(" $i", " fn($n) { abs($n * $n - $i) >= 0.0000000001 }",
+        " fn($n) { ($n + $i div $n) div 2 }"), 1984);
+
+    query(func.args(1, " fn($x) { $x < 1000 }", " fn($x) { $x * 2 }"), 1024);
+    query(func.args(1, " fn($xs) { count($xs) <= 3 }", " fn($x) { $x, $x }"),
+        "1\n1\n1\n1");
+
+    query(func.args(1, " fn($_, $p) { $p <= 10 }", " op('*')"), 3628800);
+
+    check(func.args(1, " false#0", " identity#1"), 1, root(Int.class));
+    check(func.args(" (1, 2)", " false#0", " identity#1"), "1\n2", root(RangeSeq.class));
+
+    // GH-2257
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " identity#1") + ')', 1);
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " fn($s as xs:integer+) { $s[2], $s[1] }") + ')', 2);
+    error("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " fn($s as xs:integer) { $s[2], 1 }") + ')', INVCONVERT_X_X_X);
   }
 
   /** Test method. */

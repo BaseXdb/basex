@@ -193,6 +193,10 @@ public enum Function implements AFunction {
   DOCUMENT_URI(FnDocumentUri::new, "document-uri([node])",
       params(NODE_ZO), ANY_URI_ZO),
   /** XQuery function. */
+  DO_UNTIL(FnDoUntil::new, "do-until(input,action,predicate)",
+      params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, INTEGER_O).seqType(), PREDICATE_ZM),
+      ITEM_ZM, flag(HOF)),
+  /** XQuery function. */
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
@@ -355,10 +359,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ITEMS_AT(FnItemsAt::new, "items-at(input,at)",
       params(ITEM_ZM, NUMERIC_ZM), ITEM_ZM),
-  /** XQuery function. */
-  ITERATE_WHILE(FnIterateWhile::new, "iterate-while(input,predicate,action)",
-      params(ITEM_ZM, PREDICATE_ZM,
-      FuncType.get(ITEM_ZM, ITEM_ZM, INTEGER_O).seqType()), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
@@ -651,6 +651,10 @@ public enum Function implements AFunction {
   /** XQuery function. */
   VOID(FnVoid::new, "void(input[,skip])",
       params(ITEM_ZM, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT)),
+  /** XQuery function. */
+  WHILE_DO(FnWhileDo::new, "while-do(input,predicate,action)",
+      params(ITEM_ZM, PREDICATE_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, INTEGER_O).seqType()),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   XML_TO_JSON(FnXmlToJson::new, "xml-to-json(node[,options])",
       params(NODE_ZO, MAP_ZO), STRING_ZO),

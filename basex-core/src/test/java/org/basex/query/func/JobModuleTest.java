@@ -254,7 +254,7 @@ public final class JobModuleTest extends SandboxTest {
     // receive result of asynchronous execution
     final Function func = _JOB_RESULT;
     query("let $q :=" + _JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
-      " return (" + ITERATE_WHILE.args(" ()",
+      " return (" + WHILE_DO.args(" ()",
         " function($_) { not(" + _JOB_FINISHED.args(" $q") + ") }",
         " function($_) { " + _PROF_SLEEP.args(1) + " }") + "," + func.args(" $q") + ")", 1);
 
