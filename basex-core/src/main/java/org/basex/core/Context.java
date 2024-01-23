@@ -10,7 +10,6 @@ import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -110,6 +109,7 @@ public final class Context {
     blocker = ctx.blocker;
     locking = ctx.locking;
     users = ctx.users;
+    user = ctx.user;
     repo = ctx.repo;
     log = ctx.log;
     jobs = ctx.jobs;
@@ -148,11 +148,10 @@ public final class Context {
   }
 
   /**
-   * Sets the user of this context. This method can only be called once.
+   * Sets the user of this context. This method should only be called once.
    * @param us user
    */
   public void user(final User us) {
-    if(user != null) throw Util.notExpected("User has already been assigned.");
     user = us;
   }
 

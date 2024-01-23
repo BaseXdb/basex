@@ -53,7 +53,7 @@ public final class User {
   }
 
   /**
-   * Indicates if a passwords are stored for a user.
+   * Indicates if passwords are stored for a user.
    * @return result of check
    */
   public boolean enabled() {

@@ -56,9 +56,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     path = new WsPath(pi != null ? pi : "/");
     session = request.getSession();
 
-    final Context ctx = HTTPContext.get().context();
-    context = new Context(ctx, this);
-    context.user(ctx.user());
+    context = new Context(HTTPContext.get().context(), this);
   }
 
   /**

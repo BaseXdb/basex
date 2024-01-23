@@ -31,7 +31,7 @@ public final class LocalConcurrencyTest extends SandboxTest {
       for(int d = 0; d < runs; d++) {
         execute(new Grant("write", "user", "doc" + d));
         new Thread(() -> {
-          try(Session session = new LocalSession(context, "user", "")) {
+          try(Session session = new LocalSession(context)) {
             session.execute(new Open("store"));
           } catch(final Exception ex) {
             error[0] = ex;
