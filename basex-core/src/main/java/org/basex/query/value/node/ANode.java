@@ -424,6 +424,12 @@ public abstract class ANode extends Item {
   public abstract boolean hasChildren();
 
   /**
+   * Indicates if the node has attributes.
+   * @return result of test
+   */
+  public abstract boolean hasAttributes();
+
+  /**
    * Returns the value of the specified attribute.
    * @param name attribute to be found
    * @return attribute value or {@code null}

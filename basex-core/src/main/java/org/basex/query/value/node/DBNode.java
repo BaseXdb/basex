@@ -251,6 +251,11 @@ public class DBNode extends ANode {
   }
 
   @Override
+  public final boolean hasAttributes() {
+    return data.attSize(pre, kind()) > 0;
+  }
+
+  @Override
   public final BasicNodeIter ancestorIter() {
     return root != null ? super.ancestorIter() : ancestorIter(data.parent(pre, kind()));
   }
@@ -475,7 +480,7 @@ public class DBNode extends ANode {
           qs.concat(FPI.OPEN, name(), " ", QueryString.toValue(string()), FPI.CLOSE);
           break;
         case ELEMENT:
-          qs.concat("<", name(), hasChildren() || attributeIter().size() > 0 ? DOTS : "", "/>");
+          qs.concat("<", name(), hasChildren() || hasAttributes() ? DOTS : "", "/>");
           break;
         case DOCUMENT_NODE:
           qs.token(DOCUMENT).brace(QueryString.toQuoted(baseURI()));

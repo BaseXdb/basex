@@ -211,6 +211,6 @@ public final class Users {
    * @param elem info element
    */
   public synchronized void info(final ANode elem) {
-    info = elem.hasChildren() || elem.attributeIter().size() != 0 ? elem : null;
+    info = elem.hasChildren() || elem.hasAttributes() ? elem : null;
   }
 }

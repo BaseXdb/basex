@@ -191,6 +191,11 @@ public final class FElem extends FNode {
   }
 
   @Override
+  public boolean hasAttributes() {
+    return attributes.length != 0;
+  }
+
+  @Override
   public FNode materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
 

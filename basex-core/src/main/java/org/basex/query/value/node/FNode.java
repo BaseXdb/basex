@@ -70,6 +70,11 @@ public abstract class FNode extends ANode {
   }
 
   @Override
+  public boolean hasAttributes() {
+    return false;
+  }
+
+  @Override
   public final BasicNodeIter descendantIter() {
     return desc(false);
   }
