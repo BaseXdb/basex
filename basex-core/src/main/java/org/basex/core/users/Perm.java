@@ -1,6 +1,6 @@
 package org.basex.core.users;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * User permissions.
@@ -37,6 +37,6 @@ public enum Perm {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 }

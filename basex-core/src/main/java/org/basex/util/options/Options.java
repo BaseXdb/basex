@@ -40,7 +40,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 
@@ -52,7 +52,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

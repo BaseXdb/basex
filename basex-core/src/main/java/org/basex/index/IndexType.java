@@ -2,11 +2,10 @@ package org.basex.index;
 
 import static org.basex.query.QueryError.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This enumeration lists available index types.
@@ -32,7 +31,7 @@ public enum IndexType {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 
   /**

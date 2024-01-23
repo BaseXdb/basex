@@ -44,7 +44,7 @@ public final class BaseXCollationOptions extends CollationOptions {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 
@@ -67,7 +67,7 @@ public final class BaseXCollationOptions extends CollationOptions {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

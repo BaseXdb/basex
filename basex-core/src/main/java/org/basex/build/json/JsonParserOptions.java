@@ -1,7 +1,5 @@
 package org.basex.build.json;
 
-import java.util.*;
-
 import org.basex.util.options.*;
 
 /**
@@ -34,7 +32,7 @@ public final class JsonParserOptions extends JsonOptions {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+      return EnumOption.string(name());
     }
   }
 

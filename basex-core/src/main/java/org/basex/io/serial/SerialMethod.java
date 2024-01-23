@@ -1,6 +1,6 @@
 package org.basex.io.serial;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Serialization methods.
@@ -23,6 +23,6 @@ public enum SerialMethod {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 }

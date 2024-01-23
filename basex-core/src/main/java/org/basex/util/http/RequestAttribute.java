@@ -1,6 +1,6 @@
 package org.basex.util.http;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * HTTP Request attributes.
@@ -49,6 +49,6 @@ public enum RequestAttribute {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    return EnumOption.string(name());
   }
 }

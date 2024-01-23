@@ -162,7 +162,7 @@ public final class Prop {
    * @param value value
    */
   public static void put(final Option<?> option, final String value) {
-    put(key(option), value);
+    put(DBPREFIX + option.name().toLowerCase(Locale.ENGLISH), value);
   }
 
   /**
@@ -211,14 +211,5 @@ public final class Prop {
    */
   public static void setSystem(final String name, final String value) {
     if(System.getProperty(name) == null) System.setProperty(name, value);
-  }
-
-  /**
-   * Returns the key of an option. The returned key is prefixed with {@link #DBPREFIX}.
-   * @param option option
-   * @return key
-   */
-  private static String key(final Option<?> option) {
-    return DBPREFIX + option.name().toLowerCase(Locale.ENGLISH);
   }
 }

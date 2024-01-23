@@ -1,7 +1,5 @@
 package org.basex.build.csv;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -38,7 +36,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 
@@ -63,7 +61,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

@@ -1,6 +1,6 @@
 package org.basex.core.users;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Codes.
@@ -14,6 +14,6 @@ public enum Code {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 }

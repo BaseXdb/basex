@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import java.util.*;
 import java.util.stream.*;
 
 import org.basex.build.csv.*;
@@ -200,7 +199,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 
@@ -214,7 +213,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

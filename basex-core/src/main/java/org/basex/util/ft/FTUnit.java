@@ -1,6 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Full-text units.
@@ -19,6 +19,6 @@ public enum FTUnit {
    */
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 }

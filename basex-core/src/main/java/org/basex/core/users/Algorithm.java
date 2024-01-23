@@ -1,6 +1,6 @@
 package org.basex.core.users;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Algorithms.
@@ -27,6 +27,6 @@ public enum Algorithm {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    return EnumOption.string(name());
   }
 }
