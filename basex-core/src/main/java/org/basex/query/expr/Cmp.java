@@ -2,8 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
@@ -179,12 +177,12 @@ public abstract class Cmp extends Arr {
     if(st1.type == AtomType.BOOLEAN && st2.type == AtomType.BOOLEAN) {
       final boolean eq = op == OpV.EQ, ne = op == OpV.NE;
       if(expr2 instanceof Bln) {
+        final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
+
         // boolean(A) = true()  ->  boolean(A)
         // boolean(A) <= true()  ->  true()
-        final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
-        final Expr ex1 = st1.one() ? expr1 : st1.zeroOrOne() ? cc.function(BOOLEAN, info, expr1) :
-          null;
-        if(ex1 != null && (success || st1.one())) {
+        if(st1.zeroOrOne() && (success || st1.one())) {
+          final Expr ex1 = st1.one() ? expr1 : cc.function(BOOLEAN, info, expr1);
           final QuerySupplier<Expr> not = () -> cc.function(NOT, info, ex1);
           switch(op) {
             case EQ: return ok ? ex1       : not.get();
@@ -199,20 +197,26 @@ public abstract class Cmp extends Arr {
         if(this instanceof CmpG) {
           // (A, B) = true()  ->  A or B
           // (A, B) = false()  ->  not(A and B)
-          final Checks<Expr> booleans = expr -> expr.seqType().eq(SeqType.BOOLEAN_O);
           final Expr[] args = expr1.args();
-          if((eq || ne) && expr1 instanceof List && booleans.all(args)) {
-            if(success) return new Or(info, args).optimize(cc);
-            return cc.function(NOT, info, new And(info, args).optimize(cc));
+          if((eq || ne) && expr1 instanceof List &&
+              ((Checks<Expr>) expr -> expr.seqType().eq(SeqType.BOOLEAN_O)).all(args)) {
+            return success ? new Or(info, args).optimize(cc) :
+              cc.function(NOT, info, new And(info, args).optimize(cc));
           }
 
           if(expr1 instanceof SimpleMap) {
-            final int al = args.length;
-            final Expr last = args[al - 1];
+            final SimpleMap map = (SimpleMap) expr1;
+            final int al = args.length - 1;
+            final Expr last = args[al];
+
+            // expr ! true() = true()  ->  exists(expr)
+            if(last instanceof Bln && (eq || ne)) {
+              return ((Bln) last).bool(info) != success ? Bln.FALSE :
+                cc.function(EXISTS, info, map.remove(cc, al));
+            }
+
             final Expr[] ops = last.args();
             if(ops != null && ops.length > 0 && ops[0] instanceof ContextValue) {
-              final QuerySupplier<Expr> op1 = () ->
-                SimpleMap.get(cc, info, Arrays.copyOf(args, al - 1));
               if(last instanceof CmpG) {
                 // (name ! (. = 'Ukraine')) = true()  ->  name = 'Ukraine'
                 // (code ! (. = 1)) = false()  ->  code != 1
@@ -220,21 +224,21 @@ public abstract class Cmp extends Arr {
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
                   OpG opG = ((CmpG) last).op;
                   if(!success) opG = opG.invert();
-                  return new CmpG(info, op1.get(), op2, opG, coll, sc).optimize(cc);
+                  return new CmpG(info, map.remove(cc, al), op2, opG, coll, sc).optimize(cc);
                 }
               } else if(success && last instanceof CmpR) {
                 // (number ! (. >= 1e0) = true()  ->  number >= 1e0
                 final CmpR cmp = (CmpR) last;
-                return CmpR.get(cc, info, op1.get(), cmp.min, cmp.max);
+                return CmpR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
               } else if(success && last instanceof CmpIR) {
                 // (integer ! (. >= 1) != false()  ->  integer >= 1
                 final CmpIR cmp = (CmpIR) last;
-                return CmpIR.get(cc, info, op1.get(), cmp.min, cmp.max);
+                return CmpIR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
               } else if(success && last instanceof CmpSR) {
                 // (string ! (. >= 'b') = true()  ->  string >= 'b'
                 final CmpSR cmp = (CmpSR) last;
-                return new CmpSR(op1.get(), cmp.min, cmp.mni, cmp.max, cmp.mxi, cmp.coll,
-                    info).optimize(cc);
+                return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi,
+                    cmp.coll, info).optimize(cc);
               }
             }
           }

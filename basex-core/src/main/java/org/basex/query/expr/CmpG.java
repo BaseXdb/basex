@@ -355,7 +355,6 @@ public class CmpG extends Cmp {
       ir2 = null;
     }
     return Bln.FALSE;
-
   }
 
   /**

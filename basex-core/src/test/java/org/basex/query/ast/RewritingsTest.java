@@ -3276,4 +3276,16 @@ public final class RewritingsTest extends SandboxTest {
     query("let $f := fn($f as function(*)) { fold-left(1, (), $f) } return $f(true#0)", true);
     query("(fn($f as function(*)) { fold-left(1, (), $f) })(true#0)", true);
   }
+
+  /** Boolean comparisons in simple maps. */
+  @Test public void gh2271() {
+    check("<a/>/@* ! true() = true()", false, root(EXISTS));
+    check("<a b='x'/>/@* ! true() = true()", true, root(EXISTS));
+    check("<a b='x'/>/@* ! true() != false()", true, root(EXISTS));
+
+    check("<a b='x'/>/@* ! true() = false()", false, root(Bln.class));
+    check("<a b='x'/>/@* ! true() != true()", false, root(Bln.class));
+    check("<a b='x'/>/@* ! false() = true()", false, root(Bln.class));
+    check("<a b='x'/>/@* ! false() != false()", false, root(Bln.class));
+  }
 }

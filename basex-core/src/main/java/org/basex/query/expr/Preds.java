@@ -151,11 +151,8 @@ public abstract class Preds extends Arr {
     final SeqType rst = root.seqType();
     final Predicate<Expr> first = f -> f instanceof ContextValue ||
         root.equals(f) && root.isSimple() && rst.one();
-    if(expr instanceof SimpleMap) {
-      final Expr[] mexprs = ((SimpleMap) expr).exprs;
-      if(first.test(mexprs[0]) && !mexprs[1].has(Flag.POS)) {
-        expr = SimpleMap.get(cc, expr.info(), Arrays.copyOfRange(mexprs, 1, mexprs.length));
-      }
+    if(expr instanceof SimpleMap && first.test(expr.arg(0)) && !expr.arg(1).has(Flag.POS)) {
+      expr = ((SimpleMap) expr).remove(cc, 1);
     }
 
     // paths: E[./...]  ->  E[...], E[E/...]  ->  E[...]

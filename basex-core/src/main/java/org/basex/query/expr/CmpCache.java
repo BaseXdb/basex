@@ -42,7 +42,7 @@ public final class CmpCache {
     // check if caching was dismissed
     if(set == null) return false;
 
-    // check if this is the first call, of if the value to be cached has changed
+    // check if this is the first call, or if the value to be cached has changed
     if(value != val) {
       // no cache hits: dismiss caching
       if(hits < 1) {

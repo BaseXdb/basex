@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -99,6 +98,19 @@ public abstract class SimpleMap extends Arr {
       dualiter ? new DualIterMap(info, exprs) :
       new IterMap(info, exprs)
     );
+  }
+
+  /**
+   * Removes the specified operand.
+   * @param cc compilation context
+   * @param e operand to remove
+   * @return new map expression
+   * @throws QueryException query exception
+   */
+  public Expr remove(final CompileContext cc, final int e) throws QueryException {
+    final ExprList list = new ExprList(exprs);
+    list.remove(e);
+    return get(cc, info, list.finish());
   }
 
   /**
@@ -470,7 +482,7 @@ public abstract class SimpleMap extends Arr {
         if(mode != Simplify.DISTINCT && seqType().zeroOrOne() &&
             prev.seqType().type instanceof NodeType && last instanceof Bln) {
           // boolean(@id ! true())  ->  boolean(@id)
-          expr = last == Bln.FALSE ? Bln.FALSE : get(cc, info, Arrays.copyOf(exprs, el - 1));
+          expr = last == Bln.FALSE ? Bln.FALSE : remove(cc, el - 1);
         } else {
           // nodes ! text() = string  ->  nodes/text() = string
           expr = toPath(mode, cc);
