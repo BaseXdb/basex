@@ -750,7 +750,7 @@ public final class Token {
   public static boolean eq(final byte[] token1, final byte[] token2, final DeepEqual deep) {
     final Normalizer.Form form = deep.options.get(NORMALIZATION_FORM);
     byte[] t1 = normalize(token1, form), t2 = normalize(token2, form);
-    if(deep.options.get(NORMALIZE_SPACE)) {
+    if(deep.options.get(WHITESPACE) == Whitespace.NORMALIZE) {
       t1 = normalize(t1);
       t2 = normalize(t2);
     }
@@ -1491,18 +1491,6 @@ public final class Token {
    * @return normalized token
    */
   public static byte[] normalize(final byte[] token, final Normalizer.Form form) {
-    return normalize(token, form, ascii(token));
-  }
-
-  /**
-   * Normalizes Unicode characters in the specified token.
-   * @param token token
-   * @param form normalization form (can be {@code null})
-   * @param ascii ASCII flag
-   * @return normalized token
-   */
-  public static byte[] normalize(final byte[] token, final Normalizer.Form form,
-      final boolean ascii) {
-    return form == null || ascii ? token : token(Normalizer.normalize(string(token), form));
+    return form == null || ascii(token) ? token : token(Normalizer.normalize(string(token), form));
   }
 }

@@ -51,15 +51,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: ordered. */
   public static final BooleanOption ORDERED =
       new BooleanOption("ordered", true);
-  /** Option: preserve-space. */
-  public static final BooleanOption PRESERVE_SPACE =
-      new BooleanOption("preserve-space", true);
   /** Option: processing-instructions. */
   public static final BooleanOption PROCESSING_INSTRUCTIONS =
       new BooleanOption("processing-instructions", false);
-  /** Option: text-boundaries. */
-  public static final BooleanOption TEXT_BOUNDARIES =
-      new BooleanOption("text-boundaries", true);
   /** Option: timezones. */
   public static final BooleanOption TIMEZONES =
       new BooleanOption("timezones", false);
@@ -75,6 +69,21 @@ public final class DeepEqualOptions extends Options {
   /** Option: unordered-elements. */
   public static final StringOption UNORDERED_ELEMENTS =
       new StringOption("unordered-elements", "");
+  /** Option: whitespace. */
+  public static final EnumOption<Whitespace> WHITESPACE =
+      new EnumOption<>("whitespace", Whitespace.PRESERVE);
+
+  /** Whitespace mode. */
+  public enum Whitespace {
+    /** Preserve.  */ PRESERVE,
+    /** Strip.     */ STRIP,
+    /** Normalize. */ NORMALIZE;
+
+    @Override
+    public String toString() {
+      return EnumOption.string(name());
+    }
+  }
 
   /** QNames. */
   private final QNmSet qnames = new QNmSet();

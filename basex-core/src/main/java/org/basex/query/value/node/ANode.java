@@ -166,17 +166,17 @@ public abstract class ANode extends Item {
       for(final ANode child : node.childIter()) {
         if(deep.qc != null) deep.qc.checkStop();
         final Type tp = child.type;
-        if(tp == COMMENT && !options.get(COMMENTS) ||
-           tp == PROCESSING_INSTRUCTION && !options.get(PROCESSING_INSTRUCTIONS)) continue;
-        if(tp == TEXT) {
-          final byte[] string = child.string();
-          if(Token.ws(string) && !options.get(PRESERVE_SPACE)) continue;
-          if(!nl.isEmpty() && nl.peek().type == NodeType.TEXT && !options.get(TEXT_BOUNDARIES)) {
-            nl.add(new FTxt(Token.concat(nl.pop().string(), string)));
-            continue;
-          }
+        if((tp != PROCESSING_INSTRUCTION || options.get(PROCESSING_INSTRUCTIONS)) &&
+            (tp != COMMENT || options.get(COMMENTS))) {
+          nl.add(tp != TEXT || nl.isEmpty() || nl.peek().type != NodeType.TEXT ? child.finish() :
+            new FTxt(Token.concat(nl.pop().string(), child.string())));
         }
-        nl.add(child.finish());
+      }
+      if(options.get(WHITESPACE) != Whitespace.PRESERVE && !preserve()) {
+        for(int n = nl.size() - 1; n >= 0; n--) {
+          final ANode child = nl.get(n);
+          if(child.type == TEXT && Token.ws(child.string())) nl.remove(n);
+        }
       }
       return nl;
     };
@@ -280,7 +280,7 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns all namespaces defined for the nodes.
+   * Returns all namespaces defined for the node.
    * Overwritten by {@link FElem} and {@link DBNode}.
    * @return namespace array or {@code null}
    */
@@ -295,8 +295,7 @@ public abstract class ANode extends Item {
    */
   public final Atts nsScope(final StaticContext sc) {
     final Atts ns = new Atts();
-    ANode node = this;
-    do {
+    for(ANode node = this; node != null; node = node.parent()) {
       final Atts nsp = node.namespaces();
       if(nsp != null) {
         for(int a = nsp.size() - 1; a >= 0; a--) {
@@ -304,10 +303,24 @@ public abstract class ANode extends Item {
           if(!ns.contains(key)) ns.add(key, nsp.value(a));
         }
       }
-      node = node.parent();
-    } while(node != null && node.type == ELEMENT);
+    }
     if(sc != null) sc.ns.inScope(ns);
     return ns;
+  }
+
+  /**
+   * Returns if whitespace needs to be preserved.
+   * @return node kind
+   */
+  public boolean preserve() {
+    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
+    for(ANode node = this; node != null; node = node.parent()) {
+      if(node.type == ELEMENT) {
+        final byte[] v = node.attribute(xs);
+        if(v != null) return Token.eq(v, DataText.PRESERVE);
+      }
+    }
+    return false;
   }
 
   /**
@@ -358,27 +371,27 @@ public abstract class ANode extends Item {
   static int compare(final ANode node1, final ANode node2) {
     // cache parents of first node
     final ANodeList nl = new ANodeList();
-    for(ANode n = node1; n != null; n = n.parent()) {
-      if(n == node2) return 1;
-      nl.add(n);
+    for(ANode node = node1; node != null; node = node.parent()) {
+      if(node == node2) return 1;
+      nl.add(node);
     }
     // find the lowest common ancestor
     ANode c2 = node2;
     LOOP:
-    for(ANode n = node2; (n = n.parent()) != null;) {
+    for(ANode node = node2; (node = node.parent()) != null;) {
       final int is = nl.size();
       for(int i = 1; i < is; i++) {
-        if(n == node1) return -1;
-        if(!nl.get(i).is(n)) continue;
+        if(node == node1) return -1;
+        if(!nl.get(i).is(node)) continue;
         // check which node appears as first LCA child
         final ANode c1 = nl.get(i - 1);
-        for(final ANode c : n.childIter()) {
+        for(final ANode c : node.childIter()) {
           if(c.is(c1)) return -1;
           if(c.is(c2)) return 1;
         }
         break LOOP;
       }
-      c2 = n;
+      c2 = node;
     }
     return Integer.signum(node1.id - node2.id);
   }

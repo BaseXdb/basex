@@ -182,7 +182,7 @@ public class DBNode extends ANode {
 
   @Override
   public final Atts namespaces() {
-    return data.namespaces(pre);
+    return type == NodeType.ELEMENT ? data.namespaces(pre) : null;
   }
 
   @Override

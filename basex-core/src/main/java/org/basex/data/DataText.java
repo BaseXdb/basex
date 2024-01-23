@@ -211,7 +211,7 @@ public interface DataText {
   /** CDATA output. */
   byte[] CDATA_C = token("]]>");
 
-  /** XML spaces: element name. */
+  /** XML spaces: attribute name. */
   byte[] XML_SPACE = token("xml:space");
   /** XML spaces: default. */
   byte[] DEFAULT = token("default");
