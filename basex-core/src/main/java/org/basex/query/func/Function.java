@@ -572,19 +572,9 @@ public enum Function implements AFunction {
   SUBSEQUENCE(FnSubsequence::new, "subsequence(input,start[,length])",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_ZO), ITEM_ZM),
   /** XQuery function. */
-  SUBSEQUENCE_AFTER(FnSubsequenceAfter::new, "subsequence-after(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
-  /** XQuery function. */
-  SUBSEQUENCE_BEFORE(FnSubsequenceBefore::new, "subsequence-before(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
-  /** XQuery function. */
-  SUBSEQUENCE_ENDING_WHERE(FnSubsequenceEndingWhere::new,
-      "subsequence-ending-where(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
-  /** XQuery function. */
-  SUBSEQUENCE_STARTING_WHERE(FnSubsequenceStartingWhere::new,
-      "subsequence-starting-where(input,predicate)",
-      params(ITEM_ZM, PREDICATE_O), ITEM_ZM, flag(HOF)),
+  SUBSEQUENCE_WHERE(FnSubsequenceWhere::new, "subsequence-where(input[,from,to])",
+      params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE), PREDICATE_O.with(Occ.ZERO_OR_ONE)),
+      ITEM_ZM),
   /** XQuery function. */
   SUBSTRING(FnSubstring::new, "substring(value,start[,length])",
       params(STRING_ZO, DOUBLE_O, DOUBLE_ZO), STRING_O),
