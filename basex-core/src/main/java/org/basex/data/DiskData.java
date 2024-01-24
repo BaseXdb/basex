@@ -148,7 +148,8 @@ public final class DiskData extends Data {
       resources.write(out);
       out.write(0);
     }
-    if(meta.updindex) idmap.write(meta.dbFile(DATAIDP));
+    // file may be missing if flag was just enabled
+    if(meta.updindex && idmap != null) idmap.write(meta.dbFile(DATAIDP));
     meta.dirty = false;
   }
 

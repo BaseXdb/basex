@@ -3288,4 +3288,10 @@ public final class RewritingsTest extends SandboxTest {
     check("<a b='x'/>/@* ! false() = true()", false, root(Bln.class));
     check("<a b='x'/>/@* ! false() != false()", false, root(Bln.class));
   }
+
+  /** Database optimization: Enabling UPDINDEX. */
+  @Test public void gh2272() {
+    query("db:create('test')");
+    query("db:put('test', <a/>, 'a.xml'), db:optimize('test', true(), map { 'updindex': true() })");
+  }
 }
