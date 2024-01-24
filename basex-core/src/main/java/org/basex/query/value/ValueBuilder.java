@@ -35,17 +35,6 @@ public final class ValueBuilder {
   }
 
   /**
-   * Constructor with initial items.
-   * @param qc query context (required for interrupting running queries)
-   * @param item1 first item to append
-   * @param item2 second item to append
-   */
-  public ValueBuilder(final QueryContext qc, final Item item1, final Item item2) {
-    this(qc);
-    builder = new TreeSeqBuilder().add(item1).add(item2);
-  }
-
-  /**
    * Concatenates two values.
    * @param value1 first value to concatenate
    * @param value2 second value to concatenate
@@ -62,7 +51,17 @@ public final class ValueBuilder {
     if(size1 > 1) return ((Seq) value1).insert(size1, value2, qc);
     if(size2 > 1) return ((Seq) value2).insertBefore(0, (Item) value1, qc);
     // concatenate single items
-    return TreeSeqBuilder.concat((Item) value1, (Item) value2);
+    return concat((Item) value1, (Item) value2);
+  }
+
+  /**
+   * Concatenates two items.
+   * @param item1 first item to concatenate
+   * @param item2 second item to concatenate
+   * @return concatenated values
+   */
+  public static Value concat(final Item item1, final Item item2) {
+    return TreeSeqBuilder.concat(item1, item2);
   }
 
   /**

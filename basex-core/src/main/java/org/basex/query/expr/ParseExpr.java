@@ -78,7 +78,7 @@ public abstract class ParseExpr extends Expr {
       // effective boolean value is only defined for node sequences or single items
       if(!(item instanceof ANode)) {
         final Item next = iter.next();
-        if(next != null) throw ebvError(ValueBuilder.concat(item, next, qc), info);
+        if(next != null) throw ebvError(ValueBuilder.concat(item, next), info);
       }
     }
     return pred && item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
