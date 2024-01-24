@@ -769,6 +769,9 @@ public enum Function implements AFunction {
   _ARRAY_HEAD(ArrayHead::new, "head(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_INDEX_OF(ArrayIndexOf::new, "index-of(array,search[,collation])",
+      params(ARRAY_O, ANY_ATOMIC_TYPE_ZM, STRING_ZO), INTEGER_ZM, ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_INDEX_WHERE(ArrayIndexWhere::new, "index-where(array,predicate)",
       params(ARRAY_O, PREDICATE_ZM), INTEGER_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
