@@ -63,7 +63,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   public Closure(final InputInfo info, final Expr expr, final Params params, final AnnList anns,
       final VarScope vs, final Map<Var, Expr> global) {
-    this(info, expr, params.vars(), anns, vs, global, params.type, null);
+    this(info, expr, params.vars(), anns, vs, global, params.seqType(), null);
   }
 
   /**

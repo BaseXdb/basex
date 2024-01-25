@@ -1,6 +1,7 @@
 package org.basex.io;
 
 import java.io.*;
+import java.net.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
@@ -81,6 +82,20 @@ public final class IOFile extends IO {
       abs = Strings.startsWith(p, '/') || Strings.startsWith(p, '\\');
     }
     absolute = abs;
+  }
+
+  /**
+   * Converts the specified URI to a file path.
+   * @param uri URI to be converted
+   * @return file path
+   */
+  static String toPath(final String uri) {
+    try {
+      return new URL(uri).toURI().getPath();
+    } catch(final Exception ex) {
+      Util.errln(ex);
+      return uri;
+    }
   }
 
   /**

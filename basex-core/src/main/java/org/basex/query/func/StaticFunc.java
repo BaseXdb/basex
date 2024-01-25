@@ -55,7 +55,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   StaticFunc(final QNm name, final Params params, final Expr expr, final AnnList anns,
       final VarScope vs, final InputInfo info, final String doc) {
-    super(name, params.type, anns, vs, info, doc);
+    super(name, params.seqType(), anns, vs, info, doc);
 
     this.params = params.vars();
     this.defaults = params.defaults();

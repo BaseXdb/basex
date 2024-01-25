@@ -941,7 +941,7 @@ public class QueryParser extends InputParser {
     boolean defaults = false;
     do {
       skipWs();
-      if(curr() != '$' && params.isEmpty()) break;
+      if(curr() != '$' && params.size() == 0) break;
       final InputInfo ii = info();
       final QNm name = varName();
       final SeqType type = optAsType();
@@ -956,10 +956,7 @@ public class QueryParser extends InputParser {
     } while(consume(','));
 
     wsCheck(")");
-    params.type = optAsType();
-    params.finish(qc, sc, localVars);
-
-    return params;
+    return params.seqType(optAsType()).finish(qc, sc, localVars);
   }
 
   /**

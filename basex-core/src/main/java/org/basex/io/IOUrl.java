@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpClient.*;
-import java.nio.file.*;
 import java.security.*;
 import java.security.cert.*;
 import java.time.*;
@@ -203,22 +202,6 @@ public final class IOUrl extends IO {
       if(!(c >= 'a' && c <= 'z' || c == '+' || c == '-' || c == '.' || c == '_')) return false;
     }
     return true;
-  }
-
-  /**
-   * Normalizes the specified URI and creates a path URI.
-   * @param uri uri to be converted
-   * @return file path
-   */
-  static String toFile(final String uri) {
-    try {
-      final String path = Paths.get(new URI(uri)).toString();
-      return Strings.endsWith(uri, '/') || Strings.endsWith(uri, '\\') ?
-        path + File.separator : path;
-    } catch(final Exception ex) {
-      Util.errln(ex);
-      return uri;
-    }
   }
 
   /**

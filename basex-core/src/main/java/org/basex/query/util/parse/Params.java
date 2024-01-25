@@ -20,16 +20,16 @@ import org.basex.util.*;
  */
 public final class Params {
   /** Parameters. */
-  private final ArrayList<Param> params = new ArrayList<>();
+  private ArrayList<Param> params;
   /** Return type. */
-  public SeqType type;
+  private SeqType type;
 
   /**
-   * Checks if the parameter list is empty.
-   * @return result of check
+   * Returns the number of parameters.
+   * @return count
    */
-  public boolean isEmpty() {
-    return params.isEmpty();
+  public int size() {
+    return params != null ? params.size() : 0;
   }
 
   /**
@@ -46,7 +46,18 @@ public final class Params {
     param.type = st;
     param.expr = expr;
     param.info = info;
+    if(params == null) params = new ArrayList<>(4);
     params.add(param);
+    return this;
+  }
+
+  /**
+   * Assigns the sequence type.
+   * @param st sequence type
+   * @return self reference
+   */
+  public Params seqType(final SeqType st) {
+    type = st;
     return this;
   }
 
@@ -61,17 +72,20 @@ public final class Params {
   public Params finish(final QueryContext qc, final StaticContext sc, final LocalVars vars)
       throws QueryException {
 
-    // check if the parameter names contain duplicates
-    if(params.size() > 1) {
-      final QNmSet names = new QNmSet();
-      for(final Param param : params) {
-        if(!names.add(param.name)) throw FUNCDUPL_X.get(param.info, param.name);
+    final int size = size();
+    if(size > 0) {
+      // check if the parameter names contain duplicates
+      if(size > 1) {
+        final QNmSet names = new QNmSet();
+        for(final Param param : params) {
+          if(!names.add(param.name)) throw FUNCDUPL_X.get(param.info, param.name);
+        }
       }
-    }
-    // create variables
-    for(final Param param : params) {
-      param.var = new Var(param.name, param.type, qc, sc, param.info, true);
-      vars.add(param.var);
+      // create variables
+      for(final Param param : params) {
+        param.var = new Var(param.name, param.type, qc, sc, param.info, true);
+        vars.add(param.var);
+      }
     }
     return this;
   }
@@ -81,7 +95,7 @@ public final class Params {
    * @return default values
    */
   public Var[] vars() {
-    final int ps = params.size();
+    final int ps = size();
     final Var[] vars = new Var[ps];
     for(int p = 0; p < ps; p++) vars[p] = params.get(p).var;
     return vars;
@@ -92,16 +106,28 @@ public final class Params {
    * @return default values
    */
   public Expr[] defaults() {
-    final int ps = params.size();
+    final int ps = size();
     final Expr[] defaults = new Expr[ps];
     for(int p = 0; p < ps; p++) defaults[p] = params.get(p).expr;
     return defaults;
   }
 
+  /**
+   * Returns the sequence type.
+   * @return sequence type
+   */
+  public SeqType seqType() {
+    return type;
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder().append('(');
-    for(final Param param : params) sb.append(sb.length() != 1 ? ", " : "").append(param);
+    if(size() != 0) {
+      for(final Param param : params) {
+        sb.append(sb.length() != 1 ? ", " : "").append(param);
+      }
+    }
     return sb.append(')').toString();
   }
 
