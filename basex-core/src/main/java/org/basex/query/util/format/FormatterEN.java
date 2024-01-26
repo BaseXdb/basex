@@ -59,11 +59,11 @@ final class FormatterEN extends Formatter {
       "August", "September", "October", "November", "December");
 
   /** AM/PM Markers. */
-  private static final byte[][] AMPM = tokens("Am", "Pm");
+  private static final byte[][] AMPM = tokens("AM", "PM");
   /** Ordinal suffixes (st, nr, rd, th). */
   private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
   /** Eras: BC, AD. */
-  private static final byte[][] ERAS = tokens("Bc", "Ad");
+  private static final byte[][] ERAS = tokens("BC", "AD");
 
   @Override
   public byte[] word(final long n, final NumeralType numType, final byte[] suffix) {
