@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.build.json.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -118,7 +119,7 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void numberLit(final byte[] value) throws QueryException {
+  void numberLit(final Item value) throws QueryException {
     throw error("No numbers allowed");
   }
 
