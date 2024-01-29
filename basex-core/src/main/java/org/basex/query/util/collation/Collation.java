@@ -96,9 +96,10 @@ public abstract class Collation {
     if(eq(URL, base)) {
       opts = new BaseXCollationOptions(false);
     } else if(eq(UCA, base)) {
+      final boolean fallback = !YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()));
       if(UCAOptions.ACTIVE) {
-        opts = new UCAOptions();
-      } else if(!YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()))) {
+        opts = new UCAOptions(fallback);
+      } else if(fallback) {
         opts = new BaseXCollationOptions(true);
       }
     }

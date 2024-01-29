@@ -26,7 +26,7 @@ public final class OptionsTest extends SandboxTest {
   /** Initializes various options. */
   @AfterAll public static void init() {
     // instantiate options at least once
-    new UCAOptions();
+    new UCAOptions(false);
     new CsvOptions();
     new CsvParserOptions();
     new CsvSerialOptions();

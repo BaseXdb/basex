@@ -4,8 +4,6 @@ import static com.ibm.icu.text.CollationElementIterator.*;
 import static com.ibm.icu.text.Collator.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
-
 import org.basex.util.*;
 
 import com.ibm.icu.text.*;
@@ -35,8 +33,8 @@ final class UCACollation extends Collation {
    * Private Constructor.
    * @param collator collation options
    */
-  UCACollation(final Comparator<Object> collator) {
-    this.collator = (RuleBasedCollator) collator;
+  UCACollation(final RuleBasedCollator collator) {
+    this.collator = collator;
     strength = this.collator.getStrength();
     strengthMask = mask(strength);
     isShifted = this.collator.isAlternateHandlingShifted();

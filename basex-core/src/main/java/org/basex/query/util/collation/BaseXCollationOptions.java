@@ -4,7 +4,6 @@ import static org.basex.util.Strings.*;
 
 import java.text.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.util.options.*;
@@ -71,15 +70,12 @@ public final class BaseXCollationOptions extends CollationOptions {
     }
   }
 
-  /** Fallback parsing. */
-  private final boolean fallback;
-
   /**
    * Constructor.
    * @param fallback fallback option
    */
   public BaseXCollationOptions(final boolean fallback) {
-    this.fallback = fallback;
+    super(fallback);
   }
 
   @Override
@@ -95,15 +91,17 @@ public final class BaseXCollationOptions extends CollationOptions {
    */
   private Collator collator(final HashMap<String, String> args) throws BaseXException {
     if(fallback) {
-      for(final Entry<String, String> entry : args.entrySet()) {
-        final String name = entry.getKey();
-        String value = entry.getValue();
-        if(name.equals(STRENGTH.name())) {
-          if(eq(value, "1")) value = Strength.PRIMARY.toString();
-          else if(eq(value, "2")) value = Strength.SECONDARY.toString();
-          else if(eq(value, "3")) value = Strength.TERTIARY.toString();
-          else if(eq(value, "quaternary", "4", "5")) value = Strength.IDENTICAL.toString();
+      final String name = STRENGTH.name();
+      if(args.containsKey(name)) {
+        String value = args.get(name);
+        if(eq(value, "1")) value = Strength.PRIMARY.toString();
+        else if(eq(value, "2")) value = Strength.SECONDARY.toString();
+        else if(eq(value, "3")) value = Strength.TERTIARY.toString();
+        else if(eq(value, "quaternary", "4", "5")) value = Strength.IDENTICAL.toString();
+        try {
           assign(name, value);
+        } catch (@SuppressWarnings("unused") BaseXException ex) {
+          // fallback == true -> ignore invalid values
         }
       }
     } else {
