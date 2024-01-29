@@ -114,19 +114,19 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(BACKWARDS)) {
-      Boolean b = yesNo(BACKWARDS);
+      final Boolean b = yesNo(BACKWARDS);
       if(b != null) rbc.setFrenchCollation(b);
     }
 
     if(contains(NORMALIZATION)) {
-      Boolean n = yesNo(NORMALIZATION);
+      final Boolean n = yesNo(NORMALIZATION);
       if(n != null) {
         rbc.setDecomposition(n ? Collator.CANONICAL_DECOMPOSITION : Collator.NO_DECOMPOSITION);
       }
     }
 
     if(contains(CASELEVEL)) {
-      Boolean c = yesNo(CASELEVEL);
+      final Boolean c = yesNo(CASELEVEL);
       if(c != null) rbc.setCaseLevel(c);
     }
 
@@ -140,7 +140,7 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(NUMERIC)) {
-      Boolean n = yesNo(NUMERIC);
+      final Boolean n = yesNo(NUMERIC);
       if(n != null) rbc.setNumericCollation(n);
     }
 

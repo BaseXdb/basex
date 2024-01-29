@@ -6,6 +6,7 @@ import java.text.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -100,8 +101,9 @@ public final class BaseXCollationOptions extends CollationOptions {
         else if(eq(value, "quaternary", "4", "5")) value = Strength.IDENTICAL.toString();
         try {
           assign(name, value);
-        } catch (@SuppressWarnings("unused") BaseXException ex) {
+        } catch(final BaseXException ex) {
           // fallback == true -> ignore invalid values
+          Util.debug(ex);
         }
       }
     } else {
