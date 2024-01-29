@@ -20,9 +20,9 @@ public final class JsonBasicConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonBasicConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonBasicConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     escape = jopts.get(JsonParserOptions.ESCAPE);
   }

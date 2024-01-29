@@ -57,18 +57,14 @@ public final class CsvXQueryConverter extends CsvConverter {
   }
 
   @Override
-  protected XQMap finish() throws QueryIOException {
+  protected XQMap finish() throws QueryException {
     if(row != null) rows.add(row.array(STRING_ARRAY));
-    try {
-      final MapBuilder mb = new MapBuilder();
-      if(!headers.isEmpty()) {
-        final ArrayBuilder names = new ArrayBuilder();
-        for(final byte[] header : headers) names.append(Str.get(header));
-        mb.put(NAMES, names.array(STRING_ARRAY));
-      }
-      return mb.put(RECORDS, rows.value(STRING_ARRAY)).map();
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
+    final MapBuilder mb = new MapBuilder();
+    if(!headers.isEmpty()) {
+      final ArrayBuilder names = new ArrayBuilder();
+      for(final byte[] header : headers) names.append(Str.get(header));
+      mb.put(NAMES, names.array(STRING_ARRAY));
     }
+    return mb.put(RECORDS, rows.value(STRING_ARRAY)).map();
   }
 }

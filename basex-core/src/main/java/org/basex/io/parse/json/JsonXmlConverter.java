@@ -58,17 +58,18 @@ abstract class JsonXmlConverter extends JsonConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonXmlConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonXmlConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     merge = jopts.get(JsonOptions.MERGE);
     strings = jopts.get(JsonOptions.STRINGS);
     addValues.add(true);
 
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
-    if(dupl == JsonDuplicates.USE_LAST) throw new QueryIOException(
-        JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
+    if(dupl == JsonDuplicates.USE_LAST) {
+      throw JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
+    }
   }
 
   @Override
@@ -102,22 +103,22 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  void numberLit(final byte[] value) throws QueryIOException {
+  void numberLit(final byte[] value) throws QueryException {
     addValue(NUMBER, value);
   }
 
   @Override
-  void stringLit(final byte[] value) throws QueryIOException {
+  void stringLit(final byte[] value) throws QueryException {
     addValue(STRING, value);
   }
 
   @Override
-  void nullLit() throws QueryIOException {
+  void nullLit() throws QueryException {
     addValue(NULL, null);
   }
 
   @Override
-  void booleanLit(final byte[] value) throws QueryIOException {
+  void booleanLit(final byte[] value) throws QueryException {
     addValue(BOOLEAN, value);
   }
 
@@ -125,9 +126,9 @@ abstract class JsonXmlConverter extends JsonConverter {
    * Adds a value.
    * @param type JSON type
    * @param value optional value
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  abstract void addValue(byte[] type, byte[] value) throws QueryIOException;
+  abstract void addValue(byte[] type, byte[] value) throws QueryException;
 
   /**
    * Adds type information to an element or the type cache.

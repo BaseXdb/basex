@@ -34,11 +34,10 @@ final class JsonStringConverter extends JsonConverter {
    * @param liberal liberal parsing
    * @param escape escape flag
    * @return resulting string
-   * @throws QueryIOException query I/O exception
    * @throws QueryException query exception
    */
   public static String toString(final String json, final boolean liberal, final boolean escape)
-      throws QueryIOException, QueryException {
+      throws QueryException {
 
     final JsonParserOptions jopts = new JsonParserOptions();
     jopts.set(JsonParserOptions.LIBERAL, liberal);

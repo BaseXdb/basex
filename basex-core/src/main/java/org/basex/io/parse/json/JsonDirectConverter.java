@@ -55,9 +55,9 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonDirectConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonDirectConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     lax = jopts.get(JsonOptions.LAX);
     name = JSON;

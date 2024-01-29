@@ -852,7 +852,7 @@ public enum QueryError {
   SERJSONSEQ(SERE, 23, "Value has more than one item."),
 
   /** Error code. */
-  NOCTX_X(XPDY, 2, "%: Context is undeclared."),
+  NOCTX_X(XPDY, 2, "%: Context value is undefined."),
   /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */

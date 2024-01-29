@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -19,9 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class FnJsonDoc extends Parse {
-  /** Function taking and returning a string. */
-  private static final FuncType STRFUNC = FuncType.get(SeqType.STRING_O, SeqType.STRING_O);
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item;
@@ -53,33 +49,35 @@ public class FnJsonDoc extends Parse {
     final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), false, qc);
     final boolean esc = options.get(JsonParserOptions.ESCAPE);
     final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
-    final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, info);
-    if(esc && fallback != null) throw OPTION_JSON_X.get(info,
+    if(esc && fb != null) throw OPTION_JSON_X.get(info,
         "Escaping cannot be combined with a fallback function.");
 
     try {
       options.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.XQUERY);
-      final JsonConverter conv = JsonConverter.get(options);
-      if(!esc && fallback != null) conv.fallback(string -> {
-        try {
-          final Item item = fallback.invoke(qc, info, Str.get(string)).item(qc, info);
-          return Token.string(item.string(info));
-        } catch(final QueryException ex) {
-          throw new QueryRTException(ex);
-        }
-      });
-      return conv.convert(Token.string(json), "");
-    } catch(final QueryRTException ex) {
-      throw ex.getCause();
-    } catch(final QueryIOException ex) {
+      return JsonConverter.get(options).fallback(function(fb, qc)).
+          convert(Token.string(json), "");
+    } catch(final QueryException ex) {
       Util.debug(ex);
-      final QueryException qe = ex.getCause(info);
-      final QueryError error = qe.error();
+      final QueryError error = ex.error();
       final String message = ex.getLocalizedMessage();
       if(error == JSON_PARSE_X_X_X) throw PARSE_JSON_X.get(info, message);
       if(error == JSON_DUPL_X_X_X) throw DUPLICATE_JSON_X.get(info, message);
       if(error == JSON_OPTIONS_X) throw OPTION_JSON_X.get(info, message);
-      throw qe;
+      throw ex;
     }
   }
+  /**
+   * Converts a function item to a function suitable for JSON parsing.
+   * @param func function item
+   * @param qc query context
+   * @return function or {@code null}
+   * @throws QueryException query exception
+   */
+  final QueryFunction<byte[], byte[]> function(final FuncItem func, final QueryContext qc)
+      throws QueryException {
+    if(func == null) return null;
+    toFunction(func, 1, qc);
+    return string -> func.invoke(qc, info, Str.get(string)).item(qc, info).string(info);
+  }
+
 }

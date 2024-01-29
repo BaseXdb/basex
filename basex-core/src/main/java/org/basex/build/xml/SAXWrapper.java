@@ -38,10 +38,10 @@ public final class SAXWrapper extends SingleParser {
   /**
    * Constructor.
    * @param source input source
-   * @param opts database options
+   * @param options main options
    */
-  public SAXWrapper(final IO source, final MainOptions opts) {
-    super(source, opts);
+  public SAXWrapper(final IO source, final MainOptions options) {
+    super(source, options);
   }
 
   @Override

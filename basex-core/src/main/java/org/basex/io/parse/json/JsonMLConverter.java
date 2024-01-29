@@ -25,9 +25,9 @@ final class JsonMLConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonMLConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonMLConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
   }
 
@@ -37,9 +37,9 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openObject() throws QueryIOException {
+  void openObject() throws QueryException {
     if(curr == null || name != null || stack.peek() != null)
-      error("No object allowed at this stage");
+      throw error("No object allowed at this stage");
   }
 
   @Override
@@ -50,22 +50,22 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openPair(final byte[] key, final boolean add) throws QueryIOException {
+  void openPair(final byte[] key, final boolean add) throws QueryException {
     name = shared.token(check(key));
-    if(!atts.add(name)) error("Duplicate attribute found");
+    if(!atts.add(name)) throw error("Duplicate attribute found");
   }
 
   @Override
   void closePair(final boolean add) { }
 
   @Override
-  void openArray() throws QueryIOException {
+  void openArray() throws QueryException {
     if(!stack.isEmpty()) {
       if(name == null && curr != null && stack.peek() == null) {
         stack.pop();
         stack.push(curr);
       } else if(name != null || curr != null || stack.peek() == null) {
-        error("No array allowed at this stage");
+        throw error("No array allowed at this stage");
       }
     }
     stack.push(null);
@@ -73,13 +73,13 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void closeArray() throws QueryIOException {
+  void closeArray() throws QueryException {
     FBuilder value = stack.pop();
     if(value == null) {
       value = curr;
       reset();
     }
-    if(value == null) error("Missing element name");
+    if(value == null) throw error("Missing element name");
 
     if(stack.isEmpty()) stack.push(value);
     else stack.peek().add(value);
@@ -92,7 +92,7 @@ final class JsonMLConverter extends JsonXmlConverter {
   void closeItem() { }
 
   @Override
-  void addValue(final byte[] type, final byte[] value) throws QueryIOException {
+  void addValue(final byte[] type, final byte[] value) throws QueryException {
     if(name == null && curr != null && stack.peek() == null) {
       stack.pop();
       stack.push(curr);
@@ -108,28 +108,28 @@ final class JsonMLConverter extends JsonXmlConverter {
       curr.add(shared.qName(name), val);
       name = null;
     } else {
-      error("No value allowed at this stage");
+      throw error("No value allowed at this stage");
     }
   }
 
   @Override
-  void stringLit(final byte[] value) throws QueryIOException {
+  void stringLit(final byte[] value) throws QueryException {
     addValue(STRING, value);
   }
 
   @Override
-  void numberLit(final byte[] value) throws QueryIOException {
-    error("No numbers allowed");
+  void numberLit(final byte[] value) throws QueryException {
+    throw error("No numbers allowed");
   }
 
   @Override
-  void nullLit() throws QueryIOException {
-    error("No 'null' allowed");
+  void nullLit() throws QueryException {
+    throw error("No 'null' allowed");
   }
 
   @Override
-  void booleanLit(final byte[] b) throws QueryIOException {
-    error("No booleans allowed");
+  void booleanLit(final byte[] b) throws QueryException {
+    throw error("No booleans allowed");
   }
 
   /**
@@ -144,20 +144,20 @@ final class JsonMLConverter extends JsonXmlConverter {
    * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
-   * @throws QueryIOException query I/O exception
+   * @return exception
    */
-  private static void error(final String msg, final Object... ext) throws QueryIOException {
-    throw JSON_PARSE_X.getIO(Util.info(msg, ext) + '.');
+  private static QueryException error(final String msg, final Object... ext) {
+    return JSON_PARSE_X.get(null, Util.info(msg, ext) + '.');
   }
 
   /**
    * Returns the specified name.
    * @param name name
    * @return cached QName
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  private static byte[] check(final byte[] name) throws QueryIOException {
-    if(!XMLToken.isNCName(name)) error("Invalid name: \"%\"", name);
+  private static byte[] check(final byte[] name) throws QueryException {
+    if(!XMLToken.isNCName(name)) throw error("Invalid name: \"%\"", name);
     return name;
   }
 }

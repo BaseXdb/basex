@@ -22,7 +22,8 @@ public abstract class JsonConverter {
   protected final JsonParserOptions jopts;
 
   /** Fallback function. */
-  protected JsonFallback fallback;
+  protected QueryFunction<byte[], byte[]> fallback;
+
 
   /**
    * Constructor.
@@ -37,7 +38,7 @@ public abstract class JsonConverter {
    * @param func fallback function
    * @return self reference
    */
-  public final JsonConverter fallback(final JsonFallback func) {
+  public final JsonConverter fallback(final QueryFunction<byte[], byte[]> func) {
     fallback = func;
     return this;
   }
@@ -45,10 +46,11 @@ public abstract class JsonConverter {
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
-   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   * @throws IOException exception
    * @return result
    */
-  public final Item convert(final IO input) throws IOException {
+  public final Item convert(final IO input) throws QueryException, IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
     try(NewlineInput ni = new NewlineInput(input)) {
       return convert(ni.encoding(encoding).cache().toString(), input.url());
@@ -59,10 +61,10 @@ public abstract class JsonConverter {
    * Converts the specified input to an XQuery value.
    * @param input input
    * @param path input path (can be empty string)
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    * @return result
    */
-  public final Item convert(final String input, final String path) throws QueryIOException {
+  public final Item convert(final String input, final String path) throws QueryException {
     init(path.isEmpty() ? "" : IO.get(path).url());
     final JsonParser parser = new JsonParser(input, jopts, this);
     parser.parse();
@@ -73,9 +75,9 @@ public abstract class JsonConverter {
    * Returns a JSON converter for the given configuration.
    * @param jopts options
    * @return JSON converter
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  public static JsonConverter get(final JsonParserOptions jopts) throws QueryIOException {
+  public static JsonConverter get(final JsonParserOptions jopts) throws QueryException {
     switch(jopts.get(JsonOptions.FORMAT)) {
       case JSONML:     return new JsonMLConverter(jopts);
       case ATTRIBUTES: return new JsonAttsConverter(jopts);
@@ -99,9 +101,9 @@ public abstract class JsonConverter {
 
   /**
    * Called when a JSON object is opened.
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void openObject() throws QueryIOException;
+  abstract void openObject() throws QueryException;
 
   /**
    * Called when a JSON object is closed.
@@ -112,28 +114,28 @@ public abstract class JsonConverter {
    * Called when a pair of a JSON object is opened.
    * @param key the key of the entry
    * @param add add pair
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void openPair(byte[] key, boolean add) throws QueryIOException;
+  abstract void openPair(byte[] key, boolean add) throws QueryException;
 
   /**
    * Called when a pair of a JSON object is closed.
    * @param add add pair
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void closePair(boolean add) throws QueryIOException;
+  abstract void closePair(boolean add) throws QueryException;
 
   /**
    * Called when a JSON array is opened.
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void openArray() throws QueryIOException;
+  abstract void openArray() throws QueryException;
 
   /**
    * Called when a JSON array is closed.
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void closeArray() throws QueryIOException;
+  abstract void closeArray() throws QueryException;
 
   /**
    * Called when an item of a JSON array is opened.
@@ -148,27 +150,27 @@ public abstract class JsonConverter {
   /**
    * Called when a number literal is encountered.
    * @param value string representation of the number literal
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void numberLit(byte[] value) throws QueryIOException;
+  abstract void numberLit(byte[] value) throws QueryException;
 
   /**
    * Called when a string literal is encountered.
    * @param bs the string
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void stringLit(byte[] bs) throws QueryIOException;
+  abstract void stringLit(byte[] bs) throws QueryException;
 
   /**
    * Called when a {@code null} literal is encountered.
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void nullLit() throws QueryIOException;
+  abstract void nullLit() throws QueryException;
 
   /**
    * Called when a boolean literal is encountered.
    * @param b the boolean
-   * @throws QueryIOException query exception
+   * @throws QueryException query exception
    */
-  abstract void booleanLit(byte[] b) throws QueryIOException;
+  abstract void booleanLit(byte[] b) throws QueryException;
 }

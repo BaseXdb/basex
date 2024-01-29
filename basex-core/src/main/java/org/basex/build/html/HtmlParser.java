@@ -48,16 +48,6 @@ public final class HtmlParser extends XMLParser {
    * Constructor.
    * @param source document source
    * @param options main options
-   * @throws IOException I/O exception
-   */
-  public HtmlParser(final IO source, final MainOptions options) throws IOException {
-    this(source, options, options.get(MainOptions.HTMLPARSER));
-  }
-
-  /**
-   * Constructor.
-   * @param source document source
-   * @param options main options
    * @param hopts html options
    * @throws IOException I/O exception
    */

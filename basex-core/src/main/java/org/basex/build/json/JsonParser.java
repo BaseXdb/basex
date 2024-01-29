@@ -6,6 +6,7 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.parse.json.*;
+import org.basex.query.*;
 
 /**
  * This class parses files in the JSON format
@@ -18,16 +19,6 @@ import org.basex.io.parse.json.*;
  * @author Christian Gruen
  */
 public final class JsonParser extends XMLParser {
-  /**
-   * Constructor.
-   * @param source document source
-   * @param opts database options
-   * @throws IOException I/O exception
-   */
-  public JsonParser(final IO source, final MainOptions opts) throws IOException {
-    this(source, opts, opts.get(MainOptions.JSONPARSER));
-  }
-
   /**
    * Constructor.
    * @param source document source
@@ -48,9 +39,13 @@ public final class JsonParser extends XMLParser {
    * @throws IOException I/O exception
    */
   private static IOContent toXml(final IO io, final JsonParserOptions jopts) throws IOException {
-    final JsonConverter conv = JsonConverter.get(jopts);
-    final IOContent xml = new IOContent(conv.convert(io).serialize().finish());
-    xml.name(io.name());
-    return xml;
+    try {
+      final JsonConverter conv = JsonConverter.get(jopts);
+      final IOContent xml = new IOContent(conv.convert(io).serialize().finish());
+      xml.name(io.name());
+      return xml;
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
+    }
   }
 }

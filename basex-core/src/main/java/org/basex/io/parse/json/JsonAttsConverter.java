@@ -18,9 +18,9 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonAttsConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonAttsConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
   }
 

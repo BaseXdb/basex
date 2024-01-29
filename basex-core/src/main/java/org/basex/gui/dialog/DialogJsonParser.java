@@ -14,6 +14,7 @@ import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.io.parse.json.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -118,7 +119,7 @@ final class DialogJsonParser extends DialogParser {
         final Item item = JsonConverter.get(jopts).convert(new IOContent(json));
         example.setText(example(MainParser.JSON.name(), json, item));
       }
-    } catch(final IOException ex) {
+    } catch(final QueryException | IOException ex) {
       example.setText(error(ex));
     }
     return true;

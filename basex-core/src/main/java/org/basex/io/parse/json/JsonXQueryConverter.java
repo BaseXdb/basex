@@ -45,13 +45,14 @@ public final class JsonXQueryConverter extends JsonConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonXQueryConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonXQueryConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
-    if(dupl == JsonDuplicates.RETAIN) throw new QueryIOException(
-        JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
+    if(dupl == JsonDuplicates.RETAIN) {
+      throw JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
+    }
   }
 
   @Override
@@ -75,16 +76,10 @@ public final class JsonXQueryConverter extends JsonConverter {
   }
 
   @Override
-  void closePair(final boolean add) throws QueryIOException {
+  void closePair(final boolean add) throws QueryException {
     final Value value = stack.pop();
     final Item key = (Item) stack.pop();
-    if(add) {
-      try {
-        maps.push(maps.pop().put(key, value, null));
-      } catch(final QueryException ex) {
-        throw new QueryIOException(ex);
-      }
-    }
+    if(add) maps.push(maps.pop().put(key, value, null));
   }
 
   @Override
@@ -114,12 +109,8 @@ public final class JsonXQueryConverter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final byte[] value) throws QueryIOException {
-    try {
-      stack.push(Dbl.get(value, null));
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
-    }
+  public void numberLit(final byte[] value) throws QueryException {
+    stack.push(Dbl.get(value, null));
   }
 
   @Override
