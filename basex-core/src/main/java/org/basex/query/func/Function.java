@@ -550,6 +550,9 @@ public enum Function implements AFunction {
       params(ITEM_ZM, STRING_ZM,
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_MORE), STRING_ZM), ITEM_ZM),
   /** XQuery function. */
+  SORT_WITH(FnSortWith::new, "sort-with(input,comparator)",
+      params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType()), ITEM_ZM),
+  /** XQuery function. */
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
