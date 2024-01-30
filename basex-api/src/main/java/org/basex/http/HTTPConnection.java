@@ -255,6 +255,7 @@ public final class HTTPConnection implements ClientInfo {
    * @throws ServletException servlet exception
    */
   public void forward(final String location) throws IOException, ServletException {
+    request.setAttribute(HTTPText.FORWARD, requestCtx);
     request.getRequestDispatcher(resolve(location)).forward(request, response);
   }
 

@@ -187,8 +187,8 @@ public final class RestXqFunction extends WebFunction {
    * @throws QueryException exception
    * @throws IOException I/O exception
    */
-  Expr[] bind(final Object ext, final HTTPConnection conn,
-      final QueryContext qc) throws QueryException, IOException {
+  Expr[] bind(final Object ext, final HTTPConnection conn, final QueryContext qc)
+      throws QueryException, IOException {
 
     // bind variables from segments
     final Expr[] args = new Expr[function.arity()];

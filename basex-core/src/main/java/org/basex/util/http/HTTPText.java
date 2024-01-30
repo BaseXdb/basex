@@ -31,6 +31,8 @@ public interface HTTPText {
   String DBA_CLIENT_ID = "dba";
   /** Client id. */
   String CLIENT_ID = "id";
+  /** Forwarded request context. */
+  String FORWARD = "forward";
 
   /** HTTP header string. */
   String WWW_AUTHENTICATE = "WWW-Authenticate";

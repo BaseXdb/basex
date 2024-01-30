@@ -116,7 +116,12 @@ public final class RequestContext {
    */
   public IOContent body() throws IOException {
     if(body == null) {
-      body = new IOContent(BufferInput.get(request.getInputStream()).content());
+      final RequestContext forward = (RequestContext) request.getAttribute(HTTPText.FORWARD);
+      if(forward != null && forward.body != null) {
+        body = forward.body;
+      } else {
+        body = new IOContent(BufferInput.get(request.getInputStream()).content());
+      }
     }
     return body;
   }
