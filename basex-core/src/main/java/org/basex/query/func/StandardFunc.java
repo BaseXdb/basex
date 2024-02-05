@@ -337,8 +337,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final DBNode toDBNode(final Item item, final boolean mainmem) throws QueryException {
-    if(checkNoEmpty(item, NodeType.NODE) instanceof DBNode &&
-        (mainmem || !item.data().inMemory())) return (DBNode) item;
+    if(item instanceof DBNode && (mainmem || !item.data().inMemory())) return (DBNode) item;
     throw DB_NODE_X.get(info, item);
   }
 
@@ -438,7 +437,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = toItem(expr, qc);
+    final Item item = toAtomItem(expr, qc);
     return item instanceof Uri ? toContent(string(item.string(info)), qc) :
       new IOContent(toToken(item));
   }
@@ -509,8 +508,10 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Item toNodeOrAtomItem(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = toItem(expr, qc);
-    return item instanceof ANode ? item : item.atomItem(qc, info);
+    Item item = expr.item(qc, info);
+    if(!(item instanceof ANode)) item = item.atomItem(qc, info);
+    if(item.isEmpty()) throw EMPTYFOUND.get(info);
+    return item;
   }
 
   /**

@@ -1079,8 +1079,6 @@ public enum QueryError {
   /** Error code. */
   EMPTYFOUND(XPTY, 4, "Item expected, empty sequence found."),
   /** Error code. */
-  EMPTYFOUND_X(XPTY, 4, "% expected, empty sequence found."),
-  /** Error code. */
   SEQFOUND_X(XPTY, 4, "Item expected, sequence found: %."),
   /** Error code. */
   NONUMBER_X_X(XPTY, 4, "Number expected, % found: %."),
@@ -1664,7 +1662,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
-    return INVCONVERT_X_X_X.get(info, value.type, type, value);
+    return INVCONVERT_X_X_X.get(info, value.seqType(), type, value);
   }
 
   /**

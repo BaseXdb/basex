@@ -1,7 +1,5 @@
 package org.basex.query.func.hof;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -9,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -24,7 +23,8 @@ public final class HofFoldLeft1 extends StandardFunc {
     final FItem action = toFunction(arg(1), 3, qc);
 
     int p = 0;
-    Value value = checkNoEmpty(input.next());
+    Value value = input.next();
+    if(value == null) return Empty.VALUE;
     for(Item item; (item = input.next()) != null;) {
       value = action.invoke(qc, info, value, item, Int.get(++p));
     }
@@ -34,7 +34,7 @@ public final class HofFoldLeft1 extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), action = arg(1);
-    if(input.seqType().zero()) throw EMPTYFOUND.get(info);
+    if(input.seqType().zero()) return input;
 
     // unroll fold
     final int arity = arity(action);

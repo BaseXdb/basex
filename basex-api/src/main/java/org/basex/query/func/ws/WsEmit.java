@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class WsEmit extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    WsPool.emit(toItem(arg(0), qc));
+    WsPool.emit(arg(0).atomItem(qc, info));
     return Empty.VALUE;
   }
 }

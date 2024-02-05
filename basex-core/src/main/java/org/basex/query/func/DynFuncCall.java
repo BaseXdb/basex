@@ -103,7 +103,7 @@ public final class DynFuncCall extends FuncCall {
       }
     } else if(func instanceof Value) {
       // raise error (values tested at this stage are no functions)
-      throw INVFUNCITEM_X_X.get(info, toItem(func, cc.qc).type, func);
+      throw INVFUNCITEM_X_X.get(info, func.seqType(), func);
     }
 
     return this;
@@ -165,8 +165,8 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
-    final Item item = toItem(body(), qc);
-    if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.type, item);
+    final Item item = body().item(qc, info);
+    if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
 
     final FItem func = checkUp((FItem) item, updating, sc);
     final int nargs = exprs.length - 1, arity = func.arity();

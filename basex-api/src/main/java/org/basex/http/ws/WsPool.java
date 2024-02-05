@@ -8,6 +8,7 @@ import java.util.concurrent.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.util.list.*;
 import org.eclipse.jetty.websocket.api.*;
 
@@ -62,7 +63,7 @@ public final class WsPool {
    * @param message message
    * @throws QueryException query exception
    */
-  public static void emit(final Value message) throws QueryException {
+  public static void emit(final Item message) throws QueryException {
     send(message, new ArrayList<>(CLIENTS.values()));
   }
 
@@ -72,7 +73,7 @@ public final class WsPool {
    * @param client client id
    * @throws QueryException query exception
    */
-  public static void broadcast(final Value message, final String client) throws QueryException {
+  public static void broadcast(final Item message, final String client) throws QueryException {
     final List<WebSocket> list = new ArrayList<>();
     for(final Entry<String, WebSocket> entry : CLIENTS.entrySet()) {
       if(!client.equals(entry.getKey())) list.add(entry.getValue());
