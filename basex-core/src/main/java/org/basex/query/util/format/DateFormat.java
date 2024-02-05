@@ -22,10 +22,12 @@ final class DateFormat extends FormatParser {
    * Constructor.
    * @param picture variable marker (info picture)
    * @param def default presentation modifier
+   * @param frac fractional seconds flag
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  DateFormat(final byte[] picture, final byte[] def, final InputInfo info) throws QueryException {
+  DateFormat(final byte[] picture, final byte[] def, final boolean frac, final InputInfo info)
+      throws QueryException {
     super(info);
 
     // split variable marker
@@ -44,7 +46,7 @@ final class DateFormat extends FormatParser {
 
     // choose first character and case
     try {
-      finish(pres.length == 0 ? def : presentation(pres, def, true));
+      finish(pres.length == 0 ? def : presentation(pres, def, true, frac));
     } catch(final QueryException ex) {
       throw INVFDPATTERN_X.get(info, ex.getLocalizedMessage());
     }

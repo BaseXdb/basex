@@ -282,7 +282,7 @@ public abstract class Formatter extends FormatUtil {
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier
-        final DateFormat fp = new DateFormat(substring(marker, 1), pres, info);
+        final DateFormat fp = new DateFormat(substring(marker, 1), pres, frac != null, info);
         if(max && fp.max == Integer.MAX_VALUE) {
           // limit maximum length of numeric output
           int mx = 0;
@@ -315,19 +315,7 @@ public abstract class Formatter extends FormatUtil {
             tb.add(formatInt(num, fp));
           }
         } else if(frac != null) {
-          String s = frac.toString().replace("0.", "").replaceAll("0+$", "");
-          if(frac.compareTo(BigDecimal.ZERO) != 0) {
-            final int sl = s.length();
-            if(fp.min > sl) {
-              s = frac(frac, fp.min);
-            } else if(fp.max < sl) {
-              s = frac(frac, fp.max);
-            } else {
-              final int fl = length(fp.primary);
-              if(fl != 1 && fl != sl) s = frac(frac, fl);
-            }
-          }
-          tb.add(number(token(s), fp, fp.first));
+          tb.add(formatFrac(frac, fp));
         } else {
           tb.add(formatInt(num, fp));
         }
@@ -340,15 +328,58 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * Returns the fractional part of a decimal number.
+   * Returns the formatted fractional part of a decimal number.
    * @param num number
-   * @param len length of fractional part
-   * @return string representation
+   * @param fp date format
+   * @return the formatted number
    */
-  private static String frac(final BigDecimal num, final int len) {
-    final String s = num.setScale(len, RoundingMode.DOWN).toString();
-    final int d = s.indexOf('.');
-    return d == -1 ? s : s.substring(d + 1);
+  private byte[] formatFrac(final BigDecimal num, final DateFormat fp) {
+    String s = num.toString().replace("0.", "").replaceAll("0+$", "");
+
+    // count optional and mandatory digit signs
+    int od = 0, md = 0;
+    for(final TokenParser tp = new TokenParser(fp.primary); tp.more();) {
+      final int c = tp.next();
+      if(c == '#') ++od;
+      else if(zeroes(c) != -1) ++md;
+    }
+    // adjust max with mandatory digit count
+    if(fp.max < md) fp.max = md;
+
+    // calculate number of target digits, including trailing zeroes
+    final int sl = s.length();
+    int fl = md + od;
+    if(fl == 1) fl = sl;
+    if(fp.max < fl) fl = fp.max;
+    if(fp.min > fl) fl = fp.min;
+
+    // force calculated length
+    if(fl != sl) {
+      final int len = fl;
+      final String s1 = num.setScale(len, RoundingMode.DOWN).toString();
+      final int d = s1.indexOf('.');
+      s = d == -1 ? s1 : s1.substring(d + 1);
+    }
+
+    // format number
+    byte[] number = number(token(s), fp, fp.first);
+
+    // truncate trailing zeroes
+    final int nt = Math.min(fp.max - fp.min, od);
+    if(nt > 0 && s.endsWith("0")) {
+      final String ns = string(number);
+      final int nsl = ns.length();
+      int nsi = nsl;
+      for(int dc = 0; dc <= nt;) {
+        final int c = ns.charAt(--nsi);
+        if(zeroes(c) != -1) {
+          ++dc;
+          if(c != fp.first) break;
+        }
+      }
+      if(nsi + 1 != nsl) number = token(ns.substring(0, nsi + 1));
+    }
+    return number;
   }
 
   /**

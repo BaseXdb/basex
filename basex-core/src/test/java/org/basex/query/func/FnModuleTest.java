@@ -806,6 +806,9 @@ public final class FnModuleTest extends SandboxTest {
         "America/New_York"), "07:00:00-05:00");
     query(func.args(" xs:time('12:00:00Z')", "[H01]:[m01]:[s01][Z]", " ()", " ()",
         "Asia/Kolkata"), "17:30:00+05:30");
+    query(func.args(" xs:time('12:01:01.123')", "[f99#]"), "123");
+    query(func.args(" xs:time('12:01:01.133')", "[f,2-4]"), "133");
+    query(func.args(" xs:time('12:01:01.135')", "[f00'0]"), "13'5");
   }
 
   /** Test method. */

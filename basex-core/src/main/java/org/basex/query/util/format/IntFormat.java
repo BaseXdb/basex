@@ -48,7 +48,7 @@ public final class IntFormat extends FormatParser {
 
     final byte[] pres = substring(picture, rc + 1, sc == -1 ? picture.length : sc);
     if(pres.length == 0) throw PICEMPTY.get(info, picture);
-    finish(presentation(pres, ONE, false));
+    finish(presentation(pres, ONE, false, false));
     if(sc == -1) return;
 
     // parses the format modifier

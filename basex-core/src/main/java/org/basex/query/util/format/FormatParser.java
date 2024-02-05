@@ -57,10 +57,11 @@ abstract class FormatParser extends FormatUtil {
    * @param pic picture
    * @param def default token
    * @param date date flag
+   * @param frac fractional seconds flag
    * @return presentation modifier
    * @throws QueryException query exception
    */
-  byte[] presentation(final byte[] pic, final byte[] def, final boolean date)
+  byte[] presentation(final byte[] pic, final byte[] def, final boolean date, final boolean frac)
       throws QueryException {
 
     // find primary format
@@ -93,17 +94,20 @@ abstract class FormatParser extends FormatUtil {
     tp.reset();
     boolean gss = true;
     boolean mds = false;
+    boolean ods = false;
     while(tp.more()) {
       ch = tp.next();
       final int d = zeroes(ch);
       if(d != -1) {
         // mandatory-digit-sign
+        if(ods && frac) throw OPTBEFORE_X.get(info, pic);
         if(first != d) throw DIFFMAND_X.get(info, pic);
         mds = true;
         gss = false;
       } else if(ch == '#') {
         // optional-digit-sign
-        if(mds) throw OPTAFTER_X.get(info, pic);
+        if(mds && !frac) throw OPTAFTER_X.get(info, pic);
+        ods = true;
         gss = false;
       } else if(!Character.isLetter(ch)) {
         // grouping-separator-sign

@@ -627,6 +627,8 @@ public enum QueryError {
   /** Error code. */
   OPTAFTER_X(FODF, 1310, "Optional digit sign follows mandatory digit signs: '%'."),
   /** Error code. */
+  OPTBEFORE_X(FODF, 1310, "Mandatory digit sign follows optional digit signs: '%'."),
+  /** Error code. */
   INVGROUP_X(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
   /** Error code. */
   DIFFMAND_X(FODF, 1310, "Mandatory digits is not of the same group: '%'."),
