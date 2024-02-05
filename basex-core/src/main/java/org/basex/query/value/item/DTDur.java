@@ -43,11 +43,11 @@ public final class DTDur extends Dur {
 
   /**
    * Constructor.
-   * @param sec seconds
+   * @param seconds seconds
    */
-  public DTDur(final BigDecimal sec) {
+  public DTDur(final BigDecimal seconds) {
     super(AtomType.DAY_TIME_DURATION);
-    this.seconds = sec;
+    this.seconds = seconds;
   }
 
   /**

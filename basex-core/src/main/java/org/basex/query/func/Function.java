@@ -525,6 +525,9 @@ public enum Function implements AFunction {
   ROUND_HALF_TO_EVEN(FnRoundHalfToEven::new, "round-half-to-even(value[,precision])",
       params(NUMERIC_ZO, INTEGER_ZO), NUMERIC_ZO),
   /** XQuery function. */
+  SECONDS(FnSeconds::new, "seconds(value)",
+      params(DECIMAL_ZO), DAY_TIME_DURATION_ZO),
+  /** XQuery function. */
   SECONDS_FROM_DATETIME(FnSecondsFromDateTime::new, "seconds-from-dateTime(value)",
       params(DATE_TIME_ZO), DECIMAL_ZO),
   /** XQuery function. */
