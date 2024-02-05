@@ -593,7 +593,7 @@ public enum QueryError {
   /** Error code. */
   CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
   /** Error code. */
-  CHARINV_X(FOCH, 5, "Invalid name or glyph: %."),
+  CHARINV_X(FOCH, 5, "Invalid name, glyph or codepoint value: %."),
 
   /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),

@@ -416,14 +416,27 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to an integer number.
+   * Converts an item to an integer.
    * @param item item to be converted
-   * @return number
+   * @return integer
    * @throws QueryException query exception
    */
   protected final long toLong(final Item item) throws QueryException {
     final Type type = checkNoEmpty(item, INTEGER).type;
     if(type.instanceOf(INTEGER) || type.isUntyped()) return item.itr(info);
+    throw typeError(item, INTEGER, info);
+  }
+
+  /**
+   * Converts an item to a specific integer.
+   * @param item item to be converted
+   * @param min minimum allowed value
+   * @return integer
+   * @throws QueryException query exception
+   */
+  protected final long toLong(final Item item, final long min) throws QueryException {
+    final long v = toLong(item);
+    if(v >= min) return v;
     throw typeError(item, INTEGER, info);
   }
 
