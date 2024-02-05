@@ -1811,8 +1811,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");
 
     query(func.args(" 1[. = 1]", 2), "1\n1");
+    error(func.args(" <a/>", -1), INVCONVERT_X_X_X);
 
-    check(func.args(" <a/>", -1), "", empty());
     check(func.args(" <a/>", 0), "", empty());
     check(func.args(" ()", wrap(2)), "", empty());
     check(func.args(" <a/>", 1), "<a/>", empty(func));

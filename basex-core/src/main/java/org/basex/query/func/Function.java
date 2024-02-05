@@ -113,7 +113,7 @@ public enum Function implements AFunction {
   CHAIN(FnChain::new, "chain(input,functions)",
       params(ITEM_ZM, FUNCTION_ZM), ITEM_ZM, flag(POS, CTX, NDT, HOF)),
   /** XQuery function. */
-  CHAR(FnChar::new, "char(value)", params(STRING_O), STRING_O),
+  CHAR(FnChar::new, "char(value)", params(ANY_ATOMIC_TYPE_O), STRING_O),
   /** XQuery function. */
   CHARACTERS(FnCharacters::new, "characters(value)", params(STRING_ZO), STRING_ZM),
   /** XQuery function. */

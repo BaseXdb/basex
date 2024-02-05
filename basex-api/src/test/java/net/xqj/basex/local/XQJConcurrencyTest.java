@@ -103,10 +103,8 @@ public final class XQJConcurrencyTest extends XQJBaseTest {
     }
   }
 
-  /**
-   * Query Thread.
-   */
-  private class SimpleQueryThread extends Thread {
+  /** Query Thread. */
+  private final class SimpleQueryThread extends Thread {
     /** Thrown exception or error. */
     Throwable thrown;
 

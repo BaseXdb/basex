@@ -334,7 +334,7 @@ public final class FuncItem extends FItem implements Scope {
    * @author BaseX Team 2005-24, BSD License
    * @author Leo Woerteler
    */
-  private class InlineVisitor extends ASTVisitor {
+  private final class InlineVisitor extends ASTVisitor {
     @Override
     public boolean inlineFunc(final Scope scope) {
       return scope.visit(this);

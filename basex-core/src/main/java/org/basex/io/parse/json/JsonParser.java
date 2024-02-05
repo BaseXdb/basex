@@ -75,7 +75,7 @@ public final class JsonParser extends InputParser {
    * @throws QueryException query exception
    */
   private void value() throws QueryException {
-    if(pos >= length) throw eof(", expected JSON value.");
+    if(pos >= length) throw eof(", expected JSON value");
     switch(curr()) {
       case '[':
         array();

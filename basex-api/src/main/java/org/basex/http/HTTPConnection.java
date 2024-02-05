@@ -235,8 +235,9 @@ public final class HTTPConnection implements ClientInfo {
    * @return request URI
    */
   public String uri() {
+    // according to the documentation, the method should never return null. however.
     final String uri = request.getRequestURI();
-    return uri != null ? uri : null;
+    return uri != null ? uri : "";
   }
 
   /**

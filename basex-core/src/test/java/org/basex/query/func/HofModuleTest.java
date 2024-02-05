@@ -26,7 +26,7 @@ public final class HofModuleTest extends SandboxTest {
   @Test public void foldLeft1() {
     final Function func = _HOF_FOLD_LEFT1;
     query(func.args(" 1 to 10", " function($x, $y) { $x + $y }"), 55);
-    error(func.args(" ()", " function($x, $y) { $x + $y }"), EMPTYFOUND);
+    query(func.args(" ()", " function($x, $y) { $x + $y }"), "");
 
     // should not be unrolled
     check(func.args(" 1 to 6", " function($a, $b) { $a + $b }"),

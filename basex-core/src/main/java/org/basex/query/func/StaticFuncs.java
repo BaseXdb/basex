@@ -225,7 +225,7 @@ public final class StaticFuncs extends ExprInfo {
    * @author BaseX Team 2005-24, BSD License
    * @author Christian Gruen
    */
-  private static class FuncCache {
+  private static final class FuncCache {
     /** Functions. */
     final ArrayList<StaticFunc> funcs = new ArrayList<>(1);
     /** Function calls. */

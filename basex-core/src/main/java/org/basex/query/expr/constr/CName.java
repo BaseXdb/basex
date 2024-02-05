@@ -56,12 +56,12 @@ abstract class CName extends CNode {
    * @throws QueryException query exception
    */
   final QNm qname(final boolean elem, final QueryContext qc) throws QueryException {
-    final Item item = checkNoEmpty(name.atomItem(qc, info), AtomType.QNAME);
+    final Item item = name.atomItem(qc, info);
     final Type type = item.type;
     if(type == AtomType.QNAME) return (QNm) item;
 
     if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
-      throw STRQNM_X_X.get(info, type, item);
+      throw STRQNM_X_X.get(info, item.seqType(), item);
 
     final QNm qnm = qc.shared.parseQName(item.string(info), elem, sc);
     if(qnm != null) return qnm;

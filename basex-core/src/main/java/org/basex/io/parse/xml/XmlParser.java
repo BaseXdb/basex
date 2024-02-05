@@ -70,7 +70,7 @@ public final class XmlParser {
   }
 
   /** Error handler (causing no STDERR output). */
-  private static class XmlHandler extends DefaultHandler {
+  private static final class XmlHandler extends DefaultHandler {
     @Override
     public void fatalError(final SAXParseException ex) throws SAXParseException { throw ex; }
     @Override

@@ -593,7 +593,7 @@ public enum QueryError {
   /** Error code. */
   CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
   /** Error code. */
-  CHARINV_X(FOCH, 5, "Invalid name or glyph: %."),
+  CHARINV_X(FOCH, 5, "Invalid name, glyph or codepoint value: %."),
 
   /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
@@ -1080,8 +1080,6 @@ public enum QueryError {
   NONAME_X(XPTY, 4, "Name expected, '%' found."),
   /** Error code. */
   EMPTYFOUND(XPTY, 4, "Item expected, empty sequence found."),
-  /** Error code. */
-  EMPTYFOUND_X(XPTY, 4, "% expected, empty sequence found."),
   /** Error code. */
   SEQFOUND_X(XPTY, 4, "Item expected, sequence found: %."),
   /** Error code. */
@@ -1666,7 +1664,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
-    return INVCONVERT_X_X_X.get(info, value.type, type, value);
+    return INVCONVERT_X_X_X.get(info, value.seqType(), type, value);
   }
 
   /**

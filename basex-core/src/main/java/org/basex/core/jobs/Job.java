@@ -1,6 +1,7 @@
 package org.basex.core.jobs;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -14,7 +15,7 @@ import org.basex.util.*;
  */
 public abstract class Job {
   /** Child jobs. */
-  private final List<Job> children = Collections.synchronizedList(new ArrayList<>(0));
+  private final List<Job> children = new CopyOnWriteArrayList<>();
   /** Job context. */
   private JobContext jc = new JobContext(this);
   // state and control flags must be volatile so that all threads see the actual non-cached values

@@ -143,7 +143,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /** Entry for static variables and their references. */
-  private static class VarEntry {
+  private static final class VarEntry {
     /** The static variable. */
     StaticVar var;
     /** Variable references. */
