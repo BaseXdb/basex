@@ -268,7 +268,7 @@ function stopQuery() {
  * @param {failure} failure failure function
  */
 function request(method, url, data, success, failure) {
-  var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+  var request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if(request.readyState === 4) {
       if(request.status === 200) {

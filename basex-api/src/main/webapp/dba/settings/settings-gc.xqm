@@ -17,6 +17,6 @@ declare
   %rest:path('/dba/settings-gc')
 function dba:settings-gc(
 ) as element(rest:response) {
-  Q{java.lang.System}gc(),
+  prof:gc(),
   web:redirect($dba:CAT, map { 'info': 'Garbage collection was triggered.' })
 };
