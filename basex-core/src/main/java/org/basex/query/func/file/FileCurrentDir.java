@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileCurrentDir extends FileFn {
   @Override
-  public Item item(final QueryContext qc) {
+  public Str item(final QueryContext qc) {
     return get(absolute(Paths.get(".")), true);
   }
 }

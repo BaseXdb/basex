@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileCreateTempDir extends FileCreateTempFile {
   @Override
-  public Item item(final QueryContext qc) throws QueryException, IOException {
+  public Str item(final QueryContext qc) throws QueryException, IOException {
     return createTemp(true, qc);
   }
 }

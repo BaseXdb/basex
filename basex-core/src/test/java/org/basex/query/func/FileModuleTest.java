@@ -302,6 +302,12 @@ public final class FileModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void listRoots() {
+    final Function func = _FILE_LIST_ROOTS;
+    query("exists(" + func.args() + ")");
+  }
+
+  /** Test method. */
   @Test public void move() {
     final Function func = _FILE_MOVE;
     // queries

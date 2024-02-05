@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public class FileCreateTempFile extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws QueryException, IOException {
+  public Str item(final QueryContext qc) throws QueryException, IOException {
     return createTemp(false, qc);
   }
 
@@ -30,7 +30,7 @@ public class FileCreateTempFile extends FileFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final synchronized Item createTemp(final boolean dir, final QueryContext qc)
+  final synchronized Str createTemp(final boolean dir, final QueryContext qc)
       throws QueryException, IOException {
 
     final String prefix = toString(arg(0), qc);

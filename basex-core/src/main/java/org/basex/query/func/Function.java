@@ -1327,6 +1327,9 @@ public enum Function implements AFunction {
   _FILE_LIST(FileList::new, "list(path[,recursive,pattern])",
       params(STRING_O, BOOLEAN_O, STRING_O), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
+  _FILE_LIST_ROOTS(FileListRoots::new, "list-roots()",
+      params(), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
+  /** XQuery function. */
   _FILE_MOVE(FileMove::new, "move(source,target)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */

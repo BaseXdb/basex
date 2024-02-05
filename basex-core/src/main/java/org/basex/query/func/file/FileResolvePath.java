@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileResolvePath extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws QueryException {
+  public Str item(final QueryContext qc) throws QueryException {
     final Path path = toPath(toString(arg(0), qc)), abs;
     if(defined(1)) {
       final String file = toString(arg(1), qc);
