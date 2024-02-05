@@ -54,7 +54,7 @@ public final class RESTParallelGetTest extends HTTPTest {
   }
 
   /** Client class. */
-  private static class Client extends Thread {
+  private static final class Client extends Thread {
     @Override
     public void run() {
       try {

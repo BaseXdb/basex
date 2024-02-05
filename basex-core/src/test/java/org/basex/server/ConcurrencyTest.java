@@ -113,7 +113,7 @@ public final class ConcurrencyTest extends SandboxTest {
   private static final Random RANDOM = new Random();
 
   /** Single client. */
-  private static class CommandClient extends Thread {
+  private static final class CommandClient extends Thread {
     @Override
     public void run() {
       try {

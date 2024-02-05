@@ -39,7 +39,7 @@ public final class ParallelQueryTest extends SandboxTest {
   /**
    * Query instance.
    */
-  private class Query extends Thread {
+  private final class Query extends Thread {
     @Override
     public void run() {
       try {

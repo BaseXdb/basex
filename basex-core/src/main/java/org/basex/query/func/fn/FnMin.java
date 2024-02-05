@@ -61,7 +61,7 @@ public class FnMin extends StandardFunc {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(min ^ (item.compare(it, collation, true, info) < 0)) item = it;
+        if(min ^ item.compare(it, collation, true, info) < 0) item = it;
         if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, sc, info);
       }
       return item;
@@ -71,7 +71,7 @@ public class FnMin extends StandardFunc {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(type != type2) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(min ^ (item.compare(it, collation, true, info) < 0)) item = it;
+        if(min ^ item.compare(it, collation, true, info) < 0) item = it;
       }
       return item;
     }
