@@ -20,7 +20,7 @@ declare
 function dba:log-download(
   $names  as xs:string*
 ) as item()+ {
-  if (count($names) = 1) then (
+  if(count($names) = 1) then (
     web:response-header(
       map { 'media-type': 'text/plain' },
       map { 'Content-Disposition': 'attachment; filename=' || $names || '.log' }

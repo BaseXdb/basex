@@ -173,7 +173,7 @@ var _logInput;
  * @param {string} key typed key
  */
 function logEntries(key) {
-  var reset = key !== "Enter";
+  var reset = key && key !== "Enter";
   var input = document.getElementById("input").value.trim();
   if(reset && _logInput === input) return false;
   _logInput = input;

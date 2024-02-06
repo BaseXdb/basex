@@ -196,7 +196,7 @@ function dba:log(
           map:merge(
             map:for-each($map, fn($k, $v) {
               map:entry($k, (
-                if (matches($v, $joined-terms, 'i')) then fn() {
+                if(matches($v, $joined-terms, 'i')) then fn() {
                   for $match in analyze-string($v, $joined-terms, 'i')/*
                   let $value := string($match)
                   return if($match/self::fn:match) then element b { $value } else $value
