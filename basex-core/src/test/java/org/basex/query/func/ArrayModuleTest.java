@@ -38,16 +38,6 @@ public final class ArrayModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void exists() {
-    final Function func = _ARRAY_EXISTS;
-
-    query(func.args(" [ ]"), false);
-    query(func.args(" array { () }"), false);
-    query(func.args(" [ () ]"), true);
-    query(func.args(" [ 1 ]"), true);
-  }
-
-  /** Test method. */
   @Test public void filter() {
     final Function func = _ARRAY_FILTER;
     query("([ 1 ], 1)[. instance of array(*)] ! " + func.args(" .",

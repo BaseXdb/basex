@@ -63,7 +63,7 @@ public final class XQMap extends XQData {
    * @return map
    * @throws QueryException query exception
    */
-  public static XQMap entry(final Item key, final Value value, final InputInfo info)
+  public static XQMap singleton(final Item key, final Value value, final InputInfo info)
       throws QueryException {
     return new XQMap(new TrieLeaf(key.hash(info), key, value),
         MapType.get((AtomType) key.type, value.seqType()));
@@ -210,7 +210,7 @@ public final class XQMap extends XQData {
    * @throws QueryException query exception
    */
   public XQMap put(final Item key, final Value value, final InputInfo info) throws QueryException {
-    if(this == EMPTY) return entry(key, value, info);
+    if(this == EMPTY) return singleton(key, value, info);
     final TrieNode ins = root.put(key.hash(info), key, value, 0, info);
     return ins == root ? this : new XQMap(ins, union(key.type, value.seqType()));
   }

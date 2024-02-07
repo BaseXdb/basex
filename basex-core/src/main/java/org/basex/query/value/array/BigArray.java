@@ -50,11 +50,6 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  public boolean isEmptyArray() {
-    return false;
-  }
-
-  @Override
   public long arraySize() {
     // O(1) because the middle tree caches its size
     return left.length + middle.size() + right.length;
@@ -179,7 +174,7 @@ final class BigArray extends XQArray {
   @Override
   public XQArray concat(final XQArray array) {
     // empty array
-    if(array.isEmptyArray()) return this;
+    if(array == empty()) return this;
     if(array instanceof SingletonArray) return append(((SingletonArray) array).member);
 
     final Type tp = type.union(array.type);

@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class UtilArrayMember extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return XQArray.member(arg(0).value(qc));
+    return XQArray.singleton(arg(0).value(qc));
   }
 
   @Override

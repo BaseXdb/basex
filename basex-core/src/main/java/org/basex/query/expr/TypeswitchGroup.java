@@ -83,7 +83,7 @@ public final class TypeswitchGroup extends Single {
    * @throws QueryException query exception
    */
   Expr rewrite(final Expr cond, final CompileContext cc) throws QueryException {
-    if(var == null) return cc.merge(cond, expr, info);
+    if(var == null) return cc.voidAndReturn(cond, expr, info);
 
     final IntObjMap<Var> vm = new IntObjMap<>();
     final Let let = new Let(cc.copy(var, vm), cond).optimize(cc);

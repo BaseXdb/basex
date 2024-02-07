@@ -37,7 +37,7 @@ public final class JsonModuleTest extends SandboxTest {
         "<json type=\"object\"><_0009 type=\"number\">0</_0009></json>");
     parse("{ \"a\" :0 }", "", "<json type=\"object\"><a type=\"number\">0</a></json>");
     parse("{ \"\" : 0 }", "", "<json type=\"object\"><_ type=\"number\">0</_></json>");
-    parse("{ \"\" : 0.0e0 }", "", "...<_ type=\"number\">0.0e0</_>");
+    parse("{ \"\" : 0.0e0 }", "", "...<_ type=\"number\">0</_>");
     parse("{ \"\" : null }", "", "...<_ type=\"null\"/>");
     parse("{ \"\" : true }", "", "...<_ type=\"boolean\">true</_>");
     parse("{ \"\" : {} }", "", "... type=\"object\"><_ type=\"object\"/>");
@@ -47,7 +47,7 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{ \"O\" : [ 1 ] }", "", "...<O type=\"array\"><_ type=\"number\">1</_></O>");
     parse("{ \"A\" : [ 0, 1 ] }", "",
         "...<A type=\"array\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
-    parse("{ \"\" : 0.0 }", "", "...0.0");
+    parse("{ \"\" : 0.0 }", "", "...>0<");
 
     // merging data types
     parse("[]", "'merge': true()", "<json arrays=\"json\"/>");
@@ -59,7 +59,7 @@ public final class JsonModuleTest extends SandboxTest {
         "<json objects=\"json\" numbers=\"a\"><a>0</a></json>");
     parse("{ \"\" : 0 }", "'merge': true()",
         "<json objects=\"json\" numbers=\"_\"><_>0</_></json>");
-    parse("{ \"\" : 0.0e0 }", "'merge': true()", "...<_>0.0e0</_>");
+    parse("{ \"\" : 0.0e0 }", "'merge': true()", "...<_>0</_>");
     parse("{ \"\" : null }", "'merge': true()", "...<_/>");
     parse("{ \"\" : true }", "'merge': true()", "...<_>true</_>");
     parse("{ \"\" : {} }", "'merge': true()", "... objects=\"json _\"><_/>");
@@ -100,19 +100,41 @@ public final class JsonModuleTest extends SandboxTest {
   @Test public void parseXQuery() {
     final Function func = _JSON_PARSE;
     // queries
-    final String map = " map { 'format': 'xquery' }";
-    query(func.args("{}", map), "map{}");
-    query(func.args("{\"A\":1}", map), "map{\"A\":1.0e0}");
-    query(func.args("{\"\":null}", map), "map{\"\":()}");
+    String options = " map { 'format': 'xquery' }";
+    query(func.args("{}", options), "map{}");
+    query(func.args("{\"A\":1}", options), "map{\"A\":1.0e0}");
+    query(func.args("{\"\":null}", options), "map{\"\":()}");
 
-    query(func.args("[]", map), "[]");
-    query(func.args("[\"A\"]", map), "[\"A\"]");
-    query(func.args("[1,true]", map), "[1.0e0,true()]");
+    query(func.args("[]", options), "[]");
+    query(func.args("[\"A\"]", options), "[\"A\"]");
+    query(func.args("[1,true]", options), "[1.0e0,true()]");
 
-    query(func.args("1", map), 1);
-    query(func.args("\"f\"", map), "f");
-    query(func.args("false", map), false);
-    query(func.args("null", map), "");
+    query(func.args("1", options), 1);
+    query(func.args("\"f\"", options), "f");
+    query(func.args("false", options), false);
+    query(func.args("null", options), "");
+
+    query(func.args("1234567890123456789012345678901234567890", options), "1.2345678901234568E39");
+    query(func.args("1234567890123456789012345678901234567890" +
+        ".123456789012345678901234567890123456789", options), "1.2345678901234568E39");
+    query(func.args("1234567890123456789012345678901234567890" +
+        "e1234567890123456789012345678901234567890", options), "INF");
+    query(func.args("0E1", options), 0);
+    query(func.args("0E-1", options), 0);
+    query(func.args("0E+1", options), 0);
+    query(func.args("-0E+1", options), "-0");
+    query(func.args("0E00", options), 0);
+    query(func.args("123e-123", options), "1.23E-121");
+    query(func.args("123.4e-123", options), "1.234E-121");
+    query(func.args("123.456E0001", options), "1234.56");
+    query(func.args("-123.456E0001", options), "-1234.56");
+    query(func.args("[ -123.456E0001, 0 ]", options), "[-1.23456e3,0.0e0]");
+
+    options = " map { 'format': 'xquery', 'number-parser': xs:decimal#1 }";
+    String input = "1234567890123456789012345678901234567890";
+    query(func.args(input, options), input);
+    input = "1234567890123456789012345678901234567890.123456789012345678901234567890123456789";
+    query(func.args(input, options), input);
   }
 
   /** Tests the configuration argument of {@code json:parse(...)}. */

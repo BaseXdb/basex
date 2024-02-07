@@ -40,7 +40,7 @@ public class FnEvery extends StandardFunc {
     final Expr input = arg(0), predicate = arg(1);
     final SeqType st = input.seqType();
     final boolean some = some();
-    if(st.zero()) return cc.merge(input, Bln.get(!some), info);
+    if(st.zero()) return cc.voidAndReturn(input, Bln.get(!some), info);
 
     Expr result = null;
     if(defined(1)) {

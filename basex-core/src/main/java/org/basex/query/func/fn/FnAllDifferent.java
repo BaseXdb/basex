@@ -45,7 +45,7 @@ public final class FnAllDifferent extends StandardFunc {
       final SeqType st = values.seqType();
       final AtomType type = st.type.atomic();
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
-        return cc.merge(values, Bln.TRUE, info);
+        return cc.voidAndReturn(values, Bln.TRUE, info);
 
       // all-different(1 to 10)  ->  true
       if(values instanceof RangeSeq) return Bln.TRUE;

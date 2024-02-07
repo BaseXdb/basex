@@ -83,11 +83,6 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public boolean isEmptyArray() {
-    return true;
-  }
-
-  @Override
   public XQArray reverseArray(final QueryContext qc) {
     return this;
   }

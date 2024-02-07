@@ -32,7 +32,7 @@ public final class ArrayBuild extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
-    if(st.zero()) return cc.merge(input, XQArray.empty(), info);
+    if(st.zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
 
     if(defined(1)) {
       arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE)));

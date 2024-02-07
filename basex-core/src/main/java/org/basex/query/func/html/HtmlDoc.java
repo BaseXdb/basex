@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class HtmlDoc extends HtmlParse {
+public final class HtmlDoc extends HtmlParse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String href = toStringOrNull(arg(0), qc);

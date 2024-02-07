@@ -61,6 +61,14 @@ public final class MapModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void emptyy() {
+    final Function func = _MAP_EMPTY;
+
+    query(func.args(" map { }"), true);
+    query(func.args(" map { 1: () }"), false);
+  }
+
+  /** Test method. */
   @Test public void entries() {
     final Function func = _MAP_ENTRIES;
     query(func.args(" map {}"), "");
@@ -159,8 +167,17 @@ public final class MapModuleTest extends SandboxTest {
         _MAP_ENTRY.args(" $i", " $i + 1")) +
         "for $k in " + func.args(" $map") + " order by $k return " +
         _MAP_GET.args(" $map", " $k"), "2\n3\n4");
+  }
 
-    query(func.args(" map:merge((1 to 9) ! map:entry(., string()))", " op('<')(?, '2')"), 1);
+  /** Test method. */
+  @Test public void keysWhere() {
+    final Function func = _MAP_KEYS_WHERE;
+    query(func.args(" map:merge((1 to 9) ! map:entry(., string()))",
+        " fn($k, $v) { $v < '2' }"), 1);
+    query(func.args(" map:build(1 to 9, value := string#1)",
+        " fn($k, $v) { $v < '2' }"), 1);
+    query(func.args(" map:build(1 to 9, value := string#1)",
+        " fn($k, $v) { $k < 2 }"), 1);
   }
 
   /** Test method. */

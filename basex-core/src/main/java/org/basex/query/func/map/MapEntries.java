@@ -63,6 +63,6 @@ public class MapEntries extends StandardFunc {
    * @throws QueryException query exception
    */
   XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.entry(key, value, info);
+    return XQMap.singleton(key, value, info);
   }
 }

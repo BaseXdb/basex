@@ -22,7 +22,7 @@ public abstract class JsonConverter {
   protected final JsonParserOptions jopts;
 
   /** Fallback function. */
-  protected QueryFunction<byte[], Item> fallback;
+  protected QueryFunction<byte[], byte[]> fallback;
   /** Number parser function. */
   protected QueryFunction<byte[], Item> numberParser;
 
@@ -39,7 +39,7 @@ public abstract class JsonConverter {
    * @param func fallback function
    * @return self reference
    */
-  public final JsonConverter fallback(final QueryFunction<byte[], Item> func) {
+  public final JsonConverter fallback(final QueryFunction<byte[], byte[]> func) {
     fallback = func;
     return this;
   }

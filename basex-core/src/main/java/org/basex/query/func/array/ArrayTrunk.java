@@ -18,7 +18,7 @@ public final class ArrayTrunk extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    if(array.isEmptyArray()) throw ARRAYEMPTY.get(info);
+    if(array == XQArray.empty()) throw ARRAYEMPTY.get(info);
     return array.trunk();
   }
 

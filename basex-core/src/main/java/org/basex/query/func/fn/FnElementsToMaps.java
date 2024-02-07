@@ -84,7 +84,7 @@ public final class FnElementsToMaps extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final ANode element : elements) {
       final Value value = layout(element, layouts).apply(element, qc);
-      return XQMap.entry(nodeName(element), value, info);
+      return XQMap.singleton(nodeName(element), value, info);
     }
     return vb.value(this);
   }

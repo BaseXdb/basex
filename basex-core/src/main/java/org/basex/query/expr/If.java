@@ -106,7 +106,7 @@ public final class If extends Arr {
     if(!ndt && cmp != null && cmp.equals(br1)) return new Otherwise(info, br1, br2).optimize(cc);
 
     // if(A) then B else B  ->  void(A), B
-    if(br1.equals(br2)) return cc.merge(cond, br1, info);
+    if(br1.equals(br2)) return cc.voidAndReturn(cond, br1, info);
 
     // determine type
     final SeqType st1 = br1.seqType(), st2 = br2.seqType();

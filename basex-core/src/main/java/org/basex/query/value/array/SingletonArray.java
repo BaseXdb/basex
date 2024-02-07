@@ -53,7 +53,7 @@ final class SingletonArray extends XQArray {
 
   @Override
   public XQArray concat(final XQArray other) {
-    return other.isEmptyArray() ? this : other.prepend(member);
+    return other == empty() ? this : other.prepend(member);
   }
 
   @Override
@@ -74,11 +74,6 @@ final class SingletonArray extends XQArray {
   @Override
   public XQArray tail() {
     return empty();
-  }
-
-  @Override
-  public boolean isEmptyArray() {
-    return false;
   }
 
   @Override

@@ -37,7 +37,7 @@ public class FnJsonDoc extends Parse {
 
   /**
    * Parses the specified JSON string.
-   * @param json json string
+   * @param json JSON string
    * @param xml convert to xml
    * @param qc query context
    * @return resulting item
@@ -46,17 +46,9 @@ public class FnJsonDoc extends Parse {
   final Item parse(final byte[] json, final boolean xml, final QueryContext qc)
       throws QueryException {
 
-    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), false, qc);
-    final boolean esc = options.get(JsonParserOptions.ESCAPE);
-    final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
-    final FuncItem np = options.get(JsonParserOptions.NUMBER_PARSER);
-    if(esc && fb != null) throw OPTION_JSON_X.get(info,
-        "Escaping cannot be combined with a fallback function.");
-
     try {
-      options.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.XQUERY);
-      return JsonConverter.get(options).fallback(function(fb, qc)).
-          numberParser(function(np, qc)).convert(Token.string(json), "");
+      final JsonFormat format = xml ? JsonFormat.BASIC : JsonFormat.XQUERY;
+      return converter(qc, format).convert(Token.string(json), "");
     } catch(final QueryException ex) {
       Util.debug(ex);
       final QueryError error = ex.error();
@@ -69,16 +61,33 @@ public class FnJsonDoc extends Parse {
   }
 
   /**
-   * Converts a function item to a function suitable for JSON parsing.
-   * @param func function item
+   * Returns a JSON converter.
    * @param qc query context
-   * @return function or {@code null}
+   * @param format result format (can be {@code null})
+   * @return resulting item
    * @throws QueryException query exception
    */
-  final QueryFunction<byte[], Item> function(final FuncItem func, final QueryContext qc)
+  protected final JsonConverter converter(final QueryContext qc, final JsonFormat format)
       throws QueryException {
-    if(func == null) return null;
-    toFunction(func, 1, qc);
-    return string -> func.invoke(qc, info, Atm.get(string)).item(qc, info);
+
+    final boolean dflt = format != null;
+    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), !dflt, qc);
+    if(dflt) options.set(JsonOptions.FORMAT, format);
+
+    final JsonConverter jc = JsonConverter.get(options);
+    final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
+    if(fb != null) {
+      toFunction(fb, 1, qc);
+      jc.fallback(s -> fb.invoke(qc, info, Str.get(s)).item(qc, info).string(info));
+      if(options.get(JsonParserOptions.ESCAPE)) {
+        throw OPTION_JSON_X.get(info, "Escape cannot be combined with fallback function.");
+      }
+    }
+    final FuncItem np = options.get(JsonParserOptions.NUMBER_PARSER);
+    if(np != null) {
+      toFunction(np, 1, qc);
+      jc.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
+    }
+    return jc;
   }
 }

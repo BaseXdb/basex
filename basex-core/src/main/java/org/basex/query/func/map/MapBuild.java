@@ -43,7 +43,7 @@ public final class MapBuild extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
-    if(st.zero()) return cc.merge(input, XQMap.empty(), info);
+    if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
     SeqType rst = st;
     AtomType kt = null;

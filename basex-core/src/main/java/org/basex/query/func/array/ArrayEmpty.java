@@ -15,6 +15,6 @@ public final class ArrayEmpty extends ArrayFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    return Bln.get(array.isEmptyArray());
+    return Bln.get(array == XQArray.empty());
   }
 }

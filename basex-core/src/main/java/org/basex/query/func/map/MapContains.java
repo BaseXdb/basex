@@ -25,8 +25,6 @@ public final class MapContains extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
-    if(map == XQMap.empty()) return Bln.FALSE;
-
-    return this;
+    return map == XQMap.empty() ? Bln.FALSE : this;
   }
 }

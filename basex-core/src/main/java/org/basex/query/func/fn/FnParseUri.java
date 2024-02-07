@@ -193,9 +193,7 @@ public class FnParseUri extends FnJsonDoc {
   static void add(final MapBuilder mb, final String k, final Object v) throws QueryException {
     final Value value = v instanceof Value ? (Value) v : v.toString().isEmpty() ? Empty.VALUE :
       Str.get(v.toString());
-    if(!(value.isEmpty() || value instanceof XQMap && ((XQMap) value).mapSize() == 0)) {
-      mb.put(k, value);
-    }
+    if(!(value.isEmpty() || value == XQMap.empty())) mb.put(k, value);
   }
 
   /**

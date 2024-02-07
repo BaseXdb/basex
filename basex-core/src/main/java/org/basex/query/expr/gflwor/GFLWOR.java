@@ -463,7 +463,7 @@ public final class GFLWOR extends ParseExpr {
       // rewrite let clause with unused variable
       //   let $_ := file:write(...) return ()  ->  file:write(...)
       //   let $_ := void(1) return 2  ->  void(1), 2
-      return cc.merge(inline, expr, info);
+      return cc.voidAndReturn(inline, expr, info);
     }
     if(fl.size() == 1) {
       // rewrite for/let clause to simple map

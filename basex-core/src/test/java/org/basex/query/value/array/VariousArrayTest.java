@@ -55,7 +55,7 @@ public final class VariousArrayTest extends ArrayTest {
       assertEquals(k - i - 1, array.arraySize());
     }
 
-    assertTrue(array.isEmptyArray());
+    assertTrue(array == XQArray.empty());
   }
 
   /**
@@ -81,7 +81,7 @@ public final class VariousArrayTest extends ArrayTest {
       assertEquals(i, array.arraySize());
     }
 
-    assertTrue(array.isEmptyArray());
+    assertTrue(array == XQArray.empty());
   }
 
   /**

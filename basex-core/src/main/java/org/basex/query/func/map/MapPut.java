@@ -39,7 +39,7 @@ public final class MapPut extends StandardFunc {
       if(typeKey != null) {
         SeqType st = value.seqType();
         // merge types if input is expected to have at least one entry
-        if(!(map instanceof XQMap && ((XQMap) map).mapSize() == 0)) {
+        if(map != XQMap.empty()) {
           final MapType mt = (MapType) type;
           typeKey = mt.keyType().union(typeKey);
           st = mt.declType.union(value.seqType());

@@ -141,7 +141,7 @@ public final class ArrayBuilderTest extends ArrayTest {
     final XQArray right = rb.array();
 
     final XQArray result = new ArrayBuilder().append(left).
-        append(XQArray.member(Int.get(999))).append(right).array();
+        append(XQArray.singleton(Int.get(999))).append(right).array();
     result.checkInvariants();
 
     assertEquals(left.arraySize() + 1 + right.arraySize(), result.arraySize());

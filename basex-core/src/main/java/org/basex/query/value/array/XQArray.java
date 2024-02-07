@@ -60,7 +60,7 @@ public abstract class XQArray extends XQData {
    * @param value single member
    * @return array
    */
-  public static XQArray member(final Value value) {
+  public static XQArray singleton(final Value value) {
     return new SingletonArray(value);
   }
 
@@ -157,13 +157,6 @@ public abstract class XQArray extends XQData {
    * @return reversed version of this array
    */
   public abstract XQArray reverseArray(QueryContext qc);
-
-  /**
-   * Checks if this array is empty.
-   * Running time: <i>O(1)</i>
-   * @return {@code true} if the array is empty, {@code false} otherwise
-   */
-  public abstract boolean isEmptyArray();
 
   /**
    * Inserts the given member at the given position into this array.

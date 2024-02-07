@@ -41,14 +41,14 @@ public class FnSum extends NumericFn {
     final SeqType st = values.seqType(), stZero = zero.seqType();
     if(zero == Empty.UNDEFINED) {
       // no default value
-      if(st.zero()) return cc.merge(values, Int.ZERO, info);
+      if(st.zero()) return cc.voidAndReturn(values, Int.ZERO, info);
       if(!st.mayBeArray()) {
         final SeqType ost = optType(values, false);
         if(ost != null) exprType.assign(ost);
       }
     } else if(st.zero()) {
       if(zero == Empty.VALUE || stZero.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZO)) {
-        return cc.merge(values, zero, info);
+        return cc.voidAndReturn(values, zero, info);
       }
     } else if(!st.mayBeArray() && !stZero.mayBeArray()) {
       if(st.oneOrMore()) return cc.function(Function.SUM, info, values);

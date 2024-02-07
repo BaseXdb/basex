@@ -18,7 +18,7 @@ import org.junit.jupiter.api.*;
 public final class ArrayRemoveTest extends ArrayTest {
   /** Remove one element from singleton array. */
   @Test public void singletonTest() {
-    final XQArray array = XQArray.member(Int.get(42));
+    final XQArray array = XQArray.singleton(Int.get(42));
     assertSame(XQArray.empty(), array.remove(0, qc));
   }
 

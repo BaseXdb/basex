@@ -370,7 +370,7 @@ public final class JsonParser extends InputParser {
     } else if(conv.fallback == null) {
       tb.add(REPLACEMENT);
     } else {
-      tb.add(conv.fallback.apply(token(input.substring(s, e))).string(null));
+      tb.add(conv.fallback.apply(token(input.substring(s, e))));
     }
   }
 

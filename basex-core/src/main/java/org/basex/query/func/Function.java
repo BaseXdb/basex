@@ -673,6 +673,9 @@ public enum Function implements AFunction {
   _MAP_CONTAINS(MapContains::new, "contains(map,key)",
       params(MAP_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O, MAP_URI),
   /** XQuery function. */
+  _MAP_EMPTY(MapEmpty::new, "empty(map)",
+      params(MAP_O), BOOLEAN_O, MAP_URI),
+  /** XQuery function. */
   _MAP_ENTRIES(MapEntries::new, "entries(map)",
       params(MAP_O), MAP_ZM, MAP_URI),
   /** XQuery function. */
@@ -695,8 +698,11 @@ public enum Function implements AFunction {
       FuncType.get(ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_KEYS(MapKeys::new, "keys(map[,predicate])",
-      params(MAP_O, FuncType.get(BOOLEAN_O, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
+  _MAP_KEYS(MapKeys::new, "keys(map)",
+      params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
+  /** XQuery function. */
+  _MAP_KEYS_WHERE(MapKeysWhere::new, "keys-where(map,predicate)",
+      params(MAP_O, FuncType.get(BOOLEAN_O, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
       ANY_ATOMIC_TYPE_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
@@ -735,9 +741,6 @@ public enum Function implements AFunction {
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_EMPTY(ArrayEmpty::new, "empty(array)",
-      params(ARRAY_O), BOOLEAN_O, ARRAY_URI),
-  /** XQuery function. */
-  _ARRAY_EXISTS(ArrayExists::new, "exists(array)",
       params(ARRAY_O), BOOLEAN_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_FILTER(ArrayFilter::new, "filter(array,predicate)",

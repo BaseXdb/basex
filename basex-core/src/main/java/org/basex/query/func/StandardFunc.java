@@ -594,7 +594,7 @@ public abstract class StandardFunc extends Arr {
   protected final FItem toFunctionOrNull(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
     final Item item = expr.item(qc, info);
-    return item.isEmpty() ? null : toFunction(toFunction(item, qc), nargs, false);
+    return item.isEmpty() ? null : checkArity(toFunction(item, qc), nargs, false);
   }
 
   /**
@@ -621,7 +621,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final FItem toFunction(final Expr expr, final int nargs, final boolean updating,
       final QueryContext qc) throws QueryException {
-    return toFunction(toFunction(expr, qc), nargs, updating);
+    return checkArity(toFunction(expr, qc), nargs, updating);
   }
 
   /**
@@ -632,7 +632,7 @@ public abstract class StandardFunc extends Arr {
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem toFunction(final FItem func, final int nargs, final boolean updating)
+  private FItem checkArity(final FItem func, final int nargs, final boolean updating)
       throws QueryException {
 
     checkUp(func, updating, sc);

@@ -371,14 +371,14 @@ public final class CompileContext {
   }
 
   /**
-   * Creates a list expression from an expression to be swallowed and a result expression.
-   * @param expr expression to be swallowed
+   * Creates a list expression from an expression to be absorbed and a result expression.
+   * @param expr expression to be absorbed
    * @param result result expression
    * @param info input info (can be {@code null})
    * @return function
    * @throws QueryException query exception
    */
-  public Expr merge(final Expr expr, final Expr result, final InputInfo info)
+  public Expr voidAndReturn(final Expr expr, final Expr result, final InputInfo info)
       throws QueryException {
     // a nondeterministic expression may get deterministic when optimizing the query
     return expr.has(Flag.NDT) ?

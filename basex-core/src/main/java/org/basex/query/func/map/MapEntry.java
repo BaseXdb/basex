@@ -22,7 +22,7 @@ public final class MapEntry extends StandardFunc {
     final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
 
-    return XQMap.entry(key, value, info);
+    return XQMap.singleton(key, value, info);
   }
 
   @Override
