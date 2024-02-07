@@ -26,8 +26,8 @@ public final class MapBuild extends StandardFunc {
 
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(input)) != null;) {
-      final Item k = (key != null ? key.invoke(qc, info, item) : item).atomItem(qc, info);
-      if(!k.isEmpty()) {
+      final Iter iter = (key != null ? key.invoke(qc, info, item) : item).atomIter(qc, info);
+      for(Item k; (k = qc.next(iter)) != null;) {
         Value v = value != null ? value.invoke(qc, info, item) : item;
         if(result.contains(k, info)) {
           final Value old = result.get(k, info);
