@@ -248,14 +248,15 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("\\r") + " => string-to-codepoints()", 13);
     query(func.args("\\n") + " => string-to-codepoints()", 10);
     query(func.args("\\n"), "\n");
-    query(func.args("#10"), "\n");
-    query(func.args("#xa"), "\n");
-    query(func.args("#xA"), "\n");
-    query(func.args("#x0A"), "\n");
-    query(func.args("#00000000000000000000010"), "\n");
-    query(func.args("#x0000000000000000000000A"), "\n");
-    query(func.args("#32"), " ");
-    query(func.args("#x20"), " ");
+    query(func.args(10), "\n");
+    query(func.args(" 0xa"), "\n");
+    query(func.args(" 0xA"), "\n");
+    query(func.args(" 0x0A"), "\n");
+    query(func.args(" 00000000000000000000010"), "\n");
+    query(func.args(" 0x0000000000000000000000A"), "\n");
+
+    query(func.args(32), " ");
+    query(func.args(" 0x20"), " ");
 
     query(func.args("ring"), "\u02DA");
     query(func.args("AMP"), "&");
