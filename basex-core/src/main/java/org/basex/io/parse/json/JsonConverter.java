@@ -22,8 +22,9 @@ public abstract class JsonConverter {
   protected final JsonParserOptions jopts;
 
   /** Fallback function. */
-  protected QueryFunction<byte[], byte[]> fallback;
-
+  protected QueryFunction<byte[], Item> fallback;
+  /** Number parser function. */
+  protected QueryFunction<byte[], Item> numberParser;
 
   /**
    * Constructor.
@@ -38,8 +39,18 @@ public abstract class JsonConverter {
    * @param func fallback function
    * @return self reference
    */
-  public final JsonConverter fallback(final QueryFunction<byte[], byte[]> func) {
+  public final JsonConverter fallback(final QueryFunction<byte[], Item> func) {
     fallback = func;
+    return this;
+  }
+
+  /**
+   * Assigns a number parser function.
+   * @param func number parser function
+   * @return self reference
+   */
+  public final JsonConverter numberParser(final QueryFunction<byte[], Item> func) {
+    numberParser = func;
     return this;
   }
 
@@ -152,7 +163,7 @@ public abstract class JsonConverter {
    * @param value string representation of the number literal
    * @throws QueryException query exception
    */
-  abstract void numberLit(byte[] value) throws QueryException;
+  abstract void numberLit(Item value) throws QueryException;
 
   /**
    * Called when a string literal is encountered.

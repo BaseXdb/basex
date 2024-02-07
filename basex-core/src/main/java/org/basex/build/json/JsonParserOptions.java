@@ -15,6 +15,8 @@ public final class JsonParserOptions extends JsonOptions {
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
   /** Option: fallback function (parse-json, json-to-xml). */
   public static final FuncOption FALLBACK = new FuncOption("fallback");
+  /** Option: number-parser function (parse-json, json-to-xml). */
+  public static final FuncOption NUMBER_PARSER = new FuncOption("number-parser");
   /** Option: handle duplicates (parse-json, json-to-xml). */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.class);

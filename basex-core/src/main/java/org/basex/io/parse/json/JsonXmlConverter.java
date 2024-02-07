@@ -103,8 +103,8 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  void numberLit(final byte[] value) throws QueryException {
-    addValue(NUMBER, value);
+  void numberLit(final Item value) throws QueryException {
+    addValue(NUMBER, value.string(null));
   }
 
   @Override
