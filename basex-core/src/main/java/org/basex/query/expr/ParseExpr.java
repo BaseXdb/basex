@@ -64,24 +64,38 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
       throws QueryException {
 
-    Item item;
-    if(seqType().zeroOrOne()) {
-      item = item(qc, info);
-    } else {
-      final Iter iter = iter(qc);
-      item = iter.next();
-      if(item == null) return false;
+    final QueryPredicate<Item> test = item ->
+      predicate && item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
 
-      // effective boolean value is only defined for node sequences or single items
-      if(!(item instanceof ANode)) {
-        final Item next = iter.next();
-        if(next != null) throw ebvError(ValueBuilder.concat(item, next), info);
-      }
+    // single item
+    if(seqType().zeroOrOne()) return test.test(item(qc, info));
+
+    // empty sequence?
+    final Iter iter = iter(qc);
+    Item item = iter.next();
+    if(item == null) return false;
+
+    // sequence starting with node?
+    if(item instanceof ANode) return true;
+
+    // single item?
+    Item next = iter.next();
+    if(next == null) return test.test(item);
+
+    // positional sequence?
+    final boolean num = item instanceof ANum;
+    if(predicate && num && next instanceof ANum) {
+      boolean ok = test.test(item);
+      do {
+        if(!(next instanceof ANum)) throw testError(next, true, info);
+        if(!ok) ok = test.test(next);
+      } while((next = iter.next()) != null);
+      return ok;
     }
-    return pred && item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
+    throw testError(ValueBuilder.concat(item, next), predicate && num, info);
   }
 
   @Override
@@ -677,7 +691,7 @@ public abstract class ParseExpr extends Expr {
     for(final T key : keys.getEnumConstants()) {
       if(value.equals(key.toString())) return key;
     }
-    throw EXP_FOUND_X.get(info, Arrays.toString(keys.getEnumConstants()), value);
+    throw EXP_FOUND_X_X.get(info, Arrays.toString(keys.getEnumConstants()), value);
   }
 
   /**

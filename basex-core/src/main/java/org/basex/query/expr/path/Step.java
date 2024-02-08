@@ -95,7 +95,7 @@ public abstract class Step extends Preds {
     // check for simple positional predicates
     boolean pos = false;
     for(final Expr pred : preds) {
-      if(pred instanceof CmpPos || numeric(pred)) {
+      if(pred instanceof CmpPos || Pos.numeric(pred)) {
         // predicate is known to be a positional check; can be optimized
         pos = true;
       } else if(mayBePositional(pred)) {
@@ -106,6 +106,7 @@ public abstract class Step extends Preds {
     return pos ?
       new IterPosStep(info, axis, test, preds) :
       new IterStep(info, axis, test, preds);
+
   }
 
   /**

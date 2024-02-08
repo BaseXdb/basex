@@ -63,7 +63,7 @@ public abstract class Preds extends Arr {
   /**
    * Assigns the sequence type and result size.
    * @param root root expression
-   * @return whether evaluation can be skipped
+   * @return whether the evaluation can be skipped
    */
   private boolean exprType(final Expr root) {
     long max = root.size();
@@ -291,16 +291,6 @@ public abstract class Preds extends Arr {
     if(rst.zeroOrOne()) return createSimpleMap.apply(last);
 
     return this;
-  }
-
-  /**
-   * Checks if the specified expression returns an empty sequence or a deterministic numeric value.
-   * @param expr expression
-   * @return result of check
-   */
-  protected static boolean numeric(final Expr expr) {
-    final SeqType st = expr.seqType();
-    return st.type.isNumber() && st.zeroOrOne() && expr.isSimple();
   }
 
   /**

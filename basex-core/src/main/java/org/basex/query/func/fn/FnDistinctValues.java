@@ -51,7 +51,10 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
+    arg(0, arg -> {
+      final Expr expr = arg.simplifyFor(Simplify.DATA, cc);
+      return defined(1) ? expr : expr.simplifyFor(Simplify.DISTINCT, cc);
+    });
   }
 
   @Override
@@ -68,7 +71,7 @@ public final class FnDistinctValues extends StandardFunc {
       return cc.function(SORT, info, list.finish());
     }
     // distinct-values(distinct-values($data))  ->  distinct-values($data)
-    if(DISTINCT_VALUES.is(values)) return values;
+    if(DISTINCT_VALUES.is(values) && arg(1).equals(values.arg(1))) return values;
 
     final Expr opt = optStats(cc);
     if(opt != null) return opt;

@@ -97,7 +97,7 @@ public final class SingletonSeq extends Seq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.DISTINCT) {
+    if(mode == Simplify.DISTINCT || mode == Simplify.PREDICATE && type.isNumber()) {
       expr = value;
     } else if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER,
         Simplify.STRING)) {

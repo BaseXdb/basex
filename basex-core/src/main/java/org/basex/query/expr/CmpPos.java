@@ -30,7 +30,7 @@ public interface CmpPos {
   boolean exact();
 
   /**
-   * If possible, returns an optimized expression with inverted operands.
+   * If possible, returns an inverted and optimized position check.
    * @param cc compilation context
    * @return inverted expression or {@code null}
    * @throws QueryException query exception

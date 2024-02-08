@@ -1673,7 +1673,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Singleton sequences in predicates. */
   @Test public void gh1878() {
-    error("<a/>[" + REPLICATE.args(1, 2) + ']', ARGTYPE_X_X_X);
+    query("<a/>[(1 to 2) ! 1]", "<a/>");
+    query("<a/>[" + REPLICATE.args(1, 2) + ']', "<a/>");
   }
 
   /** Lacking filter rewriting. */

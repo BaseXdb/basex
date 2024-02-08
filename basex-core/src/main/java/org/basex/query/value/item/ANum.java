@@ -115,9 +115,9 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
       throws QueryException {
-    return pred ? dbl() == qc.focus.pos : bool(ii);
+    return predicate ? dbl() == qc.focus.pos : bool(ii);
   }
 
   @Override

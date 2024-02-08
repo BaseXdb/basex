@@ -80,7 +80,7 @@ public final class IntSeq extends NativeSeq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.DISTINCT) {
+    if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE)) {
       // replace with new sequence or range sequence
       final long[] tmp = new LongList((int) size).add(values).ddo().finish();
       final int tl = tmp.length;

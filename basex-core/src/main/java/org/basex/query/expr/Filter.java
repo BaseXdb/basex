@@ -170,9 +170,12 @@ public abstract class Filter extends Preds {
         // E[last() - 1]  ->  items-at(E, size - 1)
         if(es != -1) ex = cc.function(ITEMS_AT, info, prepare.apply(expr),
             new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));
-      } else if(pred.isSimple() && pred.seqType().instanceOf(SeqType.NUMERIC_ZO)) {
+      } else if(pred.isSimple() && pred.seqType().type.instanceOf(AtomType.NUMERIC)) {
+        final Expr pos = pred.seqType().zeroOrOne() ? pred :
+          cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pred));
         // E[pos]  ->  items-at(E, pos)
-        ex = cc.function(ITEMS_AT, info, prepare.apply(expr), pred);
+        // E[pos1, pos2, ...]  ->  items-at(E, sort(distinct-values((pos1, pos2, ...)))
+        ex = cc.function(ITEMS_AT, info, prepare.apply(expr), pos);
       }
       // replace temporary result expression or add predicate to temporary list
       if(ex != null) {

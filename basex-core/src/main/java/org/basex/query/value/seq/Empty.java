@@ -81,7 +81,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred) {
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate) {
     return false;
   }
 
@@ -128,7 +128,7 @@ public final class Empty extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == VALUE;
+    return obj instanceof Empty;
   }
 
   @Override

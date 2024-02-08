@@ -1119,7 +1119,9 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPT_X(XPTY, 4, "%"),
   /** Error code. */
-  EXP_FOUND_X(XPTY, 4, "% expected, % found."),
+  EXP_FOUND_X_X(XPTY, 4, "% expected, % found."),
+  /** Error code. */
+  EXP_FOUND_X_X_X(XPTY, 4, "% expected, % found: %."),
   /** Error code. */
   BINARY_X(XPTY, 4, "Binary expected, % found."),
   /** Error code. */
@@ -1684,23 +1686,28 @@ public enum QueryError {
   }
 
   /**
-   * Throws an EBV exception.
+   * Throws an test exception.
    * @param value value
+   * @param pos positional predicate
    * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException ebvError(final Value value, final InputInfo info) {
+  public static QueryException testError(final Value value, final boolean pos,
+      final InputInfo info) {
     final String expected, found;
     final Type type = value.seqType().type;
     if(type.instanceOf(AtomType.NUMERIC) || type.instanceOf(AtomType.STRING) ||
         type.oneOf(AtomType.BOOLEAN, AtomType.ANY_URI)) {
       expected = "Single " + type;
       found = "sequence";
+    } else if(pos) {
+      expected = "Numbers";
+      found = value.itemAt(value.size() - 1).seqType().toString();
     } else {
       expected = "Number, string, boolean, URI or nodes";
       found = value.itemAt(0).seqType().toString();
     }
-    return ARGTYPE_X_X_X.get(info, expected, found, value);
+    return (pos ? EXP_FOUND_X_X_X : ARGTYPE_X_X_X).get(info, expected, found, value);
   }
 
   /**

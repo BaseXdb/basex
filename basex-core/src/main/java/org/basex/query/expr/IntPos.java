@@ -41,17 +41,6 @@ public final class IntPos extends Simple implements CmpPos {
   }
 
   /**
-   * Returns a position expression for the specified position, or an optimized boolean item.
-   * @param pos position
-   * @param info input info (can be {@code null})
-   * @return expression
-   */
-  public static Expr get(final double pos, final InputInfo info) {
-    final long p = (long) pos;
-    return p != pos || p < 1 ? Bln.FALSE : get(p, p, info);
-  }
-
-  /**
    * Returns a position expression for the specified range, or an optimized boolean item.
    * @param min minimum position
    * @param max minimum position (inclusive)

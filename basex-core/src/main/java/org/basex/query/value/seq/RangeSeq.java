@@ -1,5 +1,6 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.io.*;
@@ -107,6 +108,15 @@ public final class RangeSeq extends Seq {
    */
   private long get(final long pos) {
     return start + (ascending ? pos : -pos);
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+      throws QueryException {
+
+    if(!predicate) throw testError(this, false, ii);
+    final long pos = qc.focus.pos;
+    return pos >= min() && pos <= max();
   }
 
   @Override
