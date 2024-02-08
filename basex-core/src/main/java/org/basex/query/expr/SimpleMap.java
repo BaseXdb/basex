@@ -177,11 +177,10 @@ public abstract class SimpleMap extends Arr {
           if(expr instanceof RangeSeq) {
             // (A to B) ! items-at(E, .)  ->  util:range(E, A, B)
             // reverse(A to B) ! items-at(E, .)  ->  reverse(util:range(E, A, B))
-            final RangeSeq seq = (RangeSeq) expr;
-            final long[] range = seq.range(false);
-            final Expr func = cc.function(_UTIL_RANGE, info,
-                args[0], Int.get(range[0]), Int.get(range[1]));
-            return seq.asc ? func : cc.function(REVERSE, info, func);
+            final RangeSeq rs = (RangeSeq) expr;
+            final Expr func = cc.function(_UTIL_RANGE, info, args[0],
+                Int.get(rs.min()), Int.get(rs.max()));
+            return rs.ascending() ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
             // (START to END) ! items-at(X, .)  ->  util:range(X, START, END)
@@ -207,9 +206,10 @@ public abstract class SimpleMap extends Arr {
         final Arith arith = (Arith) next;
         final boolean plus = arith.calc == Calc.ADD, minus = arith.calc == Calc.SUBTRACT;
         if((plus || minus) && next.arg(0) instanceof ContextValue && next.arg(1) instanceof Int) {
-          final RangeSeq seq = (RangeSeq) expr;
+          final RangeSeq rs = (RangeSeq) expr;
           final long diff = ((Int) next.arg(1)).itr();
-          return RangeSeq.get(seq.range(true)[0] + (plus ? diff : -diff), seq.size(), seq.asc);
+          final long start = rs.itemAt(0).itr() + (plus ? diff : -diff);
+          return RangeSeq.get(start, rs.size(), rs.ascending());
         }
       }
 

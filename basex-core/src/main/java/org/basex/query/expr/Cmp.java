@@ -283,10 +283,13 @@ public abstract class Cmp extends Arr {
     if(count instanceof ANum) {
       final double cnt = ((ANum) count).dbl();
       if(arg.seqType().zeroOrOne()) {
-        // count(ZeroOrOne)
+        // count(ZeroOrOne) < 2  ->  true()
         if(cnt > 1) {
           return Bln.get(op == OpV.LT || op == OpV.LE || op == OpV.NE);
         }
+        // count(ZeroOrOne)  < 1  ->  empty(ZeroOrOne)
+        // count(ZeroOrOne)  = 1  ->  exists(ZeroOrOne)
+        // count(ZeroOrOne) <= 1  ->  true()
         if(cnt == 1) {
           return op == OpV.NE || op == OpV.LT ? cc.function(EMPTY, info, arg) :
                  op == OpV.EQ || op == OpV.GE ? cc.function(EXISTS, info, arg) :
@@ -295,14 +298,13 @@ public abstract class Cmp extends Arr {
       }
       final long[] counts = countRange(op, cnt);
       // count(A) >= 0  ->  true()
-      if(counts == COUNT_TRUE || counts == COUNT_FALSE) {
-        return Bln.get(counts == COUNT_TRUE);
-      }
+      if(counts == COUNT_TRUE) return Bln.TRUE;
+      if(counts == COUNT_FALSE) return Bln.FALSE;
       // count(A) > 0  ->  exists(A)
-      if(counts == COUNT_EMPTY || counts == COUNT_EXISTS) {
-        return cc.function(counts == COUNT_EMPTY ? EMPTY : EXISTS, info, arg);
-      }
+      if(counts == COUNT_EMPTY) return cc.function(EMPTY, info, arg);
+      if(counts == COUNT_EXISTS) return cc.function(EXISTS, info, arg);
       // count(A) > 1  ->  util:within(A, 2)
+      // count(A) < 5  ->  util:within(A, 0, 4)
       if(counts != null) {
         for(final long c : counts) args.add(Int.get(c));
       }
@@ -310,9 +312,11 @@ public abstract class Cmp extends Arr {
       final SeqType st2 = count.seqType();
       if(st2.type.instanceOf(AtomType.INTEGER)) {
         if(count instanceof RangeSeq) {
-          final long[] range = ((RangeSeq) count).range(false);
-          args.add(Int.get(range[0])).add(Int.get(range[1]));
+          // count(A) = 3 to 5  ->  util:within(A, 3, 5)
+          final RangeSeq rs = (RangeSeq) count;
+          args.add(Int.get(rs.min())).add(Int.get(rs.max()));
         } else if(st2.one() && (count instanceof VarRef || count instanceof ContextValue)) {
+          // count(A) = $c  ->  util:within(A, $c)
           args.add(count).add(count);
         }
         if(!args.isEmpty()) {

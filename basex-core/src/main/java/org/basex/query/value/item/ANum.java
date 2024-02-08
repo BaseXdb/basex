@@ -137,8 +137,8 @@ public abstract class ANum extends Item {
     final boolean fractional = d != l;
     switch(op) {
       case EQ: if(d < 1 || fractional) return Bln.FALSE; break;
-      case LE: if(d < 1) return Bln.FALSE; break;
       case NE: if(d < 1 || fractional) return Bln.TRUE; break;
+      case LE: if(d < 1) return Bln.FALSE; break;
       case GT: if(d < 1) return Bln.TRUE; break;
       case LT: if(d < Math.nextUp(1d)) return Bln.FALSE; break;
       case GE: if(d < Math.nextUp(1d)) return Bln.TRUE; break;

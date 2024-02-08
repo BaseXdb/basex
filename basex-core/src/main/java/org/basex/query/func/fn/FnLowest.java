@@ -82,8 +82,8 @@ public class FnLowest extends StandardFunc {
 
       // lowest(1 to 10)  ->  1 to 10
       if(input instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) input;
-        return (seq.asc ? seq : seq.reverse(null)).itemAt(min ? 0 : seq.size() - 1);
+        final RangeSeq rs = (RangeSeq) input;
+        return (rs.ascending() ? rs : rs.reverse(null)).itemAt(min ? 0 : rs.size() - 1);
       }
       // lowest(ITEM)  ->  ITEM
       if(noCheck.test(st.type) && (st.one() || input instanceof SingletonSeq &&

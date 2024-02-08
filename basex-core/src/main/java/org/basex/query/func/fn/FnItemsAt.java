@@ -163,10 +163,9 @@ public class FnItemsAt extends StandardFunc {
 
     // items-at(E, start to end)  ->  util:range(E, start, end)
     if(at instanceof RangeSeq) {
-      final RangeSeq seq = (RangeSeq) at;
-      final long[] range = seq.range(false);
-      Expr expr = cc.function(_UTIL_RANGE, info, input, Int.get(range[0]), Int.get(range[1]));
-      if(!seq.asc) expr = cc.function(REVERSE, info, expr);
+      final RangeSeq rs = (RangeSeq) at;
+      Expr expr = cc.function(_UTIL_RANGE, info, input, Int.get(rs.min()), Int.get(rs.max()));
+      if(!rs.ascending()) expr = cc.function(REVERSE, info, expr);
       return expr;
     }
     // items-at(E, S to E)  ->  util:range(E, S, E)

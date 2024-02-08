@@ -13,7 +13,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * List of expressions that have been separated by commas.
@@ -129,40 +128,46 @@ public final class List extends Arr {
   private void toRange(final CompileContext cc) {
     if(!((Checks<Expr>) expr -> expr instanceof Int || expr instanceof RangeSeq).any(exprs)) return;
 
-    long[] range = null;
+    long min = Long.MIN_VALUE, max = 0;
     final int el = exprs.length;
     final ExprList list = new ExprList(el);
     for(int e = 0; e <= el; e++) {
       final Expr expr = e < el ? exprs[e] : null;
-      long[] rng = null;
+      long mn = Long.MIN_VALUE, mx = 0;
       if(expr instanceof Int && expr.seqType().type == AtomType.INTEGER) {
         final long l = ((Int) expr).itr();
-        rng = new long[] { l, l };
+        mn = l;
+        mx = l;
       } else if(expr instanceof RangeSeq) {
-        rng = ((RangeSeq) expr).range(true);
-        if(rng[1] < rng[0]) rng = null;
+        final RangeSeq rs = (RangeSeq) expr;
+        if(rs.ascending()) {
+          mn = rs.min();
+          mx = rs.max();
+        }
       }
-      boolean add = rng == null;
+      boolean add = mn == Long.MIN_VALUE;
       if(!add) {
-        if(range == null) {
+        if(min == Long.MIN_VALUE) {
           // start new range: 1 - 2
-          range = rng;
-        } else if(rng[0] == range[1] + 1) {
+          min = mn;
+          max = mx;
+        } else if(mn == max + 1) {
           // extend range: 1 - 2, 3 - 4  ->  1 - 4
-          range[1] = rng[1];
+          max = mx;
         } else {
           // finalize existing range
           add = true;
         }
       }
       if(add) {
-        if(range != null) {
-          final long s = range[1] - range[0] + 1;
-          list.add(RangeSeq.get(range[0], s, true));
+        if(min != Long.MIN_VALUE) {
+          final long s = max - min + 1;
+          list.add(RangeSeq.get(min, s, true));
           if(s > 1) cc.info(OPTMERGE_X, list.peek());
-          range = rng;
+          min = mn;
+          max = mx;
         }
-        if(range == null && expr != null) list.add(expr);
+        if(min == Long.MIN_VALUE && expr != null) list.add(expr);
       }
     }
     exprs = list.finish();
@@ -275,26 +280,26 @@ public final class List extends Arr {
    * @return range or original expression
    */
   private Expr toDistinctRange() {
-    long start = 0, end = 0;
-    final LongList list = new LongList(2);
+    long start = 0, end = 0, min, max;
     for(final Expr expr : exprs) {
       if(expr instanceof Int) {
-        list.add(((Int) expr).itr());
+        min = ((Int) expr).itr();
+        max = min + 1;
       } else if(expr instanceof RangeSeq) {
-        list.add(((RangeSeq) expr).range(false));
+        final RangeSeq rs = (RangeSeq) expr;
+        min = rs.min();
+        max = rs.max() + 1;
       } else {
         return this;
       }
-      final long mn = list.get(0), mx = list.peek() + 1;
       if(start == end) {
-        start = mn;
-        end = mx;
+        start = min;
+        end = max;
       } else {
-        if(mx < start - 1 || mn > end) return this;
-        if(mn < start) start = mn;
-        if(mx > end) end = mx;
+        if(max < start - 1 || min > end) return this;
+        if(min < start) start = min;
+        if(max > end) end = max;
       }
-      list.reset();
     }
     return RangeSeq.get(start, end - start, true);
   }

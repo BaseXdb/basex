@@ -200,8 +200,8 @@ public class FnSort extends StandardFunc {
     if(exprs.length == 1) {
       // range values
       if(input instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) input;
-        return seq.asc ? seq : seq.reverse(null);
+        final RangeSeq rs = (RangeSeq) input;
+        return rs.ascending() ? rs : rs.reverse(null);
       }
       // sortable single or singleton values
       final SeqType st = input.seqType();

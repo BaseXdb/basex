@@ -86,9 +86,9 @@ public final class CmpIR extends Single {
 
     long mn, mx;
     if(expr2 instanceof RangeSeq) {
-      final long[] range = ((RangeSeq) expr2).range(false);
-      mn = range[0];
-      mx = range[1];
+      final RangeSeq rs = (RangeSeq) expr2;
+      mn = rs.min();
+      mx = rs.max();
     } else if(expr2 instanceof Int && (eq || !cmpEq)) {
       mn = ((Int) expr2).itr();
       mx = mn;
@@ -144,8 +144,8 @@ public final class CmpIR extends Single {
       final long size = value.size();
       if(size == 0) return Bln.FALSE;
       if(size == 1) return Bln.get(inRange((Item) value));
-      final long[] range = ((RangeSeq) value).range(false);
-      return Bln.get(range[1] >= min && range[0] <= max);
+      final RangeSeq rs = (RangeSeq) value;
+      return Bln.get(rs.max() >= min && rs.min() <= max);
     }
 
     // iterative evaluation

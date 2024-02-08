@@ -75,8 +75,8 @@ public final class IntPos extends Simple implements CmpPos {
   static Expr get(final Expr pos, final OpV op, final InputInfo info) {
     if(pos == Empty.VALUE) return Bln.FALSE;
     if(pos instanceof RangeSeq && op == OpV.EQ) {
-      final long[] range = ((RangeSeq) pos).range(false);
-      return get(range[0], range[1], info);
+      final RangeSeq rs = (RangeSeq) pos;
+      return get(rs.min(), rs.max(), info);
     }
     if(pos instanceof ANum) {
       final ANum num = (ANum) pos;

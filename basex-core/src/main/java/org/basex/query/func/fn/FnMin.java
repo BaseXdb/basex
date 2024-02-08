@@ -148,8 +148,8 @@ public class FnMin extends StandardFunc {
         final Value value = (Value) values;
         final long size = value.size();
         if(value instanceof RangeSeq) {
-          final RangeSeq seq = (RangeSeq) value;
-          item = seq.itemAt(min ^ seq.asc ? size - 1 : 0);
+          final RangeSeq rs = (RangeSeq) value;
+          item = rs.itemAt(min ^ rs.ascending() ? size - 1 : 0);
         } else if(value instanceof SingletonSeq && ((SingletonSeq) value).singleItem()) {
           item = value.itemAt(0);
         } else if(value.isItem()) {
