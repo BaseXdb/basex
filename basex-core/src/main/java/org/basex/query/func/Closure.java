@@ -27,7 +27,7 @@ import org.basex.util.hash.*;
 /**
  * Inline function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class Closure extends Single implements Scope, XQFunctionExpr {
@@ -58,34 +58,34 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @param expr function body
    * @param params parameters
    * @param anns annotations
-   * @param global bindings for non-local variables
    * @param vs scope
+   * @param global bindings for non-local variables
    */
-  public Closure(final InputInfo info, final Expr expr, final Params params,
-      final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
-    this(info, expr, params.type, null, params.vars(), anns, global, vs);
+  public Closure(final InputInfo info, final Expr expr, final Params params, final AnnList anns,
+      final VarScope vs, final Map<Var, Expr> global) {
+    this(info, expr, params.vars(), anns, vs, global, params.seqType(), null);
   }
 
   /**
    * Package-private constructor allowing a name.
    * @param info input info (can be {@code null})
    * @param expr function expression
-   * @param declType declared type (can be {@code null})
-   * @param name function name (can be {@code null})
    * @param params formal parameters
    * @param anns annotations
-   * @param global bindings for non-local variables (can be {@code null})
    * @param vs variable scope
+   * @param global bindings for non-local variables (can be {@code null})
+   * @param declType declared type (can be {@code null})
+   * @param name function name (can be {@code null})
    */
-  Closure(final InputInfo info, final Expr expr, final SeqType declType, final QNm name,
-      final Var[] params, final AnnList anns, final Map<Var, Expr> global, final VarScope vs) {
+  Closure(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
+      final VarScope vs, final Map<Var, Expr> global, final SeqType declType, final QNm name) {
     super(info, expr, SeqType.FUNCTION_O);
-    this.name = name;
     this.params = params;
-    this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     this.anns = anns;
-    this.global = global == null ? Collections.emptyMap() : global;
     this.vs = vs;
+    this.global = global == null ? Collections.emptyMap() : global;
+    this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
+    this.name = name;
   }
 
   @Override
@@ -242,8 +242,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       final IntObjMap<Var> innerVars = new IntObjMap<>();
       vs.copy(cc, innerVars);
 
-      final HashMap<Var, Expr> nl = new HashMap<>();
-      outer.forEach((key, value) -> nl.put(innerVars.get(key.id), value));
+      final HashMap<Var, Expr> bindings = new HashMap<>();
+      outer.forEach((key, value) -> bindings.put(innerVars.get(key.id), value));
 
       final Var[] prms = params.clone();
       final int pl = prms.length;
@@ -251,7 +251,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
       final Expr ex = expr.copy(cc, innerVars);
       ex.markTailCalls(null);
-      return copyType(new Closure(info, ex, declType, name, prms, anns, nl, cc.vs()));
+      return copyType(new Closure(info, ex, prms, anns, cc.vs(), bindings, declType, name));
     } finally {
       cc.removeScope();
     }
@@ -315,7 +315,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     final FuncType ft = (FuncType) seqType().type;
-    return new FuncItem(vs.sc, anns, name, params, ft, checked, vs.stackSize(), info);
+    return new FuncItem(info, checked, params, anns, ft, vs.sc, vs.stackSize(), name);
   }
 
   @Override
@@ -432,14 +432,13 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     updating = expr.has(Flag.UPD);
     final boolean annUpdating = anns.contains(Annotation.UPDATING);
     if(updating != annUpdating) {
-      if(!annUpdating) anns.add(new Ann(info, Annotation.UPDATING, Empty.VALUE));
+      if(!annUpdating) anns = anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
       else if(!expr.vacuous()) throw UPEXPECTF.get(info);
     }
   }
 
   @Override
   public boolean equals(final Object obj) {
-    // [CG] could be enhanced
     return this == obj;
   }
 

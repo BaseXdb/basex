@@ -24,70 +24,72 @@ import org.basex.util.list.*;
 /**
  * Function item.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
   /** Static context. */
   public final StaticContext sc;
   /** Function expression. */
-  private final Expr expr;
-  /** Function name (can be {@code null}). */
-  private final QNm name;
+  public final Expr expr;
+
   /** Formal parameters. */
   private final Var[] params;
+  /** Annotations. */
+  private final AnnList anns;
   /** Size of the stack frame needed for this function. */
   private final int stackSize;
   /** Input information. */
   private final InputInfo info;
+  /** Function name (can be {@code null}). */
+  private final QNm name;
   /** Query focus. */
   private final QueryFocus focus;
-  /** Annotations (lazy instantiation). */
-  private AnnList anns;
   /** Indicates if the query focus is accessed or modified. */
-  private Boolean fcs;
+  private final boolean simple;
 
   /**
    * Constructor.
-   * @param sc static context
-   * @param anns function annotations (can be {@code null})
-   * @param name function name (can be {@code null})
-   * @param params formal parameters
-   * @param type function type
-   * @param expr function body
-   * @param stackSize stack-frame size
    * @param info input info (can be {@code null})
+   * @param expr function body
+   * @param params formal parameters
+   * @param anns function annotations
+   * @param type function type
+   * @param sc static context
+   * @param stackSize stack-frame size
+   * @param name function name (can be {@code null})
    */
-  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final int stackSize, final InputInfo info) {
-    this(sc, anns, name, params, type, expr, stackSize, info, null);
+  public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
+      final FuncType type, final StaticContext sc, final int stackSize, final QNm name) {
+    this(info, expr, params, anns, type, sc, stackSize, name, null);
   }
 
   /**
    * Constructor.
-   * @param sc static context
-   * @param anns function annotations (can be {@code null})
-   * @param name function name (can be {@code null})
-   * @param params formal parameters
-   * @param type function type
-   * @param expr function body
-   * @param stackSize stack-frame size
    * @param info input info (can be {@code null})
+   * @param expr function body
+   * @param params formal parameters
+   * @param anns function annotations
+   * @param type function type
+   * @param sc static context
+   * @param stackSize stack-frame size
+   * @param name function name (can be {@code null})
    * @param focus query focus (can be {@code null})
    */
-  public FuncItem(final StaticContext sc, final AnnList anns, final QNm name, final Var[] params,
-      final FuncType type, final Expr expr, final int stackSize, final InputInfo info,
+  public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
+      final FuncType type, final StaticContext sc, final int stackSize, final QNm name,
       final QueryFocus focus) {
 
     super(type);
-    this.name = name;
-    this.params = params;
-    this.expr = expr;
-    this.stackSize = stackSize;
-    this.sc = sc;
     this.info = info;
-    this.focus = focus;
+    this.expr = expr;
+    this.params = params;
     this.anns = anns;
+    this.sc = sc;
+    this.stackSize = stackSize;
+    this.name = name;
+    this.focus = focus;
+    this.simple = !expr.has(Flag.CTX);
   }
 
   @Override
@@ -107,7 +109,6 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public AnnList annotations() {
-    if(anns == null) anns = new AnnList();
     return anns;
   }
 
@@ -115,12 +116,11 @@ public final class FuncItem extends FItem implements Scope {
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 
-    final int pl = arity();
-    for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) qc.set(params[a], args[a]);
 
     // use shortcut if focus is not accessed
-    if(fcs == null) fcs = expr.has(Flag.FCS, Flag.CTX, Flag.POS);
-    if(!fcs) return expr.value(qc);
+    if(simple) return expr.value(qc);
 
     final QueryFocus qf = qc.focus;
     qc.focus = focus != null ? focus : new QueryFocus();
@@ -175,7 +175,7 @@ public final class FuncItem extends FItem implements Scope {
     final SeqType bt = body.seqType();
     tp = optimize && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
     body.markTailCalls(null);
-    return new FuncItem(sc, anns, name, vars, tp, body, vs.stackSize(), info);
+    return new FuncItem(info, body, vars, anns, tp, sc, vs.stackSize(), name);
   }
 
   @Override
@@ -209,9 +209,9 @@ public final class FuncItem extends FItem implements Scope {
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();
     final IntObjMap<Var> vm = new IntObjMap<>();
-    final int pl = arity();
-    for(int p = 0; p < pl; p++) {
-      clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) {
+      clauses.add(new Let(cc.copy(params[a], vm), exprs[a]).optimize(cc));
     }
 
     // create the return clause
@@ -237,19 +237,18 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    if(deep.options.get(DeepEqualOptions.FALSE_ON_ERROR)) return false;
-    throw FICOMPARE_X.get(info, this);
+    if(this == item) return true;
+    if(item instanceof FuncItem) {
+      final FuncItem func = (FuncItem) item;
+      return arity() == func.arity() && expr.equals(func.expr);
+    }
+    return false;
   }
 
   @Override
   public boolean vacuousBody() {
     final SeqType st = expr.seqType();
     return st != null && st.zero() && !expr.has(Flag.UPD);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj;
   }
 
   @Override
@@ -270,19 +269,17 @@ public final class FuncItem extends FItem implements Scope {
     } else {
       final StringList list = new StringList(arity());
       for(final Var param : params) list.add(param.toErrorString());
-      if(anns != null) qs.token(anns);
-      qs.token(FUNCTION).params(list.finish()).token(AS);
-      qs.token(funcType().declType).brace(expr);
+      qs.token(anns).token(FUNCTION).params(list.finish());
+      qs.token(AS).token(funcType().declType).brace(expr);
     }
     return qs.toString();
   }
 
   @Override
   public void toString(final QueryString qs) {
+    qs.token(anns);
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    if(anns != null) qs.token(anns);
-    qs.token(FUNCTION).params(params);
-    qs.token(AS).token(funcType().declType).brace(expr);
+    qs.token(FUNCTION).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 
   /**
@@ -322,8 +319,8 @@ public final class FuncItem extends FItem implements Scope {
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
           }
           if(action != null) return new FuncItem[] {
-            new FuncItem(sc, anns, null, params, funcType(), cnd, stackSize, info, focus),
-            new FuncItem(sc, anns, null, params, funcType(), action, stackSize, info, focus)
+            new FuncItem(info, cnd, params, anns, funcType(), sc, stackSize, null, focus),
+            new FuncItem(info, action, params, anns, funcType(), sc, stackSize, null, focus)
           };
         }
       }
@@ -334,10 +331,10 @@ public final class FuncItem extends FItem implements Scope {
   /**
    * A visitor for checking inlined expressions.
    *
-   * @author BaseX Team 2005-23, BSD License
+   * @author BaseX Team 2005-24, BSD License
    * @author Leo Woerteler
    */
-  private class InlineVisitor extends ASTVisitor {
+  private final class InlineVisitor extends ASTVisitor {
     @Override
     public boolean inlineFunc(final Scope scope) {
       return scope.visit(this);

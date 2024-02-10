@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Dummy item (only used at compile time).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Dummy extends Item {
@@ -62,7 +62,8 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo info) {
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo info) throws QueryException {
     throw Util.notExpected();
   }
 

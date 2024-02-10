@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * stream that has been specified via the constructor or via
  * {@link Session#setOutputStream(OutputStream)}.</p>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Query implements Closeable {

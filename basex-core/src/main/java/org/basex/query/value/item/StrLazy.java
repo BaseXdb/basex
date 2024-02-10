@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Lazy string item ({@code xs:string}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class StrLazy extends AStr implements Lazy {
@@ -83,13 +83,13 @@ public final class StrLazy extends AStr implements Lazy {
    * @throws QueryException query exception
    */
   private TextInput get(final InputInfo info) throws QueryException {
-    TextInput ti = null;
+    NewlineInput nli = null;
     try {
-      ti = new TextInput(input);
-      ti.encoding(encoding).validate(validate);
-      return ti;
+      nli = new NewlineInput(input);
+      nli.encoding(encoding).validate(validate);
+      return nli;
     } catch(final IOException ex) {
-      if(ti != null) try { ti.close(); } catch(final IOException e) { Util.debug(e); }
+      if(nli != null) try { nli.close(); } catch(final IOException e) { Util.debug(e); }
       throw error.get(info, ex);
     }
   }

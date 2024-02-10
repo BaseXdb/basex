@@ -1,13 +1,13 @@
 (:~
  : Add new pattern.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/users';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace options = 'dba/options' at '../lib/options.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -30,6 +30,7 @@ declare
   %rest:query-param('perm',    '{$perm}', 'write')
   %rest:query-param('error',   '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:pattern-add(
   $name     as xs:string,
   $pattern  as xs:string?,
@@ -61,7 +62,7 @@ function dba:pattern-add(
               <td>Permission:</td>
               <td>
                 <select name='perm' size='3'>{
-                  for $p in $options:PERMISSIONS[position() = 1 to 3]
+                  for $p in $config:PERMISSIONS[position() = 1 to 3]
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>
                 <div class='small'/>
@@ -95,9 +96,9 @@ function dba:create(
 ) as empty-sequence() {
   try {
     user:grant($name, $perm, $pattern),
-    util:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern was created.' })
+    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern was created.' })
   } catch * {
-    util:redirect('pattern-add', map {
+    utils:redirect('pattern-add', map {
       'name': $name, 'perm': $perm, 'pattern': $pattern, 'error': $err:description
     })
   }

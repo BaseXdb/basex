@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Container of global variables of a module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
@@ -143,7 +143,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /** Entry for static variables and their references. */
-  private static class VarEntry {
+  private static final class VarEntry {
     /** The static variable. */
     StaticVar var;
     /** Variable references. */

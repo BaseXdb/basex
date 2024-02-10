@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Update operation that references databases by their name.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public abstract class NameUpdate extends Update implements Comparable<NameUpdate> {
@@ -80,7 +80,7 @@ public abstract class NameUpdate extends Update implements Comparable<NameUpdate
 
   @Override
   public final int compareTo(final NameUpdate o) {
-    return type.ordinal() - o.type.ordinal();
+    return Integer.signum(type.ordinal() - o.type.ordinal());
   }
 
   /**

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Case-insensitive collation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class NoCaseCollation extends Collation {
@@ -16,10 +16,10 @@ final class NoCaseCollation extends Collation {
     final String str = string(string), comp = string(compare);
     final int tl = str.length(), cl = comp.length(), l = Math.min(tl, cl);
     for(int i = 0; i < l; ++i) {
-      final int diff = diff(str.charAt(i), comp.charAt(i));
+      final int diff = compare(str.charAt(i), comp.charAt(i));
       if(diff != 0) return diff;
     }
-    return tl - cl;
+    return Integer.signum(tl - cl);
   }
 
   @Override
@@ -31,7 +31,7 @@ final class NoCaseCollation extends Collation {
     if(tl >= sl) {
       for(int t = mode == Mode.ENDS_WITH ? tl - sl : 0; t < tl; ++t) {
         for(int s = 0; t + s < tl;) {
-          if(diff(string.charAt(t + s), sub.charAt(s)) != 0) break;
+          if(compare(string.charAt(t + s), sub.charAt(s)) != 0) break;
           if(++s == sl) return mode == Mode.INDEX_AFTER ? t + s : t;
         }
         if(mode == Mode.STARTS_WITH) return -1;
@@ -44,13 +44,13 @@ final class NoCaseCollation extends Collation {
    * Compares two characters.
    * @param ch1 first character
    * @param ch2 second character
-   * @return difference
+   * @return result of comparison (-1, 0, 1)
    */
-  private static int diff(final char ch1, final char ch2) {
+  private static int compare(final char ch1, final char ch2) {
     if(ch1 != ch2) {
       final int c1 = ch1 >= 'a' && ch1 <= 'z' ? ch1 - 0x20 : ch1;
       final int c2 = ch2 >= 'a' && ch2 <= 'z' ? ch2 - 0x20 : ch2;
-      if(c1 != c2) return c1 - c2;
+      if(c1 != c2) return Integer.signum(c1 - c2);
     }
     return 0;
   }

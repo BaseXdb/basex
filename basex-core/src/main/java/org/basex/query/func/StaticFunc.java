@@ -27,16 +27,16 @@ import org.basex.util.hash.*;
 /**
  * A static user-defined function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class StaticFunc extends StaticDecl implements XQFunction {
   /** Formal parameters. */
   public final Var[] params;
   /** Default expressions (entries can be {@code null} references). */
-  public final Expr[] defaults;
+  final Expr[] defaults;
   /** Minimum number of arguments. */
-  public final int min;
+  final int min;
   /** Updating flag. */
   final boolean updating;
 
@@ -55,7 +55,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   StaticFunc(final QNm name, final Params params, final Expr expr, final AnnList anns,
       final VarScope vs, final InputInfo info, final String doc) {
-    super(name, params.type, anns, vs, info, doc);
+    super(name, params.seqType(), anns, vs, info, doc);
 
     this.params = params.vars();
     this.defaults = params.defaults();
@@ -72,9 +72,26 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   @Override
   public Expr compile(final CompileContext cc) {
     if(!compiled && expr != null) {
-      compiled = dontEnter = true;
+      compiled = true;
+
+      // dynamic compilation: refine parameter types to arguments types of function call
+      final SeqType[] callTypes = cc.dynamic ? cc.qc.functions.seqTypes(this) : null;
+      final int pl = params.length;
+      if(callTypes != null) {
+        boolean refined = false;
+        for(int p = 0; p < pl; p++) {
+          final Var param = params[p];
+          final SeqType cst = callTypes[p], pst = param.seqType();
+          if(!cst.eq(pst) && cst.instanceOf(pst)) {
+            param.declType = cst;
+            refined = true;
+          }
+        }
+        if(refined) cc.info(OPTREFINED_X, concat(name.prefixId(), '#', pl));
+      }
 
       // compile function body, handle return type
+      dontEnter = true;
       cc.pushFocus(null);
       cc.pushScope(vs);
       try {
@@ -86,31 +103,20 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         cc.removeScope(this);
         cc.removeFocus();
       }
-
       // convert all function calls in tail position to proper tail calls
       expr.markTailCalls(cc);
       dontEnter = false;
-    }
-    return null;
-  }
 
-  /**
-   * Optimize the static function.
-   * @param cc compilation context
-   */
-  public void optimize(final CompileContext cc) {
-    // check function calls, drop superfluous type checks
-    final SeqType[] seqTypes = cc.qc.functions.seqTypes(this);
-    if(seqTypes != null) {
-      final int pl = arity();
-      for(int p = 0; p < pl; p++) {
-        if(seqTypes[p].instanceOf(params[p].seqType())) {
-          cc.info(OPTTYPE_X, params[p]);
-          params[p].declType = null;
+      // dynamic compilation: remove redundant type declarations
+      if(callTypes != null) {
+        for(int p = 0; p < pl; p++) {
+          final Var param = params[p];
+          if(callTypes[p].instanceOf(param.seqType())) param.declType = null;
         }
       }
+      if(!cc.dynamic) declType = null;
     }
-    declType = null;
+    return null;
   }
 
   /**

@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * This class stores a string range for index access.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class StringRange implements IndexSearch {

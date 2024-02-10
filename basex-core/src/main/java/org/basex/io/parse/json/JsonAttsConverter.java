@@ -10,7 +10,7 @@ import org.basex.query.value.node.*;
 /**
  * This class converts a JSON document to an XML structure. JSON keys will be stored in attributes.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -18,9 +18,9 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonAttsConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonAttsConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
   }
 

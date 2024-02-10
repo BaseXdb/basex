@@ -14,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * DOM - Node implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class BXNode implements Node {
@@ -97,7 +97,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final short compareDocumentPosition(final Node node) {
-    return (short) Integer.compare(nd.diff(((BXNode) node).nd), 0);
+    return (short) Integer.compare(nd.compare(((BXNode) node).nd), 0);
   }
 
   @Override

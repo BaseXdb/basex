@@ -1,7 +1,7 @@
 (:~
  : Settings, garbage collection.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/settings';
 
@@ -17,6 +17,6 @@ declare
   %rest:path('/dba/settings-gc')
 function dba:settings-gc(
 ) as element(rest:response) {
-  Q{java.lang.System}gc(),
+  prof:gc(),
   web:redirect($dba:CAT, map { 'info': 'Garbage collection was triggered.' })
 };

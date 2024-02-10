@@ -8,9 +8,9 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Union node test.
+ * Union test for nodes of common type.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class UnionTest extends Test {
@@ -19,8 +19,8 @@ public final class UnionTest extends Test {
 
   /**
    * Constructor.
-   * @param type node type
-   * @param tests tests
+   * @param type common node type
+   * @param tests tests ({@link NameTest}, {@link DocTest} and {@link InvDocTest} instances)
    */
   UnionTest(final NodeType type, final Test[] tests) {
     super(type);
@@ -49,8 +49,11 @@ public final class UnionTest extends Test {
   public Boolean matches(final SeqType seqType) {
     final Type tp = seqType.type;
     if(tp.intersect(type) == null) return Boolean.FALSE;
-    final Test test = seqType.test();
-    return tp == type && test instanceof UnionTest && equals(test) ? Boolean.TRUE : null;
+    for(final Test test : tests) {
+      final Boolean matches = test.matches(seqType);
+      if(matches != Boolean.FALSE) return matches;
+    }
+    return Boolean.FALSE;
   }
 
   @Override

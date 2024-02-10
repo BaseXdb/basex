@@ -13,14 +13,14 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnStringJoin extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
-    final byte[] separator = defined(1) ? toToken(arg(1), qc) : Token.EMPTY;
+    final byte[] separator = toZeroToken(arg(1), qc);
 
     // no results: empty string
     Item item = values.next();

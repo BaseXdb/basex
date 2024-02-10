@@ -10,13 +10,13 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class MapPairs extends MapEntries {
   @Override
   XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.entry(Str.KEY, key, info).put(Str.VALUE, value, info);
+    return XQMap.singleton(Str.KEY, key, info).put(Str.VALUE, value, info);
   }
 
   @Override

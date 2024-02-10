@@ -8,13 +8,14 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnAtomicEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value1 = toItem(arg(0), qc), value2 = toItem(arg(1), qc);
+    final Item value1 = toAtomItem(arg(0), qc);
+    final Item value2 = toAtomItem(arg(1), qc);
     return Bln.get(value1.atomicEqual(value2, info));
   }
 }

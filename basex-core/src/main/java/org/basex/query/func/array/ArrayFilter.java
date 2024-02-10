@@ -11,20 +11,19 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArrayFilter extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final FItem predicate = toFunction(arg(1), 1, qc);
+    final FItem predicate = toFunction(arg(1), 2, qc);
 
+    int p = 0;
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
-        ab.append(value);
-      }
+      if(toBoolean(qc, predicate, value, Int.get(++p))) ab.append(value);
     }
     return ab.array(this);
   }
@@ -36,7 +35,8 @@ public final class ArrayFilter extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType));
+      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType,
+          SeqType.INTEGER_O));
       exprType.assign(type);
     }
     return this;

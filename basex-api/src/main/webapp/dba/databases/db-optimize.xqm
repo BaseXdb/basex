@@ -1,12 +1,12 @@
 (:~
  : Optimize databases.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -31,6 +31,7 @@ declare
   %rest:query-param('lang',  '{$lang}', 'en')
   %rest:query-param('error', '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-optimize(
   $name   as xs:string,
   $all    as xs:string?,
@@ -109,9 +110,9 @@ function dba:db-optimize(
         map:entry(., $opts = .),
       $lang ! map:entry('language', .)
     ))),
-    util:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was optimized.' })
+    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was optimized.' })
   } catch * {
-    util:redirect($dba:SUB, map {
+    utils:redirect($dba:SUB, map {
       'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }
@@ -132,8 +133,8 @@ function dba:db-optimize-all(
 ) as empty-sequence() {
   try {
     $names ! db:optimize(.),
-    util:redirect($dba:CAT, map { 'info': util:info($names, 'database', 'optimized') })
+    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'database', 'optimized') })
   } catch * {
-    util:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

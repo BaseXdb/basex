@@ -12,12 +12,12 @@ import org.w3c.dom.*;
 /**
  * Main-memory node fragment.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {
   /** Parent node (can be {@code null}). */
-  FNode parent;
+  private FNode parent;
 
   /**
    * Constructor.
@@ -38,9 +38,10 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final int diff(final ANode node) {
+  public final int compare(final ANode node) {
     // fragments: compare node ids. otherwise, find LCA
-    return this == node ? 0 : node instanceof FNode ? id - node.id : diff(this, node);
+    return this == node ? 0 : node instanceof FNode ? Integer.signum(id - node.id) :
+      compare(this, node);
   }
 
   @Override
@@ -65,6 +66,11 @@ public abstract class FNode extends ANode {
 
   @Override
   public boolean hasChildren() {
+    return false;
+  }
+
+  @Override
+  public boolean hasAttributes() {
     return false;
   }
 

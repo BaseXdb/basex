@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for strings.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class StringList extends ObjectList<String, StringList> {

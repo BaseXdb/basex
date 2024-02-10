@@ -14,7 +14,7 @@ import org.basex.util.*;
  * The inheriting classes are optimized for performance and faster than Java's
  * default decoders.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class TextDecoder {
@@ -70,7 +70,7 @@ abstract class TextDecoder {
   }
 
   /** UTF8 Decoder. */
-  private static class UTF8 extends TextDecoder {
+  private static final class UTF8 extends TextDecoder {
     /** UTF8 cache. */
     private final byte[] cache = new byte[4];
 
@@ -91,7 +91,7 @@ abstract class TextDecoder {
   }
 
   /** UTF16LE Decoder. */
-  private static class UTF16LE extends TextDecoder {
+  private static final class UTF16LE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -103,7 +103,7 @@ abstract class TextDecoder {
   }
 
   /** UTF16BE Decoder. */
-  private static class UTF16BE extends TextDecoder {
+  private static final class UTF16BE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -115,7 +115,7 @@ abstract class TextDecoder {
   }
 
   /** UTF32 Decoder. */
-  private static class UTF32 extends TextDecoder {
+  private static final class UTF32 extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Float item ({@code xs:float}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Flt extends ANum {
@@ -117,11 +117,23 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    if(item instanceof Dbl) return -item.diff(this, coll, ii);
-    // cannot be replaced by Float.compare (different semantics)
-    final float n = item.flt(ii);
-    return Float.isNaN(n) || Float.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return (item instanceof Dbl || transitive && item instanceof Dec)
+        ? -item.compare(this, coll, transitive, ii) : compare(value, item.flt(ii), transitive);
+  }
+
+  /**
+   * Compares two floats.
+   * @param f1 first floats
+   * @param f2 second floats
+   * @param transitive transitive comparison
+   * @return result of comparison
+   */
+  static int compare(final float f1, final float f2, final boolean transitive) {
+    final boolean nan = Float.isNaN(f1), fNan = Float.isNaN(f2);
+    return nan || fNan ? transitive ? nan == fNan ? 0 : nan ? -1 : 1 : NAN_DUMMY :
+      f1 < f2 ? -1 : f1 > f2 ? 1 : 0;
   }
 
   @Override

@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Parser for formatting integers in dates and times.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class DateFormat extends FormatParser {
@@ -22,10 +22,12 @@ final class DateFormat extends FormatParser {
    * Constructor.
    * @param picture variable marker (info picture)
    * @param def default presentation modifier
+   * @param frac fractional seconds flag
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  DateFormat(final byte[] picture, final byte[] def, final InputInfo info) throws QueryException {
+  DateFormat(final byte[] picture, final byte[] def, final boolean frac, final InputInfo info)
+      throws QueryException {
     super(info);
 
     // split variable marker
@@ -37,14 +39,14 @@ final class DateFormat extends FormatParser {
       final int p = pres[pl - 1];
       if(p == 'a' || p == 'c' || p == 'o' || p == 't') {
         pres = substring(pres, 0, pl - 1);
-        if(p == 'o') ordinal = EMPTY;
+        if(p == 'o') numType = NumeralType.ORDINAL;
         if(p == 't') trad = true;
       }
     }
 
     // choose first character and case
     try {
-      finish(pres.length == 0 ? def : presentation(pres, def, true));
+      finish(pres.length == 0 ? def : presentation(pres, def, true, frac));
     } catch(final QueryException ex) {
       throw INVFDPATTERN_X.get(info, ex.getLocalizedMessage());
     }

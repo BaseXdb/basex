@@ -9,7 +9,7 @@ import org.basex.query.value.seq.*;
 /**
  * Iterator interface.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Iter {
@@ -61,17 +61,23 @@ public abstract class Iter {
    * @throws QueryException query exception
    */
   public Value value(final QueryContext qc, final Expr expr) throws QueryException {
-    // check if sequence is empty
+    // empty sequence?
     final Item item1 = next();
     if(item1 == null) return Empty.VALUE;
 
-    // check for single result
+    // single item?
     final Item item2 = next();
     if(item2 == null) return item1;
 
-    // more results: build sequence
-    final ValueBuilder vb = new ValueBuilder(qc, item1, item2);
-    for(Item item; (item = qc.next(this)) != null;) vb.add(item);
+    // two items?
+    Item item = next();
+    if(item == null) return ValueBuilder.concat(item1, item2);
+
+    // more items: build sequence
+    final ValueBuilder vb = new ValueBuilder(qc).add(item1).add(item2);
+    do {
+      vb.add(item);
+    } while((item = qc.next(this)) != null);
     return vb.value(expr);
   }
 }

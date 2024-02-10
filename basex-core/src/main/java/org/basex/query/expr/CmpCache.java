@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Cached items.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class CmpCache {
@@ -42,7 +42,7 @@ public final class CmpCache {
     // check if caching was dismissed
     if(set == null) return false;
 
-    // check if this is the first call, of if the value to be cached has changed
+    // check if this is the first call, or if the value to be cached has changed
     if(value != val) {
       // no cache hits: dismiss caching
       if(hits < 1) {

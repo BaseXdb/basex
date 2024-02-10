@@ -23,7 +23,7 @@ import org.basex.util.similarity.*;
 /**
  * XQuery atomic types.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum AtomType implements Type {
@@ -1009,7 +1009,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return type.oneOf(this, AtomType.ITEM) ||
+    return this == type || type == AtomType.ITEM ||
         type instanceof AtomType && parent != null && parent.instanceOf(type);
   }
 

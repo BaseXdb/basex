@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Inner node of a {@link XQMap}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 final class TrieBranch extends TrieNode {
@@ -259,8 +259,8 @@ final class TrieBranch extends TrieNode {
     final TrieBranch ob = (TrieBranch) node;
     if(used != ob.used) return false;
     // recursively compare children
+    if(deep != null && deep.qc != null) deep.qc.checkStop();
     for(int k = 0; k < KIDS; k++) {
-      if(deep.qc != null) deep.qc.checkStop();
       if(kids[k] != null && !kids[k].equal(ob.kids[k], deep)) return false;
     }
     // everything OK

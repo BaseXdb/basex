@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * A parser for RFC 3986 URIs.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Dimitar Popov
  */
 public final class UriParser {
@@ -196,7 +196,7 @@ public final class UriParser {
 
   /**
    * URI data.
-   * @author BaseX Team 2005-23, BSD License
+   * @author BaseX Team 2005-24, BSD License
    * @author Dimitar Popov
    */
   public static final class ParsedUri {

@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This class assembles text string and tokens required by the XQuery processor
  * implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public interface QueryText {
@@ -184,18 +184,6 @@ public interface QueryText {
   /** Parser token. */ String WORDS = "words";
   /** Parser token. */ String XQUERY = "xquery";
 
-  /** Parser token. */ String DF_DEC = "decimal-separator";
-  /** Parser token. */ String DF_DIG = "digit";
-  /** Parser token. */ String DF_GRP = "grouping-separator";
-  /** Parser token. */ String DF_EXP = "exponent-separator";
-  /** Parser token. */ String DF_INF = "infinity";
-  /** Parser token. */ String DF_MIN = "minus-sign";
-  /** Parser token. */ String DF_NAN = "NaN";
-  /** Parser token. */ String DF_PAT = "pattern-separator";
-  /** Parser token. */ String DF_PC = "percent";
-  /** Parser token. */ String DF_PM = "per-mille";
-  /** Parser token. */ String DF_ZD = "zero-digit";
-
   /** Parser token. */ String NAMESPACES = "namespaces";
   /** Parser token. */ String ELEMENT_NAMESPACE = "element-namespace";
   /** Parser token. */ String FUNCTION_NAMESPACE = "function-namespace";
@@ -345,7 +333,6 @@ public interface QueryText {
 
   // QUERY PLAN ===================================================================================
 
-  /** Query Info. */ String ARGUMENT = "Argument";
   /** Query Info. */ String OP = "op";
   /** Query Info. */ String VAR = "var";
   /** Query Info. */ String INDEX = "index";
@@ -380,6 +367,7 @@ public interface QueryText {
   /** Optimization info. */ String OPTREWRITE = "rewrite";
   /** Optimization info. */ String OPTREWRITE_X_X = "rewrite %: %";
   /** Optimization info. */ String OPTMERGE_X = "merge: %";
+  /** Optimization info. */ String OPTREFINED_X = "refine parameter types: %";
   /** Optimization info. */ String OPTTYPE_X = "remove type check: %";
   /** Optimization info. */ String OPTTYPE_X_X = "remove % type check: %";
   /** Optimization info. */ String OPTFLAT_X_X = "flatten nested %: %";

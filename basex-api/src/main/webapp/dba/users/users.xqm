@@ -1,7 +1,7 @@
 (:~
  : Users page.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/users';
 
@@ -25,6 +25,7 @@ declare
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
+  %output:html-version('5')
 function dba:users(
   $sort   as xs:string,
   $error  as xs:string?,

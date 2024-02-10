@@ -21,7 +21,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnItemsAt extends StandardFunc {
@@ -42,23 +42,26 @@ public class FnItemsAt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item evalItem(final QueryContext qc) throws QueryException {
-    final Expr input = arg(0);
-    final long at = toLong(arg(1), qc) - 1;
+    final Item at = exprs[1].atomItem(qc, info);
+    if(!at.isEmpty()) {
+      // retrieve (possibly invalid) position
+      final double d = toDouble(at) - 1;
+      long l = (long) d;
+      if(d != l || l < 0) return Empty.VALUE;
 
-    // retrieve (possibly invalid) position
-    if(at < 0) return Empty.VALUE;
-    // if possible, retrieve single item
-    if(input.seqType().zeroOrOne()) return at == 0 ? input.item(qc, info) : Empty.VALUE;
+      // retrieve single item
+      final Expr input = arg(0);
+      if(input.seqType().zeroOrOne()) return l == 0 ? input.item(qc, info) : Empty.VALUE;
 
-    // fast route if the size is known
-    final Iter iter = input.iter(qc);
-    final long size = iter.size();
-    if(size >= 0) return at < size ? iter.get(at) : Empty.VALUE;
+      // fast route if the result size is known
+      final Iter iter = input.iter(qc);
+      final long size = iter.size();
+      if(size >= 0) return l < size ? iter.get(l) : Empty.VALUE;
 
-    // iterate until specified item is found
-    long p = at;
-    for(Item item; (item = qc.next(iter)) != null;) {
-      if(p-- == 0) return item;
+      // iterate until specified item is found
+      for(Item item; (item = qc.next(iter)) != null;) {
+        if(l-- == 0) return item;
+      }
     }
     return Empty.VALUE;
   }
@@ -77,8 +80,9 @@ public class FnItemsAt extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(at)) != null;) {
-          final long a = toLong(item) - 1;
-          if(a >= 0 && a < size) return input.itemAt(a);
+          final double d = toDouble(item) - 1;
+          long l = (long) d;
+          if(d == l && l >= 0 && l < size) return input.itemAt(l);
         }
         return null;
       }
@@ -93,41 +97,42 @@ public class FnItemsAt extends StandardFunc {
     if(ast.zero()) return Empty.VALUE;
 
     Occ occ = ast.zeroOrOne() ? Occ.ZERO_OR_ONE : Occ.ZERO_OR_MORE;
-    if(at instanceof Item && at.size() == 1) {
-      final long ps = toLong(at, cc.qc) - 1;
-      // negative position
-      if(ps < 0) return Empty.VALUE;
+    if(at instanceof Item && !ast.mayBeArray()) {
+      // check for fractional or negative number
+      final double d = toDouble(at, cc.qc) - 1;
+      final long l = (long) d;
+      if(d != l || l < 0) return Empty.VALUE;
       // single expression with static position
-      if(ist.zeroOrOne()) return ps == 0 ? input : Empty.VALUE;
+      if(ist.zeroOrOne()) return l == 0 ? input : Empty.VALUE;
 
       final long size = input.size();
       if(size != -1) {
         // items-at(E, last)  ->  foot(E)
-        if(ps + 1 == size) return cc.function(FOOT, info, input);
+        if(l + 1 == size) return cc.function(FOOT, info, input);
         // items-at(E, too-large)  ->  ()
-        if(ps + 1 > size) return Empty.VALUE;
+        if(l + 1 > size) return Empty.VALUE;
         // items-at(reverse(E), pos)  ->  items-at(E, size - pos)
         if(REVERSE.is(input))
-          return cc.function(ITEMS_AT, info, input.arg(0), Int.get(size - ps));
+          return cc.function(ITEMS_AT, info, input.arg(0), Int.get(size - l));
         occ = Occ.EXACTLY_ONE;
       }
-      if(ps == 0) return cc.function(HEAD, info, input);
+      if(l == 0) return cc.function(HEAD, info, input);
 
       // items-at(tail(E), pos)  ->  items-at(E, pos + 1)
       if(TAIL.is(input))
-        return cc.function(ITEMS_AT, info, input.arg(0), Int.get(ps + 2));
+        return cc.function(ITEMS_AT, info, input.arg(0), Int.get(l + 2));
       // items-at(replicate(I, count), pos)  ->  I
       if(REPLICATE.is(input)) {
         // static integer will always be greater than 1
         final Expr[] args = input.args();
         if(args[0].size() == 1 && args[1] instanceof Int) {
           final long count = ((Int) args[1]).itr();
-          return ps > count ? Empty.VALUE : args[0];
+          return l > count ? Empty.VALUE : args[0];
         }
       }
       // items-at(file:read-text-lines(E), pos)  ->  file:read-text-lines(E, pos, 1)
       if(_FILE_READ_TEXT_LINES.is(input))
-        return FileReadTextLines.opt(this, ps, 1, cc);
+        return FileReadTextLines.opt(this, l, 1, cc);
 
       // items-at((I1, I2, I3), 2)  ->  I2
       // items-at((I, E), 2)  ->  head(E)
@@ -136,12 +141,12 @@ public class FnItemsAt extends StandardFunc {
         final Expr[] args = input.args();
         final int al = args.length;
         for(int a = 0; a < al; a++) {
-          final boolean exact = a == ps, one = args[a].seqType().one();
+          final boolean exact = a == l, one = args[a].seqType().one();
           if(exact || !one && a > 0) {
             if(exact && one) return args[a];
             final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
             return exact ? cc.function(HEAD, info, list) :
-              cc.function(ITEMS_AT, info, list, Int.get(ps - a + 1));
+              cc.function(ITEMS_AT, info, list, Int.get(l - a + 1));
           }
           if(!one) break;
         }
@@ -158,10 +163,9 @@ public class FnItemsAt extends StandardFunc {
 
     // items-at(E, start to end)  ->  util:range(E, start, end)
     if(at instanceof RangeSeq) {
-      final RangeSeq seq = (RangeSeq) at;
-      final long[] range = seq.range(false);
-      Expr expr = cc.function(_UTIL_RANGE, info, input, Int.get(range[0]), Int.get(range[1]));
-      if(!seq.asc) expr = cc.function(REVERSE, info, expr);
+      final RangeSeq rs = (RangeSeq) at;
+      Expr expr = cc.function(_UTIL_RANGE, info, input, Int.get(rs.min()), Int.get(rs.max()));
+      if(!rs.ascending()) expr = cc.function(REVERSE, info, expr);
       return expr;
     }
     // items-at(E, S to E)  ->  util:range(E, S, E)
@@ -199,8 +203,8 @@ public class FnItemsAt extends StandardFunc {
       if(end instanceof Arith && countInput.test(end.arg(0)) && end.arg(1) instanceof Int) {
         final Calc calc = ((Arith) end).calc;
         final long sum = ((Int) end.arg(1)).itr();
-        if(calc == Calc.PLUS) return sum;
-        if(calc == Calc.MINUS) return -sum;
+        if(calc == Calc.ADD) return sum;
+        if(calc == Calc.SUBTRACT) return -sum;
       }
     }
     return Long.MIN_VALUE;

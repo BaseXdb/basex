@@ -21,7 +21,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnElementsToMaps extends StandardFunc {
@@ -45,7 +45,6 @@ public final class FnElementsToMaps extends StandardFunc {
     for(final Map.Entry<String, String> entry : options.get(ElementsOptions.LAYOUTS).
         free().entrySet()) {
       final QNm name = QNm.parse(Token.token(entry.getKey()), sc);
-      if(name == null) throw INVALIDOPT_X.get(info, "Unknown name: " + entry.getKey() + '.');
       final Layout layout = Layout.get(entry.getValue());
       if(layout == null) throw INVALIDOPT_X.get(info, "Unknown layout: " + entry.getValue() + '.');
       layouts.put(name, layout);
@@ -72,7 +71,7 @@ public final class FnElementsToMaps extends StandardFunc {
         if(!layouts.contains(name)) {
           final ANodeList nodes = names.get(name);
           for(final Layout l : Layout.VALUES) {
-            if(((Checks<ANode>) c -> l.matches(c)).all(nodes)) {
+            if(((Checks<ANode>) l::matches).all(nodes)) {
               layouts.put(name, l);
               break;
             }
@@ -85,7 +84,7 @@ public final class FnElementsToMaps extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final ANode element : elements) {
       final Value value = layout(element, layouts).apply(element, qc);
-      return XQMap.entry(nodeName(element), value, info);
+      return XQMap.singleton(nodeName(element), value, info);
     }
     return vb.value(this);
   }
@@ -111,7 +110,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param node node
    * @return result of check
    */
-  static boolean nonEmptyText(final ANode node) {
+  private static boolean nonEmptyText(final ANode node) {
     return node.type == NodeType.TEXT && Token.normalize(node.string()).length != 0;
   }
 
@@ -120,7 +119,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param node node
    * @return result of check
    */
-  static boolean element(final ANode node) {
+  private static boolean element(final ANode node) {
     return node.type == NodeType.ELEMENT;
   }
 
@@ -130,7 +129,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @return attributes
    * @throws QueryException query exception
    */
-  static MapBuilder attributes(final ANode node) throws QueryException {
+  private static MapBuilder attributes(final ANode node) throws QueryException {
     final MapBuilder mb = new MapBuilder();
     for(final ANode attr : node.attributeIter()) {
       mb.put(nodeName(attr, "@"), attr.string());
@@ -143,7 +142,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param node node
    * @return name
    */
-  static Str nodeName(final ANode node) {
+  private static Str nodeName(final ANode node) {
     return nodeName(node, null);
   }
 
@@ -153,7 +152,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @param prefix (can be {@code null})
    * @return name
    */
-  static Str nodeName(final ANode node, final String prefix) {
+  private static Str nodeName(final ANode node, final String prefix) {
     byte[] name = node.qname().internal();
     if(prefix != null) name = Token.concat(prefix, name);
     return Str.get(name);
@@ -166,7 +165,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @return name
    * @throws QueryException query exception
    */
-  static Str serialize(final ANode node, final String method) throws QueryException {
+  private static Str serialize(final ANode node, final String method) throws QueryException {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, method);
     try {
@@ -185,7 +184,7 @@ public final class FnElementsToMaps extends StandardFunc {
         return EMPTY_PLUS.matches(node) && node.attributeIter().next() == null;
       }
       @Override
-      Value apply(final ANode node, final QueryContext qc) throws QueryException {
+      Value apply(final ANode node, final QueryContext qc) {
         return Str.EMPTY;
       }
     },
@@ -208,7 +207,7 @@ public final class FnElementsToMaps extends StandardFunc {
         return SIMPLE_PLUS.matches(node) && node.attributeIter().next() == null;
       }
       @Override
-      Value apply(final ANode node, final QueryContext qc) throws QueryException {
+      Value apply(final ANode node, final QueryContext qc) {
         return Str.get(node.string());
       }
     },

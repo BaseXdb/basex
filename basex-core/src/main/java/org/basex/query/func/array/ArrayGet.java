@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArrayGet extends StandardFunc {
@@ -19,7 +19,7 @@ public final class ArrayGet extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Item position = toAtomItem(arg(1), qc);
-    final FItem fallback = defined(2) ? toFunction(arg(2), 1, qc) : null;
+    final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
     if(fallback == null) return array.get(position, info);
 
@@ -36,8 +36,8 @@ public final class ArrayGet extends StandardFunc {
     if(type instanceof ArrayType) {
       SeqType st = ((ArrayType) type).declType;
       if(defined(2)) {
-        final Type ftype = arg(2).seqType().type;
-        if(ftype instanceof FuncType) st = st.union(((FuncType) ftype).declType);
+        final FuncType ft = arg(2).funcType();
+        if(ft != null) st = st.union(ft.declType);
       }
       exprType.assign(st);
     }

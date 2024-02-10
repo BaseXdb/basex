@@ -14,7 +14,7 @@ import org.basex.util.*;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexBuilder extends Job {
@@ -131,7 +131,7 @@ public abstract class IndexBuilder extends Job {
     if(!Prop.debug) return;
 
     final StringBuilder sb = new StringBuilder();
-    sb.append(' ').append(count / 10000 / 100.0d).append(" M operations, ");
+    sb.append(' ').append(count / 10000 / 100d).append(" M operations, ");
     sb.append(perf).append(" (").append(Performance.getMemory()).append(").");
     if(splits > 1 && splitSize <= 0) {
       sb.append(" Recommended ").append(MainOptions.SPLITSIZE.name()).append(": ");

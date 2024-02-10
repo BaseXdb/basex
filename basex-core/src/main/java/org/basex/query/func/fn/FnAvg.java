@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnAvg extends FnSum {
@@ -29,7 +29,7 @@ public class FnAvg extends FnSum {
     if(expr != null) return expr;
 
     final SeqType st = arg(0).seqType();
-    if(!st.mayBeArray()) exprType.assign(Calc.DIV.type(st.type, st.type));
+    if(!st.mayBeArray()) exprType.assign(Calc.DIVIDE.type(st.type, st.type));
 
     return this;
   }

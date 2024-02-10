@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class ProfTime extends StandardFunc {
@@ -44,7 +44,7 @@ public class ProfTime extends StandardFunc {
    */
   final Value value(final QueryContext qc, final Supplier<byte[]> func) throws QueryException {
     final Value value = arg(0).value(qc);
-    final byte[] label = toTokenOrNull(arg(1), qc);
+    final byte[] label = toZeroToken(arg(1), qc);
     FnTrace.trace(func.get(), label, qc);
     return value;
   }

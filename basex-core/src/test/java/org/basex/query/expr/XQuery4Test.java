@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * XQuery 4.0 tests.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class XQuery4Test extends SandboxTest {
@@ -66,11 +66,11 @@ public final class XQuery4Test extends SandboxTest {
 
     query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
 
-    check("1 otherwise prof:void(2)", 1, root(Int.class));
-    check("prof:void(1) otherwise 2", 2, root(Otherwise.class));
-    check("prof:void(1) otherwise prof:void(2)", "", root(Otherwise.class));
+    check("1 otherwise void(2)", 1, root(Int.class));
+    check("void(1) otherwise 2", 2, root(Otherwise.class));
+    check("void(1) otherwise void(2)", "", root(Otherwise.class));
 
-    check("count(prof:void(1) otherwise prof:void(2))", 0, root(COUNT));
+    check("count(void(1) otherwise void(2))", 0, root(COUNT));
     query("count((1 to 10)[. = 0] otherwise (1 to 10)[. = 2])", 1);
     query("count((1 to 10)[. = 1] otherwise (1 to 10)[. = 2])", 1);
 
@@ -414,9 +414,9 @@ public final class XQuery4Test extends SandboxTest {
   @Test public void tryy() {
     query("try { 1 + <_/> } catch * { $err:map?code }", "err:FORG0001");
     query("try { 1 + <_/> } catch * { $err:map?line-number }", 1);
-    query("try { 1 + <_/> } catch * { $err:map?additional }", "");
+    query("try { 1 + <_/> } catch * { boolean($err:map?additional) }", true);
     query("try { 1 + <_/> } catch * { $err:map?value }", "");
-    query("try { 1 + <_/> } catch * { map:size($err:map) }", 5);
+    query("try { 1 + <_/> } catch * { map:size($err:map) }", 6);
 
     query("try { error((), (), 1) } catch * { $err:map?value }", 1);
     query("try { error(xs:QName('a')) } catch * { $err:map?code }", "a");

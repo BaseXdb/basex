@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 /**
  * General test of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public final class UpdateTest extends SandboxTest {
@@ -1069,7 +1069,7 @@ public final class UpdateTest extends SandboxTest {
 
   /** Reject updating function items. */
   @Test public void updatingFuncItems() {
-    query(_UPDATE_OUTPUT.args(" ?"), "(anonymous-function)#1");
+    query(_UPDATE_OUTPUT.args(" ?"), "update:output#1");
     query("update:output#1", "update:output#1");
     query("update:output#1, update:output#1", "update:output#1\nupdate:output#1");
 
@@ -1329,9 +1329,8 @@ public final class UpdateTest extends SandboxTest {
 
   /** Updates: Preserve namespace declarations. */
   @Test public void gh2206() {
-    final BiConsumer<String, String> run = (query, uri) -> {
+    final BiConsumer<String, String> run = (query, uri) ->
       query("(<_>{ " + query + "}</_> update {}) ! namespace-uri(*)", uri);
-    };
     run.accept("web:response-header(headers := map { 'a':'b' })//*:header",
         "http://expath.org/ns/http-client");
     run.accept("json-to-xml('{\"A\":1}')/*/*", "http://www.w3.org/2005/xpath-functions");

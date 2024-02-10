@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Update Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class UpdateModuleTest extends SandboxTest {
@@ -23,7 +23,7 @@ public final class UpdateModuleTest extends SandboxTest {
   @Test public void apply() {
     final Function func = _UPDATE_APPLY;
     query(func.args(" update:output#1", " [1]"), 1);
-    query(func.args(" prof:void#1", " [1]"), "");
+    query(func.args(" void#1", " [1]"), "");
     error(func.args(" count#1", " [1]"), FUNCNOTUP_X);
   }
 
@@ -41,13 +41,13 @@ public final class UpdateModuleTest extends SandboxTest {
     query(func.args(1, " update:output#1"), 1);
     query(func.args(" 1[. = 0]", " update:output#1"), "");
     query(func.args(" (1, 2)[. = 0]", " update:output#1"), "");
-    query(func.args(1, " prof:void#1"), "");
+    query(func.args(1, " void#1"), "");
 
     inline(true);
     query(func.args(1, " update:output#1"), 1);
     query(func.args(" 1[. = 0]", " update:output#1"), "");
     query(func.args(" (1, 2)[. = 0]", " update:output#1"), "");
-    query(func.args(1, " prof:void#1"), "");
+    query(func.args(1, " void#1"), "");
 
     error(func.args(1, " count#1"), FUNCNOTUP_X);
   }

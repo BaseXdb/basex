@@ -1,48 +1,37 @@
 /**
- * Opens a query file.
+ * Opens a file.
  * @param {string} file optional file name
  */
-function openQuery(file) {
+function openFile(file) {
   if(_editorMirror.getValue().trim() && !confirm("Replace editor contents?")) return;
 
-  var name;
-  if(file) {
-    name = file;
-    document.getElementById("file").value = name;
-    checkButtons();
-  } else {
-    name = fileName();
-  }
-  request("POST", "query-open?name=" + encodeURIComponent(name),
+  var name = file || fileName();
+  request("POST", "editor-open?name=" + encodeURIComponent(name),
     null,
     function(request) {
-      setInfo("Query was opened.");
       _editorMirror.setValue(request.responseText);
-      _editorMirror.focus();
+      finishFile(name, "File was opened.");
     },
     function(req) {
-      setError("Query could not be opened.");
+      setErrorFromResponse(req, name);
     }
   )
 }
 
 /**
- * Saves a query file.
+ * Saves a file.
  */
-function saveQuery() {
+function saveFile() {
   // append file suffix
-  var value = fileName();
-  if(value.indexOf(".") === -1) {
-    value += ".xq";
-    document.getElementById("file").value = value;
-  }
-  if(queryExists() && !confirm("Overwrite existing query?")) return;
+  var name = fileName();
+  if(!name.includes(".")) name += ".xq";
+  if(fileExists(name) && !confirm("Overwrite existing file?")) return;
 
-  request("POST", "query-save?name=" + encodeURIComponent(value),
+  request("POST", "editor-save?name=" + encodeURIComponent(name),
     document.getElementById("editor").value,
     function(req) {
+      finishFile(name, "File was saved.");
       refreshDataList(req);
-      setInfo("Query was saved.");
     },
     function(req) {
       setErrorFromResponse(req);
@@ -51,16 +40,14 @@ function saveQuery() {
 }
 
 /**
- * Closes a query file.
+ * Closes a file.
  */
-function closeQuery() {
-  request("POST", "query-close?name=" + encodeURIComponent(fileName()),
+function closeFile() {
+  request("POST", "editor-close?name=" + encodeURIComponent(fileName()),
     null,
     function(req) {
-      document.getElementById("file").value = "";
       _editorMirror.setValue("");
-      _editorMirror.focus();
-      checkButtons();
+      finishFile("", "File was closed.");
     },
     function(req) {
       setErrorFromResponse(req);
@@ -69,7 +56,22 @@ function closeQuery() {
 }
 
 /**
- * Refreshes the list of available query files.
+ * Finish file operation.
+ * @param {string} name new filename
+ * @param {string} info info message
+ */
+function finishFile(name, info) {
+  document.getElementById("file").value = name;
+  var disabled = name && !name.match(/\.xq(m|l|uery)?$/i)
+  document.getElementById("mode").disabled = disabled;
+  document.getElementById("run").disabled = disabled;
+  checkButtons();
+  setInfo(info);
+  _editorMirror.focus();
+};
+
+/**
+ * Refreshes the list of available files.
  * @param {object} request HTTP request
  */
 function refreshDataList(request) {
@@ -83,24 +85,25 @@ function refreshDataList(request) {
     opt.value = names[i];
     files.appendChild(opt);
   }
-  checkButtons();
 }
 
 /**
  * Refreshes the editor buttons.
  */
 function checkButtons() {
-  document.getElementById("open").disabled = !queryExists();
-  document.getElementById("save").disabled = fileName().length === 0;
-  document.getElementById("close").disabled = !queryExists();
+  var name = fileName();
+  var exists = fileExists(name);
+  document.getElementById("open").disabled = !exists;
+  document.getElementById("save").disabled = !name;
+  document.getElementById("close").disabled = !exists;
 }
 
 /**
- * Checks if the typed in query file exists.
+ * Checks if the specified file exists.
+ * @param {string} filename
  * @returns {boolean} result of check
  */
-function queryExists() {
-  var file = fileName();
+function fileExists(file) {
   var files = document.getElementById("files").children;
   for (var f = 0; f < files.length; f++) {
     if(files[f].value === file) return true;

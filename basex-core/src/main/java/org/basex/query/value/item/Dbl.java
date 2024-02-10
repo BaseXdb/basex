@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Double item ({@code xs:double}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Dbl extends ANum {
@@ -147,10 +147,23 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    // cannot be replaced by Double.compare (different semantics)
-    final double n = item.dbl(ii);
-    return Double.isNaN(n) || Double.isNaN(value) ? UNDEF : value < n ? -1 : value > n ? 1 : 0;
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return transitive && item instanceof Dec
+        ? -item.compare(this, coll, transitive, ii) : compare(value, item.dbl(ii), transitive);
+  }
+
+  /**
+   * Compares two doubles.
+   * @param d1 first double
+   * @param d2 second double
+   * @param transitive transitive comparison
+   * @return result of comparison (-1, 0, 1)
+   */
+  static int compare(final double d1, final double d2, final boolean transitive) {
+    final boolean nan = Double.isNaN(d1), dNan = Double.isNaN(d2);
+    return nan || dNan ? transitive ? nan == dNan ? 0 : nan ? -1 : 1 : NAN_DUMMY :
+      d1 < d2 ? -1 : d1 > d2 ? 1 : 0;
   }
 
   @Override

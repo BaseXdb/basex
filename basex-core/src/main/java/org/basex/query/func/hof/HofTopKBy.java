@@ -1,8 +1,9 @@
 package org.basex.query.func.hof;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -13,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class HofTopKBy extends StandardFunc {
@@ -26,7 +27,8 @@ public final class HofTopKBy extends StandardFunc {
 
     final MinHeap<Item, Item> heap = new MinHeap<>((item1, item2) -> {
       try {
-        return OpV.LT.eval(item1, item2, sc.collation, sc, info) ? -1 : 1;
+        if(!item1.comparable(item2)) throw compareError(item1, item2, info);
+        return item1.compare(item2, sc.collation, true, info);
       } catch(final QueryException qe) {
         throw new QueryRTException(qe);
       }
@@ -34,7 +36,8 @@ public final class HofTopKBy extends StandardFunc {
 
     try {
       for(Item item; (item = input.next()) != null;) {
-        heap.insert(checkNoEmpty(key.invoke(qc, info, item).item(qc, info)), item);
+        final Item ky = key.invoke(qc, info, item).item(qc, info);
+        heap.insert(ky.isEmpty() ? item : ky, item);
         if(heap.size() > k) heap.removeMin();
       }
     } catch(final QueryRTException ex) { throw ex.getCause(); }

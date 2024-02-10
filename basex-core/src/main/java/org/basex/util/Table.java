@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * It should be guaranteed that the {@link #header} object has the
  * same number of entries as all {@link #contents} string arrays.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Table {
@@ -74,7 +74,7 @@ public final class Table {
    * @return self reference
    */
   public Table sort() {
-    contents.sort((tl1, tl2) -> diff(lc(tl1.get(0)), lc(tl2.get(0))));
+    contents.sort((tl1, tl2) -> compare(lc(tl1.get(0)), lc(tl2.get(0))));
     return this;
   }
 

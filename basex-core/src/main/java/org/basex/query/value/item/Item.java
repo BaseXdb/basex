@@ -1,4 +1,4 @@
-package org.basex.query.value.item;
+ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
@@ -29,12 +29,12 @@ import org.basex.util.*;
 /**
  * Abstract super class for all items.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
-  /** Undefined item. */
-  public static final int UNDEF = Integer.MIN_VALUE;
+  /** NaN dummy item. */
+  public static final int NAN_DUMMY = Integer.MIN_VALUE;
 
   /**
    * Constructor.
@@ -83,12 +83,17 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public boolean isItem() {
+    return true;
+  }
+
+  @Override
   public final Item reverse(final QueryContext qc) {
     return this;
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
       throws QueryException {
     return bool(ii);
   }
@@ -108,7 +113,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    throw ebvError(this, ii);
+    throw testError(this, false, ii);
   }
 
   /**
@@ -191,7 +196,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return comparable(item) && atomicEqual(item, deep.info);
+    return atomicEqual(item, deep.info);
   }
 
   /**
@@ -206,17 +211,18 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns the difference between the current and the specified item.
-   * This function is overwritten by the corresponding implementations.
+   * Compares the current and the specified item.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
+   * @param transitive transitive comparison
    * @param ii input info (can be {@code null})
    * @return difference
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    throw diffError(this, item, ii);
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    throw compareError(this, item, ii);
   }
 
   /**

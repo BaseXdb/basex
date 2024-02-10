@@ -19,7 +19,7 @@ import org.w3c.dom.*;
 /**
  * Element node fragment.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FElem extends FNode {
@@ -188,6 +188,11 @@ public final class FElem extends FNode {
   @Override
   public boolean hasChildren() {
     return children.length != 0;
+  }
+
+  @Override
+  public boolean hasAttributes() {
+    return attributes.length != 0;
   }
 
   @Override

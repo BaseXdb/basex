@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Duration item ({@code xs:duration}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class Dur extends ADateDur {
@@ -34,7 +34,9 @@ public class Dur extends ADateDur {
       "M)?(" + DP + "D)?(T(" + DP + "H)?(" + DP + "M)?((\\d+(?:\\d*\\.\\d+)?)?S)?)?");
 
   /** Number of months. */
-  long mon;
+  long months;
+  /** Seconds and milliseconds. {@code null}: undefined. */
+  BigDecimal seconds;
 
   /**
    * Constructor.
@@ -69,8 +71,8 @@ public class Dur extends ADateDur {
    */
   private Dur(final Dur dur, final Type type) {
     this(type);
-    mon = dur.mon;
-    sec = dur.sec == null ? BigDecimal.ZERO : dur.sec;
+    months = dur.months;
+    seconds = dur.seconds == null ? BigDecimal.ZERO : dur.seconds;
   }
 
   /**
@@ -101,10 +103,10 @@ public class Dur extends ADateDur {
       throws QueryException {
     final long y = mt.group(2) != null ? toLong(mt.group(3), true, info) : 0;
     final long m = mt.group(4) != null ? toLong(mt.group(5), true, info) : 0;
-    mon = y * 12 + m;
+    months = y * 12 + m;
     double v = y * 12.0d + m;
     if(!mt.group(1).isEmpty()) {
-      mon = -mon;
+      months = -months;
       v = -v;
     }
     if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, vl);
@@ -126,27 +128,27 @@ public class Dur extends ADateDur {
     final long m = match.group(pos + 5) != null ? toLong(match.group(pos + 6), true, info) : 0;
     final BigDecimal s = match.group(pos + 7) != null ?
       toDecimal(match.group(pos + 8), true, info) : BigDecimal.ZERO;
-    sec = s.add(BigDecimal.valueOf(d).multiply(BD_864000)).
+    seconds = s.add(BigDecimal.valueOf(d).multiply(BD_864000)).
         add(BigDecimal.valueOf(h).multiply(BD_3600)).
         add(BigDecimal.valueOf(m).multiply(BD_60));
-    if(!match.group(1).isEmpty()) sec = sec.negate();
-    final double v = sec.doubleValue();
+    if(!match.group(1).isEmpty()) seconds = seconds.negate();
+    final double v = seconds.doubleValue();
     if(v <= Long.MIN_VALUE || v >= Long.MAX_VALUE) throw DURRANGE_X_X.get(info, type, value);
   }
 
   @Override
   public final long yea() {
-    return mon / 12;
+    return months / 12;
   }
 
   @Override
   public final long mon() {
-    return mon % 12;
+    return months % 12;
   }
 
   @Override
   public final long day() {
-    return sec.divideToIntegralValue(BD_864000).longValue();
+    return seconds.divideToIntegralValue(BD_864000).longValue();
   }
 
   @Override
@@ -161,7 +163,19 @@ public class Dur extends ADateDur {
 
   @Override
   public final BigDecimal sec() {
-    return sec.remainder(BD_60);
+    return seconds.remainder(BD_60);
+  }
+
+  /**
+   * Returns the time as milliseconds.
+   * @param info input info
+   * @return milliseconds
+   * @throws QueryException query exception
+   */
+  public long ms(final InputInfo info) throws QueryException {
+    final BigDecimal ms = seconds.multiply(Dec.BD_1000);
+    if(ms.compareTo(Dec.BD_MAXLONG) > 0) throw INTRANGE_X.get(info, ms);
+    return ms.longValue();
   }
 
   /**
@@ -169,17 +183,17 @@ public class Dur extends ADateDur {
    * @return time
    */
   private long tim() {
-    return sec.remainder(BD_864000).longValue();
+    return seconds.remainder(BD_864000).longValue();
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
-    final int ss = sec.signum();
-    if(mon < 0 || ss < 0) tb.add('-');
+    final int ss = seconds.signum();
+    if(months < 0 || ss < 0) tb.add('-');
     date(tb);
     time(tb);
-    if(mon == 0 && ss == 0) tb.add("T0S");
+    if(months == 0 && ss == 0) tb.add("T0S");
     return tb.finish();
   }
 
@@ -207,7 +221,7 @@ public class Dur extends ADateDur {
    * @param tb token builder
    */
   final void time(final TokenBuilder tb) {
-    if(sec.remainder(BD_864000).signum() == 0) return;
+    if(seconds.remainder(BD_864000).signum() == 0) return;
     tb.add('T');
     final long h = hour();
     if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }
@@ -222,14 +236,13 @@ public class Dur extends ADateDur {
   public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
       final InputInfo ii) throws QueryException {
     final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, null, ii));
-    final BigDecimal dec1 = sec == null ? BigDecimal.ZERO : sec;
-    final BigDecimal dec2 = dur.sec == null ? BigDecimal.ZERO : dur.sec;
-    return mon == dur.mon && dec1.compareTo(dec2) == 0;
+    return months == dur.months && seconds.compareTo(dur.seconds) == 0;
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    throw diffError(item, this, ii);
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    throw compareError(item, this, ii);
   }
 
   @Override
@@ -239,7 +252,7 @@ public class Dur extends ADateDur {
 
   @Override
   public final int hash(final InputInfo ii) {
-    return (int) (31 * mon + (sec == null ? 0 : sec.doubleValue()));
+    return (int) (31 * months + (seconds == null ? 0 : seconds.doubleValue()));
   }
 
   @Override
@@ -247,8 +260,7 @@ public class Dur extends ADateDur {
     if(this == obj) return true;
     if(!(obj instanceof Dur)) return false;
     final Dur dur = (Dur) obj;
-    return type.eq(dur.type) && mon == dur.mon &&
-        (sec == null ? dur.sec == null : sec.compareTo(dur.sec) == 0);
+    return type.eq(dur.type) && months == dur.months && seconds.equals(dur.seconds);
   }
 
   @Override

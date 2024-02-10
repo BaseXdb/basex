@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * Range expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Range extends Arr {
@@ -141,17 +141,16 @@ public final class Range extends Arr {
       final double l = expr.arg(1) instanceof Int ? ((Int) expr.arg(1)).itr() : 0;
       if(l != 0) {
         switch(((Arith) expr).calc) {
-          case PLUS : return LAST + l;
-          case MINUS: return LAST - l;
-          case MULT : return LAST * l;
-          case DIV  : return LAST / l;
+          case ADD : return LAST + l;
+          case SUBTRACT: return LAST - l;
+          case MULTIPLY : return LAST * l;
+          case DIVIDE  : return LAST / l;
           default: break;
         }
       }
     }
     return Double.NaN;
   }
-
 
   @Override
   public boolean equals(final Object obj) {

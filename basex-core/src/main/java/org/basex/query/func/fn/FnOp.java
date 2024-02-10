@@ -9,6 +9,7 @@ import org.basex.query.expr.CmpN.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -17,7 +18,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnOp extends StandardFunc {
@@ -44,12 +45,12 @@ public class FnOp extends StandardFunc {
       case ","        : body = new List(info, arg1, arg2); break;
       case "and"      : body = new And(info, arg1, arg2); break;
       case "or"       : body = new Or(info, arg1, arg2); break;
-      case "+"        : body = new Arith(info, arg1, arg2, Calc.PLUS); break;
-      case "-"        : body = new Arith(info, arg1, arg2, Calc.MINUS); break;
-      case "*"        : body = new Arith(info, arg1, arg2, Calc.MULT); break;
-      case "div"      : body = new Arith(info, arg1, arg2, Calc.DIV); break;
-      case "idiv"     : body = new Arith(info, arg1, arg2, Calc.IDIV); break;
-      case "mod"      : body = new Arith(info, arg1, arg2, Calc.MOD); break;
+      case "+"        : body = new Arith(info, arg1, arg2, Calc.ADD); break;
+      case "-"        : body = new Arith(info, arg1, arg2, Calc.SUBTRACT); break;
+      case "*"        : body = new Arith(info, arg1, arg2, Calc.MULTIPLY); break;
+      case "div"      : body = new Arith(info, arg1, arg2, Calc.DIVIDE); break;
+      case "idiv"     : body = new Arith(info, arg1, arg2, Calc.DIVIDEINT); break;
+      case "mod"      : body = new Arith(info, arg1, arg2, Calc.MODULO); break;
       case "="        : body = new CmpG(info, arg1, arg2, OpG.EQ, coll, sc); break;
       case "<"        : body = new CmpG(info, arg1, arg2, OpG.LT, coll, sc); break;
       case "<="       : body = new CmpG(info, arg1, arg2, OpG.LE, coll, sc); break;
@@ -75,6 +76,6 @@ public class FnOp extends StandardFunc {
       default         : throw UNKNOWNOP_X.get(info, operator);
     }
     final FuncType ft = FuncType.get(body.seqType(), SeqType.ITEM_ZM, SeqType.ITEM_ZM);
-    return new FuncItem(sc, null, null, params, ft, body, pl, info);
+    return new FuncItem(info, body, params, AnnList.EMPTY, ft, sc, pl, null);
   }
 }

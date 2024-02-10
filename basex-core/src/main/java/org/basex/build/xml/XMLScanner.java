@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * This class scans an XML document and creates atomic tokens.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class XMLScanner extends Job {
@@ -396,8 +396,8 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Scans whitespaces.
-   * @return true for whitespaces
+   * Scans whitespace.
+   * @return true for whitespace
    * @throws IOException I/O exception
    */
   private boolean s() throws IOException {
@@ -408,7 +408,7 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Checks input for whitespaces; if none are found, throws an exception.
+   * Checks input for whitespace; if none are found, throws an exception.
    * @throws IOException I/O exception
    */
   private void checkS() throws IOException {
@@ -435,9 +435,9 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Scans whitespaces.
+   * Scans whitespace.
    * @param ch current character
-   * @return true for whitespaces
+   * @return true for whitespace
    * @throws IOException I/O exception
    */
   private boolean s(final int ch) throws IOException {

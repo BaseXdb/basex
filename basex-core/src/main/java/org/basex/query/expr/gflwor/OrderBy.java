@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code order by}-expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class OrderBy extends Clause {
@@ -108,7 +108,7 @@ public final class OrderBy extends Clause {
 
                 final int c = m.isEmpty()
                     ? n.isEmpty() ? 0             : key.least ? -1 : 1
-                    : n.isEmpty() ? key.least ? 1 : -1 : m.diff(n, key.coll, key.info());
+                    : n.isEmpty() ? key.least ? 1 : -1 : m.compare(n, key.coll, true, key.info());
                 if(c != 0) return key.desc ? -c : c;
               }
               return 0;
@@ -138,7 +138,7 @@ public final class OrderBy extends Clause {
       // for $i in 1 to 2 order by 1 return $i  ->  for $i in 1 to 2 return $i
       if(expr instanceof Item) return true;
       // for $i in 1 to 2 order by $i return $i  ->  for $i in sort(1 to 2) return $i
-      if(fr != null && expr instanceof VarRef && ((VarRef) expr).var.is(fr.var)) {
+      if(fr != null && expr instanceof VarRef && ((VarRef) expr).var == fr.var) {
         fr.expr = cc.function(SORT, info, fr.expr);
         if(keys[0].desc) fr.expr = cc.function(REVERSE, info, fr.expr);
         return true;
@@ -183,7 +183,7 @@ public final class OrderBy extends Clause {
   public Clause inline(final InlineContext ic) throws QueryException {
     if(ic.var != null) {
       for(int r = refs.length; --r >= 0;) {
-        if(refs[r].var.is(ic.var)) refs = Array.remove(refs, r);
+        if(refs[r].var == ic.var) refs = Array.remove(refs, r);
       }
     }
     return ic.inline(keys) ? optimize(ic.cc) : null;

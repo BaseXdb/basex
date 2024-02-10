@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Scheduled XQuery job.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class QueryJob extends Job implements Runnable {
@@ -58,7 +58,7 @@ public final class QueryJob extends Job implements Runnable {
     long interval = 0;
     final String inter = opts.get(JobOptions.INTERVAL);
     if(inter != null && !inter.isEmpty()) {
-      interval = ms(new DTDur(token(inter), info));
+      interval = new DTDur(token(inter), info).ms(info);
       if(interval < 1000) throw JOBS_RANGE_X.get(info, inter);
       while(delay < 0) delay += interval;
     }
@@ -152,29 +152,20 @@ public final class QueryJob extends Job implements Runnable {
     if(start instanceof Int) {
       // time
       ms = start.itr(info) * 60000;
-      ms -= qdt.time.seconds().multiply(Dec.BD_1000).longValue();
+      ms -= qdt.time.daySeconds().multiply(Dec.BD_1000).longValue();
       while(ms <= min) ms += 3600000;
     } else if(start instanceof DTDur) {
       // dayTimeDuration
-      ms = ms((DTDur) start);
+      ms = ((DTDur) start).ms(info);
     } else if(start instanceof Dtm) {
       // dateTime
-      ms = ms(new DTDur((Dtm) start, qdt.datm, info));
+      ms = new DTDur((Dtm) start, qdt.datm, info).ms(info);
     } else {
       // time
-      ms = ms(new DTDur((Tim) start, qdt.time, info));
+      ms = new DTDur((Tim) start, qdt.time, info).ms(info);
       while(ms <= min) ms += 86400000;
     }
     return ms;
-  }
-
-  /**
-   * Extracts the seconds from the specified date/duration item and returns it as milliseconds.
-   * @param date date or duration
-   * @return milliseconds
-   */
-  private static long ms(final ADateDur date) {
-    return date.sec.multiply(Dec.BD_1000).longValue();
   }
 
   /**
@@ -197,7 +188,7 @@ public final class QueryJob extends Job implements Runnable {
     if(log != null && log.isEmpty()) log = null;
     if(log != null) ctx.log.write(LogType.REQUEST, log, null, "JOB:" + id, ctx);
 
-    Performance perf = new Performance();
+    final Performance perf = new Performance();
     qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
     try {
       // parse, push and register query. order is important!
@@ -214,7 +205,8 @@ public final class QueryJob extends Job implements Runnable {
       // register job
       pushJob(qp);
       register(ctx);
-      perf = new Performance();
+      // reset timer
+      perf.ns();
       if(remove) ctx.jobs.tasks.remove(id);
 
       // retrieve result; copy persistent database nodes
@@ -257,6 +249,7 @@ public final class QueryJob extends Job implements Runnable {
         }
         ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
       }
+      jc.performance = null;
 
       if(remove) ctx.jobs.tasks.remove(id);
       if(notify != null) notify.accept(result);

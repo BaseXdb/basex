@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * An array containing more members than fit into a {@link SingletonArray} or {@link SmallArray}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 final class BigArray extends XQArray {
@@ -47,11 +47,6 @@ final class BigArray extends XQArray {
    */
   BigArray(final Value[] left, final Value[] right, final Type type) {
     this(left, FingerTree.empty(), right, type);
-  }
-
-  @Override
-  public boolean isEmptyArray() {
-    return false;
   }
 
   @Override
@@ -179,7 +174,7 @@ final class BigArray extends XQArray {
   @Override
   public XQArray concat(final XQArray array) {
     // empty array
-    if(array.isEmptyArray()) return this;
+    if(array == empty()) return this;
     if(array instanceof SingletonArray) return append(((SingletonArray) array).member);
 
     final Type tp = type.union(array.type);

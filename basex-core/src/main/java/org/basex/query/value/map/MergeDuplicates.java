@@ -1,11 +1,11 @@
 package org.basex.query.value.map;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Duplicate handling.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum MergeDuplicates {
@@ -17,6 +17,6 @@ public enum MergeDuplicates {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    return EnumOption.string(name());
   }
 }

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This is an abstract class for storing objects of any kind in an array-based list.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @param <E> generic object type
  * @param <L> generic object type
@@ -92,7 +92,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public final L add(final E... elements) {
+  public L add(final E... elements) {
     E[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {
@@ -110,7 +110,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
    * @return self reference
    */
   @SuppressWarnings("unchecked")
-  public final L add(final L elements) {
+  public L add(final L elements) {
     for(final E e : elements) add(e);
     return (L) this;
   }

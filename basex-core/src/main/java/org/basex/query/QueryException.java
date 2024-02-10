@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Thrown to indicate an exception during the parsing or evaluation of a query.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class QueryException extends Exception {
@@ -234,6 +234,17 @@ public class QueryException extends Exception {
       for(final InputInfo ii : stack) tb.add(NL).add(LI).add(ii);
     }
     return tb.toString();
+  }
+
+  /**
+   * Returns a stack trace.
+   * @return stack trace
+   */
+  public byte[][] stack() {
+    final TokenList list = new TokenList();
+    if(info != null) list.add(info.toString());
+    for(final InputInfo ii : stack) list.add(ii.toString());
+    return list.finish();
   }
 
   /**

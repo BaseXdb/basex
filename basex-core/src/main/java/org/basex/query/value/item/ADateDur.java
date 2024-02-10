@@ -11,13 +11,10 @@ import org.basex.util.*;
 /**
  * Abstract super class for dates and durations.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class ADateDur extends Item {
-  /** Seconds and milliseconds. {@code null}: undefined. */
-  public BigDecimal sec;
-
   /**
    * Constructor.
    * @param type item type

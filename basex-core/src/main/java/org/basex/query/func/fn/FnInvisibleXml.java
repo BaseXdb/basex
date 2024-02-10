@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -23,7 +24,7 @@ import de.bottlecaps.markup.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
 public final class FnInvisibleXml extends StandardFunc {
@@ -73,8 +74,8 @@ public final class FnInvisibleXml extends StandardFunc {
       final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info)};
       final Expr arg = new VarRef(info, params[0]);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
-      final FuncType type = FuncType.get(parseFunction.seqType(), STRING_O);
-      return new FuncItem(sc, null, null, params, type, parseFunction, params.length, info);
+      final FuncType ft = FuncType.get(parseFunction.seqType(), STRING_O);
+      return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, sc, params.length, null);
     }
   }
 

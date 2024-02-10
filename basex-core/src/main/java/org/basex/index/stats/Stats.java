@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * This class provides statistical data for an indexed node.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Stats {
@@ -140,7 +140,7 @@ public final class Stats {
     // save distinct values
     if(values != null) {
       if(vl > meta.maxlen || vl > 0 && ws(value)) {
-        // give up categories if string is too long or only consists of whitespaces
+        // give up categories if string is too long or only consists of whitespace
         values = null;
       } else {
         values.put(value, Math.max(1, values.get(value) + 1));

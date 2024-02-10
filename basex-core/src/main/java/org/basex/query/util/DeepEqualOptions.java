@@ -11,7 +11,7 @@ import org.basex.util.options.*;
 /**
  * Options for comparing values.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class DeepEqualOptions extends Options {
@@ -48,15 +48,12 @@ public final class DeepEqualOptions extends Options {
   /** Option: normalize-space. */
   public static final BooleanOption NORMALIZE_SPACE =
       new BooleanOption("normalize-space", false);
-  /** Option: preserve-space. */
-  public static final BooleanOption PRESERVE_SPACE =
-      new BooleanOption("preserve-space", true);
+  /** Option: ordered. */
+  public static final BooleanOption ORDERED =
+      new BooleanOption("ordered", true);
   /** Option: processing-instructions. */
   public static final BooleanOption PROCESSING_INSTRUCTIONS =
       new BooleanOption("processing-instructions", false);
-  /** Option: text-boundaries. */
-  public static final BooleanOption TEXT_BOUNDARIES =
-      new BooleanOption("text-boundaries", true);
   /** Option: timezones. */
   public static final BooleanOption TIMEZONES =
       new BooleanOption("timezones", false);
@@ -72,6 +69,21 @@ public final class DeepEqualOptions extends Options {
   /** Option: unordered-elements. */
   public static final StringOption UNORDERED_ELEMENTS =
       new StringOption("unordered-elements", "");
+  /** Option: whitespace. */
+  public static final EnumOption<Whitespace> WHITESPACE =
+      new EnumOption<>("whitespace", Whitespace.PRESERVE);
+
+  /** Whitespace mode. */
+  public enum Whitespace {
+    /** Preserve.  */ PRESERVE,
+    /** Strip.     */ STRIP,
+    /** Normalize. */ NORMALIZE;
+
+    @Override
+    public String toString() {
+      return EnumOption.string(name());
+    }
+  }
 
   /** QNames. */
   private final QNmSet qnames = new QNmSet();

@@ -1,5 +1,6 @@
 package org.basex.query.value.seq;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.io.*;
@@ -21,36 +22,37 @@ import org.basex.util.*;
 /**
  * Range sequence, containing at least two integers.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RangeSeq extends Seq {
   /** Start value. */
   private final long start;
   /** Ascending/descending order. */
-  public final boolean asc;
+  private final boolean ascending;
 
   /**
    * Constructor.
    * @param start start value
    * @param size size
-   * @param asc ascending order
+   * @param ascending ascending order
    */
-  private RangeSeq(final long start, final long size, final boolean asc) {
+  private RangeSeq(final long start, final long size, final boolean ascending) {
     super(size, AtomType.INTEGER);
     this.start = start;
-    this.asc = asc;
+    this.ascending = ascending;
   }
 
   /**
    * Returns a value representation of the specified items.
    * @param start start value
    * @param size size
-   * @param asc ascending order
+   * @param ascending ascending order
    * @return resulting item or sequence
    */
-  public static Value get(final long start, final long size, final boolean asc) {
-    return size < 1 ? Empty.VALUE : size == 1 ? Int.get(start) : new RangeSeq(start, size, asc);
+  public static Value get(final long start, final long size, final boolean ascending) {
+    return size < 1 ? Empty.VALUE : size == 1 ? Int.get(start) :
+      new RangeSeq(start, size, ascending);
   }
 
   /**
@@ -64,42 +66,74 @@ public final class RangeSeq extends Seq {
   public static Value read(final DataInput in, final Type type, final QueryContext qc)
       throws IOException {
     final long size = in.readLong(), start = in.readLong();
-    final boolean asc = in.readBool();
-    return get(start, size, asc);
+    final boolean ascending = in.readBool();
+    return get(start, size, ascending);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeLong(size);
     out.writeLong(start);
-    out.writeBool(asc);
+    out.writeBool(ascending);
   }
 
   /**
-   * Returns the range as long values.
-   * @param order respect ascending/descending order
-   * @return minimum and maximum value (inclusive)
+   * Returns whether the order is ascending or descending.
+   * @return order
    */
-  public long[] range(final boolean order) {
-    final long end = asc ? start + size - 1 : start - size + 1;
-    return new long[] { order || asc ? start : end, order || asc ? end : start };
+  public boolean ascending() {
+    return ascending;
+  }
+
+  /**
+   * Returns the minimum value, ignoring the order.
+   * @return minimum value
+   */
+  public long min() {
+    return ascending ? start : start - size + 1;
+  }
+
+  /**
+   * Returns the maximum value, ignoring the order.
+   * @return maximum value
+   */
+  public long max() {
+    return ascending ? start + size - 1 : start;
+  }
+
+  /**
+   * Returns the specified value.
+   * @param pos position
+   * @return minimum value
+   */
+  private long get(final long pos) {
+    return start + (ascending ? pos : -pos);
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+      throws QueryException {
+
+    if(!predicate) throw testError(this, false, ii);
+    final long pos = qc.focus.pos;
+    return pos >= min() && pos <= max();
   }
 
   @Override
   public Object toJava() {
     final long[] obj = new long[(int) size];
-    for(int s = 0; s < size; ++s) obj[s] = start + (asc ? s : -s);
+    for(int s = 0; s < size; ++s) obj[s] = start + (ascending ? s : -s);
     return obj;
   }
 
   @Override
   public Int itemAt(final long pos) {
-    return Int.get(start + (asc ? pos : -pos));
+    return Int.get(get(pos));
   }
 
   @Override
   protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
-    return new RangeSeq(start + (asc ? pos : -pos), length, asc);
+    return new RangeSeq(get(pos), length, ascending);
   }
 
   @Override
@@ -115,7 +149,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Value reverse(final QueryContext qc) {
-    return get(range(true)[1], size(), !asc);
+    return get(get(size - 1), size(), !ascending);
   }
 
   @Override
@@ -138,39 +172,48 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Expr optimizePos(final OpV op, final CompileContext cc) {
-    final long[] range = range(false);
-    final long min = range[0], max = range[1];
-    range[0] = Math.max(range[0], 1);
-    range[1] = Math.max(range[1], 1);
+    final long min = min(), max = max();
     switch(op) {
+      case LE:
+        // position() <= (-5 to 0)  ->  false()
+        // position() <= (3 to 5)   ->  position() <= 5
+        return max <= 0 ? Bln.FALSE : Int.get(max);
+      case LT:
+        // position() < (-5 to 1)  ->  false()
+        // position() < (3 to 5)   ->  position() < 5
+        return max <= 1 ? Bln.FALSE : Int.get(max);
+      case GE:
+        // position() >= (1 to 5)  ->  true()
+        // position() >= (3 to 5)  ->  position() >= 3
+        return min <= 1 ? Bln.TRUE : Int.get(min);
+      case GT:
+        // position() > (0 to 5)  ->  true()
+        // position() > (3 to 5)  ->  position() > 3
+        return min <= 0 ? Bln.TRUE : Int.get(min);
       case EQ:
-        if(max < 1) return Bln.FALSE;
-        if(min < 2 && max == Long.MAX_VALUE) return Bln.TRUE;
+        // position() = (-5 to 0x7FFFFFFFFFFFFFFF)  ->  true()
+        // position() = (-5 to 0)                   ->  false()
+        if(min <= 1 && max == Long.MAX_VALUE) return Bln.TRUE;
+        if(max <= 0) return Bln.FALSE;
         break;
       case NE:
-        if(max < 1) return Bln.TRUE;
-        if(min < 2 && max == Long.MAX_VALUE) return Bln.FALSE;
-        break;
-      case LE:
-        return max < 1 ? Bln.FALSE : Int.get(range[1]);
-      case LT:
-        return max < 2 ? Bln.FALSE : Int.get(range[1]);
-      case GT:
-        return max < 1 ? Bln.TRUE : Int.get(range[0]);
-      case GE:
-        return max < 2 ? Bln.TRUE : Int.get(range[0]);
+        // position() != (-5 to 0x7FFFFFFFFFFFFFFF)  ->  false()
+        // position() != (-5 to 0)                   ->  true()
+        if(min <= 1 && max == Long.MAX_VALUE) return Bln.FALSE;
+        if(max <= 0) return Bln.TRUE;
     }
-    if(min == range[0] && max == range[1]) return this;
-    final Expr ex = RangeSeq.get(range[0], range[1], true);
-    return ex == Empty.VALUE ? Bln.FALSE : ex;
+    // op: =/!=, max >= 1
+    // position() = (-3 to 1)  ->  position() = 1
+    // position() = (-3 to 5)  ->  position() = (1 to 5)
+    return min >= 1 ? this : get(1, max, true);
   }
 
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof RangeSeq)) return super.equals(obj);
-    final RangeSeq seq = (RangeSeq) obj;
-    return start == seq.start && size == seq.size && asc == seq.asc;
+    final RangeSeq rs = (RangeSeq) obj;
+    return start == rs.start && size == rs.size && ascending == rs.ascending;
   }
 
   @Override
@@ -180,15 +223,13 @@ public final class RangeSeq extends Seq {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    final long[] range = range(true);
-    plan.add(plan.create(this, FROM, range[0], TO, range[1]));
+    plan.add(plan.create(this, FROM, get(0), TO, get(size - 1)));
   }
 
   @Override
   public void toString(final QueryString qs) {
-    final long[] range = range(false);
-    final String arg = new QueryString().token(range[0]).token(TO).token(range[1]).toString();
-    if(asc) {
+    final String arg = new QueryString().token(min()).token(TO).token(max()).toString();
+    if(ascending) {
       qs.paren(arg);
     } else {
       qs.function(Function.REVERSE, ' ' + arg);

@@ -24,7 +24,7 @@ import org.basex.util.*;
 /**
  * The map item.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class XQMap extends XQData {
@@ -63,7 +63,7 @@ public final class XQMap extends XQData {
    * @return map
    * @throws QueryException query exception
    */
-  public static XQMap entry(final Item key, final Value value, final InputInfo info)
+  public static XQMap singleton(final Item key, final Value value, final InputInfo info)
       throws QueryException {
     return new XQMap(new TrieLeaf(key.hash(info), key, value),
         MapType.get((AtomType) key.type, value.seqType()));
@@ -210,7 +210,7 @@ public final class XQMap extends XQData {
    * @throws QueryException query exception
    */
   public XQMap put(final Item key, final Value value, final InputInfo info) throws QueryException {
-    if(this == EMPTY) return entry(key, value, info);
+    if(this == EMPTY) return singleton(key, value, info);
     final TrieNode ins = root.put(key.hash(info), key, value, 0, info);
     return ins == root ? this : new XQMap(ins, union(key.type, value.seqType()));
   }
@@ -265,8 +265,7 @@ public final class XQMap extends XQData {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
-    return item instanceof XQMap && root.equal(((XQMap) item).root, deep);
+    return this == item || item instanceof XQMap && root.equal(((XQMap) item).root, deep);
   }
 
   @Override

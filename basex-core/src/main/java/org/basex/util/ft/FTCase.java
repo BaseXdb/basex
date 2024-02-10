@@ -1,11 +1,11 @@
 package org.basex.util.ft;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Full-text cases.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum FTCase {
@@ -20,6 +20,6 @@ public enum FTCase {
    */
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 }

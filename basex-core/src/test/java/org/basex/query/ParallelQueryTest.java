@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * Runs parallel queries.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ParallelQueryTest extends SandboxTest {
@@ -39,7 +39,7 @@ public final class ParallelQueryTest extends SandboxTest {
   /**
    * Query instance.
    */
-  private class Query extends Thread {
+  private final class Query extends Thread {
     @Override
     public void run() {
       try {

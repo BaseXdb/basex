@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This class contains all query error messages.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum QueryError {
@@ -75,7 +75,7 @@ public enum QueryError {
   /** Error code. */
   ADMIN_TODAY(ADMIN, "today", "Today's log file cannot be deleted."),
   /** Error code. */
-  ADMIN_TYPE_X(ADMIN, "type", "Type string contains whitespaces: '%'."),
+  ADMIN_TYPE_X(ADMIN, "type", "Type string contains whitespace: '%'."),
 
   // Archive Module
 
@@ -588,7 +588,7 @@ public enum QueryError {
   /** Error code. */
   CHARCOLL(FOCH, 4, "Collation does not operate on character-by-character basis."),
   /** Error code. */
-  CHARINV_X(FOCH, 5, "Invalid name or glyph: %."),
+  CHARINV_X(FOCH, 5, "Invalid name, glyph or codepoint value: %."),
 
   /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
@@ -616,7 +616,9 @@ public enum QueryError {
   INVHTMLOPT_X(FODC, 12, "HTML option processing failed: %"),
 
   /** Error code. */
-  FORMNUM_X(FODF, 1280, "Unknown decimal format: '%'."),
+  FORMNUM_X(FODF, 1280, "Unknown decimal format: %."),
+  /** Error code. */
+  FORMDUP_X(FODF, 1280, "Format name % must not be specified together with explicit format."),
   /** Error code. */
   PICEMPTY(FODF, 1310, "The picture string must not be empty: '%'"),
   /** Error code. */
@@ -624,11 +626,13 @@ public enum QueryError {
   /** Error code. */
   OPTAFTER_X(FODF, 1310, "Optional digit sign follows mandatory digit signs: '%'."),
   /** Error code. */
+  OPTBEFORE_X(FODF, 1310, "Mandatory digit sign follows optional digit signs: '%'."),
+  /** Error code. */
   INVGROUP_X(FODF, 1310, "Invalid position of grouping separator signs: '%'."),
   /** Error code. */
   DIFFMAND_X(FODF, 1310, "Mandatory digits is not of the same group: '%'."),
   /** Error code. */
-  INVORDINAL_X(FODF, 1310, "Invalid specification of ordinal numbering: '%'."),
+  INVMODIFIER_X(FODF, 1310, "Invalid specification of ordinal/cardinal numbering: '%'."),
   /** Error code. */
   INVDDPATTERN_X(FODF, 1310, "Invalid decimal-digit-pattern: '%'."),
 
@@ -733,13 +737,13 @@ public enum QueryError {
   REGBACKSLASH_X(FORX, 4, "Invalid backslash in replacement string: %."),
   /** Error code. */
   REGDOLLAR_X(FORX, 4, "Invalid dollar sign in replacement string: %."),
+  /** Error code. */
+  REGACTION_X(FORX, 5, "Both replacement string and action supplied: %."),
 
   /** Error code. */
   FIATOMIZE_X(FOTY, 13, "Atomic value required, function item found: %."),
   /** Error code. */
   FISTRING_X(FOTY, 14, "Function item has no string value: %."),
-  /** Error code. */
-  FICOMPARE_X(FOTY, 15, "Function item cannot be compared: %."),
 
   /** Error code. */
   UPFOTYPE_X(FOUP, 1, "Document or element expected, % found."),
@@ -849,7 +853,7 @@ public enum QueryError {
   SERJSONSEQ(SERE, 23, "Value has more than one item."),
 
   /** Error code. */
-  NOCTX_X(XPDY, 2, "%: Context is undeclared."),
+  NOCTX_X(XPDY, 2, "%: Context value is undefined."),
   /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */
@@ -954,8 +958,6 @@ public enum QueryError {
   /** Error code. */
   IFPAR(XPST, 3, "Expecting '(' after 'if' expression."),
   /** Error code. */
-  NOTERNARY(XPST, 3, "Incomplete ternary if expression."),
-  /** Error code. */
   NODEFAULT(XPST, 3, "Expecting default expression."),
   /** Error code. */
   NOIF(XPST, 3, "Incomplete 'if' expression."),
@@ -1009,6 +1011,8 @@ public enum QueryError {
   KEYSPEC(XPST, 3, "No specifier after lookup operator: '%'."),
   /** Error code. */
   ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
+  /** Error code. */
+  FORMPROP_X(XPST, 3, "%."),
   /** Error code. */
   CASTTYPE_X(XPST, 3, "%"),
   /** Error code. */
@@ -1076,8 +1080,6 @@ public enum QueryError {
   /** Error code. */
   EMPTYFOUND(XPTY, 4, "Item expected, empty sequence found."),
   /** Error code. */
-  EMPTYFOUND_X(XPTY, 4, "% expected, empty sequence found."),
-  /** Error code. */
   SEQFOUND_X(XPTY, 4, "Item expected, sequence found: %."),
   /** Error code. */
   NONUMBER_X_X(XPTY, 4, "Number expected, % found: %."),
@@ -1116,7 +1118,9 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPT_X(XPTY, 4, "%"),
   /** Error code. */
-  EXP_FOUND_X(XPTY, 4, "% expected, % found."),
+  EXP_FOUND_X_X(XPTY, 4, "% expected, % found."),
+  /** Error code. */
+  EXP_FOUND_X_X_X(XPTY, 4, "% expected, % found: %."),
   /** Error code. */
   BINARY_X(XPTY, 4, "Binary expected, % found."),
   /** Error code. */
@@ -1285,11 +1289,11 @@ public enum QueryError {
   /** Error code. */
   INVDECFORM_X_X(XQST, 97, "Invalid decimal-format property: %='%'."),
   /** Error code. */
-  INVDECSINGLE_X_X(XQST, 97, "Decimal-format property is no single character: %='%'."),
+  INVDECSINGLE_X_X(XQST, 97, "Decimal-format property must be a single character: %='%'."),
   /** Error code. */
   INVDECZERO_X(XQST, 97, "Zero-digit property is no Unicode digit with value zero: %."),
   /** Error code. */
-  DUPLDECFORM_X(XQST, 98, "Clash of decimal format properties: '%'."),
+  DUPLDECFORM_X(XQST, 98, "Decimal-format character is assigned twice: '%'."),
   /** Error code. */
   DUPLVALUE(XQST, 99, "Duplicate context value declaration."),
   /** Error code. */
@@ -1309,7 +1313,7 @@ public enum QueryError {
   /** Error code. */
   DECITEM(XQST, 113, "Context value cannot be bound in library module."),
   /** Error code. */
-  DECDUPLPROP_X(XQST, 114, "Duplicate decimal-format property '%'."),
+  DECDUPLPROP_X(XQST, 114, "Property is defined twice: %."),
   /** Error code. */
   DUPLVARVIS(XQST, 116, "More than one visibility annotation declared."),
   /** Error code. */
@@ -1479,7 +1483,7 @@ public enum QueryError {
 
   /**
    * Error types.
-   * @author BaseX Team 2005-23, BSD License
+   * @author BaseX Team 2005-24, BSD License
    * @author Leo Woerteler
    */
   public enum ErrType {
@@ -1615,7 +1619,8 @@ public enum QueryError {
    * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException diffError(final Item item1, final Item item2, final InputInfo info) {
+  public static QueryException compareError(final Item item1, final Item item2,
+      final InputInfo info) {
     final Type type1 = item1.type, type2 = item2.type;
     return type1.eq(type2) ? CMPTYPE_X_X_X.get(info, type1, item1, item2) :
       CMPTYPES_X_X_X_X.get(info, type1, type2, item1, item2);
@@ -1660,7 +1665,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
-    return INVCONVERT_X_X_X.get(info, value.type, type, value);
+    return INVCONVERT_X_X_X.get(info, value.seqType(), type, value);
   }
 
   /**
@@ -1680,23 +1685,28 @@ public enum QueryError {
   }
 
   /**
-   * Throws an EBV exception.
+   * Throws an test exception.
    * @param value value
+   * @param pos positional predicate
    * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException ebvError(final Value value, final InputInfo info) {
+  public static QueryException testError(final Value value, final boolean pos,
+      final InputInfo info) {
     final String expected, found;
     final Type type = value.seqType().type;
     if(type.instanceOf(AtomType.NUMERIC) || type.instanceOf(AtomType.STRING) ||
         type.oneOf(AtomType.BOOLEAN, AtomType.ANY_URI)) {
       expected = "Single " + type;
       found = "sequence";
+    } else if(pos) {
+      expected = "Numbers";
+      found = value.itemAt(value.size() - 1).seqType().toString();
     } else {
       expected = "Number, string, boolean, URI or nodes";
       found = value.itemAt(0).seqType().toString();
     }
-    return ARGTYPE_X_X_X.get(info, expected, found, value);
+    return (pos ? EXP_FOUND_X_X_X : ARGTYPE_X_X_X).get(info, expected, found, value);
   }
 
   /**
@@ -1763,7 +1773,7 @@ public enum QueryError {
   }
 
   /**
-   * Removes whitespaces and chops the specified value to a maximum size.
+   * Removes whitespace and chops the specified value to a maximum size.
    * @param value value
    * @param info input info (can be {@code null}; an empty token will be returned if
    * {@link InputInfo#internal()} returns {@code true})

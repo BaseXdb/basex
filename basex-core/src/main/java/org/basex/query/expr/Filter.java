@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract filter expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Filter extends Preds {
@@ -150,7 +150,7 @@ public abstract class Filter extends Preds {
             // E[pos .. last()]  ->  util:range(E, pos)
             ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
           } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
-              ((Arith) arg2).calc == Calc.MINUS && arg2.arg(1) == Int.ONE) {
+              ((Arith) arg2).calc == Calc.SUBTRACT && arg2.arg(1) == Int.ONE) {
             // E[1 .. last() - 1]  ->  trunk(E)
             ex = cc.function(TRUNK, info, prepare.apply(expr));
           }
@@ -170,17 +170,12 @@ public abstract class Filter extends Preds {
         // E[last() - 1]  ->  items-at(E, size - 1)
         if(es != -1) ex = cc.function(ITEMS_AT, info, prepare.apply(expr),
             new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));
-      } else if(pred.isSimple()) {
+      } else if(pred.isSimple() && pred.seqType().type.instanceOf(AtomType.NUMERIC)) {
+        final Expr pos = pred.seqType().zeroOrOne() ? pred :
+          cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pred));
         // E[pos]  ->  items-at(E, pos)
-        Expr at = null;
-        if(pred.seqType().instanceOf(SeqType.INTEGER_O)) {
-          at = pred;
-        } else if(pred instanceof ANum) {
-          final ANum num = (ANum) pred;
-          final long p = num.itr();
-          if(p == num.dbl()) at = Int.get(p);
-        }
-        if(at != null) ex = cc.function(ITEMS_AT, info, prepare.apply(expr), at);
+        // E[pos1, pos2, ...]  ->  items-at(E, sort(distinct-values((pos1, pos2, ...)))
+        ex = cc.function(ITEMS_AT, info, prepare.apply(expr), pos);
       }
       // replace temporary result expression or add predicate to temporary list
       if(ex != null) {
@@ -225,12 +220,10 @@ public abstract class Filter extends Preds {
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
-    } else if(mode == Simplify.COUNT && exprs.length == 1) {
+    } else if(mode == Simplify.COUNT && exprs.length == 1 &&
+        exprs[0].seqType().instanceOf(SeqType.NODE_ZO)) {
       // $nodes[@attr]  ->  $nodes ! @attr
-      final Expr pred = exprs[0];
-      if(pred.seqType().instanceOf(SeqType.NODE_ZO)) {
-        expr = SimpleMap.get(cc, info, root, pred);
-      }
+      expr = SimpleMap.get(cc, info, root, exprs[0]);
     }
     return cc.simplify(this, expr, mode);
   }

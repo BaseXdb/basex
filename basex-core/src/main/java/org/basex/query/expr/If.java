@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * If expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class If extends Arr {
@@ -105,8 +105,8 @@ public final class If extends Arr {
     final Expr cmp = EXISTS.is(cond) ? cond.arg(0) : ct.type instanceof NodeType ? cond : null;
     if(!ndt && cmp != null && cmp.equals(br1)) return new Otherwise(info, br1, br2).optimize(cc);
 
-    // if(A) then B else B  ->  prof:void(A), B
-    if(br1.equals(br2)) return cc.merge(cond, br1, info);
+    // if(A) then B else B  ->  void(A), B
+    if(br1.equals(br2)) return cc.voidAndReturn(cond, br1, info);
 
     // determine type
     final SeqType st1 = br1.seqType(), st2 = br2.seqType();

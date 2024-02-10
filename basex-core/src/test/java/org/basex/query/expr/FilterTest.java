@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for optimizations of the filter expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FilterTest extends SandboxTest {
@@ -384,12 +384,18 @@ public final class FilterTest extends SandboxTest {
     query("let $i := 1 return <x><a/></x>/*[position() >= $i to 0]", "");
 
     // GH-2220: Bug on arithmetic operations with last() and position()
-    check("document { <S/> }//S[last() * 150 >= position()]", "<S/>", empty(Arith.class));
-    check("document { <S/> }//S[last() * 150000 >= position()]", "<S/>", empty(Arith.class));
-    check("document { <S/> }//S[position() <= last() * 1500000000000]", "<S/>", empty(Arith.class));
-    check("document { <S/> }//S[last() * -150 <= position()]", "<S/>", empty(Arith.class));
-    check("document { <S/> }//S[last() * -150000 <= position()]", "<S/>", empty(Arith.class));
-    check("document { <S/> }//S[position() >= last() * -150000000000]", "<S/>", empty(Arith.class));
+    check("document { <S/> }//S[last() * 150 >= position()]", "<S/>",
+        empty(Arith.class), empty(ArithSimple.class));
+    check("document { <S/> }//S[last() * 150000 >= position()]", "<S/>",
+        empty(Arith.class), empty(ArithSimple.class));
+    check("document { <S/> }//S[position() <= last() * 1500000000000]", "<S/>",
+        empty(Arith.class), empty(ArithSimple.class));
+    check("document { <S/> }//S[last() * -150 <= position()]", "<S/>",
+        empty(Arith.class), empty(ArithSimple.class));
+    check("document { <S/> }//S[last() * -150000 <= position()]", "<S/>",
+        empty(Arith.class), empty(ArithSimple.class));
+    check("document { <S/> }//S[position() >= last() * -150000000000]", "<S/>",
+        empty(Arith.class), empty(ArithSimple.class));
   }
 
   /** Rewrite positional range tests. */

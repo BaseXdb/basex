@@ -24,7 +24,7 @@ import org.basex.util.*;
 /**
  * Abstract parse expression. All non-value expressions are derived from this class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
@@ -64,24 +64,38 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
       throws QueryException {
 
-    Item item;
-    if(seqType().zeroOrOne()) {
-      item = item(qc, info);
-    } else {
-      final Iter iter = iter(qc);
-      item = iter.next();
-      if(item == null) return false;
+    final QueryPredicate<Item> test = item ->
+      predicate && item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
 
-      // effective boolean value is only defined for node sequences or single items
-      if(!(item instanceof ANode)) {
-        final Item next = iter.next();
-        if(next != null) throw ebvError(ValueBuilder.concat(item, next, qc), info);
-      }
+    // single item
+    if(seqType().zeroOrOne()) return test.test(item(qc, info));
+
+    // empty sequence?
+    final Iter iter = iter(qc);
+    Item item = iter.next();
+    if(item == null) return false;
+
+    // sequence starting with node?
+    if(item instanceof ANode) return true;
+
+    // single item?
+    Item next = iter.next();
+    if(next == null) return test.test(item);
+
+    // positional sequence?
+    final boolean num = item instanceof ANum;
+    if(predicate && num && next instanceof ANum) {
+      boolean ok = test.test(item);
+      do {
+        if(!(next instanceof ANum)) throw testError(next, true, info);
+        if(!ok) ok = test.test(next);
+      } while((next = iter.next()) != null);
+      return ok;
     }
-    return pred && item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
+    throw testError(ValueBuilder.concat(item, next), predicate && num, info);
   }
 
   @Override
@@ -220,9 +234,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final byte[] toToken(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.atomItem(qc, info);
-    if(item.isEmpty()) throw EMPTYFOUND_X.get(info, STRING);
-    return toToken(item);
+    return toToken(toAtomItem(expr, qc));
   }
 
   /**
@@ -327,7 +339,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final boolean toBoolean(final Item item) throws QueryException {
-    final Type type = checkNoEmpty(item, BOOLEAN).type;
+    final Type type = item.type;
     if(type == BOOLEAN) return item.bool(info);
     if(type.isUntyped()) return Bln.parse(item, info);
     throw typeError(item, BOOLEAN, info);
@@ -351,7 +363,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final double toDouble(final Item item) throws QueryException {
-    if(checkNoEmpty(item, DOUBLE).type.isNumberOrUntyped()) return item.dbl(info);
+    if(item.type.isNumberOrUntyped()) return item.dbl(info);
     throw numberError(this, item);
   }
 
@@ -366,6 +378,17 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
     return item.isEmpty() ? null : toNumber(item);
+  }
+
+  /**
+   * Converts an item to a number.
+   * @param expr expression
+   * @param qc query context
+   * @return number
+   * @throws QueryException query exception
+   */
+  protected final ANum toNumber(final Expr expr, final QueryContext qc) throws QueryException {
+    return toNumber(expr.atomItem(qc, info));
   }
 
   /**
@@ -389,7 +412,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final float toFloat(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(checkNoEmpty(item, FLOAT).type.isNumberOrUntyped()) return item.flt(info);
+    if(item.type.isNumberOrUntyped()) return item.flt(info);
     throw numberError(this, item);
   }
 
@@ -405,14 +428,27 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to an integer number.
+   * Converts an item to an integer.
    * @param item item to be converted
-   * @return number
+   * @return integer
    * @throws QueryException query exception
    */
   protected final long toLong(final Item item) throws QueryException {
-    final Type type = checkNoEmpty(item, INTEGER).type;
+    final Type type = item.type;
     if(type.instanceOf(INTEGER) || type.isUntyped()) return item.itr(info);
+    throw typeError(item, INTEGER, info);
+  }
+
+  /**
+   * Converts an item to a specific integer.
+   * @param item item to be converted
+   * @param min minimum allowed value
+   * @return integer
+   * @throws QueryException query exception
+   */
+  protected final long toLong(final Item item, final long min) throws QueryException {
+    final long v = toLong(item);
+    if(v >= min) return v;
     throw typeError(item, INTEGER, info);
   }
 
@@ -424,7 +460,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final ANode toNode(final Expr expr, final QueryContext qc) throws QueryException {
-    return toNode(checkNoEmpty(expr.item(qc, info), NODE));
+    return toNode(expr.item(qc, info));
   }
 
   /**
@@ -451,30 +487,6 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Evaluates an expression to an item.
-   * @param expr expression
-   * @param qc query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final Item toItem(final Expr expr, final QueryContext qc) throws QueryException {
-    return checkNoEmpty(expr.item(qc, info));
-  }
-
-  /**
-   * Evaluates an expression to an item of the given type.
-   * @param expr expression
-   * @param qc query context
-   * @param type expected type
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final Item toItem(final Expr expr, final QueryContext qc, final Type type)
-      throws QueryException {
-    return checkNoEmpty(expr.item(qc, info), type);
-  }
-
-  /**
    * Evaluates an expression to an atomized item of the given type.
    * @param expr expression
    * @param qc query context
@@ -482,7 +494,9 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Item toAtomItem(final Expr expr, final QueryContext qc) throws QueryException {
-    return checkNoEmpty(expr.atomItem(qc, info));
+    final Item item = expr.atomItem(qc, info);
+    if(item.isEmpty()) throw EMPTYFOUND.get(info);
+    return item;
   }
 
   /**
@@ -530,8 +544,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Bin toBin(final Item item) throws QueryException {
-    if(checkNoEmpty(item) instanceof Bin) return (Bin) item;
-    throw BINARY_X.get(info, item.type);
+    if(item instanceof Bin) return (Bin) item;
+    throw BINARY_X.get(info, item.seqType());
   }
 
   /**
@@ -585,9 +599,9 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final byte[] toBytes(final Item item) throws QueryException {
-    if(checkNoEmpty(item).type.isStringOrUntyped()) return item.string(info);
+    if(item.type.isStringOrUntyped()) return item.string(info);
     if(item instanceof Bin) return ((Bin) item).binary(info);
-    throw STRBIN_X_X.get(info, item.type, item);
+    throw STRBIN_X_X.get(info, item.seqType(), item);
   }
 
   /**
@@ -609,7 +623,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final QNm toQNm(final Item item) throws QueryException {
-    final Type type = checkNoEmpty(item, QNAME).type;
+    final Type type = item.type;
     if(type == QNAME) return (QNm) item;
     if(type.isUntyped()) throw NSSENS_X_X.get(info, type, QNAME);
     throw typeError(item, QNAME, info);
@@ -623,7 +637,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final FItem toFunction(final Expr expr, final QueryContext qc) throws QueryException {
-    return (FItem) checkType(toItem(expr, qc, SeqType.FUNCTION), SeqType.FUNCTION);
+    return (FItem) checkType(expr.item(qc, info), SeqType.FUNCTION);
   }
 
   /**
@@ -634,7 +648,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQMap toMap(final Expr expr, final QueryContext qc) throws QueryException {
-    return toMap(toItem(expr, qc, SeqType.MAP));
+    return toMap(expr.item(qc, info));
   }
 
   /**
@@ -677,7 +691,7 @@ public abstract class ParseExpr extends Expr {
     for(final T key : keys.getEnumConstants()) {
       if(value.equals(key.toString())) return key;
     }
-    throw EXP_FOUND_X.get(info, Arrays.toString(keys.getEnumConstants()), value);
+    throw EXP_FOUND_X_X.get(info, Arrays.toString(keys.getEnumConstants()), value);
   }
 
   /**
@@ -688,7 +702,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQArray toArray(final Expr expr, final QueryContext qc) throws QueryException {
-    return toArray(toItem(expr, qc, SeqType.ARRAY));
+    return toArray(expr.item(qc, info));
   }
 
   /**
@@ -723,30 +737,19 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Item checkType(final Item item, final Type type) throws QueryException {
-    if(checkNoEmpty(item, type).type.instanceOf(type)) return item;
+    if(item.type.instanceOf(type)) return item;
     throw typeError(item, type, info);
   }
 
   /**
-   * Returns an item if it is not empty.
-   * @param item item
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  protected final Item checkNoEmpty(final Item item) throws QueryException {
-    if(item.isEmpty()) throw EMPTYFOUND.get(info);
-    return item;
-  }
-
-  /**
-   * Returns an item if it is not empty.
-   * @param item item
+   * Returns a value as item if it has the specified type.
+   * @param value value
    * @param type expected type
-   * @return specified item
+   * @return item
    * @throws QueryException query exception
    */
-  protected final Item checkNoEmpty(final Item item, final Type type) throws QueryException {
-    if(item.isEmpty()) throw EMPTYFOUND_X.get(info, type);
-    return item;
+  protected final Item checkType(final Value value, final Type type) throws QueryException {
+    if(value.seqType().instanceOf(type.seqType())) return (Item) value;
+    throw typeError(value, type, info);
   }
 }

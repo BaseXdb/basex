@@ -1,13 +1,11 @@
 package org.basex.build.json;
 
-import java.util.*;
-
 import org.basex.util.options.*;
 
 /**
  * Options for parsing JSON documents.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JsonParserOptions extends JsonOptions {
@@ -17,6 +15,8 @@ public final class JsonParserOptions extends JsonOptions {
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
   /** Option: fallback function (parse-json, json-to-xml). */
   public static final FuncOption FALLBACK = new FuncOption("fallback");
+  /** Option: number-parser function (parse-json, json-to-xml). */
+  public static final FuncOption NUMBER_PARSER = new FuncOption("number-parser");
   /** Option: handle duplicates (parse-json, json-to-xml). */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.class);
@@ -34,7 +34,7 @@ public final class JsonParserOptions extends JsonOptions {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+      return EnumOption.string(name());
     }
   }
 

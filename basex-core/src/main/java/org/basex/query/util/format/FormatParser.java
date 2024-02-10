@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Format parser for integers and dates.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class FormatParser extends FormatUtil {
@@ -22,8 +22,19 @@ abstract class FormatParser extends FormatUtil {
   byte[] primary;
   /** First character of format token, or mandatory digit. */
   int first = -1;
-  /** Ordinal suffix; {@code null} if not specified. */
-  byte[] ordinal;
+  /** Numeral type. */
+  enum NumeralType {
+    /** Ordinal. */
+    ORDINAL,
+    /** Cardinal. */
+    CARDINAL,
+    /** Numbering. */
+    NUMBERING
+  };
+  /** Type of numeral. */
+  NumeralType numType = NumeralType.NUMBERING;
+  /** Format modifier; {@code null} if not specified. */
+  byte[] modifier;
   /** Traditional modifier. */
   boolean trad;
   /** Minimum width. */
@@ -46,10 +57,11 @@ abstract class FormatParser extends FormatUtil {
    * @param pic picture
    * @param def default token
    * @param date date flag
+   * @param frac fractional seconds flag
    * @return presentation modifier
    * @throws QueryException query exception
    */
-  byte[] presentation(final byte[] pic, final byte[] def, final boolean date)
+  byte[] presentation(final byte[] pic, final byte[] def, final boolean date, final boolean frac)
       throws QueryException {
 
     // find primary format
@@ -74,7 +86,7 @@ abstract class FormatParser extends FormatUtil {
 
     // find digit of decimal-digit-pattern
     tp.reset();
-    while(first == -1 && tp.more()) first = zeroes(tp.next(), radix);
+    while(first == -1 && tp.more()) first = zeroes(tp.next());
     // no digit found: return default primary token
     if(first == -1) return def;
 
@@ -82,17 +94,20 @@ abstract class FormatParser extends FormatUtil {
     tp.reset();
     boolean gss = true;
     boolean mds = false;
+    boolean ods = false;
     while(tp.more()) {
       ch = tp.next();
-      final int d = zeroes(ch, radix);
+      final int d = zeroes(ch);
       if(d != -1) {
         // mandatory-digit-sign
+        if(ods && frac) throw OPTBEFORE_X.get(info, pic);
         if(first != d) throw DIFFMAND_X.get(info, pic);
         mds = true;
         gss = false;
       } else if(ch == '#') {
         // optional-digit-sign
-        if(mds) throw OPTAFTER_X.get(info, pic);
+        if(mds && !frac) throw OPTAFTER_X.get(info, pic);
+        ods = true;
         gss = false;
       } else if(!Character.isLetter(ch)) {
         // grouping-separator-sign
@@ -108,13 +123,23 @@ abstract class FormatParser extends FormatUtil {
   }
 
   /**
+   * Checks if a character is a valid digit.
+   * @param ch character
+   * @param zero zero character
+   * @return result of check
+   */
+  public boolean digit(final int ch, final int zero) {
+    return ch >= zero && ch <= zero + 9;
+  }
+
+  /**
    * Finishes format parsing.
    * @param pres presentation string
    */
   void finish(final byte[] pres) {
     // skip correction of case if modifier has more than one codepoint (Ww)
     final int cp = ch(pres, 0);
-    cs = radix == 10 && (cl(pres, 0) < pres.length || digit(cp)) ? Case.STANDARD :
+    cs = radix == 10 && (cl(pres, 0) < pres.length || Token.digit(cp)) ? Case.STANDARD :
       (cp & ' ') == 0 ? Case.UPPER : Case.LOWER;
     primary = lc(pres);
     if(first == -1) first = ch(primary, 0);

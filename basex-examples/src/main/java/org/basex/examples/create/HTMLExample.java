@@ -8,7 +8,7 @@ import org.basex.core.cmd.*;
  * into the database. The specified input file will be converted to XML
  * if Validator.nu is found in the classpath.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class HTMLExample {

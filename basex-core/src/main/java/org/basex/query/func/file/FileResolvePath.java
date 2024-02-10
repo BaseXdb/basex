@@ -11,12 +11,12 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FileResolvePath extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws QueryException {
+  public Str item(final QueryContext qc) throws QueryException {
     final Path path = toPath(toString(arg(0), qc)), abs;
     if(defined(1)) {
       final String file = toString(arg(1), qc);

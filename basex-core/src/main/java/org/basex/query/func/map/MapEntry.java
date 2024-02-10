@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class MapEntry extends StandardFunc {
@@ -22,7 +22,7 @@ public final class MapEntry extends StandardFunc {
     final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
 
-    return XQMap.entry(key, value, info);
+    return XQMap.singleton(key, value, info);
   }
 
   @Override

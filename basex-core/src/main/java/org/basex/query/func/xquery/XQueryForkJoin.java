@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author James Wright
  */
 public final class XQueryForkJoin extends StandardFunc {
@@ -61,12 +61,12 @@ public final class XQueryForkJoin extends StandardFunc {
     if(st.one()) return new DynFuncCall(info, sc, coerce(0, cc)).optimize(cc);
 
     final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
-      options instanceof Value ? toOptions(arg(1), new TaskOptions(), true, cc.qc).get(RESULTS) :
+      options instanceof Value ? toOptions(options, new TaskOptions(), true, cc.qc).get(RESULTS) :
       null;
     if(results == Boolean.TRUE) {
-      final Type type = st.type;
-      if(type instanceof FuncType) {
-        final SeqType dt = ((FuncType) type).declType;
+      final FuncType ft = functions.funcType();
+      if(ft != null) {
+        final SeqType dt = ft.declType;
         exprType.assign(dt.with(dt.occ.multiply(st.occ)));
       }
     } else if(results == Boolean.FALSE) {

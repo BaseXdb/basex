@@ -1,7 +1,7 @@
 (:~
  : Change directory.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/files';
 
@@ -30,10 +30,10 @@ function dba:dir-change(
     )
     return (
       (: ensure that the directory can be accessed :)
-      prof:void(file:list($path)),
+      void(file:list($path)),
   
       config:directory($path),
-      config:query('')
+      config:file('')
     ),
     web:redirect($dba:CAT)
   } catch file:io-error {

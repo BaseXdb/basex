@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class provides a parse method to convert JSON data to XML nodes.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class JsonXmlConverter extends JsonConverter {
@@ -58,17 +58,18 @@ abstract class JsonXmlConverter extends JsonConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonXmlConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonXmlConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     merge = jopts.get(JsonOptions.MERGE);
     strings = jopts.get(JsonOptions.STRINGS);
     addValues.add(true);
 
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
-    if(dupl == JsonDuplicates.USE_LAST) throw new QueryIOException(
-        JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl));
+    if(dupl == JsonDuplicates.USE_LAST) {
+      throw JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
+    }
   }
 
   @Override
@@ -102,22 +103,22 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  void numberLit(final byte[] value) throws QueryIOException {
-    addValue(NUMBER, value);
+  void numberLit(final Item value) throws QueryException {
+    addValue(NUMBER, value.string(null));
   }
 
   @Override
-  void stringLit(final byte[] value) throws QueryIOException {
+  void stringLit(final byte[] value) throws QueryException {
     addValue(STRING, value);
   }
 
   @Override
-  void nullLit() throws QueryIOException {
+  void nullLit() throws QueryException {
     addValue(NULL, null);
   }
 
   @Override
-  void booleanLit(final byte[] value) throws QueryIOException {
+  void booleanLit(final byte[] value) throws QueryException {
     addValue(BOOLEAN, value);
   }
 
@@ -125,9 +126,9 @@ abstract class JsonXmlConverter extends JsonConverter {
    * Adds a value.
    * @param type JSON type
    * @param value optional value
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  abstract void addValue(byte[] type, byte[] value) throws QueryIOException;
+  abstract void addValue(byte[] type, byte[] value) throws QueryException;
 
   /**
    * Adds type information to an element or the type cache.
@@ -136,7 +137,7 @@ abstract class JsonXmlConverter extends JsonConverter {
    */
   final void processType(final FBuilder elem, final byte[] type) {
     // merge type information
-    // check if name exists and contains no whitespaces
+    // check if name exists and contains no whitespace
     if(merge && name != null && !contains(name, ' ')) {
       // check if name is already known
       if(names.contains(name)) {
@@ -159,7 +160,7 @@ abstract class JsonXmlConverter extends JsonConverter {
         names.put(name, new TypeCache(name, type, elem));
       }
     } else {
-      // no name, or name with whitespaces: add type attribute, ignore string type
+      // no name, or name with whitespace: add type attribute, ignore string type
       addType(elem, type);
     }
   }

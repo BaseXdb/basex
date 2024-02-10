@@ -1,4 +1,4 @@
-/* Copyright (c) 2005-23, Alexander Holupirek <alex@holupirek.de>, BSD license */
+/* Copyright (c) 2005-24, Alexander Holupirek <alex@holupirek.de>, BSD license */
 #include <err.h>
 #include <errno.h>
 #include <stdint.h>

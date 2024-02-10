@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code for} clause, iterating over a sequence.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class For extends ForLet {
@@ -210,7 +210,7 @@ public final class For extends ForLet {
 
   @Override
   Expr inlineExpr(final CompileContext cc) {
-    return empty || vars.length > 1 || var.checkType() ? null : expr;
+    return empty || vars.length > 1 || var.declType != null ? null : expr;
   }
 
   @Override

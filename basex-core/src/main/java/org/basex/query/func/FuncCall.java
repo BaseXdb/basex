@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * An XQuery function call, either static or dynamic.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public abstract class FuncCall extends Arr {
@@ -39,8 +39,10 @@ public abstract class FuncCall extends Arr {
 
   @Override
   public final void markTailCalls(final CompileContext cc) {
-    if(cc != null) cc.info(QueryText.OPTTCE_X, this);
-    tco = true;
+    if(!tco) {
+      if(cc != null) cc.info(QueryText.OPTTCE_X, this);
+      tco = true;
+    }
   }
 
   @Override

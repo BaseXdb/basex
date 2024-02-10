@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 /**
  * Higher-order function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 abstract class HofFn extends StandardFunc {
@@ -25,7 +25,7 @@ abstract class HofFn extends StandardFunc {
     final FItem comparator = toFunction(arg(1), 2, qc);
     return (a, b) -> {
       try {
-        return toBoolean(comparator.invoke(qc, info, a, b).item(qc, info)) ? -1 : 1;
+        return toBoolean(qc, comparator, a, b) ? -1 : 1;
       } catch(final QueryException qe) {
         throw new QueryRTException(qe);
       }

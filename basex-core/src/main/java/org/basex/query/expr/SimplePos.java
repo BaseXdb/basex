@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Simple position range check.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class SimplePos extends Arr implements CmpPos {
@@ -86,14 +86,14 @@ final class SimplePos extends Arr implements CmpPos {
   @Override
   public Expr invert(final CompileContext cc) throws QueryException {
     if(exprs[0].seqType().one()) {
-      final Expr pos = cc.function(Function.POSITION, info);
+      final QuerySupplier<Expr> pos = () -> cc.function(Function.POSITION, info);
       final Expr expr1 = exprs[0], expr2 = exprs[1];
       if(exact()) {
-        return new CmpG(info, pos, expr1, OpG.NE, null, cc.sc()).optimize(cc);
+        return new CmpG(info, pos.get(), expr1, OpG.NE, null, cc.sc()).optimize(cc);
       } else if(expr1 == Int.ONE) {
-        return new CmpG(info, pos, expr2, OpG.GT, null, cc.sc()).optimize(cc);
+        return new CmpG(info, pos.get(), expr2, OpG.GT, null, cc.sc()).optimize(cc);
       } else if(expr2 == Int.MAX) {
-        return new CmpG(info, pos, expr1, OpG.LT, null, cc.sc()).optimize(cc);
+        return new CmpG(info, pos.get(), expr1, OpG.LT, null, cc.sc()).optimize(cc);
       }
     }
     return null;

@@ -5,7 +5,7 @@ import org.basex.query.*;
 /**
  * Position checks.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public interface CmpPos {
@@ -30,7 +30,7 @@ public interface CmpPos {
   boolean exact();
 
   /**
-   * If possible, returns an optimized expression with inverted operands.
+   * If possible, returns an inverted and optimized position check.
    * @param cc compilation context
    * @return inverted expression or {@code null}
    * @throws QueryException query exception

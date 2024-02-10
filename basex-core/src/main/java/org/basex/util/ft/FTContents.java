@@ -1,11 +1,11 @@
 package org.basex.util.ft;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Full-text content types.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum FTContents {
@@ -19,6 +19,6 @@ public enum FTContents {
    */
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 }

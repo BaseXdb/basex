@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for XQuery arrays.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArrayTest extends SandboxTest {
@@ -131,7 +131,7 @@ public final class ArrayTest extends SandboxTest {
     query("element { [ 'a' ] } { }", "<a/>");
 
     error("element { [ 'a', 'b' ] } { }", SEQFOUND_X);
-    error("element { [] } { }", EMPTYFOUND_X);
+    error("element { [] } { }", STRQNM_X_X);
   }
 
   /** Attribute constructor. */
@@ -150,7 +150,7 @@ public final class ArrayTest extends SandboxTest {
     query("attribute { [ 'a' ] } { }/name()", "a");
 
     error("attribute { [ 'a', 'b' ] } { }", SEQFOUND_X);
-    error("attribute { [] } { }", EMPTYFOUND_X);
+    error("attribute { [] } { }", STRQNM_X_X);
   }
 
   /** Attribute constructor. */

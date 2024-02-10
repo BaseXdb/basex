@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 /**
  * Replace expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public final class Replace extends Update {
@@ -59,7 +59,7 @@ public final class Replace extends Update {
     if(!(item instanceof ANode) || type == NodeType.DOCUMENT_NODE)
       throw UPTRGNODE_X.get(info, item);
     final Item item2 = iter.next();
-    if(item2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2, qc));
+    if(item2 != null) throw UPTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2));
     final ANode targ = (ANode) item;
     final Updates updates = qc.updates();
     final DBNode dbn = updates.determineDataRef(targ, qc);

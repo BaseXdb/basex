@@ -1,41 +1,41 @@
 (:~
  : Evaluate query.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
-module namespace dba = 'dba/queries';
+module namespace dba = 'dba/editor';
 
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~
  : Evaluates a query and returns the result.
- : @param  $query  query
+ : @param  $query  query string
  : @return result of query
  :)
 declare
   %rest:POST('{$query}')
-  %rest:path('/dba/query-eval')
+  %rest:path('/dba/editor-eval')
   %rest:single
   %output:method('text')
-function dba:query-eval(
+function dba:editor-eval(
   $query  as xs:string?
 ) as xs:string {
-  util:query($query, ())
+  utils:query(string($query), ())
 };
 
 (:~
  : Runs an updating query.
- : @param  $query  query
+ : @param  $query  query string
  : @return result of query
  :)
 declare
   %updating
   %rest:POST('{$query}')
-  %rest:path('/dba/query-update')
+  %rest:path('/dba/editor-update')
   %rest:single
   %output:method('text')
-function dba:query-update(
+function dba:editor-update(
   $query  as xs:string?
 ) as empty-sequence() {
-  util:update-query($query)
+  utils:update-query(string($query))
 };

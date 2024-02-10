@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Unsigned long ({@code xs:unsignedLong}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Uln extends ANum {
@@ -92,10 +92,12 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
     return item.type == AtomType.UNSIGNED_LONG ? value.compareTo(((Uln) item).value) :
-      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ? -item.diff(this, coll, ii) :
-      value.compareTo(BigInteger.valueOf(item.itr(ii)));
+      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ?
+        -item.compare(this, coll, transitive, ii) :
+        value.compareTo(BigInteger.valueOf(item.itr(ii)));
   }
 
   @Override

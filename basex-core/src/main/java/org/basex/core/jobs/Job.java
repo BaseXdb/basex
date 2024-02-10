@@ -1,6 +1,7 @@
 package org.basex.core.jobs;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
@@ -9,12 +10,12 @@ import org.basex.util.*;
 /**
  * Job class. This abstract class is implemented by all command and query instances.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Job {
   /** Child jobs. */
-  private final List<Job> children = Collections.synchronizedList(new ArrayList<>(0));
+  private final List<Job> children = new CopyOnWriteArrayList<>();
   /** Job context. */
   private JobContext jc = new JobContext(this);
   // state and control flags must be volatile so that all threads see the actual non-cached values

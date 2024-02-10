@@ -13,19 +13,20 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArrayForEachPair extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array1 = toArray(arg(0), qc), array2 = toArray(arg(1), qc);
-    final FItem action = toFunction(arg(2), 2, qc);
+    final FItem action = toFunction(arg(2), 3, qc);
 
+    int p = 0;
     final ArrayBuilder ab = new ArrayBuilder();
     final Iterator<Value> as = array1.iterator(0), bs = array2.iterator(0);
     while(as.hasNext() && bs.hasNext()) {
-      ab.append(action.invoke(qc, info, as.next(), bs.next()));
+      ab.append(action.invoke(qc, info, as.next(), bs.next(), Int.get(++p)));
     }
     return ab.array(this);
   }
@@ -38,8 +39,8 @@ public final class ArrayForEachPair extends ArrayFn {
 
     final Type type1 = array1.seqType().type, type2 = array2.seqType().type;
     if(type1 instanceof ArrayType && type2 instanceof ArrayType) {
-      arg(2, arg -> coerceFunc(arg, cc,
-        SeqType.ITEM_ZM, ((ArrayType) type1).declType, ((ArrayType) type2).declType));
+      arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM,
+          ((ArrayType) type1).declType, ((ArrayType) type2).declType, SeqType.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)

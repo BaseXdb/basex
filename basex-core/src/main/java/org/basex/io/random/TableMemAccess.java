@@ -10,7 +10,7 @@ import org.basex.util.*;
  * This class allows main memory access to the database table representation.
  * All table entries are stored in arrays
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {
@@ -163,7 +163,8 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.className(this));
-    sb.append("[size: " + meta.size + "; current: " + current + "; " + blocks.size() + " blocks: ");
+    sb.append("[size: ").append(meta.size).append("; current: ").append(current).append("; ");
+    sb.append(blocks.size()).append(" blocks: ");
     for(final TableMemBlock block : blocks) {
       sb.append(block.firstPre).append(' ');
     }

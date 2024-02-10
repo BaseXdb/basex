@@ -47,7 +47,7 @@ import org.basex.util.*;
  *   - NOT COMPRESSED: return external text unchanged
  * </pre>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -148,7 +148,8 @@ public final class DiskData extends Data {
       resources.write(out);
       out.write(0);
     }
-    if(meta.updindex) idmap.write(meta.dbFile(DATAIDP));
+    // file may be missing if flag was just enabled
+    if(meta.updindex && idmap != null) idmap.write(meta.dbFile(DATAIDP));
     meta.dirty = false;
   }
 

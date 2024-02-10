@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Boolean item ({@code xs:boolean}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Bln extends Item {
@@ -103,9 +103,10 @@ public final class Bln extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    final boolean n = item.type == type ? item.bool(ii) : parse(item, ii);
-    return value ? n ? 0 : 1 : n ? -1 : 0;
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    final boolean b = item.type == type ? item.bool(ii) : parse(item, ii);
+    return value == b ? 0 : b ? -1 : 1;
   }
 
   @Override

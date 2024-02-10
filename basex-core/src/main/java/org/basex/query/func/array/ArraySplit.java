@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class ArraySplit extends ArrayFn {
@@ -27,11 +27,11 @@ public class ArraySplit extends ArrayFn {
 
       @Override
       public XQArray next() {
-        return members.hasNext() ? XQArray.member(members.next()) : null;
+        return members.hasNext() ? XQArray.singleton(members.next()) : null;
       }
       @Override
       public Item get(final long i) {
-        return XQArray.member(array.get(i));
+        return XQArray.singleton(array.get(i));
       }
       @Override
       public long size() {
@@ -45,12 +45,12 @@ public class ArraySplit extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(XQArray.member(member));
+    for(final Value member : array.members()) vb.add(XQArray.singleton(member));
     return vb.value();
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return Empty.VALUE;
 

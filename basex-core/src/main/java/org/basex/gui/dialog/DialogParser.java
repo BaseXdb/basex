@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -17,7 +16,7 @@ import org.basex.util.*;
 /**
  * Parser options panel.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class DialogParser extends BaseXBack {
@@ -67,7 +66,7 @@ abstract class DialogParser extends BaseXBack {
    * @param ex I/O exception
    * @return error string
    */
-  static String error(final IOException ex) {
+  static String error(final Exception ex) {
     final TokenBuilder text = new TokenBuilder().bold().add(Text.ERROR).add(COL).norm().nline();
     return text.add(ex.getLocalizedMessage()).toString();
   }

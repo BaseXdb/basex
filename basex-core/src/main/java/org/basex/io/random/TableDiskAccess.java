@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * This class stores the table on disk and reads it page-wise.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
@@ -532,7 +532,7 @@ public final class TableDiskAccess extends TableAccess {
         file.readFully(buffer.data);
       }
     } catch(final IOException ex) {
-      Util.stack(ex);
+      throw new RuntimeException(Util.info(ex));
     }
   }
 

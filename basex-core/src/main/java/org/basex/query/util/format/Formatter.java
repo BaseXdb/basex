@@ -4,9 +4,12 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.math.*;
+import java.time.*;
+import java.time.zone.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.util.format.FormatParser.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -16,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Abstract class for formatting data in different languages.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {
@@ -43,29 +46,51 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Returns a formatter for the specified language.
-   * @param language language
+   * @param languageTag language tag
    * @return formatter instance
    */
-  public static Formatter get(final byte[] language) {
-    final Formatter form = MAP.get(language);
-    return form != null ? form : MAP.get(EN);
+  public static Formatter get(final byte[] languageTag) {
+    if(IcuFormatter.available()) return IcuFormatter.get(languageTag);
+    final Formatter form = getInternal(languageTag);
+    return form != null ? form : getInternal(EN);
+  }
+
+  /**
+   * Returns an internal formatter for the specified language.
+   * @param languageTag language tag
+   * @return formatter instance, or {@code null} if not implemented
+   */
+  protected static Formatter getInternal(final byte[] languageTag) {
+    final int i = indexOf(languageTag, '-');
+    return i < 0 ? MAP.get(languageTag) : MAP.get(substring(languageTag, 0, i));
+  }
+
+  /**
+   * Checks whether a formatter is available for the specified language.
+   * @param languageTag language tag
+   * @return true if the language is supported
+   */
+  public static boolean available(final byte[] languageTag) {
+    if(IcuFormatter.available()) return IcuFormatter.available(languageTag);
+    return getInternal(languageTag) != null;
   }
 
   /**
    * Returns a word representation for the specified number.
    * @param n number to be formatted
-   * @param ordinal ordinal suffix
+   * @param numType numeral type
+   * @param suffix suffix
    * @return token
    */
-  protected abstract byte[] word(long n, byte[] ordinal);
+  protected abstract byte[] word(long n, NumeralType numType, byte[] suffix);
 
   /**
-   * Returns an ordinal representation for the specified number.
+   * Returns a suffix for the representation of the specified number.
    * @param n number to be formatted
-   * @param ordinal ordinal suffix
+   * @param numType numeral type
    * @return ordinal
    */
-  protected abstract byte[] ordinal(long n, byte[] ordinal);
+  protected abstract byte[] suffix(long n, NumeralType numType);
 
   /**
    * Returns the specified month (0-11).
@@ -107,8 +132,8 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Formats the specified date.
-   * @param date date to be formatted
-   * @param language language
+   * @param dt date to be formatted
+   * @param languageTag language tag
    * @param picture picture
    * @param calendar calendar (can be {@code null})
    * @param place place
@@ -117,12 +142,12 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final ADate date, final byte[] language, final byte[] picture,
+  public final byte[] formatDate(final ADate dt, final byte[] languageTag, final byte[] picture,
       final byte[] calendar, final byte[] place, final StaticContext sc, final InputInfo info)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
-    if(language.length != 0 && MAP.get(language) == null) tb.add("[Language: en]");
+    if(languageTag.length != 0 && !available(languageTag)) tb.add("[Language: en]");
     if(calendar != null) {
       final QNm qnm;
       try {
@@ -140,7 +165,19 @@ public abstract class Formatter extends FormatUtil {
         if(c > 1) tb.add("[Calendar: AD]");
       }
     }
-    if(place.length != 0) tb.add("[Place: ]");
+    ADate date = dt;
+    if(contains(place, '/')) { // IANA time zone name
+      try {
+        final ZoneRules rules = ZoneId.of(string(place)).getRules();
+        final ZoneOffset offset = dt.type == AtomType.TIME
+            ? rules.getStandardOffset(Instant.now())
+            : rules.getOffset(dt.toJava().toGregorianCalendar().toInstant());
+        date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000), false, info);
+      } catch(final ZoneRulesException ex) {
+        // not a supported IANA time zone
+        Util.debug(ex);
+      }
+    }
 
     final DateParser dp = new DateParser(info, picture);
     while(dp.more()) {
@@ -176,7 +213,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'd':
             final long y = date.yea();
-            for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.dpm(y, m);
+            for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.daysOfMonth(y, m);
             num += date.day();
             err = tim;
             break;
@@ -245,7 +282,7 @@ public abstract class Formatter extends FormatUtil {
         if(pres == null) continue;
 
         // parse presentation modifier(s) and width modifier
-        final DateFormat fp = new DateFormat(substring(marker, 1), pres, info);
+        final DateFormat fp = new DateFormat(substring(marker, 1), pres, frac != null, info);
         if(max && fp.max == Integer.MAX_VALUE) {
           // limit maximum length of numeric output
           int mx = 0;
@@ -278,19 +315,7 @@ public abstract class Formatter extends FormatUtil {
             tb.add(formatInt(num, fp));
           }
         } else if(frac != null) {
-          String s = frac.toString().replace("0.", "").replaceAll("0+$", "");
-          if(frac.compareTo(BigDecimal.ZERO) != 0) {
-            final int sl = s.length();
-            if(fp.min > sl) {
-              s = frac(frac, fp.min);
-            } else if(fp.max < sl) {
-              s = frac(frac, fp.max);
-            } else {
-              final int fl = length(fp.primary);
-              if(fl != 1 && fl != sl) s = frac(frac, fl);
-            }
-          }
-          tb.add(number(token(s), fp, fp.first));
+          tb.add(formatFrac(frac, fp));
         } else {
           tb.add(formatInt(num, fp));
         }
@@ -303,15 +328,58 @@ public abstract class Formatter extends FormatUtil {
   }
 
   /**
-   * Returns the fractional part of a decimal number.
+   * Returns the formatted fractional part of a decimal number.
    * @param num number
-   * @param len length of fractional part
-   * @return string representation
+   * @param fp date format
+   * @return the formatted number
    */
-  private static String frac(final BigDecimal num, final int len) {
-    final String s = num.setScale(len, RoundingMode.DOWN).toString();
-    final int d = s.indexOf('.');
-    return d == -1 ? s : s.substring(d + 1);
+  private byte[] formatFrac(final BigDecimal num, final DateFormat fp) {
+    String s = num.toString().replace("0.", "").replaceAll("0+$", "");
+
+    // count optional and mandatory digit signs
+    int od = 0, md = 0;
+    for(final TokenParser tp = new TokenParser(fp.primary); tp.more();) {
+      final int c = tp.next();
+      if(c == '#') ++od;
+      else if(zeroes(c) != -1) ++md;
+    }
+    // adjust max with mandatory digit count
+    if(fp.max < md) fp.max = md;
+
+    // calculate number of target digits, including trailing zeroes
+    final int sl = s.length();
+    int fl = md + od;
+    if(fl == 1) fl = sl;
+    if(fp.max < fl) fl = fp.max;
+    if(fp.min > fl) fl = fp.min;
+
+    // force calculated length
+    if(fl != sl) {
+      final int len = fl;
+      final String s1 = num.setScale(len, RoundingMode.DOWN).toString();
+      final int d = s1.indexOf('.');
+      s = d == -1 ? s1 : s1.substring(d + 1);
+    }
+
+    // format number
+    byte[] number = number(token(s), fp, fp.first);
+
+    // truncate trailing zeroes
+    final int nt = Math.min(fp.max - fp.min, od);
+    if(nt > 0 && s.endsWith("0")) {
+      final String ns = string(number);
+      final int nsl = ns.length();
+      int nsi = nsl;
+      for(int dc = 0; dc <= nt;) {
+        final int c = ns.charAt(--nsi);
+        if(zeroes(c) != -1) {
+          ++dc;
+          if(c != fp.first) break;
+        }
+      }
+      if(nsi + 1 != nsl) number = token(ns.substring(0, nsi + 1));
+    }
+    return number;
   }
 
   /**
@@ -329,7 +397,7 @@ public abstract class Formatter extends FormatUtil {
     final TokenBuilder tb = new TokenBuilder();
     final int ch = fp.first;
     if(ch == 'w') {
-      tb.add(word(n, fp.ordinal));
+      tb.add(word(n, fp.numType, fp.modifier));
     } else if(ch == KANJI[1]) {
       japanese(tb, n);
     } else if(ch == 'i') {
@@ -541,7 +609,7 @@ public abstract class Formatter extends FormatUtil {
    */
   private byte[] number(final long num, final FormatParser fp, final int first) {
     final byte[] n = number(token(num, fp.radix), fp, first);
-    return concat(n, ordinal(num, fp.ordinal));
+    return concat(n, suffix(num, fp.numType));
   }
 
   /**
@@ -552,7 +620,7 @@ public abstract class Formatter extends FormatUtil {
    * @return number character sequence
    */
   private static byte[] number(final byte[] num, final FormatParser fp, final int first) {
-    final int zero = zeroes(first, fp.radix);
+    final int zero = fp.zeroes(first);
 
     // cache characters of presentation modifier
     final int[] mod = new TokenParser(fp.primary).toArray();
@@ -565,7 +633,7 @@ public abstract class Formatter extends FormatUtil {
     boolean regSep = false;
     for(int mp = modSize - 1; mp >= modStart; --mp) {
       final int ch = mod[mp];
-      if(digit(ch, zero, fp.radix)) {
+      if(fp.digit(ch, zero)) {
         digitPos = mp;
         continue;
       }
@@ -593,15 +661,15 @@ public abstract class Formatter extends FormatUtil {
         ch = mod[modPos--];
         if(inPos >= 0) {
           if(ch == '#' && sep) reverse.add(sepChar);
-          if(ch == '#' || digit(ch, zero, fp.radix)) {
+          if(ch == '#' || fp.digit(ch, zero)) {
             final int n = num[inPos--];
             ch = fp.radix == 10 ? zero + n - '0' : n;
           }
         } else {
           // add remaining modifiers
           if(ch == '#') break;
-          if(digit(ch, zero, fp.radix)) ch = zero;
-          if(regSep && modPos + 1 < digitPos) break;
+          if(fp.digit(ch, zero)) ch = zero;
+          if(modPos + 1 < digitPos) break;
         }
       } else if(inPos >= 0) {
         // add remaining numbers
@@ -620,20 +688,6 @@ public abstract class Formatter extends FormatUtil {
     final TokenBuilder result = new TokenBuilder();
     for(int rs = reverse.size() - 1; rs >= 0; --rs) result.add(reverse.get(rs));
     return result.finish();
-  }
-
-  /**
-   * Checks if a character is a valid digit.
-   * @param ch character
-   * @param zero zero character
-   * @param radix radix
-   * @return result of check
-   */
-  static boolean digit(final int ch, final int zero, final int radix) {
-    if(radix == 10) return ch >= zero && ch <= zero + 9;
-    final int num = ch <= '9' ? ch : (ch & 0xDF) - 0x37;
-    return ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' &&
-        num < radix;
   }
 
   /**

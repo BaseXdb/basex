@@ -1,7 +1,7 @@
 (:~
  : Code for logging in and out.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/login';
 
@@ -48,6 +48,7 @@ declare
   %rest:query-param('_error', '{$error}')
   %rest:query-param('_page',  '{$page}')
   %output:method('html')
+  %output:html-version('5')
   %perm:allow('public')
 function dba:login(
   $name   as xs:string?,
@@ -63,7 +64,7 @@ function dba:login(
         <form action='login-check' method='post'>
           <input type='hidden' name='_page' value='{ $page }'/>
           {
-            map:for-each(html:parameters(), function($key, $value) {
+            map:for-each(html:parameters(), fn($key, $value) {
               <input type='hidden' name='{ $key }' value='{ $value }'/>
             })
           }

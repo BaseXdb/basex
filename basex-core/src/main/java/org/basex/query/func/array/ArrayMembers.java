@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArrayMembers extends StandardFunc {
@@ -53,9 +53,7 @@ public final class ArrayMembers extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final FuncType ft = arg(0).funcType();
-    if(ft instanceof ArrayType) {
-      exprType.assign(MapType.get(AtomType.STRING, ft.declType));
-    }
+    if(ft instanceof ArrayType) exprType.assign(MapType.get(AtomType.STRING, ft.declType));
     return this;
   }
 
@@ -66,6 +64,6 @@ public final class ArrayMembers extends StandardFunc {
    * @throws QueryException query exception
    */
   private XQMap record(final Value value) throws QueryException {
-    return XQMap.entry(Str.VALUE, value, info);
+    return XQMap.singleton(Str.VALUE, value, info);
   }
 }

@@ -41,7 +41,7 @@ import org.w3c.dom.Text;
  * This class contains common methods for executing Java code and mapping
  * Java objects to XQuery values.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class JavaCall extends Arr {
@@ -466,7 +466,7 @@ public abstract class JavaCall extends Arr {
   static QueryException noMember(final String name, final String[] types, final int arity,
       final String full, final IntList arities, final byte[][] names, final InputInfo info) {
     // functions with different arities
-    if(!arities.isEmpty()) return Functions.wrongArity(arity, arities, full, info, false);
+    if(!arities.isEmpty()) return Functions.wrongArity(arity, arities, full, false, info);
 
     // find similar field/method names
     final byte[] nm = token(name);

@@ -19,7 +19,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnLowest extends StandardFunc {
@@ -37,8 +37,8 @@ public class FnLowest extends StandardFunc {
    */
   final Value value(final boolean min, final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final Collation coll = toCollation(arg(1), qc);
-    final FItem key = defined(2) ? toFunction(arg(2), 1, qc) : null;
+    final Collation collation = toCollation(arg(1), qc);
+    final FItem key = toFunctionOrNull(arg(2), 1, qc);
 
     final ItemList result = new ItemList();
     Value lowest = null;
@@ -48,7 +48,7 @@ public class FnLowest extends StandardFunc {
         vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
       }
       final Value low = vb.value();
-      int diff = FnSort.compare(lowest != null ? lowest : low, low, coll, info);
+      int diff = FnSort.compare(lowest != null ? lowest : low, low, collation, info);
       if(min) diff = -diff;
       if(diff > 0) continue;
       if(diff < 0) result.reset();
@@ -82,8 +82,8 @@ public class FnLowest extends StandardFunc {
 
       // lowest(1 to 10)  ->  1 to 10
       if(input instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) input;
-        return (seq.asc ? seq : seq.reverse(null)).itemAt(min ? 0 : seq.size() - 1);
+        final RangeSeq rs = (RangeSeq) input;
+        return (rs.ascending() ? rs : rs.reverse(null)).itemAt(min ? 0 : rs.size() - 1);
       }
       // lowest(ITEM)  ->  ITEM
       if(noCheck.test(st.type) && (st.one() || input instanceof SingletonSeq &&
@@ -100,7 +100,7 @@ public class FnLowest extends StandardFunc {
         return cc.function(min ? LOWEST : HIGHEST, info, args);
       }
     } else if(defined(2)) {
-      arg(2, arg -> coerceFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
+      arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
     }
     return adoptType(input);
   }

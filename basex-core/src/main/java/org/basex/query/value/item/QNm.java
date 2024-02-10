@@ -19,11 +19,11 @@ import org.basex.util.list.*;
 /**
  * QName item ({@code xs:QName}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class QNm extends Item {
-  /** QName: empty. */
+  /** QName: empty (invalid). */
   public static final QNm EMPTY = new QNm(Token.EMPTY);
   /** EQName syntax. */
   public static final Pattern EQNAME = Pattern.compile("^Q\\{([^{}]*)\\}(.+)$");
@@ -168,14 +168,14 @@ public final class QNm extends Item {
       qnm = new QNm(nm, sc);
       if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
     } else {
-      throw diffError(this, item, ii);
+      throw compareError(this, item, ii);
     }
     return eq(qnm);
   }
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return super.deepEqual(item, deep) && (
+    return type == item.type && equal(item, deep.coll, null, deep.info) && (
       !deep.options.get(DeepEqualOptions.NAMESPACE_PREFIXES) ||
       Token.eq(prefix(), ((QNm) item).prefix()));
   }
@@ -190,8 +190,9 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    throw diffError(item, this, ii);
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    throw compareError(item, this, ii);
   }
 
   /**
@@ -305,7 +306,7 @@ public final class QNm extends Item {
    * Converts a value to a QName.
    * @param value value to parse
    * @param sc static context (can be {@code null})
-   * @return string
+   * @return QName
    * @throws QueryException query exception
    */
   public static QNm parse(final byte[] value, final StaticContext sc) throws QueryException {
@@ -318,7 +319,7 @@ public final class QNm extends Item {
    * @param dflt default namespace (can be {@code null})
    * @param sc static context (can be {@code null})
    * @param info input info (can be {@code null})
-   * @return string
+   * @return QName
    * @throws QueryException query exception
    */
   public static QNm parse(final byte[] value, final byte[] dflt, final StaticContext sc,

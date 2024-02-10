@@ -3,7 +3,7 @@ package org.basex.query.util.ft;
 /**
  * Single full-text string match.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FTStringMatch implements Comparable<FTStringMatch> {
@@ -42,7 +42,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   @Override
   public int compareTo(final FTStringMatch sm) {
     final int s = start - sm.start;
-    return s == 0 ? end - sm.end : s;
+    return Integer.signum(s == 0 ? end - sm.end : s);
   }
 
   @Override

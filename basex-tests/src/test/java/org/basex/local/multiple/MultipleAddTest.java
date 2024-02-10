@@ -3,13 +3,12 @@ package org.basex.local.multiple;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.core.users.*;
 import org.junit.jupiter.api.Test;
 
 /**
  * This class performs local stress tests with a specified number of threads and queries.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MultipleAddTest extends SandboxTest {
@@ -84,7 +83,6 @@ public final class MultipleAddTest extends SandboxTest {
     Client(final Context ctx, final int runs) {
       this.runs = runs;
       this.ctx = new Context(ctx);
-      this.ctx.user(ctx.users.get(UserText.ADMIN));
     }
 
     @Override

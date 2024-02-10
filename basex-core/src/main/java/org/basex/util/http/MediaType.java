@@ -8,7 +8,7 @@ import org.basex.util.hash.*;
 /**
  * Single Internet media type.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MediaType implements Comparable<MediaType> {
@@ -97,9 +97,9 @@ public final class MediaType implements Comparable<MediaType> {
     if(p != -1) {
       for(final String param : Strings.split(string.substring(p + 1), ';')) {
         final String[] kv = Strings.split(param, '=', 2);
-        // attribute: trim whitespaces, convert to lower case
+        // attribute: trim whitespace, convert to lower case
         final String k = kv[0].trim().toLowerCase(Locale.ENGLISH);
-        // value: trim whitespaces, remove quotes and backslashed characters
+        // value: trim whitespace, remove quotes and backslashed characters
         String v = kv.length < 2 ? "" : kv[1].trim();
         if(Strings.startsWith(v, '"')) v = v.replaceAll("^\"|\"$", "").replaceAll("\\\\(.)", "$1");
         parameters.put(k, v);
@@ -225,7 +225,7 @@ public final class MediaType implements Comparable<MediaType> {
    * Compares the specified main or subtypes.
    * @param type1 first type
    * @param type2 second type
-   * @return result of check
+   * @return result of comparison (-1, 0, 1)
    */
   private static int compareTo(final String type1, final String type2) {
     return type1.equals(type2) ? 0 :

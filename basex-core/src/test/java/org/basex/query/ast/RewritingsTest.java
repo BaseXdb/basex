@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Checks query rewritings.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RewritingsTest extends SandboxTest {
@@ -582,9 +582,10 @@ public final class RewritingsTest extends SandboxTest {
     check("xs:string(''[. = <_/>])", "", empty(Cast.class), root(If.class));
 
     check("xs:string(<_/>[. = '']) = ''", true, empty(Cast.class), root(CmpSimpleG.class));
-    check("xs:double(" + wrap(1) + ") + 2", 3, empty(Cast.class), type(Arith.class, "xs:double"));
+    check("xs:double(" + wrap(1) + ") + 2", 3,
+        empty(Cast.class), type(ArithSimple.class, "xs:double"));
     check("(1, 2)[. != 0] ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
-        count(Cast.class, 1), type(Arith.class, "xs:integer"));
+        count(Cast.class, 1), type(ArithSimple.class, "xs:integer"));
 
     error("(if(" + wrap("!") + "= 'a') then 'b') cast as xs:string", INVCONVERT_X_X_X);
     error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVCONVERT_X_X_X);
@@ -1672,7 +1673,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Singleton sequences in predicates. */
   @Test public void gh1878() {
-    error("<a/>[" + REPLICATE.args(1, 2) + ']', ARGTYPE_X_X_X);
+    query("<a/>[(1 to 2) ! 1]", "<a/>");
+    query("<a/>[" + REPLICATE.args(1, 2) + ']', "<a/>");
   }
 
   /** Lacking filter rewriting. */
@@ -1719,9 +1721,8 @@ public final class RewritingsTest extends SandboxTest {
     check("(0, 1) ! ((if(.) then (1, 2) else ()) = (1, 2))", "false\ntrue", empty(If.class));
     check("(if((1, 2)[. = 0]) then () else (1, 2)) = (1, 2)", true, empty(If.class), root(NOT));
 
-    // do not rewrite...
-    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
-    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", exists(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", empty(If.class));
+    check("(0, 1)[. >= 0] ! ((if(.) then 'S' else 'P') = 'X')", "false\nfalse", empty(If.class));
   }
 
   /** Optimize inlined path steps. */
@@ -1808,7 +1809,10 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Rewritings of positional tests. */
   @Test public void gh1898() {
-    check("for $a in (1, 2) return $a[$a[.]]", 1, root(GFLWOR.class));
+    // argument of items-at can be a sequence of numbers
+    check("for $a in (1, 2) return $a[$a[.]]", 1, root(DualMap.class));
+    check("for $a in (1, 2) return $a[$a[.]]", 1, root(DualMap.class));
+    check("for $a in (2, 3) return $a[$a[.]]", "", root(DualMap.class));
   }
 
   /** Inline filter expressions. */
@@ -2434,14 +2438,14 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Dynamic unroll limit.. */
   @Test public void gh2001() {
-    check("(1, 3) ! (. * 2)", "2\n6", exists(Arith.class));
-    check("sum((1, 3) ! (. * 2))", 8, exists(Arith.class));
-    check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(Arith.class));
+    check("(1, 3) ! (. * 2)", "2\n6", exists(ArithSimple.class));
+    check("sum((1, 3) ! (. * 2))", 8, exists(ArithSimple.class));
+    check("sum((# db:unrolllimit 6 #) { (1 to 6) ! (. * 2) })", 42, empty(ArithSimple.class));
     check("(1, 2)[. = 1]", 1, root(IterFilter.class));
 
     unroll(true);
-    check("(1, 3) ! (. * 2)", "2\n6", empty(Arith.class));
-    check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(Arith.class));
+    check("(1, 3) ! (. * 2)", "2\n6", empty(ArithSimple.class));
+    check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(ArithSimple.class));
     check("(1, 2)[. = 1]", 1, root(Int.class));
   }
 
@@ -2774,7 +2778,7 @@ public final class RewritingsTest extends SandboxTest {
     check("//(b, c, d) => avg()", 4, root(Dbl.class));
     execute(new Close());
 
-    // whitespaces will be preserved in categories, but numbers will still be detected
+    // whitespace will be preserved in categories, but numbers will still be detected
     query(_DB_CREATE.args(NAME, " <a><b>1</b><b>3 </b><b> 5</b></a>", NAME));
     final String query = _DB_GET.args(NAME) + "//b => ";
     check(query + "count()", 3, root(Int.class));
@@ -3233,5 +3237,62 @@ public final class RewritingsTest extends SandboxTest {
         count(IterStep.class, 3), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())[..]", "<B/>",
         count(IterStep.class, 3), "//@axis = 'descendant'");
+  }
+
+  /** Refine parameter types to arguments types of function call. */
+  @Test public void gh2259() {
+    check("declare function local:t($a) { if($a instance of xs:integer) then 1 else 's' };" +
+        "local:t('x')", "s", empty(If.class));
+  }
+
+  /** if/then/else = else. */
+  @Test public void gh2261() {
+    query("(if ((1 to 6)[. = 1]) then 1 else 1.0) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 1.0 else 1) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 1 else 2.0) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 1.0 else 2) = 1", true);
+    query("(if ((1 to 6)[. = 1]) then 2 else 1.0) = 1", false);
+    query("(if ((1 to 6)[. = 1]) then 2.0 else 1) = 1", false);
+
+    query("(if ((1 to 6)[. = 0]) then 1 else 1.0) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 1.0 else 1) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 1 else 2.0) = 1", false);
+    query("(if ((1 to 6)[. = 0]) then 1.0 else 2) = 1", false);
+    query("(if ((1 to 6)[. = 0]) then 2 else 1.0) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 2.0 else 1) = 1", true);
+
+    query("(if ((1 to 6)[. = 0]) then 1 else xs:int(<?_ 1?>)) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then xs:int(<?_ 1?>) else 1) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 2 else xs:int(<?_ 1?>)) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then xs:int(<?_ 2?>) else 1) = 1", true);
+    query("(if ((1 to 6)[. = 0]) then 1 else xs:int(<?_ 2?>)) = 1", false);
+    query("(if ((1 to 6)[. = 0]) then xs:int(<?_ 1?>) else 2) = 1", false);
+
+    query("<d>1</d> ! ((if (text()) then xs:integer(.) else 1) = 1)", true);
+    query("<d>1</d> ! ((if (not(text())) then 1 else xs:integer(.)) = 1)", true);
+  }
+
+  /** Function call with function(*) parameter type. */
+  @Test public void gh2263() {
+    query("let $f := fn($f as function(*)) { fold-left(1, (), $f) } return $f(true#0)", true);
+    query("(fn($f as function(*)) { fold-left(1, (), $f) })(true#0)", true);
+  }
+
+  /** Boolean comparisons in simple maps. */
+  @Test public void gh2271() {
+    check("<a/>/@* ! true() = true()", false, root(EXISTS));
+    check("<a b='x'/>/@* ! true() = true()", true, root(EXISTS));
+    check("<a b='x'/>/@* ! true() != false()", true, root(EXISTS));
+
+    check("<a b='x'/>/@* ! true() = false()", false, root(Bln.class));
+    check("<a b='x'/>/@* ! true() != true()", false, root(Bln.class));
+    check("<a b='x'/>/@* ! false() = true()", false, root(Bln.class));
+    check("<a b='x'/>/@* ! false() != false()", false, root(Bln.class));
+  }
+
+  /** Database optimization: Enabling UPDINDEX. */
+  @Test public void gh2272() {
+    query("db:create('test')");
+    query("db:put('test', <a/>, 'a.xml'), db:optimize('test', true(), map { 'updindex': true() })");
   }
 }

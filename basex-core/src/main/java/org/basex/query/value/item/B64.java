@@ -6,7 +6,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
@@ -14,7 +13,7 @@ import org.basex.util.Base64;
 /**
  * Base64 item ({@code xs:base64Binary}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class B64 extends Bin {
@@ -96,33 +95,8 @@ public class B64 extends Bin {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
-    return Token.eq(binary(ii), bin);
-  }
-
-  @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo info)
-      throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(info) : parse(item, info);
-    return Token.diff(binary(info), bin);
-  }
-
-  /**
-   * Converts the given item to a byte array.
-   * @param item item to be converted
-   * @param info input info (can be {@code null})
-   * @return byte array
-   * @throws QueryException query exception
-   */
-  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
-    try {
-      return Base64.decode(item.string(info));
-    } catch(final IllegalArgumentException ex) {
-      Util.debug(ex);
-      throw AtomType.BASE64_BINARY.castError(item, info);
-    }
+  public final byte[] parse(final Item item, final InputInfo info) throws QueryException {
+    return parse(item.string(info), info);
   }
 
   /**

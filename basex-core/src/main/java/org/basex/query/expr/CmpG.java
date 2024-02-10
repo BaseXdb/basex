@@ -14,6 +14,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
@@ -28,7 +29,7 @@ import org.basex.util.hash.*;
 /**
  * General comparison.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class CmpG extends Cmp {
@@ -179,7 +180,7 @@ public class CmpG extends Cmp {
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate if one value is empty:
     // () eq local:expensive()  ->  ()
-    // prof:void(123) = 1  ->  boolean(prof:void('123'))
+    // void(123) = 1  ->  boolean(void('123'))
     Expr expr = emptyExpr();
     if(expr != this) return cc.replaceWith(this, cc.function(Function.BOOLEAN, info, expr));
 
@@ -205,7 +206,15 @@ public class CmpG extends Cmp {
     // optimize expression
     expr = opt(cc);
 
-    // range comparisons
+    // (if(A) then B else C) = X  ->  if(A) then B = X else C = X
+    final Expr expr1 = exprs[0], expr2 = exprs[1];
+    if(expr == this && expr1 instanceof If && !expr1.has(Flag.NDT)) {
+      final If iff = (If) expr1;
+      final Expr thn = new CmpG(info, iff.arg(0), expr2, op, coll, sc);
+      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjMap<>()), op, coll, sc);
+      return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
+    }
+
     if(expr == this) expr = optArith(cc);
     if(expr == this) expr = CmpIR.get(cc, this, false);
     if(expr == this) expr = CmpR.get(cc, this);
@@ -213,12 +222,11 @@ public class CmpG extends Cmp {
 
     if(expr == this) {
       // determine types, choose best implementation
-      final Expr expr1 = exprs[0], expr2 = exprs[1];
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
       // skip type check if types are identical (and a child instance of any atomic type)
       check = !(type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-          (type1.isSortable() || !op.oneOf(OpG.EQ, OpG.NE)) || comparable(type1, type2));
+          (type1.isSortable() || !op.oneOf(OpG.EQ, OpG.NE)) || comparable(type1, type2, true));
 
       CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
@@ -260,7 +268,7 @@ public class CmpG extends Cmp {
       final double num12 = op12 instanceof ANum ? ((ANum) op12).dbl() : Double.NaN;
       if(op12.seqType().instanceOf(SeqType.NUMERIC_O)) {
         final Calc calc1 = ((Arith) expr1).calc;
-        if(calc1 == Calc.MINUS && expr2 == Int.ZERO) {
+        if(calc1 == Calc.SUBTRACT && expr2 == Int.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
           ex = new CmpG(info, op11, op12, op, coll, sc);
         } else if((
@@ -268,8 +276,9 @@ public class CmpG extends Cmp {
           !Double.isNaN(num12) &&
           (expr2 instanceof ANum || expr2 instanceof Arith && op22 instanceof ANum)
         ) && (
-          calc1.oneOf(Calc.PLUS, Calc.MINUS) ||
-          calc1.oneOf(Calc.MULT, Calc.DIV) && num12 != 0 && (op.oneOf(OpG.EQ, OpG.NE) || num12 > 0)
+          calc1.oneOf(Calc.ADD, Calc.SUBTRACT) ||
+          calc1.oneOf(Calc.MULTIPLY, Calc.DIVIDE) && num12 != 0 &&
+            (op.oneOf(OpG.EQ, OpG.NE) || num12 > 0)
         )) {
           // position() + 1 < last()  ->  position() < last() - 1
           // count(E) div 2 = 1  ->  count(E) = 1 * 2
@@ -346,7 +355,6 @@ public class CmpG extends Cmp {
       ir2 = null;
     }
     return Bln.FALSE;
-
   }
 
   /**
@@ -359,7 +367,7 @@ public class CmpG extends Cmp {
   final boolean eval(final Item item1, final Item item2) throws QueryException {
     if(check) {
       final Type type1 = item1.type, type2 = item2.type;
-      if(type1 != type2 && !comparable(type1, type2)) throw diffError(item1, item2, info);
+      if(!comparable(type1, type2, true)) throw compareError(item1, item2, info);
     }
     return op.value().eval(item1, item2, coll, sc, info);
   }
@@ -385,17 +393,16 @@ public class CmpG extends Cmp {
    * Checks if types can be compared.
    * @param type1 first type to compare
    * @param type2 second type to compare
+   * @param untyped allow untyped atomics
    * @return result of check
    */
-  private static boolean comparable(final Type type1, final Type type2) {
-    if(type1.isUntyped() || type2.isUntyped() ||
+  public static boolean comparable(final Type type1, final Type type2, final boolean untyped) {
+    return type1 == type2 ||
       type1.isNumber() && type2.isNumber() ||
-      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION)) return true;
-
-    final Type atom1 = type1.atomic(), atom2 = type2.atomic();
-    return atom1 != null && atom2 != null &&
-      (atom1.instanceOf(AtomType.STRING) || atom1 == AtomType.ANY_URI) &&
-      (atom2.instanceOf(AtomType.STRING) || atom2 == AtomType.ANY_URI);
+      type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+      untyped && (type1.isUntyped() || type2.isUntyped()) ||
+      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION) ||
+      type1.instanceOf(AtomType.BINARY) && type2.instanceOf(AtomType.BINARY);
   }
 
   @Override
@@ -562,7 +569,7 @@ public class CmpG extends Cmp {
     Expr expr1 = exprs[0];
     IndexType type = null;
     if(Function.TOKENIZE.is(expr1)) {
-      if(!(expr1.arg(0).seqType().zeroOrOne() && ((FnTokenize) expr1).whitespaces())) return false;
+      if(!(expr1.arg(0).seqType().zeroOrOne() && ((FnTokenize) expr1).whitespace())) return false;
       expr1 = expr1.arg(0);
       type = IndexType.TOKEN;
     }

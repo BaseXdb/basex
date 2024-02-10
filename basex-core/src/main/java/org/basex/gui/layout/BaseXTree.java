@@ -8,7 +8,7 @@ import org.basex.gui.listener.*;
 /**
  * Project specific tree implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class BaseXTree extends JTree {

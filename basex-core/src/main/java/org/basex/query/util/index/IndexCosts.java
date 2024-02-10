@@ -6,7 +6,7 @@ import org.basex.util.*;
 /**
  * Costs of index request.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class IndexCosts implements Comparable<IndexCosts> {
@@ -75,7 +75,7 @@ public final class IndexCosts implements Comparable<IndexCosts> {
 
   @Override
   public int compareTo(final IndexCosts ic) {
-    return results - ic.results;
+    return Integer.signum(results - ic.results);
   }
 
   @Override

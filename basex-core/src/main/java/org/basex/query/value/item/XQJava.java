@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * Function item, wrapping a Java object.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class XQJava extends FItem {
@@ -90,18 +90,12 @@ public final class XQJava extends FItem {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    if(item instanceof XQJava) return equals(item);
-    throw FICOMPARE_X.get(deep.info, this);
+    return this == item || item instanceof XQJava && Objects.equals(value, ((XQJava) item).value);
   }
 
   @Override
   public Object toJava() {
     return value;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return obj == this || obj instanceof XQJava && Objects.equals(value, ((XQJava) obj).value);
   }
 
   @Override

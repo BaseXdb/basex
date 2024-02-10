@@ -1,6 +1,5 @@
 package org.basex.gui;
 
-import static org.basex.gui.GUICommand.*;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
@@ -47,7 +46,7 @@ import org.basex.util.list.*;
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class GUIConstants {
@@ -276,7 +275,7 @@ public final class GUIConstants {
   public static int fontSize;
 
   /** Names of available fonts. */
-  private static String[] fonts;
+  private static volatile String[] fonts;
   /** Characters for monospace detection. */
   private static final char[] MONOSPACE =  " !,-.01:<ILMWilmw".toCharArray();
 

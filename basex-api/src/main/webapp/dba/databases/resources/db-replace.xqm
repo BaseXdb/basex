@@ -1,12 +1,12 @@
 (:~
  : Replace resource.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../../lib/html.xqm';
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -27,6 +27,7 @@ declare
   %rest:query-param('resource', '{$resource}')
   %rest:query-param('error',    '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-replace(
   $name      as xs:string,
   $resource  as xs:string,
@@ -89,12 +90,12 @@ function dba:db-replace-post(
         $file($key)
       )
       return db:put($name, $input, $resource),
-      util:redirect($dba:SUB, map {
+      utils:redirect($dba:SUB, map {
         'name': $name, 'resource': $resource, 'info': 'Resource was replaced.'
       })
     )
   } catch * {
-    util:redirect('db-replace', map {
+    utils:redirect('db-replace', map {
       'name': $name, 'resource': $resource, 'error': $err:description
     })
   }

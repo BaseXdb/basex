@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Evaluates the 'put' command and replaces documents in a collection.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Put extends ACreate {

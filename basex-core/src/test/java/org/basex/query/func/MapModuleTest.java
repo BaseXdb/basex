@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Map Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MapModuleTest extends SandboxTest {
@@ -46,6 +46,11 @@ public final class MapModuleTest extends SandboxTest {
         + "[function-arity(.) = 1] return " + func.args(5, " $f"), "map{5:5}");
     query("for $f in (1, 2, 3, 4, string#1, 6)"
         + "[. instance of function(*)] return " + func.args(8, " $f"), "map{\"8\":8}");
+
+    query("for $f in (1, 2, 3, 4, string#1, 6)"
+        + "[. instance of function(*)] return " + func.args(8, " $f"), "map{\"8\":8}");
+
+    query("map:for-each(map:build(1, fn { 'x' }, fn { 'y' }), concat#2)", "xy");
   }
 
   /** Test method. */
@@ -53,6 +58,14 @@ public final class MapModuleTest extends SandboxTest {
     final Function func = _MAP_CONTAINS;
     query(func.args(" map { }", 1), false);
     query(func.args(_MAP_ENTRY.args(1, 2), 1), true);
+  }
+
+  /** Test method. */
+  @Test public void emptyy() {
+    final Function func = _MAP_EMPTY;
+
+    query(func.args(" map { }"), true);
+    query(func.args(" map { 1: () }"), false);
   }
 
   /** Test method. */
@@ -154,8 +167,17 @@ public final class MapModuleTest extends SandboxTest {
         _MAP_ENTRY.args(" $i", " $i + 1")) +
         "for $k in " + func.args(" $map") + " order by $k return " +
         _MAP_GET.args(" $map", " $k"), "2\n3\n4");
+  }
 
-    query(func.args(" map:merge((1 to 9) ! map:entry(., string()))", " op('<')(?, '2')"), 1);
+  /** Test method. */
+  @Test public void keysWhere() {
+    final Function func = _MAP_KEYS_WHERE;
+    query(func.args(" map:merge((1 to 9) ! map:entry(., string()))",
+        " fn($k, $v) { $v < '2' }"), 1);
+    query(func.args(" map:build(1 to 9, value := string#1)",
+        " fn($k, $v) { $v < '2' }"), 1);
+    query(func.args(" map:build(1 to 9, value := string#1)",
+        " fn($k, $v) { $k < 2 }"), 1);
   }
 
   /** Test method. */

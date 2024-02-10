@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests standard functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnModuleTest extends SandboxTest {
@@ -248,14 +249,15 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("\\r") + " => string-to-codepoints()", 13);
     query(func.args("\\n") + " => string-to-codepoints()", 10);
     query(func.args("\\n"), "\n");
-    query(func.args("#10"), "\n");
-    query(func.args("#xa"), "\n");
-    query(func.args("#xA"), "\n");
-    query(func.args("#x0A"), "\n");
-    query(func.args("#00000000000000000000010"), "\n");
-    query(func.args("#x0000000000000000000000A"), "\n");
-    query(func.args("#32"), " ");
-    query(func.args("#x20"), " ");
+    query(func.args(10), "\n");
+    query(func.args(" 0xa"), "\n");
+    query(func.args(" 0xA"), "\n");
+    query(func.args(" 0x0A"), "\n");
+    query(func.args(" 00000000000000000000010"), "\n");
+    query(func.args(" 0x0000000000000000000000A"), "\n");
+
+    query(func.args(32), " ");
+    query(func.args(" 0x20"), " ");
 
     query(func.args("ring"), "\u02DA");
     query(func.args("AMP"), "&");
@@ -416,6 +418,66 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void doUntil() {
+    final Function func = DO_UNTIL;
+    error(func.args(1, " error#0", " boolean#1"), FUNERR1);
+    query(func.args(1, " identity#1", " exists#1"), 1);
+
+    query(func.args(" ()", " string#1", " exists#1"), "");
+    query(func.args(" (21 to 24)", " tail#1", " fn($s) { head($s) >= 23 }"), "23\n24");
+    query(func.args(" (6 to 8)", " fn($s) { $s ! (. - 1) }",
+        " fn($s) { sum($s) <= 10 }"), "2\n3\n4");
+    query(func.args(" reverse(1 to 100)", " fn($s) { tail($s) }",
+        " fn($s) { sum($s) <= 20 and head($s) <= 4 }"), "4\n3\n2\n1");
+
+    query(func.args(1, " fn($x) { $x + 1 }", " fn($x) { $x >= 10000 }"), 10000);
+    query(func.args(2, " fn($x) { $x * $x }", " fn($x) { $x >= 1000 }"), 65536);
+    query(func.args(1, " fn($x) { $x, $x }", " fn($x) { count($x) >= 3 }"),
+        "1\n1\n1\n1");
+    query(func.args(" (1 to 100)", " fn($s) { subsequence($s, 2, count($s) - 2) }",
+        " fn($s) { $s[last()] - $s[1] <= 1 }"),
+        "50\n51");
+
+    query(func.args(" 1e0",
+        " fn($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) }",
+        " fn($n) { $n instance of xs:double }"),
+        1);
+    query(func.args(1,
+        " fn($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }",
+        " fn($n) { $n instance of xs:byte }"),
+        1);
+
+    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
+        " fn($map) { map { 'string': replace($map?string, $map?remove, ''),"
+        + "'remove': $map?remove =!> string-to-codepoints() "
+        + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }",
+        " fn($map) { not(characters($map?string) = $map?remove) }")
+        + "?string", "unhdrduhul");
+
+    query("let $s := (1 to 1000) return " +
+        func.args(1, " fn { . + 1 }", " fn { not(. = $s) }"), 1001);
+    query("let $i := 3936256 return " + func.args(" $i", " fn($n) { ($n + $i div $n) div 2 }",
+        " fn($n) { abs($n * $n - $i) < 0.0000000001 }"), 1984);
+
+    query(func.args(1, " fn($x) { $x * 2 }", " fn($x) { $x >= 1000 }"), 1024);
+    query(func.args(1, " fn($x) { $x, $x }", " fn($xs) { count($xs) > 3 }"),
+        "1\n1\n1\n1");
+
+    query(func.args(1, " op('*')", " fn($_, $p) { $p >= 10 }"), 3628800);
+
+    check(func.args(1, " identity#1", " true#0"), 1, root(DO_UNTIL));
+    check(func.args(" (1, 2)", " identity#1", " true#0"), "1\n2", root(DO_UNTIL));
+
+    // GH-2257
+    query("head(" + func.args(" (1, 2)", " identity#1",
+        " fn($x, $p) { $p = 1 }") + ')', 1);
+    query("head(" + func.args(" (1, 2)", " fn($s as xs:integer+) { $s[2], $s[1] }",
+        " fn($x, $p) { $p = 1 }") + ')', 2);
+    error("head(" + func.args(" (1, 2)", " fn($s as xs:integer) { $s[2], 1 }",
+        " fn($x, $p) { $p = 1 }") + ')', INVCONVERT_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void duplicateValues() {
     final Function func = DUPLICATE_VALUES;
 
@@ -508,6 +570,12 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
         exists(CmpG.class), empty(func), exists(NOT));
 
+    query(func.args(1, " op('=')"), true);
+    query(func.args(2, " op('=')"), false);
+    query(func.args(" 1 to 6", " op('=')"), true);
+    query(func.args(" 2 to 7", " op('=')"), false);
+    query(func.args(" reverse(1 to 9)", " op('=')"), false);
+
     final String lookup = "function-lookup(xs:QName(<?_ fn:every?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);
     query(lookup + "(1 to 9, not#1)", false);
@@ -519,6 +587,10 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void filter() {
     final Function func = FILTER;
     query(func.args(" (0, 1)", " boolean#1"), 1);
+
+    query(func.args(" 2 to 7", " op('=')"), "");
+    query(func.args(" 1 to 9", " op('=')"), "1\n2\n3\n4\n5\n6\n7\n8\n9");
+    query(func.args(" reverse(1 to 9)", " op('=')"), 5);
 
     check(func.args(" ()", " boolean#1"), "", empty());
     check(func.args(" 1 to 9", " function($n) { $n = 0 }"), "", exists(IterFilter.class));
@@ -545,6 +617,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(VOID.args(1), 1, " function($a, $b) { $b }"), 1);
     query(func.args(2, 1, " function($a, $b) { $b }"), 2);
     query("sort(" + func.args(" <a/>", "a", " compare#2") + ")", 1);
+
+    query(func.args(" 1 to 6", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
+    query(func.args(" 2 to 7", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
@@ -587,6 +662,8 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void foldRight() {
     final Function func = FOLD_RIGHT;
+    query(func.args(" 1 to 6", "ok", " fn($i, $r, $p) { $r[$i = $p] }"), "ok");
+    query(func.args(" 2 to 7", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
@@ -656,6 +733,9 @@ public final class FnModuleTest extends SandboxTest {
     query("sort(" + func.args(" (1 to 2)[. > 0]", " string#1") + ')', "1\n2");
     check(func.args(" ()", " boolean#1"), "", empty());
 
+    query(func.args(5, " op('*')"), 5);
+    query(func.args(" reverse(1 to 6)", " op('*')"), "6\n10\n12\n12\n10\n6");
+
     inline(true);
     // pre-compute result size
     query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
@@ -702,6 +782,57 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("aa", "a", " matches#2"), true);
     query(func.args(" ('aa', 'bb')", "a", " matches#2"), true);
     query(func.args("aa", " ('a', 'b')", " matches#2"), true);
+
+    query(func.args(5, 8, " fn($a, $b, $p) { ($b - $a) * $p }"), 3);
+    query(func.args(" (0 to 5)", " (1 to 6)", " fn($a, $b, $p) { ($b - $a) * $p }"),
+        "1\n2\n3\n4\n5\n6");
+  }
+
+  /** Test method. */
+  @Test public void formatDateTime() {
+    final Function func = FORMAT_DATETIME;
+
+    query(func.args(" xs:dateTime('2023-07-01T12:00:00Z')",
+        "[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]", " ()", " ()", "America/New_York"),
+        "2023-07-01T08:00:00-04:00");
+    query(func.args(" xs:dateTime('2023-07-01T12:00:00Z')",
+        "[Y0001]-[M01]-[D01]T[H01]:[m01]:[s01][Z]", " ()", " ()", "Asia/Kolkata"),
+        "2023-07-01T17:30:00+05:30");
+  }
+
+  /** Test method. */
+  @Test public void formatTime() {
+    final Function func = FORMAT_TIME;
+
+    query(func.args(" xs:time('12:00:00Z')", "[H01]:[m01]:[s01][Z]", " ()", " ()",
+        "America/New_York"), "07:00:00-05:00");
+    query(func.args(" xs:time('12:00:00Z')", "[H01]:[m01]:[s01][Z]", " ()", " ()",
+        "Asia/Kolkata"), "17:30:00+05:30");
+    query(func.args(" xs:time('12:01:01.123')", "[f99#]"), "123");
+    query(func.args(" xs:time('12:01:01.133')", "[f,2-4]"), "133");
+    query(func.args(" xs:time('12:01:01.135')", "[f00'0]"), "13'5");
+  }
+
+  /** Test method. */
+  @Test public void formatDate() {
+    final Function func = FORMAT_DATE;
+
+    query(func.args(" xs:date('2023-12-11')", "[Dwo] [MNn] ([FNn])", "zu"),
+        "[Language: en]eleventh December (Monday)");
+    query(func.args(" xs:date('2024-01-12Z')", "[Y0001]-[M01]-[D01][Z]", " ()", " ()",
+        "America/New_York"), "2024-01-11-05:00");
+
+    if(IcuFormatter.available()) {
+      query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
+          "Dydd Llun, Rhagfyr 11, 2023");
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es"), "septiembre");
+      // different wording for country
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-PE"), "setiembre");
+      // fallback to base language
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "es-CZ"), "septiembre");
+      // fallback to default language
+      query(func.args(" xs:date('2023-09-01')", "[MNn]", "zu-DE"), "[Language: en]September");
+    }
   }
 
   /** Test method. */
@@ -711,12 +842,41 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(11, "1"), "11");
     query(func.args(11, "001"), "011");
 
-    query(func.args(1234, "16^ffff"), "04d2");
-    query(func.args(1234, "16^F"), "4D2");
-    query(func.args(12345678, "16^ffff_ffff"), "00bc_614e");
-    query(func.args(12345678, "16^#_ffff"), "bc_614e");
-    query(func.args(255, "2^1111 1111"), "1111 1111");
-    query(func.args(1023, "32^AAAA"), "00VV");
+    query(func.args(1234, "16^xxxx"), "04d2");
+    query(func.args(1234, "16^X"), "4D2");
+    query(func.args(12345678, "16^xxxx_xxxx"), "00bc_614e");
+    query(func.args(12345678, "16^#_xxxx"), "bc_614e");
+    query(func.args(255, "2^xxxx xxxx"), "1111 1111");
+    query(func.args(1023, "32^XXXX"), "00VV");
+
+    query(func.args(1, "Ww", "de"), "Eins");
+    query(func.args(1, "Ww;o", "de"), "Erste");
+    if(IcuFormatter.available()) {
+      query(func.args(1, "Ww;c", "de"), "Ein");
+      query(func.args(1, "Ww;o(%spellout-cardinal-feminine-financial)", "bs"), "Jedinica");
+      query(func.args(1, "Ww;c(%spellout-ordinal-neuter)", "es"), "Primera");
+      query(func.args(99, "w", "fr"), "quatre-vingt-dix-neuf");
+      // different wording for country
+      query(func.args(99, "w", "fr-CH"), "nonante-neuf");
+      // fallback to language code
+      query(func.args(99, "w", "fr-PL"), "quatre-vingt-dix-neuf");
+      // fallback to default language
+      query(func.args(99, "w", "zu-DE"), "ninety-nine");
+    }
+  }
+
+  /** Test method. */
+  @Test public void formatNumber() {
+    final Function func = FORMAT_NUMBER;
+
+    query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
+    query(func.args(" 12345.67", "#.##0,00", " ()", " map { 'decimal-separator': ',', "
+        + "'grouping-separator': '.' }"), "12.345,67");
+    query(func.args(" 12345.67", "#\u2019##0.00", "de-CH"), "12\u2019345.67");
+
+    error(func.args(" 12345.67", "#.##0,00", "de", " map { 'decimal-separator': ',', "
+        + "'grouping-separator': '.' }"), FORMDUP_X);
+    error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMNUM_X);
   }
 
   /** Test method. */
@@ -873,6 +1033,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(MONTHS, " contains(?, 'v')"), 11);
     query(func.args(MONTHS, " starts-with(?, 'J')"), "1\n6\n7");
 
+    query(func.args(" 1 to 6", " fn($n, $p) { $n = $p }"), "1\n2\n3\n4\n5\n6");
+    query(func.args(" reverse(1 to 6)", " fn($n, $p) { $n = $p }"), "");
+
     check(func.args(" (0 to 5)[. = 0]", " not#1"), 1, root(GFLWOR.class));
     check(func.args(" (0 to 5)[. = 6]", " not#1"), "", root(GFLWOR.class));
 
@@ -1019,20 +1182,6 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void itemsAfter() {
-    final Function func = ITEMS_AFTER;
-
-    query(func.args(" ()", " boolean#1"), "");
-    query(func.args(0, " boolean#1"), "");
-    query(func.args(1, " boolean#1"), "");
-    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "2\n3\n0");
-    query(func.args(" 0 to 2", " not#1"), "1\n2");
-    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), 3);
-    query(func.args(MONTHS, " contains(?, 'Nov')"), "December");
-    query(func.args(MONTHS, " starts-with(?, 'Dec')"), "");
-  }
-
-  /** Test method. */
   @Test public void itemsAt() {
     final Function func = ITEMS_AT;
 
@@ -1121,110 +1270,6 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(VOID.args(" ()"), 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
-  }
-
-  /** Test method. */
-  @Test public void itemsBefore() {
-    final Function func = ITEMS_BEFORE;
-
-    query(func.args(" ()", " boolean#1"), "");
-    query(func.args(0, " boolean#1"), 0);
-    query(func.args(1, " boolean#1"), "");
-    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), 0);
-    query(func.args(" 1 to 3", " not#1"), "1\n2\n3");
-    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), 1);
-    query(func.args(MONTHS, " contains(?, 'Feb')"), "January");
-    query(func.args(MONTHS, " starts-with(?, 'Jan')"), "");
-
-    query(func.args(" (1)", " fn { . >= 2 }"), 1);
-    query(func.args(" (1, 2)", " fn { . >= 2 }"), 1);
-    query(func.args(" (1, 2, 3)", " fn { . >= 3 }"), "1\n2");
-    query(func.args(" (1, 2, 3)", " fn { . >= 3 }") + " => sort()", "1\n2");
-    query(func.args(" (1 to 10)", " fn { . >= 3 }") + " => sort()", "1\n2");
-    query(func.args(" (1 to 10)[. > 1]", " fn { . >= 3 }") + " => sort()", 2);
-    query(func.args(" (1 to 10)", " fn { . >= 3 }") + " => count()", 2);
-  }
-
-  /** Test method. */
-  @Test public void itemsEndingWhere() {
-    final Function func = ITEMS_ENDING_WHERE;
-
-    query(func.args(" ()", " boolean#1"), "");
-    query(func.args(0, " boolean#1"), 0);
-    query(func.args(1, " boolean#1"), 1);
-    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "0\n1");
-    query(func.args(" 1 to 3", " not#1"), "1\n2\n3");
-    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "1\n2");
-    query(func.args(MONTHS, " contains(?, '')"), "January");
-    query(func.args(MONTHS, " starts-with(?, 'Feb')"), "January\nFebruary");
-  }
-
-  /** Test method. */
-  @Test public void itemsStartingWhere() {
-    final Function func = ITEMS_STARTING_WHERE;
-
-    query(func.args(" ()", " boolean#1"), "");
-    query(func.args(0, " boolean#1"), "");
-    query(func.args(1, " boolean#1"), 1);
-    query(func.args(" (0, 1, 2, 3, 0)", " boolean#1"), "1\n2\n3\n0");
-    query(func.args(" 1 to 3", " not#1"), "");
-    query(func.args(" 1 to 3", " function($n) { $n mod 2 = 0 }"), "2\n3");
-    query(func.args(MONTHS, " contains(?, 'z')"), "");
-    query(func.args(MONTHS, " starts-with(?, 'Nov')"), "November\nDecember");
-
-    query(func.args(" (1)", " fn { . >= 2 }"), "");
-    query(func.args(" (1, 2)", " fn { . >= 2 }"), 2);
-    query(func.args(" (1, 2, 3)", " fn { . >= 2 }"), "2\n3");
-    query(func.args(" (1, 2, 3)", " fn { . >= 2 }") + " => sort()", "2\n3");
-    query(func.args(" (8 to 10)", " fn { . >= 10 }") + " => sort()", 10);
-    query(func.args(" (8 to 10)[. > 9]", " fn { . >= 9 }") + " => sort()", 10);
-    query(func.args(" (8 to 10)", " fn { . >= 10 }") + " => count()", 1);
-  }
-
-  /** Test method. */
-  @Test public void iterateWhile() {
-    final Function func = ITERATE_WHILE;
-    query(func.args(1, " not#1", " function($_) { error() }"), 1);
-    error(func.args(1, " boolean#1", " function($_) { error() }"), FUNERR1);
-    query(func.args(1, " empty#1", " identity#1"), 1);
-    query(func.args(" ()", " empty#1", " string#1"), "");
-    query(func.args(" (21 to 24)", " function($s) { head($s) < 23 }", " tail#1"), "23\n24");
-    query(func.args(" (6 to 8)", " function($s) { sum($s) > 10 }",
-        " function($s) { $s ! (. - 1) }"), "2\n3\n4");
-    query(func.args(" reverse(1 to 100)", " function($s) { sum($s) > 20 or head($s) > 4 }",
-        " function($s) { tail($s) }"), "4\n3\n2\n1");
-
-    query(func.args(1, " function($x) { $x < 10000 }", " function($x) { $x + 1 }"), 10000);
-    query(func.args(2, " function($x) { $x < 1000 }", " function($x) { $x * $x }"), 65536);
-    query(func.args(1, " function($x) { count($x) < 3 }", " function($x) { $x, $x }"),
-        "1\n1\n1\n1");
-    query(func.args(" (1 to 100)", " function($s) { $s[last()] - $s[1] > 1 }",
-        " function($s) { subsequence($s, 2, count($s) - 2) }"),
-        "50\n51");
-
-    query(func.args(" 1e0", " function($n) { $n instance of xs:float }",
-        " function($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) }"),
-        1);
-    query(func.args(1, " function($n) { not($n instance of xs:byte) }",
-        " function($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }"),
-        1);
-
-    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
-        " function($map) { characters($map?string) = $map?remove }",
-        " function($map) { map { 'string': replace($map?string, $map?remove, ''),"
-        + "'remove': $map?remove =!> string-to-codepoints() "
-        + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }")
-        + "?string", "unhdrduhul");
-
-    query("let $s := (1 to 1000) return " +
-        func.args(1, " fn { . = $s }", " fn { . + 1 }"), 1001);
-    query("let $i := 3936256 return " +
-        func.args(" $i", " fn($n) { abs($n * $n - $i) >= 0.0000000001 }",
-        " fn($n) { ($n + $i div $n) div 2 }"), 1984);
-
-    query(func.args(1, " function($x) { $x < 1000 }", " function($x) { $x * 2 }"), 1024);
-    query(func.args(1, " function($xs) { count($xs) <= 3 }", " function($x) { $x, $x }"),
-        "1\n1\n1\n1");
   }
 
   /** Test method. */
@@ -1611,6 +1656,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (1, 2, 3, 6, 7, 9, 10)",
         " function($seq, $new) { not($new = $seq[last()] + 1) }"),
         "[1,2,3]\n[6,7]\n[9,10]");
+
+    query(func.args(" 1 to 5", " fn($a, $n, $p) { $p mod 2 = 1 }"), "[1,2]\n[3,4]\n[5]");
   }
 
   /** Test method. */
@@ -1794,8 +1841,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");
 
     query(func.args(" 1[. = 1]", 2), "1\n1");
+    error(func.args(" <a/>", -1), INVCONVERT_X_X_X);
 
-    check(func.args(" <a/>", -1), "", empty());
     check(func.args(" <a/>", 0), "", empty());
     check(func.args(" ()", wrap(2)), "", empty());
     check(func.args(" <a/>", 1), "<a/>", empty(func));
@@ -2005,6 +2052,12 @@ public final class FnModuleTest extends SandboxTest {
         + "'November', 'December')", " contains(?, 'z')"), false);
     check(func.args(" -3 to 3", " function($n) { abs($n) >= 0 }"), true,
         exists(CmpG.class), empty(EVERY));
+
+    query(func.args(1, " op('=')"), true);
+    query(func.args(2, " op('=')"), false);
+    query(func.args(" 1 to 6", " op('=')"), true);
+    query(func.args(" 2 to 7", " op('=')"), false);
+    query(func.args(" reverse(1 to 9)", " op('=')"), true);
 
     final String lookup = "function-lookup(xs:QName(<?_ fn:some?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);
@@ -2502,7 +2555,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" subsequence((1 to 10) ! <_>{ . }</_>, 5, 1)"),
         "", empty());
 
-    // GH-2225:
+    // GH-2225
     check(func.args(" for $i at $p in 1 to 2 return <a>{ $i * $p }</a>"),
         "<a>1</a>", root(HEAD));
     check(func.args(func.args(" for $i at $p in 1 to 4 return <a>{ $i * $p }</a>")),
@@ -2541,6 +2594,65 @@ public final class FnModuleTest extends SandboxTest {
 
     // GH-2139: Simplify inlined nondeterministic code
     check("let $doc := doc('" + TEXT + "') let $a := 1 return $a", 1, root(Int.class));
+  }
+
+  /** Test method. */
+  @Test public void whileDo() {
+    final Function func = WHILE_DO;
+    query(func.args(1, " not#1", " fn($_) { error() }"), 1);
+    error(func.args(1, " boolean#1", " fn($_) { error() }"), FUNERR1);
+    query(func.args(1, " empty#1", " identity#1"), 1);
+    query(func.args(" ()", " empty#1", " string#1"), "");
+    query(func.args(" (21 to 24)", " fn($s) { head($s) < 23 }", " tail#1"), "23\n24");
+    query(func.args(" (6 to 8)", " fn($s) { sum($s) > 10 }",
+        " fn($s) { $s ! (. - 1) }"), "2\n3\n4");
+    query(func.args(" reverse(1 to 100)", " fn($s) { sum($s) > 20 or head($s) > 4 }",
+        " fn($s) { tail($s) }"), "4\n3\n2\n1");
+
+    query(func.args(1, " fn($x) { $x < 10000 }", " fn($x) { $x + 1 }"), 10000);
+    query(func.args(2, " fn($x) { $x < 1000 }", " fn($x) { $x * $x }"), 65536);
+    query(func.args(1, " fn($x) { count($x) < 3 }", " fn($x) { $x, $x }"),
+        "1\n1\n1\n1");
+    query(func.args(" (1 to 100)", " fn($s) { $s[last()] - $s[1] > 1 }",
+        " fn($s) { subsequence($s, 2, count($s) - 2) }"),
+        "50\n51");
+
+    query(func.args(" 1e0", " fn($n) { $n instance of xs:float }",
+        " fn($n) { if($n instance of xs:double) then xs:float($n) else xs:double($n) }"),
+        1);
+    query(func.args(1, " fn($n) { not($n instance of xs:byte) }",
+        " fn($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }"),
+        1);
+
+    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
+        " fn($map) { characters($map?string) = $map?remove }",
+        " fn($map) { map { 'string': replace($map?string, $map?remove, ''),"
+        + "'remove': $map?remove =!> string-to-codepoints() "
+        + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }")
+        + "?string", "unhdrduhul");
+
+    query("let $s := (1 to 1000) return " +
+        func.args(1, " fn { . = $s }", " fn { . + 1 }"), 1001);
+    query("let $i := 3936256 return " +
+        func.args(" $i", " fn($n) { abs($n * $n - $i) >= 0.0000000001 }",
+        " fn($n) { ($n + $i div $n) div 2 }"), 1984);
+
+    query(func.args(1, " fn($x) { $x < 1000 }", " fn($x) { $x * 2 }"), 1024);
+    query(func.args(1, " fn($xs) { count($xs) <= 3 }", " fn($x) { $x, $x }"),
+        "1\n1\n1\n1");
+
+    query(func.args(1, " fn($_, $p) { $p <= 10 }", " op('*')"), 3628800);
+
+    check(func.args(1, " false#0", " identity#1"), 1, root(Int.class));
+    check(func.args(" (1, 2)", " false#0", " identity#1"), "1\n2", root(RangeSeq.class));
+
+    // GH-2257
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " identity#1") + ')', 1);
+    query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " fn($s as xs:integer+) { $s[2], $s[1] }") + ')', 2);
+    error("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
+        " fn($s as xs:integer) { $s[2], 1 }") + ')', INVCONVERT_X_X_X);
   }
 
   /** Test method. */

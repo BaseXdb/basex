@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 
 /**
  * Fixed ID -> PRE mapping tests.
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Dimitar Popov
  */
 public final class IdPreMapBulkFixedTest extends IdPreMapBulkTestBase {

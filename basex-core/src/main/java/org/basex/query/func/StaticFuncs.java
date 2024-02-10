@@ -22,7 +22,7 @@ import org.basex.util.similarity.*;
 /**
  * Container for user-defined functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class StaticFuncs extends ExprInfo {
@@ -122,12 +122,9 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Returns the unions of the sequences types for function calls of the specified function.
    * @param func function
-   * @return sequence types or {@code null}
+   * @return sequence types, or {@code null} if function is not referenced
    */
   SeqType[] seqTypes(final StaticFunc func) {
-    final int sl = func.arity();
-    if(sl == 0) return null;
-
     // initialize cache for direct lookups of function calls
     if(callsMap == null) {
       callsMap = new IdentityHashMap<>();
@@ -138,7 +135,8 @@ public final class StaticFuncs extends ExprInfo {
       }
     }
     final ArrayList<StaticFuncCall> calls = callsMap.get(func);
-    if(calls == null) return null;
+    final int sl = func.arity();
+    if(calls == null || calls.isEmpty() || sl == 0) return null;
 
     final SeqType[] seqTypes = new SeqType[sl];
     for(final StaticFuncCall call : calls) {
@@ -224,10 +222,10 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Function cache.
    *
-   * @author BaseX Team 2005-23, BSD License
+   * @author BaseX Team 2005-24, BSD License
    * @author Christian Gruen
    */
-  private static class FuncCache {
+  private static final class FuncCache {
     /** Functions. */
     final ArrayList<StaticFunc> funcs = new ArrayList<>(1);
     /** Function calls. */
@@ -250,7 +248,7 @@ public final class StaticFuncs extends ExprInfo {
             for(final StaticFunc func : funcs) arities.add(func.min).add(func.arity());
             final InputInfo info = call.info();
             throw arities.isEmpty() ? qc.functions.similarError(qname(), info) :
-              Functions.wrongArity(call.arity(), arities, qname().prefixString(), info, false);
+              Functions.wrongArity(call.arity(), arities, qname().prefixString(), false, info);
           }
         } else {
           // check if all implementations exist for all functions, set updating flag

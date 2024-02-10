@@ -19,7 +19,7 @@ import org.basex.query.value.seq.*;
 /**
  * This view offers a folder visualization of the database contents.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FolderView extends View {

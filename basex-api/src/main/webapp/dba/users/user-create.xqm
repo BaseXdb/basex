@@ -1,13 +1,13 @@
 (:~
  : Create new user.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/users';
 
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace options = 'dba/options' at '../lib/options.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -28,6 +28,7 @@ declare
   %rest:query-param('perm',  '{$perm}', 'none')
   %rest:query-param('error', '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:user-create(
   $name   as xs:string?,
   $pw     as xs:string?,
@@ -68,7 +69,7 @@ function dba:user-create(
               <td>Permission:</td>
               <td>
                 <select name='perm' size='5'>{
-                  for $p in $options:PERMISSIONS
+                  for $p in $config:PERMISSIONS
                   return element option { attribute selected { }[$p = $perm], $p }
                 }</select>
                 <div class='small'/>
@@ -106,9 +107,9 @@ function dba:user-create(
     ) else (
       user:create($name, $pw, $perm)
     ),
-    util:redirect($dba:CAT, map { 'info': 'User was created.' })
+    utils:redirect($dba:CAT, map { 'info': 'User was created.' })
   } catch * {
-    util:redirect('user-create', map {
+    utils:redirect('user-create', map {
       'name': $name, 'pw': $pw, 'perm': $perm, 'error': $err:description
     })
   }

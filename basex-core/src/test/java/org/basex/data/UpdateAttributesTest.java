@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Tim Petrowsky
  */
 public final class UpdateAttributesTest extends DataUpdateTest {

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * This class compiles all components of the query that are needed in an order that
  * maximizes the amount of inlining possible.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 final class QueryCompiler {
@@ -84,31 +84,19 @@ final class QueryCompiler {
   void compile(final CompileContext cc) throws QueryException {
     add(cc.qc.main);
 
-    // compile the used scopes only, collect static functions
-    final ArrayList<StaticFunc> funcs = new ArrayList<>();
+    // collect scopes, check for circular dependencies
     final ArrayList<Scope> entries = new ArrayList<>();
-    final ArrayList<ArrayList<Scope>> iter = scopes(0);
-
-    for(final ArrayList<Scope> scps : iter) {
+    for(final ArrayList<Scope> scps : scopes(0)) {
+      for(final Scope scope : scps) scope.reset();
       entries.add(circCheck(scps));
     }
-    for(final ArrayList<Scope> scps : iter) {
-      for(final Scope scope : scps) scope.reset();
-    }
-    for(final Scope scope : entries) {
-      scope.compile(cc);
-      if(scope instanceof StaticFunc) funcs.add((StaticFunc) scope);
-    }
-
-    // check for circular variable declarations without compiling the unused scopes
     for(final StaticVar var : cc.qc.vars) {
       if(!ids.containsKey(var)) {
         for(final ArrayList<Scope> scope : scopes(add(var))) circCheck(scope);
       }
     }
-
-    // optimize static functions
-    for(final StaticFunc func : funcs) func.optimize(cc);
+    // compile scopes
+    for(final Scope scope : entries) scope.compile(cc);
   }
 
   /**

@@ -11,7 +11,7 @@ import org.basex.gui.layout.*;
 /**
  * Custom tree cell renderer to distinguish between resource types.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class ProjectCellRenderer extends DefaultTreeCellRenderer {

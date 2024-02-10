@@ -15,10 +15,10 @@ import org.basex.util.hash.*;
 /**
  * Position range check.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-final class Pos extends Single {
+public final class Pos extends Single {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -26,6 +26,34 @@ final class Pos extends Single {
    */
   private Pos(final InputInfo info, final Expr expr) {
     super(info, expr, SeqType.BOOLEAN_O);
+  }
+
+  /**
+   * Returns a position expression for the specified numeric expression.
+   * @param expr numeric expression
+   * @param info input info (can be {@code null})
+   * @param qc query context
+   * @return position expression, {@link Bln#FALSE}, or {@code null}
+   * @throws QueryException query exception
+   */
+  public static Expr get(final Expr expr, final InputInfo info, final QueryContext qc)
+      throws QueryException {
+
+    if(expr instanceof CmpPos) return expr;
+    if(!numeric(expr)) return null;
+
+    final Value value = expr.value(qc);
+    final Expr ex = IntPos.get(value, OpV.EQ, info);
+    return ex != null ? ex : MixedPos.get(value, info);
+  }
+
+  /**
+   * Checks if the specified expression returns numbers and is deterministic.
+   * @param expr expression
+   * @return result of check
+   */
+  public static boolean numeric(final Expr expr) {
+    return expr.seqType().type.isNumber() && expr.isSimple();
   }
 
   /**
@@ -38,8 +66,8 @@ final class Pos extends Single {
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  static Expr get(final Expr pos, final OpV op, final InputInfo info, final CompileContext cc,
-      final boolean create) throws QueryException {
+  static Expr get(final Expr pos, final OpV op, final InputInfo info,
+      final CompileContext cc, final boolean create) throws QueryException {
 
     // static result. example: position() > 0  ->  true
     final Expr ps = pos.optimizePos(op, cc);
@@ -72,14 +100,14 @@ final class Pos extends Single {
           break;
         case GT:
           minMax = new Expr[] { new Arith(info, type.instanceOf(AtomType.INTEGER) ? ps :
-            cc.function(Function.FLOOR, info, ps), Int.ONE, Calc.PLUS).optimize(cc), Int.MAX };
+            cc.function(Function.FLOOR, info, ps), Int.ONE, Calc.ADD).optimize(cc), Int.MAX };
           break;
         case LE:
           minMax = new Expr[] { Int.ONE, ps };
           break;
         case LT:
           minMax = new Expr[] { Int.ONE, new Arith(info, type.instanceOf(AtomType.INTEGER) ?
-            ps : cc.function(Function.CEILING, info, ps), Int.ONE, Calc.MINUS).optimize(cc) };
+            ps : cc.function(Function.CEILING, info, ps), Int.ONE, Calc.SUBTRACT).optimize(cc) };
           break;
         default:
       }

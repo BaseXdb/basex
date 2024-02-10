@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Abstract class for stemmer and tokenizer implementations.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Jens Erat
  */
 abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImpl> {
@@ -51,7 +51,7 @@ abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImp
 
   @Override
   public final int compareTo(final LanguageImpl o) {
-    return o.prec() - prec();
+    return Integer.signum(o.prec() - prec());
   }
 
   @Override

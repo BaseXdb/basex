@@ -3,7 +3,7 @@ package org.basex.query;
 /**
  * Function that raises query exceptions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @param <T> the type of the input to the function
  * @param <R> the type of the result of the function

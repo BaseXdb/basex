@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * The empty array.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 final class EmptyArray extends XQArray {
@@ -80,11 +80,6 @@ final class EmptyArray extends XQArray {
   @Override
   public XQArray subArray(final long pos, final long length, final QueryContext qc) {
     return this;
-  }
-
-  @Override
-  public boolean isEmptyArray() {
-    return true;
   }
 
   @Override

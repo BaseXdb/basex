@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests queries with path in it on collections.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Andreas Weiler
  */
 public final class PathTest extends SandboxTest {

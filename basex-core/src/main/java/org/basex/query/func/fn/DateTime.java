@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
 /**
  * Date/time functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class DateTime extends StandardFunc {
@@ -40,24 +40,20 @@ abstract class DateTime extends StandardFunc {
 
   /**
    * Adjusts a date/time item to the specified time zone.
-   * @param item item
    * @param type target type
    * @param qc query context
    * @return adjusted item
    * @throws QueryException query exception
    */
-  final ADate adjust(final Item item, final AtomType type, final QueryContext qc)
-      throws QueryException {
-
-    // clone item
-    ADate date = toDate(item, type, qc);
-    if(!item.type.isUntyped()) {
-      date = type == TIME ? new Tim(date) : type == DATE ? new Dat(date) : new Dtm(date);
-    }
+  final Item adjust(final AtomType type, final QueryContext qc) throws QueryException {
+    final Item value = arg(0).atomItem(qc, info);
     final Item zone = arg(1).atomItem(qc, info);
-    final DTDur dur = zone.isEmpty() ? null : (DTDur) checkType(zone, DAY_TIME_DURATION);
-    date.timeZone(dur, defined(1) && zone.isEmpty(), info);
-    return date;
+    if(value.isEmpty()) return Empty.VALUE;
+
+    final ADate date = toDate(value, type, qc);
+    final boolean empty = zone.isEmpty();
+    final DTDur dur = empty ? null : (DTDur) checkType(zone, DAY_TIME_DURATION);
+    return date.timeZone(dur, defined(1) && empty, info);
   }
 
   @Override

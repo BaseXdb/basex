@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for XQuery maps.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class MapTest extends SandboxTest {
@@ -26,7 +26,6 @@ public final class MapTest extends SandboxTest {
     check("map { 'A': 1, 2: 3 }?A", 1, root(Int.class));
     check("map { <_>A</_>: 1, 2: 3 }?A", 1, root(Int.class));
   }
-
 
   /** Tests the new syntax for map literals. */
   @Test public void gh755() {

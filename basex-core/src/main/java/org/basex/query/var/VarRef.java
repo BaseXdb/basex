@@ -1,9 +1,13 @@
 package org.basex.query.var;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -12,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Local Variable Reference expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -57,13 +61,13 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public VarUsage count(final Var v) {
-    return v != null && var.is(v) ? VarUsage.ONCE : VarUsage.NEVER;
+    return var == v ? VarUsage.ONCE : VarUsage.NEVER;
   }
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
     // replace variable reference with expression
-    return ic.var != null && var.is(ic.var) ? ic.copy() : null;
+    return var == ic.var  ? ic.copy() : null;
   }
 
   @Override
@@ -102,7 +106,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof VarRef && var.is(((VarRef) obj).var);
+    return this == obj || obj instanceof VarRef && var.slot == (((VarRef) obj).var).slot;
   }
 
   @Override
@@ -112,7 +116,10 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.attachVariable(plan.create(this), var, false));
+    final FBuilder elem = plan.create(this);
+    plan.addAttribute(elem, NAME, var.toErrorString());
+    plan.addAttribute(elem, ID, var.id);
+    plan.add(elem);
   }
 
   @Override

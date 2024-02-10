@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Logical expression, extended by {@link And} and {@link Or}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Logical extends Arr {
@@ -51,7 +51,7 @@ public abstract class Logical extends Arr {
 
   @Override
   public final void markTailCalls(final CompileContext cc) {
-    // if the last expression surely returns a boolean, we can jump to it
+    // if the last expression returns a boolean for sure, we can jump to it
     final Expr last = exprs[exprs.length - 1];
     if(last.seqType().eq(SeqType.BOOLEAN_O)) last.markTailCalls(cc);
   }

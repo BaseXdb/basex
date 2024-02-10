@@ -8,7 +8,7 @@ import java.util.*;
  * This class serves as an efficient constructor for {@link Token Tokens}.
  * It bears some resemblance to Java's {@link StringBuilder}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class TokenBuilder {
@@ -164,6 +164,15 @@ public final class TokenBuilder {
       }
       addByte((byte) (cp & 0x3F | 0x80));
     }
+    return this;
+  }
+
+  /**
+   * Removes the last character.
+   * @return self reference
+   */
+  public TokenBuilder removeLast() {
+    while(--size > 0 && (chars[size] & 0xC0) == 0x80);
     return this;
   }
 
@@ -339,7 +348,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Trims leading and trailing whitespaces.
+   * Trims leading and trailing whitespace.
    * @return self reference
    */
   public TokenBuilder trim() {

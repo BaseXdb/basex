@@ -23,17 +23,16 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnDistinctValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
-    final Collation coll = toCollation(arg(1), qc);
+    final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set = coll == null ? new HashItemSet(false, info) :
-      new CollationItemSet(coll, info);
+    final ItemSet set = CollationItemSet.get(collation, info);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
@@ -52,7 +51,10 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
+    arg(0, arg -> {
+      final Expr expr = arg.simplifyFor(Simplify.DATA, cc);
+      return defined(1) ? expr : expr.simplifyFor(Simplify.DISTINCT, cc);
+    });
   }
 
   @Override
@@ -69,7 +71,7 @@ public final class FnDistinctValues extends StandardFunc {
       return cc.function(SORT, info, list.finish());
     }
     // distinct-values(distinct-values($data))  ->  distinct-values($data)
-    if(DISTINCT_VALUES.is(values)) return values;
+    if(DISTINCT_VALUES.is(values) && arg(1).equals(values.arg(1))) return values;
 
     final Expr opt = optStats(cc);
     if(opt != null) return opt;
@@ -118,7 +120,7 @@ public final class FnDistinctValues extends StandardFunc {
       final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
-        final HashItemSet set = new HashItemSet(false, info);
+        final ItemSet set = CollationItemSet.get(null, info);
         for(final Stats stats : list) {
           if(!StatsType.isCategory(stats.type)) return null;
           for(final byte[] value : stats.values) {

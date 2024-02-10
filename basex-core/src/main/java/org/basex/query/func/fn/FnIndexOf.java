@@ -2,7 +2,6 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
@@ -15,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnIndexOf extends StandardFunc {
@@ -24,14 +23,16 @@ public final class FnIndexOf extends StandardFunc {
     return new Iter() {
       final Iter input = arg(0).atomIter(qc, info);
       final Item search = toAtomItem(arg(1), qc);
-      final Collation coll = toCollation(arg(2), qc);
+      final Collation collation = toCollation(arg(2), qc);
       int c;
 
       @Override
       public Int next() throws QueryException {
         for(Item item; (item = qc.next(input)) != null;) {
           ++c;
-          if(equal(item, search, coll)) return Int.get(c);
+          if(item.comparable(search) && item.equal(search, collation, sc, info)) {
+            return Int.get(c);
+          }
         }
         return null;
       }
@@ -42,28 +43,15 @@ public final class FnIndexOf extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).atomIter(qc, info);
     final Item search = toAtomItem(arg(1), qc);
-    final Collation coll = toCollation(arg(2), qc);
+    final Collation collation = toCollation(arg(2), qc);
 
     final LongList list = new LongList();
     int c = 0;
     for(Item item; (item = qc.next(input)) != null;) {
       ++c;
-      if(equal(item, search, coll)) list.add(c);
+      if(item.comparable(search) && item.equal(search, collation, sc, info)) list.add(c);
     }
     return IntSeq.get(list);
-  }
-
-  /**
-   * Checks the specified items for equality.
-   * @param item input input
-   * @param search search item
-   * @param coll collation
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  private boolean equal(final Item item, final Item search, final Collation coll)
-      throws QueryException {
-    return item.comparable(search) && OpV.EQ.eval(item, search, coll, sc, info);
   }
 
   @Override

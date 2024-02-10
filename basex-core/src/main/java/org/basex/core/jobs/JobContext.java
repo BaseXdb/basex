@@ -1,5 +1,7 @@
 package org.basex.core.jobs;
 
+import java.util.concurrent.atomic.*;
+
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.query.*;
@@ -8,7 +10,7 @@ import org.basex.util.*;
 /**
  * Job context.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JobContext {
@@ -21,7 +23,7 @@ public final class JobContext {
   /** Job prefix. */
   static final String PREFIX = "job";
   /** Query id. */
-  private static long jobId = -1;
+  private static AtomicLong jobId = new AtomicLong(-1);
 
   /** Registered locks. */
   public final Locks locks = new Locks();
@@ -63,10 +65,7 @@ public final class JobContext {
    * @return id
    */
   public String id() {
-    if(id == null) {
-      jobId = Math.max(0, jobId + 1);
-      id = PREFIX + jobId;
-    }
+    if(id == null) id = PREFIX + jobId.updateAndGet(i -> Math.max(0, i + 1));
     return id;
   }
 

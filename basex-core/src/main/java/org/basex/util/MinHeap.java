@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * A min-heap.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  * @param <K> key type
  * @param <V> value type
@@ -93,7 +93,7 @@ public final class MinHeap<K, V> {
    * Compares the keys at position {@code i} and {@code j}.
    * @param i position of first key
    * @param j position of second key
-   * @return result of check
+   * @return result of comparison
    */
   @SuppressWarnings("unchecked")
   private int compare(final int i, final int j) {

@@ -1,11 +1,11 @@
 (:~
  : Updates user information.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/users';
 
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -31,11 +31,11 @@ function dba:users-info(
     where not(deep-equal(user:info(), $xml))
     return user:update-info($xml),
 
-    util:redirect($dba:CAT, map { 'info': 'User information was updated.' })
+    utils:redirect($dba:CAT, map { 'info': 'User information was updated.' })
   } catch err:FODC0006 {
-    util:redirect($dba:CAT, map { 'error': 'XML with "info" root element expected.' })
+    utils:redirect($dba:CAT, map { 'error': 'XML with "info" root element expected.' })
   } catch * {
-    util:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, map { 'error': $err:description })
   }
 };
 
@@ -83,11 +83,11 @@ function dba:user-update(
       where not(deep-equal(user:info($name), $xml))
       return user:update-info($xml, $name)
     ),
-    util:redirect($dba:SUB, map { 'name': $newname, 'info': 'User was updated.' })
+    utils:redirect($dba:SUB, map { 'name': $newname, 'info': 'User was updated.' })
   } catch * {
     let $error := if($err:code != xs:QName('err:FODC0006')) then $err:description else
       'XML with "info" root element expected.'
-    return util:redirect($dba:SUB, map {
+    return utils:redirect($dba:SUB, map {
       'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm, 'error': $error
     })
   }

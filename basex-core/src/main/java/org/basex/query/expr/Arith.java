@@ -16,12 +16,14 @@ import org.basex.util.hash.*;
 /**
  * Arithmetic expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class Arith extends Arr {
+public class Arith extends Arr {
   /** Calculation operator. */
   public final Calc calc;
+  /** Optimized calculation. */
+  CalcOpt calcOpt;
 
   /**
    * Constructor.
@@ -42,7 +44,7 @@ public final class Arith extends Arr {
 
     // move values to second position
     Expr expr1 = exprs[0], expr2 = exprs[1];
-    if((calc == Calc.PLUS || calc == Calc.MULT) && expr1 instanceof Value &&
+    if((calc == Calc.ADD || calc == Calc.MULTIPLY) && expr1 instanceof Value &&
         !(expr2 instanceof Value)) {
       cc.info(OPTSWAP_X, this);
       exprs[0] = expr2;
@@ -62,11 +64,11 @@ public final class Arith extends Arr {
 
     Expr expr = emptyExpr();
     // 0 - $x  ->  -$x
-    if(expr == this && expr1 == Int.ZERO && calc == Calc.MINUS) {
+    if(expr == this && expr1 == Int.ZERO && calc == Calc.SUBTRACT) {
       expr = new Unary(info, expr2, true).optimize(cc);
     }
     // count($n/@*) + count($n/*)  ->  count(($n/@*, $n/*))
-    if(expr == this && Function.COUNT.is(expr1) && calc == Calc.PLUS && Function.COUNT.is(expr2)) {
+    if(expr == this && Function.COUNT.is(expr1) && calc == Calc.ADD && Function.COUNT.is(expr2)) {
       expr = cc.function(Function.COUNT, info, List.get(cc, info, expr1.arg(0), expr2.arg(0)));
     }
     if(expr == this && nums && noarray && st1.one() && st2.one()) {
@@ -76,8 +78,8 @@ public final class Arith extends Arr {
         expr = ex;
       } else if(expr1 instanceof Arith) {
         final Calc acalc = ((Arith) expr1).calc;
-        final boolean add = acalc.oneOf(Calc.PLUS, Calc.MULT);
-        final boolean sub = acalc.oneOf(Calc.MINUS, Calc.DIV);
+        final boolean add = acalc.oneOf(Calc.ADD, Calc.MULTIPLY);
+        final boolean sub = acalc.oneOf(Calc.SUBTRACT, Calc.DIVIDE);
         final boolean inverse = acalc == calc.invert();
         final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
 
@@ -97,6 +99,13 @@ public final class Arith extends Arr {
         }
       }
     }
+
+    if(expr == this && calcOpt == null && !(expr instanceof CmpSimpleG)) {
+      calcOpt = CalcOpt.get(st1, st2, calc);
+      if(calcOpt != null && st1.zeroOrOne() && st2.zeroOrOne()) {
+        expr = new ArithSimple(info, expr1, expr2, calc, calcOpt);
+      }
+    }
     return cc.replaceWith(this, expr);
   }
 
@@ -105,7 +114,8 @@ public final class Arith extends Arr {
     final Item item1 = exprs[0].atomItem(qc, info);
     if(item1.isEmpty()) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
-    return item2.isEmpty() ? Empty.VALUE : calc.eval(item1, item2, info);
+    return item2.isEmpty() ? Empty.VALUE : calcOpt != null ? calcOpt.eval(item1, item2, info) :
+      calc.eval(item1, item2, info);
   }
 
   @Override
@@ -114,15 +124,17 @@ public final class Arith extends Arr {
     if(mode == Simplify.PREDICATE && Function.LAST.is(exprs[0]) && exprs[1] instanceof ANum) {
       // E[last() + 1]  ->  E[false()]
       final double d = ((ANum) exprs[1]).dbl();
-      if(calc == Calc.PLUS && d > 0 || calc == Calc.MINUS && d < 0 ||
-        calc == Calc.MULT && d > 1 || calc == Calc.DIV && d < 1) expr = Bln.FALSE;
+      if(calc == Calc.ADD && d > 0 || calc == Calc.SUBTRACT && d < 0 ||
+        calc == Calc.MULTIPLY && d > 1 || calc == Calc.DIVIDE && d < 1) expr = Bln.FALSE;
     }
     return cc.simplify(this, expr, mode);
   }
 
   @Override
   public Arith copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Arith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), calc));
+    final Arith arith = new Arith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), calc);
+    arith.calcOpt = calcOpt;
+    return copyType(arith);
   }
 
   @Override
@@ -132,7 +144,7 @@ public final class Arith extends Arr {
 
   @Override
   public String description() {
-    return '\'' + calc.name + "' expression";
+    return '\'' + calc.name + "' calculation";
   }
 
   @Override

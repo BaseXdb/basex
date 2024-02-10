@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class sends parallel PUT requests to the REST API.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RESTParallelPutTest extends HTTPTest {
@@ -54,7 +54,7 @@ public final class RESTParallelPutTest extends HTTPTest {
   }
 
   /** Client class. */
-  private static class Client extends Thread {
+  private static final class Client extends Thread {
     @Override
     public void run() {
       try {

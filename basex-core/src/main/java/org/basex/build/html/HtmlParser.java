@@ -25,7 +25,7 @@ import nu.validator.htmlparser.sax.*;
  * The Validator.nu HTML parser was written by Henri Sivonen and is based on the MIT License:
  * {@code https://about.validator.nu/htmlparser/}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class HtmlParser extends XMLParser {
@@ -60,16 +60,6 @@ public final class HtmlParser extends XMLParser {
    */
   public static String parser() {
     return available() ? NAME : "";
-  }
-
-  /**
-   * Constructor.
-   * @param source document source
-   * @param options main options
-   * @throws IOException I/O exception
-   */
-  public HtmlParser(final IO source, final MainOptions options) throws IOException {
-    this(source, options, options.get(MainOptions.HTMLPARSER));
   }
 
   /**

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the functions of the Database Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class DbModuleTest extends SandboxTest {

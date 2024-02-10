@@ -1,11 +1,11 @@
 package org.basex.util.http;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * HTTP Request attributes.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum RequestAttribute {
@@ -49,6 +49,6 @@ public enum RequestAttribute {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    return EnumOption.string(name());
   }
 }

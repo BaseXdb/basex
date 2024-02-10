@@ -10,7 +10,7 @@ import org.basex.query.value.node.*;
 /**
  * <p>This class converts a JSON document to XML.</p>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JsonBasicConverter extends JsonXmlConverter {
@@ -20,9 +20,9 @@ public final class JsonBasicConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonBasicConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonBasicConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     escape = jopts.get(JsonParserOptions.ESCAPE);
   }

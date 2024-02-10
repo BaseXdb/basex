@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Empty sequence.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Empty extends Item {
@@ -61,6 +61,16 @@ public final class Empty extends Item {
   }
 
   @Override
+  public boolean isEmpty() {
+    return true;
+  }
+
+  @Override
+  public boolean isItem() {
+    return false;
+  }
+
+  @Override
   public Object toJava() {
     return null;
   }
@@ -71,7 +81,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred) {
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate) {
     return false;
   }
 
@@ -81,7 +91,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean bool(final InputInfo ii) throws QueryException {
+  public boolean bool(final InputInfo ii) {
     return false;
   }
 
@@ -118,7 +128,7 @@ public final class Empty extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == VALUE;
+    return obj instanceof Empty;
   }
 
   @Override

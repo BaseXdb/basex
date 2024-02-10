@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FileWriteText extends FileFn {
@@ -38,11 +38,13 @@ public class FileWriteText extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toParent(toPath(arg(0), qc));
-    Item value = toItem(arg(1), qc);
-    if(!(value instanceof AStr)) value = Str.get(toToken(value));
+    Item value = toAtomItem(arg(1), qc);
     final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);
+
+    // workaround to preserve streamable string items
+    if(!(value instanceof AStr)) value = Str.get(toToken(value));
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       if(cs == null) {

@@ -9,12 +9,12 @@ import org.basex.util.*;
 /**
  * Common superclass for static functions and variables.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public abstract class StaticDecl extends StaticScope {
   /** Annotations. */
-  public final AnnList anns;
+  public AnnList anns;
 
   /** Indicates if code is currently being compiled or evaluated. */
   protected boolean dontEnter;

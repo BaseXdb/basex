@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * A small array that is stored in a single Java array.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 final class SmallArray extends XQArray {
@@ -78,7 +78,7 @@ final class SmallArray extends XQArray {
 
   @Override
   public XQArray concat(final XQArray other) {
-    return other.isEmptyArray() ? this : other.prepend(this);
+    return other == empty() ? this : other.prepend(this);
   }
 
   @Override
@@ -105,11 +105,6 @@ final class SmallArray extends XQArray {
     return ml == 1 ? empty() :
            ml == 2 ? new SingletonArray(members[1]) :
            new SmallArray(slice(members, 1, ml), type);
-  }
-
-  @Override
-  public boolean isEmptyArray() {
-    return false;
   }
 
   @Override

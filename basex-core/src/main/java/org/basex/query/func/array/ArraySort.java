@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArraySort extends FnSort {
@@ -42,7 +42,7 @@ public final class ArraySort extends FnSort {
     final Type type = st.type;
     if(type instanceof ArrayType) {
       if(defined(2) && arg(2).size() == 1) {
-        arg(2, arg -> coerceFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, ((ArrayType) type).declType));
+        arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, ((ArrayType) type).declType));
       }
       exprType.assign(type);
     }

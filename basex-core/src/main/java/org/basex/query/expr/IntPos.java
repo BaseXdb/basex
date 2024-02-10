@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Integer position range check.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class IntPos extends Simple implements CmpPos {
@@ -38,17 +38,6 @@ public final class IntPos extends Simple implements CmpPos {
     super(info, SeqType.BOOLEAN_O);
     this.min = min;
     this.max = max;
-  }
-
-  /**
-   * Returns a position expression for the specified position, or an optimized boolean item.
-   * @param pos position
-   * @param info input info (can be {@code null})
-   * @return expression
-   */
-  public static Expr get(final double pos, final InputInfo info) {
-    final long p = (long) pos;
-    return p != pos || p < 1 ? Bln.FALSE : get(p, p, info);
   }
 
   /**
@@ -75,8 +64,8 @@ public final class IntPos extends Simple implements CmpPos {
   static Expr get(final Expr pos, final OpV op, final InputInfo info) {
     if(pos == Empty.VALUE) return Bln.FALSE;
     if(pos instanceof RangeSeq && op == OpV.EQ) {
-      final long[] range = ((RangeSeq) pos).range(false);
-      return get(range[0], range[1], info);
+      final RangeSeq rs = (RangeSeq) pos;
+      return get(rs.min(), rs.max(), info);
     }
     if(pos instanceof ANum) {
       final ANum num = (ANum) pos;

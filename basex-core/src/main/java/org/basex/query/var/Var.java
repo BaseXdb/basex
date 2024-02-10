@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Variable expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -31,7 +31,7 @@ public final class Var extends ExprInfo {
   /** Flag for function coercion. */
   public boolean coerce;
   /** Stack slot ({@code -1} if unused). */
-  int slot;
+  public int slot;
 
   /** Actual type (by type inference). */
   private final ExprType exprType;
@@ -196,14 +196,6 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Determines if this variable checks the type of the expression bound to it.
-   * @return {@code true} if the type is checked or promoted, {@code false} otherwise
-   */
-  public boolean checkType() {
-    return declType != null;
-  }
-
-  /**
    * Returns an equivalent to the given expression that checks this variable's type.
    * @param expr expression
    * @param cc compilation context
@@ -211,7 +203,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
-    return checkType() ? new TypeCheck(info, sc, expr, declType, coerce).optimize(cc) : expr;
+    return declType != null ? new TypeCheck(info, sc, expr, declType, coerce).optimize(cc) : expr;
   }
 
   /**
@@ -225,7 +217,7 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value value, final QueryContext qc, final boolean opt)
       throws QueryException {
 
-    if(!checkType() || declType.instance(value)) return value;
+    if(declType == null || declType.instance(value)) return value;
     if(coerce) return declType.coerce(value, name, qc, sc, info, opt);
     throw typeError(value, declType, name, info, false);
   }
@@ -247,27 +239,13 @@ public final class Var extends ExprInfo {
    */
   public void checkType(final Expr expr) throws QueryException {
     final SeqType et = expr.seqType(), vt = seqType();
-    if(!checkType() || vt.type.instanceOf(et.type) ||
+    if(declType == null || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
     if(!coerce || !(et.type instanceof NodeType) && !et.promotable(vt)) {
       throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) :
         typeError(expr, vt, name, info, coerce);
     }
-  }
-
-  /**
-   * Checks whether the given variable is identical to this one, i.e. has the same id.
-   * @param var variable to check
-   * @return {@code true} if the IDs are equal, {@code false} otherwise
-   */
-  public boolean is(final Var var) {
-    return id == var.id;
-  }
-
-  @Override
-  public int hashCode() {
-    return id;
   }
 
   /**
@@ -284,11 +262,6 @@ public final class Var extends ExprInfo {
     }
     coerce |= crc;
     return true;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return obj instanceof Var && is((Var) obj);
   }
 
   @Override

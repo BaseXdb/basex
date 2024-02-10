@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Date item ({@code xs:date}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Dat extends ADate {
@@ -48,7 +48,7 @@ public final class Dat extends ADate {
     this(value);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
-      if(yea <= MIN_YEAR || yea > MAX_YEAR) throw YEARRANGE_X.get(info, yea);
+      if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);
     } else {
       calc((YMDur) dur, plus, info);
     }
@@ -56,18 +56,20 @@ public final class Dat extends ADate {
   }
 
   @Override
-  public void timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
+  public Dat timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
-    super.timeZone(dur, undefined, info);
-    clean();
+    final Dat dat = new Dat(this);
+    dat.tz(dur, undefined, info);
+    dat.clean();
+    return dat;
   }
 
   /**
    * Cleans the item and removes invalid components.
    */
   private void clean() {
-    hou = -1;
-    min = -1;
-    sec = null;
+    hour = -1;
+    minute = -1;
+    seconds = null;
   }
 }

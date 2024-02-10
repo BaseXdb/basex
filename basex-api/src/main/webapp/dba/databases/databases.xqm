@@ -1,12 +1,12 @@
 (:~
  : Main page.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -27,16 +27,17 @@ declare
   %rest:query-param('info',  '{$info}')
   %rest:query-param('error', '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:databases(
   $sort   as xs:string,
   $page   as xs:integer,
   $info   as xs:string?,
   $error  as xs:string?
 ) as element(html) {
-  let $names := map:merge(db:list() ! map:entry(., true()))
+  let $db-names := db:list()
   let $databases :=
-    let $start := util:start($page, $sort)
-    let $end := util:end($page, $sort)
+    let $start := utils:start($page, $sort)
+    let $end := utils:end($page, $sort)
     for $db in db:list-details()[position() = $start to $end]
     return map {
       'name': $db,
@@ -46,10 +47,10 @@ function dba:databases(
     }
   let $backups :=
     for $backup in db:backups()
-    where matches($backup, $util:BACKUP-REGEX)
-    group by $name := replace($backup, $util:BACKUP-REGEX, '$1')
-    where $name and not($names($name))
-    let $date := replace(sort($backup)[last()], $util:BACKUP-REGEX, '$2T$3:$4:$5Z')
+    where matches($backup, $utils:BACKUP-REGEX)
+    group by $name := replace($backup, $utils:BACKUP-REGEX, '$1')
+    where $name and not($db-names = $name)
+    let $date := replace(sort($backup)[last()], $utils:BACKUP-REGEX, '$2T$3:$4:$5Z')
     return map {
       'name': $name,
       'size': (),
@@ -76,7 +77,7 @@ function dba:databases(
               html:button('backup-create-all', 'Back up'),
               html:button('backup-restore-all', 'Restore', true())
             )
-            let $count := map:size($names) + count($backups)
+            let $count := count($db-names) + count($backups)
             let $options := map {
               'sort': $sort,
               'link': 'database',
@@ -125,7 +126,7 @@ function dba:databases(
                 'backup': substring-after($backup, '-'),
                 'size': $backup/@size,
                 'comment': $backup/@comment,
-                'action': function() {
+                'action': fn() {
                   html:link('Download', 'backup/' || encode-for-uri($backup) || '.zip')
                 }
               }

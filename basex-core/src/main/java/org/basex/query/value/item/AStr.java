@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Abstract string item.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class AStr extends Item {
@@ -113,9 +113,9 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final int diff(final Item item, final Collation coll, final InputInfo info)
-      throws QueryException {
-    return Token.diff(string(info), item.string(info), coll);
+  public final int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo info) throws QueryException {
+    return Token.compare(string(info), item.string(info), coll);
   }
 
   @Override

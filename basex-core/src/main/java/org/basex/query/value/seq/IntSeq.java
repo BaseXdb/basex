@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Sequence of items of type {@link Int xs:integer}, containing at least two of them.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class IntSeq extends NativeSeq {
@@ -80,7 +80,7 @@ public final class IntSeq extends NativeSeq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.DISTINCT) {
+    if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE)) {
       // replace with new sequence or range sequence
       final long[] tmp = new LongList((int) size).add(values).ddo().finish();
       final int tl = tmp.length;

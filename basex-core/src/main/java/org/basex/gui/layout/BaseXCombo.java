@@ -17,7 +17,7 @@ import org.basex.util.options.*;
 /**
  * Project specific ComboBox implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class BaseXCombo extends JComboBox<Object> {
@@ -249,7 +249,7 @@ public class BaseXCombo extends JComboBox<Object> {
     final String value = object.toString();
     if(isEditable()) {
       getEditor().setItem(value);
-      updateHistory();
+      if(!isFocusable()) updateHistory();
     } else {
       final ComboBoxModel<Object> model = getModel();
       final int ms = model.getSize();
@@ -328,7 +328,7 @@ public class BaseXCombo extends JComboBox<Object> {
   /**
    * Combo box editor.
    *
-   * @author BaseX Team 2005-23, BSD License
+   * @author BaseX Team 2005-24, BSD License
    * @author Christian Gruen
    */
   private static final class BaseXEditor implements ComboBoxEditor {

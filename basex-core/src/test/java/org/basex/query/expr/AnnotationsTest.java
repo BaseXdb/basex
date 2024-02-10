@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 /**
  * Annotations tests.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class AnnotationsTest extends SandboxTest {
@@ -56,7 +56,6 @@ public final class AnnotationsTest extends SandboxTest {
     error("declare %output:method function local:x() { 1 }; 1", BASEX_ANN2_X_X);
     error("declare %output:method(1) function local:x() { 1 }; 1", BASEX_ANN_X_X_X);
   }
-
 
   /** Literals. */
   @Test public void literals() {

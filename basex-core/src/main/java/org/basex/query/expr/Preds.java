@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * Abstract predicate expression, implemented by {@link Filter} and {@link Step}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Preds extends Arr {
@@ -63,7 +63,7 @@ public abstract class Preds extends Arr {
   /**
    * Assigns the sequence type and result size.
    * @param root root expression
-   * @return whether evaluation can be skipped
+   * @return whether the evaluation can be skipped
    */
   private boolean exprType(final Expr root) {
     long max = root.size();
@@ -151,11 +151,8 @@ public abstract class Preds extends Arr {
     final SeqType rst = root.seqType();
     final Predicate<Expr> first = f -> f instanceof ContextValue ||
         root.equals(f) && root.isSimple() && rst.one();
-    if(expr instanceof SimpleMap) {
-      final Expr[] mexprs = ((SimpleMap) expr).exprs;
-      if(first.test(mexprs[0]) && !mexprs[1].has(Flag.POS)) {
-        expr = SimpleMap.get(cc, expr.info(), Arrays.copyOfRange(mexprs, 1, mexprs.length));
-      }
+    if(expr instanceof SimpleMap && first.test(expr.arg(0)) && !expr.arg(1).has(Flag.POS)) {
+      expr = ((SimpleMap) expr).remove(cc, 1);
     }
 
     // paths: E[./...]  ->  E[...], E[E/...]  ->  E[...]
@@ -294,16 +291,6 @@ public abstract class Preds extends Arr {
     if(rst.zeroOrOne()) return createSimpleMap.apply(last);
 
     return this;
-  }
-
-  /**
-   * Checks if the specified expression returns an empty sequence or a deterministic numeric value.
-   * @param expr expression
-   * @return result of check
-   */
-  protected static boolean numeric(final Expr expr) {
-    final SeqType st = expr.seqType();
-    return st.type.isNumber() && st.zeroOrOne() && expr.isSimple();
   }
 
   /**

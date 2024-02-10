@@ -19,7 +19,7 @@ import org.basex.util.similarity.*;
 /**
  * XQuery 3.0 function types.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public class FuncType implements Type {
@@ -44,7 +44,7 @@ public class FuncType implements Type {
    * @param argTypes argument types (can be {@code null})
    */
   FuncType(final SeqType declType, final SeqType... argTypes) {
-    this(new AnnList(), declType, argTypes);
+    this(AnnList.EMPTY, declType, argTypes);
   }
 
   /**
@@ -114,12 +114,12 @@ public class FuncType implements Type {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(type.getClass() != FuncType.class) return false;
+    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof FuncType) ||
+        type instanceof MapType || type instanceof ArrayType) return false;
+
     final FuncType ft = (FuncType) type;
-
     final int arity = argTypes.length, nargs = ft.argTypes.length;
-    if(this == SeqType.FUNCTION || ft == SeqType.FUNCTION || arity != nargs) return false;
-
+    if(arity != nargs) return false;
     for(int a = 0; a < arity; a++) {
       if(!argTypes[a].eq(ft.argTypes[a])) return false;
     }
@@ -207,7 +207,16 @@ public class FuncType implements Type {
    * @return function type
    */
   public static FuncType get(final SeqType declType, final SeqType... args) {
-    return get(new AnnList(), declType, args);
+    return get(AnnList.EMPTY, declType, args);
+  }
+
+  /**
+   * Return function type with fewer arguments.
+   * @param arity arity of target type
+   * @return function type
+   */
+  public FuncType with(final int arity) {
+    return get(anns, declType, Arrays.copyOf(argTypes, arity));
   }
 
   /**

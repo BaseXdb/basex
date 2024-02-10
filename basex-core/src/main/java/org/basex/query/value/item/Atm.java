@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Untyped atomic item ({@code xs:untypedAtomic}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Atm extends Item {
@@ -76,9 +76,10 @@ public final class Atm extends Item {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    return item.type.isUntyped() ? Token.diff(value, item.string(ii), coll) :
-      -item.diff(this, coll, ii);
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return comparable(item) ? Token.compare(value, item.string(ii), coll) :
+      -item.compare(this, coll, transitive, ii);
   }
 
   @Override

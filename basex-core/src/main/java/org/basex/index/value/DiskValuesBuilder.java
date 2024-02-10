@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * </li>
  * </ul>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class DiskValuesBuilder extends ValuesBuilder {
@@ -126,7 +126,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
         ml.reset();
         for(int i = min; i < splits; ++i) {
           if(vm[i].values.length == 0) continue;
-          final int d = diff(vm[min].key, vm[i].key);
+          final int d = compare(vm[min].key, vm[i].key);
           if(d < 0) continue;
           if(d > 0) {
             min = i;

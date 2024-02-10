@@ -1,13 +1,24 @@
+/** Link to the mirrored editor component. */
+var _editorMirror;
+/** Link to the mirrored output component. */
+var _outputMirror;
+
+/** Editor. */
+var _edit;
+
 /**
  * Toggles the selection of all check boxes in the corresponding form.
- * @param {checkbox} clicked header checkbox
+ * @param {checkbox} source clicked header checkbox
  */
 function toggle(source) {
   var form = getForm(source);
-  var inputs = form.getElementsByTagName("INPUT");
+  var inputs = form.getElementsByTagName("input");
   var checked = false;
   for(var i = 0; i < inputs.length; i++) {
-    if(inputs[i].type === "checkbox") inputs[i].checked = source.checked;
+    var input = inputs[i];
+    if(input.type === "checkbox" && input.parentElement.parentElement.style.display !== "none") {
+      input.checked = source.checked;
+    }
   }
   buttons();
 }
@@ -17,26 +28,25 @@ function toggle(source) {
  * @param {checkbox} clicked checkbox. if undefined, the buttons of all forms will be refreshed
  */
 function buttons(source) {
-  var forms = source ? [ getForm(source) ] : document.getElementsByTagName("FORM");
+  var forms = source ? [ getForm(source) ] : document.getElementsByTagName("form");
   for(var f = 0; f < forms.length; f++) {
     var form = forms[f];
     if(form.className !== "update") continue;
 
-    var inputs = form.getElementsByTagName("INPUT");
+    var inputs = form.getElementsByTagName("input");
     var checked = false;
     for(var i = 0; i < inputs.length; i++) {
       checked |= inputs[i].type === "checkbox" && inputs[i].checked;
     }
-    var buttons = form.getElementsByTagName("BUTTON");
+    var buttons = form.getElementsByTagName("button");
     for(var b = 0; b < buttons.length; b++) {
       var button = buttons[b];
       if(button.className === "global") continue;
 
       var values = [
-        "backup", "backup-drop", "backup-restore", "backup-create-all", "backup-restore-all",
-        "db-drop", "db-optimize", "db-optimize-all", "delete", "job-remove",
-        "file-delete", "job-stop", "log-delete", "session-kill",
-        "pattern-drop", "user-drop"
+        "backup", "backup-create-all", "backup-drop", "backup-restore", "backup-restore-all",
+        "db-drop", "db-optimize", "db-optimize-all", "delete", "file-delete", "job-remove",
+        "job-stop", "log-delete", "log-download", "pattern-drop", "session-kill", "user-drop"
       ];
       for(var v = 0; v < values.length; v++) {
         if(button.value === values[v]) button.disabled = !checked;
@@ -46,9 +56,8 @@ function buttons(source) {
 }
 
 /**
- * Returns the ancestor form element
- * @param {checkbox} clicked checkbox. if undefined, the buttons of all forms will be refreshed
- * @return {element} form element
+ * Returns an ancestor element
+ * @param {source} source element
  */
 function getForm(source) {
   while(source.tagName.toUpperCase() !== "FORM") source = source.parentElement;
@@ -100,7 +109,7 @@ var _running = 0;
  * @param {string} path  path to query service
  * @param {string} query query to be evaluated
  * @param {function} func  function that processes the result
- * @param {boolean} reset reset query (jump to first results)
+ * @param {boolean} reset reset query
  */
 function query(path, query, func, reset) {
   _running++;
@@ -115,12 +124,13 @@ function query(path, query, func, reset) {
     }
   }, 500);
 
-  var append = function(name, reset) {
-    var e = document.getElementById(name);
-    return !reset && e && e.value ? "&" + name + "=" + encodeURIComponent(e.value) : "";
-  };
-  var url = path + (append("name") + append("resource") + append("sort") + append("page", reset) +
-    append("time", reset)).replace(/^&/, "?");
+  var url = path;
+  for(name of [ "date", "resource", "sort", "time", "page" ]) {
+    var element = document.getElementById(name), value = element && element.value;
+    if(value && (name !== "page" || value !== 1 && !reset)) {
+      url += (url === path ? "?" : "&") + name + "=" + encodeURIComponent(value);
+    }
+  }
 
   request("POST", url, query,
     function(request) {
@@ -141,8 +151,9 @@ function query(path, query, func, reset) {
 /**
  * Displays the error that is embedded in the HTTP response.
  * @param {object} request HTTP request
+ * @param {string} optional message
  */
-function setErrorFromResponse(request) {
+function setErrorFromResponse(request, message) {
   // normalize error message
   var msg = request.statusText.match(/\[\w+\]/g) ? request.statusText : request.responseText;
   var s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
@@ -151,20 +162,20 @@ function setErrorFromResponse(request) {
   // display correctly escaped feedback
   var html = document.createElement("div");
   html.innerHTML = msg;
-  setError(html.innerText || html.textContent);
+  setError((message ? message + ": " : "") + (html.innerText || html.textContent));
 }
 
 /** Most recent log entry search string. */
 var _logInput;
 
 /**
- * Queries all log entries of a log file.
- * @param {boolean} enforce enforce query execution
- * @param {boolean} reset reset query (jump to first results)
+ * Queries the entries of the current log file.
+ * @param {string} key typed key
  */
-function logEntries(enforce, reset) {
+function logEntries(key) {
+  var reset = key && key !== "Enter";
   var input = document.getElementById("input").value.trim();
-  if(!enforce && _logInput === input) return false;
+  if(reset && _logInput === input) return false;
   _logInput = input;
   query("log", input, function(text) {
     document.getElementById("output").innerHTML = text;
@@ -177,7 +188,24 @@ function logEntries(enforce, reset) {
   window.history.replaceState(null, "", replaceParam(window.location.href, "input", input));
 }
 
-/** Most recent query search string. */
+/**
+ * Filters log files.
+ */
+function logFilter() {
+  var value = document.getElementById("log-filter").value;
+  var c = 0;
+  for (input of document.getElementById("dates").getElementsByTagName("input")) {
+    if(input.type === "checkbox" && input.name === "name") {
+      var visible = !value || input.value.includes(value);
+      input.parentElement.parentElement.style.display = visible ? null : "none";
+      if(visible) c++;
+      else input.checked = false;
+    }
+  }
+  document.getElementsByTagName("h3")[0].innerHTML = c + " Entries";
+}
+
+/** Most recent log filter string. */
 var _dbInput;
 
 /**
@@ -198,12 +226,14 @@ var _updating;
 
 /**
  * Evaluates a query.
- * @param {boolean} reverse reverse query execution mode (eval, update)
+ * @param {boolean} invert invert query execution mode (eval, update)
  */
-function runQuery(reverse) {
+function runQuery(invert) {
+  if(document.getElementById("run").disabled) return;
+
   // decide if query is read-only or updating
-  var updating = (document.getElementById("mode").selectedIndex === 1) ^ reverse;
-  var path = updating ? "query-update" : "query-eval";
+  var updating = (document.getElementById("mode").selectedIndex === 1) ^ invert;
+  var path = updating ? "editor-update" : "editor-eval";
   var file = document.getElementById("file");
   if(file && file.value) path += "?file=" + encodeURIComponent(file.value);
 
@@ -212,6 +242,7 @@ function runQuery(reverse) {
   _updating = updating;
 
   // run query
+  if(_editorMirror) _editorMirror.focus();
   query(path, document.getElementById("editor").value, function(text) {
     _outputMirror.setValue(text);
   });
@@ -222,7 +253,8 @@ function runQuery(reverse) {
  */
 function stopQuery() {
   // stop query by sending empty sequence
-  query(_updating ? "query-update" : "query-eval", "()", function(text) {
+  if(_editorMirror) _editorMirror.focus();
+  query(_updating ? "editor-update" : "editor-eval", "()", function(text) {
     setInfo("Query was stopped.");
   });
 }
@@ -236,7 +268,7 @@ function stopQuery() {
  * @param {failure} failure failure function
  */
 function request(method, url, data, success, failure) {
-  var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+  var request = new XMLHttpRequest();
   request.onreadystatechange = function() {
     if(request.readyState === 4) {
       if(request.status === 200) {
@@ -252,14 +284,6 @@ function request(method, url, data, success, failure) {
   request.send(data);
 }
 
-/** Link to the mirrored editor component. */
-var _editorMirror;
-/** Link to the mirrored output component. */
-var _outputMirror;
-
-/** Editor. */
-var _edit;
-
 /**
  * Loads the code mirror editor extension.
  * @param {string}  language programming language (syntax highlighting)
@@ -268,7 +292,7 @@ var _edit;
  */
 function loadCodeMirror(language, edit, resize) {
   _edit = edit;
-  if (CodeMirror && dispatchEvent) {
+  if(CodeMirror && dispatchEvent) {
     if(edit) {
       var editorArea = document.getElementById("editor");
       _editorMirror = CodeMirror.fromTextArea(editorArea, {

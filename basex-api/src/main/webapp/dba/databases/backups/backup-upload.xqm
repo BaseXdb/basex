@@ -1,11 +1,11 @@
 (:~
  : Upload backups.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/files';
 
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -26,8 +26,8 @@ function dba:file-upload(
   let $dir := db:option('dbpath') || '/'
   return try {
     (: reject backups with invalid content :)
-    map:for-each($files, function($file, $content) {
-      let $name := replace($file, $util:BACKUP-ZIP-REGEX, '$1')
+    map:for-each($files, fn($file, $content) {
+      let $name := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
       let $entries := archive:entries($content) ! data()
       where not(if($name) then (
         every $entry in $entries satisfies starts-with($entry, $name || '/') and
@@ -37,10 +37,10 @@ function dba:file-upload(
       ))
       return error((), 'Invalid backup file: ' || $file)
     }),
-    map:for-each($files, function($file, $content) {
+    map:for-each($files, fn($file, $content) {
       file:write-binary($dir || $file, $content)
     }),
-    web:redirect($dba:CAT, map { 'info': util:info(map:keys($files), 'backup', 'uploaded') })
+    web:redirect($dba:CAT, map { 'info': utils:info(map:keys($files), 'backup', 'uploaded') })
   } catch * {
     web:redirect($dba:CAT, map { 'error': $err:description })
   }

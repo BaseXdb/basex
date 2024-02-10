@@ -1,13 +1,15 @@
 package org.basex.query.util.format;
 
+import static org.basex.query.util.format.FormatParser.NumeralType.*;
 import static org.basex.util.Token.*;
 
+import org.basex.query.util.format.FormatParser.*;
 import org.basex.util.*;
 
 /**
  * English language formatter. Can be instantiated via {@link Formatter#get}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class FormatterEN extends Formatter {
@@ -57,22 +59,22 @@ final class FormatterEN extends Formatter {
       "August", "September", "October", "November", "December");
 
   /** AM/PM Markers. */
-  private static final byte[][] AMPM = tokens("Am", "Pm");
+  private static final byte[][] AMPM = tokens("AM", "PM");
   /** Ordinal suffixes (st, nr, rd, th). */
   private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
   /** Eras: BC, AD. */
-  private static final byte[][] ERAS = tokens("Bc", "Ad");
+  private static final byte[][] ERAS = tokens("BC", "AD");
 
   @Override
-  public byte[] word(final long n, final byte[] ordinal) {
+  public byte[] word(final long n, final NumeralType numType, final byte[] suffix) {
     final TokenBuilder tb = new TokenBuilder();
-    word(tb, n, ordinal != null);
+    word(tb, n, numType);
     return tb.finish();
   }
 
   @Override
-  public byte[] ordinal(final long n, final byte[] ordinal) {
-    if(ordinal == null) return EMPTY;
+  public byte[] suffix(final long n, final NumeralType numType) {
+    if(numType != NumeralType.ORDINAL) return EMPTY;
     final int f = (int) (n % 10);
     return ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3];
   }
@@ -114,34 +116,34 @@ final class FormatterEN extends Formatter {
    * Creates a word character sequence for the specified number.
    * @param tb token builder
    * @param number number to be formatted
-   * @param ordinal ordinal suffix
+   * @param numType numeral type
    */
-  private static void word(final TokenBuilder tb, final long number, final boolean ordinal) {
+  private static void word(final TokenBuilder tb, final long number, final NumeralType numType) {
     if(number == 0 && !tb.isEmpty()) {
     } else if(number < 20) {
-      tb.add((ordinal ? ORDINALS : WORDS)[(int) number]);
+      tb.add((numType == ORDINAL ? ORDINALS : WORDS)[(int) number]);
     } else if(number < 100) {
       final int r = (int) (number % 10);
       if(r == 0) {
-        tb.add((ordinal ? ORDINALS10 : WORDS10)[(int) number / 10]);
+        tb.add((numType == ORDINAL ? ORDINALS10 : WORDS10)[(int) number / 10]);
       } else {
         tb.add(WORDS10[(int) number / 10]).add('-');
-        tb.add((ordinal ? ORDINALS : WORDS)[r]);
+        tb.add((numType == ORDINAL ? ORDINALS : WORDS)[r]);
       }
     } else {
       for(int w = WORDS100.length - 1; w >= 0; w--) {
         final long f = UNITS100[w];
         if(number < f) continue;
 
-        word(tb, number / f, false);
+        word(tb, number / f, NUMBERING);
         tb.add(' ').add(WORDS100[w]);
         final long r = number % f;
         if(r == 0) {
-          if(ordinal) tb.add(ORDSUFFIX[3]);
+          if(numType == ORDINAL) tb.add(ORDSUFFIX[3]);
         } else {
           tb.add(' ');
         }
-        word(tb, r, ordinal);
+        word(tb, r, numType);
         break;
       }
     }

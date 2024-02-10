@@ -13,20 +13,20 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MapOfPairs extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter pairs = arg(0).iter(qc);
-    final FItem combine = defined(1) ? toFunction(arg(1), 2, qc) : null;
+    final FItem combine = toFunctionOrNull(arg(1), 2, qc);
 
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(pairs)) != null;) {
       // extract key/value record entries
       final XQMap map = toRecord(item, Str.KEY, Str.VALUE);
-      final Item key = checkType(toItem(map.get(Str.KEY, info), qc), AtomType.ANY_ATOMIC_TYPE);
+      final Item key = checkType(map.get(Str.KEY, info), AtomType.ANY_ATOMIC_TYPE);
       Value value = map.get(Str.VALUE, info);
       if(result.contains(key, info)) {
         final Value old = result.get(key, info);

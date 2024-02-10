@@ -16,13 +16,13 @@ import org.basex.util.list.*;
 /**
  * JTree node which represents a folder.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public class ResourceFolder extends ResourceNode {
   /** Comparator. */
   private static final Comparator<byte[]> CMP =
-      (o1, o2) -> Prop.CASE ? diff(o1, o2) : diff(lc(o1), lc(o2));
+      (o1, o2) -> Prop.CASE ? compare(o1, o2) : compare(lc(o1), lc(o2));
 
   /** Children of node have been loaded. */
   private boolean loaded;

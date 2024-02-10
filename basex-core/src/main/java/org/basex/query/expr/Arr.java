@@ -10,7 +10,6 @@ import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -20,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract array expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Arr extends ParseExpr {
@@ -177,21 +176,21 @@ public abstract class Arr extends ParseExpr {
   /**
    * Tries to merge consecutive EBV tests.
    * @param or union or intersection
-   * @param positional consider positional tests
+   * @param predicate predicate test
    * @param cc compilation context
    * @return {@code true} if evaluation can be skipped
    * @throws QueryException query exception
    */
-  final boolean optimizeEbv(final boolean or, final boolean positional, final CompileContext cc)
+  final boolean optimizeEbv(final boolean or, final boolean predicate, final CompileContext cc)
       throws QueryException {
 
     final ExprList list = new ExprList(exprs.length);
     boolean pos = false;
     for(final Expr expr : exprs) {
       // pre-evaluate values
-      if(expr instanceof Value && (!positional || !(expr instanceof ANum))) {
+      if(expr instanceof Value && (!predicate || !expr.seqType().mayBeNumber())) {
         // skip evaluation: true() or $bool  ->  true()
-        if(expr.test(cc.qc, info, false) == or) return true;
+        if(expr.test(cc.qc, info, predicate) == or) return true;
         // ignore result: true() and $bool  ->  $bool
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {
@@ -200,12 +199,12 @@ public abstract class Arr extends ParseExpr {
       } else {
         list.add(expr);
         // preserve entries after positional predicates
-        if(positional && !pos) pos = mayBePositional(expr);
+        if(predicate && !pos) pos = mayBePositional(expr);
       }
     }
     exprs = list.next();
 
-    if(!(positional && has(Flag.POS))) {
+    if(!(predicate && has(Flag.POS))) {
       final Class<? extends Arr> clazz = or ? And.class : Or.class;
       final QueryBiFunction<Boolean, Expr[], Expr> func = (invert, args) ->
         invert == or ? new And(info, args) : new Or(info, args);
@@ -220,7 +219,7 @@ public abstract class Arr extends ParseExpr {
     for(int l = 0; l < list.size(); l++) {
       for(int m = l + 1; m < list.size(); m++) {
         final Expr expr1 = list.get(l), expr2 = list.get(m);
-        if(!expr1.has(Flag.NDT) && !(positional && expr1.has(Flag.POS))) {
+        if(!expr1.has(Flag.NDT) && !(predicate && expr1.has(Flag.POS))) {
           // A or not(A)  ->  true()
           // A[not(B)][B]  ->  ()
           // empty(A) or exists(A)  ->  true()
@@ -241,7 +240,7 @@ public abstract class Arr extends ParseExpr {
 
     // not($a) and not($b)  ->  not($a or $b)
     final Function not = NOT;
-    final Checks<Expr> fnNot = ex -> not.is(ex) && !(positional && ex.has(Flag.POS));
+    final Checks<Expr> fnNot = ex -> not.is(ex) && !(predicate && ex.has(Flag.POS));
     if(exprs.length > 1 && fnNot.all(exprs)) {
       final ExprList tmp = new ExprList(exprs.length);
       for(final Expr expr : exprs) tmp.add(expr.arg(0));

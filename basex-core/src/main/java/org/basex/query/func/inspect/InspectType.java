@@ -1,7 +1,5 @@
 package org.basex.query.func.inspect;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -13,7 +11,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class InspectType extends StandardFunc {
@@ -33,7 +31,7 @@ public final class InspectType extends StandardFunc {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

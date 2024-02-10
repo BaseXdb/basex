@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public class MapForEach extends StandardFunc {
@@ -59,7 +59,7 @@ public class MapForEach extends StandardFunc {
     if(type instanceof MapType) {
       final MapType mtype = (MapType) type;
       final SeqType declType = mtype.argTypes[0].with(Occ.EXACTLY_ONE);
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, declType, mtype.declType));
+      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, declType, mtype.declType));
     }
 
     final FuncType ft = arg(1).funcType();

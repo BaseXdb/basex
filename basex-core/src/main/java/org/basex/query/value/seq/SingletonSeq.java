@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * Singleton value sequence.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class SingletonSeq extends Seq {
@@ -97,7 +97,7 @@ public final class SingletonSeq extends Seq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.DISTINCT) {
+    if(mode == Simplify.DISTINCT || mode == Simplify.PREDICATE && type.isNumber()) {
       expr = value;
     } else if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER,
         Simplify.STRING)) {

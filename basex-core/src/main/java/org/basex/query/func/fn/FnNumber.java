@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnNumber extends ContextFn {
@@ -44,7 +44,7 @@ public final class FnNumber extends ContextFn {
 
     // number(string(E))
     // number(xs:untypedAtomic(E))
-    // number(ITEM promote to xs:untypedAtomic)  ->  number(E)
+    // number(ITEM coerce to xs:untypedAtomic)  ->  number(E)
     if(type != null) {
       final Expr arg = simplify(value, cc);
       if(arg != null) return cc.function(Function.NUMBER, info, arg);

@@ -12,7 +12,7 @@ import org.basex.util.*;
  * Evaluates the 'inspect' command: checks if the currently opened database has
  * inconsistent data structures.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Inspect extends Command {
@@ -46,35 +46,38 @@ public final class Inspect extends Command {
     final Inspection parRef = new Inspection();
     final Inspection parChild = new Inspection();
     final Inspection idPre = md.updindex ? new Inspection() : null;
-    // loop through all database nodes
-    for(int pre = 0; pre < md.size; pre++) {
-      // check node kind
-      final int kind = data.kind(pre);
-      if(kind > 6) invKind.add(pre);
-      // check parent reference
-      final int par = data.parent(pre, kind);
-      if(par >= 0) {
-        final int parKind = data.kind(par);
-        if(par >= pre) parRef.add(pre);
-        // check if parent is no doc and no element, or if node is a descendant
-        // of its parent node
-        if(parKind != Data.DOC && parKind != Data.ELEM ||
-            par + data.size(par, parKind) < pre) parChild.add(pre);
-      }
-      // check if id/pre mapping is correct
-      if(idPre != null && data.pre(data.id(pre)) != pre) idPre.add(pre);
-    }
-
     final TokenBuilder info = new TokenBuilder();
-    info.addExt("Checking main table (% nodes):", md.size).add(Prop.NL);
-    info.add(invKind.info("invalid node kinds"));
-    info.add(parRef.info("invalid parent references"));
-    info.add(parChild.info("wrong parent/descendant relationships"));
-    if(idPre != null) info.add(idPre.info("wrong id/pre mappings"));
-    if(invKind.invalid + parRef.invalid + parChild.invalid == 0) {
-      info.add("No inconsistencies found.").add(Prop.NL);
-    } else {
-      info.add("Warning: Database is inconsistent.").add(Prop.NL);
+    try {
+      // loop through all database nodes
+      for(int pre = 0; pre < md.size; pre++) {
+        // check node kind
+        final int kind = data.kind(pre);
+        if(kind > 6) invKind.add(pre);
+        // check parent reference
+        final int par = data.parent(pre, kind);
+        if(par >= 0) {
+          final int parKind = data.kind(par);
+          if(par >= pre) parRef.add(pre);
+          // check if parent is no doc and no element, or if node is a descendant
+          // of its parent node
+          if(parKind != Data.DOC && parKind != Data.ELEM ||
+              par + data.size(par, parKind) < pre) parChild.add(pre);
+        }
+        // check if id/pre mapping is correct
+        if(idPre != null && data.pre(data.id(pre)) != pre) idPre.add(pre);
+      }
+      info.addExt("Checking main table (% nodes):", md.size).add(Prop.NL);
+      info.add(invKind.info("invalid node kinds"));
+      info.add(parRef.info("invalid parent references"));
+      info.add(parChild.info("wrong parent/descendant relationships"));
+      if(idPre != null) info.add(idPre.info("wrong id/pre mappings"));
+      if(invKind.invalid + parRef.invalid + parChild.invalid == 0) {
+        info.add("No inconsistencies found.").add(Prop.NL);
+      } else {
+        info.add("Warning: Database is inconsistent.").add(Prop.NL);
+      }
+    } catch(final RuntimeException ex) {
+      info.addExt("Access to storage failed (%).", ex).add(Prop.NL);
     }
     return info.toString();
   }

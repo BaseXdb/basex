@@ -1,13 +1,12 @@
 (:~
  : HTML components.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace html = 'dba/html';
 
-import module namespace options = 'dba/options' at 'options.xqm';
 import module namespace config = 'dba/config' at 'config.xqm';
-import module namespace util = 'dba/util' at 'util.xqm';
+import module namespace utils = 'dba/utils' at 'utils.xqm';
 
 (: Number formats. :)
 declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
@@ -40,18 +39,19 @@ declare function html:wrap(
   $options  as map(*),
   $rows     as element(tr)+
 ) as element(html) {
-  let $header := head($options?header) ! util:capitalize(.)
+  let $header := head($options?header) ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
-  return <html xml:space='preserve'>
+  return <html>
     <head>
       <meta charset='utf-8'/>
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
       <meta name='description' content='Database Administration'/>
-      <meta name='author' content='BaseX Team 2005-23, BSD License'/>
+      <meta name='author' content='BaseX Team 2005-24, BSD License'/>
+      <link rel='icon' href='static/basex.svg'/>
       <link rel='stylesheet' type='text/css' href='static/style.css'/>
       { $options?css ! <link rel='stylesheet' type='text/css' href='static/{ . }'/> }
-      <script type='text/javascript' src='static/js.js'/>
-      { $options?scripts ! <script type='text/javascript' src='static/{ . }'/> }
+      <script src='static/js.js'/>
+      { $options?scripts ! <script src='static/{ . }'/> }
     </head>
     <body>
       <table cellpadding='0' cellspacing='0'>
@@ -65,7 +65,7 @@ declare function html:wrap(
                   </span>,
                   if($user) then (
                     <span style='float:right'>
-                      <b>{ $user }</b> (<a href='logout'>logout</a>)
+                      <b>{ $user }</b> · <a href='logout'>logout</a>
                     </span>
                   ) else ()
                 }</td>
@@ -75,7 +75,7 @@ declare function html:wrap(
                   <div class='ellipsis'>{
                     if($user) then (
                       let $cats := (
-                        for $cat in ('Logs', 'Databases', 'Queries', 'Files', 'Jobs',
+                        for $cat in ('Logs', 'Databases', 'Editor', 'Files', 'Jobs',
                           'Users', 'Sessions', 'Settings')
                         let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
                         return if($link = $header) then (
@@ -118,7 +118,7 @@ declare function html:wrap(
       </table>
       <table width='100%'>{ $rows }</table>
       <hr/>
-      <div class='right'><sup>BaseX Team 2005-23, BSD License</sup></div>
+      <div class='right'><sup>BaseX Team 2005-24, BSD License</sup></div>
       <div class='small'/>
       { html:js('buttons();') }
     </body>
@@ -173,7 +173,7 @@ declare function html:checkbox(
 ) as node()+ {
   element input {
     attribute type { 'checkbox' },
-    map:for-each($map, function($key, $value) { attribute { $key } { $value } })
+    map:for-each($map, fn($key, $value) { attribute { $key } { $value } })
   },
   text { $label },
   element br { }
@@ -204,7 +204,7 @@ declare function html:button(
   $label    as xs:string,
   $confirm  as xs:boolean
 ) as element(button) {
-  html:button($value, $label, $confirm, ())
+  html:button($value, $label, $confirm, map {})
 };
 
 (:~
@@ -219,17 +219,13 @@ declare function html:button(
   $value    as xs:string,
   $label    as xs:string,
   $confirm  as xs:boolean,
-  $atts     as map(xs:string, xs:string)?
+  $atts     as map(xs:string, xs:string)
 ) as element(button) {
   element button {
     attribute name { 'action' },
     attribute value { $value },
-    if($confirm) then (
-      attribute onclick { 'return confirm("Are you sure?");' }
-    ) else (),
-    if(exists($atts)) then (
-      map:for-each($atts, function($key, $value) { attribute { $key } { $value } })
-    ) else (),
+    attribute onclick { 'return confirm("Are you sure?");' }[$confirm],
+    map:for-each($atts, fn($key, $value) { attribute { $key } { $value } }),
     $label
   }
 };
@@ -327,16 +323,16 @@ declare function html:table(
         return switch($header?type)
           case 'decimal' case 'number' case 'bytes' return
             if($desc)
-            then function($v) { 0 - number($v) }
-            else function($v) { number($v) }
+            then fn { 0 - number() }
+            else fn { number() }
           case 'time' case 'dateTime' return
             if($desc)
-            then function($v) { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime($v) }
-            else function($v) { $v }
+            then fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
+            else identity(?)
           case 'dynamic' return
-            function($v) { if($v instance of function(*)) then string-join($v()) else $v }
+            fn { if(. instance of function(*)) then string-join(.()) else . }
           default return
-            function($v) { $v }
+            identity(?)
       )
       for $entry in $entries
       order by $value($entry($key)) empty greatest collation '?lang=en'
@@ -345,7 +341,7 @@ declare function html:table(
   )
 
   (: show results :)
-  let $max-option := options:get($options:MAXROWS)
+  let $max-option := config:get($config:MAXROWS)
   let $count-option := $options?count[not($sort)]
   let $page-option := $options?page
 
@@ -557,9 +553,7 @@ declare function html:duration(
 declare function html:js(
   $js  as xs:string
 ) as element(script) {
-  <script type='text/javascript'>{
-    '(function() { ' || $js || ' })();'
-  }</script>
+  <script>{ '(function() { ' || $js || ' })();' }</script>
 };
 
 (:~
@@ -584,7 +578,7 @@ declare function html:parameters(
 ) as map(*) {
   map:merge((
     html:parameters(),
-    map:for-each($map, function($name, $value) {
+    map:for-each($map, fn($name, $value) {
       map:entry('_' || $name, $value)
     })
   ))

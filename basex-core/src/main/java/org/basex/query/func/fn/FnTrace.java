@@ -15,14 +15,14 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnTrace extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
-    final byte[] label = toTokenOrNull(arg(1), qc);
+    final byte[] label = toZeroToken(arg(1), qc);
 
     if(input.isEmpty() || input instanceof RangeSeq || input instanceof SingletonSeq) {
       trace(token(input.toString()), label, qc);
@@ -52,13 +52,11 @@ public class FnTrace extends StandardFunc {
   /**
    * Dumps the specified info to standard error or the info view of the GUI.
    * @param value traced value
-   * @param label additional label to display (can be {@code null})
+   * @param label additional label to display
    * @param qc query context
    */
   public static void trace(final byte[] value, final byte[] label, final QueryContext qc) {
-    final TokenBuilder tb = new TokenBuilder();
-    if(label != null) tb.add(label);
-    final String info = tb.add(value).toString();
+    final String info = new TokenBuilder().add(label).add(value).toString();
     if(qc.jc().tracer().print(info)) qc.evalInfo(info);
   }
 }

@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import java.util.*;
 import java.util.stream.*;
 
 import org.basex.build.csv.*;
@@ -12,7 +11,7 @@ import org.basex.util.options.*;
 /**
  * This class contains database options which are used all around the project.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MainOptions extends Options {
@@ -52,7 +51,7 @@ public final class MainOptions extends Options {
 
   /** Use internal XML parser. */
   public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
-  /** Strip whitespaces. */
+  /** Strip whitespace. */
   public static final BooleanOption STRIPWS = new BooleanOption("STRIPWS", false);
   /** Strip namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
@@ -200,7 +199,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 
@@ -214,7 +213,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

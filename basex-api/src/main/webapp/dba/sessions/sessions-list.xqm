@@ -1,13 +1,13 @@
 (:~
  : Sessions page.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/sessions';
 
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'sessions';
@@ -26,6 +26,7 @@ declare
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
+  %output:html-version('5')
 function dba:sessions(
   $sort   as xs:string,
   $error  as xs:string?,
@@ -55,7 +56,7 @@ function dba:sessions(
             } catch sessions:get {
               '–' (: non-XQuery session value :)
             }
-            let $string := util:chop(serialize($value, map { 'method': 'basex' }), 20)
+            let $string := utils:chop(serialize($value, map { 'method': 'basex' }), 20)
             order by $access descending
             return map {
               'id': $id || '|' || $name,

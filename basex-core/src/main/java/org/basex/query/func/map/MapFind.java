@@ -12,7 +12,7 @@ import org.basex.query.value.map.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MapFind extends StandardFunc {
@@ -27,8 +27,11 @@ public final class MapFind extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    return arg(0) == XQMap.empty() ? XQArray.empty() : this;
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr input = arg(0);
+    if(input.seqType().zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
+
+    return input == XQMap.empty() || input == XQArray.empty() ? XQArray.empty() : this;
   }
 
   /**

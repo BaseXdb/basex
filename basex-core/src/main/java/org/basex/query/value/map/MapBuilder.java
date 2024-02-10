@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * A convenience class for building an {@link XQMap}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MapBuilder {

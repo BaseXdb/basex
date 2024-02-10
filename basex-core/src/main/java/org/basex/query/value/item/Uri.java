@@ -16,7 +16,7 @@ import org.basex.util.*;
 /**
  * URI item ({@code xs:anyURI}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Uri extends AStr {
@@ -54,7 +54,7 @@ public final class Uri extends AStr {
   /**
    * Creates a new uri instance.
    * @param value value
-   * @param normalize remove leading and trailing whitespaces
+   * @param normalize remove leading and trailing whitespace
    * @return uri instance
    */
   public static Uri get(final byte[] value, final boolean normalize) {

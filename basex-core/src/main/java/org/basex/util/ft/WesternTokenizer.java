@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Full-text tokenizer.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class WesternTokenizer extends Tokenizer {
@@ -139,7 +139,7 @@ public final class WesternTokenizer extends Tokenizer {
     final byte[] txt = text;
     final int txtl = txt.length;
 
-    // parse whitespaces
+    // parse whitespace
     int cp = epos;
     boolean bs = false, pa = false, sn = false;
     for(; cp < txtl; cp += cl(txt, cp)) {
@@ -206,7 +206,7 @@ public final class WesternTokenizer extends Tokenizer {
     final byte[] txt = text;
     final int txtl = txt.length;
 
-    // parse whitespaces
+    // parse whitespace
     int cp = epos;
 
     final int lp = cp;

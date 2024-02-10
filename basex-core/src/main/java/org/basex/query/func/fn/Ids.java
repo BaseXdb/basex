@@ -21,12 +21,12 @@ import org.basex.util.hash.*;
 /**
  * Id functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class Ids extends ContextFn {
-  /** Hash map for data references and id flags. */
-  private final IdentityHashMap<Data, Boolean> indexed = new IdentityHashMap<>();
+  /** Map for data references and id flags. */
+  private final Map<Data, Boolean> indexed = Collections.synchronizedMap(new IdentityHashMap<>());
 
   /**
    * Returns referenced nodes.
@@ -37,7 +37,10 @@ abstract class Ids extends ContextFn {
    */
   protected final Value ids(final QueryContext qc, final boolean idref) throws QueryException {
     final TokenSet idSet = ids(arg(0).atomIter(qc, info), qc);
-    final ANode root = toRoot(toNode(context(qc), qc));
+    final ANode node = toNodeOrNull(arg(1), qc);
+
+    final ANode root = (node != null ? node : toNode(context(qc), qc)).root();
+    if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
 
     final ANodeBuilder list = new ANodeBuilder();
     if(index(root, idref)) {
@@ -72,10 +75,8 @@ abstract class Ids extends ContextFn {
     final Data data = root.data();
     if(data == null || (idref ? !data.meta.tokenindex : !data.meta.attrindex)) return false;
     // check if index names contain id attributes
-    synchronized(indexed) {
-      return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
-          containsIds(idref));
-    }
+    return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
+        containsIds(idref));
   }
 
   /**
@@ -104,18 +105,6 @@ abstract class Ids extends ContextFn {
   }
 
   /**
-   * Checks if the specified node has a document node as root.
-   * @param node input node
-   * @return root node
-   * @throws QueryException query exception
-   */
-  private ANode toRoot(final ANode node) throws QueryException {
-    final ANode root = node.root();
-    if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
-    return root;
-  }
-
-  /**
    * Extracts and returns all unique ids from the iterated strings.
    * @param iter iterator
    * @param qc query context
@@ -125,7 +114,9 @@ abstract class Ids extends ContextFn {
   private TokenSet ids(final Iter iter, final QueryContext qc) throws QueryException {
     final TokenSet ts = new TokenSet();
     for(Item ids; (ids = qc.next(iter)) != null;) {
-      for(final byte[] id : distinctTokens(toToken(ids))) ts.put(id);
+      for(final byte[] id : distinctTokens(toToken(ids))) {
+        if(XMLToken.isNCName(id)) ts.put(id);
+      }
     }
     return ts;
   }

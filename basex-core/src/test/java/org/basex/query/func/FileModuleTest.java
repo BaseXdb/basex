@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the File Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Rositsa Shadura
  */
 public final class FileModuleTest extends SandboxTest {
@@ -299,6 +299,12 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_WRITE.args(PATH4, " ()"));
     contains(func.args(PATH1, true), "y");
     query(func.args(PATH1, true, "x"), 'x' + File.separator);
+  }
+
+  /** Test method. */
+  @Test public void listRoots() {
+    final Function func = _FILE_LIST_ROOTS;
+    query("exists(" + func.args() + ")");
   }
 
   /** Test method. */

@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Dynamic invocation of a Java constructor.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class DynJavaConstr extends DynJavaCall {
@@ -62,7 +62,7 @@ final class DynJavaConstr extends DynJavaCall {
     if(!constrs.isEmpty()) return true;
     if(!enforce) return false;
 
-    throw Functions.wrongArity(arity, arities, name(), info, false);
+    throw Functions.wrongArity(arity, arities, name(), false, info);
   }
 
   @Override

@@ -26,7 +26,7 @@ import org.basex.util.hash.*;
 /**
  * Compilation context.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class CompileContext {
@@ -371,14 +371,14 @@ public final class CompileContext {
   }
 
   /**
-   * Creates a list expression from an expression to be swallowed and a result expression.
-   * @param expr expression to be swallowed
+   * Creates a list expression from an expression to be absorbed and a result expression.
+   * @param expr expression to be absorbed
    * @param result result expression
    * @param info input info (can be {@code null})
    * @return function
    * @throws QueryException query exception
    */
-  public Expr merge(final Expr expr, final Expr result, final InputInfo info)
+  public Expr voidAndReturn(final Expr expr, final Expr result, final InputInfo info)
       throws QueryException {
     // a nondeterministic expression may get deterministic when optimizing the query
     return expr.has(Flag.NDT) ?
@@ -409,16 +409,16 @@ public final class CompileContext {
    */
   public ExprList unroll(final Expr expr, final boolean items) {
     final long size = expr.size(), limit = qc.context.options.get(MainOptions.UNROLLLIMIT);
-    final boolean seq = expr instanceof Seq && size <= limit;
+    final boolean value = expr instanceof Seq && size <= limit;
     final boolean list = expr instanceof List && (
         items ? size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args())
               : expr.args().length <= limit
     );
-    if(!(seq || list)) return null;
+    if(!(value || list)) return null;
 
     info(QueryText.OPTUNROLL_X, expr);
     final ExprList exprs = new ExprList((int) size);
-    if(seq) {
+    if(value) {
       for(final Item item : (Value) expr) exprs.add(item);
     } else {
       for(final Expr arg : expr.args()) exprs.add(arg);

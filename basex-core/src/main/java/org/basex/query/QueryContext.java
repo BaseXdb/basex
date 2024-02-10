@@ -46,7 +46,7 @@ import org.basex.util.list.*;
  * This class organizes both static and dynamic properties that are specific to a
  * single query.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class QueryContext extends Job implements Closeable {
@@ -250,7 +250,9 @@ public final class QueryContext extends Job implements Closeable {
     for(final StaticFunc sf : functions.funcs()) {
       if(func.info.equals(sf.info)) {
         // inline arguments of called function
-        sf.anns.addUnique(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
+        if(!sf.anns.contains(Annotation._BASEX_INLINE)) {
+          sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
+        }
         // create and assign function call
         final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.sc, sf.info);
         call.setFunc(sf);
@@ -712,13 +714,9 @@ public final class QueryContext extends Job implements Closeable {
 
     // convert JSON input
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
-      try {
-        final JsonParserOptions jp = new JsonParserOptions();
-        jp.set(JsonOptions.FORMAT, JsonFormat.XQUERY);
-        return JsonConverter.get(jp).convert(object.toString(), "");
-      } catch(final QueryIOException ex) {
-        throw ex.getCause();
-      }
+      final JsonParserOptions jp = new JsonParserOptions();
+      jp.set(JsonOptions.FORMAT, JsonFormat.XQUERY);
+      return JsonConverter.get(jp).convert(object.toString(), "");
     }
 
     // parse target type

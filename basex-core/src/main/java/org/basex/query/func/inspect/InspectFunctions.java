@@ -14,7 +14,7 @@ import org.basex.query.value.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class InspectFunctions extends StandardFunc {
@@ -24,7 +24,7 @@ public final class InspectFunctions extends StandardFunc {
     if(!defined(0)) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final StaticFunc sf : qc.functions.funcs()) {
-        vb.add(Functions.userDefined(sf, qc, sf.sc, info));
+        vb.add(Functions.item(sf, sf.sc, info, qc));
       }
       return vb.value(this);
     }
@@ -48,7 +48,7 @@ public final class InspectFunctions extends StandardFunc {
     // collect new functions
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : qc.functions.funcs()) {
-      if(!old.contains(sf)) vb.add(Functions.userDefined(sf, qc, sf.sc, info));
+      if(!old.contains(sf)) vb.add(Functions.item(sf, sf.sc, info, qc));
     }
     funcs = vb.value(this);
     qc.resources.addFunctions(content.path(), funcs);
@@ -56,7 +56,7 @@ public final class InspectFunctions extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     if(!defined(0)) cc.qc.functions.compileAll(cc);
     return this;
   }

@@ -17,7 +17,7 @@ import java.util.Arrays;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnApply extends StandardFunc {
@@ -45,14 +45,14 @@ public class FnApply extends StandardFunc {
         final int as = Math.max(0, (int) array.arraySize());
         final SeqType[] ast = new SeqType[as];
         for(int a = 0; a < as; a++) ast[a] = array.get(a).seqType();
-        arg(0, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ast));
+        arg(0, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, ast));
       } else if(ft != null) {
         // argument will be of type array: assign generic array return type to all arguments
         final SeqType[] at = ft.argTypes;
         if(at != null) {
           final SeqType[] ast = new SeqType[at.length];
-          Arrays.fill(ast, ((ArrayType) ftArgs).declType);
-          arg(0, arg -> coerceFunc(arg, cc, SeqType.ITEM_ZM, ast));
+          Arrays.fill(ast, ftArgs.declType);
+          arg(0, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, ast));
         }
       }
     }

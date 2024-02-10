@@ -17,17 +17,16 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnAllDifferent extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
-    final Collation coll = toCollation(arg(1), qc);
+    final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set = coll == null ? new HashItemSet(false, info) :
-      new CollationItemSet(coll, info);
+    final ItemSet set = CollationItemSet.get(collation, info);
     for(Item item; (item = qc.next(values)) != null;) {
       if(!set.add(item)) return Bln.FALSE;
     }
@@ -46,11 +45,11 @@ public final class FnAllDifferent extends StandardFunc {
       final SeqType st = values.seqType();
       final AtomType type = st.type.atomic();
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
-        return cc.merge(values, Bln.TRUE, info);
+        return cc.voidAndReturn(values, Bln.TRUE, info);
 
-      // unique(1 to 10)  ->  true
+      // all-different(1 to 10)  ->  true
       if(values instanceof RangeSeq) return Bln.TRUE;
-      // unique(reverse($data))  ->  unique($data)
+      // all-different(reverse($data))  ->  all-different($data)
       if(REVERSE.is(values) || SORT.is(values)) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);

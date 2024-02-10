@@ -29,7 +29,7 @@ import org.basex.util.hash.*;
  * Abstract class for representing XQuery expressions.
  * Expression are divided into {@link ParseExpr} and {@link Value} classes.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
@@ -135,11 +135,12 @@ public abstract class Expr extends ExprInfo {
    * @param qc query context
    * @param ii input info (can be {@code null}); required for {@link Seq} instances,
    *   which have no input info)
-   * @param pred predicate test
+   * @param predicate predicate test
    * @return item
    * @throws QueryException query exception
    */
-  public abstract boolean test(QueryContext qc, InputInfo ii, boolean pred) throws QueryException;
+  public abstract boolean test(QueryContext qc, InputInfo ii, boolean predicate)
+      throws QueryException;
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).
@@ -185,7 +186,7 @@ public abstract class Expr extends ExprInfo {
       @Override
       public boolean used(final VarRef ref) {
         // abort when the variable is used
-        return !ref.var.is(var);
+        return ref.var != var;
       }
     });
   }

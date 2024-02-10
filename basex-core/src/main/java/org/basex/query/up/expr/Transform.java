@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * Transform expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public final class Transform extends Copy {
@@ -70,7 +70,7 @@ public final class Transform extends Copy {
           error = item;
         } else {
           final Item item2 = iter.next();
-          if(item2 != null) error = ValueBuilder.concat(item, item2, qc);
+          if(item2 != null) error = ValueBuilder.concat(item, item2);
         }
         if(error != null) throw UPSINGLE_X_X.get(copy.info(), copy.var.name, error);
 

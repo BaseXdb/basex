@@ -1,11 +1,11 @@
 (:~
  : Query resources.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~
  : Runs a query on a document and returns the result as string.
@@ -26,8 +26,8 @@ function dba:db-query(
   $resource  as xs:string,
   $query     as xs:string?
 ) as xs:string {
-  util:query(
-    if($query) then $query else '.',
+  utils:query(
+    $query[.] otherwise '.',
     let $type := db:type($name, $resource)
     return head(if($type = 'xml') then (
       db:get($name, $resource)

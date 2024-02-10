@@ -18,6 +18,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.tests.bxapi.*;
@@ -31,7 +32,7 @@ import org.basex.util.options.Options.*;
  * {@code http://dev.w3.org/2011/QT3-test-suite/}. The driver needs to be
  * executed from the test suite directory.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class QT3TS extends Main {
@@ -342,8 +343,7 @@ public final class QT3TS extends Main {
         // set base uri
         if(env.baseURI != null) query.baseURI(env.baseURI);
         // bind decimal formats
-        for(final Entry<QName, HashMap<String, String>> df :
-          env.decFormats.entrySet()) {
+        for(final Entry<QName, DecFormatOptions> df : env.decFormats.entrySet()) {
           query.decimalFormat(df.getKey(), df.getValue());
         }
       }

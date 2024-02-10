@@ -18,24 +18,26 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
-    final long count = toLong(arg(1), qc);
-    if(count <= 0) return Empty.VALUE;
-    if(count == 1) return input.value(qc);
+    final Item count = arg(1).atomItem(qc, info);
+
+    final long cnt = toLong(count, 0);
+    if(cnt == 0) return Empty.VALUE;
+    if(cnt == 1) return input.value(qc);
 
     // check if expression must be evaluated only once
-    final boolean once = input instanceof Value || !defined(2) || !toBoolean(arg(2), qc);
-    if(once) return SingletonSeq.get(input.value(qc), count);
+    final boolean once = input instanceof Value || !defined(2) || !toBooleanOrFalse(arg(2), qc);
+    if(once) return SingletonSeq.get(input.value(qc), cnt);
 
     // repeated evaluations
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long c = 0; c < count; c++) vb.add(input.value(qc));
+    for(long c = 0; c < cnt; c++) vb.add(input.value(qc));
     return vb.value(this);
   }
 
@@ -99,7 +101,7 @@ public class FnReplicate extends StandardFunc {
     // merge replicate functions
     if(REPLICATE.is(input) && single == ((FnReplicate) input).singleEval(true)) {
       final ExprList args = new ExprList(2).add(input.arg(0));
-      args.add(new Arith(info, count, input.arg(1), Calc.MULT).optimize(cc));
+      args.add(new Arith(info, count, input.arg(1), Calc.MULTIPLY).optimize(cc));
       if(!single) args.add(Bln.TRUE);
       return cc.function(REPLICATE, info, args.finish());
     }
@@ -109,13 +111,13 @@ public class FnReplicate extends StandardFunc {
     if(count instanceof Value) {
       c = toLong(count, cc.qc);
       // replicate(<a/>, 0)  ->  ()
-      if(c <= 0) return Empty.VALUE;
+      if(c == 0) return Empty.VALUE;
       // replicate(<a/>, 1)  ->  <a/>
       if(c == 1) return input;
       sz = input.size();
-      if(sz != -1) sz = Util.inBounds(sz, c) ? sz * c : -1;
+      if(sz != -1) sz = c > 1 && Util.inBounds(sz, c) ? sz * c : -1;
     }
-    // replicate(prof:void(<a/>), 2)  ->  prof:void(<a/>)
+    // replicate(void(<a/>), 2)  ->  void(<a/>)
     if(input == Empty.VALUE || sz == 0 && single) return input;
 
     // adopt sequence type

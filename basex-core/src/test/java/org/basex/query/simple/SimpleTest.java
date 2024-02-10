@@ -7,7 +7,7 @@ import org.basex.query.*;
 /**
  * Simple XQuery tests.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class SimpleTest extends QueryTest {
@@ -138,7 +138,7 @@ public final class SimpleTest extends QueryTest {
       { "Filter 8", integers(1), "1[boolean(max((<a>1</a>, <b>2</b>)))]" },
       { "Filter 9", strings("x"), "string(<n><a/><a>x</a></n>/a/text()[.][.])" },
       { "Filter 10", strings("x"), "string(<n><a/><a>x</a></n>/a/text()[1][1])" },
-      { "Filter 11", "1[1 to 2]" },
+      { "Filter 11", integers(1), "1[1 to 2]" },
       { "Filter 12", emptySequence(), "for $n in 0 to 1 return 'a'[position()= $n to 0]" },
       { "Filter 13", strings("a", "a"), "for $n in 0 to 1 return ('a', 'b')[position()= $n to 1]" },
 

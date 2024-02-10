@@ -5,7 +5,7 @@ import org.basex.query.*;
 /**
  * XQuery functions tests.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnFormatNumberTest extends QueryTest {
@@ -52,7 +52,7 @@ public final class FnFormatNumberTest extends QueryTest {
       { "formnum 110", strings("11"), "format-number(11, '###')" },
       { "formnum 120", strings("1,111"), "format-number(1111, '#,###')" },
       { "formnum 130", strings("1,111"), "format-number(1111, '0,000')" },
-      { "formnum 140", strings("1.11"), "format-number(1.11, '#,#.#,#')" },
+      { "formnum 140", strings("1.1,1"), "format-number(1.11, '#,#.#,#')" },
       { "formnum 150", strings("100%"), "format-number(1, '0.%')" },
       { "formnum 160", strings("-100.3%"), "format-number(-1.003, '0.0%')" },
       { "formnum 170", strings("1000\u2030"), "format-number(1, '0.\u2030')" },
@@ -66,7 +66,7 @@ public final class FnFormatNumberTest extends QueryTest {
       { "formnum 250", strings("1,234,567"), "format-number(1234567, '#,###')" },
       { "formnum 260", strings("1,234,567.76"),
         "format-number(1234567.765, '#,###.##')" },
-      { "formnum 270", strings("1.57"), "format-number(1.567, '#.#,#')" },
+      { "formnum 270", strings("1.5,7"), "format-number(1.567, '#.#,#')" },
       { "formnum 280", strings("123,45,6"), "format-number(123456, '#,##,#')" },
       { "formnum 290", strings("1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"),
         "format-number(xs:decimal('11111111111111111111'), '#,#')" },

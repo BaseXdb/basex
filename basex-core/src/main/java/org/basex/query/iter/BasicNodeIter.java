@@ -15,7 +15,7 @@ import org.basex.util.*;
  * values can also be retrieved via enhanced for(for-each) loops. Note, however, that
  * the {@link #next()} method will give you better performance.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class BasicNodeIter extends NodeIter implements Iterable<ANode> {

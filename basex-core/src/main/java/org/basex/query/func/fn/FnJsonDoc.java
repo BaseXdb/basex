@@ -9,19 +9,15 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnJsonDoc extends Parse {
-  /** Function taking and returning a string. */
-  private static final FuncType STRFUNC = FuncType.get(SeqType.STRING_O, SeqType.STRING_O);
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item;
@@ -41,7 +37,7 @@ public class FnJsonDoc extends Parse {
 
   /**
    * Parses the specified JSON string.
-   * @param json json string
+   * @param json JSON string
    * @param xml convert to xml
    * @param qc query context
    * @return resulting item
@@ -50,36 +46,48 @@ public class FnJsonDoc extends Parse {
   final Item parse(final byte[] json, final boolean xml, final QueryContext qc)
       throws QueryException {
 
-    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), false, qc);
-    final boolean esc = options.get(JsonParserOptions.ESCAPE);
-    final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
-    final FItem fallback = fb == null ? null : STRFUNC.cast(fb, qc, sc, info);
-    if(esc && fallback != null) throw OPTION_JSON_X.get(info,
-        "Escaping cannot be combined with a fallback function.");
-
     try {
-      options.set(JsonOptions.FORMAT, xml ? JsonFormat.BASIC : JsonFormat.XQUERY);
-      final JsonConverter conv = JsonConverter.get(options);
-      if(!esc && fallback != null) conv.fallback(string -> {
-        try {
-          final Item item = fallback.invoke(qc, info, Str.get(string)).item(qc, info);
-          return Token.string(item.string(info));
-        } catch(final QueryException ex) {
-          throw new QueryRTException(ex);
-        }
-      });
-      return conv.convert(Token.string(json), "");
-    } catch(final QueryRTException ex) {
-      throw ex.getCause();
-    } catch(final QueryIOException ex) {
+      final JsonFormat format = xml ? JsonFormat.BASIC : JsonFormat.XQUERY;
+      return converter(qc, format).convert(Token.string(json), "");
+    } catch(final QueryException ex) {
       Util.debug(ex);
-      final QueryException qe = ex.getCause(info);
-      final QueryError error = qe.error();
+      final QueryError error = ex.error();
       final String message = ex.getLocalizedMessage();
       if(error == JSON_PARSE_X_X_X) throw PARSE_JSON_X.get(info, message);
       if(error == JSON_DUPL_X_X_X) throw DUPLICATE_JSON_X.get(info, message);
       if(error == JSON_OPTIONS_X) throw OPTION_JSON_X.get(info, message);
-      throw qe;
+      throw ex;
     }
+  }
+
+  /**
+   * Returns a JSON converter.
+   * @param qc query context
+   * @param format result format (can be {@code null})
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  protected final JsonConverter converter(final QueryContext qc, final JsonFormat format)
+      throws QueryException {
+
+    final boolean dflt = format != null;
+    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), !dflt, qc);
+    if(dflt) options.set(JsonOptions.FORMAT, format);
+
+    final JsonConverter jc = JsonConverter.get(options);
+    final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
+    if(fb != null) {
+      toFunction(fb, 1, qc);
+      jc.fallback(s -> fb.invoke(qc, info, Str.get(s)).item(qc, info).string(info));
+      if(options.get(JsonParserOptions.ESCAPE)) {
+        throw OPTION_JSON_X.get(info, "Escape cannot be combined with fallback function.");
+      }
+    }
+    final FuncItem np = options.get(JsonParserOptions.NUMBER_PARSER);
+    if(np != null) {
+      toFunction(np, 1, qc);
+      jc.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
+    }
+    return jc;
   }
 }

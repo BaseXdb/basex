@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * Text renderer, supporting syntax highlighting and highlighting of selected, erroneous
  * or linked text.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class TextRenderer extends BaseXBack {
@@ -334,14 +334,17 @@ final class TextRenderer extends BaseXBack {
       sw = font.stringWidth(s);
       if(sw > maxWidth) {
         if(x != offset) newline(true);
-        final int[] cps = s.codePoints().toArray();
-        int c = 0;
-        final int cl = cps.length;
-        for(sw = 0; c <= cl && sw <= maxWidth; c++) sw += font.charWidth(cps[c]);
-        for(; c <= cl && font.stringWidth(new String(cps, 0, c)) <= maxWidth; c++);
-        final TokenBuilder tb = new TokenBuilder(c);
-        for(int t = 0; t < c; t++) tb.add(cps[t]);
-        s = tb.toString();
+
+        final TokenBuilder tb = new TokenBuilder();
+        sw = 0;
+        for(final int scp : s.codePoints().toArray()) {
+          if(sw >= maxWidth) break;
+          tb.add(scp);
+          sw += font.charWidth(scp);
+          if(sw > maxWidth) sw = font.stringWidth(tb.toString());
+        }
+        s = tb.removeLast().toString();
+        if(s.isEmpty()) return false;
         sw = font.stringWidth(s);
         iter.posEnd(iter.pos() + tb.size());
       }
@@ -550,7 +553,7 @@ final class TextRenderer extends BaseXBack {
       // token found
       if(xPos < x + stringWidth) {
         final int p = iter.pos(), sw = xPos - x;
-        for(int caretP = iter.pos(), oldFsw = 0; iter.more();) {
+        for(int caretP, oldFsw = 0; iter.more();) {
           caretP = iter.pos();
           iter.next();
           final int fsw = font.stringWidth(iter.substring(p, iter.pos()));

@@ -64,7 +64,7 @@ import org.basex.util.list.*;
  * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
  * are synchronized over a single context's read/write lock.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {
@@ -83,7 +83,7 @@ public abstract class Data {
 
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
-  /** Unique id. ID can get negative, as subtraction of ids is used for all comparisons. */
+  /** Unique id. Negative ID values are ok (IDs are subtracted when being compared). */
   public final int dbid = ID.incrementAndGet();
 
   /** Resource index. */

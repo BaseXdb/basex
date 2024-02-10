@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * A singleton array.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class SingletonArray extends XQArray {
@@ -53,7 +53,7 @@ final class SingletonArray extends XQArray {
 
   @Override
   public XQArray concat(final XQArray other) {
-    return other.isEmptyArray() ? this : other.prepend(member);
+    return other == empty() ? this : other.prepend(member);
   }
 
   @Override
@@ -74,11 +74,6 @@ final class SingletonArray extends XQArray {
   @Override
   public XQArray tail() {
     return empty();
-  }
-
-  @Override
-  public boolean isEmptyArray() {
-    return false;
   }
 
   @Override

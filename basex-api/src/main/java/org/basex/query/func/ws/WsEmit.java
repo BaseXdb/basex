@@ -9,13 +9,13 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class WsEmit extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    WsPool.emit(toItem(arg(0), qc));
+    WsPool.emit(arg(0).atomItem(qc, info));
     return Empty.VALUE;
   }
 }

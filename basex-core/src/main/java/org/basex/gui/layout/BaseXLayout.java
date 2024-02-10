@@ -30,7 +30,7 @@ import org.basex.util.*;
  * This class provides static layout and paint helper methods which are used all over
  * the GUI.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
@@ -92,12 +92,16 @@ public final class BaseXLayout {
    */
   public static void antiAlias(final Graphics g, final String type) {
     Object hint = null;
-    if(type.equals("Off")) {
-      hint = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
-    } else if(type.equals("On")) {
-      hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-    } else if(type.equals("GASP")) {
-      hint = RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
+    switch (type) {
+      case "Off":
+        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+        break;
+      case "On":
+        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+        break;
+      case "GASP":
+        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
+        break;
     }
     if(hint != null) ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, hint);
   }
@@ -283,7 +287,7 @@ public final class BaseXLayout {
 
   /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-23, BSD License
+   * @author BaseX Team 2005-24, BSD License
    * @author Christian Gruen
    */
   public interface DropHandler {

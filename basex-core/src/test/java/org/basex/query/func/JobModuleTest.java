@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Job Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JobModuleTest extends SandboxTest {
@@ -162,6 +162,14 @@ public final class JobModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void evalSleep() {
+    final Function func = _JOB_EVAL;
+    query(func.args("1", " ()", " map { 'cache': true() }") + " ! (" +
+        _PROF_SLEEP.args(500) + ", " + _JOB_LIST_DETAILS.args(" .") + "/@duration = 'PT0S'"
+    + ")", true);
+  }
+
+  /** Test method. */
   @Test public void evalUri() {
     final Function func = _JOB_EVAL;
     final String uri = " xs:anyURI('src/test/resources/input.xq')";
@@ -246,7 +254,7 @@ public final class JobModuleTest extends SandboxTest {
     // receive result of asynchronous execution
     final Function func = _JOB_RESULT;
     query("let $q :=" + _JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
-      " return (" + ITERATE_WHILE.args(" ()",
+      " return (" + WHILE_DO.args(" ()",
         " function($_) { not(" + _JOB_FINISHED.args(" $q") + ") }",
         " function($_) { " + _PROF_SLEEP.args(1) + " }") + "," + func.args(" $q") + ")", 1);
 

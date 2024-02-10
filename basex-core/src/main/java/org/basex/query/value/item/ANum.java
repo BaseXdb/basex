@@ -13,7 +13,7 @@ import org.basex.util.*;
  * Abstract super class for all numeric items.
  * Useful for removing exceptions and unifying hash values.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public abstract class ANum extends Item {
@@ -48,7 +48,7 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
+  public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
     if(item instanceof ANum) {
       final double d1 = dbl(ii), d2 = item.dbl(ii);
       final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
@@ -115,9 +115,9 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
       throws QueryException {
-    return pred ? dbl() == qc.focus.pos : bool(ii);
+    return predicate ? dbl() == qc.focus.pos : bool(ii);
   }
 
   @Override
@@ -137,8 +137,8 @@ public abstract class ANum extends Item {
     final boolean fractional = d != l;
     switch(op) {
       case EQ: if(d < 1 || fractional) return Bln.FALSE; break;
-      case LE: if(d < 1) return Bln.FALSE; break;
       case NE: if(d < 1 || fractional) return Bln.TRUE; break;
+      case LE: if(d < 1) return Bln.FALSE; break;
       case GT: if(d < 1) return Bln.TRUE; break;
       case LT: if(d < Math.nextUp(1d)) return Bln.FALSE; break;
       case GE: if(d < Math.nextUp(1d)) return Bln.TRUE; break;

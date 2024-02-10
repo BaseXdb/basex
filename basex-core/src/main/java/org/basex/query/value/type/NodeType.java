@@ -23,7 +23,7 @@ import org.w3c.dom.Text;
 /**
  * XQuery node types.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public enum NodeType implements Type {
@@ -232,7 +232,8 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return type.oneOf(this, AtomType.ITEM) || type instanceof NodeType && parent.instanceOf(type);
+    return this == type || type == AtomType.ITEM ||
+        type instanceof NodeType && parent.instanceOf(type);
   }
 
   @Override

@@ -20,7 +20,7 @@ import org.xml.sax.*;
 /**
  * This class contains the static context of an expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class StaticContext {
@@ -166,16 +166,17 @@ public final class StaticContext {
 
   /**
    * Returns a decimal format.
-   * @param id format id
+   * @param name name
    * @return decimal format or {@code null}
    * @throws QueryException query exception
    */
-  public DecFormatter decFormat(final byte[] id) throws QueryException {
+  public synchronized DecFormatter decFormat(final QNm name) throws QueryException {
+    final byte[] id = name.internal();
     DecFormatter df = decFormats.get(id);
-    if(df == null && eq(id, EMPTY)) {
+    if(df == null) {
       // lazy instantiation of default decimal format
-      df = new DecFormatter(null, null);
-      decFormats.put(id, df);
+      df = eq(id, EMPTY) ? new DecFormatter() : DecFormatter.forLanguage(id);
+      if(df != null) decFormats.put(id, df);
     }
     return df;
   }

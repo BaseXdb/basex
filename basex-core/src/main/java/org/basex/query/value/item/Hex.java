@@ -6,14 +6,13 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * HexBinary item ({@code xs:hexBinary}).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Hex extends Bin {
@@ -56,29 +55,8 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
-    return Token.eq(binary(ii), bin);
-  }
-
-  @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
-    return Token.diff(binary(ii), bin);
-  }
-
-  /**
-   * Converts the given item to a byte array.
-   * @param item item to be converted
-   * @param info input info (can be {@code null})
-   * @return byte array
-   * @throws QueryException query exception
-   */
-  public static byte[] parse(final Item item, final InputInfo info) throws QueryException {
-    final byte[] bytes = parse(item.string(info));
-    if(bytes != null) return bytes;
-    throw AtomType.HEX_BINARY.castError(item, info);
+  public byte[] parse(final Item item, final InputInfo info) throws QueryException {
+    return parse(item.string(info), info);
   }
 
   /**
@@ -102,13 +80,13 @@ public final class Hex extends Bin {
   private static byte[] parse(final byte[] data) {
     final int dl = data.length;
     if((dl & 1) != 0) return null;
-    final byte[] value = new byte[dl >>> 1];
+    final byte[] array = new byte[dl >>> 1];
     for(int d = 0; d < dl; d += 2) {
       final int n = Token.dec(data[d], data[d + 1]);
       if(n < 0) return null;
-      value[d >>> 1] = (byte) n;
+      array[d >>> 1] = (byte) n;
     }
-    return value;
+    return array;
   }
 
   @Override

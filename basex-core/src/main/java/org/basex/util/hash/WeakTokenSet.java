@@ -12,7 +12,7 @@ import org.basex.util.*;
  * reference showing up in a reference queue. The first entry of the token set (offset 0) is always
  * empty.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
 public class WeakTokenSet extends ASet {

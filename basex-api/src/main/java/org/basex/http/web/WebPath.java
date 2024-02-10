@@ -3,7 +3,7 @@ package org.basex.http.web;
 /**
  * This abstract class represents the path of a Web function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Johannes Finckh
  */
 public abstract class WebPath {

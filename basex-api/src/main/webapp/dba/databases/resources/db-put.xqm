@@ -1,12 +1,12 @@
 (:~
  : Put resources.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../../lib/html.xqm';
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -31,6 +31,7 @@ declare
   %rest:query-param('binary', '{$binary}')
   %rest:query-param('error',  '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-put(
   $name    as xs:string,
   $opts    as xs:string*,
@@ -74,7 +75,7 @@ function dba:db-put(
                 html:option('intparse', 'Use internal XML parser', $opts),
                 html:option('dtd', 'Parse DTDs and entities', $opts),
                 html:option('stripns', 'Strip namespaces', $opts),
-                html:option('stripws', 'Strip whitespaces', $opts),
+                html:option('stripws', 'Strip whitespace', $opts),
                 html:option('xinclude', 'Use XInclude', $opts)
               }</td>
             </tr>
@@ -124,12 +125,12 @@ function dba:db-put-post(
           ('intparse', 'dtd', 'stripns', 'stripws', 'xinclude') ! map:entry(., $opts = .))
         )
       ),
-      util:redirect($dba:SUB,
+      utils:redirect($dba:SUB,
         map { 'name': $name, 'path': $path, 'info': 'Resource was put.' }
       )
     )
   } catch * {
-    util:redirect('db-put', map {
+    utils:redirect('db-put', map {
       'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary, 'error': $err:description
     })
   }

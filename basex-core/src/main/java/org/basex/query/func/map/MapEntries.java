@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class MapEntries extends StandardFunc {
@@ -63,6 +63,6 @@ public class MapEntries extends StandardFunc {
    * @throws QueryException query exception
    */
   XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.entry(key, value, info);
+    return XQMap.singleton(key, value, info);
   }
 }

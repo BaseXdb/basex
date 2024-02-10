@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Job pool.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class JobPool {
@@ -94,7 +94,7 @@ public final class JobPool {
     final byte[] prefix = token(JobContext.PREFIX);
     final int pl = prefix.length;
     return ids.sort((id1, id2) -> startsWith(id1, prefix) && startsWith(id2, prefix) ?
-        toInt(substring(id1, pl)) - toInt(substring(id2, pl)) : diff(id1, id2), true);
+        toInt(substring(id1, pl)) - toInt(substring(id2, pl)) : compare(id1, id2), true);
   }
 
   /**

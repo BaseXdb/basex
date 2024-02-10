@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code let} clause, binding an expression to a variable.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class Let extends ForLet {
@@ -71,7 +71,7 @@ public final class Let extends ForLet {
         expr = tc.expr;
       }
     }
-    // promote at compile time
+    // coerce at compile time
     if(expr instanceof Value) {
       expr = var.checkType((Value) expr, cc.qc, true);
     }

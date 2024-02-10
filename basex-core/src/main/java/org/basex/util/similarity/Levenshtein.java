@@ -10,7 +10,7 @@ import java.util.function.*;
  * "Binary codes capable of correcting spurious insertions and deletions of ones", and
  * Damerau (1964): "A technique for computer detection and correction of spelling errors.".</p>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Levenshtein {

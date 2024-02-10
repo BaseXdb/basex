@@ -27,7 +27,7 @@ import org.basex.util.list.*;
 /**
  * Single HTTP connection.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class HTTPConnection implements ClientInfo {
@@ -100,7 +100,7 @@ public final class HTTPConnection implements ClientInfo {
     context.user(user);
 
     // generate log entry
-    final StringBuilder uri = new StringBuilder(request.getRequestURI());
+    final StringBuilder uri = new StringBuilder(uri());
     final String qs = request.getQueryString();
     if(qs != null) uri.append('?').append(qs);
     context.log.write(LogType.REQUEST, '[' + method + "] " + uri, null, context);
@@ -224,10 +224,20 @@ public final class HTTPConnection implements ClientInfo {
   public String resolve(final String location) {
     String loc = location;
     if(Strings.startsWith(location, '/')) {
-      final String uri = request.getRequestURI(), info = request.getPathInfo();
+      final String uri = uri(), info = request.getPathInfo();
       loc = (info == null ? uri : uri.substring(0, uri.length() - info.length())) + location;
     }
     return loc;
+  }
+
+  /**
+   * Returns the request URI.
+   * @return request URI
+   */
+  public String uri() {
+    // according to the documentation, the method should never return null. however.
+    final String uri = request.getRequestURI();
+    return uri != null ? uri : "";
   }
 
   /**
@@ -246,6 +256,7 @@ public final class HTTPConnection implements ClientInfo {
    * @throws ServletException servlet exception
    */
   public void forward(final String location) throws IOException, ServletException {
+    request.setAttribute(HTTPText.FORWARD, requestCtx);
     request.getRequestDispatcher(resolve(location)).forward(request, response);
   }
 
@@ -387,7 +398,7 @@ public final class HTTPConnection implements ClientInfo {
   public static String remoteAddress(final HttpServletRequest request) {
     for(final String header : FORWARDING_HEADERS) {
       final String addr = request.getHeader(header);
-      if (addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
+      if(addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
     }
     return request.getRemoteAddr();
   }

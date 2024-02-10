@@ -1,11 +1,11 @@
 package org.basex.core.users;
 
-import java.util.*;
+import org.basex.util.options.*;
 
 /**
  * Algorithms.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum Algorithm {
@@ -27,6 +27,6 @@ public enum Algorithm {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    return EnumOption.string(name());
   }
 }

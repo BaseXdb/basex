@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with one or more simple numeric predicates.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class IterPosStep extends Step {
@@ -43,17 +43,9 @@ public final class IterPosStep extends Step {
           iter = axis.iter(checkNode(qc));
           final int el = exprs.length;
           for(int e = 0; e < el; e++) {
-            final Expr expr = exprs[e];
-            if(expr instanceof CmpPos) {
-              posExpr[e] = (CmpPos) expr;
-            } else if(numeric(expr)) {
-              // pre-evaluate numeric position
-              final Item item = expr.item(qc, info);
-              if(item.isEmpty()) return null;
-              final Expr ex = IntPos.get(toDouble(item), info);
-              if(!(ex instanceof CmpPos)) return null;
-              posExpr[e] = (CmpPos) ex;
-            }
+            final Expr expr = Pos.get(exprs[e], info, qc);
+            if(expr == Bln.FALSE) return null;
+            if(expr instanceof CmpPos) posExpr[e] = (CmpPos) expr;
           }
         }
 

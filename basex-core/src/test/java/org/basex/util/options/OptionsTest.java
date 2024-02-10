@@ -19,14 +19,14 @@ import org.junit.jupiter.api.*;
 /**
  * Tests on options.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class OptionsTest extends SandboxTest {
   /** Initializes various options. */
   @AfterAll public static void init() {
     // instantiate options at least once
-    new UCAOptions();
+    new UCAOptions(false);
     new CsvOptions();
     new CsvParserOptions();
     new CsvSerialOptions();

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Provides methods for editing a text that is visualized by the {@link TextPanel}.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class TextEditor {
@@ -473,7 +473,7 @@ public final class TextEditor {
       end = s;
     }
 
-    // ignore whitespaces
+    // ignore whitespace
     while(start < end && ws(text[start])) ++start;
     while(end > start && ws(text[end - 1])) --end;
 
@@ -715,9 +715,9 @@ public final class TextEditor {
       final Collator coll = Collator.getInstance();
       cc = (t1, t2) -> coll.compare(string(sub(t1, column)), string(sub(t2, column)));
     } else if(gopts.get(GUIOptions.CASESORT)) {
-      cc = (t1, t2) -> diff(sub(t1, column), sub(t2, column));
+      cc = (t1, t2) -> compare(sub(t1, column), sub(t2, column));
     } else {
-      cc = (t1, t2) -> diff(lc(sub(t1, column)), lc(sub(t2, column)));
+      cc = (t1, t2) -> compare(lc(sub(t1, column)), lc(sub(t2, column)));
     }
     tokens.sort(cc, gopts.get(GUIOptions.ASCSORT));
 
@@ -877,7 +877,7 @@ public final class TextEditor {
   }
 
   /**
-   * Closes a bracket and unindents leading whitespaces.
+   * Closes a bracket and unindents leading whitespace.
    */
   private void close() {
     int p = pos - 1;
@@ -1061,7 +1061,7 @@ public final class TextEditor {
     final TokenBuilder tb = new TokenBuilder();
     for(int p = s; p < e; p++) {
       if(p == 0 || text[p - 1] == '\n') {
-        // find leading whitespaces
+        // find leading whitespace
         int i = 0;
         do {
           final int cp = text[p];

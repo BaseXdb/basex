@@ -1,14 +1,13 @@
 package org.basex.index.resource;
 
-import java.util.*;
-
 import org.basex.io.*;
 import org.basex.util.http.*;
+import org.basex.util.options.*;
 
 /**
  * Database resource type.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public enum ResourceType {
@@ -97,6 +96,6 @@ public enum ResourceType {
 
   @Override
   public String toString() {
-    return name().toLowerCase(Locale.ENGLISH);
+    return EnumOption.string(name());
   }
 }

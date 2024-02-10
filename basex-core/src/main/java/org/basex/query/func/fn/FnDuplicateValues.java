@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.util.function.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -17,23 +15,22 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnDuplicateValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
-    final Collation coll = toCollation(arg(1), qc);
+    final Collation collation = toCollation(arg(1), qc);
 
-    final Supplier<ItemSet> newSet = () -> coll == null ? new HashItemSet(false, info) :
-      new CollationItemSet(coll, info);
-    final ItemSet set = newSet.get(), dupl = newSet.get();
+    final ItemSet set = CollationItemSet.get(collation, info);
+    final ItemSet dups = CollationItemSet.get(collation, info);
     return new Iter() {
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(values)) != null;) {
-          if(!set.add(item) && dupl.add(item)) return item;
+          if(!set.add(item) && dups.add(item)) return item;
         }
         return null;
       }

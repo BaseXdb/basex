@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * in some cases (e.g. when bulk insertions of new documents are performed). A tree structure could
  * be introduced to offer better general performance.</p>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -269,7 +269,7 @@ final class Docs {
       final int[] order = order();
       int l = 0, h = order.length - 1;
       while(l <= h) {
-        final int m = l + h >>> 1, o = order[m], c = diff(paths.get(o), npth);
+        final int m = l + h >>> 1, o = order[m], c = compare(paths.get(o), npth);
         if(c == 0) return docs().get(o);
         if(c < 0) l = m + 1;
         else h = m - 1;

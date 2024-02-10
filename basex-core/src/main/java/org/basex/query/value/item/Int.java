@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Integer item ({@code xs:int}, {@code xs:integer}, {@code xs:short}, etc.).
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Int extends ANum {
@@ -106,8 +106,8 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean pred) {
-    return pred ? value == qc.focus.pos : bool(ii);
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate) {
+    return predicate ? value == qc.focus.pos : bool(ii);
   }
 
   @Override
@@ -131,7 +131,7 @@ public final class Int extends ANum {
   }
 
   @Override
-  public ANum round(final int scale, final boolean even) {
+  public Int round(final int scale, final boolean even) {
     final long v = rnd(scale, even);
     return v == value ? this : get(v);
   }
@@ -166,11 +166,11 @@ public final class Int extends ANum {
   }
 
   @Override
-  public int diff(final Item item, final Collation coll, final InputInfo ii) throws QueryException {
-    if(item instanceof Int) return Long.compare(value, ((Int) item).value);
-    if(item.type == AtomType.DECIMAL) return -item.diff(this, coll, ii);
-    final double d = item.dbl(ii);
-    return Double.isNaN(d) ? UNDEF : value < d ? -1 : value > d ? 1 : 0;
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    return item instanceof Int ? Long.compare(value, ((Int) item).value) :
+           item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
+           Dbl.compare(dbl(ii), item.dbl(ii), transitive);
   }
 
   @Override

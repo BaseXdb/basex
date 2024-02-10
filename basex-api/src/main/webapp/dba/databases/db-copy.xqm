@@ -1,12 +1,12 @@
 (:~
  : Copy database.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -27,6 +27,7 @@ declare
   %rest:query-param('newname', '{$newname}')
   %rest:query-param('error',   '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-copy(
   $name     as xs:string,
   $newname  as xs:string?,
@@ -80,8 +81,8 @@ function dba:db-copy(
     ) else (
       db:copy($name, $newname)
     ),
-    util:redirect($dba:SUB, map { 'name': $newname, 'info': 'Database was copied.' })
+    utils:redirect($dba:SUB, map { 'name': $newname, 'info': 'Database was copied.' })
   } catch * {
-    util:redirect('db-copy', map { 'name': $name, 'newname': $newname, 'error': $err:description })
+    utils:redirect('db-copy', map { 'name': $name, 'newname': $newname, 'error': $err:description })
   }
 };

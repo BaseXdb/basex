@@ -31,7 +31,7 @@ import org.basex.util.*;
 /**
  * Path expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Path extends ParseExpr {
@@ -317,7 +317,7 @@ public abstract class Path extends ParseExpr {
       if(prev != null) {
         final SeqType seqType = prev.seqType();
         if(seqType.type instanceof NodeType && (step instanceof ContextValue ||
-            step instanceof Step && ((Step) step).redundant(seqType))) {
+            step instanceof Step && ((Step) step).remove(seqType))) {
           removed = true;
           continue;
         }
@@ -331,7 +331,7 @@ public abstract class Path extends ParseExpr {
       list.add(expr);
 
       // ignore remaining steps if step yields no results
-      // example: A/prof:void(.)/B  ->  A/prof:void(.)
+      // example: A/void(.)/B  ->  A/void(.)
       if(expr.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
         break;

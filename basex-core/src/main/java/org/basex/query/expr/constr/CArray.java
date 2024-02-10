@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Array constructor.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class CArray extends Arr {
@@ -40,7 +40,7 @@ public final class CArray extends Arr {
     final boolean values = allAreValues(true);
     if(exprs.length == 1 && (sequences || exprs[0].size() == 1)) {
       return cc.replaceWith(this, values
-          ? XQArray.member(exprs[0].value(cc.qc))
+          ? XQArray.singleton(exprs[0].value(cc.qc))
           : cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
     }
 

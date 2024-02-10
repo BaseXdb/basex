@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the execution of parallel commands.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Andreas Weiler
  */
 public final class ConcurrencyTest extends SandboxTest {
@@ -113,7 +113,7 @@ public final class ConcurrencyTest extends SandboxTest {
   private static final Random RANDOM = new Random();
 
   /** Single client. */
-  private static class CommandClient extends Thread {
+  private static final class CommandClient extends Thread {
     @Override
     public void run() {
       try {

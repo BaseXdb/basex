@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for the {@link XQArray} data structure.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class VariousArrayTest extends ArrayTest {
@@ -55,7 +55,7 @@ public final class VariousArrayTest extends ArrayTest {
       assertEquals(k - i - 1, array.arraySize());
     }
 
-    assertTrue(array.isEmptyArray());
+    assertTrue(array == XQArray.empty());
   }
 
   /**
@@ -81,7 +81,7 @@ public final class VariousArrayTest extends ArrayTest {
       assertEquals(i, array.arraySize());
     }
 
-    assertTrue(array.isEmptyArray());
+    assertTrue(array == XQArray.empty());
   }
 
   /**

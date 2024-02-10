@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class contains common methods for full-text index builders.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FTBuilder extends IndexBuilder {
@@ -124,7 +124,7 @@ public final class FTBuilder extends IndexBuilder {
         for(int i = 0; i < splits; ++i) {
           if(m == i || v[i].token.length == 0) continue;
           final int l = v[i].token.length - v[m].token.length;
-          final int d = diff(v[m].token, v[i].token);
+          final int d = compare(v[m].token, v[i].token);
           if(l < 0 || l == 0 && d > 0 || v[m].token.length == 0) {
             m = i;
             il.reset();

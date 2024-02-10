@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * An array storing {@link Value}s.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public abstract class XQArray extends XQData {
@@ -60,7 +60,7 @@ public abstract class XQArray extends XQData {
    * @param value single member
    * @return array
    */
-  public static XQArray member(final Value value) {
+  public static XQArray singleton(final Value value) {
     return new SingletonArray(value);
   }
 
@@ -157,13 +157,6 @@ public abstract class XQArray extends XQData {
    * @return reversed version of this array
    */
   public abstract XQArray reverseArray(QueryContext qc);
-
-  /**
-   * Checks if this array is empty.
-   * Running time: <i>O(1)</i>
-   * @return {@code true} if the array is empty, {@code false} otherwise
-   */
-  public abstract boolean isEmptyArray();
 
   /**
    * Inserts the given member at the given position into this array.
@@ -376,13 +369,14 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    if(item instanceof FuncItem) throw FICOMPARE_X.get(deep.info, item);
+    if(this == item) return true;
     if(item instanceof XQArray) {
       final XQArray array = (XQArray) item;
       if(arraySize() != array.arraySize()) return false;
       final Iterator<Value> iter1 = iterator(0), iter2 = array.iterator(0);
       while(iter1.hasNext()) {
-        if(!deep.equal(iter1.next(), iter2.next())) return false;
+        final Value value1 = iter1.next(), value2 = iter2.next();
+        if(!(deep != null ? deep.equal(value1, value2) : value1.equals(value2))) return false;
       }
       return true;
     }

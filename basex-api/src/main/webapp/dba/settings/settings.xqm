@@ -1,11 +1,11 @@
 (:~
  : Settings page.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/settings';
 
-import module namespace options = 'dba/options' at '../lib/options.xqm';
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
 
 (:~ Top category :)
@@ -23,28 +23,29 @@ declare
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
+  %output:html-version('5')
 function dba:settings(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
   let $system := html:properties(db:system())
-  let $table-row := function($label, $items) {
+  let $table-row := fn($label, $items) {
     <tr><td>{ $label, <br/>, $items }</td></tr>
   }
-  let $option := function($key, $values, $label) {
+  let $option := fn($key, $values, $label) {
     $table-row($label,
       <select name='{ $key }'>{
-        let $selected := options:get($key)
+        let $selected := config:get($key)
         for $value in $values
         return element option { attribute selected { }[$value = $selected], $value }
       }</select>
     )
   }
-  let $number := function($key, $label) {
-    $table-row($label, <input type='number' name='{ $key }' value='{ options:get($key) }'/>)
+  let $number := fn($key, $label) {
+    $table-row($label, <input type='number' name='{ $key }' value='{ config:get($key) }'/>)
   }
-  let $string := function($key, $label) {
-    $table-row($label, <input type='text' name='{ $key }' value='{ options:get($key) }'/>)
+  let $string := fn($key, $label) {
+    $table-row($label, <input type='text' name='{ $key }' value='{ config:get($key) }'/>)
   }
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
@@ -54,20 +55,20 @@ function dba:settings(
           <h3>Queries</h3>
           <table>
             {
-              $number($options:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
-              $number($options:MEMORY, 'Memory limit, in MB (0 = disabled)'),
-              $number($options:MAXCHARS, 'Maximum output size'),
-              $option($options:PERMISSION, $options:PERMISSIONS, 'Permission'),
-              $option($options:INDENT, $options:INDENTS, 'Indent results')
+              $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
+              $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)'),
+              $number($config:MAXCHARS, 'Maximum output size'),
+              $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
+              $option($config:INDENT, $config:INDENTS, 'Indent results')
             }
           </table>
           <h3>Tables</h3>
           <table>{
-            $number($options:MAXROWS,  'Displayed table rows')
+            $number($config:MAXROWS,  'Displayed table rows')
           }</table>
           <h3>Logs</h3>
           <table>{
-            $string($options:IGNORE-LOGS, <span>Ignore entries (e.g. <code>/dba</code>):</span>)
+            $string($config:IGNORE-LOGS, <span>Ignore entries (e.g. <code>/dba</code>):</span>)
           }</table>
         </form>
       </td>
@@ -100,6 +101,6 @@ declare
   %rest:path('/dba/settings')
 function dba:settings-save(
 ) as element(rest:response) {
-  options:save(html:parameters()),
+  config:save(html:parameters()),
   web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
 };

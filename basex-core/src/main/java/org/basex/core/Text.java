@@ -17,7 +17,7 @@ import org.basex.util.*;
  * This class contains internationalized text strings, which are used throughout the project.
  * If this class is called first, the Strings are initialized by the {@link Lang} class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public interface Text {
@@ -53,7 +53,7 @@ public interface Text {
   /** Entity. */
   String ORGANIZATION = Prop.NAME + " Team";
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-23 " + ORGANIZATION;
+  String COPYRIGHT = "\u00A9 2005-24 " + ORGANIZATION;
 
   /** New line. */
   String NL = Prop.NL;
@@ -106,7 +106,7 @@ public interface Text {
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
     "  -w         Toggle whitespace stripping" + NL +
-    "  -W         Enable indentation with whitespaces" + NL +
+    "  -W         Enable indentation with whitespace" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
@@ -135,7 +135,7 @@ public interface Text {
     "  -v         Toggle output of progress info" + NL +
     "  -V         Toggle detailed query output" + NL +
     "  -w         Toggle whitespace stripping" + NL +
-    "  -W         Enable indentation with whitespaces" + NL +
+    "  -W         Enable indentation with whitespace" + NL +
     "  -x         Toggle output of query plan" + NL +
     "  -z         Toggle output of query result";
 
@@ -1111,7 +1111,7 @@ public interface Text {
 
   /** Dialog title for database options. */
   String CREATE_DATABASE = lang("create_database");
-  /** Strip whitespaces. */
+  /** Strip whitespace. */
   String STRIP_WS = lang("strip_ws");
   /** Strip namespaces. */
   String STRIP_NS = lang("strip_ns");
@@ -1331,8 +1331,6 @@ public interface Text {
 
   /** Dialog title for choosing a font. */
   String CHOOSE_FONT = lang("choose_font");
-  /** Predefined font types. */
-  String[] FONT_TYPES = { lang("standard"), lang("bold"), lang("italics") };
 
   /** Dialog title for treemap color schema. */
   String COLOR_SCHEMA = lang("color_schema");
@@ -1391,7 +1389,7 @@ public interface Text {
   /** Out of memory error due to database creation. */
   String H_OUT_OF_MEM = NL + lang("h_out_of_mem");
 
-  /** Information on stripping whitespaces. */
+  /** Information on stripping whitespace. */
   String H_STRIP_WS = lang("h_strip_ws");
   /** Internal parser information. */
   String H_INT_PARSER = lang("h_int_parser");

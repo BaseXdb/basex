@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Math Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MathModuleTest extends SandboxTest {
@@ -51,7 +51,7 @@ public final class MathModuleTest extends SandboxTest {
 
     check(func.args(wrap(5), 0), 1, root(Dbl.class));
     check(func.args(wrap(5), 1), 5, root(Cast.class));
-    check(func.args(wrap(5), -1), 0.2, root(Arith.class));
+    check(func.args(wrap(5), -1), 0.2, root(ArithSimple.class));
 
     check(func.args(func.args(wrap(3), 2), 2), 81, count(func, 1));
     check(func.args(func.args(func.args(wrap(3), 2), 2), 2), 6561, count(func, 1));

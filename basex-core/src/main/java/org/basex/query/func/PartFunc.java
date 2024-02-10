@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Partial function application.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class PartFunc extends Arr {
@@ -64,12 +64,11 @@ public final class PartFunc extends Arr {
       for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
       exprType.assign(FuncType.get(ft.declType, args).seqType());
     }
-
     return this;
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem func = toFunction(body(), qc);
 
     final int hl = holes.length, nargs = exprs.length + hl - 1, arity = func.arity();
@@ -95,7 +94,7 @@ public final class PartFunc extends Arr {
     final DynFuncCall expr = new DynFuncCall(info, sc, updating, false, func, args);
 
     final FuncType type = FuncType.get(anns, ft.declType, params);
-    return new FuncItem(sc, anns, null, params, type, expr, vs.stackSize(), info, qc.focus.copy());
+    return new FuncItem(info, expr, params, anns, type, sc, vs.stackSize(), null, qc.focus.copy());
   }
 
   @Override

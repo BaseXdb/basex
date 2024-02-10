@@ -9,7 +9,6 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -24,7 +23,7 @@ import org.basex.util.hash.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnMin extends StandardFunc {
@@ -41,8 +40,8 @@ public class FnMin extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item minmax(final boolean min, final QueryContext qc) throws QueryException {
-    final Collation coll = toCollation(arg(1), qc);
     final Expr values = arg(0);
+    final Collation collation = toCollation(arg(1), qc);
 
     if(values instanceof Range) {
       final Value value = values.value(qc);
@@ -58,12 +57,11 @@ public class FnMin extends StandardFunc {
     if(!type.isSortable()) throw COMPARE_X_X.get(info, type, item);
 
     // strings and URIs
-    final OpV op = min ? OpV.GT : OpV.LT;
     if(item instanceof AStr) {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(op.eval(item, it, coll, sc, info)) item = it;
+        if(min ^ item.compare(it, collation, true, info) < 0) item = it;
         if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, sc, info);
       }
       return item;
@@ -73,15 +71,18 @@ public class FnMin extends StandardFunc {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type type2 = it.type;
         if(type != type2) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(op.eval(item, it, coll, sc, info)) item = it;
+        if(min ^ item.compare(it, collation, true, info) < 0) item = it;
       }
       return item;
     }
     // numbers
     if(type.isUntyped()) item = DOUBLE.cast(item, qc, sc, info);
+    if(item == Dbl.NAN || item == Flt.NAN) return item;
     for(Item it; (it = qc.next(iter)) != null;) {
+      if(it.type.isUntyped()) it = DOUBLE.cast(it, qc, sc, info);
+      if(it == Dbl.NAN || it == Flt.NAN) return it;
       final AtomType tp = numType(item, it);
-      if(op.eval(item, it, coll, sc, info) || Double.isNaN(it.dbl(info))) item = it;
+      if(min ^ item.compare(it, collation, true, info) < 0) item = it;
       if(tp != null) item = tp.cast(item, qc, sc, info);
     }
     return item;
@@ -147,8 +148,8 @@ public class FnMin extends StandardFunc {
         final Value value = (Value) values;
         final long size = value.size();
         if(value instanceof RangeSeq) {
-          final RangeSeq seq = (RangeSeq) value;
-          item = seq.itemAt(min ^ seq.asc ? size - 1 : 0);
+          final RangeSeq rs = (RangeSeq) value;
+          item = rs.itemAt(min ^ rs.ascending() ? size - 1 : 0);
         } else if(value instanceof SingletonSeq && ((SingletonSeq) value).singleItem()) {
           item = value.itemAt(0);
         } else if(value.isItem()) {

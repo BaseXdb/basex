@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * Stores a sequence type definition.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class SeqType {
@@ -43,10 +43,12 @@ public final class SeqType {
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType ANY_ATOMIC_TYPE_ZM = ANY_ATOMIC_TYPE.seqType(ZERO_OR_MORE);
 
-  /** Zero or one xs:numeric. */
+  /** Numeric. */
   public static final SeqType NUMERIC_O = NUMERIC.seqType();
-  /** Zero or one xs:numeric. */
+  /** Zero or one numeric. */
   public static final SeqType NUMERIC_ZO = NUMERIC.seqType(ZERO_OR_ONE);
+  /** Zero or more numerics. */
+  public static final SeqType NUMERIC_ZM = NUMERIC.seqType(ZERO_OR_MORE);
   /** Double number. */
   public static final SeqType DOUBLE_O = DOUBLE.seqType();
   /** Zero or one double. */
@@ -152,6 +154,8 @@ public final class SeqType {
   public static final SeqType DOCUMENT_NODE_ZM = DOCUMENT_NODE.seqType(ZERO_OR_MORE);
   /** One element node. */
   public static final SeqType ELEMENT_O = ELEMENT.seqType();
+  /** Zero or one element node. */
+  public static final SeqType ELEMENT_ZO = ELEMENT.seqType(ZERO_OR_ONE);
   /** Zero or more element nodes. */
   public static final SeqType ELEMENT_ZM = ELEMENT.seqType(ZERO_OR_MORE);
   /** Namespace node. */
@@ -181,11 +185,13 @@ public final class SeqType {
   /** Zero of more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
   /** Predicate function. */
-  public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O).seqType();
+  public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, INTEGER_O).seqType();
   /** Predicate function. */
-  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_O, ITEM_ZM).seqType();
+  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_O, ITEM_ZM, INTEGER_O).seqType();
   /** Predicate function. */
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, ITEM_O).seqType();
+  /** Action function. */
+  public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
   /** Single map. */
   public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */

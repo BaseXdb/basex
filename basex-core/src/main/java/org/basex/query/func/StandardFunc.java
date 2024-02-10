@@ -39,7 +39,7 @@ import org.basex.util.similarity.*;
 /**
  * Built-in functions.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class StandardFunc extends Arr {
@@ -106,7 +106,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Performs function specific optimizations.
+   * Performs function-specific optimizations.
    * @param cc compilation context
    * @return optimized or original expression
    * @throws QueryException query exception
@@ -124,7 +124,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Optimizes a function that returns an empty sequence when the first atomized argument is empty,
    * and adjusts the occurrence indicator if the argument will always yield one item.
-   * @return original expression or function argument
+   * @return original or optimized expression
    */
   protected final Expr optFirst() {
     return optFirst(true, true, null);
@@ -141,7 +141,7 @@ public abstract class StandardFunc extends Arr {
    *   ({@code true} if function will always yield a result if first argument is non-empty)
    * @param atom argument will be atomized
    * @param value context value (ignored if {@code null})
-   * @return original expression or function argument
+   * @return original or optimized expression
    */
   protected final Expr optFirst(final boolean occ, final boolean atom, final Value value) {
     final Expr expr = defined(0) ? arg(0) : value;
@@ -213,7 +213,23 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   public final Expr coerce(final int i, final CompileContext cc) throws QueryException {
-    return new TypeCheck(info, sc, arg(i), definition.types[i], true).optimize(cc);
+    return coerce(i, cc, -1);
+  }
+
+  /**
+   * Returns a coerced function item argument.
+   * @param i index of function argument
+   * @param cc compilation context
+   * @param arity arity of target function (ignored if {@code -1})
+   * @return coerced argument
+   * @throws QueryException query exception
+   */
+  public final Expr coerce(final int i, final CompileContext cc, final int arity)
+      throws QueryException {
+
+    FuncType ft = (FuncType) definition.types[i].type;
+    if(arity != -1 && arity != ft.argTypes.length) ft = ft.with(arity);
+    return new TypeCheck(info, sc, arg(i), ft.seqType(), true).optimize(cc);
   }
 
   /**
@@ -225,7 +241,7 @@ public abstract class StandardFunc extends Arr {
    * @return old or new expression
    * @throws QueryException query context
    */
-  public final Expr coerceFunc(final Expr expr, final CompileContext cc, final SeqType declType,
+  public final Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType declType,
       final SeqType... argTypes) throws QueryException {
 
     // check if argument is function item
@@ -233,20 +249,34 @@ public abstract class StandardFunc extends Arr {
 
     // check number of arguments
     final FuncItem func = (FuncItem) expr;
-    final int al = argTypes.length, fargs = func.arity();
-    if(fargs != al) return expr;
+    final int nargs = argTypes.length, arity = func.arity();
+    if(arity > nargs) return expr;
 
     // select most specific argument and return types
     final FuncType oldType = func.funcType();
-    final SeqType[] oldArgs = oldType.argTypes, newArgs = new SeqType[al];
-    for(int a = 0; a < al; a++) {
-      newArgs[a] = argTypes[a].instanceOf(oldArgs[a]) ? argTypes[a] : oldArgs[a];
+    final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
+    for(int a = 0; a < arity; a++) {
+      newArgTypes[a] = argTypes[a].instanceOf(oldArgTypes[a]) ? argTypes[a] : oldArgTypes[a];
     }
     final SeqType newDecl = declType.instanceOf(oldType.declType) ? declType : oldType.declType;
-    final FuncType newType = FuncType.get(newDecl, newArgs);
+    final FuncType newType = FuncType.get(newDecl, newArgTypes);
 
     // new type is more specific: coerce to new function type
     return !newType.eq(oldType) ? func.coerceTo(newType, cc.qc, info, true) : expr;
+  }
+
+  /**
+   * Returns the arity of a function expression.
+   * @param expr function
+   * @return arity, or {@code -1} if unknown
+   */
+  public int arity(final Expr expr) {
+    final FuncType ft = expr.funcType();
+    if(ft != null) {
+      final SeqType[] at = ft.argTypes;
+      if(at != null) return at.length;
+    }
+    return -1;
   }
 
   /**
@@ -307,8 +337,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final DBNode toDBNode(final Item item, final boolean mainmem) throws QueryException {
-    if(checkNoEmpty(item, NodeType.NODE) instanceof DBNode &&
-        (mainmem || !item.data().inMemory())) return (DBNode) item;
+    if(item instanceof DBNode && (mainmem || !item.data().inMemory())) return (DBNode) item;
     throw DB_NODE_X.get(info, item);
   }
 
@@ -408,7 +437,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = toItem(expr, qc);
+    final Item item = toAtomItem(expr, qc);
     return item instanceof Uri ? toContent(string(item.string(info)), qc) :
       new IOContent(toToken(item));
   }
@@ -447,7 +476,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates an expression to an encoding string.
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param err error to raise
    * @param qc query context
    * @return normalized encoding string or {@code null}
@@ -479,13 +508,15 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Item toNodeOrAtomItem(final Expr expr, final QueryContext qc)
       throws QueryException {
-    final Item item = toItem(expr, qc);
-    return item instanceof ANode ? item : item.atomItem(qc, info);
+    Item item = expr.item(qc, info);
+    if(!(item instanceof ANode)) item = item.atomItem(qc, info);
+    if(item.isEmpty()) throw EMPTYFOUND.get(info);
+    return item;
   }
 
   /**
    * Evaluates an expression to user options.
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param qc query context
    * @return user options
    * @throws QueryException query exception
@@ -498,7 +529,7 @@ public abstract class StandardFunc extends Arr {
   /**
    * Evaluates an expression, if it exists, and returns options.
    * @param <E> options type
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param options options template
    * @param enforce raise error if a supplied option is unknown
    * @param qc query context
@@ -527,7 +558,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Evaluates an expression to variable bindings.
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param expr expression (can be empty)
    * @param qc query context
    * @return variable bindings
    * @throws QueryException query exception
@@ -537,7 +568,7 @@ public abstract class StandardFunc extends Arr {
 
     final HashMap<String, Value> hm = new HashMap<>();
     final Item item = expr.item(qc, info);
-    final XQMap map = item.size() == 0 ? XQMap.empty() : toMap(item);
+    final XQMap map = item.isEmpty() ? XQMap.empty() : toMap(item);
     map.apply((key, value) -> {
       final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key).internal();
       hm.put(string(k), value);
@@ -568,16 +599,30 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Evaluates an expression to a non-updating function item or {@code null}.
+   * @param expr expression
+   * @param nargs maximum number of supplied arguments
+   * @param qc query context
+   * @return function item or {@code null}
+   * @throws QueryException query exception
+   */
+  protected final FItem toFunctionOrNull(final Expr expr, final int nargs, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.item(qc, info);
+    return item.isEmpty() ? null : checkArity(toFunction(item, qc), nargs, false);
+  }
+
+  /**
    * Evaluates an expression to a non-updating function item.
    * @param expr expression
-   * @param arity required number of arguments (arity)
+   * @param nargs maximum number of supplied arguments
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  protected final FItem toFunction(final Expr expr, final int arity, final QueryContext qc)
+  protected final FItem toFunction(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
-    return toFunction(expr, arity, false, qc);
+    return toFunction(expr, nargs, false, qc);
   }
 
   /**
@@ -591,11 +636,37 @@ public abstract class StandardFunc extends Arr {
    */
   protected final FItem toFunction(final Expr expr, final int nargs, final boolean updating,
       final QueryContext qc) throws QueryException {
+    return checkArity(toFunction(expr, qc), nargs, updating);
+  }
 
-    final FItem func = checkUp(toFunction(expr, qc), updating, sc);
+  /**
+   * Evaluates an expression to a function item.
+   * @param func function
+   * @param nargs maximum number of supplied arguments
+   * @param updating updating flag
+   * @return function item
+   * @throws QueryException query exception
+   */
+  private FItem checkArity(final FItem func, final int nargs, final boolean updating)
+      throws QueryException {
+
+    checkUp(func, updating, sc);
     final int arity = func.arity();
     if(nargs < arity) throw arityError(func, arity, nargs, true, info);
     return func;
+  }
+
+  /**
+   * Returns the boolean result of a function invocation.
+   * @param qc query context
+   * @param predicate function to be invoked
+   * @param args arguments
+   * @return result
+   * @throws QueryException query exception
+   */
+  protected final boolean toBoolean(final QueryContext qc, final FItem predicate,
+      final Value... args) throws QueryException {
+    return toBoolean(predicate.invoke(qc, info, args).item(qc, info));
   }
 
   /**

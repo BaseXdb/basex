@@ -1,13 +1,11 @@
 package org.basex.build.json;
 
-import java.util.*;
-
 import org.basex.util.options.*;
 
 /**
  * Options for processing JSON documents.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class JsonOptions extends Options {
@@ -30,7 +28,7 @@ public class JsonOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

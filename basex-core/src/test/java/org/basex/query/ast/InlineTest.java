@@ -14,7 +14,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for inlining.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class InlineTest extends SandboxTest {
@@ -98,7 +98,7 @@ public final class InlineTest extends SandboxTest {
         + "return (1 to 2) ! $d)[. = 0]",
         "",
         exists(SingletonSeq.class));
-    check("(let $d := for-each(1 to 11, hof:id#1) "
+    check("(let $d := for-each(1 to 11, identity#1) "
         + "return (1 to 2) ! $d[1])[. = 0]",
         "",
         exists(SingletonSeq.class));

@@ -1,7 +1,7 @@
 (:~
  : Common RESTXQ access points.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/common';
 
@@ -48,6 +48,7 @@ function dba:file(
 declare
   %rest:path('/dba/{$path}')
   %output:method('html')
+  %output:html-version('5')
 function dba:unknown(
   $path  as xs:string
 ) as element(html) {

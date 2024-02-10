@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnParseUri extends FnJsonDoc {
@@ -46,10 +46,6 @@ public class FnParseUri extends FnJsonDoc {
   static final String QUERY_PARAMETERS = "query-parameters";
   /** URI part. */
   static final String FILEPATH = "filepath";
-  /** URI part. */
-  static final String KEY = "key";
-  /** URI part. */
-  static final String VALUE = "value";
 
   /** File scheme. */
   static final String FILE = "file";
@@ -67,7 +63,7 @@ public class FnParseUri extends FnJsonDoc {
 
     String string = value.replace('\\', '/');
     String fragment = "", query = "", scheme = "", filepath = "", authority = "", userinfo = "";
-    String host = "", port = "", path = "";
+    String host = "", port = "", path;
 
     // strip off the fragment identifier and any query
     Matcher m = Pattern.compile("^(.*?)#(.*)$").matcher(string);
@@ -197,9 +193,7 @@ public class FnParseUri extends FnJsonDoc {
   static void add(final MapBuilder mb, final String k, final Object v) throws QueryException {
     final Value value = v instanceof Value ? (Value) v : v.toString().isEmpty() ? Empty.VALUE :
       Str.get(v.toString());
-    if(!(value.isEmpty() || value instanceof XQMap && ((XQMap) value).mapSize() == 0)) {
-      mb.put(k, value);
-    }
+    if(!(value.isEmpty() || value == XQMap.empty())) mb.put(k, value);
   }
 
   /**

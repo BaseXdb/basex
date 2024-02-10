@@ -21,7 +21,7 @@ import org.xml.sax.*;
  * DBLP documents contain too many entities and cause an out of memory error.
  * The internal {@link XMLParser} can be used as alternative.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class SAXWrapper extends SingleParser {
@@ -38,10 +38,10 @@ public final class SAXWrapper extends SingleParser {
   /**
    * Constructor.
    * @param source input source
-   * @param opts database options
+   * @param options main options
    */
-  public SAXWrapper(final IO source, final MainOptions opts) {
-    super(source, opts);
+  public SAXWrapper(final IO source, final MainOptions options) {
+    super(source, options);
   }
 
   @Override

@@ -9,10 +9,21 @@ import org.basex.util.options.*;
 /**
  * Collation options.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 abstract class CollationOptions extends Options {
+  /** Fallback parsing. */
+  protected final boolean fallback;
+
+  /**
+   * Constructor.
+   * @param fallback fallback option
+   */
+  CollationOptions(final boolean fallback) {
+    this.fallback = fallback;
+  }
+
   /**
    * Parses the specified options and returns the faulty key.
    * @param args arguments
@@ -28,7 +39,11 @@ abstract class CollationOptions extends Options {
    */
   void assign(final HashMap<String, String> args) throws BaseXException {
     for(final Entry<String, String> entry : args.entrySet()) {
-      assign(entry.getKey(), entry.getValue());
+      try {
+        assign(entry.getKey(), entry.getValue());
+      } catch (BaseXException ex) {
+        if(!fallback) throw ex;
+      }
     }
   }
 

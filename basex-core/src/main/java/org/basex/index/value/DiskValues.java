@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * This class provides access to attribute values and text contents stored on disk.
  * The data structure is described in the {@link DiskValuesBuilder} class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class DiskValues extends ValueIndex {
@@ -204,7 +204,7 @@ public class DiskValues extends ValueIndex {
       while(l <= h) {
         final int m = l + h >>> 1;
         final byte[] txt = indexEntry(m).key;
-        final int d = diff(txt, key);
+        final int d = compare(txt, key);
         if(d == 0) return m;
         if(d < 0) l = m + 1;
         else h = m - 1;
@@ -370,7 +370,7 @@ public class DiskValues extends ValueIndex {
         final int count = idxl.readNum(idxr.read5(index * 5L));
         int id = idxl.readNum();
         // skip traversal if value is too large
-        final int diff = diff(key(id), tok.max);
+        final int diff = compare(key(id), tok.max);
         if(diff > 0 || !tok.mxi && diff == 0) break;
         // add pre values
         for(int c = 0; c < count; c++) {

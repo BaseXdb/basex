@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Query plan builder.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class QueryPlan {
@@ -148,8 +148,10 @@ public final class QueryPlan {
     if(var != null) {
       addAttribute(elem, NAME, var.toErrorString());
       addAttribute(elem, ID, var.id);
-      if(var.declType != null) addAttribute(elem, AS, var.declType);
-      if(var.coerce) addAttribute(elem, COERCE, true);
+      if(var.declType != null) {
+        addAttribute(elem, AS, var.declType);
+        if(var.coerce) addAttribute(elem, COERCE, true);
+      }
       if(type) attachType(elem, var.seqType(), var.size(), var.data());
     }
     return elem;

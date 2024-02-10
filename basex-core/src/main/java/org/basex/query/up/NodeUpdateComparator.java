@@ -70,7 +70,7 @@ import org.basex.util.*;
  * sufficient.</li>
  * </ol>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public final class NodeUpdateComparator implements Comparator<NodeUpdate> {
@@ -91,12 +91,9 @@ public final class NodeUpdateComparator implements Comparator<NodeUpdate> {
         b.type == INSERTAFTER;
     final boolean aIsInsertIntoAsFirst = a.type == INSERTINTOFIRST;
     final boolean bIsInsertIntoAsFirst = b.type == INSERTINTOFIRST;
-    final int aPre = a.pre;
-    final int bPre = b.pre;
-    final int aKind = data.kind(aPre);
-    final int bKind = data.kind(bPre);
-    final int aSize = data.size(aPre, aKind);
-    final int bSize = data.size(bPre, bKind);
+    final int aPre = a.pre, bPre = b.pre;
+    final int aKind = data.kind(aPre), bKind = data.kind(bPre);
+    final int aSize = data.size(aPre, aKind), bSize = data.size(bPre, bKind);
     final int aActualLocation = aPre +
         (aIsInsertInto ? aSize : 0) +
         (aIsInsertIntoAsFirst ? data.attSize(aPre, aKind) : 0);

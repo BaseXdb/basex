@@ -5,7 +5,7 @@ import org.basex.util.*;
 /**
  * This class organizes textual information for the XMLDB API.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public interface BXXMLDBText {

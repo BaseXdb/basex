@@ -13,16 +13,16 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MapBuild extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final FItem key = defined(1) ? toFunction(arg(1), 1, qc) : null;
-    final FItem value = defined(2) ? toFunction(arg(2), 1, qc) : null;
-    final FItem combine = defined(3) ? toFunction(arg(3), 2, qc) : null;
+    final FItem key = toFunctionOrNull(arg(1), 1, qc);
+    final FItem value = toFunctionOrNull(arg(2), 1, qc);
+    final FItem combine = toFunctionOrNull(arg(3), 2, qc);
 
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(input)) != null;) {
@@ -43,8 +43,9 @@ public final class MapBuild extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
-    if(st.zero()) return cc.merge(input, XQMap.empty(), info);
+    if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
+    SeqType rst = st;
     AtomType kt = null;
     if(defined(1)) {
       final FuncType ft = arg(1).funcType();
@@ -52,12 +53,16 @@ public final class MapBuild extends StandardFunc {
         kt = ft.declType.type.atomic();
         if(kt != null) {
           final SeqType dt = kt.seqType(Occ.ZERO_OR_ONE);
-          arg(1, arg -> coerceFunc(arg, cc, dt, st.with(Occ.EXACTLY_ONE)));
+          arg(1, arg -> refineFunc(arg, cc, dt, st.with(Occ.EXACTLY_ONE)));
         }
       }
     }
+    if(defined(2)) {
+      final FuncType ft = arg(2).funcType();
+      rst = ft != null ? ft.declType : null;
+    }
     if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
-    exprType.assign(MapType.get(kt, st.with(Occ.ONE_OR_MORE)));
+    if(rst != null && !defined(3)) exprType.assign(MapType.get(kt, rst.with(Occ.ONE_OR_MORE)));
     return this;
   }
 }

@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Custom version of the {@link SwingWorker} class.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @param <T> result type
  */

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Inspection Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class InspectModuleTest extends SandboxTest {
@@ -56,7 +56,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(query + "/argument/@type/data()", "xs:int");
     query(query + "/annotation/@name/data()", "private");
     query(query + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
-    query(query + "/return/@type/data()", "xs:integer");
+    query(query + "/return/@type/data()", "xs:int");
     query(query + "/return/@occurrence/data()", "");
 
     // unknown annotation

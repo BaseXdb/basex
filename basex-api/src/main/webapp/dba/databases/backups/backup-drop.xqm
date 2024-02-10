@@ -1,11 +1,11 @@
 (:~
  : Drop backups.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -31,8 +31,11 @@ function dba:backup-drop(
   let $target := if($name) then $dba:SUB else $dba:CAT
   return try {
     $backups ! db:drop-backup($name || '-' || .),
-    util:redirect($target, map { 'name': $name, 'info': util:info($backups, 'backup', 'dropped') })
+    utils:redirect(
+      $target,
+      map { 'name': $name, 'info': utils:info($backups, 'backup', 'dropped') }
+    )
   } catch * {
-    util:redirect($target, map { 'name': $name, 'error': $err:description })
+    utils:redirect($target, map { 'name': $name, 'error': $err:description })
   }
 };

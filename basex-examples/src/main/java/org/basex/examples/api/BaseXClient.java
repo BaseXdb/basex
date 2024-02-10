@@ -12,7 +12,7 @@ import java.util.*;
  *
  * Documentation: https://docs.basex.org/wiki/Clients
  *
- * (C) BaseX Team 2005-23, BSD License
+ * (C) BaseX Team 2005-24, BSD License
  */
 public final class BaseXClient implements Closeable {
   /** UTF-8 charset. */

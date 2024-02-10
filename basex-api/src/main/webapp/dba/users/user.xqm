@@ -1,12 +1,12 @@
 (:~
  : User page.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/users';
 
+import module namespace config = 'dba/config' at '../lib/config.xqm';
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace options = 'dba/options' at '../lib/options.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'users';
@@ -33,6 +33,7 @@ declare
   %rest:query-param('error',    '{$error}')
   %rest:query-param('info',     '{$info}')
   %output:method('html')
+  %output:html-version('5')
 function dba:user(
   $name     as xs:string,
   $newname  as xs:string?,
@@ -52,7 +53,7 @@ function dba:user(
     <tr>
       <td>
         <form action='user-update' method='post' autocomplete='off'>
-          <!--  force chrome not to autocomplete form -->
+          <!--  prevent chrome from auto-completing form -->
           <input style='display:none' type='text' name='fake1'/>
           <input style='display:none' type='password' name='fake2'/>
           <h2>{
@@ -90,7 +91,7 @@ function dba:user(
                   <td>
                     <select name='perm' size='5'>{
                       let $perm := head(($perm, $user/@permission))
-                      for $p in $options:PERMISSIONS
+                      for $p in $config:PERMISSIONS
                       return element option { attribute selected { }[$p = $perm], $p }
                     }</select>
                     <div class='small'/>

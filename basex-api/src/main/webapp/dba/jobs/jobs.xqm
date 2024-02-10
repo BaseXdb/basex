@@ -1,12 +1,12 @@
 (:~
  : Jobs page.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/jobs';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'jobs';
@@ -27,6 +27,7 @@ declare
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
+  %output:html-version('5')
 function dba:jobs(
   $sort   as xs:string,
   $job    as xs:string?,
@@ -106,7 +107,7 @@ function dba:jobs(
                   for $value in $details/@*
                   for $name in name($value)[. != 'id']
                   return <tr>
-                    <td><b>{ util:capitalize($name) }</b></td>
+                    <td><b>{ utils:capitalize($name) }</b></td>
                     <td>{ string($value) }</td>
                   </tr>
                 }</table>,
@@ -116,11 +117,11 @@ function dba:jobs(
                 return (
                   <h3>Query Bindings</h3>,
                   <table>{
-                    map:for-each($bindings, function($key, $value) {
+                    map:for-each($bindings, fn($key, $value) {
                       <tr>
                         <td><b>{ if($key) then '$' || $key else 'Context' }</b></td>
                         <td><code>{
-                          util:chop(serialize($value, map { 'method': 'basex' }), 1000)
+                          utils:chop(serialize($value, map { 'method': 'basex' }), 1000)
                         }</code></td>
                       </tr>
                     })
@@ -128,13 +129,13 @@ function dba:jobs(
                   </table>
                 ),
   
-                <h3>Query</h3>,
-                <textarea readonly='' spellcheck='false' rows='5'>{
+                <h3>Job String</h3>,
+                <textarea readonly='' spellcheck='false' rows='20'>{
                   string($details)
                 }</textarea>,
   
                 if($cached) then (
-                  let $result := util:serialize(try {
+                  let $result := utils:serialize(try {
                     job:result($job, map { 'keep': true() })
                   } catch * {
                     'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||

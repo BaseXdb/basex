@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -14,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnAnalyzeString extends RegEx {
@@ -33,15 +32,15 @@ public final class FnAnalyzeString extends RegEx {
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String value = string(toZeroToken(arg(0), qc));
     final byte[] pattern = toToken(arg(1), qc);
-    final Expr flags = defined(2) ? arg(2) : null;
-    final Matcher m = pattern(pattern, flags, qc, true).matcher(value);
+    final byte[] flags = toZeroToken(arg(2), qc);
 
+    final Matcher matcher = pattern(pattern, flags, true).matcher(value);
     final FBuilder root = FElem.build(Q_ANALYZE).declareNS();
     int start = 0;
-    while(m.find()) {
-      if(start != m.start()) nonmatch(value.substring(start, m.start()), root);
-      match(m, value, root, 0);
-      start = m.end();
+    while(matcher.find()) {
+      if(start != matcher.start()) nonmatch(value.substring(start, matcher.start()), root);
+      match(matcher, value, root, 0);
+      start = matcher.end();
     }
     if(start != value.length()) nonmatch(value.substring(start), root);
     return root.finish();

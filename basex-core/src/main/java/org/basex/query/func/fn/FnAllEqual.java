@@ -17,16 +17,16 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnAllEqual extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
-    final Collation coll = toCollation(arg(1), qc);
-    final DeepEqual deep = new DeepEqual(info, coll, qc);
+    final Collation collation = toCollation(arg(1), qc);
 
+    final DeepEqual deep = new DeepEqual(info, collation, qc);
     final Item first = values.next();
     if(first != null) {
       for(Item item; (item = qc.next(values)) != null;) {
@@ -48,11 +48,11 @@ public final class FnAllEqual extends StandardFunc {
       final SeqType st = values.seqType();
       final AtomType type = st.type.atomic();
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
-        return cc.merge(values, Bln.TRUE, info);
+        return cc.voidAndReturn(values, Bln.TRUE, info);
 
-      // uniform(1 to 10)  ->  false
+      // all-equal(1 to 10)  ->  false
       if(values instanceof RangeSeq) return Bln.FALSE;
-      // uniform(reverse($data))  ->  uniform($data)
+      // all-equal(reverse($data))  ->  all-equal($data)
       if(REVERSE.is(values) || SORT.is(values) ||
           REPLICATE.is(values) && values.arg(1) instanceof Int) {
         final Expr[] args = exprs.clone();

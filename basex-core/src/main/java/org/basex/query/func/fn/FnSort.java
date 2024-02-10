@@ -23,7 +23,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class FnSort extends StandardFunc {
@@ -81,22 +81,22 @@ public class FnSort extends StandardFunc {
   protected final Integer[] index(final Value[] values, final QueryContext qc)
       throws QueryException {
 
-    final Value key = arg(2).value(qc);
-    final int levels = (int) Math.max(1, key.size()), size = values.length;
-    final Value collation = arg(1).value(qc), order = arg(3).value(qc);
+    final Value keys = arg(2).value(qc);
+    final int levels = (int) Math.max(1, keys.size()), size = values.length;
+    final Value collations = arg(1).value(qc), order = arg(3).value(qc);
 
     final Value[][] cached = new Value[levels][];
-    final FItem[] keys = new FItem[levels];
-    final Collation[] collations = new Collation[levels];
+    final FItem[] key = new FItem[levels];
+    final Collation[] collation = new Collation[levels];
     final boolean[] invert = new boolean[levels];
 
     for(int l = 0; l < levels; l++) {
       cached[l] = new Value[size];
-      if(l < key.size()) keys[l] = toFunction(key.itemAt(l), 1, qc);
-      collations[l] = l < collation.size() ? toCollation(collation.itemAt(l), qc) :
-        l > 0 ? collations[l - 1] : null;
+      if(l < keys.size()) key[l] = toFunction(keys.itemAt(l), 1, qc);
+      collation[l] = l < collations.size() ? toCollation(collations.itemAt(l), qc) :
+        l > 0 ? collation[l - 1] : null;
       invert[l] = l < order.size() ? toEnum(order.itemAt(l), Order.class) == Order.DESCENDING :
-        l > 0 ? invert[l - 1] : false;
+        l > 0 && invert[l - 1];
     }
 
     // single value: atomize to check type
@@ -113,13 +113,13 @@ public class FnSort extends StandardFunc {
             final QueryFunction<Integer, Value> value = i -> {
               Value v = cached[ll][i];
               if(v == null) {
-                final FItem k = keys[ll];
+                final FItem k = key[ll];
                 v = (k == null ? values[i] : k.invoke(qc, info, values[i])).atomValue(qc, info);
                 cached[ll][i] = v;
               }
               return v;
             };
-            final int diff = compare(value.apply(i1), value.apply(i2), collations[l], info);
+            final int diff = compare(value.apply(i1), value.apply(i2), collation[l], info);
             if(diff != 0) return invert[l] ? -diff : diff;
           }
           return 0;
@@ -139,7 +139,7 @@ public class FnSort extends StandardFunc {
    * @param value2 second value
    * @param coll collation
    * @param info input info (can be {@code null})
-   * @return result of comparison (greater than 0, smaller than 0, or 0)
+   * @return result of comparison (-1, 0, 1)
    * @throws QueryException query exception
    */
   static int compare(final Value value1, final Value value2, final Collation coll,
@@ -147,18 +147,11 @@ public class FnSort extends StandardFunc {
     final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
     for(int i = 0; i < il; i++) {
       final Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
-      if(!item1.comparable(item2)) throw diffError(item1, item2, info);
-
-      int diff = item1.diff(item2, coll, info);
-      if(diff == Item.UNDEF) {
-        final boolean nan1 = item1 == Dbl.NAN || item1 == Flt.NAN;
-        final boolean nan2 = item2 == Dbl.NAN || item2 == Flt.NAN;
-        diff = nan1 ? nan2 ? 0 : -1 : 1;
-      }
+      if(!item1.comparable(item2)) throw compareError(item1, item2, info);
+      final int diff = item1.compare(item2, coll, true, info);
       if(diff != 0) return diff;
     }
-    final long diff = size1 - size2;
-    return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+    return Long.signum(size1 - size2);
   }
 
   @Override
@@ -174,7 +167,7 @@ public class FnSort extends StandardFunc {
     if(st.zero()) return input;
 
     if(defined(2) && arg(2).size() == 1) {
-      arg(2, arg -> coerceFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
+      arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
     } else if(exprs.length == 1) {
       if(st.zeroOrOne() && st.type.isSortable()) return input;
       // enforce pre-evaluation as remaining arguments may not be values
@@ -207,8 +200,8 @@ public class FnSort extends StandardFunc {
     if(exprs.length == 1) {
       // range values
       if(input instanceof RangeSeq) {
-        final RangeSeq seq = (RangeSeq) input;
-        return seq.asc ? seq : seq.reverse(null);
+        final RangeSeq rs = (RangeSeq) input;
+        return rs.ascending() ? rs : rs.reverse(null);
       }
       // sortable single or singleton values
       final SeqType st = input.seqType();

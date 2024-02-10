@@ -1,17 +1,16 @@
 (:~
  : Utility functions.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
-module namespace util = 'dba/util';
+module namespace utils = 'dba/utils';
 
-import module namespace options = 'dba/options' at 'options.xqm';
 import module namespace config = 'dba/config' at 'config.xqm';
 
 (:~ Regular expression for backups. :)
-declare variable $util:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$';
+declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)$';
 (:~ Regular expression for backups. :)
-declare variable $util:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
+declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
 
 (:~
  : Evaluates a query and returns the result.
@@ -19,13 +18,13 @@ declare variable $util:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d
  : @param  $context  initial context item (can be empty)
  : @return serialized result of query
  :)
-declare function util:query(
-  $query    as xs:string?,
+declare function utils:query(
+  $query    as xs:string,
   $context  as item()?
 ) as xs:string {
-  let $bindings := $context ! map { '': $context }
-  let $result := xquery:eval($query, $bindings, util:query-options())
-  return util:serialize($result)
+  let $bindings := $context ! map { '': . }
+  let $result := xquery:eval($query, $bindings, utils:query-options())
+  return utils:serialize($result)
 };
 
 (:~
@@ -33,13 +32,13 @@ declare function util:query(
  : @param  $query  query string
  : @return empty sequence
  :)
-declare %updating function util:update-query(
-  $query  as xs:string?
+declare %updating function utils:update-query(
+  $query  as xs:string
 ) as empty-sequence() {
-  xquery:eval-update($query, (), util:query-options()),
+  xquery:eval-update($query, (), utils:query-options()),
   
   let $result := update:cache(true())
-  return update:output(util:serialize($result))
+  return update:output(utils:serialize($result))
 };
 
 (:~
@@ -47,30 +46,30 @@ declare %updating function util:update-query(
  : @param  $result  query result
  : @return empty sequence
  :)
-declare function util:serialize(
+declare function utils:serialize(
   $result  as item()*
 ) as xs:string {
   (: serialize more characters than requested, because limit represents number of bytes :)
-  let $limit := options:get($options:MAXCHARS)
-  let $indent := options:get($options:INDENT)
+  let $limit := config:get($config:MAXCHARS)
+  let $indent := config:get($config:INDENT)
   let $string := serialize($result, map {
     'limit': $limit * 2 + 1,
     'method': 'basex',
     'indent': $indent
   })
-  return util:chop($string, $limit)
+  return utils:chop($string, $limit)
 };
 
 (:~
  : Returns the options for evaluating a query.
  : @return options
  :)
-declare %private function util:query-options() as map(*) {
+declare %private function utils:query-options() as map(*) {
   map {
-    'timeout'   : options:get($options:TIMEOUT),
-    'memory'    : options:get($options:MEMORY),
-    'permission': options:get($options:PERMISSION),
-    'base-uri'  : config:directory() || '/' || config:query()
+    'timeout'   : config:get($config:TIMEOUT),
+    'memory'    : config:get($config:MEMORY),
+    'permission': config:get($config:PERMISSION),
+    'base-uri'  : config:directory() || '/' || config:file()
   }
 };
 
@@ -80,12 +79,12 @@ declare %private function util:query-options() as map(*) {
  : @param  $sort  sort key
  : @return last result
  :)
-declare function util:start(
+declare function utils:start(
   $page  as xs:integer,
   $sort  as xs:string
 ) as xs:integer {
   if($page and not($sort)) then (
-    ($page - 1) * options:get($options:MAXROWS) + 1
+    ($page - 1) * config:get($config:MAXROWS) + 1
   ) else (
     1
   )
@@ -97,12 +96,12 @@ declare function util:start(
  : @param  $sort  sort key
  : @return last result
  :)
-declare function util:end(
+declare function utils:end(
   $page  as xs:integer,
   $sort  as xs:string
 ) as xs:integer {
   if($page and not($sort)) then (
-    $page * options:get($options:MAXROWS)
+    $page * config:get($config:MAXROWS)
   ) else (
     999999999
   )
@@ -114,7 +113,7 @@ declare function util:end(
  : @param  $max     maximum number of characters
  : @return string
  :)
-declare function util:chop(
+declare function utils:chop(
   $string  as xs:string,
   $max     as xs:integer
 ) as xs:string {
@@ -126,27 +125,13 @@ declare function util:chop(
 };
 
 (:~
- : Joins sequence entries.
- : @param  $items  items
- : @param  $sep    separator
- : @return result
- :)
-declare function util:item-join(
-  $items  as item()*,
-  $sep    as item()
-) as item()* {
-  for $item at $pos in $items
-  return ($sep[$pos > 1], $item)
-};
-
-(:~
  : Returns a count info for the specified items.
  : @param  $items   items
  : @param  $name    name of item (singular form)
  : @param  $action  action label (past tense)
  : @return result
  :)
-declare function util:info(
+declare function utils:info(
   $items   as item()*,
   $name    as xs:string,
   $action  as xs:string
@@ -160,7 +145,7 @@ declare function util:info(
  : @param  $string  string
  : @return capitalized string
  :)
-declare function util:capitalize(
+declare function utils:capitalize(
   $string  as xs:string
 ) as xs:string {
   upper-case(substring($string, 1, 1)) || substring($string, 2)
@@ -171,7 +156,7 @@ declare function util:capitalize(
  : @param  $url     URL
  : @param  $params  query parameters
  :)
-declare %updating function util:redirect(
+declare %updating function utils:redirect(
   $url     as xs:string,
   $params  as map(*)
 ) as empty-sequence() {

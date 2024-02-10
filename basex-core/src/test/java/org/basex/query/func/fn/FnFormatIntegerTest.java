@@ -5,7 +5,7 @@ import org.basex.query.*;
 /**
  * XQuery functions tests.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnFormatIntegerTest extends QueryTest {
@@ -67,7 +67,7 @@ public final class FnFormatIntegerTest extends QueryTest {
         "format-integer(1500000, '#,###,000')" },
       { "290", strings("1500\ud800\udd000,00"),
         "format-integer(1500000, '###\ud800\udd000,00')" },
-      { "300", strings("(602)347-826"),
+      { "300", strings("602)347-826"),
         "format-integer(602347826, '#(000)000-000')" },
       { "310", strings("SECOND"), "format-integer(2, 'W;o')" },
       { "330", strings("1st"), "format-integer(1, '1;o(-en)')" },

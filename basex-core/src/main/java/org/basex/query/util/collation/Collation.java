@@ -16,7 +16,7 @@ import org.basex.util.options.Options.*;
 /**
  * This class organizes collations.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Collation {
@@ -96,9 +96,10 @@ public abstract class Collation {
     if(eq(URL, base)) {
       opts = new BaseXCollationOptions(false);
     } else if(eq(UCA, base)) {
+      final boolean fallback = !YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()));
       if(UCAOptions.ACTIVE) {
-        opts = new UCAOptions();
-      } else if(!YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()))) {
+        opts = new UCAOptions(fallback);
+      } else if(fallback) {
         opts = new BaseXCollationOptions(true);
       }
     }
@@ -210,7 +211,7 @@ public abstract class Collation {
    * Compares two strings.
    * @param string string
    * @param compare string to be compared
-   * @return result of check
+   * @return result of comparison (-1, 0, 1)
    */
   public abstract int compare(byte[] string, byte[] compare);
 

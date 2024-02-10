@@ -25,7 +25,7 @@ import org.basex.util.list.*;
 /**
  * Database node.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class DBNode extends ANode {
@@ -182,7 +182,7 @@ public class DBNode extends ANode {
 
   @Override
   public final Atts namespaces() {
-    return data.namespaces(pre);
+    return type == NodeType.ELEMENT ? data.namespaces(pre) : null;
   }
 
   @Override
@@ -205,14 +205,15 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final int diff(final ANode node) {
+  public final int compare(final ANode node) {
     if(this == node) return 0;
     final Data ndata = node.data();
     return ndata != null ?
-      // comparison of two databases: compare pre values or database ids
-      data == ndata ? pre - ((DBNode) node).pre : data.dbid - ndata.dbid :
+      // comparison of database nodes: compare pre values or database ids
+      data == ndata ? Integer.signum(pre - ((DBNode) node).pre) :
+        Integer.signum(data.dbid - ndata.dbid) :
       // comparison of database and fragment: find LCA
-      diff(this, node);
+      compare(this, node);
   }
 
   @Override
@@ -247,6 +248,11 @@ public class DBNode extends ANode {
   public final boolean hasChildren() {
     final int kind = kind();
     return data.attSize(pre, kind) != data.size(pre, kind);
+  }
+
+  @Override
+  public final boolean hasAttributes() {
+    return data.attSize(pre, kind()) > 0;
   }
 
   @Override
@@ -474,7 +480,7 @@ public class DBNode extends ANode {
           qs.concat(FPI.OPEN, name(), " ", QueryString.toValue(string()), FPI.CLOSE);
           break;
         case ELEMENT:
-          qs.concat("<", name(), hasChildren() || attributeIter().size() > 0 ? DOTS : "", "/>");
+          qs.concat("<", name(), hasChildren() || hasAttributes() ? DOTS : "", "/>");
           break;
         case DOCUMENT_NODE:
           qs.token(DOCUMENT).brace(QueryString.toQuoted(baseURI()));

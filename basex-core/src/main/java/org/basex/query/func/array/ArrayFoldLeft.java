@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class ArrayFoldLeft extends FnFoldLeft {
@@ -19,16 +19,17 @@ public class ArrayFoldLeft extends FnFoldLeft {
     final XQArray array = toArray(arg(0), qc);
     final FItem action = action(qc);
 
+    int p = 0;
     Value result = arg(1).value(qc);
     for(final Value value : array.members()) {
       if(skip(qc, result, value)) break;
-      result = action.invoke(qc, info, result, value);
+      result = action.invoke(qc, info, result, value, Int.get(++p));
     }
     return result;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return opt(cc, true, true);
+    return optType(cc, true, true);
   }
 }

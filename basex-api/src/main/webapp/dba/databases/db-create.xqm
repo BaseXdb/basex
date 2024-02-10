@@ -1,12 +1,12 @@
 (:~
  : Create new database.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../lib/html.xqm';
-import module namespace util = 'dba/util' at '../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -29,6 +29,7 @@ declare
   %rest:query-param('lang',  '{$lang}', 'en')
   %rest:query-param('error', '{$error}')
   %output:method('html')
+  %output:html-version('5')
 function dba:db-create(
   $name   as xs:string?,
   $opts   as xs:string*,
@@ -113,11 +114,11 @@ function dba:db-create(
         return map:entry($option, $opts = $option),
         $lang ! map:entry('language', .)))
       ),
-      util:redirect($dba:SUB, map { 'name': $name,
+      utils:redirect($dba:SUB, map { 'name': $name,
         'info': 'Database "' || $name || '" was created.' })
     )
   } catch * {
-    util:redirect('db-create', map {
+    utils:redirect('db-create', map {
       'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }

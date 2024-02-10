@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * This class stores a single namespace node.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class NSNode {

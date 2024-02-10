@@ -43,7 +43,7 @@ import org.xml.sax.*;
 /**
  * This view allows the input and evaluation of queries and documents.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class EditorView extends View {
@@ -598,7 +598,7 @@ public final class EditorView extends View {
         io.name(file.path());
         JsonConverter.get(new JsonParserOptions()).convert(io);
         info(null);
-      } catch(final IOException ex) {
+      } catch(final QueryException | IOException ex) {
         info(ex);
       }
     } else if(script || file.hasSuffix(gui.gopts.xmlSuffixes()) || file.hasSuffix(IO.XSLSUFFIXES)) {

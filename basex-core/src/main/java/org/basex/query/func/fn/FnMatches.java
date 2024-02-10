@@ -12,20 +12,21 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnMatches extends RegEx {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toZeroToken(arg(0), qc), pattern = toToken(arg(1), qc);
-    final Expr flags = defined(2) ? arg(2) : null;
+    final byte[] value = toZeroToken(arg(0), qc);
+    final byte[] pattern = toToken(arg(1), qc);
+    final byte[] flags = toZeroToken(arg(2), qc);
 
-    if(flags == null) {
+    if(flags.length == 0) {
       final int ch = patternChar(pattern);
       if(ch != -1) return Bln.get(contains(value, ch));
     }
-    return Bln.get(pattern(pattern, flags, qc, false).matcher(string(value)).find());
+    return Bln.get(pattern(pattern, flags, false).matcher(string(value)).find());
   }
 
   @Override

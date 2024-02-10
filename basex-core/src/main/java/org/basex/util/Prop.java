@@ -8,7 +8,7 @@ import java.security.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
-import java.util.jar.Attributes;
+import java.util.jar.*;
 
 import org.basex.io.*;
 import org.basex.util.options.*;
@@ -16,24 +16,26 @@ import org.basex.util.options.*;
 /**
  * This class contains constants and system properties which are used all around the project.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
-  /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = version("11.0 beta");
+  /** Current version (major and minor number, optionally followed by development tag). */
+  private static final String CURRENT_VERSION = "11.0-SNAPSHOT";
 
-  /** Project name. */
+  /** Name of project in lower case. */
   public static final String PROJECT = NAME.toLowerCase(Locale.ENGLISH);
+  /** Version string. */
+  public static final String VERSION;
 
   /** System-specific newline string. */
   public static final String NL = System.lineSeparator();
   /** Returns the system's default character set. */
   public static final Charset CHARSET = Charset.defaultCharset();
   /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
-  private static final String OS = System.getProperty("os.name");
+  public static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.startsWith("Mac");
   /** Flag denoting if OS belongs to Windows family. */
@@ -46,8 +48,8 @@ public final class Prop {
   /** System property for specifying database home directory. */
   public static final String PATH = DBPREFIX + "path";
 
-  /** Application URL. */
-  public static final URL LOCATION = location();
+  /** Application URL (can be {@code null}). */
+  public static final URL LOCATION;
   /** System's temporary directory. */
   public static final String TEMPDIR = dir(System.getProperty("java.io.tmpdir"));
   /** Project home directory. */
@@ -56,8 +58,15 @@ public final class Prop {
   /** Global options, assigned by the starter classes and the web.xml context parameters. */
   private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();
 
-  // determine project home directory for storing property files and directories...
   static {
+    URL location = null;
+    final ProtectionDomain pd = Prop.class.getProtectionDomain();
+    if(pd != null) {
+      final CodeSource cs = pd.getCodeSource();
+      if(cs != null) location = cs.getLocation();
+    }
+    LOCATION = location;
+
     // check system property 'org.basex.path'
     String homedir = System.getProperty(PATH);
     // check if current working directory contains configuration file
@@ -70,6 +79,16 @@ public final class Prop {
       homedir = dir(home != null ? home : System.getProperty("user.home")) + PROJECT;
     }
     HOMEDIR = dir(homedir);
+
+    final Attributes atts = manifest();
+    String version = atts.getValue("Implementation-Version");
+    if(version != null && version.contains("-SNAPSHOT")) {
+      final String build = atts.getValue("Implementation-Build");
+      if(build != null) version += ' ' + build;
+    } else {
+      version = CURRENT_VERSION;
+    }
+    VERSION = version.replace("-SNAPSHOT", " beta");
   }
 
   // STATIC OPTIONS ===============================================================================
@@ -102,7 +121,7 @@ public final class Prop {
 
   /**
    * Returns the application directory.
-   * @param location location of application
+   * @param location location of application (can be {@code null})
    * @return application directory (can be {@code null})
    */
   private static String applicationDir(final URL location) {
@@ -127,42 +146,12 @@ public final class Prop {
   }
 
   /**
-   * Retrieves the location of the application.
-   * @return application URL, or {@code null} if not available
-   */
-  private static URL location() {
-    final ProtectionDomain pd = Prop.class.getProtectionDomain();
-    if(pd != null) {
-      final CodeSource cs = pd.getCodeSource();
-      if(cs != null) return cs.getLocation();
-    }
-    return null;
-  }
-
-  /**
-   * Returns a build version string using data from the JAR manifest.
-   * @param devVersion version used during development;
-   *        returned if there is no implementation version or no manifest
-   * @return version string
-   */
-  private static String version(final String devVersion) {
-    final String version = JarManifest.get(Attributes.Name.IMPLEMENTATION_VERSION);
-    if(version == null) return devVersion;
-    if(!version.contains("-SNAPSHOT")) return version;
-
-    final StringBuilder result = new StringBuilder(version.replace("-SNAPSHOT", " beta"));
-    final Object revision = JarManifest.get("Implementation-Build");
-    if(revision != null) result.append(' ').append(revision);
-    return result.toString();
-  }
-
-  /**
    * Sets a global option.
    * @param option option
    * @param value value
    */
   public static void put(final Option<?> option, final String value) {
-    put(key(option), value);
+    put(DBPREFIX + option.name().toLowerCase(Locale.ENGLISH), value);
   }
 
   /**
@@ -214,11 +203,25 @@ public final class Prop {
   }
 
   /**
-   * Returns the key of an option. The returned key is prefixed with {@link #DBPREFIX}.
-   * @param option option
-   * @return key
+   * Returns the attributes from the MANIFEST.MF file.
+   * @return attributes, or empty attribute list if the file is not found or cannot be parsed
    */
-  private static String key(final Option<?> option) {
-    return DBPREFIX + option.name().toLowerCase(Locale.ENGLISH);
+  private static Attributes manifest() {
+    if(LOCATION != null) {
+      try {
+        final String jar = LOCATION.getFile();
+        final ClassLoader cl = Prop.class.getClassLoader();
+        for(final URL url : Collections.list(cl.getResources("META-INF/MANIFEST.MF"))) {
+          if(url.getFile().contains(jar)) {
+            try(InputStream in = url.openStream()) {
+              return new Manifest(in).getMainAttributes();
+            }
+          }
+        }
+      } catch(final IOException ex) {
+        Util.stack(ex);
+      }
+    }
+    return new Attributes(0);
   }
 }

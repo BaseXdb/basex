@@ -6,7 +6,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the Session Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class SessionModuleTest extends HTTPTest {

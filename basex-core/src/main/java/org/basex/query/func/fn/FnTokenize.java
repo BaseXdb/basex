@@ -17,19 +17,21 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class FnTokenize extends RegEx {
   /** Default pattern. */
   private static final byte[] DEFAULT = { ' ' };
   /** Placeholder for default search. */
-  private static final byte[] WHITESPACES = Token.token("\\s+");
+  private static final byte[] WHITESPACE = Token.token("\\s+");
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final byte[] pattern = pattern(qc), value = input(pattern, qc);
-    final boolean simple = pattern == DEFAULT || !defined(2);
+    final byte[] pattern = pattern(qc);
+    final byte[] value = input(pattern, qc);
+    final byte[] flags = toZeroToken(arg(2), qc);
+    final boolean simple = pattern == DEFAULT || flags.length == 0;
     final int vl = value.length;
 
     if(simple) {
@@ -55,7 +57,7 @@ public final class FnTokenize extends RegEx {
       }
     }
 
-    final Pattern p = pattern(pattern, simple ? null : arg(2), qc, true);
+    final Pattern p = pattern(pattern, flags, true);
     return vl == 0 ? Empty.ITER : new Iter() {
       final String string = string(value);
       final Matcher matcher = p.matcher(string);
@@ -77,8 +79,10 @@ public final class FnTokenize extends RegEx {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] pattern = pattern(qc), value = input(pattern, qc);
-    final boolean simple = pattern == DEFAULT || !defined(2);
+    final byte[] pattern = pattern(qc);
+    final byte[] value = input(pattern, qc);
+    final byte[] flags = toZeroToken(arg(2), qc);
+    final boolean simple = pattern == DEFAULT || flags.length == 0;
     final int vl = value.length;
 
     if(simple) {
@@ -86,7 +90,7 @@ public final class FnTokenize extends RegEx {
       if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(split(value, ch, true));
     }
 
-    final Pattern p = pattern(pattern, simple ? null : arg(2), qc, true);
+    final Pattern p = pattern(pattern, flags, true);
     if(vl == 0) return Empty.VALUE;
 
     final TokenList tl = new TokenList();
@@ -138,9 +142,9 @@ public final class FnTokenize extends RegEx {
    * Indicates if default whitespace tokenization is to be performed.
    * @return result of check
    */
-  public boolean whitespaces() {
+  public boolean whitespace() {
     final Expr pattern = arg(1);
     return pattern == Empty.VALUE || pattern == Empty.UNDEFINED ||
-        pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACES);
+        pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACE);
   }
 }

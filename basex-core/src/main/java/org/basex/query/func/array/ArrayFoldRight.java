@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArrayFoldRight extends ArrayFoldLeft {
@@ -21,9 +21,10 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
     final FItem action = action(qc);
 
     Value result = arg(1).value(qc);
-    for(final ListIterator<Value> iter = array.iterator(array.arraySize()); iter.hasPrevious();) {
+    long p = array.arraySize();
+    for(final ListIterator<Value> iter = array.iterator(p); iter.hasPrevious();) {
       final Value value = iter.previous();
-      result = action.invoke(qc, info, value, result);
+      result = action.invoke(qc, info, value, result, Int.get(p--));
       if(skip(qc, value, result)) break;
     }
     return result;
@@ -31,6 +32,6 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return opt(cc, true, false);
+    return optType(cc, true, false);
   }
 }

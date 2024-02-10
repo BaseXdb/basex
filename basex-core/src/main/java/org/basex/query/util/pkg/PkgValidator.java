@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Package validator. This class executes some essential checks before installing a new package.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgValidator {
@@ -91,8 +91,7 @@ public final class PkgValidator {
   private void checkProcs(final ArrayList<PkgDep> deps) throws QueryException {
     // extract database version
     final HashSet<String> versions = new HashSet<>();
-    final int version = Prop.VERSION.indexOf(' ');
-    versions.add(version == -1 ? Prop.VERSION : Prop.VERSION.substring(0, version));
+    versions.add(Prop.VERSION.replaceAll(" .*", ""));
 
     // check if any of the dependencies math
     for(final PkgDep dep : deps) {

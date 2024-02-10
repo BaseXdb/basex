@@ -14,6 +14,7 @@ import org.basex.gui.layout.*;
 import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.io.parse.csv.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -21,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * CSV parser panel.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 final class DialogCsvParser extends DialogParser {
@@ -128,7 +129,7 @@ final class DialogCsvParser extends DialogParser {
 
       final Item item = CsvConverter.get(copts).convert(new IOContent(EXAMPLE));
       example.setText(example(MainParser.CSV.name(), EXAMPLE, item));
-    } catch(final IOException ex) {
+    } catch(final QueryException | IOException ex) {
       example.setText(error(ex));
     }
 

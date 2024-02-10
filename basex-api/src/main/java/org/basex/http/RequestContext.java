@@ -21,7 +21,7 @@ import org.basex.util.http.*;
 /**
  * Request of an HTTP or WebSocket connection.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class RequestContext {
@@ -116,7 +116,12 @@ public final class RequestContext {
    */
   public IOContent body() throws IOException {
     if(body == null) {
-      body = new IOContent(BufferInput.get(request.getInputStream()).content());
+      final RequestContext forward = (RequestContext) request.getAttribute(HTTPText.FORWARD);
+      if(forward != null && forward.body != null) {
+        body = forward.body;
+      } else {
+        body = new IOContent(BufferInput.get(request.getInputStream()).content());
+      }
     }
     return body;
   }

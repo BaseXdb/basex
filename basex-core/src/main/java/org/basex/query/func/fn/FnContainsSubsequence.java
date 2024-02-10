@@ -12,18 +12,19 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnContainsSequence extends StandardFunc {
+public class FnContainsSubsequence extends StandardFunc {
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
+    final FItem compare = toFunctionOrNull(arg(2), 2, qc);
+
     final QueryBiFunction<Item, Item, Boolean> cmp;
-    if(defined(2)) {
-      final FItem compare = toFunction(arg(2), 2, qc);
-      cmp = (item1, item2) -> toBoolean(compare.invoke(qc, info, item1, item2).item(qc, info));
+    if(compare != null) {
+      cmp = (item1, item2) -> toBoolean(qc, compare, item1, item2);
     } else {
       cmp = new DeepEqual(info, sc.collation, qc)::equal;
     }
@@ -60,7 +61,7 @@ public class FnContainsSequence extends StandardFunc {
     if(sst.zero()) return Bln.TRUE;
 
     if(defined(2)) {
-      arg(2, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
+      arg(2, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
           sst.with(Occ.EXACTLY_ONE)));
     }
     return this;

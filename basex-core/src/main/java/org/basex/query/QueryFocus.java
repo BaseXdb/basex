@@ -6,11 +6,11 @@ import org.basex.util.*;
 /**
  * Query focus: context value, position, size.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class QueryFocus {
-  /** Context value. */
+  /** Context value (can be {@code null}). */
   public Value value;
   /** Context position. */
   public long pos = 1;

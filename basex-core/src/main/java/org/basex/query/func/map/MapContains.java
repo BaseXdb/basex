@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class MapContains extends StandardFunc {
@@ -25,8 +25,6 @@ public final class MapContains extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
-    if(map == XQMap.empty()) return Bln.FALSE;
-
-    return this;
+    return map == XQMap.empty() ? Bln.FALSE : this;
   }
 }

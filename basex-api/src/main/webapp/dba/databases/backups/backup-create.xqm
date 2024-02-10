@@ -1,12 +1,12 @@
 (:~
  : Create backup.
  :
- : @author Christian Grün, BaseX Team 2005-23, BSD License
+ : @author Christian Grün, BaseX Team 2005-24, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 import module namespace html = 'dba/html' at '../../lib/html.xqm';
-import module namespace util = 'dba/util' at '../../lib/util.xqm';
+import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~ Top category :)
 declare variable $dba:CAT := 'databases';
@@ -23,6 +23,7 @@ declare
   %rest:path('/dba/backup-create')
   %rest:query-param('name', '{$name}', '')
   %output:method('html')
+  %output:html-version('5')
 function dba:backup-create(
   $name  as xs:string
 ) as element(html) {
@@ -78,9 +79,9 @@ function dba:db-rename(
 ) as empty-sequence() {
   try {
     db:create-backup($name, map { 'comment': $comment, 'compress': boolean($compress) }),
-    util:redirect($dba:SUB, map { 'name': $name, 'info': 'Backup was created.' })
+    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Backup was created.' })
   } catch * {
-    util:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
+    utils:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
   }
 };
 
@@ -99,8 +100,8 @@ function dba:db-optimize-all(
 ) as empty-sequence() {
   try {
     $names ! db:create-backup(.),
-    util:redirect($dba:CAT, map { 'info': util:info($names, 'database', 'backed up') })
+    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'database', 'backed up') })
   } catch * {
-    util:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, map { 'error': $err:description })
   }
 };

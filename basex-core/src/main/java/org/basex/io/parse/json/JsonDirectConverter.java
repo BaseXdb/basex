@@ -40,11 +40,11 @@ import org.basex.util.*;
  *       additional, type-specific attributes in the root node. The attributes
  *       are named by their type in the plural (<i>numbers</i>, <i>booleans</i>,
  *       <i>nulls</i>, <i>objects</i> and <i>arrays</i>), and the attribute
- *       value contains all names with that type, separated by whitespaces.</li>
+ *       value contains all names with that type, separated by whitespace.</li>
  * </ol></li>
  * </ol>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -55,9 +55,9 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   /**
    * Constructor.
    * @param opts json options
-   * @throws QueryIOException query I/O exception
+   * @throws QueryException query exception
    */
-  JsonDirectConverter(final JsonParserOptions opts) throws QueryIOException {
+  JsonDirectConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     lax = jopts.get(JsonOptions.LAX);
     name = JSON;

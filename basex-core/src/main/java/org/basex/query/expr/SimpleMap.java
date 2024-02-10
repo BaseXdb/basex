@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.func.Function.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -23,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Simple map operator.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class SimpleMap extends Arr {
@@ -102,6 +101,19 @@ public abstract class SimpleMap extends Arr {
   }
 
   /**
+   * Removes the specified operand.
+   * @param cc compilation context
+   * @param e operand to remove
+   * @return new map expression
+   * @throws QueryException query exception
+   */
+  public Expr remove(final CompileContext cc, final int e) throws QueryException {
+    final ExprList list = new ExprList(exprs);
+    list.remove(e);
+    return get(cc, info, list.finish());
+  }
+
+  /**
    * Flattens nested map expressions.
    * @param cc compilation context
    * @return optimized expression or {@code null}
@@ -154,7 +166,7 @@ public abstract class SimpleMap extends Arr {
             args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
           if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(true)) {
             // replicate(E, C) ! replicate(., D)  ->  replicate(E, C * D)
-            final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULT).optimize(cc);
+            final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULTIPLY).optimize(cc);
             return cc.function(REPLICATE, info, expr.arg(0), cnt);
           }
           if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
@@ -165,11 +177,10 @@ public abstract class SimpleMap extends Arr {
           if(expr instanceof RangeSeq) {
             // (A to B) ! items-at(E, .)  ->  util:range(E, A, B)
             // reverse(A to B) ! items-at(E, .)  ->  reverse(util:range(E, A, B))
-            final RangeSeq seq = (RangeSeq) expr;
-            final long[] range = seq.range(false);
-            final Expr func = cc.function(_UTIL_RANGE, info,
-                args[0], Int.get(range[0]), Int.get(range[1]));
-            return seq.asc ? func : cc.function(REVERSE, info, func);
+            final RangeSeq rs = (RangeSeq) expr;
+            final Expr func = cc.function(_UTIL_RANGE, info, args[0],
+                Int.get(rs.min()), Int.get(rs.max()));
+            return rs.ascending() ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
             // (START to END) ! items-at(X, .)  ->  util:range(X, START, END)
@@ -193,11 +204,12 @@ public abstract class SimpleMap extends Arr {
       // (1 to 5) ! (. + 1)  ->  2 to 6
       if(expr instanceof RangeSeq && next instanceof Arith) {
         final Arith arith = (Arith) next;
-        final boolean plus = arith.calc == Calc.PLUS, minus = arith.calc == Calc.MINUS;
+        final boolean plus = arith.calc == Calc.ADD, minus = arith.calc == Calc.SUBTRACT;
         if((plus || minus) && next.arg(0) instanceof ContextValue && next.arg(1) instanceof Int) {
-          final RangeSeq seq = (RangeSeq) expr;
+          final RangeSeq rs = (RangeSeq) expr;
           final long diff = ((Int) next.arg(1)).itr();
-          return RangeSeq.get(seq.range(true)[0] + (plus ? diff : -diff), seq.size(), seq.asc);
+          final long start = rs.itemAt(0).itr() + (plus ? diff : -diff);
+          return RangeSeq.get(start, rs.size(), rs.ascending());
         }
       }
 
@@ -470,7 +482,7 @@ public abstract class SimpleMap extends Arr {
         if(mode != Simplify.DISTINCT && seqType().zeroOrOne() &&
             prev.seqType().type instanceof NodeType && last instanceof Bln) {
           // boolean(@id ! true())  ->  boolean(@id)
-          expr = last == Bln.FALSE ? Bln.FALSE : get(cc, info, Arrays.copyOf(exprs, el - 1));
+          expr = last == Bln.FALSE ? Bln.FALSE : remove(cc, el - 1);
         } else {
           // nodes ! text() = string  ->  nodes/text() = string
           expr = toPath(mode, cc);

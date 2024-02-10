@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class MapFilter extends StandardFunc {
@@ -22,9 +22,7 @@ public final class MapFilter extends StandardFunc {
 
     final MapBuilder mb = new MapBuilder(info);
     map.apply((key, value) -> {
-      if(toBoolean(predicate.invoke(qc, info, key, value).item(qc, info))) {
-        mb.put(key, value);
-      }
+      if(toBoolean(qc, predicate, key, value)) mb.put(key, value);
     });
     return mb.map();
   }
@@ -38,7 +36,7 @@ public final class MapFilter extends StandardFunc {
     if(type instanceof MapType) {
       final MapType mtype = (MapType) type;
       final SeqType declType = mtype.argTypes[0].with(Occ.EXACTLY_ONE);
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, declType, mtype.declType));
+      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, declType, mtype.declType));
       exprType.assign(type);
     }
     return this;

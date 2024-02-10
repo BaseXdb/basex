@@ -12,22 +12,19 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ArrayIndexWhere extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final FItem predicate = toFunction(arg(1), 1, qc);
+    final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int c = 0;
+    int p = 0;
     final LongList list = new LongList();
     for(final Value value : array.members()) {
-      ++c;
-      if(toBoolean(predicate.invoke(qc, info, value).item(qc, info))) {
-        list.add(c);
-      }
+      if(toBoolean(qc, predicate, value, Int.get(++p))) list.add(p);
     }
     return IntSeq.get(list);
   }
@@ -39,7 +36,8 @@ public final class ArrayIndexWhere extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> coerceFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType));
+      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType,
+          SeqType.INTEGER_O));
     }
     return this;
   }

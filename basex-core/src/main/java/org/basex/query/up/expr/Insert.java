@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * Insert expression.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Lukas Kircher
  */
 public final class Insert extends Update {
@@ -68,7 +68,7 @@ public final class Insert extends Update {
     if(!(item instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
     final Item i2 = iter.next();
     if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info,
-        ValueBuilder.concat(item, i2, qc));
+        ValueBuilder.concat(item, i2));
 
     final ANode node = (ANode) item, parent = node.parent();
     final Type type = node.type;

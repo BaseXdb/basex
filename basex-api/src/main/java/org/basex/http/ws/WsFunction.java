@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * This class represents a single WebSocket function.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Johannes Finckh
  */
 public final class WsFunction extends WebFunction {
@@ -43,7 +43,7 @@ public final class WsFunction extends WebFunction {
     final boolean[] declared = new boolean[function.arity()];
     // counter for annotations that should occur only once
     boolean found = false;
-    final AnnList starts = new AnnList();
+    AnnList starts = AnnList.EMPTY;
 
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
@@ -63,14 +63,14 @@ public final class WsFunction extends WebFunction {
         case _WS_CLOSE:
         case _WS_CONNECT:
           path = new WsPath(toString(value.itemAt(0)));
-          starts.add(ann);
+          starts = starts.attach(ann);
           break;
         case _WS_ERROR:
         case _WS_MESSAGE:
           final QNm msg = checkVariable(toString(value.itemAt(1)), declared);
           message = new WebParam(msg, "message", null);
           path = new WsPath(toString(value.itemAt(0)));
-          starts.add(ann);
+          starts = starts.attach(ann);
           break;
         default:
           break;

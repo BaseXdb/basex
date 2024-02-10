@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Validation Module.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class ValidateModuleTest extends SandboxTest {
@@ -189,6 +189,12 @@ public final class ValidateModuleTest extends SandboxTest {
     // invalid arguments
     error(func.args("unknown"), WHICHRES_X);
     error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
+  }
+
+  /** Test method. */
+  @Test public void xsdInit() {
+    final Function func = _VALIDATE_XSD_INIT;
+    assertTrue(query(func.args()).isEmpty());
   }
 
   /** Test method. */

@@ -7,6 +7,7 @@ import org.basex.build.csv.CsvOptions.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
+import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
@@ -14,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * <p>This class converts CSV input to XML.</p>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class CsvConverter extends Job {
@@ -61,9 +62,10 @@ public abstract class CsvConverter extends Job {
    * Converts the specified input to an XQuery value.
    * @param input input
    * @return result
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public final Item convert(final IO input) throws IOException {
+  public final Item convert(final IO input) throws QueryException, IOException {
     init(input.url());
     try(NewlineInput in = new NewlineInput(input)) {
       nli = in.encoding(copts.get(CsvParserOptions.ENCODING));
@@ -110,7 +112,8 @@ public abstract class CsvConverter extends Job {
   /**
    * Returns the resulting XQuery value.
    * @return result
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected abstract Item finish() throws IOException;
+  protected abstract Item finish() throws QueryException, IOException;
 }

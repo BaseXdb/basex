@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * Leaf that contains a collision list of keys with the same hash code.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 final class TrieList extends TrieNode {
@@ -343,15 +343,18 @@ final class TrieList extends TrieNode {
     final TrieList ol = (TrieList) node;
     OUTER:
     for(int i = 0; i < size; i++) {
-      if(deep.qc != null) deep.qc.checkStop();
+      if(deep != null && deep.qc != null) deep.qc.checkStop();
       final Item key = keys[i];
+      final Value value = values[i];
       for(int j = 0; j < size; j++) {
-        if(key.atomicEqual(ol.keys[j], deep.info)) {
-          // check bound value, too
-          if(!deep.equal(values[i], ol.values[j])) return false;
-          // value matched, continue with next key
-          continue OUTER;
+        if(deep != null) {
+          if(!key.atomicEqual(ol.keys[j], deep.info)) continue;
+          if(!deep.equal(value, ol.values[j])) return false;
+        } else {
+          if(!key.equals(ol.keys[j])) continue;
+          if(!value.equals(ol.values[j])) return false;
         }
+        continue OUTER;
       }
       // all keys of the other list were checked, none matched
       return false;

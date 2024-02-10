@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * <p>In order to ensure a consistent representation of tokens in the project, all string
  * conversions should be done via the methods of this class.</p>
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class Token {
@@ -71,9 +71,9 @@ public final class Token {
   public static final byte[] DOLLAR = { '$' };
 
   /** Comparator for byte arrays. */
-  public static final Comparator<byte[]> COMPARATOR = Token::diff;
+  public static final Comparator<byte[]> COMPARATOR = Token::compare;
   /** Case-insensitive comparator for byte arrays. */
-  public static final Comparator<byte[]> LC_COMPARATOR = (o1, o2) -> diff(lc(o1), lc(o2));
+  public static final Comparator<byte[]> LC_COMPARATOR = (o1, o2) -> compare(lc(o1), lc(o2));
   /** Unicode replacement codepoint (\\uFFFD). */
   public static final char REPLACEMENT = '\uFFFD';
 
@@ -750,7 +750,7 @@ public final class Token {
   public static boolean eq(final byte[] token1, final byte[] token2, final DeepEqual deep) {
     final Normalizer.Form form = deep.options.get(NORMALIZATION_FORM);
     byte[] t1 = normalize(token1, form), t2 = normalize(token2, form);
-    if(deep.options.get(NORMALIZE_SPACE)) {
+    if(deep.options.get(WHITESPACE) == Whitespace.NORMALIZE) {
       t1 = normalize(t1);
       t2 = normalize(t2);
     }
@@ -784,16 +784,15 @@ public final class Token {
    * Compares two tokens lexicographically.
    * @param token first token
    * @param compare token to be compared
-   * @return 0 if tokens are equal, negative if first token is smaller,
-   *         positive if first token is bigger
+   * @return result of comparison (-1, 0, 1)
    */
-  public static int diff(final byte[] token, final byte[] compare) {
+  public static int compare(final byte[] token, final byte[] compare) {
     final int tl = token.length, cl = compare.length, l = Math.min(tl, cl);
     for(int i = 0; i < l; ++i) {
       final int c = (token[i] & 0xFF) - (compare[i] & 0xFF);
-      if(c != 0) return c;
+      if(c != 0) return Integer.signum(c);
     }
-    return tl - cl;
+    return Integer.signum(tl - cl);
   }
 
   /**
@@ -801,11 +800,10 @@ public final class Token {
    * @param token first token
    * @param compare token to be compared
    * @param coll collation (can be {@code null})
-   * @return 0 if tokens are equal, negative if first token is smaller,
-   *         positive if first token is bigger
+   * @return result of comparison (-1, 0, 1)
    */
-  public static int diff(final byte[] token, final byte[] compare, final Collation coll) {
-    return coll != null ? coll.compare(token, compare) : diff(token, compare);
+  public static int compare(final byte[] token, final byte[] compare, final Collation coll) {
+    return coll != null ? coll.compare(token, compare) : compare(token, compare);
   }
 
   /**
@@ -815,7 +813,7 @@ public final class Token {
    * @return smaller token
    */
   public static byte[] min(final byte[] token, final byte[] compare) {
-    return diff(token, compare) < 0 ? token : compare;
+    return compare(token, compare) < 0 ? token : compare;
   }
 
   /**
@@ -825,7 +823,7 @@ public final class Token {
    * @return bigger token
    */
   public static byte[] max(final byte[] token, final byte[] compare) {
-    return diff(token, compare) > 0 ? token : compare;
+    return compare(token, compare) > 0 ? token : compare;
   }
 
   /**
@@ -1126,9 +1124,9 @@ public final class Token {
   }
 
   /**
-   * Checks if the specified token has only whitespaces.
+   * Checks if the specified token has only whitespace.
    * @param token token
-   * @return true if all characters are whitespaces
+   * @return true if all characters are whitespace
    */
   public static boolean ws(final byte[] token) {
     for(final byte b : token) {
@@ -1157,7 +1155,7 @@ public final class Token {
   }
 
   /**
-   * Removes leading and trailing whitespaces from the specified token.
+   * Removes leading and trailing whitespace from the specified token.
    * @param token token to be trimmed
    * @return trimmed token
    */
@@ -1493,18 +1491,6 @@ public final class Token {
    * @return normalized token
    */
   public static byte[] normalize(final byte[] token, final Normalizer.Form form) {
-    return normalize(token, form, ascii(token));
-  }
-
-  /**
-   * Normalizes Unicode characters in the specified token.
-   * @param token token
-   * @param form normalization form (can be {@code null})
-   * @param ascii ASCII flag
-   * @return normalized token
-   */
-  public static byte[] normalize(final byte[] token, final Normalizer.Form form,
-      final boolean ascii) {
-    return form == null || ascii ? token : token(Normalizer.normalize(string(token), form));
+    return form == null || ascii(token) ? token : token(Normalizer.normalize(string(token), form));
   }
 }

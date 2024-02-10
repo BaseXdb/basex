@@ -1,10 +1,13 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -14,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * A named function literal.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
 public final class FuncLit extends Single implements Scope {
@@ -31,14 +34,14 @@ public final class FuncLit extends Single implements Scope {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param seqType sequence type
-   * @param name function name
    * @param params formal parameters
    * @param anns annotations
+   * @param seqType sequence type
+   * @param name function name
    * @param vs variable scope
    */
-  FuncLit(final InputInfo info, final Expr expr, final SeqType seqType, final QNm name,
-      final Var[] params, final AnnList anns, final VarScope vs) {
+  FuncLit(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
+      final SeqType seqType, final QNm name, final VarScope vs) {
 
     super(info, expr, seqType);
     this.name = name;
@@ -62,14 +65,19 @@ public final class FuncLit extends Single implements Scope {
   }
 
   @Override
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    return expr instanceof Value || !expr.has(Flag.CTX) ? cc.preEval(this) : this;
+  }
+
+  @Override
   public boolean compiled() {
     return true;
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(vs.sc, anns, name, params, funcType(), expr, vs.stackSize(),
-        info, qc.focus.copy());
+  public FuncItem item(final QueryContext qc, final InputInfo ii) {
+    return new FuncItem(info, expr, params, anns, funcType(), vs.sc, vs.stackSize(),
+        name, qc.focus.copy());
   }
 
   @Override
@@ -81,7 +89,7 @@ public final class FuncLit extends Single implements Scope {
       final Var[] vars = new Var[pl];
       for(int p = 0; p < pl; p++) vars[p] = cc.copy(params[p], vm);
       final Expr ex = expr.copy(cc, vm);
-      return copyType(new FuncLit(info, ex, seqType(), name, vars, anns, vsc));
+      return copyType(new FuncLit(info, ex, vars, anns, seqType(), name, vsc));
     } finally {
       cc.removeScope();
     }
@@ -102,7 +110,6 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public boolean equals(final Object obj) {
-    // [CG] could be enhanced
     return this == obj;
   }
 
@@ -113,6 +120,7 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.concat(name.prefixId(), "#", params.length);
+    qs.token(anns).concat("(: ", name.prefixId(), "#", params.length, " :)");
+    qs.token(FUNCTION).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 }

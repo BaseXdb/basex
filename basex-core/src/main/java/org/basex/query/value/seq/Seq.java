@@ -25,7 +25,7 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
@@ -82,10 +82,20 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean pred)
+  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
       throws QueryException {
+
     if(itemAt(0) instanceof ANode) return true;
-    throw ebvError(this, ii);
+    if(!predicate) throw testError(this, false, ii);
+
+    boolean ok = false, num = false;
+    for(final Item item : this) {
+      if(item instanceof ANode) return true;
+      if(!(item instanceof ANum)) throw testError(this, num, ii);
+      if(!ok) ok = item.dbl(ii) == qc.focus.pos;
+      num = true;
+    }
+    return ok;
   }
 
   @Override

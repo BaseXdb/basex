@@ -27,7 +27,7 @@ import org.basex.util.hash.*;
  * values can also be retrieved via enhanced for (for-each) loops. The default
  * {@link #iter()} method will provide better performance.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public abstract class Value extends Expr implements Iterable<Item> {
@@ -109,16 +109,16 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Tests if this is an empty sequence.
    * @return result of check
    */
-  public final boolean isEmpty() {
-    return size() == 0;
+  public boolean isEmpty() {
+    return false;
   }
 
   /**
    * Tests if this is an item.
    * @return result of check
    */
-  public final boolean isItem() {
-    return size() == 1;
+  public boolean isItem() {
+    return false;
   }
 
   /**

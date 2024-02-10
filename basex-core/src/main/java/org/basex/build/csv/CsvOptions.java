@@ -1,7 +1,5 @@
 package org.basex.build.csv;
 
-import java.util.*;
-
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -12,7 +10,7 @@ import org.basex.util.options.*;
 /**
  * Options for parsing and serializing CSV data.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public class CsvOptions extends Options {
@@ -38,7 +36,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 
@@ -63,7 +61,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return name().toLowerCase(Locale.ENGLISH);
+      return EnumOption.string(name());
     }
   }
 

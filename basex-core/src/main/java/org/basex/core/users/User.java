@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * This class contains information on a single user.
  *
- * @author BaseX Team 2005-23, BSD License
+ * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
 public final class User {
@@ -53,7 +53,7 @@ public final class User {
   }
 
   /**
-   * Indicates if a passwords are stored for a user.
+   * Indicates if passwords are stored for a user.
    * @return result of check
    */
   public boolean enabled() {
@@ -119,9 +119,8 @@ public final class User {
       });
       user.add(pw.finish());
     });
-    patterns.forEach((key, value) -> {
-      user.add(FElem.build(Q_DATABASE).add(Q_PATTERN, key).add(Q_PERMISSION, value).finish());
-    });
+    patterns.forEach((key, value) -> user.add(FElem.build(Q_DATABASE).add(Q_PATTERN, key).
+        add(Q_PERMISSION, value).finish()));
     if(info != null) {
       if(qc != null) {
         // create copy of the info node if query context is available
@@ -280,7 +279,7 @@ public final class User {
    * @param elem info element
    */
   public synchronized void info(final ANode elem) {
-    info = elem.hasChildren() || elem.attributeIter().size() != 0 ? elem : null;
+    info = elem.hasChildren() || elem.hasAttributes() ? elem : null;
   }
 
   /**
