@@ -16,8 +16,12 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class JobPool {
-  /** Number of queries to be queued. */
-  static final int MAXQUERIES = 1000;
+  /** Maximum number of jobs running in parallel. */
+  static final int MAX_RUNNING = 1 << 10;
+  /** Maximum number of cached jobs. */
+  static final int MAX_CACHED = 1 << 10;
+  /** Maximum number of registered jobs. */
+  static final int MAX_REGISTERED = 1 << 20;
 
   /** Queued or running jobs. */
   public final Map<String, Job> active = new ConcurrentHashMap<>();
@@ -44,7 +48,7 @@ public final class JobPool {
    * @param job job
    */
   public void register(final Job job) {
-    while(active.size() >= MAXQUERIES) Performance.sleep(1);
+    while(active.size() >= MAX_RUNNING) Performance.sleep(10);
     active.put(job.jc().id(), job);
   }
 
@@ -63,7 +67,7 @@ public final class JobPool {
     // stop running tasks and queries
     timer.cancel();
     for(final Job job : active.values()) job.stop();
-    while(!active.isEmpty()) Performance.sleep(1);
+    while(!active.isEmpty()) Performance.sleep(10);
   }
 
   /**

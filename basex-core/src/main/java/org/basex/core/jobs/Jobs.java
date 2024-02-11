@@ -78,7 +78,7 @@ public final class Jobs {
     for(int l = 0; l < list.size(); l++) {
       final QueryJobSpec spec = list.get(l);
       try {
-        new QueryJob(spec, context, null, null, null);
+        new QueryJob(spec, context, null, null);
       } catch(final QueryException ex) {
         // drop failing jobs
         Util.errln(ex);
