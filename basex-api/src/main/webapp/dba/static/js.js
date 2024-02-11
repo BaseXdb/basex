@@ -106,10 +106,10 @@ var _running = 0;
 
 /**
  * Runs a query and shows the result.
- * @param {string} path  path to query service
- * @param {string} query query to be evaluated
- * @param {function} func  function that processes the result
- * @param {boolean} reset reset query
+ * @param {string}   path    path to query service
+ * @param {string}   query   query to be evaluated
+ * @param {function} func    function that processes the result
+ * @param {boolean}  reset   reset query
  */
 function query(path, query, func, reset) {
   _running++;
@@ -125,7 +125,7 @@ function query(path, query, func, reset) {
   }, 500);
 
   var url = path;
-  for(name of [ "date", "resource", "sort", "time", "page" ]) {
+  for(name of [ "name", "date", "resource", "sort", "time", "page" ]) {
     var element = document.getElementById(name), value = element && element.value;
     if(value && (name !== "page" || value !== 1 && !reset)) {
       url += (url === path ? "?" : "&") + name + "=" + encodeURIComponent(value);
@@ -193,16 +193,23 @@ function logEntries(key) {
  */
 function logFilter() {
   var value = document.getElementById("log-filter").value;
-  var c = 0;
-  for (input of document.getElementById("dates").getElementsByTagName("input")) {
+  var count = selected = 0;
+  for (var input of document.getElementById("dates").getElementsByTagName("input")) {
     if(input.type === "checkbox" && input.name === "name") {
-      var visible = !value || input.value.includes(value);
+      var visible = !value || input.value.startsWith(value);
       input.parentElement.parentElement.style.display = visible ? null : "none";
-      if(visible) c++;
-      else input.checked = false;
+      if(visible) {
+        count++;
+        if (input.checked) selected++;
+      } else {
+        input.checked = false;
+      }
     }
   }
-  document.getElementsByTagName("h3")[0].innerHTML = c + " Entries";
+  for (var id of ["log-download", "log-delete"]) {
+    document.getElementById(id).disabled = !selected;
+  }
+  document.getElementsByTagName("h3")[0].innerHTML = count + " Entries";
 }
 
 /** Most recent log filter string. */
