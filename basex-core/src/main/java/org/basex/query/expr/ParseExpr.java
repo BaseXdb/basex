@@ -88,12 +88,12 @@ public abstract class ParseExpr extends Expr {
     // positional sequence?
     final boolean num = item instanceof ANum;
     if(predicate && num && next instanceof ANum) {
-      boolean ok = test.test(item);
+      if(test.test(item)) return true;
       do {
         if(!(next instanceof ANum)) throw testError(next, true, info);
-        if(!ok) ok = test.test(next);
+        if(test.test(next)) return true;
       } while((next = iter.next()) != null);
-      return ok;
+      return false;
     }
     throw testError(ValueBuilder.concat(item, next), predicate && num, info);
   }
