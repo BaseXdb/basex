@@ -88,14 +88,14 @@ public abstract class Seq extends Value {
     if(itemAt(0) instanceof ANode) return true;
     if(!predicate) throw testError(this, false, ii);
 
-    boolean ok = false, num = false;
+    boolean num = false;
     for(final Item item : this) {
       if(item instanceof ANode) return true;
       if(!(item instanceof ANum)) throw testError(this, num, ii);
-      if(!ok) ok = item.dbl(ii) == qc.focus.pos;
+      if(item.dbl(ii) == qc.focus.pos) return true;
       num = true;
     }
-    return ok;
+    return false;
   }
 
   @Override

@@ -91,8 +91,8 @@ function dba:logs(
           <input type='hidden' name='time' id='time' value='{ $time }'/>
           <div id='list'>{
             let $buttons := (
-              html:button('log-download', 'Download'),
-              html:button('log-delete', 'Delete', true())
+              html:button('log-download', 'Download', false(), map { 'id': 'log-download'}),
+              html:button('log-delete', 'Delete', true(), map { 'id': 'log-delete'})
             )
             let $headers := (
               map { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },

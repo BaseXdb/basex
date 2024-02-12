@@ -39,11 +39,10 @@ public final class QueryJob extends Job implements Runnable {
    * @param context database context
    * @param info input info (can be {@code null})
    * @param notify notify function (ignored if {@code null})
-   * @param qc query context (ignored if {@code null})
    * @throws QueryException query exception
    */
   public QueryJob(final QueryJobSpec job, final Context context, final InputInfo info,
-      final Consumer<QueryJobResult> notify, final QueryContext qc) throws QueryException {
+      final Consumer<QueryJobResult> notify) throws QueryException {
 
     this.job = job;
     this.notify = notify;
@@ -75,10 +74,8 @@ public final class QueryJob extends Job implements Runnable {
 
     // number of scheduled and active tasks must not exceed limit
     final JobPool jobs = context.jobs;
-    while(jobs.tasks.size() + jobs.active.size() >= JobPool.MAXQUERIES) {
-      Performance.sleep(10);
-      if(qc != null) qc.checkStop();
-    }
+    if(jobs.tasks.size() + jobs.active.size() >= JobPool.MAX_REGISTERED)
+      throw JOBS_OVERFLOW.get(info);
 
     synchronized(jobs.tasks) {
       // custom job id: check if it is invalid or has already been assigned
@@ -93,7 +90,7 @@ public final class QueryJob extends Job implements Runnable {
       }
       if(cache) {
         // check if too many query results are cached
-        if(jobs.results.size() >= JobPool.MAXQUERIES) throw JOBS_OVERFLOW.get(info);
+        if(jobs.results.size() >= JobPool.MAX_CACHED) throw JOBS_OVERFLOW.get(info);
         jobs.results.put(id, result);
       }
 

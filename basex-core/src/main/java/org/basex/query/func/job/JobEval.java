@@ -51,7 +51,7 @@ public class JobEval extends StandardFunc {
     }
 
     final QueryJobSpec spec = new QueryJobSpec(options, bindings, query);
-    final QueryJob job = new QueryJob(spec, qc.context, info, null, qc);
+    final QueryJob job = new QueryJob(spec, qc.context, info, null);
 
     // add service
     if(service) {
