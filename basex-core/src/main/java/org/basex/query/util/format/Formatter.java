@@ -343,20 +343,27 @@ public abstract class Formatter extends FormatUtil {
       if(c == '#') ++od;
       else if(zeroes(c) != -1) ++md;
     }
-    // adjust max with mandatory digit count
-    if(fp.max < md) fp.max = md;
 
     // calculate number of target digits, including trailing zeroes
     final int sl = s.length();
     int fl = md + od;
     if(fl == 1) fl = sl;
-    if(fp.max < fl) fl = fp.max;
+
+    // adjust min/max with mandatory digit count
+    if(fp.max < md) fp.max = md;
+    if(fp.min < md) fp.min = md;
+
+    // adjust number of target digits
+    if(fp.min > md) md = fp.min;
     if(fp.min > fl) fl = fp.min;
+    if(fp.max != Integer.MAX_VALUE) {
+      od = fp.max - fp.min;
+      fl = fp.max;
+    }
 
     // force calculated length
     if(fl != sl) {
-      final int len = fl;
-      final String s1 = num.setScale(len, RoundingMode.DOWN).toString();
+      final String s1 = num.setScale(fl, RoundingMode.DOWN).toString();
       final int d = s1.indexOf('.');
       s = d == -1 ? s1 : s1.substring(d + 1);
     }
@@ -365,16 +372,16 @@ public abstract class Formatter extends FormatUtil {
     byte[] number = number(token(s), fp, fp.first);
 
     // truncate trailing zeroes
-    final int nt = Math.min(fp.max - fp.min, od);
-    if(nt > 0 && s.endsWith("0")) {
+    if(od > 0 && s.endsWith("0")) {
       final String ns = string(number);
       final int nsl = ns.length();
       int nsi = nsl;
-      for(int dc = 0; dc <= nt;) {
+      for(int dc = 0; dc <= od;) {
         final int c = ns.charAt(--nsi);
-        if(zeroes(c) != -1) {
+        final int zero = zeroes(c);
+        if(zero != -1) {
           ++dc;
-          if(c != fp.first) break;
+          if(c != zero) break;
         }
       }
       if(nsi + 1 != nsl) number = token(ns.substring(0, nsi + 1));
