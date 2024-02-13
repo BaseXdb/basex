@@ -8,7 +8,9 @@ import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -77,7 +79,23 @@ final class SimplePos extends Arr implements CmpPos {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Bln.get(test(qc.focus.pos, qc) != 0);
+    final long pos = qc.focus.pos;
+    final Item min = exprs[0].atomItem(qc, info);
+    if(min.isEmpty()) return Bln.FALSE;
+    if(exact()) return Bln.get(pos == toDouble(min));
+
+    final Item max = exprs[1].atomItem(qc, info);
+    if(max.isEmpty()) return Bln.FALSE;
+    return Bln.get(pos >= toDouble(min) && pos <= toDouble(max));
+  }
+
+  @Override
+  public Value positions(final QueryContext qc) throws QueryException {
+    final Item min = exprs[0].atomItem(qc, info);
+    final Item max = exact() ? min : exprs[1].atomItem(qc, info);
+    if(min.isEmpty() || max.isEmpty()) return Empty.VALUE;
+    final long mn = (long) Math.ceil(toDouble(min)), mx = (long) Math.floor(toDouble(max));
+    return RangeSeq.get(mn, mx - mn + 1, true);
   }
 
   @Override
@@ -123,21 +141,6 @@ final class SimplePos extends Arr implements CmpPos {
   @Override
   public boolean exact() {
     return exprs.length == 1;
-  }
-
-  @Override
-  public int test(final long pos, final QueryContext qc) throws QueryException {
-    final Item min = exprs[0].atomItem(qc, info);
-    if(min.isEmpty()) return 0;
-    final double mn = toDouble(min), mx;
-    if(exact()) {
-      mx = mn;
-    } else {
-      final Item max = exprs[1].atomItem(qc, info);
-      if(max.isEmpty()) return 0;
-      mx = toDouble(max);
-    }
-    return pos == mx ? 2 : pos >= mn && pos <= mx ? 1 : 0;
   }
 
   @Override

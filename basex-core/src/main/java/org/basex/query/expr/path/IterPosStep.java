@@ -29,16 +29,26 @@ public final class IterPosStep extends Step {
 
   @Override
   public NodeIter iter(final QueryContext qc) {
+    final int el = exprs.length;
     return new NodeIter() {
-      final long[] cPos = new long[exprs.length];
+      /** Current context positions. */
+      final long[] currPos = new long[el];
+      /** Cached search positions. */
+      final Value[] cachedPos = new Value[el];
+      /** Iterator. */
       BasicNodeIter iter;
+      /** Skip remaining tests. */
       boolean skip;
 
       @Override
       public ANode next() throws QueryException {
         if(skip) return null;
-        if(iter == null) iter = axis.iter(checkNode(qc));
-
+        if(iter == null) {
+          iter = axis.iter(checkNode(qc));
+          for(int e = 0; e < el; e++) {
+            if(exprs[e] instanceof CmpPos) cachedPos[e] = ((CmpPos) exprs[e]).positions(qc);
+          }
+        }
         for(final ANode node : iter) {
           qc.checkStop();
           if(test.matches(node) && preds(node)) return node.finish();
@@ -51,14 +61,14 @@ public final class IterPosStep extends Step {
         final Value qv = qf.value;
         qf.value = node;
         try {
-          final int pl = exprs.length;
-          for(int p = 0; p < pl; p++) {
-            final Expr pred = exprs[p];
-            if(pred instanceof CmpPos) {
-              final int t = ((CmpPos) pred).test(++cPos[p], qc);
-              if(t == 0) return false;
-              if(t == 2) skip = true;
-            } else if(!pred.test(qc, info, 0)) {
+          for(int e = 0; e < el; e++) {
+            final Value pos = cachedPos[e];
+            if(pos != null) {
+              final long p = ++currPos[e];
+              if(!pos.test(qc, info, p)) return false;
+              // last position reached: early exit
+              if(p == pos.itemAt(pos.size() - 1).itr(info)) skip = true;
+            } else if(!exprs[e].test(qc, info, 0)) {
               return false;
             }
           }

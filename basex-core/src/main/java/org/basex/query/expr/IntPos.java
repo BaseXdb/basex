@@ -7,7 +7,9 @@ import org.basex.query.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -53,17 +55,18 @@ public final class IntPos extends Simple implements CmpPos {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Bln.get(test(qc.focus.pos, qc) != 0);
+    final long pos = qc.focus.pos;
+    return Bln.get(pos >= min && pos <= max);
+  }
+
+  @Override
+  public Value positions(final QueryContext qc) throws QueryException {
+    return RangeSeq.get(min, max - min + 1, true);
   }
 
   @Override
   public boolean exact() {
     return min == max;
-  }
-
-  @Override
-  public int test(final long pos, final QueryContext qc) {
-    return pos == max ? 2 : pos >= min && pos <= max ? 1 : 0;
   }
 
   @Override

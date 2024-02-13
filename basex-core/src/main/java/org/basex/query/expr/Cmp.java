@@ -393,7 +393,7 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
-    if(POSITION.is(exprs[0])) {
+    if(POSITION.is(exprs[0]) && exprs[1].seqType().type.isNumberOrUntyped()) {
       final Expr expr = Pos.get(exprs[1], op, info, cc, null);
       if(expr != null) return expr;
     }

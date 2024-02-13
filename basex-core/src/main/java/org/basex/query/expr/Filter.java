@@ -9,6 +9,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -165,12 +166,10 @@ public abstract class Filter extends Preds {
           ex = cc.function(ITEMS_AT, info, add.apply(expr), pos);
         }
       } else if(pred instanceof MixedPos) {
-        final MixedPos pos = (MixedPos) pred;
-        if(pos.expr.isSimple()) {
-          // E[pos: POS1, POS2, ...]  ->  items-at(E, sort(distinct-values((POS1, POS2, ...)))
-          ex = cc.function(ITEMS_AT, info, add.apply(expr), pos.max > 0 ? pos.expr :
-            cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pos.expr)));
-        }
+        // E[pos: POS1, POS2, ...]  ->  items-at(E, sort(distinct-values((POS1, POS2, ...)))
+        final Expr pos = ((MixedPos) pred).expr;
+        ex = cc.function(ITEMS_AT, info, add.apply(expr), pos instanceof Value ? pos :
+          cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pos)));
       } else if(pred instanceof CmpG) {
         final Expr op1 = pred.arg(0), op2 = pred.arg(1);
         if(POSITION.is(op1) && ((Cmp) pred).opV() == OpV.NE &&

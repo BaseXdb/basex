@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 
 /**
  * Position checks.
@@ -10,18 +11,12 @@ import org.basex.query.*;
  */
 public interface CmpPos {
   /**
-   * Checks the current position.
-   * <ul>
-   *   <li> Returns {@code 2} if the test is successful and remaining tests can be skipped
-   *   <li> Returns {@code 1} if the test is successful
-   *   <li> Returns {@code 0} otherwise
-   * </ul>
-   * @param pos current position
+   * Returns the positions in ascending order.
    * @param qc query context
-   * @return result of check
+   * @return positions
    * @throws QueryException query exception
    */
-  int test(long pos, QueryContext qc) throws QueryException;
+  Value positions(QueryContext qc) throws QueryException;
 
   /**
    * Checks if the minimum and maximum positions are identical.

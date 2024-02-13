@@ -51,17 +51,9 @@ public final class Pos extends Single {
 
     if(op == OpV.EQ) {
       // normalize positions (sort, remove duplicates and illegal positions)
-      if(pos instanceof Value && !(pos instanceof RangeSeq) &&
-          pos.size() <= CompileContext.MAX_PREEVAL) {
-        final LongList list = new LongList();
-        for(final Item item : (Value) pos) {
-          final double d = item.dbl(info);
-          long l = (long) d;
-          if(l > 0 && d == l) list.add(l);
-        }
-        if(list.ddo().isEmpty()) return Bln.FALSE;
-        pos = IntSeq.get(list.finish());
-      }
+      if(pos instanceof Value && pos.size() <= CompileContext.MAX_PREEVAL) pos = ddo((Value) pos);
+      if(pos == Empty.VALUE) return Bln.FALSE;
+
       // range sequence. example: position() = 5 to 10
       if(pos instanceof RangeSeq) {
         final RangeSeq rs = (RangeSeq) pos;
@@ -130,12 +122,29 @@ public final class Pos extends Single {
       }
     }
 
-    // position() = (1, 3, 2)
+    // position() = (1, 2, 4)
     if(op == OpV.EQ && pos.isSimple()) {
       return ref instanceof MixedPos ? null : new MixedPos(info, pos);
     }
 
     return null;
+  }
+
+  /**
+   * Returns positions sorted and without duplicates.
+   * @param value positions
+   * @return sorted positions
+   * @throws QueryException query exception
+   */
+  public static Value ddo(final Value value) throws QueryException {
+    if(value instanceof RangeSeq) return value;
+    final LongList list = new LongList();
+    for(final Item item : value) {
+      final double d = item.dbl(null);
+      long l = (long) d;
+      if(l > 0 && d == l) list.add(l);
+    }
+    return IntSeq.get(list.ddo().finish());
   }
 
   @Override
@@ -145,7 +154,7 @@ public final class Pos extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.NUMBER, cc);
+    expr = expr.simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
 
     final Expr ex = get(expr, OpV.EQ, info, cc, this);
     return ex != null ? cc.replaceWith(this, ex) : this;

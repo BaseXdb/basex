@@ -19,18 +19,13 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 final class MixedPos extends Single implements CmpPos {
-  /** Maximum position ({@code 0} if unknown). */
-  public long max;
-
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param expr positions
+   * @param expr positions; if a value is supplied, the entries are sorted
    */
   MixedPos(final InputInfo info, final Expr expr) {
     super(info, expr, SeqType.BOOLEAN_O);
-    // normalized values: cache maximum value
-    if(expr instanceof Value) max = ((Int) ((Value) expr).itemAt(expr.size() - 1)).itr();
   }
 
   @Override
@@ -49,14 +44,13 @@ final class MixedPos extends Single implements CmpPos {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Bln.get(test(qc.focus.pos, qc) != 0);
+    final long pos = qc.focus.pos;
+    return Bln.get(expr.value(qc).test(qc, info, pos));
   }
 
   @Override
-  public int test(final long pos, final QueryContext qc) throws QueryException {
-    final Value value = expr.value(qc);
-    final boolean test = value.test(qc, info, pos);
-    return test ? pos == max ? 2 : 1 : 0;
+  public Value positions(final QueryContext qc) throws QueryException {
+    return expr instanceof Value ? (Value) expr : Pos.ddo(expr.value(qc));
   }
 
   @Override
@@ -71,9 +65,7 @@ final class MixedPos extends Single implements CmpPos {
 
   @Override
   public MixedPos copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final MixedPos pos = copyType(new MixedPos(info, expr.copy(cc, vm)));
-    pos.max = max;
-    return pos;
+    return copyType(new MixedPos(info, expr.copy(cc, vm)));
   }
 
   @Override

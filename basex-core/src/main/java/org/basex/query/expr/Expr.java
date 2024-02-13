@@ -351,7 +351,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
-    return this;
+    return simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
   }
 
   /**

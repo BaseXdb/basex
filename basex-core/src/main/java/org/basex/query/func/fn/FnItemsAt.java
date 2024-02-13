@@ -47,20 +47,24 @@ public class FnItemsAt extends StandardFunc {
       // retrieve (possibly invalid) position
       final double d = toDouble(at) - 1;
       long l = (long) d;
-      if(d != l || l < 0) return Empty.VALUE;
+      if(l >= 0 && d == l) {
+        // retrieve single item
+        final Expr input = arg(0);
+        if(input.seqType().zeroOrOne()) {
+          return l == 0 ? input.item(qc, info) : Empty.VALUE;
+        }
 
-      // retrieve single item
-      final Expr input = arg(0);
-      if(input.seqType().zeroOrOne()) return l == 0 ? input.item(qc, info) : Empty.VALUE;
+        // fast route if the result size is known
+        final Iter iter = input.iter(qc);
+        final long size = iter.size();
+        if(size >= 0) {
+          return l < size ? iter.get(l) : Empty.VALUE;
+        }
 
-      // fast route if the result size is known
-      final Iter iter = input.iter(qc);
-      final long size = iter.size();
-      if(size >= 0) return l < size ? iter.get(l) : Empty.VALUE;
-
-      // iterate until specified item is found
-      for(Item item; (item = qc.next(iter)) != null;) {
-        if(l-- == 0) return item;
+        // iterate until specified item is found
+        for(Item item; (item = qc.next(iter)) != null;) {
+          if(l-- == 0) return item;
+        }
       }
     }
     return Empty.VALUE;
@@ -75,8 +79,10 @@ public class FnItemsAt extends StandardFunc {
   private Iter evalIter(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     final Iter at = arg(1).iter(qc);
-    final long size = input.size();
+
     return new Iter() {
+      final long size = input.size();
+
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(at)) != null;) {
