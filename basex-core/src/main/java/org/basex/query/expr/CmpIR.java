@@ -119,15 +119,14 @@ public final class CmpIR extends Single {
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();
 
-    if(expr instanceof Value) return cc.preEval(this);
-
     if(Function.POSITION.is(expr)) {
       // E[let $p := position() return $p = 1 to 2]
       final long mn = Math.max(min, 1), size = max - mn + 1;
       final Expr pos = RangeSeq.get(mn, size, true).optimizePos(OpV.EQ, cc);
       return cc.replaceWith(this, pos instanceof Bln ? pos : IntPos.get(pos, OpV.EQ, info));
     }
-    return this;
+
+    return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override

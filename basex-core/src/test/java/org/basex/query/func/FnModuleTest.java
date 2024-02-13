@@ -1018,6 +1018,9 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" reverse(1 to 1000000)", 1000000) + ")", 1);
 
     query("count(" + func.args(" (1 to 1000000) ! 'x'", "x") + ")", 1000000);
+
+    check(func.args(" replicate(1, 6)", 1), "1\n2\n3\n4\n5\n6", exists(RangeSeq.class));
+
   }
 
   /** Test method. */

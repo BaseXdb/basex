@@ -82,7 +82,7 @@ public class FnItemsAt extends StandardFunc {
         for(Item item; (item = qc.next(at)) != null;) {
           final double d = toDouble(item) - 1;
           long l = (long) d;
-          if(d == l && l >= 0 && l < size) return input.itemAt(l);
+          if(l >= 0 && d == l && l < size) return input.itemAt(l);
         }
         return null;
       }

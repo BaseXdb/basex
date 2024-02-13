@@ -36,7 +36,7 @@ public final class ArrayIndexOf extends ArrayFn {
         if(i == s) list.add(c);
       }
     }
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 
   @Override

@@ -47,6 +47,6 @@ public final class ConvertBinaryToIntegers extends StandardFunc {
 
     final LongList list = new LongList(bl);
     for(final byte b : bytes) list.add(b & 0xFF);
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 }

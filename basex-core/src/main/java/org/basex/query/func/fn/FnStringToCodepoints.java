@@ -35,7 +35,7 @@ public final class FnStringToCodepoints extends StandardFunc {
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
           final LongList list = new LongList(Seq.initialCapacity(size));
           for(final byte b : token) list.add(b);
-          return IntSeq.get(list);
+          return IntSeq.get(list.finish());
         }
       };
     }
@@ -65,6 +65,6 @@ public final class FnStringToCodepoints extends StandardFunc {
       final int tl = token.length;
       for(int t = 0; t < tl; t += cl(token, t)) list.add(cp(token, t));
     }
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 }

@@ -70,7 +70,7 @@ public abstract class Preds extends Arr {
     boolean exact = max != -1;
     if(!exact) max = Long.MAX_VALUE;
 
-    // check for positional predicates
+    // positional predicates
     for(final Expr expr : exprs) {
       if(expr instanceof Int || Function.LAST.is(expr)) {
         // use minimum of old value and 1
@@ -117,30 +117,30 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Simplifies all predicates.
+   * Optimizes all predicates.
    * @param cc compilation context
    * @param root root expression
    * @return {@code true} if evaluation can be skipped
    * @throws QueryException query exception
    */
-  protected final boolean simplify(final CompileContext cc, final Expr root) throws QueryException {
+  protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
     return cc.ok(root, () -> {
       final ExprList list = new ExprList(exprs.length);
-      for(final Expr expr : exprs) simplify(expr, list, root, cc);
+      for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();
       return optimizeEbv(false, true, cc);
     }) || exprType(root);
   }
 
   /**
-   * Simplifies a predicate.
+   * Optimizes a predicate.
    * @param pred predicate
    * @param list resulting predicates
    * @param root root expression
    * @param cc compilation context
    * @throws QueryException query exception
    */
-  private void simplify(final Expr pred, final ExprList list, final Expr root,
+  private void optimize(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
     // E[exists(nodes)]  ->  E[nodes]
@@ -210,7 +210,7 @@ public abstract class Preds extends Arr {
       cc.info(OPTPRED_X, expr);
       for(final Expr ex : expr.args()) {
         final boolean numeric = ex.seqType().mayBeNumber();
-        simplify(numeric ? cc.function(Function.BOOLEAN, info, ex) : ex, list, root, cc);
+        optimize(numeric ? cc.function(Function.BOOLEAN, info, ex) : ex, list, root, cc);
       }
       expr = Bln.TRUE;
     }

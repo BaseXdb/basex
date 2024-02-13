@@ -34,7 +34,7 @@ public class DbNodeId extends StandardFunc {
     final Iter nodes = arg(0).iter(qc);
     final LongList list = new LongList(Seq.initialCapacity(nodes.size()));
     for(Item item; (item = qc.next(nodes)) != null;) list.add(id(toDBNode(item, false)));
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 
   @Override

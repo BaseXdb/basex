@@ -85,7 +85,7 @@ public final class List extends Arr {
         values[vl++] = value;
       }
 
-      // result size will be small enough to be cast to an integer
+      // size will be small enough to be cast to an integer
       Value value = Seq.get((int) size, type, values);
       if(value == null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
@@ -252,7 +252,7 @@ public final class List extends Arr {
         expr = List.get(cc, info, exprs);
       } else if(seqType().type == AtomType.INTEGER) {
         // merge numbers and ranges
-        expr = toDistinctRange();
+        expr = toRange();
       } else {
         // otherwise, rewrite list to union
         expr = toUnion(cc);
@@ -276,10 +276,10 @@ public final class List extends Arr {
   }
 
   /**
-   * If possible, rewrites the list to a distinct range expression.
+   * If possible, rewrites the list to a range sequence.
    * @return range or original expression
    */
-  private Expr toDistinctRange() {
+  private Expr toRange() {
     long start = 0, end = 0, min, max;
     for(final Expr expr : exprs) {
       if(expr instanceof Int) {
@@ -296,7 +296,7 @@ public final class List extends Arr {
         start = min;
         end = max;
       } else {
-        if(max < start - 1 || min > end) return this;
+        if(max < start || min > end) return this;
         if(min < start) start = min;
         if(max > end) end = max;
       }

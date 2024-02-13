@@ -51,7 +51,7 @@ public final class FnIndexOf extends StandardFunc {
       ++c;
       if(item.comparable(search) && item.equal(search, collation, sc, info)) list.add(c);
     }
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 
   @Override

@@ -76,7 +76,7 @@ public abstract class Filter extends Preds {
     if(st.zero()) return cc.replaceWith(this, root);
 
     // simplify predicates
-    if(simplify(cc, root)) return cc.emptySeq(this);
+    if(optimize(cc, root)) return cc.emptySeq(this);
     // no predicates: return root
     if(exprs.length == 0) return root;
 
@@ -125,22 +125,21 @@ public abstract class Filter extends Preds {
     Expr expr = root;
     boolean opt = false;
     final ExprList preds = new ExprList(exprs.length);
-    final QueryFunction<Expr, Expr> prepare = ex ->
-      preds.isEmpty() ? ex : get(cc, info, ex, preds.next());
+    final QueryFunction<Expr, Expr> add = e -> preds.isEmpty() ? e : get(cc, info, e, preds.next());
     for(final Expr pred : exprs) {
       Expr ex = null;
       if(pred instanceof IntPos) {
         // E[min .. max]  ->  util:range(E, min, max)
         final IntPos pos = (IntPos) pred;
-        ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), Int.get(pos.min),
+        ex = cc.function(_UTIL_RANGE, info, add.apply(expr), Int.get(pos.min),
             Int.get(pos.max));
       } else if(pred instanceof SimplePos) {
-        if(!((SimplePos) pred).exact()) {
-          // E[min .. max]  ->  util:range(E, pos.min, pos.max)
-          ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), pred.arg(0), pred.arg(1));
-        } else if(pred.arg(0).seqType().instanceOf(SeqType.INTEGER_O)) {
+        if(((SimplePos) pred).exact()) {
           // E[pos]  ->  items-at(E, pos.min)
-          ex = cc.function(ITEMS_AT, info, prepare.apply(expr), pred.arg(0));
+          ex = cc.function(ITEMS_AT, info, add.apply(expr), pred.arg(0));
+        } else {
+          // E[min .. max]  ->  util:range(E, pos.min, pos.max)
+          ex = cc.function(_UTIL_RANGE, info, add.apply(expr), pred.arg(0), pred.arg(1));
         }
       } else if(pred instanceof Pos) {
         final Expr pos = ((Pos) pred).expr;
@@ -148,11 +147,11 @@ public abstract class Filter extends Preds {
           final Expr arg1 = pos.arg(0), arg2 = pos.arg(1);
           if(arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple() && LAST.is(arg2)) {
             // E[pos .. last()]  ->  util:range(E, pos)
-            ex = cc.function(_UTIL_RANGE, info, prepare.apply(expr), arg1);
+            ex = cc.function(_UTIL_RANGE, info, add.apply(expr), arg1);
           } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
               ((Arith) arg2).calc == Calc.SUBTRACT && arg2.arg(1) == Int.ONE) {
             // E[1 .. last() - 1]  ->  trunk(E)
-            ex = cc.function(TRUNK, info, prepare.apply(expr));
+            ex = cc.function(TRUNK, info, add.apply(expr));
           }
         }
       } else if(pred instanceof CmpG) {
@@ -160,22 +159,22 @@ public abstract class Filter extends Preds {
         if(POSITION.is(op1) && ((Cmp) pred).opV() == OpV.NE &&
             op2.seqType().instanceOf(SeqType.INTEGER_O) && op2.isSimple()) {
           // E[position() != pos]  ->  remove(E, pos)
-          ex = cc.function(REMOVE, info, prepare.apply(expr), op2);
+          ex = cc.function(REMOVE, info, add.apply(expr), op2);
         }
       } else if(LAST.is(pred)) {
         // E[last()]  ->  foot(E)
-        ex = cc.function(FOOT, info, prepare.apply(expr));
+        ex = cc.function(FOOT, info, add.apply(expr));
       } else if(pred instanceof Arith && preds.isEmpty() && LAST.is(pred.arg(0))) {
         final long es = expr.size();
         // E[last() - 1]  ->  items-at(E, size - 1)
-        if(es != -1) ex = cc.function(ITEMS_AT, info, prepare.apply(expr),
+        if(es != -1) ex = cc.function(ITEMS_AT, info, add.apply(expr),
             new Arith(info, Int.get(es), pred.arg(1), ((Arith) pred).calc).optimize(cc));
       } else if(pred.isSimple() && pred.seqType().type.instanceOf(AtomType.NUMERIC)) {
         final Expr pos = pred.seqType().zeroOrOne() ? pred :
           cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pred));
         // E[pos]  ->  items-at(E, pos)
         // E[pos1, pos2, ...]  ->  items-at(E, sort(distinct-values((pos1, pos2, ...)))
-        ex = cc.function(ITEMS_AT, info, prepare.apply(expr), pos);
+        ex = cc.function(ITEMS_AT, info, add.apply(expr), pos);
       }
       // replace temporary result expression or add predicate to temporary list
       if(ex != null) {
@@ -186,7 +185,7 @@ public abstract class Filter extends Preds {
       }
     }
     // return optimized or filter expression
-    return opt ? cc.replaceWith(this, prepare.apply(expr)) :
+    return opt ? cc.replaceWith(this, add.apply(expr)) :
       copyType(new CachedFilter(info, root, exprs));
   }
 

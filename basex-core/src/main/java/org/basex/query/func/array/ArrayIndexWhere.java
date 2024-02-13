@@ -26,7 +26,7 @@ public final class ArrayIndexWhere extends ArrayFn {
     for(final Value value : array.members()) {
       if(toBoolean(qc, predicate, value, Int.get(++p))) list.add(p);
     }
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 
   @Override

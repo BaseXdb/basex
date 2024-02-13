@@ -284,7 +284,7 @@ public final class CompileContext {
    * @param expr original expression
    * @param result resulting expression
    * @param mode mode of simplification
-   * @return optimized expression
+   * @return simplified or original expression
    * @throws QueryException query exception
    */
   public Expr simplify(final Expr expr, final Expr result, final Simplify mode)

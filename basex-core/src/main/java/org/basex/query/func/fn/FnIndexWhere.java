@@ -32,7 +32,7 @@ public final class FnIndexWhere extends StandardFunc {
     for(Item item; (item = input.next()) != null;) {
       if(toBoolean(qc, predicate, item, Int.get(++p))) list.add(p);
     }
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 
   @Override

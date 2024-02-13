@@ -168,7 +168,7 @@ public class FnSort extends StandardFunc {
 
     if(defined(2) && arg(2).size() == 1) {
       arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
-    } else if(exprs.length == 1) {
+    } else if(!defined(1)) {
       if(st.zeroOrOne() && st.type.isSortable()) return input;
       // enforce pre-evaluation as remaining arguments may not be values
       if(input instanceof Value) {

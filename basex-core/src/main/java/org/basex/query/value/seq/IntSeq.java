@@ -132,16 +132,6 @@ public final class IntSeq extends NativeSeq {
 
   /**
    * Creates an xs:integer sequence with the specified values.
-   * @param values values (will be invalidated by this call)
-   * @return value
-   */
-  public static Value get(final LongList values) {
-    return values.isEmpty() ? Empty.VALUE : values.size() == 1 ? Int.get(values.get(0)) :
-      new IntSeq(values.finish(), AtomType.INTEGER);
-  }
-
-  /**
-   * Creates an xs:integer sequence with the specified values.
    * @param values values
    * @return value
    */
@@ -152,32 +142,49 @@ public final class IntSeq extends NativeSeq {
   /**
    * Creates a sequence with the specified values.
    * @param values values
-   * @param type type
+   * @param type item type; must be instance of xs:integer
    * @return value
    */
   public static Value get(final long[] values, final Type type) {
+    // empty?
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Int.get(values[0], type) : new IntSeq(values, type);
+    if(vl == 0) return Empty.VALUE;
+    // single item?
+    final long first = values[0];
+    if(vl == 1) return Int.get(first, type);
+    // singleton or range?
+    boolean singleton = true, range = true;
+    int v = 0;
+    while((singleton || range) && ++v < vl) {
+      final long l = values[v];
+      singleton &= l == first;
+      range &= l == first + v;
+    }
+    if(v == vl) {
+      if(singleton) return SingletonSeq.get(Int.get(first, type), vl);
+      if(type == AtomType.INTEGER) return RangeSeq.get(first, vl, true);
+    }
+    return new IntSeq(values, type);
   }
 
   /**
    * Creates a typed sequence with the items of the specified values.
    * @param size size of resulting sequence
-   * @param type item type
+   * @param type item type; must be instance of xs:integer
    * @param values values
    * @return value
    * @throws QueryException query exception
    */
   static Value get(final Type type, final int size, final Value... values) throws QueryException {
-    final LongList tmp = new LongList(size);
+    final LongList list = new LongList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
       if(value instanceof IntSeq) {
-        tmp.add(((IntSeq) value).values);
+        list.add(((IntSeq) value).values);
       } else {
-        for(final Item item : value) tmp.add(item.itr(null));
+        for(final Item item : value) list.add(item.itr(null));
       }
     }
-    return get(tmp.finish(), type);
+    return get(list.finish(), type);
   }
 }
