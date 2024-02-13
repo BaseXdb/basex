@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -61,40 +62,6 @@ public abstract class Preds extends Arr {
   protected abstract Expr type(Expr expr);
 
   /**
-   * Assigns the sequence type and result size.
-   * @param root root expression
-   * @return whether the evaluation can be skipped
-   */
-  private boolean exprType(final Expr root) {
-    long max = root.size();
-    boolean exact = max != -1;
-    if(!exact) max = Long.MAX_VALUE;
-
-    // positional predicates
-    for(final Expr expr : exprs) {
-      if(expr instanceof Int || Function.LAST.is(expr)) {
-        // use minimum of old value and 1
-        max = Math.min(max, 1);
-      } else if(expr instanceof IntPos) {
-        final IntPos pos = (IntPos) expr;
-        // subtract start position. example: ...[1 to 2][2]  ->  2  ->  1
-        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[1 to 5]  ->  5
-        max = Math.min(max, pos.max - pos.min + 1);
-      } else {
-        // resulting size will be unknown for any other filter
-        exact = false;
-      }
-    }
-
-    final boolean empty = max == 0;
-    SeqType st = root.seqType();
-    st = max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO);
-    exprType.assign(st, exact || empty ? max : -1);
-    return empty;
-  }
-
-  /**
    * Checks if the specified item matches the predicates.
    * @param item item to be checked
    * @param qc query context
@@ -120,7 +87,7 @@ public abstract class Preds extends Arr {
    * Optimizes all predicates.
    * @param cc compilation context
    * @param root root expression
-   * @return {@code true} if evaluation can be skipped
+   * @return whether the evaluation can be skipped
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
@@ -129,7 +96,7 @@ public abstract class Preds extends Arr {
       for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();
       return optimizeEbv(false, true, cc);
-    }) || exprType(root);
+    }) || optimizeType(root);
   }
 
   /**
@@ -191,17 +158,18 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // positional tests:
-    //   <a/>/.[position() = 1]  ->  <a/>/.[true()]
-    //   $child/..[position() > 1]  ->  $child/..[false()]
+    // positional tests: x[1]  ->  x[pos: 1]
+    if(expr.seqType().type.instanceOf(AtomType.NUMERIC)) {
+      final Expr ex = Pos.get(expr, OpV.EQ, info, cc, null);
+      if(ex != null) expr = ex;
+    }
+
+    // <a/>/.[pos: 1]  ->  <a/>/.[true()]
+    // $child/..[pos: 2, 5]  ->  $child/..[false()]
     if(root instanceof Step) {
       final Axis axis = ((Step) root).axis;
-      if(axis == Axis.SELF || axis == Axis.PARENT) {
-        if(expr instanceof Int) {
-          expr = Bln.get(((Int) expr).itr() == 1);
-        } else if(expr instanceof IntPos) {
-          expr = Bln.get(((IntPos) expr).min == 1);
-        }
+      if((axis == Axis.SELF || axis == Axis.PARENT) && expr instanceof IntPos) {
+        expr = Bln.get(((IntPos) expr).min == 1);
       }
     }
 
@@ -217,6 +185,42 @@ public abstract class Preds extends Arr {
 
     // add predicate to list
     if(expr != Bln.TRUE) list.add(cc.simplify(pred, expr, Simplify.PREDICATE));
+  }
+
+  /**
+   * Assigns the sequence type and result size.
+   * @param root root expression
+   * @return whether the evaluation can be skipped
+   */
+  private boolean optimizeType(final Expr root) {
+    long max = root.size();
+    boolean exact = max != -1;
+    if(!exact) max = Long.MAX_VALUE;
+
+    // positional predicates
+    for(final Expr expr : exprs) {
+      if(expr instanceof Pos && Function.LAST.is(((Pos) expr).expr) || expr instanceof SimplePos &&
+          ((SimplePos) expr).exact() && Function.LAST.is(expr.arg(0))) {
+        // use minimum of old value and 1
+        max = Math.min(max, 1);
+      } else if(expr instanceof IntPos) {
+        final IntPos pos = (IntPos) expr;
+        // subtract start position. example: ...[pos: 1, 2][2]  ->  2  ->  1
+        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
+        // use minimum of old value and range. example: ...[pos: 1, 5]  ->  5
+        max = Math.min(max, pos.max - pos.min + 1);
+      } else {
+        // resulting size will be unknown for any other filter
+        exact = false;
+      }
+      // no results will be returned
+      if(max == 0) return true;
+    }
+
+    SeqType st = root.seqType();
+    st = max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO);
+    exprType.assign(st, exact ? max : -1);
+    return false;
   }
 
   /**

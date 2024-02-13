@@ -89,13 +89,13 @@ public abstract class Step extends Preds {
       final Expr... preds) {
 
     // optimize single last() functions
-    if(preds.length == 1 && Function.LAST.is(preds[0]))
+    if(preds.length == 1 && preds[0] instanceof Pos && Function.LAST.is(((Pos) preds[0]).expr))
       return new IterLastStep(info, axis, test, preds);
 
     // check for simple positional predicates
     boolean pos = false;
     for(final Expr pred : preds) {
-      if(pred instanceof CmpPos || Pos.numeric(pred)) {
+      if(pred instanceof CmpPos) {
         // predicate is known to be a positional check; can be optimized
         pos = true;
       } else if(mayBePositional(pred)) {

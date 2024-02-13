@@ -394,7 +394,7 @@ public abstract class Cmp extends Arr {
    */
   private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
     if(POSITION.is(exprs[0])) {
-      final Expr expr = Pos.get(exprs[1], op, info, cc, true);
+      final Expr expr = Pos.get(exprs[1], op, info, cc, null);
       if(expr != null) return expr;
     }
     return this;

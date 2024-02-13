@@ -398,9 +398,9 @@ public final class RewritingsTest extends SandboxTest {
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() <= $i]", "a\nb",
-        exists(_UTIL_RANGE));
+        exists(ITEMS_AT));
     check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]",
-        "a\nb", exists(_UTIL_RANGE));
+        "a\nb", exists(ITEMS_AT));
     check("for $i in" + seq + "return ('a', 'b')[position() > $i and position() < $i]",
         "", exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() > $i]",
@@ -1438,7 +1438,8 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1841() {
     check("<_/>[position() = (1, 1)]", "<_/>", root(CElem.class));
     check("<_/>[position() = (1, 2, 1)]", "<_/>", root(CElem.class));
-    check("<_/>[position() = (1, 2, 2.1)]", "<_/>", count(Int.class, 2));
+    check("<_/>[position() = (1, 2, 2.1)]", "<_/>", root(CElem.class));
+    check("<_/>[position() = (3, 2, 2.1, 1)]", "<_/>", root(CElem.class));
   }
 
   /** Flatten expression lists. */
@@ -1491,7 +1492,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // move filters with positional tests and variable references into simple map
     check("for $c in 1 to 10 return $c[.]", 1, root(DualMap.class));
-    check("for $c in 1 to 10 return $c[position() = (0, 2)]", "", root(DualMap.class));
+    check("for $c in 1 to 10 return $c[position() = (0, 2)]", "", empty());
 
     // no rewriting: position checks are replaced by items-at
     check("for $c in 1 to 10 return $c[position() =" + wrap(2) + "]", "", root(DualMap.class));

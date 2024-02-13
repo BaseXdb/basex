@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -86,14 +85,16 @@ public final class PathTest extends SandboxTest {
     query("//ul/li[last()][2]", "");
 
     // return last
-    query("//ul/li[''][last()]", "");
-    query("//ul/li['x'][last()]", LI2);
-    query("//ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>][last()]", LI2);
+    check("//ul/li[last()]", LI2, exists(IterLastStep.class));
+    check("//ul/li[''][last()]", "", empty());
+    check("//ul/li['x'][last()]", LI2, exists(IterLastStep.class));
+    check("//ul/li[<a b='{" + _RANDOM_INTEGER.args() + " }'/>][last()]", LI2,
+        exists(CachedStep.class));
 
-    query("//ul/li[0][last()]", "");
-    query("//ul/li[1][last()]", LI1);
-    query("//ul/li[3][last()]", "");
-    query("//ul/li[last()][last()]", LI2);
+    check("//ul/li[0][last()]", "", empty());
+    check("//ul/li[1][last()]", LI1, exists(CachedStep.class));
+    check("//ul/li[3][last()]", "", exists(CachedStep.class));
+    check("//ul/li[last()][last()]", LI2, exists(CachedStep.class));
 
     // multiple positions
     query("//ul/li[''][position() = 1 to 2]", "");
@@ -259,21 +260,21 @@ public final class PathTest extends SandboxTest {
   /** Position checks. */
   @Test public void cmpPos() {
     check("<a/>/*[1]",
-        "", exists(IterPosStep.class), exists(Int.class));
+        "", exists(IterPosStep.class), exists(IntPos.class));
     check("<a/>/*[position() = 1]",
-        "", exists(IterPosStep.class), exists(Int.class));
+        "", exists(IterPosStep.class), exists(IntPos.class));
     check("for $i in 1 to 2 return <a/>/*[$i]",
         "", exists(IterPosStep.class), exists(VarRef.class));
     check("for $i in 1 to 2 return <a/>/*[position() = $i]",
-        "", exists(IterPosStep.class), empty(SimplePos.class));
+        "", exists(IterPosStep.class), exists(SimplePos.class));
     check("for $i in 1 to 2 return <a/>/*[position() = $i to $i]",
-        "", exists(IterPosStep.class), empty(SimplePos.class));
+        "", exists(IterPosStep.class), exists(SimplePos.class));
     check("for $i in 1 to 2 return <a/>/*[position() = $i to $i + 1]",
         "", exists(IterPosStep.class), exists(SimplePos.class));
     check("let $i := 1 return <a/>/*[position() = $i to $i + 1]",
         "", exists(IterPosStep.class), empty(VarRef.class), exists(IntPos.class));
     check("let $i := 1 return <a/>/*[position() = 0 to $i]",
-        "", exists(IterPosStep.class), empty(VarRef.class), count(Int.class, 1));
+        "", exists(IterPosStep.class), empty(VarRef.class), exists(IntPos.class));
     check("let $i := 0 return <a/>/*[position() = 1 to $i]",
         "", empty());
   }

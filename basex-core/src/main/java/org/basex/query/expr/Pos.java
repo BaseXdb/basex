@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static java.lang.Long.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
@@ -7,10 +9,12 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Position range check.
@@ -29,99 +33,109 @@ public final class Pos extends Single {
   }
 
   /**
-   * Returns a position expression for the specified numeric expression.
-   * @param expr numeric expression
-   * @param info input info (can be {@code null})
-   * @param qc query context
-   * @return position expression, {@link Bln#FALSE}, or {@code null}
-   * @throws QueryException query exception
-   */
-  public static Expr get(final Expr expr, final InputInfo info, final QueryContext qc)
-      throws QueryException {
-
-    if(expr instanceof CmpPos) return expr;
-    if(!numeric(expr)) return null;
-
-    final Value value = expr.value(qc);
-    final Expr ex = IntPos.get(value, OpV.EQ, info);
-    return ex != null ? ex : MixedPos.get(value, info);
-  }
-
-  /**
-   * Checks if the specified expression returns numbers and is deterministic.
-   * @param expr expression
-   * @return result of check
-   */
-  public static boolean numeric(final Expr expr) {
-    return expr.seqType().type.isNumber() && expr.isSimple();
-  }
-
-  /**
    * Tries to rewrite {@code fn:position() CMP number(s)} to a positional expression.
-   * @param pos positions to be matched
+   * @param positions positions to be matched
    * @param op comparison operator
    * @param info input info (can be {@code null})
    * @param cc compilation context
-   * @param create create create new instance of this class
+   * @param ref calling expression
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  static Expr get(final Expr pos, final OpV op, final InputInfo info,
-      final CompileContext cc, final boolean create) throws QueryException {
+  public static Expr get(final Expr positions, final OpV op, final InputInfo info,
+      final CompileContext cc, final Expr ref) throws QueryException {
 
     // static result. example: position() > 0  ->  true
-    final Expr ps = pos.optimizePos(op, cc);
-    if(ps instanceof Bln) return ps;
+    Expr pos = positions.optimizePos(op, cc);
+    if(pos instanceof Bln) return pos;
 
-    // value range. example: position() = 5 to 10
-    final Expr ex = IntPos.get(ps, op, info);
-    if(ex != null) return ex;
-
-    // equality check, range: position() = RANGE
-    if(op == OpV.EQ && ps instanceof Range) {
-      if(((Range) ps).ints) {
-        if(ps.isSimple()) return new SimplePos(info, ps.args());
-        if(create) return new Pos(info, ps);
+    if(op == OpV.EQ) {
+      // normalize positions (sort, remove duplicates and illegal positions)
+      if(pos instanceof Value && !(pos instanceof RangeSeq) &&
+          pos.size() <= CompileContext.MAX_PREEVAL) {
+        final LongList list = new LongList();
+        for(final Item item : (Value) pos) {
+          final double d = item.dbl(info);
+          long l = (long) d;
+          if(l > 0 && d == l) list.add(l);
+        }
+        if(list.ddo().isEmpty()) return Bln.FALSE;
+        pos = IntSeq.get(list.finish());
       }
-      return null;
+      // range sequence. example: position() = 5 to 10
+      if(pos instanceof RangeSeq) {
+        final RangeSeq rs = (RangeSeq) pos;
+        return IntPos.get(rs.min(), rs.max(), info);
+      }
+      // range. example: position() = 3 to $max
+      if(pos instanceof Range && ((Range) pos).ints) {
+        if(pos.isSimple()) return new SimplePos(info, pos.args());
+        return ref instanceof Pos ? null : new Pos(info, pos);
+      }
     }
 
-    // rewrite check of single values to equality check
-    Expr[] minMax = null;
-    final SeqType st = ps.seqType();
-    final Type type = st.type;
-    if(st.one() && type.isNumberOrUntyped()) {
+    // integer tests. example: position() > 5
+    if(pos instanceof ANum) {
+      final ANum num = (ANum) pos;
+      final long p = num.itr();
+      final boolean exact = p == num.dbl();
       switch(op) {
-        case EQ:
-          minMax = new Expr[] { ps, ps };
-          break;
-        case GE:
-          minMax = new Expr[] { ps, Int.MAX };
-          break;
-        case GT:
-          minMax = new Expr[] { new Arith(info, type.instanceOf(AtomType.INTEGER) ? ps :
-            cc.function(Function.FLOOR, info, ps), Int.ONE, Calc.ADD).optimize(cc), Int.MAX };
-          break;
-        case LE:
-          minMax = new Expr[] { Int.ONE, ps };
-          break;
-        case LT:
-          minMax = new Expr[] { Int.ONE, new Arith(info, type.instanceOf(AtomType.INTEGER) ?
-            ps : cc.function(Function.CEILING, info, ps), Int.ONE, Calc.SUBTRACT).optimize(cc) };
-          break;
+        case EQ: return exact ? IntPos.get(p, p, info) : Bln.FALSE;
+        case GE: return IntPos.get(exact ? p : p + 1, MAX_VALUE, info);
+        case GT: return IntPos.get(p + 1, MAX_VALUE, info);
+        case LE: return IntPos.get(1, p, info);
+        case LT: return IntPos.get(1, exact ? p - 1 : p, info);
+        case NE: return exact ? p < 2 ? IntPos.get(p + 1, MAX_VALUE, info) : null : Bln.TRUE;
         default:
       }
     }
 
-    // position() = 'xyz', position() != 2
-    if(minMax == null) return null;
-    // position() <= $pos  ->  position() = 1 to $pos
-    if(ps.isSimple()) return new SimplePos(info, minMax);
-    // position() = last()
-    if(minMax[0] == minMax[1]) return create ? new Pos(info, minMax[0]) : null;
-    // rewritten to equality range: position() < last()  ->  position() = 1 to last() - 1
-    return type.instanceOf(AtomType.INTEGER) ?
-      get(new Range(info, minMax).optimize(cc), OpV.EQ, info, cc, create) : null;
+    // numeric tests
+    final SeqType st = pos.seqType();
+    final Type type = st.type;
+    final boolean integer = type.instanceOf(AtomType.INTEGER);
+    if(st.zeroOrOne() && type.isNumberOrUntyped()) {
+      Expr min = null, max = null;
+      switch(op) {
+        case EQ:
+          min = pos;
+          break;
+        case GE:
+          min = pos;
+          max = Int.MAX;
+          break;
+        case GT:
+          min = new Arith(info, integer ? pos :
+            cc.function(Function.FLOOR, info, pos), Int.ONE, Calc.ADD).optimize(cc);
+          max = Int.MAX;
+          break;
+        case LE:
+          min = Int.ONE;
+          max = pos;
+          break;
+        case LT:
+          min = Int.ONE;
+          max = new Arith(info, integer ?
+            pos : cc.function(Function.CEILING, info, pos), Int.ONE, Calc.SUBTRACT).optimize(cc);
+          break;
+        default:
+      }
+      if(min != null) {
+        // position() <= $pos  ->  pos: 1, $pos
+        if(pos.isSimple()) return SimplePos.get(min, max, info);
+        // position() = last()  ->  pos: last()
+        if(max == null) return ref instanceof Pos ? null : new Pos(info, min);
+        // position() < last()  ->  position() = 1 to last() - 1
+        if(integer) return get(new Range(info, min, max).optimize(cc), OpV.EQ, info, cc, ref);
+      }
+    }
+
+    // position() = (1, 3, 2)
+    if(op == OpV.EQ && pos.isSimple()) {
+      return ref instanceof MixedPos ? null : new MixedPos(info, pos);
+    }
+
+    return null;
   }
 
   @Override
@@ -133,7 +147,7 @@ public final class Pos extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
-    final Expr ex = get(expr, OpV.EQ, info, cc, false);
+    final Expr ex = get(expr, OpV.EQ, info, cc, this);
     return ex != null ? cc.replaceWith(this, ex) : this;
   }
 
@@ -162,9 +176,12 @@ public final class Pos extends Single {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[position() = last()]  ->  E[last()]
-    return cc.simplify(this, mode == Simplify.PREDICATE &&
-        expr.seqType().instanceOf(SeqType.NUMERIC_O) ? expr : this, mode);
+    if(mode == Simplify.PREDICATE) {
+      // pos: last() + 1  ->  false()
+      final Expr ex = expr.simplifyFor(mode, cc);
+      if(ex != expr) return ex;
+    }
+    return simplify(mode, cc);
   }
 
   @Override

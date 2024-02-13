@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -31,7 +30,6 @@ public final class IterPosStep extends Step {
   @Override
   public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
-      final CmpPos[] posExpr = new CmpPos[exprs.length];
       final long[] cPos = new long[exprs.length];
       BasicNodeIter iter;
       boolean skip;
@@ -39,15 +37,7 @@ public final class IterPosStep extends Step {
       @Override
       public ANode next() throws QueryException {
         if(skip) return null;
-        if(iter == null) {
-          iter = axis.iter(checkNode(qc));
-          final int el = exprs.length;
-          for(int e = 0; e < el; e++) {
-            final Expr expr = Pos.get(exprs[e], info, qc);
-            if(expr == Bln.FALSE) return null;
-            if(expr instanceof CmpPos) posExpr[e] = (CmpPos) expr;
-          }
-        }
+        if(iter == null) iter = axis.iter(checkNode(qc));
 
         for(final ANode node : iter) {
           qc.checkStop();
@@ -64,13 +54,12 @@ public final class IterPosStep extends Step {
           final int pl = exprs.length;
           for(int p = 0; p < pl; p++) {
             final Expr pred = exprs[p];
-            final CmpPos pos = posExpr[p];
-            if(pos != null) {
-              final int t = pos.test(++cPos[p], qc);
+            if(pred instanceof CmpPos) {
+              final int t = ((CmpPos) pred).test(++cPos[p], qc);
               if(t == 0) return false;
               if(t == 2) skip = true;
-            } else {
-              if(!pred.test(qc, info, 0)) return false;
+            } else if(!pred.test(qc, info, 0)) {
+              return false;
             }
           }
         } finally {

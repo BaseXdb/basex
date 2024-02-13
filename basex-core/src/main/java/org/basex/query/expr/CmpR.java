@@ -11,7 +11,6 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -130,11 +129,10 @@ public final class CmpR extends Single {
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();
 
+    // position() = .1e0  ->  false()
     if(Function.POSITION.is(expr)) {
-      // E[let $p := position() return $p > .1e0]
-      final long mn = Math.max((long) Math.ceil(min), 1), size = (long) Math.floor(max) - mn + 1;
-      final Expr pos = RangeSeq.get(mn, size, true).optimizePos(OpV.EQ, cc);
-      return cc.replaceWith(this, pos instanceof Bln ? pos : IntPos.get(pos, OpV.EQ, info));
+      final long mn = Math.max((long) Math.ceil(min), 1), mx = (long) Math.floor(max);
+      return cc.replaceWith(this, IntPos.get(mn, mx, info));
     }
 
     return expr instanceof Value ? cc.preEval(this) : this;
