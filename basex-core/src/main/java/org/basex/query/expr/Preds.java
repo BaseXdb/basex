@@ -108,7 +108,7 @@ public abstract class Preds extends Arr {
     qf.value = item;
     try {
       for(final Expr expr : exprs) {
-        if(!expr.test(qc, info, true)) return false;
+        if(!expr.test(qc, info, qf.pos)) return false;
       }
       return true;
     } finally {
@@ -208,9 +208,9 @@ public abstract class Preds extends Arr {
     // recursive optimization of AND expressions: E[A and [B and C]]  ->  E[A][B][C]
     if(expr instanceof And && !expr.has(Flag.POS)) {
       cc.info(OPTPRED_X, expr);
-      for(final Expr ex : expr.args()) {
-        final boolean numeric = ex.seqType().mayBeNumber();
-        optimize(numeric ? cc.function(Function.BOOLEAN, info, ex) : ex, list, root, cc);
+      for(final Expr arg : expr.args()) {
+        final boolean numeric = arg.seqType().mayBeNumber();
+        optimize(numeric ? cc.function(Function.BOOLEAN, info, arg) : arg, list, root, cc);
       }
       expr = Bln.TRUE;
     }

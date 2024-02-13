@@ -43,7 +43,7 @@ public class CachedFilter extends Filter {
         final Item item = value.itemAt(v);
         qf.value = item;
         qf.pos = v + 1;
-        if(expr.test(qc, info, true)) items.add(item);
+        if(expr.test(qc, info, v + 1)) items.add(item);
       }
       // save memory
       value = null;
@@ -55,12 +55,12 @@ public class CachedFilter extends Filter {
         qf.size = vs;
         expr = exprs[e];
         int c = 0;
-        for(int i = 0; i < vs; ++i) {
+        for(int v = 0; v < vs; ++v) {
           qc.checkStop();
-          final Item item = items.get(i);
+          final Item item = items.get(v);
           qf.value = item;
-          qf.pos = i + 1;
-          if(expr.test(qc, info, true)) items.set(c++, item);
+          qf.pos = v + 1;
+          if(expr.test(qc, info, v + 1)) items.set(c++, item);
         }
         items.size(c);
       }

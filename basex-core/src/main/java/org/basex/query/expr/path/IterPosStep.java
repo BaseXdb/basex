@@ -65,13 +65,12 @@ public final class IterPosStep extends Step {
           for(int p = 0; p < pl; p++) {
             final Expr pred = exprs[p];
             final CmpPos pos = posExpr[p];
-            if(pos == null) {
-              if(!pred.test(qc, info, true)) return false;
-            } else {
-              final long ps = ++cPos[p];
-              final int t = pos.test(ps, qc);
+            if(pos != null) {
+              final int t = pos.test(++cPos[p], qc);
               if(t == 0) return false;
               if(t == 2) skip = true;
+            } else {
+              if(!pred.test(qc, info, 0)) return false;
             }
           }
         } finally {

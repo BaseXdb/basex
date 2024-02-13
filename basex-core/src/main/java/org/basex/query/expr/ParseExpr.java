@@ -64,11 +64,11 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
 
     final QueryPredicate<Item> test = item ->
-      predicate && item instanceof ANum ? item.dbl(info) == qc.focus.pos : item.bool(info);
+      pos > 0 && item instanceof ANum ? item.dbl(info) == pos : item.bool(info);
 
     // single item
     if(seqType().zeroOrOne()) return test.test(item(qc, info));
@@ -87,7 +87,7 @@ public abstract class ParseExpr extends Expr {
 
     // positional sequence?
     final boolean num = item instanceof ANum;
-    if(predicate && num && next instanceof ANum) {
+    if(pos > 0 && num && next instanceof ANum) {
       if(test.test(item)) return true;
       do {
         if(!(next instanceof ANum)) throw testError(next, true, info);
@@ -95,7 +95,7 @@ public abstract class ParseExpr extends Expr {
       } while((next = iter.next()) != null);
       return false;
     }
-    throw testError(ValueBuilder.concat(item, next), predicate && num, info);
+    throw testError(ValueBuilder.concat(item, next), pos > 0 && num, info);
   }
 
   @Override

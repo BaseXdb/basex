@@ -49,13 +49,7 @@ final class MixedPos extends Simple implements CmpPos {
 
   @Override
   public int test(final long pos, final QueryContext qc) throws QueryException {
-    final long qf = qc.focus.pos;
-    qc.focus.pos = pos;
-    try {
-      return positions.test(qc, info, true) ? 1 : 0;
-    } finally {
-      qc.focus.pos = qf;
-    }
+    return positions.test(qc, info, pos) ? 1 : 0;
   }
 
   @Override

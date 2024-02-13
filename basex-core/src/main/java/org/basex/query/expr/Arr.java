@@ -190,7 +190,7 @@ public abstract class Arr extends ParseExpr {
       // pre-evaluate values
       if(expr instanceof Value && (!predicate || !expr.seqType().mayBeNumber())) {
         // skip evaluation: true() or $bool  ->  true()
-        if(expr.test(cc.qc, info, predicate) == or) return true;
+        if(expr.test(cc.qc, info, 0) == or) return true;
         // ignore result: true() and $bool  ->  $bool
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {

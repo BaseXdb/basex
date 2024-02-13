@@ -39,7 +39,7 @@ public final class Where extends Clause {
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         while(sub.next(qc)) {
-          if(expr.test(qc, info, false)) return true;
+          if(expr.test(qc, info, 0)) return true;
         }
         return false;
       }
@@ -62,7 +62,7 @@ public final class Where extends Clause {
     // where exists(nodes)  ->  where nodes
     expr = expr.simplifyFor(Simplify.EBV, cc);
     if(expr instanceof Value && !(expr instanceof Bln)) {
-      expr = cc.replaceWith(expr, Bln.get(expr.test(cc.qc, info, false)));
+      expr = cc.replaceWith(expr, Bln.get(expr.test(cc.qc, info, 0)));
     }
     return this;
   }

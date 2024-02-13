@@ -81,7 +81,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate) {
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
     return false;
   }
 

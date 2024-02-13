@@ -111,11 +111,9 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-
-    if(!predicate) throw testError(this, false, ii);
-    final long pos = qc.focus.pos;
+    if(pos == 0) throw testError(this, false, ii);
     return pos >= min() && pos <= max();
   }
 

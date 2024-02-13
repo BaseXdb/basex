@@ -35,7 +35,7 @@ public final class And extends Logical {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     for(final Expr expr : exprs) {
-      if(!expr.test(qc, info, false)) return Bln.FALSE;
+      if(!expr.test(qc, info, 0)) return Bln.FALSE;
     }
     return Bln.TRUE;
   }

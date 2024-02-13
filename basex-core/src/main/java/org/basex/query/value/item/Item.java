@@ -93,7 +93,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     return bool(ii);
   }

@@ -135,12 +135,11 @@ public abstract class Expr extends ExprInfo {
    * @param qc query context
    * @param ii input info (can be {@code null}); required for {@link Seq} instances,
    *   which have no input info)
-   * @param predicate predicate test
+   * @param pos position of context item (if {@code 0}, perform EBV test)
    * @return item
    * @throws QueryException query exception
    */
-  public abstract boolean test(QueryContext qc, InputInfo ii, boolean predicate)
-      throws QueryException;
+  public abstract boolean test(QueryContext qc, InputInfo ii, long pos) throws QueryException;
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).

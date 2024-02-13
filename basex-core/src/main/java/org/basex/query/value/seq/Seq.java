@@ -82,17 +82,17 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
 
     if(itemAt(0) instanceof ANode) return true;
-    if(!predicate) throw testError(this, false, ii);
+    if(pos == 0) throw testError(this, false, ii);
 
     boolean num = false;
     for(final Item item : this) {
       if(item instanceof ANode) return true;
       if(!(item instanceof ANum)) throw testError(this, num, ii);
-      if(item.dbl(ii) == qc.focus.pos) return true;
+      if(item.dbl(ii) == pos) return true;
       num = true;
     }
     return false;

@@ -106,8 +106,8 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate) {
-    return predicate ? value == qc.focus.pos : bool(ii);
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
+    return pos > 0 ? value == pos : bool(ii);
   }
 
   @Override

@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class FnNot extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(!arg(0).test(qc, info, false));
+    return Bln.get(!arg(0).test(qc, info, 0));
   }
 
   @Override

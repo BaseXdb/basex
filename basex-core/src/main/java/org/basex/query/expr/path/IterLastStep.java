@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-final class IterLastStep extends Step {
+public final class IterLastStep extends Step {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
