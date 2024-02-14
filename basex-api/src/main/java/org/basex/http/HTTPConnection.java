@@ -391,14 +391,23 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Returns the content type of a request, or an empty string.
+   * Returns the address of the client that sent a request, or an empty string.
+   * Evaluates the HTTP headers to find the original IP address.
    * @param request servlet request
-   * @return content type
+   * @return remote address
    */
   public static String remoteAddress(final HttpServletRequest request) {
     for(final String header : FORWARDING_HEADERS) {
-      final String addr = request.getHeader(header);
-      if(addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
+      final String value = request.getHeader(header);
+      // header found: test last (most reliable) part first
+      if(value != null && !value.isEmpty()) {
+        String ip = null;
+        final String[] entries = value.split("\\s*,\\s*");
+        for(int e = entries.length; --e >= 0 && entries[e].matches("^\\[?[:.\\d]+\\]?$");) {
+          ip = entries[e];
+        }
+        if(ip != null) return ip;
+      }
     }
     return request.getRemoteAddr();
   }
