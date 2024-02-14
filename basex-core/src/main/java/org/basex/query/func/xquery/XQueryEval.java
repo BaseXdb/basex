@@ -104,6 +104,7 @@ public class XQueryEval extends StandardFunc {
       }
 
       // evaluate query
+      final boolean pass = options.get(XQueryOptions.PASS);
       try {
         final StaticContext sctx = new StaticContext(qctx);
         sctx.baseURI(toBaseUri(query.url(), options, XQueryOptions.BASE_URI));
@@ -125,15 +126,20 @@ public class XQueryEval extends StandardFunc {
         for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
         return vb.value();
       } catch(final JobException ex) {
-        if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
-        if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);
+        QueryError error = null;
+        if(qctx.state == JobState.TIMEOUT) error = XQUERY_TIMEOUT;
+        else if(qctx.state == JobState.MEMORY)  error = XQUERY_MEMORY;
+        if(error != null) throw error.get(pass ? new InputInfo(query.path(), 1, 1) : info);
         throw ex;
       } catch(final QueryException ex) {
         Util.debug(ex);
+        final InputInfo ii = ex.info();
         final QueryError error = ex.error();
         final QueryException qe = error == BASEX_PERMISSION_X || error == BASEX_PERMISSION_X_X ?
           XQUERY_PERMISSION1_X.get(info, ex.getLocalizedMessage()) : ex;
-        throw qe.info(options.get(XQueryOptions.PASS) ? ex.info() : info);
+        // pass on error info: assign (possibly empty) path of module which caused the error
+        throw qe.info(pass ? ii.path().equals(info.path()) ?
+          new InputInfo(query.path(), ii.line(), ii.column()) : ii : info);
       }
     } finally {
       if(to != null) to.cancel();
