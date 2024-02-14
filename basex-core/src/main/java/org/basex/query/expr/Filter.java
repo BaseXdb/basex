@@ -156,20 +156,14 @@ public abstract class Filter extends Preds {
         } else if(LAST.is(pos)) {
           // E[pos: last()]  ->  foot(E)
           ex = cc.function(FOOT, info, add.apply(expr));
-        } else if(pos instanceof Arith && preds.isEmpty() && LAST.is(pos.arg(0))) {
-          final long es = expr.size();
-          // E[pos: last() - 1]  ->  items-at(E, size - 1)
-          if(es != -1) ex = cc.function(ITEMS_AT, info, add.apply(expr),
-              new Arith(info, Int.get(es), pos.arg(1), ((Arith) pos).calc).optimize(cc));
-        } else if(pos.isSimple()) {
-          // E[pos: RANGE]  ->  items-at(E, RANGE))
-          ex = cc.function(ITEMS_AT, info, add.apply(expr), pos);
         }
       } else if(pred instanceof MixedPos) {
         // E[pos: POS1, POS2, ...]  ->  items-at(E, sort(distinct-values((POS1, POS2, ...)))
         final Expr pos = ((MixedPos) pred).expr;
-        ex = cc.function(ITEMS_AT, info, add.apply(expr), pos instanceof Value ? pos :
-          cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pos)));
+        // Value instances are known to be sorted (see Pos#get)
+        final boolean sorted = pos instanceof Value;
+        ex = cc.function(ITEMS_AT, info, add.apply(expr), sorted ? pos :
+          cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pos)), Bln.get(sorted));
       } else if(pred instanceof CmpG) {
         final Expr op1 = pred.arg(0), op2 = pred.arg(1);
         if(POSITION.is(op1) && ((Cmp) pred).opV() == OpV.NE &&

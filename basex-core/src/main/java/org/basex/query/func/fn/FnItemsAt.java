@@ -79,6 +79,8 @@ public class FnItemsAt extends StandardFunc {
   private Iter evalIter(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     final Iter at = arg(1).iter(qc);
+    // hidden option, indicates whether the positions are sorted
+    final boolean sorted = toBooleanOrFalse(arg(2), qc);
 
     return new Iter() {
       final long size = input.size();
@@ -88,7 +90,11 @@ public class FnItemsAt extends StandardFunc {
         for(Item item; (item = qc.next(at)) != null;) {
           final double d = toDouble(item) - 1;
           long l = (long) d;
-          if(l >= 0 && d == l && l < size) return input.itemAt(l);
+          if(l < size) {
+            if(l >= 0 && d == l) return input.itemAt(l);
+          } else if(sorted) {
+            break;
+          }
         }
         return null;
       }

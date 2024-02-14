@@ -11,7 +11,7 @@ import org.basex.query.value.*;
  */
 public interface CmpPos {
   /**
-   * Returns the positions in ascending order.
+   * Returns the positions (sorted, without duplicates).
    * @param qc query context
    * @return positions
    * @throws QueryException query exception

@@ -357,8 +357,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   IS_NAN(FnIsNaN::new, "is-NaN(value)", params(ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
-  ITEMS_AT(FnItemsAt::new, "items-at(input,at)",
-      params(ITEM_ZM, NUMERIC_ZM), ITEM_ZM),
+  ITEMS_AT(FnItemsAt::new, "items-at(input,at[,sorted])",
+      params(ITEM_ZM, NUMERIC_ZM, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
