@@ -50,11 +50,8 @@ function dba:editor(
               <button name='save' id='save' disabled='' onclick='saveFile()'>Save</button>,
               <button name='close' id='close' disabled='' onclick='closeFile()'>Close</button>,
               <span>  </span>,
-              <select id='mode' style='width:revert'>{
-                ('Read-Only', 'Updating') ! element option { . }
-              }</select>,
               <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
-              <button id='stop' onclick='stopQuery()' disabled=''>Stop</button>
+              <button id='stop' onclick='stopQuery(true)' disabled=''>Stop</button>
             ), <span> </span>),
             <h2 class='right'>Result</h2>
           }</form>

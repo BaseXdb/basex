@@ -13,6 +13,21 @@ declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(
 declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
 
 (:~
+ : Checks if a query is updating.
+ : @param  $query  query string
+ : @return result of check
+ :)
+declare function utils:query-updating(
+  $query  as xs:string
+) as xs:boolean {
+  let $result := xquery:parse($query, map {
+    'base-uri': config:directory() || '/' || config:file(),
+    'pass'    : true()
+  })
+  return $result/@updating = 'true'
+};
+
+(:~
  : Evaluates a query and returns the result.
  : @param  $query    query string
  : @param  $context  initial context item (can be empty)
@@ -32,7 +47,7 @@ declare function utils:query(
  : @param  $query  query string
  : @return empty sequence
  :)
-declare %updating function utils:update-query(
+declare %updating function utils:update(
   $query  as xs:string
 ) as empty-sequence() {
   xquery:eval-update($query, (), utils:query-options()),
@@ -69,7 +84,8 @@ declare %private function utils:query-options() as map(*) {
     'timeout'   : config:get($config:TIMEOUT),
     'memory'    : config:get($config:MEMORY),
     'permission': config:get($config:PERMISSION),
-    'base-uri'  : config:directory() || '/' || config:file()
+    'base-uri'  : config:directory() || '/' || config:file(),
+    'pass'      : true()
   }
 };
 

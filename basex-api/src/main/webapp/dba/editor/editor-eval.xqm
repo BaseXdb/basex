@@ -8,16 +8,31 @@ module namespace dba = 'dba/editor';
 import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 
 (:~
+ : Checks if a query is updating.
+ : @param  $query  query string
+ : @return result of check
+ :)
+declare
+  %rest:POST('{$query}')
+  %rest:path('/dba/parse')
+  %output:method('text')
+function dba:parse(
+  $query  as xs:string?
+) as xs:boolean {
+  utils:query-updating($query)
+};
+
+(:~
  : Evaluates a query and returns the result.
  : @param  $query  query string
  : @return result of query
  :)
 declare
   %rest:POST('{$query}')
-  %rest:path('/dba/editor-eval')
+  %rest:path('/dba/query')
   %rest:single
   %output:method('text')
-function dba:editor-eval(
+function dba:query(
   $query  as xs:string?
 ) as xs:string {
   utils:query(string($query), ())
@@ -31,11 +46,11 @@ function dba:editor-eval(
 declare
   %updating
   %rest:POST('{$query}')
-  %rest:path('/dba/editor-update')
+  %rest:path('/dba/update')
   %rest:single
   %output:method('text')
-function dba:editor-update(
+function dba:update(
   $query  as xs:string?
 ) as empty-sequence() {
-  utils:update-query(string($query))
+  utils:update(string($query))
 };

@@ -1,55 +1,64 @@
-/** Link to the mirrored editor component. */
-var _editorMirror;
-/** Link to the mirrored output component. */
-var _outputMirror;
+/** Link to the CodeMirror editor component. */
+var _editor;
+/** Link to the CodeMirror output component. */
+var _output;
 
-/** Editor. */
-var _edit;
+/** Type of (latest) running query. */
+var _updating;
+/** Promise of (latest) running query. */
+var _running;
+
+/** Most recent log entry search string. */
+var _logInput;
+/** Most recent log filter string. */
+var _dbInput;
 
 /**
- * Toggles the selection of all check boxes in the corresponding form.
+ * Toggles the selection of all checkboxes in a form.
  * @param {checkbox} source clicked header checkbox
  */
 function toggle(source) {
-  var form = getForm(source);
-  var inputs = form.getElementsByTagName("input");
-  var checked = false;
-  for(var i = 0; i < inputs.length; i++) {
-    var input = inputs[i];
-    if(input.type === "checkbox" && input.parentElement.parentElement.style.display !== "none") {
-      input.checked = source.checked;
+  for(var input of getForm(source).getElementsByTagName("input")) {
+    if(input.type === "checkbox") {
+      input.checked = source.checked && input.parentElement.parentElement.style.display !== "none";
     }
   }
-  buttons();
+  buttons(source);
 }
 
 /**
- * Refreshes the disabled property of form buttons after a checkbox has been clicked.
- * @param {checkbox} clicked checkbox. if undefined, the buttons of all forms will be refreshed
+ * Refreshes all buttons and checkboxes of a form.
+ * @param {checkbox} source clicked checkbox. if undefined, all forms will be refreshed
  */
 function buttons(source) {
-  var forms = source ? [ getForm(source) ] : document.getElementsByTagName("form");
-  for(var f = 0; f < forms.length; f++) {
-    var form = forms[f];
-    if(form.className !== "update") continue;
-
-    var inputs = form.getElementsByTagName("input");
-    var checked = false;
-    for(var i = 0; i < inputs.length; i++) {
-      checked |= inputs[i].type === "checkbox" && inputs[i].checked;
+  for(var form of (source ? [ getForm(source) ] : document.getElementsByTagName("form"))) {
+    // count selected items and refresh header checkbox
+    var count = 0, checked = 0, header = undefined;
+    for(var input of form.getElementsByTagName("input")) {
+      if(input.type === "checkbox" && input.parentElement.parentElement.style.display !== "none") {
+        if(input.name) {
+          count++;
+          if(input.checked) checked++;
+        } else {
+          header = input;
+        }
+      }
     }
-    var buttons = form.getElementsByTagName("button");
-    for(var b = 0; b < buttons.length; b++) {
-      var button = buttons[b];
-      if(button.className === "global") continue;
+    if(header) header.checked = count && count === checked;
 
+    // refresh button states
+    if(form.className === "update") {
       var values = [
         "backup", "backup-create-all", "backup-drop", "backup-restore", "backup-restore-all",
         "db-drop", "db-optimize", "db-optimize-all", "delete", "file-delete", "job-remove",
         "job-stop", "log-delete", "log-download", "pattern-drop", "session-kill", "user-drop"
       ];
-      for(var v = 0; v < values.length; v++) {
-        if(button.value === values[v]) button.disabled = !checked;
+      for(var button of form.getElementsByTagName("button")) {
+        if(button.className !== "global") {
+          for(var value of values) {
+            if(button.value === value) button.disabled = !checked;
+          }
+        }
       }
     }
   }
@@ -60,113 +69,163 @@ function buttons(source) {
  * @param {source} source element
  */
 function getForm(source) {
-  while(source.tagName.toUpperCase() !== "FORM") source = source.parentElement;
+  while(source.tagName.toLowerCase() !== "form") source = source.parentElement;
   return source;
 }
 
 /**
- * Displays an info message.
- * @param {string} message  info message
- */
-function setInfo(message) {
-  setText(message, "info");
-}
-
-/**
- * Displays a warning message.
- * @param {string} message  warning message
- */
-function setWarning(message) {
-  setText(message, "warning");
-}
-
-/**
- * Displays an error message. Stack trace info will be removed.
- * @param {string} message error message
- */
-function setError(message) {
-  setText(message.replace(/Stack Trace:.*/, ""), "error");
-}
-
-/**
  * Displays text with the specified type.
- * @param {string} message message
- * @param {type}   type    message type (info, warning, error)
+ * @param {string} message message to display
+ * @param {type} type message type (info, warning, error)
  */
 function setText(message, type) {
   var info = document.getElementById("info");
   info.className = type;
-  var msg = message.replace(/^\[.*?\] /, "");
-  info.textContent = msg.length > 80 ? msg.substring(0, 80) + "…" : msg;
+  info.textContent = message;
   info.title = message;
 }
 
-/** Indicates how many queries are being evaluated. */
-var _running = 0;
+/**
+ * Creates and sends an HTTP request.
+ * @param {url} url URL to be called
+ * @param {data} data data to be sent
+ * @returns {promise} promise
+ */
+function request(url, data) {
+  return new Promise((resolve, reject) => {
+    var request = new XMLHttpRequest();
+    request.open("post", url);
+    request.setRequestHeader("Content-Type", "text/plain");
+    request.onreadystatechange = () => {
+      if(request.readyState === XMLHttpRequest.DONE) {
+        var status = request.status;
+        if(status >= 200 && status < 400) {
+          resolve(request.responseText);
+        } else {
+          reject(request);
+        }
+      }
+    };
+    request.send(data);
+  });
+}
 
 /**
  * Runs a query and shows the result.
- * @param {string}   path    path to query service
- * @param {string}   query   query to be evaluated
- * @param {function} func    function that processes the result
- * @param {boolean}  reset   reset query
+ * @param {string} path URL path
+ * @param {string} query query to be evaluated
+ * @param {boolean} reset reset query
  */
-function query(path, query, func, reset) {
-  _running++;
-  setInfo("");
-  var stop = document.getElementById("stop");
-  if(stop) stop.disabled = true;
-
-  setTimeout(function() {
-    if(_running) {
-      setWarning("Please wait…");
-      if(stop) stop.disabled = false;
-    }
-  }, 500);
-
+function query(path, query, reset) {
   var url = path;
-  for(name of [ "name", "date", "resource", "sort", "time", "page" ]) {
+  for(var name of [ "name", "date", "resource", "sort", "time", "page" ]) {
     var element = document.getElementById(name), value = element && element.value;
     if(value && (name !== "page" || value !== 1 && !reset)) {
       url += (url === path ? "?" : "&") + name + "=" + encodeURIComponent(value);
     }
   }
-
-  request("POST", url, query,
-    function(request) {
-      _running--;
-      if(!_running) {
-        setInfo("Query was successful.");
-        if(stop) stop.disabled = true;
-      }
-      func(request.responseText);
-    },
-    function(request) {
-      _running--;
-      if(request.status !== 460 || !_running) setErrorFromResponse(request);
-    }
-  )
+  return request(url, query);
 }
 
 /**
- * Displays the error that is embedded in the HTTP response.
- * @param {object} request HTTP request
- * @param {string} optional message
+ * Evaluates a query.
  */
-function setErrorFromResponse(request, message) {
+function runQuery() {
+  if(document.getElementById("run").disabled) return;
+  if(_editor) _editor.focus();
+
+  var stop = document.getElementById("stop");
+  stop.disabled = true;
+  setText("", "");
+
+  var queryString = document.getElementById("editor").value;
+  var self = query("parse", queryString);
+  return self.then((updating) => {
+    var up = updating === "true";
+    var next = _running && up !== _updating ? stopQuery() : Promise.resolve();
+    _updating = up;
+    return next;
+  }).then(() => {
+    register(self);
+    var file = document.getElementById("file");
+    var path = _updating ? "update" : "query";
+    if(file && file.value) path += "?file=" + encodeURIComponent(file.value);
+    return query(path, queryString);
+  }).then((text) => {
+    showResult(text);
+  }).catch((response) => {
+    showError(response);
+  }).finally(() => {
+    if(self === _running) {
+      stop.disabled = true;
+      _running = undefined;
+    }
+  });
+}
+
+/**
+ * Stops the currently evaluated query by (sending an empty sequence as query).
+ * @param {boolean} show show info if query was successfully stopped
+ * @returns {promise} promise
+ */
+function stopQuery(show) {
+  if(_editor) _editor.focus();
+
+  return query(_updating ? "update" : "query", "()").then(() => {
+    _running = undefined;
+    if(show) {
+      setText("Query was stopped.", "warning");
+      document.getElementById("stop").disabled = true;
+    }
+  });
+}
+
+/**
+ * Registers the promise.
+ * @param {promise} self reference to promise
+ */
+function register(self) {
+  _running = self;
+  setTimeout(() => {
+    if(self === _running) {
+      setText("Please wait…", "warning");
+      document.getElementById("stop").disabled = false;
+    }
+  }, 500);
+}
+
+/**
+ * Displays an error message.
+ * @param {response} response HTTP response
+ * @param {string} info optional info
+ */
+function showError(response, info) {
+  if(response.status === 460) return;
+
   // normalize error message
-  var msg = request.statusText.match(/\[\w+\]/g) ? request.statusText : request.responseText;
+  var msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
+  var lc = msg.match(/\d+\/\d+:/);
   var s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
-  msg = msg.replace(/\s+/g, " ");
+  msg = msg.replace(/^\[.*?\] /, "").replace(/Stack Trace:.*/, "").replace(/\s+/g, " ");
+  if(info) msg = info + ": " + msg;
+  if(lc) msg = lc + " " + msg;
+
   // display correctly escaped feedback
   var html = document.createElement("div");
   html.innerHTML = msg;
-  setError((message ? message + ": " : "") + (html.innerText || html.textContent));
+  setText(html.innerText || html.textContent, "error");
 }
 
-/** Most recent log entry search string. */
-var _logInput;
+/**
+ * Shows the result of a query.
+ * @param {string} text result
+ * @returns {promise} promise
+ */
+function showResult(text) {
+  setText("Query was successful.", "info");
+  _output.setValue(text);
+}
 
 /**
  * Queries the entries of the current log file.
@@ -177,15 +236,15 @@ function logEntries(key) {
   var input = document.getElementById("input").value.trim();
   if(reset && _logInput === input) return false;
   _logInput = input;
-  query("log", input, function(text) {
+  return query("log", input, reset).then((text) => {
     document.getElementById("output").innerHTML = text;
     var e = document.getElementById(window.location.hash.replace(/^#/, ""));
     if(e) e.scrollIntoView();
     if(reset) window.history.replaceState(null, "", replaceParam(window.location.href, "page", 1));
-  }, reset);
-
-  // refresh browser history
-  window.history.replaceState(null, "", replaceParam(window.location.href, "input", input));
+  }).finally(() => {
+    // refresh browser history
+    window.history.replaceState(null, "", replaceParam(window.location.href, "input", input));
+  });
 }
 
 /**
@@ -193,27 +252,25 @@ function logEntries(key) {
  */
 function logFilter() {
   var value = document.getElementById("log-filter").value;
-  var count = selected = 0;
-  for (var input of document.getElementById("dates").getElementsByTagName("input")) {
+  var count = 0, checked = 0;
+  for(var input of document.getElementById("dates").getElementsByTagName("input")) {
     if(input.type === "checkbox" && input.name === "name") {
       var visible = !value || input.value.startsWith(value);
       input.parentElement.parentElement.style.display = visible ? null : "none";
       if(visible) {
         count++;
-        if (input.checked) selected++;
+        if(input.checked) checked++;
       } else {
         input.checked = false;
       }
     }
   }
-  for (var id of ["log-download", "log-delete"]) {
-    document.getElementById(id).disabled = !selected;
+  for(var id of ["log-download", "log-delete"]) {
+    document.getElementById(id).disabled = !checked;
   }
   document.getElementsByTagName("h3")[0].innerHTML = count + " Entries";
+  buttons();
 }
-
-/** Most recent log filter string. */
-var _dbInput;
 
 /**
  * Queries a database resource.
@@ -223,133 +280,61 @@ function queryResource(enforce) {
   var input = document.getElementById("input").value.trim();
   if(!enforce && _dbInput === input) return false;
   _dbInput = input;
-  query("db-query", input, function(text) {
-    _outputMirror.setValue(text);
-  });
-}
 
-/** Indicates if current query is updating. */
-var _updating;
-
-/**
- * Evaluates a query.
- * @param {boolean} invert invert query execution mode (eval, update)
- */
-function runQuery(invert) {
-  if(document.getElementById("run").disabled) return;
-
-  // decide if query is read-only or updating
-  var updating = (document.getElementById("mode").selectedIndex === 1) ^ invert;
-  var path = updating ? "editor-update" : "editor-eval";
-  var file = document.getElementById("file");
-  if(file && file.value) path += "?file=" + encodeURIComponent(file.value);
-
-  // stop old query if mode was changed (each has its own %rest:single function)
-  if(_running && _updating !== updating) stopQuery();
-  _updating = updating;
-
-  // run query
-  if(_editorMirror) _editorMirror.focus();
-  query(path, document.getElementById("editor").value, function(text) {
-    _outputMirror.setValue(text);
+  var self = query("db-query", input);
+  register(self);
+  return self.then((text) => {
+    showResult(text);
+  }).catch((response) => {
+    showError(response);
+  }).finally(() => {
+    if(self === _running) _running = undefined;
   });
 }
 
 /**
- * Stops a query.
- */
-function stopQuery() {
-  // stop query by sending empty sequence
-  if(_editorMirror) _editorMirror.focus();
-  query(_updating ? "editor-update" : "editor-eval", "()", function(text) {
-    setInfo("Query was stopped.");
-  });
-}
-
-/**
- * Creates and sends an HTTP request.
- * @param {string}  method  HTTP method
- * @param {url}     url     URL to be called
- * @param {data}    data    data to be sent
- * @param {success} success success function
- * @param {failure} failure failure function
- */
-function request(method, url, data, success, failure) {
-  var request = new XMLHttpRequest();
-  request.onreadystatechange = function() {
-    if(request.readyState === 4) {
-      if(request.status === 200) {
-        success(request);
-      } else {
-        failure(request);
-      }
-    }
-  };
-  // synchronous querying: wait for server feedback
-  request.open(method, url, true);
-  request.setRequestHeader("Content-Type", "text/plain");
-  request.send(data);
-}
-
-/**
- * Loads the code mirror editor extension.
+ * Loads the CodeMirror editor extension.
  * @param {string}  language programming language (syntax highlighting)
- * @param {boolean}  edit editor flag (vs. read-only view)
- * @param {boolean}  resize text areas to full height
+ * @param {boolean} edit edit flag (edit vs. read-only)
+ * @param {boolean} resize resize text areas to maximum height
  */
 function loadCodeMirror(language, edit, resize) {
-  _edit = edit;
   if(CodeMirror && dispatchEvent) {
     if(edit) {
       var editorArea = document.getElementById("editor");
-      _editorMirror = CodeMirror.fromTextArea(editorArea, {
+      _editor = CodeMirror.fromTextArea(editorArea, {
         mode: language,
         lineNumbers: true,
         lineWrapping: true,
         extraKeys: {
-          "Ctrl-Enter"      : function(cm) { runQuery(); },
-          "Cmd-Enter"       : function(cm) { runQuery(); },
-          "Shift-Ctrl-Enter": function(cm) { runQuery(true); },
-          "Shift-Cmd-Enter" : function(cm) { runQuery(true); }
+          "Ctrl-Enter": runQuery,
+          "Cmd-Enter" : runQuery
         }
       });
-      _editorMirror.on("change", function(cm, cmo) { cm.save(); });
-      _editorMirror.display.wrapper.style.border = "solid 1px grey";
+      _editor.on("change", (cm) => { cm.save(); });
+      _editor.display.wrapper.style.border = "solid 1px grey";
     }
 
     var outputArea = document.getElementById("output");
     if(outputArea != null) {
-      _outputMirror = CodeMirror.fromTextArea(outputArea, {
+      _output = CodeMirror.fromTextArea(outputArea, {
         mode: "xml",
         lineWrapping: true,
         readOnly: true
       });
-      _outputMirror.display.wrapper.style.border = "solid 1px grey";
+      _output.display.wrapper.style.border = "solid 1px grey";
     }
 
     if(resize) {
-      window.addEventListener("load", setDisplayHeight);
-      window.addEventListener("resize", setDisplayHeight);
+      var refresh = () => {
+        var size = window.innerHeight - document.getElementById("footer").offsetTop - 30;
+        for(var elem of document.getElementsByClassName("CodeMirror")) {
+          elem.CodeMirror.setSize("100%", Math.max(50, size + elem.offsetHeight));
+        }
+      };
+      window.addEventListener("load", refresh);
+      window.addEventListener("resize", refresh);
     }
-  }
-}
-
-/**
- * Sets the display height of the editor and result views.
- */
-function setDisplayHeight() {
-  // get current height
-  var dummy = document.createElement("div");
-  document.body.appendChild(dummy);
-  var p = dummy.offsetTop;
-  document.body.removeChild(dummy);
-  var s = window.innerHeight;
-
-  // adjust height of all editors
-  var elems = document.getElementsByClassName("CodeMirror");
-  for(var e = 0; e < elems.length; e++) {
-    var v = _edit ? p - elems[e].offsetHeight : elems[e].offsetTop;
-    elems[e].CodeMirror.setSize("100%", Math.max(50, s - 20 - v));
   }
 }
 
@@ -363,8 +348,8 @@ function addInput(source) {
 
 /**
  * Replace a query parameter.
- * @param {string} url   url
- * @param {string} name  name
+ * @param {string} url URL
+ * @param {string} name name
  * @param {string} value value
  * @returns {string} new url
  */
@@ -373,9 +358,8 @@ function replaceParam(url, name, value) {
   var qm = url.indexOf("?");
   var href = (qm < 0 ? url : url.substr(0, qm)) + "?" + key + encodeURIComponent(value);
   if(qm >= 0) {
-    var params = url.substr(qm + 1).split("&");
-    for(var p = 0; p < params.length; p++) {
-      if(params[p].indexOf(key) < 0) href += "&" + params[p];
+    for(var param of url.substr(qm + 1).split("&")) {
+      if(param.indexOf(key) < 0) href += "&" + param;
     }
   }
   return href;

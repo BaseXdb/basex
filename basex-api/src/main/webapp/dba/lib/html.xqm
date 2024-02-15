@@ -118,7 +118,7 @@ declare function html:wrap(
       </table>
       <table width='100%'>{ $rows }</table>
       <hr/>
-      <div class='right'><sup>BaseX Team 2005-24, BSD License</sup></div>
+      <div id='footer' class='right'><sup>BaseX Team 2005-24, BSD License</sup></div>
       <div class='small'/>
       { html:js('buttons();') }
     </body>

@@ -50,7 +50,7 @@ function dba:files(
               ['Home'      , Q{org.basex.util.Prop}HOMEDIR() ],
               ['Working'   , file:current-dir() ],
               ['Temporary' , file:temp-dir() ],
-              file:list-roots() ! ['Root', string(.)],
+              Q{java:java.io.File}listRoots() ! ['Root', string(.)],
               ['Current'   , $dir]
             )
             let $selected := (

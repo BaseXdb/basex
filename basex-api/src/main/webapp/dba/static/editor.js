@@ -3,19 +3,15 @@
  * @param {string} file optional file name
  */
 function openFile(file) {
-  if(_editorMirror.getValue().trim() && !confirm("Replace editor contents?")) return;
+  if(_editor.getValue().trim() && !confirm("Replace editor contents?")) return;
 
   var name = file || fileName();
-  request("POST", "editor-open?name=" + encodeURIComponent(name),
-    null,
-    function(request) {
-      _editorMirror.setValue(request.responseText);
-      finishFile(name, "File was opened.");
-    },
-    function(req) {
-      setErrorFromResponse(req, name);
-    }
-  )
+  return request("editor-open?name=" + encodeURIComponent(name)).then((text) => {
+    _editor.setValue(text);
+    finishFile(name, "File was opened.");
+  }).catch((response) => {
+    showError(response, name);
+  });
 }
 
 /**
@@ -27,62 +23,53 @@ function saveFile() {
   if(!name.includes(".")) name += ".xq";
   if(fileExists(name) && !confirm("Overwrite existing file?")) return;
 
-  request("POST", "editor-save?name=" + encodeURIComponent(name),
-    document.getElementById("editor").value,
-    function(req) {
-      finishFile(name, "File was saved.");
-      refreshDataList(req);
-    },
-    function(req) {
-      setErrorFromResponse(req);
-    }
-  )
+  var fileString = document.getElementById("editor").value;
+  return request("editor-save?name=" + encodeURIComponent(name), fileString).then((text) => {
+    finishFile(name, "File was saved.");
+    refreshDataList(text);
+  }).catch((response) => {
+    showError(response, name);
+  });
 }
 
 /**
  * Closes a file.
  */
 function closeFile() {
-  request("POST", "editor-close?name=" + encodeURIComponent(fileName()),
-    null,
-    function(req) {
-      _editorMirror.setValue("");
-      finishFile("", "File was closed.");
-    },
-    function(req) {
-      setErrorFromResponse(req);
-    }
-  );
+  request("editor-close?name=" + encodeURIComponent(fileName())).then(() => {
+    _editor.setValue("");
+    finishFile("", "File was closed.");
+  }).catch((response) => {
+    showError(response);
+  });
 }
 
 /**
- * Finish file operation.
+ * Finishes a file operation.
  * @param {string} name new filename
  * @param {string} info info message
  */
 function finishFile(name, info) {
   document.getElementById("file").value = name;
-  var disabled = name && !name.match(/\.xq(m|l|uery)?$/i)
-  document.getElementById("mode").disabled = disabled;
+  var disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
   document.getElementById("run").disabled = disabled;
   checkButtons();
-  setInfo(info);
-  _editorMirror.focus();
-};
+  setText(info, "info");
+  _editor.focus();
+}
 
 /**
  * Refreshes the list of available files.
- * @param {object} request HTTP request
+ * @param {object} text available files
  */
-function refreshDataList(request) {
+function refreshDataList(text) {
   var files = document.getElementById("files");
   while(files.firstChild) {
     files.removeChild(files.firstChild);
   }
-  var names = request.responseText.split("/");
-  for (var i = 0; i < names.length; i++) {
+  for(var name of text.split("/")) {
     var opt = document.createElement("option");
-    opt.value = names[i];
+    opt.value = name;
     files.appendChild(opt);
   }
 }
@@ -103,10 +90,9 @@ function checkButtons() {
  * @param {string} filename
  * @returns {boolean} result of check
  */
-function fileExists(file) {
-  var files = document.getElementById("files").children;
-  for (var f = 0; f < files.length; f++) {
-    if(files[f].value === file) return true;
+function fileExists(filename) {
+  for(var file of document.getElementById("files").children) {
+    if(file.value === filename) return true;
   }
   return false;
 }
