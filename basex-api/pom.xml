@@ -12,7 +12,7 @@
   </parent>
 
   <properties>
-    <jettyVersion>9.4.53.v20231009</jettyVersion>
+    <jettyVersion>11.0.20</jettyVersion>
   </properties>
 
   <name>BaseX API</name>
@@ -47,9 +47,13 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
     </dependency>
+	<dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-jetty-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-server</artifactId>
+      <artifactId>websocket-jetty-server</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
