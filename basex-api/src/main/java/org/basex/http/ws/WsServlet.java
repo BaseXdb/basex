@@ -2,7 +2,7 @@ package org.basex.http.ws;
 
 import java.io.*;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
 import org.basex.http.*;
 import org.eclipse.jetty.websocket.servlet.*;

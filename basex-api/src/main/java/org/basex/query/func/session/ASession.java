@@ -2,7 +2,7 @@ package org.basex.query.func.session;
 
 import java.util.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;

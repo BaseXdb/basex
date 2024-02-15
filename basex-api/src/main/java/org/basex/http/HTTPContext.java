@@ -3,7 +3,7 @@ package org.basex.http;
 import java.io.*;
 import java.util.*;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
 import org.basex.*;
 import org.basex.core.*;

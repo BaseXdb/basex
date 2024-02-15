@@ -1,8 +1,8 @@
 package org.basex.http.webdav;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
 import org.basex.http.*;
 

@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;

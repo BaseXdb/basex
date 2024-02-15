@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 import java.util.regex.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.http.web.*;

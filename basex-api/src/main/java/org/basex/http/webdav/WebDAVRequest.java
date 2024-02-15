@@ -7,7 +7,8 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import javax.servlet.http.*;
+// import jakarta.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.FileItem;
@@ -120,7 +121,7 @@ final class WebDAVRequest extends AbstractRequest {
 
   @Override
   public Cookie getCookie(final String name) {
-    for(final javax.servlet.http.Cookie c : request.getCookies()) {
+    for(final jakarta.servlet.http.Cookie c : request.getCookies()) {
       if(c.getName().equals(name)) return new WebDAVCookie(c);
     }
     return null;
@@ -129,7 +130,7 @@ final class WebDAVRequest extends AbstractRequest {
   @Override
   public List<Cookie> getCookies() {
     final List<Cookie> list = new ArrayList<>();
-    for(final javax.servlet.http.Cookie c : request.getCookies()) {
+    for(final jakarta.servlet.http.Cookie c : request.getCookies()) {
       list.add(new WebDAVCookie(c));
     }
     return list;
