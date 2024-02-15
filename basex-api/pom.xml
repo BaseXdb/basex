@@ -12,7 +12,8 @@
   </parent>
 
   <properties>
-    <jettyVersion>9.4.53.v20231009</jettyVersion>
+	<jakarta.websocket.api.version>2.1.1</jakarta.websocket.api.version>
+    <jettyVersion>11.0.20</jettyVersion>
   </properties>
 
   <name>BaseX API</name>
@@ -48,8 +49,14 @@
       <artifactId>jetty-webapp</artifactId>
     </dependency>
     <dependency>
+      <groupId>jakarta.websocket</groupId>
+      <artifactId>jakarta.websocket-api</artifactId>
+      <version>${jakarta.websocket.api.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-server</artifactId>
+      <artifactId>websocket-jakarta-server</artifactId>
+      <version>${jettyVersion}</version>
     </dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
