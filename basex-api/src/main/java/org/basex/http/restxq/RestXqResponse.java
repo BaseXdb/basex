@@ -1,12 +1,12 @@
 package org.basex.http.restxq;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
 import org.basex.http.*;
 import org.basex.http.web.*;

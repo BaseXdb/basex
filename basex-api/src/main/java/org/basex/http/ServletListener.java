@@ -1,6 +1,6 @@
 package org.basex.http;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
 /**
  * This class creates and destroys servlet contexts.

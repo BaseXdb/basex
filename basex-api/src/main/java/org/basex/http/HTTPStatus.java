@@ -1,6 +1,6 @@
 package org.basex.http;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
 import org.basex.util.*;
 

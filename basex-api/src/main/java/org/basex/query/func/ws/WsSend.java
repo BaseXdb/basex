@@ -2,6 +2,8 @@ package org.basex.query.func.ws;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
+
 import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;

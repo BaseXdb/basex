@@ -1,5 +1,7 @@
 package org.basex.query.func.ws;
 
+import java.io.*;
+
 import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;

@@ -1,6 +1,6 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
 import java.io.*;
 

@@ -1,5 +1,6 @@
 package org.basex.http.ws;
 
+import java.io.*;
 import java.nio.*;
 import java.util.*;
 import java.util.Map.*;
@@ -19,6 +20,7 @@ import org.eclipse.jetty.websocket.api.*;
  * @author Johannes Finckh
  */
 public final class WsPool {
+  private static final WriteCallback CALLBACK = new WriteCallback() {};
   /** Clients of the pool. id -> adapter. */
   private static final ConcurrentHashMap<String, WebSocket> CLIENTS = new ConcurrentHashMap<>();
   /** WebSocket prefix. */
@@ -128,9 +130,9 @@ public final class WsPool {
       final RemoteEndpoint remote = ws.getSession().getRemote();
       for(final Object value : values) {
         if(value instanceof ByteBuffer) {
-          remote.sendBytesByFuture((ByteBuffer) value);
+          remote.sendBytes((ByteBuffer) value, CALLBACK);
         } else {
-          remote.sendStringByFuture((String) value);
+          remote.sendString((String) value, CALLBACK);
         }
       }
     }

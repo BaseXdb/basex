@@ -1,5 +1,7 @@
 package org.basex.query.func.ws;
 
+import java.io.*;
+
 import org.basex.http.ws.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -17,5 +19,6 @@ public final class WsEmit extends WsFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     WsPool.emit(arg(0).atomItem(qc, info));
     return Empty.VALUE;
+
   }
 }
