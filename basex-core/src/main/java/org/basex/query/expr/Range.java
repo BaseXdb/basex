@@ -99,12 +99,14 @@ public final class Range extends Arr {
         if(mn > LAST || mx < 1) return Bln.FALSE;
         if(mn < 1) minMax[0] = Int.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        if(mn < LAST && mx >= LAST) minMax[1] = Int.MAX;
         break;
       case NE:
         if(mn <= 1 && mx >= LAST) return Bln.FALSE;
         if(results && (mn > LAST || mx < 1)) return Bln.TRUE;
         if(mn < 1) minMax[0] = Int.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        if(mn < LAST && mx >= LAST) minMax[1] = Int.MAX;
         break;
       case LE:
         if(mx < 1) return Bln.FALSE;

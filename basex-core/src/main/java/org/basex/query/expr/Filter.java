@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.func.Function.*;
 
+import java.util.function.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
@@ -127,6 +129,7 @@ public abstract class Filter extends Preds {
     boolean opt = false;
     final ExprList preds = new ExprList(exprs.length);
     final QueryFunction<Expr, Expr> add = e -> preds.isEmpty() ? e : get(cc, info, e, preds.next());
+    final Predicate<Expr> simpleInt = e -> e.seqType().eq(SeqType.INTEGER_O) && e.isSimple();
     for(final Expr pred : exprs) {
       Expr ex = null;
       if(pred instanceof IntPos) {
@@ -145,29 +148,42 @@ public abstract class Filter extends Preds {
         final Expr pos = ((Pos) pred).expr;
         if(pos instanceof Range) {
           final Expr arg1 = pos.arg(0), arg2 = pos.arg(1);
-          if(arg1.seqType().instanceOf(SeqType.INTEGER_O) && arg1.isSimple() && LAST.is(arg2)) {
-            // E[pos: POS to last()]  ->  util:range(E, POS)
+          if(simpleInt.test(arg1) && LAST.is(arg2)) {
+            // E[pos: INT to last()]  ->  util:range(E, INT)
             ex = cc.function(_UTIL_RANGE, info, add.apply(expr), arg1);
           } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
               ((Arith) arg2).calc == Calc.SUBTRACT && arg2.arg(1) == Int.ONE) {
             // E[pos: 1 to last() - 1]  ->  trunk(E)
             ex = cc.function(TRUNK, info, add.apply(expr));
+          } else if(arg1 instanceof Arith && LAST.is(arg1.arg(0)) &&
+              ((Arith) arg1).calc == Calc.SUBTRACT && simpleInt.test(arg1.arg(1)) &&
+              arg2 == Int.MAX) {
+            // E[pos: last() - INT to MAX]  ->  reverse(subsequence(reverse(E), 1, INT + 1))
+            ex = cc.function(REVERSE, info, cc.function(SUBSEQUENCE, info,
+                cc.function(REVERSE, info, add.apply(expr)), Int.ONE,
+                new Arith(info, arg1.arg(1), Int.ONE, Calc.ADD).optimize(cc)));
           }
         } else if(LAST.is(pos)) {
           // E[pos: last()]  ->  foot(E)
           ex = cc.function(FOOT, info, add.apply(expr));
+        } else if(pos instanceof Arith && LAST.is(pos.arg(0)) &&
+            ((Arith) pos).calc == Calc.SUBTRACT && simpleInt.test(pos.arg(1))) {
+          // E[pos: last() - INT]  ->  items-at(reverse(E), INT + 1)
+          ex = cc.function(ITEMS_AT, info, cc.function(REVERSE, info, add.apply(expr)),
+              new Arith(info, pos.arg(1), Int.ONE, Calc.ADD).optimize(cc));
         }
       } else if(pred instanceof MixedPos) {
-        // E[pos: POS1, POS2, ...]  ->  items-at(E, sort(distinct-values((POS1, POS2, ...)))
         final Expr pos = ((MixedPos) pred).expr;
-        // Value instances are known to be sorted (see Pos#get)
+        // Value instances are known to be sorted and duplicate-free (see Pos#get)
         final boolean sorted = pos instanceof Value;
+        // E[pos: INT1, INT2, ...]  ->  items-at(E, INT1, INT2, ...)
+        // E[pos: POSITIONS, ...]  ->  items-at(E, sort(distinct-values((POSITIONS)))
         ex = cc.function(ITEMS_AT, info, add.apply(expr), sorted ? pos :
           cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pos)), Bln.get(sorted));
       } else if(pred instanceof CmpG) {
         final Expr op1 = pred.arg(0), op2 = pred.arg(1);
         if(POSITION.is(op1) && ((Cmp) pred).opV() == OpV.NE &&
-            op2.seqType().instanceOf(SeqType.INTEGER_O) && op2.isSimple()) {
+            op2.isSimple() && op2.seqType().instanceOf(SeqType.INTEGER_O)) {
           // E[position() != pos]  ->  remove(E, pos)
           ex = cc.function(REMOVE, info, add.apply(expr), op2);
         }

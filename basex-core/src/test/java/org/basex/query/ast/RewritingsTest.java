@@ -438,9 +438,9 @@ public final class RewritingsTest extends SandboxTest {
         "<b/>", empty(List.class), root(IterFilter.class));
 
     check("<a/>[position() >= last() - 1]",
-        "<a/>", exists(Range.class));
+        "<a/>", root(CElem.class));
     check("<a/>[position() > last() - 2]",
-        "<a/>", exists(Range.class));
+        "<a/>", root(CElem.class));
     check("<a/>[position() = 0 to 9223372036854775807]",
         "<a/>", root(CElem.class));
     check("<a/>[position() = -1 to 9223372036854775807]",

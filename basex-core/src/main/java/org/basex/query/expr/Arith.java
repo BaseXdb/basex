@@ -43,6 +43,7 @@ public class Arith extends Arr {
     if(allAreValues(false)) return cc.preEval(this);
 
     // move values to second position
+    // 1 + position()  ->  position() + 1
     Expr expr1 = exprs[0], expr2 = exprs[1];
     if((calc == Calc.ADD || calc == Calc.MULTIPLY) && expr1 instanceof Value &&
         !(expr2 instanceof Value)) {
@@ -83,20 +84,24 @@ public class Arith extends Arr {
         final boolean inverse = acalc == calc.invert();
         final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
 
-        if(arg2 instanceof Value && expr2 instanceof Value && (acalc == calc || inverse)) {
+        if(arg2 instanceof ANum && expr2 instanceof ANum && (acalc == calc || inverse)) {
           // (E - 3) + 2  ->  E - (3 - 2)
           // (E * 3 div 2  ->  E * (3 div 2)
           final Calc ncalc = add ? calc : sub ? calc.invert() : null;
-          if(ncalc != null) {
-            expr = new Arith(info, arg1, new Arith(info, arg2, expr2, ncalc).optimize(cc),
-                acalc).optimize(cc);
-          }
+          if(ncalc != null) expr = new Arith(info, arg1,
+              new Arith(info, arg2, expr2, ncalc).optimize(cc), acalc).optimize(cc);
         } else if(inverse) {
           // E + NUMBER - NUMBER  ->  E
           // NUMBER * E div NUMBER  ->  E
           expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
           if(expr != this) expr = new Cast(cc.sc(), info, expr, SeqType.NUMERIC_O).optimize(cc);
         }
+      } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof ANum &&
+          ((ANum) expr2).dbl() < 0) {
+        // E + -1  ->  E - 1
+        // E - -1  ->  E + 1
+        final Expr inv2 = new Unary(info, expr2, true).optimize(cc);
+        expr = new Arith(info, expr1, inv2, calc.invert()).optimize(cc);
       }
     }
 

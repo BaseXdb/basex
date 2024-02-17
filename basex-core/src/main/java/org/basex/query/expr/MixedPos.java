@@ -50,7 +50,7 @@ final class MixedPos extends Single implements CmpPos {
 
   @Override
   public Value positions(final QueryContext qc) throws QueryException {
-    // Value instances are known to be sorted (see Pos#get)
+    // Value instances are known to be sorted and duplicate-free (see Pos#get)
     return expr instanceof Value ? (Value) expr : Pos.ddo(expr.value(qc));
   }
 
