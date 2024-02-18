@@ -173,7 +173,7 @@ public final class Dbl extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Dbl && value == ((Dbl) obj).value;
+    return this == obj || obj instanceof Dbl && Double.compare(value, ((Dbl) obj).value) == 0;
   }
 
   // STATIC METHODS ===============================================================================

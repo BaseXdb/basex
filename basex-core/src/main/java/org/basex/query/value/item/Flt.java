@@ -143,7 +143,7 @@ public final class Flt extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Flt && value == ((Flt) obj).value;
+    return this == obj || obj instanceof Flt && Float.compare(value, ((Flt) obj).value) == 0;
   }
 
   // STATIC METHODS ===============================================================================
