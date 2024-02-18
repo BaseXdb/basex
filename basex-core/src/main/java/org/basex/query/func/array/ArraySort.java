@@ -24,12 +24,17 @@ public final class ArraySort extends FnSort {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final ValueList list = new ValueList(array.arraySize());
+    final long as = array.arraySize();
+    if(as == 0) return array;
+
+    final ValueList list = new ValueList(as);
     for(final Value member : array.members()) list.add(member);
     final Value[] values = list.finish();
+    final Integer[] index = index(values, qc);
+    if(sorted(index)) return array;
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final int i : index(values, qc)) ab.append(values[i]);
+    for(final int i : index) ab.append(values[i]);
     return ab.array(this);
   }
 

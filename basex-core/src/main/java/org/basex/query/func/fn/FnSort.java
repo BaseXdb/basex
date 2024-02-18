@@ -58,17 +58,30 @@ public class FnSort extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter iter(final Value input, final QueryContext qc) throws QueryException {
-    final ValueList list = new ValueList(input.size());
+    final long is = input.size();
+    final ItemList list = new ItemList(is);
     for(final Item item : input) list.add(item);
-    final Value[] values = list.finish();
-
+    final Item[] values = list.finish();
     final Integer[] index = index(values, qc);
-    return new BasicIter<>(values.length) {
+    return sorted(index) ? input.iter() : new BasicIter<>(is) {
       @Override
-      public Item get(final long i) {
-        return (Item) values[index[(int) i]];
+      public Item get(final long l) {
+        return values[index[(int) l]];
       }
     };
+  }
+
+  /**
+   * Checks if the index is sorted.
+   * @param index index
+   * @return result of check
+   */
+  protected final boolean sorted(final Integer[] index) {
+    final int il = index.length;
+    for(int i = 0; i < il; i++) {
+      if(index[i] != i) return false;
+    }
+    return true;
   }
 
   /**
@@ -103,7 +116,7 @@ public class FnSort extends StandardFunc {
     if(size == 1) values[0].atomValue(qc, info);
 
     final Integer[] indexes = new Integer[size];
-    for(int o = 0; o < size; o++) indexes[o] = o;
+    for(int o = 0; o < size; o++) indexes[o] = Integer.valueOf(o);
     try {
       Arrays.sort(indexes, (i1, i2) -> {
         qc.checkStop();
@@ -197,6 +210,8 @@ public class FnSort extends StandardFunc {
    * @return sorted value or {@code null}
    */
   private Value quickValue(final Value input) {
+    // empty sequence
+    if(input.isEmpty()) return input;
     if(exprs.length == 1) {
       // range values
       if(input instanceof RangeSeq) {
