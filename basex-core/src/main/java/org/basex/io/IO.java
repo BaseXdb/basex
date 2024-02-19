@@ -139,20 +139,19 @@ public abstract class IO {
   }
 
   /**
-   * Returns the binary contents.
-   * @return binary contents
+   * Returns the binary content.
+   * @return binary content
    * @throws IOException I/O exception
    */
   public abstract byte[] read() throws IOException;
 
   /**
-   * Returns the contents as string. The input encoding will be guessed by analyzing the
-   * first bytes. UTF-8 will be used as fallback.
-   * @return string contents
+   * Returns the contents as string. The input encoding will be guessed by analyzing the input.
+   * @return string content
    * @throws IOException I/O exception
    */
   public final String string() throws IOException {
-    return new TextInput(this).cache().toString();
+    return new TextInput(read()).cache().toString();
   }
 
   /**
