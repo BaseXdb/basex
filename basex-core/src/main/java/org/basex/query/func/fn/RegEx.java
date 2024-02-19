@@ -4,6 +4,7 @@ import static java.util.regex.Pattern.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
@@ -31,9 +32,27 @@ abstract class RegEx extends StandardFunc {
    */
   static class RegExpr {
     /** Pattern. */
-    Pattern pattern;
-    /** Number of groups. */
-    int groups;
+    final Pattern pattern;
+    /** Parent group id's of capturing groups. */
+    private int[] parentGroups;
+
+    /**
+     * Constructor.
+     * @param pattern pattern
+     */
+    RegExpr(final Pattern pattern) {
+      this.pattern = pattern;
+      parentGroups = null;
+    }
+
+    /**
+     * Returns the parent group id's of capturing groups.
+     * @return parent group id's.
+     */
+    int[] getParentGroups() {
+      if(parentGroups == null) parentGroups = GroupScanner.parentGroups(pattern.pattern());
+      return parentGroups;
+    }
   }
 
   /**
@@ -109,7 +128,6 @@ abstract class RegEx extends StandardFunc {
     try {
       // Java syntax, literal query: no need to change anything
       final Pattern pattern;
-      int groups = 0;
       if(java || (flags & LITERAL) != 0) {
         pattern = Pattern.compile(string(regex), flags);
       } else {
@@ -125,17 +143,155 @@ abstract class RegEx extends StandardFunc {
             Pattern.compile(pattern.pattern());
           if(p.matcher("").matches()) throw REGEMPTY_X.get(info, string);
         }
-        groups = parser.groups();
       }
 
-      final RegExpr regExpr = new RegExpr();
-      regExpr.pattern = pattern;
-      regExpr.groups = groups;
-      return regExpr;
+      return new RegExpr(pattern);
 
     } catch(final PatternSyntaxException | ParseException | TokenMgrError ex) {
       Util.debug(ex);
       throw REGINVALID_X.get(info, regex);
     }
+  }
+
+  /**
+   * Analyze the nesting of capturing groups in a Java regular expression.
+   */
+  protected static final class GroupScanner {
+    /** The pattern. */
+    private final String pattern;
+    /** Pattern length. */
+    private final int len;
+    /** Current position. */
+    private int pos;
+    /** Length of most recent code point. */
+    private int chrCount;
+
+    /** Constructor.
+     * @param pattern a Java regular expression.
+     */
+    private GroupScanner(final String pattern) {
+      this.pattern = pattern;
+      len = pattern.length();
+      pos = 0;
+    }
+
+    /**
+     * Find the parent groups of capturing groups in a Java regular expression.
+     * @param pattern the regular expression.
+     * @return an array indicating the parent group id for each capturing group, where element i
+     * contains the parent group id of capturing group i+1.
+     */
+    public static int[] parentGroups(final String pattern) {
+      final GroupScanner gnd = new GroupScanner(pattern);
+      final Stack<Integer> open = new Stack<>();
+      open.push(0);
+      int[] parentGroups = new int[0];
+      boolean quoted = false;
+      int classLevel = 0;
+      for(;;) {
+        switch(gnd.nxtToken()) {
+          case EOP:
+            return parentGroups;
+          case LBRACKET:
+            if(!quoted) ++classLevel;
+            break;
+          case RBRACKET:
+            if(!quoted) --classLevel;
+            break;
+          case LQUOTE:
+            if(classLevel == 0) quoted = true;
+            break;
+          case RQUOTE:
+            if(classLevel == 0) quoted = false;
+            break;
+          case CAPT_LPAREN:
+            if(!quoted && classLevel == 0) {
+              parentGroups = Arrays.copyOf(parentGroups, parentGroups.length + 1);
+              parentGroups[parentGroups.length - 1] = open.peek();
+              open.push(parentGroups.length);
+            }
+            break;
+          case LPAREN:
+            if(!quoted && classLevel == 0) open.push(open.peek());
+            break;
+          case RPAREN:
+            if(!quoted && classLevel == 0) open.pop();
+            break;
+          default:
+        }
+      }
+    }
+
+    /**
+     * Return the next token.
+     * @return next token
+     */
+    private Token nxtToken() {
+      switch (nxtCp()) {
+        case -1: return Token.EOP;
+        case ']': return Token.RBRACKET;
+        case '[': return Token.LBRACKET;
+        case ')': return Token.RPAREN;
+        case '\\':
+          switch (nxtCp()) {
+            case -1: return Token.EOP;
+            case 'Q': return Token.LQUOTE;
+            case 'E': return Token.RQUOTE;
+            default: return Token.OTHER;
+          }
+        case '(':
+          switch(nxtCp()) {
+            case '?':
+              switch(nxtCp()) {
+                case '<': return Token.CAPT_LPAREN;
+                default:
+                  reset();
+                  return Token.LPAREN;
+              }
+            default:
+              reset();
+              return Token.CAPT_LPAREN;
+          }
+        default: return Token.OTHER;
+      }
+    }
+
+    /**
+     * Fetch the next code point.
+     * @return the next code point.
+     */
+    private int nxtCp() {
+      final int cp;
+      if(pos < len) {
+        cp = pattern.codePointAt(pos);
+        chrCount = Character.charCount(cp);
+        pos += chrCount;
+      }
+      else {
+        cp = -1;
+        chrCount = 0;
+      }
+      return cp;
+    }
+
+    /**
+     * Reset current position to before the most recent code point.
+     */
+    private void reset() {
+      pos -= chrCount;
+    }
+
+    /** Relevant token types. */
+    private enum Token {
+      /** End of pattern.                         */ EOP,
+      /** Capturing group's left parenthesis.     */ CAPT_LPAREN,
+      /** Non-capturing group's left parenthesis. */ LPAREN,
+      /** Right parenthesis.                      */ RPAREN,
+      /** Left square bracket.                    */ LBRACKET,
+      /** Right square bracket.                   */ RBRACKET,
+      /** Left quote.                             */ LQUOTE,
+      /** Right quote.                            */ RQUOTE,
+      /** Anything else.                          */ OTHER,
+    };
   }
 }

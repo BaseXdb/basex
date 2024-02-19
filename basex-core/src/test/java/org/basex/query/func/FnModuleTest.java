@@ -4,8 +4,11 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
+
 import org.basex.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
@@ -147,6 +150,16 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void analyzeString() {
     final Function func = ANALYZE_STRING;
     query(func.args("a", "", "j") + "//fn:non-match/text()", "a");
+
+    for(String opt : Arrays.asList(" ()", "j")) {
+      query(func.args("banana", "(b)(x?)", opt), "<analyze-string-result xmlns="
+          + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b</group>"
+          + "<group nr=\"2\"/></match><non-match>anana</non-match></analyze-string-result>");
+      query(func.args("banana", "(b(x?))", opt), "<analyze-string-result xmlns="
+          + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b<group nr=\"2\"/>"
+          + "</group></match><non-match>anana</non-match></analyze-string-result>");
+    }
+
     error(func.args("a", ""), REGEMPTY_X);
   }
 
@@ -1788,6 +1801,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("bab", "a", " action := function($_, $__) { }"), "bb");
     query(func.args("bab", "(a)", " action := function($_, $__) { }"), "bb");
     query(func.args("bab", "(a)", " action := function($_, $__) { '' }"), "bb");
+    query(func.args("abcde", "b(.)d", "$1"), "ace");
+    query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
 
     error(func.args("W", ".*", " ()", " ()", " function($k, $g) { }"), REGEMPTY_X);
   }

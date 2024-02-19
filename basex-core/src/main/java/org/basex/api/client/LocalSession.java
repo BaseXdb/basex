@@ -5,7 +5,9 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
+import org.basex.server.*;
 
 /**
  * This class offers methods to locally execute database commands.
@@ -31,8 +33,46 @@ public class LocalSession extends Session {
    * @param output client output; if set to {@code null}, results will be returned as strings
    */
   public LocalSession(final Context context, final OutputStream output) {
+    this(context, output, context.user());
+  }
+
+  /**
+   * Constructor, specifying login data.
+   * @param context context
+   * @param username username
+   * @param password password (plain text)
+   * @throws LoginException login exception
+   */
+  public LocalSession(final Context context, final String username, final String password)
+      throws LoginException {
+    this(context, username, password, null);
+  }
+
+  /**
+   * Constructor, specifying login data and an output stream.
+   * @param context context
+   * @param username username
+   * @param password password (plain text)
+   * @param output client output; if set to {@code null}, results will be returned as strings
+   * @throws LoginException login exception
+   */
+  public LocalSession(final Context context, final String username, final String password,
+      final OutputStream output) throws LoginException {
+
+    this(context, output, context.users.get(username));
+    if(!ctx.user().matches(password)) throw new LoginException(username);
+  }
+
+  /**
+   * Constructor, specifying an output stream.
+   * @param context context
+   * @param output output stream
+   * @param user user
+   */
+  private LocalSession(final Context context, final OutputStream output, final User user) {
     super(output);
     ctx = new Context(context);
+    ctx.user(user);
   }
 
   @Override

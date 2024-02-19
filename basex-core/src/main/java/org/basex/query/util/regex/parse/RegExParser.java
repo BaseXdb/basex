@@ -47,14 +47,6 @@ public class RegExParser implements RegExParserConstants {
     multiLine = multi;
   }
 
-  /**
-   * Returns the number of parsed groups.
-   * @return number of groups
-   */
-  final public int groups() {
-    return groups;
-  }
-
 /**
    * Root production.
    * @return expression
@@ -635,61 +627,7 @@ cp = Escape.getCp(token.image);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_charOrEsc_360_7_12()
- {
-    if (jj_3R_XmlChar_373_5_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_charRange_338_5_6()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    jj_lookingAhead = true;
-    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE;
-    jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_charRange_338_7_8()) {
-    jj_scanpos = xsp;
-    if (jj_3R_charRange_343_7_9()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_charOrEsc_360_5_10()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_360_7_12()) {
-    jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_361_7_13()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_posCharGroup_321_5_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1()
- {
-    if (jj_scan_token(DIGIT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_XmlChar_373_5_11()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(12)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(13)) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_posCharGroup_322_7_7()
+  private boolean jj_3R_posCharGroup_314_7_7()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -705,7 +643,7 @@ cp = Escape.getCp(token.image);
 
   private boolean jj_3_3()
  {
-    if (jj_3R_charRange_338_5_6()) return true;
+    if (jj_3R_charRange_330_5_6()) return true;
     return false;
   }
 
@@ -715,18 +653,18 @@ cp = Escape.getCp(token.image);
     xsp = jj_scanpos;
     if (jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_posCharGroup_322_7_7()) return true;
+    if (jj_3R_posCharGroup_314_7_7()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_charRange_343_7_9()
+  private boolean jj_3R_charRange_335_7_9()
  {
-    if (jj_3R_XmlChar_373_5_11()) return true;
+    if (jj_3R_XmlChar_365_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_321_5_5()
+  private boolean jj_3R_posCharGroup_313_5_5()
  {
     Token xsp;
     if (jj_3_4()) return true;
@@ -737,17 +675,71 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_361_7_13()
+  private boolean jj_3R_charOrEsc_353_7_13()
  {
     if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
-  private boolean jj_3R_charRange_338_7_8()
+  private boolean jj_3R_charRange_330_7_8()
  {
-    if (jj_3R_charOrEsc_360_5_10()) return true;
+    if (jj_3R_charOrEsc_352_5_10()) return true;
     if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_360_5_10()) return true;
+    if (jj_3R_charOrEsc_352_5_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_charOrEsc_352_7_12()
+ {
+    if (jj_3R_XmlChar_365_5_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_charRange_330_5_6()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    jj_lookingAhead = true;
+    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE;
+    jj_lookingAhead = false;
+    if (!jj_semLA || jj_3R_charRange_330_7_8()) {
+    jj_scanpos = xsp;
+    if (jj_3R_charRange_335_7_9()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_charOrEsc_352_5_10()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_charOrEsc_352_7_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_charOrEsc_353_7_13()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_posCharGroup_313_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_scan_token(DIGIT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_XmlChar_365_5_11()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(12)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(13)) return true;
+    }
     return false;
   }
 
