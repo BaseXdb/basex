@@ -34,6 +34,8 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
   private Object payload;
   /** Skip whitespace. */
   private final boolean skipWs;
+  /** Skip comments. */
+  private final boolean skipCmt;
 
   /** Unicode category regex. */
   private static final Pattern CAT_REGEX = Pattern.compile("^L[ultmo]?|M[nce]?|N[dlo]?" +
@@ -43,8 +45,9 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
    * Constructor.
    * @param input input string
    * @param strip strip whitespace
+   * @param comments allow and strip comments
    */
-  public RegExLexer(final byte[] input, final boolean strip) {
+  public RegExLexer(final byte[] input, final boolean strip, final boolean comments) {
     this.input = input;
     IntList ls = null;
     final int il = input.length;
@@ -61,20 +64,34 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
     }
     lines = ls;
     skipWs = strip;
+    skipCmt = comments;
   }
 
   /**
    * Consumes the next code point in the input sequence.
+   * @param skipComments whether comments are allowed
    * @return the code point
    */
-  private int next() {
+  private int next(final boolean skipComments) {
     final int il = input.length;
     int cp;
-    do {
+    for(;;) {
       if(pos >= il) return -1;
       cp = cp(input, pos);
       pos += cl(input, pos);
-    } while(skipWs && state <= 0 && ws(cp));
+      if(state <= 0) {
+        if(skipWs && ws(cp)) continue;
+        if(skipComments && cp == '#') {
+          do {
+            if(pos >= il) return -1;
+            cp = cp(input, pos);
+            pos += cl(input, pos);
+          } while(cp != '#');
+          continue;
+        }
+      }
+      break;
+    }
     tb.add(cp);
     return cp;
   }
@@ -84,7 +101,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
    * @return token kind
    */
   private int normal() {
-    final int curr = next();
+    int curr = next(skipCmt);
     if(curr == -1) return 0;
     switch(curr) {
       case '^':  return LINE_START;
@@ -96,7 +113,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
       case '|':  return OR;
       case '(':
         final int p = pos, ts = tb.size();
-        if(next() == '?' && next() == ':') return NPAR_OPEN;
+        if(next(skipCmt) == '?' && next(skipCmt) == ':') return NPAR_OPEN;
         pos = p;
         tb.size(ts);
         return PAR_OPEN;
@@ -122,7 +139,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
    * @return token kind
    */
   private int escape() {
-    final int curr = next();
+    final int curr = next(false);
     switch(curr) {
       case 'n':
       case 'r':
@@ -142,6 +159,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
       case '[':
       case ']':
       case '^':
+      case '#':
         return SINGLE_ESC;
       case 's':
       case 'S':
@@ -157,9 +175,9 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
       case 'p':
       case 'P':
         final String p = "\\" + (char) curr;
-        final int nxt = next();
+        final int nxt = next(skipCmt);
         if(nxt != '{') throw error(p, nxt);
-        for(int cp = next(); cp != '}'; cp = next())
+        for(int cp = next(skipCmt); cp != '}'; cp = next(skipCmt))
           if(cp == -1) throw error(tb.toString(), -1);
         final String in = tb.toString().substring(3, tb.size() - 1);
         final Matcher m = CAT_REGEX.matcher(in);
@@ -191,7 +209,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
   private int inClass() {
     final byte fst = first;
     first = 0;
-    final int curr = next();
+    final int curr = next(skipCmt);
     switch(curr) {
       case '\\': return escape();
       case '^':
@@ -218,7 +236,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
    * @return token kind
    */
   private int inQuantifier() {
-    final int curr = next();
+    final int curr = next(skipCmt);
     if(curr == ',') return COMMA;
     if(curr == '}') {
       state = 0;

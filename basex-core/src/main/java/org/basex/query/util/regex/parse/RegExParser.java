@@ -36,12 +36,13 @@ public class RegExParser implements RegExParserConstants {
    * Constructor.
    * @param regex regular expression to parse
    * @param strip strip whitespace while lexing
+   * @param comments allow comments while lexing
    * @param all dot matches all
    * @param multi multi line search
    */
-  public RegExParser(final byte[] regex, final boolean strip, final boolean all,
-      final boolean multi) {
-    this(new RegExLexer(regex, strip));
+  public RegExParser(final byte[] regex, final boolean strip, final boolean comments,
+      final boolean all, final boolean multi) {
+    this(new RegExLexer(regex, strip, comments));
     dotAll = all;
     multiLine = multi;
   }
@@ -1000,7 +1001,7 @@ cp = Escape.getCp(token.image);
 	   p = p.next;
 	 }
 
-	 p.gen = jj_gen + xla - jj_la; 
+	 p.gen = jj_gen + xla - jj_la;
 	 p.first = token;
 	 p.arg = xla;
   }

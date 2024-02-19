@@ -94,13 +94,14 @@ abstract class RegEx extends StandardFunc {
 
     // process modifiers
     int flags = 0;
-    boolean strip = false, java = false;
+    boolean strip = false, comments = false, java = false;
     for(final byte mod : modifiers) {
       if(mod == 'i') flags |= CASE_INSENSITIVE | UNICODE_CASE;
       else if(mod == 'm') flags |= MULTILINE;
       else if(mod == 's') flags |= DOTALL;
       else if(mod == 'q') flags |= LITERAL;
       else if(mod == 'x') strip = true;
+      else if(mod == 'c') comments = true;
       else if(mod == 'j' || mod == '!') java = true;
       else if(mod != ';') throw REGFLAG_X.get(info, (char) mod);
     }
@@ -112,7 +113,7 @@ abstract class RegEx extends StandardFunc {
       if(java || (flags & LITERAL) != 0) {
         pattern = Pattern.compile(string(regex), flags);
       } else {
-        final RegExParser parser = new RegExParser(regex, strip, (flags & DOTALL) != 0,
+        final RegExParser parser = new RegExParser(regex, strip, comments, (flags & DOTALL) != 0,
             (flags & MULTILINE) != 0);
         final String string = parser.parse().toString();
 
