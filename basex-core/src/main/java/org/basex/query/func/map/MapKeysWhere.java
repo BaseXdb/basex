@@ -36,4 +36,9 @@ public final class MapKeysWhere extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

@@ -85,4 +85,9 @@ public class FnEvery extends StandardFunc {
   boolean some() {
     return false;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

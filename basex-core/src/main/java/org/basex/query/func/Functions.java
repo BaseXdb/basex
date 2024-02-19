@@ -95,7 +95,7 @@ public final class Functions {
       final int min = fd.minMax[0], max = fd.minMax[1];
       final Expr[] prepared = prepareArgs(fb, fd.names, min, max, fd);
       final StandardFunc sf = fd.get(fb.sc, fb.info, prepared);
-      if(sf.updating()) qc.updating();
+      if(sf.hasUPD()) qc.updating();
       return sf;
     }
 
@@ -149,7 +149,7 @@ public final class Functions {
       final QNm[] names = fd.paramNames(arity);
       for(int a = 0; a < arity; a++) fb.add(names[a], ft.argTypes[a], qc);
       final StandardFunc sf = fd.get(sc, info, fb.args());
-      final boolean updating = sf.updating();
+      final boolean updating = sf.hasUPD();
       if(updating) {
         fb.anns = fb.anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
         qc.updating();

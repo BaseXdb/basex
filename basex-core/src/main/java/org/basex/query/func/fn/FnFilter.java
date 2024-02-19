@@ -65,4 +65,9 @@ public final class FnFilter extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

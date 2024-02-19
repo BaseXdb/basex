@@ -43,4 +43,9 @@ public final class ArrayGet extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 2;
+  }
 }

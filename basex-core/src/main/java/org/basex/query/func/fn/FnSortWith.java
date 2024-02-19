@@ -55,4 +55,9 @@ public final class FnSortWith extends StandardFunc {
     final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

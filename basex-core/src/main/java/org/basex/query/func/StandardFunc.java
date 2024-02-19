@@ -181,10 +181,34 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public boolean has(final Flag... flags) {
-    // check function definition
+  public final boolean has(final Flag... flags) {
+    // check function
+    int hof = hofIndex();
+    if(hof >= 0 && hof < Integer.MIN_VALUE && !defined(hof)) hof = -1;
     for(final Flag flag : flags) {
-      if(flag == Flag.UPD ? updating() : definition.has(flag)) return true;
+      switch(flag) {
+        case UPD:
+          if(hasUPD()) return true;
+          break;
+        case CTX:
+          if(hasCTX()) return true;
+          break;
+        case HOF:
+          if(hof >= 0) return true;
+          break;
+        case NDT:
+          // check whether function argument may contain non-deterministic functions
+          if(hof == Integer.MIN_VALUE) return true;
+          if(hof >= 0) {
+            if(!(arg(hof) instanceof Value)) return true;
+            for(final Item item : (Value) arg(hof)) {
+              if(!(item instanceof FuncItem) || ((FuncItem) item).expr.has(Flag.NDT)) return true;
+            }
+          }
+          break;
+        default:
+      }
+      if(definition.has(flag)) return true;
     }
     // check arguments (without function invocation; it only applies to function itself)
     final Flag[] flgs = Flag.HOF.remove(flags);
@@ -195,9 +219,26 @@ public abstract class StandardFunc extends Arr {
    * Indicates if this function is updating.
    * @return result of check
    */
-  public boolean updating() {
+  public boolean hasUPD() {
     // mix updates: higher-order function may be updating
-    return definition.has(Flag.UPD) || sc.mixUpdates && definition.has(Flag.HOF);
+    return definition.has(Flag.UPD) || sc.mixUpdates && hofIndex() >= 0;
+  }
+
+  /**
+   * Indicates if this function relies on the context.
+   * @return result of check
+   */
+  public boolean hasCTX() {
+    return definition.has(Flag.CTX);
+  }
+
+  /**
+   * Returns the index of a single higher-order function parameter.
+   * @return index, {@code -1} if no HOF parameter exist, or {@code Integer#MAX_VALUE} if the
+   *   number cannot be returned or if multiple HOF parameters exist
+   */
+  public int hofIndex() {
+    return definition.has(Flag.HOF) ? Integer.MAX_VALUE : -1;
   }
 
   @Override

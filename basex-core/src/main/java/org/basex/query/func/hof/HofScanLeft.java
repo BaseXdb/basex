@@ -53,4 +53,9 @@ public final class HofScanLeft extends StandardFunc {
     exprType.assign(input.seqType().union(Occ.ZERO)).data(input);
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 2;
+  }
 }

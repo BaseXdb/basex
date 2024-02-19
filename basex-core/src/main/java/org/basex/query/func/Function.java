@@ -137,7 +137,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   CONTAINS_SUBSEQUENCE(FnContainsSubsequence::new,
       "contains-subsequence(input,subsequence[,compare])",
-      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   CONTAINS_TOKEN(FnContainsToken::new, "contains-token(value,token[,collation])",
       params(STRING_ZM, STRING_O, STRING_ZO), BOOLEAN_O),
@@ -217,7 +217,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ENDS_WITH_SUBSEQUENCE(FnEndsWithSubsequence::new,
       "ends-with-subsequence(input,subsequence[,compare])",
-      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
       params(STRING_O), STRING_ZO),
@@ -306,7 +306,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   HIGHEST(FnHighest::new, "highest(input[,collation,key])",
       params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
-      ITEM_ZM),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   HOURS_FROM_DATETIME(FnHoursFromDateTime::new, "hours-from-dateTime(value)",
       params(DATE_TIME_ZO), INTEGER_ZO),
@@ -361,10 +361,10 @@ public enum Function implements AFunction {
       params(ITEM_ZM, NUMERIC_ZM, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(HOF), FN_URI, Perm.CREATE),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
-      params(STRING_ZO, MAP_ZO), NODE_ZO, flag(CNS)),
+      params(STRING_ZO, MAP_ZO), NODE_ZO, flag(CNS, HOF)),
   /** XQuery function. */
   LANG(FnLang::new, "lang(language[,node])",
       params(STRING_ZO, NODE_ZO), BOOLEAN_O),
@@ -383,7 +383,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   LOWEST(FnLowest::new, "lowest(input[,collation,key])",
       params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
-      ITEM_ZM),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   MATCHES(FnMatches::new, "matches(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_ZO), BOOLEAN_O),
@@ -461,7 +461,7 @@ public enum Function implements AFunction {
       params(STRING_O, INTEGER_O), INTEGER_O),
   /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(value[,options])",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO),
+      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(CNS, HOF)),
   /** XQuery function. */
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_O), QNAME_O),
@@ -551,14 +551,15 @@ public enum Function implements AFunction {
       FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_MORE), STRING_ZM), ITEM_ZM),
   /** XQuery function. */
   SORT_WITH(FnSortWith::new, "sort-with(input,comparators)",
-      params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType(Occ.ZERO_OR_MORE)), ITEM_ZM),
+      params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType(Occ.ZERO_OR_MORE)),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
   STARTS_WITH_SUBSEQUENCE(FnStartsWithSubsequence::new,
       "starts-with-subsequence(input,subsequence[,compare])",
-      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   STATIC_BASE_URI(FnStaticBaseUri::new, "static-base-uri()",
       params(), ANY_URI_ZO),
@@ -580,7 +581,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   SUBSEQUENCE_WHERE(FnSubsequenceWhere::new, "subsequence-where(input[,from,to])",
       params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE), PREDICATE_O.with(Occ.ZERO_OR_ONE)),
-      ITEM_ZM),
+      ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   SUBSTRING(FnSubstring::new, "substring(value,start[,length])",
       params(STRING_ZO, DOUBLE_O, DOUBLE_ZO), STRING_O),
@@ -613,7 +614,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, STRING_ZO), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   TRANSITIVE_CLOSURE(FnTransitiveClosure::new, "transitive-closure(node,step)",
-      params(NODE_O, FUNCTION_O), NODE_ZM),
+      params(NODE_O, FUNCTION_O), NODE_ZM, flag(HOF)),
   /** XQuery function. */
   TRANSLATE(FnTranslate::new, "translate(value,replace,with)",
       params(STRING_ZO, STRING_O, STRING_O), STRING_O),
@@ -1937,7 +1938,7 @@ public enum Function implements AFunction {
       flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions[,options])",
-      params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(NDT, HOF), XQUERY_URI),
+      params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse::new, "parse(input[,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO), NODE_O, flag(NDT), XQUERY_URI, Perm.CREATE),

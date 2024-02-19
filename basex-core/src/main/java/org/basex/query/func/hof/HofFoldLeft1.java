@@ -55,4 +55,9 @@ public final class HofFoldLeft1 extends StandardFunc {
     if(ft != null) exprType.assign(ft.declType);
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

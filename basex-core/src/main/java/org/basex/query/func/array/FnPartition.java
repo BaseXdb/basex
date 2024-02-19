@@ -67,4 +67,9 @@ public final class FnPartition extends ArrayFn {
     exprType.assign(ArrayType.get(so));
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

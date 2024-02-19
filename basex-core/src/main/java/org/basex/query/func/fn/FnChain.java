@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -36,7 +35,7 @@ public final class FnChain extends FnApply {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    return this;
+  public int hofIndex() {
+    return 1;
   }
 }

@@ -154,7 +154,7 @@ public class XQueryEval extends StandardFunc {
   }
 
   @Override
-  public boolean updating() {
-    return sc.mixUpdates || super.updating();
+  public boolean hasUPD() {
+    return sc.mixUpdates || super.hasUPD();
   }
 }

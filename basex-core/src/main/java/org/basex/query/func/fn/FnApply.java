@@ -2,6 +2,8 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -11,8 +13,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-
-import java.util.Arrays;
 
 /**
  * Function implementation.
@@ -75,5 +75,10 @@ public class FnApply extends StandardFunc {
     final long ar = func.arity(), as = args.size();
     if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, args);
     return func.invoke(qc, info, args.finish());
+  }
+
+  @Override
+  public int hofIndex() {
+    return 0;
   }
 }

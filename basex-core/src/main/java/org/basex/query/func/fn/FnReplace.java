@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -95,7 +94,7 @@ public final class FnReplace extends RegEx {
   }
 
   @Override
-  public boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && defined(4) || super.has(flags);
+  public int hofIndex() {
+    return 4;
   }
 }

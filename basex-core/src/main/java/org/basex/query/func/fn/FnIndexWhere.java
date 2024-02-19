@@ -61,4 +61,9 @@ public final class FnIndexWhere extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

@@ -46,8 +46,8 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   @Override
-  public final boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags) && contextAccess() || super.has(flags);
+  public boolean hasCTX() {
+    return contextAccess();
   }
 
   @Override

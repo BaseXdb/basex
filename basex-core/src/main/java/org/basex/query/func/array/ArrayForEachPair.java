@@ -49,4 +49,9 @@ public final class ArrayForEachPair extends ArrayFn {
 
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 2;
+  }
 }

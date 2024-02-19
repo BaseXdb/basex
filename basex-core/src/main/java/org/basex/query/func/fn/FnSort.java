@@ -10,7 +10,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -199,11 +198,6 @@ public class FnSort extends StandardFunc {
     return adoptType(input);
   }
 
-  @Override
-  public final boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && defined(2) || super.has(flags);
-  }
-
   /**
    * Evaluates value arguments.
    * @param input input value
@@ -225,5 +219,10 @@ public class FnSort extends StandardFunc {
     }
     // no quick evaluation possible
     return null;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 2;
   }
 }

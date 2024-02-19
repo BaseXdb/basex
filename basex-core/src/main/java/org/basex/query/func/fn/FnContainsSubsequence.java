@@ -66,4 +66,9 @@ public class FnContainsSubsequence extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 2;
+  }
 }

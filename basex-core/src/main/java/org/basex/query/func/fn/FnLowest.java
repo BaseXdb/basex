@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -106,7 +105,7 @@ public class FnLowest extends StandardFunc {
   }
 
   @Override
-  public boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && defined(2) || super.has(flags);
+  public int hofIndex() {
+    return 2;
   }
 }

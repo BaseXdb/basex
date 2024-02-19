@@ -1,7 +1,7 @@
 package org.basex.query.func.xquery;
 
-import static org.basex.query.func.xquery.TaskOptions.*;
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.xquery.TaskOptions.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -10,6 +10,7 @@ import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -25,18 +26,18 @@ import org.basex.util.*;
 public final class XQueryForkJoin extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value functions = arg(0).value(qc);
+    final Iter functions = arg(0).iter(qc);
     final TaskOptions options = toOptions(arg(1), new TaskOptions(), true, qc);
 
     final long size = functions.size();
     if(size == 0) return Empty.VALUE;
 
-    final ArrayList<FItem> list = new ArrayList<>((int) size);
-    for(final Item function : functions) {
+    final ArrayList<FItem> list = new ArrayList<>(Seq.initialCapacity(size));
+    for(Item function; (function = functions.next()) != null;) {
       list.add(checkUp(toFunction(function, 0, qc), false, sc));
     }
     // single function: invoke directly
-    if(size == 1) return list.get(0).invoke(qc, info);
+    if(list.size() == 1) return list.get(0).invoke(qc, info);
 
     final ForkJoinPool pool = new ForkJoinPool(options.parallel());
     final TaskContext tc = new TaskContext(list, options, qc, info);
@@ -73,5 +74,10 @@ public final class XQueryForkJoin extends StandardFunc {
       exprType.assign(SeqType.EMPTY_SEQUENCE_Z);
     }
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 0;
   }
 }

@@ -65,4 +65,10 @@ public final class MapBuild extends StandardFunc {
     if(rst != null && !defined(3)) exprType.assign(MapType.get(kt, rst.with(Occ.ONE_OR_MORE)));
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    final boolean key = defined(1), value = defined(2), combine = defined(3);
+    return (key ? value || combine : value && combine) ? super.hofIndex() : key ? 1 : value ? 2 : 3;
+  }
 }

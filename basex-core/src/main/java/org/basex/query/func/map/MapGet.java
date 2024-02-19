@@ -52,4 +52,9 @@ public final class MapGet extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 2;
+  }
 }

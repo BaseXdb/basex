@@ -41,4 +41,9 @@ public final class ArrayIndexWhere extends ArrayFn {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

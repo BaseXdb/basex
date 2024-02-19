@@ -45,4 +45,9 @@ public final class ArrayForEach extends ArrayFn {
 
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

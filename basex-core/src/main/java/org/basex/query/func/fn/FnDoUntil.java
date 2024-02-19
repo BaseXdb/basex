@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnDoUntil extends FnWhileDo {
+public final class FnDoUntil extends FnWhileDo {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem action = toFunction(arg(1), 2, qc), predicate = toFunction(arg(2), 2, qc);
