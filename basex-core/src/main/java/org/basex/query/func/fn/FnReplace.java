@@ -81,7 +81,7 @@ public final class FnReplace extends RegEx {
             s = ++i;
             if(i < sl && Character.isDigit(string.charAt(i))) i++;
             final int n = Integer.parseInt(string.substring(s, i));
-            if(n <= regExpr.groups) sb.append('$').append(n);
+            if(n <= matcher.groupCount()) sb.append('$').append(n);
             s = i;
           } else {
             sb.append(string, s, i + 1);

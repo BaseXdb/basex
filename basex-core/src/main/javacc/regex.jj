@@ -53,14 +53,6 @@ public class RegExParser {
     dotAll = all;
     multiLine = multi;
   }
-
-  /**
-   * Returns the number of parsed groups.
-   * @return number of groups
-   */
-  final public int groups() {
-    return groups;
-  }
 }
 
 PARSER_END(RegExParser)
