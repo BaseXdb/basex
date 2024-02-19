@@ -204,7 +204,7 @@ function showError(response, info) {
 
   // normalize error message
   var msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
-  var lc = msg.match(/\d+\/\d+:/);
+  var lc = !info && msg.match(/\d+\/\d+:/);
   var s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
   msg = msg.replace(/^\[.*?\] /, "").replace(/Stack Trace:.*/, "").replace(/\s+/g, " ");

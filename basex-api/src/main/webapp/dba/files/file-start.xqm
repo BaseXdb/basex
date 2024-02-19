@@ -23,7 +23,7 @@ function dba:file-start(
   $file  as xs:string
 ) as element(rest:response) {
   let $id := replace($file, '\.\.+|/|\\', '')
-  let $uri := xs:anyURI(config:directory() || $id)
+  let $uri := xs:anyURI(config:files-dir() || $id)
   let $params := try {
     (: stop running job before starting new job :)
     job:remove($id),

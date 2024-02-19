@@ -24,16 +24,13 @@ function dba:file-upload(
   $files  as map(xs:string, xs:base64Binary)
 ) as element(rest:response) {
   (: save files :)
-  let $dir := config:directory()
+  let $dir := config:files-dir()
   return try {
     (: Parse all XQuery files; reject files that cannot be parsed :)
     map:for-each($files, fn($file, $content) {
       if(matches($file, '\.xqm?$')) then (
-        void(xquery:parse(
-          convert:binary-to-string($content),
-          map { 'plan': false(), 'pass': true(), 'base-uri': $dir || $file }
-        ))
-      ) else ()
+        void(utils:query-parse(convert:binary-to-string($content), $dir || $file))
+      )
     }),
     map:for-each($files, fn($file, $content) {
       file:write-binary($dir || $file, $content)

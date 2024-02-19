@@ -34,7 +34,7 @@ function dba:files(
   $info   as xs:string?,
   $page   as xs:string
 ) as element(html) {
-  let $dir := config:directory()
+  let $dir := config:files-dir()
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
@@ -43,15 +43,15 @@ function dba:files(
           <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
             let $webapp := dba:dir(db:option('webpath'))[.]
             let $options := (
-              ['DBA'       , $config:DBA-DIRECTORY],
-              ['Webapp'    , $webapp],
-              ['RESTXQ'    , dba:dir($webapp ! file:resolve-path(db:option('restxqpath'), .))],
-              ['Repository', dba:dir(db:option('repopath'))],
-              ['Home'      , Q{org.basex.util.Prop}HOMEDIR() ],
-              ['Working'   , file:current-dir() ],
-              ['Temporary' , file:temp-dir() ],
-              Q{java:java.io.File}listRoots() ! ['Root', string(.)],
-              ['Current'   , $dir]
+              [ 'DBA'       , $config:DBA-DIR ],
+              [ 'Webapp'    , $webapp ],
+              [ 'RESTXQ'    , dba:dir($webapp ! file:resolve-path(db:option('restxqpath'), .)) ],
+              [ 'Repository', dba:dir(db:option('repopath')) ],
+              [ 'Home'      , Q{org.basex.util.Prop}HOMEDIR() ],
+              [ 'Working'   , file:current-dir() ],
+              [ 'Temporary' , file:temp-dir() ],
+              Q{java:java.io.File}listRoots() ! [ 'Root', string(.) ],
+              [ 'Current'   , $dir ]
             )
             let $selected := (
               for $option at $pos in $options
@@ -99,7 +99,7 @@ function dba:files(
                   if($dir) then () else (
                     html:link('Download', 'file/' || encode-for-uri($name)),
                     if($size <= $limit) then (
-                      html:link('Edit', 'editor', map { 'file': $name })
+                      html:link('Edit', 'editor', map { 'name': $name })
                     ) else (),
                     if(matches($name, '\.xq$')) then (
                       (: choose first running job :)

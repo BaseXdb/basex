@@ -135,12 +135,12 @@ function dba:jobs(
                 }</textarea>,
   
                 if($cached) then (
-                  let $result := utils:serialize(try {
-                    job:result($job, map { 'keep': true() })
+                  let $result := try {
+                    utils:serialize(job:result($job, map { 'keep': true() }))
                   } catch * {
                     'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
                       $err:column-number || ':' || string:nl() || $err:description
-                  })
+                  }
                   where $result
                   return (
                     <h3>{

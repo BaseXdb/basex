@@ -26,14 +26,12 @@ function dba:dir-change(
     let $path := file:path-to-native(if(contains($dir, $sep)) then (
       $dir
     ) else (
-      config:directory() || $dir || $sep)
+      config:files-dir() || $dir || $sep)
     )
     return (
       (: ensure that the directory can be accessed :)
       void(file:list($path)),
-  
-      config:directory($path),
-      config:file('')
+      config:set-files-dir($path)
     ),
     web:redirect($dba:CAT)
   } catch file:io-error {

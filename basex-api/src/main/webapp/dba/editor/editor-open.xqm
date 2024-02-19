@@ -8,7 +8,7 @@ module namespace dba = 'dba/editor';
 import module namespace config = 'dba/config' at '../lib/config.xqm';
 
 (:~
- : Returns the string content of a file.
+ : Returns the content of a file.
  : @param  $name  name of file
  : @return content
  :)
@@ -19,6 +19,9 @@ declare
 function dba:editor-open(
   $name  as xs:string
 ) as xs:string {
-  file:read-text(config:directory() || $name),
-  config:file($name)
+  let $path := config:editor-dir() || $name
+  return (
+    file:read-text($path),
+    config:set-edited-file($path)
+  )
 };

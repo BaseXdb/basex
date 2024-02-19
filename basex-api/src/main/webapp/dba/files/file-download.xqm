@@ -18,7 +18,7 @@ declare
 function dba:file-download(
   $name  as xs:string
 ) as item()+ {
-  let $path := config:directory() || $name
+  let $path := config:files-dir() || $name
   return (
     web:response-header(
       map { 'media-type': 'application/octet-stream' },

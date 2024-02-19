@@ -15,7 +15,7 @@ declare variable $dba:CAT := 'editor';
  : Editor page.
  : @param  $error  error string
  : @param  $info   info string
- : @param  $file   file to be opened
+ : @param  $name   name of edited file
  : @return page
  :)
 declare
@@ -23,15 +23,22 @@ declare
   %rest:path('/dba/editor')
   %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
-  %rest:query-param('file',  '{$file}')
+  %rest:query-param('name',  '{$name}')
   %output:method('html')
   %output:html-version('5')
 function dba:editor(
   $error  as xs:string?,
   $info   as xs:string?,
-  $file   as xs:string?
+  $name   as xs:string?
 ) as element(html) {
-  html:wrap(
+  (: register file to be edited :)
+  let $edited := if($name) then (
+    config:set-edited-file(config:files-dir() || $name),
+    $name
+  ) else (
+    config:edited-file()
+  )
+  return html:wrap(
     map {
       'header': $dba:CAT, 'info': $info, 'error': $error,
       'css': 'codemirror/lib/codemirror.css',
@@ -42,7 +49,7 @@ function dba:editor(
       <tr>
         <td colspan='2'>
           <form autocomplete='off' action='javascript:void(0);'>{
-            <datalist id='files'>{ config:files() ! element option { . } }</datalist>,
+            <datalist id='files'>{ config:editor-files() ! element option { . } }</datalist>,
             intersperse((
               <input type='text' id='file' name='file' placeholder='Name of file'
                      list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
@@ -65,8 +72,7 @@ function dba:editor(
         <td width='50%'>{
           <textarea name='output' id='output' readonly=''/>,
           html:js('loadCodeMirror("xquery", true, true);'),
-          for $name in head(($file, config:file())[.])
-          return html:js('openFile("' || $name || '");')
+          $edited ! html:js('openFile("' || file:name(.) || '");')
         }</td>
       </tr>
     )

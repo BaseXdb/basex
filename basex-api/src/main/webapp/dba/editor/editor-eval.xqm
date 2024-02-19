@@ -19,7 +19,7 @@ declare
 function dba:parse(
   $query  as xs:string?
 ) as xs:boolean {
-  utils:query-updating($query)
+  utils:query-parse(string($query), ())/@updating = 'true'
 };
 
 (:~

@@ -7,13 +7,13 @@ module namespace config = 'dba/config';
 
 (:~ Session key. :)
 declare variable $config:SESSION-KEY := 'dba';
-(:~ Currently selected directory. :)
-declare %private variable $config:DIRECTORY := 'dba-directory';
-(:~ Name of currently opened file. :)
-declare %private variable $config:FILE := 'dba-file';
+(:~ Current directory in the file panel. :)
+declare %private variable $config:FILES-DIR := 'dba-files-dir';
+(:~ Name of currently edited file. :)
+declare %private variable $config:EDITED-FILE := 'dba-edited-file';
 
 (:~ DBA directory. :)
-declare variable $config:DBA-DIRECTORY := (
+declare variable $config:DBA-DIR := (
   for $dir in db:option('dbpath') || '/.dba'
   return (
     if(file:exists($dir)) then () else file:create-dir($dir),
@@ -42,7 +42,7 @@ declare variable $config:IGNORE-LOGS := 'ignore-logs';
 declare variable $config:INDENT := 'indent';
 
 (:~ Options file. :)
-declare %private variable $config:OPTIONS-FILE := $config:DBA-DIRECTORY || '.dba.xml';
+declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';
 
 (:~ Default options. :)
 declare %basex:lazy %private variable $config:DEFAULTS := map {
@@ -105,62 +105,69 @@ declare function config:save(
 ) as empty-sequence() {
   file:write($config:OPTIONS-FILE, element options {
     map:for-each($config:DEFAULTS, fn($key, $value) {
-      element { $key } { ($options($key), $value)[1] }
+      element { $key } { $options($key) otherwise $value }
     })
   })
 };
 
 (:~
- : Returns the current working directory.
+ : Returns the current files directory.
  : @return directory
  :)
-declare function config:directory() as xs:string {
-  let $dir := session:get($config:DIRECTORY)
-  return if(exists($dir) and file:exists($dir)) then (
-    $dir
-  ) else (
-    $config:DBA-DIRECTORY
-  )
+declare function config:files-dir() as xs:string {
+  session:get($config:FILES-DIR) otherwise $config:DBA-DIR
 };
 
 (:~
- : Assigns a working directory.
- : @param  $value  value
+ : Assigns the current files directory.
+ : @param  $dir  directory
  :)
-declare function config:directory(
-  $value  as xs:string
+declare function config:set-files-dir(
+  $dir  as xs:string
 ) as empty-sequence() {
-  session:set($config:DIRECTORY, $value)
+  session:set($config:FILES-DIR, $dir)
 };
 
 (:~
- : Returns the name of the currently opened file.
- : @return current file
+ : Returns the current editor directory.
+ : @return directory
  :)
-declare function config:file(
-) as xs:string? {
-  session:get($config:FILE)
+declare function config:editor-dir() as xs:string {
+  (config:edited-file()[.] ! file:parent(.)) otherwise config:files-dir()
 };
 
 (:~
- : Assigns the name of the currently opened file.
- : @param  $value  value
+ : Returns the currently edited file.
+ : @return file path
  :)
-declare function config:file(
-  $value  as xs:string
+declare function config:edited-file() as xs:string? {
+  session:get($config:EDITED-FILE)
+};
+
+(:~
+ : Assigns the currently edited file.
+ : @param  $path  file path
+ :)
+declare function config:set-edited-file(
+  $path  as xs:string
 ) as empty-sequence() {
-  session:set($config:FILE, $value)
+  session:set($config:EDITED-FILE, $path)
 };
 
 (:~
- : Returns the names of all files.
+ : Closes the currently edited file.
+ :)
+declare function config:close-edited-file() as empty-sequence() {
+  session:delete($config:EDITED-FILE)
+};
+
+(:~
+ : Returns the names of all files that can be opened in the editor.
  : @return list of files
  :)
-declare function config:files() as xs:string* {
+declare function config:editor-files() as xs:string* {
   let $limit := config:get($config:MAXCHARS)
-  let $dir := config:directory()
-  where file:is-dir($dir)
-  for $file in file:children($dir)
+  for $file in file:children(config:editor-dir())
   where file:is-file($file) and file:size($file) <= $limit
   return file:name($file)
 };

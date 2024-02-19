@@ -13,18 +13,20 @@ declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(
 declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
 
 (:~
- : Checks if a query is updating.
+ : Parses a query.
  : @param  $query  query string
- : @return result of check
+ : @param  $uri    base URI (optional)
+ : @return parse result
  :)
-declare function utils:query-updating(
-  $query  as xs:string
-) as xs:boolean {
-  let $result := xquery:parse($query, map {
-    'base-uri': config:directory() || '/' || config:file(),
+declare function utils:query-parse(
+  $query  as xs:string,
+  $uri    as xs:string?
+) as element() {
+  xquery:parse($query, map {
+    'base-uri': $uri otherwise config:edited-file() otherwise config:editor-dir(),
+    'plan'    : false(),
     'pass'    : true()
   })
-  return $result/@updating = 'true'
 };
 
 (:~
@@ -57,20 +59,20 @@ declare %updating function utils:update(
 };
 
 (:~
- : Finalizes the result of an evaluated query.
- : @param  $result  query result
- : @return empty sequence
+ : Serializes a value, considering the specified system limits.
+ : @param  $value  value
+ : @return string
  :)
 declare function utils:serialize(
-  $result  as item()*
+  $value  as item()*
 ) as xs:string {
   (: serialize more characters than requested, because limit represents number of bytes :)
   let $limit := config:get($config:MAXCHARS)
   let $indent := config:get($config:INDENT)
-  let $string := serialize($result, map {
+  let $string := serialize($value, map {
     'limit': $limit * 2 + 1,
-    'method': 'basex',
-    'indent': $indent
+    'indent': $indent,
+    'method': 'basex'
   })
   return utils:chop($string, $limit)
 };
@@ -84,7 +86,7 @@ declare %private function utils:query-options() as map(*) {
     'timeout'   : config:get($config:TIMEOUT),
     'memory'    : config:get($config:MEMORY),
     'permission': config:get($config:PERMISSION),
-    'base-uri'  : config:directory() || '/' || config:file(),
+    'base-uri'  : config:edited-file() otherwise config:editor-dir(),
     'pass'      : true()
   }
 };

@@ -22,6 +22,6 @@ declare
 function dba:dir-create(
   $name  as xs:string
 ) as element(rest:response) {
-  file:create-dir(config:directory() || $name),
+  file:create-dir(config:files-dir() || $name),
   web:redirect($dba:CAT, map { 'info': 'Directory "' || $name || '" was created.' })
 };

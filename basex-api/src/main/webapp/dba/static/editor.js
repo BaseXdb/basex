@@ -26,7 +26,7 @@ function saveFile() {
   var fileString = document.getElementById("editor").value;
   return request("editor-save?name=" + encodeURIComponent(name), fileString).then((text) => {
     finishFile(name, "File was saved.");
-    refreshDataList(text);
+    refreshDataList(text.split("/"));
   }).catch((response) => {
     showError(response, name);
   });
@@ -36,12 +36,14 @@ function saveFile() {
  * Closes a file.
  */
 function closeFile() {
-  request("editor-close?name=" + encodeURIComponent(fileName())).then(() => {
+  var name = fileName();
+  return name ? request("editor-close?name=" + encodeURIComponent(name)).then((text) => {
     _editor.setValue("");
     finishFile("", "File was closed.");
+    refreshDataList(text.split("/"));
   }).catch((response) => {
     showError(response);
-  });
+  }) : Promise.resolve();
 }
 
 /**
@@ -59,15 +61,15 @@ function finishFile(name, info) {
 }
 
 /**
- * Refreshes the list of available files.
- * @param {object} text available files
+ * Refreshes the list of editable files.
+ * @param {array} names editable files
  */
-function refreshDataList(text) {
+function refreshDataList(names) {
   var files = document.getElementById("files");
   while(files.firstChild) {
     files.removeChild(files.firstChild);
   }
-  for(var name of text.split("/")) {
+  for(var name of names) {
     var opt = document.createElement("option");
     opt.value = name;
     files.appendChild(opt);
@@ -79,10 +81,9 @@ function refreshDataList(text) {
  */
 function checkButtons() {
   var name = fileName();
-  var exists = fileExists(name);
-  document.getElementById("open").disabled = !exists;
+  document.getElementById("open").disabled = !fileExists(name);
   document.getElementById("save").disabled = !name;
-  document.getElementById("close").disabled = !exists;
+  document.getElementById("close").disabled = !name;
 }
 
 /**
