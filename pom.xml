@@ -400,8 +400,6 @@
           <configuration>
             <source>${compileSource}</source>
             <target>${compileSource}</target>
-            <!-- https://jira.codehaus.org/browse/MCOMPILER-205 -->
-            <useIncrementalCompilation>false</useIncrementalCompilation>
           </configuration>
         </plugin>
 
