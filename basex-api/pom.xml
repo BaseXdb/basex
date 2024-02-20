@@ -56,10 +56,6 @@
       <artifactId>milton-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-fileupload2-jakarta</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
     </dependency>
@@ -105,7 +101,7 @@
         <artifactId>jetty-maven-plugin</artifactId>
         <version>${jettyVersion}</version>
         <configuration>
-          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
+          <jettyXmls>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXmls>
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8081</stopPort>
           <supportedPackagings>
