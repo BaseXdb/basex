@@ -4,20 +4,20 @@ import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
 import java.util.*;
 
-import javax.servlet.http.*;
-
-import org.apache.commons.fileupload.*;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.servlet.*;
+import org.apache.commons.fileupload2.core.*;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.jakarta.*;
 import org.basex.http.*;
 import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Cookie;
 import com.bradmcevoy.http.Response.*;
+
+import jakarta.servlet.http.*;
 
 /**
  * Wrapper around {@link HttpServletRequest}, which in addition implements {@link Request}.
@@ -120,7 +120,7 @@ final class WebDAVRequest extends AbstractRequest {
 
   @Override
   public Cookie getCookie(final String name) {
-    for(final javax.servlet.http.Cookie c : request.getCookies()) {
+    for(final jakarta.servlet.http.Cookie c : request.getCookies()) {
       if(c.getName().equals(name)) return new WebDAVCookie(c);
     }
     return null;
@@ -129,7 +129,7 @@ final class WebDAVRequest extends AbstractRequest {
   @Override
   public List<Cookie> getCookies() {
     final List<Cookie> list = new ArrayList<>();
-    for(final javax.servlet.http.Cookie c : request.getCookies()) {
+    for(final jakarta.servlet.http.Cookie c : request.getCookies()) {
       list.add(new WebDAVCookie(c));
     }
     return list;
@@ -141,8 +141,9 @@ final class WebDAVRequest extends AbstractRequest {
     try {
       if(isMultiPart()) {
         parseQueryString(params, request.getQueryString());
-        final List<FileItem> items = new ServletFileUpload().parseRequest(request);
-        for(final FileItem item : items) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        final List<FileItem<?>> items = new JakartaServletFileUpload().parseRequest(request);
+        for(final FileItem<?> item : items) {
           if(item.isFormField())
             params.put(item.getFieldName(), item.getString());
           else
@@ -215,7 +216,7 @@ final class WebDAVRequest extends AbstractRequest {
  */
 class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   /** Wrapped file item. */
-  private final FileItem file;
+  private final FileItem<?> file;
   /** File name. */
   private final String name;
 
@@ -233,7 +234,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
    * Constructor.
    * @param file file item
    */
-  FileItemWrapper(final FileItem file) {
+  FileItemWrapper(final FileItem<?> file) {
     this.file = file;
     name = fixIEFileName(file.getName());
   }

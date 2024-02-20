@@ -2,7 +2,7 @@ package org.basex.http;
 
 import java.util.concurrent.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.util.list.*;
 

@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.html.*;

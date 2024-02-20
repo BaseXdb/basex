@@ -18,6 +18,7 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.gzip.*;
 import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.webapp.*;
+import org.eclipse.jetty.websocket.server.config.*;
 import org.eclipse.jetty.xml.*;
 
 /**
@@ -93,6 +94,7 @@ public final class BaseXHTTP extends CLI {
     } else {
       jetty.setHandler(wac);
     }
+    JettyWebSocketServletContainerInitializer.configure(wac, null);
 
     ServerConnector sc = null;
     for(final Connector conn : jetty.getConnectors()) {

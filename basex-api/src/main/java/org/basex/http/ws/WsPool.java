@@ -128,9 +128,9 @@ public final class WsPool {
       final RemoteEndpoint remote = ws.getSession().getRemote();
       for(final Object value : values) {
         if(value instanceof ByteBuffer) {
-          remote.sendBytesByFuture((ByteBuffer) value);
+          remote.sendBytes((ByteBuffer) value, WriteCallback.NOOP);
         } else {
-          remote.sendStringByFuture((String) value);
+          remote.sendString((String) value, WriteCallback.NOOP);
         }
       }
     }

@@ -2,10 +2,10 @@ package org.basex.http.ws;
 
 import java.io.*;
 
-import javax.servlet.*;
-
 import org.basex.http.*;
-import org.eclipse.jetty.websocket.servlet.*;
+import org.eclipse.jetty.websocket.server.*;
+
+import jakarta.servlet.*;
 
 /**
  * WebSocket servlet.
@@ -13,9 +13,9 @@ import org.eclipse.jetty.websocket.servlet.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Johannes Finckh
  */
-public final class WsServlet extends WebSocketServlet {
+public final class WsServlet extends JettyWebSocketServlet {
   @Override
-  public void configure(final WebSocketServletFactory factory) {
+  public void configure(final JettyWebSocketServletFactory factory) {
     factory.setCreator(new WsCreator());
   }
 

@@ -2,7 +2,7 @@ package org.basex.http.web;
 
 import java.io.*;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
 import org.basex.core.*;
 import org.basex.query.*;

@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
