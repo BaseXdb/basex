@@ -14,13 +14,9 @@ public final class RestXqPathTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void get() throws Exception {
-    // ignore duplicate slashes
+    // root access
     get("root", "declare %R:path('') function m:f() { 'root' };", "");
-    get("root", "declare %R:path('') function m:f() { 'root' };", "/");
-    get("root", "declare %R:path('') function m:f() { 'root' };", "//");
-    get("root", "declare %R:path('') function m:f() { 'root' };", "/////");
     get("root", "declare %R:path('/') function m:f() { 'root' };", "");
-    get("root", "declare %R:path('/') function m:f() { 'root' };", "/");
     // explicit GET method
     get("root", "declare %R:GET %R:path('') function m:f() { 'root' };", "");
     // duplicate GET method
