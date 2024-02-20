@@ -3,19 +3,13 @@ package org.basex.http.webdav;
 import static org.basex.http.webdav.WebDAVUtils.*;
 
 import java.io.*;
-import java.net.*;
-import java.nio.charset.*;
 import java.util.*;
+import java.util.Map.*;
 
-import org.apache.commons.fileupload2.core.*;
-import org.apache.commons.fileupload2.core.FileItem;
-import org.apache.commons.fileupload2.jakarta.*;
 import org.basex.http.*;
-import org.basex.util.*;
 
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Cookie;
-import com.bradmcevoy.http.Response.*;
 
 import jakarta.servlet.http.*;
 
@@ -42,17 +36,6 @@ final class WebDAVRequest extends AbstractRequest {
   private final String url;
   /** Authentication. */
   private Auth auth;
-  /** Content types map. */
-  private static final Map<ContentType, String> CONTENT_TYPES = new EnumMap<>(ContentType.class);
-  /** Type contents map. */
-  private static final Map<String, ContentType> TYPE_CONTENTS = new HashMap<>();
-
-  static {
-    CONTENT_TYPES.put(ContentType.HTTP, Response.HTTP);
-    CONTENT_TYPES.put(ContentType.MULTIPART, Response.MULTIPART);
-    CONTENT_TYPES.put(ContentType.XML, Response.XML);
-    CONTENT_TYPES.forEach((key, value) -> TYPE_CONTENTS.put(value, key));
-  }
 
   /**
    * Constructor.
@@ -138,142 +121,8 @@ final class WebDAVRequest extends AbstractRequest {
   @Override
   public void parseRequestParameters(final Map<String, String> params,
       final Map<String, com.bradmcevoy.http.FileItem> files) throws RequestParseException {
-    try {
-      if(isMultiPart()) {
-        parseQueryString(params, request.getQueryString());
-        @SuppressWarnings({ "unchecked", "rawtypes"})
-        final List<FileItem<?>> items = new JakartaServletFileUpload().parseRequest(request);
-        for(final FileItem<?> item : items) {
-          if(item.isFormField())
-            params.put(item.getFieldName(), item.getString());
-          else
-            files.put(item.getFieldName(), new FileItemWrapper(item));
-        }
-      } else {
-        final Enumeration<String> en = request.getParameterNames();
-        while(en.hasMoreElements()) {
-          final String nm = en.nextElement();
-          final String val = request.getParameter(nm);
-          params.put(nm, val);
-        }
-      }
-    } catch(final FileUploadException ex) {
-      throw new RequestParseException("FileUploadException", ex);
-    } catch(final Throwable ex) {
-      throw new RequestParseException(ex.getMessage(), ex);
+    for(Entry<String, String[]> e : request.getParameterMap().entrySet()) {
+      if(e.getValue().length > 0) params.put(e.getKey(), e.getValue()[0]);
     }
-  }
-
-  /**
-   * Parse the query string.
-   * @param map parsed key-values will be stored here
-   * @param qs query string
-   */
-  private static void parseQueryString(final Map<String, String> map, final String qs) {
-    if(qs == null) return;
-    for(final String nv : Strings.split(qs, '&')) {
-      final String[] parts = Strings.split(nv, '=', 2);
-      final String key = parts[0];
-      String val = null;
-      if(parts.length > 1) {
-        val = URLDecoder.decode(parts[1], StandardCharsets.UTF_8);
-      }
-      map.put(key, val);
-    }
-  }
-
-  /**
-   * Request content type.
-   * @return the content type of the current request
-   */
-  private ContentType getRequestContentType() {
-    final String s = request.getContentType();
-    if(s == null) return null;
-    if(s.contains(Response.MULTIPART)) return ContentType.MULTIPART;
-    return TYPE_CONTENTS.get(s);
-  }
-
-  /**
-   * Is the content type of the request a multipart?
-   * @return {@code true} if the request is multipart
-   */
-  private boolean isMultiPart() {
-    return getRequestContentType() == ContentType.MULTIPART;
-  }
-}
-
-/**
- * Wrapper around {@link FileItem}, which in addition implements
- * {@link com.bradmcevoy.http.FileItem}.
- * This implementation is the same as the implementation of
- * {@code FileItemWrapper} found in {@code milton-servlet}. Since this is one of
- * the few classes which is needed from that library, the source is integrated
- * into BaseX.
- * @author Milton Development Team
- * @author BaseX Team 2005-24, BSD License
- * @author Rositsa Shadura
- * @author Dimitar Popov
- */
-class FileItemWrapper implements com.bradmcevoy.http.FileItem {
-  /** Wrapped file item. */
-  private final FileItem<?> file;
-  /** File name. */
-  private final String name;
-
-  /**
-   * Strip path information provided by IE.
-   * @param string string
-   * @return stripped string
-   */
-  private static String fixIEFileName(final String string) {
-    final int pos = string.lastIndexOf('\\');
-    return pos < 0 ? string : string.substring(pos + 1);
-  }
-
-  /**
-   * Constructor.
-   * @param file file item
-   */
-  FileItemWrapper(final FileItem<?> file) {
-    this.file = file;
-    name = fixIEFileName(file.getName());
-  }
-
-  @Override
-  public String getContentType() {
-    return file.getContentType();
-  }
-
-  @Override
-  public String getFieldName() {
-    return file.getFieldName();
-  }
-
-  @Override
-  public InputStream getInputStream() {
-    try {
-      return file.getInputStream();
-    } catch(final IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  @Override
-  public OutputStream getOutputStream() {
-    try {
-      return file.getOutputStream();
-    } catch(final IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public long getSize() {
-    return file.getSize();
   }
 }
