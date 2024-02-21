@@ -1551,7 +1551,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr ftContains() throws QueryException {
-    final Expr expr = stringConcat();
+    final Expr expr = otherwise();
     final int p = pos;
     if(!wsConsumeWs(CONTAINS) || !wsConsumeWs(TEXT)) {
       pos = p;
@@ -1565,6 +1565,19 @@ public class QueryParser extends InputParser {
       throw error(FTIGNORE);
     }
     return new FTContains(expr, select, info());
+  }
+
+  /**
+   * Parses the "OtherwiseExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr otherwise() throws QueryException {
+    final Expr expr = stringConcat();
+    if(expr == null || !wsConsumeWs(OTHERWISE)) return expr;
+    final ExprList el = new ExprList(expr);
+    do add(el, stringConcat()); while(wsConsume(OTHERWISE));
+    return new Otherwise(info(), el.finish());
   }
 
   /**
@@ -1613,29 +1626,16 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr multiplicative() throws QueryException {
-    Expr expr = otherwise();
+    Expr expr = union();
     while(expr != null) {
       final Calc c = consume('*') || consume('×') ? Calc.MULTIPLY :
         consume('÷') || wsConsumeWs(DIV) ? Calc.DIVIDE :
         wsConsumeWs(IDIV) ? Calc.DIVIDEINT :
         wsConsumeWs(MOD) ? Calc.MODULO : null;
       if(c == null) break;
-      expr = new Arith(info(), expr, check(otherwise(), CALCEXPR), c);
+      expr = new Arith(info(), expr, check(union(), CALCEXPR), c);
     }
     return expr;
-  }
-
-  /**
-   * Parses the "OtherwiseExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr otherwise() throws QueryException {
-    final Expr expr = union();
-    if(expr == null || !wsConsumeWs(OTHERWISE)) return expr;
-    final ExprList el = new ExprList(expr);
-    do add(el, union()); while(wsConsume(OTHERWISE));
-    return new Otherwise(info(), el.finish());
   }
 
   /**
