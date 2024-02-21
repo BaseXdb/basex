@@ -646,7 +646,7 @@ public enum Function implements AFunction {
   URI_COLLECTION(FnUriCollection::new, "uri-collection([uri])",
       params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
-  VOID(FnVoid::new, "void(input[,skip])",
+  VOID(FnVoid::new, "void([input,skip])",
       params(ITEM_ZM, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   WHILE_DO(FnWhileDo::new, "while-do(input,predicate,action)",
