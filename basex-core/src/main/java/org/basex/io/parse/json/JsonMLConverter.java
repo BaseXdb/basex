@@ -119,7 +119,7 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void numberLit(final Item value) throws QueryException {
+  void numberLit(final Item item) throws QueryException {
     throw error("No numbers allowed");
   }
 

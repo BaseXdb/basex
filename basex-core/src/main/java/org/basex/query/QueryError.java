@@ -835,13 +835,13 @@ public enum QueryError {
   /** Error code. */
   SERPI(SERE, 15, "Processing construction contains '>'."),
   /** Error code. */
-  SER_X(SEPM, 16, "%"),
+  SERPARAM_X(SEPM, 16, "%"),
   /** Error code. */
   SERMAP_X(SEPM, 17, "Character map is not valid: %."),
   /** Error code. */
   SEROPT_X(SEPM, 17, "%"),
   /** Error code. */
-  SEROPTION_X(SEPM, 17, "Serialization parameter '%' is invalid."),
+  SERINVALID_X(SEPM, 17, "Serialization parameter '%' is invalid."),
   /** Error code. */
   SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
   /** Error code. */
@@ -1304,9 +1304,9 @@ public enum QueryError {
   /** Error code. */
   DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
   /** Error code. */
-  OPTDECL_X(XQST, 108, "Output declaration not allowed in library module: %."),
+  OUTPUTLIB_X(XQST, 108, "Output declaration not allowed in library module: %."),
   /** Error code. */
-  OUTINVALID_X(XQST, 109, "%"),
+  OUTPUT_X(XQST, 109, "%"),
   /** Error code. */
   OUTDUPL_X(XQST, 110, "Duplicate declaration of 'output:%'."),
   /** Error code. */

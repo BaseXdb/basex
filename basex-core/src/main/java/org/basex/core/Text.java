@@ -233,17 +233,15 @@ public interface Text {
   /** Options error. */
   String OPT_OFFSET_X = "List counter for '%' is invalid.";
   /** Options error. */
-  String OPT_INVALID_X_X = "Invalid '%' value '%'; must be ";
+  String OPT_BOOLEAN_X_X = "Invalid '%' value '%'; expected: 'yes', 'no', or boolean.";
   /** Options error. */
-  String OPT_BOOLEAN_X_X = OPT_INVALID_X_X + "'yes', 'no', or a boolean.";
+  String OPT_NUMBER_X_X = "Invalid '%' value '%'; expected: number.";
   /** Options error. */
-  String OPT_NUMBER_X_X = OPT_INVALID_X_X + "a number.";
+  String OPT_MAP_X_X = "Invalid '%' value '%'; expected: a map.";
   /** Options error. */
-  String OPT_MAP_X_X = OPT_INVALID_X_X + "a map.";
+  String OPT_FUNC_X_X = "Invalid '%' value '%'; expected: a function.";
   /** Options error. */
-  String OPT_FUNC_X_X = OPT_INVALID_X_X + "a function.";
-  /** Options error. */
-  String OPT_ONEOF_X_X_X = OPT_INVALID_X_X + "one of: %.";
+  String OPT_ONEOF_X_X_X = "Invalid '%' value '%'; expected: one of %.";
   /** Options error. */
   String OPT_EXPECT_X_X_X = "% expected, % found: %.";
 

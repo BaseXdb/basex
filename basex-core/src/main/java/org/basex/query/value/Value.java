@@ -207,7 +207,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
     } catch(final QueryIOException ex) {
       throw ex;
     } catch(final IOException ex) {
-      throw SER_X.getIO(ex);
+      throw SERPARAM_X.getIO(ex);
     } catch(final ArrayIndexOutOfBoundsException ex) {
       // might occur if serialized result is too large
       Util.debug(ex);

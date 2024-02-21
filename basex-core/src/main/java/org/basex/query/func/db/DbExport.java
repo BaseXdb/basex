@@ -29,7 +29,7 @@ public final class DbExport extends DbAccess {
     try {
       Export.export(data, path, sopts, null);
     } catch(final IOException ex) {
-      throw SER_X.get(info, ex);
+      throw SERPARAM_X.get(info, ex);
     }
     return Empty.VALUE;
   }

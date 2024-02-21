@@ -437,10 +437,10 @@ public class Options implements Iterable<Option<?>> {
       for(final Item key : map.keys()) {
         if(!tb.isEmpty()) tb.add(',');
         tb.add(key.string(info)).add('=');
-        final Value value = map.get(key, info);
-        if(!value.isItem()) throw new BaseXException(
-            Text.OPT_EXPECT_X_X_X, AtomType.STRING, value.seqType(), value);
-        tb.add(string(((Item) value).string(info)).replace(",", ",,"));
+        final Value val = map.get(key, info);
+        if(!val.isItem()) throw new BaseXException(
+            Text.OPT_EXPECT_X_X_X, AtomType.STRING, val.seqType(), val);
+        tb.add(string(((Item) val).string(info)).replace(",", ",,"));
       }
     } else if(item instanceof QNm) {
       tb.add(((QNm) item).internal());
@@ -769,21 +769,20 @@ public class Options implements Iterable<Option<?>> {
       return;
     }
 
-    Object value = null;
-    String expected = null;
+    Object val = null, expected = null;
     final Type type = item.type;
     if(option instanceof BooleanOption) {
       if(type == AtomType.BOOLEAN) {
-        value = item.bool(info);
+        val = item.bool(info);
       } else {
         final String s = string(item.string(info));
-        value = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
+        val = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
       }
-      if(value == null) expected = Text.OPT_BOOLEAN_X_X;
+      if(val == null) expected = Text.OPT_BOOLEAN_X_X;
     } else if(option instanceof NumberOption) {
-      value = (int) item.itr(info);
+      val = (int) item.itr(info);
     } else if(option instanceof StringOption) {
-      value = serialize(item, info);
+      val = serialize(item, info);
     } else if(option instanceof EnumOption) {
       byte[] token;
       if(type == AtomType.BOOLEAN) {
@@ -798,20 +797,20 @@ public class Options implements Iterable<Option<?>> {
         expected = Text.OPT_BOOLEAN_X_X;
       } else {
         final EnumOption<?> eo = (EnumOption<?>) option;
-        value = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
-        if(value == null) throw new BaseXException(allowed(option, string(token),
+        val = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
+        if(val == null) throw new BaseXException(allowed(option, string(token),
             (Object[]) eo.values()));
       }
     } else if(option instanceof OptionsOption) {
       if(item instanceof XQMap) {
-        value = ((OptionsOption<?>) option).newInstance();
-        ((Options) value).assign((XQMap) item, error, info);
+        val = ((OptionsOption<?>) option).newInstance();
+        ((Options) val).assign((XQMap) item, error, info);
       } else {
         expected = Text.OPT_MAP_X_X;
       }
     } else if(option instanceof FuncOption) {
       if(item instanceof FuncItem) {
-        value = item;
+        val = item;
       } else {
         expected = Text.OPT_FUNC_X_X;
       }
@@ -819,8 +818,8 @@ public class Options implements Iterable<Option<?>> {
       throw Util.notExpected("Unsupported option: " + option);
     }
 
-    if(expected != null) throw new BaseXException(expected, option.name(), item);
-    put(option, value);
+    if(expected != null) throw new BaseXException(expected.toString(), option.name(), item);
+    put(option, val);
   }
 
   /**

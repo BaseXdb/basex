@@ -29,7 +29,7 @@ public final class JsonParser extends InputParser {
 
   /** Converter. */
   private final JsonConverter conv;
-  /** Spec. */
+  /** Liberal flag. */
   private final boolean liberal;
   /** Escape flag. */
   private final boolean escape;

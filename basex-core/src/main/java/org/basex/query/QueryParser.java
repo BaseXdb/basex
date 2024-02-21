@@ -548,7 +548,7 @@ public class QueryParser extends InputParser {
 
     if(eq(qname.uri(), OUTPUT_URI)) {
       // output declaration
-      if(sc.module != null) throw error(OPTDECL_X, qname.string());
+      if(sc.module != null) throw error(OUTPUTLIB_X, qname.string());
 
       final SerializerOptions sopts = qc.parameters();
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);

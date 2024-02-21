@@ -196,9 +196,9 @@ public final class SerializerOptions extends Options {
       assign(name, string(value));
     } catch(final BaseXException ex) {
       for(final Option<?> o : this) {
-        if(o.name().equals(name)) throw SER_X.get(info, ex);
+        if(o.name().equals(name)) throw SERPARAM_X.get(info, ex);
       }
-      throw OUTINVALID_X.get(info, ex);
+      throw OUTPUT_X.get(info, ex);
     }
 
     // parse parameters and character map
@@ -217,13 +217,13 @@ public final class SerializerOptions extends Options {
       if(root != null) FuncOptions.serializer(root, this, info);
 
       final HashMap<String, String> free = free();
-      if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
+      if(!free.isEmpty()) throw SERINVALID_X.get(info, free.keySet().iterator().next());
 
       for(final ANode child : root.childIter()) {
         if(child.type != NodeType.ELEMENT) continue;
         if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
           final String map = characterMap(child);
-          if(map == null) throw SEROPTION_X.get(info, USE_CHARACTER_MAPS.name());
+          if(map == null) throw SERINVALID_X.get(info, USE_CHARACTER_MAPS.name());
           set(USE_CHARACTER_MAPS, map);
         }
       }

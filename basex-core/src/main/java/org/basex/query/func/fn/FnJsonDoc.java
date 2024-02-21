@@ -7,6 +7,7 @@ import org.basex.build.json.JsonOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -75,17 +76,17 @@ public class FnJsonDoc extends Parse {
     if(dflt) options.set(JsonOptions.FORMAT, format);
 
     final JsonConverter jc = JsonConverter.get(options);
-    final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
-    if(fb != null) {
-      toFunction(fb, 1, qc);
+    final Value fallback = options.get(JsonParserOptions.FALLBACK);
+    if(fallback != null) {
+      final FItem fb = toFunction(fallback, 1, qc);
       jc.fallback(s -> fb.invoke(qc, info, Str.get(s)).item(qc, info).string(info));
       if(options.get(JsonParserOptions.ESCAPE)) {
         throw OPTION_JSON_X.get(info, "Escape cannot be combined with fallback function.");
       }
     }
-    final FuncItem np = options.get(JsonParserOptions.NUMBER_PARSER);
-    if(np != null) {
-      toFunction(np, 1, qc);
+    final Value numberParser = options.get(JsonParserOptions.NUMBER_PARSER);
+    if(numberParser != null) {
+      final FItem np = toFunction(numberParser, 1, qc);
       jc.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
     }
     return jc;

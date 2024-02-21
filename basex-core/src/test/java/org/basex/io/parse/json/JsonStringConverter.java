@@ -91,8 +91,8 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final Item value) {
-    tb.add(value);
+  public void numberLit(final Item item) {
+    tb.add(item);
   }
 
   @Override

@@ -109,8 +109,8 @@ public final class JsonXQueryConverter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final Item value) throws QueryException {
-    stack.push(value);
+  public void numberLit(final Item item) throws QueryException {
+    stack.push(item);
   }
 
   @Override
