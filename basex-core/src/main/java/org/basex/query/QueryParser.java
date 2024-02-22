@@ -556,12 +556,12 @@ public class QueryParser extends InputParser {
 
     } else if(eq(qname.uri(), DB_URI)) {
       // project-specific declaration
-      if(sc.module != null) throw error(BASEX_OPTIONS3_X, qname.local());
+      if(sc.module != null) throw error(BASEX_OPTIONSLIB_X, qname.local());
       qc.options.add(name, value, this);
 
     } else if(eq(qname.uri(), BASEX_URI)) {
       // query-specific options
-      if(!name.equals(LOCK)) throw error(BASEX_OPTIONS1_X, name);
+      if(!name.equals(LOCK)) throw error(BASEX_OPTIONSINV_X, name);
       for(final String lock : Locking.queryLocks(value)) qc.locks.add(lock);
     }
     // ignore unknown options
@@ -1912,9 +1912,10 @@ public class QueryParser extends InputParser {
       if(eq(name.prefix(), DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
-        final Option<?> opt = qc.context.options.option(key);
-        if(opt == null) throw error(BASEX_OPTIONS1_X, key);
-        el.add(new DBPragma(name, opt, value));
+        final MainOptions options = qc.context.options;
+        final Option<?> option = options.option(key);
+        if(option == null) throw error(BASEX_OPTIONSINV_X, options.similar(key));
+        el.add(new DBPragma(name, option, value));
       } else if(eq(name.prefix(), BASEX_PREFIX)) {
         // project-specific declaration
         el.add(new BaseXPragma(name, value));

@@ -125,14 +125,14 @@ public final class DbModuleTest extends SandboxTest {
     query("exists(" + _DB_GET.args(NAME, "C3.xml") + ")", true);
 
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X_X);
+        " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'header': ('true', 'false') } }"),
         INVALIDOPTION_X_X_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': 'csv', 'csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS2_X);
+        " map { 'parser': 'csv', 'csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS2_X);
+        " map { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
 
     error(func.args(NAME, " <a/>"), RESINV_X);
     error(func.args(NAME, " <a/>", " ()"), RESINV_X);
@@ -375,13 +375,11 @@ public final class DbModuleTest extends SandboxTest {
 
     // specify unknown or invalid options
     error(func.args(NAME, " ()", " ()", " map { 'xyz': 'abc' }"),
-        BASEX_OPTIONS1_X);
-    error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
 
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
@@ -742,15 +740,14 @@ public final class DbModuleTest extends SandboxTest {
     assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
 
     // check invalid options
-    error(func.args(NAME, false, " map { 'xyz': 'abc' }"), BASEX_OPTIONS1_X);
+    error(func.args(NAME, false, " map { 'xyz': 'abc' }"),
+        BASEX_OPTIONS_X);
     error(func.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
-        BASEX_OPTIONS1_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
 
     // check if optimize call adopts original options
     query(func.args(NAME));

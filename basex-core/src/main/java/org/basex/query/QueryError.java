@@ -46,11 +46,11 @@ public enum QueryError {
   /** Error code. */
   BASEX_STRIP_X(BASEX, "strip", "Duplicate attribute name: %."),
   /** Error code. */
-  BASEX_OPTIONS1_X(BASEX, "options", "Unknown database option: %."),
+  BASEX_OPTIONS_X(BASEX, "options", "%"),
   /** Error code. */
-  BASEX_OPTIONS2_X(BASEX, "options", "%"),
+  BASEX_OPTIONSINV_X(BASEX, "options", "Unknown database option: %."),
   /** Error code. */
-  BASEX_OPTIONS3_X(BASEX, "options", "Database option not allowed in library module: %."),
+  BASEX_OPTIONSLIB_X(BASEX, "options", "Database option not allowed in library module: %."),
   /** Error code. */
   BASEX_OPTIONS_X_X(BASEX, "options", "Database option '%' cannot be set to '%'."),
   /** Error code. */

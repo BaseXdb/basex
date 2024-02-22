@@ -65,7 +65,7 @@ public final class FetchModuleTest extends SandboxTest {
     query(COUNT.args(func.args(CSV,
         " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }") + "//City"), 3);
 
-    error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X_X);
+    error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X);
     error(func.args(XML + 'x'), WHICHRES_X);
     error(func.args("httttp://x"), FETCH_OPEN_X);
   }

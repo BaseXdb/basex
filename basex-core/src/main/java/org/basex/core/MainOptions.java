@@ -188,6 +188,9 @@ public final class MainOptions extends Options {
   /** All parsing options. */
   public static final Option<?>[] PARSING = Stream.concat(Stream.of(XMLPARSING),
       Stream.of(EXTPARSING)).toArray(Option<?>[]::new);
+  /** All create options. */
+  public static final Option<?>[] CREATING = Stream.concat(Stream.of(INDEXING),
+      Stream.of(PARSING)).toArray(Option<?>[]::new);
 
   /** Parser. */
   public enum MainParser {

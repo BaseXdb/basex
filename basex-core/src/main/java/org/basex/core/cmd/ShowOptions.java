@@ -55,7 +55,7 @@ public final class ShowOptions extends Command {
       // retrieve value of specific option
       final String name = args[0].toUpperCase(Locale.ENGLISH);
       final Object value = get(name, context);
-      if(value == null) return error(context.options.error(name));
+      if(value == null) return error(context.options.similar(name));
       out.println(name + COLS + value);
     }
     return true;

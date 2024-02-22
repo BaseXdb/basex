@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Definition of built-in function.
+ * Definition of a built-in function.
  *
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen

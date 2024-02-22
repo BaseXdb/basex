@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -14,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.up.primitives.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
@@ -43,11 +41,7 @@ public final class DBCreate extends NameUpdate {
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBCREATE, name, qc, info);
-    final List<Option<?>> supported = new ArrayList<>();
-    Collections.addAll(supported, MainOptions.INDEXING);
-    Collections.addAll(supported, MainOptions.PARSING);
-
-    final DBOptions dbopts = new DBOptions(qopts, supported, info);
+    final DBOptions dbopts = new DBOptions(qopts, MainOptions.CREATING, info);
     options = dbopts.assignTo(new MainOptions(qc.context.options, false));
     newDocs = new DBNew(qc, options, info, inputs);
   }

@@ -22,18 +22,6 @@ public final class DBOptions {
 
   /**
    * Constructor.
-   * @param options query options
-   * @param supported supported options
-   * @param info input info (can be {@code null})
-   * @throws QueryException query exception
-   */
-  public DBOptions(final HashMap<String, String> options, final List<Option<?>> supported,
-      final InputInfo info) throws QueryException {
-    this(options, supported.toArray(Option<?>[]::new), info);
-  }
-
-  /**
-   * Constructor.
    * @param qopts query options
    * @param supported supported options
    * @param info input info (can be {@code null})
@@ -42,43 +30,18 @@ public final class DBOptions {
   public DBOptions(final HashMap<String, String> qopts, final Option<?>[] supported,
       final InputInfo info) throws QueryException {
 
-    final HashMap<String, Option<?>> support = new HashMap<>();
+    final HashMap<String, Option<?>> options = new HashMap<>();
     for(final Option<?> option : supported) {
-      support.put(option.name().toLowerCase(Locale.ENGLISH), option);
+      options.put(option.name().toLowerCase(Locale.ENGLISH), option);
     }
 
     for(final Entry<String, String> entry : qopts.entrySet()) {
-      final String key = entry.getKey();
-      final Option<?> option = support.get(key);
-      if(option == null) throw BASEX_OPTIONS1_X.get(info, key);
-
-      final String value = entry.getValue();
-      if(option instanceof NumberOption) {
-        final int v = Strings.toInt(value);
-        if(v < 0) throw BASEX_OPTIONS_X_X.get(info, key, value);
-        map.put(option, v);
-      } else if(option instanceof BooleanOption) {
-        final boolean yes = Strings.toBoolean(value);
-        if(!yes && !Strings.no(value)) throw BASEX_OPTIONS_X_X.get(info, key, value);
-        map.put(option, yes);
-      } else if(option instanceof StringOption) {
-        map.put(option, value);
-      } else if(option instanceof EnumOption) {
-        final EnumOption<?> eo = (EnumOption<?>) option;
-        final Object ev = eo.get(value);
-        if(ev == null) throw BASEX_OPTIONS_X_X.get(info, key, value);
-        map.put(option, ev);
-      } else if(option instanceof OptionsOption) {
-        try {
-          final Options o = ((OptionsOption<?>) option).newInstance();
-          o.assign(value);
-          map.put(option, o);
-        } catch(final BaseXException ex) {
-          throw BASEX_OPTIONS2_X.get(info, ex);
-        }
-      } else {
-        throw Util.notExpected();
-      }
+      final String name = entry.getKey();
+      final Option<?> option = options.get(name);
+      if(option == null) throw BASEX_OPTIONS_X.get(info, Options.similar(name, options));
+      final String error = Options.assign(option, entry.getValue(), -1,
+          v -> map.put(option, v), null);
+      if(error != null) throw BASEX_OPTIONS_X.get(info, error);
     }
   }
 

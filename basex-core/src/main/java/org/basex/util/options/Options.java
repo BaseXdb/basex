@@ -1,6 +1,5 @@
 package org.basex.util.options;
 
-import static java.lang.Integer.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
@@ -9,6 +8,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -59,11 +59,11 @@ public class Options implements Iterable<Option<?>> {
   /** Comment in configuration file. */
   private static final String PROPUSER = "# Local Options";
 
-  /** Map with option names and definition. */
-  private final TreeMap<String, Option<?>> options;
+  /** Map with option names and definitions. */
+  private final TreeMap<String, Option<?>> definitions;
   /** Map with option names and values. */
   private final TreeMap<String, Object> values;
-  /** Free option definitions. */
+  /** Free option assignments. */
   private final HashMap<String, String> free;
 
   /** Options, cached from an input file. */
@@ -83,14 +83,14 @@ public class Options implements Iterable<Option<?>> {
    * @param opts options file
    */
   protected Options(final IOFile opts) {
-    options = new TreeMap<>();
+    definitions = new TreeMap<>();
     values = new TreeMap<>();
     free = new HashMap<>();
     try {
       for(final Option<?> opt : options(getClass())) {
         if(opt instanceof Comment) continue;
         final String name = opt.name();
-        options.put(name, opt);
+        definitions.put(name, opt);
         values.put(name, opt.value());
       }
     } catch(final Exception ex) {
@@ -105,7 +105,7 @@ public class Options implements Iterable<Option<?>> {
    */
   @SuppressWarnings("unchecked")
   protected Options(final Options opts) {
-    options = (TreeMap<String, Option<?>>) opts.options.clone();
+    definitions = (TreeMap<String, Option<?>>) opts.definitions.clone();
     values = (TreeMap<String, Object>) opts.values.clone();
     free = (HashMap<String, String>) opts.free.clone();
     user.add(opts.user);
@@ -167,7 +167,7 @@ public class Options implements Iterable<Option<?>> {
    * @return value (can be {@code null})
    */
   public final synchronized Option<?> option(final String name) {
-    return options.get(name);
+    return definitions.get(name);
   }
 
   /**
@@ -368,7 +368,7 @@ public class Options implements Iterable<Option<?>> {
    * @throws BaseXException database exception
    */
   public synchronized void assign(final String name, final String value) throws BaseXException {
-    if(options.isEmpty()) {
+    if(definitions.isEmpty()) {
       free.put(name, value);
     } else {
       assign(name, value, -1, true);
@@ -395,7 +395,7 @@ public class Options implements Iterable<Option<?>> {
     } else {
       throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, name.type, name);
     }
-    if(options.isEmpty()) {
+    if(definitions.isEmpty()) {
       free.put(nm, serialize(value, info));
     } else {
       assign(nm, value, error, info);
@@ -493,7 +493,17 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @return error string
    */
-  public final synchronized String error(final String name) {
+  public final synchronized String similar(final String name) {
+    return similar(name, definitions);
+  }
+
+  /**
+   * Returns an error string for an unknown option.
+   * @param name name of option
+   * @param options options
+   * @return error string
+   */
+  public static final String similar(final String name, final Map<String, Option<?>> options) {
     final Object similar = Levenshtein.similar(token(name),
         options.keySet().toArray(String[]::new));
     return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, name, similar) :
@@ -538,7 +548,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void assign(final MediaType type) throws BaseXException {
     for(final Entry<String, String> entry : type.parameters()) {
-      if(options.isEmpty()) {
+      if(definitions.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
       } else {
         // ignore unknown options
@@ -577,14 +587,14 @@ public class Options implements Iterable<Option<?>> {
    * @return names
    */
   public final synchronized String[] names() {
-    final StringList sl = new StringList(options.size());
+    final StringList sl = new StringList(definitions.size());
     for(final Option<?> option : this) sl.add(option.name());
     return sl.finish();
   }
 
   @Override
   public final synchronized Iterator<Option<?>> iterator() {
-    return options.values().iterator();
+    return definitions.values().iterator();
   }
 
   @Override
@@ -594,7 +604,7 @@ public class Options implements Iterable<Option<?>> {
     values.forEach((name, value) -> {
       if(value != null) {
         final StringList sl = new StringList();
-        final Object value2 = options.get(name).value();
+        final Object value2 = definitions.get(name).value();
         if(value instanceof String[]) {
           for(final String s : (String[]) value) sl.add(s);
         } else if(value instanceof int[]) {
@@ -743,146 +753,162 @@ public class Options implements Iterable<Option<?>> {
   private synchronized void assign(final String name, final Value value, final boolean error,
       final InputInfo info) throws QueryException {
 
-    final Option<?> option = options.get(name);
+    final Option<?> option = definitions.get(name);
     if(option == null) {
-      if(error) throw OPTION_X.get(info, error(name));
+      if(error) throw OPTION_X.get(info, similar(name));
       return;
     }
 
     Object val = null, expected = null;
     final Item item = value.isItem() ? (Item) value : null;
+    final SeqType st = value.seqType();
     if(option instanceof ValueOption) {
-      final SeqType st = ((ValueOption) option).seqType();
-      if(value.seqType().instanceOf(st)) val = value;
-      else expected = st;
-    } else {
-      if(option instanceof BooleanOption) {
-        if(item != null) {
-          if(item.type == AtomType.BOOLEAN) {
-            val = item.bool(info);
-          } else {
-            final String s = string(item.string(info));
-            val = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
-          }
-        }
-        if(val == null) expected = AtomType.BOOLEAN;
-      } else if(option instanceof NumberOption) {
-        if(item != null) val = (int) item.itr(info);
-        else expected = AtomType.INTEGER;
-      } else if(option instanceof StringOption) {
-        val = serialize(value, info);
-      } else if(option instanceof EnumOption) {
-        byte[] token = null;
-        if(item != null) {
-          if(item.type == AtomType.BOOLEAN) {
-            token = item.string(info);
-          } else if(item.type.isNumber()) {
-            final long l = item.itr(info);
-            token = l == 1 ? TRUE : l == 0 ? FALSE : null;
-          } else {
-            token = item.string(info);
-          }
-        }
-        if(token == null) {
-          expected = AtomType.STRING;
+      final SeqType est = ((ValueOption) option).seqType();
+      if(st.instanceOf(est)) val = value;
+      else expected = est;
+    } else if(option instanceof BooleanOption) {
+      if(item != null) {
+        if(st.type == AtomType.BOOLEAN) {
+          val = item.bool(info);
         } else {
-          final EnumOption<?> eo = (EnumOption<?>) option;
-          val = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
-          if(val == null) throw OPTION_X.get(info,
-              allowed(option, string(token), (Object[]) eo.values()));
-        }
-      } else if(option instanceof OptionsOption) {
-        if(item instanceof XQMap) {
-          val = ((OptionsOption<?>) option).newInstance();
-          ((Options) val).assign((XQMap) item, error, info);
-        } else {
-          expected = SeqType.MAP;
+          final String s = string(item.string(info));
+          val = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
         }
       }
+      if(val == null) expected = AtomType.BOOLEAN;
+    } else if(option instanceof NumberOption) {
+      if(item != null) val = (int) item.itr(info);
+      else expected = AtomType.INTEGER;
+    } else if(option instanceof StringOption) {
+      val = serialize(value, info);
+    } else if(option instanceof EnumOption) {
+      byte[] token = null;
+      if(item != null) {
+        if(st.type == AtomType.BOOLEAN || !st.type.isNumber()) {
+          token = item.string(info);
+        } else {
+          final long l = item.itr(info);
+          token = l == 1 ? TRUE : l == 0 ? FALSE : null;
+        }
+      }
+      if(token == null) {
+        expected = AtomType.STRING;
+      } else {
+        final EnumOption<?> eo = (EnumOption<?>) option;
+        val = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
+        if(val == null) throw OPTION_X.get(info,
+            allowed(option, string(token), (Object[]) eo.values()));
+      }
+    } else if(option instanceof OptionsOption) {
+      if(item instanceof XQMap) {
+        val = ((OptionsOption<?>) option).newInstance();
+        ((Options) val).assign((XQMap) item, error, info);
+      } else {
+        expected = SeqType.MAP;
+      }
     }
-    if(expected != null) throw INVALIDOPTION_X_X_X_X.get(info, option.name(),
-        expected, value.seqType(), value);
+    if(expected != null) throw INVALIDOPTION_X_X_X_X.get(info, name, expected, st, value);
     put(option, val);
   }
 
   /**
    * Assigns the specified name and value.
    * @param name name of option
-   * @param value value of option
+   * @param value value to be assigned
    * @param index index (optional, can be {@code -1})
-   * @param error raise error if option is unknown
+   * @param error raise error if the option is unknown
    * @return success flag
    * @throws BaseXException database exception
    */
   private synchronized boolean assign(final String name, final String value, final int index,
       final boolean error) throws BaseXException {
 
-    final Option<?> option = options.get(name);
+    final Option<?> option = definitions.get(name);
     if(option == null) {
-      if(error) throw new BaseXException(error(name));
+      if(error) throw new BaseXException(similar(name));
       return false;
     }
+    final String err = assign(option, value, index, v -> put(option, v), this);
+    if(error && err != null) throw new BaseXException(err);
 
+    return true;
+  }
+
+  /**
+   * Assigns a value to an option.
+   * @param option option
+   * @param value value to be assigned
+   * @param index index (optional, can be {@code -1})
+   * @param assign function to assign the value
+   * @param definitions option definitions (can be {@code null})
+   * @return string or {@code null}
+   */
+  public static String assign(final Option<?> option, final String value, final int index,
+      final Consumer<Object> assign, final Options definitions) {
+
+    final String name = option.name();
     if(option instanceof BooleanOption) {
       final boolean v;
-      if(value == null || value.isEmpty()) {
-        final Boolean b = get((BooleanOption) option);
-        if(b == null) throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), "");
+      if(value.isEmpty() && definitions != null) {
+        final Boolean b = definitions.get((BooleanOption) option);
+        if(b == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, "");
         v = !b;
       } else {
         v = Strings.toBoolean(value);
-        if(!v && !Strings.no(value))
-          throw new BaseXException(Text.OPT_BOOLEAN_X_X, option.name(), value);
+        if(!v && !Strings.no(value)) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
       }
-      put(option, v);
+      assign.accept(v);
     } else if(option instanceof NumberOption) {
       final int v = Strings.toInt(value);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), value);
-      put(option, v);
+      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+      assign.accept(v);
     } else if(option instanceof StringOption) {
-      put(option, value);
+      assign.accept(value);
     } else if(option instanceof EnumOption) {
       final EnumOption<?> eo = (EnumOption<?>) option;
       final Object v = eo.get(value);
-      if(v == null) throw new BaseXException(allowed(option, value, (Object[]) eo.values()));
-      put(option, v);
+      if(v == null) return allowed(option, value, (Object[]) eo.values());
+      assign.accept(v);
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
-      o.assign(value);
-      put(option, o);
-    } else if(option instanceof NumbersOption) {
+      try {
+        o.assign(value);
+      } catch(final BaseXException ex) {
+        Util.debug(ex);
+        return ex.getMessage();
+      }
+      assign.accept(o);
+    } else if(option instanceof NumbersOption && definitions != null) {
       final int v = Strings.toInt(value);
-      if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), value);
-      int[] ii = (int[]) get(option);
+      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+      int[] ii = (int[]) definitions.get(option);
       if(index == -1) {
         if(ii == null) ii = new int[0];
         final IntList il = new IntList(ii.length + 1);
         for(final int i : ii) il.add(i);
-        put(option, il.add(v).finish());
+        assign.accept(il.add(v).finish());
       } else {
-        if(index < 0 || index >= ii.length)
-          throw new BaseXException(Text.OPT_OFFSET_X, option.name());
+        if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
         ii[index] = v;
       }
-    } else if(option instanceof StringsOption) {
-      String[] ss = (String[]) get(option);
+    } else if(option instanceof StringsOption && definitions != null) {
+      String[] ss = (String[]) definitions.get(option);
       if(index == -1) {
         if(ss == null) ss = new String[0];
         final StringList sl = new StringList(ss.length + 1);
         for(final String s : ss) sl.add(s);
-        put(option, sl.add(value).finish());
+        assign.accept(sl.add(value).finish());
       } else if(index == 0) {
-        final int v = Strings.toInt(value);
-        if(v == MIN_VALUE) throw new BaseXException(Text.OPT_NUMBER_X_X, option.name(), value);
-        values.put(name, new String[v]);
+        final int i = Strings.toInt(value);
+        if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+        definitions.values.put(name, new String[i]);
       } else {
-        if(index <= 0 || index > ss.length)
-          throw new BaseXException(Text.OPT_OFFSET_X, option.name());
+        if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
         ss[index - 1] = value;
       }
     } else {
       throw Util.notExpected("Unsupported option: " + option);
     }
-    return true;
+    return null;
   }
 }

@@ -32,25 +32,23 @@ public final class DBOptimize extends DBUpdate {
    * Constructor.
    * @param data data
    * @param all optimize all database structures flag
-   * @param opts query options
+   * @param qopts query options
    * @param qc database context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DBOptimize(final Data data, final boolean all, final HashMap<String, String> opts,
+  public DBOptimize(final Data data, final boolean all, final HashMap<String, String> qopts,
       final QueryContext qc, final InputInfo info) throws QueryException {
 
     super(UpdateType.DBOPTIMIZE, data, info);
     this.all = all;
     this.qc = qc;
 
-    final ArrayList<Option<?>> supported = new ArrayList<>();
-    for(final Option<?> option : MainOptions.INDEXING) {
-      if(all || option != MainOptions.UPDINDEX) supported.add(option);
-    }
+    final Option<?>[] supported = Arrays.stream(MainOptions.INDEXING).
+        filter(c -> all || c != MainOptions.UPDINDEX).toArray(Option<?>[]::new);
 
     // create options, based on global defaults
-    final DBOptions dbopts = new DBOptions(opts, supported, info);
+    final DBOptions dbopts = new DBOptions(qopts, supported, info);
     final MetaData meta = data.meta;
     dbopts.assignIfAbsent(MainOptions.TEXTINDEX, meta.createtext);
     dbopts.assignIfAbsent(MainOptions.ATTRINDEX, meta.createattr);

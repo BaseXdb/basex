@@ -43,8 +43,9 @@ final class QueryOptions {
    */
   void add(final String name, final byte[] value, final QueryParser parser) throws QueryException {
     final String key = name.toUpperCase(Locale.ENGLISH);
-    final Option<?> opt = qc.context.options.option(key);
-    if(opt == null) throw BASEX_OPTIONS1_X.get(parser.info(), name);
+    final MainOptions options = qc.context.options;
+    final Option<?> option = options.option(key);
+    if(option == null) throw BASEX_OPTIONSINV_X.get(parser.info(), options.similar(name));
 
     // try to assign option to dummy options
     if(dummyOptions == null) dummyOptions = new MainOptions(false);
@@ -55,7 +56,7 @@ final class QueryOptions {
       throw BASEX_OPTIONS_X_X.get(parser.info(), key, value);
     }
     // if successful, cache assigned value
-    localOpts.put(opt, dummyOptions.get(opt));
+    localOpts.put(option, dummyOptions.get(option));
   }
 
   /**
