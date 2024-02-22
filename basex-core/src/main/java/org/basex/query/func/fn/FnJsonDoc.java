@@ -77,7 +77,7 @@ public class FnJsonDoc extends Parse {
 
     final JsonConverter jc = JsonConverter.get(options);
     final Value fallback = options.get(JsonParserOptions.FALLBACK);
-    if(fallback != null) {
+    if(!fallback.isEmpty()) {
       final FItem fb = toFunction(fallback, 1, qc);
       jc.fallback(s -> fb.invoke(qc, info, Str.get(s)).item(qc, info).string(info));
       if(options.get(JsonParserOptions.ESCAPE)) {
@@ -85,7 +85,7 @@ public class FnJsonDoc extends Parse {
       }
     }
     final Value numberParser = options.get(JsonParserOptions.NUMBER_PARSER);
-    if(numberParser != null) {
+    if(!numberParser.isEmpty()) {
       final FItem np = toFunction(numberParser, 1, qc);
       jc.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
     }

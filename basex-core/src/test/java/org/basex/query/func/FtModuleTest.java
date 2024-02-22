@@ -65,8 +65,8 @@ public final class FtModuleTest extends SandboxTest {
         " map { 'mode': 'all words', 'window': map { 'size': 3 } }"), true);
 
     // check buggy options
-    error(func.args("x", "x", " map { 'x': 'y' }"), INVALIDOPT_X);
-    error(func.args("x", "x", " map { 'mode': '' }"), INVALIDOPT_X);
+    error(func.args("x", "x", " map { 'x': 'y' }"), OPTION_X);
+    error(func.args("x", "x", " map { 'mode': '' }"), OPTION_X);
     error(func.args("x", "x", " 1"), MAP_X_X);
   }
 
@@ -188,8 +188,8 @@ public final class FtModuleTest extends SandboxTest {
         "Databases and XML");
 
     // check buggy options
-    error(func.args(NAME, "x", " map { 'x': 'y' }"), INVALIDOPT_X);
-    error(func.args(NAME, "x", " map { 'mode': '' }"), INVALIDOPT_X);
+    error(func.args(NAME, "x", " map { 'x': 'y' }"), OPTION_X);
+    error(func.args(NAME, "x", " map { 'mode': '' }"), OPTION_X);
     error(func.args(NAME, "x", " 1"), MAP_X_X);
   }
 

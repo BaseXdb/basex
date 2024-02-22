@@ -1,5 +1,6 @@
 package org.basex.build.json;
 
+import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -14,9 +15,10 @@ public final class JsonParserOptions extends JsonOptions {
   /** Option: liberal parsing (parse-json, json-to-xml). */
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
   /** Option: fallback function (parse-json, json-to-xml). */
-  public static final FuncOption FALLBACK = new FuncOption("fallback");
+  public static final ValueOption FALLBACK = new ValueOption("fallback", SeqType.FUNCTION_ZO);
   /** Option: number-parser function (parse-json, json-to-xml). */
-  public static final FuncOption NUMBER_PARSER = new FuncOption("number-parser");
+  public static final ValueOption NUMBER_PARSER =
+      new ValueOption("number-parser", SeqType.FUNCTION_ZO);
   /** Option: handle duplicates (parse-json, json-to-xml). */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.class);

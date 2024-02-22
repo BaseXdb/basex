@@ -237,13 +237,7 @@ public interface Text {
   /** Options error. */
   String OPT_NUMBER_X_X = "Invalid '%' value '%'; expected: number.";
   /** Options error. */
-  String OPT_MAP_X_X = "Invalid '%' value '%'; expected: a map.";
-  /** Options error. */
-  String OPT_FUNC_X_X = "Invalid '%' value '%'; expected: a function.";
-  /** Options error. */
   String OPT_ONEOF_X_X_X = "Invalid '%' value '%'; expected: one of %.";
-  /** Options error. */
-  String OPT_EXPECT_X_X_X = "% expected, % found: %.";
 
   /** "log". */
   String PLOTLOG = "log";

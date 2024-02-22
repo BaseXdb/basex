@@ -1,5 +1,7 @@
 package org.basex.build.csv;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -68,22 +70,14 @@ public class CsvOptions extends Options {
   @Override
   public synchronized void assign(final String name, final String value) throws BaseXException {
     super.assign(name, value);
-    check();
+    if(separator() == -1) throw new BaseXException("Invalid separator: '%'", get(SEPARATOR));
   }
 
   @Override
   public synchronized void assign(final Item name, final Value value, final boolean error,
-      final InputInfo info) throws BaseXException, QueryException {
+      final InputInfo info) throws QueryException {
     super.assign(name, value, error, info);
-    check();
-  }
-
-  /**
-   * Checks the separator character.
-   * @throws BaseXException database exception
-   */
-  private void check() throws BaseXException {
-    if(separator() == -1) throw new BaseXException("Invalid separator: '%'", get(SEPARATOR));
+    if(separator() == -1) throw OPTION_X.get(info, "Invalid separator: '%'", get(SEPARATOR));
   }
 
   /**

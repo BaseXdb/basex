@@ -68,7 +68,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'format': 'rar' }"),
         ARCHIVE_FORMAT);
     // unknown option
-    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'x': 'y' }"), INVALIDOPT_X);
+    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'x': 'y' }"), OPTION_X);
     error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'format': 'xxx' }"),
         ARCHIVE_FORMAT);
     // algorithm not supported

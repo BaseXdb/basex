@@ -154,7 +154,7 @@ public final class JsonModuleTest extends SandboxTest {
         " map { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
         "9\n10");
 
-    error(func.args("42", " map { 'spec': 'garbage' }"), INVALIDOPT_X);
+    error(func.args("42", " map { 'spec': 'garbage' }"), OPTION_X);
   }
 
   /** Test method. */

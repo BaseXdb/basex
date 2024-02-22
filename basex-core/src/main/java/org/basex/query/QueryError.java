@@ -1144,6 +1144,12 @@ public enum QueryError {
   FUNCNOTUP_X(XPTY, 4, "Function is not updating: %."),
   /** Error code. */
   UNKNOWNOP_X(XPTY, 4, "Unknown operator: %."),
+  /** Error code. */
+  INVALIDOPTION_X_X_X_X(XPTY, 4, "Option %: % expected, % found: %."),
+  /** Error code. */
+  INVALIDOPTION_X_X_X(XPTY, 4, "Option: % expected, % found: %."),
+  /** Error code. */
+  OPTION_X(XPTY, 4, "%"),
 
   /** Error code. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),

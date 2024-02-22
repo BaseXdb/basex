@@ -94,6 +94,8 @@ public final class SeqType {
   public static final SeqType QNAME_O = QNAME.seqType();
   /** Zero or one QNames. */
   public static final SeqType QNAME_ZO = QNAME.seqType(ZERO_OR_ONE);
+  /** Zero or more QNames. */
+  public static final SeqType QNAME_ZM = QNAME.seqType(ZERO_OR_MORE);
 
   /** Single xs:boolean. */
   public static final SeqType BOOLEAN_O = BOOLEAN.seqType();

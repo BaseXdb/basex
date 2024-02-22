@@ -1,6 +1,7 @@
 package org.basex.util.options;
 
 import static java.lang.Integer.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
@@ -17,7 +18,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -234,12 +234,12 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns the requested function.
+   * Returns the requested value.
    * @param option option to be found
    * @return value or {@code null})
    */
-  public final synchronized FuncItem get(final FuncOption option) {
-    return (FuncItem) get((Option<?>) option);
+  public final synchronized Value get(final ValueOption option) {
+    return (Value) get((Option<?>) option);
   }
 
   /**
@@ -382,11 +382,10 @@ public class Options implements Iterable<Option<?>> {
    * @param value value to be assigned
    * @param error raise error if a supplied option is unknown
    * @param info input info (can be {@code null})
-   * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   public synchronized void assign(final Item name, final Value value, final boolean error,
-      final InputInfo info) throws BaseXException, QueryException {
+      final InputInfo info) throws QueryException {
 
     final String nm;
     if(name instanceof QNm) {
@@ -394,58 +393,42 @@ public class Options implements Iterable<Option<?>> {
     } else if(name.type.isStringOrUntyped()) {
       nm = string(name.string(info));
     } else {
-      throw new BaseXException(Text.OPT_EXPECT_X_X_X, AtomType.STRING, name.type, name);
+      throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, name.type, name);
     }
-
-    final Item item;
-    if(value.isItem()) {
-      // single item: convert QName to string
-      item = value instanceof QNm ? Str.get(((QNm) value).internal()) : (Item) value;
-    } else if(value.size() > 1) {
-      // multiple items: create string representation
-      final TokenBuilder tb = new TokenBuilder();
-      for(final Item it : value) {
-        if(!tb.isEmpty()) tb.add(' ');
-        tb.add(serialize(it, info));
-      }
-      item = Str.get(tb.finish());
-    } else {
-      throw new BaseXException(Text.OPT_EXPECT_X_X_X, SeqType.ITEM_O, value.seqType(), value);
-    }
-
     if(options.isEmpty()) {
-      free.put(nm, serialize(item, info));
+      free.put(nm, serialize(value, info));
     } else {
-      assign(nm, item, error, info);
+      assign(nm, value, error, info);
     }
   }
 
   /**
-   * Creates a string representation of the specified item.
-   * @param item item
+   * Creates a string representation of the specified value.
+   * @param value value
    * @param info input info (can be {@code null})
    * @return string
-   * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private static String serialize(final Item item, final InputInfo info)
-      throws BaseXException, QueryException {
-
+  private static String serialize(final Value value, final InputInfo info) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    if(item instanceof XQMap) {
-      final XQMap map = (XQMap) item;
+    if(value instanceof XQMap) {
+      final XQMap map = (XQMap) value;
       for(final Item key : map.keys()) {
         if(!tb.isEmpty()) tb.add(',');
         tb.add(key.string(info)).add('=');
         final Value val = map.get(key, info);
-        if(!val.isItem()) throw new BaseXException(
-            Text.OPT_EXPECT_X_X_X, AtomType.STRING, val.seqType(), val);
+        if(!val.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, val.seqType(), val);
         tb.add(string(((Item) val).string(info)).replace(",", ",,"));
       }
-    } else if(item instanceof QNm) {
-      tb.add(((QNm) item).internal());
+    } else if(value instanceof QNm) {
+      tb.add(((QNm) value).internal());
+    } else if(value instanceof Item) {
+      tb.add(((Item) value).string(info));
     } else {
-      tb.add(item.string(info));
+      for(final Item item : value) {
+        if(!tb.isEmpty()) tb.add(' ');
+        tb.add(item.string(info));
+      }
     }
     return tb.toString();
   }
@@ -580,12 +563,10 @@ public class Options implements Iterable<Option<?>> {
    * @param map map
    * @param error raise error if a supplied option is unknown
    * @param info input info (can be {@code null})
-   * @throws BaseXException database exception
    * @throws QueryException query exception
    */
   public final synchronized void assign(final XQMap map, final boolean error, final InputInfo info)
-      throws BaseXException, QueryException {
-
+      throws QueryException {
     for(final Item name : map.keys()) {
       assign(name, map.get(name, info), error, info);
     }
@@ -754,71 +735,73 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Assigns the specified name and value.
    * @param name name of option
-   * @param item value to be assigned
+   * @param value value to be assigned
    * @param error raise error if option is unknown
    * @param info input info (can be {@code null})
-   * @throws BaseXException database exception
    * @throws QueryException query exception
    */
-  private synchronized void assign(final String name, final Item item, final boolean error,
-      final InputInfo info) throws BaseXException, QueryException {
+  private synchronized void assign(final String name, final Value value, final boolean error,
+      final InputInfo info) throws QueryException {
 
     final Option<?> option = options.get(name);
     if(option == null) {
-      if(error) throw new BaseXException(error(name));
+      if(error) throw OPTION_X.get(info, error(name));
       return;
     }
 
     Object val = null, expected = null;
-    final Type type = item.type;
-    if(option instanceof BooleanOption) {
-      if(type == AtomType.BOOLEAN) {
-        val = item.bool(info);
-      } else {
-        final String s = string(item.string(info));
-        val = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
-      }
-      if(val == null) expected = Text.OPT_BOOLEAN_X_X;
-    } else if(option instanceof NumberOption) {
-      val = (int) item.itr(info);
-    } else if(option instanceof StringOption) {
-      val = serialize(item, info);
-    } else if(option instanceof EnumOption) {
-      byte[] token;
-      if(type == AtomType.BOOLEAN) {
-        token = item.string(info);
-      } else if(type.isNumber()) {
-        final long l = item.itr(info);
-        token = l == 1 ? TRUE : l == 0 ? FALSE : null;
-      } else {
-        token = item.string(info);
-      }
-      if(token == null) {
-        expected = Text.OPT_BOOLEAN_X_X;
-      } else {
-        final EnumOption<?> eo = (EnumOption<?>) option;
-        val = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
-        if(val == null) throw new BaseXException(allowed(option, string(token),
-            (Object[]) eo.values()));
-      }
-    } else if(option instanceof OptionsOption) {
-      if(item instanceof XQMap) {
-        val = ((OptionsOption<?>) option).newInstance();
-        ((Options) val).assign((XQMap) item, error, info);
-      } else {
-        expected = Text.OPT_MAP_X_X;
-      }
-    } else if(option instanceof FuncOption) {
-      if(item instanceof FuncItem) {
-        val = item;
-      } else {
-        expected = Text.OPT_FUNC_X_X;
-      }
+    final Item item = value.isItem() ? (Item) value : null;
+    if(option instanceof ValueOption) {
+      final SeqType st = ((ValueOption) option).seqType();
+      if(value.seqType().instanceOf(st)) val = value;
+      else expected = st;
     } else {
-      throw Util.notExpected("Unsupported option: " + option);
+      if(option instanceof BooleanOption) {
+        if(item != null) {
+          if(item.type == AtomType.BOOLEAN) {
+            val = item.bool(info);
+          } else {
+            final String s = string(item.string(info));
+            val = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
+          }
+        }
+        if(val == null) expected = AtomType.BOOLEAN;
+      } else if(option instanceof NumberOption) {
+        if(item != null) val = (int) item.itr(info);
+        else expected = AtomType.INTEGER;
+      } else if(option instanceof StringOption) {
+        val = serialize(value, info);
+      } else if(option instanceof EnumOption) {
+        byte[] token = null;
+        if(item != null) {
+          if(item.type == AtomType.BOOLEAN) {
+            token = item.string(info);
+          } else if(item.type.isNumber()) {
+            final long l = item.itr(info);
+            token = l == 1 ? TRUE : l == 0 ? FALSE : null;
+          } else {
+            token = item.string(info);
+          }
+        }
+        if(token == null) {
+          expected = AtomType.STRING;
+        } else {
+          final EnumOption<?> eo = (EnumOption<?>) option;
+          val = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
+          if(val == null) throw OPTION_X.get(info,
+              allowed(option, string(token), (Object[]) eo.values()));
+        }
+      } else if(option instanceof OptionsOption) {
+        if(item instanceof XQMap) {
+          val = ((OptionsOption<?>) option).newInstance();
+          ((Options) val).assign((XQMap) item, error, info);
+        } else {
+          expected = SeqType.MAP;
+        }
+      }
     }
-
-    if(expected != null) throw new BaseXException(expected.toString(), option.name(), item);
+    if(expected != null) throw INVALIDOPTION_X_X_X_X.get(info, option.name(),
+        expected, value.seqType(), value);
     put(option, val);
   }
 

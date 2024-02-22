@@ -128,7 +128,7 @@ public final class DbModuleTest extends SandboxTest {
         " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X_X);
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'header': ('true', 'false') } }"),
-        INVALIDOPT_X);
+        INVALIDOPTION_X_X_X);
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS2_X);
     error(func.args(NAME, CSV, "csv.xml",

@@ -21,7 +21,6 @@ public final class FnDeepEqual extends StandardFunc {
     final Iter iter1 = arg(0).iter(qc), iter2 = arg(1).iter(qc);
     final Collation collation = toCollation(arg(2), qc);
     final DeepEqualOptions options = toOptions(arg(3), new DeepEqualOptions(), false, qc);
-    options.finish(sc);
 
     return Bln.get(new DeepEqual(info, collation, qc, options).equal(iter1, iter2));
   }
