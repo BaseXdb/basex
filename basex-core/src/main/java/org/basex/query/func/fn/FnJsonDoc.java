@@ -89,6 +89,7 @@ public class FnJsonDoc extends Parse {
       final FItem np = toFunction(numberParser, 1, qc);
       jc.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
     }
+    jc.nullValue(options.get(JsonParserOptions.NULL));
     return jc;
   }
 }

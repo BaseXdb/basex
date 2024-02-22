@@ -22,6 +22,8 @@ public final class JsonParserOptions extends JsonOptions {
   /** Option: handle duplicates (parse-json, json-to-xml). */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.class);
+  /** Option: null item (parse-json). */
+  public static final ValueOption NULL = new ValueOption("null", SeqType.ITEM_ZM);
   /** Option: validation (json-to-xml). */
   public static final BooleanOption VALIDATE = new BooleanOption("validate", false);
   /** Option: encoding (custom). */

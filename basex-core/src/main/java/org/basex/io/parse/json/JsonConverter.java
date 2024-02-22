@@ -7,7 +7,9 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Interface for converters from JSON to XQuery values.
@@ -25,6 +27,8 @@ public abstract class JsonConverter {
   protected QueryFunction<byte[], byte[]> fallback;
   /** Number parser function. */
   protected QueryFunction<byte[], Item> numberParser;
+  /** Null value. */
+  protected Value nullValue = Empty.VALUE;
 
   /**
    * Constructor.
@@ -37,21 +41,25 @@ public abstract class JsonConverter {
   /**
    * Assigns a fallback function for invalid characters.
    * @param func fallback function
-   * @return self reference
    */
-  public final JsonConverter fallback(final QueryFunction<byte[], byte[]> func) {
+  public final void fallback(final QueryFunction<byte[], byte[]> func) {
     fallback = func;
-    return this;
   }
 
   /**
    * Assigns a number parser function.
    * @param func number parser function
-   * @return self reference
    */
-  public final JsonConverter numberParser(final QueryFunction<byte[], Item> func) {
+  public final void numberParser(final QueryFunction<byte[], Item> func) {
     numberParser = func;
-    return this;
+  }
+
+  /**
+   * Assigns a value for 'null' values.
+   * @param item null value
+   */
+  public final void nullValue(final Value item) {
+    nullValue = item;
   }
 
   /**

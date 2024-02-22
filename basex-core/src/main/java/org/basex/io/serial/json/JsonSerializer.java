@@ -24,6 +24,9 @@ import org.basex.util.options.Options.YesNo;
  * @author Christian Gruen
  */
 public abstract class JsonSerializer extends StandardSerializer {
+  /** QName: xml:base. */
+  private static final QNm FN_NULL = new QNm(JsonConstants.NULL, QueryText.FN_URI);
+
   /** JSON options. */
   final JsonSerialOptions jopts;
   /** Escape special characters. */
@@ -52,7 +55,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   @Override
   public void serialize(final Item item) throws IOException {
     if(sep) throw SERJSON.getIO();
-    if(item == null) {
+    if(item == null || item instanceof QNm && ((QNm) item).eq(FN_NULL)) {
       out.print(JsonConstants.NULL);
     } else {
       super.serialize(item);
