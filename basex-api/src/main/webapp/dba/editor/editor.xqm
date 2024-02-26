@@ -53,7 +53,8 @@ function dba:editor(
             intersperse((
               <input type='text' id='file' name='file' placeholder='Name of file'
                      list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
-              <button type='submit' name='open' id='open' disabled='' onclick='openFile()'>Open</button>,
+              <button type='submit' name='open' id='open' disabled=''
+                      onclick='openFile()'>Open</button>,
               <button name='save' id='save' disabled='' onclick='saveFile()'>Save</button>,
               <button name='close' id='close' disabled='' onclick='closeFile()'>Close</button>,
               <span>  </span>,

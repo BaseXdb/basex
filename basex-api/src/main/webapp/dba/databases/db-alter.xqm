@@ -83,6 +83,8 @@ function dba:db-alter(
     ),
     utils:redirect($dba:SUB, map { 'name': $newname, 'info': 'Database was renamed.' })
   } catch * {
-    utils:redirect('db-alter', map { 'name': $name, 'newname': $newname, 'error': $err:description })
+    utils:redirect('db-alter', map {
+      'name': $name, 'newname': $newname, 'error': $err:description
+    })
   }
 };
