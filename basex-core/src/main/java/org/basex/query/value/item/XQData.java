@@ -68,8 +68,8 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
-      final boolean optimize) throws QueryException {
+  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
+      final InputInfo ii) throws QueryException {
     if(instanceOf(ft)) return this;
     throw typeError(this, ft, ii);
   }

@@ -108,7 +108,7 @@ public final class QueryStack {
    */
   public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
     final int pos = start + var.slot;
-    stack[pos] = var.checkType(value, qc, false);
+    stack[pos] = var.checkType(value, qc, null);
     vars[pos] = var;
   }
 

@@ -210,15 +210,15 @@ public final class Var extends ExprInfo {
    * Checks the type of this value and casts/promotes it when necessary.
    * @param value value to be checked
    * @param qc query context
-   * @param opt if the result should be optimized
+   * @param cc compilation context (can be {@code null})
    * @return checked and possibly cast value
    * @throws QueryException if the check failed
    */
-  public Value checkType(final Value value, final QueryContext qc, final boolean opt)
+  public Value checkType(final Value value, final QueryContext qc, final CompileContext cc)
       throws QueryException {
 
     if(declType == null || declType.instance(value)) return value;
-    if(coerce) return declType.coerce(value, name, qc, sc, info, opt);
+    if(coerce) return declType.coerce(value, name, qc, sc, cc, info);
     throw typeError(value, declType, name, info, false);
   }
 

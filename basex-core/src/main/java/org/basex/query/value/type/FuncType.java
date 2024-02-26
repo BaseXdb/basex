@@ -97,7 +97,7 @@ public class FuncType implements Type {
 
     if(!(item instanceof FItem)) throw typeError(item, this, info);
     final FItem func = (FItem) item;
-    return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, info, false);
+    return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, null, info);
   }
 
   @Override

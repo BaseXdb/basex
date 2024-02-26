@@ -83,7 +83,7 @@ public class TypeCheck extends Single {
     // function item coercion
     if(expr instanceof FuncItem && type instanceof FuncType) {
       if(!st.occ.check(1)) throw error(expr, st);
-      return cc.replaceWith(this, ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, info, true));
+      return cc.replaceWith(this, ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, cc, info));
     }
 
     // pre-evaluate (check value and result size)
@@ -150,7 +150,7 @@ public class TypeCheck extends Single {
             items.add(item);
           } else {
             if(!coerce) throw error(expr, st);
-            st.coerce(item, null, items, qc, sc, info, false);
+            st.coerce(item, null, items, qc, sc, null, info);
           }
         }
 
@@ -175,7 +175,7 @@ public class TypeCheck extends Single {
 
     // check occurrence indicator and item type
     if(st.instance(value)) return value;
-    if(coerce) return st.coerce(value, null, qc, sc, info, false);
+    if(coerce) return st.coerce(value, null, qc, sc, null, info);
     throw error(value, st);
   }
 

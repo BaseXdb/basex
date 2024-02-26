@@ -67,12 +67,12 @@ public abstract class FItem extends Item implements XQFunction {
    * Converts this function item to the given function type.
    * @param ft function type
    * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
    * @param ii input info (can be {@code null})
-   * @param optimize optimize resulting item
    * @return coerced item
    * @throws QueryException query exception
    */
-  public abstract FItem coerceTo(FuncType ft, QueryContext qc, InputInfo ii, boolean optimize)
+  public abstract FItem coerceTo(FuncType ft, QueryContext qc, CompileContext cc, InputInfo ii)
       throws QueryException;
 
   @Override

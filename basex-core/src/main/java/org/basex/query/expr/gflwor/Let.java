@@ -73,7 +73,7 @@ public final class Let extends ForLet {
     }
     // coerce at compile time
     if(expr instanceof Value) {
-      expr = var.checkType((Value) expr, cc.qc, true);
+      expr = var.checkType((Value) expr, cc.qc, cc);
     }
 
     // assign type to clause and variable
