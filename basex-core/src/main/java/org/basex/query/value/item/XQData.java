@@ -76,12 +76,12 @@ public abstract class XQData extends FItem {
     // create a coerced function:
     //    function($key as ft.argTypes[0]) as ft.declType {XQData.this ? $key coerce to ft.declType}
 
+    if(ft.argTypes.length != 1) throw arityError(this, 1, ft.argTypes.length, true, ii);
     final Var[] params = { new VarScope(sc).addNew(paramName(0), ft.argTypes[0], true, qc, ii)};
     final VarRef param = new VarRef(ii, params[0]);
     final Lookup lookup = new Lookup(ii, this, param);
     final TypeCheck check = new TypeCheck(ii, sc, lookup, ft.declType, true);
     final FItem fItem = new FuncItem(ii, check, params, annotations(), ft, sc, params.length, null);
-    if(ft.argTypes.length != 1) throw arityError(fItem, 1, ft.argTypes.length, true, ii);
     return fItem;
   }
 
