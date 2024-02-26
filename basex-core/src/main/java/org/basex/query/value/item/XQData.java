@@ -82,7 +82,6 @@ public abstract class XQData extends FItem {
     final Lookup lookup = new Lookup(ii, this, param);
     final TypeCheck check = new TypeCheck(ii, lookup, ft.declType, true);
     final FItem fItem = new FuncItem(ii, check, params, annotations(), ft, sc, params.length, null);
-    if(ft.argTypes.length != 1) throw arityError(fItem, 1, ft.argTypes.length, true, ii);
     return fItem;
   }
 
