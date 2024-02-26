@@ -71,19 +71,6 @@ public abstract class XQData extends FItem {
   @Override
   public final FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
-
-//    final int arity = arity(), nargs = ft.argTypes.length;
-//    if(nargs < arity) throw arityError(this, arity, nargs, false, ii);
-//
-//    // optimize: continue with coercion if current type is only an instance of new type
-//    FuncType tp = funcType();
-//    if(cc != null ? tp.eq(ft) : tp.instanceOf(ft)) return this;
-//    //if(instanceOf(ft)) return this;
-//
-//    // create a coerced function:
-//    //    fn($key as ft.argTypes[0]) as ft.declType {XQData.this($key) coerce to ft.declType}
-//    final StaticContext sc = cc != null ? cc.sc() : new StaticContext(qc);
-
     if(instanceOf(ft)) return this;
 
     // create a coerced function:
