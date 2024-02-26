@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -69,18 +70,19 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final StaticContext sc,
-      final InputInfo ii, final boolean optimize) throws QueryException {
+  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
+      final InputInfo ii) throws QueryException {
     if(instanceOf(ft)) return this;
 
     // create a coerced function:
     //    function($key as ft.argTypes[0]) as ft.declType {XQData.this ? $key coerce to ft.declType}
 
     if(ft.argTypes.length != 1) throw arityError(this, 1, ft.argTypes.length, true, ii);
+    final StaticContext sc = new StaticContext(qc);
     final Var[] params = { new VarScope(sc).addNew(paramName(0), ft.argTypes[0], true, qc, ii)};
     final VarRef param = new VarRef(ii, params[0]);
-    final Lookup lookup = new Lookup(ii, this, param);
-    final TypeCheck check = new TypeCheck(ii, sc, lookup, ft.declType, true);
+    final FuncCall call = new DynFuncCall(ii, sc, this, param);
+    final TypeCheck check = new TypeCheck(ii, sc, call, ft.declType, true);
     final FItem fItem = new FuncItem(ii, check, params, annotations(), ft, sc, params.length, null);
     return fItem;
   }

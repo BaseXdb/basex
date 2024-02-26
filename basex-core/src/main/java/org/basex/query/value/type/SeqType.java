@@ -384,13 +384,13 @@ public final class SeqType {
    * @param name variable name (can be {@code null})
    * @param qc query context
    * @param sc static context
+   * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
-   * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value coerce(final Value value, final QNm name, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
+      final StaticContext sc, final CompileContext cc, final InputInfo info) throws QueryException {
 
     final long size = value.size();
     ItemList items = null;
@@ -404,7 +404,7 @@ public final class SeqType {
           items = new ItemList(Seq.initialCapacity(size));
           for(int j = 0; j < i; j++) items.add(value.itemAt(j));
         }
-        coerce(item, name, items, qc, sc, info, opt);
+        coerce(item, name, items, qc, sc, cc, info);
       }
     }
     final long is = items != null ? items.size() : value.size();
@@ -419,12 +419,12 @@ public final class SeqType {
    * @param items item cache
    * @param qc query context
    * @param sc static context
+   * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
-   * @param opt if the result should be optimized
    * @throws QueryException query exception
    */
   public void coerce(final Item item, final QNm name, final ItemList items, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
+      final StaticContext sc, final CompileContext cc, final InputInfo info) throws QueryException {
 
     if(type instanceof AtomType) {
       final Iter iter = item.atomValue(qc, info).iter();
@@ -449,7 +449,7 @@ public final class SeqType {
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
-      items.add(((FItem) item).coerceTo((FuncType) type, qc, sc, info, opt));
+      items.add(((FItem) item).coerceTo((FuncType) type, qc, cc, info));
     } else {
       throw typeError(item, with(EXACTLY_ONE), name, info, true);
     }

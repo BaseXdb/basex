@@ -164,7 +164,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         Expr inline = null;
         if(ex instanceof Value) {
           // values are always inlined into the closure
-          inline = var.checkType((Value) ex, cc.qc, true);
+          inline = var.checkType((Value) ex, cc.qc, cc);
         } else if(ex instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
           final Closure cl = (Closure) ex;
@@ -304,7 +304,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // we can type check immediately
       final Value value = (Value) body;
       checked = declType.instance(value) ? value :
-        declType.coerce(value, name, qc, vs.sc, info, false);
+        declType.coerce(value, name, qc, vs.sc, null, info);
     } else {
       // check at each call: reject impossible arities
       if(argType.type.instanceOf(declType.type) && argType.occ.intersect(declType.occ) == null &&

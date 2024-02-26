@@ -303,7 +303,7 @@ public abstract class StandardFunc extends Arr {
     final FuncType newType = FuncType.get(newDecl, newArgTypes);
 
     // new type is more specific: coerce to new function type
-    return !newType.eq(oldType) ? func.coerceTo(newType, cc.qc, sc, info, true) : expr;
+    return !newType.eq(oldType) ? func.coerceTo(newType, cc.qc, cc, info) : expr;
   }
 
   /**

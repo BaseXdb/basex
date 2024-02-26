@@ -137,18 +137,17 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final StaticContext stc,
-      final InputInfo ii, final boolean optimize) throws QueryException {
+  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
+      final InputInfo ii) throws QueryException {
 
     final int arity = arity(), nargs = ft.argTypes.length;
     if(nargs < arity) throw arityError(this, arity, nargs, false, info);
 
     // optimize: continue with coercion if current type is only an instance of new type
     FuncType tp = funcType();
-    if(optimize ? tp.eq(ft) : tp.instanceOf(ft)) return this;
+    if(cc != null ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
     // create new compilation context and variable scope
-    final CompileContext cc = new CompileContext(qc, false);
     final VarScope vs = new VarScope(sc);
     final Var[] vars = new Var[arity];
     final Expr[] args = new Expr[arity];
@@ -156,26 +155,31 @@ public final class FuncItem extends FItem implements Scope {
       vars[a] = vs.addNew(params[a].name, ft.argTypes[a], true, qc, info);
       args[a] = new VarRef(info, vars[a]).optimize(cc);
     }
-    cc.pushScope(vs);
 
-    // create new function call (will immediately be inlined/simplified when being optimized)
-    final boolean updating = anns != null && anns.contains(Annotation.UPDATING) ||
-        expr.has(Flag.UPD);
-    Expr body = new DynFuncCall(info, sc, updating, false, this, args);
-    if(optimize) body = body.optimize(cc);
+    try {
+      if(cc != null) cc.pushScope(vs);
 
-    // add type check if return types differ
-    final SeqType dt = ft.declType;
-    if(!tp.declType.instanceOf(dt)) {
-      body = new TypeCheck(info, sc, body, dt, true);
-      if(optimize) body = body.optimize(cc);
+      // create new function call (will immediately be inlined/simplified when being optimized)
+      final boolean updating = anns != null && anns.contains(Annotation.UPDATING) ||
+          expr.has(Flag.UPD);
+      Expr body = new DynFuncCall(info, sc, updating, false, this, args);
+      if(cc != null) body = body.optimize(cc);
+
+      // add type check if return types differ
+      final SeqType dt = ft.declType;
+      if(!tp.declType.instanceOf(dt)) {
+        body = new TypeCheck(info, sc, body, dt, true);
+        if(cc != null) body = body.optimize(cc);
+      }
+
+      // adopt type of optimized body if it is more specific than passed on type
+      final SeqType bt = body.seqType();
+      tp = cc != null && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
+      body.markTailCalls(null);
+      return new FuncItem(info, body, vars, anns, tp, sc, vs.stackSize(), name);
+    } finally {
+      if(cc != null) cc.removeScope();
     }
-
-    // adopt type of optimized body if it is more specific than passed on type
-    final SeqType bt = body.seqType();
-    tp = optimize && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
-    body.markTailCalls(null);
-    return new FuncItem(info, body, vars, anns, tp, sc, vs.stackSize(), name);
   }
 
   @Override
