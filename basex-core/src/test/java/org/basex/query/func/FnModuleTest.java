@@ -611,6 +611,14 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" ('a', <a/>)", " function($s as xs:string) as xs:boolean? { $s = 'a' }"), "a",
         exists(IterFilter.class));
 
+    check(func.args(9, " map{9:true()}"), 9);
+    check(func.args(9, " map{9:false()}"), null);
+    error(func.args(9, " map{9:()}"), INVCONVERT_X_X_X);
+
+    check(func.args(1, " [true()]"), 1);
+    check(func.args(1, " [false()]"), null);
+    error(func.args(1, " [()]"), INVCONVERT_X_X_X);
+
     inline(true);
     check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", root(List.class));
     check(func.args(" <a/>", " boolean#1"), "<a/>", root(CElem.class));

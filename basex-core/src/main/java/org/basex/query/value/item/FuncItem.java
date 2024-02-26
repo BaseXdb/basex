@@ -137,8 +137,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
-      final boolean optimize) throws QueryException {
+  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final StaticContext stc,
+      final InputInfo ii, final boolean optimize) throws QueryException {
 
     final int arity = arity(), nargs = ft.argTypes.length;
     if(nargs < arity) throw arityError(this, arity, nargs, false, info);

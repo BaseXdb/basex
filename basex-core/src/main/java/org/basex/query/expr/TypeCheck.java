@@ -83,7 +83,8 @@ public class TypeCheck extends Single {
     // function item coercion
     if(expr instanceof FuncItem && type instanceof FuncType) {
       if(!st.occ.check(1)) throw error(expr, st);
-      return cc.replaceWith(this, ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, info, true));
+      return cc.replaceWith(this,
+          ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, sc, info, true));
     }
 
     // pre-evaluate (check value and result size)

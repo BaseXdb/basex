@@ -449,7 +449,7 @@ public final class SeqType {
         }
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
-      items.add(((FItem) item).coerceTo((FuncType) type, qc, info, opt));
+      items.add(((FItem) item).coerceTo((FuncType) type, qc, sc, info, opt));
     } else {
       throw typeError(item, with(EXACTLY_ONE), name, info, true);
     }
