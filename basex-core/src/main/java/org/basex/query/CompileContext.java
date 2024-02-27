@@ -239,7 +239,7 @@ public final class CompileContext {
 
   /**
    * Returns the current static context.
-   * @return static context
+   * @return static context (can be {@code null})
    */
   public StaticContext sc() {
     return vs().sc;

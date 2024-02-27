@@ -229,7 +229,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   public boolean updating() {
     // MIXUPDATES: recursive check; otherwise, rely on flag (GH-1281)
-    return sc.mixUpdates ? check(Flag.UPD) : updating;
+    return sc != null && sc.mixUpdates ? check(Flag.UPD) : updating;
   }
 
   /**
@@ -301,12 +301,12 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   public static boolean inline(final CompileContext cc, final AnnList anns, final Expr expr) {
-    final Ann inline = anns != null ? anns.get(Annotation._BASEX_INLINE) : null;
+    final Ann inline = anns.get(Annotation._BASEX_INLINE);
     final long limit;
     if(inline != null) {
       final Value value = inline.value();
       limit = value.isEmpty() ? Long.MAX_VALUE : ((ANum) value.itemAt(0)).itr();
-    } else if(anns != null && anns.get(Annotation._BASEX_LOCK) != null) {
+    } else if(anns.contains(Annotation._BASEX_LOCK)) {
       limit = 0;
     } else {
       limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);

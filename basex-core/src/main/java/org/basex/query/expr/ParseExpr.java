@@ -154,18 +154,27 @@ public abstract class ParseExpr extends Expr {
    * @param <T> expression type
    * @param expr expression (can be {@code null})
    * @param updating indicates if expression is expected to be updating
-   * @param sc static context
+   * @param sc static context (can be {@code null} at runtime)
    * @return specified expression
    * @throws QueryException query exception
    */
   protected final <T extends XQFunctionExpr> T checkUp(final T expr, final boolean updating,
       final StaticContext sc) throws QueryException {
 
-    if(!(sc.mixUpdates || updating == expr.annotations().contains(Annotation.UPDATING))) {
+    if(!mixupdates(sc) && updating != expr.annotations().contains(Annotation.UPDATING)) {
       if(!updating) throw FUNCUP_X.get(info, expr);
       if(!expr.vacuousBody()) throw FUNCNOTUP_X.get(info, expr);
     }
     return expr;
+  }
+
+  /**
+   * Returns the value of the mixupdates flag, if available.
+   * @param sc static context (can be {@code null} at runtime)
+   * @return value
+   */
+  protected static final boolean mixupdates(final StaticContext sc) {
+    return sc != null && sc.mixUpdates;
   }
 
   /**

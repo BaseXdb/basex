@@ -113,7 +113,7 @@ public class XQueryEval extends StandardFunc {
         }
         qctx.parseMain(string(query.read()), null, sctx);
 
-        if(!sc.mixUpdates && updating != qctx.updating) {
+        if(!mixupdates(sc) && updating != qctx.updating) {
           if(!updating) throw XQUERY_UPDATE1.get(info);
           if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATE2.get(info);
         }
@@ -155,6 +155,6 @@ public class XQueryEval extends StandardFunc {
 
   @Override
   public boolean hasUPD() {
-    return sc.mixUpdates || super.hasUPD();
+    return mixupdates(sc) || super.hasUPD();
   }
 }

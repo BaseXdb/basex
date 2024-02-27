@@ -221,7 +221,7 @@ public abstract class StandardFunc extends Arr {
    */
   public boolean hasUPD() {
     // mix updates: higher-order function may be updating
-    return definition.has(Flag.UPD) || sc.mixUpdates && hofIndex() >= 0;
+    return definition.has(Flag.UPD) || mixupdates(sc) && hofIndex() >= 0;
   }
 
   /**

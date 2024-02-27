@@ -79,7 +79,7 @@ public final class DynFuncCall extends FuncCall {
         final int arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
       }
-      if(!sc.mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
+      if(!mixupdates(sc) && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
       final SeqType dt = ft.declType;
@@ -176,9 +176,8 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag... flags) {
-    final boolean upd = updating || sc.mixUpdates;
-    if(Flag.UPD.in(flags) && upd) return true;
-    if(Flag.NDT.in(flags) && (ndt || upd)) return true;
+    if(Flag.UPD.in(flags) && (updating || mixupdates(sc))) return true;
+    if(Flag.NDT.in(flags) && (ndt || updating || mixupdates(sc))) return true;
     final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
     return flgs.length != 0 && super.has(flgs);
   }

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class FuncCall extends Arr {
-  /** Static context of this function call. */
+  /** Static context (can be {@null} at runtime). */
   final StaticContext sc;
   /** Tail-call flag. */
   boolean tco;

@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
-  /** Static context. */
+  /** Static context (can be {@null} at runtime). */
   public final StaticContext sc;
   /** Function expression. */
   public final Expr expr;
@@ -55,7 +55,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param params formal parameters
    * @param anns function annotations
    * @param type function type
-   * @param sc static context
+   * @param sc static context (can be {@null} at runtime)
    * @param stackSize stack-frame size
    * @param name function name (can be {@code null})
    */
@@ -71,7 +71,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param params formal parameters
    * @param anns function annotations
    * @param type function type
-   * @param sc static context
+   * @param sc static context (can be {@null} at runtime)
    * @param stackSize stack-frame size
    * @param name function name (can be {@code null})
    * @param focus query focus (can be {@code null})
@@ -137,49 +137,10 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
+  public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
-
-    final int arity = arity(), nargs = ft.argTypes.length;
-    if(nargs < arity) throw arityError(this, arity, nargs, false, info);
-
-    // optimize: continue with coercion if current type is only an instance of new type
-    FuncType tp = funcType();
-    if(cc != null ? tp.eq(ft) : tp.instanceOf(ft)) return this;
-
-    // create new compilation context and variable scope
-    final VarScope vs = new VarScope(sc);
-    final Var[] vars = new Var[arity];
-    final Expr[] args = new Expr[arity];
-    for(int a = 0; a < arity; a++) {
-      vars[a] = vs.addNew(params[a].name, ft.argTypes[a], true, qc, info);
-      args[a] = new VarRef(info, vars[a]).optimize(cc);
-    }
-
-    try {
-      if(cc != null) cc.pushScope(vs);
-
-      // create new function call (will immediately be inlined/simplified when being optimized)
-      final boolean updating = anns != null && anns.contains(Annotation.UPDATING) ||
-          expr.has(Flag.UPD);
-      Expr body = new DynFuncCall(info, sc, updating, false, this, args);
-      if(cc != null) body = body.optimize(cc);
-
-      // add type check if return types differ
-      final SeqType dt = ft.declType;
-      if(!tp.declType.instanceOf(dt)) {
-        body = new TypeCheck(info, body, dt, true);
-        if(cc != null) body = body.optimize(cc);
-      }
-
-      // adopt type of optimized body if it is more specific than passed on type
-      final SeqType bt = body.seqType();
-      tp = cc != null && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
-      body.markTailCalls(null);
-      return new FuncItem(info, body, vars, anns, tp, sc, vs.stackSize(), name);
-    } finally {
-      if(cc != null) cc.removeScope();
-    }
+    return coerceTo(ft, qc, cc, info, null, anns.contains(Annotation.UPDATING) ||
+        expr.has(Flag.UPD));
   }
 
   @Override
