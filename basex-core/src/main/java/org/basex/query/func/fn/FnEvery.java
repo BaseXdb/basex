@@ -47,7 +47,7 @@ public class FnEvery extends StandardFunc {
       final int arity = arity(predicate);
       if(arity == 1 || arity == 2) {
         final IntObjMap<Var> vm = new IntObjMap<>();
-        final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
+        final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
         final Expr item = new VarRef(info, i).optimize(cc);
         final For fr;
         Expr pos = null;
@@ -58,7 +58,7 @@ public class FnEvery extends StandardFunc {
         } else {
           // some : (for $i at $p in INPUT return PREDICATE($i, $p)) = true()
           // every:  not((for $i at $p in INPUT return PREDICATE($i, $p)) = false())
-          final Var p = cc.copy(new Var(new QNm("pos"), null, cc.qc, sc, info), vm);
+          final Var p = cc.copy(new Var(new QNm("pos"), null, cc.qc, info), vm);
           fr = new For(i, p, null, input, false).optimize(cc);
           pos = new VarRef(info, p).optimize(cc);
         }

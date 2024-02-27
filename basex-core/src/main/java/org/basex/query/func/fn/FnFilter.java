@@ -51,8 +51,8 @@ public final class FnFilter extends StandardFunc {
       final IntObjMap<Var> vm = new IntObjMap<>();
       final LinkedList<Clause> clauses = new LinkedList<>();
 
-      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
-      final Var p = cc.copy(new Var(new QNm("pos"), SeqType.INTEGER_O, cc.qc, sc, info), vm);
+      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
+      final Var p = cc.copy(new Var(new QNm("pos"), SeqType.INTEGER_O, cc.qc, info), vm);
       clauses.add(new For(i, p, null, input, false).optimize(cc));
 
       final Expr pred = coerce(1, cc);

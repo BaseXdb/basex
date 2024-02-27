@@ -270,7 +270,7 @@ public abstract class StandardFunc extends Arr {
 
     FuncType ft = (FuncType) definition.types[i].type;
     if(arity != -1 && arity != ft.argTypes.length) ft = ft.with(arity);
-    return new TypeCheck(info, sc, arg(i), ft.seqType(), true).optimize(cc);
+    return new TypeCheck(info, arg(i), ft.seqType(), true).optimize(cc);
   }
 
   /**

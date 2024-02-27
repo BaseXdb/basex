@@ -956,7 +956,7 @@ public class QueryParser extends InputParser {
     } while(consume(','));
 
     wsCheck(")");
-    return params.seqType(optAsType()).finish(qc, sc, localVars);
+    return params.seqType(optAsType()).finish(qc, localVars);
   }
 
   /**
@@ -1069,7 +1069,7 @@ public class QueryParser extends InputParser {
           final VarRef ref = ng.get(i);
           // if one groups variables such as $x as xs:integer, then the resulting
           // sequence isn't compatible with the type and can't be assigned
-          final Var nv = localVars.add(new Var(ref.var.name, null, qc, sc, ref.var.info));
+          final Var nv = localVars.add(new Var(ref.var.name, null, qc, ref.var.info));
           ngrp[i] = nv;
           curr.put(nv.name.internal(), nv);
         }
@@ -1164,7 +1164,7 @@ public class QueryParser extends InputParser {
         clauses.add(new For(fr, at, score, expr, empty));
       } else if(member != null) {
         // for member $m in EXPR  ->  for $m in array:split(EXPR) let $m := array:values($a)
-        final Var split = new Var(member.name, null, qc, sc, ii);
+        final Var split = new Var(member.name, null, qc, ii);
         localVars.add(split, member);
         clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(sc, ii, expr), false));
         clauses.add(new Let(member, Function._ARRAY_VALUES.get(sc, ii, new VarRef(ii, split))));
@@ -1176,14 +1176,14 @@ public class QueryParser extends InputParser {
       } else if(key == null) {
         // for value in EXPR
         // ->  for $v in map:entries(EXPR) let $v := map:values($v)
-        final Var entries = new Var(value.name, null, qc, sc, ii);
+        final Var entries = new Var(value.name, null, qc, ii);
         localVars.add(entries, value);
         clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), false));
         clauses.add(new Let(value, Function._MAP_VALUES.get(sc, ii, new VarRef(ii, entries))));
       } else {
         // for key $k value $v in EXPR
         // ->  for $v in map:entries(EXPR) let $k := map:keys($v) let $v := map:values($v)
-        final Var entries = localVars.add(new Var(value.name, null, qc, sc, ii));
+        final Var entries = localVars.add(new Var(value.name, null, qc, ii));
         localVars.add(entries, key, value);
         clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), false));
         clauses.add(new Let(key, Function._MAP_KEYS.get(sc, ii, new VarRef(ii, entries))));
@@ -1718,7 +1718,7 @@ public class QueryParser extends InputParser {
     final Expr expr = coerce();
     if(!wsConsumeWs(TREAT)) return expr;
     wsCheck(AS);
-    return new Treat(sc, info(), expr, sequenceType());
+    return new Treat(info(), expr, sequenceType());
   }
 
   /**
@@ -1730,7 +1730,7 @@ public class QueryParser extends InputParser {
     final Expr expr = castable();
     if(!wsConsumeWs(COERCE)) return expr;
     wsCheck(TO);
-    return new TypeCheck(info(), sc, expr, sequenceType(), true);
+    return new TypeCheck(info(), expr, sequenceType(), true);
   }
 
   /**
@@ -1783,7 +1783,7 @@ public class QueryParser extends InputParser {
         int s = 0;
         if(mapping) {
           s = localVars.openScope();
-          fr = new For(new Var(new QNm("item"), null, qc, sc, ii), expr);
+          fr = new For(new Var(new QNm("item"), null, qc, ii), expr);
           arg = new VarRef(ii, fr.var);
         } else {
           arg = expr;
@@ -2349,7 +2349,7 @@ public class QueryParser extends InputParser {
           // focus function
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
-          params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, sc, localVars);
+          params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
           expr = new CachedMap(ii, localVars.resolve(name, ii), enclosedExpr());
         }
         final VarScope vs = localVars.popContext();
@@ -2558,7 +2558,7 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     final QNm name = varName();
     final SeqType st = type != null ? type : optAsType();
-    return new Var(name, st, qc, sc, ii);
+    return new Var(name, st, qc, ii);
   }
 
   /**
@@ -3343,7 +3343,7 @@ public class QueryParser extends InputParser {
       final Var[] vs = new Var[cl];
       final InputInfo ii = info();
       for(int c = 0; c < cl; c++) {
-        vs[c] = localVars.add(new Var(Catch.QNAMES[c], Catch.TYPES[c], qc, sc, ii));
+        vs[c] = localVars.add(new Var(Catch.QNAMES[c], Catch.TYPES[c], qc, ii));
       }
       final Catch c = new Catch(ii, vs, tests);
       c.expr = enclosedExpr();

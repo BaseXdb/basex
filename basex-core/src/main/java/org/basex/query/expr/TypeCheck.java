@@ -23,8 +23,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public class TypeCheck extends Single {
-  /** Static context. */
-  final StaticContext sc;
   /** Flag for function coercion. */
   public final boolean coerce;
   /** Only check occurrence indicator. */
@@ -33,15 +31,13 @@ public class TypeCheck extends Single {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context
    * @param expr expression to be promoted
    * @param seqType target type
    * @param coerce flag for function coercion
    */
-  public TypeCheck(final InputInfo info, final StaticContext sc, final Expr expr,
-      final SeqType seqType, final boolean coerce) {
+  public TypeCheck(final InputInfo info, final Expr expr, final SeqType seqType,
+      final boolean coerce) {
     super(info, expr, seqType);
-    this.sc = sc;
     this.coerce = coerce;
   }
 
@@ -150,7 +146,7 @@ public class TypeCheck extends Single {
             items.add(item);
           } else {
             if(!coerce) throw error(expr, st);
-            st.coerce(item, null, items, qc, sc, null, info);
+            st.coerce(item, null, items, qc, null, info);
           }
         }
 
@@ -175,7 +171,7 @@ public class TypeCheck extends Single {
 
     // check occurrence indicator and item type
     if(st.instance(value)) return value;
-    if(coerce) return st.coerce(value, null, qc, sc, null, info);
+    if(coerce) return st.coerce(value, null, qc, null, info);
     throw error(value, st);
   }
 
@@ -231,7 +227,7 @@ public class TypeCheck extends Single {
    * @return error code
    */
   TypeCheck get(final Expr ex, final SeqType st) {
-    return new TypeCheck(info, sc, ex, st, coerce);
+    return new TypeCheck(info, ex, st, coerce);
   }
 
   @Override

@@ -168,7 +168,7 @@ public final class FuncItem extends FItem implements Scope {
       // add type check if return types differ
       final SeqType dt = ft.declType;
       if(!tp.declType.instanceOf(dt)) {
-        body = new TypeCheck(info, sc, body, dt, true);
+        body = new TypeCheck(info, body, dt, true);
         if(cc != null) body = body.optimize(cc);
       }
 

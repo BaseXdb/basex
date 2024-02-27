@@ -55,7 +55,7 @@ public final class VarScope {
    */
   public Var addNew(final QNm name, final SeqType st, final boolean param, final QueryContext qc,
       final InputInfo info) {
-    return add(new Var(name, st, qc, sc, info, param));
+    return add(new Var(name, st, qc, info, param));
   }
 
   /**

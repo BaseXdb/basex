@@ -254,7 +254,7 @@ public final class CompileContext {
   public Var copy(final Var var, final IntObjMap<Var> vm) {
     if(var == null) return null;
     final VarScope vs = vs();
-    final Var vr = vs.add(new Var(var, qc, vs.sc));
+    final Var vr = vs.add(new Var(var, qc));
     if(vm != null) vm.put(var.id, vr);
     return vr;
   }

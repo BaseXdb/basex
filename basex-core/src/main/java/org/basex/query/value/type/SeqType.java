@@ -383,14 +383,13 @@ public final class SeqType {
    * @param value value to promote
    * @param name variable name (can be {@code null})
    * @param qc query context
-   * @param sc static context
    * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value coerce(final Value value, final QNm name, final QueryContext qc,
-      final StaticContext sc, final CompileContext cc, final InputInfo info) throws QueryException {
+      final CompileContext cc, final InputInfo info) throws QueryException {
 
     final long size = value.size();
     ItemList items = null;
@@ -404,7 +403,7 @@ public final class SeqType {
           items = new ItemList(Seq.initialCapacity(size));
           for(int j = 0; j < i; j++) items.add(value.itemAt(j));
         }
-        coerce(item, name, items, qc, sc, cc, info);
+        coerce(item, name, items, qc, cc, info);
       }
     }
     final long is = items != null ? items.size() : value.size();
@@ -418,13 +417,12 @@ public final class SeqType {
    * @param name variable name (can be {@code null})
    * @param items item cache
    * @param qc query context
-   * @param sc static context
    * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public void coerce(final Item item, final QNm name, final ItemList items, final QueryContext qc,
-      final StaticContext sc, final CompileContext cc, final InputInfo info) throws QueryException {
+      final CompileContext cc, final InputInfo info) throws QueryException {
 
     if(type instanceof AtomType) {
       final Iter iter = item.atomValue(qc, info).iter();
@@ -434,7 +432,7 @@ public final class SeqType {
           items.add(item1);
         } else if(tp == UNTYPED_ATOMIC) {
           if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
-          final Iter iter2 = type.cast(item1, qc, sc, info).iter();
+          final Iter iter2 = type.cast(item1, qc, null, info).iter();
           for(Item item2; (item2 = qc.next(iter2)) != null;) {
             items.add(item2);
           }

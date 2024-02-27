@@ -45,8 +45,8 @@ public class FnForEach extends StandardFunc {
       // for $i in INPUT return ACTION($i)
       // for $i at $p in INPUT return ACTION($i, $p)
       final IntObjMap<Var> vm = new IntObjMap<>();
-      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
-      final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, sc, info), vm) : null;
+      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
+      final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, info), vm) : null;
       final For fr = new For(i, p, null, input, false).optimize(cc);
 
       final Expr act = coerce(1, cc, arity);

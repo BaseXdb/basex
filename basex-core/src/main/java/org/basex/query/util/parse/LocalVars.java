@@ -72,7 +72,7 @@ public final class LocalVars {
     final int ls = vars.size();
     while(++l < ls) {
       final VarContext vctx = vars.get(l);
-      final Var local = new Var(var.name, var.seqType(), parser.qc, parser.sc, info);
+      final Var local = new Var(var.name, var.seqType(), parser.qc, info);
       vctx.add(local);
       vctx.bindings.put(local, new VarRef(info, var));
       var = local;

@@ -64,14 +64,11 @@ public final class Params {
   /**
    * Finalizes the parameters.
    * @param qc query context
-   * @param sc static context
    * @param vars local variables
    * @return self reference
    * @throws QueryException query exception
    */
-  public Params finish(final QueryContext qc, final StaticContext sc, final LocalVars vars)
-      throws QueryException {
-
+  public Params finish(final QueryContext qc, final LocalVars vars) throws QueryException {
     final int size = size();
     if(size > 0) {
       // check if the parameter names contain duplicates
@@ -83,7 +80,7 @@ public final class Params {
       }
       // create variables
       for(final Param param : params) {
-        param.var = new Var(param.name, param.type, qc, sc, param.info, true);
+        param.var = new Var(param.name, param.type, qc, param.info, true);
         vars.add(param.var);
       }
     }

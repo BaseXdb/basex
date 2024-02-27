@@ -15,14 +15,12 @@ import org.basex.util.*;
 public final class Treat extends TypeCheck {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param expr expression
    * @param seqType sequence type
    */
-  public Treat(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType seqType) {
-    super(info, sc, expr, seqType, false);
+  public Treat(final InputInfo info, final Expr expr, final SeqType seqType) {
+    super(info, expr, seqType, false);
   }
 
   @Override
@@ -32,6 +30,6 @@ public final class Treat extends TypeCheck {
 
   @Override
   TypeCheck get(final Expr ex, final SeqType st) {
-    return new Treat(sc, info, ex, st);
+    return new Treat(info, ex, st);
   }
 }
