@@ -64,12 +64,11 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
+    // return external function call
     if(external != null) return external.compile(cc);
 
+    // compile arguments and function
     super.compile(cc);
-    checkVisible();
-
-    // compile mutually recursive functions
     func.compile(cc);
 
     // try to inline the function
@@ -116,6 +115,9 @@ public final class StaticFuncCall extends FuncCall {
         exprs[a] = dflt;
       }
     }
+    // check visibility
+    if(sf.anns.contains(Annotation.PRIVATE) && !sf.sc.baseURI().eq(sc.baseURI()))
+      throw FUNCPRIVATE_X.get(info, name.string());
   }
 
   /**
@@ -132,16 +134,6 @@ public final class StaticFuncCall extends FuncCall {
    */
   public void setExternal(final ParseExpr ext) {
     external = ext;
-  }
-
-  /**
-   * Checks if the called function is visible
-   * (i.e., has no private annotation or is in the same namespace).
-   * @throws QueryException query exception
-   */
-  private void checkVisible() throws QueryException {
-    if(func != null && func.anns.contains(Annotation.PRIVATE) &&
-        !func.sc.baseURI().eq(sc.baseURI())) throw FUNCPRIVATE_X.get(info, name.string());
   }
 
   /**
