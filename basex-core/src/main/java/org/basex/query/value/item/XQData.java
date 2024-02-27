@@ -75,7 +75,7 @@ public abstract class XQData extends FItem {
     if(instanceOf(ft)) return this;
 
     // create a coerced function:
-    //    function($key as ft.argTypes[0]) as ft.declType {XQData.this ? $key coerce to ft.declType}
+    //    function($key as ft.argTypes[0]) as ft.declType {XQData.this($key) coerce to ft.declType}
 
     if(ft.argTypes.length != 1) throw arityError(this, 1, ft.argTypes.length, true, ii);
     final StaticContext sc = new StaticContext(qc);
