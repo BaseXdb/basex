@@ -126,6 +126,24 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void jaroWinkler() {
+    final Function func = _STRING_JARO_WINKLER;
+    query(func.args("", ""), 0);
+    query(func.args("", "a"), 0);
+    query(func.args("aaapppp", ""), 0);
+    query(func.args("frog", "fog"), .93);
+    query(func.args("fly", "ant"), 0);
+    query(func.args("elephant", "hippo"), .44);
+    query(func.args("hippo", "elephant"), .44);
+    query(func.args("hippo", "zzzzzzzz"), 0);
+    query(func.args("hello", "hallo"), .88);
+    query(func.args("ABC Corporation", "ABC Corp"), .93);
+    query(func.args("D N H Enterprises Inc", "D &amp; H Enterprises, Inc."), .95);
+    query(func.args("My Gym Children's Fitness Center", "My Gym. Childrens Fitness"), .92);
+    query(func.args("PENNSYLVANIA", "PENNCISYLVNIA"), .88);
+  }
+
+  /** Test method. */
   @Test public void levenshtein() {
     final Function func = _STRING_LEVENSHTEIN;
     // queries

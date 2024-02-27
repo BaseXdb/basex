@@ -1752,6 +1752,9 @@ public enum Function implements AFunction {
   _STRING_FORMAT(StringFormat::new, "format(pattern[,values...])",
       params(STRING_O, ITEM_O), STRING_O, STRING_URI),
   /** XQuery function. */
+  _STRING_JARO_WINKLER(StringJaroWinkler::new, "jaro-winkler(value1,value2)",
+      params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
+  /** XQuery function. */
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(value1,value2)",
       params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
   /** XQuery function. */
