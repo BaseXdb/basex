@@ -221,7 +221,7 @@ public abstract class StandardFunc extends Arr {
    */
   public boolean hasUPD() {
     // mix updates: higher-order function may be updating
-    return definition.has(Flag.UPD) || mixupdates(sc) && hofIndex() >= 0;
+    return definition.has(Flag.UPD) || mixupdates() && hofIndex() >= 0;
   }
 
   /**
@@ -239,6 +239,11 @@ public abstract class StandardFunc extends Arr {
    */
   public int hofIndex() {
     return definition.has(Flag.HOF) ? Integer.MAX_VALUE : -1;
+  }
+
+  @Override
+  protected final boolean mixupdates() {
+    return sc.mixUpdates;
   }
 
   @Override
@@ -676,7 +681,7 @@ public abstract class StandardFunc extends Arr {
   private FItem checkArity(final FItem func, final int nargs, final boolean updating)
       throws QueryException {
 
-    checkUp(func, updating, sc);
+    checkUp(func, updating);
     final int arity = func.arity();
     if(nargs < arity) throw arityError(func, arity, nargs, true, info);
     return func;

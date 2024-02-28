@@ -23,7 +23,7 @@ import org.basex.query.value.type.*;
 public class FnApply extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem function = checkUp(toFunction(arg(0), qc), this instanceof UpdateApply, sc);
+    final FItem function = checkUp(toFunction(arg(0), qc), this instanceof UpdateApply);
     final XQArray arguments = toArray(arg(1), qc);
 
     final ValueList args = new ValueList(arguments.arraySize());

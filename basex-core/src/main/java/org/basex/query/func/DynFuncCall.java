@@ -26,6 +26,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
+  /** Static context (can be {@code null} at runtime; only required for MIXUPDATES check). */
+  private final StaticContext sc;
   /** Updating flag. */
   private final boolean updating;
   /** Nondeterministic flag. */
@@ -48,7 +50,7 @@ public final class DynFuncCall extends FuncCall {
   /**
    * Function constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context
+   * @param sc static context (can be {@code null} at runtime)
    * @param updating updating flag
    * @param ndt nondeterministic flag
    * @param expr function expression
@@ -57,9 +59,10 @@ public final class DynFuncCall extends FuncCall {
   public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
       final boolean ndt, final Expr expr, final Expr... args) {
 
-    super(info, sc, ExprList.concat(args, expr));
+    super(info, ExprList.concat(args, expr));
     this.updating = updating;
     this.ndt = ndt;
+    this.sc = sc;
   }
 
   @Override
@@ -79,7 +82,7 @@ public final class DynFuncCall extends FuncCall {
         final int arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
       }
-      if(!mixupdates(sc) && !updating && ft.anns.contains(Annotation.UPDATING)) {
+      if(!mixupdates() && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
       final SeqType dt = ft.declType;
@@ -97,7 +100,7 @@ public final class DynFuncCall extends FuncCall {
       // try to inline the function
       if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
         final XQFunctionExpr fe = (XQFunctionExpr) func;
-        checkUp(fe, updating, sc);
+        checkUp(fe, updating);
         final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
         if(inlined != null) return inlined;
       }
@@ -168,16 +171,21 @@ public final class DynFuncCall extends FuncCall {
     final Item item = body().item(qc, info);
     if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
 
-    final FItem func = checkUp((FItem) item, updating, sc);
+    final FItem func = checkUp((FItem) item, updating);
     final int nargs = exprs.length - 1, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
     return func;
   }
 
   @Override
+  protected boolean mixupdates() {
+    return sc != null && sc.mixUpdates;
+  }
+
+  @Override
   public boolean has(final Flag... flags) {
-    if(Flag.UPD.in(flags) && (updating || mixupdates(sc))) return true;
-    if(Flag.NDT.in(flags) && (ndt || updating || mixupdates(sc))) return true;
+    if(Flag.UPD.in(flags) && (updating || mixupdates())) return true;
+    if(Flag.NDT.in(flags) && (ndt || updating || mixupdates())) return true;
     final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
     return flgs.length != 0 && super.has(flgs);
   }

@@ -13,20 +13,16 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public abstract class FuncCall extends Arr {
-  /** Static context (can be {@null} at runtime). */
-  final StaticContext sc;
   /** Tail-call flag. */
   boolean tco;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context
    * @param exprs sub-expressions
    */
-  FuncCall(final InputInfo info, final StaticContext sc, final Expr[] exprs) {
+  FuncCall(final InputInfo info, final Expr[] exprs) {
     super(info, SeqType.ITEM_ZM, exprs);
-    this.sc = sc;
   }
 
   /**

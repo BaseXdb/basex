@@ -110,7 +110,7 @@ public abstract class FItem extends Item implements XQFunction {
     try {
       if(cc != null) cc.pushScope(vs);
 
-      // create new function call (will immediately be inlined/simplified when being optimized)
+      // create new function call (will immediately be inlined/simplified when optimized)
       Expr body = new DynFuncCall(ii, sc, updating, false, this, args);
       if(cc != null) body = body.optimize(cc);
 

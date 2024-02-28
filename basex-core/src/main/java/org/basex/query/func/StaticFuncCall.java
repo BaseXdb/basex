@@ -23,6 +23,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class StaticFuncCall extends FuncCall {
+  /** Static context. */
+  final StaticContext sc;
   /** Function name. */
   final QNm name;
   /** Function reference (can be {@code null}). */
@@ -57,9 +59,10 @@ public final class StaticFuncCall extends FuncCall {
    */
   private StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
       final StaticFunc func, final InputInfo info) {
-    super(info, sc, args);
+    super(info, args);
     this.name = name;
     this.func = func;
+    this.sc = sc;
   }
 
   @Override

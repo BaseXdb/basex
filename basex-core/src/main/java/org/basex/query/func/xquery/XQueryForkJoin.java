@@ -34,7 +34,7 @@ public final class XQueryForkJoin extends StandardFunc {
 
     final ArrayList<FItem> list = new ArrayList<>(Seq.initialCapacity(size));
     for(Item function; (function = functions.next()) != null;) {
-      list.add(checkUp(toFunction(function, 0, qc), false, sc));
+      list.add(checkUp(toFunction(function, 0, qc), false));
     }
     // single function: invoke directly
     if(list.size() == 1) return list.get(0).invoke(qc, info);
