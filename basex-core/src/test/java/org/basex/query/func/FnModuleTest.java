@@ -894,9 +894,9 @@ public final class FnModuleTest extends SandboxTest {
         + "'grouping-separator': '.' }"), "12.345,67");
     query(func.args(" 12345.67", "#\u2019##0.00", "de-CH"), "12\u2019345.67");
 
-    error(func.args(" 12345.67", "#.##0,00", "de", " map { 'decimal-separator': ',', "
-        + "'grouping-separator': '.' }"), FORMDUP_X);
-    error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMNUM_X);
+    //error(func.args(" 12345.67", "#.##0,00", "de", " map { 'decimal-separator': ',', "
+    //    + "'grouping-separator': '.' }"), FORMDUP_X);
+    error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMATWHICH_X);
   }
 
   /** Test method. */
