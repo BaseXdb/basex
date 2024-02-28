@@ -436,7 +436,7 @@ public final class JsonParser extends InputParser {
    * @return query exception
    */
   private QueryException error(final QueryError err, final String msg, final Object... ext) {
-    final InputInfo ii = new InputInfo(this);
+    final InputInfo ii = info();
     return err.get(ii, ii.line(), ii.column(), Util.inf(msg, ext));
   }
 }

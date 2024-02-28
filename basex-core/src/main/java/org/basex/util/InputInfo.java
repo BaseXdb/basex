@@ -29,7 +29,7 @@ public final class InputInfo {
    * Constructor.
    * @param parser input parser, containing information on the current parsing state
    */
-  public InputInfo(final InputParser parser) {
+  InputInfo(final InputParser parser) {
     input = parser.input;
     path = parser.file;
     col = parser.pos;

@@ -200,9 +200,9 @@ final class StringParser extends CommandParser {
       case REPO:
         switch(consume(CmdRepo.class, cmd)) {
           case INSTALL:
-            return new RepoInstall(string(cmd), new InputInfo(parser));
+            return new RepoInstall(string(cmd), parser.info());
           case DELETE:
-            return new RepoDelete(string(cmd), new InputInfo(parser));
+            return new RepoDelete(string(cmd), parser.info());
           case LIST:
             return new RepoList();
         }

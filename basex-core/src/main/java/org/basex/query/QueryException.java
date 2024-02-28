@@ -190,7 +190,7 @@ public class QueryException extends Exception {
     if(info != null) return;
     // check if line/column information has already been added
     parser.pos = Math.min(parser.mark, parser.length);
-    info = new InputInfo(parser);
+    info = parser.info();
   }
 
   /**
