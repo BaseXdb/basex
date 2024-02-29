@@ -181,12 +181,7 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   boolean verify() {
-    try {
-      return key.hash() == hash;
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      return false;
-    }
+    return key.hash() == hash;
   }
 
   @Override

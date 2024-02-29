@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
-import org.basex.query.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -246,10 +245,8 @@ public final class MapModuleTest extends SandboxTest {
 
   /**
    * Regression tests for {@code map:merge(...)} in the presence of hash collisions.
-   *
-   * @throws QueryException exception
    */
-  @Test public void gh1779() throws QueryException {
+  @Test public void gh1779() {
     final Function func = _MAP_MERGE;
     final Str[] keys = { Str.get("DENW21AL100077Hs"), Str.get("DENW21AL100076i5"),
         Str.get("DENW21AL100076hT") };

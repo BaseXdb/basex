@@ -76,6 +76,16 @@ public final class StrLazy extends AStr implements Lazy {
     }
   }
 
+  @Override
+  public int hash() {
+    try {
+      return Token.hash(string(null));
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      return Integer.MAX_VALUE;
+    }
+  }
+
   /**
    * Returns an input stream for the item.
    * @param info input info (can be {@code null})

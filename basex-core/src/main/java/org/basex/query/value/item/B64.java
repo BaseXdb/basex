@@ -95,6 +95,16 @@ public class B64 extends Bin {
   }
 
   @Override
+  public int hash() {
+    try {
+      return Token.hash(binary(null));
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+      return Integer.MAX_VALUE;
+    }
+  }
+
+  @Override
   public final byte[] parse(final Item item, final InputInfo info) throws QueryException {
     return parse(item.string(info), info);
   }

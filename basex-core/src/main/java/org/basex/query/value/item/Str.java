@@ -126,6 +126,11 @@ public final class Str extends AStr {
   }
 
   @Override
+  public int hash() {
+    return Token.hash(value);
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     // E['x']  ->  E[true()]
     return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?

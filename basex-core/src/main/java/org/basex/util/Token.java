@@ -97,8 +97,8 @@ public final class Token {
     'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
   };
 
-  /** Maximum length for hash calculation. */
-  private static final byte MAX_HASH_LENGTH = 96;
+  /** Maximum number of hash operations. */
+  private static final byte MAX_HASH_OPS = 127;
   /** Maximum values for converting tokens to integer values. */
   private static final int MAX_INT = Integer.MAX_VALUE / 10;
   /** Maximum values for converting tokens to long values. */
@@ -723,9 +723,11 @@ public final class Token {
    * @return hash code
    */
   public static int hash(final byte[] token) {
+    final int tl = token.length, s = Math.max(1, tl / MAX_HASH_OPS);
     int h = 0;
-    final int l = Math.min(token.length, MAX_HASH_LENGTH);
-    for(int i = 0; i != l; ++i) h = (h << 5) - h + token[i];
+    for(int t = 0; t < tl; t += s) {
+      h = (h << 5) - h + token[t];
+    }
     return h;
   }
 

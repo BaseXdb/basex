@@ -68,7 +68,7 @@ public final class Uri extends AStr {
    * @return result of check
    */
   public boolean eq(final Uri uri) {
-    return Token.eq(string(), uri.string());
+    return Token.eq(value, uri.value);
   }
 
   /**
@@ -119,6 +119,11 @@ public final class Uri extends AStr {
    */
   public byte[] string() {
     return value;
+  }
+
+  @Override
+  public int hash() {
+    return Token.hash(value);
   }
 
   @Override

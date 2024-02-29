@@ -150,14 +150,13 @@ public abstract class ANum extends Item {
   @Override
   public final int hash() {
     // makes sure the hashing is good for very small and very big numbers
-    final long l = itr();
+    final long i = itr();
     final float f = flt();
 
     // extract fractional part from a finite float
-    final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY ||
-        isNaN(f) ? 0 : floatToIntBits(f - l);
-
-    int h = frac ^ (int) (l ^ l >>> 32);
+    final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY || isNaN(f) ? 0 :
+      floatToIntBits(f - i);
+    int h = frac ^ (int) (i ^ i >>> 32);
 
     // this part ensures better distribution of bits (from java.util.HashMap)
     h ^= h >>> 20 ^ h >>> 12;

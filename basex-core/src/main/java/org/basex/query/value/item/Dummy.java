@@ -46,6 +46,11 @@ public final class Dummy extends Item {
   }
 
   @Override
+  public int hash() {
+    throw Util.notExpected();
+  }
+
+  @Override
   public boolean bool(final InputInfo ii) {
     throw Util.notExpected();
   }

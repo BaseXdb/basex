@@ -299,8 +299,8 @@ public class CmpG extends Cmp {
 
   /**
    * Compares all values of the first and second iterators.
-   * @param iter1 first iterator
-   * @param iter2 second iterator
+   * @param iter1 first atomic iterator
+   * @param iter2 second atomic iterator
    * @param size1 size of first iterator
    * @param size2 size of second iterator
    * @param qc query context

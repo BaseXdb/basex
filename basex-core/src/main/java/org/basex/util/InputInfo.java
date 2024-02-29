@@ -24,8 +24,8 @@ public final class InputInfo {
   private String input;
   /** Line number ({@code 0} if not initialized). */
   private int line;
-  /** Column number of (if not initialized) string position. */
-  private int col;
+  /** Column number or (if not initialized) string position. */
+  private int column;
 
   /**
    * Constructor.
@@ -34,7 +34,7 @@ public final class InputInfo {
   public InputInfo(final InputParser parser) {
     input = parser.input;
     path = parser.file;
-    col = parser.pos;
+    column = parser.pos;
   }
 
   /**
@@ -56,7 +56,7 @@ public final class InputInfo {
   public InputInfo(final String path, final int line, final int col) {
     this.path = path;
     this.line = line;
-    this.col = col;
+    this.column = col;
   }
 
   /**
@@ -82,7 +82,7 @@ public final class InputInfo {
    */
   public int column() {
     init();
-    return col;
+    return column;
   }
 
   /**
@@ -100,7 +100,7 @@ public final class InputInfo {
     // positions have already been calculated
     if(line != 0) return;
 
-    final int cl = Math.min(col, input.length());
+    final int cl = Math.min(column, input.length());
     final String q = input;
     int l = 1, c = 1;
     for(int i = 0, ch; i < cl; i += Character.charCount(ch)) {
@@ -109,7 +109,7 @@ public final class InputInfo {
       else if(ch != '\r') { c++; }
     }
     line = l;
-    col = c;
+    column = c;
   }
 
   /**

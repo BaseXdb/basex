@@ -60,9 +60,8 @@ public final class XQMap extends XQData {
    * @param key key
    * @param value value
    * @return map
-   * @throws QueryException query exception
    */
-  public static XQMap singleton(final Item key, final Value value) throws QueryException {
+  public static XQMap singleton(final Item key, final Value value) {
     return new XQMap(new TrieLeaf(key.hash(), key, value),
         MapType.get((AtomType) key.type, value.seqType()));
   }

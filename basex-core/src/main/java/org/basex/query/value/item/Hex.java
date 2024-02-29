@@ -50,8 +50,13 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) throws QueryException {
-    return Token.hex(binary(ii), true);
+  public byte[] string(final InputInfo ii) {
+    return Token.hex(data, true);
+  }
+
+  @Override
+  public int hash() {
+    return Token.hash(data);
   }
 
   @Override

@@ -54,6 +54,11 @@ public final class Atm extends Item {
   }
 
   @Override
+  public int hash() {
+    return Token.hash(value);
+  }
+
+  @Override
   public boolean bool(final InputInfo ii) {
     return value.length != 0;
   }
