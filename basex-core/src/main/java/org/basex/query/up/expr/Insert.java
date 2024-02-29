@@ -39,22 +39,20 @@ public final class Insert extends Update {
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param src source expression
    * @param mode insertion mode
    * @param trg target expression
    */
-  public Insert(final StaticContext sc, final InputInfo info, final Expr src, final Mode mode,
-      final Expr trg) {
-    super(sc, info, trg, src);
+  public Insert(final InputInfo info, final Expr src, final Mode mode, final Expr trg) {
+    super(info, trg, src);
     this.mode = mode;
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FBuilder builder = new FBuilder();
-    final Constr constr = new Constr(builder, info, sc, qc).add(exprs[1]);
+    final Constr constr = new Constr(builder, info, qc).add(exprs[1]);
     final ANodeList cList = toList(builder, false), aList = toList(builder, true);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
@@ -110,7 +108,7 @@ public final class Insert extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Insert(sc, info, exprs[1].copy(cc, vm), mode, exprs[0].copy(cc, vm)));
+    return copyType(new Insert(info, exprs[1].copy(cc, vm), mode, exprs[0].copy(cc, vm)));
   }
 
   @Override

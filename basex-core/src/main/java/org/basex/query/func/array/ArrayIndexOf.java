@@ -31,7 +31,7 @@ public final class ArrayIndexOf extends ArrayFn {
         int i = -1;
         while(++i < s) {
           final Item item1 = value.itemAt(i), item2 = search.itemAt(i);
-          if(!(item1.comparable(item2) && item1.equal(item2, collation, sc, info))) break;
+          if(!(item1.comparable(item2) && item1.equal(item2, collation, info))) break;
         }
         if(i == s) list.add(c);
       }

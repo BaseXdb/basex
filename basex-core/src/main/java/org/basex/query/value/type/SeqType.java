@@ -335,13 +335,12 @@ public final class SeqType {
    * @param value value to cast
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */
   public Value cast(final Value value, final boolean error, final QueryContext qc,
-      final StaticContext sc, final InputInfo info) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     // check cardinality
     final long size = value.size();
@@ -357,7 +356,7 @@ public final class SeqType {
       // cast single items
       if(size == 1) {
         final Item item = (Item) value;
-        return item.type.eq(type) ? item : type.cast(item, qc, sc, info);
+        return item.type.eq(type) ? item : type.cast(item, qc, info);
       }
       // cast sequences
       final ValueBuilder vb = new ValueBuilder(qc);
@@ -366,7 +365,7 @@ public final class SeqType {
           vb.add(item);
         } else {
           qc.checkStop();
-          vb.add(type.cast(item, qc, sc, info));
+          vb.add(type.cast(item, qc, info));
         }
       }
       return vb.value(type);
@@ -432,7 +431,7 @@ public final class SeqType {
           items.add(item1);
         } else if(tp == UNTYPED_ATOMIC) {
           if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
-          final Iter iter2 = type.cast(item1, qc, null, info).iter();
+          final Iter iter2 = type.cast(item1, qc, info).iter();
           for(Item item2; (item2 = qc.next(iter2)) != null;) {
             items.add(item2);
           }

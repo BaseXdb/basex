@@ -31,8 +31,8 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     throw FIATOMIZE_X.get(ii, this);
   }
 
@@ -82,13 +82,12 @@ public abstract class FItem extends Item implements XQFunction {
    * @param qc query context
    * @param cc compilation context ({@code null} during runtime)
    * @param ii input info (can be {@code null})
-   * @param sc static context (can be {@code null})
    * @param updating updating flag
    * @return coerced item
    * @throws QueryException query exception
    */
   final FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii, final StaticContext sc, final boolean updating) throws QueryException {
+      final InputInfo ii, final boolean updating) throws QueryException {
 
     final SeqType[] argTypes = ft.argTypes;
     final int arity = arity(), nargs = argTypes.length;
@@ -99,7 +98,7 @@ public abstract class FItem extends Item implements XQFunction {
     if(cc != null ? tp.eq(ft) : tp.instanceOf(ft)) return this;
 
     // create new compilation context and variable scope
-    final VarScope vs = new VarScope(sc);
+    final VarScope vs = new VarScope();
     final Var[] vars = new Var[arity];
     final Expr[] args = new Expr[arity];
     for(int a = 0; a < arity; a++) {
@@ -111,7 +110,7 @@ public abstract class FItem extends Item implements XQFunction {
       if(cc != null) cc.pushScope(vs);
 
       // create new function call (will immediately be inlined/simplified when optimized)
-      Expr body = new DynFuncCall(ii, sc, updating, false, this, args);
+      Expr body = new DynFuncCall(ii, updating, false, this, args);
       if(cc != null) body = body.optimize(cc);
 
       // add type check if return types differ
@@ -125,7 +124,7 @@ public abstract class FItem extends Item implements XQFunction {
       final SeqType bt = body.seqType();
       tp = cc != null && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, argTypes) : ft;
       body.markTailCalls(null);
-      return new FuncItem(ii, body, vars, annotations(), tp, sc, vs.stackSize(), funcName());
+      return new FuncItem(ii, body, vars, annotations(), tp, vs.stackSize(), funcName());
     } finally {
       if(cc != null) cc.removeScope();
     }

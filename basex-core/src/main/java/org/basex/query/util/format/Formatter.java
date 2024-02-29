@@ -137,21 +137,19 @@ public abstract class Formatter extends FormatUtil {
    * @param picture picture
    * @param calendar calendar (can be {@code null})
    * @param place place
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @return formatted string
    * @throws QueryException query exception
    */
   public final byte[] formatDate(final ADate dt, final byte[] languageTag, final byte[] picture,
-      final byte[] calendar, final byte[] place, final StaticContext sc, final InputInfo info)
-      throws QueryException {
+      final byte[] calendar, final byte[] place, final InputInfo info) throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
     if(languageTag.length != 0 && !available(languageTag)) tb.add("[Language: en]");
     if(calendar != null) {
       final QNm qnm;
       try {
-        qnm = QNm.parse(trim(calendar), sc);
+        qnm = QNm.parse(trim(calendar), info.sc());
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw CALWHICH_X.get(info, calendar);

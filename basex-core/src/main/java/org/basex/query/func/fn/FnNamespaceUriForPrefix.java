@@ -23,7 +23,7 @@ public final class FnNamespaceUriForPrefix extends StandardFunc {
     final ANode element = toElem(arg(1), qc);
 
     if(eq(value, XML)) return Uri.get(XML_URI, false);
-    final Atts at = element.nsScope(sc);
+    final Atts at = element.nsScope(sc());
     final byte[] uri = at.value(value);
     return uri == null || uri.length == 0 ? Empty.VALUE : Uri.get(uri, false);
   }

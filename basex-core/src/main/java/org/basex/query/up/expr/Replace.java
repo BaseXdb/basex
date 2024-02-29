@@ -32,22 +32,20 @@ public final class Replace extends Update {
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param trg target expression
    * @param src source expression
    * @param value replace value of
    */
-  public Replace(final StaticContext sc, final InputInfo info, final Expr trg, final Expr src,
-      final boolean value) {
-    super(sc, info, trg, src);
+  public Replace(final InputInfo info, final Expr trg, final Expr src, final boolean value) {
+    super(info, trg, src);
     this.value = value;
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FBuilder builder = new FBuilder();
-    final Constr constr = new Constr(builder, info, sc, qc).add(exprs[1]);
+    final Constr constr = new Constr(builder, info, qc).add(exprs[1]);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
 
@@ -95,7 +93,7 @@ public final class Replace extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Replace(sc, info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), value));
+    return copyType(new Replace(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), value));
   }
 
   @Override

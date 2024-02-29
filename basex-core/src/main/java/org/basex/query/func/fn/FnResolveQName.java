@@ -27,7 +27,7 @@ public final class FnResolveQName extends StandardFunc {
 
     final byte[] prefix = Token.prefix(value);
     byte[] uri = element.uri(prefix);
-    if(uri == null) uri = sc.ns.uri(prefix);
+    if(uri == null) uri = info.sc().ns.uri(prefix);
     if(uri == null) throw NSDECL_X.get(info, prefix);
     return qc.shared.qName(value, uri);
   }

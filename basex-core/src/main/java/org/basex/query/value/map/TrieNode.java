@@ -26,14 +26,11 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    TrieNode delete(final int hash, final Item key, final int level) {
-      return this; }
+    TrieNode delete(final int hash, final Item key, final int level) { return this; }
     @Override
-    Value get(final int hash, final Item key, final int level) {
-      return null; }
+    Value get(final int hash, final Item key, final int level) { return null; }
     @Override
-    boolean contains(final int hash, final Item key, final int level) {
-      return false; }
+    boolean contains(final int hash, final Item key, final int level) { return false; }
     @Override
     TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
         final QueryContext qc, final InputInfo info) { return node; }

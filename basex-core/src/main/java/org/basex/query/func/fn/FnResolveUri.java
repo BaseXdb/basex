@@ -29,7 +29,7 @@ public final class FnResolveUri extends StandardFunc {
     if(u.isAbsolute()) return u;
 
     // check base uri: reject invalid, relative, and non-hierarchical URIs and fragment identifiers
-    final Uri b = base == null ? sc.baseURI() : Uri.get(base);
+    final Uri b = base == null ? info.sc().baseURI() : Uri.get(base);
     final byte[] string = b.string();
     if(!b.isValid() || !b.isAbsolute() || contains(string, '#') || !contains(string, '/'))
       throw URIARG_X.get(info, b);

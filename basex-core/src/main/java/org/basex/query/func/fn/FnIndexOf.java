@@ -20,17 +20,18 @@ import org.basex.util.list.*;
 public final class FnIndexOf extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter input = arg(0).atomIter(qc, info);
+    final Item search = toAtomItem(arg(1), qc);
+    final Collation collation = toCollation(arg(2), qc);
+
     return new Iter() {
-      final Iter input = arg(0).atomIter(qc, info);
-      final Item search = toAtomItem(arg(1), qc);
-      final Collation collation = toCollation(arg(2), qc);
       int c;
 
       @Override
       public Int next() throws QueryException {
         for(Item item; (item = qc.next(input)) != null;) {
           ++c;
-          if(item.comparable(search) && item.equal(search, collation, sc, info)) {
+          if(item.comparable(search) && item.equal(search, collation, info)) {
             return Int.get(c);
           }
         }
@@ -49,7 +50,7 @@ public final class FnIndexOf extends StandardFunc {
     int c = 0;
     for(Item item; (item = qc.next(input)) != null;) {
       ++c;
-      if(item.comparable(search) && item.equal(search, collation, sc, info)) list.add(c);
+      if(item.comparable(search) && item.equal(search, collation, info)) list.add(c);
     }
     return IntSeq.get(list.finish());
   }

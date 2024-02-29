@@ -63,7 +63,7 @@ public class FnEvery extends StandardFunc {
           pos = new VarRef(info, p).optimize(cc);
         }
         final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-        final Expr rtrn = new DynFuncCall(info, sc, coerce(1, cc, arity), args).optimize(cc);
+        final Expr rtrn = new DynFuncCall(info, coerce(1, cc, arity), args).optimize(cc);
         result = new GFLWOR(info, fr, rtrn).optimize(cc);
       }
     } else {
@@ -72,7 +72,7 @@ public class FnEvery extends StandardFunc {
       result = input;
     }
     if(result != null) {
-      final Expr cmp = new CmpG(info, result, Bln.get(some), OpG.EQ, null, sc).optimize(cc);
+      final Expr cmp = new CmpG(info, result, Bln.get(some), OpG.EQ).optimize(cc);
       return some ? cmp : cc.function(Function.NOT, info, cmp);
     }
     return this;

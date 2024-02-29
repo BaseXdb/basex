@@ -3,8 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import java.util.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -30,8 +28,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CmpSR extends Single {
-  /** Collation (can be {@code null}). */
-  final Collation coll;
   /** Minimum (can be {@code null} if {@link #max} is assigned). */
   final byte[] min;
   /** Include minimum value. */
@@ -51,14 +47,12 @@ public final class CmpSR extends Single {
    * @param mni include minimum value
    * @param max maximum value (can be {@code null} if {@code min} is assigned)
    * @param mxi include maximum value
-   * @param coll collation (can be {@code null})
    * @param info input info (can be {@code null})
    */
-  CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max,
-      final boolean mxi, final Collation coll, final InputInfo info) {
+  CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max, final boolean mxi,
+      final InputInfo info) {
 
     super(info, expr, SeqType.BOOLEAN_O);
-    this.coll = coll;
     this.min = min;
     this.mni = mni;
     this.max = max;
@@ -94,10 +88,10 @@ public final class CmpSR extends Single {
     final byte[] d = ((AStr) cmp2).string(cmp.info);
     ParseExpr expr = null;
     switch(cmp.op.value()) {
-      case GE: expr = new CmpSR(cmp1, d,    true,  null, true,  cmp.coll, cmp.info); break;
-      case GT: expr = new CmpSR(cmp1, d,    false, null, true,  cmp.coll, cmp.info); break;
-      case LE: expr = new CmpSR(cmp1, null, true,  d,    true,  cmp.coll, cmp.info); break;
-      case LT: expr = new CmpSR(cmp1, null, true,  d,    false, cmp.coll, cmp.info); break;
+      case GE: expr = new CmpSR(cmp1, d,    true,  null, true,  cmp.info); break;
+      case GT: expr = new CmpSR(cmp1, d,    false, null, true,  cmp.info); break;
+      case LE: expr = new CmpSR(cmp1, null, true,  d,    true,  cmp.info); break;
+      case LT: expr = new CmpSR(cmp1, null, true,  d,    false, cmp.info); break;
       default:
     }
     return expr != null ? expr.optimize(cc) : cmp;
@@ -128,6 +122,7 @@ public final class CmpSR extends Single {
   private boolean eval(final Item item) throws QueryException {
     if(!item.type.isStringOrUntyped()) throw compareError(item, Str.EMPTY, info);
     final byte[] s = item.string(info);
+    final Collation coll = sc().collation;
     final int mn = min == null ?  1 : Token.compare(s, min, coll);
     final int mx = max == null ? -1 : Token.compare(s, max, coll);
     return (mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0);
@@ -137,7 +132,7 @@ public final class CmpSR extends Single {
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
 
-    Collation cl = null;
+    Collation coll = null;
     byte[] newMin = null, newMax = null;
     boolean newMni = true, newMxi = true;
     if(ex instanceof CmpSR) {
@@ -146,17 +141,17 @@ public final class CmpSR extends Single {
       newMax = cmp.max;
       newMni = cmp.mni;
       newMxi = cmp.mxi;
-      cl = cmp.coll;
+      coll = cmp.sc().collation;
     } else if(ex instanceof CmpG) {
       final CmpG cmp = (CmpG) ex;
       if(cmp.op == OpG.EQ && cmp.exprs[1] instanceof Str) {
         newMin = ((Str) cmp.exprs[1]).string();
         newMax = newMin;
-        cl = cmp.coll;
+        coll = cmp.sc().collation;
       }
     }
-    if(newMin == null && newMax == null || !expr.equals(ex.arg(0)) ||
-        cl != null || coll != null || or) return null;
+    if(newMin == null && newMax == null || !expr.equals(ex.arg(0)) || coll != null ||
+        sc().collation != null || or) return null;
 
     // determine common minimum and maximum value
     if(newMin == null) {
@@ -178,17 +173,17 @@ public final class CmpSR extends Single {
       final int diff = Token.compare(newMin, newMax);
       // return comparison for exact hit
       if(diff == 0 && newMni && newMxi) return
-        new CmpG(info, expr, Str.get(newMin), OpG.EQ, null, cc.sc()).optimize(cc);
+          new CmpG(info, expr, Str.get(newMin), OpG.EQ).optimize(cc);
       // remove comparisons that will never yield results
       if(diff >= 0) return Bln.FALSE;
     }
-    return new CmpSR(expr, newMin, newMni, newMax, newMxi, null, info).optimize(cc);
+    return new CmpSR(expr, newMin, newMni, newMax, newMxi, info).optimize(cc);
   }
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only default collation is supported, and min/max values are required
-    if(coll != null || min == null || max == null) return false;
+    if(sc().collation != null || min == null || max == null) return false;
 
     // accept only location path, string and equality expressions
     final Data data = ii.db.data();
@@ -212,7 +207,7 @@ public final class CmpSR extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final CmpSR cmp = new CmpSR(expr.copy(cc, vm), min, mni, max, mxi, coll, info);
+    final CmpSR cmp = new CmpSR(expr.copy(cc, vm), min, mni, max, mxi, info);
     cmp.single = single;
     return copyType(cmp);
   }
@@ -223,7 +218,7 @@ public final class CmpSR extends Single {
     if(!(obj instanceof CmpSR)) return false;
     final CmpSR c = (CmpSR) obj;
     return Token.eq(min, c.min) && mni == c.mni && Token.eq(max, c.max) && mxi && c.mxi &&
-        Objects.equals(coll, c.coll) && super.equals(obj);
+        sc() == c.sc() && super.equals(obj);
   }
 
   @Override

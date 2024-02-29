@@ -71,11 +71,12 @@ public final class FnInvisibleXml extends StandardFunc {
       } catch(final BlitzException ex) {
         throw IXML_GEN_X.get(info, ex);
       }
-      final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info)};
-      final Expr arg = new VarRef(info, params[0]);
+      final Var var = new VarScope().addNew(new QNm("input"), STRING_O, true, qc, info);
+      final Var[] params = { var };
+      final Expr arg = new VarRef(info, var);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
       final FuncType ft = FuncType.get(parseFunction.seqType(), STRING_O);
-      return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, sc, params.length, null);
+      return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, params.length, null);
     }
   }
 

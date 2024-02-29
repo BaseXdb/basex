@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 public final class FileBaseDir extends FileFn {
   @Override
   public Item item(final QueryContext qc) {
-    final IO base = sc.baseIO();
+    final IO base = sc().baseIO();
     if(!(base instanceof IOFile)) return Empty.VALUE;
     return get(absolute(Paths.get(base.isDir() ? base.path() : base.dir())), true);
   }

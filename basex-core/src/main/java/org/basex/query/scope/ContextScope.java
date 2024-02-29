@@ -1,5 +1,6 @@
 package org.basex.query.scope;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -15,14 +16,15 @@ public final class ContextScope extends MainModule {
   /**
    * Constructor.
    * @param expr root expression
-   * @param declType declare type (can be {@code null})
+   * @param declType declared type (can be {@code null})
    * @param vs variable scope
+   * @param sc static context
    * @param info input info (can be {@code null})
    * @param doc xqdoc string (can be {@code null})
    */
   public ContextScope(final Expr expr, final SeqType declType, final VarScope vs,
-      final InputInfo info, final String doc) {
-    super(expr, vs);
+      final StaticContext sc, final InputInfo info, final String doc) {
+    super(expr, vs, sc);
     this.declType = declType;
     this.info = info;
     doc(doc);

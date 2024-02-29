@@ -22,22 +22,17 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class PartFunc extends Arr {
-  /** Static context. */
-  private final StaticContext sc;
   /** Positions of the placeholders. */
   private final int[] holes;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context
    * @param exprs expressions (arguments, body)
    * @param holes positions of the placeholders
    */
-  public PartFunc(final InputInfo info, final StaticContext sc, final Expr[] exprs,
-      final int[] holes) {
+  public PartFunc(final InputInfo info, final Expr[] exprs, final int[] holes) {
     super(info, SeqType.FUNCTION_O, exprs);
-    this.sc = sc;
     this.holes = holes;
   }
 
@@ -76,7 +71,7 @@ public final class PartFunc extends Arr {
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];
-    final VarScope vs = new VarScope(sc);
+    final VarScope vs = new VarScope();
     final Var[] params = new Var[hl];
     int a = -1;
     for(int h = 0; h < hl; h++) {
@@ -91,10 +86,10 @@ public final class PartFunc extends Arr {
 
     final AnnList anns = func.annotations();
     final boolean updating = anns.contains(Annotation.UPDATING);
-    final DynFuncCall expr = new DynFuncCall(info, sc, updating, false, func, args);
+    final DynFuncCall expr = new DynFuncCall(info, updating, false, func, args);
 
     final FuncType type = FuncType.get(anns, ft.declType, params);
-    return new FuncItem(info, expr, params, anns, type, sc, vs.stackSize(), null, qc.focus.copy());
+    return new FuncItem(info, expr, params, anns, type, vs.stackSize(), null, qc.focus.copy());
   }
 
   @Override
@@ -104,7 +99,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new PartFunc(info, sc, copyAll(cc, vm, exprs), holes.clone()));
+    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), holes.clone()));
   }
 
   @Override

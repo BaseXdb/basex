@@ -50,8 +50,6 @@ public abstract class JavaCall extends Arr {
 
   /** Updating flag. */
   public final boolean updating;
-  /** Static context. */
-  final StaticContext sc;
   /** Permission. */
   final Perm perm;
   /** Indicates if function parameters are XQuery types. */
@@ -62,14 +60,11 @@ public abstract class JavaCall extends Arr {
    * @param args arguments
    * @param perm required permission to run the function
    * @param updating updating flag
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
-  JavaCall(final Expr[] args, final Perm perm, final boolean updating, final StaticContext sc,
-      final InputInfo info) {
+  JavaCall(final Expr[] args, final Perm perm, final boolean updating, final InputInfo info) {
     super(info, SeqType.ITEM_ZM, args);
     this.updating = updating;
-    this.sc = sc;
     this.perm = perm;
   }
 
@@ -336,13 +331,12 @@ public abstract class JavaCall extends Arr {
    * @param qname function name
    * @param args arguments
    * @param qc query context
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @return Java function or {@code null}
    * @throws QueryException query exception
    */
   public static JavaCall get(final QNm qname, final Expr[] args, final QueryContext qc,
-      final StaticContext sc, final InputInfo info) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     // rewrite function name, extract argument types
     String name = camelCase(string(qname.local()));
@@ -373,7 +367,7 @@ public abstract class JavaCall extends Arr {
         Perm.get(req.value().name().toLowerCase(Locale.ENGLISH));
       final boolean updating = meth.getAnnotation(Updating.class) != null;
       if(updating) qc.updating();
-      return new StaticJavaCall(module, meth, args, perm, updating, sc, info);
+      return new StaticJavaCall(module, meth, args, perm, updating, info);
     }
 
     /* skip Java class lookup if...
@@ -385,7 +379,7 @@ public abstract class JavaCall extends Arr {
      * - module namespace _ = '_'; declare function _:_() { _:_() };
      * - fn:does-not-exist(), util:not-available()
      */
-    if(enforce || (sc.module == null || !eq(sc.module.uri(), qname.uri())) &&
+    if(enforce || (info.sc().module == null || !eq(info.sc().module.uri(), qname.uri())) &&
         NSGlobal.prefix(qname.uri()).length == 0) {
 
       // Java constructor, function, or variable
@@ -405,11 +399,11 @@ public abstract class JavaCall extends Arr {
       } else {
         // constructor
         if(name.equals(NEW)) {
-          final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, sc, info);
+          final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, info);
           if(djc.init(enforce)) return djc;
         }
         // field or method
-        final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, sc, info);
+        final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, info);
         if(djf.init(enforce)) return djf;
       }
     }

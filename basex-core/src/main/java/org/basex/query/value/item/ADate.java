@@ -380,8 +380,8 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return compare(item, ii) == 0;
   }
 
@@ -420,7 +420,7 @@ public abstract class ADate extends ADateDur {
    * @throws QueryException query exception
    */
   private int compare(final Item item, final InputInfo info) throws QueryException {
-    final ADate dat = (ADate) (item instanceof ADate ? item : type.cast(item, null, null, info));
+    final ADate dat = (ADate) (item instanceof ADate ? item : type.cast(item, null, info));
     return seconds().compareTo(dat.seconds());
   }
 

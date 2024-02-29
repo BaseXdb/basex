@@ -43,7 +43,7 @@ public final class FnFilter extends StandardFunc {
     if(arity == 1) {
       // INPUT[PREDICATE(.)]
       final Expr pred = cc.get(input, () ->
-        new DynFuncCall(info, sc, coerce(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
+        new DynFuncCall(info, coerce(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
       );
       return Filter.get(cc, info, input, pred);
     } else if(arity == 2) {
@@ -58,7 +58,7 @@ public final class FnFilter extends StandardFunc {
       final Expr pred = coerce(1, cc);
       final Expr item = new VarRef(info, i).optimize(cc);
       final Expr pos = new VarRef(info, p).optimize(cc);
-      final Expr dfc = new DynFuncCall(info, sc, pred, item, pos).optimize(cc);
+      final Expr dfc = new DynFuncCall(info, pred, item, pos).optimize(cc);
       clauses.add(new Where(dfc, info).optimize(cc));
 
       return new GFLWOR(info, clauses, new VarRef(info, i).optimize(cc)).optimize(cc);

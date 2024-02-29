@@ -192,8 +192,8 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final ANode cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+  public final ANode cast(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
     if(item.type == this) return (ANode) item;
     throw typeError(item, this, info);
   }

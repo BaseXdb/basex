@@ -19,18 +19,13 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class Update extends Arr {
-  /** Static context. */
-  final StaticContext sc;
-
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param expr expressions
    */
-  Update(final StaticContext sc, final InputInfo info, final Expr... expr) {
+  Update(final InputInfo info, final Expr... expr) {
     super(info, SeqType.EMPTY_SEQUENCE_Z, expr);
-    this.sc = sc;
   }
 
   @Override

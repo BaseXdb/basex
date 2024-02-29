@@ -70,8 +70,7 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hash, final Item key, final int level)
-      throws QueryException {
+  TrieNode delete(final int hash, final Item key, final int level) throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
     if(sub == null) return this;
@@ -96,16 +95,14 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  Value get(final int hash, final Item key, final int level)
-      throws QueryException {
+  Value get(final int hash, final Item key, final int level) throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
     return sub == null ? null : sub.get(hash, key, level + 1);
   }
 
   @Override
-  boolean contains(final int hash, final Item key, final int level)
-      throws QueryException {
+  boolean contains(final int hash, final Item key, final int level) throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
     return sub != null && sub.contains(hash, key, level + 1);

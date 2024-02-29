@@ -22,12 +22,11 @@ import org.basex.util.hash.*;
 public final class CTxt extends CNode {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param value value
    */
-  public CTxt(final StaticContext sc, final InputInfo info, final Expr value) {
-    super(sc, info, SeqType.TEXT_ZO, true, value);
+  public CTxt(final InputInfo info, final Expr value) {
+    super(info, SeqType.TEXT_ZO, true, value);
   }
 
   @Override
@@ -56,7 +55,7 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CTxt(sc, info, exprs[0].copy(cc, vm)));
+    return copyType(new CTxt(info, exprs[0].copy(cc, vm)));
   }
 
   @Override

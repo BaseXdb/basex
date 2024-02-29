@@ -39,8 +39,8 @@ public final class ArrayType extends FuncType {
   }
 
   @Override
-  public XQArray cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+  public XQArray cast(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
 
     if(item instanceof XQArray) {
       final XQArray a = (XQArray) item;

@@ -26,7 +26,7 @@ public class FnContainsSubsequence extends StandardFunc {
     if(compare != null) {
       cmp = (item1, item2) -> toBoolean(qc, compare, item1, item2);
     } else {
-      cmp = new DeepEqual(info, sc.collation, qc)::equal;
+      cmp = new DeepEqual(info, null, qc)::equal;
     }
     return Bln.get(compare(input, subsequence, cmp));
   }

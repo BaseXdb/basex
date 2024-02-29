@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.users.*;
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -237,14 +236,13 @@ public final class FuncDefinition {
 
   /**
    * Creates a new function instance.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param args function arguments
    * @return function
    */
-  public StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... args) {
+  public StandardFunc get(final InputInfo info, final Expr... args) {
     final StandardFunc sf = supplier.get();
-    sf.init(sc, info, this, args);
+    sf.init(info, this, args);
     return sf;
   }
 

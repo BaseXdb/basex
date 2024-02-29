@@ -76,13 +76,13 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(info, expr, params, anns, funcType(), vs.sc, vs.stackSize(),
-        name, qc.focus.copy());
+    return new FuncItem(info, expr, params, anns, funcType(), vs.stackSize(), name,
+        qc.focus.copy());
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final VarScope vsc = new VarScope(vs.sc);
+    final VarScope vsc = new VarScope();
     cc.pushScope(vsc);
     try {
       final int pl = params.length;

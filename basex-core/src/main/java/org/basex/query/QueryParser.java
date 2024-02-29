@@ -153,7 +153,7 @@ public class QueryParser extends InputParser {
       if(expr == null) throw alterError(EXPREMPTY);
 
       final VarScope vs = localVars.popContext();
-      final MainModule mm = new MainModule(expr, vs);
+      final MainModule mm = new MainModule(expr, vs, sc);
       mm.set(funcs, vars, moduleURIs, namespaces, moduleDoc);
       finish(mm);
       check(mm);
@@ -552,7 +552,7 @@ public class QueryParser extends InputParser {
 
       final SerializerOptions sopts = qc.parameters();
       if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
-      sopts.parse(name, value, sc, info());
+      sopts.parse(name, value, info());
 
     } else if(eq(qname.uri(), DB_URI)) {
       // project-specific declaration
@@ -648,7 +648,7 @@ public class QueryParser extends InputParser {
   private boolean defaultCollationDecl() throws QueryException {
     if(!wsConsumeWs(COLLATION)) return false;
     if(!decl.add(COLLATION)) throw error(DUPLCOLL);
-    sc.collation = Collation.get(stringLiteral(), qc, sc, info(), WHICHDEFCOLL_X);
+    sc.collation = Collation.get(stringLiteral(), qc, info(), WHICHDEFCOLL_X);
     return true;
   }
 
@@ -842,7 +842,7 @@ public class QueryParser extends InputParser {
     localVars.pushContext(false);
     final Expr expr = check(single(), NOEXPR);
     final VarScope vs = localVars.popContext();
-    qc.contextValue = new ContextScope(expr, st, vs, info(), docBuilder.toString());
+    qc.contextValue = new ContextScope(expr, st, vs, sc, info(), docBuilder.toString());
 
     if(sc.module != null) throw error(DECITEM);
     if(!sc.mixUpdates && expr.has(Flag.UPD)) throw error(UPCTX, expr);
@@ -1166,28 +1166,28 @@ public class QueryParser extends InputParser {
         // for member $m in EXPR  ->  for $m in array:split(EXPR) let $m := array:values($a)
         final Var split = new Var(member.name, null, qc, ii);
         localVars.add(split, member);
-        clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(sc, ii, expr), false));
-        clauses.add(new Let(member, Function._ARRAY_VALUES.get(sc, ii, new VarRef(ii, split))));
+        clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(ii, expr), false));
+        clauses.add(new Let(member, Function._ARRAY_VALUES.get(ii, new VarRef(ii, split))));
       } else if(value == null) {
         // for key $k in EXPR
         // ->  for $k in map:keys(EXPR)
         localVars.add(key);
-        clauses.add(new For(key, at, score, Function._MAP_KEYS.get(sc, ii, expr), false));
+        clauses.add(new For(key, at, score, Function._MAP_KEYS.get(ii, expr), false));
       } else if(key == null) {
         // for value in EXPR
         // ->  for $v in map:entries(EXPR) let $v := map:values($v)
         final Var entries = new Var(value.name, null, qc, ii);
         localVars.add(entries, value);
-        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), false));
-        clauses.add(new Let(value, Function._MAP_VALUES.get(sc, ii, new VarRef(ii, entries))));
+        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(ii, expr), false));
+        clauses.add(new Let(value, Function._MAP_VALUES.get(ii, new VarRef(ii, entries))));
       } else {
         // for key $k value $v in EXPR
         // ->  for $v in map:entries(EXPR) let $k := map:keys($v) let $v := map:values($v)
         final Var entries = localVars.add(new Var(value.name, null, qc, ii));
         localVars.add(entries, key, value);
-        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(sc, ii, expr), false));
-        clauses.add(new Let(key, Function._MAP_KEYS.get(sc, ii, new VarRef(ii, entries))));
-        clauses.add(new Let(value, Function._MAP_VALUES.get(sc, ii, new VarRef(ii, entries))));
+        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(ii, expr), false));
+        clauses.add(new Let(key, Function._MAP_KEYS.get(ii, new VarRef(ii, entries))));
+        clauses.add(new Let(value, Function._MAP_VALUES.get(ii, new VarRef(ii, entries))));
       }
     } while(wsConsumeWs(","));
   }
@@ -1271,7 +1271,7 @@ public class QueryParser extends InputParser {
       if(least) wsCheck(LEAST);
     }
     final Collation coll = wsConsumeWs(COLLATION) ?
-      Collation.get(stringLiteral(), qc, sc, info(), FLWORCOLL_X) : sc.collation;
+      Collation.get(stringLiteral(), qc, info(), FLWORCOLL_X) : sc.collation;
     return new OrderKey(info(), expr, desc, least, coll);
   }
 
@@ -1318,7 +1318,7 @@ public class QueryParser extends InputParser {
       }
 
       final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
-          qc, sc, info(), FLWORCOLL_X) : sc.collation;
+          qc, info(), FLWORCOLL_X) : sc.collation;
       final GroupSpec spec = new GroupSpec(var.info, localVars.add(var), by, coll);
       if(specs == null) {
         specs = new GroupSpec[] { spec };
@@ -1355,13 +1355,13 @@ public class QueryParser extends InputParser {
     } while(wsConsumeWs(","));
 
     wsCheck(SATISFIES);
-    final Expr rtrn = Function.BOOLEAN.get(sc, info(), check(single(), NOSOME));
+    final Expr rtrn = Function.BOOLEAN.get(info(), check(single(), NOSOME));
     localVars.closeScope(s);
 
     final InputInfo ii = clauses.peek().info();
     final GFLWOR flwor = new GFLWOR(ii, clauses, rtrn);
-    final CmpG cmp = new CmpG(ii, flwor, Bln.get(some), OpG.EQ, null, sc);
-    return some ? cmp : Function.NOT.get(sc, ii, cmp);
+    final CmpG cmp = new CmpG(ii, flwor, Bln.get(some), OpG.EQ);
+    return some ? cmp : Function.NOT.get(ii, cmp);
   }
 
   /**
@@ -1530,16 +1530,13 @@ public class QueryParser extends InputParser {
     final Expr expr = ftContains();
     if(expr != null) {
       for(final OpV c : OpV.VALUES) {
-        if(wsConsumeWs(c.name))
-          return new CmpV(info(), expr, check(ftContains(), CMPEXPR), c, sc.collation, sc);
+        if(wsConsumeWs(c.name)) return new CmpV(info(), expr, check(ftContains(), CMPEXPR), c);
       }
       for(final OpN c : OpN.VALUES) {
-        if(wsConsumeWs(c.name))
-          return new CmpN(info(), expr, check(ftContains(), CMPEXPR), c);
+        if(wsConsumeWs(c.name)) return new CmpN(info(), expr, check(ftContains(), CMPEXPR), c);
       }
       for(final OpG c : OpG.VALUES) {
-        if(wsConsumeWs(c.name))
-          return new CmpG(info(), expr, check(ftContains(), CMPEXPR), c, sc.collation, sc);
+        if(wsConsumeWs(c.name)) return new CmpG(info(), expr, check(ftContains(), CMPEXPR), c);
       }
     }
     return expr;
@@ -1742,7 +1739,7 @@ public class QueryParser extends InputParser {
     final Expr expr = cast();
     if(!wsConsumeWs(CASTABLE)) return expr;
     wsCheck(AS);
-    return new Castable(sc, info(), expr, simpleType());
+    return new Castable(info(), expr, simpleType());
   }
 
   /**
@@ -1754,7 +1751,7 @@ public class QueryParser extends InputParser {
     final Expr expr = arrow();
     if(!wsConsumeWs(CAST)) return expr;
     wsCheck(AS);
-    return new Cast(sc, info(), expr, simpleType());
+    return new Cast(info(), expr, simpleType());
   }
 
   /**
@@ -1955,7 +1952,7 @@ public class QueryParser extends InputParser {
     Expr root = null;
     if(consume('/')) {
       final InputInfo ii = info();
-      root = Function._UTIL_ROOT.get(sc, ii, new ContextValue(ii));
+      root = Function._UTIL_ROOT.get(ii, new ContextValue(ii));
       el = new ExprList();
       final Expr expr;
       if(consume('/')) {
@@ -2371,7 +2368,7 @@ public class QueryParser extends InputParser {
       if(Function.ERROR.is(num)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, num);
       final int arity = (int) ((Int) num).itr();
-      return Functions.item(name, arity, false, sc, info(), qc);
+      return Functions.item(name, arity, false, info(), qc);
     }
     pos = p;
     return null;
@@ -2467,7 +2464,7 @@ public class QueryParser extends InputParser {
     if(token.isEmpty()) throw error(NUMBER_X, token);
     // out of range
     if(range || max != 0 && l > max) return FnError.get(RANGE_X.get(info(), token),
-        SeqType.INTEGER_O, sc);
+        SeqType.INTEGER_O);
 
     return Int.get(negate ? -l : l);
   }
@@ -2608,7 +2605,7 @@ public class QueryParser extends InputParser {
    */
   private FuncBuilder argumentList(final boolean keywords, final Expr[] args)
       throws QueryException {
-    final FuncBuilder fb  = new FuncBuilder(sc, info()).init(args, null);
+    final FuncBuilder fb  = new FuncBuilder(info()).init(args, null);
     wsCheck("(");
     if(!wsConsumeWs(")")) {
       boolean kw = false;
@@ -2663,7 +2660,7 @@ public class QueryParser extends InputParser {
       if(constr ? consume('`') && consume('{') : consume('{') && !consume('{')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
         final Expr expr = expr();
-        if(expr != null) el.add(Function.STRING_JOIN.get(sc, info(), expr, Str.SPACE));
+        if(expr != null) el.add(Function.STRING_JOIN.get(info(), expr, Str.SPACE));
         skipWs();
         check('}');
         if(constr) check('`');
@@ -2799,7 +2796,7 @@ public class QueryParser extends InputParser {
         if(atts == null) atts = new ArrayList<>(1);
         atts.add(attn);
         qnames.add(attn, false, info());
-        add(cont, new CAttr(sc, info(), false, attn, attv.finish()));
+        add(cont, new CAttr(info(), false, attn, attv.finish()));
       }
       if(!consumeWS()) break;
     }
@@ -2834,7 +2831,7 @@ public class QueryParser extends InputParser {
 
     sc.ns.size(size);
     sc.elemNS = nse;
-    return new CElem(sc, info(), false, name, ns, cont.finish());
+    return new CElem(info(), false, name, ns, cont.finish());
   }
 
   /**
@@ -2900,7 +2897,7 @@ public class QueryParser extends InputParser {
       final char ch = consumeContent();
       if(ch == '-' && consume('-')) {
         check('>');
-        return new CComm(sc, info(), false, Str.get(tb.finish()));
+        return new CComm(info(), false, Str.get(tb.finish()));
       }
       tb.add(ch);
     }
@@ -2921,7 +2918,7 @@ public class QueryParser extends InputParser {
     while(true) {
       final char ch = consumeContent();
       if(ch == '?' && consume('>')) {
-        return new CPI(sc, info(), false, Str.get(str), Str.get(tb.finish()));
+        return new CPI(info(), false, Str.get(str), Str.get(tb.finish()));
       }
       if(!space) throw error(PIWRONG);
       tb.add(ch);
@@ -2979,7 +2976,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compDoc() throws QueryException {
-    return curr('{') ? new CDoc(sc, info(), false, enclosedExpr()) : null;
+    return curr('{') ? new CDoc(info(), false, enclosedExpr()) : null;
   }
 
   /**
@@ -3004,7 +3001,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    return curr('{') ? new CElem(sc, info(), true, name, new Atts(), enclosedExpr()) : null;
+    return curr('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
   }
 
   /**
@@ -3028,7 +3025,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    return curr('{') ? new CAttr(sc, info(), true, name, enclosedExpr()) : null;
+    return curr('{') ? new CAttr(info(), true, name, enclosedExpr()) : null;
   }
 
   /**
@@ -3048,7 +3045,7 @@ public class QueryParser extends InputParser {
       name = Str.get(str);
     }
     skipWs();
-    return curr('{') ? new CNSpace(sc, info(), true, name, enclosedExpr()) : null;
+    return curr('{') ? new CNSpace(info(), true, name, enclosedExpr()) : null;
   }
 
   /**
@@ -3057,7 +3054,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compText() throws QueryException {
-    return curr('{') ? new CTxt(sc, info(), enclosedExpr()) : null;
+    return curr('{') ? new CTxt(info(), enclosedExpr()) : null;
   }
 
   /**
@@ -3066,7 +3063,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compComment() throws QueryException {
-    return curr('{') ? new CComm(sc, info(), true, enclosedExpr()) : null;
+    return curr('{') ? new CComm(info(), true, enclosedExpr()) : null;
   }
 
   /**
@@ -3088,7 +3085,7 @@ public class QueryParser extends InputParser {
     }
 
     skipWs();
-    return curr('{') ? new CPI(sc, info(), true, name, enclosedExpr()) : null;
+    return curr('{') ? new CPI(info(), true, name, enclosedExpr()) : null;
   }
 
   /**
@@ -3782,7 +3779,7 @@ public class QueryParser extends InputParser {
     }
     final Expr trg = check(single(), INCOMPLETE);
     qc.updating();
-    return new Insert(sc, info(), s, mode, trg);
+    return new Insert(info(), s, mode, trg);
   }
 
   /**
@@ -3797,7 +3794,7 @@ public class QueryParser extends InputParser {
       return null;
     }
     qc.updating();
-    return new Delete(sc, info(), check(single(), INCOMPLETE));
+    return new Delete(info(), check(single(), INCOMPLETE));
   }
 
   /**
@@ -3816,7 +3813,7 @@ public class QueryParser extends InputParser {
     wsCheck(AS);
     final Expr n = check(single(), INCOMPLETE);
     qc.updating();
-    return new Rename(sc, info(), trg, n);
+    return new Rename(info(), trg, n);
   }
 
   /**
@@ -3841,7 +3838,7 @@ public class QueryParser extends InputParser {
     wsCheck(WITH);
     final Expr src = check(single(), INCOMPLETE);
     qc.updating();
-    return new Replace(sc, info(), trg, src, value);
+    return new Replace(info(), trg, src, value);
   }
 
   /**
@@ -3897,7 +3894,7 @@ public class QueryParser extends InputParser {
         }
         // skip if primary expression cannot be a function
         if(upd) qc.updating();
-        return new DynFuncCall(ii, sc, upd, ndt, func, argList.finish());
+        return new DynFuncCall(ii, upd, ndt, func, argList.finish());
       }
     }
     pos = p;
@@ -4315,5 +4312,10 @@ public class QueryParser extends InputParser {
     }
     if(sb.length() >= max) sb.append(Text.DOTS);
     return sb.toString().trim();
+  }
+
+  @Override
+  public final InputInfo info() {
+    return new InputInfo(this, sc);
   }
 }

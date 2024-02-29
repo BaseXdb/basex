@@ -41,9 +41,8 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public XQMap cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-
+  public XQMap cast(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
     if(item instanceof XQMap) {
       final XQMap m = (XQMap) item;
       if(m.instanceOf(this)) return m;

@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
 import java.io.*;
 import java.util.regex.*;
@@ -156,10 +157,10 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     final QNm qnm;
+    final StaticContext sc = ii != null ? ii.sc() : null;
     if(item instanceof QNm) {
       qnm = (QNm) item;
     } else if(item.type.isUntyped() && sc != null) {
@@ -175,7 +176,7 @@ public final class QNm extends Item {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return type == item.type && equal(item, deep.coll, null, deep.info) && (
+    return type == item.type && equal(item, null, deep.info) && (
       !deep.options.get(DeepEqualOptions.NAMESPACE_PREFIXES) ||
       Token.eq(prefix(), ((QNm) item).prefix()));
   }

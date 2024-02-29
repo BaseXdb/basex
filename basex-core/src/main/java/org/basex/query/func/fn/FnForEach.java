@@ -53,7 +53,7 @@ public class FnForEach extends StandardFunc {
       final boolean updating = this instanceof UpdateForEach, ndt = act.has(Flag.NDT);
       final ExprList args = new ExprList(new VarRef(info, i).optimize(cc));
       if(arity == 2) args.add(new VarRef(info, p).optimize(cc));
-      final Expr rtrn = new DynFuncCall(info, sc, updating, ndt, act, args.finish()).optimize(cc);
+      final Expr rtrn = new DynFuncCall(info, updating, ndt, act, args.finish()).optimize(cc);
       return new GFLWOR(info, fr, rtrn).optimize(cc);
     }
     return this;

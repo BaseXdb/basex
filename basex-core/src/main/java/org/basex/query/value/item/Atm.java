@@ -64,10 +64,10 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return comparable(item) ? Token.eq(value, item.string(ii), coll) :
-      item.equal(this, coll, sc, ii);
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return comparable(item) ? Token.eq(value, item.string(ii), Collation.get(coll, ii)) :
+      item.equal(this, coll, ii);
   }
 
   @Override
@@ -78,7 +78,7 @@ public final class Atm extends Item {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return comparable(item) ? Token.compare(value, item.string(ii), coll) :
+    return comparable(item) ? Token.compare(value, item.string(ii), Collation.get(coll, ii)) :
       -item.compare(this, coll, transitive, ii);
   }
 

@@ -61,7 +61,7 @@ public class FnEmpty extends StandardFunc {
       final Expr[] args = input.args();
       if(args.length == 2 && args[1].seqType().one() &&
           CmpG.compatible(args[0].seqType(), args[1].seqType(), true)) {
-        input = new CmpG(info, args[0], args[1], OpG.EQ, null, sc).optimize(cc);
+        input = new CmpG(info, args[0], args[1], OpG.EQ).optimize(cc);
       }
     } else if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input)) {
       // exists(string-to-codepoints(E))  ->  boolean(string(E))
@@ -74,7 +74,7 @@ public class FnEmpty extends StandardFunc {
     final boolean map = _MAP_KEYS.is(input), array = _ARRAY_MEMBERS.is(input);
     if(map || array) {
       input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
-      return new CmpG(info, input, Int.ZERO, exists ? OpG.NE : OpG.EQ, null, sc).optimize(cc);
+      return new CmpG(info, input, Int.ZERO, exists ? OpG.NE : OpG.EQ).optimize(cc);
     }
 
     return embed(cc, true);

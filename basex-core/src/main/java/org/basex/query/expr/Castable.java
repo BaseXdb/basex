@@ -19,14 +19,12 @@ import org.basex.util.hash.*;
 public final class Castable extends Convert {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param expr expression
    * @param seqType sequence type to check
    */
-  public Castable(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType seqType) {
-    super(sc, info, expr, seqType, SeqType.BOOLEAN_O);
+  public Castable(final InputInfo info, final Expr expr, final SeqType seqType) {
+    super(info, expr, seqType, SeqType.BOOLEAN_O);
   }
 
   @Override
@@ -38,19 +36,19 @@ public final class Castable extends Convert {
     if(castable != null) return cc.replaceWith(this, Bln.get(castable));
 
     final Expr arg = simplify(castType, cc);
-    if(arg != null) return new Castable(sc, info, arg, seqType).optimize(cc);
+    if(arg != null) return new Castable(info, arg, seqType).optimize(cc);
 
     return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(seqType.cast(expr.atomValue(qc, info), false, qc, sc, info) != null);
+    return Bln.get(seqType.cast(expr.atomValue(qc, info), false, qc, info) != null);
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Castable(sc, info, expr.copy(cc, vm), seqType));
+    return copyType(new Castable(info, expr.copy(cc, vm), seqType));
   }
 
   @Override

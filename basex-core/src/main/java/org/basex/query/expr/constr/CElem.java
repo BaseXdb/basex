@@ -35,16 +35,15 @@ public final class CElem extends CName {
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param name name
    * @param nspaces namespaces
    * @param exprs element contents
    */
-  public CElem(final StaticContext sc, final InputInfo info, final boolean computed,
-      final Expr name, final Atts nspaces, final Expr... exprs) {
-    super(sc, info, SeqType.ELEMENT_O, computed, name, exprs);
+  public CElem(final InputInfo info, final boolean computed, final Expr name, final Atts nspaces,
+      final Expr... exprs) {
+    super(info, SeqType.ELEMENT_O, computed, name, exprs);
     this.nspaces = nspaces;
   }
 
@@ -54,7 +53,7 @@ public final class CElem extends CName {
     try {
       return super.compile(cc);
     } finally {
-      sc.ns.size(s);
+      sc().ns.size(s);
     }
   }
 
@@ -138,7 +137,7 @@ public final class CElem extends CName {
       final FBuilder elem = FElem.build(nm);
 
       // add child and attribute nodes
-      final Constr constr = new Constr(elem, info, sc, qc).add(exprs);
+      final Constr constr = new Constr(elem, info, qc).add(exprs);
       if(constr.errAtt != null) throw NOATTALL_X.get(info, constr.errAtt);
       if(constr.errNS != null) throw NONSALL_X.get(info, constr.errNS);
       if(constr.duplAtt != null) throw CATTDUPL_X.get(info, constr.duplAtt);
@@ -151,13 +150,13 @@ public final class CElem extends CName {
       return elem.finish();
 
     } finally {
-      sc.ns.size(s);
+      info.sc().ns.size(s);
     }
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CElem(sc, info, computed, name.copy(cc, vm), new Atts(nspaces),
+    return copyType(new CElem(info, computed, name.copy(cc, vm), new Atts(nspaces),
         copyAll(cc, vm, exprs)));
   }
 
@@ -166,7 +165,7 @@ public final class CElem extends CName {
    * @return old position in namespace stack
    */
   private int addNS() {
-    final NSContext nsContext = sc.ns;
+    final NSContext nsContext = info.sc().ns;
     final int size = nsContext.size(), ns = nspaces.size();
     for(int n = 0; n < ns; n++) nsContext.add(nspaces.name(n), nspaces.value(n));
     return size;

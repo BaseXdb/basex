@@ -11,6 +11,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class NoCaseCollation extends Collation {
+  /** Singleton instance. */
+  static final NoCaseCollation INSTANCE = new NoCaseCollation();
+
   @Override
   public int compare(final byte[] string, final byte[] compare) {
     final String str = string(string), comp = string(compare);

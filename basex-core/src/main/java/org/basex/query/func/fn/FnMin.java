@@ -62,7 +62,7 @@ public class FnMin extends StandardFunc {
         final Type type2 = it.type;
         if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, type2, it);
         if(min ^ item.compare(it, collation, true, info) < 0) item = it;
-        if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, sc, info);
+        if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, info);
       }
       return item;
     }
@@ -76,14 +76,14 @@ public class FnMin extends StandardFunc {
       return item;
     }
     // numbers
-    if(type.isUntyped()) item = DOUBLE.cast(item, qc, sc, info);
+    if(type.isUntyped()) item = DOUBLE.cast(item, qc, info);
     if(item == Dbl.NAN || item == Flt.NAN) return item;
     for(Item it; (it = qc.next(iter)) != null;) {
-      if(it.type.isUntyped()) it = DOUBLE.cast(it, qc, sc, info);
+      if(it.type.isUntyped()) it = DOUBLE.cast(it, qc, info);
       if(it == Dbl.NAN || it == Flt.NAN) return it;
       final AtomType tp = numType(item, it);
       if(min ^ item.compare(it, collation, true, info) < 0) item = it;
-      if(tp != null) item = tp.cast(item, qc, sc, info);
+      if(tp != null) item = tp.cast(item, qc, info);
     }
     return item;
   }

@@ -238,14 +238,6 @@ public final class CompileContext {
   }
 
   /**
-   * Returns the current static context.
-   * @return static context (can be {@code null})
-   */
-  public StaticContext sc() {
-    return vs().sc;
-  }
-
-  /**
    * Creates a new copy of the given variable in this scope.
    * @param var variable to copy (can be {@code null})
    * @param vm variable mapping (can be {@code null})
@@ -337,7 +329,7 @@ public final class CompileContext {
    * @return function
    */
   public StandardFunc error(final QueryException qe, final Expr expr) {
-    return FnError.get(qe, expr.seqType(), sc());
+    return FnError.get(qe, expr.seqType());
   }
 
   /**
@@ -367,7 +359,7 @@ public final class CompileContext {
    */
   public Expr function(final AFunction function, final InputInfo info, final Expr... exprs)
       throws QueryException {
-    return function.get(sc(), info, exprs).optimize(this);
+    return function.get(info, exprs).optimize(this);
   }
 
   /**

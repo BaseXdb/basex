@@ -185,13 +185,11 @@ public final class SerializerOptions extends Options {
    * Parses options.
    * @param name name of option
    * @param value value
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public void parse(final String name, final byte[] value, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-
+  public void parse(final String name, final byte[] value, final InputInfo info)
+      throws QueryException {
     try {
       assign(name, string(value));
     } catch(final BaseXException ex) {
@@ -205,7 +203,7 @@ public final class SerializerOptions extends Options {
     if(name.equals(PARAMETER_DOCUMENT.name())) {
       Uri uri = Uri.get(value);
       if(!uri.isValid()) throw INVURI_X.get(info, value);
-      if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, info);
+      if(!uri.isAbsolute()) uri = info.sc().baseURI().resolve(uri, info);
       final IO io = IO.get(string(uri.string()));
       final ANode root;
       try {

@@ -15,23 +15,18 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class Convert extends Single {
-  /** Static context. */
-  final StaticContext sc;
   /** Sequence type to cast to (zero or one items). */
   final SeqType seqType;
 
   /**
    * Function constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param expr expression
    * @param seqType sequence type to cast to (zero or one item)
    * @param targetType target type
    */
-  Convert(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType seqType, final SeqType targetType) {
+  Convert(final InputInfo info, final Expr expr, final SeqType seqType, final SeqType targetType) {
     super(info, expr, targetType);
-    this.sc = sc;
     this.seqType = seqType;
   }
 

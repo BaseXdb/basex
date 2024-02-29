@@ -64,7 +64,7 @@ public final class DeepEqual {
   public DeepEqual(final InputInfo info, final Collation coll, final  QueryContext qc,
       final DeepEqualOptions options) {
     this.info = info;
-    this.coll = coll;
+    this.coll = Collation.get(coll, info);
     this.qc = qc;
     this.options = options != null ? options : DEFAULTS;
   }

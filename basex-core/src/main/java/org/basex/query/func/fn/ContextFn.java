@@ -79,7 +79,7 @@ public abstract class ContextFn extends StandardFunc {
     if(ic.var == null && !(ic.expr instanceof ContextValue) && contextAccess()) {
       // $v ! string()  ->  string($v)
       final Expr[] newArgs = new ExprList(args.length + 1).add(args).add(ic.copy()).finish();
-      expr = definition.get(ic.cc.sc(), info, newArgs);
+      expr = definition.get(info, newArgs);
     }
     return expr != null ? expr.optimize(ic.cc) : null;
   }

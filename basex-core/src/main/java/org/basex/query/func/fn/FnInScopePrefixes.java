@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 public class FnInScopePrefixes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Atts atts = toElem(arg(0), qc).nsScope(sc).add(XML, XML_URI);
+    final Atts atts = toElem(arg(0), qc).nsScope(sc()).add(XML, XML_URI);
 
     final int as = atts.size();
     final TokenList tl = new TokenList();

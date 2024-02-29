@@ -75,9 +75,9 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    */
   private FuncItem permuteFunc(final long seed, final QueryContext qctx) {
     final Var var = new Var(new QNm("seq"), null, qctx, info, true, 0, null);
-    final StandardFunc sf = Function._RANDOM_SEEDED_PERMUTATION.get(sc, info, Int.get(seed),
+    final StandardFunc sf = Function._RANDOM_SEEDED_PERMUTATION.get(info, Int.get(seed),
         new VarRef(info, var));
-    return new FuncItem(info, sf, new Var[] { var }, AnnList.EMPTY, PERMUTE_TYPE, sc, 1, null);
+    return new FuncItem(info, sf, new Var[] { var }, AnnList.EMPTY, PERMUTE_TYPE, 1, null);
   }
 
   /**
@@ -86,7 +86,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
    * @return function returning the next random number generator
    */
   private FuncItem nextFunc(final long seed) {
-    final StandardFunc sf = Function.RANDOM_NUMBER_GENERATOR.get(sc, info, Int.get(seed));
-    return new FuncItem(info, sf, new Var[0], AnnList.EMPTY, NEXT_TYPE, sc, 0, null);
+    final StandardFunc sf = Function.RANDOM_NUMBER_GENERATOR.get(info, Int.get(seed));
+    return new FuncItem(info, sf, new Var[0], AnnList.EMPTY, NEXT_TYPE, 0, null);
   }
 }

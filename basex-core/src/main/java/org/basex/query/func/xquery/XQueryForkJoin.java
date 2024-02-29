@@ -59,7 +59,7 @@ public final class XQueryForkJoin extends StandardFunc {
     final Expr functions = arg(0), options = arg(1);
     final SeqType st = functions.seqType();
     if(st.zero()) return functions;
-    if(st.one()) return new DynFuncCall(info, sc, coerce(0, cc)).optimize(cc);
+    if(st.one()) return new DynFuncCall(info, coerce(0, cc)).optimize(cc);
 
     final Boolean results = options == Empty.UNDEFINED ? Boolean.TRUE :
       options instanceof Value ? toOptions(options, new TaskOptions(), true, cc.qc).get(RESULTS) :

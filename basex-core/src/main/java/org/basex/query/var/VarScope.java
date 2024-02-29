@@ -20,18 +20,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class VarScope {
-  /** Static context (can be {@code null} at runtime). */
-  public final StaticContext sc;
   /** Local variables in this scope. */
   private final ArrayList<Var> vars = new ArrayList<>();
-
-  /**
-   * Constructor for a top-level module.
-   * @param sc static context
-   */
-  public VarScope(final StaticContext sc) {
-    this.sc = sc;
-  }
 
   /**
    * Adds a variable to this scope.

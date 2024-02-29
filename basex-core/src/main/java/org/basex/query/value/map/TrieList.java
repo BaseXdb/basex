@@ -58,9 +58,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item key, final int level)
-      throws QueryException {
-
+  TrieNode delete(final int hs, final Item key, final int level) throws QueryException {
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
@@ -120,8 +118,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  Value get(final int hs, final Item key, final int level)
-      throws QueryException {
+  Value get(final int hs, final Item key, final int level) throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;) {
         if(key.atomicEqual(keys[k])) return values[k];
@@ -131,8 +128,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  boolean contains(final int hs, final Item key, final int level)
-      throws QueryException {
+  boolean contains(final int hs, final Item key, final int level) throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;)
         if(key.atomicEqual(keys[k])) return true;

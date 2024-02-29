@@ -28,8 +28,6 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
-  /** Static context (can be {@null} at runtime). */
-  public final StaticContext sc;
   /** Function expression. */
   public final Expr expr;
 
@@ -55,13 +53,12 @@ public final class FuncItem extends FItem implements Scope {
    * @param params formal parameters
    * @param anns function annotations
    * @param type function type
-   * @param sc static context (can be {@null} at runtime)
    * @param stackSize stack-frame size
    * @param name function name (can be {@code null})
    */
   public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
-      final FuncType type, final StaticContext sc, final int stackSize, final QNm name) {
-    this(info, expr, params, anns, type, sc, stackSize, name, null);
+      final FuncType type, final int stackSize, final QNm name) {
+    this(info, expr, params, anns, type, stackSize, name, null);
   }
 
   /**
@@ -71,21 +68,17 @@ public final class FuncItem extends FItem implements Scope {
    * @param params formal parameters
    * @param anns function annotations
    * @param type function type
-   * @param sc static context (can be {@null} at runtime)
    * @param stackSize stack-frame size
    * @param name function name (can be {@code null})
    * @param focus query focus (can be {@code null})
    */
   public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
-      final FuncType type, final StaticContext sc, final int stackSize, final QNm name,
-      final QueryFocus focus) {
-
+      final FuncType type, final int stackSize, final QNm name, final QueryFocus focus) {
     super(type);
     this.info = info;
     this.expr = expr;
     this.params = params;
     this.anns = anns;
-    this.sc = sc;
     this.stackSize = stackSize;
     this.name = name;
     this.focus = focus;
@@ -139,8 +132,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
-    return coerceTo(ft, qc, cc, info, null, anns.contains(Annotation.UPDATING) ||
-        expr.has(Flag.UPD));
+    return coerceTo(ft, qc, cc, info, anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD));
   }
 
   @Override
@@ -217,6 +209,11 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public InputInfo info() {
+    return info;
+  }
+
+  @Override
   public String description() {
     return FUNCTION + ' ' + ITEM;
   }
@@ -284,8 +281,8 @@ public final class FuncItem extends FItem implements Scope {
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
           }
           if(action != null) return new FuncItem[] {
-            new FuncItem(info, cnd, params, anns, funcType(), sc, stackSize, null, focus),
-            new FuncItem(info, action, params, anns, funcType(), sc, stackSize, null, focus)
+            new FuncItem(info, cnd, params, anns, funcType(), stackSize, null, focus),
+            new FuncItem(info, action, params, anns, funcType(), stackSize, null, focus)
           };
         }
       }

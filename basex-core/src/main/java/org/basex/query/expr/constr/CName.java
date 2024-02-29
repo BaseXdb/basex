@@ -23,16 +23,15 @@ abstract class CName extends CNode {
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param seqType sequence type
    * @param computed computed constructor
    * @param name name
    * @param exprs contents
    */
-  CName(final StaticContext sc, final InputInfo info, final SeqType seqType, final boolean computed,
-      final Expr name, final Expr... exprs) {
-    super(sc, info, seqType, computed, exprs);
+  CName(final InputInfo info, final SeqType seqType, final boolean computed, final Expr name,
+      final Expr... exprs) {
+    super(info, seqType, computed, exprs);
     this.name = name;
   }
 
@@ -63,7 +62,7 @@ abstract class CName extends CNode {
     if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
       throw STRQNM_X_X.get(info, item.seqType(), item);
 
-    final QNm qnm = qc.shared.parseQName(item.string(info), elem, sc);
+    final QNm qnm = qc.shared.parseQName(item.string(info), elem, sc());
     if(qnm != null) return qnm;
 
     throw INVQNAME_X.get(info, item);

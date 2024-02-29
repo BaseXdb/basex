@@ -39,13 +39,12 @@ public final class StaticJavaCall extends JavaCall {
    * @param args arguments
    * @param perm required permission
    * @param updating updating flag
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
   StaticJavaCall(final Object module, final Method method, final Expr[] args, final Perm perm,
-      final boolean updating, final StaticContext sc, final InputInfo info) {
+      final boolean updating, final InputInfo info) {
 
-    super(args, perm, updating, sc, info);
+    super(args, perm, updating, info);
     this.module = module;
     this.method = method;
     params = method.getParameterTypes();
@@ -70,7 +69,7 @@ public final class StaticJavaCall extends JavaCall {
     // assign query context if module is inheriting the {@link QueryModule} interface
     if(module instanceof QueryModule) {
       final QueryModule qm = (QueryModule) module;
-      qm.staticContext = sc;
+      qm.staticContext = sc();
       qm.queryContext = qc;
     }
 
@@ -87,7 +86,7 @@ public final class StaticJavaCall extends JavaCall {
 
   @Override
   public StaticJavaCall copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new StaticJavaCall(module, method, copyAll(cc, vm, exprs), perm, updating, sc,
+    return copyType(new StaticJavaCall(module, method, copyAll(cc, vm, exprs), perm, updating,
         info));
   }
 

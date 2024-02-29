@@ -19,7 +19,7 @@ public final class FnPrefixFromQName extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final QNm value = toQNmOrNull(arg(0), qc);
     return value == null || !value.hasPrefix() ? Empty.VALUE :
-      AtomType.NCNAME.cast(Str.get(value.prefix()), qc, sc, info);
+      AtomType.NCNAME.cast(Str.get(value.prefix()), qc, info);
   }
 
   @Override

@@ -19,7 +19,7 @@ public final class FnParseQName extends StandardFunc {
   public QNm item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
 
-    final QNm qnm = qc.shared.parseQName(value, true, sc);
+    final QNm qnm = qc.shared.parseQName(value, true, sc());
     if(qnm == null) throw valueError(AtomType.QNAME, value, info);
     if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(info, qnm.prefix());
     return qnm;

@@ -15,7 +15,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -167,12 +166,9 @@ public class CmpG extends Cmp {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
-   * @param coll collation (can be {@code null})
-   * @param sc static context
    */
-  public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final OpG op,
-      final Collation coll, final StaticContext sc) {
-    super(info, expr1, expr2, coll, SeqType.BOOLEAN_O, sc);
+  public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final OpG op) {
+    super(info, expr1, expr2, SeqType.BOOLEAN_O);
     this.op = op;
   }
 
@@ -210,8 +206,8 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr == this && expr1 instanceof If && !expr1.has(Flag.NDT)) {
       final If iff = (If) expr1;
-      final Expr thn = new CmpG(info, iff.arg(0), expr2, op, coll, sc);
-      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjMap<>()), op, coll, sc);
+      final Expr thn = new CmpG(info, iff.arg(0), expr2, op);
+      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjMap<>()), op);
       return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
     }
 
@@ -232,13 +228,12 @@ public class CmpG extends Cmp {
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) {
-          expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info, check);
+          expr = new CmpSimpleG(expr1, expr2, op, info, check);
         }
-      } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
+      } else if(op == OpG.EQ && sc().collation == null && (type1.isNumber() && type2.isNumber() ||
           type1.isStringOrUntyped() && type2.isStringOrUntyped()) && !st2.zeroOrOne()) {
         // hash-based comparisons
-        hash = this instanceof CmpHashG ? (CmpHashG) this :
-          new CmpHashG(expr1, expr2, op, sc, info);
+        hash = this instanceof CmpHashG ? (CmpHashG) this : new CmpHashG(expr1, expr2, op, info);
         expr = hash;
       }
       // pre-evaluate expression; discard hashed results
@@ -270,7 +265,7 @@ public class CmpG extends Cmp {
         final Calc calc1 = ((Arith) expr1).calc;
         if(calc1 == Calc.SUBTRACT && expr2 == Int.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
-          ex = new CmpG(info, op11, op12, op, coll, sc);
+          ex = new CmpG(info, op11, op12, op);
         } else if((
           Function.POSITION.is(op11) ||
           !Double.isNaN(num12) &&
@@ -285,7 +280,7 @@ public class CmpG extends Cmp {
           // $a - 1 = $b + 1  ->  $a = $b + 2
           // $x * -1 = 1  ->  $x = 1 div -1  (no rewrite if RHS of */div (<,<=,>=,>) is negative)
           final Expr arg2 = new Arith(info, expr2, op12, calc1.invert()).optimize(cc);
-          ex = new CmpG(info, op11, arg2, op, coll, sc);
+          ex = new CmpG(info, op11, arg2, op);
         }
       }
     }
@@ -369,7 +364,7 @@ public class CmpG extends Cmp {
       final Type type1 = item1.type, type2 = item2.type;
       if(!comparable(type1, type2, true)) throw compareError(item1, item2, info);
     }
-    return op.value().eval(item1, item2, coll, sc, info);
+    return op.value().eval(item1, item2, info);
   }
 
   /**
@@ -410,7 +405,7 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
-      new CmpG(info, expr1, expr2, op.invert(), coll, sc) : null;
+      new CmpG(info, expr1, expr2, op.invert()) : null;
   }
 
   @Override
@@ -444,13 +439,14 @@ public class CmpG extends Cmp {
     // compare first and second comparison
     final CmpG cmp2 = (CmpG) expr2;
     final OpG cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
-    if(op != cmpOp || coll != cmp2.coll || !exprs[0].equals(cmp2.exprs[0])) return null;
+    if(op != cmpOp || sc().collation != cmp2.sc().collation || !exprs[0].equals(cmp2.exprs[0]))
+      return null;
 
     // function for creating new comparison
     final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
     final QueryFunction<OpG, Expr> newList = newOp -> {
       final Expr exprR = List.get(cc, info, exprR1, exprR2);
-      return new CmpG(info, exprL, exprR, newOp, coll, sc).optimize(cc);
+      return new CmpG(info, exprL, exprR, newOp).optimize(cc);
     };
 
     // check if comparisons can be merged
@@ -550,7 +546,7 @@ public class CmpG extends Cmp {
       if(part != null) {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
-          final Test test = new NameTest(qname, part, (NodeType) type, cc.sc().elemNS);
+          final Test test = new NameTest(qname, part, (NodeType) type, sc().elemNS);
           final Expr step = Step.get(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }
@@ -564,7 +560,7 @@ public class CmpG extends Cmp {
   @Override
   public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only equality expressions on default collation can be rewritten
-    if(op != OpG.EQ || coll != null) return false;
+    if(op != OpG.EQ || sc().collation != null) return false;
 
     Expr expr1 = exprs[0];
     IndexType type = null;
@@ -578,7 +574,7 @@ public class CmpG extends Cmp {
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final CmpG cmp = new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc);
+    final CmpG cmp = new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op);
     cmp.check = check;
     return copyType(cmp);
   }

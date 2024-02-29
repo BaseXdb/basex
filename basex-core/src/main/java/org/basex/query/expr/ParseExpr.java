@@ -119,8 +119,16 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public InputInfo info() {
+  public final InputInfo info() {
     return info;
+  }
+
+  /**
+   * Returns the current static context.
+   * @return static context (can be {@code null})
+   */
+  public final StaticContext sc() {
+    return info.sc();
   }
 
   // OPTIMIZATIONS ================================================================================
@@ -159,19 +167,11 @@ public abstract class ParseExpr extends Expr {
    */
   protected final <T extends XQFunctionExpr> T checkUp(final T expr, final boolean updating)
       throws QueryException {
-    if(!mixupdates() && updating != expr.annotations().contains(Annotation.UPDATING)) {
+    if(updating != expr.annotations().contains(Annotation.UPDATING) && !sc().mixUpdates) {
       if(!updating) throw FUNCUP_X.get(info, expr);
       if(!expr.vacuousBody()) throw FUNCNOTUP_X.get(info, expr);
     }
     return expr;
-  }
-
-  /**
-   * Returns the value of the mixupdates flag, if available.
-   * @return value
-   */
-  protected boolean mixupdates() {
-    return false;
   }
 
   /**

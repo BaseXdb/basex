@@ -149,18 +149,18 @@ public class FnSort extends StandardFunc {
    * Compares two values.
    * @param value1 first value
    * @param value2 second value
-   * @param coll collation
    * @param info input info (can be {@code null})
+   * @param collation collation (can be {@code null})
    * @return result of comparison (-1, 0, 1)
    * @throws QueryException query exception
    */
-  static int compare(final Value value1, final Value value2, final Collation coll,
+  static int compare(final Value value1, final Value value2, final Collation collation,
       final InputInfo info) throws QueryException {
     final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
     for(int i = 0; i < il; i++) {
       final Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
       if(!item1.comparable(item2)) throw compareError(item1, item2, info);
-      final int diff = item1.compare(item2, coll, true, info);
+      final int diff = item1.compare(item2, collation, true, info);
       if(diff != 0) return diff;
     }
     return Long.signum(size1 - size2);

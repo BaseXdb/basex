@@ -84,7 +84,7 @@ public final class Functions {
       throws QueryException {
 
     // partial function call?
-    if(fb.partial()) return dynamic(item(name, fb.arity(), false, fb.sc, fb.info, qc), fb);
+    if(fb.partial()) return dynamic(item(name, fb.arity(), false, fb.info, qc), fb);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) return constructorCall(name, fb);
@@ -94,7 +94,7 @@ public final class Functions {
     if(fd != null) {
       final int min = fd.minMax[0], max = fd.minMax[1];
       final Expr[] prepared = prepareArgs(fb, fd.names, min, max, fd);
-      final StandardFunc sf = fd.get(fb.sc, fb.info, prepared);
+      final StandardFunc sf = fd.get(fb.info, prepared);
       if(sf.hasUPD()) qc.updating();
       return sf;
     }
@@ -112,8 +112,8 @@ public final class Functions {
   public static Expr dynamic(final Expr expr, final FuncBuilder fb) {
     final Expr[] args = fb.args();
     return fb.partial() ? args.length == 0 ? expr :
-      new PartFunc(fb.info, fb.sc, ExprList.concat(args, expr), fb.holes()) :
-      new DynFuncCall(fb.info, fb.sc, expr, args);
+      new PartFunc(fb.info, ExprList.concat(args, expr), fb.holes()) :
+      new DynFuncCall(fb.info, expr, args);
   }
 
   /**
@@ -121,16 +121,15 @@ public final class Functions {
    * @param name function name
    * @param arity number of arguments
    * @param runtime {@code true} if this method is called at runtime
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param qc query context
    * @return literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
   public static Expr item(final QNm name, final int arity, final boolean runtime,
-      final StaticContext sc, final InputInfo info, final QueryContext qc) throws QueryException {
+      final InputInfo info, final QueryContext qc) throws QueryException {
 
-    final FuncBuilder fb = new FuncBuilder(sc, info).initLiteral(arity, runtime);
+    final FuncBuilder fb = new FuncBuilder(info).initLiteral(arity, runtime);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) {
@@ -148,7 +147,7 @@ public final class Functions {
       final FuncType ft = fd.type(arity, fb.anns);
       final QNm[] names = fd.paramNames(arity);
       for(int a = 0; a < arity; a++) fb.add(names[a], ft.argTypes[a], qc);
-      final StandardFunc sf = fd.get(sc, info, fb.args());
+      final StandardFunc sf = fd.get(info, fb.args());
       final boolean updating = sf.hasUPD();
       if(updating) {
         fb.anns = fb.anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
@@ -168,7 +167,7 @@ public final class Functions {
     for(int a = 0; a < arity; a++) fb.add(new QNm(ARG + (a + 1), ""), null, qc);
 
     // Java function
-    final JavaCall java = JavaCall.get(name, fb.args(), qc, sc, info);
+    final JavaCall java = JavaCall.get(name, fb.args(), qc, info);
     if(java != null) {
       final SeqType[] sts = new SeqType[arity];
       Arrays.fill(sts, SeqType.ITEM_ZM);
@@ -188,16 +187,15 @@ public final class Functions {
   /**
    * Creates a function item for a user-defined function.
    * @param sf static function
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param qc query context
    * @return function item
    * @throws QueryException query exception
    */
-  public static FuncItem item(final StaticFunc sf, final StaticContext sc,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+  public static FuncItem item(final StaticFunc sf, final InputInfo info, final QueryContext qc)
+      throws QueryException {
     // safe cast (no context dependency, runtime evaluation)
-    final FuncBuilder fb = new FuncBuilder(sc, info).initLiteral(sf.arity(), true);
+    final FuncBuilder fb = new FuncBuilder(info).initLiteral(sf.arity(), true);
     return (FuncItem) item(sf, fb, qc);
   }
 
@@ -312,7 +310,7 @@ public final class Functions {
       throw ABSTRACTFUNC_X.get(fb.info, name.prefixId());
 
     final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, name.string());
-    return new Cast(fb.sc, fb.info, prepared.length != 0 ? prepared[0] :
+    return new Cast(fb.info, prepared.length != 0 ? prepared[0] :
       new ContextValue(fb.info), SeqType.get(type, Occ.ZERO_OR_ONE));
   }
 
@@ -329,7 +327,7 @@ public final class Functions {
 
     if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, fb.info);
 
-    final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.sc, fb.info);
+    final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info);
     qc.functions.register(call);
     return call;
   }
@@ -405,7 +403,7 @@ public final class Functions {
     }
     // runtime: create function item
     if(fb.runtime) {
-      return new FuncItem(fb.info, expr, params, anns, ft, vs.sc, vs.stackSize(), name);
+      return new FuncItem(fb.info, expr, params, anns, ft, vs.stackSize(), name);
     }
     // otherwise: create closure
     final SeqType declType = updating ? SeqType.EMPTY_SEQUENCE_Z : ft != null ? ft.declType : null;

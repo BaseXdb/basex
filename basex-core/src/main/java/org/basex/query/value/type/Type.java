@@ -139,12 +139,11 @@ public interface Type {
    * Casts the specified item to this type.
    * @param item item to be converted
    * @param qc query context (can be {@code null} if the target type needs no reference)
-   * @param sc static context (only required for {@link AtomType#QNAME} conversion)
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(Item item, QueryContext qc, StaticContext sc, InputInfo info) throws QueryException;
+  Value cast(Item item, QueryContext qc, InputInfo info) throws QueryException;
 
   /**
    * Casts the specified Java value to this type.

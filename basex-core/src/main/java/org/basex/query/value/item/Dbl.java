@@ -141,8 +141,8 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return value == item.dbl(ii);
   }
 

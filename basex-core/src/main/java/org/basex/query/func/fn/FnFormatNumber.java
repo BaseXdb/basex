@@ -36,13 +36,13 @@ public final class FnFormatNumber extends StandardFunc {
         qnm = toQNm(name);
       } else if(!name.isEmpty()) {
         try {
-          qnm = QNm.parse(trim(toToken(name)), sc);
+          qnm = QNm.parse(trim(toToken(name)), sc());
         } catch(final QueryException ex) {
           Util.debug(ex);
           throw FORMNUM_X.get(info, name);
         }
       }
-      df = sc.decFormat(qnm);
+      df = info.sc().decFormat(qnm);
       if(df == null) throw FORMNUM_X.get(info, qnm.prefixId(XML));
     } else if(name.isEmpty()) {
       df = new DecFormatter(toOptions(format, new DecFormatOptions(), true, qc), info);

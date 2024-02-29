@@ -46,7 +46,7 @@ public class FnParseXml extends StandardFunc {
     final byte[] value = toTokenOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    final IO io = new IOContent(value, string(sc.baseURI().string()));
+    final IO io = new IOContent(value, string(info.sc().baseURI().string()));
     try {
       return new DBNode(frag ? new XMLParser(io, new MainOptions(), true) : Parser.xmlParser(io));
     } catch(final IOException ex) {

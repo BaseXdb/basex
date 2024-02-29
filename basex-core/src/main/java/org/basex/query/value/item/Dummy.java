@@ -51,8 +51,8 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     throw Util.notExpected();
   }
 
@@ -63,7 +63,7 @@ public final class Dummy extends Item {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
     throw Util.notExpected();
   }
 

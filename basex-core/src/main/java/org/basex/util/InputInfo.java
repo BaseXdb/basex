@@ -18,6 +18,8 @@ public final class InputInfo {
   private boolean internal;
   /** Input path. */
   private final String path;
+  /** Static context. */
+  private StaticContext sc;
   /** Input string (can be {@code null}). */
   private String input;
   /** Line number ({@code 0} if not initialized). */
@@ -29,10 +31,20 @@ public final class InputInfo {
    * Constructor.
    * @param parser input parser, containing information on the current parsing state
    */
-  InputInfo(final InputParser parser) {
+  public InputInfo(final InputParser parser) {
     input = parser.input;
     path = parser.file;
     col = parser.pos;
+  }
+
+  /**
+   * Constructor.
+   * @param parser input parser, containing information on the current parsing state
+   * @param sc static context
+   */
+  public InputInfo(final InputParser parser, final StaticContext sc) {
+    this(parser);
+    this.sc = sc;
   }
 
   /**
@@ -74,6 +86,14 @@ public final class InputInfo {
   }
 
   /**
+   * Returns the static context.
+   * @return static context
+   */
+  public StaticContext sc() {
+    return sc;
+  }
+
+  /**
    * Calculates the column and line number in a string.
    */
   private void init() {
@@ -102,7 +122,7 @@ public final class InputInfo {
 
   /**
    * Activates light-weight error handling (invoked e.g. by {@link SeqType#cast(
-   * org.basex.query.value.Value, boolean, QueryContext, StaticContext, InputInfo)}).
+   * org.basex.query.value.Value, boolean, QueryContext, InputInfo)}).
    * @param value value to set
    */
   public void internal(final boolean value) {

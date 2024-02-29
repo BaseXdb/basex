@@ -29,7 +29,7 @@ public abstract class Parse extends StandardFunc {
    * @return io reference, or {@code null} if the URI is invalid
    */
   protected IO input(final byte[] uri) {
-    return input != null ? input : Uri.get(uri).isValid() ? sc.resolve(string(uri)) : null;
+    return input != null ? input : Uri.get(uri).isValid() ? info.sc().resolve(string(uri)) : null;
   }
 
   /**

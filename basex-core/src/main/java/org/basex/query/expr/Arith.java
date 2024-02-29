@@ -94,7 +94,7 @@ public class Arith extends Arr {
           // E + NUMBER - NUMBER  ->  E
           // NUMBER * E div NUMBER  ->  E
           expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
-          if(expr != this) expr = new Cast(cc.sc(), info, expr, SeqType.NUMERIC_O).optimize(cc);
+          if(expr != this) expr = new Cast(info, expr, SeqType.NUMERIC_O).optimize(cc);
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof ANum &&
           ((ANum) expr2).dbl() < 0) {

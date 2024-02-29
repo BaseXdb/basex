@@ -45,7 +45,7 @@ public final class StaticFuncs extends ExprInfo {
    */
   public StaticFunc declare(final QNm name, final Params params, final Expr expr,
       final AnnList anns, final String doc, final VarScope vs, final InputInfo info)
-          throws QueryException {
+      throws QueryException {
 
     final byte[] uri = name.uri();
     if(uri.length == 0) throw FUNNONS_X.get(info, name.string());
@@ -324,7 +324,7 @@ public final class StaticFuncs extends ExprInfo {
      */
     boolean setJava(final StaticFuncCall call, final QueryContext qc) throws QueryException {
       final JavaCall java = literals.isEmpty() ?
-        JavaCall.get(call.name, call.exprs, qc, call.sc, call.info()) : null;
+        JavaCall.get(call.name, call.exprs, qc, call.info()) : null;
       call.setExternal(java);
       return java != null;
     }

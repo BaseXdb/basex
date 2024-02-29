@@ -24,15 +24,13 @@ import org.basex.util.hash.*;
 public final class CNSpace extends CName {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param name name
    * @param value value
    */
-  public CNSpace(final StaticContext sc, final InputInfo info, final boolean computed,
-      final Expr name, final Expr value) {
-    super(sc, info, SeqType.NAMESPACE_NODE_O, computed, name, value);
+  public CNSpace(final InputInfo info, final boolean computed, final Expr name, final Expr value) {
+    super(info, SeqType.NAMESPACE_NODE_O, computed, name, value);
   }
 
   @Override
@@ -61,7 +59,7 @@ public final class CNSpace extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CNSpace(sc, info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm)));
+    return copyType(new CNSpace(info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm)));
   }
 
   @Override

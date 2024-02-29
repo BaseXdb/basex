@@ -150,7 +150,7 @@ public class InputParser {
    * Creates input information.
    * @return input info
    */
-  public final InputInfo info() {
+  public InputInfo info() {
     return new InputInfo(this);
   }
 }

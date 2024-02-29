@@ -21,21 +21,19 @@ import org.basex.util.hash.*;
 public final class CDoc extends CNode {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param expr expression
    */
-  public CDoc(final StaticContext sc, final InputInfo info, final boolean computed,
-      final Expr expr) {
-    super(sc, info, SeqType.DOCUMENT_NODE_O, computed, expr);
+  public CDoc(final InputInfo info, final boolean computed, final Expr expr) {
+    super(info, SeqType.DOCUMENT_NODE_O, computed, expr);
   }
 
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FBuilder doc = FDoc.build();
 
-    final Constr constr = new Constr(doc, info, sc, qc).add(exprs);
+    final Constr constr = new Constr(doc, info, qc).add(exprs);
     if(constr.errAtt != null) throw DOCATTS_X.get(info, constr.errAtt);
     if(constr.errNS != null) throw DOCNS_X.get(info, constr.errNS);
     final Atts ns = doc.namespaces;
@@ -48,7 +46,7 @@ public final class CDoc extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CDoc(sc, info, computed, exprs[0].copy(cc, vm)));
+    return copyType(new CDoc(info, computed, exprs[0].copy(cc, vm)));
   }
 
   @Override

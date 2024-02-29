@@ -43,22 +43,21 @@ public abstract class Collation {
    * Returns a collation instance for the specified uri.
    * @param uri collation uri (can be {@code null})
    * @param qc query context
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param err error code for unknown collation uris
-   * @return collator instance or {@code null} for unicode point collation
+   * @return collation instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
-  public static Collation get(final byte[] uri, final QueryContext qc, final StaticContext sc,
-      final InputInfo info, final QueryError err) throws QueryException {
+  public static Collation get(final byte[] uri, final QueryContext qc, final InputInfo info,
+      final QueryError err) throws QueryException {
 
     // return default collation
-    if(uri == null) return sc.collation;
+    if(uri == null) return info.sc().collation;
 
     final Uri u = Uri.get(uri);
     if(!u.isValid()) throw INVURI_X.get(info, uri);
     final byte[] url = u.isAbsolute() ? uri :
-      Token.startsWith(uri, '?') ? concat(URL, uri) : sc.baseURI().resolve(u, info).string();
+      Token.startsWith(uri, '?') ? concat(URL, uri) : info.sc().baseURI().resolve(u, info).string();
 
     // return unicode point collation
     if(eq(COLLATION_URI, url)) return null;
@@ -85,7 +84,7 @@ public abstract class Collation {
       throws QueryException {
 
     // case-insensitive collation
-    if(eq(NOCASE, uri)) return new NoCaseCollation();
+    if(eq(NOCASE, uri)) return NoCaseCollation.INSTANCE;
 
     final int q = Token.indexOf(uri, '?');
     final byte[] base = q == -1 ? uri : substring(uri, 0, q);
@@ -112,6 +111,16 @@ public abstract class Collation {
     } catch(final IllegalArgumentException | BaseXException ex) {
       throw err.get(info, ex.getMessage());
     }
+  }
+
+  /**
+   * Returns a collation for the specified collation and input info.
+   * @param coll collation
+   * @param info input info (can be {@code null})
+   * @return collation instance, or {@code null} for unicode point collation
+   */
+  public static Collation get(final Collation coll, final InputInfo info) {
+    return coll != null ? coll : info != null ? info.sc().collation : null;
   }
 
   /**

@@ -23,8 +23,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class StaticFuncCall extends FuncCall {
-  /** Static context. */
-  final StaticContext sc;
   /** Function name. */
   final QNm name;
   /** Function reference (can be {@code null}). */
@@ -40,12 +38,11 @@ public final class StaticFuncCall extends FuncCall {
    * @param name function name
    * @param args positional arguments
    * @param keywords keyword arguments (can be {@code null})
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
   public StaticFuncCall(final QNm name, final Expr[] args, final QNmMap<Expr> keywords,
-      final StaticContext sc, final InputInfo info) {
-    this(name, args, sc, null, info);
+      final InputInfo info) {
+    this(name, args, (StaticFunc) null, info);
     this.keywords = keywords;
   }
 
@@ -53,16 +50,14 @@ public final class StaticFuncCall extends FuncCall {
    * Copy constructor.
    * @param name function name
    * @param args arguments
-   * @param sc static context
    * @param func referenced function (can be {@code null})
    * @param info input info (can be {@code null})
    */
-  private StaticFuncCall(final QNm name, final Expr[] args, final StaticContext sc,
-      final StaticFunc func, final InputInfo info) {
+  private StaticFuncCall(final QNm name, final Expr[] args, final StaticFunc func,
+      final InputInfo info) {
     super(info, args);
     this.name = name;
     this.func = func;
-    this.sc = sc;
   }
 
   @Override
@@ -90,7 +85,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public StaticFuncCall copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new StaticFuncCall(name, Arr.copyAll(cc, vm, exprs), sc, func, info));
+    return copyType(new StaticFuncCall(name, Arr.copyAll(cc, vm, exprs), func, info));
   }
 
   /**
@@ -106,7 +101,7 @@ public final class StaticFuncCall extends FuncCall {
     if(keywords != null) {
       final QNm[] names = new QNm[arity];
       for(int n = 0; n < arity; n++) names[n] = sf.paramName(n);
-      exprs = Functions.prepareArgs(new FuncBuilder(sc, info).init(exprs, keywords), names, this);
+      exprs = Functions.prepareArgs(new FuncBuilder(info).init(exprs, keywords), names, this);
       keywords = null;
     }
     // adopt default expressions
@@ -119,7 +114,7 @@ public final class StaticFuncCall extends FuncCall {
       }
     }
     // check visibility
-    if(sf.anns.contains(Annotation.PRIVATE) && !sf.sc.baseURI().eq(sc.baseURI()))
+    if(sf.anns.contains(Annotation.PRIVATE) && !sf.sc.baseURI().eq(sc().baseURI()))
       throw FUNCPRIVATE_X.get(info, name.string());
   }
 

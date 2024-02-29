@@ -45,8 +45,6 @@ import org.basex.util.similarity.*;
 public abstract class StandardFunc extends Arr {
   /** Function definition. */
   public FuncDefinition definition;
-  /** Static context. */
-  public StaticContext sc;
 
   /**
    * Constructor.
@@ -58,13 +56,10 @@ public abstract class StandardFunc extends Arr {
   /**
    * Initializes the function.
    * @param ii input info (can be {@code null})
-   * @param sctx static context
    * @param df function definition
    * @param args function arguments
    */
-  final void init(final StaticContext sctx, final InputInfo ii, final FuncDefinition df,
-      final Expr[] args) {
-    sc = sctx;
+  final void init(final InputInfo ii, final FuncDefinition df, final Expr[] args) {
     info = ii;
     definition = df;
     exprs = args;
@@ -118,7 +113,7 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final StandardFunc copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(definition.get(sc, info, copyAll(cc, vm, args())));
+    return copyType(definition.get(info, copyAll(cc, vm, args())));
   }
 
   /**
@@ -221,7 +216,7 @@ public abstract class StandardFunc extends Arr {
    */
   public boolean hasUPD() {
     // mix updates: higher-order function may be updating
-    return definition.has(Flag.UPD) || mixupdates() && hofIndex() >= 0;
+    return definition.has(Flag.UPD) || sc().mixUpdates && hofIndex() >= 0;
   }
 
   /**
@@ -239,11 +234,6 @@ public abstract class StandardFunc extends Arr {
    */
   public int hofIndex() {
     return definition.has(Flag.HOF) ? Integer.MAX_VALUE : -1;
-  }
-
-  @Override
-  protected final boolean mixupdates() {
-    return sc.mixUpdates;
   }
 
   @Override
@@ -355,7 +345,7 @@ public abstract class StandardFunc extends Arr {
       final Expr[] ops = arg(0).args();
       if(((Checks<Expr>) op -> op == ops[0] || op.seqType().one() && !op.has(Flag.POS)).all(ops)) {
         final Expr[] args = new ExprList(args().clone()).set(0, ops[0]).finish();
-        final Expr fn = definition.get(sc, info, args).optimize(cc);
+        final Expr fn = definition.get(info, args).optimize(cc);
         return skip ? fn : SimpleMap.get(cc, info, new ExprList(ops.clone()).set(0, fn).finish());
       }
     }
@@ -372,7 +362,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final ADate toDate(final Item item, final AtomType type, final QueryContext qc)
       throws QueryException {
-    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, sc, info) : checkType(item, type));
+    return (ADate) (item.type.isUntyped() ? type.cast(item, qc, info) : checkType(item, type));
   }
 
   /**
@@ -421,7 +411,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Collation toCollation(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return Collation.get(toTokenOrNull(expr, qc), qc, sc, info, WHICHCOLL_X);
+    return Collation.get(toTokenOrNull(expr, qc), qc, info, WHICHCOLL_X);
   }
 
   /**
@@ -468,7 +458,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO toIO(final String uri) throws QueryException {
-    final IO io = sc.resolve(uri);
+    final IO io = info.sc().resolve(uri);
     if(!io.exists()) throw WHICHRES_X.get(info, io);
     if(io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io);
     return io;
@@ -517,7 +507,7 @@ public abstract class StandardFunc extends Arr {
       final StringOption option) {
     final String base = options.get(option);
     return base != null && !base.isEmpty() ? base :
-      path != null && !path.isEmpty() ? path : string(sc.baseURI().string());
+      path != null && !path.isEmpty() ? path : string(info.sc().baseURI().string());
   }
 
   /**

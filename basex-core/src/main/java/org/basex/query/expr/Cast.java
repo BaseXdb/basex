@@ -21,14 +21,12 @@ import org.basex.util.hash.*;
 public final class Cast extends Convert {
   /**
    * Function constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param expr expression
    * @param seqType sequence type to cast to (zero or one item)
    */
-  public Cast(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType seqType) {
-    super(sc, info, expr, seqType, SeqType.ITEM_ZM);
+  public Cast(final InputInfo info, final Expr expr, final SeqType seqType) {
+    super(info, expr, seqType, SeqType.ITEM_ZM);
   }
 
   @Override
@@ -45,14 +43,14 @@ public final class Cast extends Convert {
     if(castable == Boolean.TRUE) return cc.replaceWith(this, expr);
 
     final Expr arg = simplify(castType, cc);
-    if(arg != null) return new Cast(sc, info, arg, seqType).optimize(cc);
+    if(arg != null) return new Cast(info, arg, seqType).optimize(cc);
 
     return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return seqType.cast(expr.atomValue(qc, info), true, qc, sc, info);
+    return seqType.cast(expr.atomValue(qc, info), true, qc, info);
   }
 
   /**
@@ -71,7 +69,7 @@ public final class Cast extends Convert {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Cast(sc, info, expr.copy(cc, vm), seqType));
+    return copyType(new Cast(info, expr.copy(cc, vm), seqType));
   }
 
   @Override

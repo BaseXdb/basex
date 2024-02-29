@@ -20,12 +20,10 @@ public final class CmpHashG extends CmpG {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
-  CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final StaticContext sc,
-      final InputInfo info) {
-    super(info, expr1, expr2, op, null, sc);
+  CmpHashG(final Expr expr1, final Expr expr2, final OpG op, final InputInfo info) {
+    super(info, expr1, expr2, op);
   }
 
   /**
@@ -73,7 +71,7 @@ public final class CmpHashG extends CmpG {
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CmpHashG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, sc, info));
+    return copyType(new CmpHashG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, info));
   }
 
   @Override

@@ -69,7 +69,7 @@ public class FnFoldLeft extends StandardFunc {
         final Expr func = coerce(2, cc, arity);
         expr = zero;
         for(final Expr ex : unroll) {
-          expr = new DynFuncCall(info, sc, func, expr, ex).optimize(cc);
+          expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
         }
         return expr;
       }

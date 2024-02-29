@@ -9,7 +9,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -25,11 +24,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Cmp extends Arr {
-  /** Collation (can be {@code null}). */
-  final Collation coll;
-  /** Static context. */
-  final StaticContext sc;
-
   /** Check: true. */
   private static final long[] COUNT_TRUE = { };
   /** Check: false. */
@@ -44,15 +38,10 @@ public abstract class Cmp extends Arr {
    * @param info input info (can be {@code null})
    * @param expr1 first expression
    * @param expr2 second expression
-   * @param coll collation (can be {@code null})
    * @param seqType sequence type
-   * @param sc static context
    */
-  Cmp(final InputInfo info, final Expr expr1, final Expr expr2, final Collation coll,
-      final SeqType seqType, final StaticContext sc) {
+  Cmp(final InputInfo info, final Expr expr1, final Expr expr2, final SeqType seqType) {
     super(info, seqType, expr1, expr2);
-    this.coll = coll;
-    this.sc = sc;
   }
 
   /**
@@ -224,7 +213,7 @@ public abstract class Cmp extends Arr {
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
                   OpG opG = ((CmpG) last).op;
                   if(!success) opG = opG.invert();
-                  return new CmpG(info, map.remove(cc, al), op2, opG, coll, sc).optimize(cc);
+                  return new CmpG(info, map.remove(cc, al), op2, opG).optimize(cc);
                 }
               } else if(success && last instanceof CmpR) {
                 // (number ! (. >= 1e0) = true()  ->  number >= 1e0
@@ -237,8 +226,8 @@ public abstract class Cmp extends Arr {
               } else if(success && last instanceof CmpSR) {
                 // (string ! (. >= 'b') = true()  ->  string >= 'b'
                 final CmpSR cmp = (CmpSR) last;
-                return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi,
-                    cmp.coll, info).optimize(cc);
+                return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi, info).
+                    optimize(cc);
               }
             }
           }

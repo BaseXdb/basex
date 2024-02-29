@@ -102,9 +102,9 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return Token.eq(string(ii), item.string(ii), coll);
+  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return Token.eq(string(ii), item.string(ii), Collation.get(coll, ii));
   }
 
   @Override
@@ -114,8 +114,8 @@ public abstract class AStr extends Item {
 
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo info) throws QueryException {
-    return Token.compare(string(info), item.string(info), coll);
+      final InputInfo ii) throws QueryException {
+    return Token.compare(string(ii), item.string(ii), Collation.get(coll, ii));
   }
 
   @Override

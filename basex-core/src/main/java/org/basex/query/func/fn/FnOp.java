@@ -8,7 +8,6 @@ import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpN.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -32,7 +31,7 @@ public class FnOp extends StandardFunc {
     final String operator = toString(arg(0), qc);
 
     final int pl =  2;
-    final VarScope vs = new VarScope(sc);
+    final VarScope vs = new VarScope();
     final Var[] params = new Var[pl];
     final Expr[] args = new Expr[pl];
     for(int p = 0; p < pl; p++) {
@@ -40,7 +39,6 @@ public class FnOp extends StandardFunc {
       args[p] = new VarRef(info, params[p]);
     }
     final Expr arg1 = args[0], arg2 = args[1], body;
-    final Collation coll = sc.collation;
     switch(operator) {
       case ","        : body = new List(info, arg1, arg2); break;
       case "and"      : body = new And(info, arg1, arg2); break;
@@ -51,18 +49,18 @@ public class FnOp extends StandardFunc {
       case "div"      : body = new Arith(info, arg1, arg2, Calc.DIVIDE); break;
       case "idiv"     : body = new Arith(info, arg1, arg2, Calc.DIVIDEINT); break;
       case "mod"      : body = new Arith(info, arg1, arg2, Calc.MODULO); break;
-      case "="        : body = new CmpG(info, arg1, arg2, OpG.EQ, coll, sc); break;
-      case "<"        : body = new CmpG(info, arg1, arg2, OpG.LT, coll, sc); break;
-      case "<="       : body = new CmpG(info, arg1, arg2, OpG.LE, coll, sc); break;
-      case ">"        : body = new CmpG(info, arg1, arg2, OpG.GT, coll, sc); break;
-      case ">="       : body = new CmpG(info, arg1, arg2, OpG.GE, coll, sc); break;
-      case "!="       : body = new CmpG(info, arg1, arg2, OpG.NE, coll, sc); break;
-      case "eq"       : body = new CmpV(info, arg1, arg2, OpV.EQ, coll, sc); break;
-      case "lt"       : body = new CmpV(info, arg1, arg2, OpV.LT, coll, sc); break;
-      case "le"       : body = new CmpV(info, arg1, arg2, OpV.LE, coll, sc); break;
-      case "gt"       : body = new CmpV(info, arg1, arg2, OpV.GT, coll, sc); break;
-      case "ge"       : body = new CmpV(info, arg1, arg2, OpV.GE, coll, sc); break;
-      case "ne"       : body = new CmpV(info, arg1, arg2, OpV.NE, coll, sc); break;
+      case "="        : body = new CmpG(info, arg1, arg2, OpG.EQ); break;
+      case "<"        : body = new CmpG(info, arg1, arg2, OpG.LT); break;
+      case "<="       : body = new CmpG(info, arg1, arg2, OpG.LE); break;
+      case ">"        : body = new CmpG(info, arg1, arg2, OpG.GT); break;
+      case ">="       : body = new CmpG(info, arg1, arg2, OpG.GE); break;
+      case "!="       : body = new CmpG(info, arg1, arg2, OpG.NE); break;
+      case "eq"       : body = new CmpV(info, arg1, arg2, OpV.EQ); break;
+      case "lt"       : body = new CmpV(info, arg1, arg2, OpV.LT); break;
+      case "le"       : body = new CmpV(info, arg1, arg2, OpV.LE); break;
+      case "gt"       : body = new CmpV(info, arg1, arg2, OpV.GT); break;
+      case "ge"       : body = new CmpV(info, arg1, arg2, OpV.GE); break;
+      case "ne"       : body = new CmpV(info, arg1, arg2, OpV.NE); break;
       case "<<"       : body = new CmpN(info, arg1, arg2, OpN.ET); break;
       case ">>"       : body = new CmpN(info, arg1, arg2, OpN.GT); break;
       case "is"       : body = new CmpN(info, arg1, arg2, OpN.EQ); break;
@@ -76,6 +74,6 @@ public class FnOp extends StandardFunc {
       default         : throw UNKNOWNOP_X.get(info, operator);
     }
     final FuncType ft = FuncType.get(body.seqType(), SeqType.ITEM_ZM, SeqType.ITEM_ZM);
-    return new FuncItem(info, body, params, AnnList.EMPTY, ft, sc, pl, null);
+    return new FuncItem(info, body, params, AnnList.EMPTY, ft, pl, null);
   }
 }

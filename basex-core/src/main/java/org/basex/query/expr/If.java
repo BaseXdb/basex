@@ -132,9 +132,9 @@ public final class If extends Arr {
         new And(info, cond, br1).optimize(cc);
 
       if(contradict(br1, br2, false)) return new CmpG(
-          info, cc.function(BOOLEAN, info, cond), br1, OpG.EQ, null, cc.sc()).optimize(cc);
+          info, cc.function(BOOLEAN, info, cond), br1, OpG.EQ).optimize(cc);
       if(contradict(br2, br1, false)) return new CmpG(
-          info, cc.function(BOOLEAN, info, cond), br2, OpG.NE, null, cc.sc()).optimize(cc);
+          info, cc.function(BOOLEAN, info, cond), br2, OpG.NE).optimize(cc);
     }
     return this;
   }

@@ -18,7 +18,7 @@ public final class FnLocalNameFromQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final QNm value = toQNmOrNull(arg(0), qc);
-    return value == null ? Empty.VALUE : AtomType.NCNAME.cast(Str.get(value.local()), qc, sc, info);
+    return value == null ? Empty.VALUE : AtomType.NCNAME.cast(Str.get(value.local()), qc, info);
   }
 
   @Override

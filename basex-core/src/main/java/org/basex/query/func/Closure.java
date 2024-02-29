@@ -200,8 +200,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // only evaluate if:
     // - the closure is empty, so we don't lose variables
     // - the result size does not exceed a specific limit
-    return global.isEmpty() && expr.size() <= CompileContext.MAX_PREEVAL ?
-      cc.preEval(this) : this;
+    return global.isEmpty() && expr.size() <= CompileContext.MAX_PREEVAL ? cc.preEval(this) : this;
   }
 
   @Override
@@ -232,12 +231,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final VarScope innerScope = new VarScope(vs.sc);
+    final VarScope vsc = new VarScope();
 
     final HashMap<Var, Expr> outer = new HashMap<>();
     global.forEach((key, value) -> outer.put(key, value.copy(cc, vm)));
 
-    cc.pushScope(innerScope);
+    cc.pushScope(vsc);
     try {
       final IntObjMap<Var> innerVars = new IntObjMap<>();
       vs.copy(cc, innerVars);
@@ -314,7 +313,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
 
     final FuncType ft = (FuncType) seqType().type;
-    return new FuncItem(info, checked, params, anns, ft, vs.sc, vs.stackSize(), name);
+    return new FuncItem(info, checked, params, anns, ft, vs.stackSize(), name);
   }
 
   @Override

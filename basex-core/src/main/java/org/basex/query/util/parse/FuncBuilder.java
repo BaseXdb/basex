@@ -17,8 +17,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FuncBuilder {
-  /** Static context. */
-  public final StaticContext sc;
   /** Input Info. */
   public final InputInfo info;
 
@@ -44,11 +42,9 @@ public final class FuncBuilder {
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info
    */
-  public FuncBuilder(final StaticContext sc, final InputInfo info) {
-    this.sc = sc;
+  public FuncBuilder(final InputInfo info) {
     this.info = info;
   }
 
@@ -133,7 +129,7 @@ public final class FuncBuilder {
   public FuncBuilder initLiteral(final int a, final boolean rt) {
     fixedArgs = new Expr[a];
     params = new Var[a];
-    vs = new VarScope(sc);
+    vs = new VarScope();
     runtime = rt;
     return this;
   }

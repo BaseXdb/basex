@@ -77,7 +77,7 @@ public abstract class XQData extends FItem {
   @Override
   public final FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
-    return coerceTo(ft, qc, cc, ii, cc != null ? cc.sc() : null, false);
+    return coerceTo(ft, qc, cc, ii, false);
   }
 
   /**

@@ -26,8 +26,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
-  /** Static context (can be {@code null} at runtime; only required for MIXUPDATES check). */
-  private final StaticContext sc;
   /** Updating flag. */
   private final boolean updating;
   /** Nondeterministic flag. */
@@ -38,31 +36,27 @@ public final class DynFuncCall extends FuncCall {
   /**
    * Function constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context
    * @param expr function expression
    * @param args arguments
    */
-  public DynFuncCall(final InputInfo info, final StaticContext sc, final Expr expr,
-      final Expr... args) {
-    this(info, sc, false, false, expr, args);
+  public DynFuncCall(final InputInfo info, final Expr expr, final Expr... args) {
+    this(info, false, false, expr, args);
   }
 
   /**
    * Function constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context (can be {@code null} at runtime)
    * @param updating updating flag
    * @param ndt nondeterministic flag
    * @param expr function expression
    * @param args arguments
    */
-  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
-      final boolean ndt, final Expr expr, final Expr... args) {
+  public DynFuncCall(final InputInfo info, final boolean updating, final boolean ndt,
+      final Expr expr, final Expr... args) {
 
     super(info, ExprList.concat(args, expr));
     this.updating = updating;
     this.ndt = ndt;
-    this.sc = sc;
   }
 
   @Override
@@ -82,7 +76,7 @@ public final class DynFuncCall extends FuncCall {
         final int arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
       }
-      if(!mixupdates() && !updating && ft.anns.contains(Annotation.UPDATING)) {
+      if(!sc().mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
       final SeqType dt = ft.declType;
@@ -156,7 +150,7 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(cc, vm, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = new DynFuncCall(info, sc, updating, ndt, copy[last], args);
+    final DynFuncCall call = new DynFuncCall(info, updating, ndt, copy[last], args);
     if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
     return copyType(call);
   }
@@ -178,14 +172,9 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  protected boolean mixupdates() {
-    return sc != null && sc.mixUpdates;
-  }
-
-  @Override
   public boolean has(final Flag... flags) {
-    if(Flag.UPD.in(flags) && (updating || mixupdates())) return true;
-    if(Flag.NDT.in(flags) && (ndt || updating || mixupdates())) return true;
+    if(Flag.UPD.in(flags) && (updating || sc().mixUpdates)) return true;
+    if(Flag.NDT.in(flags) && (ndt || updating || sc().mixUpdates)) return true;
     final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
     return flgs.length != 0 && super.has(flgs);
   }

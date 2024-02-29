@@ -96,8 +96,8 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     throw Util.notExpected();
   }
 

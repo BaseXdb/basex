@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.util.*;
 
@@ -19,13 +18,12 @@ public interface AFunction {
 
   /**
    * Creates a new instance of the function.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param args function arguments
    * @return function
    */
-  default StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... args) {
-    return definition().get(sc, info, args);
+  default StandardFunc get(final InputInfo info, final Expr... args) {
+    return definition().get(info, args);
   }
 
   /**

@@ -54,7 +54,7 @@ public final class FnIndexWhere extends StandardFunc {
       final Expr item = new VarRef(info, i).optimize(cc);
       final Expr pos = new VarRef(info, p).optimize(cc);
       final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-      final Expr dfc = new DynFuncCall(info, sc, coerce(1, cc, arity), args).optimize(cc);
+      final Expr dfc = new DynFuncCall(info, coerce(1, cc, arity), args).optimize(cc);
       clauses.add(new Where(dfc, info).optimize(cc));
 
       return new GFLWOR(info, clauses, new VarRef(info, p).optimize(cc)).optimize(cc);

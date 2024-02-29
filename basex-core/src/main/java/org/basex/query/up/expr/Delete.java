@@ -24,12 +24,11 @@ import org.basex.util.hash.*;
 public final class Delete extends Update {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param trg target expression
    */
-  public Delete(final StaticContext sc, final InputInfo info, final Expr trg) {
-    super(sc, info, trg);
+  public Delete(final InputInfo info, final Expr trg) {
+    super(info, trg);
   }
 
   @Override
@@ -49,7 +48,7 @@ public final class Delete extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Delete(sc, info, exprs[0].copy(cc, vm)));
+    return copyType(new Delete(info, exprs[0].copy(cc, vm)));
   }
 
   @Override

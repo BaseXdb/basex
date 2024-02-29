@@ -28,13 +28,12 @@ import org.basex.util.hash.*;
 public final class Rename extends Update {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param trg target expression
    * @param name new name expression
    */
-  public Rename(final StaticContext sc, final InputInfo info, final Expr trg, final Expr name) {
-    super(sc, info, trg, name);
+  public Rename(final InputInfo info, final Expr trg, final Expr name) {
+    super(info, trg, name);
   }
 
   @Override
@@ -50,11 +49,11 @@ public final class Rename extends Update {
     final CNode ex;
     final Type type = item.type;
     if(type == NodeType.ELEMENT) {
-      ex = new CElem(sc, info, false, exprs[1], new Atts());
+      ex = new CElem(info, false, exprs[1], new Atts());
     } else if(type == NodeType.ATTRIBUTE) {
-      ex = new CAttr(sc, info, false, exprs[1], Empty.VALUE);
+      ex = new CAttr(info, false, exprs[1], Empty.VALUE);
     } else if(type == NodeType.PROCESSING_INSTRUCTION) {
-      ex = new CPI(sc, info, false, exprs[1], Empty.VALUE);
+      ex = new CPI(info, false, exprs[1], Empty.VALUE);
     } else {
       throw UPWRTRGTYP_X.get(info, item);
     }
@@ -68,7 +67,7 @@ public final class Rename extends Update {
     if(elem || attr) {
       final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
       if(elem || newPrefix.length > 0) {
-        final Atts nspaces = target.nsScope(sc);
+        final Atts nspaces = target.nsScope(sc());
         final int ns = nspaces.size();
         for(int n = 0; n < ns; n++) {
           final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
@@ -86,7 +85,7 @@ public final class Rename extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Rename(sc, info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+    return copyType(new Rename(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
   }
 
   @Override

@@ -110,8 +110,7 @@ public final class StaticVar extends StaticDecl {
    */
   void bind(final Value val, final QueryContext qc) throws QueryException {
     if(external && !compiled) {
-      value = declType == null || declType.instance(val) ? val :
-        declType.cast(val, true, qc, sc, info);
+      value = declType == null || declType.instance(val) ? val : declType.cast(val, true, qc, info);
       expr = value;
     }
   }

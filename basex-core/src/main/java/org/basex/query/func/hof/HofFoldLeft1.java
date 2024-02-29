@@ -45,7 +45,7 @@ public final class HofFoldLeft1 extends StandardFunc {
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {
-          expr = new DynFuncCall(info, sc, func, expr, unroll.get(i)).optimize(cc);
+          expr = new DynFuncCall(info, func, expr, unroll.get(i)).optimize(cc);
         }
         return expr;
       }

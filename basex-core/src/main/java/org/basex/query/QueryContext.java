@@ -254,9 +254,9 @@ public final class QueryContext extends Job implements Closeable {
           sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
         }
         // create and assign function call
-        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.sc, sf.info);
+        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info);
         call.setFunc(sf);
-        main = new MainModule(call, new VarScope(sf.sc));
+        main = new MainModule(call, new VarScope(), sf.sc);
         updating = sf.updating();
         return;
       }
@@ -308,7 +308,7 @@ public final class QueryContext extends Job implements Closeable {
       }
       final Value value = bindings.get(QNm.EMPTY);
       if(value != null) {
-        contextValue = new ContextScope(value, sc.contextType, new VarScope(sc), null, null);
+        contextValue = new ContextScope(value, sc.contextType, new VarScope(), sc, null, null);
       }
       if(contextValue != null) finalContext = true;
 
@@ -729,10 +729,10 @@ public final class QueryContext extends Job implements Closeable {
     if(object instanceof Value) {
       final Value val = (Value) object;
       // cast single item
-      if(val.isItem()) return tp.cast((Item) val, this, sc, null);
+      if(val.isItem()) return tp.cast((Item) val, this, null);
       // cast sequence
       final ValueBuilder vb = new ValueBuilder(this);
-      for(final Item item : val) vb.add(tp.cast(item, this, sc, null));
+      for(final Item item : val) vb.add(tp.cast(item, this, null));
       return vb.value(tp);
     }
 

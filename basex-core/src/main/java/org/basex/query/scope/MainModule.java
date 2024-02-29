@@ -19,9 +19,10 @@ public class MainModule extends AModule {
    * Constructor.
    * @param expr root expression
    * @param vs variable scope
+   * @param sc static context
    */
-  public MainModule(final Expr expr, final VarScope vs) {
-    super(vs.sc);
+  public MainModule(final Expr expr, final VarScope vs, final StaticContext sc) {
+    super(sc);
     this.expr = expr;
     this.vs = vs;
   }

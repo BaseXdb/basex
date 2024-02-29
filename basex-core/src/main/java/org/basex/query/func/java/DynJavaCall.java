@@ -32,12 +32,10 @@ abstract class DynJavaCall extends JavaCall {
    * @param clazz Java class
    * @param types types provided in the parsed expression string (can be {@code null})
    * @param args arguments
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
-  DynJavaCall(final Class<?> clazz, final String[] types, final Expr[] args, final StaticContext sc,
-      final InputInfo info) {
-    super(args, Perm.ADMIN, false, sc, info);
+  DynJavaCall(final Class<?> clazz, final String[] types, final Expr[] args, final InputInfo info) {
+    super(args, Perm.ADMIN, false, info);
     this.clazz = clazz;
     this.types = types;
   }

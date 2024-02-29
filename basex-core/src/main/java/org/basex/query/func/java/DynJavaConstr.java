@@ -31,12 +31,11 @@ final class DynJavaConstr extends DynJavaCall {
    * @param clazz Java class
    * @param types types provided in the parsed expression string (can be {@code null})
    * @param args arguments
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
   DynJavaConstr(final Class<?> clazz, final String[] types, final Expr[] args,
-      final StaticContext sc, final InputInfo info) {
-    super(clazz, types, args, sc, info);
+      final InputInfo info) {
+    super(clazz, types, args, info);
   }
 
   /**
@@ -91,7 +90,7 @@ final class DynJavaConstr extends DynJavaCall {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final DynJavaConstr c = new DynJavaConstr(clazz, types, copyAll(cc, vm, exprs), sc, info);
+    final DynJavaConstr c = new DynJavaConstr(clazz, types, copyAll(cc, vm, exprs), info);
     c.constrs = constrs;
     return copyType(c);
   }

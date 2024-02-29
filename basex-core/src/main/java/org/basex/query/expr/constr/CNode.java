@@ -18,23 +18,19 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class CNode extends Arr {
-  /** Static context. */
-  final StaticContext sc;
   /** Computed constructor. */
   final boolean computed;
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param seqType sequence type
    * @param exprs expressions
    */
-  CNode(final StaticContext sc, final InputInfo info, final SeqType seqType, final boolean computed,
+  CNode(final InputInfo info, final SeqType seqType, final boolean computed,
       final Expr... exprs) {
     super(info, seqType, exprs);
-    this.sc = sc;
     this.computed = computed;
   }
 
@@ -89,8 +85,7 @@ public abstract class CNode extends Arr {
         }
       }
     }
-    return cc.simplify(this, st != null ? new Cast(cc.sc(), info, exprs[0], st).optimize(cc) : this,
-      mode);
+    return cc.simplify(this, st != null ? new Cast(info, exprs[0], st).optimize(cc) : this, mode);
   }
 
   @Override

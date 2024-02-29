@@ -273,9 +273,7 @@ public abstract class Preds extends Arr {
         type1 == type2 || type1.isStringOrUntyped() && type2.isStringOrUntyped()
       )) && !op2.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(op1, true);
-        if(expr != this) {
-          return new CmpG(cmp.info, expr, op2, cmp.opG(), cmp.coll, cmp.sc).optimize(cc);
-        }
+        if(expr != this) return new CmpG(cmp.info, expr, op2, cmp.opG()).optimize(cc);
       }
     }
 

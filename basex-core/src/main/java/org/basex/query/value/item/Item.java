@@ -179,13 +179,11 @@ public abstract class Item extends Value {
    * Compares items for equality. Called by {@link OpV}.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
-   * @param sc static context; required for comparing items of type xs:QName (can be {@code null})
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean equal(Item item, Collation coll, StaticContext sc, InputInfo ii)
-      throws QueryException;
+  public abstract boolean equal(Item item, Collation coll, InputInfo ii) throws QueryException;
 
   /**
    * Compares items for deep equality.
@@ -207,7 +205,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean atomicEqual(final Item item) throws QueryException {
-    return comparable(item) && equal(item, null, null, null);
+    return comparable(item) && equal(item, null, null);
   }
 
   /**

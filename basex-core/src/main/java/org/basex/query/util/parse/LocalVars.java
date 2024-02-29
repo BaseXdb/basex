@@ -103,7 +103,7 @@ public final class LocalVars {
     // - if it is specified in the main module
     final QNm module = parser.sc.module;
     if(module == null || eq(module.uri(), uri) || parser.moduleURIs.contains(uri))
-      return parser.qc.vars.newRef(name, parser.sc, info);
+      return parser.qc.vars.newRef(name, info);
 
     throw parser.error(VARUNDEF_X, info, '$' + string(name.string()));
   }
@@ -115,7 +115,7 @@ public final class LocalVars {
    */
   public HashMap<Var, Expr> pushContext(final boolean global) {
     final HashMap<Var, Expr> map = global ? new HashMap<>() : null;
-    vars.add(new VarContext(map, parser.sc));
+    vars.add(new VarContext(map));
     return map;
   }
 

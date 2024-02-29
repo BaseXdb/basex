@@ -63,7 +63,7 @@ public final class ArrayMembers extends StandardFunc {
    * @return map
    * @throws QueryException query exception
    */
-  private XQMap record(final Value value) throws QueryException {
+  private static XQMap record(final Value value) throws QueryException {
     return XQMap.singleton(Str.VALUE, value);
   }
 }

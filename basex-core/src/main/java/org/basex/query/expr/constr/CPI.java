@@ -24,15 +24,13 @@ import org.basex.util.hash.*;
 public final class CPI extends CName {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param name name
    * @param value value
    */
-  public CPI(final StaticContext sc, final InputInfo info, final boolean computed, final Expr name,
-      final Expr value) {
-    super(sc, info, SeqType.PROCESSING_INSTRUCTION_O, computed, name, value);
+  public CPI(final InputInfo info, final boolean computed, final Expr name, final Expr value) {
+    super(info, SeqType.PROCESSING_INSTRUCTION_O, computed, name, value);
   }
 
   @Override
@@ -65,7 +63,7 @@ public final class CPI extends CName {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CPI(sc, info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm)));
+    return copyType(new CPI(info, computed, name.copy(cc, vm), exprs[0].copy(cc, vm)));
   }
 
   @Override

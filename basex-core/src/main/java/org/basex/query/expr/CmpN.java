@@ -84,7 +84,7 @@ public final class CmpN extends Cmp {
    * @param op comparator
    */
   public CmpN(final InputInfo info, final Expr expr1, final Expr expr2, final OpN op) {
-    super(info, expr1, expr2, null, SeqType.BOOLEAN_ZO, null);
+    super(info, expr1, expr2, SeqType.BOOLEAN_ZO);
     this.op = op;
   }
 

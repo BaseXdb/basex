@@ -62,7 +62,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
-        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // merge arithmetical expressions
       if(expr1.equals(expr2)) {
@@ -142,7 +142,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
-        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
@@ -225,7 +225,7 @@ public enum Calc {
       if(expr2 instanceof ANum) {
         final double dbl2 = ((ANum) expr2).dbl();
         // check for neutral number
-        if(dbl2 == 1) return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        if(dbl2 == 1) return new Cast(info, expr1, type.seqType()).optimize(cc);
         // check for absorbing number
         if(dbl2 == 0) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
       }
@@ -245,7 +245,7 @@ public enum Calc {
       if(expr2 instanceof Arith) {
         final Arith arith = (Arith) expr2;
         if(arith.calc == DIVIDE && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
-          return new Cast(cc.sc(), info, arith.exprs[0], type.seqType()).optimize(cc);
+          return new Cast(info, arith.exprs[0], type.seqType()).optimize(cc);
         }
       }
       return null;
@@ -309,7 +309,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
-        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
@@ -366,7 +366,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
-        return new Cast(cc.sc(), info, expr1, SeqType.INTEGER_O).optimize(cc);
+        return new Cast(info, expr1, SeqType.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {

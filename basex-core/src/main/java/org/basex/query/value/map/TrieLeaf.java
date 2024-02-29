@@ -64,20 +64,17 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item ky, final int level)
-      throws QueryException {
+  TrieNode delete(final int hs, final Item ky, final int level) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? null : this;
   }
 
   @Override
-  Value get(final int hs, final Item ky, final int level)
-      throws QueryException {
+  Value get(final int hs, final Item ky, final int level) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? value : null;
   }
 
   @Override
-  boolean contains(final int hs, final Item ky, final int level)
-      throws QueryException {
+  boolean contains(final int hs, final Item ky, final int level) throws QueryException {
     return hs == hash && key.atomicEqual(ky);
   }
 
