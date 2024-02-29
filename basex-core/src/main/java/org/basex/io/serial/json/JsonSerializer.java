@@ -95,7 +95,7 @@ public abstract class JsonSerializer extends StandardSerializer {
           string(name);
           out.print(':');
           if(indent) out.print(' ');
-          serialize(m.get(key, null));
+          serialize(m.get(key));
           s = true;
         }
 

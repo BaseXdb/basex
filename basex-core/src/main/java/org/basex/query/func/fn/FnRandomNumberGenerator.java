@@ -48,7 +48,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item seed = arg(0).atomItem(qc, info);
-    return result(seed.isEmpty() ? qc.dateTime().nano : seed.hash(info), qc);
+    return result(seed.isEmpty() ? qc.dateTime().nano : seed.hash(), qc);
   }
 
   /**
@@ -61,7 +61,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private XQMap result(final long s0, final QueryContext qc) throws QueryException {
     // derived from Java's random class
     final long itr1 = next(s0), itr2 = next(itr1);
-    return new MapBuilder(info).
+    return new MapBuilder().
       put(NUMBER, Dbl.get(((itr1 >>> 22 << 27) + (itr2 >>> 21)) / (double) (1L << 53))).
       put(NEXT, nextFunc(itr2)).
       put(PERMUTE, permuteFunc(itr1, qc)).map();

@@ -183,7 +183,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       tb.add(':');
       if(indent) tb.add(' ');
       try {
-        final Value value = map.get(key, null);
+        final Value value = map.get(key);
         final boolean par = value.size() != 1;
         if(par) tb.add('(');
         int cc = 0;

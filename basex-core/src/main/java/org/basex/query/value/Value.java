@@ -178,11 +178,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a hash code for this value.
-   * @param ii input info (can be {@code null})
    * @return hash code
-   * @throws QueryException if atomization cannot be applied (e.g. function item)
+   * @throws QueryException query exception
    */
-  public abstract int hash(InputInfo ii) throws QueryException;
+  public abstract int hash() throws QueryException;
 
   /**
    * Serializes the value, using the standard XML serializer,

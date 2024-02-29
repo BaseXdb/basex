@@ -251,7 +251,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final int hash(final InputInfo ii) {
+  public final int hash() {
     return (int) (31 * months + (seconds == null ? 0 : seconds.doubleValue()));
   }
 

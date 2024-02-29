@@ -138,7 +138,7 @@ public interface Type {
   /**
    * Casts the specified item to this type.
    * @param item item to be converted
-   * @param qc query context
+   * @param qc query context (can be {@code null} if the target type needs no reference)
    * @param sc static context (only required for {@link AtomType#QNAME} conversion)
    * @param info input info (can be {@code null})
    * @return cast value
@@ -149,7 +149,7 @@ public interface Type {
   /**
    * Casts the specified Java value to this type.
    * @param value Java value
-   * @param qc query context
+   * @param qc query context (can be {@code null} if the target type needs no reference
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception

@@ -48,13 +48,13 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
+  public final boolean atomicEqual(final Item item) throws QueryException {
     if(item instanceof ANum) {
-      final double d1 = dbl(ii), d2 = item.dbl(ii);
+      final double d1 = dbl(), d2 = item.dbl(null);
       final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
       if(n1 || n2) return n1 == n2;
       if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
-      return dec(ii).compareTo(item.dec(ii)) == 0;
+      return dec(null).compareTo(item.dec(null)) == 0;
     }
     return false;
   }
@@ -148,10 +148,10 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final int hash(final InputInfo ii) {
+  public final int hash() {
     // makes sure the hashing is good for very small and very big numbers
     final long l = itr();
-    final float f = flt(ii);
+    final float f = flt();
 
     // extract fractional part from a finite float
     final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY ||

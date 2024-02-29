@@ -33,7 +33,7 @@ public final class StaticFuncs extends ExprInfo {
 
   /**
    * Declares a new user-defined function.
-   * @param qname function name
+   * @param name function name
    * @param params parameters with variables and optional default values
    * @param expr function body (can be {@code null})
    * @param anns annotations
@@ -43,17 +43,17 @@ public final class StaticFuncs extends ExprInfo {
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final QNm qname, final Params params, final Expr expr,
+  public StaticFunc declare(final QNm name, final Params params, final Expr expr,
       final AnnList anns, final String doc, final VarScope vs, final InputInfo info)
           throws QueryException {
 
-    final byte[] uri = qname.uri();
-    if(uri.length == 0) throw FUNNONS_X.get(info, qname.string());
-    if(NSGlobal.reserved(uri) || Functions.builtIn(qname) != null)
-      throw FNRESERVED_X.get(info, qname.string());
+    final byte[] uri = name.uri();
+    if(uri.length == 0) throw FUNNONS_X.get(info, name.string());
+    if(NSGlobal.reserved(uri) || Functions.builtIn(name) != null)
+      throw FNRESERVED_X.get(info, name.string());
 
-    final StaticFunc sf = new StaticFunc(qname, params, expr, anns, vs, info, doc);
-    if(!cache(qname.prefixId()).register(sf)) throw DUPLFUNC_X.get(sf.info, qname.string());
+    final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
+    if(!cache(name.prefixId()).register(sf)) throw DUPLFUNC_X.get(sf.info, name.string());
     return sf;
   }
 

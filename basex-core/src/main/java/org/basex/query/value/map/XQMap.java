@@ -59,13 +59,11 @@ public final class XQMap extends XQData {
    * Creates a map with a single entry.
    * @param key key
    * @param value value
-   * @param info input info (can be {@code null})
    * @return map
    * @throws QueryException query exception
    */
-  public static XQMap singleton(final Item key, final Value value, final InputInfo info)
-      throws QueryException {
-    return new XQMap(new TrieLeaf(key.hash(info), key, value),
+  public static XQMap singleton(final Item key, final Value value) throws QueryException {
+    return new XQMap(new TrieLeaf(key.hash(), key, value),
         MapType.get((AtomType) key.type, value.seqType()));
   }
 
@@ -74,7 +72,7 @@ public final class XQMap extends XQData {
     out.writeNum(mapSize());
     for(final Item key : keys()) {
       Store.write(out, key);
-      Store.write(out, get(key, null));
+      Store.write(out, get(key));
     }
   }
 
@@ -95,31 +93,51 @@ public final class XQMap extends XQData {
 
   /**
    * Deletes a key from this map.
-   * @param key key to delete (must not be {@code null})
-   * @param info input info (can be {@code null})
+   * @param key key to delete
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public XQMap delete(final Item key, final InputInfo info) throws QueryException {
-    final TrieNode del = root.delete(key.hash(info), key, 0, info);
+  public XQMap delete(final Item key) throws QueryException {
+    final TrieNode del = root.delete(key.hash(), key, 0);
     return del == root ? this : del == null ? EMPTY : new XQMap(del, type);
   }
 
   @Override
-  public Value get(final Item key, final InputInfo info) throws QueryException {
-    final Value value = root.get(key.hash(info), key, 0, info);
-    return value == null ? Empty.VALUE : value;
+  public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
+      throws QueryException {
+    return get(key(args[0], qc, ii));
+  }
+
+  /**
+   * Gets a value from this map.
+   * @param key key to look for
+   * @return bound value if found, empty sequence otherwise
+   * @throws QueryException query exception
+   */
+  public Value get(final Item key) throws QueryException {
+    return getInternal(key, true);
+  }
+
+  /**
+   * Gets the internal map value.
+   * @param key key to look for
+   * @param empty if {@code true}, return empty sequence if key is not found
+   * @return value or {@code null}
+   * @throws QueryException query exception
+   */
+  public Value getInternal(final Item key, final boolean empty) throws QueryException {
+    final Value value = root.get(key.hash(), key, 0);
+    return value != null ? value : empty ? Empty.VALUE : null;
   }
 
   /**
    * Checks if the given key exists in the map.
-   * @param key key to look for (must not be {@code null})
-   * @param info input info (can be {@code null})
+   * @param key key to look for
    * @return {@code true()} if the key exists, {@code false()} otherwise
    * @throws QueryException query exception
    */
-  public boolean contains(final Item key, final InputInfo info) throws QueryException {
-    return root.contains(key.hash(info), key, 0, info);
+  public boolean contains(final Item key) throws QueryException {
+    return root.contains(key.hash(), key, 0);
   }
 
   /**
@@ -127,16 +145,16 @@ public final class XQMap extends XQData {
    * @param map map to add
    * @param merge merge duplicate keys
    * @param qc query context
-   * @param info input info (can be {@code null})
+   * @param ii input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
   public XQMap addAll(final XQMap map, final MergeDuplicates merge, final QueryContext qc,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     if(this == EMPTY) return map;
     if(map == EMPTY) return this;
-    final TrieNode upd = root.addAll(map.root, 0, merge, qc, info);
+    final TrieNode upd = root.addAll(map.root, 0, merge, qc, ii);
     if(upd == map.root) return map;
 
     final Type tp;
@@ -166,10 +184,10 @@ public final class XQMap extends XQData {
 
     if(materialized(test, ii)) return this;
 
-    final MapBuilder mb = new MapBuilder(ii);
+    final MapBuilder mb = new MapBuilder();
     for(final Item key : keys()) {
       qc.checkStop();
-      mb.put(key, get(key, ii).materialize(test, ii, qc));
+      mb.put(key, get(key).materialize(test, ii, qc));
     }
     return mb.map();
   }
@@ -203,15 +221,14 @@ public final class XQMap extends XQData {
 
   /**
    * Puts the given value into this map and replaces existing keys.
-   * @param key key to insert (must not be {@code null})
+   * @param key key to insert
    * @param value value to insert
-   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public XQMap put(final Item key, final Value value, final InputInfo info) throws QueryException {
-    if(this == EMPTY) return singleton(key, value, info);
-    final TrieNode ins = root.put(key.hash(info), key, value, 0, info);
+  public XQMap put(final Item key, final Value value) throws QueryException {
+    if(this == EMPTY) return singleton(key, value);
+    final TrieNode ins = root.put(key.hash(), key, value, 0);
     return ins == root ? this : new XQMap(ins, union(key.type, value.seqType()));
   }
 
@@ -276,13 +293,8 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
-    return root.hash(ii);
-  }
-
-  @Override
   public void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     tb.add("map{");
     int c = 0;
@@ -297,7 +309,7 @@ public final class XQMap extends XQData {
       }
       tb.add(key).add(':');
       if(indent) tb.add(' ');
-      final Value value = get(key, info);
+      final Value value = get(key);
       final boolean par = value.size() != 1;
       if(par) tb.add('(');
       int cc = 0;
@@ -306,8 +318,8 @@ public final class XQMap extends XQData {
           tb.add(',');
           if(indent) tb.add(' ');
         }
-        if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
-        else if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
+        if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, ii);
+        else if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, ii);
         else tb.add(item);
       }
       if(par) tb.add(')');
@@ -333,7 +345,7 @@ public final class XQMap extends XQData {
       final int max = Math.min(size, 5);
       for(long i = 0; i < max; i++) {
         final Item key = keys.itemAt(i);
-        list.add(key).add(get(key, null));
+        list.add(key).add(get(key));
       }
       plan.add(plan.create(this, ENTRIES, size));
     } catch(final QueryException ex) {

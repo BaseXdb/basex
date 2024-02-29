@@ -26,7 +26,7 @@ public class FnBuildUri extends FnJsonDoc {
 
     if(!scheme.isEmpty()) {
       uri.add(scheme);
-      final Value hierarchical = parts.get(Str.get(HIERARCHICAL), info);
+      final Value hierarchical = parts.get(Str.get(HIERARCHICAL));
       final boolean hrrchcl = hierarchical.isEmpty() || toBoolean(hierarchical, qc);
       uri.add(hrrchcl ? "://" : ":");
       if(scheme.equals(FILE) && options.get(UriOptions.UNC_PATH)) uri.add("//");
@@ -35,7 +35,7 @@ public class FnBuildUri extends FnJsonDoc {
     String userinfo = get(parts, USERINFO, qc);
     if(userinfo.contains(":") && !options.get(UriOptions.ALLOW_DEPRECATED_FEATURES)) userinfo = "";
 
-    String port = string(toZeroToken(parts.get(Str.get(PORT), info), qc));
+    String port = string(toZeroToken(parts.get(Str.get(PORT)), qc));
     if(omitPort(port, scheme, options)) port = "";
 
     final String host = get(parts, HOST, qc), authority = get(parts, AUTHORITY, qc);
@@ -47,7 +47,7 @@ public class FnBuildUri extends FnJsonDoc {
       uri.add(authority);
     }
 
-    final Value segments = parts.get(Str.get(PATH_SEGMENTS), info);
+    final Value segments = parts.get(Str.get(PATH_SEGMENTS));
     if(!segments.isEmpty()) {
       final String sep = options.get(UriOptions.PATH_SEPARATOR);
       int a = 0;
@@ -59,7 +59,7 @@ public class FnBuildUri extends FnJsonDoc {
       uri.add(get(parts, PATH, qc));
     }
 
-    final Value qp = parts.get(Str.get(QUERY_PARAMETERS), info);
+    final Value qp = parts.get(Str.get(QUERY_PARAMETERS));
     if(!qp.isEmpty()) {
       final TokenBuilder query = new TokenBuilder();
       final String sep = options.get(UriOptions.QUERY_SEPARATOR);
@@ -88,7 +88,7 @@ public class FnBuildUri extends FnJsonDoc {
    */
   private String get(final XQMap map, final String key, final QueryContext qc)
       throws QueryException {
-    final Value value = map.get(Str.get(key), info);
+    final Value value = map.get(Str.get(key));
     return value.isEmpty() ? "" : string(toToken(value, qc));
   }
 }

@@ -37,7 +37,7 @@ public final class InspectStaticContext extends StandardFunc {
       case BASE_URI:
         return sctx.baseURI();
       case NAMESPACES:
-        MapBuilder mb = new MapBuilder(info);
+        MapBuilder mb = new MapBuilder();
         Atts nsp = sctx.ns.list;
         int ns = nsp.size();
         for(int n = 0; n < ns; n++) {
@@ -73,7 +73,7 @@ public final class InspectStaticContext extends StandardFunc {
         // enforce creation of default formatter
         sctx.decFormat(QNm.EMPTY);
         // loop through all formatters
-        mb = new MapBuilder(info);
+        mb = new MapBuilder();
         for(final byte[] format : sctx.decFormats) {
           mb.put(Str.get(format), sctx.decFormats.get(format).toMap());
         }

@@ -678,7 +678,7 @@ public abstract class ParseExpr extends Expr {
   protected final XQMap toRecord(final Item item, final AStr... keys) throws QueryException {
     final XQMap map = toMap(item);
     for(final AStr key : keys) {
-      if(!map.contains(key, info)) throw INVCONVERT_X_X_X.get(info, item.type, "record()", item);
+      if(!map.contains(key)) throw INVCONVERT_X_X_X.get(info, item.type, "record()", item);
     }
     return map;
   }

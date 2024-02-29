@@ -259,8 +259,8 @@ public final class Payload {
             final XQMap map = value instanceof XQMap ? (XQMap) value : XQMap.empty();
             final Str file = Str.get(filename);
             final B64 contents = B64.get(cont.next());
-            final Value files = new ItemList().add(map.get(file, info)).add(contents).value();
-            value = map.put(file, files, info);
+            final Value files = new ItemList().add(map.get(file)).add(contents).value();
+            value = map.put(file, files);
           } else {
             // assign string, join multiple strings
             final Str v = Str.get(cont.next());

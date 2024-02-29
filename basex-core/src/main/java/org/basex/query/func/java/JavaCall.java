@@ -314,7 +314,7 @@ public abstract class JavaCall extends Arr {
           final Iterator<?> ir = (Iterator<?>) object;
           while(ir.hasNext()) vb.add(toValue(ir.next(), qc, info, wrap));
         } else if(object instanceof Map) {
-          final MapBuilder mb = new MapBuilder(info);
+          final MapBuilder mb = new MapBuilder();
           for(final Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
             final Item key = toValue(entry.getKey(), qc, info, wrap).item(qc, info);
             final Value value = toValue(entry.getValue(), qc, info, wrap);

@@ -25,12 +25,12 @@ public class MapEntries extends StandardFunc {
       @Override
       public XQMap next() throws QueryException {
         final Item key = keys.next();
-        return key != null ? entry(key, map.get(key, info)) : null;
+        return key != null ? entry(key, map.get(key)) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
         final Item key = keys.get(i);
-        return entry(key, map.get(key, info));
+        return entry(key, map.get(key));
       }
       @Override
       public long size() {
@@ -63,6 +63,6 @@ public class MapEntries extends StandardFunc {
    * @throws QueryException query exception
    */
   XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.singleton(key, value, info);
+    return XQMap.singleton(key, value);
   }
 }

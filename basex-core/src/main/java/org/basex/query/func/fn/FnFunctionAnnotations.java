@@ -18,7 +18,7 @@ public class FnFunctionAnnotations extends StandardFunc {
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
 
-    final MapBuilder mb = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder();
     for(final Ann ann : function.annotations()) {
       mb.put(ann.name(), ann.value());
     }

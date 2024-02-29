@@ -20,7 +20,7 @@ public final class MapFilter extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    final MapBuilder mb = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder();
     map.apply((key, value) -> {
       if(toBoolean(qc, predicate, key, value)) mb.put(key, value);
     });

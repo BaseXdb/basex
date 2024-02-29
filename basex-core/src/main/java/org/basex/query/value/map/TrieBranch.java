@@ -49,13 +49,13 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item key, final Value value, final int level,
-      final InputInfo info) throws QueryException {
+  TrieNode put(final int hs, final Item key, final Value value, final int level)
+      throws QueryException {
     final int k = key(hs, level);
     final TrieNode sub = kids[k], nsub;
     final int bs, rem;
     if(sub != null) {
-      nsub = sub.put(hs, key, value, level + 1, info);
+      nsub = sub.put(hs, key, value, level + 1);
       if(nsub == sub) return this;
       bs = used;
       rem = sub.size;
@@ -70,12 +70,12 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hash, final Item key, final int level, final InputInfo info)
+  TrieNode delete(final int hash, final Item key, final int level)
       throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
     if(sub == null) return this;
-    final TrieNode nsub = sub.delete(hash, key, level + 1, info);
+    final TrieNode nsub = sub.delete(hash, key, level + 1);
     if(nsub == sub) return this;
 
     final int nu;
@@ -96,19 +96,19 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  Value get(final int hash, final Item key, final int level, final InputInfo info)
+  Value get(final int hash, final Item key, final int level)
       throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
-    return sub == null ? null : sub.get(hash, key, level + 1, info);
+    return sub == null ? null : sub.get(hash, key, level + 1);
   }
 
   @Override
-  boolean contains(final int hash, final Item key, final int level, final InputInfo info)
+  boolean contains(final int hash, final Item key, final int level)
       throws QueryException {
     final int k = key(hash, level);
     final TrieNode sub = kids[k];
-    return sub != null && sub.contains(hash, key, level + 1, info);
+    return sub != null && sub.contains(hash, key, level + 1);
   }
 
   /** End strings. */
@@ -240,15 +240,6 @@ final class TrieBranch extends TrieNode {
       if(nd != null && !nd.instanceOf(kt, dt)) return false;
     }
     return true;
-  }
-
-  @Override
-  int hash(final InputInfo info) throws QueryException {
-    int hash = 0;
-    for(final TrieNode nd : kids) {
-      if(nd != null) hash = (hash << 5) - hash + nd.hash(info);
-    }
-    return hash;
   }
 
   @Override

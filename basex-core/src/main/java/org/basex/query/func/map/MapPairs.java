@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
 public class MapPairs extends MapEntries {
   @Override
   XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.singleton(Str.KEY, key, info).put(Str.VALUE, value, info);
+    return XQMap.singleton(Str.KEY, key).put(Str.VALUE, value);
   }
 
   @Override

@@ -34,7 +34,7 @@ public class MapForEach extends StandardFunc {
           if(item != null) return item;
           final Item key = keys.next();
           if(key == null) return null;
-          iter = action.invoke(qc, info, key, map.get(key, info)).iter();
+          iter = action.invoke(qc, info, key, map.get(key)).iter();
         }
       }
     };

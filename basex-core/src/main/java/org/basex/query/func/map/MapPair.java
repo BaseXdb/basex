@@ -22,7 +22,7 @@ public final class MapPair extends StandardFunc {
     final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
 
-    return XQMap.singleton(Str.KEY, key, info).put(Str.VALUE, value, info);
+    return XQMap.singleton(Str.KEY, key).put(Str.VALUE, value);
   }
 
   @Override

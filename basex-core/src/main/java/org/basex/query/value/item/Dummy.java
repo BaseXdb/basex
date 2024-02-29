@@ -57,7 +57,7 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public boolean atomicEqual(final Item item, final InputInfo ii) {
+  public boolean atomicEqual(final Item item) {
     throw Util.notExpected();
   }
 

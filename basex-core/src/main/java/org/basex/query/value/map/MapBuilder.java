@@ -13,25 +13,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class MapBuilder {
-  /** Input info (can be {@code null}). */
-  private final InputInfo info;
   /** Map. */
   private XQMap map = XQMap.empty();
-
-  /**
-   * Constructor.
-   */
-  public MapBuilder() {
-    this(null);
-  }
-
-  /**
-   * Constructor.
-   * @param info input info (can be {@code null})
-   */
-  public MapBuilder(final InputInfo info) {
-    this.info = info;
-  }
 
   /**
    * Adds a key/value pair to the map.
@@ -41,7 +24,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final Item key, final Value value) throws QueryException {
-    map = map.put(key, value, info);
+    map = map.put(key, value);
     return this;
   }
 
@@ -118,7 +101,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public boolean contains(final Item key) throws QueryException {
-    return map.contains(key, info);
+    return map.contains(key);
   }
 
   /**
@@ -128,7 +111,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public Value get(final Item key) throws QueryException {
-    return map.get(key, info);
+    return map.get(key);
   }
 
   /**

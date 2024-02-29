@@ -26,13 +26,13 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    TrieNode delete(final int hash, final Item key, final int level, final InputInfo info) {
+    TrieNode delete(final int hash, final Item key, final int level) {
       return this; }
     @Override
-    Value get(final int hash, final Item key, final int level, final InputInfo info) {
+    Value get(final int hash, final Item key, final int level) {
       return null; }
     @Override
-    boolean contains(final int hash, final Item key, final int level, final InputInfo info) {
+    boolean contains(final int hash, final Item key, final int level) {
       return false; }
     @Override
     TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
@@ -59,12 +59,10 @@ abstract class TrieNode {
     @Override
     boolean instanceOf(final AtomType kt, final SeqType dt) { return true; }
     @Override
-    int hash(final InputInfo info) { return 0; }
-    @Override
     boolean equal(final TrieNode node, final DeepEqual deep) { return this == node; }
     @Override
-    public TrieNode put(final int hash, final Item key, final Value value, final int level,
-        final InputInfo info) { return new TrieLeaf(hash, key, value); }
+    public TrieNode put(final int hash, final Item key, final Value value, final int level) {
+      return new TrieLeaf(hash, key, value); }
     @Override
     void apply(final QueryBiConsumer<Item, Value> func) { }
     @Override
@@ -90,45 +88,40 @@ abstract class TrieNode {
    * @param key key to insert
    * @param value value to insert
    * @param level level
-   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode put(int hash, Item key, Value value, int level, InputInfo info)
-      throws QueryException;
+  abstract TrieNode put(int hash, Item key, Value value, int level) throws QueryException;
 
   /**
    * Deletes a key from this map.
    * @param hash hash code of the key
    * @param key key to delete
    * @param level level
-   * @param info input info (can be {@code null})
    * @return updated map if changed, {@code null} if deleted, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode delete(int hash, Item key, int level, InputInfo info) throws QueryException;
+  abstract TrieNode delete(int hash, Item key, int level) throws QueryException;
 
   /**
    * Looks up the value associated with the given key.
    * @param hash hash code
    * @param key key to look up
    * @param level level
-   * @param info input info (can be {@code null})
    * @return bound value if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  abstract Value get(int hash, Item key, int level, InputInfo info) throws QueryException;
+  abstract Value get(int hash, Item key, int level) throws QueryException;
 
   /**
    * Checks if the given key exists in the map.
    * @param hash hash code
    * @param key key to look for
    * @param level level
-   * @param info input info (can be {@code null})
    * @return {@code true} if the key exists, {@code false} otherwise
    * @throws QueryException query exception
    */
-  abstract boolean contains(int hash, Item key, int level, InputInfo info) throws QueryException;
+  abstract boolean contains(int hash, Item key, int level) throws QueryException;
 
   /**
    * <p> Inserts all bindings from the given node into this one.
@@ -243,14 +236,6 @@ abstract class TrieNode {
    * @return {@code true} if the type fits, {@code false} otherwise
    */
   abstract boolean instanceOf(AtomType kt, SeqType dt);
-
-  /**
-   * Calculates the hash code of this node.
-   * @param info input info (can be {@code null})
-   * @return hash value
-   * @throws QueryException query exception
-   */
-  abstract int hash(InputInfo info) throws QueryException;
 
   /**
    * Checks if this node is indistinguishable from the given node.

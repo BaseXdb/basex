@@ -278,7 +278,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int hash(final InputInfo ii) {
+  public int hash() {
     return Token.hash(internal());
   }
 

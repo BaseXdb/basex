@@ -58,13 +58,13 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item key, final int level, final InputInfo info)
+  TrieNode delete(final int hs, final Item key, final int level)
       throws QueryException {
 
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
-        if(key.atomicEqual(keys[i], info)) {
+        if(key.atomicEqual(keys[i])) {
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -87,13 +87,13 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item key, final Value value, final int level,
-      final InputInfo info) throws QueryException {
+  TrieNode put(final int hs, final Item key, final Value value, final int level)
+      throws QueryException {
 
     // same hash, replace or merge
     if(hs == hash) {
       for(int i = keys.length; i-- > 0;) {
-        if(key.atomicEqual(keys[i], info)) {
+        if(key.atomicEqual(keys[i])) {
           // replace value
           final Value[] vs = values.clone();
           vs[i] = value;
@@ -108,7 +108,7 @@ final class TrieList extends TrieNode {
     final int a = key(hs, level), b = key(hash, level);
     final int used;
     if(a == b) {
-      ch[a] = put(hs, key, value, level + 1, info);
+      ch[a] = put(hs, key, value, level + 1);
       used = 1 << a;
     } else {
       ch[a] = new TrieLeaf(hs, key, value);
@@ -120,22 +120,22 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  Value get(final int hs, final Item key, final int level, final InputInfo info)
+  Value get(final int hs, final Item key, final int level)
       throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;) {
-        if(key.atomicEqual(keys[k], info)) return values[k];
+        if(key.atomicEqual(keys[k])) return values[k];
       }
     }
     return null;
   }
 
   @Override
-  boolean contains(final int hs, final Item key, final int level, final InputInfo info)
+  boolean contains(final int hs, final Item key, final int level)
       throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;)
-        if(key.atomicEqual(keys[k], info)) return true;
+        if(key.atomicEqual(keys[k])) return true;
     }
     return false;
   }
@@ -153,7 +153,7 @@ final class TrieList extends TrieNode {
     qc.checkStop();
     if(hash == leaf.hash) {
       for(int k = keys.length; k-- > 0;) {
-        if(leaf.key.atomicEqual(keys[k], info)) {
+        if(leaf.key.atomicEqual(keys[k])) {
           switch(merge) {
             case USE_FIRST:
             case USE_ANY:
@@ -208,7 +208,7 @@ final class TrieList extends TrieNode {
         // check if the key is already in the list
         for(int j = unmatched.nextSetBit(0); j >= 0; j = unmatched.nextSetBit(j + 1)) {
           final Item k = list.keys[j];
-          if(k.atomicEqual(ok, info)) {
+          if(k.atomicEqual(ok)) {
             unmatched.clear(j);
             switch(merge) {
               case USE_FIRST:
@@ -270,7 +270,7 @@ final class TrieList extends TrieNode {
     try {
       for(int i = 1; i < size; i++) {
         for(int j = i; j-- > 0;) {
-          if(keys[i].atomicEqual(keys[j], null)) return false;
+          if(keys[i].atomicEqual(keys[j])) return false;
         }
       }
     } catch(final QueryException ex) {
@@ -328,14 +328,6 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  int hash(final InputInfo info) throws QueryException {
-    int h = hash;
-    // order isn't important, operation has to be commutative
-    for(int i = size; --i >= 0;) h ^= values[i].hash(info);
-    return h;
-  }
-
-  @Override
   boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
     if(!(node instanceof TrieList) || size != node.size) return false;
 
@@ -348,7 +340,7 @@ final class TrieList extends TrieNode {
       final Value value = values[i];
       for(int j = 0; j < size; j++) {
         if(deep != null) {
-          if(!key.atomicEqual(ol.keys[j], deep.info)) continue;
+          if(!key.atomicEqual(ol.keys[j])) continue;
           if(!deep.equal(value, ol.values[j])) return false;
         } else {
           if(!key.equals(ol.keys[j])) continue;

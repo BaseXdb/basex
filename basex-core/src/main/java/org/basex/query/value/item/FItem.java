@@ -37,7 +37,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final boolean atomicEqual(final Item item, final InputInfo ii) {
+  public final boolean atomicEqual(final Item item) {
     return false;
   }
 

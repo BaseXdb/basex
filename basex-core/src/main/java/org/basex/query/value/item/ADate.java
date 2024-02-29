@@ -392,12 +392,12 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
-    return type == item.type && compare(item, ii) == 0 && hasTz() == ((ADate) item).hasTz();
+  public final boolean atomicEqual(final Item item) throws QueryException {
+    return type == item.type && compare(item, null) == 0 && hasTz() == ((ADate) item).hasTz();
   }
 
   @Override
-  public final int hash(final InputInfo ii) {
+  public final int hash() {
     return seconds().intValue();
   }
 

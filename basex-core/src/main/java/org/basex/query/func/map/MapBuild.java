@@ -29,11 +29,11 @@ public final class MapBuild extends StandardFunc {
       final Item k = (key != null ? key.invoke(qc, info, item) : item).atomItem(qc, info);
       if(!k.isEmpty()) {
         Value v = value != null ? value.invoke(qc, info, item) : item;
-        if(result.contains(k, info)) {
-          final Value old = result.get(k, info);
+        if(result.contains(k)) {
+          final Value old = result.get(k);
           v = combine != null ? combine.invoke(qc, info, old, v) : ValueBuilder.concat(old, v, qc);
         }
-        result = result.put(k, v, info);
+        result = result.put(k, v);
       }
     }
     return result;

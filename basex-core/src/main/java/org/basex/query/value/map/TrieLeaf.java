@@ -43,11 +43,9 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item ky, final Value vl, final int level, final InputInfo info)
-      throws QueryException {
-
+  TrieNode put(final int hs, final Item ky, final Value vl, final int level) throws QueryException {
     // same hash, replace or merge
-    if(hs == hash) return key.atomicEqual(ky, info) ? new TrieLeaf(hs, ky, vl) :
+    if(hs == hash) return key.atomicEqual(ky) ? new TrieLeaf(hs, ky, vl) :
       new TrieList(hash, key, value, ky, vl);
 
     // different hash, branch
@@ -55,7 +53,7 @@ final class TrieLeaf extends TrieNode {
     final int a = key(hs, level), b = key(hash, level);
     final int used;
     if(a == b) {
-      ch[a] = put(hs, ky, vl, level + 1, info);
+      ch[a] = put(hs, ky, vl, level + 1);
       used = 1 << a;
     } else {
       ch[a] = new TrieLeaf(hs, ky, vl);
@@ -66,21 +64,21 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item ky, final int level, final InputInfo info)
+  TrieNode delete(final int hs, final Item ky, final int level)
       throws QueryException {
-    return hs == hash && key.atomicEqual(ky, info) ? null : this;
+    return hs == hash && key.atomicEqual(ky) ? null : this;
   }
 
   @Override
-  Value get(final int hs, final Item ky, final int level, final InputInfo info)
+  Value get(final int hs, final Item ky, final int level)
       throws QueryException {
-    return hs == hash && key.atomicEqual(ky, info) ? value : null;
+    return hs == hash && key.atomicEqual(ky) ? value : null;
   }
 
   @Override
-  boolean contains(final int hs, final Item ky, final int level, final InputInfo info)
+  boolean contains(final int hs, final Item ky, final int level)
       throws QueryException {
-    return hs == hash && key.atomicEqual(ky, info);
+    return hs == hash && key.atomicEqual(ky);
   }
 
   @Override
@@ -95,7 +93,7 @@ final class TrieLeaf extends TrieNode {
 
     qc.checkStop();
     if(hash == leaf.hash) {
-      if(!key.atomicEqual(leaf.key, info))
+      if(!key.atomicEqual(leaf.key))
         return new TrieList(hash, key, value, leaf.key, leaf.value);
 
       switch(merge) {
@@ -133,7 +131,7 @@ final class TrieLeaf extends TrieNode {
     // same hash? insert binding
     if(hash == list.hash) {
       for(int i = 0; i < list.size; i++) {
-        if(key.atomicEqual(list.keys[i], info)) {
+        if(key.atomicEqual(list.keys[i])) {
           final Item[] ks = list.keys.clone();
           final Value[] vs = list.values.clone();
           ks[i] = key;
@@ -187,7 +185,7 @@ final class TrieLeaf extends TrieNode {
   @Override
   boolean verify() {
     try {
-      return key.hash(null) == hash;
+      return key.hash() == hash;
     } catch(final QueryException ex) {
       Util.debug(ex);
       return false;
@@ -229,15 +227,10 @@ final class TrieLeaf extends TrieNode {
   boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
     if(node instanceof TrieLeaf) {
       final TrieLeaf leaf = (TrieLeaf) node;
-      return deep != null ? key.atomicEqual(leaf.key, deep.info) && deep.equal(value, leaf.value) :
+      return deep != null ? key.atomicEqual(leaf.key) && deep.equal(value, leaf.value) :
         key.equals(leaf.key) && value.equals(leaf.value);
     }
     return false;
-  }
-
-  @Override
-  int hash(final InputInfo info) throws QueryException {
-    return 31 * hash + value.hash(info);
   }
 
   @Override

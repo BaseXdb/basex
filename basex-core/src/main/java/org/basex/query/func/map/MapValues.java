@@ -32,7 +32,7 @@ public class MapValues extends StandardFunc {
           if(item != null) return item;
           final Item key = keys.next();
           if(key == null) return null;
-          iter = map.get(key, info).iter();
+          iter = map.get(key).iter();
         }
       }
     };

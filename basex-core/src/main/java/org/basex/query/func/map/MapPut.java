@@ -25,7 +25,7 @@ public final class MapPut extends StandardFunc {
     final Item key = toAtomItem(arg(1), qc);
     final Value value = arg(2).value(qc);
 
-    return map.put(key, value, info);
+    return map.put(key, value);
   }
 
   @Override

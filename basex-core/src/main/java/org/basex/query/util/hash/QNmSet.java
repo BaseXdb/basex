@@ -62,7 +62,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return id, or {@code 0} if key does not exist
    */
   public final int id(final QNm key) {
-    final int b = key.hash(null) & capacity() - 1;
+    final int b = key.hash() & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(key.eq(keys[id])) return id;
     }
@@ -86,7 +86,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return id, or negative id if key has already been stored
    */
   private int index(final QNm key) {
-    final int h = key.hash(null);
+    final int h = key.hash();
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(keys[id].eq(key)) return -id;

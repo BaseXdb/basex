@@ -161,12 +161,12 @@ public class FnParseUri extends FnJsonDoc {
         final int eq = q.indexOf('=');
         final Str key = eq == -1 ? Str.EMPTY : Str.get(q.substring(0, eq));
         final Str val = Str.get(q.substring(eq + 1));
-        queries = queries.put(key, ValueBuilder.concat(queries.get(key, info), val, qc), info);
+        queries = queries.put(key, ValueBuilder.concat(queries.get(key), val, qc));
       }
     }
     filepath = decode(filepath);
 
-    final MapBuilder mb = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder();
     add(mb, URI, value);
     add(mb, SCHEME, scheme);
     add(mb, HIERARCHICAL, hierarchical);

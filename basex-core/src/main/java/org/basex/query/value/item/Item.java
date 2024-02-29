@@ -195,19 +195,19 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
+  @SuppressWarnings("unused")
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return atomicEqual(item, deep.info);
+    return atomicEqual(item);
   }
 
   /**
    * Compares items for atomic equality. Called by {@link FnAtomicEqual}.
    * @param item item to be compared
-   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
-    return comparable(item) && equal(item, null, null, ii);
+  public boolean atomicEqual(final Item item) throws QueryException {
+    return comparable(item) && equal(item, null, null, null);
   }
 
   /**
@@ -316,8 +316,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public int hash(final InputInfo ii) throws QueryException {
-    return Token.hash(string(ii));
+  public int hash() throws QueryException {
+    return Token.hash(string(null));
   }
 
   /**

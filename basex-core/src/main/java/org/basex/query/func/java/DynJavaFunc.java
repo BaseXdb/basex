@@ -39,8 +39,8 @@ final class DynJavaFunc extends DynJavaCall {
    * @param sc static context
    * @param info input info (can be {@code null})
    */
-  DynJavaFunc(final Class<?> clazz, final String name, final String[] types,
-      final Expr[] args, final StaticContext sc, final InputInfo info) {
+  DynJavaFunc(final Class<?> clazz, final String name, final String[] types, final Expr[] args,
+      final StaticContext sc, final InputInfo info) {
     super(clazz, types, args, sc, info);
     this.name = name;
   }

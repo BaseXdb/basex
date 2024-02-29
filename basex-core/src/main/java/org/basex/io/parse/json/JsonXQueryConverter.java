@@ -79,7 +79,7 @@ public final class JsonXQueryConverter extends JsonConverter {
   void closePair(final boolean add) throws QueryException {
     final Value value = stack.pop();
     final Item key = (Item) stack.pop();
-    if(add) maps.push(maps.pop().put(key, value, null));
+    if(add) maps.push(maps.pop().put(key, value));
   }
 
   @Override

@@ -267,14 +267,30 @@ public abstract class XQArray extends XQData {
   abstract void checkInvariants();
 
   @Override
-  public final Value get(final Item key, final InputInfo info) throws QueryException {
+  public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
+      throws QueryException {
+    return getInternal(key(args[0], qc, ii), ii, true);
+  }
+
+  /**
+   * Gets the internal map value.
+   * @param key key to look for
+   * @param ii input info (can be {@code null})
+   * @param error if {@code true}, raise error if index is out of bounds
+   * @return value or {@code null}
+   * @throws QueryException query exception
+   */
+  public Value getInternal(final Item key, final InputInfo ii, final boolean error)
+      throws QueryException {
     final Type tp = key.type;
     if(!tp.instanceOf(AtomType.INTEGER) && !tp.isUntyped())
-      throw typeError(key, AtomType.INTEGER, info);
+      throw typeError(key, AtomType.INTEGER, ii);
 
-    final long pos = key.itr(info), size = arraySize();
+    final long pos = key.itr(ii), size = arraySize();
     if(pos > 0 && pos <= size) return get(pos - 1);
-    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, size);
+
+    if(error) throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
+    return null;
   }
 
   @Override
@@ -297,7 +313,7 @@ public abstract class XQArray extends XQData {
 
   @Override
   public final void string(final boolean indent, final TokenBuilder tb, final int level,
-      final InputInfo info) throws QueryException {
+      final InputInfo ii) throws QueryException {
 
     tb.add('[');
     int c = 0;
@@ -315,8 +331,8 @@ public abstract class XQArray extends XQData {
           if(indent) tb.add(' ');
         }
         final Item item = value.itemAt(i);
-        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, info);
-        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, info);
+        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, ii);
+        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, ii);
         else tb.add(item.toString());
       }
       if(vs != 1) tb.add(')');

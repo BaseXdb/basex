@@ -43,7 +43,7 @@ abstract class WebFn extends StandardFunc {
     int c = 0;
     for(final Item key : map.keys()) {
       final byte[] name = key.string(info);
-      for(final Item item : map.get(key, info)) {
+      for(final Item item : map.get(key)) {
         tb.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, false));
         tb.add('=').add(Token.encodeUri(item.string(info), false));
       }

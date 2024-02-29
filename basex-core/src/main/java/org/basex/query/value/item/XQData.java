@@ -54,12 +54,19 @@ public abstract class XQData extends FItem {
     return false;
   }
 
-  @Override
-  public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
+  /**
+   * Returns the key for accessing a function value.
+   * @param key key argument
+   * @param qc query context
+   * @param ii input info
+   * @return key
+   * @throws QueryException query exception
+   */
+  protected final Item key(final Value key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    final Item key = args[0].atomItem(qc, ii);
-    if(key.isEmpty()) throw EMPTYFOUND.get(ii);
-    return get(key, ii);
+    final Item item = key.atomItem(qc, ii);
+    if(item.isEmpty()) throw EMPTYFOUND.get(ii);
+    return item;
   }
 
   @Override
@@ -72,15 +79,6 @@ public abstract class XQData extends FItem {
       final InputInfo ii) throws QueryException {
     return coerceTo(ft, qc, cc, ii, cc != null ? cc.sc() : null, false);
   }
-
-  /**
-   * Gets a value from this item.
-   * @param key key to look for (must not be {@code null})
-   * @param info input info (can be {@code null})
-   * @return bound value if found, the empty sequence {@code ()} otherwise
-   * @throws QueryException query exception
-   */
-  public abstract Value get(Item key, InputInfo info) throws QueryException;
 
   /**
    * Returns a string representation of the item.

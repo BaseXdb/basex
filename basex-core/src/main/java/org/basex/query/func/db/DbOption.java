@@ -39,7 +39,7 @@ public final class DbOption extends StandardFunc {
     if(value instanceof Integer) return Int.get((Integer) value);
     if(value instanceof Options) {
       final Options options = (Options) value;
-      final MapBuilder mb = new MapBuilder(info);
+      final MapBuilder mb = new MapBuilder();
       for(final Option<?> opt : options) {
         final Item item = item(options.get(opt));
         if(item != null) mb.put(Str.get(opt.name()), item);

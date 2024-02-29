@@ -253,8 +253,8 @@ public final class MapModuleTest extends SandboxTest {
     final Function func = _MAP_MERGE;
     final Str[] keys = { Str.get("DENW21AL100077Hs"), Str.get("DENW21AL100076i5"),
         Str.get("DENW21AL100076hT") };
-    assertEquals(keys[0].hash(null), keys[1].hash(null));
-    assertEquals(keys[1].hash(null), keys[2].hash(null));
+    assertEquals(keys[0].hash(), keys[1].hash());
+    assertEquals(keys[1].hash(), keys[2].hash());
 
     final String mapAB = Util.info("map { '%': %, '%': % }", keys[0], 1, keys[1], 1);
     final String mapABC = Util.info("map { '%': %, '%': %, '%': % }",

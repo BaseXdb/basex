@@ -66,7 +66,7 @@ public final class CMap extends Arr {
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final MapBuilder mb = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder();
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       final Item key = toAtomItem(exprs[e], qc);

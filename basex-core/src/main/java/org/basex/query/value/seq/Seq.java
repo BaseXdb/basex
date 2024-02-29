@@ -210,13 +210,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final int hash(final InputInfo ii) throws QueryException {
+  public final int hash() throws QueryException {
     // final hash function because equivalent sequences *must* produce the
     // same hash value, otherwise they get lost in hash maps.
     // example: hash(RangeSeq(1 to 3)) == hash(ItrSeq(1, 2, 3))
     //                                 == hash(ItemSeq(Itr(1), Itr(2), Itr(3)))
     int h = 1;
-    for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);
+    for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash();
     return h;
   }
 

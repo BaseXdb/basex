@@ -149,8 +149,8 @@ public final class Dbl extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return transitive && item instanceof Dec
-        ? -item.compare(this, coll, transitive, ii) : compare(value, item.dbl(ii), transitive);
+    return transitive && item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
+      compare(value, item.dbl(ii), transitive);
   }
 
   /**

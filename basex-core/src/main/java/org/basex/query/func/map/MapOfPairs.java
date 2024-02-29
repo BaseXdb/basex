@@ -26,14 +26,14 @@ public final class MapOfPairs extends StandardFunc {
     for(Item item; (item = qc.next(pairs)) != null;) {
       // extract key/value record entries
       final XQMap map = toRecord(item, Str.KEY, Str.VALUE);
-      final Item key = checkType(map.get(Str.KEY, info), AtomType.ANY_ATOMIC_TYPE);
-      Value value = map.get(Str.VALUE, info);
-      if(result.contains(key, info)) {
-        final Value old = result.get(key, info);
+      final Item key = checkType(map.get(Str.KEY), AtomType.ANY_ATOMIC_TYPE);
+      Value value = map.get(Str.VALUE);
+      if(result.contains(key)) {
+        final Value old = result.get(key);
         value = combine != null ? combine.invoke(qc, info, old, value) :
           ValueBuilder.concat(old, value, qc);
       }
-      result = result.put(key, value, info);
+      result = result.put(key, value);
     }
     return result;
   }

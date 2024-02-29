@@ -19,7 +19,7 @@ public final class MapContains extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
 
-    return Bln.get(map.contains(key, info));
+    return Bln.get(map.contains(key));
   }
 
   @Override

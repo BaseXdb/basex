@@ -21,7 +21,7 @@ public final class ArrayOfMembers extends ArrayFn {
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(Item item; (item = qc.next(members)) != null;) {
-      ab.append(toRecord(item, Str.VALUE).get(Str.VALUE, info));
+      ab.append(toRecord(item, Str.VALUE).get(Str.VALUE));
     }
     return ab.array(this);
   }
