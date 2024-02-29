@@ -162,7 +162,7 @@ public final class Databases {
    * @return date string
    */
   public static String date(final String backup) {
-    return backup.replaceAll("^.+-(" + DATE + ")$", "$1");
+    return backup.replaceAll("^.*-(" + DATE + ")$", "$1");
   }
 
   /**
