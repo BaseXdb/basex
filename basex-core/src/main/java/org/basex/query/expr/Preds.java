@@ -126,7 +126,7 @@ public abstract class Preds extends Arr {
     if(expr instanceof Path && rst.type instanceof NodeType) {
       final Path path = (Path) expr;
       if(first.test(path.root) && !path.steps[0].has(Flag.POS)) {
-        expr = Path.get(cc, expr.info(), null, path.steps);
+        expr = Path.get(cc, expr.info(info), null, path.steps);
       }
     }
 

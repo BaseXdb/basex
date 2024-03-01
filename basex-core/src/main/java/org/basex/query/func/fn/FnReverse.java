@@ -89,14 +89,13 @@ public final class FnReverse extends StandardFunc {
       final int al = args.length;
       final ExprList list = new ExprList(al);
       for(int a = al - 1; a >= 0; a--) list.add(cc.function(REVERSE, info, args[a]));
-      return List.get(cc, input.info(), list.finish());
+      return List.get(cc, input.info(info), list.finish());
     }
     // reverse(E[test])  ->  reverse(E)[test]
     if(input instanceof IterFilter) {
       final IterFilter filter = (IterFilter) input;
-      if(filter.root.size() != -1) {
-        return Filter.get(cc, info, cc.function(REVERSE, filter.info(), filter.root), filter.exprs);
-      }
+      if(filter.root.size() != -1) return Filter.get(cc, info,
+          cc.function(REVERSE, filter.info(info), filter.root), filter.exprs);
     }
 
     adoptType(input);

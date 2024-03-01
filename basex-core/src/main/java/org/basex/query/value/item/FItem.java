@@ -31,9 +31,9 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    throw FIATOMIZE_X.get(ii, this);
+    throw FIATOMIZE_X.get(info(ii), this);
   }
 
   @Override
@@ -55,13 +55,13 @@ public abstract class FItem extends Item implements XQFunction {
   @Override
   public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
-    throw BASEX_STORE_X.get(ii, this);
+    throw BASEX_STORE_X.get(info(ii), this);
   }
 
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    throw BASEX_STORE_X.get(ii, this);
+    throw BASEX_STORE_X.get(info(ii), this);
   }
 
   /**
@@ -73,25 +73,13 @@ public abstract class FItem extends Item implements XQFunction {
    * @return coerced item
    * @throws QueryException query exception
    */
-  public abstract FItem coerceTo(FuncType ft, QueryContext qc, CompileContext cc, InputInfo ii)
-      throws QueryException;
+  public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
+      final InputInfo ii) throws QueryException {
 
-  /**
-   * Converts this function item to the given function type.
-   * @param ft function type
-   * @param qc query context
-   * @param cc compilation context ({@code null} during runtime)
-   * @param ii input info (can be {@code null})
-   * @param updating updating flag
-   * @return coerced item
-   * @throws QueryException query exception
-   */
-  final FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii, final boolean updating) throws QueryException {
-
+    final InputInfo info = info(ii);
     final SeqType[] argTypes = ft.argTypes;
     final int arity = arity(), nargs = argTypes.length;
-    if(nargs < arity) throw arityError(this, arity, nargs, false, ii);
+    if(nargs < arity) throw arityError(this, arity, nargs, false, info);
 
     // optimize: continue with coercion if current type is only an instance of new type
     FuncType tp = funcType();
@@ -102,21 +90,21 @@ public abstract class FItem extends Item implements XQFunction {
     final Var[] vars = new Var[arity];
     final Expr[] args = new Expr[arity];
     for(int a = 0; a < arity; a++) {
-      vars[a] = vs.addNew(paramName(a), argTypes[a], true, qc, ii);
-      args[a] = new VarRef(ii, vars[a]).optimize(cc);
+      vars[a] = vs.addNew(paramName(a), argTypes[a], true, qc, info);
+      args[a] = new VarRef(info, vars[a]).optimize(cc);
     }
 
     try {
       if(cc != null) cc.pushScope(vs);
 
       // create new function call (will immediately be inlined/simplified when optimized)
-      Expr body = new DynFuncCall(ii, updating, false, this, args);
+      Expr body = new DynFuncCall(info, updating(), false, this, args);
       if(cc != null) body = body.optimize(cc);
 
       // add type check if return types differ
       final SeqType dt = ft.declType;
       if(!tp.declType.instanceOf(dt)) {
-        body = new TypeCheck(ii, body, dt, true);
+        body = new TypeCheck(info, body, dt, true);
         if(cc != null) body = body.optimize(cc);
       }
 
@@ -124,11 +112,17 @@ public abstract class FItem extends Item implements XQFunction {
       final SeqType bt = body.seqType();
       tp = cc != null && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, argTypes) : ft;
       body.markTailCalls(null);
-      return new FuncItem(ii, body, vars, annotations(), tp, vs.stackSize(), funcName());
+      return new FuncItem(info, body, vars, annotations(), tp, vs.stackSize(), funcName());
     } finally {
       if(cc != null) cc.removeScope();
     }
   }
+
+  /**
+   * Indicates if the function item is updating.
+   * @return result of check
+   */
+  abstract boolean updating();
 
   @Override
   public final boolean equals(final Object obj) {

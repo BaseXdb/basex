@@ -130,9 +130,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
-    return coerceTo(ft, qc, cc, info, anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD));
+  boolean updating() {
+    return anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
   }
 
   @Override

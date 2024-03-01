@@ -82,6 +82,11 @@ public final class XQJava extends FItem {
   }
 
   @Override
+  boolean updating() {
+    return false;
+  }
+
+  @Override
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
     if(instanceOf(ft)) return this;

@@ -54,6 +54,11 @@ public abstract class XQData extends FItem {
     return false;
   }
 
+  @Override
+  boolean updating() {
+    return false;
+  }
+
   /**
    * Returns the key for accessing a function value.
    * @param key key argument
@@ -72,12 +77,6 @@ public abstract class XQData extends FItem {
   @Override
   public final int stackFrameSize() {
     return 0;
-  }
-
-  @Override
-  public final FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
-    return coerceTo(ft, qc, cc, ii, false);
   }
 
   /**

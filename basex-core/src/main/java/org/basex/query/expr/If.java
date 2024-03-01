@@ -68,7 +68,7 @@ public final class If extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(EMPTY.is(cond)) {
       // if(empty(A)) then B else C  ->  if(exists(A)) then C else B
-      cond = cc.function(EXISTS, cond.info(), cond.arg(0));
+      cond = cc.function(EXISTS, cond.info(info), cond.arg(0));
       swap();
       cc.info(QueryText.OPTSWAP_X, this);
     } else if(NOT.is(cond)) {
