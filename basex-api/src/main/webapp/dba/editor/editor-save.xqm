@@ -27,7 +27,7 @@ function dba:editor-save(
   let $string := string($content)
   return (
     (: validate file :)
-    if(matches($path, '\.xqm?$')) then void(utils:query-parse($string, $path)),
+    if(matches($path, '\.xq(m|l|y|u|uery)?$')) then void(utils:query-parse($string, $path)),
     file:write-text($path, $string),
     config:set-edited-file($path),
     string-join(config:editor-files(), '/')

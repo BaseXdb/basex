@@ -27,13 +27,13 @@ function dba:file-upload(
   let $dir := config:files-dir()
   return try {
     (: Parse all XQuery files; reject files that cannot be parsed :)
-    map:for-each($files, fn($file, $content) {
-      if(matches($file, '\.xqm?$')) then (
-        void(utils:query-parse(convert:binary-to-string($content), $dir || $file))
+    map:for-each($files, fn($name, $content) {
+      if(matches($name, '\.xq(m|l|y|u|uery)?$')) then (
+        void(utils:query-parse(convert:binary-to-string($content), $dir || $name))
       )
     }),
-    map:for-each($files, fn($file, $content) {
-      file:write-binary($dir || $file, $content)
+    map:for-each($files, fn($name, $content) {
+      file:write-binary($dir || $name, $content)
     }),
     web:redirect($dba:CAT, map { 'info': utils:info(map:keys($files), 'file', 'uploaded') })
   } catch * {
