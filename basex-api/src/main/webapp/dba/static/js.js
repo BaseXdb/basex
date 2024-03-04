@@ -128,7 +128,7 @@ function query(path, query, reset) {
 }
 
 /**
- * Evaluates a query.
+ * Evaluates a query in the editor panel.
  */
 function runQuery() {
   if(document.getElementById("run").disabled) return;
@@ -164,7 +164,7 @@ function runQuery() {
 }
 
 /**
- * Stops the currently evaluated query by (sending an empty sequence as query).
+ * Stops the query that is currently evaluated in the editor panel.
  * @param {boolean} show show info if query was successfully stopped
  * @returns {promise} promise
  */
@@ -189,7 +189,8 @@ function register(self) {
   setTimeout(() => {
     if(self === _running) {
       setText("Please wait…", "warning");
-      document.getElementById("stop").disabled = false;
+      var stop = document.getElementById("stop");
+      if(stop) stop.disabled = false;
     }
   }, 500);
 }
@@ -311,7 +312,10 @@ function loadCodeMirror(language, edit, resize) {
           "Cmd-Enter" : runQuery
         }
       });
-      _editor.on("change", (cm) => { cm.save(); });
+      _editor.on("change", (cm) => {
+        cm.save();
+        if(checkButtons) checkButtons();
+      });
       _editor.display.wrapper.style.border = "solid 1px grey";
     }
 
