@@ -57,8 +57,7 @@ public final class XQMap extends XQData {
 
   @Override
   public FuncType funcType() {
-    final SeqType dt = ((MapType) type).declType.union(Occ.ZERO);
-    return FuncType.get(dt, SeqType.ANY_ATOMIC_TYPE_O);
+    return ((MapType) type).funcType();
   }
 
   /**
@@ -220,6 +219,8 @@ public final class XQMap extends XQData {
     if(ft instanceof MapType) {
       kt = ((MapType) ft).keyType();
       if(kt == AtomType.ANY_ATOMIC_TYPE) kt = null;
+    } else if (ft.declType.occ.min != 0) {
+      return false;
     }
 
     SeqType dt = ft.declType;

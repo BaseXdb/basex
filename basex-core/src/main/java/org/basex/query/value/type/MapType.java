@@ -73,7 +73,8 @@ public final class MapType extends FuncType {
     if(!(type instanceof FuncType) || type instanceof ArrayType) return false;
 
     final FuncType ft = (FuncType) type;
-    return declType.instanceOf(ft.declType) && (
+    final SeqType dt = type instanceof MapType ? declType : funcType().declType;
+    return dt.instanceOf(ft.declType) && (
       type instanceof MapType ? keyType().instanceOf(((MapType) type).keyType()) :
       ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)
     );
@@ -128,5 +129,14 @@ public final class MapType extends FuncType {
   public String toString() {
     final Object[] param = this == SeqType.MAP ? WILDCARD : new Object[] { keyType(), declType };
     return new QueryString().token(MAP).params(param).toString();
+  }
+
+  /**
+   * Returns the function type of this map type.
+   * @return function type
+   */
+  public FuncType funcType() {
+    final SeqType dt = declType.union(Occ.ZERO);
+    return FuncType.get(dt, SeqType.ANY_ATOMIC_TYPE_O);
   }
 }
