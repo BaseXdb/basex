@@ -87,11 +87,14 @@ public abstract class FItem extends Item implements XQFunction {
 
     // create new compilation context and variable scope
     final VarScope vs = new VarScope();
-    final Var[] vars = new Var[arity];
+    final Var[] vars = new Var[nargs];
     final Expr[] args = new Expr[arity];
     for(int a = 0; a < arity; a++) {
       vars[a] = vs.addNew(paramName(a), argTypes[a], true, qc, info);
       args[a] = new VarRef(info, vars[a]).optimize(cc);
+    }
+    for(int a = arity; a < nargs; a++) {
+      vars[a] = vs.addNew(QNm.EMPTY, argTypes[a], true, qc, info);
     }
 
     try {
