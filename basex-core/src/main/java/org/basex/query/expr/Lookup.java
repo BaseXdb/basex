@@ -45,8 +45,9 @@ public final class Lookup extends Arr {
     if(is == 0) return cc.replaceWith(this, inputs);
 
     // skip optimizations if input may yield other items than maps or arrays
-    final FuncType ft = inputs.funcType();
-    final boolean map = ft instanceof MapType, array = ft instanceof ArrayType;
+    final SeqType st = inputs.seqType();
+    final Type tp = st.type;
+    final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
     final Expr expr = opt(cc);
@@ -54,7 +55,7 @@ public final class Lookup extends Arr {
 
     // derive type from input expression
     final Expr keys = exprs[1];
-    final SeqType st = ft.declType, kt = keys.seqType();
+    final SeqType kt = keys.seqType();
     Occ occ = st.occ;
     if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeArray()) {
       // key is wildcard, or expressions yield no single item
@@ -63,7 +64,7 @@ public final class Lookup extends Arr {
       // map lookup may result in empty sequence
       occ = occ.union(Occ.ZERO);
     }
-    exprType.assign(st.type, occ);
+    exprType.assign(tp, occ);
 
     return this;
   }
@@ -81,7 +82,7 @@ public final class Lookup extends Arr {
 
     final long is = input.size();
     final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) ->
-      keys == WILDCARD ? cc.function(input.funcType() instanceof MapType ?
+      keys == WILDCARD ? cc.function(input.seqType().type instanceof MapType ?
       Function._MAP_VALUES : Function._ARRAY_VALUES, info, in) :
       new DynFuncCall(info, in, arg).optimize(cc);
 

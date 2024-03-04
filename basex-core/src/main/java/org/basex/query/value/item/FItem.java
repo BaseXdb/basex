@@ -48,7 +48,7 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final FuncType funcType() {
+  public FuncType funcType() {
     return (FuncType) type;
   }
 

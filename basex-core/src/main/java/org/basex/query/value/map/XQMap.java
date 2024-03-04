@@ -55,6 +55,12 @@ public final class XQMap extends XQData {
     return EMPTY;
   }
 
+  @Override
+  public FuncType funcType() {
+    final SeqType dt = ((MapType) type).declType.union(Occ.ZERO);
+    return FuncType.get(dt, SeqType.ANY_ATOMIC_TYPE_O);
+  }
+
   /**
    * Creates a map with a single entry.
    * @param key key
@@ -82,7 +88,10 @@ public final class XQMap extends XQData {
 
   @Override
   public void refineType(final Expr expr) {
-    if(root.size != 0) super.refineType(expr);
+    if(root.size != 0) {
+      final Type t = type.intersect(expr.seqType().type);
+      if(t != null) type = t;
+    }
   }
 
   @Override
