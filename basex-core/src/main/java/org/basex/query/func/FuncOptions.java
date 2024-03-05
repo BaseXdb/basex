@@ -89,7 +89,7 @@ public final class FuncOptions {
     if(!item.isEmpty()) {
       try {
         if(item instanceof XQMap) {
-          options.assign((XQMap) item, enforceKnown, info);
+          options.assign((XQMap) item, enforceKnown ? OPTION_X : null, info);
         } else {
           final Type type = item.type;
           if(test == null) throw MAP_X_X.get(info, type, item);
