@@ -52,7 +52,7 @@ public final class MapBuild extends StandardFunc {
       if(ft != null) {
         kt = ft.declType.type.atomic();
         if(kt != null) {
-          final SeqType dt = kt.seqType(Occ.ZERO_OR_ONE);
+          final SeqType dt = kt.seqType(Occ.ZERO_OR_MORE);
           arg(1, arg -> refineFunc(arg, cc, dt, st.with(Occ.EXACTLY_ONE)));
         }
       }
