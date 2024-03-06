@@ -41,7 +41,9 @@ public final class FnFormatNumber extends StandardFunc {
       }
     }
     DecFormatter df = sc().decFormat(qnm, info);
-    if(!format.isEmpty()) {
+    if(format.isEmpty()) {
+      if(df == null) throw FORMATWHICH_X.get(info, formatName);
+    } else {
       final DecFormatOptions options = toOptions(format,
           df != null ? df.options() : new DecFormatOptions(), true, qc);
       try {
