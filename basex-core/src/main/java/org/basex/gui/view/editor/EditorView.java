@@ -1017,7 +1017,7 @@ public final class EditorView extends View {
     for(final EditorArea edit : editors()) {
       if(edit.opened()) continue;
       final String n = edit.file().name().substring(FILE.length());
-      bl.set(n.isEmpty() ? 1 : Integer.parseInt(n), true);
+      bl.set(n.isEmpty() ? 1 : Strings.toInt(n), true);
     }
     // find first free file number
     int b = 0;
