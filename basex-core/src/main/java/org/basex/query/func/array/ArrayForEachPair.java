@@ -40,7 +40,7 @@ public final class ArrayForEachPair extends ArrayFn {
     final Type type1 = array1.seqType().type, type2 = array2.seqType().type;
     if(type1 instanceof ArrayType && type2 instanceof ArrayType) {
       arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM,
-          ((ArrayType) type1).declType, ((ArrayType) type2).declType, SeqType.INTEGER_O));
+          ((ArrayType) type1).memberType, ((ArrayType) type2).memberType, SeqType.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)

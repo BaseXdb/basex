@@ -35,10 +35,10 @@ public class FnApply extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr func = arg(0), args = arg(1);
     FuncType ft = func.funcType();
-    final FuncType ftArgs = args.funcType();
+    final Type tpArgs = args.seqType().type;
 
     // try to pass on types of array argument to function item
-    if(ftArgs instanceof ArrayType) {
+    if(tpArgs instanceof ArrayType) {
       if(args instanceof XQArray) {
         // argument is a value: final types are known
         final XQArray array = (XQArray) args;
@@ -51,7 +51,7 @@ public class FnApply extends StandardFunc {
         final SeqType[] at = ft.argTypes;
         if(at != null) {
           final SeqType[] ast = new SeqType[at.length];
-          Arrays.fill(ast, ftArgs.declType);
+          Arrays.fill(ast, ((ArrayType) tpArgs).memberType);
           arg(0, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, ast));
         }
       }

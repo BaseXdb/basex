@@ -67,13 +67,13 @@ public final class MapMerge extends StandardFunc {
 
       // check if duplicates will be combined (if yes, adjust occurrence of return type)
       MapType mt = (MapType) st.type;
-      final SeqType dt = mt.declType;
+      final SeqType dt = mt.valueType;
       // broaden type if values may be combined
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
       if(!dt.zero() && defined(1)) {
         if(!(arg(1) instanceof Value) || toOptions(arg(1), new MergeOptions(), false, cc.qc).
             get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
-          mt = MapType.get(mt.keyType(), dt.union(Occ.ONE_OR_MORE));
+          mt = MapType.get(mt.keyType, dt.union(Occ.ONE_OR_MORE));
         }
       }
       exprType.assign(mt);

@@ -193,6 +193,14 @@ public interface Type {
     return false;
   }
 
+  /**
+   * Returns the function type of this type, if any.
+   * @return function type, or {@code null} if type cannot represent a function
+   */
+  default FuncType funcType() {
+    return null;
+  }
+
   // PUBLIC AND STATIC METHODS ====================================================================
 
   /**

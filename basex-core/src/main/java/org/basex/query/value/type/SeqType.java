@@ -467,7 +467,7 @@ public final class SeqType {
              tp == FLOAT && type.intersect(DECIMAL) != null ||
              tp == STRING && type.intersect(ANY_URI) != null;
     }
-    return st.type instanceof FuncType && type instanceof FuncType;
+    return st.type instanceof FType && type instanceof FType;
   }
 
   /**
@@ -570,7 +570,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeFunction() {
-    return !zero() && (type instanceof FuncType || ANY_ATOMIC_TYPE.instanceOf(type));
+    return !zero() && (type instanceof FType || ANY_ATOMIC_TYPE.instanceOf(type));
   }
 
   /**
@@ -628,7 +628,7 @@ public final class SeqType {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!one() && type instanceof FuncType) {
+    if(!one() && type instanceof FType) {
       tb.add('(').add(typeString()).add(')');
     } else {
       tb.add(typeString());

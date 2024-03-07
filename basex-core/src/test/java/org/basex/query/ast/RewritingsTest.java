@@ -2078,7 +2078,7 @@ public final class RewritingsTest extends SandboxTest {
     check("()?*", "", empty());
     check("map { 1: 2 }?*", 2, root(Int.class));
     check("[ 1 ]?*", 1, root(Int.class));
-    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
+    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string?)?1",
         "A", root(Str.class));
 
     // do not pre-evaluate lookups with multiple input items

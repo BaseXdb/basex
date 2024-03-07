@@ -77,7 +77,7 @@ public abstract class StandardFunc extends Arr {
 
     // pre-evaluate if arguments are values and not too large
     final SeqType st = definition.seqType;
-    return allAreValues(st.occ.max > 1 || st.type instanceof FuncType) && isSimple()
+    return allAreValues(st.occ.max > 1 || st.type instanceof FType) && isSimple()
         ? cc.preEval(this) : this;
   }
 

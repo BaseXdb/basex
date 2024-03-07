@@ -28,8 +28,8 @@ public final class ArrayOfMembers extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) exprType.assign(ArrayType.get(ft.declType));
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) exprType.assign(ArrayType.get(((MapType) tp).valueType));
     return this;
   }
 }
