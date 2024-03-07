@@ -56,54 +56,24 @@ public class FnMin extends StandardFunc {
     final Type type = item.type;
     if(!type.isSortable()) throw COMPARE_X_X.get(info, type, item);
 
-    // strings and URIs
-    if(item instanceof AStr) {
-      for(Item it; (it = qc.next(iter)) != null;) {
-        final Type type2 = it.type;
-        if(!(it instanceof AStr)) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(min ^ item.compare(it, collation, true, info) < 0) item = it;
-        if(type != type2 && item.type == ANY_URI) item = STRING.cast(item, qc, info);
-      }
-      return item;
+    final boolean string = item instanceof AStr, numeric = !string && !(
+        type == BOOLEAN || item instanceof ADate || item instanceof Dur || item instanceof Bin);
+    if(numeric) {
+      if(type.isUntyped()) item = DOUBLE.cast(item, qc, info);
+      if(item == Dbl.NAN || item == Flt.NAN) return item;
     }
-    // booleans, dates, durations, binaries
-    if(type == BOOLEAN || item instanceof ADate || item instanceof Dur || item instanceof Bin) {
-      for(Item it; (it = qc.next(iter)) != null;) {
-        final Type type2 = it.type;
-        if(type != type2) throw ARGTYPE_X_X_X.get(info, type, type2, it);
-        if(min ^ item.compare(it, collation, true, info) < 0) item = it;
-      }
-      return item;
-    }
-    // numbers
-    if(type.isUntyped()) item = DOUBLE.cast(item, qc, info);
-    if(item == Dbl.NAN || item == Flt.NAN) return item;
     for(Item it; (it = qc.next(iter)) != null;) {
-      if(it.type.isUntyped()) it = DOUBLE.cast(it, qc, info);
-      if(it == Dbl.NAN || it == Flt.NAN) return it;
-      final AtomType tp = numType(item, it);
+      final Type type2 = it.type;
+      if(numeric) {
+        if(type2.isUntyped()) it = DOUBLE.cast(it, qc, info);
+        if(it == Dbl.NAN || it == Flt.NAN) return it;
+      }
+      if(!(numeric ? it instanceof ANum : string ? it instanceof AStr : type == type2)) {
+        throw ARGTYPE_X_X_X.get(info, type, type2, it);
+      }
       if(min ^ item.compare(it, collation, true, info) < 0) item = it;
-      if(tp != null) item = tp.cast(item, qc, info);
     }
     return item;
-  }
-
-  /**
-   * Returns the new target type, or {@code null} if conversion is not necessary.
-   * @param item1 first item
-   * @param item2 second item
-   * @return result (or {@code null})
-   * @throws QueryException query exception
-   */
-  private AtomType numType(final Item item1, final Item item2) throws QueryException {
-    final Type type2 = item2.type;
-    if(type2.isUntyped()) return DOUBLE;
-    final Type type1 = item1.type;
-    if(!(item2 instanceof ANum)) throw ARGTYPE_X_X_X.get(info, type1, type2, item2);
-    return type1 == type2 ? null :
-           type1 == DOUBLE || type2 == DOUBLE ? DOUBLE :
-           type1 == FLOAT || type2 == FLOAT ? FLOAT :
-           null;
   }
 
   @Override
