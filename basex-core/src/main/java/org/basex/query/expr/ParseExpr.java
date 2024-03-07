@@ -732,7 +732,8 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item checkType(final Expr expr, final AtomType type, final QueryContext qc)
       throws QueryException {
-    return checkType(expr.atomItem(qc, info), type);
+    final Item item = expr.atomItem(qc, info);
+    return item.type.isUntyped() ? type.cast(item, qc, info) : checkType(item, type);
   }
 
   /**

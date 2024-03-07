@@ -72,7 +72,7 @@ public final class InspectStaticContext extends StandardFunc {
         return StrSeq.get(tl);
       case DECIMAL_FORMATS:
         // enforce creation of default formatter
-        sctx.decFormat(QNm.EMPTY);
+        sctx.decFormat(QNm.EMPTY, info);
         // loop through all formatters
         mb = new MapBuilder();
         for(final byte[] format : sctx.decFormats) {

@@ -3,7 +3,7 @@
  * @param {string} file optional file name
  */
 function openFile(file) {
-  if(_editor.getValue().trim() && !confirm("Replace editor contents?")) return;
+  if(_editor.historySize().undo !== 0 && !confirm("Replace editor contents?")) return;
 
   var name = file || fileName();
   return request("editor-open?name=" + encodeURIComponent(name)).then((text) => {
@@ -21,8 +21,7 @@ function saveFile() {
   // append file suffix
   var name = fileName();
   if(!name.includes(".")) name += ".xq";
-  if(fileExists(name) && !confirm("Overwrite existing file?")) return;
-
+ 
   var fileString = document.getElementById("editor").value;
   return request("editor-save?name=" + encodeURIComponent(name), fileString).then((text) => {
     finishFile(name, "File was saved.");
@@ -55,6 +54,7 @@ function finishFile(name, info) {
   document.getElementById("file").value = name;
   var disabled = name && !name.match(/\.xq(m|l|uery)?$/i);
   document.getElementById("run").disabled = disabled;
+  _editor.clearHistory();
   checkButtons();
   setText(info, "info");
   _editor.focus();
@@ -82,7 +82,7 @@ function refreshDataList(names) {
 function checkButtons() {
   var name = fileName();
   document.getElementById("open").disabled = !fileExists(name);
-  document.getElementById("save").disabled = !name;
+  document.getElementById("save").disabled = !name || _editor.historySize().undo === 0;
   document.getElementById("close").disabled = !name;
 }
 

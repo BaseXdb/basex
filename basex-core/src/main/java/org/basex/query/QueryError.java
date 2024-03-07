@@ -617,9 +617,9 @@ public enum QueryError {
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
 
   /** Error code. */
-  FORMNUM_X(FODF, 1280, "Unknown decimal format: %."),
+  FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),
   /** Error code. */
-  FORMDUP_X(FODF, 1280, "Format name % must not be specified together with explicit format."),
+  FORMATINV_X(FODF, 1290, "%."),
   /** Error code. */
   PICEMPTY(FODF, 1310, "The picture string must not be empty: '%'"),
   /** Error code. */

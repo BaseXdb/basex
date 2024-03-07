@@ -23,6 +23,9 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class DecFormatter extends FormatUtil {
+  /** Decimal Format. */
+  private final DecFormatOptions options;
+
   /** Decimal-digit-family characters (mandatory-digit-sign). */
   private final byte[] digits;
   /** Active characters. */
@@ -64,19 +67,20 @@ public final class DecFormatter extends FormatUtil {
 
   /**
    * Constructor.
-   * @param definition decimal format definition (can be {@code null})
+   * @param options decimal format options
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public DecFormatter(final DecFormatOptions definition, final InputInfo info)
-      throws QueryException {
+  public DecFormatter(final DecFormatOptions options, final InputInfo info) throws QueryException {
+    this.options = options;
+
     // assign map values
     int z = '0';
-    if(definition != null) {
-      for(final Option<?> option : definition) {
-        if(!definition.contains(option)) continue;
+    if(options != null) {
+      for(final Option<?> option : options) {
+        if(!options.contains(option)) continue;
         final String k = option.name();
-        final byte[] v = token(definition.get((StringOption) option));
+        final byte[] v = token(options.get((StringOption) option));
         if(option == DecFormatOptions.INFINITY) {
           inf = v;
         } else if(option == DecFormatOptions.NAN) {
@@ -133,14 +137,16 @@ public final class DecFormatter extends FormatUtil {
   /**
    * Returns a decimal formatter for the given language.
    * @param languageTag language tag
+   * @param info input info (can be {@code null})
    * @return a decimal formatter, or {@code null} if the language is not supported
    * @throws QueryException query exception
    */
-  public static DecFormatter forLanguage(final byte[] languageTag) throws QueryException {
+  public static DecFormatter forLanguage(final byte[] languageTag, final InputInfo info)
+      throws QueryException {
     final String l = string(languageTag);
     final DecFormatOptions dfo = IcuFormatter.available() ? IcuFormatter.decFormat(l) :
       decFormatSymbols(l);
-    return dfo != null ? new DecFormatter(dfo, null) : null;
+    return dfo != null ? new DecFormatter(dfo, info) : null;
   }
 
   /**
@@ -168,6 +174,15 @@ public final class DecFormatter extends FormatUtil {
       }
     }
     return null;
+  }
+
+
+  /**
+   * Returns the decimal format options.
+   * @return options
+   */
+  public DecFormatOptions options() {
+    return options;
   }
 
   /**
