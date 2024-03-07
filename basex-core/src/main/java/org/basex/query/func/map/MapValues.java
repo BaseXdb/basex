@@ -49,8 +49,8 @@ public class MapValues extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) exprType.assign(ft.declType.with(Occ.ZERO_OR_MORE));
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) exprType.assign(((MapType) tp).valueType.with(Occ.ZERO_OR_MORE));
     return this;
   }
 }

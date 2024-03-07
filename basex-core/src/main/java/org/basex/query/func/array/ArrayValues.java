@@ -60,8 +60,8 @@ public class ArrayValues extends StandardFunc {
 
   @Override
   protected final Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof ArrayType) exprType.assign(ft.declType.with(Occ.ZERO_OR_MORE));
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof ArrayType) exprType.assign(((ArrayType) tp).memberType.with(Occ.ZERO_OR_MORE));
     return this;
   }
 
@@ -69,7 +69,7 @@ public class ArrayValues extends StandardFunc {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final Expr array = arg(0);
     final Expr expr = mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA) &&
-        array.funcType() instanceof ArrayType ? array : this;
+        array.seqType().type instanceof ArrayType ? array : this;
     return cc.simplify(this, expr, mode);
   }
 }

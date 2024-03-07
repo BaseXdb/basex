@@ -40,9 +40,9 @@ public final class MapOfPairs extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) {
-      final SeqType st = ft.declType;
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) {
+      final SeqType st = ((MapType) tp).valueType;
       final AtomType kt = st.type.atomic();
       exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, st));
     }

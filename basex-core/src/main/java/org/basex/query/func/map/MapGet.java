@@ -40,7 +40,7 @@ public final class MapGet extends StandardFunc {
     // combine result type with return type of fallback function, or with empty sequence
     final Type type = map.seqType().type;
     if(type instanceof MapType) {
-      SeqType st = ((MapType) type).declType;
+      SeqType st = ((MapType) type).valueType;
       if(fallback) {
         final FuncType ft = arg(2).funcType();
         if(ft != null) st = st.union(ft.declType);

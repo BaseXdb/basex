@@ -29,7 +29,7 @@ public final class ArrayAppend extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      final SeqType dt = ((ArrayType) type).declType.union(add.seqType());
+      final SeqType dt = ((ArrayType) type).memberType.union(add.seqType());
       exprType.assign(ArrayType.get(dt));
     }
     return this;

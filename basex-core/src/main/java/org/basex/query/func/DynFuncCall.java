@@ -79,8 +79,7 @@ public final class DynFuncCall extends FuncCall {
       if(!sc().mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
-      final SeqType dt = ft.declType;
-      exprType.assign(ft instanceof MapType ? dt.union(Occ.ZERO) : dt);
+      exprType.assign(ft.declType);
     }
 
     if(func instanceof XQData) {

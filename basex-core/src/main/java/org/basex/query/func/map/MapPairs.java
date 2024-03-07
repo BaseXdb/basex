@@ -21,10 +21,10 @@ public class MapPairs extends MapEntries {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) {
-      final MapType mt = (MapType) ft;
-      exprType.assign(MapType.get(AtomType.STRING, mt.declType.union(mt.keyType().seqType())));
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) {
+      final MapType mt = (MapType) tp;
+      exprType.assign(MapType.get(AtomType.STRING, mt.valueType.union(mt.keyType.seqType())));
     }
     return this;
   }

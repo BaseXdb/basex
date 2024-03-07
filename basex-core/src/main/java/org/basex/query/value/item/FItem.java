@@ -42,14 +42,8 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public void refineType(final Expr expr) {
-    final FuncType t = funcType().intersect(expr.seqType().type);
-    if(t != null) type = t;
-  }
-
-  @Override
   public FuncType funcType() {
-    return (FuncType) type;
+    return type.funcType();
   }
 
   @Override

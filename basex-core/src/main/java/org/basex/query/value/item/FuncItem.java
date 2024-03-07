@@ -106,6 +106,12 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public void refineType(final Expr exp) {
+    final Type t = funcType().intersect(exp.seqType().type);
+    if(t != null) type = t;
+  }
+
+  @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 

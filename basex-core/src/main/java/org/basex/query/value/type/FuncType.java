@@ -22,11 +22,9 @@ import org.basex.util.similarity.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public class FuncType implements Type {
+public class FuncType extends FType {
   /** Name. */
   public static final byte[] FUNCTION = Token.token(QueryText.FUNCTION);
-  /** Any function placeholder string. */
-  static final String[] WILDCARD = { "*" };
 
   /** Annotations. */
   public final AnnList anns;
@@ -34,9 +32,6 @@ public class FuncType implements Type {
   public final SeqType declType;
   /** Argument types (can be {@code null}, indicated that no types were specified). */
   public final SeqType[] argTypes;
-
-  /** Sequence types (lazy instantiation). */
-  private EnumMap<Occ, SeqType> seqTypes;
 
   /**
    * Constructor.
@@ -60,35 +55,8 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final boolean isNumber() {
-    return false;
-  }
-
-  @Override
-  public final boolean isUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isNumberOrUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isStringOrUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isSortable() {
-    return false;
-  }
-
-  @Override
-  public SeqType seqType(final Occ occ) {
-    // cannot statically be instantiated due to circular dependencies
-    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
-    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
+  public FuncType funcType() {
+    return this;
   }
 
   @Override
@@ -100,12 +68,6 @@ public class FuncType implements Type {
   }
 
   @Override
-  public Item cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-    throw FUNCCAST_X_X.get(info, this, value);
-  }
-
-  @Override
   public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
     throw Util.notExpected();
   }
@@ -113,8 +75,8 @@ public class FuncType implements Type {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof FuncType) ||
-        type instanceof MapType || type instanceof ArrayType) return false;
+    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof FuncType))
+      return false;
 
     final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
@@ -128,8 +90,7 @@ public class FuncType implements Type {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(this == SeqType.FUNCTION || !(type instanceof FuncType) || type instanceof MapType ||
-        type instanceof ArrayType) return false;
+    if(this == SeqType.FUNCTION || !(type instanceof FuncType)) return false;
 
     final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
@@ -148,9 +109,9 @@ public class FuncType implements Type {
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
-    if(!(type instanceof FuncType)) return AtomType.ITEM;
+    final FuncType ft = type.funcType();
+    if(ft == null) return AtomType.ITEM;
 
-    final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return SeqType.FUNCTION;
 
@@ -166,14 +127,14 @@ public class FuncType implements Type {
   }
 
   @Override
-  public FuncType intersect(final Type type) {
+  public Type intersect(final Type type) {
     if(instanceOf(type)) return this;
-    if(type.instanceOf(this)) return (FuncType) type;
+    if(type.instanceOf(this)) return type;
 
-    if(!(type instanceof FuncType)) return null;
+    if(type instanceof MapType || type instanceof ArrayType) return type.intersect(this);
 
-    final FuncType ft = (FuncType) type;
-    if(ft instanceof MapType || ft instanceof ArrayType) return ft.intersect(this);
+    final FuncType ft = type.funcType();
+    if(ft == null) return null;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return null;
@@ -283,11 +244,6 @@ public class FuncType implements Type {
   @Override
   public ID id() {
     return Type.ID.FUN;
-  }
-
-  @Override
-  public boolean nsSensitive() {
-    return false;
   }
 
   @Override
