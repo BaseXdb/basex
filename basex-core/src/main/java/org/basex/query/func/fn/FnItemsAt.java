@@ -89,7 +89,7 @@ public class FnItemsAt extends StandardFunc {
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(at)) != null;) {
           final double d = toDouble(item) - 1;
-          long l = (long) d;
+          final long l = (long) d;
           if(l < size) {
             if(l >= 0 && d == l) return input.itemAt(l);
           } else if(sorted) {

@@ -75,7 +75,7 @@ public abstract class ParseExpr extends Expr {
 
     // empty sequence?
     final Iter iter = iter(qc);
-    Item item = iter.next();
+    final Item item = iter.next();
     if(item == null) return false;
 
     // sequence starting with node?

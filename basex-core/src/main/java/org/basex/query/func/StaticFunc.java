@@ -199,9 +199,9 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
       // updating function
       if(!(exprUpdating || expr.vacuous())) throw UPEXPECTF.get(ii);
       if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(ii);
-    } else {
+    } else if(exprUpdating) {
       // uses updates, but is not declared as such
-      if(exprUpdating) throw UPNOT_X.get(ii, description());
+      throw UPNOT_X.get(ii, description());
     }
   }
 

@@ -107,12 +107,10 @@ public final class FuncDefinition {
         break;
       } else if(ch == ')') {
         break;
-      } else {
-        if(optional) {
-          if(max == min) max++;
-        } else {
-          if(min == 0) min = 1;
-        }
+      } else if(optional) {
+        if(max == min) max++;
+      } else if(min == 0) {
+        min = 1;
       }
     }
     if(max == -1) max = min;

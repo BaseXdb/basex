@@ -115,7 +115,7 @@ public class FnSort extends StandardFunc {
     if(size == 1) values[0].atomValue(qc, info);
 
     final Integer[] indexes = new Integer[size];
-    for(int o = 0; o < size; o++) indexes[o] = Integer.valueOf(o);
+    for(int o = 0; o < size; o++) indexes[o] = o;
     try {
       Arrays.sort(indexes, (i1, i2) -> {
         qc.checkStop();

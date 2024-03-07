@@ -1394,7 +1394,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(1.1), 1.1);
     query(func.args(" 1e1"), 10);
     query(func.args(" (1, 1e1)"), 1);
-    query(func.args(" (1, 1.1, 1e1)") + " instance of xs:double", true);
+    query(func.args(" (1, 1.1, 1e1)") + " instance of xs:integer", true);
     query(func.args(wrap(1)) + " instance of xs:double", true);
     query(func.args(" [1]"), 1);
     query(func.args(" (7, 6, 6, 6.0, 5.0, 5.0, xs:float('5'), xs:float('4'), xs:float('4'), " +
@@ -1406,7 +1406,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (xs:anyURI('c'), xs:anyURI('b'), 'a')") +
         " ! (. = 'a' and . instance of xs:string)", true);
     query(func.args(" ('b', xs:anyURI('a'))") +
-        " ! (. = 'a' and . instance of xs:string)", true);
+        " ! (. = 'a' and . instance of xs:anyURI)", true);
     query(func.args(" (2, 3, 1)"), 1);
     query(func.args(" (xs:date('2002-01-01'), xs:date('2003-01-01'), xs:date('2001-01-01'))"),
         "2001-01-01");

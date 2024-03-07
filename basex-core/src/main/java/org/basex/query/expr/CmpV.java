@@ -46,7 +46,7 @@ public final class CmpV extends Cmp {
       public boolean eval(final Item item1, final Item item2, final InputInfo info)
           throws QueryException {
         final int v = item1.compare(item2, null, false, info);
-        return v != Item.NAN_DUMMY & v < 0;
+        return v != Item.NAN_DUMMY && v < 0;
       }
       @Override
       public OpV swap() { return GT; }

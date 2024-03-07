@@ -185,7 +185,7 @@ abstract class RegEx extends StandardFunc {
       final GroupScanner gnd = new GroupScanner(pattern);
       final Stack<Integer> open = new Stack<>();
       open.push(0);
-      int[] parentGroups = new int[0];
+      int[] parentGroups = { };
       boolean quoted = false;
       int classLevel = 0;
       for(;;) {
@@ -292,6 +292,6 @@ abstract class RegEx extends StandardFunc {
       /** Left quote.                             */ LQUOTE,
       /** Right quote.                            */ RQUOTE,
       /** Anything else.                          */ OTHER,
-    };
+    }
   }
 }

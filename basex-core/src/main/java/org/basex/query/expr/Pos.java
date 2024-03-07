@@ -141,7 +141,7 @@ public final class Pos extends Single {
     final LongList list = new LongList();
     for(final Item item : value) {
       final double d = item.dbl(null);
-      long l = (long) d;
+      final long l = (long) d;
       if(l > 0 && d == l) list.add(l);
     }
     return IntSeq.get(list.ddo().finish());

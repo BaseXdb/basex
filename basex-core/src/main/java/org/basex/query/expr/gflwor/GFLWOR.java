@@ -134,7 +134,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     return cc.simplify(this, mode == Simplify.COUNT &&
-        clauses.removeIf(clause -> clause instanceof OrderBy) ? optimize(cc) : this, mode);
+        clauses.removeIf(OrderBy.class::isInstance) ? optimize(cc) : this, mode);
   }
 
   /**

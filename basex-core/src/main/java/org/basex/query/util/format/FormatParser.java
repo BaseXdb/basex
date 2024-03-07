@@ -30,7 +30,7 @@ abstract class FormatParser extends FormatUtil {
     CARDINAL,
     /** Numbering. */
     NUMBERING
-  };
+  }
   /** Type of numeral. */
   NumeralType numType = NumeralType.NUMBERING;
   /** Format modifier; {@code null} if not specified. */

@@ -41,7 +41,7 @@ abstract class CollationOptions extends Options {
     for(final Entry<String, String> entry : args.entrySet()) {
       try {
         assign(entry.getKey(), entry.getValue());
-      } catch (BaseXException ex) {
+      } catch(final BaseXException ex) {
         if(!fallback) throw ex;
       }
     }

@@ -119,7 +119,7 @@ public final class Flt extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return (item instanceof Dbl || transitive && item instanceof Dec)
+    return item instanceof Dbl || transitive && item instanceof Dec
         ? -item.compare(this, coll, transitive, ii) : compare(value, item.flt(ii), transitive);
   }
 

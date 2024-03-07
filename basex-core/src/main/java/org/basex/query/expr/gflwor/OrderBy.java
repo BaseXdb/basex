@@ -87,7 +87,7 @@ public final class OrderBy extends Clause {
         perm = new Integer[len];
         tpls = new Value[len][];
         for(int i = 0; i < len; i++) {
-          perm[i] = Integer.valueOf(i);
+          perm[i] = i;
           tpls[i] = tuples.get(i << 1 | 1);
           ks[i] = (Item[]) tuples.get(i << 1);
         }

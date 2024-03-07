@@ -121,7 +121,7 @@ final class WebDAVRequest extends AbstractRequest {
   @Override
   public void parseRequestParameters(final Map<String, String> params,
       final Map<String, com.bradmcevoy.http.FileItem> files) throws RequestParseException {
-    for(Entry<String, String[]> e : request.getParameterMap().entrySet()) {
+    for(final Entry<String, String[]> e : request.getParameterMap().entrySet()) {
       if(e.getValue().length > 0) params.put(e.getKey(), e.getValue()[0]);
     }
   }

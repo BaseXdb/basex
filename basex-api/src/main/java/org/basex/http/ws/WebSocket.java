@@ -197,7 +197,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     final Performance perf = new Performance();
     try {
       func.run();
-    } catch (final Exception ex) {
+    } catch(final Exception ex) {
       context.log.write(LogType.ERROR, "", perf, context);
       throw ex;
     }

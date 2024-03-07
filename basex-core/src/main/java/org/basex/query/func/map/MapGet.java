@@ -33,8 +33,8 @@ public final class MapGet extends StandardFunc {
     if(fallback) {
       final Type type = arg(1).seqType().type.atomic();
       if(type != null) arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, type.seqType()));
-    } else {
-      if(map == XQMap.empty()) return Empty.VALUE;
+    } else if(map == XQMap.empty()) {
+      return Empty.VALUE;
     }
 
     // combine result type with return type of fallback function, or with empty sequence
