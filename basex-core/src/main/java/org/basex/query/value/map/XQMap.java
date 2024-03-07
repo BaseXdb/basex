@@ -82,7 +82,10 @@ public final class XQMap extends XQData {
 
   @Override
   public void refineType(final Expr expr) {
-    if(root.size != 0) super.refineType(expr);
+    if(root.size != 0) {
+      final Type t = type.intersect(expr.seqType().type);
+      if(t != null) type = t;
+    }
   }
 
   @Override
@@ -159,8 +162,8 @@ public final class XQMap extends XQData {
     final Type tp;
     if(merge == MergeDuplicates.COMBINE) {
       final MapType mt = (MapType) map.type;
-      final SeqType mst = mt.declType;
-      tp = union(mt.keyType(), mst.zero() ? mst : mst.with(Occ.ONE_OR_MORE));
+      final SeqType mst = mt.valueType;
+      tp = union(mt.keyType, mst.zero() ? mst : mst.with(Occ.ONE_OR_MORE));
     } else {
       tp = type.union(map.type);
     }
@@ -201,21 +204,23 @@ public final class XQMap extends XQData {
   @Override
   public boolean instanceOf(final Type tp) {
     if(type.instanceOf(tp)) return true;
-    if(!(tp instanceof FuncType) || tp instanceof ArrayType) return false;
 
-    final FuncType ft = (FuncType) tp;
-    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O))
-      return false;
-
-    AtomType kt = null;
-    if(ft instanceof MapType) {
-      kt = ((MapType) ft).keyType();
-      if(kt == AtomType.ANY_ATOMIC_TYPE) kt = null;
+    if(tp instanceof MapType) {
+      final MapType mt = (MapType) tp;
+      final AtomType kt =  mt.keyType == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType;
+      final SeqType vt = mt.valueType.eq(SeqType.ITEM_ZM) ? null : mt.valueType;
+      return kt == null && vt == null || root.instanceOf(kt, vt);
     }
-
-    SeqType dt = ft.declType;
-    if(dt.eq(SeqType.ITEM_ZM)) dt = null;
-    return kt == null && dt == null || root.instanceOf(kt, dt);
+    if(tp instanceof FuncType) {
+      final FuncType ft = (FuncType) tp;
+      if(ft.declType.occ.min != 0 || ft.argTypes.length != 1
+          || !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)) {
+        return false;
+      }
+      SeqType dt = ft.declType.eq(SeqType.ITEM_ZM) ? null : ft.declType;
+      return dt == null || root.instanceOf(null, dt);
+    }
+    return false;
   }
 
   /**
@@ -239,8 +244,8 @@ public final class XQMap extends XQData {
    */
   private Type union(final Type kt, final SeqType vt) {
     final MapType mt = (MapType) type;
-    final Type mkt = mt.keyType();
-    final SeqType mst = mt.declType;
+    final Type mkt = mt.keyType;
+    final SeqType mst = mt.valueType;
     return mkt == kt && mst.eq(vt) ? type : MapType.get((AtomType) mkt.union(kt), mst.union(vt));
   }
 
@@ -259,7 +264,7 @@ public final class XQMap extends XQData {
   public Value keys() {
     final ItemList items = new ItemList(root.size);
     root.keys(items);
-    return items.value(((MapType) type).keyType());
+    return items.value(((MapType) type).keyType);
   }
 
   /**

@@ -29,12 +29,12 @@ public final class MapKeysWhere extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) {
-      final MapType mt = (MapType) ft;
-      final AtomType kt = mt.keyType();
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) {
+      final MapType mt = (MapType) tp;
+      final AtomType kt = mt.keyType;
       arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, kt.seqType()));
-      exprType.assign(((MapType) ft).keyType());
+      exprType.assign(kt);
     }
     return this;
   }

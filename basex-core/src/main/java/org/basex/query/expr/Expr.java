@@ -310,8 +310,7 @@ public abstract class Expr extends ExprInfo {
    * @return function type, or {@code null} if expression yields no functions
    */
   public FuncType funcType() {
-    final Type type = seqType().type;
-    return type instanceof FuncType ? (FuncType) type : null;
+    return seqType().type.funcType();
   }
 
   /**

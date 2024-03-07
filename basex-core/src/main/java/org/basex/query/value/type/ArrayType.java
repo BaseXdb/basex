@@ -17,25 +17,28 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class ArrayType extends FuncType {
+public final class ArrayType extends FType {
   /** Name. */
   public static final byte[] ARRAY = Token.token(QueryText.ARRAY);
 
+  /** Type of the array members. */
+  public final SeqType memberType;
+
   /**
    * Constructor.
-   * @param declType declared return type
+   * @param memberType member type
    */
-  ArrayType(final SeqType declType) {
-    super(declType, SeqType.INTEGER_O);
+  ArrayType(final SeqType memberType) {
+    this.memberType = memberType;
   }
 
   /**
    * Creates an array type.
-   * @param declType declared return type
+   * @param memberType member type
    * @return array type
    */
-  public static ArrayType get(final SeqType declType) {
-    return declType.arrayType();
+  public static ArrayType get(final SeqType memberType) {
+    return memberType.arrayType();
   }
 
   @Override
@@ -59,19 +62,22 @@ public final class ArrayType extends FuncType {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type || type instanceof ArrayType && declType.eq(((ArrayType) type).declType);
+    return this == type
+        || type instanceof ArrayType && memberType.eq(((ArrayType) type).memberType);
   }
 
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(!(type instanceof FuncType) || type instanceof MapType) return false;
 
-    final FuncType ft = (FuncType) type;
-    return declType.instanceOf(ft.declType) && (
-      type instanceof ArrayType ||
-      ft.argTypes.length == 1 && ft.argTypes[0].instanceOf(SeqType.INTEGER_O)
-    );
+    if(type instanceof ArrayType) return memberType.instanceOf(((ArrayType) type).memberType);
+
+    if(type instanceof FuncType) {
+      final FuncType ft = (FuncType) type;
+      return memberType.instanceOf(ft.declType) && ft.argTypes.length == 1
+          && ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
+    }
+    return false;
   }
 
   @Override
@@ -79,12 +85,10 @@ public final class ArrayType extends FuncType {
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
-    if(type instanceof ArrayType) {
-      final ArrayType at = (ArrayType) type;
-      return get(declType.union(at.declType));
-    }
-    return type instanceof MapType  ? SeqType.FUNCTION :
-           type instanceof FuncType ? type.union(this) : AtomType.ITEM;
+    if(type instanceof ArrayType) return get(memberType.union(((ArrayType) type).memberType));
+    return type instanceof MapType ? SeqType.FUNCTION
+                                   : type instanceof FuncType ? type.union(this)
+                                                              : AtomType.ITEM;
   }
 
   @Override
@@ -92,20 +96,22 @@ public final class ArrayType extends FuncType {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return (ArrayType) type;
 
-    if(!(type instanceof FuncType) || type instanceof MapType) return null;
-
-    final FuncType ft = (FuncType) type;
-    final SeqType dt = declType.intersect(ft.declType);
-    if(dt == null) return null;
-
-    if(type instanceof ArrayType) return get(dt);
-
+    if(type instanceof ArrayType) {
+      final SeqType dt = memberType.intersect(((ArrayType) type).memberType);
+      if(dt == null) return null;
+      return get(dt);
+    }
     return null;
   }
 
   @Override
+  public FuncType funcType() {
+    return FuncType.get(memberType, SeqType.INTEGER_O);
+  }
+
+  @Override
   public AtomType atomic() {
-    return argTypes[0].type.atomic();
+    return memberType.type.atomic();
   }
 
   @Override
@@ -115,7 +121,7 @@ public final class ArrayType extends FuncType {
 
   @Override
   public String toString() {
-    final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { declType };
+    final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { memberType };
     return new QueryString().token(ARRAY).params(param).toString();
   }
 }

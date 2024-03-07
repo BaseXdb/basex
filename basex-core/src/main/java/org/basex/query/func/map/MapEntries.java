@@ -50,8 +50,8 @@ public class MapEntries extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) exprType.assign(ft);
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) exprType.assign(tp);
     return this;
   }
 

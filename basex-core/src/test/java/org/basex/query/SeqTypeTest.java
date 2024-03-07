@@ -196,7 +196,9 @@ public final class SeqTypeTest {
       // function(xs:integer) as xs:nonNegativeInteger
       f4 = FuncType.get(NON_NEGATIVE_INTEGER.seqType(), INTEGER_O).seqType(),
       // function(xs:boolean) as xs:integer
-      f5 = FuncType.get(INTEGER_O, BOOLEAN_O).seqType();
+      f5 = FuncType.get(INTEGER_O, BOOLEAN_O).seqType(),
+      // function(xs:boolean) as xs:integer?
+      f6 = FuncType.get(INTEGER_ZO, BOOLEAN_O).seqType();
 
     combine(f1, op);
     combine(f2, op);
@@ -235,7 +237,7 @@ public final class SeqTypeTest {
     combine(MAP_O, m1, MAP_O, op);
     combine(m1, INTEGER_O, ITEM_O, op);
     combine(m1, f1, f1, op);
-    combine(m1, f2, f5, op);
+    combine(m1, f2, f6, op);
     combine(m1, m2, m1, op);
     combine(m1, m3, m1, op);
     combine(m2, m4, m1, op);
@@ -300,7 +302,9 @@ public final class SeqTypeTest {
       // function(xs:boolean) as xs:integer
       f5 = FuncType.get(INTEGER_O, BOOLEAN_O).seqType(),
       // function(xs:boolean) as xs:boolean
-      f6 = FuncType.get(BOOLEAN_O, BOOLEAN_O).seqType();
+      f6 = FuncType.get(BOOLEAN_O, BOOLEAN_O).seqType(),
+      // function(xs:boolean) as xs:integer?
+      f7 = FuncType.get(INTEGER_ZO, BOOLEAN_O).seqType();
 
     combine(f1, op);
     combine(f2, op);
@@ -345,7 +349,7 @@ public final class SeqTypeTest {
     combine(m1, m3,
         MapType.get(BOOLEAN, NON_NEGATIVE_INTEGER.seqType()).seqType(), op);
     combine(m2, m4, null, op);
-    combine(m4, f5, m4, op);
+    combine(m4, f7, m4, op);
 
     final SeqType
       // array(xs:integer)

@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -256,7 +257,7 @@ public abstract class XQArray extends XQData {
    * @return union type
    */
   final Type union(final Value value) {
-    final SeqType dt = ((ArrayType) type).declType, st = value.seqType();
+    final SeqType dt = ((ArrayType) type).memberType, st = value.seqType();
     return dt.eq(st) ? type : ArrayType.get(dt.union(st));
   }
 
@@ -296,6 +297,12 @@ public abstract class XQArray extends XQData {
   @Override
   public final QNm paramName(final int pos) {
     return new QNm("pos", "");
+  }
+
+  @Override
+  public void refineType(final Expr expr) {
+    final Type t = type.intersect(expr.seqType().type);
+    if(t != null) type = t;
   }
 
   @Override
@@ -368,17 +375,23 @@ public abstract class XQArray extends XQData {
   @Override
   public final boolean instanceOf(final Type tp) {
     if(type.instanceOf(tp)) return true;
-    if(!(tp instanceof FuncType) || tp instanceof MapType) return false;
 
-    final FuncType ft = (FuncType) tp;
-    if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.INTEGER_O)) return false;
+    final SeqType mt;
+    if(tp instanceof ArrayType) {
+      mt = ((ArrayType) tp).memberType;
+    } else if(tp instanceof FuncType) {
+      final FuncType ft = (FuncType) tp;
+      if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.INTEGER_O)) return false;
+      mt = ft.declType;
+    } else {
+      return false;
+    }
 
-    final SeqType dt = ft.declType;
-    if(dt.eq(SeqType.ITEM_ZM)) return true;
+    if(mt.eq(SeqType.ITEM_ZM)) return true;
 
     // check types of members
     for(final Value value : members()) {
-      if(!dt.instance(value)) return false;
+      if(!mt.instance(value)) return false;
     }
     return true;
   }
