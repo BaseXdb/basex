@@ -45,8 +45,7 @@ public final class Lookup extends Arr {
     if(is == 0) return cc.replaceWith(this, inputs);
 
     // skip optimizations if input may yield other items than maps or arrays
-    final SeqType st = inputs.seqType();
-    final Type tp = st.type;
+    final Type tp = inputs.seqType().type;
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
@@ -56,6 +55,7 @@ public final class Lookup extends Arr {
     // derive type from input expression
     final Expr keys = exprs[1];
     final SeqType kt = keys.seqType();
+    final SeqType st = map ? ((MapType) tp).valueType : ((ArrayType) tp).memberType;
     Occ occ = st.occ;
     if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeArray()) {
       // key is wildcard, or expressions yield no single item
@@ -64,7 +64,7 @@ public final class Lookup extends Arr {
       // map lookup may result in empty sequence
       occ = occ.union(Occ.ZERO);
     }
-    exprType.assign(tp, occ);
+    exprType.assign(st.type, occ);
 
     return this;
   }
