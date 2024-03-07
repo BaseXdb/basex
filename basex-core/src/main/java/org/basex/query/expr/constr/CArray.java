@@ -44,16 +44,16 @@ public final class CArray extends Arr {
           : cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
     }
 
-    SeqType dt = null;
+    SeqType mt = null;
     if(sequences) {
-      dt = SeqType.union(exprs, true);
+      mt = SeqType.union(exprs, true);
     } else {
       for(final Expr expr : exprs) {
         final SeqType st = expr.seqType().with(Occ.EXACTLY_ONE);
-        dt = dt == null ? st : dt.union(st);
+        mt = mt == null ? st : mt.union(st);
       }
     }
-    if(dt != null) exprType.assign(ArrayType.get(dt));
+    if(mt != null) exprType.assign(ArrayType.get(mt));
 
     return allAreValues(true) ? cc.preEval(this) : this;
   }

@@ -257,8 +257,8 @@ public abstract class XQArray extends XQData {
    * @return union type
    */
   final Type union(final Value value) {
-    final SeqType dt = ((ArrayType) type).memberType, st = value.seqType();
-    return dt.eq(st) ? type : ArrayType.get(dt.union(st));
+    final SeqType mt = ((ArrayType) type).memberType, st = value.seqType();
+    return mt.eq(st) ? type : ArrayType.get(mt.union(st));
   }
 
   /**
@@ -301,8 +301,8 @@ public abstract class XQArray extends XQData {
 
   @Override
   public void refineType(final Expr expr) {
-    final Type t = type.intersect(expr.seqType().type);
-    if(t != null) type = t;
+    final Type tp = type.intersect(expr.seqType().type);
+    if(tp != null) type = tp;
   }
 
   @Override
@@ -426,49 +426,49 @@ public abstract class XQArray extends XQData {
     }
     // convert to specific arrays
     if(dt.one()) {
-      final Type t = dt.type;
-      if(t == AtomType.BOOLEAN) {
+      final Type tp = dt.type;
+      if(tp == AtomType.BOOLEAN) {
         final BoolList list = new BoolList(sz);
         for(final Value member : members()) list.add(((Bln) member).bool(null));
         return list.finish();
       }
-      if(t == AtomType.BYTE) {
+      if(tp == AtomType.BYTE) {
         final ByteList list = new ByteList(sz);
         for(final Value member : members()) list.add((byte) ((Int) member).itr());
         return list.finish();
       }
-      if(t.oneOf(AtomType.SHORT, AtomType.UNSIGNED_BYTE)) {
+      if(tp.oneOf(AtomType.SHORT, AtomType.UNSIGNED_BYTE)) {
         final ShortList list = new ShortList(sz);
         for(final Value member : members()) list.add((short) ((Int) member).itr());
         return list.finish();
       }
-      if(t == AtomType.UNSIGNED_SHORT) {
+      if(tp == AtomType.UNSIGNED_SHORT) {
         final char[] chars = new char[sz];
         int c = 0;
         for(final Value member : members()) chars[c++] = (char) ((Int) member).itr();
         return chars;
       }
-      if(t == AtomType.INT) {
+      if(tp == AtomType.INT) {
         final IntList list = new IntList(sz);
         for(final Value member : members()) list.add((int) ((Int) member).itr());
         return list.finish();
       }
-      if(t.instanceOf(AtomType.INTEGER) && t != AtomType.UNSIGNED_LONG) {
+      if(tp.instanceOf(AtomType.INTEGER) && tp != AtomType.UNSIGNED_LONG) {
         final LongList list = new LongList(sz);
         for(final Value member : members()) list.add(((Int) member).itr());
         return list.finish();
       }
-      if(t == AtomType.FLOAT) {
+      if(tp == AtomType.FLOAT) {
         final FloatList list = new FloatList(sz);
         for(final Value member : members()) list.add(((Flt) member).flt());
         return list.finish();
       }
-      if(t == AtomType.DOUBLE) {
+      if(tp == AtomType.DOUBLE) {
         final DoubleList list = new DoubleList(sz);
         for(final Value member : members()) list.add(((Dbl) member).dbl());
         return list.finish();
       }
-      if(t.instanceOf(AtomType.STRING)) {
+      if(tp.instanceOf(AtomType.STRING)) {
         final StringList list = new StringList(sz);
         for(final Value member : members()) list.add((String) member.toJava());
         return list.finish();

@@ -37,14 +37,14 @@ public final class MapPut extends StandardFunc {
     if(type instanceof MapType) {
       AtomType typeKey = key.seqType().type.atomic();
       if(typeKey != null) {
-        SeqType st = value.seqType();
+        SeqType vt = value.seqType();
         // merge types if input is expected to have at least one entry
         if(map != XQMap.empty()) {
           final MapType mt = (MapType) type;
           typeKey = mt.keyType.union(typeKey);
-          st = mt.valueType.union(value.seqType());
+          vt = mt.valueType.union(value.seqType());
         }
-        exprType.assign(MapType.get(typeKey, st));
+        exprType.assign(MapType.get(typeKey, vt));
       }
     }
     return this;

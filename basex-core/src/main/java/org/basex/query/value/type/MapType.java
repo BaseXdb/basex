@@ -81,8 +81,8 @@ public final class MapType extends FType {
     }
     if (type instanceof FuncType) {
       final FuncType ft = type.funcType();
-      return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1
-          && ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O);
+      return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
+          ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O);
     }
     return false;
   }
@@ -96,9 +96,8 @@ public final class MapType extends FType {
       final MapType mt = (MapType) type;
       return get(keyType.union(mt.keyType), valueType.union(mt.valueType));
     }
-    return type instanceof ArrayType ? SeqType.FUNCTION
-                                     : type instanceof FuncType ? type.union(this)
-                                                                : AtomType.ITEM;
+    return type instanceof ArrayType ? SeqType.FUNCTION :
+           type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
   @Override
@@ -106,16 +105,13 @@ public final class MapType extends FType {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
-    if(!(type instanceof MapType)) return null;
-    final MapType mt = (MapType) type;
-
-    final SeqType vt = valueType.intersect(mt.valueType);
-    if(vt == null) return null;
-
-    final Type kt = keyType.intersect(mt.keyType);
-    if(!(kt instanceof AtomType)) return null;
-
-    return get((AtomType) kt, vt);
+    if(type instanceof MapType) {
+      final MapType mt = (MapType) type;
+      final Type kt = keyType.intersect(mt.keyType);
+      final SeqType vt = valueType.intersect(mt.valueType);
+      if(kt instanceof AtomType && vt != null) return get((AtomType) kt, vt);
+    }
+    return null;
   }
 
   @Override
@@ -131,8 +127,7 @@ public final class MapType extends FType {
 
   @Override
   public FuncType funcType() {
-    final SeqType dt = valueType.union(Occ.ZERO);
-    return FuncType.get(dt, SeqType.ANY_ATOMIC_TYPE_O);
+    return FuncType.get(valueType.union(Occ.ZERO), SeqType.ANY_ATOMIC_TYPE_O);
   }
 
   @Override

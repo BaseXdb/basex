@@ -120,10 +120,7 @@ public class FuncType extends FType {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return SeqType.FUNCTION;
     }
-
-    final AnnList an = anns.union(ft.anns);
-    final SeqType dt = declType.union(ft.declType);
-    return get(an, dt, arg);
+    return get(anns.union(ft.anns), declType.union(ft.declType), arg);
   }
 
   @Override

@@ -107,8 +107,8 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public void refineType(final Expr exp) {
-    final Type t = funcType().intersect(exp.seqType().type);
-    if(t != null) type = t;
+    final Type tp = funcType().intersect(exp.seqType().type);
+    if(tp != null) type = tp;
   }
 
   @Override

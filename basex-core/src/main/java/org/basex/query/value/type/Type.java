@@ -297,8 +297,8 @@ public interface Type {
    */
   default Type refine(final Expr expr) {
     if(expr != null) {
-      final Type t = expr.seqType().type.intersect(this);
-      if(t != null) return t;
+      final Type tp = expr.seqType().type.intersect(this);
+      if(tp != null) return tp;
     }
     return this;
   }

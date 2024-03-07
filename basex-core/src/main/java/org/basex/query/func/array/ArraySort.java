@@ -47,8 +47,8 @@ public final class ArraySort extends FnSort {
     final Type type = st.type;
     if(type instanceof ArrayType) {
       if(defined(2) && arg(2).size() == 1) {
-        arg(2,
-            arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, ((ArrayType) type).memberType));
+        arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM,
+            ((ArrayType) type).memberType));
       }
       exprType.assign(type);
     }

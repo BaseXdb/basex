@@ -54,12 +54,12 @@ public final class CMap extends Arr {
     if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
 
     // determine static value type
-    SeqType dt = null;
+    SeqType vt = null;
     for(int e = 1; e < el; e += 2) {
       final SeqType dst = exprs[e].seqType();
-      dt = dt == null ? dst : dt.union(dst);
+      vt = vt == null ? dst : vt.union(dst);
     }
-    exprType.assign(MapType.get(kt, dt != null ? dt : SeqType.ITEM_ZM));
+    exprType.assign(MapType.get(kt, vt != null ? vt : SeqType.ITEM_ZM));
 
     return allAreValues(true) ? cc.preEval(this) : this;
   }

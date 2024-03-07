@@ -61,10 +61,10 @@ public final class FnPartition extends ArrayFn {
       return cc.function(_UTIL_ARRAY_MEMBER, info, input);
     }
 
-    final SeqType so = st.with(Occ.EXACTLY_ONE);
-    arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, st.with(Occ.ZERO_OR_MORE), so,
+    final SeqType mt = st.with(Occ.EXACTLY_ONE);
+    arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, st.with(Occ.ZERO_OR_MORE), mt,
         SeqType.INTEGER_O));
-    exprType.assign(ArrayType.get(so));
+    exprType.assign(ArrayType.get(mt));
     return this;
   }
 

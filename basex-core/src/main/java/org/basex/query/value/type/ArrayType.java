@@ -62,8 +62,8 @@ public final class ArrayType extends FType {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type
-        || type instanceof ArrayType && memberType.eq(((ArrayType) type).memberType);
+    return this == type ||
+        type instanceof ArrayType && memberType.eq(((ArrayType) type).memberType);
   }
 
   @Override
@@ -74,8 +74,8 @@ public final class ArrayType extends FType {
 
     if(type instanceof FuncType) {
       final FuncType ft = (FuncType) type;
-      return memberType.instanceOf(ft.declType) && ft.argTypes.length == 1
-          && ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
+      return memberType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
+          ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
     }
     return false;
   }
@@ -86,9 +86,8 @@ public final class ArrayType extends FType {
     if(type.instanceOf(this)) return this;
 
     if(type instanceof ArrayType) return get(memberType.union(((ArrayType) type).memberType));
-    return type instanceof MapType ? SeqType.FUNCTION
-                                   : type instanceof FuncType ? type.union(this)
-                                                              : AtomType.ITEM;
+    return type instanceof MapType ? SeqType.FUNCTION :
+           type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
   @Override
@@ -97,9 +96,8 @@ public final class ArrayType extends FType {
     if(type.instanceOf(this)) return (ArrayType) type;
 
     if(type instanceof ArrayType) {
-      final SeqType dt = memberType.intersect(((ArrayType) type).memberType);
-      if(dt == null) return null;
-      return get(dt);
+      final SeqType mt = memberType.intersect(((ArrayType) type).memberType);
+      if(mt != null) return get(mt);
     }
     return null;
   }
