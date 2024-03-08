@@ -300,6 +300,9 @@ public enum Function implements AFunction {
   GENERATE_ID(FnGenerateId::new, "generate-id([node])",
       params(NODE_ZO), STRING_O),
   /** XQuery function. */
+  GRAPHEMES(FnGraphemes::new, "graphemes(value[,options])",
+      params(STRING_ZO, MAP_ZO), STRING_ZM),
+  /** XQuery function. */
   HAS_CHILDREN(FnHasChildren::new, "has-children([node])",
       params(NODE_ZM), BOOLEAN_O),
   /** XQuery function. */

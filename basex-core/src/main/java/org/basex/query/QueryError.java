@@ -67,6 +67,8 @@ public enum QueryError {
   BASEX_UPDATE(BASEX, "update", "Update target was not created by transform expression."),
   /** Error code. */
   BASEX_WS(BASEX, "ws", "WebSocket connection required."),
+  /** Error code. */
+  BASEX_ICU(BASEX, "icu", "ICU is not available in the classpath."),
 
   // Admin Module
 
