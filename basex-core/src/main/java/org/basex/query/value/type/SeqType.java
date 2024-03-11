@@ -441,6 +441,21 @@ public final class SeqType {
           items.add(Flt.get(item1.flt(info)));
         } else if(type == STRING && item1 instanceof Uri) {
           items.add(Str.get(item1.string(info)));
+        } else if(type.instanceOf(tp)
+            || type == ANY_URI && item1 instanceof Str
+            || type.instanceOf(HEX_BINARY) && item1 instanceof B64
+            || type.instanceOf(BASE64_BINARY) && item1 instanceof Hex) {
+          // casting and relabeling
+          Item cast;
+          try {
+            cast = (Item) type.cast(item1, qc, info);
+          } catch(@SuppressWarnings("unused") final QueryException ex) {
+            cast = null;
+          }
+          if(cast == null || type.instanceOf(tp) && !cast.equal(item1, null, info)) {
+            throw typeError(item, with(EXACTLY_ONE), name, info, true);
+          }
+          items.add(cast);
         } else {
           throw typeError(item, with(EXACTLY_ONE), name, info, true);
         }
