@@ -30,20 +30,20 @@ public class ValidateRng extends ValidateFn {
     return process(new Validation() {
       @Override
       void process(final ValidationHandler handler) throws IOException, QueryException {
-        final IO in = read(toNodeOrAtomItem(arg(0), qc), null);
-        final Item sch = toNodeOrAtomItem(arg(1), qc);
+        final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
+        final Item schema = toNodeOrAtomItem(arg(1), false, qc);
         final boolean compact = toBooleanOrFalse(arg(2), qc);
 
         // detect format of schema input
-        IO schema;
+        IO schm;
         try {
-          schema = read(sch, null);
+          schm = read(schema, null);
         } catch(final QueryException ex) {
           // compact schema: treat string as input
           if(!compact || ex.error() != WHICHRES_X) throw ex;
-          schema = new IOContent(sch.string(info));
+          schm = new IOContent(schema.string(info));
         }
-        schema = prepare(schema, handler);
+        schm = prepare(schm, handler);
 
         try {
           /*
@@ -86,8 +86,8 @@ public class ValidateRng extends ValidateFn {
           final Object vd = vdClass.getConstructor(pmClass, srClass).newInstance(pm, sr);
 
           // load schema, validate document
-          final Object loaded = vdLoadSchema.invoke(vd, schema.inputSource());
-          if(loaded.equals(Boolean.TRUE)) vdValidate.invoke(vd, in.inputSource());
+          final Object loaded = vdLoadSchema.invoke(vd, schm.inputSource());
+          if(loaded.equals(Boolean.TRUE)) vdValidate.invoke(vd, input.inputSource());
 
         } catch(final ClassNotFoundException ex) {
           Util.debug(ex);

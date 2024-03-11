@@ -12,7 +12,6 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.w3c.dom.ls.*;
 import org.xml.sax.*;
@@ -65,11 +64,11 @@ public class ValidateXsd extends ValidateFn {
       void process(final ValidationHandler handler) throws IOException, SAXException,
           QueryException {
 
-        final IO input = read(toNodeOrAtomItem(arg(0), qc), null);
-        final Item schema = defined(1) ? toNodeOrAtomItem(arg(1), qc) : Empty.VALUE;
+        final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
+        final Item schema = toNodeOrAtomItem(arg(1), true, qc);
         final HashMap<String, String> options = toOptions(arg(2), qc);
 
-        final String url = schema.isEmpty() ? "" : prepare(read(schema, null), handler).url();
+        final String url = schema == null ? "" : prepare(read(schema, null), handler).url();
         final String caching = options.remove("cache");
         final boolean cache = caching != null && Strings.toBoolean(caching);
 

@@ -538,13 +538,15 @@ public abstract class StandardFunc extends Arr {
   /**
    * Converts an item to a node or an atomized item.
    * @param expr expression
+   * @param empty allow empty item
    * @param qc query context
-   * @return node or atomized item
+   * @return node, atomized item or {@code null}
    * @throws QueryException query exception
    */
-  protected final Item toNodeOrAtomItem(final Expr expr, final QueryContext qc)
+  protected final Item toNodeOrAtomItem(final Expr expr, final boolean empty, final QueryContext qc)
       throws QueryException {
     Item item = expr.item(qc, info);
+    if(empty && item.isEmpty()) return null;
     if(!(item instanceof ANode)) item = item.atomItem(qc, info);
     if(item.isEmpty()) throw EMPTYFOUND.get(info);
     return item;
