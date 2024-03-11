@@ -437,14 +437,15 @@ public final class SeqType {
           }
         } else if(type == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL))) {
           items.add(Dbl.get(item1.dbl(info)));
-        } else if(type == FLOAT && tp.instanceOf(DECIMAL)) {
+        } else if(type == FLOAT && (tp == DOUBLE || tp.instanceOf(DECIMAL))) {
           items.add(Flt.get(item1.flt(info)));
         } else if(type == STRING && item1 instanceof Uri) {
           items.add(Str.get(item1.string(info)));
         } else if(type.instanceOf(tp)
-            || type == ANY_URI && item1 instanceof Str
-            || type.instanceOf(HEX_BINARY) && item1 instanceof B64
-            || type.instanceOf(BASE64_BINARY) && item1 instanceof Hex) {
+            || type == DECIMAL && (tp == DOUBLE || tp == FLOAT)
+            || type == ANY_URI && tp.instanceOf(STRING)
+            || type == HEX_BINARY && tp == BASE64_BINARY
+            || type == BASE64_BINARY && tp == HEX_BINARY) {
           // casting and relabeling
           Item cast;
           try {
