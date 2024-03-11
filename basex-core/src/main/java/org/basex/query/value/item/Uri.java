@@ -82,7 +82,12 @@ public final class Uri extends AStr {
   public Uri resolve(final Uri add, final InputInfo info) throws QueryException {
     if(add.value.length == 0) return this;
     try {
-      final URI base = new URI(Token.string(value)), res = new URI(Token.string(add.value));
+      final URI res = new URI(Token.string(add.value));
+      URI base = new URI(Token.string(value));
+      if("".equals(base.getPath()) && !"".equals(base.getHost())) {
+        // work around JDK-8272702, https://bugs.java.com/bugdatabase/view_bug?bug_id=8272702
+        base = new URI(Token.string(value) + "/");
+      }
       String uri = base.resolve(res).toString();
       if(uri.startsWith(IO.FILEPREF))
         uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");

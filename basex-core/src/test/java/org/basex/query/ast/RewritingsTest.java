@@ -1006,9 +1006,11 @@ public final class RewritingsTest extends SandboxTest {
     check(wrap(1) + "coerce to xs:string", 1, root(TypeCheck.class));
     check("(1, 2) coerce to xs:double+", "1\n2",
         empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
+    check("(-128, 127) coerce to xs:byte+", "-128\n127",
+        empty(TypeCheck.class), root(ItemSeq.class), count(Int.class, 2));
 
     error("<a/> coerce to empty-sequence()", INVCONVERT_X_X_X);
-    error("(1, 2) coerce to xs:byte+", INVCONVERT_X_X_X);
+    error("(1, 128) coerce to xs:byte+", INVCONVERT_X_X_X);
   }
 
   /** Treat and coerce, error messages. */
