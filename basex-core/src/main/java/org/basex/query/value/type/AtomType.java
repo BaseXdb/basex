@@ -288,7 +288,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Flt read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
-      return Flt.get(in.readToken(), null);
+      return Flt.get(Flt.parse(in.readToken(), null));
     }
   },
 
@@ -306,7 +306,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dbl read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
-      return Dbl.get(in.readToken(), null);
+      return Dbl.get(Dbl.parse(in.readToken(), null));
     }
   },
 
@@ -1167,7 +1167,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean nsSensitive() {
-    return instanceOf(QNAME) || instanceOf(NOTATION);
+    return eq(QNAME) || eq(NOTATION);
   }
 
   @Override

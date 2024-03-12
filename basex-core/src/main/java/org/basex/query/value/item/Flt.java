@@ -44,17 +44,6 @@ public final class Flt extends ANum {
       Float.isNaN(value) ? NAN : new Flt(value);
   }
 
-  /**
-   * Returns an instance of this class.
-   * @param value value
-   * @param info input info (can be {@code null})
-   * @return instance
-   * @throws QueryException query exception
-   */
-  public static Flt get(final byte[] value, final InputInfo info) throws QueryException {
-    return get(parse(value, info));
-  }
-
   @Override
   public byte[] string() {
     return Token.token(value);

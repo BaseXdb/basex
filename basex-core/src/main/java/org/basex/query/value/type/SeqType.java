@@ -423,48 +423,41 @@ public final class SeqType {
   public void coerce(final Item item, final QNm name, final ItemList items, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
+    final QuerySupplier<QueryException> error = () ->
+      typeError(item, with(EXACTLY_ONE), name, info, true);
     if(type instanceof AtomType) {
+      final AtomType at = (AtomType) type;
       final Iter iter = item.atomValue(qc, info).iter();
-      for(Item item1; (item1 = qc.next(iter)) != null;) {
-        final Type tp = item1.type;
-        if(tp.instanceOf(type)) {
-          items.add(item1);
-        } else if(tp == UNTYPED_ATOMIC) {
-          if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
-          final Iter iter2 = type.cast(item1, qc, info).iter();
-          for(Item item2; (item2 = qc.next(iter2)) != null;) {
-            items.add(item2);
+      for(Item it; (it = qc.next(iter)) != null;) {
+        final Type tp = it.type;
+        if(!tp.instanceOf(at)) {
+          if(tp == UNTYPED_ATOMIC) {
+            if(at.nsSensitive()) throw NSSENS_X_X.get(info, item.type, at);
+            it = at.cast(it, qc, info);
+          } else if(
+            at == DECIMAL && (tp == DOUBLE || tp == FLOAT) ||
+            at == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL)) ||
+            at == FLOAT && (tp == DOUBLE || tp.instanceOf(DECIMAL)) ||
+            at == STRING && tp == ANY_URI ||
+            at == ANY_URI && tp.instanceOf(STRING) ||
+            at == HEX_BINARY && tp == BASE64_BINARY ||
+            at == BASE64_BINARY && tp == HEX_BINARY
+          ) {
+            it = at.cast(it, qc, info);
+          } else if(at.instanceOf(tp)) {
+            final Item old = it;
+            it = at.cast(it, qc, info);
+            if(!it.equal(old, null, info)) throw error.get();
+          } else {
+            throw error.get();
           }
-        } else if(type == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL))) {
-          items.add(Dbl.get(item1.dbl(info)));
-        } else if(type == FLOAT && (tp == DOUBLE || tp.instanceOf(DECIMAL))) {
-          items.add(Flt.get(item1.flt(info)));
-        } else if(type == STRING && item1 instanceof Uri) {
-          items.add(Str.get(item1.string(info)));
-        } else if(type.instanceOf(tp)
-            || type == DECIMAL && (tp == DOUBLE || tp == FLOAT)
-            || type == ANY_URI && tp.instanceOf(STRING)
-            || type == HEX_BINARY && tp == BASE64_BINARY
-            || type == BASE64_BINARY && tp == HEX_BINARY) {
-          // casting and relabeling
-          Item cast;
-          try {
-            cast = (Item) type.cast(item1, qc, info);
-          } catch(@SuppressWarnings("unused") final QueryException ex) {
-            cast = null;
-          }
-          if(cast == null || type.instanceOf(tp) && !cast.equal(item1, null, info)) {
-            throw typeError(item, with(EXACTLY_ONE), name, info, true);
-          }
-          items.add(cast);
-        } else {
-          throw typeError(item, with(EXACTLY_ONE), name, info, true);
         }
+        items.add(it);
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       items.add(((FItem) item).coerceTo((FuncType) type, qc, cc, info));
     } else {
-      throw typeError(item, with(EXACTLY_ONE), name, info, true);
+      throw error.get();
     }
   }
 

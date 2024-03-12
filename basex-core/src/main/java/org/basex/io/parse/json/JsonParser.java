@@ -101,7 +101,7 @@ public final class JsonParser extends InputParser {
       case '9':
         // number
         conv.numberLit(conv.numberParser != null ? conv.numberParser.apply(number()) :
-          Dbl.get(number(), null));
+          Dbl.get(Dbl.parse(number(), null)));
         break;
       default:
         // boolean, null or constructor

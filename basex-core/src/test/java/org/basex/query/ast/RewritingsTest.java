@@ -1010,7 +1010,7 @@ public final class RewritingsTest extends SandboxTest {
         empty(TypeCheck.class), root(ItemSeq.class), count(Int.class, 2));
 
     error("<a/> coerce to empty-sequence()", INVCONVERT_X_X_X);
-    error("(1, 128) coerce to xs:byte+", INVCONVERT_X_X_X);
+    error("(1, 128) coerce to xs:byte+", FUNCCAST_X_X_X);
   }
 
   /** Treat and coerce, error messages. */
