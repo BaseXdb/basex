@@ -220,9 +220,9 @@ public class CmpG extends Cmp {
       // determine types, choose best implementation
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
-      // skip type check if types are identical (and a child instance of any atomic type)
-      check = !(type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-          (type1.isSortable() || !op.oneOf(OpG.EQ, OpG.NE)) || comparable(type1, type2, true));
+      // skip type check if types are identical, have a specific atomic type and are comparable
+      check = !(type1 == type2 && !type1.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.ITEM) &&
+          comparable(type1, type2, true));
 
       CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {

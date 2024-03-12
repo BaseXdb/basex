@@ -40,17 +40,7 @@ public enum AtomType implements Type {
   ANY_SIMPLE_TYPE("anySimpleType", null, XS_URI, false, false, false, false, Type.ID.AST),
 
   /** Any atomic type. */
-  ANY_ATOMIC_TYPE("anyAtomicType", ITEM, XS_URI, false, false, false, false, Type.ID.AAT) {
-    @Override
-    public Atm cast(final Item item, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      return Atm.get(item.string(info));
-    }
-    @Override
-    public Atm cast(final Object value, final QueryContext qc, final InputInfo info) {
-      return Atm.get(token(value));
-    }
-  },
+  ANY_ATOMIC_TYPE("anyAtomicType", ITEM, XS_URI, false, false, false, false, Type.ID.AAT),
 
   /** Untyped Atomic type. */
   UNTYPED_ATOMIC("untypedAtomic", ANY_ATOMIC_TYPE, XS_URI, false, true, false, true, Type.ID.ATM) {
