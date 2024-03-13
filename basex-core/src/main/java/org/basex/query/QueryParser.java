@@ -2228,11 +2228,7 @@ public class QueryParser extends InputParser {
     expr = compConstructor();
     if(expr != null) return expr;
     // ordered expression
-    int p = pos;
-    if(wsConsumeWs(ORDERED) || wsConsumeWs(UNORDERED)) {
-      if(curr('{')) return enclosedExpr();
-      pos = p;
-    }
+    if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
     // map constructor
     if(wsConsumeWs(MAP, MAPCONSTR, "{")) return new CMap(info(), keyValues());
     // curly array constructor
@@ -2245,7 +2241,7 @@ public class QueryParser extends InputParser {
     // square array constructor
     if(wsConsume("[")) return new CArray(info(), true, values());
     // unary lookup
-    p = pos;
+    int p = pos;
     if(consume("?")) {
       if(!wsConsume(",") && !consume(")")) {
         final InputInfo ii = info();
@@ -2949,14 +2945,14 @@ public class QueryParser extends InputParser {
    */
   private Expr compConstructor() throws QueryException {
     final int p = pos;
-    if(wsConsumeWs(DOCUMENT))  return consume(compDoc(), p);
-    if(wsConsumeWs(ELEMENT))   return consume(compElement(), p);
-    if(wsConsumeWs(ATTRIBUTE)) return consume(compAttribute(), p);
-    if(wsConsumeWs(NAMESPACE)) return consume(compNamespace(), p);
-    if(wsConsumeWs(TEXT))      return consume(compText(), p);
-    if(wsConsumeWs(COMMENT))   return consume(compComment(), p);
-    if(wsConsumeWs(PROCESSING_INSTRUCTION))        return consume(compPI(), p);
-    return null;
+    return consume(
+      wsConsumeWs(DOCUMENT) ? compDoc() :
+      wsConsumeWs(ELEMENT) ? compElement() :
+      wsConsumeWs(ATTRIBUTE) ? compAttribute() :
+      wsConsumeWs(NAMESPACE) ? compNamespace() :
+      wsConsumeWs(TEXT) ? compText() :
+      wsConsumeWs(COMMENT) ? compComment() :
+      wsConsumeWs(PROCESSING_INSTRUCTION) ? compPI() : null, p);
   }
 
   /**
@@ -2986,8 +2982,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compElement() throws QueryException {
-    skipWs();
-
     final Expr name;
     final InputInfo ii = info();
     final QNm qnm = eQName(SKIPCHECK, null);
@@ -3010,8 +3004,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compAttribute() throws QueryException {
-    skipWs();
-
     final Expr name;
     final InputInfo ii = info();
     final QNm qnm = eQName(SKIPCHECK, null);
@@ -3034,8 +3026,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
-    skipWs();
-
     final Expr name;
     final byte[] str = ncName(null);
     if(str.length == 0) {
@@ -3072,8 +3062,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compPI() throws QueryException {
-    skipWs();
-
     final Expr name;
     final byte[] str = ncName(null);
     if(str.length == 0) {
