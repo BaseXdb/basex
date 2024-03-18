@@ -65,6 +65,12 @@ final class BaseXCollation extends Collation {
     }
   }
 
+  @Override
+  public byte[] key(final byte[] string, final InputInfo info) throws QueryException {
+    if(!(collator instanceof RuleBasedCollator)) throw CHARCOLL.get(info);
+    return ((RuleBasedCollator) collator).getCollationKey(Token.string(string)).toByteArray();
+  }
+
   /**
    * Determines whether one string starts with another.
    * @param string string iterator
