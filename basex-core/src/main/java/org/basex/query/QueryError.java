@@ -619,7 +619,7 @@ public enum QueryError {
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),
   /** Error code. */
-  FORMATINV_X(FODF, 1290, "%."),
+  FORMATINV_X(FODF, 1290, "%"),
   /** Error code. */
   PICEMPTY(FODF, 1310, "The picture string must not be empty: '%'"),
   /** Error code. */

@@ -669,7 +669,7 @@ public final class QT3TS extends Main {
    */
   private String assertDeepEq(final QT3Result result, final XdmValue expected) {
     final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
-    return exp.deepEqual(result.value) ? null : exp.toString();
+    return exp.deepEqual(result.value, true) ? null : exp.toString();
   }
 
   /**
@@ -679,25 +679,8 @@ public final class QT3TS extends Main {
    * @return optional expected test suite result
    */
   private String assertPermutation(final QT3Result result, final XdmValue expected) {
-    // cache expected results
-    final HashSet<String> exp = new HashSet<>();
-    for(final XdmItem item : environment(new XQuery(expected.getString(), ctx), result.env))
-      exp.add(item.getString());
-    // cache actual results
-    final HashSet<String> res = new HashSet<>();
-    for(final XdmItem item : result.value) res.add(item.getString());
-
-    if(exp.size() != res.size())
-      return Util.info("% results (found: %)", exp.size(), res.size());
-
-    for(final String s : exp.toArray(String[]::new)) {
-      if(!res.contains(s)) return Util.info("% (missing)", s);
-    }
-    for(final String s : res.toArray(String[]::new)) {
-      if(!exp.contains(s))
-        return Util.info("% (missing in expected result)", s);
-    }
-    return null;
+    final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
+    return exp.deepEqual(result.value, false) ? null : exp.toString();
   }
 
   /**
