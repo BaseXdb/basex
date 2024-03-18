@@ -373,7 +373,7 @@ public abstract class XQArray extends XQData {
   }
 
   @Override
-  public final boolean instanceOf(final Type tp) {
+  public final boolean instanceOf(final Type tp) throws QueryException {
     if(type.instanceOf(tp)) return true;
 
     final SeqType mt;

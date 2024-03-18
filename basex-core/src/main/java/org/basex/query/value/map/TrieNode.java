@@ -231,8 +231,9 @@ abstract class TrieNode {
    * @param kt key type
    * @param dt declared type
    * @return {@code true} if the type fits, {@code false} otherwise
+   * @throws QueryException query exception
    */
-  abstract boolean instanceOf(AtomType kt, SeqType dt);
+  abstract boolean instanceOf(AtomType kt, SeqType dt) throws QueryException;
 
   /**
    * Checks if this node is indistinguishable from the given node.

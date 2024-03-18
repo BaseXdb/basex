@@ -93,7 +93,8 @@ public interface Type {
     /** xs:NOTATION.              */ NOT(83),
     /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86),
-    /** last dummy type.          */ LAST(87);
+    /** enum().                   */ ENM(87),
+    /** last dummy type.          */ LAST(88);
 
     /** Type index. */
     private final byte index;

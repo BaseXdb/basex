@@ -161,8 +161,10 @@ public abstract class Item extends Value {
    * Overwritten by {@link XQMap} and {@link XQArray}.
    * @param tp type
    * @return result of check
+   * @throws QueryException query exception
    */
-  public boolean instanceOf(final Type tp) {
+  @SuppressWarnings("all")
+  public boolean instanceOf(final Type tp) throws QueryException {
     return type.instanceOf(tp);
   }
 
