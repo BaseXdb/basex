@@ -147,6 +147,16 @@ public class InputParser {
   }
 
   /**
+   * Returns the supplied character, or a codepoint for a surrogate pair.
+   * @return codepoint
+   */
+  public final int surrogate() {
+    final char ch = consume();
+    return Character.isHighSurrogate(ch) && curr() != 0 && Character.isLowSurrogate(curr()) ?
+      Character.toCodePoint(ch, consume()) : ch;
+  }
+
+  /**
    * Creates input information.
    * @return input info
    */

@@ -96,6 +96,11 @@ final class UCACollation extends Collation {
     }
   }
 
+  @Override
+  public byte[] key(final byte[] string, final InputInfo info) {
+    return collator.getCollationKey(Token.string(string)).toByteArray();
+  }
+
   /**
    * Determines whether one string starts with another.
    * @param string string iterator

@@ -69,7 +69,7 @@ public class FnParseUri extends FnJsonDoc {
     Matcher m = Pattern.compile("^(.*?)#(.*)$").matcher(string);
     if(m.matches()) {
       string = m.group(1);
-      fragment = m.group(2);
+      fragment = decode(m.group(2));
     }
     m = Pattern.compile("^(.*?)\\?(.*)$").matcher(string);
     if(m.matches()) {
@@ -151,7 +151,7 @@ public class FnParseUri extends FnJsonDoc {
     final TokenList segments = new TokenList();
     if(!string.isEmpty()) {
       final String separator = Pattern.quote(options.get(UriOptions.PATH_SEPARATOR));
-      for(final String s : string.split(separator)) segments.add(decode(s));
+      for(final String s : string.split(separator, -1)) segments.add(decode(s));
     }
 
     XQMap queries = XQMap.empty();
@@ -159,8 +159,8 @@ public class FnParseUri extends FnJsonDoc {
       final String separator = Pattern.quote(options.get(UriOptions.QUERY_SEPARATOR));
       for(final String q : query.split(separator)) {
         final int eq = q.indexOf('=');
-        final Str key = eq == -1 ? Str.EMPTY : Str.get(q.substring(0, eq));
-        final Str val = Str.get(q.substring(eq + 1));
+        final Str key = eq == -1 ? Str.EMPTY : Str.get(decode(q.substring(0, eq)));
+        final Str val = Str.get(decode(q.substring(eq + 1)));
         queries = queries.put(key, ValueBuilder.concat(queries.get(key), val, qc));
       }
     }

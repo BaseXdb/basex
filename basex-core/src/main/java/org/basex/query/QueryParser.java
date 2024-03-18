@@ -2663,9 +2663,9 @@ public class QueryParser extends InputParser {
       } else {
         // fixed part
         pos = p;
-        final char ch = consume();
-        if(!constr && (ch == '{' || ch == '}' || ch == '`')) check(ch);
-        tb.add(ch);
+        final int cp = surrogate();
+        if(!constr && (cp == '{' || cp == '}' || cp == '`')) check(cp);
+        tb.add(cp);
       }
     }
     throw error(INCOMPLETE);
@@ -4039,13 +4039,10 @@ public class QueryParser extends InputParser {
         if(!consume(';')) entityError(i, INVENTITY_X);
       }
     } else {
-      final char ch = consume();
-      int cp = ch;
+      int cp = surrogate();
       if(cp == '\r') {
         cp = '\n';
-        if(curr(cp)) consume();
-      } else if(Character.isHighSurrogate(ch) && curr() != 0 && Character.isLowSurrogate(curr())) {
-        cp = Character.toCodePoint(ch, consume());
+        consume('\n');
       }
       tb.add(cp);
     }
@@ -4083,7 +4080,7 @@ public class QueryParser extends InputParser {
    * @param ch expected character
    * @throws QueryException query exception
    */
-  private void check(final char ch) throws QueryException {
+  private void check(final int ch) throws QueryException {
     if(!consume(ch)) throw error(WRONGCHAR_X_X, ch, found());
   }
 

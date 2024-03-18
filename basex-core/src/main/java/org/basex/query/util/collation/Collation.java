@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 import org.basex.util.options.Options.*;
 
 /**
@@ -225,6 +226,15 @@ public abstract class Collation {
   public abstract int compare(byte[] string, byte[] compare);
 
   /**
+   * Returns a collation key.
+   * @param string string
+   * @param info input info (can be {@code null})
+   * @return key
+   * @throws QueryException query exception
+   */
+  public abstract byte[] key(byte[] string, InputInfo info) throws QueryException;
+
+  /**
    * Returns the start or end position of the specified substring.
    * @param string string
    * @param sub substring to be found
@@ -235,4 +245,18 @@ public abstract class Collation {
    */
   protected abstract int indexOf(String string, String sub, Mode mode, InputInfo info)
       throws QueryException;
+
+  /**
+   * Returns a standard collation key.
+   * @param string string
+   * @return key
+   */
+  public static byte[] key(final byte[] string) {
+    final ByteList bl = new ByteList(string.length * 3);
+    for(final TokenParser tp = new TokenParser(string); tp.more();) {
+      final int n = tp.next();
+      bl.add(n >>> 16).add(n >>> 8).add(n);
+    }
+    return bl.finish();
+  }
 }
