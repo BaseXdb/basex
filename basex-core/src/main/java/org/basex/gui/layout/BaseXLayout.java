@@ -204,7 +204,7 @@ public final class BaseXLayout {
     final int ll = label.length();
     for(int l = 0; l < ll; l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
-      if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1) continue;
+      if(!letter(ch) || mnem.indexOf(String.valueOf(ch)) != -1) continue;
       b.setMnemonic(ch);
       mnem.append(ch);
       break;

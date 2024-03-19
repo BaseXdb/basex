@@ -867,7 +867,7 @@ public enum QueryError {
   /** Error code. */
   QUERYEMPTY(XPST, 3, "Empty query."),
   /** Error code. */
-  MODLEINV_X(XPST, 3, "Module contains illegal character: #%."),
+  MODLEINV_X(XPST, 3, "Module contains illegal character: %."),
   /** Error code. */
   NOQUOTE_X(XPST, 3, "Expecting quote%."),
   /** Error code. */
@@ -889,13 +889,21 @@ public enum QueryError {
   /** Error code. */
   NOELEMNAME(XPST, 3, "Expecting element name."),
   /** Error code. */
-  ELEMNAME_X(XPST, 3, "Expecting element name, '<%' found."),
+  ELEMNAME_X(XPST, 3, "Element name expected, '%' found."),
   /** Error code. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** Error code. */
   NOEXPR(XPST, 3, "Expecting expression."),
   /** Error code. */
-  NOCONTENT(XPST, 3, "Expecting node content."),
+  NOCOMMENT(XPST, 3, "Expecting comment."),
+  /** Error code. */
+  INVALPI(XPST, 3, "Expecting name of processing instruction."),
+  /** Error code. */
+  PIXML_X(XPST, 3, "Name of processing instruction is illegal: '%'."),
+  /** Error code. */
+  NOPI(XPST, 3, "Expecting processing instruction."),
+  /** Error code. */
+  NOCDATA(XPST, 3, "Expecting CDATA section."),
   /** Error code. */
   WRONGCHAR_X_X(XPST, 3, "Expecting '%'%."),
   /** Error code. */
@@ -922,8 +930,6 @@ public enum QueryError {
   NOVARNAME(XPST, 3, "Variable name expected, '%' found."),
   /** Error code. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
-  /** Error code. */
-  PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** Error code. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** Error code. */
@@ -981,9 +987,7 @@ public enum QueryError {
   /** Error code. */
   INVNAME_X(XPST, 3, "Invalid QName: '%'."),
   /** Error code. */
-  PIXML_X(XPST, 3, "Processing instruction has illegal name: %."),
-  /** Error code. */
-  QNAME_X(XPST, 3, "Expecting QName, '%' found."),
+  QNAME_X(XPST, 3, "QName expected, '%' found."),
   /** Error code. */
   PROLOGORDER(XPST, 3, "Default declarations must be declared first."),
   /** Error code. */
@@ -992,8 +996,6 @@ public enum QueryError {
   FTSTOP(XPST, 3, "Stop words expected."),
   /** Error code. */
   FTMATCH_X(XPST, 3, "Unknown match option '%...'."),
-  /** Error code. */
-  INVALPI(XPST, 3, "Processing instruction has invalid name: '%' found."),
   /** Error code. */
   INTEXP(XPST, 3, "Integer expected."),
   /** Error code. */
