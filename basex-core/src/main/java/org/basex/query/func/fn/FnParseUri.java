@@ -100,9 +100,9 @@ public class FnParseUri extends FnJsonDoc {
       scheme = FILE;
       filepath = string;
     } else {
-      m = Pattern.compile("^/*(/[a-zA-Z]:.*)$").matcher(string);
+      m = Pattern.compile("^/*(/[a-zA-Z][:|].*)$").matcher(string);
       if((scheme.isEmpty() || scheme.equals(FILE)) && m.matches()) {
-        string = m.group(1);
+        string = m.group(1).replaceAll("^(..)\\|", "$1:");
       } else {
         m = Pattern.compile("^///*([^/]+)?(/.*)?$").matcher(string);
         if(m.matches()) {
