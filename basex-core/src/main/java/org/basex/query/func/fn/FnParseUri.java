@@ -61,34 +61,29 @@ public class FnParseUri extends FnJsonDoc {
     final String value = toString(arg(0), qc);
     final UriOptions options = toOptions(arg(1), new UriOptions(), false, qc);
 
-    String string = value.replace('\\', '/');
-    String fragment = "", query = "", scheme = "", filepath = "", authority = "", userinfo = "";
-    String host = "", port = "", path;
+    String string = value.replace('\\', '/'), fragment = "", query = "", scheme = "";
+    String filepath = "", authority = "", userinfo = "", host = "", port = "", path;
 
     // strip off the fragment identifier and any query
-    Matcher m = Pattern.compile("^(.*?)#(.*)$").matcher(string);
-    if(m.matches()) {
-      string = m.group(1);
-      fragment = decode(m.group(2));
+    final Regex r = new Regex();
+    if(r.has(string, "^(.*?)#(.*)$")) {
+      string = r.group(1);
+      fragment = decode(r.group(2));
     }
-    m = Pattern.compile("^(.*?)\\?(.*)$").matcher(string);
-    if(m.matches()) {
-      string = m.group(1);
-      query = m.group(2);
+    if(r.has(string, "^(.*?)\\?(.*)$")) {
+      string = r.group(1);
+      query = r.group(2);
     }
 
     // attempt to identify the scheme
-    if(string.matches("^[a-zA-Z][:|].*$")) {
+    if(r.has(string, "^[a-zA-Z][:|].*$")) {
       scheme = FILE;
       string = string.replaceAll("^(.)\\|", "$1:");
       filepath = string;
       string = "/" + string;
-    } else {
-      m = Pattern.compile("^([a-zA-Z][-+.A-Za-z0-9]*):(.*)$").matcher(string);
-      if(m.matches()) {
-        scheme = m.group(1);
-        string = m.group(2);
-      }
+    } else if(r.has(string, "^([a-zA-Z][-+.A-Za-z0-9]*):(.*)$")) {
+      scheme = r.group(1);
+      string = r.group(2);
     }
 
     // determine if the URI is hierarchical
@@ -96,49 +91,41 @@ public class FnParseUri extends FnJsonDoc {
       string.isEmpty() ? Empty.VALUE : Bln.get(string.startsWith("/"));
 
     // examine the remaining parts of the string
-    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && string.matches("^//[^/].*$")) {
+    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && r.has(string, "^//[^/].*$")) {
       scheme = FILE;
       filepath = string;
-    } else {
-      m = Pattern.compile("^/*(/[a-zA-Z][:|].*)$").matcher(string);
-      if((scheme.isEmpty() || scheme.equals(FILE)) && m.matches()) {
-        string = m.group(1).replaceAll("^(..)\\|", "$1:");
-      } else {
-        m = Pattern.compile("^///*([^/]+)?(/.*)?$").matcher(string);
-        if(m.matches()) {
-          authority = m.group(1);
-          string = m.group(2);
-        }
-      }
+    } else if((scheme.isEmpty() || scheme.equals(FILE)) && r.has(string, "^/*(/[a-zA-Z][:|].*)$")) {
+      string = r.group(1).replaceAll("^(..)\\|", "$1:");
+    } else if(r.has(string, "^///*([^/]+)?$")) {
+      authority = r.group(1);
+      string = "";
+    } else if(r.has(string, "^///*([^/]+)?(/.*)?$")) {
+      authority = r.group(1);
+      string = r.group(2);
     }
     if(string == null) string = "";
 
     // parse userinfo
-    m = Pattern.compile("^(([^@]*)@)(.*)(:([^:]*))?$").matcher(authority);
-    if(m.matches()) {
-      userinfo = m.group(2);
+    if(r.has(authority, "^(([^@]*)@)(.*)(:([^:]*))?$")) {
+      userinfo = r.group(2);
       if(!options.get(UriOptions.ALLOW_DEPRECATED_FEATURES) && userinfo.contains(":")) {
         userinfo = "";
       }
     }
     // parse host
-    m = Pattern.compile("^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$").matcher(authority);
-    if(m.matches()) {
-      host = m.group(3);
-    } else if(authority.matches("^(([^@]*)@)?\\[.*$")) {
+    if(r.has(authority, "^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$")) {
+      host = r.group(3);
+    } else if(r.has(authority, "^(([^@]*)@)?\\[.*$")) {
       throw PARSE_URI_X.get(info, value);
-    } else {
-      m = Pattern.compile("^(([^@]*)@)?([^:]+)(:([^:]*))?$").matcher(authority);
-      if(m.matches()) host = m.group(3);
+    } else if(r.has(authority, "^(([^@]*)@)?([^:]+)(:([^:]*))?$")) {
+      host = r.group(3);
     }
     if(host == null) host = "";
     // an IPv6/IPvFuture address may contain a colon
-    m = Pattern.compile("^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$").matcher(authority);
-    if(m.matches()) {
-      port = m.group(5);
-    } else {
-      m = Pattern.compile("^(([^@]*)@)?([^:]+)(:([^:]*))?$").matcher(authority);
-      if(m.matches()) port = m.group(5);
+    if(r.has(authority, "^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$")) {
+      port = r.group(5);
+    } else if(r.has(authority, "^(([^@]*)@)?([^:]+)(:([^:]*))?$")) {
+      port = r.group(5);
     }
     if(port == null) port = "";
     if(omitPort(port, scheme, options)) port = "";
@@ -215,5 +202,31 @@ public class FnParseUri extends FnJsonDoc {
   static boolean omitPort(final String port, final String scheme, final UriOptions options) {
     return options.get(UriOptions.OMIT_DEFAULT_PORTS) &&
         Objects.equals(PORTS.get(scheme), port);
+  }
+
+  /** Helper class for regex matching. */
+  private static final class Regex {
+    /** Current matcher. */
+    private Matcher m;
+
+    /**
+     * Attempts to find the input in the pattern.
+     * @param pattern pattern
+     * @param input input
+     * @return result of check
+     */
+    boolean has(final String pattern, final String input) {
+      m = Pattern.compile(input).matcher(pattern);
+      return m.find();
+    }
+
+    /**
+     * Returns the specified group.
+     * @param i index
+     * @return string
+     */
+    String group(final int i) {
+      return m.group(i);
+    }
   }
 }
