@@ -792,7 +792,7 @@ public enum Function implements AFunction {
       params(ARRAY_O, PREDICATE_ZM), INTEGER_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore::new, "insert-before(array,position,member)",
-      params(ARRAY_O, INTEGER_O, ITEM_ZO), ARRAY_O, ARRAY_URI),
+      params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_JOIN(ArrayJoin::new, "join(arrays)",
       params(ARRAY_ZM), ARRAY_O, ARRAY_URI),
