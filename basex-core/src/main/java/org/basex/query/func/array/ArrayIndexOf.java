@@ -2,10 +2,10 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
@@ -23,18 +23,11 @@ public final class ArrayIndexOf extends ArrayFn {
     final Collation collation = toCollation(arg(2), qc);
 
     int c = 0;
+    final DeepEqual deep = new DeepEqual(info, collation, qc);
     final LongList list = new LongList();
-    for(final Value value : array.members()) {
-      c++;
-      final long s = search.size();
-      if(s == value.size()) {
-        int i = -1;
-        while(++i < s) {
-          final Item item1 = value.itemAt(i), item2 = search.itemAt(i);
-          if(!(item1.comparable(item2) && item1.equal(item2, collation, info))) break;
-        }
-        if(i == s) list.add(c);
-      }
+    for(final Value member : array.members()) {
+      ++c;
+      if(deep.equal(member, search)) list.add(c);
     }
     return IntSeq.get(list.finish());
   }
