@@ -432,7 +432,7 @@ public final class QT3TS extends Main {
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
-    "'staticTyping', 'typedData', 'XQUpdate')";
+    "'staticTyping', 'typedData', 'XQUpdate', 'fn-transform-XSLT', 'fn-load-xquery-module')";
 
   /**
    * Checks if the current test case is supported.
@@ -441,12 +441,9 @@ public final class QT3TS extends Main {
    */
   private boolean supported(final XdmValue test) {
     // the following query generates a result if the specified test is not supported
-    return all || new XQuery(
-      "*:dependency[" +
-      // skip schema imports, schema validation, namespace axis, static typing
-      "@type = 'feature' and (" +
-      " @value = " + NOSUPPORT + " and (@satisfied = 'true' or empty(@satisfied)) or" +
-      " @value != " + NOSUPPORT + "and @satisfied = 'false') or " +
+    return all || new XQuery("*:dependency[" +
+      // skip various features
+      "@type = 'feature' and @value = " + NOSUPPORT + " and string(@satisfied) = ('', 'true') or " +
       // skip fully-normalized unicode tests
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
@@ -455,7 +452,7 @@ public final class QT3TS extends Main {
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
-        ']', ctx).context(test).value().size() == 0;
+    "]", ctx).context(test).value().size() == 0;
   }
 
   /**
