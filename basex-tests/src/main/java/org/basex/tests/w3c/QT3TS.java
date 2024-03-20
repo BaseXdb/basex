@@ -699,10 +699,10 @@ public final class QT3TS extends Main {
 
       final XdmValue returned = result.value;
       final String res = normNL(
-          asString("serialize(., map{ 'indent':'no','method':'xml' })", returned));
+          asString("serialize(., map { 'method': 'xml' })", returned));
       if(exp.equals(res)) return null;
       final String r = normNL(asString(
-          "serialize(., map{ 'indent':'no','method':'xml','omit-xml-declaration':'no' })",
+          "serialize(., map { 'method': 'xml', 'omit-xml-declaration': 'no' })",
           returned));
       if(exp.equals(r)) return null;
 

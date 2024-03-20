@@ -67,7 +67,7 @@ public abstract class IO {
   public static final String[] XQSUFFIXES =
     { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery", ".xpath" };
   /** Archive suffixes. */
-  public static final String[] ZIPSUFFIXES = {
+  public static final String[] ARCHIVESUFFIXES = {
     ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, TARSUFFIX, XARSUFFIX,
     ".docx", ".pptx", ".xlsx", ".odt", ".odp", ".ods", ".epub", ".idml"
   };
@@ -264,7 +264,7 @@ public abstract class IO {
    * @return result of check
    */
   public final boolean isArchive() {
-    return hasSuffix(ZIPSUFFIXES);
+    return hasSuffix(ARCHIVESUFFIXES);
   }
 
   /**

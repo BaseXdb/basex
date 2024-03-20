@@ -1327,7 +1327,7 @@ public final class RewritingsTest extends SandboxTest {
       "  map:entry(<e/> ! string(), '')" +
       "}; local:f()?*", "");
     query("declare function local:f() as map(xs:string, xs:string) {" +
-      "  map:put(map {}, <e/> ! string(), '')" +
+      "  map:put(map { }, <e/> ! string(), '')" +
       "}; local:f()?*", "");
   }
 

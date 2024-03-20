@@ -225,7 +225,7 @@ public abstract class SimpleMap extends Arr {
         if(ic.inlineable(next)) {
           // inline values
           //   'a' ! (. = 'a')  ->  'a'  = 'a'
-          //   map {} ! ?*      ->  map {}?*
+          //   map { } ! ?*      ->  map { }?*
           //   123 ! number()   ->  number(123)
           // inline context reference
           //   . ! number() = 2  ->  number() = 2

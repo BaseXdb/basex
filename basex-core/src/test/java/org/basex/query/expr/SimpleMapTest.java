@@ -58,7 +58,7 @@ public final class SimpleMapTest extends SandboxTest {
     query("5 ! string(.)", "5");
     query("(1, 2) ! position()", "1\n2");
     query("(1, 2) ! last()", "2\n2");
-    query("map {} ! head(?_) ! string()", "");
+    query("map { } ! head(?_) ! string()", "");
 
     check("1 ! .", 1, root(Int.class));
     check("(1, 2)[. = 1] ! .", 1, root(IterFilter.class));
