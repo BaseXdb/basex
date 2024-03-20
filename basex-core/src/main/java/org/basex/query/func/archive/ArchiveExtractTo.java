@@ -25,22 +25,41 @@ public class ArchiveExtractTo extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(arg(0), qc);
-    final B64 archive = toB64(arg(1), qc);
     final HashSet<String> entries = entries(arg(2), qc);
-
-    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
-      while(in.more()) {
-        if(entries != null && entries.isEmpty()) break;
-        final ZipEntry ze = in.entry();
-        final String name = ze.getName();
-        if(entries == null || entries.remove(name)) {
-          final Path file = path.resolve(name);
-          if(ze.isDirectory()) {
-            Files.createDirectories(file);
-          } else {
-            Files.createDirectories(file.getParent());
-            try(BufferOutput out = new BufferOutput(new IOFile(file.toFile()))) {
-              in.write(out);
+    try {
+      final Object archive = toInput(arg(1), qc, entries != null);
+      if(archive instanceof Bin) {
+        try(BufferInput bi = ((Bin) archive).input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
+          while(in.more() && (entries == null || !entries.isEmpty())) {
+            final ZipEntry ze = in.entry();
+            final String name = ze.getName();
+            if(entries != null && !entries.remove(name)) continue;
+            final Path file = path.resolve(name);
+            if(ze.isDirectory()) {
+              Files.createDirectories(file);
+            } else {
+              Files.createDirectories(file.getParent());
+              try(BufferOutput out = new BufferOutput(new IOFile(file.toFile()))) {
+                in.write(out);
+              }
+            }
+          }
+        }
+      } else {
+        try(ZipFile zip = new ZipFile(archive.toString())) {
+          for(final String entry : entries) {
+            final ZipEntry ze = zip.getEntry(entry);
+            if(ze == null) continue;
+            final Path file = path.resolve(ze.getName());
+            if(ze.isDirectory()) {
+              Files.createDirectories(file);
+            } else {
+              Files.createDirectories(file.getParent());
+              try(BufferOutput out = new BufferOutput(new IOFile(file.toFile()))) {
+                try(InputStream is = zip.getInputStream(ze); BufferInput in = new BufferInput(is)) {
+                  for(int b; (b = in.read()) != -1;) out.write(b);
+                }
+              }
             }
           }
         }

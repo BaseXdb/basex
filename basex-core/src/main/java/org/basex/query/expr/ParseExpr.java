@@ -555,17 +555,6 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Evaluates an expression (token, binary item) to a byte array.
-   * @param expr expression
-   * @param qc query context
-   * @return byte array
-   * @throws QueryException query exception
-   */
-  protected final byte[] toBytes(final Expr expr, final QueryContext qc) throws QueryException {
-    return toBytes(expr.atomItem(qc, info));
-  }
-
-  /**
    * Evaluates an expression to a Base64 item.
    * @param expr expression
    * @param qc query context
@@ -596,6 +585,17 @@ public abstract class ParseExpr extends Expr {
    */
   protected final B64 toB64(final Item item) throws QueryException {
     return (B64) checkType(item, BASE64_BINARY);
+  }
+
+  /**
+   * Evaluates an expression (token, binary item) to a byte array.
+   * @param expr expression
+   * @param qc query context
+   * @return byte array
+   * @throws QueryException query exception
+   */
+  protected final byte[] toBytes(final Expr expr, final QueryContext qc) throws QueryException {
+    return toBytes(expr.atomItem(qc, info));
   }
 
   /**

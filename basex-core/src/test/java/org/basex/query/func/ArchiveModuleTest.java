@@ -37,7 +37,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     countEntries(func.args(" <archive:entry>X</archive:entry>", "", " map { }"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
         " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
-    countEntries(func.args("X", "", " map {}"), 1);
+    countEntries(func.args("X", "", " map { }"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
         " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
@@ -102,29 +102,40 @@ public final class ArchiveModuleTest extends SandboxTest {
   @Test public void delete() {
     final Function func = _ARCHIVE_DELETE;
     // delete single entry
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + func.args(" $a", "infos/stopWords") +
-          "let $c := " + _ARCHIVE_ENTRIES.args(" $b") +
-          "return count($c)", 4);
+    query("let$archive := " + func.args(ZIP, "infos/stopWords") +
+        "let $entries := " + _ARCHIVE_ENTRIES.args(" $archive") +
+        "return count($entries)", 4);
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $updated := " + func.args(" $archive", "infos/stopWords") +
+        "let $entries := " + _ARCHIVE_ENTRIES.args(" $updated") +
+        "return count($entries)", 4);
     // delete all entries except for the first
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + _ARCHIVE_ENTRIES.args(" $a") +
-          "let $c := " + func.args(" $a", " $b[position() > 1]") +
-          "return count(archive:entries($c))", 1);
+    query("let $entries := " + _ARCHIVE_ENTRIES.args(ZIP) +
+        "let $updated := " + func.args(ZIP, " tail($entries)") +
+        "return count(archive:entries($updated))", 1);
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $entries := " + _ARCHIVE_ENTRIES.args(" $archive") +
+        "let $updated := " + func.args(" $archive", " tail($entries)") +
+        "return count(archive:entries($updated))", 1);
     // updates an existing entry
-    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " ! " +
-        func.args(" .", "X"), ARCHIVE_MODIFY_X);
+    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " => " + func.args("X"),
+        ARCHIVE_MODIFY_X);
   }
 
   /** Test method. */
   @Test public void entries() {
     final Function func = _ARCHIVE_ENTRIES;
     // read entries
+    query(COUNT.args(func.args(ZIP)), 5);
     query(COUNT.args(func.args(_FILE_READ_BINARY.args(ZIP))), 5);
     // simple zip files
+    query(COUNT.args(func.args(ZIP) +
+        "[@size][@last-modified][@compressed-size]"), 5);
     query(COUNT.args(func.args(_FILE_READ_BINARY.args(ZIP)) +
         "[@size][@last-modified][@compressed-size]"), 5);
     // simple gzip files
+    query(COUNT.args(func.args(GZIP) +
+        "[not(@size)][not(@last-modified)][not(@compressed-size)][not(text())]"), 1);
     query(COUNT.args(func.args(_FILE_READ_BINARY.args(GZIP)) +
         "[not(@size)][not(@last-modified)][not(@compressed-size)][not(text())]"), 1);
   }
@@ -133,44 +144,80 @@ public final class ArchiveModuleTest extends SandboxTest {
   @Test public void extractBinary() {
     final Function func = _ARCHIVE_EXTRACT_BINARY;
     // extract all entries
+    query(COUNT.args(func.args(ZIP)), 5);
     query(COUNT.args(func.args(_FILE_READ_BINARY.args(ZIP))), 5);
     // extract all entries
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + _ARCHIVE_ENTRIES.args(" $a") +
-          "return count(" + func.args(" $a", " $b") + ')', 5);
+    query("count(" + func.args(ZIP, _ARCHIVE_ENTRIES.args(ZIP)) + ')', 5);
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $entries := " + _ARCHIVE_ENTRIES.args(" $archive") +
+        "return count(" + func.args(" $archive", " $entries") + ')', 5);
     // extract single entry
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + func.args(" $a", "test/input.xml") +
-          "let $c := " + _CONVERT_BINARY_TO_STRING.args(" $b") +
-          "let $d := " + PARSE_XML.args(" $c") +
-          "return $d//title/text()", "XML");
+    query("let $extracted := " + func.args(ZIP, "test/input.xml") +
+        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $doc := " + PARSE_XML.args(" $string") +
+        "return $doc//title/text()", "XML");
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $extracted := " + func.args(" $archive", "test/input.xml") +
+        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $doc := " + PARSE_XML.args(" $string") +
+        "return $doc//title/text()", "XML");
     // extract single entry
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + func.args(" $a", " <archive:entry>test/input.xml</archive:entry>") +
-          "let $c := " + _CONVERT_BINARY_TO_STRING.args(" $b") +
-          "let $d := " + PARSE_XML.args(" $c") +
-          "return $d//title/text()", "XML");
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $extracted := " + func.args(" $archive",
+            " <archive:entry>test/input.xml</archive:entry>") +
+        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $doc := " + PARSE_XML.args(" $string") +
+        "return $doc//title/text()", "XML");
+    query("let $extracted := " + func.args(ZIP, " <archive:entry>test/input.xml</archive:entry>") +
+        "let $string := " + _CONVERT_BINARY_TO_STRING.args(" $extracted") +
+        "let $doc := " + PARSE_XML.args(" $string") +
+        "return $doc//title/text()", "XML");
+    // extract non-existing entry
+    query("empty(" + func.args(ZIP, "xyz") + ")", true);
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "return empty(" + func.args(" $archive", "xzy") + ")", true);
+    query("empty(" + func.args(GZIP, "xyz") + ")", true);
+    query("let $archive := " + _FILE_READ_BINARY.args(GZIP) +
+        "return empty(" + func.args(" $archive", "xzy") + ")", true);
   }
 
   /** Test method. */
   @Test public void extractText() {
     final Function func = _ARCHIVE_EXTRACT_TEXT;
     // extract all entries
+    query(COUNT.args(func.args(ZIP)), 5);
     query(COUNT.args(func.args(_FILE_READ_BINARY.args(ZIP))), 5);
     // extract all entries
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + _ARCHIVE_ENTRIES.args(" $a") +
-          "return " + COUNT.args(func.args(" $a", " $b")), 5);
+    query("let $entries := " + _ARCHIVE_ENTRIES.args(ZIP) +
+        "return " + COUNT.args(func.args(ZIP, " $entries")), 5);
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $entries := " + _ARCHIVE_ENTRIES.args(" $archive") +
+        "return " + COUNT.args(func.args(" $archive", " $entries")), 5);
     // extract single entry
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + func.args(" $a", "test/input.xml") +
-          "let $c := " + PARSE_XML.args(" $b") +
-          "return $c//title/text()", "XML");
+    query("let $entry := " + func.args(ZIP, "test/input.xml") +
+        "let $doc := " + PARSE_XML.args(" $entry") +
+        "return $doc//title/text()", "XML");
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $b := " + func.args(" $archive", "test/input.xml") +
+        "let $doc := " + PARSE_XML.args(" $b") +
+        "return $doc//title/text()", "XML");
     // extract single entry
-    query("let $a := " + _FILE_READ_BINARY.args(ZIP) +
-          "let $b := " + func.args(" $a", " <archive:entry>test/input.xml</archive:entry>") +
-          "let $c := " + PARSE_XML.args(" $b") +
-          "return $c//title/text()", "XML");
+    query("let $entry := " + func.args(ZIP,
+        " <archive:entry>test/input.xml</archive:entry>") +
+        "let $doc := " + PARSE_XML.args(" $entry") +
+        "return $doc//title/text()", "XML");
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "let $entry := " + func.args(" $archive",
+            " <archive:entry>test/input.xml</archive:entry>") +
+        "let $doc := " + PARSE_XML.args(" $entry") +
+        "return $doc//title/text()", "XML");
+    // extract non-existing entry
+    query("empty(" + func.args(ZIP, "xyz") + ")", true);
+    query("let $archive := " + _FILE_READ_BINARY.args(ZIP) +
+        "return empty(" + func.args(" $archive", "xzy") + ")", true);
+    query("empty(" + func.args(GZIP, "xyz") + ")", true);
+    query("let $archive := " + _FILE_READ_BINARY.args(GZIP) +
+        "return empty(" + func.args(" $archive", "xzy") + ")", true);
   }
 
   /** Test method. */
@@ -178,26 +225,40 @@ public final class ArchiveModuleTest extends SandboxTest {
     final Function func = _ARCHIVE_EXTRACT_TO;
     final String tmp = new IOFile(sandbox(), "tmp").path();
     // write archive and count number of entries
+    query(func.args(tmp, ZIP));
+    countEntries(ZIP, 5);
     query(func.args(tmp, _FILE_READ_BINARY.args(ZIP)));
     countEntries(_FILE_READ_BINARY.args(ZIP), 5);
     // write archive and count number of entries
+    query(func.args(tmp, ZIP, _ARCHIVE_ENTRIES.args(ZIP)));
+    countEntries(_FILE_READ_BINARY.args(ZIP), 5);
     query(func.args(tmp, _FILE_READ_BINARY.args(ZIP),
         _ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP))));
     countEntries(_FILE_READ_BINARY.args(ZIP), 5);
 
-    query("let $a := " + _ARCHIVE_ENTRIES.args(
-      _FILE_READ_BINARY.args(ZIP)) + "/string() " +
-      "let $f := " + _FILE_LIST.args(tmp, true) + '[' +
-      _FILE_IS_FILE.args(" '" + tmp + "/'||.") + "] ! replace(., '\\\\', '/') " +
-      "return (every $e in $a satisfies $e = $f) and (every $e in $f satisfies $e =$ a)",
-      true);
+    query("let $entries := " + _ARCHIVE_ENTRIES.args(ZIP) + " ! string() " +
+        "let $files := " + _FILE_LIST.args(tmp, true) + '[' +
+          _FILE_IS_FILE.args(" '" + tmp + "/'||.") + "] ! replace(., '\\\\', '/') " +
+        "return deep-equal($entries, $files, (), map { 'ordered': false() })",
+        true);
+    query("let $entries := " + _ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP)) + "/string() " +
+        "let $files := " + _FILE_LIST.args(tmp, true) + '[' +
+          _FILE_IS_FILE.args(" '" + tmp + "/'||.") + "] ! replace(., '\\\\', '/') " +
+        "return deep-equal($entries, $files, (), map { 'ordered': false() })",
+        true);
+
+    // write non-existing entry
+    query(func.args(tmp, ZIP, "xyz"));
+    query(func.args(tmp, GZIP, "xyz"));
   }
 
   /** Test method. */
   @Test public void options() {
     final Function func = _ARCHIVE_OPTIONS;
     // read entries
+    query(func.args(ZIP) + "?format", "zip");
     query(func.args(_FILE_READ_BINARY.args(ZIP)) + "?format", "zip");
+    query(func.args(GZIP) + "?algorithm", "deflate");
     query(func.args(_FILE_READ_BINARY.args(GZIP)) + "?algorithm", "deflate");
   }
 
@@ -205,23 +266,25 @@ public final class ArchiveModuleTest extends SandboxTest {
   @Test public void update() {
     final Function func = _ARCHIVE_UPDATE;
     // add a new entry
-    query(_FILE_READ_BINARY.args(ZIP) + " ! " +
-        func.args(" .", "X", "X") + " ! " +
-        COUNT.args(_ARCHIVE_ENTRIES.args(" .")), 6);
+    query(func.args(ZIP, "X", "X") + " => " + _ARCHIVE_ENTRIES.args() + " => " + COUNT.args(), 6);
+    query(_FILE_READ_BINARY.args(ZIP) + " => " + func.args("X", "X") + " => " +
+        _ARCHIVE_ENTRIES.args() + " => " + COUNT.args(), 6);
     // add a new entry
-    query(_FILE_READ_BINARY.args(ZIP) + " ! " +
-        func.args(" .", " <archive:entry>X</archive:entry>", "X") + " ! " +
-        COUNT.args(_ARCHIVE_ENTRIES.args(" .")), 6);
-    query(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "X") + " ! " +
-        func.args(" .", " <archive:entry>Y</archive:entry>", "Y") + " ! " +
-        _ARCHIVE_EXTRACT_TEXT.args(" ."), "X\nY");
+    query(func.args(ZIP, " <archive:entry>X</archive:entry>", "X") + " => " +
+        _ARCHIVE_ENTRIES.args() + " => " + COUNT.args(), 6);
+    query(_FILE_READ_BINARY.args(ZIP) + " => " +
+        func.args(" <archive:entry>X</archive:entry>", "X") + " => " +
+        _ARCHIVE_ENTRIES.args() + " => " + COUNT.args(), 6);
+    query(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "X") + " => " +
+        func.args(" <archive:entry>Y</archive:entry>", "Y") + " => " +
+        _ARCHIVE_EXTRACT_TEXT.args(), "X\nY");
     // updates an existing entry
-    query(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "X") + " ! " +
-        func.args(" .", " <archive:entry>X</archive:entry>", "Y") + " ! " +
-        _ARCHIVE_EXTRACT_TEXT.args(" ."), "Y");
+    query(_ARCHIVE_CREATE.args(" <archive:entry>X</archive:entry>", "X") + " => " +
+        func.args(" <archive:entry>X</archive:entry>", "Y") + " => " +
+        _ARCHIVE_EXTRACT_TEXT.args(), "Y");
     // updates an existing entry
-    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " ! " +
-        func.args(" .", "X", "Y"), ARCHIVE_MODIFY_X);
+    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " => " +
+        func.args("X", "Y"), ARCHIVE_MODIFY_X);
   }
 
   /** Test method. */
