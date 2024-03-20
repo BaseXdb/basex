@@ -1,9 +1,9 @@
 package org.basex.query.func.archive;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.zip.*;
 
 import org.basex.io.in.*;
@@ -11,7 +11,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -36,13 +35,14 @@ public class ArchiveExtractBinary extends ArchiveFn {
    */
   final TokenList extract(final QueryContext qc) throws QueryException {
     final B64 archive = toB64(arg(0), qc);
-    final TokenSet entries = entries(arg(1), qc);
+    final HashSet<String> entries = entries(arg(1), qc);
 
     final TokenList tl = new TokenList();
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       while(in.more()) {
+        if(entries != null && entries.isEmpty()) break;
         final ZipEntry ze = in.entry();
-        if(!ze.isDirectory() && (entries == null || entries.remove(token(ze.getName())) != 0)) {
+        if(!ze.isDirectory() && (entries == null || entries.remove(ze.getName()))) {
           final ArrayOutput out = new ArrayOutput();
           in.write(out);
           tl.add(out.finish());

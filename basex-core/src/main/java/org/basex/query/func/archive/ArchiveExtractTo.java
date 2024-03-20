@@ -1,10 +1,10 @@
 package org.basex.query.func.archive;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.*;
 import java.util.zip.*;
 
 import org.basex.io.*;
@@ -14,7 +14,6 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -27,13 +26,14 @@ public class ArchiveExtractTo extends ArchiveFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(arg(0), qc);
     final B64 archive = toB64(arg(1), qc);
-    final TokenSet hs = entries(arg(2), qc);
+    final HashSet<String> entries = entries(arg(2), qc);
 
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       while(in.more()) {
+        if(entries != null && entries.isEmpty()) break;
         final ZipEntry ze = in.entry();
         final String name = ze.getName();
-        if(hs == null || hs.remove(token(name)) != 0) {
+        if(entries == null || entries.remove(name)) {
           final Path file = path.resolve(name);
           if(ze.isDirectory()) {
             Files.createDirectories(file);
