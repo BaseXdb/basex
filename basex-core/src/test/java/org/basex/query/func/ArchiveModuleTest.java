@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -260,6 +261,37 @@ public final class ArchiveModuleTest extends SandboxTest {
     query(func.args(_FILE_READ_BINARY.args(ZIP)) + "?format", "zip");
     query(func.args(GZIP) + "?algorithm", "deflate");
     query(func.args(_FILE_READ_BINARY.args(GZIP)) + "?algorithm", "deflate");
+  }
+
+  /** Test method. */
+  @Test public void refresh() {
+    final Function func = _ARCHIVE_REFRESH;
+
+    // refresh temporary file
+    final String tmp = Prop.TEMPDIR + NAME + "refresh";
+    query(_FILE_COPY.args(ZIP, tmp));
+
+    query(func.args(tmp, "binary", " xs:hexBinary('414243')"));
+    query(_ARCHIVE_EXTRACT_BINARY.args(tmp, "binary"), "ABC");
+
+    query(func.args(tmp, "new", "NEW"));
+    query(_ARCHIVE_ENTRIES.args(tmp) + "[. = 'new'] => count()", 1);
+    query(_ARCHIVE_EXTRACT_TEXT.args(tmp, "new"), "NEW");
+
+    query(func.args(tmp, "new", "NEWER"));
+    query(_ARCHIVE_EXTRACT_TEXT.args(tmp, "new"), "NEWER");
+
+    final String lastModified = "2001-01-01T01:01:01Z";
+    query(func.args(tmp, " <archive:entry last-modified='" + lastModified + "'>new</archive:entry>",
+        "NEWEST"));
+    query(_ARCHIVE_ENTRIES.args(tmp) + "[. = 'new'] ! data(@last-modified)", lastModified);
+
+    error(func.args(GZIP, "x", "x"), ARCHIVE_ZIP_X);
+    error(func.args("http://www.abalaba.com/zip.zip", "x", "x"), ARCHIVE_ZIP_X);
+    error(func.args(tmp, " <archive:entry encoding='XXX'>new</archive:entry>", "NEWEST"),
+        ARCHIVE_ENCODE1_X);
+    error(func.args(tmp, " <archive:entry encoding='US-ASCII'>new</archive:entry>", "\u00FC"),
+        ARCHIVE_ENCODE2_X);
   }
 
   /** Test method. */

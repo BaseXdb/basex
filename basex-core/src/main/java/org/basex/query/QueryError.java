@@ -101,6 +101,8 @@ public enum QueryError {
   ARCHIVE_NUMBER_X_X(ARCHIVE, "number", "Number of entries and contents differs: % vs. %."),
   /** Error code. */
   ARCHIVE_SINGLE_X(ARCHIVE, "single", "% archives are limited to a single entry."),
+  /** Error code. */
+  ARCHIVE_ZIP_X(ARCHIVE, "zip", "Local ZIP file expected: %."),
 
   // Binary Module
 

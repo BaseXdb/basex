@@ -944,6 +944,10 @@ public enum Function implements AFunction {
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",
       params(ANY_ATOMIC_TYPE_O), MAP_ZO, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
+  _ARCHIVE_REFRESH(ArchiveRefresh::new, "refresh(path,entries,contents)",
+      params(STRING_O, ITEM_ZM, ITEM_ZM),
+      EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+  /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate::new, "update(archive,entries,contents)",
       params(ANY_ATOMIC_TYPE_O, ITEM_ZM, ITEM_ZM),
       BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
