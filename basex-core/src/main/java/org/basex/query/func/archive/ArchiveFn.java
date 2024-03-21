@@ -102,7 +102,7 @@ abstract class ArchiveFn extends StandardFunc {
     if(!archive.type.isStringOrUntyped()) throw STRBIN_X_X.get(info, archive.seqType(), archive);
 
     // return file reference if input is a ZIP file
-    final IO io = IO.get(toString(archive, qc));
+    final IO io = toIO(archive, qc);
     if(direct && io instanceof IOFile) {
       if(io.hasSuffix(IO.ZIPSUFFIX)) return io;
       try(InputStream is = io.inputStream()) {
