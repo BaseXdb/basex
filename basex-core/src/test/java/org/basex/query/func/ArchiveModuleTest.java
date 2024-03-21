@@ -48,15 +48,15 @@ public final class ArchiveModuleTest extends SandboxTest {
     // different number of entries and contents
     error(func.args("X", " ()"), ARCHIVE_NUMBER_X_X);
     // name must not be empty
-    error(func.args(" <archive:entry/>", ""), ARCHIVE_DESCRIPTOR1);
+    error(func.args(" <archive:entry/>", ""), ARCHIVE_NAME);
     // invalid compression level
     error(func.args(" <archive:entry compression-level='x'>X</archive:entry>", ""),
-        ARCHIVE_DESCRIPTOR2_X);
+        ARCHIVE_LEVEL_X);
     error(func.args(" <archive:entry compression-level='10'>X</archive:entry>", ""),
-        ARCHIVE_DESCRIPTOR2_X);
+        ARCHIVE_LEVEL_X);
     // invalid modification date
     error(func.args(" <archive:entry last-modified='2020'>X</archive:entry>", ""),
-        ARCHIVE_DESCRIPTOR3_X);
+        ARCHIVE_TIMESTAMP_X);
     // content must be string or binary
     error(func.args(" <archive:entry>X</archive:entry>", " 123"), STRBIN_X_X);
     // wrong encoding

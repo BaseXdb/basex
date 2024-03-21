@@ -12,6 +12,7 @@ import javax.xml.transform.stream.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 
@@ -357,6 +358,18 @@ public abstract class IO {
       if(suf.equals(suffix)) return true;
     }
     return false;
+  }
+
+  /**
+   * Writes data from an input stream to an output stream.
+   * @param in input stream
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  public static final void write(final InputStream in, final OutputStream out) throws IOException {
+    try(BufferInput bi = BufferInput.get(in); BufferOutput bo = BufferOutput.get(out)) {
+      for(int c; (c = bi.read()) != -1;) bo.write(c);
+    }
   }
 
   /**

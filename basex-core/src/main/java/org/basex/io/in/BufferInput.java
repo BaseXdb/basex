@@ -65,7 +65,7 @@ public class BufferInput extends InputStream {
    * Constructor.
    * @param is input stream
    */
-  public BufferInput(final InputStream is) {
+  protected BufferInput(final InputStream is) {
     this(is, is instanceof BufferInput ? ((BufferInput) is).length : -1);
   }
 

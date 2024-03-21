@@ -75,7 +75,7 @@ final class ProjectCache implements Iterable<String> {
       try(DirectoryStream<Path> paths = Files.newDirectoryStream(root)) {
         for(final Path path : paths) {
           // skip hidden files, cancel parsing if directory contains .ignore file
-          final IOFile io = new IOFile(path.toFile());
+          final IOFile io = new IOFile(path);
           if(io.ignore()) return;
           if(showHidden || !io.isHidden()) {
             if(Files.isDirectory(path)) {

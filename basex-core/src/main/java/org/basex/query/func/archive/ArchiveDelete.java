@@ -28,7 +28,7 @@ public final class ArchiveDelete extends ArchiveFn {
     // entries to be deleted
     final TokenSet names = new TokenSet();
     for(Item item; (item = qc.next(entries)) != null;) {
-      names.add(checkElemToken(item, qc).string(info));
+      names.add(toString(item, qc));
     }
 
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {

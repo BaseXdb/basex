@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
@@ -23,18 +24,20 @@ public class ArchiveExtractBinary extends ArchiveFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final byte[] bytes : extract(qc)) vb.add(B64.get(bytes));
+    for(final byte[] content : extract(qc)) {
+      vb.add(B64.get(content));
+    }
     return vb.value(this);
   }
 
   /**
-   * Extracts entries from the archive.
+   * Extracts contents from an archive.
    * @param qc query context
-   * @return text entries
+   * @return contents
    * @throws QueryException query exception
    */
   final TokenList extract(final QueryContext qc) throws QueryException {
-    final HashSet<String> entries = entries(arg(1), qc);
+    final HashSet<String> entries = toEntries(arg(1), qc);
     final TokenList tl = new TokenList();
     try {
       final Object archive = toInput(arg(0), qc, entries != null);
@@ -54,9 +57,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
             final ZipEntry ze = zip.getEntry(entry);
             if(ze == null || ze.isDirectory()) continue;
             final ArrayOutput out = new ArrayOutput();
-            try(InputStream is = zip.getInputStream(ze); BufferInput in = new BufferInput(is)) {
-              for(int b; (b = in.read()) != -1;) out.write(b);
-            }
+            IO.write(zip.getInputStream(ze), out);
             tl.add(out.finish());
           }
         }

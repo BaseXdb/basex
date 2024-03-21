@@ -25,7 +25,7 @@ public class ArchiveExtractTo extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(arg(0), qc);
-    final HashSet<String> entries = entries(arg(2), qc);
+    final HashSet<String> entries = toEntries(arg(2), qc);
     try {
       final Object archive = toInput(arg(1), qc, entries != null);
       if(archive instanceof Bin) {
@@ -39,7 +39,7 @@ public class ArchiveExtractTo extends ArchiveFn {
               Files.createDirectories(file);
             } else {
               Files.createDirectories(file.getParent());
-              try(BufferOutput out = new BufferOutput(new IOFile(file.toFile()))) {
+              try(BufferOutput out = new BufferOutput(new IOFile(file))) {
                 in.write(out);
               }
             }
@@ -55,11 +55,7 @@ public class ArchiveExtractTo extends ArchiveFn {
               Files.createDirectories(file);
             } else {
               Files.createDirectories(file.getParent());
-              try(BufferOutput out = new BufferOutput(new IOFile(file.toFile()))) {
-                try(InputStream is = zip.getInputStream(ze); BufferInput in = new BufferInput(is)) {
-                  for(int b; (b = in.read()) != -1;) out.write(b);
-                }
-              }
+              IO.write(zip.getInputStream(ze), new IOFile(file).outputStream());
             }
           }
         }

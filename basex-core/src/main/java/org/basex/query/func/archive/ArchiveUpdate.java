@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 import java.util.zip.*;
 
 import org.basex.io.in.*;
@@ -23,7 +24,7 @@ public final class ArchiveUpdate extends ArchiveCreate {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // entries to be updated
     final Bin archive = toArchive(arg(0), qc);
-    final Map<String, Item[]> map = toMap(arg(1), arg(2), qc);
+    final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
 
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       final String format = in.format();
@@ -33,15 +34,15 @@ public final class ArchiveUpdate extends ArchiveCreate {
       try(ArchiveOut out = ArchiveOut.get(format, info, ao)) {
         // write existing or updated entries
         while(in.more()) {
-          final Item[] entry = map.remove(in.entry().getName());
-          if(entry != null) {
-            add(entry, out, ZipEntry.DEFLATED, "", qc);
+          final Entry<Item, Item> file = files.remove(in.entry().getName());
+          if(file != null) {
+            add(file, out, ZipEntry.DEFLATED, "", qc);
           } else {
             out.write(in);
           }
         }
         // add remaining entries
-        for(final Item[] entry : map.values()) {
+        for(final Entry<Item, Item> entry : files.values()) {
           add(entry, out, ZipEntry.DEFLATED, "", qc);
         }
       }

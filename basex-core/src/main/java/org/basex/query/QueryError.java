@@ -80,11 +80,11 @@ public enum QueryError {
   // Archive Module
 
   /** Error code. */
-  ARCHIVE_DESCRIPTOR1(ARCHIVE, "descriptor", "Name of ZIP entry must not be empty."),
+  ARCHIVE_NAME(ARCHIVE, "descriptor", "Name of ZIP entry must not be empty."),
   /** Error code. */
-  ARCHIVE_DESCRIPTOR2_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
+  ARCHIVE_LEVEL_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
   /** Error code. */
-  ARCHIVE_DESCRIPTOR3_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),
+  ARCHIVE_TIMESTAMP_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),
   /** Error code. */
   ARCHIVE_ENCODE1_X(ARCHIVE, "encode", "Unknown encoding '%'."),
   /** Error code. */
