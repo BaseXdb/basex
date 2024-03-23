@@ -15,6 +15,7 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -119,8 +120,8 @@ public class ArchiveCreate extends ArchiveFn {
     final Item content = file.getValue();
     if(content instanceof Bin) {
       out.write(ze, (Bin) content, info);
-    } else {
-      out.write(ze, encode(toBytes(content), encoding(header), false, qc));
+    } else if(content != XQArray.empty()) {
+      out.write(ze, encode(toBytes(content, qc), encoding(header), false, qc));
     }
   }
 

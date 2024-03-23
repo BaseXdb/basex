@@ -110,6 +110,8 @@ public final class Token {
   private static final byte[] IRI_CHARACTERS = token("!#$%&*'()+,-./:;=?@[]~_");
   /** Reserved characters. */
   private static final byte[] URI_CHARACTERS = token("-._~");
+  /** URI path characters. */
+  private static final byte[] URI_PATH = token("\r\n\t %/?#+[]");
 
   /** Character lengths. */
   private static final int[] CHLEN = { 1, 1, 1, 1, 2, 2, 3, 4 };
@@ -1411,13 +1413,18 @@ public final class Token {
    * Returns a URI-encoded token.
    * @param token token
    * @param iri input
+   * @param path uri path
    * @return encoded token
    */
-  public static byte[] encodeUri(final byte[] token, final boolean iri) {
+  public static byte[] encodeUri(final byte[] token, final boolean iri, final boolean path) {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte b : token) {
-      if(letterOrDigit(b) || contains(iri ? IRI_CHARACTERS : URI_CHARACTERS, b)) tb.addByte(b);
-      else hex(tb, b);
+      if(path ? !contains(URI_PATH, b) :
+        letterOrDigit(b) || contains(iri ? IRI_CHARACTERS : URI_CHARACTERS, b)) {
+        tb.addByte(b);
+      } else {
+        hex(tb, b);
+      }
     }
     return tb.finish();
   }
@@ -1441,7 +1448,7 @@ public final class Token {
    * @param tb token builder
    * @param value byte to be added
    */
-  private static void hex(final TokenBuilder tb, final byte value) {
+  public static void hex(final TokenBuilder tb, final byte value) {
     tb.add('%');
     tb.addByte(HEX_TABLE[(value & 0xFF) >> 4]);
     tb.addByte(HEX_TABLE[value & 0xFF & 15]);
