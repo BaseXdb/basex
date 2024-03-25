@@ -304,11 +304,6 @@ public enum QueryError {
   /** Error code. */
   GEO_ARG(GEO, 6, "Illegal argument: %."),
 
-  // Hashing Module
-
-  /** Error code. */
-  HASH_ALGORITHM_X(HASH, "algorithm", "Algorithm not supported: '%'."),
-
   // HTML Module
 
   /** Error code. */
@@ -671,6 +666,9 @@ public enum QueryError {
   INVFDPATTERN_X(FOFD, 1340, "%"),
   /** Error code. */
   PICINVCOMP_X_X_X(FOFD, 1350, "[%] not applicable to %: %."),
+
+  /** Error code. */
+  HASH_ALGORITHM_X(FOHA, 1, "Algorithm not supported: '%'."),
 
   /** Error code. */
   PARSE_JSON_X(FOJS, 1, "%"),
@@ -1511,7 +1509,6 @@ public enum QueryError {
     /** Error type. */ FT(FT_PREFIX,             FT_URI),
     /** Error type. */ GEO(GEO_PREFIX,           GEO_URI),
     /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
-    /** Error type. */ HASH(HASH_PREFIX,         HASH_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
     /** Error type. */ JOB(JOB_PREFIX,           JOB_URI),
     /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
@@ -1552,9 +1549,11 @@ public enum QueryError {
     /** Error type. */ FODT,
     /** Error type. */ FOFD,
     /** Error type. */ FOER,
+    /** Error type. */ FOHA,
     /** Error type. */ FOIX,
     /** Error type. */ FOJS,
     /** Error type. */ FONS,
+    /** Error type. */ FOOP,
     /** Error type. */ FORG,
     /** Error type. */ FORX,
     /** Error type. */ FOTY,

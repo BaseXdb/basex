@@ -21,7 +21,6 @@ import org.basex.query.func.fetch.*;
 import org.basex.query.func.file.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.ft.*;
-import org.basex.query.func.hash.*;
 import org.basex.query.func.hof.*;
 import org.basex.query.func.html.*;
 import org.basex.query.func.http.*;
@@ -303,6 +302,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   HAS_CHILDREN(FnHasChildren::new, "has-children([node])",
       params(NODE_ZM), BOOLEAN_O),
+  /** XQuery function. */
+  HASH(FnHash::new, "hash(value[,options])",
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), HEX_BINARY_O),
   /** XQuery function. */
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),
@@ -1435,21 +1437,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _FT_TOKENS(FtTokens::new, "tokens(database[,prefix])",
       params(STRING_O, STRING_O), ELEMENT_ZM, flag(NDT), FT_URI),
-
-  // Hash Module
-
-  /** XQuery function. */
-  _HASH_HASH(HashHash::new, "hash(value,algorithm)",
-      params(ANY_ATOMIC_TYPE_O, STRING_O), BASE64_BINARY_O, HASH_URI),
-  /** XQuery function. */
-  _HASH_MD5(HashMd5::new, "md5(value)",
-      params(ANY_ATOMIC_TYPE_O), BASE64_BINARY_O, HASH_URI),
-  /** XQuery function. */
-  _HASH_SHA1(HashSha1::new, "sha1(value)",
-      params(ANY_ATOMIC_TYPE_O), BASE64_BINARY_O, HASH_URI),
-  /** XQuery function. */
-  _HASH_SHA256(HashSha256::new, "sha256(value)",
-      params(ANY_ATOMIC_TYPE_O), BASE64_BINARY_O, HASH_URI),
 
   // HOF Module
 
