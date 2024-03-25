@@ -84,7 +84,7 @@ public final class Functions {
       throws QueryException {
 
     // partial function call?
-    if(fb.partial()) return dynamic(item(name, fb.arity(), false, fb.info, qc), fb);
+    if(fb.placeholders > 0) return dynamic(item(name, fb.arity, false, fb.info, qc), fb);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) return constructorCall(name, fb);
@@ -111,8 +111,9 @@ public final class Functions {
    */
   public static Expr dynamic(final Expr expr, final FuncBuilder fb) {
     final Expr[] args = fb.args();
-    return fb.partial() ? args.length == 0 ? expr :
-      new PartFunc(fb.info, ExprList.concat(args, expr), fb.holes()) :
+    final int ph = fb.placeholders;
+    return ph > 0 ? ph == args.length ? expr :
+      new PartFunc(fb.info, ExprList.concat(args, expr), ph) :
       new DynFuncCall(fb.info, expr, args);
   }
 
@@ -129,7 +130,7 @@ public final class Functions {
   public static Expr item(final QNm name, final int arity, final boolean runtime,
       final InputInfo info, final QueryContext qc) throws QueryException {
 
-    final FuncBuilder fb = new FuncBuilder(info).initLiteral(arity, runtime);
+    final FuncBuilder fb = new FuncBuilder(info, arity, runtime);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) {
@@ -142,7 +143,7 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, true, info);
+      checkArity(arity, fd.minMax[0], fd.minMax[1], true, info, fd);
 
       final FuncType ft = fd.type(arity, fb.anns);
       final QNm[] names = fd.paramNames(arity);
@@ -195,7 +196,7 @@ public final class Functions {
   public static FuncItem item(final StaticFunc sf, final InputInfo info, final QueryContext qc)
       throws QueryException {
     // safe cast (no context dependency, runtime evaluation)
-    final FuncBuilder fb = new FuncBuilder(info).initLiteral(sf.arity(), true);
+    final FuncBuilder fb = new FuncBuilder(info, sf.arity(), true);
     return (FuncItem) item(sf, fb, qc);
   }
 
@@ -203,13 +204,13 @@ public final class Functions {
    * Raises an error for the wrong number of function arguments.
    * @param nargs number of supplied arguments
    * @param arities available arities (if first arity is negative, function is variadic)
-   * @param function function
    * @param literal literal flag
    * @param info input info (can be {@code null})
+   * @param function function (for error messages)
    * @return error
    */
   public static QueryException wrongArity(final int nargs, final IntList arities,
-      final Object function, final boolean literal, final InputInfo info) {
+      final boolean literal, final InputInfo info, final Object function) {
 
     final String supplied = literal ? "Arity " + nargs : arguments(nargs), expected;
     if(!arities.isEmpty() && arities.peek() < 0) {
@@ -276,7 +277,7 @@ public final class Functions {
    * Incorporates keywords in the argument list.
    * @param fb function arguments
    * @param names parameter names
-   * @param function function
+   * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
@@ -358,13 +359,13 @@ public final class Functions {
    * @param nargs number of supplied arguments
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
-   * @param function function
    * @param literal literal
    * @param info input info (can be {@code null})
+   * @param function function (for error messages)
    * @throws QueryException query exception
    */
   private static void checkArity(final int nargs, final int min, final int max,
-      final Object function, final boolean literal, final InputInfo info) throws QueryException {
+      final boolean literal, final InputInfo info, final Object function) throws QueryException {
 
     if(nargs < min || nargs > max) {
       final IntList arities = new IntList();
@@ -373,7 +374,7 @@ public final class Functions {
       } else {
         arities.add(-min);
       }
-      throw wrongArity(nargs, arities, function, literal, info);
+      throw wrongArity(nargs, arities, literal, info, function);
     }
   }
 
@@ -416,22 +417,22 @@ public final class Functions {
    * @param names parameter names
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
-   * @param function function
+   * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
   private static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final int min,
       final int max, final Object function) throws QueryException {
 
-    final Expr[] tmp = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
-    final int arity = tmp.length;
+    final Expr[] args = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
+    final int arity = args.length;
     for(int a = arity - 1; a >= 0; a--) {
-      if(tmp[a] == null) {
+      if(args[a] == null) {
         if(a < min) throw ARGMISSING_X_X.get(fb.info, function, names[a].prefixString());
-        tmp[a] = Empty.UNDEFINED;
+        args[a] = Empty.UNDEFINED;
       }
     }
-    checkArity(arity, min, max, function, false, fb.info);
-    return tmp;
+    checkArity(arity, min, max, false, fb.info, function);
+    return args;
   }
 }

@@ -78,7 +78,7 @@ final class DynJavaFunc extends DynJavaCall {
     final TokenList names = new TokenList();
     for(final String mthd : allMethods.keySet()) names.add(mthd);
     for(final Field fld : clazz.getFields()) names.add(fld.getName());
-    throw noMember(name, types, arity, name(), arities, names.finish(), info);
+    throw noMember(name, types, arity, arities, names.finish(), info, name());
   }
 
   @Override
