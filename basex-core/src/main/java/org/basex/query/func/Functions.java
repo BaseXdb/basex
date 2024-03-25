@@ -84,7 +84,7 @@ public final class Functions {
       throws QueryException {
 
     // partial function call?
-    if(fb.partial()) return dynamic(item(name, fb.arity(), false, fb.info, qc), fb);
+    if(fb.placeholders > 0) return dynamic(item(name, fb.arity, false, fb.info, qc), fb);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) return constructorCall(name, fb);
@@ -111,8 +111,9 @@ public final class Functions {
    */
   public static Expr dynamic(final Expr expr, final FuncBuilder fb) {
     final Expr[] args = fb.args();
-    return fb.partial() ? args.length == 0 ? expr :
-      new PartFunc(fb.info, ExprList.concat(args, expr), fb.holes()) :
+    final int ph = fb.placeholders;
+    return ph > 0 ? ph == args.length ? expr :
+      new PartFunc(fb.info, ExprList.concat(args, expr), ph) :
       new DynFuncCall(fb.info, expr, args);
   }
 
@@ -129,7 +130,7 @@ public final class Functions {
   public static Expr item(final QNm name, final int arity, final boolean runtime,
       final InputInfo info, final QueryContext qc) throws QueryException {
 
-    final FuncBuilder fb = new FuncBuilder(info).initLiteral(arity, runtime);
+    final FuncBuilder fb = new FuncBuilder(info, arity, runtime);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) {
@@ -195,7 +196,7 @@ public final class Functions {
   public static FuncItem item(final StaticFunc sf, final InputInfo info, final QueryContext qc)
       throws QueryException {
     // safe cast (no context dependency, runtime evaluation)
-    final FuncBuilder fb = new FuncBuilder(info).initLiteral(sf.arity(), true);
+    final FuncBuilder fb = new FuncBuilder(info, sf.arity(), true);
     return (FuncItem) item(sf, fb, qc);
   }
 
@@ -423,15 +424,15 @@ public final class Functions {
   private static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final int min,
       final int max, final Object function) throws QueryException {
 
-    final Expr[] tmp = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
-    final int arity = tmp.length;
+    final Expr[] args = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
+    final int arity = args.length;
     for(int a = arity - 1; a >= 0; a--) {
-      if(tmp[a] == null) {
+      if(args[a] == null) {
         if(a < min) throw ARGMISSING_X_X.get(fb.info, function, names[a].prefixString());
-        tmp[a] = Empty.UNDEFINED;
+        args[a] = Empty.UNDEFINED;
       }
     }
     checkArity(arity, min, max, function, false, fb.info);
-    return tmp;
+    return args;
   }
 }

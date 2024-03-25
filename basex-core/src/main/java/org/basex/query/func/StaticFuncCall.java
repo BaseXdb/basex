@@ -101,7 +101,7 @@ public final class StaticFuncCall extends FuncCall {
     if(keywords != null) {
       final QNm[] names = new QNm[arity];
       for(int n = 0; n < arity; n++) names[n] = sf.paramName(n);
-      exprs = Functions.prepareArgs(new FuncBuilder(info).init(exprs, keywords), names, this);
+      exprs = Functions.prepareArgs(new FuncBuilder(info, exprs, keywords), names, this);
       keywords = null;
     }
     // adopt default expressions

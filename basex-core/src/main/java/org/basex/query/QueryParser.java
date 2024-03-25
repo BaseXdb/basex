@@ -1781,7 +1781,7 @@ public class QueryParser extends InputParser {
         } else {
           arg = expr;
         }
-        final FuncBuilder fb = argumentList(name != null, new Expr[] { arg });
+        final FuncBuilder fb = argumentList(name != null, arg);
         expr = name != null ? Functions.get(name, fb, qc) : Functions.dynamic(ex, fb);
         if(mapping) {
           expr = new GFLWOR(ii, fr, expr);
@@ -2591,38 +2591,33 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "ArgumentList" rule.
    * @param keywords allow keyword arguments
-   * @param args arguments (can be {@code null})
+   * @param expr first argument (can be {@code null})
    * @return function arguments
    * @throws QueryException query exception
    */
-  private FuncBuilder argumentList(final boolean keywords, final Expr[] args)
+  private FuncBuilder argumentList(final boolean keywords, final Expr expr)
       throws QueryException {
-    final FuncBuilder fb  = new FuncBuilder(info()).init(args, null);
+    final FuncBuilder fb  = new FuncBuilder(info());
+    if(expr != null) fb.add(expr, null);
     wsCheck("(");
     if(!wsConsumeWs(")")) {
       boolean kw = false;
       do {
         final int p = pos;
+        QNm name = null;
         if(keywords) {
-          final QNm name = eQName(null, null);
-          if(name != null && wsConsume(":=")) {
-            final Expr expr = single();
-            if(expr == null) throw error(FUNCARG_X, found());
-            if(fb.add(name, expr)) throw error(KEYWORDTWICE_X, name);
+          final QNm qnm = eQName(null, null);
+          if(wsConsume(":=")) {
+            name = qnm;
             kw = true;
           } else {
             pos = p;
           }
         }
-        if(p == pos && !kw) {
+        if(!kw || name != null) {
           final Expr arg = single();
-          if(arg != null) {
-            fb.add(arg);
-          } else if(wsConsume("?")) {
-            fb.add(null);
-          } else {
-            throw error(FUNCARG_X, found());
-          }
+          if(arg == null && !wsConsume("?")) throw error(FUNCARG_X, found());
+          if(fb.add(arg != null ? arg : Empty.UNDEFINED, name)) throw error(KEYWORDTWICE_X, name);
         }
       } while(wsConsumeWs(","));
       if(!consume(")")) throw error(FUNCARG_X, found());

@@ -10,6 +10,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -22,18 +23,18 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class PartFunc extends Arr {
-  /** Positions of the placeholders. */
-  private final int[] holes;
+  /** Number of placeholders. */
+  private final int placeholders;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param exprs expressions (arguments, body)
-   * @param holes positions of the placeholders
+   * @param exprs expressions (arguments with optional placeholders, followed by body)
+   * @param placeholders number of placeholders
    */
-  public PartFunc(final InputInfo info, final Expr[] exprs, final int[] holes) {
+  public PartFunc(final InputInfo info, final Expr[] exprs, final int placeholders) {
     super(info, SeqType.FUNCTION_O, exprs);
-    this.holes = holes;
+    this.placeholders = placeholders;
   }
 
   /**
@@ -51,12 +52,13 @@ public final class PartFunc extends Arr {
     final Expr func = body();
     final FuncType ft = func.funcType();
     if(ft != null && ft != SeqType.FUNCTION) {
-      final int nargs = exprs.length + holes.length - 1, arity = ft.argTypes.length;
+      final int nargs = exprs.length - 1, arity = ft.argTypes.length;
       if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
-      final SeqType[] args = new SeqType[holes.length];
-      final int hl = holes.length;
-      for(int h = 0; h < hl; h++) args[h] = ft.argTypes[holes[h]];
+      final SeqType[] args = new SeqType[placeholders];
+      for(int a = 0, e = 0; e < nargs; e++) {
+        if(placeholder(exprs[e])) args[a++] = ft.argTypes[e];
+      }
       exprType.assign(FuncType.get(ft.declType, args).seqType());
     }
     return this;
@@ -66,24 +68,27 @@ public final class PartFunc extends Arr {
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FItem func = toFunction(body(), qc);
 
-    final int hl = holes.length, nargs = exprs.length + hl - 1, arity = func.arity();
+    final int el = exprs.length - 1;
+    final int nargs = el, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
     final FuncType ft = func.funcType();
     final Expr[] args = new Expr[nargs];
     final VarScope vs = new VarScope();
-    final Var[] params = new Var[hl];
-    int a = -1;
-    for(int h = 0; h < hl; h++) {
-      while(++a < holes[h]) args[a] = exprs[a - h].value(qc);
-      params[h] = vs.addNew(func.paramName(holes[h]), null, false, qc, info);
-      args[a] = new VarRef(info, params[h]);
-      final SeqType at = ft.argTypes[a];
-      if(at != null) params[h].refineType(at, null);
-    }
-    final int al = args.length;
-    while(++a < al) args[a] = exprs[a - hl].value(qc);
 
+    final Var[] params = new Var[placeholders];
+    for(int p = 0, e = 0; e < el; e++) {
+      final Expr expr = exprs[e];
+      if(placeholder(expr)) {
+        final Var param = vs.addNew(func.paramName(e), null, false, qc, info);
+        args[e] = new VarRef(info, param);
+        final SeqType at = ft.argTypes[e];
+        if(at != null) param.refineType(at, null);
+        params[p++] = param;
+      } else {
+        args[e] = expr.value(qc);
+      }
+    }
     final AnnList anns = func.annotations();
     final boolean updating = anns.contains(Annotation.UPDATING);
     final DynFuncCall expr = new DynFuncCall(info, updating, false, func, args);
@@ -99,29 +104,36 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), holes.clone()));
+    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), placeholders));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof PartFunc && Arrays.equals(holes, ((PartFunc) obj).holes) &&
-        super.equals(obj);
+    return this == obj || obj instanceof PartFunc && super.equals(obj);
+  }
+
+  /**
+   * Checks if an expression is a placeholder.
+   * @param expr expression to be checked
+   * @return result of check
+   */
+  private static boolean placeholder(final Expr expr) {
+    return expr == Empty.UNDEFINED;
   }
 
   @Override
   public void toString(final QueryString qs) {
     qs.token(body()).token('(');
-    int p = -1;
-    final int el = exprs.length, hs = holes.length;
-    for(int i = 0; i < hs; i++) {
-      while(++p < holes[i]) {
-        if(p > 0) qs.token(SEP);
-        qs.token(exprs[p - i]);
+    final int el = exprs.length - 1;
+    for(int e = 0; e < el; e++) {
+      if(e > 0) qs.token(SEP);
+      final Expr expr = exprs[e];
+      if(placeholder(expr)) {
+        qs.token('?');
+      } else {
+        qs.token(exprs[e]);
       }
-      if(p > 0) qs.token(SEP);
-      qs.token('?');
     }
-    while(++p < el + hs - 1) qs.token(SEP).token(exprs[p - hs]);
     qs.token(')');
   }
 }
