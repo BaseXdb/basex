@@ -84,7 +84,7 @@ final class ZIPOut extends ArchiveOut {
       }
     }
     zos.putNextEntry(entry);
-    write(bin, zos, info);
+    writeBin(bin, zos, info);
     zos.closeEntry();
   }
 

@@ -80,11 +80,11 @@ public enum QueryError {
   // Archive Module
 
   /** Error code. */
-  ARCHIVE_DESCRIPTOR1(ARCHIVE, "descriptor", "Name of ZIP entry must not be empty."),
+  ARCHIVE_NAME(ARCHIVE, "descriptor", "Name of ZIP entry must not be empty."),
   /** Error code. */
-  ARCHIVE_DESCRIPTOR2_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
+  ARCHIVE_LEVEL_X(ARCHIVE, "descriptor", "Invalid compression level: '%'."),
   /** Error code. */
-  ARCHIVE_DESCRIPTOR3_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),
+  ARCHIVE_TIMESTAMP_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),
   /** Error code. */
   ARCHIVE_ENCODE1_X(ARCHIVE, "encode", "Unknown encoding '%'."),
   /** Error code. */
@@ -101,6 +101,8 @@ public enum QueryError {
   ARCHIVE_NUMBER_X_X(ARCHIVE, "number", "Number of entries and contents differs: % vs. %."),
   /** Error code. */
   ARCHIVE_SINGLE_X(ARCHIVE, "single", "% archives are limited to a single entry."),
+  /** Error code. */
+  ARCHIVE_ZIP_X(ARCHIVE, "zip", "Local ZIP file expected: %."),
 
   // Binary Module
 
@@ -301,11 +303,6 @@ public enum QueryError {
   GEO_WRITE(GEO, 5, "%."),
   /** Error code. */
   GEO_ARG(GEO, 6, "Illegal argument: %."),
-
-  // Hashing Module
-
-  /** Error code. */
-  HASH_ALGORITHM_X(HASH, "algorithm", "Algorithm not supported: '%'."),
 
   // HTML Module
 
@@ -671,6 +668,9 @@ public enum QueryError {
   PICINVCOMP_X_X_X(FOFD, 1350, "[%] not applicable to %: %."),
 
   /** Error code. */
+  HASH_ALGORITHM_X(FOHA, 1, "Algorithm not supported: '%'."),
+
+  /** Error code. */
   PARSE_JSON_X(FOJS, 1, "%"),
   /** Error code. */
   DUPLICATE_JSON_X(FOJS, 3, "%"),
@@ -867,7 +867,7 @@ public enum QueryError {
   /** Error code. */
   QUERYEMPTY(XPST, 3, "Empty query."),
   /** Error code. */
-  MODLEINV_X(XPST, 3, "Module contains illegal character: #%."),
+  MODLEINV_X(XPST, 3, "Module contains illegal character: %."),
   /** Error code. */
   NOQUOTE_X(XPST, 3, "Expecting quote%."),
   /** Error code. */
@@ -889,13 +889,21 @@ public enum QueryError {
   /** Error code. */
   NOELEMNAME(XPST, 3, "Expecting element name."),
   /** Error code. */
-  ELEMNAME_X(XPST, 3, "Expecting element name, '<%' found."),
+  ELEMNAME_X(XPST, 3, "Element name expected, '%' found."),
   /** Error code. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** Error code. */
   NOEXPR(XPST, 3, "Expecting expression."),
   /** Error code. */
-  NOCONTENT(XPST, 3, "Expecting node content."),
+  NOCOMMENT(XPST, 3, "Expecting comment."),
+  /** Error code. */
+  INVALPI(XPST, 3, "Expecting name of processing instruction."),
+  /** Error code. */
+  PIXML_X(XPST, 3, "Name of processing instruction is illegal: '%'."),
+  /** Error code. */
+  NOPI(XPST, 3, "Expecting processing instruction."),
+  /** Error code. */
+  NOCDATA(XPST, 3, "Expecting CDATA section."),
   /** Error code. */
   WRONGCHAR_X_X(XPST, 3, "Expecting '%'%."),
   /** Error code. */
@@ -922,8 +930,6 @@ public enum QueryError {
   NOVARNAME(XPST, 3, "Variable name expected, '%' found."),
   /** Error code. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
-  /** Error code. */
-  PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** Error code. */
   NOFTSELECT_X(XPST, 3, "Expecting quote or opening curly brace%."),
   /** Error code. */
@@ -981,9 +987,7 @@ public enum QueryError {
   /** Error code. */
   INVNAME_X(XPST, 3, "Invalid QName: '%'."),
   /** Error code. */
-  PIXML_X(XPST, 3, "Processing instruction has illegal name: %."),
-  /** Error code. */
-  QNAME_X(XPST, 3, "Expecting QName, '%' found."),
+  QNAME_X(XPST, 3, "QName expected, '%' found."),
   /** Error code. */
   PROLOGORDER(XPST, 3, "Default declarations must be declared first."),
   /** Error code. */
@@ -992,8 +996,6 @@ public enum QueryError {
   FTSTOP(XPST, 3, "Stop words expected."),
   /** Error code. */
   FTMATCH_X(XPST, 3, "Unknown match option '%...'."),
-  /** Error code. */
-  INVALPI(XPST, 3, "Processing instruction has invalid name: '%' found."),
   /** Error code. */
   INTEXP(XPST, 3, "Integer expected."),
   /** Error code. */
@@ -1507,7 +1509,6 @@ public enum QueryError {
     /** Error type. */ FT(FT_PREFIX,             FT_URI),
     /** Error type. */ GEO(GEO_PREFIX,           GEO_URI),
     /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
-    /** Error type. */ HASH(HASH_PREFIX,         HASH_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
     /** Error type. */ JOB(JOB_PREFIX,           JOB_URI),
     /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
@@ -1548,9 +1549,11 @@ public enum QueryError {
     /** Error type. */ FODT,
     /** Error type. */ FOFD,
     /** Error type. */ FOER,
+    /** Error type. */ FOHA,
     /** Error type. */ FOIX,
     /** Error type. */ FOJS,
     /** Error type. */ FONS,
+    /** Error type. */ FOOP,
     /** Error type. */ FORG,
     /** Error type. */ FORX,
     /** Error type. */ FOTY,

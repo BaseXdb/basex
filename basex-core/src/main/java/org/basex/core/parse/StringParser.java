@@ -219,21 +219,21 @@ final class StringParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     consumeWS();
     boolean more = true, quoted = false;
     while(more && parser.more()) {
-      final char ch = parser.curr();
+      final int cp = parser.current();
       if(quoted) {
-        if(ch == '"') more = false;
-      } else if(ch <= ' ' || eoc()) {
+        if(cp == '"') more = false;
+      } else if(cp <= ' ' || eoc()) {
         break;
-      } else if(ch == '"' && sb.length() == 0) {
+      } else if(cp == '"' && tb.isEmpty()) {
         quoted = true;
       }
-      sb.append(parser.consume());
+      tb.add(parser.consume());
     }
-    return finish(sb.toString().replaceAll("^\"|\"$", ""), cmd);
+    return finish(tb.toString().replaceAll("^\"|\"$", ""), cmd);
   }
 
   /**
@@ -245,9 +245,9 @@ final class StringParser extends CommandParser {
    */
   private String remaining(final Cmd cmd, final boolean quotes) throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    while(parser.more()) sb.append(parser.consume());
-    final String str = sb.toString();
+    final TokenBuilder tb = new TokenBuilder();
+    while(parser.more()) tb.add(parser.consume());
+    final String str = tb.toString();
     return finish(quotes ? str.replaceAll("^\"|\"$", "") : str, cmd);
   }
 
@@ -258,9 +258,9 @@ final class StringParser extends CommandParser {
    */
   private String command() throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    while(!eoc() && !ws(parser.curr())) sb.append(parser.consume());
-    return finish(sb, null);
+    final TokenBuilder tb = new TokenBuilder();
+    while(!eoc() && !ws(parser.current())) tb.add(parser.consume());
+    return finish(tb.toString(), null);
   }
 
   /**
@@ -305,16 +305,16 @@ final class StringParser extends CommandParser {
    */
   private String name(final Cmd cmd, final boolean glob) throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    char last = 0;
+    final TokenBuilder tb = new TokenBuilder();
+    int last = 0;
     while(true) {
-      final char ch = parser.curr();
-      if(!Databases.validChar(ch, sb.length() == 0) &&
-          (!glob || ch != '*' && ch != '?' && ch != ',')) {
-        return finish((eoc() || ws(ch)) && last != '.' ? sb : null, cmd);
+      final int cp = parser.current();
+      if(!Databases.validChar(cp, tb.isEmpty()) &&
+          (!glob || cp != '*' && cp != '?' && cp != ',')) {
+        return finish((eoc() || ws(cp)) && last != '.' ? tb.toString() : null, cmd);
       }
-      sb.append(parser.consume());
-      last = ch;
+      tb.add(parser.consume());
+      last = cp;
     }
   }
 
@@ -329,7 +329,7 @@ final class StringParser extends CommandParser {
     consumeWS();
     final int p = parser.pos;
     final boolean ok = (parser.consume(key) || parser.consume(
-        key.toLowerCase(Locale.ENGLISH))) && (parser.curr(0) || ws(parser.curr()));
+        key.toLowerCase(Locale.ENGLISH))) && (parser.current(0) || ws(parser.current()));
     if(!ok) {
       parser.pos = p;
       if(cmd != null) throw help(null, cmd);
@@ -357,19 +357,18 @@ final class StringParser extends CommandParser {
    */
   private String number() throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    if(parser.curr() == '-') sb.append(parser.consume());
-    while(digit(parser.curr())) sb.append(parser.consume());
-    return finish(eoc() || ws(parser.curr()) ? sb : null, null);
+    final TokenBuilder tb = new TokenBuilder();
+    if(parser.current() == '-') tb.add(parser.consume());
+    while(digit(parser.current())) tb.add(parser.consume());
+    return finish(eoc() || ws(parser.current()) ? tb.toString() : null, null);
   }
 
   /**
-   * Consumes all whitespace characters from the beginning of the remaining
-   * query.
+   * Consumes all whitespace characters from the beginning of the remaining query.
    */
   private void consumeWS() {
     final int pl = parser.length;
-    while(parser.pos < pl && parser.input.charAt(parser.pos) <= ' ') ++parser.pos;
+    while(parser.pos < pl && parser.input[parser.pos] <= ' ') ++parser.pos;
     parser.mark = parser.pos - 1;
   }
 
@@ -448,7 +447,7 @@ final class StringParser extends CommandParser {
    * @return true if command has ended
    */
   private boolean eoc() {
-    return !parser.more() || parser.curr() == ';';
+    return !parser.more() || parser.current() == ';';
   }
 
   /**

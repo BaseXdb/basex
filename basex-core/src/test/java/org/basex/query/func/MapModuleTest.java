@@ -70,7 +70,7 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void entries() {
     final Function func = _MAP_ENTRIES;
-    query(func.args(" map {}"), "");
+    query(func.args(" map { }"), "");
     query(func.args(" map { 1: 2 }") + " !" + _MAP_KEYS.args(" ."), 1);
     query(func.args(" map { 1: 2 }") + " !" + _MAP_VALUES.args(" ."), 2);
     query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_KEYS.args(" ."), 1);
@@ -308,7 +308,7 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void pairs() {
     final Function func = _MAP_PAIRS;
-    query(func.args(" map {}"), "");
+    query(func.args(" map { }"), "");
     query(func.args(" map { 1: 2 }") + "?key", 1);
     query(func.args(" map { 1: 2 }") + "?value", 2);
     query(func.args(" map { 1: (2, 3) }") + "?key", 1);
@@ -350,7 +350,7 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void values() {
     final Function func = _MAP_VALUES;
 
-    query(func.args(" map {}"), "");
+    query(func.args(" map { }"), "");
     query(func.args(" map { 1: 2 }"), 2);
     query(func.args(" map { 1: (2, 3) }"), "2\n3");
     query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");

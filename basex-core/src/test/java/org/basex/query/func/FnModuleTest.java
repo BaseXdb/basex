@@ -1907,7 +1907,7 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void serialize() {
     final Function func = SERIALIZE;
     contains(func.args(" <x/>"), "<x/>");
-    contains(func.args(" <x/>", " map {}"), "<x/>");
+    contains(func.args(" <x/>", " map { }"), "<x/>");
     contains(func.args(" <x>a</x>", " map { 'method': 'text' }"), "a");
 
     // character maps

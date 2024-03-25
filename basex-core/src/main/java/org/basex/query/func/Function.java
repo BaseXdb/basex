@@ -21,7 +21,6 @@ import org.basex.query.func.fetch.*;
 import org.basex.query.func.file.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.ft.*;
-import org.basex.query.func.hash.*;
 import org.basex.query.func.hof.*;
 import org.basex.query.func.html.*;
 import org.basex.query.func.http.*;
@@ -303,6 +302,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   HAS_CHILDREN(FnHasChildren::new, "has-children([node])",
       params(NODE_ZM), BOOLEAN_O),
+  /** XQuery function. */
+  HASH(FnHash::new, "hash(value[,options])",
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), HEX_BINARY_O),
   /** XQuery function. */
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),
@@ -792,7 +794,7 @@ public enum Function implements AFunction {
       params(ARRAY_O, PREDICATE_ZM), INTEGER_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore::new, "insert-before(array,position,member)",
-      params(ARRAY_O, INTEGER_O, ITEM_ZO), ARRAY_O, ARRAY_URI),
+      params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_JOIN(ArrayJoin::new, "join(arrays)",
       params(ARRAY_ZM), ARRAY_O, ARRAY_URI),
@@ -926,26 +928,30 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_DELETE(ArchiveDelete::new, "delete(archive,entries)",
-      params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_ENTRIES(ArchiveEntries::new, "entries(archive)",
-      params(BASE64_BINARY_O), ELEMENT_ZM, flag(NDT), ARCHIVE_URI),
+      params(ANY_ATOMIC_TYPE_O), ELEMENT_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_BINARY(ArchiveExtractBinary::new, "extract-binary(archive[,entries])",
-      params(BASE64_BINARY_O, ITEM_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI),
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), BASE64_BINARY_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TEXT(ArchiveExtractText::new, "extract-text(archive[,entries,encoding])",
-      params(BASE64_BINARY_O, ITEM_ZM, STRING_ZO), STRING_ZM, flag(NDT), ARCHIVE_URI),
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM, STRING_ZO), STRING_ZM, flag(NDT), ARCHIVE_URI),
   /** XQuery function. */
   _ARCHIVE_EXTRACT_TO(ArchiveExtractTo::new, "extract-to(path,archive[,entries])",
-      params(STRING_O, BASE64_BINARY_O, ITEM_ZM),
+      params(STRING_O, ANY_ATOMIC_TYPE_O, ITEM_ZM),
       EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_OPTIONS(ArchiveOptions::new, "options(archive)",
-      params(BASE64_BINARY_O), MAP_ZO, flag(NDT), ARCHIVE_URI),
+      params(ANY_ATOMIC_TYPE_O), MAP_ZO, flag(NDT), ARCHIVE_URI),
+  /** XQuery function. */
+  _ARCHIVE_REFRESH(ArchiveRefresh::new, "refresh(path,entries,contents)",
+      params(STRING_O, ITEM_ZM, ITEM_ZM),
+      EMPTY_SEQUENCE_Z, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_UPDATE(ArchiveUpdate::new, "update(archive,entries,contents)",
-      params(BASE64_BINARY_O, ITEM_ZM, ITEM_ZM),
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM, ITEM_ZM),
       BASE64_BINARY_O, flag(NDT), ARCHIVE_URI, Perm.CREATE),
   /** XQuery function. */
   _ARCHIVE_WRITE(ArchiveWrite::new, "write(path,entries,contents[,options])",
@@ -1431,21 +1437,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _FT_TOKENS(FtTokens::new, "tokens(database[,prefix])",
       params(STRING_O, STRING_O), ELEMENT_ZM, flag(NDT), FT_URI),
-
-  // Hash Module
-
-  /** XQuery function. */
-  _HASH_HASH(HashHash::new, "hash(value,algorithm)",
-      params(ANY_ATOMIC_TYPE_O, STRING_O), BASE64_BINARY_O, HASH_URI),
-  /** XQuery function. */
-  _HASH_MD5(HashMd5::new, "md5(value)",
-      params(ANY_ATOMIC_TYPE_O), BASE64_BINARY_O, HASH_URI),
-  /** XQuery function. */
-  _HASH_SHA1(HashSha1::new, "sha1(value)",
-      params(ANY_ATOMIC_TYPE_O), BASE64_BINARY_O, HASH_URI),
-  /** XQuery function. */
-  _HASH_SHA256(HashSha256::new, "sha256(value)",
-      params(ANY_ATOMIC_TYPE_O), BASE64_BINARY_O, HASH_URI),
 
   // HOF Module
 

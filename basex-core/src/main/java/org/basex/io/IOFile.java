@@ -8,7 +8,6 @@ import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
-import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -31,6 +30,14 @@ public final class IOFile extends IO {
   private final boolean absolute;
   /** File reference. */
   private final File file;
+
+  /**
+   * Constructor.
+   * @param path path reference
+   */
+  public IOFile(final Path path) {
+    this(path.toFile(), "");
+  }
 
   /**
    * Constructor.
@@ -290,9 +297,7 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final InputStream is) throws IOException {
-    try(BufferInput in = BufferInput.get(is); BufferOutput out = new BufferOutput(this)) {
-      for(int i; (i = in.read()) != -1;) out.write(i);
-    }
+    write(is, new BufferOutput(this));
   }
 
   /**

@@ -22,6 +22,15 @@ public final class BufferOutput extends OutputStream {
   private int pos;
 
   /**
+   * Returns a buffered output stream.
+   * @param os output stream
+   * @return stream
+   */
+  public static BufferOutput get(final OutputStream os) {
+    return os instanceof BufferOutput ? (BufferOutput) os : new BufferOutput(os);
+  }
+
+  /**
    * Constructor.
    * @param file target file
    * @throws IOException I/O exception
@@ -34,7 +43,7 @@ public final class BufferOutput extends OutputStream {
    * Constructor with a default buffer size.
    * @param out the stream to write to
    */
-  public BufferOutput(final OutputStream out) {
+  protected BufferOutput(final OutputStream out) {
     this(out, IO.BLOCKSIZE);
   }
 
@@ -43,7 +52,7 @@ public final class BufferOutput extends OutputStream {
    * @param out the stream to write to
    * @param bufsize buffer size
    */
-  BufferOutput(final OutputStream out, final int bufsize) {
+  protected BufferOutput(final OutputStream out, final int bufsize) {
     this.out = out;
     this.bufsize = bufsize;
     buffer = new byte[bufsize];

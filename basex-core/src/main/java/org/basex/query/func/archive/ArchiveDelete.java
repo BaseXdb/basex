@@ -22,13 +22,13 @@ import org.basex.util.hash.*;
 public final class ArchiveDelete extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 archive = toB64(arg(0), qc);
+    final Bin archive = toArchive(arg(0), qc);
     final Iter entries = arg(1).iter(qc);
 
     // entries to be deleted
     final TokenSet names = new TokenSet();
     for(Item item; (item = qc.next(entries)) != null;) {
-      names.add(checkElemToken(item, qc).string(info));
+      names.add(toString(item, qc));
     }
 
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {

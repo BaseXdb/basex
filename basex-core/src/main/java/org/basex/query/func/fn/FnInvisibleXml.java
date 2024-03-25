@@ -103,8 +103,7 @@ public final class FnInvisibleXml extends StandardFunc {
     public DBNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
       final String input = toString(arg(0), qc);
       try {
-        final String output = parser.parse(input);
-        return new DBNode(IO.get(output));
+        return new DBNode(IO.get(parser.parse(input)));
       } catch(final BlitzParseException ex) {
         throw IXML_INP_X_X_X.get(ii, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(BlitzException | IOException ex) {

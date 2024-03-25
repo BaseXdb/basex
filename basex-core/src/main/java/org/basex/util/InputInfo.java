@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 
@@ -20,8 +22,8 @@ public final class InputInfo {
   private final String path;
   /** Static context. */
   private StaticContext sc;
-  /** Input string (can be {@code null}). */
-  private String input;
+  /** Input (can be {@code null}). */
+  private int[] input;
   /** Line number ({@code 0} if not initialized). */
   private int line;
   /** Column number or (if not initialized) string position. */
@@ -100,13 +102,11 @@ public final class InputInfo {
     // positions have already been calculated
     if(line != 0) return;
 
-    final int cl = Math.min(column, input.length());
-    final String q = input;
+    final int cl = Math.min(column, input.length);
     int l = 1, c = 1;
-    for(int i = 0, ch; i < cl; i += Character.charCount(ch)) {
-      ch = q.codePointAt(i);
-      if(ch == '\n') { l++; c = 1; }
-      else if(ch != '\r') { c++; }
+    for(int i = 0; i < cl; i++) {
+      final int cp = input[i];
+      if(cp == '\n') { l++; c = 1; } else { c++; }
     }
     line = l;
     column = c;
@@ -133,7 +133,7 @@ public final class InputInfo {
   public boolean equals(final Object object) {
     if(!(object instanceof InputInfo)) return false;
     final InputInfo ii = (InputInfo) object;
-    return (path != null ? path.equals(ii.path) : input.equals(ii.input)) &&
+    return (path != null ? path.equals(ii.path) : Arrays.equals(input, ii.input)) &&
         column() == ii.column() && line() == ii.line();
   }
 

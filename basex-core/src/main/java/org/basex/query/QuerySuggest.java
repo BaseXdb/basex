@@ -57,7 +57,7 @@ final class QuerySuggest extends QueryParser {
       }
       list.sort();
     }
-    return list.add(input.substring(0, index));
+    return list.add(substring(0, index).toString());
   }
 
   @Override
