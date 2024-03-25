@@ -434,7 +434,7 @@ public abstract class JavaCall extends Arr {
     if(cs == 0) {
       final TokenList names = new TokenList();
       for(final String method : allMethods.keySet()) names.add(method);
-      throw noMember(name, types, arity, string(qname.string()), arities, names.finish(), info);
+      throw noMember(name, types, arity, arities, names.finish(), info, string(qname.string()));
     }
     if(cs > 1) throw JAVAMULTIPLE_X_X.get(info, qname.string(),
         paramTypes(candidates.toArray(Executable[]::new), false));
@@ -447,20 +447,20 @@ public abstract class JavaCall extends Arr {
   }
 
   /**
-   * Returns an error message if no fields and methods could be chosen for execution.
+   * Returns an error message (no field or method could be chosen for execution).
    * @param name name of field or method
    * @param types types (can be {@code null})
    * @param arity supplied arity
-   * @param full full name of field or method
    * @param arities arities of found methods
    * @param names list of available names
    * @param info input info (can be {@code null})
+   * @param member name of field or method (for error messages)
    * @return exception
    */
   static QueryException noMember(final String name, final String[] types, final int arity,
-      final String full, final IntList arities, final byte[][] names, final InputInfo info) {
+      final IntList arities, final byte[][] names, final InputInfo info, final String member) {
     // functions with different arities
-    if(!arities.isEmpty()) return Functions.wrongArity(arity, arities, full, false, info);
+    if(!arities.isEmpty()) return Functions.wrongArity(arity, arities, false, info, member);
 
     // find similar field/method names
     final byte[] nm = token(name);
@@ -469,9 +469,9 @@ public abstract class JavaCall extends Arr {
       // if name is equal, no function was chosen via exact type matching
       final StringJoiner sj = new StringJoiner(", ", "(", ")");
       for(final String type : types) sj.add(className(type));
-      return JAVAARGS_X_X.get(info, full, sj);
+      return JAVAARGS_X_X.get(info, member, sj);
     }
-    return JAVAMEMBER_X.get(info, similar(full, similar));
+    return JAVAMEMBER_X.get(info, similar(member, similar));
   }
 
   /**

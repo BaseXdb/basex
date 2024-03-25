@@ -61,7 +61,7 @@ final class DynJavaConstr extends DynJavaCall {
     if(!constrs.isEmpty()) return true;
     if(!enforce) return false;
 
-    throw Functions.wrongArity(arity, arities, name(), false, info);
+    throw Functions.wrongArity(arity, arities, false, info, name());
   }
 
   @Override

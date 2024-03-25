@@ -143,7 +143,7 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, true, info);
+      checkArity(arity, fd.minMax[0], fd.minMax[1], true, info, fd);
 
       final FuncType ft = fd.type(arity, fb.anns);
       final QNm[] names = fd.paramNames(arity);
@@ -204,13 +204,13 @@ public final class Functions {
    * Raises an error for the wrong number of function arguments.
    * @param nargs number of supplied arguments
    * @param arities available arities (if first arity is negative, function is variadic)
-   * @param function function
    * @param literal literal flag
    * @param info input info (can be {@code null})
+   * @param function function (for error messages)
    * @return error
    */
   public static QueryException wrongArity(final int nargs, final IntList arities,
-      final Object function, final boolean literal, final InputInfo info) {
+      final boolean literal, final InputInfo info, final Object function) {
 
     final String supplied = literal ? "Arity " + nargs : arguments(nargs), expected;
     if(!arities.isEmpty() && arities.peek() < 0) {
@@ -277,7 +277,7 @@ public final class Functions {
    * Incorporates keywords in the argument list.
    * @param fb function arguments
    * @param names parameter names
-   * @param function function
+   * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
@@ -359,13 +359,13 @@ public final class Functions {
    * @param nargs number of supplied arguments
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
-   * @param function function
    * @param literal literal
    * @param info input info (can be {@code null})
+   * @param function function (for error messages)
    * @throws QueryException query exception
    */
   private static void checkArity(final int nargs, final int min, final int max,
-      final Object function, final boolean literal, final InputInfo info) throws QueryException {
+      final boolean literal, final InputInfo info, final Object function) throws QueryException {
 
     if(nargs < min || nargs > max) {
       final IntList arities = new IntList();
@@ -374,7 +374,7 @@ public final class Functions {
       } else {
         arities.add(-min);
       }
-      throw wrongArity(nargs, arities, function, literal, info);
+      throw wrongArity(nargs, arities, literal, info, function);
     }
   }
 
@@ -417,7 +417,7 @@ public final class Functions {
    * @param names parameter names
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
-   * @param function function
+   * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
@@ -432,7 +432,7 @@ public final class Functions {
         args[a] = Empty.UNDEFINED;
       }
     }
-    checkArity(arity, min, max, function, false, fb.info);
+    checkArity(arity, min, max, false, fb.info, function);
     return args;
   }
 }
