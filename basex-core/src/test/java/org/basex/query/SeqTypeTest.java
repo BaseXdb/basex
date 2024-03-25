@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.function.*;
 
 import org.basex.query.value.type.*;
+import org.basex.util.hash.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -154,6 +155,23 @@ public final class SeqTypeTest {
     assertFalse(NODE_O.instanceOf(ELEMENT_O));
     assertFalse(ITEM_O.instanceOf(ELEMENT_O));
     assertTrue(ELEMENT_O.instanceOf(ITEM_O));
+
+    // enums
+    final SeqType
+      // enum('a')
+      e1 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("a"))),
+      // enum('b')
+      e2 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("b"))),
+      // enum('a', 'b')
+      e3 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("a", "b")));
+    assertTrue(e1.instanceOf(e3));
+    assertFalse(e1.instanceOf(e2));
+    assertFalse(e3.instanceOf(e1));
+    assertTrue(e3.instanceOf(e3));
+    assertTrue(e1.instanceOf(STRING_O));
+    assertFalse(STRING_O.instanceOf(e3));
+    assertFalse(e1.instanceOf(LANGUAGE_O));
+    assertFalse(LANGUAGE_O.instanceOf(e3));
   }
 
   /** Tests for {@link SeqType#union(SeqType)}. */
@@ -264,6 +282,22 @@ public final class SeqTypeTest {
     combine(a1, f1, FUNCTION_O, op);
     combine(a1, f2, FUNCTION_O, op);
     combine(a2, a4, a2, op);
+
+    // enums
+    final SeqType
+      // enum('a')
+      e1 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("a"))),
+      // enum('b')
+      e2 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("b"))),
+      // enum('a', 'b')
+      e3 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("a", "b")));
+
+    combine(e1, e2, e3, op);
+    combine(e1, e3, e3, op);
+    combine(e3, op);
+    combine(e1, STRING_O, STRING_O, op);
+    combine(e1, LANGUAGE_O, STRING_O, op);
+    combine(e1, INTEGER_O, ANY_ATOMIC_TYPE_O, op);
   }
 
   /** Tests for {@link SeqType#intersect(SeqType)}. */
@@ -378,6 +412,22 @@ public final class SeqTypeTest {
     combine(a1, FuncType.get(ITEM_O).seqType(), null, op);
     combine(a1, f1, null, op);
     combine(a4, f5, null, op);
+
+    // enums
+    final SeqType
+      // enum('a')
+      e1 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("a"))),
+      // enum('b')
+      e2 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("b"))),
+      // enum('a', 'b')
+      e3 = SeqType.get(ENUM, EXACTLY_ONE, EnumValues.get(new TokenSet("a", "b")));
+
+    combine(e1, e2, null, op);
+    combine(e1, e3, e1, op);
+    combine(e3, op);
+    combine(e1, STRING_O, e1, op);
+    combine(e1, LANGUAGE_O, null, op);
+    combine(e1, INTEGER_O, null, op);
   }
 
   /**

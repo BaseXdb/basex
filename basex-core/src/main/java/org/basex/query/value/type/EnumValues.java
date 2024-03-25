@@ -2,6 +2,7 @@ package org.basex.query.value.type;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -40,8 +41,8 @@ public final class EnumValues {
   public static EnumValues get(final EnumValues ev1, final EnumValues ev2) {
     if(ev1 == null || ev2 == null) return null;
     final TokenSet v = new TokenSet();
-    ev1.values.forEach(val -> v.add(val));
-    ev2.values.forEach(val -> v.add(val));
+    for(final byte[] val : ev1.values) v.add(val);
+    for(final byte[] val : ev2.values) v.add(val);
     return get(v);
   }
 
@@ -49,20 +50,20 @@ public final class EnumValues {
    * Computes the intersection of two instances.
    * @param ev1 first enum values (can be {@code null})
    * @param ev2 second enum values (can be {@code null})
-   * @return the intersection.
+   * @return the intersection, or {@code null} if it is empty
    */
   public static EnumValues intersect(final EnumValues ev1, final EnumValues ev2) {
+    if(ev1 == null) return ev2;
+    else if(ev2 == null) return ev1;
     final TokenSet v = new TokenSet();
-    if(ev1 != null && ev2 != null) {
-      ev1.values.forEach(val -> {
-        if(ev2.values.contains(val)) v.add(val);
-      });
+    for(final byte[] val : ev1.values) {
+      if(ev2.values.contains(val)) v.add(val);
     }
-    return get(v);
+    return v.isEmpty() ? null : get(v);
   }
 
   /**
-   * Checks whether the given item value is valid.
+   * Checks whether the given item value is a valid enum value.
    * @param item item
    * @return true, if this instance contains the item value
    * @throws QueryException query exception
@@ -71,11 +72,48 @@ public final class EnumValues {
     return values.contains(item.string(null));
   }
 
+  /**
+   * Checks whether all of the values of this object are also values of the given enum values.
+   * @param enumValues enum values to test
+   * @return result of check
+   */
+  public boolean instanceOf(final EnumValues enumValues) {
+    for(final byte[] key : values) {
+      if(!enumValues.values.contains(key)) return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = 31;
+    if(values != null) {
+      for(final byte[] v : values) {
+        result += Token.hash(v);
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof EnumValues)) return false;
+    final EnumValues other = (EnumValues) obj;
+    if(values == null) {
+      if(other.values != null) return false;
+    } else {
+      if(values.size() != other.values.size()) return false;
+      if(!instanceOf(other)) return false;
+    }
+    return true;
+  }
+
   @Override
   public String toString() {
     final QueryString qs = new QueryString().token(AtomType.ENUM).token('(');
     int n = values.size();
-    for(byte[] v : values) {
+    for(final byte[] v : values) {
       qs.quoted(v);
       if(--n != 0) qs.token(',');
     }

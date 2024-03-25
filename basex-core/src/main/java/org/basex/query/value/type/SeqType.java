@@ -285,8 +285,9 @@ public final class SeqType {
    */
   public static SeqType get(final Type type, final Occ occ, final Test test,
       final EnumValues enumValues) {
-    return occ == ZERO || test == null || !(type instanceof NodeType) ?
-      get(type, occ) : new SeqType(type, occ, test, enumValues);
+    return occ == ZERO || (test == null || !(type instanceof NodeType))
+        && (enumValues == null || type != ENUM) ? get(type, occ)
+                                                : new SeqType(type, occ, test, enumValues);
   }
 
   /**
@@ -360,7 +361,7 @@ public final class SeqType {
    */
   public boolean instance(final Item item) throws QueryException {
     return item.instanceOf(type) && (test == null || test.matches(item))
-        || enumValues != null && item.instanceOf(STRING) && enumValues.matches(item);
+        || enumValues != null && item.instanceOf(ENUM) && enumValues.matches(item);
   }
 
   /**
@@ -390,9 +391,8 @@ public final class SeqType {
       if(size == 1) {
         final Item item = (Item) value;
         if(enumValues != null) {
-          if(!item.type.instanceOf(STRING) || !enumValues.matches(item))
-            throw QueryError.typeError(item, type, info);
-          return item;
+          if(!enumValues.matches(item)) throw QueryError.typeError(item, type, info);
+          return item.type == STRING ? item : Str.get(item.string(info), ENUM);
         }
         return item.type.eq(type) ? item : type.cast(item, qc, info);
       }
@@ -400,9 +400,8 @@ public final class SeqType {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item item : value) {
         if(enumValues != null) {
-          if(!item.type.instanceOf(STRING) || !enumValues.matches(item))
-            throw QueryError.typeError(item, type, info);
-          vb.add(item);
+          if(!enumValues.matches(item)) throw QueryError.typeError(item, type, info);
+          vb.add(item.type == STRING ? item : Str.get(item.string(info), ENUM));
         } else if(item.type.eq(type)) {
           vb.add(item);
         } else {
@@ -473,7 +472,9 @@ public final class SeqType {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type tp = it.type;
         if(!tp.instanceOf(at)) {
-          if(tp == UNTYPED_ATOMIC) {
+          if(enumValues != null) {
+            it = (Item) cast(it, true, qc, info);
+          } else if(tp == UNTYPED_ATOMIC) {
             if(at.nsSensitive()) throw NSSENS_X_X.get(info, item.type, at);
             it = at.cast(it, qc, info);
           } else if(
@@ -565,11 +566,14 @@ public final class SeqType {
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
-    final EnumValues ev = EnumValues.intersect(enumValues, st.enumValues);
+    if(enumValues != null || st.enumValues != null) {
+      final EnumValues ev = EnumValues.intersect(enumValues, st.enumValues);
+      return ev == null ? null : get(tp, oc, ev);
+    }
     if(test == null || st.test == null || test.equals(st.test))
-      return get(tp, oc, test != null ? test : st.test, ev);
+      return get(tp, oc, test != null ? test : st.test);
     final Test kn = test.intersect(st.test);
-    return kn == null ? null : get(tp, oc, kn, ev);
+    return kn == null ? null : get(tp, oc, kn);
   }
 
   /**
@@ -635,8 +639,9 @@ public final class SeqType {
    */
   public boolean instanceOf(final SeqType st) {
     // empty sequence: only check cardinality
-    return this == st || (zero() ? !st.oneOrMore() :
-      type.instanceOf(st.type) && occ.instanceOf(st.occ) && kindInstanceOf(st));
+    return this == st || (zero() ? !st.oneOrMore()
+                                 : type.instanceOf(st.type) && occ.instanceOf(st.occ)
+                                     && kindInstanceOf(st) && valuesInstanceOf(st));
   }
 
   /**
@@ -647,6 +652,16 @@ public final class SeqType {
    */
   public boolean kindInstanceOf(final SeqType st) {
     return st.test == null || test != null && test.instanceOf(st.test);
+  }
+
+  /**
+   * Checks if the enum values of this sequence type are instances of the enum values of the
+   * specified sequence type.
+   * @param st sequence type to check
+   * @return result of check
+   */
+  public boolean valuesInstanceOf(final SeqType st) {
+    return st.enumValues == null || enumValues != null && enumValues.instanceOf(st.enumValues);
   }
 
   /**
@@ -663,7 +678,8 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType st) {
-    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(test, st.test);
+    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(test, st.test)
+        && Objects.equals(enumValues, st.enumValues);
   }
 
   @Override
