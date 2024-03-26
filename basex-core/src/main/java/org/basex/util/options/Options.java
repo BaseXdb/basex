@@ -380,11 +380,11 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param value value to be assigned
-   * @param error raise error if a supplied option is unknown
+   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Value value, final boolean error,
+  public synchronized void assign(final Item name, final Value value, final QueryError error,
       final InputInfo info) throws QueryException {
 
     final String nm;
@@ -571,12 +571,12 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses and assigns options from the specified map.
    * @param map map
-   * @param error raise error if a supplied option is unknown
+   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final boolean error, final InputInfo info)
-      throws QueryException {
+  public final synchronized void assign(final XQMap map, final QueryError error,
+      final InputInfo info) throws QueryException {
     for(final Item name : map.keys()) {
       assign(name, map.get(name), error, info);
     }
@@ -746,16 +746,16 @@ public class Options implements Iterable<Option<?>> {
    * Assigns the specified name and value.
    * @param name name of option
    * @param value value to be assigned
-   * @param error raise error if option is unknown
+   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private synchronized void assign(final String name, final Value value, final boolean error,
+  private synchronized void assign(final String name, final Value value, final QueryError error,
       final InputInfo info) throws QueryException {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
-      if(error) throw OPTION_X.get(info, similar(name));
+      if(error != null) throw OPTION_X.get(info, similar(name));
       return;
     }
 
