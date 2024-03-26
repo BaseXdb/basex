@@ -2226,7 +2226,7 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
     // map constructor
-    if(wsConsumeWs(MAP, MAPCONSTR, "{")) return new CMap(info(), keyValues());
+    if(current('{') || wsConsumeWs(MAP, MAPCONSTR, "{")) return new CMap(info(), keyValues());
     // curly array constructor
     if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
       wsCheck("{");
