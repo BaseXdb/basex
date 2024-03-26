@@ -1,6 +1,5 @@
 package org.basex.query.util.collation;
 
-import static org.basex.util.Reflect.*;
 import static org.basex.util.Strings.*;
 
 import java.util.*;
@@ -43,11 +42,6 @@ public final class UCAOptions extends CollationOptions {
   public static final StringOption NUMERIC = new StringOption("numeric");
   /** Option: reorder. */
   public static final StringOption REORDER = new StringOption("reorder");
-
-  /** Name of the Collator class. */
-  private static final Class<?> COLLATOR = find("com.ibm.icu.text.Collator");
-  /** Whether the Collator class is on the class path. */
-  static final boolean ACTIVE = COLLATOR != null;
 
   /**
    * Constructor.

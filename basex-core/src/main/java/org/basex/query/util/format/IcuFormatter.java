@@ -20,9 +20,6 @@ import com.ibm.icu.util.*;
  * @author Gunther Rademacher
  */
 public final class IcuFormatter extends Formatter {
-  /** Whether ICU is available on the class path. */
-  private static final boolean AVAILABLE =
-      Reflect.available("com.ibm.icu.text.RuleBasedNumberFormat");
   /** Prefix of RuleSet names that are supported by ICU's SPELLOUT format. */
   private static final String ICU_SPELLOUT_PREFIX = "%spellout-";
   /** Name or prefix of ICU spell out ordinal rule set. */
@@ -136,14 +133,6 @@ public final class IcuFormatter extends Formatter {
     get(languageTag);
     // check map using get rather than contains, as map contains null values
     return MAP.get().get(languageTag) != null;
-  }
-
-  /**
-   * Checks if the ICU4J library is available.
-   * @return result of check
-   */
-  public static boolean available() {
-    return AVAILABLE;
   }
 
   @Override

@@ -144,8 +144,7 @@ public final class DecFormatter extends FormatUtil {
   public static DecFormatter forLanguage(final byte[] languageTag, final InputInfo info)
       throws QueryException {
     final String l = string(languageTag);
-    final DecFormatOptions dfo = IcuFormatter.available() ? IcuFormatter.decFormat(l) :
-      decFormatSymbols(l);
+    final DecFormatOptions dfo = Prop.ICU ? IcuFormatter.decFormat(l) : decFormatSymbols(l);
     return dfo != null ? new DecFormatter(dfo, info) : null;
   }
 
