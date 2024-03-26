@@ -1,10 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
-import org.basex.query.func.java.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -344,57 +342,6 @@ public final class JavaFunctionTest extends SandboxTest {
     query(Util.info(pattern, "some", ""), true);
     query(Util.info(pattern, "none", ""), true);
     query(Util.info(pattern, "void", ""), "");
-  }
-
-  /** Test. */
-  @Test public void camelCase() {
-    assertEquals("", JavaCall.camelCase(""));
-    assertEquals("a", JavaCall.camelCase("a"));
-    assertEquals("aB", JavaCall.camelCase("a-b"));
-    assertEquals("aBC", JavaCall.camelCase("a-b--c"));
-    assertEquals("a.bC", JavaCall.camelCase("a.b-c"));
-    assertEquals("a/b.cD", JavaCall.camelCase("a/b.c-D"));
-  }
-
-  /** Test. */
-  @Test public void className() {
-    assertEquals("", JavaCall.uriToClasspath(""));
-    assertEquals("A", JavaCall.uriToClasspath("a"));
-    assertEquals(".", JavaCall.uriToClasspath("."));
-    assertEquals(".A", JavaCall.uriToClasspath(".a"));
-    assertEquals(".Ab", JavaCall.uriToClasspath(".ab"));
-    assertEquals("String", JavaCall.uriToClasspath("string"));
-    assertEquals("java.lang.String", JavaCall.uriToClasspath("java.lang.string"));
-    assertEquals("java.lang.String", JavaCall.uriToClasspath("java.lang.string"));
-    assertEquals("java.lang.String", JavaCall.uriToClasspath("java/lang/string"));
-    assertEquals("org.basex.modules.MD", JavaCall.uriToClasspath("org.basex.modules.m-d"));
-    assertEquals("a.BC", JavaCall.uriToClasspath("a/-b-c"));
-  }
-
-  /** Test. */
-  @Test public void uri2Path() {
-    assertEquals("a", JavaCall.uri2path("a"));
-    assertEquals("a", JavaCall.uri2path("/a"));
-    assertEquals("a/b", JavaCall.uri2path("a/b"));
-    assertEquals("a-c", JavaCall.uri2path("a-c"));
-    assertEquals("A", JavaCall.uri2path("%41"));
-    assertEquals("a/b", JavaCall.uri2path("a///b"));
-    assertEquals("a/index", JavaCall.uri2path("a/"));
-    assertEquals("index", JavaCall.uri2path("/"));
-    assertEquals("index", JavaCall.uri2path(""));
-
-    assertEquals("org/index", JavaCall.uri2path("http://org"));
-    assertEquals("org/index", JavaCall.uri2path("http://org/"));
-    assertEquals("org/basex/m/hello/World", JavaCall.uri2path("http://basex.org/m/hello/World"));
-    assertEquals("com/example/www/index", JavaCall.uri2path("http://www.example.com"));
-    assertEquals("a/b/c", JavaCall.uri2path("a:b:c"));
-    assertEquals("A/A", JavaCall.uri2path("http://%41/%41"));
-
-    assertEquals("-gg", JavaCall.uri2path("%gg"));
-    assertEquals("-", JavaCall.uri2path(";"));
-    assertEquals("http-/-gg", JavaCall.uri2path("http://%gg"));
-
-    assertEquals("a/b/c", JavaCall.uri2path("a:b:c"));
   }
 
   /** DOM tests. */

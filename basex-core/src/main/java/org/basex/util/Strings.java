@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import java.net.*;
 import java.nio.charset.*;
 import java.security.*;
 import java.util.*;
@@ -294,5 +295,78 @@ public final class Strings {
   public static String[] encodings() {
     if(encodings == null) encodings = Charset.availableCharsets().keySet().toArray(String[]::new);
     return encodings;
+  }
+
+  /**
+   * Converts a string to camel case.
+   * @param string string to convert
+   * @return resulting string
+   */
+  public static String camelCase(final String string) {
+    final StringBuilder sb = new StringBuilder();
+    boolean upper = false;
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = string.charAt(s);
+      if(ch == '-') {
+        upper = true;
+      } else if(upper) {
+        sb.append(Character.toUpperCase(ch));
+        upper = false;
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Converts the given string to a Java class name. Slashes will be replaced with dots, and
+   * the last package segment will be capitalized and camel-cased.
+   * @param string string to convert
+   * @return class name
+   */
+  public static String uriToClasspath(final String string) {
+    final String s = string.replace('/', '.');
+    final int c = s.lastIndexOf('.') + 1;
+    return s.substring(0, c) + capitalize(camelCase(s.substring(c)));
+  }
+
+  /**
+   * Converts a URI to a directory path.
+   * See https://docs.basex.org/wiki/Repository#URI_Rewriting for details.
+   * @param uri namespace uri
+   * @return converted path
+   */
+  public static String uri2path(final String uri) {
+    String path = uri;
+    try {
+      final URI u = new URI(uri);
+      final TokenBuilder tb = new TokenBuilder();
+      if(u.isOpaque()) {
+        tb.add(u.getScheme()).add('/').add(u.getSchemeSpecificPart().replace(':', '/'));
+      } else {
+        final String auth = u.getAuthority();
+        if(auth != null) {
+          // reverse authority, replace dots by slashes. example: basex.org  ->  org/basex
+          final String[] comp = split(auth, '.');
+          for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
+        }
+        // add remaining path
+        final String p = u.getPath();
+        tb.add(p == null || p.isEmpty() ? "/" : p.replace('.', '/'));
+      }
+      path = tb.toString();
+    } catch(final URISyntaxException ex) {
+      Util.debug(ex);
+    }
+
+    // replace special characters with dashes; remove multiple slashes
+    path = path.replaceAll("[^\\w.-/]+", "-").replaceAll("//+", "/");
+    // add "index" string
+    if(endsWith(path, '/')) path += "index";
+    // remove heading slash
+    if(startsWith(path, '/')) path = path.substring(1);
+    return path;
   }
 }

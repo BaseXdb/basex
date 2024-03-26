@@ -5,7 +5,7 @@ import static org.basex.util.Strings.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
@@ -38,6 +38,8 @@ public final class UCAOptions extends CollationOptions {
   public static final StringOption CASELEVEL = new StringOption("caseLevel");
   /** Option: caseFirst. */
   public static final StringOption CASEFIRST = new StringOption("caseFirst");
+  /** Option: maxVariable. */
+  public static final StringOption MAXVARIABLE = new StringOption("maxVariable", "punct");
   /** Option: numeric. */
   public static final StringOption NUMERIC = new StringOption("numeric");
   /** Option: reorder. */
@@ -81,16 +83,16 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(STRENGTH)) {
-      final String v = get(STRENGTH);
-      final Integer s;
-      if(eq(v, "primary", "1")) s = Collator.PRIMARY;
-      else if(eq(v, "secondary", "2")) s = Collator.SECONDARY;
-      else if(eq(v, "tertiary", "3")) s = Collator.TERTIARY;
-      else if(eq(v, "quaternary", "4")) s = Collator.QUATERNARY;
-      else if(eq(v, "identical", "5")) s = Collator.IDENTICAL;
-      else s = null;
+      Integer s = null;
+      switch(get(STRENGTH)) {
+        case "primary":    case "1": s = Collator.PRIMARY; break;
+        case "secondary":  case "2": s = Collator.SECONDARY; break;
+        case "tertiary":   case "3": s = Collator.TERTIARY; break;
+        case "quaternary": case "4": s = Collator.QUATERNARY; break;
+        case "identical":  case "5": s = Collator.IDENTICAL; break;
+        default: if(!fallback) throw error(STRENGTH);
+      }
       if(s != null) rbc.setStrength(s);
-      else if(!fallback) throw error(STRENGTH);
     }
 
     if(contains(ALTERNATE)) {
@@ -104,7 +106,9 @@ public final class UCAOptions extends CollationOptions {
         if(eq(v, "blanked") && rbc.getStrength() == Collator.QUATERNARY) {
           rbc.setStrength(Collator.TERTIARY);
         }
-      } else if(!fallback) throw error(ALTERNATE);
+      } else if(!fallback) {
+        throw error(ALTERNATE);
+      }
     }
 
     if(contains(BACKWARDS)) {
@@ -125,12 +129,23 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(CASEFIRST)) {
-      final String v = get(CASEFIRST);
-      switch(v) {
+      switch(get(CASEFIRST)) {
         case "upper": rbc.setUpperCaseFirst(true); break;
         case "lower": rbc.setLowerCaseFirst(true); break;
         default: if(!fallback) throw error(CASEFIRST);
       }
+    }
+
+    if(contains(MAXVARIABLE)) {
+      int m = 0;
+      switch(get(MAXVARIABLE)) {
+        case "space":    m = Collator.ReorderCodes.SPACE; break;
+        case "punct":    m = Collator.ReorderCodes.PUNCTUATION; break;
+        case "symbol":   m = Collator.ReorderCodes.SYMBOL; break;
+        case "currency": m = Collator.ReorderCodes.CURRENCY; break;
+        default: if(!fallback) throw error(MAXVARIABLE);
+      }
+      if(m != 0) rbc.setMaxVariable(m);
     }
 
     if(contains(NUMERIC)) {
@@ -139,21 +154,21 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(REORDER)) {
-      final String v = get(REORDER);
       final IntList list = new IntList();
-      for(final String code : split(v, ',')) {
+      for(final String code : split(get(REORDER), ',')) {
+        int c = 0;
         switch(code) {
-          case "space":    list.add(Collator.ReorderCodes.SPACE);       break;
-          case "punct":    list.add(Collator.ReorderCodes.PUNCTUATION); break;
-          case "symbol":   list.add(Collator.ReorderCodes.SYMBOL);      break;
-          case "currency": list.add(Collator.ReorderCodes.CURRENCY);    break;
-          case "digit":    list.add(Collator.ReorderCodes.DIGIT);       break;
+          case "space":    c = Collator.ReorderCodes.SPACE;       break;
+          case "punct":    c = Collator.ReorderCodes.PUNCTUATION; break;
+          case "symbol":   c = Collator.ReorderCodes.SYMBOL;      break;
+          case "currency": c = Collator.ReorderCodes.CURRENCY;    break;
+          case "digit":    c = Collator.ReorderCodes.DIGIT;       break;
           default:
-            final int[] c = code.length() == 4 ? UScript.getCode(code) : null;
-            if(c != null) list.add(c[0]);
+            final int[] tmp = code.length() == 4 ? UScript.getCode(code) : null;
+            if(tmp != null) c = tmp[0];
             else if(!fallback) throw error(REORDER);
-            break;
         }
+        if(c != 0) list.add(c);
       }
       if(!list.isEmpty()) rbc.setReorderCodes(list.finish());
     }

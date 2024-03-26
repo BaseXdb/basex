@@ -89,7 +89,7 @@ abstract class DynJavaCall extends JavaCall {
    */
   final QueryException instanceExpected(final Exception ex) {
     if(ex != null) Util.debug(ex);
-    return JAVANOINSTANCE_X_X.get(info, JavaCall.className(clazz), JavaCall.argType(arg(0)));
+    return JAVANOINSTANCE_X_X.get(info, className(clazz), JavaCall.argType(arg(0)));
   }
 
   @Override

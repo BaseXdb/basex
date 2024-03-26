@@ -25,10 +25,10 @@ public abstract class Collation {
   private static final byte[] NOCASE =
       token("http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive");
 
-  /** UCA collations. */
-  private static final byte[] UCA = token("http://www.w3.org/2013/collation/UCA");
-  /** Implementation-defined collation URI. */
-  private static final byte[] URL = token(BASEX_URL + "/collation");
+  /** ICU (UCA) collation URL. */
+  public static final byte[] ICU = token("http://www.w3.org/2013/collation/UCA");
+  /** BaseX collation URI. */
+  public static final byte[] BASEX = token(BASEX_URL + "/collation");
   /** Collation URI. */
   private byte[] uri = EMPTY;
 
@@ -57,8 +57,8 @@ public abstract class Collation {
 
     final Uri u = Uri.get(uri);
     if(!u.isValid()) throw INVURI_X.get(info, uri);
-    final byte[] url = u.isAbsolute() ? uri :
-      Token.startsWith(uri, '?') ? concat(URL, uri) : info.sc().baseURI().resolve(u, info).string();
+    final byte[] url = u.isAbsolute() ? uri : Token.startsWith(uri, '?') ? concat(BASEX, uri) :
+      info.sc().baseURI().resolve(u, info).string();
 
     // return unicode point collation
     if(eq(COLLATION_URI, url)) return null;
@@ -93,9 +93,9 @@ public abstract class Collation {
         q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';')));
 
     CollationOptions opts = null;
-    if(eq(URL, base)) {
+    if(eq(BASEX, base)) {
       opts = new BaseXCollationOptions(false);
-    } else if(eq(UCA, base)) {
+    } else if(eq(ICU, base)) {
       final boolean fallback = !YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()));
       opts = Prop.ICU ? new UCAOptions(fallback) : new BaseXCollationOptions(fallback);
     }

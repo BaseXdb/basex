@@ -18,7 +18,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-abstract class WebFn extends StandardFunc {
+public abstract class WebFn extends StandardFunc {
   /** Response options. */
   public static class ResponseOptions extends Options {
     /** Status. */
@@ -39,17 +39,32 @@ abstract class WebFn extends StandardFunc {
     final byte[] anchor = toZeroToken(arg(2), qc);
 
     final XQMap map = params.isEmpty() ? XQMap.empty() : toMap(params);
-    final TokenBuilder tb = new TokenBuilder().add(href);
+    final TokenBuilder url = createUrl(href, map, info);
+    if(anchor.length > 0) url.add('#').add(Token.encodeUri(anchor, false));
+    return url.toString();
+  }
+
+  /**
+   * Creates a URL from the function arguments.
+   * @param href host and path
+   * @param params query parameters
+   * @param info input info
+   * @return supplied URL builder
+   * @throws QueryException query exception
+   */
+  public static final TokenBuilder createUrl(final byte[] href, final XQMap params,
+      final InputInfo info) throws QueryException {
+
+    final TokenBuilder url = new TokenBuilder().add(href);
     int c = 0;
-    for(final Item key : map.keys()) {
+    for(final Item key : params.keys()) {
       final byte[] name = key.string(info);
-      for(final Item item : map.get(key)) {
-        tb.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, false));
-        tb.add('=').add(Token.encodeUri(item.string(info), false));
+      for(final Item item : params.get(key)) {
+        url.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, false));
+        url.add('=').add(Token.encodeUri(item.string(info), false));
       }
     }
-    if(anchor.length > 0) tb.add('#').add(Token.encodeUri(anchor, false));
-    return tb.toString();
+    return url;
   }
 
   /**

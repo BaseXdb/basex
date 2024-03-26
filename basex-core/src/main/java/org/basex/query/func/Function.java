@@ -122,6 +122,9 @@ public enum Function implements AFunction {
   CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(values)",
       params(INTEGER_ZM), STRING_O),
   /** XQuery function. */
+  COLLATION(FnCollation::new, "collation(options)",
+      params(MAP_O), ANY_URI_O),
+  /** XQuery function. */
   COLLATION_KEY(FnCollationKey::new, "collation-key(value[,collation])",
       params(STRING_O, STRING_ZO), BASE64_BINARY_O),
   /** XQuery function. */
