@@ -27,7 +27,7 @@ public class ArchiveCreateFrom extends ArchiveCreate {
     final IOFile root = new IOFile(toPath(arg(0), qc));
     if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
 
-    final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), true, qc);
+    final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), qc);
     final boolean recursive = options.get(CreateFromOptions.RECURSIVE);
     final boolean rootDir = options.get(CreateFromOptions.ROOT_DIR);
 

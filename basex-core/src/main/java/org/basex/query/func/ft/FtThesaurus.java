@@ -23,7 +23,7 @@ public final class FtThesaurus extends FtAccess {
   public Value value(final QueryContext qc) throws QueryException {
     final ANode node = toNode(arg(0), qc);
     final byte[] term = toToken(arg(1), qc);
-    final FtThesaurusOptions options = toOptions(arg(2), new FtThesaurusOptions(), true, qc);
+    final FtThesaurusOptions options = toOptions(arg(2), new FtThesaurusOptions(), qc);
 
     if(node != nd) {
       thesaurus = new Thesaurus(node);

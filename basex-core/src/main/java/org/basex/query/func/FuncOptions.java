@@ -64,13 +64,11 @@ public final class FuncOptions {
    * @param item item to be converted (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
-   * @param enforce raise error if a supplied option is unknown
    * @return specified options
    * @throws QueryException query exception
    */
-  public <T extends Options> T assign(final Item item, final T options, final boolean enforce)
-      throws QueryException {
-    enforceKnown = enforce;
+  public <T extends Options> T assign(final Item item, final T options) throws QueryException {
+    enforceKnown = options.getClass() != Options.class;
     return assign(item, options, INVALIDOPT_X);
   }
 
@@ -89,7 +87,7 @@ public final class FuncOptions {
     if(!item.isEmpty()) {
       try {
         if(item instanceof XQMap) {
-          options.assign((XQMap) item, enforceKnown, info);
+          options.assign((XQMap) item, enforceKnown ? OPTION_X : null, info);
         } else {
           final Type type = item.type;
           if(test == null) throw MAP_X_X.get(info, type, item);

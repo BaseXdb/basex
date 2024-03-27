@@ -23,7 +23,7 @@ public class FnXmlToJson extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNodeOrNull(arg(0), qc);
-    final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), false, qc);
+    final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), qc);
     if(node == null) return Empty.VALUE;
 
     options.set(JsonOptions.FORMAT, JsonFormat.BASIC);

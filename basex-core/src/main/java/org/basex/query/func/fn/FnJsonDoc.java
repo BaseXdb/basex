@@ -71,9 +71,8 @@ public class FnJsonDoc extends Parse {
   protected final JsonConverter converter(final QueryContext qc, final JsonFormat format)
       throws QueryException {
 
-    final boolean dflt = format != null;
-    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), !dflt, qc);
-    if(dflt) options.set(JsonOptions.FORMAT, format);
+    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), qc);
+    if(format != null) options.set(JsonOptions.FORMAT, format);
 
     final JsonConverter jc = JsonConverter.get(options);
     final Value fallback = options.get(JsonParserOptions.FALLBACK);

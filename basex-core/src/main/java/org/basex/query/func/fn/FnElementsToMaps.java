@@ -39,7 +39,7 @@ public final class FnElementsToMaps extends StandardFunc {
     final ANodeList elements = new ANodeList();
     final Iter iter = arg(0).iter(qc);
     for(Item item; (item = iter.next()) != null;) elements.add(toElem(item, qc));
-    final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), false, qc);
+    final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
 
     final QNmMap<Layout> layouts = new QNmMap<>();
     for(final Map.Entry<String, String> entry : options.get(ElementsOptions.LAYOUTS).

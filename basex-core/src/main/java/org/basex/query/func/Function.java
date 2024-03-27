@@ -676,7 +676,7 @@ public enum Function implements AFunction {
   // Map Module
 
   /** XQuery function. */
-  _MAP_BUILD(MapBuild::new, "build(input[,key,value,combine])",
+  _MAP_BUILD(MapBuild::new, "build(input[,keys,value,combine])",
       params(ITEM_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(Occ.ZERO_OR_ONE),
       FuncType.get(ITEM_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE),
       FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),

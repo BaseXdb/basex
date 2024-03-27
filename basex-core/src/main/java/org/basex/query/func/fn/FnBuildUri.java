@@ -19,7 +19,7 @@ public class FnBuildUri extends FnJsonDoc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap parts = toMap(arg(0), qc);
-    final UriOptions options = toOptions(arg(1), new UriOptions(), false, qc);
+    final UriOptions options = toOptions(arg(1), new UriOptions(), qc);
 
     final TokenBuilder uri = new TokenBuilder();
     final String scheme = get(parts, SCHEME, qc);

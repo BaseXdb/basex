@@ -25,7 +25,7 @@ public final class ArchiveWrite extends ArchiveCreate {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(arg(0), qc);
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);
-    final CreateOptions options = toOptions(arg(3), new CreateOptions(), true, qc);
+    final CreateOptions options = toOptions(arg(3), new CreateOptions(), qc);
 
     try {
       try(BufferOutput out = new BufferOutput(new IOFile(path))) {

@@ -45,7 +45,7 @@ public final class FnFormatNumber extends StandardFunc {
       if(df == null) throw FORMATWHICH_X.get(info, formatName);
     } else {
       final DecFormatOptions options = toOptions(format,
-          df != null ? df.options() : new DecFormatOptions(), true, qc);
+          df != null ? df.options() : new DecFormatOptions(), qc);
       try {
         df = new DecFormatter(options, info);
       } catch(final QueryException ex) {

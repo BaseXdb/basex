@@ -20,7 +20,7 @@ public final class FtContains extends FtAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = arg(0).value(qc), terms = arg(1).value(qc);
-    final FtContainsOptions options = toOptions(arg(2), new FtContainsOptions(), true, qc);
+    final FtContainsOptions options = toOptions(arg(2), new FtContainsOptions(), qc);
 
     final FTMode mode = options.get(FtIndexOptions.MODE);
     final FTOpt opt = ftOpt(options, qc).assign(qc.ftOpt());

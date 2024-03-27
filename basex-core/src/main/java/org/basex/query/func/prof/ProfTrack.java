@@ -30,7 +30,7 @@ public final class ProfTrack extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final TrackOptions options = toOptions(arg(1), new TrackOptions(), true, qc);
+    final TrackOptions options = toOptions(arg(1), new TrackOptions(), qc);
 
     // include memory consumption
     long min = -1;

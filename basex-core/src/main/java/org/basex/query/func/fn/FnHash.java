@@ -24,7 +24,7 @@ public final class FnHash extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    final HashOptions options = toOptions(arg(1), new HashOptions(), false, qc);
+    final HashOptions options = toOptions(arg(1), new HashOptions(), qc);
     final String alg = options.get(HashOptions.ALGORITHM);;
 
     final MessageDigest md;

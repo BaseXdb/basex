@@ -97,11 +97,7 @@ public abstract class Collation {
       opts = new BaseXCollationOptions(false);
     } else if(eq(UCA, base)) {
       final boolean fallback = !YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()));
-      if(UCAOptions.ACTIVE) {
-        opts = new UCAOptions(fallback);
-      } else if(fallback) {
-        opts = new BaseXCollationOptions(true);
-      }
+      opts = Prop.ICU ? new UCAOptions(fallback) : new BaseXCollationOptions(fallback);
     }
     if(opts == null) throw err.get(info, Util.inf("Unknown collation '%'", uri));
 

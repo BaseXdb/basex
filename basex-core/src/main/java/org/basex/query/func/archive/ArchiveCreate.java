@@ -41,7 +41,7 @@ public class ArchiveCreate extends ArchiveFn {
    */
   public final void create(final OutputStream os, final QueryContext qc) throws QueryException {
     final Map<String, Entry<Item, Item>> files = toFiles(arg(0), arg(1), qc);
-    final CreateOptions options = toOptions(arg(2), new CreateOptions(), true, qc);
+    final CreateOptions options = toOptions(arg(2), new CreateOptions(), qc);
     create(files, options, os, qc);
   }
 
