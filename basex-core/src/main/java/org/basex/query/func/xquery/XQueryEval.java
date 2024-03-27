@@ -68,7 +68,7 @@ public class XQueryEval extends StandardFunc {
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final XQueryOptions options = new XQueryOptions();
     options.put(XQueryOptions.PERMISSION, perm);
-    toOptions(arg(2), options, true, qc);
+    toOptions(arg(2), options, qc);
 
     final Perm evalPerm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
     if(!user.has(evalPerm)) throw XQUERY_PERMISSION2_X.get(info, evalPerm);

@@ -22,7 +22,7 @@ public final class FtSearch extends FtAccess {
   public NodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final Value query = arg(1).value(qc);
-    final FtIndexOptions options = toOptions(arg(2), new FtIndexOptions(), true, qc);
+    final FtIndexOptions options = toOptions(arg(2), new FtIndexOptions(), qc);
 
     final IndexDb db = new IndexStaticDb(data, info);
     final FTMode mode = options.get(FtIndexOptions.MODE);

@@ -40,7 +40,7 @@ public class CsvParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final CsvParserOptions options = toOptions(arg(1), new CsvParserOptions(), true, qc);
+    final CsvParserOptions options = toOptions(arg(1), new CsvParserOptions(), qc);
     try {
       return CsvConverter.get(options).convert(io);
     } catch(final IOException ex) {

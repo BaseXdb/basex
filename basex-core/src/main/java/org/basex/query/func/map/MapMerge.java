@@ -31,7 +31,7 @@ public final class MapMerge extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = arg(0).iter(qc);
-    final MergeOptions options = toOptions(arg(1), new MergeOptions(), false, qc);
+    final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
 
     final MergeDuplicates merge = options.get(MergeOptions.DUPLICATES);
     XQMap map = XQMap.empty();
@@ -71,7 +71,7 @@ public final class MapMerge extends StandardFunc {
       // broaden type if values may be combined
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
       if(!vt.zero() && defined(1)) {
-        if(!(arg(1) instanceof Value) || toOptions(arg(1), new MergeOptions(), false, cc.qc).
+        if(!(arg(1) instanceof Value) || toOptions(arg(1), new MergeOptions(), cc.qc).
             get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
           mt = MapType.get(mt.keyType, vt.union(Occ.ONE_OR_MORE));
         }

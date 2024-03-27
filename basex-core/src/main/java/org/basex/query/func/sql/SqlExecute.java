@@ -43,7 +43,7 @@ public class SqlExecute extends SqlFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
     final String query = toString(arg(1), qc);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), true, qc);
+    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
 
     try {
       final Statement stmt = conn.createStatement();

@@ -60,7 +60,7 @@ public final class FnInvisibleXml extends StandardFunc {
       final String grammar = value.isEmpty()
           ? Blitz.ixmlGrammar()
           : FnInvisibleXml.this.toString(value);
-      final IxmlOptions opts = toOptions(arg(1), new IxmlOptions(), true, qc);
+      final IxmlOptions opts = toOptions(arg(1), new IxmlOptions(), qc);
       final de.bottlecaps.markup.blitz.Parser parser;
       try {
         parser = opts.get(IxmlOptions.FAIL_ON_ERROR)

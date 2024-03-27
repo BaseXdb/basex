@@ -47,7 +47,7 @@ abstract class ProcFn extends StandardFunc {
     }
 
     // options
-    final ProcOptions options = toOptions(arg(2), new ProcOptions(), true, qc);
+    final ProcOptions options = toOptions(arg(2), new ProcOptions(), qc);
     final String encoding = options.get(ProcOptions.ENCODING);
     final Charset cs;
     try {

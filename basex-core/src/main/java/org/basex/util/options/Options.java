@@ -755,7 +755,7 @@ public class Options implements Iterable<Option<?>> {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
-      if(error != null) throw OPTION_X.get(info, similar(name));
+      if(error != null && !name.startsWith("Q{")) throw OPTION_X.get(info, similar(name));
       return;
     }
 

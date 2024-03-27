@@ -59,7 +59,7 @@ public class FnParseUri extends FnJsonDoc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String value = toString(arg(0), qc);
-    final UriOptions options = toOptions(arg(1), new UriOptions(), false, qc);
+    final UriOptions options = toOptions(arg(1), new UriOptions(), qc);
 
     String string = value.replace('\\', '/'), fragment = "", query = "", scheme = "";
     String filepath = "", authority = "", userinfo = "", host = "", port = "", path;

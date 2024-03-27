@@ -55,7 +55,7 @@ public class XsltTransform extends XsltFn {
   final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
     final IO input = read(arg(0), qc), stylesheet = read(arg(1), qc);
     final HashMap<String, String> arguments = toOptions(arg(2), qc);
-    final XsltOptions options = toOptions(arg(3), new XsltOptions(), true, qc);
+    final XsltOptions options = toOptions(arg(3), new XsltOptions(), qc);
 
     final ArrayOutput result = new ArrayOutput();
     final PrintStream errPS = System.err;

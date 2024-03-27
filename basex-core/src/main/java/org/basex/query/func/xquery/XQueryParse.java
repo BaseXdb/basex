@@ -46,7 +46,7 @@ public class XQueryParse extends StandardFunc {
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IO query = toContent(arg(0), qc);
-    final XQueryOptions options = toOptions(arg(1), new XQueryOptions(), true, qc);
+    final XQueryOptions options = toOptions(arg(1), new XQueryOptions(), qc);
 
     // base-uri: choose uri specified in options, file path, or base-uri from parent query
     try(QueryContext qctx = new QueryContext(qc.context)) {
