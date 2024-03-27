@@ -535,8 +535,7 @@ public final class QT3TS extends Main {
       }
       return msg;
     } catch(final Exception ex) {
-      Util.stack(ex);
-      return "Exception: " + ex.getMessage();
+      return "Flawed test case: " + Util.message(ex);
     }
   }
 
