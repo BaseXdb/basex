@@ -85,15 +85,13 @@ public abstract class Seq extends Value {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
 
-    if(itemAt(0) instanceof ANode) return true;
-    if(pos == 0) throw testError(this, false, ii);
+    final Item first = itemAt(0);
+    if(first instanceof ANode) return true;
+    if(pos == 0 || !(first instanceof ANum)) throw testError(this, false, ii);
 
-    boolean num = false;
     for(final Item item : this) {
-      if(item instanceof ANode) return true;
-      if(!(item instanceof ANum)) throw testError(this, num, ii);
-      if(item.dbl(ii) == pos) return true;
-      num = true;
+      if(!(item instanceof ANum)) throw testError(this, true, ii);
+      if(item.test(qc, ii, pos)) return true;
     }
     return false;
   }
