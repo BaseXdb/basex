@@ -618,8 +618,8 @@ public final class QT3TS extends Main {
     final String exp = expected.getString();
     try {
       final String query = "declare variable $result external; " + exp;
-      return environment(new XQuery(query, ctx), result.env).variable("$result", result.value).
-          value().getBoolean() ? null : exp;
+      return environment(new XQuery(query, ctx), result.env).context(result.value).variable(
+          "$result", result.value).value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
       // should not occur
       return ex.getException().getMessage();

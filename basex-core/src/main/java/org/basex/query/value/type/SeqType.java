@@ -486,7 +486,7 @@ public final class SeqType {
             at == BASE64_BINARY && tp == HEX_BINARY
           ) {
             it = at.cast(it, qc, info);
-          } else if(at.instanceOf(tp)) {
+          } else if(!at.union(tp).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
             final Item old = it;
             if(enumValues != null) it = (Item) cast(it, true, qc, info);
             else it = at.cast(it, qc, info);
