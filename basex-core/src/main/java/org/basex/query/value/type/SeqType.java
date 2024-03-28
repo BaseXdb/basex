@@ -361,7 +361,7 @@ public final class SeqType {
    */
   public boolean instance(final Item item) throws QueryException {
     return item.instanceOf(type) && (test == null || test.matches(item))
-        || enumValues != null && item.instanceOf(ENUM) && enumValues.matches(item);
+        && (enumValues == null || enumValues.matches(item));
   }
 
   /**
@@ -392,7 +392,7 @@ public final class SeqType {
         final Item item = (Item) value;
         if(enumValues != null) {
           if(!enumValues.matches(item)) throw QueryError.typeError(item, type, info);
-          return item.type == STRING ? item : Str.get(item.string(info), ENUM);
+          return item.type == ENUM ? item : Str.get(item.string(info), ENUM);
         }
         return item.type.eq(type) ? item : type.cast(item, qc, info);
       }
@@ -401,7 +401,7 @@ public final class SeqType {
       for(final Item item : value) {
         if(enumValues != null) {
           if(!enumValues.matches(item)) throw QueryError.typeError(item, type, info);
-          vb.add(item.type == STRING ? item : Str.get(item.string(info), ENUM));
+          vb.add(item.type == ENUM ? item : Str.get(item.string(info), ENUM));
         } else if(item.type.eq(type)) {
           vb.add(item);
         } else {
@@ -472,11 +472,10 @@ public final class SeqType {
       for(Item it; (it = qc.next(iter)) != null;) {
         final Type tp = it.type;
         if(!tp.instanceOf(at)) {
-          if(enumValues != null) {
-            it = (Item) cast(it, true, qc, info);
-          } else if(tp == UNTYPED_ATOMIC) {
+          if(tp == UNTYPED_ATOMIC) {
             if(at.nsSensitive()) throw NSSENS_X_X.get(info, item.type, at);
-            it = at.cast(it, qc, info);
+            if(enumValues != null) it = (Item) cast(it, true, qc, info);
+            else it = at.cast(it, qc, info);
           } else if(
             at == DECIMAL && (tp == DOUBLE || tp == FLOAT) ||
             at == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL)) ||
@@ -489,7 +488,8 @@ public final class SeqType {
             it = at.cast(it, qc, info);
           } else if(at.instanceOf(tp)) {
             final Item old = it;
-            it = at.cast(it, qc, info);
+            if(enumValues != null) it = (Item) cast(it, true, qc, info);
+            else it = at.cast(it, qc, info);
             if(!it.equal(old, null, info)) throw error.get();
           } else {
             throw error.get();
