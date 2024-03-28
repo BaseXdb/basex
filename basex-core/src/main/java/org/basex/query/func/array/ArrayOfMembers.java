@@ -17,10 +17,10 @@ import org.basex.util.*;
 public final class ArrayOfMembers extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter members = arg(0).iter(qc);
+    final Iter input = arg(0).iter(qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(Item item; (item = qc.next(members)) != null;) {
+    for(Item item; (item = qc.next(input)) != null;) {
       ab.append(toRecord(item, Str.VALUE).get(Str.VALUE));
     }
     return ab.array(this);

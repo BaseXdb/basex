@@ -12,6 +12,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -59,6 +60,17 @@ public final class IntSeq extends NativeSeq {
   @Override
   public Int itemAt(final long pos) {
     return Int.get(values[(int) pos], type);
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+
+    if(pos == 0) return super.test(qc, ii, pos);
+    for(final long value : values) {
+      if(value == pos) return true;
+    }
+    return false;
   }
 
   @Override

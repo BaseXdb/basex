@@ -67,35 +67,31 @@ public abstract class ParseExpr extends Expr {
   public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
 
-    final QueryPredicate<Item> test = item ->
-      pos > 0 && item instanceof ANum ? item.dbl(info) == pos : item.bool(info);
-
     // single item
-    if(seqType().zeroOrOne()) return test.test(item(qc, info));
+    if(seqType().zeroOrOne()) return item(qc, info).test(qc, info, pos);
 
     // empty sequence?
     final Iter iter = iter(qc);
-    final Item item = iter.next();
-    if(item == null) return false;
+    final Item first = iter.next();
+    if(first == null) return false;
 
     // sequence starting with node?
-    if(item instanceof ANode) return true;
+    if(first instanceof ANode) return true;
 
     // single item?
     Item next = iter.next();
-    if(next == null) return test.test(item);
+    if(next == null) return first.test(qc, info, pos);
 
     // positional sequence?
-    final boolean num = item instanceof ANum;
-    if(pos > 0 && num && next instanceof ANum) {
-      if(test.test(item)) return true;
-      do {
-        if(!(next instanceof ANum)) throw testError(next, true, info);
-        if(test.test(next)) return true;
-      } while((next = iter.next()) != null);
-      return false;
-    }
-    throw testError(ValueBuilder.concat(item, next), pos > 0 && num, info);
+    if(pos == 0 || !(first instanceof ANum))
+      throw testError(ValueBuilder.concat(first, next), false, ii);
+
+    if(first.test(qc, info, pos)) return true;
+    do {
+      if(!(next instanceof ANum)) throw testError(ValueBuilder.concat(first, next), true, info);
+      if(next.test(qc, info, pos)) return true;
+    } while((next = iter.next()) != null);
+    return false;
   }
 
   @Override

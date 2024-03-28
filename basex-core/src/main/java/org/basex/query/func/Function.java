@@ -802,7 +802,7 @@ public enum Function implements AFunction {
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
       params(ARRAY_O), MAP_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_OF_MEMBERS(ArrayOfMembers::new, "of-members(members)",
+  _ARRAY_OF_MEMBERS(ArrayOfMembers::new, "of-members(input)",
       params(MAP_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array,position,member)",
