@@ -202,7 +202,7 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public boolean instanceOf(final Type tp) {
+  public boolean instanceOf(final Type tp) throws QueryException {
     if(type.instanceOf(tp)) return true;
 
     if(tp instanceof MapType) {

@@ -60,7 +60,7 @@ public class TypeCheck extends Single {
     }
 
     final SeqType et = expr.seqType();
-    occ = et.type.instanceOf(type) && et.kindInstanceOf(st);
+    occ = et.type.instanceOf(type) && et.kindInstanceOf(st) && et.valuesInstanceOf(st);
 
     // remove redundant type check
     if(expr instanceof TypeCheck) {
