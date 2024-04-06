@@ -78,10 +78,7 @@ public class FnJsonDoc extends Parse {
     final Value fallback = options.get(JsonParserOptions.FALLBACK);
     if(!fallback.isEmpty()) {
       final FItem fb = toFunction(fallback, 1, qc);
-      jc.fallback(s -> {
-        final Item item = fb.invoke(qc, info, Str.get(s)).atomItem(qc, info);
-        return item.isEmpty() ? Token.EMPTY : item.string(info);
-      });
+      jc.fallback(s -> toAtomItem(fb.invoke(qc, info, Str.get(s)), qc).string(info));
       if(options.get(JsonParserOptions.ESCAPE)) {
         throw OPTION_JSON_X.get(info, "Escape cannot be combined with fallback function.");
       }
