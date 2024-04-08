@@ -128,10 +128,9 @@ public final class Users {
   /**
    * Drops a user from the list.
    * @param user user reference
-   * @return success flag
    */
-  public synchronized boolean drop(final User user) {
-    return users.remove(user.name()) != null;
+  public synchronized void drop(final User user) {
+    users.remove(user.name());
   }
 
   /**
