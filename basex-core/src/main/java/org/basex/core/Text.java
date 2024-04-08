@@ -46,9 +46,8 @@ public interface Text {
   /** Main author. */
   String AUTHOR = "Christian Grün";
   /** Co-authors (1). */
-  String AUTHORS1 = "Michael Seiferle, Alexander Holupirek";
-  /** Co-authors (2). */
-  String AUTHORS2 = "Marc H. Scholl, Sabine Teubner, Dominik Abend";
+  String AUTHORS = "Michael Seiferle, Alexander Holupirek, Gunther Rademacher, Sabine Teubner, "
+      + "Dominik Abend, Marc H. Scholl";
 
   /** Entity. */
   String ORGANIZATION = Prop.NAME + " Team";

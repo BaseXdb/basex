@@ -39,7 +39,7 @@ public final class DialogAbout extends BaseXDialog {
 
     p.add(label, BorderLayout.WEST);
 
-    final BaseXBack pp = new BaseXBack(false).layout(new RowLayout());
+    final BaseXBack pp = new BaseXBack(new RowLayout());
 
     pp.add(new BaseXLabel(TITLE, false, true));
     final BaseXLabel url = new BaseXLabel("<html><u>" + PUBLIC_URL + "</u></html>");
@@ -52,14 +52,17 @@ public final class DialogAbout extends BaseXDialog {
     pp.add(new BaseXLabel(COPYRIGHT));
     pp.add(new BaseXLabel(LICENSE));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(new BaseXLabel(CHIEF_ARCHITECT + COLS + AUTHOR));
+    pp.add(new BaseXLabel(CHIEF_ARCHITECT, false, true));
+    pp.add(new BaseXLabel(AUTHOR));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(new BaseXLabel(TEAM + COLS + AUTHORS1 + ','));
-    pp.add(new BaseXLabel(AUTHORS2));
-    pp.add(new BaseXLabel(AND_OTHERS));
+    pp.add(new BaseXLabel(TEAM, false, true));
+    final BaseXBack authors = new BaseXBack(new RowLayout());
+    for(final String author : AUTHORS.split(",\\s+")) authors.add(new BaseXLabel("• " + author));
+    pp.add(authors);
     pp.add(Box.createVerticalStrut(7));
     final String lang = gui.context.soptions.get(StaticOptions.LANG);
-    pp.add(new BaseXLabel(TRANSLATION + " (" + lang + "): " + DialogGeneralPrefs.creds(lang)));
+    pp.add(new BaseXLabel(TRANSLATION + " (" + lang + ")", false, true));
+    pp.add(new BaseXLabel(DialogGeneralPrefs.credits(lang)));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);
 
