@@ -3079,9 +3079,13 @@ public class QueryParser extends InputParser {
     skipWs();
     final QNm name = eQName(sc.elemNS, TYPEINVALID);
     Type type = ListType.find(name);
+    EnumValues values = null;
     if(type == null) {
       type = AtomType.find(name, false);
-      if(consume("(")) throw error(SIMPLETYPE_X, name.prefixId(XML));
+      if(consume("(")) {
+        if(type != AtomType.ENUM) throw error(SIMPLETYPE_X, name.prefixId(XML));
+        values = enumerationType();
+      }
       if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
         type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
         throw error(INVALIDCAST_X, name.prefixId(XML));
@@ -3089,7 +3093,7 @@ public class QueryParser extends InputParser {
         throw error(WHICHCAST_X, AtomType.similar(name));
     }
     skipWs();
-    return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
+    return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE, values);
   }
 
   /**
@@ -3151,6 +3155,10 @@ public class QueryParser extends InputParser {
         // item type
         type = AtomType.ITEM;
         wsCheck(")");
+      } else if(name.eq(AtomType.ENUM.qname())) {
+        // enum type
+        type = AtomType.ENUM;
+        st = SeqType.get(type, Occ.EXACTLY_ONE, enumerationType());
       }
       // no type found
       if(type == null) throw error(WHICHTYPE_X, FuncType.similar(name));
@@ -3299,6 +3307,20 @@ public class QueryParser extends InputParser {
       return null;
     }
     return Test.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name), null);
+  }
+
+  /**
+   * Parses the "EnumerationType" rule without the leading keyword and the opening bracket.
+   * @return enum values
+   * @throws QueryException query exception
+   */
+  private EnumValues enumerationType() throws QueryException {
+    final TokenSet values = new TokenSet();
+    do {
+      values.add(stringLiteral());
+    } while(wsConsume(","));
+    check(')');
+    return new EnumValues(values);
   }
 
   /**

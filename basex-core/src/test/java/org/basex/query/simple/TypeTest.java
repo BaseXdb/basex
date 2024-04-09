@@ -14,6 +14,9 @@ public final class TypeTest extends QueryTest {
         { "Simple 1", booleans(true), "1 castable as xs:integer" },
         { "Simple 2", booleans(true), "1 castable as xs:integer?" },
         { "Simple 3", booleans(true), "() castable as xs:integer?" },
+        { "Simple 4", strings("42"), "(42 cast as enum('42')) cast as enum('42', '43')" },
+        { "Simple 5", booleans(true), "(42 cast as enum('42')) castable as enum('42', '43')" },
+        { "Simple 6", booleans(false), "(42 cast as enum('42')) castable as enum('43')" },
 
         { "SimpleErr 1", "1 castable as xs:integer+" },
         { "SimpleErr 2", "1 castable as xs:integer()" },
@@ -21,6 +24,7 @@ public final class TypeTest extends QueryTest {
         { "SimpleErr 4", "1 castable as integer" },
         { "SimpleErr 5", "1 castable as xs:NOTATION" },
         { "SimpleErr 6", "1 castable as xs:anyAtomicType" },
+        { "SimpleErr 7", "(42 cast as enum('42')) cast as enum('x')" },
 
         { "Type 1", booleans(true), "1 instance of item()" },
         { "Type 2", booleans(true), "1 instance of xs:anyAtomicType" },

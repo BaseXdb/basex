@@ -55,8 +55,8 @@ public final class Instance extends Single {
     }
 
     // 1: only check item type, 2: only check occurrence indicator
-    check = et.occ.instanceOf(seqType.occ) ? 1 :
-      et.type.instanceOf(seqType.type) && et.kindInstanceOf(seqType) ? 2 : 0;
+    check = et.occ.instanceOf(seqType.occ) ? 1 : et.type.instanceOf(seqType.type) &&
+      et.kindInstanceOf(seqType) && et.valuesInstanceOf(seqType) ? 2 : 0;
     return this;
   }
 
