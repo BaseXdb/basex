@@ -50,8 +50,8 @@ function dba:settings(
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='33%'>
-        <form action='settings' method='post'>
-          <h2>Settings » { html:button('save', 'Save') }</h2>
+        <form method='post'>
+          <h2>Settings » { html:button('settings-save', 'Save') }</h2>
           <h3>Queries</h3>
           <table>
             {
@@ -74,8 +74,8 @@ function dba:settings(
       </td>
       <td class='vertical'/>
       <td width='33%'>
-        <form action='settings-gc' method='post'>
-          <h2>Global Options » { html:button('gc', 'GC') }</h2>
+        <form method='post'>
+          <h2>Global Options » { html:button('settings-gc', 'GC') }</h2>
           <table>{
             $system/tr[th][3]/preceding-sibling::tr[not(th)]
           }</table>
@@ -98,7 +98,7 @@ function dba:settings(
  :)
 declare
   %rest:POST
-  %rest:path('/dba/settings')
+  %rest:path('/dba/settings-save')
 function dba:settings-save(
 ) as element(rest:response) {
   config:save(html:parameters()),

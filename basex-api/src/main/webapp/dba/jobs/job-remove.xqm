@@ -16,10 +16,10 @@ declare variable $dba:CAT := 'jobs';
  : @return redirection
  :)
 declare
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/job-remove')
   %rest:query-param('id', '{$ids}')
-function dba:job-stop(
+function dba:job-remove(
   $ids  as xs:string*
 ) as element(rest:response) {
   let $params := try {

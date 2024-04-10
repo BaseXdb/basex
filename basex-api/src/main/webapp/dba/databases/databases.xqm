@@ -60,7 +60,7 @@ function dba:databases(
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
-        <form action='{ $dba:CAT }' method='post' class='update'>
+        <form method='post'>
           <h2>Databases</h2>
           {
             let $headers := (
@@ -72,10 +72,10 @@ function dba:databases(
             let $entries := ($databases, $backups)
             let $buttons := (
               html:button('db-create', 'Create…'),
-              html:button('db-optimize-all', 'Optimize'),
-              html:button('db-drop', 'Drop', true()),
-              html:button('backup-create-all', 'Back up'),
-              html:button('backup-restore-all', 'Restore', true())
+              html:button('dbs-optimize', 'Optimize', 'CHECK'),
+              html:button('dbs-drop', 'Drop', ('CHECK', 'CONFIRM')),
+              html:button('backups-create', 'Back up', 'CHECK'),
+              html:button('backups-restore', 'Restore', ('CHECK', 'CONFIRM'))
             )
             let $count := count($db-names) + count($backups)
             let $options := map {
@@ -91,15 +91,15 @@ function dba:databases(
       <td class='vertical'/>
       <td>
         <h2>Upload Backups</h2>
-        <form action='backup-upload' method='post' enctype='multipart/form-data'>
-          <input type='file' name='files' multiple='multiple'/>
-          <input type='submit' value='Send'/>
-        </form>
+        <form method='post' enctype='multipart/form-data'>{
+          <input type='file' name='files' multiple='multiple'/>,
+          html:button('backup-upload', 'Upload')
+        }</form>
         <div class='note'>
           Ensure that your server has enough RAM assigned to upload large backups.
         </div>
         <div class='small'/>
-        <form action='{ $dba:CAT }' method='post' class='update'>
+        <form method='post'>
           <input type='hidden' name='name' value=''/>
           <h2>General Backups</h2>
           <div class='note'>
@@ -131,9 +131,9 @@ function dba:databases(
                 }
               }
             let $buttons := (
-              html:button('backup-create', 'Create…', false(), map { 'class': 'global' }),
-              html:button('backup-restore', 'Restore', true()),
-              html:button('backup-drop', 'Drop', true())
+              html:button('backup-create', 'Create…'),
+              html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
+              html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
             )
             let $params := map { 'name': '' }
             return html:table($headers, $entries, $buttons, $params, map { })
@@ -141,34 +141,5 @@ function dba:databases(
         </form>
       </td>
     </tr>
-  )
-};
-
-(:~
- : Redirects to the specified action.
- : @param  $action   action to perform
- : @param  $names    names of selected databases
- : @param  $backups  backups
- : @return redirection
- :)
-declare
-  %rest:POST
-  %rest:path('/dba/databases')
-  %rest:query-param('action', '{$action}')
-  %rest:query-param('name',   '{$names}')
-  %rest:query-param('backup',  '{$backups}')
-function dba:databases-redirect(
-  $action   as xs:string,
-  $names    as xs:string*,
-  $backups  as xs:string*
-) as element(rest:response) {
-  web:redirect($action,
-    if($action = ('db-create')) then (
-      map { }
-    ) else if($action = ('backup-create', 'backup-drop', 'backup-restore')) then (
-      map { 'redirect': $dba:CAT, 'backup': $backups }
-    ) else (
-      map { 'name': $names }
-    )
   )
 };

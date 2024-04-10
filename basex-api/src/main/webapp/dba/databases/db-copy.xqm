@@ -22,6 +22,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
+  %rest:POST
   %rest:path('/dba/db-copy')
   %rest:query-param('name',    '{$name}')
   %rest:query-param('newname', '{$newname}')
@@ -36,19 +37,19 @@ function dba:db-copy(
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action='db-copy' method='post' autocomplete='off'>
+        <form method='post' autocomplete='off'>
           <input type='hidden' name='name' value='{ $name }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:button('db-copy', 'Copy')
+            html:button('db-copy-do', 'Copy')
           }</h2>
           <table>
             <tr>
               <td>New name:</td>
               <td>
-                <input type='text' name='newname' value='{ head(($newname, $name)) }' id='newname'/>
-                { html:focus('newname') }
+                <input type='text' name='newname' value='{ $newname otherwise $name }'
+                  autofocus='autofocus'/>
                 <div class='small'/>
               </td>
             </tr>
@@ -68,10 +69,10 @@ function dba:db-copy(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/db-copy')
+  %rest:path('/dba/db-copy-do')
   %rest:query-param('name',    '{$name}')
   %rest:query-param('newname', '{$newname}')
-function dba:db-copy(
+function dba:db-copy-do(
   $name     as xs:string,
   $newname  as xs:string
 ) as empty-sequence() {

@@ -52,14 +52,14 @@ function dba:user(
     },
     <tr>
       <td>
-        <form action='user-update' method='post' autocomplete='off'>
+        <form method='post' autocomplete='off'>
           <!--  prevent chrome from auto-completing form -->
           <input style='display:none' type='text' name='fake1'/>
           <input style='display:none' type='password' name='fake2'/>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             $name, ' » ',
-            html:button('update', 'Update')
+            html:button('user-update', 'Update')
           }</h2>
           <input type='hidden' name='name' value='{ $name }'/>
           <table>{
@@ -69,8 +69,7 @@ function dba:user(
                   <td>Name:</td>
                   <td>
                     <input type='text' name='newname'
-                      value='{ head(($newname, $name)) }' id='newname'/>
-                    { html:focus('newname') }
+                      value='{ $newname otherwise $name }' autofocus='autofocus'/>
                     <div class='small'/>
                   </td>
                 </tr>
@@ -78,7 +77,8 @@ function dba:user(
               <tr>
                 <td>Password:</td>
                 <td>
-                  <input type='password' name='pw' value='{ $pw }' id='pw'/> &#xa0;
+                  <input type='password' name='pw' value='{ $pw }' autofocus='autofocus'/>
+                  &#xa0;
                   <span class='note'>
                     …only changed if a new one is entered<br/>
                   </span>
@@ -90,9 +90,9 @@ function dba:user(
                   <td>Permission:</td>
                   <td>
                     <select name='perm' size='5'>{
-                      let $perm := head(($perm, $user/@permission))
+                      let $prm := $perm otherwise $user/@permission
                       for $p in $config:PERMISSIONS
-                      return element option { attribute selected { }[$p = $perm], $p }
+                      return element option { if($p = $prm) then attribute selected { }, $p }
                     }</select>
                     <div class='small'/>
                   </td>
@@ -115,7 +115,7 @@ function dba:user(
       <td>{
         if($admin) then () else <_>
           <h3>Local Permissions</h3>
-          <form action='{ $dba:SUB }' method='post' id='{ $dba:SUB }' class='update'>
+          <form method='post'>
             <input type='hidden' name='name' value='{ $name }' id='name'/>
             <div class='small'/>
             {
@@ -129,7 +129,7 @@ function dba:user(
               }
               let $buttons := if($admin) then () else (
                 html:button('pattern-add', 'Add…'),
-                html:button('pattern-drop', 'Drop', true())
+                html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
               )
               return html:table($headers, $entries, $buttons, map { }, map { })
             }
@@ -144,25 +144,4 @@ function dba:user(
       }</td>
     </tr>
   )
-};
-
-(:~
- : Redirects to the specified action.
- : @param  $action    action to perform
- : @param  $name      username
- : @param  $patterns  patterns
- : @return redirection
- :)
-declare
-  %rest:POST
-  %rest:path('/dba/user')
-  %rest:form-param('action',  '{$action}')
-  %rest:form-param('name',    '{$name}')
-  %rest:form-param('pattern', '{$patterns}')
-function dba:user-redirect(
-  $action    as xs:string,
-  $name      as xs:string,
-  $patterns  as xs:string*
-) as element(rest:response) {
-  web:redirect($action, map { 'name': $name, 'pattern': $patterns })
 };

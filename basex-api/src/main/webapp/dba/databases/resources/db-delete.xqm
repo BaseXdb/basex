@@ -18,7 +18,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/db-delete')
   %rest:query-param('name',     '{$name}')
   %rest:query-param('resource', '{$resources}')

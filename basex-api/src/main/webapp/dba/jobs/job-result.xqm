@@ -14,7 +14,7 @@ declare variable $dba:CAT := 'jobs';
  : @return rest response and file content
  :)
 declare
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/job-result')
   %rest:query-param('id', '{$id}', '')
 function dba:job-result(

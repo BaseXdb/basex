@@ -22,6 +22,7 @@ declare variable $dba:CAT := 'users';
  :)
 declare
   %rest:GET
+  %rest:POST
   %rest:path('/dba/user-create')
   %rest:query-param('name',  '{$name}')
   %rest:query-param('pw',    '{$pw}')
@@ -38,13 +39,13 @@ function dba:user-create(
   html:wrap(map { 'header': $dba:CAT, 'error': $error },
     <tr>
       <td>
-        <form action='user-create' method='post' autocomplete='off'>
+        <form method='post' autocomplete='off'>
           <!--  force chrome not to autocomplete form -->
           <input style='display:none' type='text' name='fake1'/>
           <input style='display:none' type='password' name='fake2'/>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
-            html:button('create', 'Create')
+            html:button('user-create-do', 'Create')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
           <input type='hidden' name='opts' value='x'/>
@@ -52,16 +53,14 @@ function dba:user-create(
             <tr>
               <td>Name:</td>
               <td>
-                <input type='text' name='name' value='{ $name }' id='name'/>
-                { html:focus('name') }
+                <input type='text' name='name' value='{ $name }' autofocus='autofocus'/>
                 <div class='small'/>
               </td>
             </tr>
             <tr>
               <td>Password:</td>
               <td>
-                <input type='password' name='pw' value='{ $pw }' id='pw'
-                  autocomplete='new-password'/>
+                <input type='password' name='pw' value='{ $pw }' autocomplete='new-password'/>
                 <div class='small'/>
               </td>
             </tr>
@@ -92,11 +91,11 @@ function dba:user-create(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/user-create')
+  %rest:path('/dba/user-create-do')
   %rest:query-param('name', '{$name}')
   %rest:query-param('pw',   '{$pw}')
   %rest:query-param('perm', '{$perm}')
-function dba:user-create(
+function dba:user-create-do(
   $name  as xs:string,
   $pw    as xs:string,
   $perm  as xs:string

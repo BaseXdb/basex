@@ -41,7 +41,7 @@ function dba:jobs(
   },
     <tr>{
       <td>
-        <form action='{ $dba:CAT }' method='post' class='update'>
+        <form method='post'>
         <h2>Jobs</h2>
         {
           let $headers := (
@@ -74,7 +74,7 @@ function dba:jobs(
               'start': $start otherwise $time
             }
           let $buttons := (
-            html:button('job-remove', 'Remove', true())
+            html:button('job-remove', 'Remove', ('CHECK', 'CONFIRM'))
           )
           let $options := map { 'sort': $sort, 'presort': 'duration' }
           return html:table($headers, $entries, $buttons, map { }, $options) update {
@@ -94,11 +94,11 @@ function dba:jobs(
         return (
           <td class='vertical'/>,
           <td>
-            <form action='jobs' method='post' id='jobs'>{
+            <form method='post'>{
               <input type='hidden' name='id' value='{ $job }'/>,
               <h2>{
                 'Job: ', $job, '&#xa0;',
-                if($details) then html:button('job-remove', 'Remove', false())
+                if($details) then html:button('job-remove', 'Remove')
               }</h2>,
 
               if($details) then (
@@ -163,22 +163,4 @@ function dba:jobs(
       ) else()
     }</tr>
   )
-};
-
-(:~
- : Redirects to the specified action.
- : @param  $action  action to perform
- : @param  $ids     ids
- : @return redirection
- :)
-declare
-  %rest:POST
-  %rest:path('/dba/jobs')
-  %rest:query-param('action', '{$action}')
-  %rest:query-param('id',     '{$ids}')
-function dba:jobs-redirect(
-  $action  as xs:string,
-  $ids     as xs:string*
-) as element(rest:response) {
-  web:redirect($action, map { 'id': $ids })
 };

@@ -189,45 +189,27 @@ declare function html:button(
   $value  as xs:string,
   $label  as xs:string
 ) as element(button) {
-  html:button($value, $label, false())
+  html:button($value, $label, ())
 };
 
 (:~
  : Creates a button.
- : @param  $value    button value
+ : @param  $action   button action
  : @param  $label    label
- : @param  $confirm  confirm click
+ : @param  $options  options: 'CONFIRM' (show confirmation dialog), 'CHECK' (consider checkboxes)
  : @return button
  :)
 declare function html:button(
-  $value    as xs:string,
+  $action   as xs:string,
   $label    as xs:string,
-  $confirm  as xs:boolean
+  $options  as xs:string*
 ) as element(button) {
-  html:button($value, $label, $confirm, map {})
-};
-
-(:~
- : Creates a button.
- : @param  $value    button value
- : @param  $label    label
- : @param  $confirm  confirm click
- : @param  $atts     additional attributes
- : @return button
- :)
-declare function html:button(
-  $value    as xs:string,
-  $label    as xs:string,
-  $confirm  as xs:boolean,
-  $atts     as map(xs:string, xs:string)
-) as element(button) {
-  element button {
-    attribute name { 'action' },
-    attribute value { $value },
-    attribute onclick { 'return confirm("Are you sure?");' }[$confirm],
-    map:for-each($atts, fn($key, $value) { attribute { $key } { $value } }),
+  <button>{
+    attribute formaction { $action }[$action],
+    attribute onclick { 'return confirm("Are you sure?");' }[$options = 'CONFIRM'],
+    attribute data-check { 'check' }[$options = 'CHECK'],
     $label
-  }
+  }</button>
 };
 
 (:~
@@ -313,7 +295,7 @@ declare function html:table(
   (: sort entries :)
   let $sort := $options?sort
   let $sorted-entries := (
-    let $key := head(($sort[.], $headers[1]?key))
+    let $key := head(($sort[.], head($headers)?key))
     return if(not($sort) or $key = $options?presort) then (
       $entries
     ) else (
@@ -454,18 +436,6 @@ declare function html:table(
       }
     }
   )
-};
-
-(:~
- : Focuses the specified field via Javascript.
- : @param  $element  element to be focused
- : @return script element
- :)
-declare function html:focus(
-  $element  as xs:string
-) as element(script) {
-  html:js('var u = document.getElementById("' || replace($element, '"', '') || '"); ' ||
-    'u.focus(); u.select();')
 };
 
 (:~

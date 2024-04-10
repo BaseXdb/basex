@@ -16,10 +16,10 @@ declare variable $dba:CAT := 'logs';
  : @return redirection
  :)
 declare
-  %rest:GET
-  %rest:path('/dba/log-delete')
+  %rest:POST
+  %rest:path('/dba/logs-delete')
   %rest:query-param('name', '{$names}')
-function dba:log-delete(
+function dba:logs-delete(
   $names  as xs:string*
 ) as element(rest:response) {
   try {

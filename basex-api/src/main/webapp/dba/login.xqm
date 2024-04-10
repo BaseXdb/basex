@@ -61,7 +61,7 @@ function dba:login(
   html:wrap(map { 'error': $error },
     <tr>
       <td>
-        <form action='login-check' method='post'>
+        <form method='post'>
           <input type='hidden' name='_page' value='{ $page }'/>
           {
             map:for-each(html:parameters(), fn($key, $value) {
@@ -73,8 +73,7 @@ function dba:login(
             <tr>
               <td><b>Name:</b></td>
               <td>
-                <input type='text' name='_name' value='{ $name }' id='user'/>
-                { html:focus('user') }
+                <input type='text' name='_name' value='{ $name }' autofocus='autofocus'/>
               </td>
             </tr>
             <tr>
@@ -82,7 +81,7 @@ function dba:login(
               <td>{
                 <input type='password' name='_pass'/>,
                 ' ',
-                <input type='submit' value='Login'/>
+                html:button('login-check', 'Login')
               }</td>
             </tr>
           </table>

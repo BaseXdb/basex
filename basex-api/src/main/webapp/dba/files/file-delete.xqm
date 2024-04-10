@@ -17,7 +17,7 @@ declare variable $dba:CAT := 'files';
  : @return redirection
  :)
 declare
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/file-delete')
   %rest:query-param('name', '{$names}')
 function dba:file-delete(

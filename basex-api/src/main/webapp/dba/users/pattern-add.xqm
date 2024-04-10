@@ -24,6 +24,7 @@ declare variable $dba:SUB := 'user';
  :)
 declare
   %rest:GET
+  %rest:POST
   %rest:path('/dba/pattern-add')
   %rest:query-param('name',    '{$name}')
   %rest:query-param('pattern', '{$pattern}')
@@ -40,19 +41,18 @@ function dba:pattern-add(
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action='pattern-add' method='post' autocomplete='off'>
+        <form method='post' autocomplete='off'>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:button('create', 'Add Pattern')
+            html:button('pattern-add-do', 'Add Pattern')
           }</h2>
           <input type='hidden' name='name' value='{ $name }'/>
           <table>
             <tr>
               <td>Pattern:</td>
               <td>
-                <input type='text' name='pattern' value='{ $pattern }' id='pattern'/>
-                { html:focus('pattern') } &#xa0;
+                <input type='text' name='pattern' value='{ $pattern }' autofocus='autofocus'/>  
                 <span class='note'>…support for <a target='_blank'
                   href='https://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.</span>
                 <div class='small'/>
@@ -85,11 +85,11 @@ function dba:pattern-add(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/pattern-add')
+  %rest:path('/dba/pattern-add-do')
   %rest:query-param('name',    '{$name}')
   %rest:query-param('perm',    '{$perm}')
   %rest:query-param('pattern', '{$pattern}')
-function dba:create(
+function dba:pattern-add-do(
   $name     as xs:string,
   $perm     as xs:string,
   $pattern  as xs:string

@@ -13,6 +13,7 @@ module namespace dba = 'dba/databases';
  : @return rest response and file content
  :)
 declare
+  %rest:POST
   %rest:path('/dba/db-download')
   %rest:query-param('name',     '{$name}')
   %rest:query-param('resource', '{$resource}')

@@ -20,7 +20,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/backup-restore')
   %rest:query-param('name',   '{$name}', '')
   %rest:query-param('backup', '{$backups}')
@@ -47,10 +47,10 @@ function dba:backup-restore(
  :)
 declare
   %updating
-  %rest:GET
-  %rest:path('/dba/backup-restore-all')
+  %rest:POST
+  %rest:path('/dba/backups-restore')
   %rest:query-param('name', '{$names}')
-function dba:db-optimize-all(
+function dba:backups-restore(
   $names  as xs:string*
 ) as empty-sequence() {
   try {

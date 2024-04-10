@@ -84,15 +84,15 @@ function dba:logs(
                  onkeyup='logFilter();' class='smallinput'/>
         }</h2>
 
-        <form action='{ $dba:CAT }' class='update' method='post' id='dates'>
+        <form method='post' id='dates'>
           <input type='hidden' name='date' id='date' value='{ $date }'/>
           <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
           <input type='hidden' name='page' id='page' value='{ $page }'/>
           <input type='hidden' name='time' id='time' value='{ $time }'/>
           <div id='list'>{
             let $buttons := (
-              html:button('log-download', 'Download', false(), map { 'id': 'log-download'}),
-              html:button('log-delete', 'Delete', true(), map { 'id': 'log-delete'})
+              html:button('logs-download', 'Download', 'CHECK'),
+              html:button('logs-delete', 'Delete', ('CHECK', 'CONFIRM'))
             )
             let $headers := (
               map { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
@@ -123,13 +123,12 @@ function dba:logs(
             $date, '&#xa0;',
             <input type='hidden' name='name' value='{ $date }'/>,
             <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                   title='Enter regular expression'
+                   title='Enter regular expression' autofocus='autofocus'
                    onkeyup='logEntries(event.key);'/>
           }</h3>,
           <div id='output'/>,
           html:js('logEntries();')
-        ) else (),
-        html:focus('input')
+        )
       }</td>
     </tr>
   )
@@ -229,22 +228,4 @@ function dba:log(
   let $params := map { 'name': $date, 'input': $input }
   let $options := map { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
   return html:table($headers, $entries, (), $params, $options)
-};
-
-(:~
- : Redirects to the specified action.
- : @param  $action  action to perform
- : @param  $names   names of selected log files
- : @return redirection
- :)
-declare
-  %rest:POST
-  %rest:path('/dba/logs')
-  %rest:query-param('action', '{$action}')
-  %rest:query-param('name',   '{$names}')
-function dba:logs-redirect(
-  $action  as xs:string,
-  $names   as xs:string*
-) as element(rest:response) {
-  web:redirect($action, map { 'name': $names[.], 'redirect': $dba:CAT })
 };

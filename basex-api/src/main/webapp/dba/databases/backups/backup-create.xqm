@@ -20,6 +20,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
+  %rest:POST
   %rest:path('/dba/backup-create')
   %rest:query-param('name', '{$name}', '')
   %output:method('html')
@@ -30,19 +31,19 @@ function dba:backup-create(
   html:wrap(map { 'header': ($dba:CAT, $name) },
     <tr>
       <td>
-        <form action='backup-create' method='post' autocomplete='off'>
+        <form method='post' autocomplete='off'>
           <input type='hidden' name='name' value='{ $name }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             (html:link($name, $dba:SUB, map { 'name': $name }), ' » ')[$name],
-            html:button('backup-create', 'Create Backup')
+            html:button('backup-create-do', 'Create Backup')
           }</h2>
           <table>
             <tr>
               <td>Comment:</td>
               <td>
-                <input type='text' name='comment' id='comment' size='64' placeholder='optional'/>
-                { html:focus('comment') }
+                <input type='text' name='comment' size='64' placeholder='optional'
+                  autofocus='autofocus'/>
               </td>
             </tr>
             <tr>
@@ -68,11 +69,11 @@ function dba:backup-create(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/backup-create')
+  %rest:path('/dba/backup-create-do')
   %rest:query-param('name',     '{$name}', '')
   %rest:query-param('comment',  '{$comment}')
   %rest:query-param('compress', '{$compress}')
-function dba:db-rename(
+function dba:backup-create-do(
   $name      as xs:string,
   $comment   as xs:string,
   $compress  as xs:string?
@@ -92,10 +93,10 @@ function dba:db-rename(
  :)
 declare
   %updating
-  %rest:GET
-  %rest:path('/dba/backup-create-all')
+  %rest:POST
+  %rest:path('/dba/backups-create')
   %rest:query-param('name', '{$names}')
-function dba:db-optimize-all(
+function dba:backups-create(
   $names  as xs:string*
 ) as empty-sequence() {
   try {

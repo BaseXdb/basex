@@ -24,6 +24,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
+  %rest:POST
   %rest:path('/dba/db-put')
   %rest:query-param('name',   '{$name}')
   %rest:query-param('opts',   '{$opts}')
@@ -43,11 +44,11 @@ function dba:db-put(
   return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action='db-put' method='post' enctype='multipart/form-data' autocomplete='off'>
+        <form method='post' enctype='multipart/form-data' autocomplete='off'>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:button('db-put', 'Put')
+            html:button('db-put-do', 'Put')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
           <input type='hidden' name='opts' value='x'/>
@@ -98,13 +99,13 @@ function dba:db-put(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/db-put')
+  %rest:path('/dba/db-put-do')
   %rest:form-param('name',   '{$name}')
   %rest:form-param('opts',   '{$opts}')
   %rest:form-param('path',   '{$path}')
   %rest:form-param('file',   '{$file}')
   %rest:form-param('binary', '{$binary}')
-function dba:db-put-post(
+function dba:db-put-do(
   $name    as xs:string,
   $opts    as xs:string*,
   $path    as xs:string,
@@ -126,7 +127,7 @@ function dba:db-put-post(
         )
       ),
       utils:redirect($dba:SUB,
-        map { 'name': $name, 'path': $path, 'info': 'Resource was put.' }
+        map { 'name': $name, 'path': $path, 'info': 'Resource was added or updated.' }
       )
     )
   } catch * {

@@ -35,7 +35,7 @@ function dba:sessions(
   html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
-        <form action='{ $dba:CAT }' method='post' class='update'>
+        <form method='post'>
         <h2>Web Sessions</h2>
         {
           let $headers := (
@@ -66,7 +66,7 @@ function dba:sessions(
               'you': $you
             }
           let $buttons := (
-            html:button('session-kill', 'Kill', true())
+            html:button('session-kill', 'Kill', ('CHECK', 'CONFIRM'))
           )
           let $options := map { 'sort': $sort, 'presort': 'access' }
           return html:table($headers, $entries, $buttons, map { }, $options)
@@ -90,25 +90,4 @@ function dba:sessions(
       </td>
     </tr>
   )
-};
-
-(:~
- : Redirects to the specified action.
- : @param  $action  action to perform
- : @param  $names   names of users
- : @param  $ids     ids
- : @return redirection
- :)
-declare
-  %rest:POST
-  %rest:path('/dba/sessions')
-  %rest:query-param('action', '{$action}')
-  %rest:query-param('name',   '{$names}')
-  %rest:query-param('id',     '{$ids}')
-function dba:users-redirect(
-  $action  as xs:string,
-  $names   as xs:string*,
-  $ids     as xs:string*
-) as element(rest:response) {
-  web:redirect($action, map { 'id': $ids })
 };

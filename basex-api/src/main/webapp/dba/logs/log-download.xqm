@@ -14,10 +14,10 @@ declare variable $dba:CAT := 'logs';
  : @return single or zipped file
  :)
 declare
-  %rest:GET
-  %rest:path('/dba/log-download')
+  %rest:POST
+  %rest:path('/dba/logs-download')
   %rest:query-param('name', '{$names}')
-function dba:log-download(
+function dba:logs-download(
   $names  as xs:string*
 ) as item()+ {
   if(count($names) = 1) then (

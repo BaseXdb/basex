@@ -17,7 +17,7 @@ declare variable $dba:CAT := 'users';
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/user-drop')
   %rest:query-param('name', '{$names}')
 function dba:user-drop(

@@ -18,7 +18,7 @@ declare variable $dba:SUB := 'user';
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/pattern-drop')
   %rest:query-param('name',    '{$name}')
   %rest:query-param('pattern', '{$patterns}')

@@ -46,20 +46,9 @@ function buttons(source) {
     }
     if(header) header.checked = count && count === checked;
 
-    // refresh button states
-    if(form.className === "update") {
-      var values = [
-        "backup", "backup-create-all", "backup-drop", "backup-restore", "backup-restore-all",
-        "db-drop", "db-optimize", "db-optimize-all", "delete", "file-delete", "job-remove",
-        "job-stop", "log-delete", "log-download", "pattern-drop", "session-kill", "user-drop"
-      ];
-      for(var button of form.getElementsByTagName("button")) {
-        if(button.className !== "global") {
-          for(var value of values) {
-            if(button.value === value) button.disabled = !checked;
-          }
-        }
-      }
+    // check button states
+    for(var button of form.getElementsByTagName("button")) {
+      if(button.getAttribute("data-check")) button.disabled = !checked;
     }
   }
 }

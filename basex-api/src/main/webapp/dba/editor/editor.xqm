@@ -67,8 +67,7 @@ function dba:editor(
       </tr>,
       <tr>
         <td width='50%'>
-          <textarea id='editor' name='editor'/>
-          { html:focus('editor') }
+          <textarea id='editor' name='editor' autofocus='autofocus'/>
         </td>
         <td width='50%'>{
           <textarea name='output' id='output' readonly=''/>,

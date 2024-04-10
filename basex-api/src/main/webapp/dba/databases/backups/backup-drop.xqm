@@ -20,7 +20,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/backup-drop')
   %rest:query-param('name',   '{$name}', '')
   %rest:query-param('backup', '{$backups}')

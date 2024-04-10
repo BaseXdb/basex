@@ -16,7 +16,7 @@ declare variable $dba:CAT := 'sessions';
  : @return redirection
  :)
 declare
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/session-kill')
   %rest:query-param('id', '{$ids}')
 function dba:drop(

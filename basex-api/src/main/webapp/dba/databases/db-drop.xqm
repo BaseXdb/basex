@@ -17,10 +17,10 @@ declare variable $dba:CAT := 'databases';
  :)
 declare
   %updating
-  %rest:GET
-  %rest:path('/dba/db-drop')
+  %rest:POST
+  %rest:path('/dba/dbs-drop')
   %rest:query-param('name', '{$names}')
-function dba:db-drop(
+function dba:dbs-drop(
   $names  as xs:string*
 ) as empty-sequence() {
   try {

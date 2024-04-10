@@ -32,8 +32,6 @@ function dba:users-info(
     return user:update-info($xml),
 
     utils:redirect($dba:CAT, map { 'info': 'User information was updated.' })
-  } catch err:FODC0006 {
-    utils:redirect($dba:CAT, map { 'error': 'XML with "info" root element expected.' })
   } catch * {
     utils:redirect($dba:CAT, map { 'error': $err:description })
   }
@@ -83,12 +81,10 @@ function dba:user-update(
       where not(deep-equal(user:info($name), $xml))
       return user:update-info($xml, $name)
     ),
-    utils:redirect($dba:SUB, map { 'name': $newname, 'info': 'User was updated.' })
+    utils:redirect($dba:CAT, map { 'name': $newname, 'info': 'User was updated.' })
   } catch * {
-    let $error := if($err:code != xs:QName('err:FODC0006')) then $err:description else
-      'XML with "info" root element expected.'
-    return utils:redirect($dba:SUB, map {
-      'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm, 'error': $error
+    utils:redirect($dba:SUB, map {
+      'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm, 'error': $err:description
     })
   }
 };
@@ -102,10 +98,15 @@ declare %private function dba:user-info(
   $info  as xs:string
 ) as element(info) {
   if($info) then (
-    parse-xml($info)/*[self::info or error(xs:QName(err:FODC0006))] update {
-      delete node .//text()[not(normalize-space())]
-    }
+    let $xml := parse-xml($info)/*
+    return if($xml/self::info) then (
+      $xml update {
+        delete node .//text()[not(normalize-space())]
+      }
+    ) else (
+      error((), 'XML with "info" root element expected.')
+    )
   ) else (
-    element info {}
+    element info { }
   )
 };

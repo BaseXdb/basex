@@ -22,6 +22,7 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %rest:GET
+  %rest:POST
   %rest:path('/dba/db-replace')
   %rest:query-param('name',     '{$name}')
   %rest:query-param('resource', '{$resource}')
@@ -36,20 +37,19 @@ function dba:db-replace(
   html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
-        <form action='db-replace' method='post' enctype='multipart/form-data'>
+        <form method='post' enctype='multipart/form-data'>
           <input type='hidden' name='name' value='{ $name }'/>
           <input type='hidden' name='resource' value='{ $resource }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
             html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }), ' » ',
-            html:button('db-replace', 'Replace')
+            html:button('db-replace-do', 'Replace')
           }</h2>
           <table>
             <tr>
               <td>
-                <input type='file' name='file'/>
-                { html:focus('file') }
+                <input type='file' name='file' autofocus='autofocus'/>
                 <div class='small'/>
               </td>
             </tr>
@@ -61,7 +61,7 @@ function dba:db-replace(
 };
 
 (:~
- : Replaces a resource in the database.
+ : Replaces a database resource.
  : @param  $name      database
  : @param  $resource  resource
  : @param  $file      file input
@@ -70,11 +70,11 @@ function dba:db-replace(
 declare
   %updating
   %rest:POST
-  %rest:path('/dba/db-replace')
+  %rest:path('/dba/db-replace-do')
   %rest:form-param('name',     '{$name}')
   %rest:form-param('resource', '{$resource}')
   %rest:form-param('file',     '{$file}')
-function dba:db-replace-post(
+function dba:db-replace-do(
   $name      as xs:string,
   $resource  as xs:string,
   $file      as map(*)?
