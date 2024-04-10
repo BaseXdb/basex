@@ -91,7 +91,7 @@ public final class ScanTest extends SandboxTest {
    * @param query query to be evaluated
    */
   private void run(final String query) {
-    Util.outln("Query: " + query);
+    Util.println("Query: " + query);
     // warm up
     query(query);
     final Performance p = new Performance();
@@ -99,10 +99,10 @@ public final class ScanTest extends SandboxTest {
     final Performance pl = new Performance();
     for(int l = 0; l < LOOPS; l++) {
       query(query);
-      Util.outln(pl);
+      Util.println(pl);
     }
     // print average runtime
-    Util.outln(p.getTime(LOOPS));
-    Util.outln();
+    Util.println(p.getTime(LOOPS));
+    Util.println("");
   }
 }

@@ -139,7 +139,7 @@ public final class InputInfo {
 
   @Override
   public int hashCode() {
-    return (path != null ? path.hashCode() : input.hashCode()) + column() + (line() << 16);
+    return (path != null ? path.hashCode() : Arrays.hashCode(input)) + column() + (line() << 16);
   }
 
   @Override

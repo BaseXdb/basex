@@ -2237,7 +2237,7 @@ public class QueryParser extends InputParser {
     // square array constructor
     if(wsConsume("[")) return new CArray(info(), true, values());
     // unary lookup
-    int p = pos;
+    final int p = pos;
     if(consume("?")) {
       if(!wsConsume(",") && !consume(")")) {
         final InputInfo ii = info();

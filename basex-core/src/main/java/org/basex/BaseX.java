@@ -164,7 +164,7 @@ public class BaseX extends CLI {
    * Launches the console mode, which reads and executes user input.
    */
   private void console() {
-    Util.outln(header() + NL + TRY_MORE_X);
+    Util.println(header() + NL + TRY_MORE_X);
     verbose = true;
 
     // create console reader
@@ -181,7 +181,7 @@ public class BaseX extends CLI {
         try {
           if(!execute(CommandParser.get(in, context).pwReader(cr))) {
             // show goodbye message if method returns false
-            Util.outln(BYE[new Random().nextInt(4)]);
+            Util.println(BYE[new Random().nextInt(4)]);
             break;
           }
         } catch(final IOException ex) {

@@ -47,7 +47,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
   @Override
   public DiskValues build() throws IOException {
-    Util.debug(detailedInfo());
+    Util.debugln(detailedInfo());
 
     try {
       final boolean updindex = data.meta.updindex;

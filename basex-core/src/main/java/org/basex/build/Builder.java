@@ -76,7 +76,7 @@ public abstract class Builder extends Job {
    */
   final void parse() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
-    Util.debug(shortInfo() + DOTS);
+    Util.debugln(shortInfo() + DOTS);
     try {
       // add document node and parse document
       parser.parse(this);

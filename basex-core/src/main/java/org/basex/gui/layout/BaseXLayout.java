@@ -235,11 +235,11 @@ public final class BaseXLayout {
             for(final DataFlavor df : tr.getTransferDataFlavors()) {
               sb.append("- ").append(df).append('\n');
             }
-            Util.debug(sb);
+            Util.debugln(sb);
           }
           break;
         }
-        Util.debug("Clipboard has no contents.");
+        Util.debugln("Clipboard has no contents.");
         break;
       } catch(final Exception ex) {
         Util.stack(ex);

@@ -59,7 +59,7 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
     @Override
     public String readLine(final String prompt) {
       try {
-        Util.out(prompt);
+        Util.print(prompt);
         return in.readLine();
       } catch(final IOException ex) {
         throw Util.notExpected(ex);
@@ -68,7 +68,7 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
 
     @Override
     public String password() {
-      Util.out(PW_PROMPT);
+      Util.print(PW_PROMPT);
       return Util.password();
     }
 

@@ -26,7 +26,7 @@ public class MemValuesBuilder extends ValuesBuilder {
 
   @Override
   public MemValues build() throws IOException {
-    Util.debug(detailedInfo());
+    Util.debugln(detailedInfo());
 
     final MemValues index = new MemValues(data, type);
     final boolean updindex = data.meta.updindex;

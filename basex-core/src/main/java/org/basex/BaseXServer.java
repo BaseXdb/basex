@@ -77,7 +77,7 @@ public final class BaseXServer extends CLI implements Runnable {
     super(ctx, args);
 
     // do not output header if called by HTTP server
-    if(!quiet && !daemon) Util.outln(header());
+    if(!quiet && !daemon) Util.println(header());
 
     final StaticOptions sopts = context.soptions;
     final int port = sopts.get(StaticOptions.SERVERPORT);
@@ -87,7 +87,7 @@ public final class BaseXServer extends CLI implements Runnable {
     // stop server
     if(stop) {
       stop();
-      if(!quiet) Util.outln(SRV_STOPPED_PORT_X, port);
+      if(!quiet) Util.println(SRV_STOPPED_PORT_X, port);
       // keep message visible for a while
       Performance.sleep(1000);
       return;
@@ -96,7 +96,7 @@ public final class BaseXServer extends CLI implements Runnable {
     // start server in a new Java process
     if(service) {
       start(port, args);
-      if(!quiet) Util.outln(SRV_STARTED_PORT_X, port);
+      if(!quiet) Util.println(SRV_STARTED_PORT_X, port);
       Performance.sleep(1000);
       return;
     }
@@ -122,7 +122,7 @@ public final class BaseXServer extends CLI implements Runnable {
 
     // show info that server has been started
     final String startX = Util.info(SRV_STARTED_PORT_X, port);
-    if(!quiet) Util.outln(startX);
+    if(!quiet) Util.println(startX);
     context.log.writeServer(LogType.OK, startX);
 
     // show info when server is aborted
@@ -210,7 +210,7 @@ public final class BaseXServer extends CLI implements Runnable {
 
     final int port = context.soptions.get(StaticOptions.SERVERPORT);
     final String stopX = Util.info(SRV_STOPPED_PORT_X, port);
-    if(!quiet) Util.outln(stopX);
+    if(!quiet) Util.println(stopX);
     context.log.writeServer(LogType.OK, stopX);
 
     // close database context

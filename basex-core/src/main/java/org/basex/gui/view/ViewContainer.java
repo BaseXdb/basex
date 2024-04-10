@@ -352,7 +352,7 @@ public final class ViewContainer extends BaseXBack {
     for(final ViewPanel view : views) {
       if(view.toString().equals(name)) return view;
     }
-    Util.debug(Util.className(this) + ": Unknown view \"%\"", name);
+    Util.debugln(Util.className(this) + ": Unknown view \"%\"", name);
     return null;
   }
 }

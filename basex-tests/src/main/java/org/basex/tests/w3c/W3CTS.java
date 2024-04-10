@@ -149,21 +149,21 @@ public abstract class W3CTS extends Main {
     data = new DBNode(new IOFile(path + input)).data();
 
     final DBNode root = new DBNode(data, 0);
-    Util.outln(NL + Util.className(this) + " Test Suite " + text("/*:test-suite/@version", root));
+    Util.println(NL + Util.className(this) + " Test Suite " + text("/*:test-suite/@version", root));
 
-    Util.outln("Caching Sources...");
+    Util.println("Caching Sources...");
     for(final Item node : nodes("//*:source", root)) {
       final String val = (path + text("@FileName", node)).replace('\\', '/');
       srcs.put(text("@ID", node), val);
     }
 
-    Util.outln("Caching Modules...");
+    Util.println("Caching Modules...");
     for(final Item node : nodes("//*:module", root)) {
       final String val = (path + text("@FileName", node)).replace('\\', '/');
       mods.put(text("@ID", node), val);
     }
 
-    Util.outln("Caching Collections...");
+    Util.println("Caching Collections...");
     for(final Item node : nodes("//*:collection", root)) {
       final String cname = text("@ID", node);
       final StringList dl = new StringList();
@@ -175,28 +175,28 @@ public abstract class W3CTS extends Main {
     init(root);
 
     if(reporting) {
-      Util.outln("Delete old results...");
+      Util.println("Delete old results...");
       new IOFile(results).delete();
     }
 
-    if(verbose) Util.outln();
+    if(verbose) Util.println("");
     final Value nodes = minimum ?
       nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
       nodes(group != null ? "//*:test-group[@name eq '" + group +
         "']//*:test-case" : "//*:test-case", root);
 
     long total = nodes.size();
-    Util.out("Parsing " + total + " Queries");
+    Util.print("Parsing " + total + " Queries");
     int t = 0;
     for(final Item node : nodes) {
       if(!parse(node)) break;
-      if(!verbose && t++ % 500 == 0) Util.out(".");
+      if(!verbose && t++ % 500 == 0) Util.print(".");
     }
-    Util.outln();
+    Util.println("");
     total = ok + ok2 + err + err2;
 
     final String time = perf.getTime();
-    Util.outln("Writing log file..." + NL);
+    Util.println("Writing log file..." + NL);
     try(PrintOutput po = new PrintOutput(new IOFile(path + pathlog))) {
       po.println("TEST RESULTS ________________________________________________");
       po.println(NL + "Total #Queries: " + total);
@@ -223,11 +223,11 @@ public abstract class W3CTS extends Main {
       }
     }
 
-    Util.outln("Total #Queries: " + total);
-    Util.outln("Correct / Empty results: " + ok + " / " + ok2);
-    Util.out("Conformance (w/empty results): ");
-    Util.outln(pc(ok, total) + " / " + pc(ok + ok2, total));
-    Util.outln("Total Time: " + time);
+    Util.println("Total #Queries: " + total);
+    Util.println("Correct / Empty results: " + ok + " / " + ok2);
+    Util.print("Conformance (w/empty results): ");
+    Util.println(pc(ok, total) + " / " + pc(ok + ok2, total));
+    Util.println("Total Time: " + time);
 
     context.close();
     sandbox().delete();
@@ -256,7 +256,7 @@ public abstract class W3CTS extends Main {
     if(single != null && !outname.startsWith(single)) return true;
 
     final Performance perf = new Performance();
-    if(verbose) Util.out("- " + outname);
+    if(verbose) Util.print("- " + outname);
 
     boolean inspect = false;
     boolean correct = true;
@@ -469,10 +469,10 @@ public abstract class W3CTS extends Main {
     final long nano = perf.ns();
     final boolean slow = nano / 1000000 > timer;
     if(verbose) {
-      if(slow) Util.out(": " + Performance.getTime(nano, 1));
-      Util.outln();
+      if(slow) Util.print(": " + Performance.getTime(nano, 1));
+      Util.println("");
     } else if(slow) {
-      Util.out(NL + "- " + outname + ": " + Performance.getTime(nano, 1));
+      Util.print(NL + "- " + outname + ": " + Performance.getTime(nano, 1));
     }
 
     return single == null || !outname.equals(single);

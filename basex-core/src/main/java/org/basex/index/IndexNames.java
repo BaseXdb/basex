@@ -50,7 +50,7 @@ public final class IndexNames {
         uri = "";
         ln = entry;
       } else { // invalid
-        Util.debug("Included name is invalid: %", entry);
+        Util.debugln("Included name is invalid: %", entry);
         continue;
       }
       qnames.add(ln == null ? null : token(ln), uri == null ? null : token(uri));

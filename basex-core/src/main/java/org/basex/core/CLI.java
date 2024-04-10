@@ -34,7 +34,7 @@ public abstract class CLI extends Main {
 
   /** Password reader. */
   private static final PasswordReader PWREADER = () -> {
-    Util.out(PASSWORD + COLS);
+    Util.print(PASSWORD + COLS);
     return Util.password();
   };
   /** Session. */
@@ -92,7 +92,7 @@ public abstract class CLI extends Main {
   protected final void execute(final Command cmd, final boolean info) throws IOException {
     final Session ss = session();
     ss.execute(cmd);
-    if(info) Util.out(ss.info());
+    if(info) Util.print(ss.info());
   }
 
   /**
@@ -118,11 +118,11 @@ public abstract class CLI extends Main {
     String username = context.soptions.get(StaticOptions.USER);
     String password = context.soptions.get(StaticOptions.PASSWORD);
     while(username.isEmpty()) {
-      Util.out(USERNAME + COLS);
+      Util.print(USERNAME + COLS);
       username = Util.input();
     }
     while(password.isEmpty()) {
-      Util.out(PASSWORD + COLS);
+      Util.print(PASSWORD + COLS);
       password = Util.password();
     }
 

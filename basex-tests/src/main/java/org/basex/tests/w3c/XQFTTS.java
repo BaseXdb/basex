@@ -48,7 +48,7 @@ public final class XQFTTS extends W3CTS {
 
   @Override
   protected void init(final DBNode root) throws QueryException {
-    Util.outln("Caching Full-text Structures...");
+    Util.println("Caching Full-text Structures...");
     for(final Item node : nodes("//*:stopwords", root)) {
       final String val = (path + text("@FileName", node)).replace('\\', '/');
       stop.put(text("@uri", node), IO.get(val));

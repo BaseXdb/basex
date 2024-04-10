@@ -58,14 +58,14 @@ final class LuceneStemmer extends Stemmer {
   private static void add(final Language lang, final String name) {
     final Class<?> clz = Reflect.find(PATTERN, name);
     if(clz == null) {
-      Util.debug("Could not initialize \"%\" Lucene stemmer class.", lang);
+      Util.debugln("Could not initialize \"%\" Lucene stemmer class.", lang);
       return;
     }
     Method m = Reflect.method(clz, "stem", String.class);
     final boolean ch = m == null;
     if(ch) m = Reflect.method(clz, "stem", char[].class, int.class);
     if(m == null) {
-      Util.debug("Could not initialize \"%\" Lucene stemmer method.", lang);
+      Util.debugln("Could not initialize \"%\" Lucene stemmer method.", lang);
     } else {
       CLASSES.put(lang, new StemmerClass(clz, m, ch));
     }

@@ -533,7 +533,7 @@ public class Options implements Iterable<Option<?>> {
       if(name.startsWith(DBPREFIX)) {
         name = name.substring(DBPREFIX.length()).toUpperCase(Locale.ENGLISH);
         try {
-          if(assign(name, value, -1, false)) Util.debug(name + Text.COLS + value);
+          if(assign(name, value, -1, false)) Util.debugln(name + Text.COLS + value);
         } catch(final BaseXException ex) {
           Util.errln(ex);
         }

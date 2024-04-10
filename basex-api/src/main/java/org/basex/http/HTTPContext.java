@@ -82,7 +82,7 @@ public final class HTTPContext {
       String value = sc.getInitParameter(name);
       if(name.startsWith(Prop.DBPREFIX) && name.endsWith("path") && !new File(value).isAbsolute()) {
         // prefix relative path with absolute servlet path
-        Util.debug(name.toUpperCase(Locale.ENGLISH) + ": " + value);
+        Util.debugln(name.toUpperCase(Locale.ENGLISH) + ": " + value);
         value = new IOFile(webapp, value).path();
       }
       Prop.put(name, value);

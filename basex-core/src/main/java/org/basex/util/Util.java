@@ -108,19 +108,12 @@ public final class Util {
   }
 
   /**
-   * Prints a newline to standard output.
-   */
-  public static void outln() {
-    out(NL);
-  }
-
-  /**
    * Prints a string to standard output, followed by a newline.
    * @param string output string
    * @param ext text optional extensions
    */
-  public static void outln(final Object string, final Object... ext) {
-    out((string instanceof byte[] ? string((byte[]) string) : string) + NL, ext);
+  public static void println(final Object string, final Object... ext) {
+    print((string instanceof byte[] ? string((byte[]) string) : string) + NL, ext);
   }
 
   /**
@@ -128,7 +121,7 @@ public final class Util {
    * @param string output string
    * @param ext text optional extensions
    */
-  public static void out(final Object string, final Object... ext) {
+  public static void print(final Object string, final Object... ext) {
     System.out.print(info(string, ext));
   }
 
@@ -206,7 +199,7 @@ public final class Util {
    * @param string debug string
    * @param ext text optional extensions
    */
-  public static void debug(final Object string, final Object... ext) {
+  public static void debugln(final Object string, final Object... ext) {
     if(Prop.debug) errln(string, ext);
   }
 

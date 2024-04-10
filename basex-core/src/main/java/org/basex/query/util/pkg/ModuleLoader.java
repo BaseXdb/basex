@@ -190,7 +190,7 @@ public final class ModuleLoader {
 
     // parse package descriptor
     final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, id);
+    if(!pkgDesc.exists()) Util.debugln(PkgText.MISSDESC, id);
 
     pkg = new PkgParser(info).parse(pkgDesc);
     // check if package contains a jar descriptor
