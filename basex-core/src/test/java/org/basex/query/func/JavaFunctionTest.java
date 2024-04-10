@@ -75,7 +75,7 @@ public final class JavaFunctionTest extends SandboxTest {
     query("declare namespace Properties = 'java.util.Properties'; Properties:new()",
         "java:java.util.Properties#0");
     query("declare namespace Properties = 'java.util.Properties'; Properties:new()()",
-        "map{}");
+        "{}");
   }
 
   /** Tests importing a Java class. */
@@ -274,7 +274,7 @@ public final class JavaFunctionTest extends SandboxTest {
   @Test public void fromJava() {
     final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
     query(mod + "n:data() ! (if(. instance of function(*)) then .() else .)",
-        "a\nb\nc\nmap{\"d\":\"e\"}\nf");
+        "a\nb\nc\n{\"d\":\"e\"}\nf");
 
     query(mod + "let $c := n:data() ! (if(. instance of function(*)) then .() else .) "
         + "return ($c[1], $c[2], $c[3], map:keys($c[4]), $c[4]?*, $c[5])",

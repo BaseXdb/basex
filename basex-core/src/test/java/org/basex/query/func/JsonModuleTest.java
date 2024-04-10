@@ -101,9 +101,9 @@ public final class JsonModuleTest extends SandboxTest {
     final Function func = _JSON_PARSE;
     // queries
     String options = " map { 'format': 'xquery' }";
-    query(func.args("{}", options), "map{}");
-    query(func.args("{\"A\":1}", options), "map{\"A\":1.0e0}");
-    query(func.args("{\"\":null}", options), "map{\"\":()}");
+    query(func.args("{}", options), "{}");
+    query(func.args("{\"A\":1}", options), "{\"A\":1.0e0}");
+    query(func.args("{\"\":null}", options), "{\"\":()}");
 
     query(func.args("[]", options), "[]");
     query(func.args("[\"A\"]", options), "[\"A\"]");

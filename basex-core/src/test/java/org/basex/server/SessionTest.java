@@ -633,7 +633,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test public void queryJSON() throws IOException {
     final Query query = session.query(SerializerOptions.INDENT.arg("no") + "map { 'a': '&amp;' }");
-    assertEqual("map{\"a\":\"&amp;\"}", query.next());
+    assertEqual("{\"a\":\"&amp;\"}", query.next());
   }
 
   /**

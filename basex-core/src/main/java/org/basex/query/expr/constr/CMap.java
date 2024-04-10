@@ -94,7 +94,7 @@ public final class CMap extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(MAP).token(" { ");
+    qs.token("{ ");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       if(e != 0) qs.token(',');

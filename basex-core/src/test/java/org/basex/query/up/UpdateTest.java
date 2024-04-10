@@ -1157,8 +1157,8 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh1576() {
     query(_UPDATE_OUTPUT.args(" [ ]"), "[]");
     query(_UPDATE_OUTPUT.args(" [ 1, (2, [ 3, 4 ]) ]"), "[1,(2,[3,4])]");
-    query(_UPDATE_OUTPUT.args(" map { }"), "map{}");
-    query(_UPDATE_OUTPUT.args(" map { 1: map { 2: 3 }}"), "map{1:map{2:3}}");
+    query(_UPDATE_OUTPUT.args(" map { }"), "{}");
+    query(_UPDATE_OUTPUT.args(" map { 1: map { 2: 3 }}"), "{1:{2:3}}");
 
     error(_UPDATE_OUTPUT.args(" true#0"), BASEX_STORE_X);
     error(_UPDATE_OUTPUT.args(" [ true#0 ]"), BASEX_STORE_X);

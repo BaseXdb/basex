@@ -905,7 +905,7 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void functionAnnotations() {
     final Function func = FUNCTION_ANNOTATIONS;
     // queries
-    query(func.args(" true#0"), "map{}");
+    query(func.args(" true#0"), "{}");
     query(func.args(" %local:x function() { }") +
         "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
     query(func.args(" %Q{uri}name('a', 'b') function() {}") +

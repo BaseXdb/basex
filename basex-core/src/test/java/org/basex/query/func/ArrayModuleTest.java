@@ -247,12 +247,12 @@ public final class ArrayModuleTest extends SandboxTest {
     final Function func = _ARRAY_MEMBERS;
 
     query(func.args(" []"), "");
-    query(func.args(" [ () ]"), "map{\"value\":()}");
-    query(func.args(" [ 1 ]"), "map{\"value\":1}");
-    query(func.args(" [ 1, 2 ]"), "map{\"value\":1}\nmap{\"value\":2}");
-    query(func.args(" [ (1, 2) ]"), "map{\"value\":(1,2)}");
-    query(func.args(" [ (1, 2), 3 ]"), "map{\"value\":(1,2)}\nmap{\"value\":3}");
-    query(func.args(" array { <_>1</_> to 100000 }") + " => foot()", "map{\"value\":100000}");
+    query(func.args(" [ () ]"), "{\"value\":()}");
+    query(func.args(" [ 1 ]"), "{\"value\":1}");
+    query(func.args(" [ 1, 2 ]"), "{\"value\":1}\n{\"value\":2}");
+    query(func.args(" [ (1, 2) ]"), "{\"value\":(1,2)}");
+    query(func.args(" [ (1, 2), 3 ]"), "{\"value\":(1,2)}\n{\"value\":3}");
+    query(func.args(" array { <_>1</_> to 100000 }") + " => foot()", "{\"value\":100000}");
   }
 
   /** Test method. */
