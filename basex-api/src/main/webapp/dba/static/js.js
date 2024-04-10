@@ -194,12 +194,12 @@ function showError(response, info) {
 
   // normalize error message
   var msg = response.statusText.match(/\[\w+\]/g) ? response.statusText : response.responseText;
-  var lc = !info && msg.match(/\d+\/\d+:/);
+  var lc = !info && /(\d+)\/(\d+):/.exec(msg);
   var s = msg.indexOf("["), e1 = msg.indexOf("\n", s);
   if(s > -1) msg = msg.substring(s, e1 > s ? e1 : msg.length);
   msg = msg.replace(/^\[.*?\] /, "").replace(/Stack Trace:.*/, "").replace(/\s+/g, " ");
   if(info) msg = info + ": " + msg;
-  if(lc) msg = lc + " " + msg;
+  if(lc) _editor.setCursor(lc[1] - 1, lc[2] - 1);
 
   // display correctly escaped feedback
   var html = document.createElement("div");
