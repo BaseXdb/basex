@@ -209,8 +209,9 @@ public final class Var extends ExprInfo {
   public Value checkType(final Value value, final QueryContext qc, final CompileContext cc)
       throws QueryException {
 
-    if(declType == null || declType.instance(value)) return value;
+    if(declType == null) return value;
     if(coerce) return declType.coerce(value, name, qc, cc, info);
+    if(declType.instance(value)) return value;
     throw typeError(value, declType, name, info, false);
   }
 

@@ -688,7 +688,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final boolean toBoolean(final QueryContext qc, final FItem predicate,
       final Value... args) throws QueryException {
-    return toBoolean(predicate.invoke(qc, info, args).item(qc, info));
+    return toBoolean(predicate.invoke(qc, info, args).atomItem(qc, info));
   }
 
   /**

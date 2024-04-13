@@ -436,6 +436,8 @@ public final class SeqType {
   public Value coerce(final Value value, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
+    if(instance(value)) return value;
+
     final long size = value.size();
     ItemList items = null;
     for(long i = 0; i < size; i++) {

@@ -170,8 +170,8 @@ public class TypeCheck extends Single {
     }
 
     // check occurrence indicator and item type
-    if(st.instance(value)) return value;
     if(coerce) return st.coerce(value, null, qc, null, info);
+    if(st.instance(value)) return value;
     throw error(value, st);
   }
 
