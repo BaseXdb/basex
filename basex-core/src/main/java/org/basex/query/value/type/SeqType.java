@@ -385,23 +385,13 @@ public final class SeqType {
     if(!error && info != null) info.internal(true);
 
     try {
-      final QueryFunction<Item, Value> cast = item -> {
-        if(values != null) {
-          final byte[] string = item.string(info);
-          if(!values.matches(string)) throw typeError(item, type, info);
-          if(item.type != ENUM) return Str.get(string, ENUM);
-        } else if(!item.type.eq(type)) {
-          return type.cast(item, qc, info);
-        }
-        return item;
-      };
       // cast single items
-      if(size == 1) return cast.apply((Item) value);
+      if(size == 1) return cast((Item) value, qc, info);
       // cast sequences
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item item : value) {
         qc.checkStop();
-        vb.add(cast.apply(item));
+        vb.add(cast(item, qc, info));
       }
       return vb.value(type);
     } catch(final QueryException ex) {
@@ -413,9 +403,30 @@ public final class SeqType {
   }
 
   /**
+   * Casts an item to this type.
+   * @param item item to cast
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast value
+   * @throws QueryException query exception
+   */
+  private Value cast(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+
+    if(values != null) {
+      final byte[] string = item.string(info);
+      if(!values.matches(string)) throw typeError(item, type, info);
+      if(item.type != ENUM) return Str.get(string, ENUM);
+    } else if(!item.type.eq(type)) {
+      return type.cast(item, qc, info);
+    }
+    return item;
+  }
+
+  /**
    * Converts the specified value to this type.
    * @param value value to promote
-   * @param name variable name (can be {@code null})
+   * @param name variable name (used for error message, can be {@code null})
    * @param qc query context
    * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
@@ -448,7 +459,7 @@ public final class SeqType {
   /**
    * Converts the specified item to this type.
    * @param item item to promote
-   * @param name variable name (can be {@code null})
+   * @param name variable name (used for error message, can be {@code null})
    * @param items item cache
    * @param qc query context
    * @param cc compilation context ({@code null} during runtime)
@@ -461,33 +472,32 @@ public final class SeqType {
     final QuerySupplier<QueryException> error = () ->
       typeError(item, with(EXACTLY_ONE), name, info, true);
     if(type instanceof AtomType) {
-      final AtomType at = (AtomType) type;
       final Iter iter = item.atomValue(qc, info).iter();
       for(Item it; (it = qc.next(iter)) != null;) {
-        final Type tp = it.type;
-        if(!tp.instanceOf(at)) {
-          if(tp == UNTYPED_ATOMIC) {
-            if(at.nsSensitive()) throw NSSENS_X_X.get(info, item.type, at);
-            if(values != null) it = (Item) cast(it, true, qc, info);
-            else it = at.cast(it, qc, info);
+        Item relabel = null;
+        final Type itemType = it.type;
+        if(!itemType.instanceOf(type)) {
+          if(itemType == UNTYPED_ATOMIC) {
+            if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
+            // item will be cast
           } else if(
-            at == DECIMAL && (tp == DOUBLE || tp == FLOAT) ||
-            at == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL)) ||
-            at == FLOAT && (tp == DOUBLE || tp.instanceOf(DECIMAL)) ||
-            at == STRING && tp == ANY_URI ||
-            at == ANY_URI && tp.instanceOf(STRING) ||
-            at == HEX_BINARY && tp == BASE64_BINARY ||
-            at == BASE64_BINARY && tp == HEX_BINARY
+            type == DECIMAL && (itemType == DOUBLE || itemType == FLOAT) ||
+            type == DOUBLE && (itemType == FLOAT || itemType.instanceOf(DECIMAL)) ||
+            type == FLOAT && (itemType == DOUBLE || itemType.instanceOf(DECIMAL)) ||
+            type == STRING && itemType == ANY_URI ||
+            type == ANY_URI && itemType.instanceOf(STRING) ||
+            type == HEX_BINARY && itemType == BASE64_BINARY ||
+            type == BASE64_BINARY && itemType == HEX_BINARY
           ) {
-            it = at.cast(it, qc, info);
-          } else if(!at.union(tp).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
-            final Item old = it;
-            if(values != null) it = (Item) cast(it, true, qc, info);
-            else it = at.cast(it, qc, info);
-            if(!it.equal(old, null, info)) throw error.get();
+            // item will be cast
+          } else if(!type.union(itemType).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
+            // item will be relabeled: remember old type for future comparison
+            relabel = it;
           } else {
             throw error.get();
           }
+          it = (Item) cast(it, qc, info);
+          if(relabel != null && !it.equal(relabel, null, info)) throw error.get();
         }
         items.add(it);
       }
