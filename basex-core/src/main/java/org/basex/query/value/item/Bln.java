@@ -104,13 +104,13 @@ public final class Bln extends Item {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return value == (item.type == type ? item.bool(ii) : parse(item, ii));
+    return value == (item.type == AtomType.BOOLEAN ? item.bool(ii) : parse(item, ii));
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    final boolean b = item.type == type ? item.bool(ii) : parse(item, ii);
+    final boolean b = item.type == AtomType.BOOLEAN ? item.bool(ii) : parse(item, ii);
     return value == b ? 0 : b ? -1 : 1;
   }
 
