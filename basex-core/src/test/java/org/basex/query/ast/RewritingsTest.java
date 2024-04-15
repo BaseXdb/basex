@@ -2120,9 +2120,13 @@ public final class RewritingsTest extends SandboxTest {
     check("for $a allowing empty in () group by $a return $a", "", root(GFLWOR.class));
     check("for $a in (1 to 6) group by $g := [ $a mod 1 ] return $g", 0, root(GFLWOR.class));
     check("for $a in (1 to 6) group by $g := [] return $g", "", root(GFLWOR.class));
+    check("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", "1\n2",
+        root(DISTINCT_VALUES), exists(GFLWOR.class));
+    check("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", "1\n2",
+        root(GFLWOR.class));
 
-    error("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", INVTREAT_X_X_X);
-    error("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
+    error("for $a as xs:byte in (127 to 128)[. >= 0] group by $a return $a", FUNCCAST_X_X_X);
+    error("for $a in (127 to 128)[. >= 0] group by $a as xs:byte := $a return $a", FUNCCAST_X_X_X);
   }
 
   /** Rewrite expression range to replicate. */
