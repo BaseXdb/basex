@@ -1735,7 +1735,7 @@ public class QueryParser extends InputParser {
     final Expr expr = cast();
     if(!wsConsumeWs(CASTABLE)) return expr;
     wsCheck(AS);
-    return new Castable(info(), expr, simpleType());
+    return new Castable(info(), expr, castTarget());
   }
 
   /**
@@ -1747,7 +1747,7 @@ public class QueryParser extends InputParser {
     final Expr expr = arrow();
     if(!wsConsumeWs(CAST)) return expr;
     wsCheck(AS);
-    return new Cast(info(), expr, simpleType());
+    return new Cast(info(), expr, castTarget());
   }
 
   /**
@@ -3071,12 +3071,14 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "SimpleType" rule.
+   * Parses the "CastTarget" rule.
    * @return sequence type
    * @throws QueryException query exception
    */
-  private SeqType simpleType() throws QueryException {
-    skipWs();
+  private SeqType castTarget() throws QueryException {
+    // choice item type
+    if(wsConsume("(")) return choiceItemType();
+
     final QNm name = eQName(sc.elemNS, TYPEINVALID);
     Type type = ListType.find(name);
     EnumValues values = null;
@@ -3127,12 +3129,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private SeqType itemType() throws QueryException {
-    // parenthesized item type
-    if(wsConsume("(")) {
-      final SeqType st = itemType();
-      wsCheck(")");
-      return st;
-    }
+    // choice item type
+    if(wsConsume("(")) return choiceItemType();
 
     // parse annotations and type name
     final AnnList anns = annotations(false).check(false, false);
@@ -3321,6 +3319,20 @@ public class QueryParser extends InputParser {
     } while(wsConsume(","));
     check(')');
     return new EnumValues(values);
+  }
+
+  /**
+   * Parses the "ChoiceItemType" rule without the leading parenthesis.
+   * @return item type
+   * @throws QueryException query exception
+   */
+  private SeqType choiceItemType() throws QueryException {
+    final ArrayList<SeqType> types = new ArrayList<>();
+    do {
+      types.add(itemType());
+    } while(wsConsume("|"));
+    check(')');
+    return types.get(0); // TODO: return proper representation of union type
   }
 
   /**
