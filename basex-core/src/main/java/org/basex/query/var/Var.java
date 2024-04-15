@@ -26,9 +26,9 @@ public final class Var extends ExprInfo {
   /** Input info (can be {@code null}). */
   public final InputInfo info;
 
-  /** Declared type, {@code null} if not specified. */
+  /** Declared type ({@code null} if {@code item()} or no type was specified). */
   public SeqType declType;
-  /** Flag for coercion. */
+  /** Coercion flag. */
   public boolean coerce;
   /** Stack slot ({@code -1} if unused). */
   public int slot;
@@ -55,7 +55,7 @@ public final class Var extends ExprInfo {
     this.slot = slot;
     this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     this.exprType = exprType != null ? exprType : new ExprType(SeqType.ITEM_ZM);
-    this.coerce = coerce;
+    this.coerce = coerce && this.declType != null;
     id = qc.varIDs++;
   }
 
@@ -240,7 +240,7 @@ public final class Var extends ExprInfo {
   /**
    * Tries to adopt the given type check.
    * @param st type to check
-   * @param crc if function coercion should be applied
+   * @param crc if coercion should be applied
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st, final boolean crc) {

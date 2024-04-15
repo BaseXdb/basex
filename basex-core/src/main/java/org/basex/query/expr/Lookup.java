@@ -108,8 +108,8 @@ public final class Lookup extends Arr {
         return SimpleMap.get(cc, info, keys, ex);
       }
       // multiple inputs:
-      //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
-      final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
+      //  INPUTS?(KEYS)  ->  for $item in INPUTS return KEYS ! $item(.)
+      final Var var = cc.vs().addNew(new QNm("item"), null, false, cc.qc, info);
       final For fr = new For(var, input).optimize(cc);
       final Expr ex = cc.get(keys, () ->
         rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));
