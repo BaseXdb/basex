@@ -45,7 +45,7 @@ function dba:databases(
       'size': $db/@size,
       'date': $db/@modified-date
     }
-  let $backups :=
+  let $backups := (
     for $backup in db:backups()
     where matches($backup, $utils:BACKUP-REGEX)
     group by $name := replace($backup, $utils:BACKUP-REGEX, '$1')
@@ -56,7 +56,7 @@ function dba:databases(
       'size': (),
       'date': $date
     }
-
+  )
   return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>

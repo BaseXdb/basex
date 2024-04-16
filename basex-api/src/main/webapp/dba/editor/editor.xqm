@@ -38,43 +38,35 @@ function dba:editor(
   ) else (
     config:edited-file()
   )
-  return html:wrap(
-    map {
-      'header': $dba:CAT, 'info': $info, 'error': $error,
-      'css': 'codemirror/lib/codemirror.css',
-      'scripts': ('editor.js', 'codemirror/lib/codemirror.js',
-                  'codemirror/mode/xquery/xquery.js', 'codemirror/mode/xml/xml.js')
-    },
-    (
-      <tr>
-        <td colspan='2'>
-          <form autocomplete='off' action='javascript:void(0);'>{
-            <datalist id='files'>{ config:editor-files() ! element option { . } }</datalist>,
-            intersperse((
-              <input type='text' id='file' name='file' placeholder='Name of file'
-                     list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
-              <button type='submit' name='open' id='open' disabled=''
-                      onclick='openFile()'>Open</button>,
-              <button name='save' id='save' disabled='' onclick='saveFile()'>Save</button>,
-              <button name='close' id='close' disabled='' onclick='closeFile()'>Close</button>,
-              <span>  </span>,
-              <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
-              <button id='stop' onclick='stopQuery(true)' disabled=''>Stop</button>
-            ), <span> </span>),
-            <h2 class='right'>Result</h2>
-          }</form>
-        </td>
-      </tr>,
-      <tr>
-        <td width='50%'>
-          <textarea id='editor' name='editor' autofocus='autofocus'/>
-        </td>
-        <td width='50%'>{
-          <textarea name='output' id='output' readonly=''/>,
-          html:js('loadCodeMirror("xquery", true, true);'),
-          $edited ! html:js('openFile("' || file:name(.) || '");')
-        }</td>
-      </tr>
-    )
-  )
+  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error }, (
+    <tr>
+      <td colspan='2'>
+        <form autocomplete='off' action='javascript:void(0);'>{
+          <datalist id='files'>{ config:editor-files() ! element option { . } }</datalist>,
+          intersperse((
+            <input type='text' id='file' name='file' placeholder='Name of file'
+                   list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
+            <button type='submit' name='open' id='open' disabled=''
+                    onclick='openFile()'>Open</button>,
+            <button name='save' id='save' disabled='' onclick='saveFile()'>Save</button>,
+            <button name='close' id='close' disabled='' onclick='closeFile()'>Close</button>,
+            <span>  </span>,
+            <button id='run' onclick='runQuery()' title='Ctrl-Enter'>Run</button>,
+            <button id='stop' onclick='stopQuery(true)' disabled=''>Stop</button>
+          ), <span> </span>),
+          <h2 class='right'>Result</h2>
+        }</form>
+      </td>
+    </tr>,
+    <tr>
+      <td width='50%'>
+        <textarea id='editor' name='editor' autofocus='autofocus'/>
+      </td>
+      <td width='50%'>{
+        <textarea name='output' id='output' readonly=''/>,
+        html:js('loadCodeMirror("xquery", true, true);'),
+        $edited ! html:js('openFile("' || file:name(.) || '");')
+      }</td>
+    </tr>
+  ))
 };

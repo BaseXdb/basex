@@ -31,12 +31,7 @@ function dba:users(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  html:wrap(
-    map {
-      'header': $dba:CAT, 'info': $info, 'error': $error,
-      'css': 'codemirror/lib/codemirror.css',
-      'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
-    },
+  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <form method='post'>

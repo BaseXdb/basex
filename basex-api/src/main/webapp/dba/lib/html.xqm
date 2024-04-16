@@ -28,8 +28,7 @@ declare function html:wrap(
  : <ul>
  :   <li><b>header</b>: page headers</li>
  :   <li><b>error</b>: error string</li>
- :   <li><b>css</b>: CSS files</li>
- :   <li><b>scripts</b>: JavaScript files</li>
+ :   <li><b>info</b>: info string</li>
  : </ul>
  : @param  $options  options
  : @param  $rows     tr elements
@@ -49,9 +48,12 @@ declare function html:wrap(
       <meta name='author' content='BaseX Team 2005-24, BSD License'/>
       <link rel='icon' href='static/basex.svg'/>
       <link rel='stylesheet' type='text/css' href='static/style.css'/>
-      { $options?css ! <link rel='stylesheet' type='text/css' href='static/{ . }'/> }
+      <link rel='stylesheet' type='text/css' href='static/codemirror/codemirror.css'/>
       <script src='static/js.js'/>
-      { $options?scripts ! <script src='static/{ . }'/> }
+      <script src='static/editor.js'/>
+      <script src='static/codemirror/codemirror.js'/>
+      <script src='static/codemirror/xquery.js'/>
+      <script src='static/codemirror/xml.js'/>
     </head>
     <body>
       <table cellpadding='0' cellspacing='0'>

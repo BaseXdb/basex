@@ -81,21 +81,19 @@ function refreshDataList(names) {
  */
 function checkButtons() {
   var name = fileName();
-  document.getElementById("open").disabled = !fileExists(name);
-  document.getElementById("save").disabled = !name || _editor.historySize().undo === 0;
-  document.getElementById("close").disabled = !name;
+  (document.getElementById("open") || {}).disabled = !fileExists(name);
+  (document.getElementById("save") || {}).disabled = !name || _editor.historySize().undo === 0;
+  (document.getElementById("close") || {}).disabled = !name;
 }
 
 /**
  * Checks if the specified file exists.
- * @param {string} filename
+ * @param {string} name filename
  * @returns {boolean} result of check
  */
-function fileExists(filename) {
-  for(var file of document.getElementById("files").children) {
-    if(file.value === filename) return true;
-  }
-  return false;
+function fileExists(name) {
+  const files = document.getElementById("files");
+  return files && Array.from(files.children).some(file => file.value === name);
 }
 
 /**
@@ -103,5 +101,6 @@ function fileExists(filename) {
  * @returns {string} file name
  */
 function fileName() {
-  return document.getElementById("file").value.trim();
+  const file = document.getElementById("file")
+  if(file) return file.value.trim();
 }
