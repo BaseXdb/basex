@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -16,8 +15,8 @@ import org.junit.jupiter.api.Test;
  * @author Dimitar Popov
  */
 public final class FTIndexQueryTest extends FTData {
-  /** Initializes the tests. */
-  @BeforeAll public static void init() {
+  static {
+    create(DOC);
     queries = QUERIES;
   }
 
