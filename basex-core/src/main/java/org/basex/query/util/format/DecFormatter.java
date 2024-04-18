@@ -76,42 +76,40 @@ public final class DecFormatter extends FormatUtil {
 
     // assign map values
     int z = '0';
-    if(options != null) {
-      for(final Option<?> option : options) {
-        if(!options.contains(option)) continue;
-        final String k = option.name();
-        final byte[] v = token(options.get((StringOption) option));
-        if(option == DecFormatOptions.INFINITY) {
-          inf = v;
-        } else if(option == DecFormatOptions.NAN) {
-          nan = v;
-        } else if(v.length != 0 && cl(v, 0) == v.length) {
-          final int cp = cp(v, 0);
-          if(option == DecFormatOptions.DECIMAL_SEPARATOR) {
-            decimal = cp;
-          } else if(option == DecFormatOptions.GROUPING_SEPARATOR) {
-            grouping = cp;
-          } else if(option == DecFormatOptions.EXPONENT_SEPARATOR) {
-            exponent = cp;
-          } else if(option == DecFormatOptions.PATTERN_SEPARATOR) {
-            pattern = cp;
-          } else if(option == DecFormatOptions.MINUS_SIGN) {
-            minus = cp;
-          } else if(option == DecFormatOptions.DIGIT) {
-            digit = cp;
-          } else if(option == DecFormatOptions.PERCENT) {
-            percent = cp;
-          } else if(option == DecFormatOptions.PER_MILLE) {
-            permille = cp;
-          } else if(option == DecFormatOptions.ZERO_DIGIT) {
-            z = zeroes(cp);
-            if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
-            if(z != cp) throw INVDECZERO_X.get(info, (char) cp);
-          }
-        } else {
-          // signs must have single character
-          throw INVDECSINGLE_X_X.get(info, k, v);
+    for(final Option<?> option : options) {
+      if(!options.contains(option)) continue;
+      final String k = option.name();
+      final byte[] v = token(options.get((StringOption) option));
+      if(option == DecFormatOptions.INFINITY) {
+        inf = v;
+      } else if(option == DecFormatOptions.NAN) {
+        nan = v;
+      } else if(v.length != 0 && cl(v, 0) == v.length) {
+        final int cp = cp(v, 0);
+        if(option == DecFormatOptions.DECIMAL_SEPARATOR) {
+          decimal = cp;
+        } else if(option == DecFormatOptions.GROUPING_SEPARATOR) {
+          grouping = cp;
+        } else if(option == DecFormatOptions.EXPONENT_SEPARATOR) {
+          exponent = cp;
+        } else if(option == DecFormatOptions.PATTERN_SEPARATOR) {
+          pattern = cp;
+        } else if(option == DecFormatOptions.MINUS_SIGN) {
+          minus = cp;
+        } else if(option == DecFormatOptions.DIGIT) {
+          digit = cp;
+        } else if(option == DecFormatOptions.PERCENT) {
+          percent = cp;
+        } else if(option == DecFormatOptions.PER_MILLE) {
+          permille = cp;
+        } else if(option == DecFormatOptions.ZERO_DIGIT) {
+          z = zeroes(cp);
+          if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
+          if(z != cp) throw INVDECZERO_X.get(info, (char) cp);
         }
+      } else if(option != DecFormatOptions.FORMAT_NAME) {
+        // signs must have single character
+        throw INVDECSINGLE_X_X.get(info, k, v);
       }
     }
 

@@ -507,6 +507,6 @@ public abstract class XQArray extends XQData {
       }
       if(ms != 1) tb.add(')');
     }
-    qs.bracket(tb.add(' ').finish());
+    qs.braced("[ ", tb.add(' ').finish(), " ]");
   }
 }

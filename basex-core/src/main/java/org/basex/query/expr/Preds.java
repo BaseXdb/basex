@@ -318,6 +318,6 @@ public abstract class Preds extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    for(final Expr expr : exprs) qs.bracket(expr);
+    for(final Expr expr : exprs) qs.braced("[", expr, "]");
   }
 }

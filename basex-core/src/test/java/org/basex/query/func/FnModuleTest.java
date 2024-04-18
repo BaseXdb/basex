@@ -892,12 +892,17 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = FORMAT_NUMBER;
 
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
-    query(func.args(" 12345.67", "#.##0,00", " ()", " map { 'decimal-separator': ',', "
+    query(func.args(" 12345.67", "#.##0,00", " { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), "12.345,67");
     query(func.args(" 12345.67", "#\u2019##0.00", "de-CH"), "12\u2019345.67");
+    query(func.args(" 12345.67", "#.##0,00", " { "
+        + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
+    query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'de' }"), "12.345,67");
+    query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'de', "
+        + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
+    query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'en', "
+        + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
 
-    //error(func.args(" 12345.67", "#.##0,00", "de", " map { 'decimal-separator': ',', "
-    //    + "'grouping-separator': '.' }"), FORMDUP_X);
     error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMATWHICH_X);
   }
 
