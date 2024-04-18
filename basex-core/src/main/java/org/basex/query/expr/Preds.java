@@ -40,7 +40,7 @@ public abstract class Preds extends Arr {
     // called at an early stage as it affects the optimization of predicates
     final Expr root = type(cc.qc.focus.value);
     final int el = exprs.length;
-    if(el != 0) cc.get(this, () -> {
+    if(el != 0) cc.get(this, true, () -> {
       if(root != null) {
         final long size = root.size();
         if(size != -1) cc.qc.focus.size = size;
@@ -91,7 +91,7 @@ public abstract class Preds extends Arr {
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
-    return cc.ok(root, () -> {
+    return cc.ok(root, true, () -> {
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();

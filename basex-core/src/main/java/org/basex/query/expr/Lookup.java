@@ -95,7 +95,7 @@ public final class Lookup extends Arr {
       if(is == 1) return rewrite.apply(input, keys);
       // multiple inputs:
       //   INPUTS?(KEY)  ->  INPUTS ! .(KEY)
-      final Expr ex = cc.get(input, () -> rewrite.apply(ContextValue.get(cc, info), keys));
+      final Expr ex = cc.get(input, true, () -> rewrite.apply(ContextValue.get(cc, info), keys));
       return SimpleMap.get(cc, info, input, ex);
     }
 
@@ -104,14 +104,14 @@ public final class Lookup extends Arr {
       if(is == 1) {
         // single input:
         //  INPUT?(KEYS)  ->  KEYS ! INPUT(.)
-        final Expr ex = cc.get(keys, () -> rewrite.apply(input, ContextValue.get(cc, info)));
+        final Expr ex = cc.get(keys, true, () -> rewrite.apply(input, ContextValue.get(cc, info)));
         return SimpleMap.get(cc, info, keys, ex);
       }
       // multiple inputs:
       //  INPUTS?(KEYS)  ->  for $item in INPUTS return KEYS ! $item(.)
       final Var var = cc.vs().addNew(new QNm("item"), null, cc.qc, info);
       final For fr = new For(var, input).optimize(cc);
-      final Expr ex = cc.get(keys, () ->
+      final Expr ex = cc.get(keys, true, () ->
         rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));
       return new GFLWOR(info, fr, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
     }

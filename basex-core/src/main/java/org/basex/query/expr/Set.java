@@ -163,8 +163,8 @@ abstract class Set extends Arr {
         }
         list.add(newPredicate(step.exprs, cc));
       }
-      final Expr merged = cc.get(root, () -> mergePredicates(list.finish(), cc).optimize(cc));
-      preds = s == sl ? new Expr[] { merged } : null;
+      preds = s < sl ? null : new Expr[] { cc.get(root, true,
+          () -> mergePredicates(list.finish(), cc).optimize(cc)) };
     }
     if(test == null || preds == null) return null;
 

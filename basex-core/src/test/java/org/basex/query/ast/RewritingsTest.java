@@ -1056,7 +1056,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
-        root(ItemMap.class), empty(IterPath.class), empty(IterMap.class));
+        root(SingleValueMap.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
     check("<a><b/></a>[b ! ..]", "<a><b/></a>", exists(CachedPath.class));
@@ -1811,7 +1811,8 @@ public final class RewritingsTest extends SandboxTest {
     check("count#1 ! .('a')", 1, root(Int.class));
 
     // do not generate nested node constructors
-    check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()", "x", root(ItemMap.class));
+    check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()",
+        "x", root(SingleValueMap.class));
   }
 
   /** Rewritings of positional tests. */
@@ -1998,7 +1999,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Rewrite side-effecting let expressions. */
   @Test public void gh1917() {
     check("let $a := (# basex:nondeterministic #) { <a/> } return $a ! name()",
-        "a", root(ItemMap.class));
+        "a", root(SingleValueMap.class));
   }
 
   /** Rewrite list to replicate. */
@@ -3054,7 +3055,7 @@ public final class RewritingsTest extends SandboxTest {
         "a", root(SUBSTRING_BEFORE));
     check("for $b in <?_ a-1?> group by $c := substring-before($b, '-') " +
         "return ($c, string-length($c))",
-        "a\n1", root(DualIterMap.class));
+        "a\n1", root(CachedValueMap.class));
   }
 
   /** Inlined type check. */

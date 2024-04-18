@@ -4,6 +4,7 @@ import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -38,7 +39,7 @@ public final class ContextValue extends Simple {
   public Expr optimize(final CompileContext cc) {
     final Value value = cc.qc.focus.value;
     if(value != null) {
-      if(!cc.nestedFocus()) return cc.replaceWith(this, value);
+      if(!(value instanceof Dummy)) return cc.replaceWith(this, value);
       adoptType(value);
     }
     return this;

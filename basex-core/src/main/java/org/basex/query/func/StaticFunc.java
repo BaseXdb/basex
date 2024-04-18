@@ -95,7 +95,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
       // compile function body, handle return type
       dontEnter = true;
-      cc.pushFocus(null);
+      cc.pushFocus(null, false);
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);

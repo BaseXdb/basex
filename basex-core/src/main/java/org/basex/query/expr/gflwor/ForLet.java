@@ -99,7 +99,7 @@ abstract class ForLet extends Clause {
     if(!ic.inlineable(ex)) return false;
 
     // reset context value (will not be accessible in predicate)
-    Expr pred = cc.get(expr, () -> ic.inline(ex));
+    Expr pred = cc.get(expr, true, () -> ic.inline(ex));
 
     // attach predicates to axis path or filter, or create a new filter
     // for $i in 1 where $i  ->  for $i in 1[boolean(.)]

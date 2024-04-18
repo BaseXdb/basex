@@ -269,7 +269,7 @@ public abstract class Filter extends Preds {
     if(changed) root = inlined;
 
     // do not inline context reference in predicates
-    changed |= ic.var != null && ic.cc.ok(root, () -> ic.inline(exprs));
+    changed |= ic.var != null && ic.cc.ok(root, true, () -> ic.inline(exprs));
 
     return changed ? optimize(ic.cc) : null;
   }

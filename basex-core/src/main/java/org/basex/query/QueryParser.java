@@ -1868,7 +1868,7 @@ public class QueryParser extends InputParser {
   private Expr value() throws QueryException {
     validate();
     final Expr expr = extension();
-    return expr == null ? map() : expr;
+    return expr == null ? valueMap() : expr;
   }
 
   /**
@@ -1948,11 +1948,28 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "MapExpr" rule.
+   * Parses the "ValueMapExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr map() throws QueryException {
+  private Expr valueMap() throws QueryException {
+    final Expr expr = itemMap();
+    if(expr != null) {
+      if(wsConsumeWs("~")) {
+        final ExprList el = new ExprList(expr);
+        do add(el, itemMap()); while(wsConsumeWs("~"));
+        return new CachedValueMap(info(), el.finish());
+      }
+    }
+    return expr;
+  }
+
+  /**
+   * Parses the "ItemMapExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr itemMap() throws QueryException {
     final Expr expr = path();
     if(expr != null) {
       final int next = next();
@@ -2405,7 +2422,7 @@ public class QueryParser extends InputParser {
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
           params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
-          expr = new CachedMap(ii, localVars.resolve(name, ii), enclosedExpr());
+          expr = new CachedValueMap(ii, localVars.resolve(name, ii), enclosedExpr());
         }
         final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))

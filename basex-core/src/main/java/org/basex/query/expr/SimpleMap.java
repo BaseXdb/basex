@@ -15,7 +15,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -25,7 +24,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public abstract class SimpleMap extends Arr {
+public abstract class SimpleMap extends Mapping {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -33,6 +32,11 @@ public abstract class SimpleMap extends Arr {
    */
   SimpleMap(final InputInfo info, final Expr... exprs) {
     super(info, SeqType.ITEM_ZM, exprs);
+  }
+
+  @Override
+  final boolean items() {
+    return true;
   }
 
   /**
@@ -50,50 +54,27 @@ public abstract class SimpleMap extends Arr {
   }
 
   @Override
-  public final void checkUp() throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e < el - 1; e++) checkNoUp(exprs[e]);
-    exprs[el - 1].checkUp();
-  }
-
-  @Override
-  public boolean vacuous() {
-    return exprs[exprs.length - 1].vacuous();
-  }
-
-  @Override
-  public final Expr compile(final CompileContext cc) throws QueryException {
-    final int el = exprs.length;
-    for(int e = 0; e < el; e++) {
-      final Expr expr = cc.compileOrError(exprs[e], e == 0);
-      if(e == 0) cc.pushFocus(expr);
-      else cc.updateFocus(expr);
-      exprs[e] = expr;
-    }
-    cc.removeFocus();
-    return optimize(cc);
-  }
-
-  @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // merge operands
     Expr ex = flattenMaps(cc);
     if(ex == null) ex = mergePaths(cc);
-    if(ex == null) ex = mergeOps(cc);
     if(ex == null) ex = dropOps(cc);
     if(ex != null) return ex;
+    final Expr[] merged = merge(cc);
+    if(merged != null) return merged.length == 1 ? merged[0] : get(cc, info, merged);
 
-    // choose best map implementation
-    boolean cached = false, item = true;
+    // choose best implementation
+    boolean cached = false, one = true, zoo = true;
     for(final Expr expr : exprs) {
       cached = cached || expr.has(Flag.POS);
-      item = item && expr.seqType().zeroOrOne();
+      one = one && expr.seqType().one();
+      zoo = zoo && expr.seqType().zeroOrOne();
     }
     final boolean dualiter = exprs.length == 2, dual = dualiter && exprs[1].seqType().zeroOrOne();
 
     return copyType(
       cached ? new CachedMap(info, exprs) :
-      item ? new ItemMap(info, exprs) :
+      one ? new SingleValueMap(info, exprs) :
+      zoo ? new ItemMap(info, exprs) :
       dual ? new DualMap(info, exprs) :
       dualiter ? new DualIterMap(info, exprs) :
       new IterMap(info, exprs)
@@ -132,17 +113,8 @@ public abstract class SimpleMap extends Arr {
     return list.size() != exprs.length ? get(cc, info, list.finish()) : null;
   }
 
-  /**
-   * Tries to merge two adjacent map operands.
-   * @param expr first operand
-   * @param next second operand
-   * @param cc compilation context
-   * @return new expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr merge(final Expr expr, final Expr next, final CompileContext cc)
-      throws QueryException {
-
+  @Override
+  Expr merge(final Expr expr, final Expr next, final CompileContext cc) throws QueryException {
     final long size = expr.size();
     if(!expr.has(Flag.NDT) && !next.has(Flag.POS)) {
       // merge expressions if next expression does not rely on the context
@@ -221,30 +193,10 @@ public abstract class SimpleMap extends Arr {
         input = ((SingletonSeq) expr).itemAt(0);
       }
       if(input.size() == 1) {
-        final InlineContext ic = new InlineContext(null, input, cc);
-        if(ic.inlineable(next)) {
-          // inline values
-          //   'a' ! (. = 'a')  ->  'a'  = 'a'
-          //   map { } ! ?*      ->  map { }?*
-          //   123 ! number()   ->  number(123)
-          // inline context reference
-          //   . ! number() = 2  ->  number() = 2
-          // inline variable references
-          //   $a ! (. + .)  ->  $a + $a
-          // inline any other expression
-          //   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
-          //   ($n + 2) ! abs(.) ->  abs(. + 2)
-          // skip nested node constructors
-          //   <X/> ! <X xmlns='x'>{ . }</X>
-          Expr ex;
-          try {
-            ex = ic.inline(next);
-          } catch(final QueryException qe) {
-            // replace original expression with error
-            ex = cc.error(qe, next);
-          }
+        final Expr inlined = inline(input, next, cc);
+        if(inlined != null) {
           // replicate(1, 2) ! (. = 1)  ->  replicate(1 = 1, 2)
-          return expr == input ? ex : cc.replicate(ex, Int.get(size), info);
+          return expr == input ? inlined : cc.replicate(inlined, Int.get(size), info);
         }
       }
 
@@ -344,53 +296,6 @@ public abstract class SimpleMap extends Arr {
   }
 
   /**
-   * Merges the operands.
-   * @param cc compilation context
-   * @return resulting expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr mergeOps(final CompileContext cc) throws QueryException {
-    final int el = exprs.length;
-    final ExprList list = new ExprList(el).add(exprs[0]);
-
-    boolean pushed = false;
-    try {
-      for(int e = 1; e < el; e++) {
-        final Expr merged = merge(list.peek(), exprs[e], cc);
-        if(merged != null) {
-          list.set(list.size() - 1, merged);
-        } else {
-          list.add(exprs[e]);
-        }
-        if(list.size() > 1) {
-          final Expr expr = list.get(list.size() - 2);
-          if(pushed) {
-            cc.updateFocus(expr);
-          } else {
-            cc.pushFocus(expr);
-            pushed = true;
-          }
-        }
-      }
-    } finally {
-      if(pushed) cc.removeFocus();
-    }
-
-    // remove context value references (ignore first expression)
-    // (1 to 10) ! .  ->  (1 to 10)
-    for(int n = list.size() - 1; n > 0; n--) {
-      if(list.get(n) instanceof ContextValue) list.remove(n);
-    }
-
-    final int ls = list.size();
-    if(ls == el) return null;
-    if(ls == 1) return cc.replaceWith(this, list.peek());
-
-    cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
-    return get(cc, info, list.finish());
-  }
-
-  /**
    * Determines the type and result size and drops expressions that will never be evaluated.
    * @param cc compilation context
    * @return optimized expression or {@code null}
@@ -442,7 +347,7 @@ public abstract class SimpleMap extends Arr {
       return mode == Simplify.DISTINCT || e + 1 == el ? expr.simplifyFor(mode, cc) : expr;
     };
     Expr root = simplify.apply(0);
-    cc.pushFocus(root);
+    cc.pushFocus(root, true);
     if(root instanceof AxisPath) {
       final AxisPath path = (AxisPath) root;
       root = path.root;
@@ -455,7 +360,7 @@ public abstract class SimpleMap extends Arr {
         final AxisPath path = (AxisPath) expr;
         if(path.root != null) return this;
         steps.add(path.steps);
-        cc.updateFocus(expr);
+        cc.updateFocus(expr, true);
       }
     } finally {
       cc.removeFocus();
@@ -473,7 +378,7 @@ public abstract class SimpleMap extends Arr {
     if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT,
         Simplify.DISTINCT)) {
       // distinct-values(@id ! data())  ->  distinct-values(@id)
-      final Expr lst = cc.get(prev, () -> last.simplifyFor(mode, cc));
+      final Expr lst = cc.get(prev, true, () -> last.simplifyFor(mode, cc));
       if(lst != last) expr = get(cc, info, new ExprList(el).add(exprs).set(el - 1, lst).finish());
     }
 
@@ -490,89 +395,6 @@ public abstract class SimpleMap extends Arr {
       }
     }
     return cc.simplify(this, expr, mode);
-  }
-
-  @Override
-  public final boolean has(final Flag... flags) {
-    // Context dependency, positional access: only check first expression.
-    // Examples: . ! abc, position() ! a
-    if(Flag.FCS.in(flags) ||
-       Flag.CTX.in(flags) && exprs[0].has(Flag.CTX) ||
-       Flag.POS.in(flags) && exprs[0].has(Flag.POS)) return true;
-    // check remaining flags
-    final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
-    return flgs.length != 0 && super.has(flgs);
-  }
-
-  @Override
-  public final boolean accept(final ASTVisitor visitor) {
-    visitor.enterFocus();
-    if(!visitAll(visitor, exprs)) return false;
-    visitor.exitFocus();
-    return true;
-  }
-
-  @Override
-  public final VarUsage count(final Var var) {
-    VarUsage uses = VarUsage.NEVER;
-    // context reference check: only consider first operand
-    if(var != null) {
-      final int el = exprs.length;
-      for(int e = 1; e < el; e++) {
-        uses = uses.plus(exprs[e].count(var));
-        if(uses == VarUsage.MORE_THAN_ONCE) break;
-      }
-    }
-    // assume that remaining operands will be evaluated multiple times
-    return uses == VarUsage.NEVER ? exprs[0].count(var) : VarUsage.MORE_THAN_ONCE;
-  }
-
-  @Override
-  public final boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue && ic.var != null) {
-      final int el = exprs.length;
-      for(int e = 1; e < el; e++) {
-        if(exprs[e].uses(ic.var)) return false;
-      }
-    }
-    return exprs[0].inlineable(ic);
-  }
-
-  @Override
-  public final Expr inline(final InlineContext ic) throws QueryException {
-    boolean changed = false;
-    // context inlining: only consider first expression
-    final CompileContext cc = ic.cc;
-    final int el = ic.var == null ? 1 : exprs.length;
-    for(int e = 0; e < el; e++) {
-      Expr inlined;
-      try {
-        inlined = exprs[e].inline(ic);
-      } catch(final QueryException qe) {
-        // replace original expression with error
-        inlined = cc.error(qe, exprs[e]);
-      }
-      if(inlined != null) {
-        exprs[e] = inlined;
-        changed = true;
-      } else {
-        inlined = exprs[e];
-      }
-      if(e == 0) cc.pushFocus(inlined);
-      else cc.updateFocus(inlined);
-    }
-    cc.removeFocus();
-
-    return changed ? optimize(cc) : null;
-  }
-
-  @Override
-  public void markTailCalls(final CompileContext cc) {
-    final int el = exprs.length - 1;
-    for(int e = 0; e < el; e++) {
-      if(!exprs[e].seqType().zeroOrOne()) return;
-    }
-    exprs[el].markTailCalls(cc);
   }
 
   @Override

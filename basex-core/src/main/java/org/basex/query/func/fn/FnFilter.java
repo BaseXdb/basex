@@ -42,7 +42,7 @@ public final class FnFilter extends StandardFunc {
     final int arity = arity(predicate);
     if(arity == 1) {
       // INPUT[PREDICATE(.)]
-      final Expr pred = cc.get(input, () ->
+      final Expr pred = cc.get(input, true, () ->
         new DynFuncCall(info, coerceFunc(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
       );
       return Filter.get(cc, info, input, pred);

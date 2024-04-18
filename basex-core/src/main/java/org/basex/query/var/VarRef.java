@@ -67,7 +67,7 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
     // replace variable reference with expression
-    return var == ic.var  ? ic.copy() : null;
+    return var == ic.var ? ic.copy() : null;
   }
 
   @Override

@@ -455,29 +455,32 @@ public final class GFLWOR extends ParseExpr {
   private Expr inline(final Expr inline, final Expr expr, final ForLet fl,
       final CompileContext cc) throws QueryException {
 
-    if(expr instanceof VarRef && ((VarRef) expr).var == fl.var) {
-      // replace return clause with expression
-      //   for $c in (1, 2) return $c  ->  (1, 2)
-      //   let $c := <a/> return $c  ->  <a/>
-      return inline;
-    }
-    if(fl instanceof Let && expr.count(fl.var) == VarUsage.NEVER) {
-      // rewrite let clause with unused variable
-      //   let $_ := file:write(...) return ()  ->  file:write(...)
-      //   let $_ := void(1) return 2  ->  void(1), 2
-      return cc.voidAndReturn(inline, expr, info);
-    }
-    if(fl.size() == 1) {
-      // rewrite for/let clause to simple map
-      //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
-      //   let $c := <_/> return (name($c), $c)  ->  <_/> ! (name(.), .)
-      // skip expressions with context reference
-      //   <_/>[for $c in (1, 2) return (., $c)]
+    // replace return clause with expression
+    //   for $c in (1, 2) return $c  ->  (1, 2)
+    //   let $c := <a/> return $c  ->  <a/>
+    if(expr instanceof VarRef && ((VarRef) expr).var == fl.var) return inline;
+
+    // rewrite let clause with unused variable
+    //   let $_ := file:write(...) return ()  ->  file:write(...)
+    //   let $_ := void(1) return 2  ->  void(1), 2
+    final boolean let = fl instanceof Let, item = fl.size() == 1;
+    if(let && expr.count(fl.var) == VarUsage.NEVER) return cc.voidAndReturn(inline, expr, info);
+
+    // rewrite for/let clause to simple map
+    //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
+    //   let $c := <_/> return (name($c), $c)  ->  <_/> ! (name(.), .)
+    //   let $c := (<a/>, <b/> return count($c)  ->  (<a/>, <b/> ~ count(.)
+    // skip expressions with context reference
+    //   <_/>[for $c in (1, 2) return (., $c)]
+    if((let || item) && !expr.has(Flag.CTX)) {
       final InlineContext ic = new InlineContext(fl.var, new ContextValue(info), cc);
-      if(ic.inlineable(expr) && !expr.has(Flag.CTX)) {
-        return SimpleMap.get(cc, info, inline, cc.get(inline, () -> ic.inline(expr)));
+      if(ic.inlineable(expr)) {
+        final Expr inlined = cc.get(inline, item, () -> ic.inline(expr));
+        return let ? ValueMap.get(cc, info, inline, inlined) :
+          SimpleMap.get(cc, info, inline, inlined);
       }
     }
+
     return null;
   }
 

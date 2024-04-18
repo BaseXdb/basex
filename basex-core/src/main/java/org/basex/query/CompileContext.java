@@ -18,7 +18,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -157,31 +156,35 @@ public final class CompileContext {
   /**
    * Pushes the current query focus onto the stack and, if possible, assigns a new dummy item.
    * @param expr focus expression (can be {@code null})
+   * @param item focus single item
    */
-  public void pushFocus(final Expr expr) {
+  public void pushFocus(final Expr expr, final boolean item) {
     focuses.add(qc.focus);
     final QueryFocus qf = new QueryFocus();
-    if(expr != null) qf.value = dummy(expr);
+    if(expr != null) qf.value = new Dummy(expr, item);
     qc.focus = qf;
   }
 
   /**
    * Assigns a new dummy item to the query focus.
    * @param expr focus expression
+   * @param item focus single item
    */
-  public void updateFocus(final Expr expr) {
-    qc.focus.value = dummy(expr);
+  public void updateFocus(final Expr expr, final boolean item) {
+    qc.focus.value = new Dummy(expr, item);
   }
 
   /**
    * Evaluates a function within the focus of the supplied expression.
    * @param expr focus expression (can be {@code null})
+   * @param item focus single item
    * @param func function to evaluate
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public Expr get(final Expr expr, final QuerySupplier<Expr> func) throws QueryException {
-    pushFocus(expr);
+  public Expr get(final Expr expr, final boolean item, final QuerySupplier<Expr> func)
+      throws QueryException {
+    pushFocus(expr, item);
     try {
       return func.get();
     } finally {
@@ -192,26 +195,19 @@ public final class CompileContext {
   /**
    * Evaluates a function within the focus of the supplied expression.
    * @param expr focus expression (can be {@code null})
+   * @param item focus single item
    * @param func function to evaluate
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean ok(final Expr expr, final QuerySupplier<Boolean> func) throws QueryException {
-    pushFocus(expr);
+  public boolean ok(final Expr expr, final boolean item, final QuerySupplier<Boolean> func)
+      throws QueryException {
+    pushFocus(expr, item);
     try {
       return func.get();
     } finally {
       removeFocus();
     }
-  }
-
-  /**
-   * Returns a dummy item, based on the type of the specified expression and the current context.
-   * @param expr expression
-   * @return dummy item
-   */
-  private Item dummy(final Expr expr) {
-    return new Dummy(expr.seqType().with(Occ.EXACTLY_ONE), expr.data());
   }
 
   /**

@@ -48,7 +48,6 @@ public final class CachedMap extends SimpleMap {
     } finally {
       qc.focus = focus;
     }
-
     return value;
   }
 
