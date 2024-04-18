@@ -89,7 +89,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void transform2() {
     set(MainOptions.MAINMEM, true);
     try {
-      execute(new CreateDB("DBtransform", "<instance><data><vocable hits='1'/></data></instance>"));
+      execute(new CreateDB("DBTransform", "<instance><data><vocable hits='1'/></data></instance>"));
       query("for $voc in 1 to 2 "
           + "let $xml :=" + _DB_GET.args("DBTransform")
           + "return $xml update {"
