@@ -60,10 +60,10 @@ function dba:editor(
     </tr>,
     <tr>
       <td width='50%'>
-        <textarea id='editor' name='editor' autofocus='autofocus'/>
+        <textarea id='editor' autofocus='autofocus' spellcheck='false'/>
       </td>
       <td width='50%'>{
-        <textarea name='output' id='output' readonly=''/>,
+        <textarea id='output' readonly='' spellcheck='false'/>,
         html:js('loadCodeMirror("xquery", true, true);'),
         $edited ! html:js('openFile("' || file:name(.) || '");')
       }</td>

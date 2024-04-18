@@ -125,11 +125,6 @@ function dba:jobs(
                   </table>
                 ),
   
-                <h3>Job String</h3>,
-                <textarea readonly='' spellcheck='false' rows='20'>{
-                  string($details)
-                }</textarea>,
-  
                 if($cached) then (
                   let $result := try {
                     utils:serialize(job:result($job, map { 'keep': true() }))
@@ -149,7 +144,12 @@ function dba:jobs(
                     }</textarea>,
                     html:js('loadCodeMirror("xml");')
                   )
-                )
+                ),
+  
+                <h3>Job String</h3>,
+                <textarea readonly='' spellcheck='false'>{
+                  string($details)
+                }</textarea>
               ) else (
                 'Job has expired.'
               )

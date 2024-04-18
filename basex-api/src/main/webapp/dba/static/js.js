@@ -284,14 +284,17 @@ function queryResource(enforce) {
 
 /**
  * Loads the CodeMirror editor extension.
- * @param {string}  language programming language (syntax highlighting)
+ * @param {string}  language of main editor (for syntax highlighting)
  * @param {boolean} edit edit flag (edit vs. read-only)
  * @param {boolean} resize resize text areas to maximum height
  */
 function loadCodeMirror(language, edit, resize) {
-  if(CodeMirror && dispatchEvent) {
-    if(edit) {
-      var editorArea = document.getElementById("editor");
+  if(!CodeMirror || !dispatchEvent) return;
+
+  var useCM = !/android/i.test(navigator.userAgent);
+  if(edit) {
+    var editorArea = document.getElementById("editor");
+    if (useCM) {
       _editor = CodeMirror.fromTextArea(editorArea, {
         mode: language,
         lineNumbers: true,
@@ -301,33 +304,55 @@ function loadCodeMirror(language, edit, resize) {
           "Cmd-Enter" : runQuery
         }
       });
+      _editor.display.wrapper.className += " codemirror";
       _editor.on("change", (cm) => {
         cm.save();
         if(checkButtons) checkButtons();
       });
-      _editor.display.wrapper.style.border = "solid 1px grey";
+    } else {
+      _editor = {
+        setValue(v) { editorArea.value = v; },
+        historySize() { return {}; },
+        clearHistory() {},
+        focus() { editorArea.focus(); }
+      }
+      editorArea.onchange = () => {
+        if(checkButtons) checkButtons();
+      };
     }
+  }
 
-    var outputArea = document.getElementById("output");
-    if(outputArea != null) {
+  var outputArea = document.getElementById("output");
+  if(outputArea != null) {
+    if (useCM) {
       _output = CodeMirror.fromTextArea(outputArea, {
         mode: "xml",
         lineWrapping: true,
         readOnly: true
       });
-      _output.display.wrapper.style.border = "solid 1px grey";
+      _output.display.wrapper.className += " codemirror";
+    } else {
+      _output = {
+        setValue(v) { outputArea.value = v; }
+      }
     }
+  }
 
-    if(resize) {
-      var refresh = () => {
-        var size = window.innerHeight - document.getElementById("footer").offsetTop - 30;
+  if(resize) {
+    var refresh = () => {
+      var size = window.innerHeight - document.getElementById("footer").offsetTop - 32;
+      if (useCM) {
         for(var elem of document.getElementsByClassName("CodeMirror")) {
-          elem.CodeMirror.setSize("100%", Math.max(50, size + elem.offsetHeight));
+          elem.CodeMirror.setSize("100%", Math.max(100, size + elem.offsetHeight));
         }
-      };
-      window.addEventListener("load", refresh);
-      window.addEventListener("resize", refresh);
-    }
+      } else {
+        for(var elem of document.getElementsByTagName("textarea")) {
+          elem.style.height = Math.max(100, size + elem.offsetHeight) + "px"; 
+        }
+      }
+    };
+    window.addEventListener("load", refresh);
+    window.addEventListener("resize", refresh);
   }
 }
 

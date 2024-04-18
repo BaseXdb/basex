@@ -3,7 +3,7 @@
  * @param {string} file optional file name
  */
 function openFile(file) {
-  if(_editor.historySize().undo !== 0 && !confirm("Replace editor contents?")) return;
+  if(_editor.historySize().undo > 0 && !confirm("Replace editor contents?")) return;
 
   var name = file || fileName();
   return request("editor-open?name=" + encodeURIComponent(name)).then((text) => {
