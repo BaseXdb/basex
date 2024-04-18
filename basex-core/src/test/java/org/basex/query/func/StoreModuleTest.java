@@ -84,7 +84,7 @@ public class StoreModuleTest extends SandboxTest {
     query(_STORE_WRITE.args());
     query(_STORE_WRITE.args("LIST1"));
     query(_STORE_WRITE.args("LIST2"));
-    query(func.args(), "LIST1\nLIST2");
+    query(func.args() + " => sort()", "LIST1\nLIST2");
     query(func.args() + " ! " + _STORE_DELETE.args(" ."));
     query(func.args(), "");
   }
