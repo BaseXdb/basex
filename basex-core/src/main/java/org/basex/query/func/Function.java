@@ -282,8 +282,8 @@ public enum Function implements AFunction {
   FORMAT_INTEGER(FnFormatInteger::new, "format-integer(value,picture[,language])",
       params(INTEGER_ZO, STRING_O, STRING_ZO), STRING_O),
   /** XQuery function. */
-  FORMAT_NUMBER(FnFormatNumber::new, "format-number(value,picture[,format-name,format])",
-      params(NUMERIC_ZO, STRING_O, STRING_ZO, MAP_ZO), STRING_O),
+  FORMAT_NUMBER(FnFormatNumber::new, "format-number(value,picture[,options])",
+      params(NUMERIC_ZO, STRING_O, ITEM_ZO), STRING_O),
   /** XQuery function. */
   FORMAT_TIME(FnFormatTime::new, "format-time(value,picture[,language,calendar,place])",
       params(TIME_ZO, STRING_O, STRING_ZO, STRING_ZO, STRING_ZO), STRING_ZO),
@@ -342,7 +342,7 @@ public enum Function implements AFunction {
   IN_SCOPE_PREFIXES(FnInScopePrefixes::new, "in-scope-prefixes(element)",
       params(ELEMENT_O), STRING_ZM),
   /** XQuery function. */
-  INDEX_OF(FnIndexOf::new, "index-of(input,search[,collation])",
+  INDEX_OF(FnIndexOf::new, "index-of(input,target[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_O, STRING_ZO), INTEGER_ZM),
   /** XQuery function. */
   INDEX_WHERE(FnIndexWhere::new, "index-where(input,predicate)",
@@ -790,7 +790,7 @@ public enum Function implements AFunction {
   _ARRAY_HEAD(ArrayHead::new, "head(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_INDEX_OF(ArrayIndexOf::new, "index-of(array,search[,collation])",
+  _ARRAY_INDEX_OF(ArrayIndexOf::new, "index-of(array,target[,collation])",
       params(ARRAY_O, ANY_ATOMIC_TYPE_ZM, STRING_ZO), INTEGER_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_INDEX_WHERE(ArrayIndexWhere::new, "index-where(array,predicate)",

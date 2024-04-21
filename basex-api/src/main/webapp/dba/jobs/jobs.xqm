@@ -34,11 +34,7 @@ function dba:jobs(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  html:wrap(map {
-    'header': $dba:CAT, 'info': $info, 'error': $error,
-    'css': 'codemirror/lib/codemirror.css',
-    'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
-  },
+  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>{
       <td>
         <form method='post'>
@@ -129,11 +125,6 @@ function dba:jobs(
                   </table>
                 ),
   
-                <h3>Job String</h3>,
-                <textarea readonly='' spellcheck='false' rows='20'>{
-                  string($details)
-                }</textarea>,
-  
                 if($cached) then (
                   let $result := try {
                     utils:serialize(job:result($job, map { 'keep': true() }))
@@ -153,7 +144,12 @@ function dba:jobs(
                     }</textarea>,
                     html:js('loadCodeMirror("xml");')
                   )
-                )
+                ),
+  
+                <h3>Job String</h3>,
+                <textarea readonly='' spellcheck='false'>{
+                  string($details)
+                }</textarea>
               ) else (
                 'Job has expired.'
               )

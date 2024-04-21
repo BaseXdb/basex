@@ -45,12 +45,7 @@ function dba:database(
   if(not($name)) then web:redirect('databases') else
 
   let $db-exists := db:exists($name)
-  return html:wrap(
-    map {
-      'header': ($dba:CAT, $name), 'info': $info, 'error': $error,
-      'css': 'codemirror/lib/codemirror.css',
-      'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
-    },
+  return html:wrap(map { 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
     <tr>{
       <td>
         <form method='post'>

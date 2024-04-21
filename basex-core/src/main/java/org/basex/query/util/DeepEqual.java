@@ -6,6 +6,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -26,6 +27,9 @@ public final class DeepEqual {
   public final Collation coll;
   /** Options. */
   public final DeepEqualOptions options;
+
+  /** Comparison function. */
+  public FItem itemsEqual;
   /** Flag for nested node comparisons. */
   public boolean nested;
 
@@ -96,6 +100,7 @@ public final class DeepEqual {
       int size1 = 0, size2 = 0;
       OUTER:
       for(Item item1; (item1 = iter1.next()) != null;) {
+        if(qc != null) qc.checkStop();
         size1++;
         for(int i = items2.size(); --i >= 0;) {
           if(equal(item1, items2.get(i))) {
@@ -131,6 +136,11 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Item item1, final Item item2) throws QueryException {
+    if(itemsEqual != null) {
+      final Value value = itemsEqual.invoke(qc, info, item1, item2);
+      final Value test = SeqType.BOOLEAN_ZO.coerce(value, null, qc, null, info);
+      if(!test.isEmpty()) return ((Bln) test).bool(info);
+    }
     nested = false;
     return item1 == item2 || item1.deepEqual(item2, this);
   }

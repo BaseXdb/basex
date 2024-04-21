@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -21,33 +22,37 @@ public final class FnFormatNumber extends StandardFunc {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Item value = arg(0).atomItem(qc, info);
     final byte[] picture = toToken(arg(1), qc);
-    final Item formatName = arg(2).atomItem(qc, info);
-    final Item format = arg(3).item(qc, info);
+    final Item options = arg(2).item(qc, info);
 
+    // check input
     final Type type = value.type;
     if(value.isEmpty()) value = Dbl.NAN;
     else if(type.isUntyped()) value = Dbl.get(value.dbl(info));
     else if(!type.isNumberOrUntyped()) throw numberError(this, value);
 
-    QNm qnm = QNm.EMPTY;
-    if(formatName instanceof QNm) {
-      qnm = toQNm(formatName);
-    } else if(!formatName.isEmpty()) {
-      try {
-        qnm = QNm.parse(trim(toToken(formatName)), sc());
-      } catch(final QueryException ex) {
-        Util.debug(ex);
-        throw FORMATWHICH_X.get(info, formatName);
-      }
-    }
-    DecFormatter df = sc().decFormat(qnm, info);
-    if(format.isEmpty()) {
-      if(df == null) throw FORMATWHICH_X.get(info, formatName);
+    // find decimal-format name
+    DecFormatOptions dfo = null;
+    final String name;
+    if(options instanceof XQMap) {
+      dfo = toOptions(options, new DecFormatOptions(), qc);
+      name = dfo.get(DecFormatOptions.FORMAT_NAME);
     } else {
-      final DecFormatOptions options = toOptions(format,
-          df != null ? df.options() : new DecFormatOptions(), qc);
+      name = toStringOrNull(options, qc);
+    }
+
+    // create formatter, based on decimal-format name
+    DecFormatter df = null;
+    try {
+      df = sc().decFormat(name != null ? QNm.parse(trim(token(name)), sc()) : QNm.EMPTY, info);
+    } catch(final QueryException ex) {
+      Util.debug(ex);
+    }
+    if(df == null) throw FORMATWHICH_X.get(info, name);
+
+    // enrich formatter, based on options
+    if(dfo != null) {
       try {
-        df = new DecFormatter(options, info);
+        df = new DecFormatter(toOptions(options, df.options(), qc), info);
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw FORMATINV_X.get(info, ex.getLocalizedMessage());

@@ -26,17 +26,15 @@ public final class Var extends ExprInfo {
   /** Input info (can be {@code null}). */
   public final InputInfo info;
 
-  /** Declared type, {@code null} if not specified. */
+  /** Declared type ({@code null} if {@code item()} or no type was specified). */
   public SeqType declType;
-  /** Flag for function coercion. */
+  /** Coercion flag. */
   public boolean coerce;
   /** Stack slot ({@code -1} if unused). */
   public int slot;
 
   /** Actual type (by type inference). */
   private final ExprType exprType;
-  /** Flag for function parameters. */
-  private final boolean param;
   /** Input expression, from which the data reference and DDO flag will be requested. */
   private Expr ex;
 
@@ -46,19 +44,18 @@ public final class Var extends ExprInfo {
    * @param declType declared type, {@code null} for no check
    * @param qc query context, used for generating a variable ID
    * @param info input info (can be {@code null})
-   * @param param function parameter flag
+   * @param coerce coercion flag
    * @param slot stack slot ({@code -1} if unused)
    * @param exprType expression type (can be {@code null})
    */
   public Var(final QNm name, final SeqType declType, final QueryContext qc, final InputInfo info,
-      final boolean param, final int slot, final ExprType exprType) {
+      final boolean coerce, final int slot, final ExprType exprType) {
     this.name = name;
-    this.param = param;
     this.info = info;
     this.slot = slot;
     this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     this.exprType = exprType != null ? exprType : new ExprType(SeqType.ITEM_ZM);
-    coerce = param;
+    this.coerce = coerce && this.declType != null;
     id = qc.varIDs++;
   }
 
@@ -79,11 +76,11 @@ public final class Var extends ExprInfo {
    * @param declType declared sequence type, {@code null} for no check
    * @param qc query context, used for generating a variable ID
    * @param info input info (can be {@code null})
-   * @param param function parameter flag
+   * @param coerce coercion flag
    */
   public Var(final QNm name, final SeqType declType, final QueryContext qc, final InputInfo info,
-      final boolean param) {
-    this(name, declType, qc, info, param, -1, null);
+      final boolean coerce) {
+    this(name, declType, qc, info, coerce, -1, null);
   }
 
   /**
@@ -92,8 +89,7 @@ public final class Var extends ExprInfo {
    * @param qc query context
    */
   public Var(final Var var, final QueryContext qc) {
-    this(var.name, var.declType, qc, var.info, var.param, -1, new ExprType(var.exprType));
-    coerce = var.coerce;
+    this(var.name, var.declType, qc, var.info, var.coerce, -1, new ExprType(var.exprType));
   }
 
   /**
@@ -244,7 +240,7 @@ public final class Var extends ExprInfo {
   /**
    * Tries to adopt the given type check.
    * @param st type to check
-   * @param crc if function coercion should be applied
+   * @param crc if coercion should be applied
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st, final boolean crc) {

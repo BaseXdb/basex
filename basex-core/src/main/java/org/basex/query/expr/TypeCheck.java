@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public class TypeCheck extends Single {
-  /** Flag for function coercion. */
+  /** Coercion flag. */
   public final boolean coerce;
   /** Only check occurrence indicator. */
   private boolean occ;
@@ -33,7 +33,7 @@ public class TypeCheck extends Single {
    * @param info input info (can be {@code null})
    * @param expr expression to be promoted
    * @param seqType target type
-   * @param coerce flag for function coercion
+   * @param coerce coercion flag
    */
   public TypeCheck(final InputInfo info, final Expr expr, final SeqType seqType,
       final boolean coerce) {

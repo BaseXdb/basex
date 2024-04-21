@@ -12,8 +12,10 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class FTTest extends FTData {
-  static { create(DOC); }
-  static { queries = QUERIES; }
+  static {
+    create(DOC);
+    queries = QUERIES;
+  }
 
   @Test @Override
   public void test() {

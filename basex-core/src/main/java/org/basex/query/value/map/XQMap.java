@@ -361,6 +361,6 @@ public final class XQMap extends XQData {
   public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     root.add(tb);
-    qs.brace(tb.toString().replaceAll(", $", ""));
+    qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
   }
 }

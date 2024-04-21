@@ -408,7 +408,9 @@ public final class GFLWORTest extends SandboxTest {
   @Test public void inlineLetTest() {
     check("let $x := 1 let $b := $x + 2 return $b + 3", 6, empty(Let.class));
     check("let $x := <x>0</x> let $b := $x/text() return $b + 1", 1, empty(Let.class));
-    error("let $x := <x>false</x> let $b as xs:boolean := $x/text() return $b", INVTREAT_X_X_X);
+    check("let $x := <x>false</x> let $b as xs:boolean := $x/text() return $b", false,
+        empty(Let.class));
+    error("let $x := <x>42</x> let $b as xs:boolean := $x/text() return $b", FUNCCAST_X_X_X);
   }
 
   /** Tests flattening. */

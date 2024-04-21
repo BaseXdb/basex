@@ -35,6 +35,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: in-scope-namespaces. */
   public static final BooleanOption IN_SCOPE_NAMESPACES =
       new BooleanOption("in-scope-namespaces", false);
+  /** Option: items-equal. */
+  public static final ValueOption ITEMS_EQUAL =
+      new ValueOption("items-equal", SeqType.FUNCTION_O);
   /** Option: namespace-prefixes. */
   public static final BooleanOption NAMESPACE_PREFIXES =
       new BooleanOption("namespace-prefixes", false);

@@ -136,15 +136,6 @@ public final class QueryString {
   }
 
   /**
-   * Adds a token wrapped with square brackets.
-   * @param token token to be added
-   * @return self reference
-   */
-  public QueryString bracket(final Object token) {
-    return braced("[", token, "]");
-  }
-
-  /**
    * Serializes a chopped version of the specified value.
    * @param value value
    * @return string
@@ -171,7 +162,7 @@ public final class QueryString {
    * @param close closing brace
    * @return self reference
    */
-  private QueryString braced(final String open, final Object token, final String close) {
+  public QueryString braced(final String open, final Object token, final String close) {
     tb.add(open);
     token(token);
     final byte[] t = Token.token(close);

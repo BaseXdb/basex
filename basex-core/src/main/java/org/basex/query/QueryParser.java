@@ -2547,7 +2547,8 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     final QNm name = varName();
     final SeqType st = type != null ? type : optAsType();
-    return new Var(name, st, qc, ii);
+    final boolean coerce = type == null && st != null;
+    return new Var(name, st, qc, ii, coerce);
   }
 
   /**

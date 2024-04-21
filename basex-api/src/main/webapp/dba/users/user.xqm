@@ -44,12 +44,7 @@ function dba:user(
 ) as element(html) {
   let $user := user:list-details($name)
   let $admin := $name eq 'admin'
-  return html:wrap(
-    map {
-      'header': ($dba:CAT, $name), 'info': $info, 'error': $error,
-      'css': 'codemirror/lib/codemirror.css',
-      'scripts': ('codemirror/lib/codemirror.js', 'codemirror/mode/xml/xml.js')
-    },
+  return html:wrap(map { 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
