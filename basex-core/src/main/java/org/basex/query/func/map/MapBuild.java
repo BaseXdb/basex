@@ -20,15 +20,17 @@ public final class MapBuild extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final FItem key = toFunctionOrNull(arg(1), 1, qc);
-    final FItem value = toFunctionOrNull(arg(2), 1, qc);
+    final FItem key = toFunctionOrNull(arg(1), 2, qc);
+    final FItem value = toFunctionOrNull(arg(2), 2, qc);
     final FItem combine = toFunctionOrNull(arg(3), 2, qc);
 
+    int p = 0;
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(input)) != null;) {
-      final Iter iter = (key != null ? key.invoke(qc, info, item) : item).atomIter(qc, info);
+      final Int pos = Int.get(++p);
+      final Iter iter = (key != null ? key.invoke(qc, info, item, pos) : item).atomIter(qc, info);
       for(Item k; (k = qc.next(iter)) != null;) {
-        Value v = value != null ? value.invoke(qc, info, item) : item;
+        Value v = value != null ? value.invoke(qc, info, item, pos) : item;
         if(result.contains(k)) {
           final Value old = result.get(k);
           v = combine != null ? combine.invoke(qc, info, old, v) : ValueBuilder.concat(old, v, qc);
