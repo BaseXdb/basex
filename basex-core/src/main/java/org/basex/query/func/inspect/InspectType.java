@@ -42,25 +42,16 @@ public final class InspectType extends StandardFunc {
     final Mode mode = options.get(InspectOptions.MODE);
     final boolean item = options.get(InspectOptions.ITEM);
 
-    SeqType st = null;
+    SeqType et = arg(0).seqType(), st = value.seqType();
     switch(mode) {
       case EXPRESSION:
-        st = arg(0).seqType();
+        st = et;
         break;
       case VALUE:
-        st = value.seqType();
         break;
       default:
-        // combine types of all items to get more specific type
-        for(final Item it : value) {
-          final SeqType st2 = it.seqType();
-          st = st == null ? st2 : st.union(st2);
-        }
-        if(st == null) st = SeqType.EMPTY_SEQUENCE_Z;
-        st = st.with(value.seqType().occ);
-
-        // compare with original type, which may be more specific (in particular for node types)
-        final SeqType et = arg(0).seqType();
+        // compare refined with original type, which may be more specific (e.g. for node types)
+        value.refineType();
         if(et.instanceOf(st)) st = et;
     }
     return Str.get((item ? st.type : st).toString());

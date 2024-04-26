@@ -314,6 +314,9 @@ public abstract class Item extends Value {
     return true;
   }
 
+  @Override
+  public final void refineType() { }
+
   /**
    * Returns a score value. Overwritten by {@link FTNode}.
    * @return score value

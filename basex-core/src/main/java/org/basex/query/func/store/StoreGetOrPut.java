@@ -19,7 +19,7 @@ public final class StoreGetOrPut extends StoreFn {
     Value value = store(qc).get(key);
     if(value.isEmpty()) {
       value = put.invoke(qc, info);
-      store(qc).put(key, value);
+      store(key, value, qc);
     }
     return value;
   }

@@ -6,6 +6,8 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Store function.
@@ -42,5 +44,19 @@ abstract class StoreFn extends StandardFunc {
    */
   static Store store(final QueryContext qc) {
     return qc.context.store;
+  }
+
+  /**
+   * Stores a materialized, compact version of the specified value in the store.
+   * @param key key
+   * @param value value
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  void store(final byte[] key, final Value value, final QueryContext qc) throws QueryException {
+    final Value materialized = value.materialize(n -> false, info, qc);
+    materialized.refineType();
+    final Value compact = Seq.get(materialized.size(), materialized.type, value);
+    store(qc).put(key, compact !=  null ? compact : materialized);
   }
 }

@@ -54,4 +54,7 @@ abstract class NativeSeq extends Seq {
   public final Value remove(final long pos, final QueryContext qc) {
     return copyRemove(pos, qc);
   }
+
+  @Override
+  public void refineType() { }
 }

@@ -150,6 +150,11 @@ public final class SingletonSeq extends Seq {
     return size / value.size();
   }
 
+  @Override
+  public void refineType() {
+    refineType(value);
+  }
+
   // STATIC METHODS ===============================================================================
 
   /**
