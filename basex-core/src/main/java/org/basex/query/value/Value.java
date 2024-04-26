@@ -241,6 +241,26 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public abstract Value reverse(QueryContext qc);
 
+  /**
+   * Computes a more precise sequence type of this value.
+   */
+  public void refineType() {
+    refineType(this);
+  }
+
+  /**
+   * Refines the type of a value.
+   * @param value value
+   */
+  protected static void refineType(final Value value) {
+    Type tp = null;
+    for(final Item it : value) {
+      final Type tp2 = it.type;
+      tp = tp == null ? tp2 : tp.union(tp2);
+    }
+    value.type = tp;
+  }
+
   @Override
   public boolean accept(final ASTVisitor visitor) {
     final Data data = data();

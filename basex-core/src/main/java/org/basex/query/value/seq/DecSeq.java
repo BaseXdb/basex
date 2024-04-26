@@ -98,8 +98,8 @@ public final class DecSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  static Value get(final int size, final Value... values) throws QueryException {
-    final BigDecimal[] tmp = new BigDecimal[size];
+  static Value get(final long size, final Value... values) throws QueryException {
+    final BigDecimal[] tmp = new BigDecimal[Array.checkCapacity(size)];
     int t = 0;
     for(final Value value : values) {
       // speed up construction, depending on input

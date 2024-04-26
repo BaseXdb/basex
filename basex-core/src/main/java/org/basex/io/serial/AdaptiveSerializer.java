@@ -169,9 +169,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   protected void map(final XQMap map) throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
-    if(indent) tb.add(' ');
-    tb.add('{');
+    final TokenBuilder tb = new TokenBuilder().add('{');
     int c = 0;
     ++level;
     for(final Item key : map.keys()) {

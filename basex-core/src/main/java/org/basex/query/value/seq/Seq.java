@@ -346,7 +346,7 @@ public abstract class Seq extends Value {
    * @return value, or {@code null} if sequence could not be created
    * @throws QueryException query exception
    */
-  public static Value get(final int size, final Type type, final Value... values)
+  public static Value get(final long size, final Type type, final Value... values)
       throws QueryException {
 
     if(type instanceof AtomType) {

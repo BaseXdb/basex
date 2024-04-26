@@ -108,7 +108,7 @@ public final class StrSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  static Value get(final int size, final Value... values) throws QueryException {
+  static Value get(final long size, final Value... values) throws QueryException {
     final TokenList tmp = new TokenList(size);
     for(final Value value : values) {
       // speed up construction, depending on input

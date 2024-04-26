@@ -213,6 +213,9 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
+  public void refineType() { }
+
+  @Override
   public String description() {
     return "range " + SEQUENCE;
   }

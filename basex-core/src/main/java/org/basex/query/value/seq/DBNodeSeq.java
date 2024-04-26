@@ -126,6 +126,11 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
+  public void refineType() {
+    refineType(this);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof DBNodeSeq)) return super.equals(obj);
