@@ -32,6 +32,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption FAIRLOCK = new BooleanOption("FAIRLOCK", false);
   /** Timeout (seconds) for remembering result of asynchronous queries. */
   public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
+  /** Write store at shutdown. */
+  public static final BooleanOption WRITESTORE = new BooleanOption("WRITESTORE", true);
 
   /** Comment: written to the options file. */
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
