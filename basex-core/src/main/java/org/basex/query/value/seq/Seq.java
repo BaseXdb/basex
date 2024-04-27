@@ -339,17 +339,18 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Tries to create a typed sequence with the items of the specified values.
+   * Tries to create a compactified version of the specified values.
    * @param size size of resulting sequence
-   * @param values values
    * @param type type
+   * @param values values
    * @return value, or {@code null} if sequence could not be created
    * @throws QueryException query exception
    */
   public static Value get(final long size, final Type type, final Value... values)
       throws QueryException {
 
-    if(type instanceof AtomType) {
+    if((values.length != 1 || values[0] instanceof TreeSeq || values[0] instanceof ItemSeq) &&
+        type instanceof AtomType) {
       switch((AtomType) type) {
         case BOOLEAN:
           return BlnSeq.get(size, values);

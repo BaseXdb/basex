@@ -253,6 +253,12 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @param value value
    */
   protected static void refineType(final Value value) {
+    // check selectively if type cannot be refined any further
+    final Type vt = value.type;
+    if(vt instanceof NodeType && vt != NodeType.NODE ||
+       vt instanceof AtomType && ((Checks<AtomType>) t ->
+       !t.instanceOf(vt) || t.eq(vt)).all(AtomType.values())) return;
+
     Type tp = null;
     for(final Item it : value) {
       final Type tp2 = it.type;
