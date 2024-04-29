@@ -42,7 +42,7 @@ function dba:files(
           <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
             let $dir-path := fn($path) {
               try {
-                file:path-to-native($dir)
+                file:path-to-native($path)
               } catch file:* { }
             }
             let $webapp := $dir-path(db:option('webpath'))[.]

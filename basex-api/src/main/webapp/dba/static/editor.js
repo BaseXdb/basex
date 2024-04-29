@@ -82,7 +82,7 @@ function refreshDataList(names) {
 function checkButtons() {
   var name = fileName();
   (document.getElementById("open") || {}).disabled = !fileExists(name);
-  (document.getElementById("save") || {}).disabled = !name || _editor.historySize().undo === 0;
+  (document.getElementById("save") || {}).disabled = !name;
   (document.getElementById("close") || {}).disabled = !name;
 }
 
