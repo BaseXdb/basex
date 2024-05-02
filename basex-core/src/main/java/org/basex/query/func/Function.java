@@ -481,7 +481,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARTITION(FnPartition::new, "partition(input,split-when)",
-      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
+      params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
   PATH(FnPath::new, "path([node])",
@@ -677,8 +677,8 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _MAP_BUILD(MapBuild::new, "build(input[,keys,value,combine])",
-      params(ITEM_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(Occ.ZERO_OR_ONE),
-      FuncType.get(ITEM_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE),
+      params(ITEM_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
+      FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
       FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
