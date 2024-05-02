@@ -300,7 +300,7 @@ public final class XQMap extends XQData {
   public void string(final boolean indent, final TokenBuilder tb, final int level,
       final InputInfo ii) throws QueryException {
 
-    tb.add("map{");
+    tb.add("{");
     int c = 0;
     final IntConsumer addWS = lvl -> {
       for(int l = 0; l < lvl; l++) tb.add("  ");
