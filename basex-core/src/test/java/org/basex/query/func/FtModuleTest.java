@@ -71,6 +71,8 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("行イ音便", "行イ音便", " { 'fuzzy': true() }"), true);
     query(func.args("行イ音音", "行イ音便", " { 'fuzzy': true() }"), true);
     query(func.args("行イ音便", "行イ音音", " { 'fuzzy': true() }"), true);
+    query(func.args("イイ音便", "行イ音便", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音便", "イイ音便", " { 'fuzzy': true() }"), true);
 
     query(func.args("行イ音便", "serch", " { 'fuzzy': true() }"), false);
     query(func.args("serch", "行イ音便", " { 'fuzzy': true() }"), false);

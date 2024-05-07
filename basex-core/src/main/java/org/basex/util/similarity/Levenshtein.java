@@ -150,13 +150,14 @@ public final class Levenshtein {
    * @return normalized token
    */
   private static int[] normalize(final byte[] token) {
-    int tlen = 0;
-    for(int t = 0; t < token.length; t += cl(token, t)) ++tlen;
-    final int[] tmp = new int[tlen];
-    for(int t = 0, p = 0; t < tlen; t += cl(token, t), p++) {
-      tmp[p] = noDiacritics(lc(cp(token, t)));
+    final int tl = token.length;
+    int cl = 0;
+    for(int t = 0; t < tl; t += cl(token, t)) cl++;
+    final int[] cps = new int[cl];
+    for(int c = 0, t = 0; c < cl; c++, t += cl(token, t)) {
+      cps[c] = noDiacritics(lc(cp(token, t)));
     }
-    return tmp;
+    return cps;
   }
 
   /**
