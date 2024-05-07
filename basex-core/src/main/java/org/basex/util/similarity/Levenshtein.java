@@ -3,6 +3,7 @@ package org.basex.util.similarity;
 import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
 import java.util.function.*;
 
 /**
@@ -20,7 +21,7 @@ public final class Levenshtein {
   /** Default number of allowed errors; dynamic calculation if value is 0. */
   private final int maxErrors;
   /** Matrix for calculating Levenshtein distance. */
-  private int[][] matrix;
+  private final int[][] matrix;
 
   /**
    * Constructor.
@@ -35,6 +36,12 @@ public final class Levenshtein {
    */
   public Levenshtein(final int maxErrors) {
     this.maxErrors = maxErrors;
+    matrix = new int[MAX + 2][MAX + 2];
+    final int ml = matrix.length;
+    for(int m = 0; m < ml; ++m) {
+      matrix[0][m] = m;
+      matrix[m][0] = m;
+    }
   }
 
   /**
@@ -102,38 +109,28 @@ public final class Levenshtein {
    * @return distance
    */
   private int distance(final byte[] token, final byte[] compare, final int max) {
-    final int sl = compare.length, tl = token.length;
-    int clen = 0, tlen = 0;
-    for(int c = 0; c < sl; c += cl(compare, c)) ++clen;
-    for(int t = 0; t < tl; t += cl(token, t)) ++tlen;
+    // create normalized copies of the tokens
+    final int[] tkn = normalize(token), cmp = normalize(compare);
+    final int tl = tkn.length, cl = cmp.length;
 
     // use exact search for too short and too long values
-    final int dlen = Math.abs(clen - tlen);
-    if(max == 0 && (tlen < 4 || clen < 4) || tlen > MAX || clen > MAX)
-      return dlen == 0 && same(token, compare) ? 0 : Integer.MAX_VALUE;
+    final int dlen = Math.abs(cl - tl);
+    if(max == 0 && (tl < 4 || cl < 4) || tl > MAX || cl > MAX) {
+      return dlen == 0 && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
+    }
 
     // skip different tokens with too different lengths
-    final int k = max == 0 ? Math.max(1, clen >> 2) : max;
+    final int k = max == 0 ? Math.max(1, cl >> 2) : max;
     if(dlen > k) return Integer.MAX_VALUE;
 
     // compute distance
-    int[][] mx = matrix;
-    if(mx == null) {
-      mx = new int[MAX + 2][MAX + 2];
-      final int ml = mx.length;
-      for(int m = 0; m < ml; ++m) {
-        mx[0][m] = m;
-        mx[m][0] = m;
-      }
-      matrix = mx;
-    }
-
     int f = -1, g = -1;
-    for(int t = 0; t < tlen; t += cl(token, t)) {
-      final int tn = noDiacritics(lc(cp(token, t)));
+    final int[][] mx = matrix;
+    for(int t = 0; t < tl; t++) {
+      final int tn = tkn[t];
       int d = Integer.MAX_VALUE;
-      for(int c = 0; c < clen; c += cl(compare, c)) {
-        final int cn = noDiacritics(lc(cp(compare, c)));
+      for(int c = 0; c < cl; c++) {
+        final int cn = cmp[c];
         int e = m(mx[t][c + 1] + 1, mx[t + 1][c] + 1, mx[t][c] + (tn == cn ? 0 : 1));
         if(tn == g && cn == f) e = mx[t][c];
         mx[t + 1][c + 1] = e;
@@ -143,8 +140,23 @@ public final class Levenshtein {
       if(d > k) return Integer.MAX_VALUE;
       f = tn;
     }
-    final int d = mx[tlen][clen];
+    final int d = mx[tl][cl];
     return d <= k ? d : Integer.MAX_VALUE;
+  }
+
+  /**
+   * Normalizes a token and returns a codepoint array.
+   * @param token token
+   * @return normalized token
+   */
+  private static int[] normalize(final byte[] token) {
+    int tlen = 0;
+    for(int t = 0; t < token.length; t += cl(token, t)) ++tlen;
+    final int[] tmp = new int[tlen];
+    for(int t = 0, p = 0; t < tlen; t += cl(token, t), p++) {
+      tmp[p] = noDiacritics(lc(cp(token, t)));
+    }
+    return tmp;
   }
 
   /**
@@ -188,19 +200,5 @@ public final class Levenshtein {
    */
   private static int m(final int a, final int b, final int c) {
     return Math.min(Math.min(a, b), c);
-  }
-
-  /**
-   * Compares two character arrays for equality.
-   * @param token input token
-   * @param compare token to be compared
-   * @return true if the arrays are equal
-   */
-  private static boolean same(final byte[] token, final byte[] compare) {
-    final int tl = token.length, cl = compare.length;
-    for(int c = 0, t = 0; t < tl && c < cl; t += cl(token, t), c += cl(compare, c)) {
-      if(lc(noDiacritics(cp(token, t))) != lc(noDiacritics(cp(compare, t)))) return false;
-    }
-    return true;
   }
 }

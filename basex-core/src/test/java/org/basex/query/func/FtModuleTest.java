@@ -64,6 +64,17 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("databases and xml", "databases xml",
         " map { 'mode': 'all words', 'window': map { 'size': 3 } }"), true);
 
+    // GH-2296
+    query(func.args("serch", "serch", " { 'fuzzy': true() }"), true);
+    query(func.args("surch", "serch", " { 'fuzzy': true() }"), true);
+    query(func.args("serch", "surch", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音便", "行イ音便", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音音", "行イ音便", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音便", "行イ音音", " { 'fuzzy': true() }"), true);
+
+    query(func.args("行イ音便", "serch", " { 'fuzzy': true() }"), false);
+    query(func.args("serch", "行イ音便", " { 'fuzzy': true() }"), false);
+
     // check buggy options
     error(func.args("x", "x", " map { 'x': 'y' }"), OPTION_X);
     error(func.args("x", "x", " map { 'mode': '' }"), OPTION_X);
