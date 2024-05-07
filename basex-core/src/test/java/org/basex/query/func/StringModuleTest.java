@@ -111,12 +111,6 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void cr() {
-    final Function func = _STRING_CR;
-    query("string-to-codepoints(" + func.args() + ')', 13);
-  }
-
-  /** Test method. */
   @Test public void format() {
     final Function func = _STRING_FORMAT;
     query(func.args("x", "x"), "x");
@@ -161,13 +155,6 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("", ""), 1);
 
     query("let $x := string-join((1 to 1000) ! 'a') return " + func.args(" $x", " $x"), 1);
-  }
-
-  /** Test method. */
-  @Test public void nl() {
-    final Function func = _STRING_NL;
-    query(func.args(), "\n");
-    query("string-to-codepoints(" + func.args() + ')', 10);
   }
 
   /** Tests, adopted from Apache Commons project (SoundexTest.java). */
@@ -282,12 +269,6 @@ public final class StringModuleTest extends SandboxTest {
     soundexVariations("E625",
       "Erickson", "Erickson", "Erikson", "Ericson", "Ericksen", "Ericsen"
     );
-  }
-  /** Test method. */
-  @Test public void tab() {
-    final Function func = _STRING_TAB;
-    query(func.args(), "\t");
-    query("string-to-codepoints(" + func.args() + ')', 9);
   }
 
   /**
