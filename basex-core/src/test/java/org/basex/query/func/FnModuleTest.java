@@ -614,11 +614,11 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(9, " { 9: true() }"), 9);
     check(func.args(9, " { 9: false() }"), null);
     check(func.args(9, " { 9: ()} "), "");
-    error(func.args(8, " { 9: true() }"), INVCONVERT_X_X_X);
+    check(func.args(8, " { 9: true() }"), "");
 
     check(func.args(1, " [ true() ]"), 1);
     check(func.args(1, " [ false() ]"), null);
-    error(func.args(1, " [ () ]"), INVCONVERT_X_X_X);
+    check(func.args(1, " [ () ]"), "");
     error(func.args(2, " [ true() ]"), ARRAYBOUNDS_X_X);
 
     inline(true);
