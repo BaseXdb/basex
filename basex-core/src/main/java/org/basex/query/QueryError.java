@@ -452,6 +452,8 @@ public enum QueryError {
 
   /** Error code. */
   STRING_FORMAT_X_X(STRING, "format", "%: %."),
+  /** Error code. */
+  STRING_BOUNDS_X(STRING, "bounds", "String exceeds maximum supported length of % characters."),
 
   // Unit Module
 

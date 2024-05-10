@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -141,20 +142,37 @@ public final class StringModuleTest extends SandboxTest {
   @Test public void levenshtein() {
     final Function func = _STRING_LEVENSHTEIN;
     // queries
+    query(func.args("", ""), 1);
+    query(func.args("a", "a"), 1);
     query(func.args("ab", "ab"), 1);
-    query(func.args("ab", "a"), 0.5);
-    query(func.args("ab", "a"), 0.5);
-    query(func.args("ab", ""), 0);
+    query(func.args("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), 1);
+    query("string-join(replicate('x', 1000)) ! " + func.args(" .", " ."), 1);
 
-    query(func.args("ac", "ab"), 0.5);
+    query(func.args("a", "b"), 0);
+    query(func.args("b", "a"), 0);
+
+    query(func.args("ab", "a"), 0.5);
     query(func.args("a", "ab"), 0.5);
+
+    query(func.args("ab", ""), 0);
     query(func.args("", "ab"), 0);
 
+    query(func.args("ac", "ab"), 0.5);
+    query(func.args("ab", "ac"), 0.5);
+
     query(func.args("ab", "ba"), 0.5);
+    query(func.args("ba", "ab"), 0.5);
 
-    query(func.args("", ""), 1);
+    query(func.args("ab", "axb"), 2e0 / 3);
+    query(func.args("ab", "axx"), 1e0 / 3);
 
-    query("let $x := string-join((1 to 1000) ! 'a') return " + func.args(" $x", " $x"), 1);
+    query(func.args("xyb", "ab"), 1e0 / 3);
+    query(func.args("ab", "xyb"), 1e0 / 3);
+
+    query(func.args(" string-join(replicate('x', 10000))", "x"), "0.0001");
+    query(func.args("x", " string-join(replicate('x', 10000))"), "0.0001");
+
+    error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
   }
 
   /** Tests, adopted from Apache Commons project (SoundexTest.java). */
