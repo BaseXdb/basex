@@ -1746,8 +1746,10 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Distinct document order. */
   @Test public void gh1888() {
-    check("let $a := <a/> return" + _UTIL_DDO.args(" ($a, $a)"), "<a/>", root(CElem.class));
-    check("let $a := <a/> return ($a, $a)/.", "<a/>", root(CElem.class));
+    check("let $a := <a/> return" + DISTINCT_ORDERED_NODES.args(" ($a, $a)"),
+        "<a/>", root(CElem.class));
+    check("let $a := <a/> return ($a, $a)/.",
+        "<a/>", root(CElem.class));
   }
 
   /** Simple map implementation for two operands. */

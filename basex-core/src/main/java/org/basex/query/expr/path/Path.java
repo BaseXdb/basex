@@ -342,7 +342,7 @@ public abstract class Path extends ParseExpr {
     if(removed && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
       if(root == null) root = ContextValue.get(cc, info);
       if(!root.ddo()) {
-        root = cc.replaceWith(root, cc.function(Function._UTIL_DDO, info, root));
+        root = cc.replaceWith(root, cc.function(Function.DISTINCT_ORDERED_NODES, info, root));
       }
     }
 

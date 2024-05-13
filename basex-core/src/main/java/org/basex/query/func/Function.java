@@ -186,6 +186,9 @@ public enum Function implements AFunction {
   DEFAULT_LANGUAGE(FnDefaultLanguage::new, "default-language()",
       params(), LANGUAGE_O),
   /** XQuery function. */
+  DISTINCT_ORDERED_NODES(FnDistinctOrderedNodes::new, "distinct-ordered-nodes(nodes...)",
+      params(NODE_ZM), NODE_ZM),
+  /** XQuery function. */
   DISTINCT_VALUES(FnDistinctValues::new, "distinct-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
@@ -1836,9 +1839,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_DDO(UtilDdo::new, "ddo(nodes)",
-      params(NODE_ZM), NODE_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),

@@ -19,6 +19,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -757,6 +758,19 @@ public abstract class StandardFunc extends Arr {
       list.add(name);
       return list;
     });
+  }
+
+  /**
+   * Merge variadic arguments.
+   * @return merged arguments
+   */
+  protected final Expr variadic() {
+    final int al = args().length;
+    if(al == 0) return Empty.VALUE;
+    if(al == 1) return arg(0);
+    final ExprList list = new ExprList(al);
+    for(final Expr expr : args()) list.add(expr);
+    return new List(info, list.finish());
   }
 
   @Override

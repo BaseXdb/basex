@@ -313,7 +313,7 @@ public abstract class Arr extends ParseExpr {
         // A intersect (A union B)  ->  A
         // (A and B) or (A and B and C)  ->  A
         return left.seqType().type instanceof NodeType && !left.ddo() ?
-          cc.function(Function._UTIL_DDO, info, left) : left;
+          cc.function(Function.DISTINCT_ORDERED_NODES, info, left) : left;
       } else if(curr.size() == 1) {
         // single additional test: add this test
         // (A and B) or (A and C)  ->  A and (B or C)
