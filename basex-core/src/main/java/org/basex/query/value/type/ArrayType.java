@@ -18,9 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FType {
-  /** Name. */
-  public static final byte[] ARRAY = Token.token(QueryText.ARRAY);
-
   /** Type of the array members. */
   public final SeqType memberType;
 
@@ -120,6 +117,6 @@ public final class ArrayType extends FType {
   @Override
   public String toString() {
     final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { memberType };
-    return new QueryString().token(ARRAY).params(param).toString();
+    return new QueryString().token(QueryText.ARRAY).params(param).toString();
   }
 }

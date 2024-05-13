@@ -18,8 +18,6 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class MapType extends FType {
-  /** Name. */
-  public static final byte[] MAP = Token.token(QueryText.MAP);
   /** Key type of the map. */
   public final AtomType keyType;
   /** Value types (can be {@code null}, indicating that no type was specified). */
@@ -122,7 +120,7 @@ public final class MapType extends FType {
   @Override
   public String toString() {
     final Object[] param = this == SeqType.MAP ? WILDCARD : new Object[] { keyType, valueType};
-    return new QueryString().token(MAP).params(param).toString();
+    return new QueryString().token(QueryText.MAP).params(param).toString();
   }
 
   @Override
