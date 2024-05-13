@@ -75,7 +75,9 @@ public class FnLowest extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    if(!defined(1)) {
+    if(defined(2)) {
+      arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
+    } else if(!defined(1)) {
       final Predicate<Type> noCheck = type -> type.isSortable() && !type.isUntyped();
       if(st.zeroOrOne() && noCheck.test(st.type)) return input;
 
@@ -98,8 +100,6 @@ public class FnLowest extends StandardFunc {
         args[0] = args[0].arg(0);
         return cc.function(min ? LOWEST : HIGHEST, info, args);
       }
-    } else if(defined(2)) {
-      arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
     }
     return adoptType(input);
   }

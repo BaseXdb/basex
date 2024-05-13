@@ -888,7 +888,7 @@ public enum Function implements AFunction {
   // Math Module (custom)
 
   /** XQuery function. */
-  _MATH_COSH(MathCosh::new, "cosh(radians)",
+  _MATH_COSH(MathCosh::new, "cosh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
   _MATH_CRC32(MathCrc32::new, "crc32(value)",
@@ -897,10 +897,10 @@ public enum Function implements AFunction {
   _MATH_E(MathE::new, "e()",
       params(), DOUBLE_O, MATH_URI),
   /** XQuery function. */
-  _MATH_SINH(MathSinh::new, "sinh(radians)",
+  _MATH_SINH(MathSinh::new, "sinh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
-  _MATH_TANH(MathTanh::new, "tanh(radians)",
+  _MATH_TANH(MathTanh::new, "tanh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
 
   // Admin Module
