@@ -136,12 +136,25 @@ public final class DeepEqual {
    * @throws QueryException query exception
    */
   public boolean equal(final Item item1, final Item item2) throws QueryException {
+    final Bln eq = itemsEqual(item1, item2);
+    if(eq != null) return eq.bool(info);
+    nested = false;
+    return item1 == item2 || item1.deepEqual(item2, this);
+  }
+
+  /**
+   * Checks items for deep equality.
+   * @param item1 first item
+   * @param item2 second item
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public Bln itemsEqual(final Item item1, final Item item2) throws QueryException {
     if(itemsEqual != null) {
       final Value value = itemsEqual.invoke(qc, info, item1, item2);
       final Value test = SeqType.BOOLEAN_ZO.coerce(value, null, qc, null, info);
-      if(!test.isEmpty()) return ((Bln) test).bool(info);
+      if(!test.isEmpty()) return (Bln) test;
     }
-    nested = false;
-    return item1 == item2 || item1.deepEqual(item2, this);
+    return null;
   }
 }
