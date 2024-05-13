@@ -131,7 +131,7 @@ function dba:jobs(
                     utils:serialize(job:result($job, map { 'keep': true() }))
                   } catch * {
                     'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
-                      $err:column-number || ':' || string:nl() || $err:description
+                      $err:column-number || ':' || char('\n') || $err:description
                   }
                   where $result
                   return (
