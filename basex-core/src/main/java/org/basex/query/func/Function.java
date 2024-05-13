@@ -891,9 +891,6 @@ public enum Function implements AFunction {
   _MATH_COSH(MathCosh::new, "cosh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
-  _MATH_CRC32(MathCrc32::new, "crc32(value)",
-      params(STRING_ZO), HEX_BINARY_ZO, MATH_URI),
-  /** XQuery function. */
   _MATH_E(MathE::new, "e()",
       params(), DOUBLE_O, MATH_URI),
   /** XQuery function. */

@@ -944,6 +944,14 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void crc32() {
+    final Function func = HASH;
+    query(func.args(" ()", " { 'algorithm': 'crc-32' }"), "");
+    query("string( " + func.args("", " { 'algorithm': 'CRC-32' }") + ')', "00000000");
+    query("string( " + func.args("BaseX", " { 'algorithm': 'CRC-32' }") + ')', "4C06FC7F");
+  }
+
+  /** Test method. */
   @Test public void head() {
     final Function func = HEAD;
 
