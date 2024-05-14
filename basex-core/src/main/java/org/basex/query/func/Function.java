@@ -119,7 +119,7 @@ public enum Function implements AFunction {
   CODEPOINT_EQUAL(FnCodepointEqual::new, "codepoint-equal(value1,value2)",
       params(STRING_ZO, STRING_ZO), BOOLEAN_ZO),
   /** XQuery function. */
-  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(values)",
+  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(values...)",
       params(INTEGER_ZM), STRING_O),
   /** XQuery function. */
   COLLATION(FnCollation::new, "collation(options)",
