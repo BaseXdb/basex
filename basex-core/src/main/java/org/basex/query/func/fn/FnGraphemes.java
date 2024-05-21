@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import java.text.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -19,6 +20,7 @@ public final class FnGraphemes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String value = toStringOrNull(arg(0), qc);
+    if(value == null) return Empty.VALUE;
 
     final TokenList list = new TokenList();
     if(Prop.ICU) {
@@ -30,6 +32,11 @@ public final class FnGraphemes extends StandardFunc {
         list.add(value.substring(s, e));
       }
     }
-    return value != null ? StrSeq.get(list.finish()) : Empty.VALUE;
+    return StrSeq.get(list.finish());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 }
