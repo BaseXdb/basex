@@ -58,9 +58,10 @@ public final class FnParseUri extends StandardFunc {
       "http", "80", "https", "443", "ftp", "21", "ssh", "22");
 
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String value = toString(arg(0), qc);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final String value = toStringOrNull(arg(0), qc);
     final UriOptions options = toOptions(arg(1), new UriOptions(), qc);
+    if(value == null) return Empty.VALUE;
 
     String string = value.replace('\\', '/'), fragment = "", query = "", scheme = "";
     String filepath = "", authority = "", userinfo = "", host = "", port = "", path;

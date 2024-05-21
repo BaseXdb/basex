@@ -472,7 +472,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
-      params(STRING_O, INTEGER_O), INTEGER_O),
+      params(STRING_ZO, INTEGER_O), INTEGER_O),
   /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(value[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(CNS, HOF)),
