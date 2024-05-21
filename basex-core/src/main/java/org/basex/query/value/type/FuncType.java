@@ -1,7 +1,6 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -13,8 +12,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
-import org.basex.util.similarity.*;
 
 /**
  * XQuery 3.0 function types.
@@ -23,9 +20,6 @@ import org.basex.util.similarity.*;
  * @author Leo Woerteler
  */
 public class FuncType extends FType {
-  /** Name. */
-  public static final byte[] FUNCTION = Token.token(QueryText.FUNCTION);
-
   /** Annotations. */
   public final AnnList anns;
   /** Return type of the function. */
@@ -183,38 +177,12 @@ public class FuncType extends FType {
    */
   public static Type find(final QNm name) {
     if(name.uri().length == 0) {
-      final byte[] ln = name.local();
-      if(Token.eq(ln, FuncType.FUNCTION)) return SeqType.FUNCTION;
-      if(Token.eq(ln, MapType.MAP)) return SeqType.MAP;
-      if(Token.eq(ln, ArrayType.ARRAY)) return SeqType.ARRAY;
+      final String ln = Token.string(name.local());
+      if(ln.equals(QueryText.FUNCTION) || ln.equals(QueryText.FN)) return SeqType.FUNCTION;
+      if(ln.equals(QueryText.MAP)) return SeqType.MAP;
+      if(ln.equals(QueryText.ARRAY)) return SeqType.ARRAY;
     }
     return null;
-  }
-
-  /**
-   * Returns an info message for a similar function.
-   * @param qname name of type
-   * @return info string
-   */
-  public static byte[] similar(final QNm qname) {
-    final byte[] ln = lc(qname.local());
-
-    final TokenList list = new TokenList();
-    list.add(AtomType.ITEM.qname().local()).add(FuncType.FUNCTION);
-    list.add(MapType.MAP).add(ArrayType.ARRAY);
-    for(final NodeType type : NodeType.values()) list.add(type.qname().local());
-    final byte[][] values = list.finish();
-
-    Object similar = Levenshtein.similar(ln, values);
-    if(similar == null) {
-      for(final byte[] value : values) {
-        if(startsWith(value, ln)) {
-          similar = value;
-          break;
-        }
-      }
-    }
-    return QueryError.similar(qname.prefixId(XML), similar);
   }
 
   /**
@@ -245,7 +213,7 @@ public class FuncType extends FType {
 
   @Override
   public String toString() {
-    final QueryString qs = new QueryString().token(anns).token(FUNCTION);
+    final QueryString qs = new QueryString().token(anns).token(QueryText.FN);
     if(this == SeqType.FUNCTION) qs.params(WILDCARD);
     else qs.params(argTypes).token(QueryText.AS).token(declType);
     return qs.toString();

@@ -60,20 +60,10 @@ public class QueryParser extends InputParser {
       "^(xquery( version ['\"].*?['\"])?( encoding ['\"].*?['\"])? ?; ?)?module .*");
   /** QName check: skip namespace check. */
   private static final byte[] SKIPCHECK = {};
-  /** Reserved function names. */
-  private static final TokenSet KEYWORDS;
-
-  // initialize keywords
-  static {
-    KEYWORDS = new TokenSet(
-      NodeType.ATTRIBUTE.qname().string(), NodeType.COMMENT.qname().string(),
-      NodeType.DOCUMENT_NODE.qname().string(), NodeType.ELEMENT.qname().string(),
-      NodeType.NAMESPACE_NODE.qname().string(), NodeType.NODE.qname().string(),
-      NodeType.PROCESSING_INSTRUCTION.qname().string(), NodeType.TEXT.qname().string(),
-      NodeType.SCHEMA_ATTRIBUTE.qname().string(), NodeType.SCHEMA_ELEMENT.qname().string(),
-      ArrayType.ARRAY, FuncType.FUNCTION, MapType.MAP, AtomType.ITEM.qname().string(),
-      token(EMPTY_SEQUENCE), token(IF), token(SWITCH), token(TYPESWITCH));
-  }
+  /** Reserved keywords. */
+  private static final TokenSet KEYWORDS = new TokenSet(
+      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
+      SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, FN, FUNCTION, IF, SWITCH, TYPESWITCH);
 
   /** URIs of modules loaded by the current file. */
   public final TokenSet moduleURIs = new TokenSet();
@@ -3162,7 +3152,7 @@ public class QueryParser extends InputParser {
         st = SeqType.get(type, Occ.EXACTLY_ONE, enumerationType());
       }
       // no type found
-      if(type == null) throw error(WHICHTYPE_X, FuncType.similar(name));
+      if(type == null) throw error(WHICHTYPE_X, Type.similar(name));
     } else {
       // attach default element namespace
       if(!name.hasURI()) name.uri(sc.elemNS);

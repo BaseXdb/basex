@@ -1184,8 +1184,8 @@ public enum AtomType implements Type {
    */
   public static AtomType find(final QNm qname, final boolean all) {
     if(!Token.eq(qname.uri(), BASEX_URI)) {
-      for(final AtomType tp : VALUES) {
-        if(qname.eq(tp.qname()) && (all || tp.parent != null)) return tp;
+      for(final AtomType value : VALUES) {
+        if(qname.eq(value.qname()) && (all || value.parent != null)) return value;
       }
     }
     return null;
@@ -1203,12 +1203,12 @@ public enum AtomType implements Type {
       final QNm qnm = tp.qname();
       return Token.eq(qnm.uri(), XS_URI) && tp.parent != null ? qnm.local() : null;
     };
-    Object similar = Levenshtein.similar(ln, VALUES, o -> local.apply((AtomType) o));
+    Object similar = Levenshtein.similar(ln, VALUES, value -> local.apply((AtomType) value));
     if(similar == null) {
-      for(final AtomType tp : VALUES) {
-        final byte[] lc = local.apply(tp);
+      for(final AtomType value : VALUES) {
+        final byte[] lc = local.apply(value);
         if(lc != null && startsWith(lc, ln)) {
-          similar = tp;
+          similar = value;
           break;
         }
       }
