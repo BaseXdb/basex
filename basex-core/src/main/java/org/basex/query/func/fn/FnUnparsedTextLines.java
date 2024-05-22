@@ -23,13 +23,13 @@ import org.basex.util.list.*;
 public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Item text = unparsedText(qc, false, true);
+    final Item text = unparsedText(qc, false, arg(1));
     return text.isEmpty() ? Empty.ITER : new LinesIter(text.string(info));
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item text = unparsedText(qc, false, true);
+    final Item text = unparsedText(qc, false, arg(1));
     if(text.isEmpty()) return Empty.VALUE;
 
     try(NewlineInput ni = new NewlineInput(text.string(info))) {

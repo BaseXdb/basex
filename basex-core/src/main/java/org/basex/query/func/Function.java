@@ -177,8 +177,8 @@ public enum Function implements AFunction {
   DECODE_FROM_URI(FnDecodeFromUri::new, "decode-from-uri(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
-  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation,options])",
-      params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_ZO), BOOLEAN_O),
+  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,options])",
+      params(ITEM_ZM, ITEM_ZM, ITEM_ZO), BOOLEAN_O),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation::new, "default-collation()",
       params(), STRING_O),
@@ -642,14 +642,14 @@ public enum Function implements AFunction {
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(href[,encoding])",
-      params(STRING_ZO, STRING_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
+  UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(href[,options])",
+      params(STRING_ZO, ITEM_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(href[,encoding])",
-      params(STRING_ZO, STRING_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.CREATE),
+  UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(href[,options])",
+      params(STRING_ZO, ITEM_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(href[,encoding])",
-      params(STRING_ZO, STRING_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
+  UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(href[,options])",
+      params(STRING_ZO, ITEM_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   UPPER_CASE(FnUpperCase::new, "upper-case(value)",
       params(STRING_ZO), STRING_O),
