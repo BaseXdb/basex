@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
@@ -39,27 +41,33 @@ public final class Rename extends Update {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = arg(0).iter(qc);
     final Item name = arg(1).atomItem(qc, info);
+    final IdentityHashMap<Type, QNm> names = new IdentityHashMap<>();
 
     for(Item item; (item = iter.next()) != null;) {
       final Type type = item.type;
-      final boolean elemnt = type == NodeType.ELEMENT, attribute = type == NodeType.ATTRIBUTE;
-      final CNode cname;
-      if(elemnt) {
-        cname = new CElem(info, false, name, new Atts());
-      } else if(attribute) {
-        cname = new CAttr(info, false, name, Empty.VALUE);
-      } else if(type == NodeType.PROCESSING_INSTRUCTION) {
-        cname = new CPI(info, false, name, Empty.VALUE);
-      } else {
-        throw UPWRTRGTYP_X.get(info, item);
+      final boolean element = type == NodeType.ELEMENT, attribute = type == NodeType.ATTRIBUTE;
+      final boolean pi = type == NodeType.PROCESSING_INSTRUCTION;
+      if(!(element || attribute || pi)) throw UPWRTRGTYP_X.get(info, item);
+
+      QNm newName = names.get(type);
+      if(newName == null) {
+        final CNode cname;
+        if(element) {
+          cname = new CElem(info, false, name, new Atts());
+        } else if(attribute) {
+          cname = new CAttr(info, false, name, Empty.VALUE);
+        } else {
+          cname = new CPI(info, false, name, Empty.VALUE);
+        }
+        newName = ((ANode) cname.item(qc, info)).qname();
+        names.put(type, newName);
       }
-      final ANode target = (ANode) item;
-      final QNm newName = ((ANode) cname.item(qc, info)).qname();
 
       // check for namespace conflicts
-      if(elemnt || attribute) {
+      final ANode target = (ANode) item;
+      if(element || attribute) {
         final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
-        if(elemnt || newPrefix.length > 0) {
+        if(element || newPrefix.length > 0) {
           final Atts nspaces = target.nsScope(sc());
           final int ns = nspaces.size();
           for(int n = 0; n < ns; n++) {

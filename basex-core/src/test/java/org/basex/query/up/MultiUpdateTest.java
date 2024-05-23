@@ -258,4 +258,33 @@ public final class MultiUpdateTest extends SandboxTest {
 
     error("document {} update { insert nodes attribute new {} into . }", UPATTELM2_X);
   }
+
+  /** Insert before/after/as first/as last. */
+  @Test public void insertOthers() {
+    final String input = "<xml><old>TEXT</old><old>TEXT</old></xml>";
+    query(input + " update { insert nodes <new/> before * }",
+        "<xml><new/><old>TEXT</old><new/><old>TEXT</old></xml>");
+    query(input + " update { insert nodes <new/> after * }",
+        "<xml><old>TEXT</old><new/><old>TEXT</old><new/></xml>");
+    query(input + " update { insert nodes <new/> as first into * }",
+        "<xml><old><new/>TEXT</old><old><new/>TEXT</old></xml>");
+    query(input + " update { insert nodes <new/> as last into * }",
+        "<xml><old>TEXT<new/></old><old>TEXT<new/></old></xml>");
+  }
+
+  /** Insert before/after/as first/as last. */
+  @Test public void insertBeforeAfterError() {
+    final String input = "<xml><old/></xml>";
+    error(input + " update { insert nodes attribute new {} before 'x' }", UPTRGTYP2_X);
+    error(input + " update { insert nodes attribute new {} after 'x' }", UPTRGTYP2_X);
+
+    error("document {} update { insert nodes attribute new {} before . }", UPTRGTYP2_X);
+    error("attribute old { } update { insert nodes attribute new {} after . }", UPTRGTYP2_X);
+
+    error("document { <a/> } update { insert nodes attribute new {} before * }", UPATTELM_X);
+    error("document { <a/> } update { insert nodes attribute new {} after * }", UPATTELM_X);
+
+    error(input + " update { insert nodes attribute new {} before . }", UPPAREMPTY_X);
+    error(input + " update { insert nodes attribute new {} after . }", UPPAREMPTY_X);
+  }
 }

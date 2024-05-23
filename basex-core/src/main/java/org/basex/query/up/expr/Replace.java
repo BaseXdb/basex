@@ -9,7 +9,6 @@ import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -43,7 +42,7 @@ public final class Replace extends Update {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = arg(0).iter(qc);
-    final Value nodes = arg(1).value(qc);
+    FBuilder builder = null;
 
     for(Item item; (item = iter.next()) != null;) {
       final Type type = item.type;
@@ -55,7 +54,7 @@ public final class Replace extends Update {
       final DBNode dbn = updates.determineDataRef(targ, qc);
 
       // replace node
-      final FBuilder builder = builder(nodes, qc);
+      if(builder == null) builder = builder(arg(1), qc);
       if(value) {
         // replace value of node
         byte[] text = Token.EMPTY;

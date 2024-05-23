@@ -8,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -51,9 +50,9 @@ public final class Insert extends Update {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = arg(0).iter(qc);
-    final Value nodes = arg(1).value(qc);
-
     final boolean sibling = mode == Mode.BEFORE || mode == Mode.AFTER;
+    FBuilder builder = null;
+
     for(Item item; (item = iter.next()) != null;) {
       final Type type = item.type;
       if(!(type instanceof NodeType)) throw (sibling ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
@@ -67,7 +66,7 @@ public final class Insert extends Update {
         throw UPTRGTYP_X.get(info, node);
       }
 
-      final FBuilder builder = builder(nodes, qc);
+      if(builder == null) builder = builder(arg(1), qc);
       final Updates updates = qc.updates();
       NodeUpdate up;
       DBNode dbnode;

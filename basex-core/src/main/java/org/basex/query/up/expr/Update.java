@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -57,14 +56,14 @@ abstract class Update extends Arr {
 
   /**
    * Creates a node builder.
-   * @param nodes nodes
+   * @param expr node expression
    * @param qc query context
    * @return builder
    * @throws QueryException query exception
    */
-  final FBuilder builder(final Value nodes, final QueryContext qc) throws QueryException {
+  final FBuilder builder(final Expr expr, final QueryContext qc) throws QueryException {
     final FBuilder builder = new FBuilder();
-    final Constr constr = new Constr(builder, info, qc).add(nodes);
+    final Constr constr = new Constr(builder, info, qc).add(expr);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
     return builder;
