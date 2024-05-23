@@ -29,14 +29,14 @@ abstract class Copy extends Arr {
   public final Expr optimize(final CompileContext cc) {
     // do not assign original sequence type (name of node may change):
     // <a/> update { rename node . as 'x' }  ->  <x/>
-    final SeqType st = result().seqType();
+    final SeqType st = arg(target()).seqType();
     exprType.assign(st.type, st.occ);
     return this;
   }
 
   @Override
   public void checkUp() throws QueryException {
-    final Expr modify = modify();
+    final Expr modify = arg(update());
     modify.checkUp();
     if(!modify.vacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
   }
@@ -47,18 +47,18 @@ abstract class Copy extends Arr {
   }
 
   /**
-   * Returns the updating expression.
+   * Returns the position of the updating expression.
    * @return result expression
    */
-  final Expr modify() {
-    return exprs[0];
+  final int update() {
+    return 0;
   }
 
   /**
-   * Returns the result expression.
-   * @return result expression
+   * Returns the position of the target expression.
+   * @return target expression
    */
-  final Expr result() {
-    return exprs[1];
+  final int target() {
+    return 1;
   }
 }

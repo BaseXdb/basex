@@ -38,7 +38,7 @@ public final class Rename extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
+    final Iter iter = arg(0).iter(qc);
     final Item item = iter.next();
 
     // check target constraints
@@ -49,11 +49,11 @@ public final class Rename extends Update {
     final CNode ex;
     final Type type = item.type;
     if(type == NodeType.ELEMENT) {
-      ex = new CElem(info, false, exprs[1], new Atts());
+      ex = new CElem(info, false, arg(1), new Atts());
     } else if(type == NodeType.ATTRIBUTE) {
-      ex = new CAttr(info, false, exprs[1], Empty.VALUE);
+      ex = new CAttr(info, false, arg(1), Empty.VALUE);
     } else if(type == NodeType.PROCESSING_INSTRUCTION) {
-      ex = new CPI(info, false, exprs[1], Empty.VALUE);
+      ex = new CPI(info, false, arg(1), Empty.VALUE);
     } else {
       throw UPWRTRGTYP_X.get(info, item);
     }
@@ -85,7 +85,7 @@ public final class Rename extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Rename(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+    return copyType(new Rename(info, arg(0).copy(cc, vm), arg(1).copy(cc, vm)));
   }
 
   @Override
@@ -95,6 +95,6 @@ public final class Rename extends Update {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(RENAME).token(NODE).token(exprs[0]).token(AS).token(exprs[1]);
+    qs.token(RENAME).token(NODE).token(arg(0)).token(AS).token(arg(1));
   }
 }

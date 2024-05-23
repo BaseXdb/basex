@@ -52,13 +52,13 @@ public final class Insert extends Update {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FBuilder builder = new FBuilder();
-    final Constr constr = new Constr(builder, info, qc).add(exprs[1]);
+    final Constr constr = new Constr(builder, info, qc).add(arg(1));
     final ANodeList cList = toList(builder, false), aList = toList(builder, true);
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
 
     // check target constraints
-    final Iter iter = exprs[0].iter(qc);
+    final Iter iter = arg(0).iter(qc);
     final Item item = iter.next();
     if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
 
@@ -108,7 +108,7 @@ public final class Insert extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Insert(info, exprs[1].copy(cc, vm), mode, exprs[0].copy(cc, vm)));
+    return copyType(new Insert(info, arg(1).copy(cc, vm), mode, arg(0).copy(cc, vm)));
   }
 
   @Override
@@ -118,7 +118,7 @@ public final class Insert extends Update {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(QueryText.INSERT).token(QueryText.NODES).token(exprs[1]).token(QueryText.INTO).
-      token(exprs[0]);
+    qs.token(QueryText.INSERT).token(QueryText.NODES).token(arg(1)).token(QueryText.INTO).
+      token(arg(0));
   }
 }
