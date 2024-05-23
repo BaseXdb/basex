@@ -10,7 +10,6 @@ import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -39,47 +38,42 @@ public final class Rename extends Update {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = arg(0).iter(qc);
-    final Item item = iter.next();
+    final Item name = arg(1).atomItem(qc, info);
 
-    // check target constraints
-    if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
-    final Item item2 = iter.next();
-    if(item2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2));
+    for(Item item; (item = iter.next()) != null;) {
+      final Type type = item.type;
+      final boolean elemnt = type == NodeType.ELEMENT, attribute = type == NodeType.ATTRIBUTE;
+      final CNode cname;
+      if(elemnt) {
+        cname = new CElem(info, false, name, new Atts());
+      } else if(attribute) {
+        cname = new CAttr(info, false, name, Empty.VALUE);
+      } else if(type == NodeType.PROCESSING_INSTRUCTION) {
+        cname = new CPI(info, false, name, Empty.VALUE);
+      } else {
+        throw UPWRTRGTYP_X.get(info, item);
+      }
+      final ANode target = (ANode) item;
+      final QNm newName = ((ANode) cname.item(qc, info)).qname();
 
-    final CNode ex;
-    final Type type = item.type;
-    if(type == NodeType.ELEMENT) {
-      ex = new CElem(info, false, arg(1), new Atts());
-    } else if(type == NodeType.ATTRIBUTE) {
-      ex = new CAttr(info, false, arg(1), Empty.VALUE);
-    } else if(type == NodeType.PROCESSING_INSTRUCTION) {
-      ex = new CPI(info, false, arg(1), Empty.VALUE);
-    } else {
-      throw UPWRTRGTYP_X.get(info, item);
-    }
-
-    final QNm newName = ((ANode) ex.item(qc, info)).qname();
-    final ANode target = (ANode) item;
-
-    // check namespace conflicts...
-    final Type tt = target.type;
-    final boolean elem = tt == NodeType.ELEMENT, attr = tt == NodeType.ATTRIBUTE;
-    if(elem || attr) {
-      final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
-      if(elem || newPrefix.length > 0) {
-        final Atts nspaces = target.nsScope(sc());
-        final int ns = nspaces.size();
-        for(int n = 0; n < ns; n++) {
-          final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
-          if(eq(prefix, newPrefix) && !eq(uri, newUri))
-            throw UPNSCONFL_X_X.get(info, newName, new QNm(prefix, uri));
+      // check for namespace conflicts
+      if(elemnt || attribute) {
+        final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
+        if(elemnt || newPrefix.length > 0) {
+          final Atts nspaces = target.nsScope(sc());
+          final int ns = nspaces.size();
+          for(int n = 0; n < ns; n++) {
+            final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
+            if(eq(prefix, newPrefix) && !eq(uri, newUri))
+              throw UPNSCONFL_X_X.get(info, newName, new QNm(prefix, uri));
+          }
         }
       }
-    }
 
-    final Updates updates = qc.updates();
-    final DBNode dbn = updates.determineDataRef(target, qc);
-    updates.add(new RenameNode(dbn.pre(), dbn.data(), info, newName), qc);
+      final Updates updates = qc.updates();
+      final DBNode dbn = updates.determineDataRef(target, qc);
+      updates.add(new RenameNode(dbn.pre(), dbn.data(), info, newName), qc);
+    }
     return Empty.VALUE;
   }
 

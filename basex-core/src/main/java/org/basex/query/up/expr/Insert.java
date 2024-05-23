@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
@@ -51,57 +50,53 @@ public final class Insert extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FBuilder builder = new FBuilder();
-    final Constr constr = new Constr(builder, info, qc).add(arg(1));
-    final ANodeList cList = toList(builder, false), aList = toList(builder, true);
-    if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
-    if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
-
-    // check target constraints
     final Iter iter = arg(0).iter(qc);
-    final Item item = iter.next();
-    if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
+    final Value nodes = arg(1).value(qc);
 
-    final boolean loc = mode == Mode.BEFORE || mode == Mode.AFTER;
-    if(!(item instanceof ANode)) throw (loc ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
-    final Item i2 = iter.next();
-    if(i2 != null) throw (loc ? UPTRGSNGL2_X : UPTRGSNGL_X).get(info,
-        ValueBuilder.concat(item, i2));
+    final boolean sibling = mode == Mode.BEFORE || mode == Mode.AFTER;
+    for(Item item; (item = iter.next()) != null;) {
+      final Type type = item.type;
+      if(!(type instanceof NodeType)) throw (sibling ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
 
-    final ANode node = (ANode) item, parent = node.parent();
-    final Type type = node.type;
-    if(loc) {
-      if(type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
-        throw UPTRGTYP2_X.get(info, node);
-      if(parent == null) throw UPPAREMPTY_X.get(info, node);
-    } else if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) {
-      throw UPTRGTYP_X.get(info, node);
-    }
-
-    NodeUpdate up;
-    DBNode dbn;
-    // no update primitive is created if node list is empty
-    final Updates updates = qc.updates();
-    if(!aList.isEmpty()) {
-      final ANode targ = loc ? parent : node;
-      if(targ.type != NodeType.ELEMENT) throw (loc ? UPATTELM_X : UPATTELM2_X).get(info, targ);
-
-      dbn = updates.determineDataRef(targ, qc);
-      up = new InsertAttribute(dbn.pre(), dbn.data(), info, checkNS(aList, targ));
-      updates.add(up, qc);
-    }
-
-    // no update primitive is created if node list is empty
-    if(!cList.isEmpty()) {
-      dbn = updates.determineDataRef(node, qc);
-      switch(mode) {
-        case BEFORE: up = new InsertBefore(dbn.pre(), dbn.data(), info, cList); break;
-        case AFTER : up = new InsertAfter(dbn.pre(), dbn.data(), info, cList); break;
-        case FIRST : up = new InsertIntoAsFirst(dbn.pre(), dbn.data(), info, cList); break;
-        case LAST  : up = new InsertIntoAsLast(dbn.pre(), dbn.data(), info, cList); break;
-        default    : up = new InsertInto(dbn.pre(), dbn.data(), info, cList);
+      final ANode node = (ANode) item, parent = node.parent();
+      if(sibling) {
+        if(type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
+          throw UPTRGTYP2_X.get(info, node);
+        if(parent == null) throw UPPAREMPTY_X.get(info, node);
+      } else if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) {
+        throw UPTRGTYP_X.get(info, node);
       }
-      updates.add(up, qc);
+
+      final FBuilder builder = builder(nodes, qc);
+      final Updates updates = qc.updates();
+      NodeUpdate up;
+      DBNode dbnode;
+
+      // no update primitive is created if node list is empty
+      ANodeList list = builder.attributes;
+      if(list != null) {
+        final ANode target = sibling ? parent : node;
+        if(target.type != NodeType.ELEMENT)
+          throw (sibling ? UPATTELM_X : UPATTELM2_X).get(info, target);
+
+        dbnode = updates.determineDataRef(target, qc);
+        up = new InsertAttribute(dbnode.pre(), dbnode.data(), info, checkNS(list, target));
+        updates.add(up, qc);
+      }
+
+      // no update primitive is created if node list is empty
+      list = builder.children;
+      if(list != null) {
+        dbnode = updates.determineDataRef(node, qc);
+        switch(mode) {
+          case BEFORE: up = new InsertBefore(dbnode.pre(), dbnode.data(), info, list); break;
+          case AFTER : up = new InsertAfter(dbnode.pre(), dbnode.data(), info, list); break;
+          case FIRST : up = new InsertIntoAsFirst(dbnode.pre(), dbnode.data(), info, list); break;
+          case LAST  : up = new InsertIntoAsLast(dbnode.pre(), dbnode.data(), info, list); break;
+          default    : up = new InsertInto(dbnode.pre(), dbnode.data(), info, list);
+        }
+        updates.add(up, qc);
+      }
     }
     return Empty.VALUE;
   }

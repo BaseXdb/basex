@@ -3799,7 +3799,7 @@ public class QueryParser extends InputParser {
    */
   private Expr rename() throws QueryException {
     final int p = pos;
-    if(!wsConsumeWs(RENAME) || !wsConsumeWs(NODE)) {
+    if(!wsConsumeWs(RENAME) || !wsConsumeWs(NODE) && !wsConsumeWs(NODES)) {
       pos = p;
       return null;
     }
@@ -3823,8 +3823,8 @@ public class QueryParser extends InputParser {
     final boolean value = wsConsumeWs(VALUEE);
     if(value) {
       wsCheck(OF);
-      wsCheck(NODE);
-    } else if(!wsConsumeWs(NODE)) {
+      if(!wsConsumeWs(NODES)) wsCheck(NODE);
+    } else if(!wsConsumeWs(NODE) && !wsConsumeWs(NODES)) {
       pos = p;
       return null;
     }
