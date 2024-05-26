@@ -73,6 +73,7 @@ public final class MapType extends FType {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
     if(type instanceof MapType) {
       final MapType mt = (MapType) type;
       return valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
@@ -87,6 +88,7 @@ public final class MapType extends FType {
 
   @Override
   public Type union(final Type type) {
+    if(type instanceof ChoiceItemType) return type.union(this);
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
@@ -100,6 +102,7 @@ public final class MapType extends FType {
 
   @Override
   public Type intersect(final Type type) {
+    if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 

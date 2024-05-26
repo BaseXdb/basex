@@ -1,10 +1,11 @@
 package org.basex.query;
 
-import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.SeqType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.value.type.*;
@@ -172,6 +173,81 @@ public final class SeqTypeTest {
     assertFalse(STRING_O.instanceOf(e3));
     assertFalse(e1.instanceOf(LANGUAGE_O));
     assertFalse(LANGUAGE_O.instanceOf(e3));
+
+    final SeqType
+      // (xs:date | xs:string)
+      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      // (element() | xs:string)
+      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      // (xs:NMTOKENS | xs:string)
+      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      // (array(*) | xs:string)
+      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      // (map(*) | xs:string)
+      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      // (function(*) | xs:string)
+      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+
+    assertTrue(c1.instanceOf(c1));
+    assertFalse(c1.instanceOf(c2));
+    assertFalse(c1.instanceOf(c3));
+    assertFalse(c1.instanceOf(c4));
+    assertFalse(c1.instanceOf(c5));
+    assertFalse(c1.instanceOf(c6));
+    assertFalse(c1.instanceOf(DATE_O));
+    assertTrue(DATE_O.instanceOf(c1));
+    assertFalse(c1.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c1));
+    assertFalse(c2.instanceOf(c1));
+    assertTrue(c2.instanceOf(c2));
+    assertFalse(c2.instanceOf(c3));
+    assertFalse(c2.instanceOf(c4));
+    assertFalse(c2.instanceOf(c5));
+    assertFalse(c2.instanceOf(c6));
+    assertFalse(c2.instanceOf(ELEMENT_O));
+    assertTrue(ELEMENT_O.instanceOf(c2));
+    assertFalse(c2.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c2));
+    assertFalse(c3.instanceOf(c1));
+    assertFalse(c3.instanceOf(c2));
+    assertTrue(c3.instanceOf(c3));
+    assertFalse(c3.instanceOf(c4));
+    assertFalse(c3.instanceOf(c5));
+    assertFalse(c3.instanceOf(c6));
+    assertFalse(c3.instanceOf(NMTOKENS_O));
+    assertTrue(NMTOKENS_O.instanceOf(c3));
+    assertFalse(c3.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c3));
+    assertFalse(c4.instanceOf(c1));
+    assertFalse(c4.instanceOf(c2));
+    assertFalse(c4.instanceOf(c3));
+    assertTrue(c4.instanceOf(c4));
+    assertFalse(c4.instanceOf(c5));
+    assertTrue(c4.instanceOf(c6));
+    assertFalse(c4.instanceOf(ARRAY_O));
+    assertTrue(ARRAY_O.instanceOf(c4));
+    assertFalse(c4.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c4));
+    assertFalse(c5.instanceOf(c1));
+    assertFalse(c5.instanceOf(c2));
+    assertFalse(c5.instanceOf(c3));
+    assertFalse(c5.instanceOf(c4));
+    assertTrue(c5.instanceOf(c5));
+    assertTrue(c5.instanceOf(c6));
+    assertFalse(c5.instanceOf(MAP_O));
+    assertTrue(MAP_O.instanceOf(c5));
+    assertFalse(c5.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c5));
+    assertFalse(c6.instanceOf(c1));
+    assertFalse(c6.instanceOf(c2));
+    assertFalse(c6.instanceOf(c3));
+    assertFalse(c6.instanceOf(c4));
+    assertFalse(c6.instanceOf(c5));
+    assertTrue(c6.instanceOf(c6));
+    assertFalse(c6.instanceOf(FUNCTION_O));
+    assertTrue(FUNCTION_O.instanceOf(c6));
+    assertFalse(c6.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c6));
   }
 
   /** Tests for {@link SeqType#union(SeqType)}. */
@@ -298,6 +374,39 @@ public final class SeqTypeTest {
     combine(e1, STRING_O, STRING_O, op);
     combine(e1, LANGUAGE_O, STRING_O, op);
     combine(e1, INTEGER_O, ANY_ATOMIC_TYPE_O, op);
+
+    final SeqType
+      // (xs:date | xs:string)
+      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      // (element() | xs:string)
+      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      // (xs:NMTOKENS | xs:string)
+      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      // (array(*) | xs:string)
+      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      // (map(*) | xs:string)
+      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      // (function(*) | xs:string)
+      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+
+    combine(c1, op);
+    combine(c1, DATE_O, ANY_ATOMIC_TYPE_O, op);
+    combine(c1, STRING_O, ANY_ATOMIC_TYPE_O, op);
+    combine(c2, op);
+    combine(c2, ELEMENT_O, ITEM_O, op);
+    combine(c2, STRING_O, ITEM_O, op);
+    combine(c3, op);
+    combine(c3, NMTOKENS_O, ITEM_O, op);
+    combine(c3, STRING_O, ITEM_O, op);
+    combine(c4, op);
+    combine(c4, ARRAY_O, ITEM_O, op);
+    combine(c4, STRING_O, ITEM_O, op);
+    combine(c5, op);
+    combine(c5, MAP_O, ITEM_O, op);
+    combine(c5, STRING_O, ITEM_O, op);
+    combine(c6, op);
+    combine(c6, FUNCTION_O, ITEM_O, op);
+    combine(c6, STRING_O, ITEM_O, op);
   }
 
   /** Tests for {@link SeqType#intersect(SeqType)}. */
@@ -428,6 +537,45 @@ public final class SeqTypeTest {
     combine(e1, STRING_O, e1, op);
     combine(e1, LANGUAGE_O, null, op);
     combine(e1, INTEGER_O, null, op);
+
+    final SeqType
+      // (xs:date | xs:string)
+      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      // (element() | xs:string)
+      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      // (xs:NMTOKENS | xs:string)
+      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      // (array(*) | xs:string)
+      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      // (map(*) | xs:string)
+      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      // (function(*) | xs:string)
+      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+
+    combine(c1, op);
+    combine(c1, DATE_O, DATE_O, op);
+    combine(c1, STRING_O, STRING_O, op);
+    combine(c1, INTEGER_O, null, op);
+    combine(c2, op);
+    combine(c2, ELEMENT_O, ELEMENT_O, op);
+    combine(c2, STRING_O, STRING_O, op);
+    combine(c2, INTEGER_O, null, op);
+    combine(c3, op);
+    combine(c3, NMTOKENS_O, NMTOKENS_O, op);
+    combine(c3, STRING_O, STRING_O, op);
+    combine(c3, INTEGER_O, null, op);
+    combine(c4, op);
+    combine(c4, ARRAY_O, ARRAY_O, op);
+    combine(c4, STRING_O, STRING_O, op);
+    combine(c4, INTEGER_O, null, op);
+    combine(c5, op);
+    combine(c5, MAP_O, MAP_O, op);
+    combine(c5, STRING_O, STRING_O, op);
+    combine(c5, INTEGER_O, null, op);
+    combine(c6, op);
+    combine(c6, FUNCTION_O, FUNCTION_O, op);
+    combine(c6, STRING_O, STRING_O, op);
+    combine(c6, INTEGER_O, null, op);
   }
 
   /**

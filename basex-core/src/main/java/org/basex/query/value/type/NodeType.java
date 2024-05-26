@@ -232,17 +232,20 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
+    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
     return this == type || type == AtomType.ITEM ||
         type instanceof NodeType && parent.instanceOf(type);
   }
 
   @Override
   public final Type union(final Type type) {
+    if(type instanceof ChoiceItemType) return type.union(this);
     return this == type ? this : type instanceof NodeType ? NODE : AtomType.ITEM;
   }
 
   @Override
   public final NodeType intersect(final Type type) {
+    if(type instanceof ChoiceItemType) return (NodeType) type.intersect(this);
     return instanceOf(type) ? this : type.instanceOf(this) ? (NodeType) type : null;
   }
 
