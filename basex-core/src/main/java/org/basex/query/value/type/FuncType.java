@@ -90,6 +90,7 @@ public class FuncType extends FType {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
     if(this == SeqType.FUNCTION || !(type instanceof FuncType)) return false;
 
     final FuncType ft = (FuncType) type;
@@ -106,6 +107,7 @@ public class FuncType extends FType {
 
   @Override
   public Type union(final Type type) {
+    if(type instanceof ChoiceItemType) return type.union(this);
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
@@ -125,6 +127,7 @@ public class FuncType extends FType {
 
   @Override
   public Type intersect(final Type type) {
+    if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 

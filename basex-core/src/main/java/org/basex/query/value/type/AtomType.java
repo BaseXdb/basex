@@ -1001,12 +1001,14 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
+    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
     return this == type || type == AtomType.ITEM ||
         type instanceof AtomType && parent != null && parent.instanceOf(type);
   }
 
   @Override
   public final AtomType union(final Type type) {
+    if(type instanceof ChoiceItemType) return (AtomType) type.union(this);
     if(type.instanceOf(this)) return this;
 
     if(type instanceof AtomType) {
@@ -1022,6 +1024,7 @@ public enum AtomType implements Type {
 
   @Override
   public final Type intersect(final Type type) {
+    if(type instanceof ChoiceItemType) return type.intersect(this);
     return instanceOf(type) ? this : type.instanceOf(this) ? type : null;
   }
 

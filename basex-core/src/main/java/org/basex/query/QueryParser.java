@@ -3077,23 +3077,27 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private SeqType castTarget() throws QueryException {
-    // choice item type
-    if(wsConsume("(")) return choiceItemType();
-
-    final QNm name = eQName(sc.elemNS, TYPEINVALID);
-    Type type = ListType.find(name);
+    Type type;
     EnumValues values = null;
-    if(type == null) {
-      type = AtomType.find(name, false);
-      if(consume("(")) {
-        if(type != AtomType.ENUM) throw error(SIMPLETYPE_X, name.prefixId(XML));
-        values = enumerationType();
+    if(wsConsume("(")) {
+      type = choiceItemType();
+      if(type.atomic() == null)
+        throw error(INVALIDCAST_X, type);
+    } else {
+      final QNm name = eQName(sc.elemNS, TYPEINVALID);
+      type = ListType.find(name);
+      if(type == null) {
+        type = AtomType.find(name, false);
+        if(consume("(")) {
+          if(type != AtomType.ENUM) throw error(SIMPLETYPE_X, name.prefixId(XML));
+          values = enumerationType();
+        }
+        if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
+          type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
+          throw error(INVALIDCAST_X, name.prefixId(XML));
+        if(type == null)
+          throw error(WHICHCAST_X, AtomType.similar(name));
       }
-      if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
-        type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
-        throw error(INVALIDCAST_X, name.prefixId(XML));
-      if(type == null)
-        throw error(WHICHCAST_X, AtomType.similar(name));
     }
     skipWs();
     return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE, values);
@@ -3131,7 +3135,7 @@ public class QueryParser extends InputParser {
    */
   private SeqType itemType() throws QueryException {
     // choice item type
-    if(wsConsume("(")) return choiceItemType();
+    if(wsConsume("(")) return SeqType.get(choiceItemType(), Occ.EXACTLY_ONE);
 
     // parse annotations and type name
     final AnnList anns = annotations(false).check(false, false);
@@ -3327,13 +3331,15 @@ public class QueryParser extends InputParser {
    * @return item type
    * @throws QueryException query exception
    */
-  private SeqType choiceItemType() throws QueryException {
+  private Type choiceItemType() throws QueryException {
     final ArrayList<SeqType> types = new ArrayList<>();
     do {
-      types.add(itemType());
+      final SeqType st = itemType();
+      if(st.type instanceof ChoiceItemType) types.addAll(((ChoiceItemType) st.type).alts);
+      else types.add(st);
     } while(wsConsume("|"));
     check(')');
-    return types.get(0); // TODO: return proper representation of union type
+    return types.size() == 1 ? types.get(0).type : new ChoiceItemType(types);
   }
 
   /**

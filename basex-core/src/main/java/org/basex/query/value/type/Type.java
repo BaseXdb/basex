@@ -94,7 +94,11 @@ public interface Type {
     /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86),
     /** enum().                   */ ENM(87),
-    /** last dummy type.          */ LAST(88);
+
+    // item type
+    /** choice item type.         */ CIT(88),
+
+    /** last dummy type.          */ LAST(89);
 
     /** Type index. */
     private final byte index;

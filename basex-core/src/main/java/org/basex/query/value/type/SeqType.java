@@ -2,6 +2,7 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
@@ -205,6 +206,9 @@ public final class SeqType {
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
+  /** Single NMTOKENS. */
+  public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
+
   /** Item type. */
   public final Type type;
   /** Occurrence indicator. */
@@ -357,6 +361,10 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Item item) {
+    if (type instanceof ChoiceItemType) {
+      for(final SeqType tp : ((ChoiceItemType) type).alts) if(tp.instance(item)) return true;
+      return false;
+    }
     return item.instanceOf(type) && (test == null || test.matches(item)) &&
         (values == null || values.matches(((Str) item).string()));
   }
@@ -473,6 +481,18 @@ public final class SeqType {
 
     final QuerySupplier<QueryException> error = () ->
       typeError(item, with(EXACTLY_ONE), name, info, true);
+    if(type instanceof ChoiceItemType) {
+      final int sz = items.size();
+      for(final SeqType tp : ((ChoiceItemType) type).alts) {
+        try {
+          tp.coerce(item, name, items, qc, cc, info);
+          return;
+        } catch (@SuppressWarnings("unused") final QueryException ex) {
+          while(items.size() > sz) items.pop();
+        }
+      }
+      throw error.get();
+    }
     if(type instanceof AtomType) {
       final Iter iter = item.atomValue(qc, info).iter();
       for(Item it; (it = qc.next(iter)) != null;) {
