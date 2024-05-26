@@ -67,6 +67,7 @@ public class FnEvery extends StandardFunc {
         fr = new For(i, p, null, input, false).optimize(cc);
         pos = new VarRef(info, p).optimize(cc);
       }
+
       final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
       final Expr rtrn =  func ? new DynFuncCall(info, coerce(1, cc, arity), args).optimize(cc) :
         cc.function(Function.BOOLEAN, info, args);

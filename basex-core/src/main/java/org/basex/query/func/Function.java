@@ -119,7 +119,7 @@ public enum Function implements AFunction {
   CODEPOINT_EQUAL(FnCodepointEqual::new, "codepoint-equal(value1,value2)",
       params(STRING_ZO, STRING_ZO), BOOLEAN_ZO),
   /** XQuery function. */
-  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(values)",
+  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(values...)",
       params(INTEGER_ZM), STRING_O),
   /** XQuery function. */
   COLLATION(FnCollation::new, "collation(options)",
@@ -177,14 +177,17 @@ public enum Function implements AFunction {
   DECODE_FROM_URI(FnDecodeFromUri::new, "decode-from-uri(value)",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
-  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,collation,options])",
-      params(ITEM_ZM, ITEM_ZM, STRING_ZO, MAP_ZO), BOOLEAN_O),
+  DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,options])",
+      params(ITEM_ZM, ITEM_ZM, ITEM_ZO), BOOLEAN_O),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation::new, "default-collation()",
       params(), STRING_O),
   /** XQuery function. */
   DEFAULT_LANGUAGE(FnDefaultLanguage::new, "default-language()",
       params(), LANGUAGE_O),
+  /** XQuery function. */
+  DISTINCT_ORDERED_NODES(FnDistinctOrderedNodes::new, "distinct-ordered-nodes(nodes...)",
+      params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
   DISTINCT_VALUES(FnDistinctValues::new, "distinct-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
@@ -299,6 +302,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   GENERATE_ID(FnGenerateId::new, "generate-id([node])",
       params(NODE_ZO), STRING_O),
+  /** XQuery function. */
+  GRAPHEMES(FnGraphemes::new, "graphemes(value[,options])",
+      params(STRING_ZO, MAP_ZO), STRING_ZM),
   /** XQuery function. */
   HAS_CHILDREN(FnHasChildren::new, "has-children([node])",
       params(NODE_ZM), BOOLEAN_O),
@@ -481,7 +487,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARTITION(FnPartition::new, "partition(input,split-when)",
-      params(ITEM_ZM, FuncType.get(BOOLEAN_O, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
+      params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
   PATH(FnPath::new, "path([node])",
@@ -636,14 +642,14 @@ public enum Function implements AFunction {
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(href[,encoding])",
-      params(STRING_ZO, STRING_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
+  UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(href[,options])",
+      params(STRING_ZO, ITEM_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(href[,encoding])",
-      params(STRING_ZO, STRING_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.CREATE),
+  UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(href[,options])",
+      params(STRING_ZO, ITEM_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(href[,encoding])",
-      params(STRING_ZO, STRING_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
+  UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(href[,options])",
+      params(STRING_ZO, ITEM_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   UPPER_CASE(FnUpperCase::new, "upper-case(value)",
       params(STRING_ZO), STRING_O),
@@ -677,8 +683,8 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _MAP_BUILD(MapBuild::new, "build(input[,keys,value,combine])",
-      params(ITEM_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O).seqType(Occ.ZERO_OR_ONE),
-      FuncType.get(ITEM_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE),
+      params(ITEM_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZO, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
+      FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
       FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
@@ -749,7 +755,7 @@ public enum Function implements AFunction {
       params(ARRAY_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_BUILD(ArrayBuild::new, "build(input[,action])",
-      params(ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
+      params(ITEM_ZM, ACTION_O.with(Occ.ZERO_OR_ONE)),
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_EMPTY(ArrayEmpty::new, "empty(array)",
@@ -888,19 +894,16 @@ public enum Function implements AFunction {
   // Math Module (custom)
 
   /** XQuery function. */
-  _MATH_COSH(MathCosh::new, "cosh(radians)",
+  _MATH_COSH(MathCosh::new, "cosh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
-  /** XQuery function. */
-  _MATH_CRC32(MathCrc32::new, "crc32(value)",
-      params(STRING_ZO), HEX_BINARY_ZO, MATH_URI),
   /** XQuery function. */
   _MATH_E(MathE::new, "e()",
       params(), DOUBLE_O, MATH_URI),
   /** XQuery function. */
-  _MATH_SINH(MathSinh::new, "sinh(radians)",
+  _MATH_SINH(MathSinh::new, "sinh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
   /** XQuery function. */
-  _MATH_TANH(MathTanh::new, "tanh(radians)",
+  _MATH_TANH(MathTanh::new, "tanh(value)",
       params(DOUBLE_ZO), DOUBLE_ZO, MATH_URI),
 
   // Admin Module
@@ -1740,9 +1743,6 @@ public enum Function implements AFunction {
   _STRING_COLOGNE_PHONETIC(StringColognePhonetic::new, "cologne-phonetic(value)",
       params(STRING_O), STRING_O, STRING_URI),
   /** XQuery function. */
-  _STRING_CR(StringCr::new, "cr()",
-      params(), STRING_O, STRING_URI),
-  /** XQuery function. */
   _STRING_FORMAT(StringFormat::new, "format(pattern[,values...])",
       params(STRING_O, ITEM_O), STRING_O, STRING_URI),
   /** XQuery function. */
@@ -1752,14 +1752,8 @@ public enum Function implements AFunction {
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(value1,value2)",
       params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
   /** XQuery function. */
-  _STRING_NL(StringNl::new, "nl()",
-      params(), STRING_O, STRING_URI),
-  /** XQuery function. */
   _STRING_SOUNDEX(StringSoundex::new, "soundex(value)",
       params(STRING_O), STRING_O, STRING_URI),
-  /** XQuery function. */
-  _STRING_TAB(StringTab::new, "tab()",
-      params(), STRING_O, STRING_URI),
 
   // Unit Module
 
@@ -1845,9 +1839,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_DDO(UtilDdo::new, "ddo(nodes)",
-      params(NODE_ZM), NODE_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
@@ -1938,7 +1929,7 @@ public enum Function implements AFunction {
       flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions[,options])",
-      params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI),
+      params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI, Perm.ADMIN),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse::new, "parse(input[,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO), NODE_O, flag(NDT), XQUERY_URI, Perm.CREATE),

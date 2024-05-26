@@ -17,6 +17,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: base-uri. */
   public static final BooleanOption BASE_URI =
       new BooleanOption("base-uri", false);
+  /** Option: collation. */
+  public static final StringOption COLLATION =
+      new StringOption("collation");
   /** Option: comments. */
   public static final BooleanOption COMMENTS =
       new BooleanOption("comments", false);

@@ -46,6 +46,7 @@ declare function html:wrap(
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
       <meta name='description' content='Database Administration'/>
       <meta name='author' content='BaseX Team 2005-24, BSD License'/>
+      <meta name="robots" content="noindex"/>
       <link rel='icon' href='static/basex.svg'/>
       <link rel='stylesheet' type='text/css' href='static/style.css'/>
       <link rel='stylesheet' type='text/css' href='static/codemirror/codemirror.css'/>

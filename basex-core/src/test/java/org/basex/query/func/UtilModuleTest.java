@@ -188,7 +188,7 @@ public final class UtilModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void ddo() {
-    final Function func = _UTIL_DDO;
+    final Function func = DISTINCT_ORDERED_NODES;
     query(func.args(" <a/>"), "<a/>");
     query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
 

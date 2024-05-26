@@ -51,7 +51,7 @@ public final class Transform extends Copy {
   public void checkUp() throws QueryException {
     for(final Let copy : copies) copy.checkUp();
     super.checkUp();
-    result().checkUp();
+    arg(target()).checkUp();
   }
 
   @Override
@@ -81,13 +81,13 @@ public final class Transform extends Copy {
         updates.addData(item.data());
       }
 
-      if(!modify().value(qc).isEmpty()) throw UPMODIFY.get(info);
+      if(!arg(update()).value(qc).isEmpty()) throw UPMODIFY.get(info);
       updates.prepare(qc);
       updates.apply(qc);
     } finally {
       qc.updates = tmp;
     }
-    return result().value(qc);
+    return arg(target()).value(qc);
   }
 
   @Override
@@ -96,7 +96,7 @@ public final class Transform extends Copy {
       if(copy.has(flags)) return true;
     }
     return Flag.CNS.in(flags) ||
-        Flag.UPD.in(flags) && result().has(Flag.UPD) ||
+        Flag.UPD.in(flags) && arg(target()).has(Flag.UPD) ||
         super.has(Flag.UPD.remove(flags));
   }
 
@@ -115,14 +115,14 @@ public final class Transform extends Copy {
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
-    final boolean a = ic.inline(copies), b = ic.inline(exprs);
+    final boolean a = ic.inline(copies), b = ic.inline(args());
     return a || b ? optimize(ic.cc) : null;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Transform(info, copyAll(cc, vm, copies), modify().copy(cc, vm),
-        result().copy(cc, vm)));
+    return copyType(new Transform(info, copyAll(cc, vm, copies), arg(update()).copy(cc, vm),
+        arg(target()).copy(cc, vm)));
   }
 
   @Override
@@ -145,7 +145,7 @@ public final class Transform extends Copy {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), copies, exprs);
+    plan.add(plan.create(this), copies, args());
   }
 
   @Override
@@ -157,6 +157,6 @@ public final class Transform extends Copy {
       else more = true;
       qs.token(copy.var.id()).token(":=").token(copy.expr);
     }
-    qs.token(MODIFY).token(modify()).token(RETURN).token(result());
+    qs.token(MODIFY).token(update()).token(RETURN).token(target());
   }
 }

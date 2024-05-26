@@ -42,7 +42,7 @@ abstract class Set extends Arr {
     if(expr == null) {
       final int el = exprs.length;
       if(el == 0) return Empty.VALUE;
-      if(el == 1) return cc.function(Function._UTIL_DDO, info, exprs[0]);
+      if(el == 1) return cc.function(Function.DISTINCT_ORDERED_NODES, info, exprs[0]);
       // try to merge operands
       expr = mergePaths(cc);
       if(expr == null) expr = mergeFilters(cc);

@@ -39,7 +39,7 @@ public final class Store implements Closeable {
   /** Dirty flag. */
   private boolean dirty = true;
   /** Initialization flag. */
-  private boolean init;
+  private boolean initialized;
 
   /**
    * Constructor.
@@ -97,7 +97,7 @@ public final class Store implements Closeable {
    * Clears the map.
    */
   public synchronized void clear() {
-    init = true;
+    initialized = true;
     dirty = true;
     map.clear();
   }
@@ -131,7 +131,7 @@ public final class Store implements Closeable {
     if(!exists && !standard(store)) return false;
 
     name = store;
-    init = true;
+    initialized = true;
     dirty = false;
     map.clear();
     if(exists) {
@@ -186,11 +186,12 @@ public final class Store implements Closeable {
 
   @Override
   public synchronized void close() {
-    // skip write if store has not been used or is not standard store
-    try {
-      if(init && name.isEmpty() && dirty) write("");
-    } catch(final IOException | QueryException ex) {
-      Util.stack(ex);
+    if(context.soptions.get(StaticOptions.WRITESTORE) && initialized && name.isEmpty() && dirty) {
+      try {
+        write("");
+      } catch(final IOException | QueryException ex) {
+        Util.stack(ex);
+      }
     }
   }
 
@@ -200,7 +201,7 @@ public final class Store implements Closeable {
    * Initializes the store.
    */
   private synchronized void init() {
-    if(init) return;
+    if(initialized) return;
     try(QueryContext qc = new QueryContext(context)) {
       read("", qc);
     } catch(final IOException | QueryException ex) {

@@ -31,7 +31,7 @@ function dba:job-result(
     } catch * {
       dba:job-result($id, false(),
         'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
-          $err:column-number || ':' || string:nl() || $err:description
+          $err:column-number || ':' || char('\n') || $err:description
       )
     }
   )

@@ -25,19 +25,19 @@ public final class TransformWith extends Copy {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param source source expression
+   * @param target target expression
    * @param modify modify expression
    */
-  public TransformWith(final InputInfo info, final Expr source, final Expr modify) {
-    super(info, SeqType.NODE_ZM, modify, source);
+  public TransformWith(final InputInfo info, final Expr target, final Expr modify) {
+    super(info, SeqType.NODE_ZM, modify, target);
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    exprs[1] = result().compile(cc);
-    cc.pushFocus(new Dummy(result().seqType(), null));
+    arg(target(), arg -> arg.compile(cc));
+    cc.pushFocus(new Dummy(arg(target()).seqType(), null));
     try {
-      exprs[0] = modify().compile(cc);
+      arg(update(), arg -> arg.compile(cc));
     } finally {
       cc.removeFocus();
     }
@@ -46,13 +46,13 @@ public final class TransformWith extends Copy {
 
   @Override
   public void checkUp() throws QueryException {
-    checkNoUp(result());
+    checkNoUp(arg(target()));
     super.checkUp();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = result().value(qc);
+    final Value value = arg(target()).value(qc);
     final Updates tmp = qc.updates();
     final QueryFocus focus = qc.focus, qf = new QueryFocus();
     qc.focus = qf;
@@ -71,7 +71,7 @@ public final class TransformWith extends Copy {
         qc.updates = updates;
         updates.addData(node.data());
 
-        if(!modify().value(qc).isEmpty()) throw UPMODIFY.get(info);
+        if(!arg(update()).value(qc).isEmpty()) throw UPMODIFY.get(info);
         updates.prepare(qc);
         updates.apply(qc);
         vb.add(node);
@@ -89,33 +89,34 @@ public final class TransformWith extends Copy {
     // Context dependency, positional access: only check first expression.
     // Example: . update { delete node a }
     return Flag.CNS.in(flags) ||
-        Flag.CTX.in(flags) && result().has(Flag.CTX) ||
-        Flag.POS.in(flags) && result().has(Flag.POS) ||
+        Flag.CTX.in(flags) && arg(target()).has(Flag.CTX) ||
+        Flag.POS.in(flags) && arg(target()).has(Flag.POS) ||
         super.has(Flag.UPD.remove(Flag.POS.remove(Flag.CTX.remove(flags))));
   }
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    return result().inlineable(ic) && !(ic.expr instanceof ContextValue && modify().uses(ic.var));
+    return arg(target()).inlineable(ic) &&
+        !(ic.expr instanceof ContextValue && arg(update()).uses(ic.var));
   }
 
   @Override
   public VarUsage count(final Var var) {
     // context reference check: only consider source expression
-    return var == null ? result().count(null) : super.count(var);
+    return var == null ? arg(target()).count(null) : super.count(var);
   }
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
-    final Expr inlined = result().inline(ic);
+    final Expr inlined = arg(target()).inline(ic);
     boolean changed = inlined != null;
-    if(changed) exprs[1] = inlined;
+    if(changed) arg(1, arg -> inlined);
 
     // do not inline context reference in updating expressions
-    changed |= ic.var != null && ic.cc.ok(result(), () -> {
-      final Expr expr = modify().inline(ic);
+    changed |= ic.var != null && ic.cc.ok(arg(target()), () -> {
+      final Expr expr = arg(update()).inline(ic);
       if(expr == null) return false;
-      exprs[0] = expr;
+      arg(update(), arg -> expr);
       return true;
     });
     return changed ? optimize(ic.cc) : null;
@@ -123,7 +124,8 @@ public final class TransformWith extends Copy {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new TransformWith(info, result().copy(cc, vm), modify().copy(cc, vm)));
+    return copyType(new TransformWith(info,
+        arg(target()).copy(cc, vm), arg(update()).copy(cc, vm)));
   }
 
   @Override
@@ -133,6 +135,6 @@ public final class TransformWith extends Copy {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(result()).token(UPDATE).brace(modify());
+    qs.token(target()).token(UPDATE).brace(update());
   }
 }

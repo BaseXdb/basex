@@ -690,31 +690,31 @@ public final class QT3TS extends Main {
     final boolean normalizeSpace = asBoolean("@normalize-space=('true','1')", expected);
     final boolean ignorePrefixes = asBoolean("@ignore-prefixes=('true','1')", expected);
 
-    String exp = expected.getString();
+    String expctd = expected.getString();
     try {
-      if(!file.isEmpty()) exp = string(new IOFile(baseDir, file).read());
-      exp = normNL(exp);
-      if(normalizeSpace) exp = string(normalize(token(exp)));
+      if(!file.isEmpty()) expctd = string(new IOFile(baseDir, file).read());
+      expctd = normNL(expctd);
+      if(normalizeSpace) expctd = string(normalize(token(expctd)));
 
       final XdmValue returned = result.value;
-      final String res = normNL(
-          asString("serialize(., map { 'method': 'xml' })", returned));
-      if(exp.equals(res)) return null;
-      final String r = normNL(asString(
-          "serialize(., map { 'method': 'xml', 'omit-xml-declaration': 'no' })",
+      final String rslt = normNL(
+          asString("serialize(., { 'method': 'xml' })", returned));
+      if(expctd.equals(rslt)) return null;
+      final String rtrnd = normNL(
+          asString("serialize(., { 'method': 'xml', 'omit-xml-declaration': 'no' })",
           returned));
-      if(exp.equals(r)) return null;
+      if(expctd.equals(rtrnd)) return null;
 
       // include check for comments, processing instructions and namespaces
       final StringList options = new StringList();
       options.add("'" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "':" + !ignorePrefixes + "()");
       options.add("'" + DeepEqualOptions.COMMENTS.name() + "':true()");
       options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "':true()");
-      final String query = Function.DEEP_EQUAL.args(" <X>" + exp + "</X>",
-          " <X>" + res + "</X>", " ()", " map { " + String.join(", ", options) + " }");
-      return asBoolean(query, expected) ? null : exp;
+      final String query = Function.DEEP_EQUAL.args(" <X>" + expctd + "</X>",
+          " <X>" + rslt + "</X>", " { " + String.join(", ", options) + " }");
+      return asBoolean(query, expected) ? null : expctd;
     } catch(final IOException ex) {
-      return Util.info("% (found: %)", exp, ex);
+      return Util.info("% (found: %)", expctd, ex);
     }
   }
 

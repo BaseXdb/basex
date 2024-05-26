@@ -23,7 +23,7 @@ public class FnJsonDoc extends Parse {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item;
     try {
-      item = unparsedText(qc, false, false);
+      item = unparsedText(qc, false, null);
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw ex.error() == INVCHARS_X ? PARSE_JSON_X.get(info, ex.getLocalizedMessage()) : ex;

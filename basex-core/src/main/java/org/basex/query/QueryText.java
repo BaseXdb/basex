@@ -52,6 +52,7 @@ public interface QueryText {
   /** Parser token. */ String DISTANCE = "distance";
   /** Parser token. */ String DIV = "div";
   /** Parser token. */ String DOCUMENT = "document";
+  /** Parser token. */ String DOCUMENT_NODE = "document-node";
   /** Parser token. */ String ELEMENT = "element";
   /** Parser token. */ String ELSE = "else";
   /** Parser token. */ String EMPTY_SEQUENCE = "empty-sequence";
@@ -104,6 +105,7 @@ public interface QueryText {
   /** Parser token. */ String MODULE = "module";
   /** Parser token. */ String MOST = "most";
   /** Parser token. */ String NAMESPACE = "namespace";
+  /** Parser token. */ String NAMESPACE_NODE = "namespace-node";
   /** Parser token. */ String NEXT = "next";
   /** Parser token. */ String NO_INHERIT = "no-inherit";
   /** Parser token. */ String NO_PRESERVE = "no-preserve";
@@ -134,6 +136,7 @@ public interface QueryText {
   /** Parser token. */ String REVALIDATION = "revalidation";
   /** Parser token. */ String SAME = "same";
   /** Parser token. */ String SATISFIES = "satisfies";
+  /** Parser token. */ String SCHEMA_ATTRIBUTE = "schema-attribute";
   /** Parser token. */ String SCHEMA_ELEMENT = "schema-element";
   /** Parser token. */ String SCHEMA = "schema";
   /** Parser token. */ String SCORE = "score";

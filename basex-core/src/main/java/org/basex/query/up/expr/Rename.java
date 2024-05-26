@@ -4,13 +4,14 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.node.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -38,54 +39,55 @@ public final class Rename extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
-    final Item item = iter.next();
+    final Iter iter = arg(0).iter(qc);
+    final Item name = arg(1).atomItem(qc, info);
+    final IdentityHashMap<Type, QNm> names = new IdentityHashMap<>();
 
-    // check target constraints
-    if(item == null) throw UPSEQEMP_X.get(info, Util.className(this));
-    final Item item2 = iter.next();
-    if(item2 != null) throw UPWRTRGSINGLE_X.get(info, ValueBuilder.concat(item, item2));
+    for(Item item; (item = iter.next()) != null;) {
+      final Type type = item.type;
+      final boolean element = type == NodeType.ELEMENT, attribute = type == NodeType.ATTRIBUTE;
+      final boolean pi = type == NodeType.PROCESSING_INSTRUCTION;
+      if(!(element || attribute || pi)) throw UPWRTRGTYP_X.get(info, item);
 
-    final CNode ex;
-    final Type type = item.type;
-    if(type == NodeType.ELEMENT) {
-      ex = new CElem(info, false, exprs[1], new Atts());
-    } else if(type == NodeType.ATTRIBUTE) {
-      ex = new CAttr(info, false, exprs[1], Empty.VALUE);
-    } else if(type == NodeType.PROCESSING_INSTRUCTION) {
-      ex = new CPI(info, false, exprs[1], Empty.VALUE);
-    } else {
-      throw UPWRTRGTYP_X.get(info, item);
-    }
+      QNm newName = names.get(type);
+      if(newName == null) {
+        final CNode cname;
+        if(element) {
+          cname = new CElem(info, false, name, new Atts());
+        } else if(attribute) {
+          cname = new CAttr(info, false, name, Empty.VALUE);
+        } else {
+          cname = new CPI(info, false, name, Empty.VALUE);
+        }
+        newName = ((ANode) cname.item(qc, info)).qname();
+        names.put(type, newName);
+      }
 
-    final QNm newName = ((ANode) ex.item(qc, info)).qname();
-    final ANode target = (ANode) item;
-
-    // check namespace conflicts...
-    final Type tt = target.type;
-    final boolean elem = tt == NodeType.ELEMENT, attr = tt == NodeType.ATTRIBUTE;
-    if(elem || attr) {
-      final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
-      if(elem || newPrefix.length > 0) {
-        final Atts nspaces = target.nsScope(sc());
-        final int ns = nspaces.size();
-        for(int n = 0; n < ns; n++) {
-          final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
-          if(eq(prefix, newPrefix) && !eq(uri, newUri))
-            throw UPNSCONFL_X_X.get(info, newName, new QNm(prefix, uri));
+      // check for namespace conflicts
+      final ANode target = (ANode) item;
+      if(element || attribute) {
+        final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
+        if(element || newPrefix.length > 0) {
+          final Atts nspaces = target.nsScope(sc());
+          final int ns = nspaces.size();
+          for(int n = 0; n < ns; n++) {
+            final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
+            if(eq(prefix, newPrefix) && !eq(uri, newUri))
+              throw UPNSCONFL_X_X.get(info, newName, new QNm(prefix, uri));
+          }
         }
       }
-    }
 
-    final Updates updates = qc.updates();
-    final DBNode dbn = updates.determineDataRef(target, qc);
-    updates.add(new RenameNode(dbn.pre(), dbn.data(), info, newName), qc);
+      final Updates updates = qc.updates();
+      final DBNode dbn = updates.determineDataRef(target, qc);
+      updates.add(new RenameNode(dbn.pre(), dbn.data(), info, newName), qc);
+    }
     return Empty.VALUE;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Rename(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm)));
+    return copyType(new Rename(info, arg(0).copy(cc, vm), arg(1).copy(cc, vm)));
   }
 
   @Override
@@ -95,6 +97,6 @@ public final class Rename extends Update {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(RENAME).token(NODE).token(exprs[0]).token(AS).token(exprs[1]);
+    qs.token(RENAME).token(NODE).token(arg(0)).token(AS).token(arg(1));
   }
 }

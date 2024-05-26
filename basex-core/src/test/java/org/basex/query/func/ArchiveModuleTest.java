@@ -240,12 +240,12 @@ public final class ArchiveModuleTest extends SandboxTest {
     query("let $entries := " + _ARCHIVE_ENTRIES.args(ZIP) + " ! string() " +
         "let $files := " + _FILE_LIST.args(tmp, true) + '[' +
           _FILE_IS_FILE.args(" '" + tmp + "/'||.") + "] ! replace(., '\\\\', '/') " +
-        "return deep-equal($entries, $files, (), map { 'ordered': false() })",
+        "return deep-equal($entries, $files, { 'ordered': false() })",
         true);
     query("let $entries := " + _ARCHIVE_ENTRIES.args(_FILE_READ_BINARY.args(ZIP)) + "/string() " +
         "let $files := " + _FILE_LIST.args(tmp, true) + '[' +
           _FILE_IS_FILE.args(" '" + tmp + "/'||.") + "] ! replace(., '\\\\', '/') " +
-        "return deep-equal($entries, $files, (), map { 'ordered': false() })",
+        "return deep-equal($entries, $files, { 'ordered': false() })",
         true);
 
     // write non-existing entry

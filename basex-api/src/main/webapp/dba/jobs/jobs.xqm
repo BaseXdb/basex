@@ -75,9 +75,10 @@ function dba:jobs(
           let $options := map { 'sort': $sort, 'presort': 'duration' }
           return html:table($headers, $entries, $buttons, map { }, $options) update {
             (: replace job ids with links :)
-            for $tr at $p in tr[not(th)]
-            for $entries in $entries[$p][?you = '–']
-            let $text := $tr/td[1]/text()
+            for $tr in tr[not(th)]
+            for $text in $tr/td[1]/text()
+            for $id in data($tr/@id)
+            for $entries in $entries[?id = $id][?you = '–']
             return replace node $text with <a href='?job={ $entries?id }'>{ $text }</a>
           }
         }
@@ -130,7 +131,7 @@ function dba:jobs(
                     utils:serialize(job:result($job, map { 'keep': true() }))
                   } catch * {
                     'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
-                      $err:column-number || ':' || string:nl() || $err:description
+                      $err:column-number || ':' || char('\n') || $err:description
                   }
                   where $result
                   return (

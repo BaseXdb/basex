@@ -8,6 +8,8 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * XQuery types.
@@ -306,6 +308,32 @@ public interface Type {
       if(tp != null) return tp;
     }
     return this;
+  }
+
+  /**
+   * Returns an info message for a similar function.
+   * @param qname name of type
+   * @return info string
+   */
+  static byte[] similar(final QNm qname) {
+    final byte[] ln = Token.lc(qname.local());
+
+    final TokenList list = new TokenList();
+    list.add(QueryText.ITEM).add(QueryText.FUNCTION).add(QueryText.FN);
+    list.add(QueryText.MAP).add(QueryText.ARRAY);
+    for(final NodeType type : NodeType.values()) list.add(type.qname().local());
+    final byte[][] values = list.finish();
+
+    Object similar = Levenshtein.similar(ln, values);
+    if(similar == null) {
+      for(final byte[] value : values) {
+        if(Token.startsWith(value, ln)) {
+          similar = value;
+          break;
+        }
+      }
+    }
+    return QueryError.similar(qname.prefixId(Token.XML), similar);
   }
 
   @Override

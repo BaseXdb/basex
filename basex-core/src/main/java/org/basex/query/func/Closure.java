@@ -462,7 +462,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       global.forEach((k, v) -> qs.token(LET).token(k).token(":=").token(v));
       qs.token(RETURN);
     }
-    qs.token(FUNCTION).params(params);
+    qs.token(FN).params(params);
     qs.token(AS).token(declType != null ? declType : SeqType.ITEM_ZM).brace(expr);
     if(inlined) qs.token(')');
   }

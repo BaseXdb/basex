@@ -19,6 +19,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -411,7 +412,19 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Collation toCollation(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return Collation.get(toTokenOrNull(expr, qc), qc, info, WHICHCOLL_X);
+    return toCollation(toTokenOrNull(expr, qc), qc);
+  }
+
+  /**
+   * Evaluates an item to a collation.
+   * @param collation collation URI or {@code null}
+   * @param qc query context
+   * @return collation, or {@code null} for default collation
+   * @throws QueryException query exception
+   */
+  protected final Collation toCollation(final byte[] collation, final QueryContext qc)
+      throws QueryException {
+    return Collation.get(collation, qc, info, WHICHCOLL_X);
   }
 
   /**
@@ -520,19 +533,28 @@ public abstract class StandardFunc extends Arr {
    */
   protected final String toEncodingOrNull(final Expr expr, final QueryError err,
       final QueryContext qc) throws QueryException {
+    return toEncodingOrNull(toStringOrNull(expr, qc), err);
+  }
 
-    final Item encoding = expr.atomItem(qc, info);
-    if(encoding.size() == 0) return null;
+  /**
+   * Evaluates an expression to an encoding string.
+   * @param encoding encoding (can be {@code null})
+   * @param err error to raise
+   * @return normalized encoding string or {@code null}
+   * @throws QueryException query exception
+   */
+  protected final String toEncodingOrNull(final String encoding, final QueryError err)
+      throws QueryException {
 
-    final String enc = toString(encoding);
+    if(encoding == null) return null;
     try {
-      if(Charset.isSupported(enc)) return Strings.normEncoding(enc);
+      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
     } catch(final IllegalArgumentException ex) {
       // character set is invalid or unknown (e.g. empty string)
       Util.debug(ex);
     }
-    throw err.get(info, QueryError.similar(enc,
-        Levenshtein.similar(token(enc), Strings.encodings())));
+    throw err.get(info, QueryError.similar(encoding,
+        Levenshtein.similar(token(encoding), Strings.encodings())));
   }
 
   /**
@@ -688,7 +710,8 @@ public abstract class StandardFunc extends Arr {
    */
   protected final boolean toBoolean(final QueryContext qc, final FItem predicate,
       final Value... args) throws QueryException {
-    return toBoolean(predicate.invoke(qc, info, args).atomItem(qc, info));
+    final Item item = predicate.invoke(qc, info, args).atomItem(qc, info);
+    return !item.isEmpty() && toBoolean(item);
   }
 
   /**
@@ -756,6 +779,19 @@ public abstract class StandardFunc extends Arr {
       list.add(name);
       return list;
     });
+  }
+
+  /**
+   * Merge variadic arguments.
+   * @return merged arguments
+   */
+  protected final Expr variadic() {
+    final int al = args().length;
+    if(al == 0) return Empty.VALUE;
+    if(al == 1) return arg(0);
+    final ExprList list = new ExprList(al);
+    for(final Expr expr : args()) list.add(expr);
+    return new List(info, list.finish());
   }
 
   @Override

@@ -236,7 +236,7 @@ public final class FuncItem extends FItem implements Scope {
     } else {
       final StringList list = new StringList(arity());
       for(final Var param : params) list.add(param.toErrorString());
-      qs.token(anns).token(FUNCTION).params(list.finish());
+      qs.token(anns).token(FN).params(list.finish());
       qs.token(AS).token(funcType().declType).brace(expr);
     }
     return qs.toString();
@@ -246,7 +246,7 @@ public final class FuncItem extends FItem implements Scope {
   public void toString(final QueryString qs) {
     qs.token(anns);
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    qs.token(FUNCTION).params(params).token(AS).token(funcType().declType).brace(expr);
+    qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 
   /**

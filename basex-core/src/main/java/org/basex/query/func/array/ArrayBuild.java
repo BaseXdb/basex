@@ -19,11 +19,12 @@ public final class ArrayBuild extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final FItem action = toFunctionOrNull(arg(1), 1, qc);
+    final FItem action = toFunctionOrNull(arg(1), 2, qc);
 
+    int p = 0;
     final ArrayBuilder ab = new ArrayBuilder();
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.append(action != null ? action.invoke(qc, info, item) : item);
+      ab.append(action != null ? action.invoke(qc, info, item, Int.get(++p)) : item);
     }
     return ab.array();
   }
@@ -35,7 +36,8 @@ public final class ArrayBuild extends StandardFunc {
     if(st.zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
 
     if(defined(1)) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE)));
+      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE),
+          SeqType.INTEGER_O));
       final FuncType ft = arg(1).funcType();
       if(ft != null) exprType.assign(ArrayType.get(ft.declType));
     }

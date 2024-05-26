@@ -145,7 +145,9 @@ public abstract class ANode extends Item {
           if(attr2 == null) return false;
           name2 = attr2.qname();
           if(name1.eq(name2)) {
-            if((!options.get(NAMESPACE_PREFIXES) || Token.eq(name1.prefix(), name2.prefix())) &&
+            final Bln eq = deep.itemsEqual(attr1, attr2);
+            if(eq == Bln.TRUE || eq == null &&
+                (!options.get(NAMESPACE_PREFIXES) || Token.eq(name1.prefix(), name2.prefix())) &&
                 Token.eq(attr1.string(), attr2.string(), deep)) break;
             return false;
           }
@@ -194,7 +196,7 @@ public abstract class ANode extends Item {
         if(deep.qc != null) deep.qc.checkStop();
         final ANode child1 = iter1.next();
         if(child1 == null) return true;
-        if(!child1.deepEqual(iter2.next(), deep)) return false;
+        if(!deep.equal(child1, iter2.next())) return false;
       }
     }
 
@@ -203,7 +205,7 @@ public abstract class ANode extends Item {
       boolean found = false;
       for(int l2 = list2.size() - 1; !found && l2 >= 0; l2--) {
         if(deep.qc != null) deep.qc.checkStop();
-        if(list1.get(l1).deepEqual(list2.get(l2), deep)) {
+        if(deep.equal(list1.get(l1), list2.get(l2))) {
           list2.remove(l2);
           found = true;
         }

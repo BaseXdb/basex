@@ -611,15 +611,15 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" ('a', <a/>)", " function($s as xs:string) as xs:boolean? { $s = 'a' }"), "a",
         exists(IterFilter.class));
 
-    check(func.args(9, " map{9:true()}"), 9);
-    check(func.args(9, " map{9:false()}"), null);
-    error(func.args(9, " map{9:()}"), INVCONVERT_X_X_X);
-    error(func.args(8, " map{9:true()}"), INVCONVERT_X_X_X);
+    check(func.args(9, " { 9: true() }"), 9);
+    check(func.args(9, " { 9: false() }"), null);
+    check(func.args(9, " { 9: ()} "), "");
+    check(func.args(8, " { 9: true() }"), "");
 
-    check(func.args(1, " [true()]"), 1);
-    check(func.args(1, " [false()]"), null);
-    error(func.args(1, " [()]"), INVCONVERT_X_X_X);
-    error(func.args(2, " [true()]"), ARRAYBOUNDS_X_X);
+    check(func.args(1, " [ true() ]"), 1);
+    check(func.args(1, " [ false() ]"), null);
+    check(func.args(1, " [ () ]"), "");
+    error(func.args(2, " [ true() ]"), ARRAYBOUNDS_X_X);
 
     inline(true);
     check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", root(List.class));
@@ -944,6 +944,14 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void crc32() {
+    final Function func = HASH;
+    query(func.args(" ()", " { 'algorithm': 'crc-32' }"), "");
+    query("string( " + func.args("", " { 'algorithm': 'CRC-32' }") + ')', "00000000");
+    query("string( " + func.args("BaseX", " { 'algorithm': 'CRC-32' }") + ')', "4C06FC7F");
+  }
+
+  /** Test method. */
   @Test public void head() {
     final Function func = HEAD;
 
@@ -1018,6 +1026,9 @@ public final class FnModuleTest extends SandboxTest {
         " function($a) { string($a/@*) }"), "<_ _=\"9\"/>");
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 6, empty(REVERSE));
+
+    query(func.args(" (98 to 102)", " key := string#1"), 99);
+    query(func.args(" (98 to 102)", " ()", " string#1"), 99);
 
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
@@ -1343,6 +1354,9 @@ public final class FnModuleTest extends SandboxTest {
         " function($a) { string($a/@*) }"), "<_ _=\"10\"/>");
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 4, empty(REVERSE));
+
+    query(func.args(" (98 to 102)", " key := string#1"), 100);
+    query(func.args(" (98 to 102)", " ()", " string#1"), 100);
 
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);

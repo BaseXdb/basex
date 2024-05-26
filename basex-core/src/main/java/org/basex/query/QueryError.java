@@ -452,6 +452,8 @@ public enum QueryError {
 
   /** Error code. */
   STRING_FORMAT_X_X(STRING, "format", "%: %."),
+  /** Error code. */
+  STRING_BOUNDS_X(STRING, "bounds", "String exceeds maximum supported length of % characters."),
 
   // Unit Module
 
@@ -1364,8 +1366,6 @@ public enum QueryError {
   /** Error code. */
   UPNSCONFL2_X_X(XUDY, 24, "Namespaces conflicts: % vs. %."),
   /** Error code. */
-  UPSEQEMP_X(XUDY, 27, "% target is an empty sequence."),
-  /** Error code. */
   UPPAREMPTY_X(XUDY, 29, "Target has no parent: %."),
   /** Error code. */
   UPATTELM_X(XUDY, 30, "Attribute cannot be added to %."),
@@ -1395,17 +1395,11 @@ public enum QueryError {
   /** Error code. */
   UPTRGTYP_X(XUTY, 5, "Target is not an element or document: %."),
   /** Error code. */
-  UPTRGSNGL_X(XUTY, 5, "Target is not a single node: %."),
-  /** Error code. */
   UPTRGTYP2_X(XUTY, 6, "Target is not an element, text, comment or pi: %."),
-  /** Error code. */
-  UPTRGSNGL2_X(XUTY, 6, "Target is not a single node: %."),
   /** Error code. */
   UPTRGDELEMPT_X(XUTY, 7, "Target is not a node: %."),
   /** Error code. */
   UPTRGNODE_X(XUTY, 8, "Target is not an element, text, attribute, comment or pi: %."),
-  /** Error code. */
-  UPTRGSINGLE_X(XUTY, 8, "Target is not a single node: %."),
   /** Error code. */
   UPWRELM_X(XUTY, 10, "Node cannot be replaced with attribute: %."),
   /** Error code. */
@@ -1413,11 +1407,9 @@ public enum QueryError {
   /** Error code. */
   UPWRTRGTYP_X(XUTY, 12, "Target is not an element, attribute or pi: %."),
   /** Error code. */
-  UPWRTRGSINGLE_X(XUTY, 12, "Target is not a single node: %."),
+  UPSOURCE_X(XUTY, 13, "Source is not a node: %."),
   /** Error code. */
   UPSINGLE_X_X(XUTY, 13, "Value of $% is not a single node: %."),
-  /** Error code. */
-  UPSOURCE_X(XUTY, 13, "Source is not a node: %."),
   /** Error code. */
   UPATTELM2_X(XUTY, 22, "Attribute cannot be added to %.");
 

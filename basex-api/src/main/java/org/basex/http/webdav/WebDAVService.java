@@ -305,7 +305,7 @@ final class WebDAVService {
    */
   List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-        _DB_LIST_DETAILS.args() + " ! (string(), @modified-date)", _STRING_TAB.args()));
+        _DB_LIST_DETAILS.args() + " ! (string(), @modified-date)", CHAR.args(9)));
 
     final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> dbs = new ArrayList<>();

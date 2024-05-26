@@ -8,10 +8,13 @@ import java.io.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Parse functions.
@@ -20,6 +23,16 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Parse extends StandardFunc {
+  /** Parse Options. */
+  public static final class ParseOptions extends Options {
+    /** Normalize-newlines option. */
+    public static final BooleanOption NORMALIZE_NEWLINES =
+        new BooleanOption("normalize-newlines");
+    /** Encoding option. */
+    public static final StringOption ENCODING =
+        new StringOption("encoding");
+  }
+
   /** Input reference. */
   IO input;
 
@@ -36,12 +49,12 @@ public abstract class Parse extends StandardFunc {
    * Performs the unparsed-text function.
    * @param qc query context
    * @param check only check if text is available
-   * @param encoding parse encoding
+   * @param options options argument or {@code null}
    * @return content string, {@link Empty#VALUE} if no URL is supplied, or boolean success flag
    *   if availability is checked
    * @throws QueryException query exception
    */
-  final Item unparsedText(final QueryContext qc, final boolean check, final boolean encoding)
+  final Item unparsedText(final QueryContext qc, final boolean check, final Expr options)
       throws QueryException {
     try {
       IO io = input;
@@ -53,21 +66,31 @@ public abstract class Parse extends StandardFunc {
       }
       if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
 
-      String enc = encoding ? toEncodingOrNull(arg(1), ENCODING_X, qc) : null;
+      final ParseOptions po = new ParseOptions();
+      if(options != null) {
+        if(arg(1) instanceof XQMap) {
+          toOptions(options, po, qc);
+        } else {
+          po.set(ParseOptions.ENCODING, toStringOrNull(options, qc));
+        }
+      }
+      final Boolean normalize = po.get(ParseOptions.NORMALIZE_NEWLINES);
+      String encoding = toEncodingOrNull(po.get(ParseOptions.ENCODING), ENCODING_X);
 
       // only required for test APIs
       final String[] pathEnc = qc.resources.text(io);
       if(pathEnc != null) {
         io = IO.get(pathEnc[0]);
-        enc = pathEnc[1];
+        encoding = pathEnc[1];
       }
 
       // parse text
-      try(InputStream is = io.inputStream(); NewlineInput nli = new NewlineInput(io)) {
-        nli.encoding(enc).validate(true);
-        if(!check) return Str.get(nli.content());
+      try(InputStream is = io.inputStream(); TextInput ti = normalize == Boolean.TRUE ||
+          this instanceof FnUnparsedTextLines ? new NewlineInput(io) : new TextInput(io)) {
+        ti.encoding(encoding).validate(true);
+        if(!check) return Str.get(ti.content());
 
-        while(nli.read() != -1);
+        while(ti.read() != -1);
         return Bln.TRUE;
       } catch(final IOException ex) {
         if(check) return Bln.FALSE;

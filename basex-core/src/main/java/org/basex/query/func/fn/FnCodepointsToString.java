@@ -25,10 +25,10 @@ public final class FnCodepointsToString extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // input is single integer
-    if(singleInt) return toStr(arg(0).item(qc, info).itr(info), info);
+    if(singleInt) return toStr(variadic().item(qc, info).itr(info), info);
 
     // current input is single item
-    final Iter values = arg(0).atomIter(qc, info);
+    final Iter values = variadic().atomIter(qc, info);
     final long size = values.size();
     if(size == 1) return toStr(toLong(values.next()), info);
 
@@ -42,12 +42,14 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr values = arg(0);
+    Expr values = arg(0);
+    final Expr variadic = variadic();
+    if(variadic != values) return cc.function(CODEPOINTS_TO_STRING, info, variadic.optimize(cc));
 
     // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
     if(STRING_TO_CODEPOINTS.is(values)) return cc.function(STRING, info, values.args());
 
-    singleInt = arg(0).seqType().instanceOf(SeqType.INTEGER_O);
+    singleInt = values.seqType().instanceOf(SeqType.INTEGER_O);
     return this;
   }
 

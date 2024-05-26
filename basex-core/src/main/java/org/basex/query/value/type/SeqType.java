@@ -188,11 +188,11 @@ public final class SeqType {
   /** Zero of more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
   /** Predicate function. */
-  public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, INTEGER_O).seqType();
+  public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, INTEGER_O).seqType();
   /** Predicate function. */
-  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_O, ITEM_ZM, INTEGER_O).seqType();
+  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_ZO, ITEM_ZM, INTEGER_O).seqType();
   /** Predicate function. */
-  public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, ITEM_O).seqType();
+  public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
   /** Single map. */
