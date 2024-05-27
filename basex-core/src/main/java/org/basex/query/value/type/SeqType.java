@@ -77,6 +77,8 @@ public final class SeqType {
   public static final SeqType STRING_ZO = STRING.seqType(ZERO_OR_ONE);
   /** Zero or more strings. */
   public static final SeqType STRING_ZM = STRING.seqType(ZERO_OR_MORE);
+  /** Single NCName. */
+  public static final SeqType NCNAME_O = NCNAME.seqType();
   /** Zero or one NCName. */
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
   /** Single language. */
@@ -220,7 +222,7 @@ public final class SeqType {
   /** Array type (lazy instantiation). */
   private ArrayType arrayType;
   /** Map types (lazy instantiation). */
-  private EnumMap<AtomType, MapType> mapTypes;
+  private Map<Type, MapType> mapTypes;
 
   /**
    * Constructor.
@@ -307,8 +309,8 @@ public final class SeqType {
    * @param keyType key type
    * @return map type
    */
-  public MapType mapType(final AtomType keyType) {
-    if(mapTypes == null) mapTypes = new EnumMap<>(AtomType.class);
+  public MapType mapType(final Type keyType) {
+    if(mapTypes == null) mapTypes = new HashMap<>();
     return mapTypes.computeIfAbsent(keyType, o -> new MapType(keyType, this));
   }
 
@@ -539,7 +541,7 @@ public final class SeqType {
     if(intersect(st) != null) return true;
     if(occ.intersect(st.occ) == null) return false;
     final Type tp = st.type;
-    if(tp instanceof AtomType) {
+    if(tp instanceof AtomType || tp instanceof ChoiceItemType) {
       if(type.isUntyped()) return !tp.nsSensitive();
       return tp == DOUBLE && (type.intersect(FLOAT) != null || type.intersect(DECIMAL) != null) ||
              tp == FLOAT && type.intersect(DECIMAL) != null ||
@@ -710,6 +712,24 @@ public final class SeqType {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof SeqType && eq((SeqType) obj);
+  }
+
+  /**
+   * This implementation of {@link #hashCode} is used on the alternatives of a
+   * {@link ChoiceItemType}, while {@link #mapTypes} is being maintained as a {@link HashMap}.
+   * Since {@link MapType#keyType} is guaranteed to be an atomic type, we expect it to be called
+   * only on {@link #SeqType} instances based on some {@link AtomType}, where suitable hash codes
+   * are available for {@link #type}, {@link #occ}, and {@link #values}.
+   */
+  @Override
+  public int hashCode() {
+    if(test != null) throw Util.notExpected();
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((occ == null) ? 0 : occ.hashCode());
+    result = prime * result + ((values == null) ? 0 : values.hashCode());
+    return result;
   }
 
   /**

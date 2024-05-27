@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class MapType extends FType {
   /** Key type of the map. */
-  public final AtomType keyType;
+  public final Type keyType;
   /** Value types (can be {@code null}, indicating that no type was specified). */
   public final SeqType valueType;
 
@@ -28,7 +28,7 @@ public final class MapType extends FType {
    * @param keyType key type
    * @param valueType value type
    */
-  MapType(final AtomType keyType, final SeqType valueType) {
+  MapType(final Type keyType, final SeqType valueType) {
     this.keyType = keyType;
     this.valueType = valueType;
   }
@@ -39,7 +39,7 @@ public final class MapType extends FType {
    * @param valueType value type
    * @return map type
    */
-  public static MapType get(final AtomType keyType, final SeqType valueType) {
+  public static MapType get(final Type keyType, final SeqType valueType) {
     return valueType.mapType(keyType);
   }
 
@@ -110,7 +110,7 @@ public final class MapType extends FType {
       final MapType mt = (MapType) type;
       final Type kt = keyType.intersect(mt.keyType);
       final SeqType vt = valueType.intersect(mt.valueType);
-      if(kt instanceof AtomType && vt != null) return get((AtomType) kt, vt);
+      if(kt != null && kt.atomic() != null && vt != null) return get(kt, vt);
     }
     return null;
   }

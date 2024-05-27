@@ -3188,7 +3188,7 @@ public class QueryParser extends InputParser {
       final Type key = itemType().type;
       if(!key.instanceOf(AtomType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
       wsCheck(",");
-      final MapType tp = MapType.get((AtomType) key, sequenceType());
+      final MapType tp = MapType.get(key, sequenceType());
       wsCheck(")");
       return tp;
     }

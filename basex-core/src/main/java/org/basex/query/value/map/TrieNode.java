@@ -54,7 +54,7 @@ abstract class TrieNode {
     @Override
     boolean materialized(final Predicate<Data> test, final InputInfo info) { return true; }
     @Override
-    boolean instanceOf(final AtomType kt, final SeqType dt) { return true; }
+    boolean instanceOf(final Type kt, final SeqType dt) { return true; }
     @Override
     boolean equal(final TrieNode node, final DeepEqual deep) { return this == node; }
     @Override
@@ -232,7 +232,7 @@ abstract class TrieNode {
    * @param dt declared type
    * @return {@code true} if the type fits, {@code false} otherwise
    */
-  abstract boolean instanceOf(AtomType kt, SeqType dt);
+  abstract boolean instanceOf(Type kt, SeqType dt);
 
   /**
    * Checks if this node is indistinguishable from the given node.
