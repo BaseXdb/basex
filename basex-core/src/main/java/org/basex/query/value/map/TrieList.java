@@ -309,7 +309,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  boolean instanceOf(final AtomType kt, final SeqType dt) {
+  boolean instanceOf(final Type kt, final SeqType dt) {
     if(kt != null) {
       for(final Item key : keys) {
         if(!key.type.instanceOf(kt)) return false;

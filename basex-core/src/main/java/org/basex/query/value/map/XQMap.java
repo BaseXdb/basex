@@ -63,7 +63,7 @@ public final class XQMap extends XQData {
    */
   public static XQMap singleton(final Item key, final Value value) {
     return new XQMap(new TrieLeaf(key.hash(), key, value),
-        MapType.get((AtomType) key.type, value.seqType()));
+        MapType.get(key.type, value.seqType()));
   }
 
   @Override
@@ -207,7 +207,7 @@ public final class XQMap extends XQData {
 
     if(tp instanceof MapType) {
       final MapType mt = (MapType) tp;
-      final AtomType kt =  mt.keyType == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType;
+      final Type kt =  mt.keyType == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType;
       final SeqType vt = mt.valueType.eq(SeqType.ITEM_ZM) ? null : mt.valueType;
       return kt == null && vt == null || root.instanceOf(kt, vt);
     }
@@ -246,7 +246,7 @@ public final class XQMap extends XQData {
     final MapType mt = (MapType) type;
     final Type mkt = mt.keyType;
     final SeqType mvt = mt.valueType;
-    return mkt == kt && mvt.eq(vt) ? type : MapType.get((AtomType) mkt.union(kt), mvt.union(vt));
+    return mkt == kt && mvt.eq(vt) ? type : MapType.get(mkt.union(kt), mvt.union(vt));
   }
 
   /**

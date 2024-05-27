@@ -48,6 +48,8 @@ import org.basex.query.func.xquery.*;
 import org.basex.query.func.xslt.*;
 import org.basex.query.util.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Definitions of all built-in XQuery functions.
@@ -339,8 +341,9 @@ public enum Function implements AFunction {
   IMPLICIT_TIMEZONE(FnImplicitTimezone::new, "implicit-timezone()",
       params(), DAY_TIME_DURATION_O, flag(NDT)),
   /** XQuery function. */
-  IN_SCOPE_NAMESPACES(FnInScopeNamespaces::new, "in-scope-namespaces(element)",
-      params(ELEMENT_O), MAP_O),
+  IN_SCOPE_NAMESPACES(FnInScopeNamespaces::new, "in-scope-namespaces(element)", params(ELEMENT_O),
+      ANY_URI_O.mapType(new ChoiceItemType(Arrays.asList(NCNAME_O, SeqType.get(AtomType.ENUM,
+          Occ.EXACTLY_ONE, new EnumValues(new TokenSet(Token.token(""))))))).seqType()),
   /** XQuery function. */
   IN_SCOPE_PREFIXES(FnInScopePrefixes::new, "in-scope-prefixes(element)",
       params(ELEMENT_O), STRING_ZM),

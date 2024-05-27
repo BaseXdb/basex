@@ -170,9 +170,18 @@ public class ChoiceItemType implements Type {
    */
   private Type union() {
     if(union == null) {
-      union = alts.get(0).type;
-      for(int i = 1; i < alts.size(); ++i) union = union.union(alts.get(i).type);
+      for(final SeqType st : alts) union = union == null ? st.type : union.union(st.type);
     }
     return union;
+  }
+
+  @Override
+  public int hashCode() {
+    return alts.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof ChoiceItemType && alts.equals(((ChoiceItemType) obj).alts);
   }
 }

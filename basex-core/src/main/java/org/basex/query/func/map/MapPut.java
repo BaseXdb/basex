@@ -35,7 +35,7 @@ public final class MapPut extends StandardFunc {
 
     final Type type = map.seqType().type;
     if(type instanceof MapType) {
-      AtomType typeKey = key.seqType().type.atomic();
+      Type typeKey = key.seqType().type.atomic();
       if(typeKey != null) {
         SeqType vt = value.seqType();
         // merge types if input is expected to have at least one entry

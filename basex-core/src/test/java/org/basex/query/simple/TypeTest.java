@@ -32,6 +32,9 @@ public final class TypeTest extends QueryTest {
         { "Type 4", booleans(true), "1 instance of xs:integer" },
         { "Type 5", booleans(false), "1 instance of xs:string" },
         { "Type 6", booleans(false), "1 instance of xs:untypedAtomic" },
+        { "Type 7", booleans(true),
+            "{1: 1, 'a': 2} instance of map((xs:integer|xs:string), item()) "},
+        { "Type 8", booleans(false), "{1: 1} instance of map((xs:unsignedByte|xs:byte), item())"},
 
         { "TypeErr 1", "1 instance of xs:abcde" },
         { "TypeErr 2", "1 instance of xs:string()" },
