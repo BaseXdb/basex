@@ -77,8 +77,6 @@ public final class SeqType {
   public static final SeqType STRING_ZO = STRING.seqType(ZERO_OR_ONE);
   /** Zero or more strings. */
   public static final SeqType STRING_ZM = STRING.seqType(ZERO_OR_MORE);
-  /** Single NCName. */
-  public static final SeqType NCNAME_O = NCNAME.seqType();
   /** Zero or one NCName. */
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
   /** Single language. */
@@ -207,7 +205,6 @@ public final class SeqType {
   public static final SeqType ARRAY_O = ARRAY.seqType();
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
-
   /** Single NMTOKENS. */
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
 
@@ -363,8 +360,10 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Item item) {
-    if (type instanceof ChoiceItemType) {
-      for(final SeqType tp : ((ChoiceItemType) type).alts) if(tp.instance(item)) return true;
+    if(type instanceof ChoiceItemType) {
+      for(final SeqType tp : ((ChoiceItemType) type).alts) {
+        if(tp.instance(item)) return true;
+      }
       return false;
     }
     return item.instanceOf(type) && (test == null || test.matches(item)) &&

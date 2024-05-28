@@ -78,7 +78,7 @@ public final class MapType extends FType {
       final MapType mt = (MapType) type;
       return valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
     }
-    if (type instanceof FuncType) {
+    if(type instanceof FuncType) {
       final FuncType ft = type.funcType();
       return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O);

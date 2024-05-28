@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -25,7 +26,7 @@ public final class FnInScopeNamespaces extends StandardFunc {
     for(int a = 0; a < as; ++a) {
       final byte[] key = atts.name(a);
       if(key.length + atts.value(a).length != 0) {
-        mb.put(Str.get(key), Uri.get(atts.value(a)));
+        mb.put(Str.get(key, AtomType.NCNAME), Uri.get(atts.value(a)));
       }
     }
     return mb.map();

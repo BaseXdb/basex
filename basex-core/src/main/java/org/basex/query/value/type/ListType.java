@@ -111,20 +111,19 @@ public enum ListType implements Type {
 
   @Override
   public final boolean instanceOf(final Type tp) {
-    if(tp instanceof ChoiceItemType) return ((ChoiceItemType) tp).hasInstance(this);
-    return this == tp || tp == AtomType.ITEM;
+    return this == tp || (tp instanceof ChoiceItemType ? ((ChoiceItemType) tp).hasInstance(this) :
+      tp == AtomType.ITEM);
   }
 
   @Override
   public final Type union(final Type tp) {
-    if(tp instanceof ChoiceItemType) return tp.union(this);
-    return this == tp ? tp : AtomType.ITEM;
+    return this == tp ? tp : tp instanceof ChoiceItemType ? tp.union(this) : AtomType.ITEM;
   }
 
   @Override
   public final Type intersect(final Type tp) {
-    if(tp instanceof ChoiceItemType) return tp.intersect(this);
-    return instanceOf(tp) ? this : tp.instanceOf(this) ? tp : null;
+    return tp instanceof ChoiceItemType ? tp.intersect(this) : instanceOf(tp) ? this :
+      tp.instanceOf(this) ? tp : null;
   }
 
   @Override

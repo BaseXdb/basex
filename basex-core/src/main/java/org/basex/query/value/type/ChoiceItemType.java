@@ -21,7 +21,7 @@ public class ChoiceItemType implements Type {
   /** Alternative item types. */
   public final List<SeqType> alts;
   /** Common ancestor type. */
-  public Type union;
+  private final Type union;
 
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
@@ -32,6 +32,11 @@ public class ChoiceItemType implements Type {
    */
   public ChoiceItemType(final List<SeqType> alts) {
     this.alts = alts;
+    Type tp = null;
+    for(final SeqType st : alts) {
+      tp = tp == null ? st.type : tp.union(st.type);
+    }
+    union = tp;
   }
 
   @Override
@@ -50,8 +55,8 @@ public class ChoiceItemType implements Type {
     for(final SeqType st : alts) {
       try {
         return st.type.cast(value, qc, info);
-      }
-      catch(@SuppressWarnings("unused") final QueryException ex) {
+      } catch(final QueryException ex) {
+        Util.debug(ex);
       }
     }
     throw FUNCCAST_X_X.get(info, this, value);
@@ -71,19 +76,21 @@ public class ChoiceItemType implements Type {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type
-        || type instanceof ChoiceItemType && alts.equals(((ChoiceItemType) type).alts);
+    return this == type ||
+        type instanceof ChoiceItemType && alts.equals(((ChoiceItemType) type).alts);
   }
 
   @Override
   public boolean instanceOf(final Type type) {
-    for(final SeqType st : alts) if(!st.type.instanceOf(type)) return false;
+    for(final SeqType st : alts) {
+      if(!st.type.instanceOf(type)) return false;
+    }
     return true;
   }
 
   @Override
   public Type union(final Type type) {
-    return union().union(type);
+    return union.union(type);
   }
 
   @Override
@@ -104,32 +111,32 @@ public class ChoiceItemType implements Type {
 
   @Override
   public boolean isNumber() {
-    return union().isNumber();
+    return union.isNumber();
   }
 
   @Override
   public boolean isUntyped() {
-    return union().isNumberOrUntyped();
+    return union.isNumberOrUntyped();
   }
 
   @Override
   public boolean isNumberOrUntyped() {
-    return union().isNumberOrUntyped();
+    return union.isNumberOrUntyped();
   }
 
   @Override
   public boolean isStringOrUntyped() {
-    return union().isStringOrUntyped();
+    return union.isStringOrUntyped();
   }
 
   @Override
   public boolean isSortable() {
-    return union().isSortable();
+    return union.isSortable();
   }
 
   @Override
   public AtomType atomic() {
-    return union().atomic();
+    return union.atomic();
   }
 
   @Override
@@ -139,8 +146,32 @@ public class ChoiceItemType implements Type {
 
   @Override
   public boolean nsSensitive() {
-    for(final SeqType st : alts) if(st.type.nsSensitive()) return true;
+    for(final SeqType st : alts) {
+      if(st.type.nsSensitive()) return true;
+    }
     return false;
+  }
+
+  /**
+   * Checks if the given type is an instance of the this type.
+   * @param type type to be checked
+   * @return result of check
+   */
+  boolean hasInstance(final Type type) {
+    for(final SeqType st : alts) {
+      if(type.instanceOf(st.type)) return true;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return alts.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof ChoiceItemType && alts.equals(((ChoiceItemType) obj).alts);
   }
 
   @Override
@@ -152,36 +183,5 @@ public class ChoiceItemType implements Type {
       if(--n != 0) qs.token(" | ");
     }
     return qs.token(')').toString();
-  }
-
-  /**
-   * Checks if the given type is an instance of the this type.
-   * @param type type to be checked
-   * @return result of check
-   */
-  public boolean hasInstance(final Type type) {
-    for(final SeqType st : alts) if(type.instanceOf(st.type)) return true;
-    return false;
-  }
-
-  /**
-   * Computes the least common ancestor type of all alternative types.
-   * @return the union type
-   */
-  private Type union() {
-    if(union == null) {
-      for(final SeqType st : alts) union = union == null ? st.type : union.union(st.type);
-    }
-    return union;
-  }
-
-  @Override
-  public int hashCode() {
-    return alts.hashCode();
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return this == obj || obj instanceof ChoiceItemType && alts.equals(((ChoiceItemType) obj).alts);
   }
 }

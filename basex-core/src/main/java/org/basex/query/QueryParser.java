@@ -3071,8 +3071,7 @@ public class QueryParser extends InputParser {
     EnumValues values = null;
     if(wsConsume("(")) {
       type = choiceItemType();
-      if(type.atomic() == null)
-        throw error(INVALIDCAST_X, type);
+      if(type.atomic() == null) throw error(INVALIDCAST_X, type);
     } else {
       final QNm name = eQName(sc.elemNS, TYPEINVALID);
       type = ListType.find(name);

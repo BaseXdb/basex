@@ -66,15 +66,13 @@ public final class ArrayType extends FType {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
-
     if(type instanceof ArrayType) return memberType.instanceOf(((ArrayType) type).memberType);
-
     if(type instanceof FuncType) {
       final FuncType ft = (FuncType) type;
       return memberType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
     }
+    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
     return false;
   }
 
