@@ -441,7 +441,7 @@ public final class QT3TS extends Main {
    */
   private boolean supported(final XdmValue test) {
     // the following query generates a result if the specified test is not supported
-    return all || new XQuery("*:dependency[" +
+    final String query = all ? "*:test[@update = 'true']" : "*:dependency[" +
       // skip various features
       "@type = 'feature' and @value = " + NOSUPPORT + " and string(@satisfied) = ('', 'true') or " +
       // skip fully-normalized unicode tests
@@ -452,7 +452,8 @@ public final class QT3TS extends Main {
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
-    "]", ctx).context(test).value().size() == 0;
+    "]";
+    return new XQuery(query, ctx).context(test).value().size() == 0;
   }
 
   /**
