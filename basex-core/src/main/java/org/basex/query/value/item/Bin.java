@@ -45,7 +45,8 @@ public abstract class Bin extends Item {
   @Override
   public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item instanceof Bin && Token.eq(binary(ii), ((Bin) item).binary(ii));
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
+    return Token.eq(binary(ii), bin);
   }
 
   @Override

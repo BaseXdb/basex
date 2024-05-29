@@ -60,6 +60,11 @@ public final class SimpleTest extends QueryTest {
       { "Compare 17", booleans(false), "xs:double(1.13) lt xs:float (1.13)" },
       { "Compare 18", booleans(true),  "xs:double(1.13) gt xs:float (1.13)" },
 
+      { "Compare 50", booleans(true),  "xs:hexBinary('41') = xs:untypedAtomic('41')" },
+      { "Compare 51", booleans(true),  "xs:untypedAtomic('41') = xs:hexBinary('41')" },
+      { "Compare 52", booleans(true),  "xs:untypedAtomic('41') <= xs:hexBinary('41')" },
+      { "Compare 53", booleans(true),  "xs:hexBinary('41') <= xs:untypedAtomic('41')" },
+
       { "FLWOR 1", integers(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", integers(4),
         "(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]" },
