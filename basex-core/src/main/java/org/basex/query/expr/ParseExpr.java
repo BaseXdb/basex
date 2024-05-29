@@ -551,36 +551,15 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Evaluates an expression to a Base64 item.
-   * @param expr expression
-   * @param qc query context
-   * @return Base64 item
-   * @throws QueryException query exception
-   */
-  protected final B64 toB64(final Expr expr, final QueryContext qc) throws QueryException {
-    return toB64(expr.atomItem(qc, info));
-  }
-
-  /**
-   * Evaluates an expression to a Base64 item.
+   * Evaluates an expression to a binary item.
    * @param expr expression
    * @param qc query context
    * @return Base64 item, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
-  protected final B64 toB64OrNull(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final Bin toBinOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : toB64(item);
-  }
-
-  /**
-   * Converts an item to a base64 item.
-   * @param item item
-   * @return Base64 item
-   * @throws QueryException query exception
-   */
-  protected final B64 toB64(final Item item) throws QueryException {
-    return (B64) checkType(item, BASE64_BINARY);
+    return item.isEmpty() ? null : toBin(item);
   }
 
   /**
