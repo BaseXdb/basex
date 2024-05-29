@@ -109,7 +109,7 @@ public final class Lookup extends Arr {
       }
       // multiple inputs:
       //  INPUTS?(KEYS)  ->  for $item in INPUTS return KEYS ! $item(.)
-      final Var var = cc.vs().addNew(new QNm("item"), null, false, cc.qc, info);
+      final Var var = cc.vs().addNew(new QNm("item"), null, cc.qc, info);
       final For fr = new For(var, input).optimize(cc);
       final Expr ex = cc.get(keys, () ->
         rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));

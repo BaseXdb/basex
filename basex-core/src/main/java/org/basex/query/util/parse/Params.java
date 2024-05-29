@@ -80,7 +80,7 @@ public final class Params {
       }
       // create variables
       for(final Param param : params) {
-        param.var = new Var(param.name, param.type, qc, param.info, true);
+        param.var = new Var(param.name, param.type, qc, param.info);
         vars.add(param.var);
       }
     }

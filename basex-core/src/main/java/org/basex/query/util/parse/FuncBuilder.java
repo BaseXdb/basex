@@ -107,7 +107,7 @@ public final class FuncBuilder {
    * @param qc query context
    */
   public void add(final QNm name, final SeqType st, final QueryContext qc) {
-    final Var var = vs.addNew(name, st, true, qc, info);
+    final Var var = vs.addNew(name, st, qc, info);
     params[arity] = var;
     add(new VarRef(info, var), null);
   }

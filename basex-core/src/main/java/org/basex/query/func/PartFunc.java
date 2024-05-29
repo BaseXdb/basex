@@ -80,7 +80,7 @@ public final class PartFunc extends Arr {
     for(int p = 0, e = 0; e < el; e++) {
       final Expr expr = exprs[e];
       if(placeholder(expr)) {
-        final Var param = vs.addNew(func.paramName(e), null, false, qc, info);
+        final Var param = vs.addNew(func.paramName(e), null, qc, info);
         args[e] = new VarRef(info, param);
         final SeqType at = ft.argTypes[e];
         if(at != null) param.refineType(at, null);

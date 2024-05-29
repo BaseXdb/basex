@@ -96,7 +96,7 @@ public final class Catch extends Single {
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final int vl = QNAMES.length;
     final Var[] vrs = new Var[vl];
-    for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(QNAMES[v], TYPES[v], false, cc.qc, info);
+    for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(QNAMES[v], TYPES[v], cc.qc, info);
     final Catch ctch = new Catch(info, vrs, new ArrayList<>(tests));
     final int val = vars.length;
     for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);

@@ -38,14 +38,12 @@ public final class VarScope {
    * Creates a new local variable in this scope.
    * @param name variable name
    * @param st type of the variable (can be {@code null})
-   * @param coerce coercion flag
    * @param qc query context
    * @param info input info (can be {@code null})
    * @return the variable
    */
-  public Var addNew(final QNm name, final SeqType st, final boolean coerce, final QueryContext qc,
-      final InputInfo info) {
-    return add(new Var(name, st, qc, info, coerce));
+  public Var addNew(final QNm name, final SeqType st, final QueryContext qc, final InputInfo info) {
+    return add(new Var(name, st, qc, info));
   }
 
   /**

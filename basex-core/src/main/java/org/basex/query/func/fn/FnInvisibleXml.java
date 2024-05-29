@@ -71,7 +71,7 @@ public final class FnInvisibleXml extends StandardFunc {
       } catch(final BlitzException ex) {
         throw IXML_GEN_X.get(info, ex);
       }
-      final Var var = new VarScope().addNew(new QNm("input"), STRING_O, true, qc, info);
+      final Var var = new VarScope().addNew(new QNm("input"), STRING_O, qc, info);
       final Var[] params = { var };
       final Expr arg = new VarRef(info, var);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);

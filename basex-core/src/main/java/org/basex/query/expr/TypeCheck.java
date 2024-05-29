@@ -187,7 +187,7 @@ public class TypeCheck extends Single {
    * @return result of check
    */
   public final boolean isRedundant(final Var var) {
-    return (!coerce || var.coerce) && var.declaredType().instanceOf(seqType());
+    return (!coerce || var.declType != null) && var.declaredType().instanceOf(seqType());
   }
 
   /**
