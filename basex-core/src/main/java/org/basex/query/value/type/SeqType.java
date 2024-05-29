@@ -7,6 +7,7 @@ import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -307,8 +308,8 @@ public final class SeqType {
    * @return map type
    */
   public MapType mapType(final Type keyType) {
-    if(mapTypes == null) mapTypes = new HashMap<>();
-    return mapTypes.computeIfAbsent(keyType, o -> new MapType(keyType, this));
+    if(mapTypes == null) mapTypes = new ConcurrentHashMap<>();
+    return mapTypes.computeIfAbsent(keyType, k -> new MapType(k, this));
   }
 
   /**
