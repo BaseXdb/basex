@@ -54,6 +54,6 @@ public final class InspectType extends StandardFunc {
         value.refineType();
         if(et.instanceOf(st)) st = et;
     }
-    return Str.get((item ? st.type : st).toString());
+    return Str.get((item ? st.with(Occ.EXACTLY_ONE) : st).toString());
   }
 }

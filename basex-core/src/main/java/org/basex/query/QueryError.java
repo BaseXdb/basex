@@ -1630,10 +1630,33 @@ public enum QueryError {
 
   /**
    * Throws a type exception.
+   * @param value value
+   * @param type target type
    * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
+    return typeError(value, type.seqType(), info);
+  }
+
+  /**
+   * Throws a type exception.
+   * @param expr expression
+   * @param st target type
+   * @param info input info (can be {@code null})
+   * @return query exception
+   */
+  public static QueryException typeError(final Expr expr, final SeqType st, final InputInfo info) {
+    return typeError(expr, st, null, info, true);
+  }
+
+
+  /**
+   * Throws a type exception.
    * @param expr expression
    * @param st target type
    * @param name name (can be {@code null})
+   * @param info input info (can be {@code null})
    * @param coerce coerce or treat as
    * @return query exception
    */
@@ -1644,10 +1667,10 @@ public enum QueryError {
 
   /**
    * Throws a type exception.
-   * @param info input info (can be {@code null})
    * @param expr expression
    * @param st target type
    * @param name variable name (can be {@code null})
+   * @param info input info (can be {@code null})
    * @param error error code
    * @return query exception
    */
@@ -1657,17 +1680,6 @@ public enum QueryError {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
     return error.get(info, expr.seqType(), st, tb.add(expr.toErrorString()).finish());
-  }
-
-  /**
-   * Throws a type cast exception.
-   * @param value value
-   * @param type target type
-   * @param info input info (can be {@code null})
-   * @return query exception
-   */
-  public static QueryException typeError(final Value value, final Type type, final InputInfo info) {
-    return INVCONVERT_X_X_X.get(info, value.seqType(), type, value);
   }
 
   /**

@@ -63,7 +63,7 @@ abstract class Convert extends Single {
    * @param castType type to cast to
    * @return result of check or {@code null}
    */
-  final Boolean cast(final SeqType castType) {
+  final Boolean castable(final SeqType castType) {
     final SeqType est = expr.seqType();
     if(!est.mayBeArray()) {
       final long es = expr.size();

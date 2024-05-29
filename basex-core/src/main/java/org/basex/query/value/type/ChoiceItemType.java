@@ -180,7 +180,7 @@ public class ChoiceItemType implements Type {
     int n = alts.size();
     for(final SeqType st : alts) {
       qs.token(st.toString());
-      if(--n != 0) qs.token(" | ");
+      if(--n != 0) qs.token('|');
     }
     return qs.token(')').toString();
   }

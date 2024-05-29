@@ -31,11 +31,11 @@ public final class Castable extends Convert {
   public Expr optimize(final CompileContext cc) throws QueryException {
     super.optimize(cc);
 
-    final SeqType castType = castType();
-    final Boolean castable = cast(castType);
-    if(castable != null) return cc.replaceWith(this, Bln.get(castable));
+    final SeqType st = castType();
+    final Boolean test = castable(st);
+    if(test != null) return cc.replaceWith(this, Bln.get(test));
 
-    final Expr arg = simplify(castType, cc);
+    final Expr arg = simplify(st, cc);
     if(arg != null) return new Castable(info, arg, seqType).optimize(cc);
 
     return expr instanceof Value ? cc.preEval(this) : this;

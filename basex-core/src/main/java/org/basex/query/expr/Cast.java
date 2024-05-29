@@ -35,14 +35,14 @@ public final class Cast extends Convert {
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
         seqType.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
 
-    final SeqType castType = castType();
-    exprType.assign(castType);
+    final SeqType st = castType();
+    exprType.assign(st);
 
-    final Boolean castable = cast(castType);
-    if(castable == Boolean.FALSE) throw error(expr);
-    if(castable == Boolean.TRUE) return cc.replaceWith(this, expr);
+    final Boolean test = castable(st);
+    if(test == Boolean.FALSE) throw typeError(expr, seqType, info);
+    if(test == Boolean.TRUE) return cc.replaceWith(this, expr);
 
-    final Expr arg = simplify(castType, cc);
+    final Expr arg = simplify(st, cc);
     if(arg != null) return new Cast(info, arg, seqType).optimize(cc);
 
     return expr instanceof Value ? cc.preEval(this) : this;
@@ -51,15 +51,6 @@ public final class Cast extends Convert {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return seqType.cast(expr.atomValue(qc, info), true, qc, info);
-  }
-
-  /**
-   * Throws a type error.
-   * @param ex expression that triggers the error
-   * @return query exception
-   */
-  private QueryException error(final Expr ex) {
-    return INVCONVERT_X_X_X.get(info, ex.seqType(), seqType, ex);
   }
 
   @Override

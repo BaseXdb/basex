@@ -386,7 +386,7 @@ public final class SeqType {
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) {
-      if(error) throw INVCONVERT_X_X_X.get(info, value.seqType(), this, value);
+      if(error) throw typeError(value, this, info);
       return null;
     }
     if(size == 0) return Empty.VALUE;
@@ -425,7 +425,7 @@ public final class SeqType {
 
     if(values != null) {
       final byte[] string = item.string(info);
-      if(!values.matches(string)) throw typeError(item, type, info);
+      if(!values.matches(string)) throw typeError(item, with(Occ.EXACTLY_ONE), info);
       if(item.type != ENUM) return Str.get(string, ENUM);
     } else if(!item.type.eq(type)) {
       return type.cast(item, qc, info);
