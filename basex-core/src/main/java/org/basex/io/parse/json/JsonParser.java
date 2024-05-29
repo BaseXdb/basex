@@ -7,7 +7,6 @@ import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.build.json.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -100,8 +99,7 @@ public final class JsonParser extends InputParser {
       case '8':
       case '9':
         // number
-        conv.numberLit(conv.numberParser != null ? conv.numberParser.apply(number()) :
-          Dbl.get(Dbl.parse(number(), null)));
+        conv.numberLit(number());
         break;
       default:
         // boolean, null or constructor

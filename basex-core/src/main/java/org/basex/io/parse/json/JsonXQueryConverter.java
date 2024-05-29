@@ -109,8 +109,8 @@ public final class JsonXQueryConverter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final Item item) throws QueryException {
-    stack.push(item);
+  public void numberLit(final byte[] value) throws QueryException {
+    stack.push(numberParser != null ? numberParser.apply(value) : Dbl.get(Dbl.parse(value, null)));
   }
 
   @Override

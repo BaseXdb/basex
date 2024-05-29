@@ -104,8 +104,13 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  void numberLit(final Item item) throws QueryException {
-    addValue(NUMBER, item.isEmpty() ? Token.EMPTY : item.string(null));
+  void numberLit(final byte[] value) throws QueryException {
+    byte[] string = value;
+    if(numberParser != null) {
+      final Item item = numberParser.apply(value);
+      string = item.isEmpty() ? Token.EMPTY : item.string(null);
+    }
+    addValue(NUMBER, string);
   }
 
   @Override

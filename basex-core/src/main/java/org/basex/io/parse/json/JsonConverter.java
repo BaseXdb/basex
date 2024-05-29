@@ -168,17 +168,17 @@ public abstract class JsonConverter {
 
   /**
    * Called when a number literal is encountered.
-   * @param item number item
+   * @param value string representation
    * @throws QueryException query exception
    */
-  abstract void numberLit(Item item) throws QueryException;
+  abstract void numberLit(byte[] value) throws QueryException;
 
   /**
    * Called when a string literal is encountered.
-   * @param token the string
+   * @param value string representation
    * @throws QueryException query exception
    */
-  abstract void stringLit(byte[] token) throws QueryException;
+  abstract void stringLit(byte[] value) throws QueryException;
 
   /**
    * Called when a {@code null} literal is encountered.
@@ -188,8 +188,8 @@ public abstract class JsonConverter {
 
   /**
    * Called when a boolean literal is encountered.
-   * @param b the boolean
+   * @param value string representation
    * @throws QueryException query exception
    */
-  abstract void booleanLit(byte[] b) throws QueryException;
+  abstract void booleanLit(byte[] value) throws QueryException;
 }
