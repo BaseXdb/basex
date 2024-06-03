@@ -43,8 +43,8 @@ public class ChoiceItemType implements Type {
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     for(final SeqType st : alts) {
-      final Value v = st.cast(item, false, qc, info);
-      if(v != null) return v;
+      final Value val = st.cast(item, false, qc, info);
+      if(val != null) return val;
     }
     throw FUNCCAST_X_X_X.get(info, item.type, this, item);
   }

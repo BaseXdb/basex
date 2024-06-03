@@ -30,12 +30,13 @@ public final class MapBuild extends StandardFunc {
       final Int pos = Int.get(++p);
       final Iter iter = (key != null ? key.invoke(qc, info, item, pos) : item).atomIter(qc, info);
       for(Item k; (k = qc.next(iter)) != null;) {
-        Value v = value != null ? value.invoke(qc, info, item, pos) : item;
+        Value val = value != null ? value.invoke(qc, info, item, pos) : item;
         if(result.contains(k)) {
           final Value old = result.get(k);
-          v = combine != null ? combine.invoke(qc, info, old, v) : ValueBuilder.concat(old, v, qc);
+          val = combine != null ? combine.invoke(qc, info, old, val) :
+            ValueBuilder.concat(old, val, qc);
         }
-        result = result.put(k, v);
+        result = result.put(k, val);
       }
     }
     return result;

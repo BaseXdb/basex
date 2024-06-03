@@ -31,11 +31,11 @@ public final class FnPartition extends ArrayFn {
         while(value != null) {
           final Item item = input.next();
           if(item == null || toBoolean(qc, splitWhen, value, item, Int.get(++p))) {
-            final Value v = value;
+            final Value val = value;
             value = item;
-            if(!v.isEmpty()) {
+            if(!val.isEmpty()) {
               final ArrayBuilder ab = new ArrayBuilder();
-              for(final Item it : v) ab.append(it);
+              for(final Item it : val) ab.append(it);
               return ab.array();
             }
           } else {

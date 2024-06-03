@@ -123,13 +123,13 @@ public class FnSort extends StandardFunc {
           for(int l = 0; l < levels; l++) {
             final int ll = l;
             final QueryFunction<Integer, Value> value = i -> {
-              Value v = cached[ll][i];
-              if(v == null) {
+              Value val = cached[ll][i];
+              if(val == null) {
                 final FItem k = key[ll];
-                v = (k == null ? values[i] : k.invoke(qc, info, values[i])).atomValue(qc, info);
-                cached[ll][i] = v;
+                val = (k == null ? values[i] : k.invoke(qc, info, values[i])).atomValue(qc, info);
+                cached[ll][i] = val;
               }
-              return v;
+              return val;
             };
             final int diff = compare(value.apply(i1), value.apply(i2), collation[l], info);
             if(diff != 0) return invert[l] ? -diff : diff;
