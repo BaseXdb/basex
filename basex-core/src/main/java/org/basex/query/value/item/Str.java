@@ -2,7 +2,10 @@ package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.function.*;
+
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -138,7 +141,20 @@ public final class Str extends AStr {
   }
 
   @Override
+  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+      throws QueryException {
+    return type == AtomType.ENUM ? get(string()) : this;
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+      throws QueryException {
+    return type != AtomType.ENUM;
+  }
+
+  @Override
   public String toJava() {
     return Token.string(value);
   }
+
 }
