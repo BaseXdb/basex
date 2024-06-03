@@ -248,7 +248,7 @@ public abstract class Collation {
    * @return key
    */
   public static byte[] key(final byte[] string) {
-    final ByteList bl = new ByteList(string.length * 3);
+    final ByteList bl = new ByteList(string.length * 3L);
     for(final TokenParser tp = new TokenParser(string); tp.more();) {
       final int n = tp.next();
       bl.add(n >>> 16).add(n >>> 8).add(n);

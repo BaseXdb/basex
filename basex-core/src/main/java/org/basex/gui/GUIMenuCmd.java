@@ -982,7 +982,7 @@ public enum GUIMenuCmd implements GUICommand {
    * @return result of check
    */
   private static boolean updatable(final DBNodes node, final int... kinds) {
-    if(node == null || (kinds.length == 0 ? node.size() < 1 : node.size() != 1)) return false;
+    if(node == null || (kinds.length == 0 ? node.isEmpty() : node.size() != 1)) return false;
     final int k = node.data().kind(node.pre(0));
     for(final int kind : kinds) {
       if(k == kind) return false;

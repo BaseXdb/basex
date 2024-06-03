@@ -59,6 +59,11 @@ public final class DBNodes extends DBNodeSeq {
     return ftpos;
   }
 
+  @Override
+  public boolean isEmpty() {
+    return size() == 0;
+  }
+
   /**
    * Returns {@code null} if the pre values reference all documents of the database.
    * @return self reference or {@code null}

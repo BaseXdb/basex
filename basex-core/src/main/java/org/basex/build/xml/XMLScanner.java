@@ -838,11 +838,11 @@ final class XMLScanner extends Job {
             !consume(ENTS) && !consume(ENT1) && !consume(NMTS) &&
             !consume(NMT)) { // [56]
           if(consume(NOT)) { // [57,58]
-            checkS(); check('('); s(); name(true); s();
-            while(consume('|')) { s(); name(true); s(); }
+            checkS(); check('(');
+            do { s(); name(true); s(); } while(consume('|'));
           } else { // [59]
-            check('('); s(); nmtoken(); s();
-            while(consume('|')) { s(); nmtoken(); s(); }
+            check('(');
+            do { s(); nmtoken(); s(); } while(consume('|'));
           }
           check(')');
         }

@@ -722,16 +722,4 @@ public abstract class ParseExpr extends Expr {
     if(item.type.instanceOf(type)) return item;
     throw typeError(item, type, info);
   }
-
-  /**
-   * Returns a value as item if it has the specified type.
-   * @param value value
-   * @param type expected type
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final Item checkType(final Value value, final Type type) throws QueryException {
-    if(value.seqType().instanceOf(type.seqType())) return (Item) value;
-    throw typeError(value, type, info);
-  }
 }

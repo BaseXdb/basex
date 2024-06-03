@@ -10,10 +10,6 @@ import jakarta.servlet.*;
  */
 public final class ServletListener implements ServletContextListener {
   @Override
-  public void contextInitialized(final ServletContextEvent event) {
-  }
-
-  @Override
   public void contextDestroyed(final ServletContextEvent event) {
     HTTPContext.get().close();
   }

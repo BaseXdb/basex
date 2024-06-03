@@ -2,7 +2,6 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.io.in.DataInput;
@@ -62,7 +61,7 @@ public class FuncType extends FType {
   }
 
   @Override
-  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+  public Item read(final DataInput in, final QueryContext qc) {
     throw Util.notExpected();
   }
 
@@ -180,10 +179,12 @@ public class FuncType extends FType {
    */
   public static Type find(final QNm name) {
     if(name.uri().length == 0) {
-      final String ln = Token.string(name.local());
-      if(ln.equals(QueryText.FUNCTION) || ln.equals(QueryText.FN)) return SeqType.FUNCTION;
-      if(ln.equals(QueryText.MAP)) return SeqType.MAP;
-      if(ln.equals(QueryText.ARRAY)) return SeqType.ARRAY;
+      switch(Token.string(name.local())) {
+        case QueryText.FUNCTION:
+        case QueryText.FN:       return SeqType.FUNCTION;
+        case QueryText.MAP:      return SeqType.MAP;
+        case QueryText.ARRAY:    return SeqType.ARRAY;
+      }
     }
     return null;
   }

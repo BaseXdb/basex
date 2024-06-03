@@ -56,17 +56,17 @@ final class MapList extends IntList {
 
     // summarize sizes
     final double sizeP = w / 100.0d;
-    long sum = 0;
+    double sum = 0;
     for(int i = 0; i < size; ++i) sum += weight(textLen, data, i);
 
-    // use #children and size for weight
     if(sizeP < 1) {
+      // use #children and size for weight
       for(int i = 0; i < size; ++i) {
         weight[i] = sizeP * weight(textLen, data, i) / sum +
           (1 - sizeP) * ViewData.size(data, list[i]) / nchildren;
       }
-    // only sizes
     } else {
+      // only sizes
       for(int i = 0; i < size; ++i) {
         weight[i] = weight(textLen, data, i) / sum;
       }

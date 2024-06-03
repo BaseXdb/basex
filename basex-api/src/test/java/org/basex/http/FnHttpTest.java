@@ -213,10 +213,9 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Parse normal request.
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  @Test public void parseRequest() throws IOException, QueryException {
+  @Test public void parseRequest() throws Exception {
     // Simple HTTP request with no errors
     final String request = "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
@@ -236,10 +235,9 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Parse multipart request.
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  @Test public void parseMultipartReq() throws IOException, QueryException {
+  @Test public void parseMultipartReq() throws Exception {
     final String multiReq = "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
@@ -283,10 +281,9 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Parse multipart request when the contents for each part are set from the $bodies parameter.
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  @Test public void parseMultipartReqBodies() throws IOException, QueryException {
+  @Test public void parseMultipartReqBodies() throws Exception {
     final String multiReq = "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
@@ -562,10 +559,9 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Tests response handling with specified charset in the header 'Content-Type'.
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  @Test public void responseWithCharset() throws IOException, QueryException {
+  @Test public void responseWithCharset() throws Exception {
     // Create fake HTTP connection
     final FakeHttpResponse response = new FakeHttpResponse();
     // Set content type
@@ -580,10 +576,9 @@ public class FnHttpTest extends HTTPTest {
 
   /**
    * Tests content-type parsing.
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
-  @Test public void parseContentType() throws IOException, QueryException {
+  @Test public void parseContentType() throws Exception {
     final FakeHttpResponse response = new FakeHttpResponse();
     // upper case attribute, quoted string
     response.header("Content-Type", "text/plain; CHARSET=\"CP1252\"");
@@ -772,7 +767,7 @@ public class FnHttpTest extends HTTPTest {
    */
   private static void checkResponse(final Value value, final int itemsCount, final int expStatus) {
     assertEquals(itemsCount, value.size());
-    assertTrue(value.itemAt(0) instanceof FElem);
+    assertInstanceOf(FElem.class, value.itemAt(0));
     final FElem response = (FElem) value.itemAt(0);
     assertNotNull(response.attributeIter());
     if(!eq(response.attribute(HTTPText.Q_STATUS), token(expStatus))) {

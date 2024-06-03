@@ -21,7 +21,7 @@ public final class ValidateXsdInit extends ValidateFn {
   }
 
   @Override
-  public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
+  public ArrayList<ErrorInfo> errors(final QueryContext qc) {
     throw Util.notExpected();
   }
 }

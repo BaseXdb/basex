@@ -1545,7 +1545,6 @@ public enum QueryError {
     /** Error type. */ FOIX,
     /** Error type. */ FOJS,
     /** Error type. */ FONS,
-    /** Error type. */ FOOP,
     /** Error type. */ FORG,
     /** Error type. */ FORX,
     /** Error type. */ FOTY,

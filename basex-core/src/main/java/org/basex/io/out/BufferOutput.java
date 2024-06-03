@@ -43,7 +43,7 @@ public final class BufferOutput extends OutputStream {
    * Constructor with a default buffer size.
    * @param out the stream to write to
    */
-  protected BufferOutput(final OutputStream out) {
+  BufferOutput(final OutputStream out) {
     this(out, IO.BLOCKSIZE);
   }
 
@@ -52,7 +52,7 @@ public final class BufferOutput extends OutputStream {
    * @param out the stream to write to
    * @param bufsize buffer size
    */
-  protected BufferOutput(final OutputStream out, final int bufsize) {
+  BufferOutput(final OutputStream out, final int bufsize) {
     this.out = out;
     this.bufsize = bufsize;
     buffer = new byte[bufsize];

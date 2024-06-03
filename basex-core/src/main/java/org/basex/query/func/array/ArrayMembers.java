@@ -27,11 +27,11 @@ public final class ArrayMembers extends StandardFunc {
       final Iterator<Value> members = array.members().iterator();
 
       @Override
-      public XQMap next() throws QueryException {
+      public XQMap next() {
         return members.hasNext() ? record(members.next()) : null;
       }
       @Override
-      public Item get(final long i) throws QueryException {
+      public Item get(final long i) {
         return record(array.get(i));
       }
       @Override

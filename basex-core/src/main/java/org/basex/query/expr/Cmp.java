@@ -136,7 +136,7 @@ public abstract class Cmp extends Arr {
     final Type type1 = st1.type;
     if(expr1.equals(expr2) &&
       // keep: () = (), (1,2) != (1,2), (1,2) eq (1,2)
-      (op != OpV.EQ || this instanceof CmpV ? st1.one() : st1.oneOrMore()) &&
+      (op != OpV.EQ ? st1.one() : st1.oneOrMore()) &&
       // keep: xs:double('NaN') = xs:double('NaN')
       (type1.isStringOrUntyped() || type1.instanceOf(AtomType.DECIMAL) ||
           type1 == AtomType.BOOLEAN) &&

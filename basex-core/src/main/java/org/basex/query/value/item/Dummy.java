@@ -46,18 +46,12 @@ public final class Dummy extends Item {
   }
 
   @Override
-  public int hash() {
-    throw Util.notExpected();
-  }
-
-  @Override
   public boolean bool(final InputInfo ii) {
     throw Util.notExpected();
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii) {
     throw Util.notExpected();
   }
 
@@ -68,7 +62,7 @@ public final class Dummy extends Item {
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
+      final InputInfo ii) {
     throw Util.notExpected();
   }
 

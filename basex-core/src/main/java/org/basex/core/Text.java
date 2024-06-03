@@ -1368,8 +1368,6 @@ public interface Text {
   String CHIEF_ARCHITECT = lang("chief_architect");
   /** Contributors info. */
   String TEAM = lang("team");
-  /** Developer names. */
-  String AND_OTHERS = lang("and_others");
   /** Translation. */
   String TRANSLATION = lang("translation");
 

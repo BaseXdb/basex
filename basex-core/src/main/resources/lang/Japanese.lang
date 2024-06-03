@@ -12,7 +12,6 @@ admin_static         = Admin ユーザーは編集できません。
 algorithm            = アルゴリズム
 all                  = すべて
 alter_pw             = パスワードの変更
-and_others           = その他の貢献者
 are_you_sure         = よろしいですか？
 ascending_order      = 昇順
 attribute            = 属性

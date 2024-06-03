@@ -29,7 +29,7 @@ public final class Var extends ExprInfo {
   /** Declared type ({@code null} if no type or {@code item()*} was specified). */
   public SeqType declType;
   /** Stack slot ({@code -1} if unused). */
-  public int slot;
+  int slot;
 
   /** Actual type (by type inference). */
   private final ExprType exprType;
@@ -222,11 +222,8 @@ public final class Var extends ExprInfo {
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
   public boolean adoptCheck(final SeqType st) {
-    if(declType == null || st.instanceOf(declType)) {
-      declType = st;
-    } else if(!declType.instanceOf(st)) {
-      return false;
-    }
+    if(declType != null && !st.instanceOf(declType)) return declType.instanceOf(st);
+    declType = st;
     return true;
   }
 

@@ -198,7 +198,7 @@ public final class CollectionTest extends XMLDBBaseTest {
 
     // test xml resource and ID creation
     Resource resource = collection.createResource(null, XMLResource.RESOURCE_TYPE);
-    assertTrue(resource instanceof XMLResource, "XMLResource expected.");
+    assertInstanceOf(XMLResource.class, resource, "XMLResource expected.");
     assertNotNull(resource.getId(), "No ID was created.");
 
     // test adoption of specified id

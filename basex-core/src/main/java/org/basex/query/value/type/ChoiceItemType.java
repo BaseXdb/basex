@@ -2,7 +2,6 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.io.in.DataInput;
@@ -17,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public class ChoiceItemType implements Type {
+public final class ChoiceItemType implements Type {
   /** Alternative item types. */
   public final List<SeqType> alts;
   /** Common ancestor type. */
@@ -63,7 +62,7 @@ public class ChoiceItemType implements Type {
   }
 
   @Override
-  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+  public Item read(final DataInput in, final QueryContext qc) {
     throw Util.notExpected();
   }
 

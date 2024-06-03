@@ -60,7 +60,7 @@ final class MixedPos extends Single implements CmpPos {
   }
 
   @Override
-  public Expr invert(final CompileContext cc) throws QueryException {
+  public Expr invert(final CompileContext cc) {
     return null;
   }
 

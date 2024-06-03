@@ -65,10 +65,9 @@ public final class DbModuleServerTest extends SandboxTest {
 
   /**
    * Tests client/server functionality of database functions.
-   * @throws IOException I/O exception
-   * @throws InterruptedException interrupted exception
+   * @throws Exception exception
    */
-  @Test public void concurrentClients() throws IOException, InterruptedException {
+  @Test public void concurrentClients() throws Exception {
     final ClientSession check = createClient();
 
     // same DB name, which is 2 x NUM times

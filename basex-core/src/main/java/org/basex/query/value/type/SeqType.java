@@ -127,8 +127,6 @@ public final class SeqType {
   public static final SeqType BINARY_O = BINARY.seqType();
   /** One xs:hexBinary. */
   public static final SeqType HEX_BINARY_O = HEX_BINARY.seqType();
-  /** Zero or one xs:hexBinary. */
-  public static final SeqType HEX_BINARY_ZO = HEX_BINARY.seqType(ZERO_OR_ONE);
   /** Single xs:base64Binary. */
   public static final SeqType BASE64_BINARY_O = BASE64_BINARY.seqType();
   /** Zero or one xs:base64Binary. */
@@ -287,7 +285,7 @@ public final class SeqType {
    * @param values enum values (can be {@code null}; ignored if this is not an enum type)
    * @return sequence type
    */
-  public static SeqType get(final Type type, final Occ occ, final Test test,
+  private static SeqType get(final Type type, final Occ occ, final Test test,
       final EnumValues values) {
     return occ == ZERO || (test == null || !(type instanceof NodeType)) &&
         (values == null || type != ENUM) ? get(type, occ) : new SeqType(type, occ, test, values);

@@ -23,7 +23,7 @@ public final class JobContext {
   /** Job prefix. */
   static final String PREFIX = "job";
   /** Query id. */
-  private static AtomicLong jobId = new AtomicLong(-1);
+  private static final AtomicLong JOBID = new AtomicLong(-1);
 
   /** Registered locks. */
   public final Locks locks = new Locks();
@@ -65,7 +65,7 @@ public final class JobContext {
    * @return id
    */
   public String id() {
-    if(id == null) id = PREFIX + jobId.updateAndGet(i -> Math.max(0, i + 1));
+    if(id == null) id = PREFIX + JOBID.updateAndGet(i -> Math.max(0, i + 1));
     return id;
   }
 

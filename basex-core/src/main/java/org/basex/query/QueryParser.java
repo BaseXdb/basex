@@ -2319,8 +2319,8 @@ public class QueryParser extends InputParser {
       final boolean args = wsConsume("("), focus = !args && current('{');
       if(args || focus) {
         final HashMap<Var, Expr> global = localVars.pushContext(true);
-        Params params = null;
-        Expr expr = null;
+        Params params;
+        Expr expr;
         if(args) {
           params = paramList(false);
           expr = enclosedExpr();

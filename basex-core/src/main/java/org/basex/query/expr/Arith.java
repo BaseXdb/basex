@@ -105,7 +105,7 @@ public class Arith extends Arr {
       }
     }
 
-    if(expr == this && calcOpt == null && !(expr instanceof CmpSimpleG)) {
+    if(expr == this && calcOpt == null && !(expr instanceof ArithSimple)) {
       calcOpt = CalcOpt.get(st1, st2, calc);
       if(calcOpt != null && st1.zeroOrOne() && st2.zeroOrOne()) {
         expr = new ArithSimple(info, expr1, expr2, calc, calcOpt);

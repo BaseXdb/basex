@@ -87,8 +87,7 @@ public final class EnumValues {
     if(this == obj) return true;
     if(!(obj instanceof EnumValues)) return false;
     final EnumValues other = (EnumValues) obj;
-    if(values.size() != other.values.size() || !instanceOf(other)) return false;
-    return true;
+    return values.size() == other.values.size() && instanceOf(other);
   }
 
   @Override

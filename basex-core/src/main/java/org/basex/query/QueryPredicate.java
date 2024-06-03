@@ -14,7 +14,6 @@ public interface QueryPredicate<T> {
    *
    * @param t the function argument
    * @return the function result
-   * @throws QueryException query exception
    */
-  boolean test(T t) throws QueryException;
+  boolean test(T t);
 }

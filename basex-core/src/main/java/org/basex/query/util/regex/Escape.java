@@ -216,8 +216,8 @@ public final class Escape extends RegExp {
    * @param r range
    */
   private static void add(final Map<String, int[][]> m, final String n, final int[] r) {
-    final int[][] old = m.get(n), nw = { r };
-    m.put(n, old == null ? nw : merge(old, nw));
+    final int[][] nw = { r };
+    m.compute(n, (k, old) -> old == null ? nw : merge(old, nw));
   }
 
   static {

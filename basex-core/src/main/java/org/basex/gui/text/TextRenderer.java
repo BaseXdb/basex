@@ -322,7 +322,7 @@ final class TextRenderer extends BaseXBack {
     String s = iter.currString();
     int sw = 0;
 
-    if(s.length() == 0) return false;
+    if(s.isEmpty()) return false;
     final int cp = s.codePointAt(0);
     if(cp == TokenBuilder.BOLD) {
       setStyle(Font.BOLD);

@@ -60,7 +60,7 @@ public final class IntPos extends Simple implements CmpPos {
   }
 
   @Override
-  public Value positions(final QueryContext qc) throws QueryException {
+  public Value positions(final QueryContext qc) {
     return RangeSeq.get(min, max - min + 1, true);
   }
 

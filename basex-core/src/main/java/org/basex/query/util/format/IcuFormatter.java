@@ -32,14 +32,12 @@ public final class IcuFormatter extends Formatter {
   private static final String ICU_SPELLOUT_CARDINAL_NEUTER = ICU_SPELLOUT_CARDINAL + "-neuter";
 
   /** IcuFormatter instances. */
-  private static final ThreadLocal<TokenObjMap<IcuFormatter>> MAP = new ThreadLocal<>() {
-    protected TokenObjMap<IcuFormatter> initialValue() {
-      final TokenObjMap<IcuFormatter> map = new TokenObjMap<>();
-      // initialize hash map with English formatter as default
-      map.put(EN, forLanguage(EN));
-      return map;
-    }
-  };
+  private static final ThreadLocal<TokenObjMap<IcuFormatter>> MAP = ThreadLocal.withInitial(() -> {
+    // initialize hash map with English formatter as default
+    final TokenObjMap<IcuFormatter> map = new TokenObjMap<>();
+    map.put(EN, forLanguage(EN));
+    return map;
+  });
 
   /** ICU rule based spell out format. */
   private final RuleBasedNumberFormat spelloutFormat;

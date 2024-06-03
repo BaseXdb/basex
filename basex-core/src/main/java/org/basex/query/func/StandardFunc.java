@@ -726,7 +726,7 @@ public abstract class StandardFunc extends Arr {
   protected final String toName(final Expr expr, final boolean empty, final QueryError error,
       final QueryContext qc) throws QueryException {
     final String name = toString(expr, qc);
-    if(empty && name.length() == 0 || Databases.validName(name)) return name;
+    if(empty && name.isEmpty() || Databases.validName(name)) return name;
     throw error.get(info, name);
   }
 

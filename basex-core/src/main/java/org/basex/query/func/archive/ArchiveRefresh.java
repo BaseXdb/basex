@@ -31,14 +31,14 @@ public final class ArchiveRefresh extends ArchiveCreate {
     try {
       if(!localZip(io)) throw ARCHIVE_ZIP_X.get(info, io);
 
-      try(FileSystem fs = FileSystems.newFileSystem(Paths.get(((IOFile) io).path()), null)) {
+      try(FileSystem fs = FileSystems.newFileSystem(Paths.get(io.path()), null)) {
         for(final Entry<String, Entry<Item, Item>> file : files.entrySet()) {
           final Path path = fs.getPath(file.getKey());
           final Entry<Item, Item> entry = file.getValue();
           final Item header = entry.getKey(), content = entry.getValue();
           try(OutputStream os = Files.newOutputStream(path)) {
             if(content instanceof Bin) {
-              IO.write(((Bin) content).input(info), os);
+              IO.write(content.input(info), os);
             } else {
               os.write(encode(toBytes(content), encoding(header), false, qc));
             }
