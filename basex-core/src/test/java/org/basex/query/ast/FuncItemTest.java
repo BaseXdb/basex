@@ -197,6 +197,8 @@ public final class FuncItemTest extends SandboxTest {
   @Test public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
         "return $f(function() { 1, 2 })", INVCONVERT_X_X_X);
+    error("let $x as fn (xs:byte) as item() := fn($x as item()) {$x} return $x(384)",
+        FUNCCAST_X_X_X);
   }
 
   /** Checks if nested closures are inlined. */

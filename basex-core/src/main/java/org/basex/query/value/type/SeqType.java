@@ -446,14 +446,24 @@ public final class SeqType {
   public Value coerce(final Value value, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
-    if(instance(value)) return value;
+    boolean coerceArgs = false;
+    final SeqType[] argTypes = type instanceof FuncType ? ((FuncType) type).argTypes : null;
+    if(argTypes != null) {
+      for(final SeqType at : argTypes) {
+        if(!at.eq(ITEM_ZM)) {
+          coerceArgs = true;
+          break;
+        }
+      }
+    }
+    if(instance(value) && !coerceArgs) return value;
 
     final long size = value.size();
     ItemList items = null;
     for(long i = 0; i < size; i++) {
       qc.checkStop();
       final Item item = value.itemAt(i);
-      if(instance(item)) {
+      if(instance(item) && !coerceArgs) {
         if(items != null) items.add(item);
       } else {
         if(items == null) {
