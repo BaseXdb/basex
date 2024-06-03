@@ -391,46 +391,46 @@ public final class SeqType {
     }
     if(size == 0) return Empty.VALUE;
 
+    // cast single items
+    if(size == 1) return cast((Item) value, error, qc, info);
+    // cast sequences
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : value) {
+      qc.checkStop();
+      vb.add(cast(item, error, qc, info));
+    }
+    return vb.value(type);
+  }
+
+  /**
+   * Casts an item to this type.
+   * @param item item to cast
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast value
+   * @throws QueryException query exception
+   */
+  private Value cast(final Item item, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+
     // enable light-weight error handling
     if(!error && info != null) info.internal(true);
-
     try {
-      // cast single items
-      if(size == 1) return cast((Item) value, qc, info);
-      // cast sequences
-      final ValueBuilder vb = new ValueBuilder(qc);
-      for(final Item item : value) {
-        qc.checkStop();
-        vb.add(cast(item, qc, info));
+      if(values != null) {
+        final byte[] string = item.string(info);
+        if(!values.matches(string)) throw typeError(item, type, info);
+        if(item.type != ENUM) return Str.get(string, ENUM);
+      } else if(!item.type.eq(type)) {
+        return type.cast(item, qc, info);
       }
-      return vb.value(type);
+      return item;
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
     } finally {
       if(!error && info != null) info.internal(false);
     }
-  }
-
-  /**
-   * Casts an item to this type.
-   * @param item item to cast
-   * @param qc query context
-   * @param info input info (can be {@code null})
-   * @return cast value
-   * @throws QueryException query exception
-   */
-  private Value cast(final Item item, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-
-    if(values != null) {
-      final byte[] string = item.string(info);
-      if(!values.matches(string)) throw typeError(item, with(Occ.EXACTLY_ONE), info);
-      if(item.type != ENUM) return Str.get(string, ENUM);
-    } else if(!item.type.eq(type)) {
-      return type.cast(item, qc, info);
-    }
-    return item;
   }
 
   /**
@@ -538,7 +538,7 @@ public final class SeqType {
           } else {
             throw error.get();
           }
-          it = (Item) cast(it, qc, info);
+          it = (Item) cast(it, true, qc, info);
           if(relabel != null && !it.equal(relabel, null, info)) throw error.get();
         }
         items.add(it);
