@@ -2117,7 +2117,7 @@ public final class FnModuleTest extends SandboxTest {
     check("(" + _RANDOM_DOUBLE.args() + " => " + REPLICATE.args(10, true) + " => " +
         func.args() + ")[. > 1]", "", exists(func));
 
-    error(func.args(" true#0"), FIATOMIZE_X);
+    query(func.args(" true#0"), "fn:true#0");
     error(func.args(" (1 to 2) ! true#0"), FIATOMIZE_X);
   }
 

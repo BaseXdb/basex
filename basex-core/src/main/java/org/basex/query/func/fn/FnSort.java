@@ -111,9 +111,6 @@ public class FnSort extends StandardFunc {
         l > 0 && invert[l - 1];
     }
 
-    // single value: atomize to check type
-    if(size == 1) values[0].atomValue(qc, info);
-
     final Integer[] indexes = new Integer[size];
     for(int o = 0; o < size; o++) indexes[o] = o;
     try {
