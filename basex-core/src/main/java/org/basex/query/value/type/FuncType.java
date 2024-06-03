@@ -24,7 +24,7 @@ public class FuncType extends FType {
   public final AnnList anns;
   /** Return type of the function. */
   public final SeqType declType;
-  /** Argument types (can be {@code null}, indicated that no types were specified). */
+  /** Argument types (can be {@code null}, indicates that no types were specified). */
   public final SeqType[] argTypes;
 
   /**

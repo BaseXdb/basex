@@ -446,36 +446,44 @@ public final class SeqType {
   public Value coerce(final Value value, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
-    boolean coerceArgs = false;
+    // check if function arguments must be coerced
+    boolean coerce = false;
     final SeqType[] argTypes = type instanceof FuncType ? ((FuncType) type).argTypes : null;
     if(argTypes != null) {
       for(final SeqType at : argTypes) {
         if(!at.eq(ITEM_ZM)) {
-          coerceArgs = true;
+          coerce = true;
           break;
         }
       }
     }
-    if(instance(value) && !coerceArgs) return value;
 
-    final long size = value.size();
-    ItemList items = null;
-    for(long i = 0; i < size; i++) {
-      qc.checkStop();
-      final Item item = value.itemAt(i);
-      if(instance(item) && !coerceArgs) {
-        if(items != null) items.add(item);
-      } else {
-        if(items == null) {
-          items = new ItemList(Seq.initialCapacity(size));
-          for(int j = 0; j < i; j++) items.add(value.itemAt(j));
+    // check if value must be coerced
+    if(!coerce) {
+      if(instance(value)) return value;
+
+      for(final Item item : value) {
+        qc.checkStop();
+        if(!instance(item)) {
+          coerce = true;
+          break;
         }
-        coerce(item, name, items, qc, cc, info);
       }
     }
-    final long is = items != null ? items.size() : value.size();
-    if(!occ.check(is)) throw typeError(value, this, name, info, true);
-    return items != null ? items.value(type) : value;
+
+    // coerce items if required
+    Value val = value;
+    if(coerce) {
+      final ItemList items = new ItemList(Seq.initialCapacity(value.size()));
+      for(final Item item : value) {
+        qc.checkStop();
+        coerce(item, name, items, qc, cc, info);
+      }
+      val = items.value(type);
+    }
+
+    if(!occ.check(val.size())) throw typeError(value, this, name, info, true);
+    return val;
   }
 
   /**
