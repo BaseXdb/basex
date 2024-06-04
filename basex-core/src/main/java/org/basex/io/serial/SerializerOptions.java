@@ -98,8 +98,8 @@ public final class SerializerOptions extends Options {
       new EnumOption<>("json-node-output-method", SerialMethod.XML);
 
   /** Specific serialization parameter. */
-  public static final OptionsOption<CsvSerialOptions> CSV =
-      new OptionsOption<>("csv", new CsvSerialOptions());
+  public static final OptionsOption<CsvOptions> CSV =
+      new OptionsOption<>("csv", new CsvOptions());
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
       new OptionsOption<>("json", new JsonSerialOptions());

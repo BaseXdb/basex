@@ -124,21 +124,6 @@ public final class CsvModuleTest extends SandboxTest {
         "'header': true(), 'format': 'xquery'", "A\n1\n");
   }
 
-  /** Test method. */
-  @Test public void serializeAllow() {
-    query(_CSV_SERIALIZE.args(" <csv><record><A>1</A></record></csv>",
-        " map { 'allow': '1' }"), "1\n");
-
-    // value not allowed
-    error(_CSV_SERIALIZE.args(" <csv><record><A>123</A></record></csv>",
-        " map { 'allow': '1' }"), CSV_SERIALIZE_X_X);
-    error(_CSV_SERIALIZE.args(" <csv><record><A>1</A></record></csv>",
-        " map { 'allow': '2' }"), CSV_SERIALIZE_X_X);
-    // invalid pattern
-    error(_CSV_SERIALIZE.args(" <csv><record><A>+</A></record></csv>",
-        " map { 'allow': '+' }"), CSV_SERIALIZE_X_X);
-  }
-
   /**
    * Runs the specified query.
    * @param input query input

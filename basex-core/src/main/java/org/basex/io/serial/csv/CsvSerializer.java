@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.regex.*;
 
 import org.basex.build.csv.*;
 import org.basex.io.serial.*;
@@ -20,7 +19,7 @@ import org.basex.util.list.*;
  */
 abstract class CsvSerializer extends StandardSerializer {
   /** CSV options. */
-  final CsvSerialOptions copts;
+  final CsvOptions copts;
   /** Separator. */
   final int separator;
   /** Generate quotes. */
@@ -28,8 +27,6 @@ abstract class CsvSerializer extends StandardSerializer {
   /** Generate backslashes. */
   final boolean backslashes;
 
-  /** Data pattern. */
-  Pattern allow;
   /** Header flag. */
   boolean header;
 
@@ -45,15 +42,6 @@ abstract class CsvSerializer extends StandardSerializer {
     quotes = copts.get(CsvOptions.QUOTES);
     backslashes = copts.get(CsvOptions.BACKSLASHES);
     header = copts.get(CsvOptions.HEADER);
-    final String allw = copts.get(CsvSerialOptions.ALLOW);
-    if(!allw.isEmpty()) {
-      try {
-        allow = Pattern.compile(allw);
-      } catch(final PatternSyntaxException ex) {
-        Util.debug(ex);
-        throw CSV_SERIALIZE_X_X.getIO("Invalid pattern", allw);
-      }
-    }
     separator = copts.separator();
   }
 
@@ -69,12 +57,7 @@ abstract class CsvSerializer extends StandardSerializer {
       final byte[] v = entries.get(i);
       if(i != 0) out.print(separator);
 
-      byte[] txt = EMPTY;
-      if(v != null) {
-        txt = v;
-        if(allow != null && !allow.matcher(string(v)).matches())
-          throw CSV_SERIALIZE_X_X.getIO("Value is not allowed", v);
-      }
+      byte[] txt = v != null ? v : EMPTY;
       final boolean delim = contains(txt, separator) || contains(txt, '\n');
       final boolean special = contains(txt, '\r') || contains(txt, '\t') || contains(txt, '"');
       if(delim || special || backslashes && contains(txt, '\\')) {
