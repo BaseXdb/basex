@@ -247,7 +247,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
           case '\t':
             tb.add('t'); break;
           default:
-            tb.add('u').add('0').add('0').add(HEX_TABLE[cp >> 4]).add(HEX_TABLE[cp & 0xF]); break;
+            tb.add('u').add(hex(cp, 4));
         }
       } else {
         if((cp == '\\' || cp == '"' || cp == '/' && escapeSolidus) &&

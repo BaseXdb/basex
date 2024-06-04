@@ -63,9 +63,10 @@ public final class FTWindow extends FTFilter {
     for(final FTStringMatch sm : match) {
       if(sm.exclude) continue;
       if(first == null) first = sm;
-      first.gaps |= sm.end - first.end > 1;
-      first.end = sm.end;
-      if(pos(first.end, lexer) - pos(first.start, lexer) > n) return false;
+      final int fend = first.end, send = sm.end;
+      first.gaps |= send - fend > 1;
+      first.end = send;
+      if(pos(send, lexer) - pos(first.start, lexer) > n) return false;
     }
     if(first == null) return false;
 

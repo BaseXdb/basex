@@ -1452,10 +1452,6 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_SORT_WITH(HofSortWith::new, "sort-with(input,comparator)",
-      params(ITEM_ZM, BIPREDICATE_O),
-      ITEM_ZM, flag(HOF), HOF_URI),
-  /** XQuery function. */
   _HOF_TOP_K_BY(HofTopKBy::new, "top-k-by(input,key,k)",
       params(ITEM_ZM, FuncType.get(ITEM_O, ITEM_O).seqType(), INTEGER_O),
       ITEM_ZM, flag(HOF), HOF_URI),

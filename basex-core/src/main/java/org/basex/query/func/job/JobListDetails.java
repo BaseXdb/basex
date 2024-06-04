@@ -75,7 +75,6 @@ public final class JobListDetails extends StandardFunc {
   private byte[] dateTime(final long ms) throws QueryException {
     final Dtm dtm = Dtm.get(ms);
     final DTDur tz = new DTDur(BigDecimal.valueOf(TimeZone.getDefault().getOffset(ms) / 1000));
-    dtm.timeZone(tz, false, info);
-    return dtm.string(info);
+    return dtm.timeZone(tz, false, info).string(info);
   }
 }

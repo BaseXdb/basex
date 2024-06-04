@@ -438,6 +438,10 @@ public abstract class ParseExpr extends Expr {
   protected final long toLong(final Item item) throws QueryException {
     final Type type = item.type;
     if(type.instanceOf(INTEGER) || type.isUntyped()) return item.itr(info);
+    if(type == DECIMAL) {
+      final long l = item.itr(info);
+      if(item.dbl(info) == l) return l;
+    }
     throw typeError(item, INTEGER, info);
   }
 

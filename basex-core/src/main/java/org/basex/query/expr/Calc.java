@@ -8,7 +8,6 @@ import static org.basex.query.expr.CalcOpt.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -235,10 +234,9 @@ public enum Calc {
           return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
         }
         if(_MATH_POW.is(expr1)) {
-          final StandardFunc func = (StandardFunc) expr1;
-          if(func.exprs[0].equals(expr2) && func.exprs[1] instanceof ANum) {
-            final double factor = ((ANum) func.exprs[1]).dbl();
-            return cc.function(_MATH_POW, info, func.exprs[0], Dbl.get(factor + 1));
+          if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
+            final double factor = ((ANum) expr1.arg(1)).dbl();
+            return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor + 1));
           }
         }
       }
@@ -316,10 +314,9 @@ public enum Calc {
         return type == DECIMAL ? Dec.ONE : type == INTEGER ? Int.ONE : null;
       }
       if(_MATH_POW.is(expr1)) {
-        final StandardFunc func = (StandardFunc) expr1;
-        if(func.exprs[0].equals(expr2) && func.exprs[1] instanceof ANum) {
-          final double factor = ((ANum) func.exprs[1]).dbl();
-          return cc.function(_MATH_POW, info, func.exprs[0], Dbl.get(factor - 1));
+        if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
+          final double factor = ((ANum) expr1.arg(1)).dbl();
+          return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor - 1));
         }
       }
       return null;

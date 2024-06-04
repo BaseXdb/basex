@@ -351,7 +351,6 @@ public abstract class Formatter extends FormatUtil {
     if(fp.min < md) fp.min = md;
 
     // adjust number of target digits
-    if(fp.min > md) md = fp.min;
     if(fp.min > fl) fl = fp.min;
     if(fp.max != Integer.MAX_VALUE) {
       od = fp.max - fp.min;

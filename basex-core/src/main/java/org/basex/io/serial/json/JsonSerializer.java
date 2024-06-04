@@ -161,20 +161,64 @@ public abstract class JsonSerializer extends StandardSerializer {
 
   @Override
   protected final void print(final int cp) throws IOException {
-    if(escape) {
-      switch(cp) {
-        case '\b': out.print("\\b");  break;
-        case '\f': out.print("\\f");  break;
-        case '\n': out.print("\\n");  break;
-        case '\r': out.print("\\r");  break;
-        case '\t': out.print("\\t");  break;
-        case '"' : out.print("\\\""); break;
-        case '/' : out.print(escapeSolidus ? "\\/" : "/");  break;
-        case '\\': out.print("\\\\"); break;
-        default  : out.print(cp);     break;
+    try {
+      if(escape) {
+        switch(cp) {
+          case '\b':
+            out.print('\\');
+            out.print('b');
+            break;
+          case '\f':
+            out.print('\\');
+            out.print('f');
+            break;
+          case '\n':
+            out.print('\\');
+            out.print('n');
+            break;
+          case '\r':
+            out.print('\\');
+            out.print('r');
+            break;
+          case '\t':
+            out.print('\\');
+            out.print('t');
+            break;
+          case '"' :
+            out.print('\\');
+            out.print('"');
+            break;
+          case '/' :
+            if(escapeSolidus) out.print('\\');
+            out.print('/');
+            break;
+          case '\\':
+            out.print('\\');
+            out.print('\\');
+            break;
+          default:
+            out.print(cp);
+            break;
+        }
+      } else {
+        out.print(cp);
       }
-    } else {
-      super.print(cp);
+    } catch(final QueryIOException ex) {
+      if(ex.getCause().error() == SERENC_X_X) {
+        if(Character.isBmpCodePoint(cp)) {
+          out.print('\\');
+          out.print('u');
+          out.print(hex(cp, 4));
+        } else {
+          out.print('\\');
+          out.print('u');
+          out.print(hex(Character.highSurrogate(cp), 4));
+          out.print('\\');
+          out.print('u');
+          out.print(hex(Character.lowSurrogate(cp), 4));
+        }
+      }
+      else throw ex;
     }
   }
 

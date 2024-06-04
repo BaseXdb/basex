@@ -1417,7 +1417,7 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte b : token) {
       if(letterOrDigit(b) || contains(iri ? IRI_CHARACTERS : URI_CHARACTERS, b)) tb.addByte(b);
-      else hex(tb, b);
+      else tb.add('%').add(hex(b, 2));
     }
     return tb.finish();
   }
@@ -1431,20 +1431,21 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte b : token) {
       if(b >= 0x20 && b <= 0x7e) tb.addByte(b);
-      else hex(tb, b);
+      else tb.add('%').add(hex(b, 2));
     }
     return tb.finish();
   }
 
   /**
-   * Adds the specified byte in hex code.
-   * @param tb token builder
-   * @param value byte to be added
+   * Returns a hex representation of the specified value.
+   * @param value value
+   * @param length length of hex output
+   * @return hex representation
    */
-  private static void hex(final TokenBuilder tb, final byte value) {
-    tb.add('%');
-    tb.addByte(HEX_TABLE[(value & 0xFF) >> 4]);
-    tb.addByte(HEX_TABLE[value & 0xFF & 15]);
+  public static byte[] hex(final int value, final int length) {
+    final TokenBuilder tb = new TokenBuilder(length);
+    for(int l = length - 1; l >= 0; l--) tb.add(HEX_TABLE[value >> (l << 2) & 0xF]);
+    return tb.finish();
   }
 
   /**

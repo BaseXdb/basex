@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -45,15 +44,6 @@ public final class HofModuleTest extends SandboxTest {
         exists(Int.class),
         empty(func),
         count(Util.className(Arith.class) + "[@op = '+']", 4));
-  }
-
-  /** Test method. */
-  @Test public void sortWith() {
-    final Function func = _HOF_SORT_WITH;
-    query(func.args(" ()", " function($a, $b) { $a < $b }"), "");
-    query(func.args(" 1 to 5", " function($a, $b) { $a > $b }"), "5\n4\n3\n2\n1");
-    error(func.args(" 1 to 5", " <x/>"), INVCONVERT_X_X_X);
-    error(func.args(" 1 to 5", wrap("")), INVCONVERT_X_X_X);
   }
 
   /** Test method. */

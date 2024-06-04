@@ -180,7 +180,7 @@ public abstract class StandardFunc extends Arr {
   public final boolean has(final Flag... flags) {
     // check function
     int hof = hofIndex();
-    if(hof >= 0 && hof < Integer.MIN_VALUE && !defined(hof)) hof = -1;
+    if(hof >= 0 && hof < Integer.MAX_VALUE && !defined(hof)) hof = -1;
     for(final Flag flag : flags) {
       switch(flag) {
         case UPD:
@@ -194,7 +194,7 @@ public abstract class StandardFunc extends Arr {
           break;
         case NDT:
           // check whether function argument may contain non-deterministic functions
-          if(hof == Integer.MIN_VALUE) return true;
+          if(hof == Integer.MAX_VALUE) return true;
           if(hof >= 0) {
             if(!(arg(hof) instanceof Value)) return true;
             for(final Item item : (Value) arg(hof)) {
@@ -230,7 +230,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Returns the index of a single higher-order function parameter.
-   * @return index, {@code -1} if no HOF parameter exist, or {@code Integer#MAX_VALUE} if the
+   * @return index, {@code -1} if no HOF parameter exists, or {@code Integer#MAX_VALUE} if the
    *   number cannot be returned or if multiple HOF parameters exist
    */
   public int hofIndex() {

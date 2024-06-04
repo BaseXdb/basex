@@ -58,4 +58,9 @@ public class FnForEach extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofIndex() {
+    return 1;
+  }
 }

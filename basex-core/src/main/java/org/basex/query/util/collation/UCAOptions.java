@@ -177,10 +177,9 @@ public final class UCAOptions extends CollationOptions {
   }
 
   /**
-   * Returns the boolean value of a yes/no option, or {@code null}, if not recognized and fallback
-   * is allowed.
+   * Returns the boolean value of a yes/no option.
    * @param option option
-   * @return result
+   * @return boolean value, or {@code null} if not recognized and fallback is allowed.
    * @throws BaseXException database exception
    */
   private Boolean yesNo(final StringOption option) throws BaseXException {
