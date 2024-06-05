@@ -14,6 +14,7 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.validate.ErrorInfo.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -87,8 +88,10 @@ abstract class ValidateFn extends StandardFunc {
    */
   protected final FNode report(final QueryContext qc) throws QueryException {
     final ArrayList<ErrorInfo> errors = errors(qc);
+    final Checks<ErrorInfo> warnings = ei -> ei.level == Level.WARNING;
+
     final FBuilder report = FElem.build(Q_REPORT);
-    report.add(FElem.build(Q_STATUS).add(errors.isEmpty() ? VALID : INVALID));
+    report.add(FElem.build(Q_STATUS).add(warnings.all(errors) ? VALID : INVALID));
     for(final ErrorInfo ei : errors) {
       final FBuilder error = FElem.build(Q_MESSAGE).add(Q_LEVEL, ei.level);
       if(ei.line != Integer.MIN_VALUE) error.add(Q_LINE, ei.line);
@@ -118,7 +121,7 @@ abstract class ValidateFn extends StandardFunc {
     } catch(final SAXException ex) {
       // fatal exception: send exceptions to debug output, ignore root exception
       Util.rootException(ex);
-      v.add(ex, Validation.FATAL);
+      v.add(ex, Level.FATAL);
     } catch(final IOException | ParserConfigurationException | Error ex) {
       throw VALIDATE_START_X.get(info, ex);
     } finally {

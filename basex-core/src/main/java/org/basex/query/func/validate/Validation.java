@@ -1,5 +1,7 @@
 package org.basex.query.func.validate;
 
+import org.basex.query.func.validate.ErrorInfo.Level;
+
 import java.io.*;
 import java.util.*;
 
@@ -18,13 +20,6 @@ import org.xml.sax.helpers.*;
  * @author Christian Gruen
  */
 abstract class Validation extends DefaultHandler {
-  /** Fatal error. */
-  static final String FATAL = "Fatal";
-  /** Error. */
-  static final String ERROR = "Error";
-  /** Warning. */
-  static final String WARNING = "Warning";
-
   /** Errors. */
   private final ArrayList<ErrorInfo> errors = new ArrayList<>();
   /** Schema URL. */
@@ -66,17 +61,17 @@ abstract class Validation extends DefaultHandler {
 
   @Override
   public void fatalError(final SAXParseException ex) {
-    add(ex, FATAL);
+    add(ex, Level.FATAL);
   }
 
   @Override
   public void error(final SAXParseException ex) {
-    add(ex, ERROR);
+    add(ex, Level.ERROR);
   }
 
   @Override
   public void warning(final SAXParseException ex) {
-    add(ex, WARNING);
+    add(ex, Level.WARNING);
   }
 
   /**
@@ -84,7 +79,7 @@ abstract class Validation extends DefaultHandler {
    * @param ex exception
    * @param level level
    */
-  void add(final SAXException ex, final String level) {
+  void add(final SAXException ex, final Level level) {
     errors.add(new ErrorInfo(ex, level, schema));
   }
 

@@ -11,10 +11,17 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 final class ErrorInfo {
+  /** Error level. */
+  enum Level {
+    /** Fatal. */ FATAL,
+    /** Error. */ ERROR,
+    /** Warning. */ WARNING,
+  };
+
   /** Message. */
   final String message;
   /** Level. */
-  final String level;
+  final Level level;
   /** URL. */
   String url;
   /** Line number. */
@@ -28,7 +35,7 @@ final class ErrorInfo {
    * @param level type
    * @param schema schema url
    */
-  ErrorInfo(final SAXException ex, final String level, final IO schema) {
+  ErrorInfo(final SAXException ex, final Level level, final IO schema) {
     this.level = level;
 
     String m = ex.getMessage();
