@@ -408,21 +408,15 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws QueryIOException query I/O exception
    */
   private QNmSet cdata() throws QueryIOException {
-    QNmSet list = cdata;
-    if(list == null) {
-      list = new QNmSet();
+    if(cdata == null) {
+      cdata = new QNmSet();
       final boolean html = this instanceof HTMLSerializer;
-      final String cdse = sopts.get(CDATA_SECTION_ELEMENTS);
-      for(final byte[] name : split(normalize(token(cdse)), ' ')) {
-        if(name.length == 0) continue;
-        final QNm qnm = resolve(name);
-        if(!html || contains(name, ':') && (!html5 || !string(name).contains("html:"))) {
-          list.add(qnm);
-        }
+      for(final QNm name : qnames(CDATA_SECTION_ELEMENTS)) {
+        final byte[] uri = name.uri();
+        if(!html || uri.length != 0 && (!html5 || !eq(uri, XHTML_URI))) cdata.add(name);
       }
-      cdata = list;
     }
-    return list;
+    return cdata;
   }
 
   /**
@@ -441,24 +435,19 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws QueryIOException query I/O exception
    */
   boolean suppressIndentation(final QNm qname) throws QueryIOException {
-    if(suppress == null) {
-      suppress = new QNmSet();
-      for(final byte[] name : split(normalize(token(sopts.get(SUPPRESS_INDENTATION))), ' ')) {
-        if(name.length != 0) suppress.add(resolve(name));
-      }
-    }
+    if(suppress == null) suppress = qnames(SUPPRESS_INDENTATION);
     return suppress.contains(qname);
   }
 
   /**
-   * Resolves a QName.
-   * @param name name to be resolved
-   * @return list
+   * Returns the values of an option as QNames.
+   * @param option option to be found
+   * @return set of QNames
    * @throws QueryIOException query I/O exception
    */
-  private QNm resolve(final byte[] name) throws QueryIOException {
+  private QNmSet qnames(final StringOption option) throws QueryIOException {
     try {
-      return QNm.parse(name, sc == null ? null : sc.elemNS, sc, null);
+      return QNm.set(sopts.get(option), sc);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

@@ -389,7 +389,7 @@ public class Options implements Iterable<Option<?>> {
 
     final String nm;
     if(name instanceof QNm) {
-      nm = string(((QNm) name).internal());
+      nm = string(((QNm) name).unique());
     } else if(name.type.isStringOrUntyped()) {
       nm = string(name.string(info));
     } else {
@@ -421,13 +421,13 @@ public class Options implements Iterable<Option<?>> {
         tb.add(string(((Item) val).string(info)).replace(",", ",,"));
       }
     } else if(value instanceof QNm) {
-      tb.add(((QNm) value).internal());
+      tb.add(((QNm) value).unique());
     } else if(value instanceof Item) {
       tb.add(((Item) value).string(info));
     } else {
       for(final Item item : value) {
         if(!tb.isEmpty()) tb.add(' ');
-        tb.add(item.string(info));
+        tb.add(serialize(item, info));
       }
     }
     return tb.toString();

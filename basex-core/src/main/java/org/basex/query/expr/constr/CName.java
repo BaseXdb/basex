@@ -137,7 +137,7 @@ abstract class CName extends CNode {
   @Override
   public final void toString(final QueryString qs, final String kind) {
     qs.token(kind);
-    if(name instanceof QNm) qs.token(((QNm) name).internal());
+    if(name instanceof QNm) qs.token(((QNm) name).unique());
     else qs.brace(name);
     super.toString(qs, null);
   }

@@ -51,7 +51,7 @@ public final class FnPath extends ContextFn {
 
       final QNm qname = node.qname();
       if(type == NodeType.ATTRIBUTE) {
-        tb.add('@').add(qname.internal());
+        tb.add('@').add(qname.unique());
       } else if(type == NodeType.ELEMENT) {
         tb.add(qname.eqName()).add('[').addInt(element(node, qname, qc)).add(']');
       } else if(type == NodeType.PROCESSING_INSTRUCTION) {

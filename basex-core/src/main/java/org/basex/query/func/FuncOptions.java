@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.normalize;
 
 import org.basex.core.*;
 import org.basex.io.serial.*;
@@ -162,17 +161,13 @@ public final class FuncOptions {
     if(!Strings.contains(value, ':')) return value;
 
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte[] name : split(normalize(token(value)), ' ')) {
+    for(final byte[] name : distinctTokens(token(value))) {
       final int i = indexOf(name, ':');
       if(i == -1) {
         tb.add(name);
       } else {
-        final byte[] vl = elem.nsScope(null).value(substring(name, 0, i));
-        if(vl != null) {
-          tb.add(QNm.eqName(vl, substring(name, i + 1)));
-        } else {
-          tb.add(name);
-        }
+        final byte[] uri = elem.nsScope(null).value(substring(name, 0, i));
+        tb.add(uri != null ? QNm.eqName(uri, substring(name, i + 1)) : name);
       }
       tb.add(' ');
     }

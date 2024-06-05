@@ -173,7 +173,7 @@ public final class StaticContext {
    */
   public synchronized DecFormatter decFormat(final QNm name, final InputInfo info)
       throws QueryException {
-    final byte[] id = name.internal();
+    final byte[] id = name.unique();
     DecFormatter df = decFormats.get(id);
     if(df == null) {
       // lazy instantiation of default decimal format

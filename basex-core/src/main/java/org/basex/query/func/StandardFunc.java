@@ -614,7 +614,7 @@ public abstract class StandardFunc extends Arr {
     final Item item = expr.item(qc, info);
     final XQMap map = item.isEmpty() ? XQMap.empty() : toMap(item);
     map.apply((key, value) -> {
-      final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key).internal();
+      final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key).unique();
       hm.put(string(k), value);
     });
     return hm;

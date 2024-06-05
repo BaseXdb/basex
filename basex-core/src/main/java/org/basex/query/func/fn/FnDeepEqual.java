@@ -29,6 +29,7 @@ public final class FnDeepEqual extends StandardFunc {
     } else {
       deo.set(DeepEqualOptions.COLLATION, toStringOrNull(options, qc));
     }
+
     final String collation = deo.get(DeepEqualOptions.COLLATION);
     final Collation coll = collation != null ? toCollation(Token.token(collation), qc) : null;
 

@@ -125,7 +125,7 @@ public final class StaticVar extends StaticDecl {
    * @return identifier
    */
   public byte[] id() {
-    return Token.concat(Token.DOLLAR, name.internal());
+    return Token.concat(Token.DOLLAR, name.unique());
   }
 
   /**

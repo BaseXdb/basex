@@ -13,6 +13,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -228,7 +229,7 @@ public final class QNm extends Item {
    * </ul>
    * @return QName as token
    */
-  public byte[] internal() {
+  public byte[] unique() {
     return uri == null ? name : internal(null, local(), uri);
   }
 
@@ -253,7 +254,7 @@ public final class QNm extends Item {
    * <ul>
    *   <li> Skips the prefix if the namespace of the QName equals the specified one.</li>
    *   <li> Returns a prefixed name if the namespace URI is statically known.</li>
-   *   <li> Otherwise, {@link #internal()} is called.</li>
+   *   <li> Otherwise, {@link #unique()} is called.</li>
    * </ul>
    * @param ns default uri (can be {@code null})
    * @return QName as token
@@ -262,7 +263,7 @@ public final class QNm extends Item {
     final byte[] u = uri();
     if(ns != null && Token.eq(u, ns)) return local();
     final byte[] p = NSGlobal.prefix(u);
-    return p.length != 0 ? concat(p, COLON, local()) : internal();
+    return p.length != 0 ? concat(p, COLON, local()) : unique();
   }
 
   /**
@@ -280,7 +281,7 @@ public final class QNm extends Item {
 
   @Override
   public int hash() {
-    return Token.hash(internal());
+    return Token.hash(unique());
   }
 
   @Override
@@ -298,10 +299,25 @@ public final class QNm extends Item {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(internal());
+    qs.token(unique());
   }
 
   // STATIC METHODS ===============================================================================
+
+  /**
+   * Returns the requested value as set of QNames.
+   * @param value value to be parsed
+   * @param sc static context (can be {@code null})
+   * @return set with QNames
+   * @throws QueryException query exception
+   */
+  public static QNmSet set(final String value, final StaticContext sc) throws QueryException {
+    final QNmSet set = new QNmSet();
+    for(final byte[] name : distinctTokens(token(value))) {
+      if(name.length != 0) set.add(parse(name, sc == null ? null : sc.elemNS, sc, null));
+    }
+    return set;
+  }
 
   /**
    * Converts a value to a QName.

@@ -183,7 +183,7 @@ public enum Annotation {
 
   static {
     for(final Annotation value : VALUES) {
-      MAP.put(new QNm(value.local(), value.uri).internal(), value);
+      MAP.put(new QNm(value.local(), value.uri).unique(), value);
     }
   }
 
@@ -218,7 +218,7 @@ public enum Annotation {
    * @return annotation or {@code null}
    */
   public static Annotation get(final QNm name) {
-    return MAP.get(name.internal());
+    return MAP.get(name.unique());
   }
 
   /**
