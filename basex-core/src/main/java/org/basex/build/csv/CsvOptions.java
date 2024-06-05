@@ -38,7 +38,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 
@@ -63,7 +63,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 

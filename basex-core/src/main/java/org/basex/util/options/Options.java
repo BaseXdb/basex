@@ -40,7 +40,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 
@@ -52,7 +52,7 @@ public class Options implements Iterable<Option<?>> {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 

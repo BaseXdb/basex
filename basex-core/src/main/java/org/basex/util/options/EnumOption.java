@@ -78,10 +78,10 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
 
   /**
    * Helper function for converting enumeration names to strings.
-   * @param name name
+   * @param en enumeration
    * @return lower-case string with '-' replaced by '-';
    */
-  public static String string(final String name) {
-    return name.toLowerCase(Locale.ENGLISH).replace('_', '-');
+  public static String string(final Enum<?> en) {
+    return en.name().toLowerCase(Locale.ENGLISH).replace('_', '-');
   }
 }

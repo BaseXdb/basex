@@ -87,7 +87,7 @@ public final class DeepEqualOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 

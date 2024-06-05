@@ -38,7 +38,7 @@ public final class JsonParserOptions extends JsonOptions {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 

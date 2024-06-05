@@ -17,6 +17,6 @@ public enum MergeDuplicates {
 
   @Override
   public String toString() {
-    return EnumOption.string(name());
+    return EnumOption.string(this);
   }
 }
