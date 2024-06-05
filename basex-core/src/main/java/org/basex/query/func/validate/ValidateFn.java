@@ -112,20 +112,19 @@ abstract class ValidateFn extends StandardFunc {
    * @return errors
    * @throws QueryException query exception
    */
-  protected final ArrayList<ErrorInfo> process(final Validation v) throws QueryException {
-    final ValidationHandler handler = new ValidationHandler();
+  protected final ArrayList<ErrorInfo> validate(final Validation v) throws QueryException {
     try {
-      v.process(handler);
+      v.validate();
     } catch(final SAXException ex) {
       // fatal exception: send exceptions to debug output, ignore root exception
       Util.rootException(ex);
-      handler.add(ex, ValidationHandler.FATAL);
+      v.add(ex, Validation.FATAL);
     } catch(final IOException | ParserConfigurationException | Error ex) {
       throw VALIDATE_START_X.get(info, ex);
     } finally {
       v.finish();
     }
-    return handler.getErrors();
+    return v.getErrors();
   }
 
   /**

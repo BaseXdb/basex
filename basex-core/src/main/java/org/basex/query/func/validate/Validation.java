@@ -1,6 +1,7 @@
 package org.basex.query.func.validate;
 
 import java.io.*;
+import java.util.*;
 
 import javax.xml.parsers.*;
 
@@ -8,6 +9,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 /**
  * Abstract validator class.
@@ -15,35 +17,41 @@ import org.xml.sax.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-abstract class Validation {
-  /** Temporary schema instance. */
+abstract class Validation extends DefaultHandler {
+  /** Fatal error. */
+  static final String FATAL = "Fatal";
+  /** Error. */
+  static final String ERROR = "Error";
+  /** Warning. */
+  static final String WARNING = "Warning";
+
+  /** Errors. */
+  private final ArrayList<ErrorInfo> errors = new ArrayList<>();
+  /** Schema URL. */
   private IOFile schema;
 
   /**
    * Starts the validation.
-   * @param handler error handler
    * @throws IOException I/O exception
    * @throws ParserConfigurationException parser configuration exception
    * @throws SAXException SAX exception
    * @throws QueryException query exception
    */
-  abstract void process(ValidationHandler handler)
-      throws IOException, ParserConfigurationException, SAXException, QueryException;
+  abstract void validate() throws IOException, ParserConfigurationException, SAXException,
+    QueryException;
 
   /**
    * Prepares validation. Creates a temporary file from the specified IO reference if it is
    * main-memory content or a streaming reference.
    * @param in schema file
-   * @param handler error handler
    * @return resulting file
    * @throws IOException I/O exception
    */
-  final IO prepare(final IO in, final ValidationHandler handler) throws IOException {
+  final IO prepare(final IO in) throws IOException {
     if(in instanceof IOContent || in instanceof IOStream) {
       // cache main-memory content or stream to file
       schema = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
       schema.write(in.read());
-      handler.schema(schema);
       return schema;
     }
     return in;
@@ -54,5 +62,37 @@ abstract class Validation {
    */
   final void finish() {
     if(schema != null) schema.delete();
+  }
+
+  @Override
+  public void fatalError(final SAXParseException ex) {
+    add(ex, FATAL);
+  }
+
+  @Override
+  public void error(final SAXParseException ex) {
+    add(ex, ERROR);
+  }
+
+  @Override
+  public void warning(final SAXParseException ex) {
+    add(ex, WARNING);
+  }
+
+  /**
+   * Adds a new error info.
+   * @param ex exception
+   * @param level level
+   */
+  void add(final SAXException ex, final String level) {
+    errors.add(new ErrorInfo(ex, level, schema));
+  }
+
+  /**
+   * Returns the errors.
+   * @return errors
+   */
+  ArrayList<ErrorInfo> getErrors() {
+    return errors;
   }
 }

@@ -27,9 +27,9 @@ public class ValidateRng extends ValidateFn {
 
   @Override
   public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
-    return process(new Validation() {
+    return validate(new Validation() {
       @Override
-      void process(final ValidationHandler handler) throws IOException, QueryException {
+      void validate() throws IOException, QueryException {
         final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
         final Item schema = toNodeOrAtomItem(arg(1), false, qc);
         final boolean compact = toBooleanOrFalse(arg(2), qc);
@@ -43,7 +43,7 @@ public class ValidateRng extends ValidateFn {
           if(!compact || ex.error() != WHICHRES_X) throw ex;
           schm = new IOContent(schema.string(info));
         }
-        schm = prepare(schm, handler);
+        schm = prepare(schm);
 
         try {
           /*
@@ -74,7 +74,7 @@ public class ValidateRng extends ValidateFn {
 
           // assign error handler
           final Object pmb = pmbClass.getConstructor().newInstance();
-          pmbPut.invoke(pmb, vpClass.getField("ERROR_HANDLER").get(null), handler);
+          pmbPut.invoke(pmb, vpClass.getField("ERROR_HANDLER").get(null), this);
 
           // enable ID/IDREF checks
           final Object present = flClass.getField("PRESENT").get(null);

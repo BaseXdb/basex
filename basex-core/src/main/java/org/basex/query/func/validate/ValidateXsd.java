@@ -60,16 +60,14 @@ public class ValidateXsd extends ValidateFn {
 
   @Override
   public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
-    return process(new Validation() {
+    return validate(new Validation() {
       @Override
-      void process(final ValidationHandler handler) throws IOException, SAXException,
-          QueryException {
-
+      void validate() throws IOException, SAXException, QueryException {
         final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
         final Item schema = toNodeOrAtomItem(arg(1), true, qc);
         final HashMap<String, String> options = toOptions(arg(2), qc);
 
-        final String url = schema == null ? "" : prepare(read(schema, null), handler).url();
+        final String url = schema == null ? "" : prepare(read(schema, null)).url();
         final String caching = options.remove("cache");
         final boolean cache = caching != null && Strings.toBoolean(caching);
 
@@ -90,6 +88,7 @@ public class ValidateXsd extends ValidateFn {
             // Saxon: use version 1.1
             if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
           }
+          sf.setErrorHandler(this);
 
           final LSResourceResolver ls = Resolver.resources(qc.context.options);
           if(ls != null) sf.setResourceResolver(ls);
@@ -104,7 +103,7 @@ public class ValidateXsd extends ValidateFn {
         }
 
         final Validator v = s.newValidator();
-        v.setErrorHandler(handler);
+        v.setErrorHandler(this);
         v.validate(input instanceof IOContent || input instanceof IOStream ?
             new StreamSource(input.inputStream()) : new StreamSource(input.url()));
       }

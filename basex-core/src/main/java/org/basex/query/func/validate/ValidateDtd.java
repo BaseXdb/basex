@@ -26,9 +26,9 @@ public class ValidateDtd extends ValidateFn {
 
   @Override
   public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
-    return process(new Validation() {
+    return validate(new Validation() {
       @Override
-      void process(final ValidationHandler handler)
+      void validate()
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
         final Item input = toNodeOrAtomItem(arg(0), false, qc);
@@ -39,13 +39,13 @@ public class ValidateDtd extends ValidateFn {
         SerializerOptions sp = null;
         if(schm != null) {
           sp = new SerializerOptions();
-          sp.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(schm, handler).url());
+          sp.set(SerializerOptions.DOCTYPE_SYSTEM, prepare(schm).url());
         }
 
         final IO in = read(input, sp);
         final SAXParserFactory sf = SAXParserFactory.newInstance();
         sf.setValidating(true);
-        sf.newSAXParser().parse(in.inputSource(), handler);
+        sf.newSAXParser().parse(in.inputSource(), this);
       }
     });
   }
