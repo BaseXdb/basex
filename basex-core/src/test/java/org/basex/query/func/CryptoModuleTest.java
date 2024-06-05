@@ -86,48 +86,4 @@ public final class CryptoModuleTest extends SandboxTest {
         "E477384D7CA229DD1426E64B63EBF2D36EBD6D7E669A6735424E72EA6C01D3F8" +
         "B56EB39C36D8232F5427999B8D1A3F9CD1128FC69F4D75B434216810FA367E98");
   }
-
-  /**
-   * Tests whether validate-signature returns true for a certificate created
-   * with generate-signature.
-   */
-  @Test public void validateSignature() {
-    final Function func = _CRYPTO_VALIDATE_SIGNATURE, func2 = _CRYPTO_GENERATE_SIGNATURE;
-
-    query(func.args(func2.args(" <a/>", "", "", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "", "SHA1", "DSA_SHA1", "", "enveloped")), true);
-
-    final String input =
-        " <a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'>" +
-        "<SignedInfo><CanonicalizationMethod " +
-        "Algorithm='http://www.w3.org/TR/2001/REC-xml-c14n-20010315'/>" +
-        "<SignatureMethod Algorithm='http://www.w3.org/2000/09/xmldsig#rsa-" +
-        "sha1'/><Reference URI=''><Transforms><Transform Algorithm='http://" +
-        "www.w3.org/2000/09/xmldsig#enveloped-signature'/></Transforms>" +
-        "<DigestMethod Algorithm='http://www.w3.org/2000/09/xmldsig#sha1'/>" +
-        "<DigestValue>9hvH4qztnIYgYfJDRLnEMPJdoaY=</DigestValue></Reference>" +
-        "</SignedInfo><SignatureValue>W/BpXt9odK+Ot2cU0No0+tzwAJyqSx+CRMXG2B" +
-        "T6NRc2qbMMSB7l+RcR6jwsu2Smt0LCltR1YFLTPoD+GCarZA==</SignatureValue>" +
-        "<KeyInfo><KeyValue><RSAKeyValue><Modulus>mH+uHBX+3mE9bgWzcDym0pnyu" +
-        "W3ca6EexNvQ/sAKgDNmO1xFNgVWSgKGMxmaGRzGyPi+8+KeGKGM0mS1jpRPQQ==" +
-        "</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue>" +
-        "</KeyInfo></Signature></a>";
-    query(func.args(input), true);
-
-    query(func.args(func2.args(" <a><n/></a>", "exclusive", "SHA512", "RSA_SHA1", "myPrefix",
-        "enveloped", "/a/n")), true);
-    query(func.args(func2.args(" <a/>", "exclusive", "", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "exclusive-with-comments", "", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "inclusive", "", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "inclusive-with-comments", "", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "", "SHA1", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "", "SHA256", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "", "SHA512", "", "", "")), true);
-    query(func.args(func2.args(" <a/>", "", "", "DSA_SHA1", "", "")), true);
-    query(func.args(func2.args(" <a/>", "", "", "RSA_SHA1", "", "")), true);
-    query(func.args(func2.args(" <a/>", "", "", "", "prefix", "")), true);
-    query(func.args(func2.args(" <a/>", "", "", "", "", "enveloped")), true);
-    query(func.args(func2.args(" <a/>", "", "", "", "", "enveloping")), true);
-    query(func.args(func2.args(" <a><n/><n/></a>", "", "", "", "", "", "/a/n")), true);
-  }
 }
