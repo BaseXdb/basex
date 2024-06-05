@@ -8,6 +8,7 @@ import java.util.Map.*;
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -75,10 +76,20 @@ public class ValidateXsd extends ValidateFn {
         Schema s = cache ? MAP.get(url) : null;
         if(s == null) {
           // create schema factory and set version
-          final SchemaFactory sf = JAVA ? SchemaFactory.newInstance(FACTORY) :
-            (SchemaFactory) Reflect.get(Reflect.find(IMPL[OFFSET]));
-          // Saxon: use version 1.1
-          if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
+          final SchemaFactory sf;
+          if(JAVA) {
+            sf = SchemaFactory.newInstance(FACTORY);
+          } else {
+            final Class<?> clz = Reflect.find(IMPL[OFFSET]);
+            // catch Saxon errors (e.g. NoClassDefFoundError: org/xmlresolver/Resolver)
+            try {
+              sf = (SchemaFactory) clz.getDeclaredConstructor().newInstance();
+            } catch(final Exception ex) {
+              throw new BaseXException(ex);
+            }
+            // Saxon: use version 1.1
+            if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
+          }
 
           final LSResourceResolver ls = Resolver.resources(qc.context.options);
           if(ls != null) sf.setResourceResolver(ls);

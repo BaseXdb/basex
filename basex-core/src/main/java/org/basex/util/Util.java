@@ -160,27 +160,31 @@ public final class Util {
 
   /**
    * Returns a more user-friendly error message for the specified exception.
-   * @param throwable throwable reference
+   * @param th throwable reference
    * @return error message
    */
-  public static String message(final Throwable throwable) {
-    debug(throwable);
-    if(throwable instanceof BindException) return SRV_RUNNING;
-    if(throwable instanceof ConnectException) return CONNECTION_ERROR;
-    if(throwable instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
-    if(throwable instanceof SocketException) return CONNECTION_ERROR;
+  public static String message(final Throwable th) {
+    debug(th);
+    if(th instanceof BindException) return SRV_RUNNING;
+    if(th instanceof ConnectException) return CONNECTION_ERROR;
+    if(th instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
+    if(th instanceof SocketException) return CONNECTION_ERROR;
 
-    String msg = throwable.getMessage();
-    if(throwable instanceof JobException) return msg;
-    if(msg == null || msg.isEmpty() || throwable instanceof RuntimeException)
-      msg = throwable.toString();
-    if(throwable instanceof FileNotFoundException ||
-        throwable instanceof NoSuchFileException) return info(RES_NOT_FOUND_X, msg);
-    if(throwable instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
-    if(throwable instanceof SSLException) return "SSL: " + msg;
+    String msg = th.getMessage();
+    if(th instanceof JobException) return msg;
+    if(msg == null || msg.isEmpty() || th instanceof RuntimeException || th instanceof Error) {
+      msg = th.toString();
+    }
+    if(th instanceof ReflectiveOperationException) {
+      if(th.getCause() != null) msg += "; " + th.getCause();
+    }
+    if(th instanceof FileNotFoundException || th instanceof NoSuchFileException)
+      return info(RES_NOT_FOUND_X, msg);
+    if(th instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
+    if(th instanceof SSLException) return "SSL: " + msg;
 
     // chop long error messages. // example: doc("http://google.com/sdffds")
-    if(throwable.getClass() == IOException.class && msg.length() > 200) {
+    if(th.getClass() == IOException.class && msg.length() > 200) {
       msg = msg.substring(0, 200) + DOTS;
     }
     return msg;
