@@ -2,6 +2,7 @@ package org.basex.query.func.validate;
 
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 import org.xml.sax.*;
 
 /**
@@ -15,7 +16,12 @@ final class ErrorInfo {
   enum Level {
     /** Fatal. */ FATAL,
     /** Error. */ ERROR,
-    /** Warning. */ WARNING,
+    /** Warning. */ WARNING;
+
+    @Override
+    public String toString() {
+      return Strings.capitalize(EnumOption.string(this));
+    }
   };
 
   /** Message. */
