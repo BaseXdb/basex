@@ -1,3 +1,22 @@
+VERSION 11.0 (June 6, 2024) --------------------------------------------
+
+ STORAGE
+ - Key/value Store: Better compactification when storing values
+ - CSV/JSON/XML parsing: reduced memory consumption
+
+ XQUERY
+ - First release with new 4.0 features
+ - Numerous new built-in functions (standard, maps, arrays, math)
+ - Updates: Multiple targets in rename/replace/insert expressions
+ - New custom functions: archive:refresh, validate:xsd-init, xslt:init
+ - Full support for Invisible XML.
+
+ GENERAL
+ - GUI: Full Unicode character support
+ - Web Server: Upgrade to Jetty 11
+ - Command-Line: New options -C, -Q, -W
+ - Options: WRITESTORE, writes store to disk at shutdown time
+
 VERSION 10.7 (August 4, 2023) ------------------------------------------
 
  - GUI, Editor: Full support for Unicode characters
