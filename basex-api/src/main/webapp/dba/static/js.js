@@ -341,13 +341,14 @@ function loadCodeMirror(language, edit, resize) {
   if(resize) {
     var refresh = () => {
       var size = window.innerHeight - document.getElementById("footer").offsetTop - 32;
+      var height = elem => Math.max(192, size + elem.offsetHeight);
       if (useCM) {
         for(var elem of document.getElementsByClassName("CodeMirror")) {
-          elem.CodeMirror.setSize("100%", Math.max(100, size + elem.offsetHeight));
+          elem.CodeMirror.setSize("100%", height(elem));
         }
       } else {
         for(var elem of document.getElementsByTagName("textarea")) {
-          elem.style.height = Math.max(100, size + elem.offsetHeight) + "px"; 
+          elem.style.height = height(elem) + "px"; 
         }
       }
     };
