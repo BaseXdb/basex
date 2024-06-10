@@ -270,24 +270,23 @@ public abstract class XQArray extends XQData {
   @Override
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return getInternal(key(args[0], qc, ii), ii, true);
+    return getInternal(key(args[0], qc, ii), qc, ii, true);
   }
 
   /**
    * Gets the internal map value.
    * @param key key to look for
+   * @param qc query context
    * @param ii input info (can be {@code null})
    * @param error if {@code true}, raise error if index is out of bounds
    * @return value or {@code null}
    * @throws QueryException query exception
    */
-  public Value getInternal(final Item key, final InputInfo ii, final boolean error)
-      throws QueryException {
-    final Type tp = key.type;
-    if(!tp.instanceOf(AtomType.INTEGER) && !tp.isUntyped())
-      throw typeError(key, AtomType.INTEGER, ii);
+  public Value getInternal(final Item key, final QueryContext qc, final InputInfo ii,
+      final boolean error) throws QueryException {
+    final Item ki = (Item) SeqType.INTEGER_O.coerce(key, null, qc, null, ii);
 
-    final long pos = key.itr(ii), size = arraySize();
+    final long pos = ki.itr(ii), size = arraySize();
     if(pos > 0 && pos <= size) return get(pos - 1);
 
     if(error) throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
