@@ -76,8 +76,7 @@ public abstract class FItem extends Item implements XQFunction {
     if(nargs < arity) throw arityError(this, arity, nargs, false, info);
 
     // optimize: continue with coercion if current type is only an instance of new type
-    FuncType tp = funcType();
-    if(cc != null ? tp.eq(ft) : tp.instanceOf(ft)) return this;
+    if(type instanceof FuncType && (cc != null ? type.eq(ft) : type.instanceOf(ft))) return this;
 
     // create new compilation context and variable scope
     final VarScope vs = new VarScope();
@@ -100,6 +99,7 @@ public abstract class FItem extends Item implements XQFunction {
 
       // add type check if return types differ
       final SeqType dt = ft.declType;
+      FuncType tp = funcType();
       if(!tp.declType.instanceOf(dt)) {
         body = new TypeCheck(info, body, dt, true);
         if(cc != null) body = body.optimize(cc);
