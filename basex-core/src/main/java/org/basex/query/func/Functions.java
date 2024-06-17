@@ -475,7 +475,7 @@ public final class Functions {
     final int nonKwPh = p;
     for(int a = posArgs; a < fb.arity; ++a) {
       if(PartFunc.placeholder(exprs[a])) {
-        QNm name = names[a];
+        final QNm name = names[a];
         int i = nonKwPh;
         for(final QNm qnm : fb.keywords) {
           if(qnm.eq(name)) break;
