@@ -1971,9 +1971,9 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>/(a | *)", "", type(IterStep.class, "element()*"));
     check("<a/>/(a | * | b)", "", type(IterStep.class, "element()*"));
 
-    check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
-    check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
-    check("count((<a/> | <b/>, <b/> | <a/>))", 4, type(List.class, "element(a)|element(b)+"));
+    check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
+    check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
+    check("count((<a/> | <b/>, <b/> | <a/>))", 4, type(List.class, "(element(a)|element(b))+"));
   }
 
   /** Push type checks into expressions. */

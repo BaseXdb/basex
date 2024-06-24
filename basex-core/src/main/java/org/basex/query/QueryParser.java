@@ -3065,28 +3065,29 @@ public class QueryParser extends InputParser {
    */
   private SeqType castTarget() throws QueryException {
     Type type;
-    EnumValues values = null;
     if(wsConsume("(")) {
       type = choiceItemType();
       if(type.atomic() == null) throw error(INVALIDCAST_X, type);
     } else {
       final QNm name = eQName(sc.elemNS, TYPEINVALID);
-      type = ListType.find(name);
-      if(type == null) {
-        type = AtomType.find(name, false);
-        if(consume("(")) {
-          if(type != AtomType.ENUM) throw error(SIMPLETYPE_X, name.prefixId(XML));
-          values = enumerationType();
+      if(!name.hasURI() && eq(name.local(), token("enum"))) {
+        if(!wsConsume("(")) throw error(WHICHCAST_X, AtomType.similar(name));
+        type = enumerationType();
+      } else {
+        type = ListType.find(name);
+        if(type == null) {
+          type = AtomType.find(name, false);
+          if(consume("(")) throw error(SIMPLETYPE_X, name.prefixId(XML));
+          if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
+            type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
+            throw error(INVALIDCAST_X, name.prefixId(XML));
+          if(type == null)
+            throw error(WHICHCAST_X, AtomType.similar(name));
         }
-        if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
-          type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
-          throw error(INVALIDCAST_X, name.prefixId(XML));
-        if(type == null)
-          throw error(WHICHCAST_X, AtomType.similar(name));
       }
     }
     skipWs();
-    return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE, values);
+    return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
   }
 
   /**
@@ -3126,38 +3127,38 @@ public class QueryParser extends InputParser {
     // parse annotations and type name
     final AnnList anns = annotations(false).check(false, false);
     skipWs();
-    final QNm name = eQName(null, TYPEINVALID);
-
-    // parse type
     SeqType st = null;
     Type type;
-    if(wsConsume("(")) {
-      // function type
-      type = FuncType.find(name);
-      if(type != null) return functionTest(anns, type).seqType();
-      // node type
-      type = NodeType.find(name);
-      if(type != null) {
-        // extended node type
-        if(!wsConsume(")")) st = SeqType.get(type, Occ.EXACTLY_ONE, kindTest((NodeType) type));
-      } else if(name.eq(AtomType.ITEM.qname())) {
-        // item type
-        type = AtomType.ITEM;
-        wsCheck(")");
-      } else if(name.eq(AtomType.ENUM.qname())) {
-        // enum type
-        type = AtomType.ENUM;
-        st = SeqType.get(type, Occ.EXACTLY_ONE, enumerationType());
-      }
-      // no type found
-      if(type == null) throw error(WHICHTYPE_X, Type.similar(name));
+    final QNm name = eQName(null, TYPEINVALID);
+    if(!name.hasURI() && eq(name.local(), token("enum"))) {
+      if(!wsConsume("(")) throw error(WHICHCAST_X, AtomType.similar(name));
+      type = enumerationType();
     } else {
-      // attach default element namespace
-      if(!name.hasURI()) name.uri(sc.elemNS);
-      // atomic type
-      type = AtomType.find(name, false);
-      // no type found
-      if(type == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
+      // parse type
+      if(wsConsume("(")) {
+        // function type
+        type = FuncType.find(name);
+        if(type != null) return functionTest(anns, type).seqType();
+        // node type
+        type = NodeType.find(name);
+        if(type != null) {
+          // extended node type
+          if(!wsConsume(")")) st = SeqType.get(type, Occ.EXACTLY_ONE, kindTest((NodeType) type));
+        } else if(name.eq(AtomType.ITEM.qname())) {
+          // item type
+          type = AtomType.ITEM;
+          wsCheck(")");
+        }
+        // no type found
+        if(type == null) throw error(WHICHTYPE_X, Type.similar(name));
+      } else {
+        // attach default element namespace
+        if(!name.hasURI()) name.uri(sc.elemNS);
+        // atomic type
+        type = AtomType.find(name, false);
+        // no type found
+        if(type == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
+      }
     }
     // annotations are not allowed for remaining types
     if(!anns.isEmpty()) throw error(NOANN);
@@ -3303,13 +3304,13 @@ public class QueryParser extends InputParser {
    * @return enum values
    * @throws QueryException query exception
    */
-  private EnumValues enumerationType() throws QueryException {
+  private EnumType enumerationType() throws QueryException {
     final TokenSet values = new TokenSet();
     do {
       values.add(stringLiteral());
     } while(wsConsume(","));
     check(')');
-    return new EnumValues(values);
+    return new EnumType(values);
   }
 
   /**
@@ -3318,11 +3319,24 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Type choiceItemType() throws QueryException {
-    final ArrayList<SeqType> types = new ArrayList<>();
+    final ArrayList<SeqType> types = new ArrayList<>() {
+      @Override
+      public boolean add(final SeqType st) {
+        // collect alternative item type, combining consecutive EnumTypes into a single instance
+        if(!(st.type instanceof EnumType) || isEmpty()) return super.add(st);
+        int i = size() - 1;
+        Type tp = get(i).type;
+        if(!(tp instanceof EnumType)) return super.add(st);
+        set(i, tp.union(st.type).seqType());
+        return true;
+      };
+    };
+
     do {
       final SeqType st = itemType();
-      if(st.type instanceof ChoiceItemType) types.addAll(((ChoiceItemType) st.type).alts);
-      else types.add(st);
+      // collect alternative item type, combining nested ChoiceItemTypes into a single instance
+      if(!(st.type instanceof ChoiceItemType)) types.add(st);
+      else for(SeqType alt : ((ChoiceItemType) st.type).alts) types.add(alt);
     } while(wsConsume("|"));
     check(')');
     return types.size() == 1 ? types.get(0).type : new ChoiceItemType(types);
