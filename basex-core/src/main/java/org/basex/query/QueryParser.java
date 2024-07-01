@@ -92,7 +92,7 @@ public class QueryParser extends InputParser {
   /** Temporary token cache. */
   private final TokenBuilder token = new TokenBuilder();
   /** Current XQDoc string. */
-  private final StringBuilder docBuilder = new StringBuilder();
+  private final TokenBuilder docBuilder = new TokenBuilder();
 
   /** XQDoc string of module. */
   private String moduleDoc = "";
@@ -351,7 +351,7 @@ public class QueryParser extends InputParser {
       } else {
         return;
       }
-      docBuilder.setLength(0);
+      docBuilder.reset();
       skipWs();
       check(';');
     }
@@ -387,7 +387,7 @@ public class QueryParser extends InputParser {
           break;
         }
       }
-      docBuilder.setLength(0);
+      docBuilder.reset();
       skipWs();
       check(';');
     }
@@ -4161,7 +4161,7 @@ public class QueryParser extends InputParser {
     ++pos;
     final boolean xqdoc = next() == '~';
     if(xqdoc) {
-      docBuilder.setLength(0);
+      docBuilder.reset();
       ++pos;
     }
     comment(false, xqdoc);
@@ -4185,11 +4185,11 @@ public class QueryParser extends InputParser {
         pos += 2;
         if(!nested && moduleDoc.isEmpty()) {
           moduleDoc = docBuilder.toString().trim();
-          docBuilder.setLength(0);
+          docBuilder.reset();
         }
         return;
       }
-      if(xqdoc) docBuilder.append(curr);
+      if(xqdoc) docBuilder.add(curr);
     }
     throw error(COMCLOSE);
   }
