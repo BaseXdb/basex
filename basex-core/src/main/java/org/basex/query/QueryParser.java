@@ -2048,8 +2048,12 @@ public class QueryParser extends InputParser {
       checkTest(test, true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
-      test = nodeTest(NodeType.ATTRIBUTE, true);
-      checkTest(test, false);
+      if(wsConsume("(")) {
+        test = unionNodeTest(false);
+      } else {
+        test = simpleNodeTest(NodeType.ATTRIBUTE, true);
+        checkTest(test, false);
+      }
       if(test == null) {
         --pos;
         throw error(NOATTNAME);
@@ -2062,8 +2066,12 @@ public class QueryParser extends InputParser {
             alterPos = pos;
             axis = ax;
             final boolean element = ax != Axis.ATTRIBUTE;
-            test = nodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
-            checkTest(test, element);
+            if(consume("(")) {
+              test = unionNodeTest(element);
+            } else {
+              test = simpleNodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
+              checkTest(test, element);
+            }
             if(test == null) throw error(AXISMISS_X, axis);
             break;
           }
@@ -2073,7 +2081,7 @@ public class QueryParser extends InputParser {
 
       if(axis == null) {
         axis = Axis.CHILD;
-        test = nodeTest(NodeType.ELEMENT, true);
+        test = simpleNodeTest(NodeType.ELEMENT, true);
         if(test == KindTest.NAMESPACE_NODE) throw error(NSAXIS);
         if(test != null && test.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
         checkTest(test, axis != Axis.ATTRIBUTE);
@@ -2095,7 +2103,28 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "NodeTest" rule.
+   * Parses the UnionNodeTest rule rule without the leading parenthesis.
+   * @param element element flag
+   * @return test or {@code null}
+   * @throws QueryException query exception
+   */
+  private Test unionNodeTest(final boolean element) throws QueryException {
+    final NodeType nodeType = element ? NodeType.ELEMENT : NodeType.ATTRIBUTE;
+    final ArrayList<Test> tests = new ArrayList<>();
+    do {
+      skipWs();
+      final Test test = simpleNodeTest(nodeType, true);
+      checkTest(test, element);
+      if(test == null) return null;
+      tests.add(test);
+    } while(wsConsume("|"));
+    if(!consume(')')) throw error(WRONGCHAR_X_X, ')', found());
+    return tests.size() == 1 ? tests.get(0)
+                             : new UnionTest(tests.toArray(Test[]::new));
+  }
+
+  /**
+   * Parses the "SimpleNodeTest" rule.
    * Parses the "NameTest" rule.
    * Parses the "KindTest" rule.
    * @param type node type (either {@link NodeType#ELEMENT} or {@link NodeType#ATTRIBUTE})
@@ -2103,7 +2132,7 @@ public class QueryParser extends InputParser {
    * @return test or {@code null}
    * @throws QueryException query exception
    */
-  private Test nodeTest(final NodeType type, final boolean all) throws QueryException {
+  private Test simpleNodeTest(final NodeType type, final boolean all) throws QueryException {
     int p = pos;
     if(consume('*')) {
       p = pos;
@@ -3371,7 +3400,7 @@ public class QueryParser extends InputParser {
     ArrayList<Test> tests = null;
     do {
       skipWs();
-      final Test test = nodeTest(type, false);
+      final Test test = simpleNodeTest(type, false);
       if(test == null) return null;
       if(tests == null) tests = new ArrayList<>(1);
       tests.add(test);

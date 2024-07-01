@@ -278,4 +278,16 @@ public final class PathTest extends SandboxTest {
     check("let $i := 0 return <a/>/*[position() = 1 to $i]",
         "", empty());
   }
+
+  /** Union node tests. */
+  @Test public void unionNodeTest() {
+    final String el = "<x a='a'><e>e</e>t<!--c--><?p p?></x>";
+    check(el + "/attribute::(document-node()|a|e|text())!string()", "a");
+    check(el + "/@(a|processing-instruction())!string()", "a");
+    check(el + "/attribute::(node()|processing-instruction())!string()", "a");
+    check(el + "/child::(a|e|text())!string()", "e\nt");
+    check(el + "/child::(a|e|processing-instruction())!string()", "e\np");
+    check(el + "/child::(a|e|text()|comment())!string()", "e\nt\nc");
+    check(el + "/descendant-or-self::(text()|*|comment())!string()", "et\ne\ne\nt\nc");
+  }
 }
