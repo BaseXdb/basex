@@ -108,13 +108,27 @@ public final class Functions {
    * @param expr function expression
    * @param fb function arguments
    * @return function call
+   * @throws QueryException query exception
    */
-  public static Expr dynamic(final Expr expr, final FuncBuilder fb) {
-    final Expr[] args = fb.args();
+  public static Expr dynamic(final Expr expr, final FuncBuilder fb) throws QueryException {
+    final Expr[] args;
+    final int[] paramPerm;
     final int ph = fb.placeholders;
-    return ph > 0 ? ph == args.length ? expr :
-      new PartFunc(fb.info, ExprList.concat(args, expr), ph) :
-      new DynFuncCall(fb.info, expr, args);
+
+    if(fb.keywords == null) {
+      args = fb.args();
+      if(ph == 0) return new DynFuncCall(fb.info, expr, args);
+      if(ph == args.length) return expr;
+      paramPerm = null;
+    } else {
+      if(!(expr instanceof Closure)) throw Util.notExpected();
+      final QNm[] names = ((Closure) expr).paramNames();
+      args = prepareArgs(fb, names, expr);
+      if(ph == 0) return new DynFuncCall(fb.info, expr, args);
+      paramPerm = preparePlaceholders(fb, names, args);
+    }
+
+    return new PartFunc(fb.info, ExprList.concat(args, expr), ph, paramPerm);
   }
 
   /**
@@ -434,5 +448,42 @@ public final class Functions {
     }
     checkArity(arity, min, max, false, fb.info, function);
     return args;
+  }
+
+  /**
+   * Calculates the permutation of argument placeholder ordinals, that will map from the order of
+   * placeholders in the target function's argument list to the parameter positions in the parameter
+   * list of a partially evaluated function.
+   * @param fb function arguments
+   * @param names parameter names
+   * @param exprs expressions (arguments with optional placeholders, followed by body)
+   * @return an integer array, where the value at index i indicates the index in the parameter list
+   *         of the partially evaluated function of the i-th placeholder in the (positional) target
+   *         function argument list.
+   */
+  private static int[] preparePlaceholders(final FuncBuilder fb, final QNm[] names,
+      final Expr[] exprs) {
+    final int[] placeholderPerm = new int[fb.placeholders];
+    final int posArgs = fb.arity - fb.keywords.size();
+    int p = 0;
+    for(int a = 0; a < posArgs; ++a) {
+      if(PartFunc.placeholder(exprs[a])) {
+        placeholderPerm[p] = p;
+        ++p;
+      }
+    }
+    final int nonKwPh = p;
+    for(int a = posArgs; a < fb.arity; ++a) {
+      if(PartFunc.placeholder(exprs[a])) {
+        final QNm name = names[a];
+        int i = nonKwPh;
+        for(final QNm qnm : fb.keywords) {
+          if(qnm.eq(name)) break;
+          if(PartFunc.placeholder(fb.keywords.get(qnm))) ++i;
+        }
+        placeholderPerm[p++] = i;
+      }
+    }
+    return placeholderPerm;
   }
 }

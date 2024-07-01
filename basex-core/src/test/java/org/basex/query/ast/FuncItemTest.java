@@ -322,4 +322,12 @@ public final class FuncItemTest extends SandboxTest {
     query("array:fold-right(" + array + ", 1, fn($a, $b) { if($b > 10000000) then $b else $a+$b })",
         10094951);
   }
+
+  /** Checks order of keyword placeholder parameters of partially evaluated function. */
+  @Test public void placeholderOrder() {
+    query("declare function local:f($s as xs:string, $i as xs:integer) {$s, $i}; "
+        + "let $result := local:f(i := ?, s := ?)(4.0, xs:anyURI('XQuery'))"
+        + "return ($result[1] instance of xs:string, $result[2] instance of xs:integer)",
+        "true\ntrue");
+  }
 }

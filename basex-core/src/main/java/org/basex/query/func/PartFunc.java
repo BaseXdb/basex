@@ -25,16 +25,21 @@ import org.basex.util.hash.*;
 public final class PartFunc extends Arr {
   /** Number of placeholders. */
   private final int placeholders;
+  /** Placeholder parameter permutation (can be {@code null}). */
+  private final int[] placeholderPerm;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param exprs expressions (arguments with optional placeholders, followed by body)
    * @param placeholders number of placeholders
+   * @param placeholderPerm placeholder parameter permutation (can be {@code null})
    */
-  public PartFunc(final InputInfo info, final Expr[] exprs, final int placeholders) {
+  public PartFunc(final InputInfo info, final Expr[] exprs, final int placeholders,
+      final int[] placeholderPerm) {
     super(info, SeqType.FUNCTION_O, exprs);
     this.placeholders = placeholders;
+    this.placeholderPerm = placeholderPerm;
   }
 
   /**
@@ -56,8 +61,9 @@ public final class PartFunc extends Arr {
       if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
       final SeqType[] args = new SeqType[placeholders];
-      for(int a = 0, e = 0; e < nargs; e++) {
-        if(placeholder(exprs[e])) args[a++] = ft.argTypes[e];
+      for(int a = 0, e = 0; e < nargs; e++) if(placeholder(exprs[e])) {
+        args[placeholderPerm == null ? a : placeholderPerm[a]] = ft.argTypes[e];
+        ++a;
       }
       exprType.assign(FuncType.get(ft.declType, args).seqType());
     }
@@ -80,11 +86,11 @@ public final class PartFunc extends Arr {
     for(int p = 0, e = 0; e < el; e++) {
       final Expr expr = exprs[e];
       if(placeholder(expr)) {
-        final Var param = vs.addNew(func.paramName(e), null, qc, info);
-        args[e] = new VarRef(info, param);
         final SeqType at = ft.argTypes[e];
-        if(at != null) param.refineType(at, null);
-        params[p++] = param;
+        final Var param = vs.addNew(func.paramName(e), at, qc, info);
+        args[e] = new VarRef(info, param);
+        params[placeholderPerm == null ? p : placeholderPerm[p]] = param;
+        ++p;
       } else {
         args[e] = expr.value(qc);
       }
@@ -104,7 +110,8 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), placeholders));
+    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), placeholders,
+        placeholderPerm == null ? null : placeholderPerm.clone()));
   }
 
   @Override
@@ -117,7 +124,7 @@ public final class PartFunc extends Arr {
    * @param expr expression to be checked
    * @return result of check
    */
-  private static boolean placeholder(final Expr expr) {
+  static boolean placeholder(final Expr expr) {
     return expr == Empty.UNDEFINED;
   }
 
