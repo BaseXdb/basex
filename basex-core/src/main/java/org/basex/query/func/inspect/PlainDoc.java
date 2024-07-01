@@ -138,7 +138,7 @@ final class PlainDoc extends Inspect {
     type(ft.declType, rtrn);
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
     if(returns != null) {
-      for(final byte[] val : returns) add(val, rtrn);
+      for(final byte[] value : returns) add(value, rtrn);
     }
     return function.add(rtrn).finish();
   }

@@ -98,9 +98,9 @@ public abstract class Inspect {
   final void comment(final TokenObjMap<TokenList> tags, final FBuilder parent)
       throws QueryException {
     for(final byte[] tag : tags) {
-      for(final byte[] name : tags.get(tag)) {
+      for(final byte[] value : tags.get(tag)) {
         final FBuilder elem = element(tag);
-        add(name, elem);
+        add(value, elem);
         parent.add(elem);
       }
     }

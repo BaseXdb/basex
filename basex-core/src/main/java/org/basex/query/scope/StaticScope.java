@@ -91,7 +91,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   }
 
   /**
-   * Returns a map with all documentation tags found for this scope or {@code null} if
+   * Returns a map with all documentation tags found for this scope, or {@code null} if
    * no documentation exists. The main description is flagged with the "description" key.
    * The supported tags are defined in {@link Inspect#DOC_TAGS} (other tags will be
    * included in the map, too).
