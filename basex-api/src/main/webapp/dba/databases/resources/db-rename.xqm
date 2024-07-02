@@ -37,7 +37,7 @@ function dba:db-rename(
   $target    as xs:string?,
   $error     as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
+  html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
@@ -45,8 +45,8 @@ function dba:db-rename(
           <input type='hidden' name='resource' value='{ $resource }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }), ' » ',
+            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+            html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
             html:button('db-rename-do', 'Rename')
           }</h2>
           <table>
@@ -89,12 +89,10 @@ function dba:db-rename-do(
       error((), 'Resource already exists.')
     ) else (
       db:rename($name, $resource, $target),
-      utils:redirect($dba:SUB, map {
-        'name': $name, 'resource': $target, 'info': 'Resource was renamed.'
-      })
+      utils:redirect($dba:SUB, { 'name': $name, 'resource': $target, 'info': 'Resource was renamed.' })
     )
   } catch * {
-    utils:redirect('db-rename', map {
+    utils:redirect('db-rename', {
       'name': $name, 'resource': $resource, 'target': $target, 'error': $err:description
     })
   }

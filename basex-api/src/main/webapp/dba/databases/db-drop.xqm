@@ -25,8 +25,8 @@ function dba:dbs-drop(
 ) as empty-sequence() {
   try {
     $names ! db:drop(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'database', 'dropped') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'dropped') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

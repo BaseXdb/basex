@@ -34,14 +34,14 @@ function dba:db-alter(
   $newname  as xs:string?,
   $error    as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
+  html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
           <input type='hidden' name='name' value='{ $name }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
             html:button('db-alter-do', 'Rename')
           }</h2>
           <table>
@@ -82,8 +82,8 @@ function dba:db-alter-do(
     ) else (
       db:alter($name, $newname)
     ),
-    utils:redirect($dba:SUB, map { 'name': $newname, 'info': 'Database was renamed.' })
+    utils:redirect($dba:SUB, { 'name': $newname, 'info': 'Database was renamed.' })
   } catch * {
-    utils:redirect('db-alter', map { 'name': $name, 'newname': $newname, 'error': $err:description })
+    utils:redirect('db-alter', { 'name': $name, 'newname': $newname, 'error': $err:description })
   }
 };

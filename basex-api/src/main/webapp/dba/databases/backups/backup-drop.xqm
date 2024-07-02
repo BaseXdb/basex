@@ -31,11 +31,8 @@ function dba:backup-drop(
   let $target := if($name) then $dba:SUB else $dba:CAT
   return try {
     $backups ! db:drop-backup($name || '-' || .),
-    utils:redirect(
-      $target,
-      map { 'name': $name, 'info': utils:info($backups, 'backup', 'dropped') }
-    )
+    utils:redirect($target, { 'name': $name, 'info': utils:info($backups, 'backup', 'dropped') })
   } catch * {
-    utils:redirect($target, map { 'name': $name, 'error': $err:description })
+    utils:redirect($target, { 'name': $name, 'error': $err:description })
   }
 };

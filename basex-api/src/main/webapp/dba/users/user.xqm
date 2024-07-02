@@ -44,7 +44,7 @@ function dba:user(
 ) as element(html) {
   let $user := user:list-details($name)
   let $admin := $name eq 'admin'
-  return html:wrap(map { 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
+  return html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
@@ -97,7 +97,7 @@ function dba:user(
                 <td>Information:</td>
                 <td>
                   <textarea name='info' id='editor' spellcheck='false'>{
-                    serialize(user:info($name), map { 'indent': true() } )
+                    serialize(user:info($name), { 'indent': true() } )
                   }</textarea>
                 </td>
               </tr>,
@@ -115,10 +115,10 @@ function dba:user(
             <div class='small'/>
             {
               let $headers := (
-                map { 'key': 'pattern', 'label': 'Pattern' },
-                map { 'key': 'permission', 'label': 'Local Permission' }
+                { 'key': 'pattern', 'label': 'Pattern' },
+                { 'key': 'permission', 'label': 'Local Permission' }
               )
-              let $entries := $user/database ! map {
+              let $entries := $user/database ! {
                 'pattern': @pattern,
                 'permission': @permission
               }
@@ -126,7 +126,7 @@ function dba:user(
                 html:button('pattern-add', 'Add…'),
                 html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
               )
-              return html:table($headers, $entries, $buttons, map { }, map { })
+              return html:table($headers, $entries, $buttons)
             }
           </form>
           <div class='note'>

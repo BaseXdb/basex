@@ -31,9 +31,9 @@ function dba:users-info(
     where not(deep-equal(user:info(), $xml))
     return user:update-info($xml),
 
-    utils:redirect($dba:CAT, map { 'info': 'User information was updated.' })
+    utils:redirect($dba:CAT, { 'info': 'User information was updated.' })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };
 
@@ -81,9 +81,9 @@ function dba:user-update(
       where not(deep-equal(user:info($name), $xml))
       return user:update-info($xml, $name)
     ),
-    utils:redirect($dba:CAT, map { 'name': $newname, 'info': 'User was updated.' })
+    utils:redirect($dba:CAT, { 'name': $newname, 'info': 'User was updated.' })
   } catch * {
-    utils:redirect($dba:SUB, map {
+    utils:redirect($dba:SUB, {
       'name': $name, 'newname': $newname, 'pw': $pw, 'perm': $perm, 'error': $err:description
     })
   }

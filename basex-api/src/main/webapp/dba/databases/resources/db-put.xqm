@@ -41,13 +41,13 @@ function dba:db-put(
   $error   as xs:string?
 ) as element(html) {
   let $opts := if($opts = 'x') then $opts else ''
-  return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
+  return html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form method='post' enctype='multipart/form-data' autocomplete='off'>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
             html:button('db-put-do', 'Put')
           }</h2>
           <!-- dummy value; prevents reset of options when nothing is selected -->
@@ -127,11 +127,11 @@ function dba:db-put-do(
         )
       ),
       utils:redirect($dba:SUB,
-        map { 'name': $name, 'path': $path, 'info': 'Resource was added or updated.' }
+        { 'name': $name, 'path': $path, 'info': 'Resource was added or updated.' }
       )
     )
   } catch * {
-    utils:redirect('db-put', map {
+    utils:redirect('db-put', {
       'name': $name, 'opts': $opts, 'path': $path, 'binary': $binary, 'error': $err:description
     })
   }

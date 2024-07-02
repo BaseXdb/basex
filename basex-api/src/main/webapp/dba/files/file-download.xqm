@@ -21,8 +21,8 @@ function dba:file-download(
   let $path := config:files-dir() || $name
   return (
     web:response-header(
-      map { 'media-type': 'application/octet-stream' },
-      map { 'Content-Length': file:size($path) }
+      { 'media-type': 'application/octet-stream' },
+      { 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
   )

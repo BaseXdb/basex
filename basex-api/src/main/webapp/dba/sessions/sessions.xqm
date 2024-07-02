@@ -32,18 +32,18 @@ function dba:sessions(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <form method='post'>
         <h2>Web Sessions</h2>
         {
           let $headers := (
-            map { 'key': 'id', 'label': 'ID', 'type': 'id' },
-            map { 'key': 'name', 'label': 'Name' },
-            map { 'key': 'value', 'label': 'Value' },
-            map { 'key': 'access', 'label': 'Last Access', 'type': 'time', 'order': 'desc' },
-            map { 'key': 'you', 'label': 'You' }
+            { 'key': 'id', 'label': 'ID', 'type': 'id' },
+            { 'key': 'name', 'label': 'Name' },
+            { 'key': 'value', 'label': 'Value' },
+            { 'key': 'access', 'label': 'Last Access', 'type': 'time', 'order': 'desc' },
+            { 'key': 'you', 'label': 'You' }
           )
           let $entries :=
             for $id in sessions:ids()
@@ -56,9 +56,9 @@ function dba:sessions(
             } catch sessions:get {
               '–' (: non-XQuery session value :)
             }
-            let $string := utils:chop(serialize($value, map { 'method': 'basex' }), 20)
+            let $string := utils:chop(serialize($value, { 'method': 'basex' }), 20)
             order by $access descending
-            return map {
+            return {
               'id': $id || '|' || $name,
               'name': $name,
               'value': $string,
@@ -68,8 +68,8 @@ function dba:sessions(
           let $buttons := (
             html:button('session-kill', 'Kill', ('CHECK', 'CONFIRM'))
           )
-          let $options := map { 'sort': $sort, 'presort': 'access' }
-          return html:table($headers, $entries, $buttons, map { }, $options)
+          let $options := { 'sort': $sort, 'presort': 'access' }
+          return html:table($headers, $entries, $buttons, {}, $options)
         }
         </form>
       </td>
@@ -78,14 +78,14 @@ function dba:sessions(
         <h2>Database Sessions</h2>
         {
           let $headers := (
-            map { 'key': 'address', 'label': 'Address' },
-            map { 'key': 'user', 'label': 'User' }
+            { 'key': 'address', 'label': 'Address' },
+            { 'key': 'user', 'label': 'User' }
           )
-          let $entries := admin:sessions() ! map {
+          let $entries := admin:sessions() ! {
             'address': @address,
             'user': @user
           }
-          return html:table($headers, $entries, (), map { }, map { })
+          return html:table($headers, $entries)
         }
       </td>
     </tr>

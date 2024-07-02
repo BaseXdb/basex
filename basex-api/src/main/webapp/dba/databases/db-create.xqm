@@ -38,7 +38,7 @@ function dba:db-create(
   $error  as xs:string?
 ) as element(html) {
   let $opts := if($opts = 'x') then $opts else ('textindex', 'attrindex')
-  return html:wrap(map { 'header': $dba:CAT, 'error': $error },
+  return html:wrap({ 'header': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
@@ -117,12 +117,10 @@ function dba:db-create-do(
         return map:entry($option, $opts = $option),
         $lang ! map:entry('language', .)))
       ),
-      utils:redirect($dba:SUB, map {
-        'name': $name, 'info': 'Database "' || $name || '" was created.'
-      })
+      utils:redirect($dba:SUB, { 'name': $name, 'info': 'Database "' || $name || '" was created.' })
     )
   } catch * {
-    utils:redirect('db-create', map {
+    utils:redirect('db-create', {
       'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }

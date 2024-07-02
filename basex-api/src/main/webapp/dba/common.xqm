@@ -33,8 +33,8 @@ function dba:file(
   let $path := file:base-dir() || 'static/' || $file
   return (
     web:response-header(
-      map { 'media-type': web:content-type($path) },
-      map { 'Cache-Control': 'max-age=3600,public', 'Content-Length': file:size($path) }
+      { 'media-type': web:content-type($path) },
+      { 'Cache-Control': 'max-age=3600,public', 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
   )

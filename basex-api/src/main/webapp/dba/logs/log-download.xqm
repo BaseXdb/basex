@@ -22,14 +22,14 @@ function dba:logs-download(
 ) as item()+ {
   if(count($names) = 1) then (
     web:response-header(
-      map { 'media-type': 'text/plain' },
-      map { 'Content-Disposition': 'attachment; filename=' || $names || '.log' }
+      { 'media-type': 'text/plain' },
+      { 'Content-Disposition': 'attachment; filename=' || $names || '.log' }
     ),
     file:read-binary(db:option('dbpath') || '/.logs/' || $names || '.log')
   ) else (
     web:response-header(
-      map { 'media-type': 'application/zip' },
-      map { 'Content-Disposition': 'attachment; filename=' ||
+      { 'media-type': 'application/zip' },
+      { 'Content-Disposition': 'attachment; filename=' ||
         string-join(sort($names)[position() = (1, last())], '_') || '.zip' }
     ),
     let $logs := $names ! (. || '.log')

@@ -47,7 +47,7 @@ function dba:settings(
   let $string := fn($key, $label) {
     $table-row($label, <input type='text' name='{ $key }' value='{ config:get($key) }'/>)
   }
-  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='33%'>
         <form method='post'>
@@ -102,5 +102,5 @@ declare
 function dba:settings-save(
 ) as element(rest:response) {
   config:save(html:parameters()),
-  web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
+  web:redirect($dba:CAT, { 'info': 'Settings were saved.' })
 };

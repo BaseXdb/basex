@@ -28,8 +28,8 @@ function dba:file-delete(
     for $name in $names
     where $name != '..'
     return file:delete(config:files-dir() || $name),
-    web:redirect($dba:CAT, map { 'info': utils:info($names, 'file', 'deleted') })
+    web:redirect($dba:CAT, { 'info': utils:info($names, 'file', 'deleted') })
   } catch * {
-    web:redirect($dba:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
 };

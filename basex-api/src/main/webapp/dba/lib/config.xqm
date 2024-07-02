@@ -45,7 +45,7 @@ declare variable $config:INDENT := 'indent';
 declare %private variable $config:OPTIONS-FILE := $config:DBA-DIR || '.dba.xml';
 
 (:~ Default options. :)
-declare %basex:lazy %private variable $config:DEFAULTS := map {
+declare %basex:lazy %private variable $config:DEFAULTS := {
   $config:MAXCHARS   : 1000000,
   $config:MAXROWS    : 1000,
   $config:TIMEOUT    : 30,

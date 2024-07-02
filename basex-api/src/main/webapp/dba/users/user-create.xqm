@@ -36,7 +36,7 @@ function dba:user-create(
   $perm   as xs:string,
   $error  as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': $dba:CAT, 'error': $error },
+  html:wrap({ 'header': $dba:CAT, 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
@@ -106,9 +106,9 @@ function dba:user-create-do(
     ) else (
       user:create($name, $pw, $perm)
     ),
-    utils:redirect($dba:CAT, map { 'info': 'User was created.' })
+    utils:redirect($dba:CAT, { 'info': 'User was created.' })
   } catch * {
-    utils:redirect('user-create', map {
+    utils:redirect('user-create', {
       'name': $name, 'pw': $pw, 'perm': $perm, 'error': $err:description
     })
   }

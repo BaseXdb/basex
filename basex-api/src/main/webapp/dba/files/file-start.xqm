@@ -28,10 +28,10 @@ function dba:file-start(
     (: stop running job before starting new job :)
     job:remove($id),
     job:wait($id),
-    void(job:eval($uri, (), map { 'cache': 'true', 'id': $id, 'log': 'DBA job' })),
-    map { 'info': 'Job was started.', 'job': $id }
+    void(job:eval($uri, (), { 'cache': 'true', 'id': $id, 'log': 'DBA job' })),
+    { 'info': 'Job was started.', 'job': $id }
   } catch * {
-    map { 'error': $err:description }
+    { 'error': $err:description }
   }
   return web:redirect($dba:CAT, $params)
 };

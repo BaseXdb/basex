@@ -14,7 +14,7 @@ declare variable $chat-util:id := 'id';
  : Sends a users list (all, active) to all registered clients.
  :)
 declare function chat-util:users() as empty-sequence() {
-  ws:emit(map {
+  ws:emit({
     'type': 'users',
     'users': array { sort(user:list()) },
     'active': array { distinct-values(
@@ -34,7 +34,7 @@ declare function chat-util:message(
   $to    as xs:string?
 ) as empty-sequence() {
   let $ws-ids := ws:ids()[not($to) or ws:get(., $chat-util:id) = $to]
-  return ws:send(map {
+  return ws:send({
     'type': 'message',
     'text': serialize($text),
     'from': ws:get(ws:id(), $chat-util:id),

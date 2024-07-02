@@ -25,8 +25,8 @@ function dba:user-drop(
 ) as empty-sequence() {
   try {
     $names ! user:drop(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'user', 'dropped') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'user', 'dropped') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

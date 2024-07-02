@@ -6,7 +6,7 @@ ws.onopen = function(event) {
   // send regular ping to keep connection alive
   setInterval(function ping() {
     send("ping", "");
-  }, 250000);
+  }, 15000);
 };
 
 ws.onmessage = function(event) {

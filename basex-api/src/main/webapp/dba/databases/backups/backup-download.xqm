@@ -19,8 +19,8 @@ function dba:backup-download(
   let $path := db:option('dbpath') || '/' || $backup
   return (
     web:response-header(
-      map { 'media-type': 'application/octet-stream' },
-      map { 'Content-Length': file:size($path) }
+      { 'media-type': 'application/octet-stream' },
+      { 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
   )

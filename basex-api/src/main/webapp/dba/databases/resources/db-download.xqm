@@ -23,8 +23,8 @@ function dba:db-download(
 ) as item()+ {
   try {
     web:response-header(
-      map { 'media-type': db:content-type($name, $resource) },
-      map { 'Content-Disposition': 'attachment; filename=' || $resource }
+      { 'media-type': db:content-type($name, $resource) },
+      { 'Content-Disposition': 'attachment; filename=' || $resource }
     ),
     let $type := db:type($name, $resource)
     return if($type = 'xml') then (

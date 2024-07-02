@@ -39,7 +39,7 @@ function dba:databases(
     let $start := utils:start($page, $sort)
     let $end := utils:end($page, $sort)
     for $db in db:list-details()[position() = $start to $end]
-    return map {
+    return {
       'name': $db,
       'resources': $db/@resources,
       'size': $db/@size,
@@ -51,23 +51,23 @@ function dba:databases(
     group by $name := replace($backup, $utils:BACKUP-REGEX, '$1')
     where $name and not($db-names = $name)
     let $date := replace(sort($backup)[last()], $utils:BACKUP-REGEX, '$2T$3:$4:$5Z')
-    return map {
+    return {
       'name': $name,
       'size': (),
       'date': $date
     }
   )
-  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <form method='post'>
           <h2>Databases</h2>
           {
             let $headers := (
-              map { 'key': 'name', 'label': 'Name' },
-              map { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc' },
-              map { 'key': 'size', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
-              map { 'key': 'date', 'label': 'Last Modified', 'type': 'dateTime', 'order': 'desc' }
+              { 'key': 'name', 'label': 'Name' },
+              { 'key': 'resources', 'label': 'Count', 'type': 'number', 'order': 'desc' },
+              { 'key': 'size', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
+              { 'key': 'date', 'label': 'Last Modified', 'type': 'dateTime', 'order': 'desc' }
             )
             let $entries := ($databases, $backups)
             let $buttons := (
@@ -78,13 +78,13 @@ function dba:databases(
               html:button('backups-restore', 'Restore', ('CHECK', 'CONFIRM'))
             )
             let $count := count($db-names) + count($backups)
-            let $options := map {
+            let $options := {
               'sort': $sort,
               'link': 'database',
               'page': $page,
               'count': $count
             }
-            return html:table($headers, $entries, $buttons, map { }, $options)
+            return html:table($headers, $entries, $buttons, {}, $options)
           }
         </form>
       </td>
@@ -114,15 +114,15 @@ function dba:databases(
           <div class='small'/>
           {
             let $headers := (
-              map { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
-              map { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
-              map { 'key': 'comment', 'label': 'Comment' },
-              map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
+              { 'key': 'backup', 'label': 'Name', 'order': 'desc' },
+              { 'key': 'size', 'label': 'Size', 'type': 'bytes' },
+              { 'key': 'comment', 'label': 'Comment' },
+              { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
             )
             let $entries :=
               for $backup in db:backups('')
               order by $backup descending
-              return map {
+              return {
                 'backup': substring-after($backup, '-'),
                 'size': $backup/@size,
                 'comment': $backup/@comment,
@@ -135,8 +135,8 @@ function dba:databases(
               html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
               html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
             )
-            let $params := map { 'name': '' }
-            return html:table($headers, $entries, $buttons, $params, map { })
+            let $params := { 'name': '' }
+            return html:table($headers, $entries, $buttons, $params)
           }
         </form>
       </td>

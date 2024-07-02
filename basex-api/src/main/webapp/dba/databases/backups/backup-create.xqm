@@ -28,14 +28,14 @@ declare
 function dba:backup-create(
   $name  as xs:string
 ) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name) },
+  html:wrap({ 'header': ($dba:CAT, $name) },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
           <input type='hidden' name='name' value='{ $name }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            (html:link($name, $dba:SUB, map { 'name': $name }), ' » ')[$name],
+            (html:link($name, $dba:SUB, { 'name': $name }), ' » ')[$name],
             html:button('backup-create-do', 'Create Backup')
           }</h2>
           <table>
@@ -79,10 +79,10 @@ function dba:backup-create-do(
   $compress  as xs:string?
 ) as empty-sequence() {
   try {
-    db:create-backup($name, map { 'comment': $comment, 'compress': boolean($compress) }),
-    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Backup was created.' })
+    db:create-backup($name, { 'comment': $comment, 'compress': boolean($compress) }),
+    utils:redirect($dba:SUB, { 'name': $name, 'info': 'Backup was created.' })
   } catch * {
-    utils:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
+    utils:redirect($dba:SUB, { 'name': $name, 'error': $err:description })
   }
 };
 
@@ -101,8 +101,8 @@ function dba:backups-create(
 ) as empty-sequence() {
   try {
     $names ! db:create-backup(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'database', 'backed up') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'backed up') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

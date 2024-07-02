@@ -31,7 +31,7 @@ function dba:check(
     let $target := if(ends-with($path, '/dba')) then 'dba/login' else 'login'
     (: last visited page to redirect to (if there was one) :)
     let $page := replace($path, '^.*dba/?', '')[.]
-    return web:redirect($target, html:parameters(map { 'page': $page }))
+    return web:redirect($target, html:parameters({ 'page': $page }))
   )
 };
 
@@ -58,7 +58,7 @@ function dba:login(
   (: user is already logged in: redirect to main page :)
   if(session:get($config:SESSION-KEY)) then web:redirect('/dba') else
 
-  html:wrap(map { 'error': $error },
+  html:wrap({ 'error': $error },
     <tr>
       <td>
         <form method='post'>
@@ -134,7 +134,7 @@ function dba:logout(
   return (
     (: write log entry, redirect to login page :)
     admin:write-log('Logout: ' || $user, 'DBA'),
-    web:redirect('/dba/login', map { '_name': $user })
+    web:redirect('/dba/login', { '_name': $user })
   ),
   (: deletes the session key :)
   session:delete($config:SESSION-KEY)
@@ -174,6 +174,6 @@ declare %private function dba:reject(
   admin:write-log('Login denied: ' || $name, 'DBA'),
   web:redirect(
     'login',
-    html:parameters(map { 'name': $name, 'error': $error, 'page': $page })
+    html:parameters({ 'name': $name, 'error': $error, 'page': $page })
   )
 };

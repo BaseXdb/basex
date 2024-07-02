@@ -24,8 +24,8 @@ function dba:logs-delete(
 ) as element(rest:response) {
   try {
     $names ! admin:delete-logs(.),
-    web:redirect($dba:CAT, map { 'info': utils:info($names, 'log', 'deleted') })
+    web:redirect($dba:CAT, { 'info': utils:info($names, 'log', 'deleted') })
   } catch * {
-    web:redirect($dba:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
 };

@@ -22,7 +22,7 @@ declare function utils:query-parse(
   $query  as xs:string,
   $uri    as xs:string?
 ) as element() {
-  xquery:parse($query, map {
+  xquery:parse($query, {
     'base-uri': $uri otherwise config:edited-file() otherwise config:editor-dir(),
     'plan'    : false(),
     'pass'    : true()
@@ -39,7 +39,7 @@ declare function utils:query(
   $query    as xs:string,
   $context  as item()?
 ) as xs:string {
-  let $bindings := $context ! map { '': . }
+  let $bindings := $context ! { '': . }
   let $result := xquery:eval($query, $bindings, utils:query-options())
   return utils:serialize($result)
 };
@@ -69,7 +69,7 @@ declare function utils:serialize(
   (: serialize more characters than requested, because limit represents number of bytes :)
   let $limit := config:get($config:MAXCHARS)
   let $indent := config:get($config:INDENT)
-  let $string := serialize($value, map {
+  let $string := serialize($value, {
     'limit': $limit * 2 + 1,
     'indent': $indent,
     'method': 'basex'
@@ -82,7 +82,7 @@ declare function utils:serialize(
  : @return options
  :)
 declare %private function utils:query-options() as map(*) {
-  map {
+  {
     'timeout'   : config:get($config:TIMEOUT),
     'memory'    : config:get($config:MEMORY),
     'permission': config:get($config:PERMISSION),

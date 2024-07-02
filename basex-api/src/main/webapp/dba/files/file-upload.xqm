@@ -35,8 +35,8 @@ function dba:file-upload(
     map:for-each($files, fn($name, $content) {
       file:write-binary($dir || $name, $content)
     }),
-    web:redirect($dba:CAT, map { 'info': utils:info(map:keys($files), 'file', 'uploaded') })
+    web:redirect($dba:CAT, { 'info': utils:info(map:keys($files), 'file', 'uploaded') })
   } catch * {
-    web:redirect($dba:CAT, map { 'error': 'Upload failed: ' || $err:description })
+    web:redirect($dba:CAT, { 'error': 'Upload failed: ' || $err:description })
   }
 };

@@ -28,10 +28,8 @@ function dba:db-delete(
 ) as empty-sequence() {
   try {
     $resources ! db:delete($name, .),
-    utils:redirect($dba:SUB,
-      map { 'name': $name, 'info': utils:info($resources, 'resource', 'deleted') }
-    )
+    utils:redirect($dba:SUB, { 'name': $name, 'info': utils:info($resources, 'resource', 'deleted') })
   } catch * {
-    utils:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
+    utils:redirect($dba:SUB, { 'name': $name, 'error': $err:description })
   }
 };

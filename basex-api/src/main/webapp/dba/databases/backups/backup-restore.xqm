@@ -31,12 +31,9 @@ function dba:backup-restore(
   let $target := if($name) then $dba:SUB else $dba:CAT
   return try {
     db:restore($name || '-' || head($backups)),
-    utils:redirect(
-      $target,
-      map { 'name': $name, 'info': utils:info($backups, 'backup', 'restored') }
-    )
+    utils:redirect($target, { 'name': $name, 'info': utils:info($backups, 'backup', 'restored') })
   } catch * {
-    utils:redirect($target, map { 'name': $name, 'error': $err:description })
+    utils:redirect($target, { 'name': $name, 'error': $err:description })
   }
 };
 
@@ -55,8 +52,8 @@ function dba:backups-restore(
 ) as empty-sequence() {
   try {
     $names ! db:restore(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'backup', 'restored') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'backup', 'restored') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

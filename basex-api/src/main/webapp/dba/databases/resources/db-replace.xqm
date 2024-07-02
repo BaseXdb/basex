@@ -34,7 +34,7 @@ function dba:db-replace(
   $resource  as xs:string,
   $error     as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
+  html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form method='post' enctype='multipart/form-data'>
@@ -42,8 +42,8 @@ function dba:db-replace(
           <input type='hidden' name='resource' value='{ $resource }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }), ' » ',
+            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+            html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
             html:button('db-replace-do', 'Replace')
           }</h2>
           <table>
@@ -90,12 +90,12 @@ function dba:db-replace-do(
         $file($key)
       )
       return db:put($name, $input, $resource),
-      utils:redirect($dba:SUB, map {
+      utils:redirect($dba:SUB, {
         'name': $name, 'resource': $resource, 'info': 'Resource was replaced.'
       })
     )
   } catch * {
-    utils:redirect('db-replace', map {
+    utils:redirect('db-replace', {
       'name': $name, 'resource': $resource, 'error': $err:description
     })
   }

@@ -35,6 +35,6 @@ function dba:dir-change(
     ),
     web:redirect($dba:CAT)
   } catch file:io-error {
-    web:redirect($dba:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
 };

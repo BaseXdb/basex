@@ -25,8 +25,8 @@ function dba:drop(
   try {
     for $id in $ids
     return sessions:delete(substring-before($id, '|'), substring-after($id, '|')),
-    web:redirect($dba:CAT, map { 'info': utils:info($ids, 'session', 'killed') })
+    web:redirect($dba:CAT, { 'info': utils:info($ids, 'session', 'killed') })
   } catch * {
-    web:redirect($dba:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
 };

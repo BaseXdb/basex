@@ -34,7 +34,7 @@ function dba:files(
   $page   as xs:string
 ) as element(html) {
   let $dir := config:files-dir()
-  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <h2>Directory</h2>
@@ -54,7 +54,7 @@ function dba:files(
               [ 'Home'      , Q{org.basex.util.Prop}HOMEDIR() ],
               [ 'Working'   , file:current-dir() ],
               [ 'Temporary' , file:temp-dir() ],
-              Q{java:java.io.File}listRoots() ! [ 'Root', string(.) ],
+              file:list-roots() ! [ 'Root', string(.) ],
               [ 'Current'   , $dir ]
             )
             let $selected := head(
@@ -76,10 +76,10 @@ function dba:files(
 
         <form method='post'>{
           let $headers := (
-            map { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
-            map { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc' },
-            map { 'key': 'bytes', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
-            map { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
+            { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+            { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc' },
+            { 'key': 'bytes', 'label': 'Bytes', 'type': 'bytes', 'order': 'desc' },
+            { 'key': 'action', 'label': 'Action', 'type': 'dynamic' }
           )
           let $entries := (
             let $limit := config:get($config:MAXCHARS)
@@ -93,9 +93,9 @@ function dba:files(
             (: skip files without access permissions :)
             for $modified in try { file:last-modified($file) } catch * { }
             let $size := file:size($file)
-            return map {
+            return {
               'name': fn() {
-                if($dir) then html:link($name, 'dir-change', map { 'dir': $name }) else $name
+                if($dir) then html:link($name, 'dir-change', { 'dir': $name }) else $name
               },
               'date': $modified,
               'bytes': $size,
@@ -104,7 +104,7 @@ function dba:files(
                   if($dir) then () else (
                     html:link('Download', 'file/' || encode-for-uri($name)),
                     if($size <= $limit) then (
-                      html:link('Edit', 'editor', map { 'name': $name })
+                      html:link('Edit', 'editor', { 'name': $name })
                     ) else (),
                     if(matches($name, '\.xq$')) then (
                       (: choose first running job :)
@@ -114,9 +114,9 @@ function dba:files(
                       )
                       let $id := string($job/@id)
                       return if(empty($job)) then (
-                        html:link('Start', 'file-start', map { 'file': $name })
+                        html:link('Start', 'file-start', { 'file': $name })
                       ) else (
-                        html:link('Job', 'jobs', map { 'job': $id })
+                        html:link('Job', 'jobs', { 'job': $id })
                       )
                     ) else ()
                   )
@@ -125,8 +125,8 @@ function dba:files(
             }
           )
           let $buttons := html:button('file-delete', 'Delete', ('CHECK', 'CONFIRM'))
-          let $options := map { 'sort': $sort, 'page': xs:integer($page) }
-          return html:table($headers, $entries, $buttons, map { }, $options)
+          let $options := { 'sort': $sort, 'page': xs:integer($page) }
+          return html:table($headers, $entries, $buttons, {}, $options)
         }</form>
 
         <h3>Create Directory</h3>

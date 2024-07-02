@@ -38,13 +38,13 @@ function dba:pattern-add(
   $perm     as xs:string,
   $error    as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
+  html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
+            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
             html:button('pattern-add-do', 'Add Pattern')
           }</h2>
           <input type='hidden' name='name' value='{ $name }'/>
@@ -96,9 +96,9 @@ function dba:pattern-add-do(
 ) as empty-sequence() {
   try {
     user:grant($name, $perm, $pattern),
-    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Pattern was created.' })
+    utils:redirect($dba:SUB, { 'name': $name, 'info': 'Pattern was created.' })
   } catch * {
-    utils:redirect('pattern-add', map {
+    utils:redirect('pattern-add', {
       'name': $name, 'perm': $perm, 'pattern': $pattern, 'error': $err:description
     })
   }

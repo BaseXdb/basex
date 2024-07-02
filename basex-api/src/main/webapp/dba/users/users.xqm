@@ -31,22 +31,22 @@ function dba:users(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td>
         <form method='post'>
         <h2>Users</h2>
         {
           let $headers := (
-            map { 'key': 'name', 'label': 'Name' },
-            map { 'key': 'permission', 'label': 'Permission' },
-            map { 'key': 'you', 'label': 'You' }
+            { 'key': 'name', 'label': 'Name' },
+            { 'key': 'permission', 'label': 'Permission' },
+            { 'key': 'you', 'label': 'You' }
           )
           let $entries := (
             let $current := session:get($config:SESSION-KEY)
             for $user in user:list-details()
             let $name := string($user/@name)
-            return map {
+            return {
               'name': $name,
               'permission': $user/@permission,
               'you': if($current = $name) then '✓' else '–'
@@ -56,8 +56,8 @@ function dba:users(
             html:button('user-create', 'Create…'),
             html:button('user-drop', 'Drop', ('CHECK', 'CONFIRM'))
           )
-          let $options := map { 'link': 'user', 'sort': $sort }
-          return html:table($headers, $entries, $buttons, map { }, $options)
+          let $options := { 'link': 'user', 'sort': $sort }
+          return html:table($headers, $entries, $buttons, {}, $options)
         }
         </form>
         <div>&#xa0;</div>
@@ -69,7 +69,7 @@ function dba:users(
           html:button('users-info', 'Update'),
           <div class='small'/>,
           <textarea name='info' id='editor' spellcheck='false'>{
-            serialize(user:info(), map { 'indent': true() } )
+            serialize(user:info(), { 'indent': true() } )
           }</textarea>,
           html:js('loadCodeMirror("xml", true);')
         }</form>

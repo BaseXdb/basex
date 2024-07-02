@@ -18,5 +18,5 @@ declare
 function dba:settings-gc(
 ) as element(rest:response) {
   prof:gc(),
-  web:redirect($dba:CAT, map { 'info': 'Garbage collection was triggered.' })
+  web:redirect($dba:CAT, { 'info': 'Garbage collection was triggered.' })
 };

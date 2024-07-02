@@ -51,8 +51,8 @@ declare %private function dba:job-result(
 ) as item()+ {
   let $name := $id || (if($ok) then '.txt' else '.log')
   return web:response-header(
-    map { 'media-type': 'application/octet-stream' },
-    map { 'Content-Disposition': 'attachment; filename=' || $name }
+    { 'media-type': 'application/octet-stream' },
+    { 'Content-Disposition': 'attachment; filename=' || $name }
   ),
   $result
 };

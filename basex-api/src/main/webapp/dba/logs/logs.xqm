@@ -36,7 +36,7 @@ function dba:logs-jump(
     return ($pos - 1) idiv $max + 1,
     1
   ))
-  return web:redirect('/dba/logs', map { 'name': $date, 'page': $page, 'time': $time }) update {
+  return web:redirect('/dba/logs', { 'name': $date, 'page': $page, 'time': $time }) update {
     .//*:header/@value ! (replace value of node . with . || '#' || $time)
   }
 };
@@ -75,7 +75,7 @@ function dba:logs(
 ) as element(html) {
   let $files := reverse(sort(admin:logs()))
   let $date := $name otherwise string(head($files))
-  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>
       <td width='190'>
         <h2>{
@@ -95,15 +95,15 @@ function dba:logs(
               html:button('logs-delete', 'Delete', ('CHECK', 'CONFIRM'))
             )
             let $headers := (
-              map { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
-              map { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
+              { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
+              { 'key': 'size', 'label': 'Size', 'type': 'bytes' }
             )
             let $entries :=
               for $entry in $files
-              return map {
+              return {
                 'name': fn() {
                   let $link := html:link(
-                    $entry, $dba:CAT, (map { 'sort': $sort }, map { 'name': $entry })
+                    $entry, $dba:CAT, ({ 'sort': $sort }, { 'name': $entry })
                   ) update {
                     (: enrich link targets with current search string :)
                     insert node attribute onclick { 'addInput(this);' } into .
@@ -112,7 +112,7 @@ function dba:logs(
                 },
                 'size': $entry/@size
               }
-            return html:table($headers, $entries, $buttons, map { }, map { })
+            return html:table($headers, $entries, $buttons)
           }</div>
         </form>
       </td>
@@ -165,12 +165,12 @@ function dba:log(
   $input[.] ! void(analyze-string('', .)),
 
   let $headers := (
-    map { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },
-    map { 'key': 'address', 'label': 'Address' },
-    map { 'key': 'user', 'label': 'User', 'type': 'dynamic' },
-    map { 'key': 'type', 'label': 'Type', 'type': 'dynamic' },
-    map { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc' },
-    map { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
+    { 'key': 'time', 'label': 'Time', 'type': 'dynamic', 'order': 'desc' },
+    { 'key': 'address', 'label': 'Address' },
+    { 'key': 'user', 'label': 'User', 'type': 'dynamic' },
+    { 'key': 'type', 'label': 'Type', 'type': 'dynamic' },
+    { 'key': 'ms', 'label': 'ms', 'type': 'decimal', 'order': 'desc' },
+    { 'key': 'text', 'label': 'Text', 'type': 'dynamic' }
   )
   let $entries := (
     let $ignore-logs := config:get($config:IGNORE-LOGS)
@@ -183,7 +183,7 @@ function dba:log(
     where not($ignore-logs and matches($text, $ignore-logs, 'i'))
 
     for $map-results in (
-      let $map := map {
+      let $map := {
         'user': string($log/@user),
         'type': string($log/@type),
         'text': $text
@@ -214,18 +214,18 @@ function dba:log(
     let $id := string($log/@time)
     return map:merge((
       $map-results,
-      map {
+      {
         'id': $id,
         'address': string($log/@address),
         'ms': xs:decimal($log/@ms),
         'time': fn() {
-          let $link := html:link($id, $dba:CAT || '-jump', map { 'date': $date, 'time': $id })
+          let $link := html:link($id, $dba:CAT || '-jump', { 'date': $date, 'time': $id })
           return if(not($input) and $id = $time) then element b { $link } else $link
         }
       }
     ))
   )
-  let $params := map { 'name': $date, 'input': $input }
-  let $options := map { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
+  let $params := { 'name': $date, 'input': $input }
+  let $options := { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
   return html:table($headers, $entries, (), $params, $options)
 };

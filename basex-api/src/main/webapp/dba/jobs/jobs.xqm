@@ -34,20 +34,20 @@ function dba:jobs(
   $error  as xs:string?,
   $info   as xs:string?
 ) as element(html) {
-  html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
     <tr>{
       <td>
         <form method='post'>
         <h2>Jobs</h2>
         {
           let $headers := (
-            map { 'key': 'id', 'label': 'ID' },
-            map { 'key': 'state', 'label': 'State' },
-            map { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
-            map { 'key': 'user', 'label': 'User' },
-            map { 'key': 'you', 'label': 'You' },
-            map { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
-            map { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
+            { 'key': 'id', 'label': 'ID' },
+            { 'key': 'state', 'label': 'State' },
+            { 'key': 'duration', 'label': 'Dur.', 'type': 'number', 'order': 'desc' },
+            { 'key': 'user', 'label': 'User' },
+            { 'key': 'you', 'label': 'You' },
+            { 'key': 'time', 'label': 'Time', 'type': 'time', 'order': 'desc' },
+            { 'key': 'start', 'label': 'Start', 'type': 'time', 'order': 'desc' }
           )
           let $entries :=
             let $curr := job:current()
@@ -60,7 +60,7 @@ function dba:jobs(
             let $time := data($details/@time)
             let $start := data($details/@start)
             order by $sec descending, $start descending
-            return map {
+            return {
               'id': $id,
               'state': $details/@state,
               'duration': html:duration($sec),
@@ -72,8 +72,8 @@ function dba:jobs(
           let $buttons := (
             html:button('job-remove', 'Remove', ('CHECK', 'CONFIRM'))
           )
-          let $options := map { 'sort': $sort, 'presort': 'duration' }
-          return html:table($headers, $entries, $buttons, map { }, $options) update {
+          let $options := { 'sort': $sort, 'presort': 'duration' }
+          return html:table($headers, $entries, $buttons, {}, $options) update {
             (: replace job ids with links :)
             for $tr in tr[not(th)]
             for $text in $tr/td[1]/text()
@@ -118,7 +118,7 @@ function dba:jobs(
                       <tr>
                         <td><b>{ if($key) then '$' || $key else 'Context' }</b></td>
                         <td><code>{
-                          utils:chop(serialize($value, map { 'method': 'basex' }), 1000)
+                          utils:chop(serialize($value, { 'method': 'basex' }), 1000)
                         }</code></td>
                       </tr>
                     })
@@ -128,7 +128,7 @@ function dba:jobs(
   
                 if($cached) then (
                   let $result := try {
-                    utils:serialize(job:result($job, map { 'keep': true() }))
+                    utils:serialize(job:result($job, { 'keep': true() }))
                   } catch * {
                     'Stopped at ' || $err:module || ', ' || $err:line-number || '/' ||
                       $err:column-number || ':' || char('\n') || $err:description

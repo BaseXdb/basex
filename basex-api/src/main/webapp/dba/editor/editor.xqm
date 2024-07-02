@@ -38,7 +38,7 @@ function dba:editor(
   ) else (
     config:edited-file()
   )
-  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error }, (
+  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error }, (
     <tr>
       <td colspan='2'>
         <form autocomplete='off' action='javascript:void(0);'>{

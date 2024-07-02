@@ -19,7 +19,7 @@ declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 declare function html:wrap(
   $rows  as element(tr)+
 ) as element(html) {
-  html:wrap(map { }, $rows)
+  html:wrap({}, $rows)
 };
 
 (:~
@@ -158,9 +158,9 @@ declare function html:checkbox(
   $label    as xs:string
 ) as node()+ {
   html:checkbox($label, map:merge((
-    map { 'name':  $name },
-    map { 'value': $value },
-    if($checked) then map { 'checked': $checked } else ()
+    { 'name':  $name },
+    { 'value': $value },
+    if($checked) then { 'checked': $checked } else ()
   )))
 };
 
@@ -184,19 +184,6 @@ declare function html:checkbox(
 
 (:~
  : Creates a button.
- : @param  $value  button value
- : @param  $label  label
- : @return button
- :)
-declare function html:button(
-  $value  as xs:string,
-  $label  as xs:string
-) as element(button) {
-  html:button($value, $label, ())
-};
-
-(:~
- : Creates a button.
  : @param  $action   button action
  : @param  $label    label
  : @param  $options  options: 'CONFIRM' (show confirmation dialog), 'CHECK' (consider checkboxes)
@@ -205,7 +192,7 @@ declare function html:button(
 declare function html:button(
   $action   as xs:string,
   $label    as xs:string,
-  $options  as xs:string*
+  $options  as xs:string*  := ()
 ) as element(button) {
   <button>{
     attribute formaction { $action }[$action],
@@ -283,9 +270,9 @@ declare function html:properties(
 declare function html:table(
   $headers  as map(*)*,
   $entries  as map(*)*,
-  $buttons  as element(button)*,
-  $params   as map(*),
-  $options  as map(*)
+  $buttons  as element(button)* := (),
+  $params   as map(*)           := {},
+  $options  as map(*)           := {}
 ) as element()+ {
   (: display buttons :)
   if($buttons) then (
@@ -356,7 +343,7 @@ declare function html:table(
         return if($curr-page = $page) then (
           $page || $suffix
         ) else (
-          html:link(string($page), '', ($params, map { 'page': $page, 'sort': $sort })),
+          html:link(string($page), '', ($params, { 'page': $page, 'sort': $sort })),
           $suffix
         )
       )
@@ -391,7 +378,7 @@ declare function html:table(
             $label
           ) else (
             (: generate sort link :)
-            html:link($label, '', ($params, map { 'sort': $name }))
+            html:link($label, '', ($params, { 'sort': $name }))
           )
         }
       },
@@ -431,7 +418,7 @@ declare function html:table(
             ' '
           ) else (),
           if($pos = 1 and exists($link)) then (
-            html:link($value, $link, ($params, map { $name: $value }))
+            html:link($value, $link, ($params, { $name: $value }))
           ) else if($type = 'id') then () else (
             $value
           )
@@ -439,19 +426,6 @@ declare function html:table(
       }
     }
   )
-};
-
-(:~
- : Creates a link to the specified target.
- : @param  $text  link text
- : @param  $href  link reference
- : @return link
- :)
-declare function html:link(
-  $text  as xs:string,
-  $href  as xs:string
-) as element(a) {
-  <a href='{ $href }'>{ $text }</a>
 };
 
 (:~
@@ -464,9 +438,9 @@ declare function html:link(
 declare function html:link(
   $text    as xs:string,
   $href    as xs:string,
-  $params  as map(*)*
+  $params  as map(*)*    := {}
 ) as element(a) {
-  html:link($text, web:create-url($href, map:merge($params)))
+  <a href='{ web:create-url($href, map:merge($params)) }'>{ $text }</a>
 };
 
 (:~
@@ -536,7 +510,7 @@ declare function html:js(
 declare function html:parameters() as map(*) {
   map:merge(
     for $param in request:parameter-names()[not(starts-with(., '_'))]
-    return map { $param: request:parameter($param) }
+    return { $param: request:parameter($param) }
   )
 };
 

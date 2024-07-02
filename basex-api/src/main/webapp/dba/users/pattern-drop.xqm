@@ -28,9 +28,8 @@ function dba:pattern-drop(
 ) as empty-sequence() {
   try {
     $patterns ! user:drop($name, .),
-    utils:redirect($dba:SUB, map {
-      'name': $name, 'info': utils:info($patterns, 'pattern', 'dropped') })
+    utils:redirect($dba:SUB, { 'name': $name, 'info': utils:info($patterns, 'pattern', 'dropped') })
   } catch * {
-    utils:redirect($dba:SUB, map { 'error': $err:description })
+    utils:redirect($dba:SUB, { 'error': $err:description })
   }
 };

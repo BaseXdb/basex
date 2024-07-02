@@ -42,13 +42,13 @@ function dba:db-optimize(
 ) as element(html) {
   let $opts := if($opts = 'x') then $opts else db:info($name)//*[text() = 'true']/name()
   let $lang := if($opts = 'x') then $lang else 'en'
-  return html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
+  return html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
     <tr>
       <td>
         <form method='post' autocomplete='off'>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, 'database', map { 'name': $name }), ' » ',
+            html:link($name, 'database', { 'name': $name }), ' » ',
             html:button('db-optimize-do', 'Optimize')
           }</h2>
           <!-- dummy value; prevents reset of options if nothing is selected -->
@@ -113,9 +113,9 @@ function dba:db-optimize-do(
         map:entry(., $opts = .),
       $lang ! map:entry('language', .)
     ))),
-    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Database was optimized.' })
+    utils:redirect($dba:SUB, { 'name': $name, 'info': 'Database was optimized.' })
   } catch * {
-    utils:redirect($dba:SUB, map {
+    utils:redirect($dba:SUB, {
       'name': $name, 'opts': $opts, 'lang': $lang, 'error': $err:description
     })
   }
@@ -135,8 +135,8 @@ function dba:dbs-optimize(
 ) as empty-sequence() {
   try {
     $names ! db:optimize(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'database', 'optimized') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'optimized') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

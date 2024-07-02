@@ -24,9 +24,9 @@ function dba:job-remove(
 ) as element(rest:response) {
   let $params := try {
     $ids ! job:remove(.),
-    map { 'info': utils:info($ids, 'job', 'removed') }
+    { 'info': utils:info($ids, 'job', 'removed') }
   } catch * {
-    map { 'error': $err:description }
+    { 'error': $err:description }
   }
   return web:redirect($dba:CAT, $params)
 };
