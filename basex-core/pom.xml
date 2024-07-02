@@ -32,13 +32,11 @@
     <dependency>
       <groupId>org.ccil.cowan.tagsoup</groupId>
       <artifactId>tagsoup</artifactId>
-      <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
-      <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -49,7 +47,6 @@
     <dependency>
       <groupId>de.bottlecaps</groupId>
       <artifactId>markup-blitz</artifactId>
-      <scope>provided</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
