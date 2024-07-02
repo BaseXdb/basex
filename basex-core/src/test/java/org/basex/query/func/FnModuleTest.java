@@ -1170,11 +1170,16 @@ public final class FnModuleTest extends SandboxTest {
         + "   \"(\", e, \")\".") + "('2*3+4')",
           "<e xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"ambiguous\">"
         + "<e><e><f>2</f></e>*<e><f>3</f></e></e>+<e><f>4</f></e></e>");
-    // input with cr+lf
+    // input with cr+lf, ixml 1.0
+    query("string-to-codepoints("
+        + func.args("ixml version '1.0'. s: ~[]*.")
+        + "(codepoints-to-string((9,13,10,9,10,13,9,10,9,13,9))))",
+        "9\n13\n10\n9\n10\n13\n9\n10\n9\n13\n9");
+    // input with cr+lf, ixml 1.1+
     query("string-to-codepoints("
         + func.args("s: ~[]*.")
         + "(codepoints-to-string((9,13,10,9,10,13,9,10,9,13,9))))",
-        "9\n13\n10\n9\n10\n13\n9\n10\n9\n13\n9");
+        "9\n10\n9\n10\n10\n9\n10\n9\n10\n9");
     // invalid input
     query("let $parser := " + func.args("s: ~[\"x\"]*.") + "\n"
         + "return $parser('x')",
