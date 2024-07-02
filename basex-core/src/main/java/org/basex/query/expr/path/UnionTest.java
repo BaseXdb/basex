@@ -99,10 +99,11 @@ public final class UnionTest extends Test {
   @Override
   public String toString(final boolean full) {
     final TokenBuilder tb = new TokenBuilder();
+    char ch = '(';
     for(final Test test : tests) {
-      if(!tb.isEmpty()) tb.add('|');
-      tb.add(test.toString(full));
+      tb.add(ch).add(test.toString(full));
+      ch = '|';
     }
-    return tb.toString();
+    return tb.add(')').toString();
   }
 }

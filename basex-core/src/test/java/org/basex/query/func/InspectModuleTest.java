@@ -173,14 +173,16 @@ public final class InspectModuleTest extends SandboxTest {
 
     query(func.args(" 1 to 2", " map { 'item': true() }"), "xs:integer");
     query(func.args(" (<a/>, <b/>)[name() = 'a']", " map { 'mode': 'expression' }"),
-        "element(a)|element(b)*");
+        "(element(a)|element(b))*");
+    query(func.args(" ('z' cast as enum('x', 'a', 'z'), 'a' cast as (enum('a')|enum('b')))"),
+        "enum(\"z\", \"a\")+");
 
     String expr = " (<a/>, <b/>)[name() = 'a']";
     String result = "element()";
     query(func.args(expr), result);
     query(func.args(expr, " map { 'mode': 'computed' }"), result);
     query(func.args(expr, " map { 'mode': 'value' }"), result);
-    query(func.args(expr, " map { 'mode': 'expression' }"), "element(a)|element(b)*");
+    query(func.args(expr, " map { 'mode': 'expression' }"), "(element(a)|element(b))*");
 
     expr = " map:put(map { 1: text { 2 } }, 2, text { 2 })";
     result = "map(xs:integer, text())";

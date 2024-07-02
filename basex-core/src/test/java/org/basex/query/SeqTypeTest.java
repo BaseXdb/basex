@@ -160,11 +160,11 @@ public final class SeqTypeTest {
     // enums
     final SeqType
       // enum('a')
-      e1 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("a"))),
+      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
       // enum('b')
-      e2 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("b"))),
+      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
       // enum('a', 'b')
-      e3 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("a", "b")));
+      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
     assertTrue(e1.instanceOf(e3));
     assertFalse(e1.instanceOf(e2));
     assertFalse(e3.instanceOf(e1));
@@ -362,11 +362,11 @@ public final class SeqTypeTest {
     // enums
     final SeqType
       // enum('a')
-      e1 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("a"))),
+      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
       // enum('b')
-      e2 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("b"))),
+      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
       // enum('a', 'b')
-      e3 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("a", "b")));
+      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
 
     combine(e1, e2, e3, op);
     combine(e1, e3, e3, op);
@@ -525,11 +525,11 @@ public final class SeqTypeTest {
     // enums
     final SeqType
       // enum('a')
-      e1 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("a"))),
+      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
       // enum('b')
-      e2 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("b"))),
+      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
       // enum('a', 'b')
-      e3 = SeqType.get(ENUM, EXACTLY_ONE, new EnumValues(new TokenSet("a", "b")));
+      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
 
     combine(e1, e2, null, op);
     combine(e1, e3, e1, op);

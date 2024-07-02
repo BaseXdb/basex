@@ -902,10 +902,7 @@ public enum AtomType implements Type {
   },
 
   /** NOTATION Type. */
-  NOTATION("NOTATION", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.NOT),
-
-  /** Enum type. */
-  ENUM("enum", STRING, EMPTY, false, false, true, true, Type.ID.ENM);
+  NOTATION("NOTATION", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.NOT);
 
 
   /** Language pattern. */
@@ -1008,7 +1005,9 @@ public enum AtomType implements Type {
 
   @Override
   public final AtomType union(final Type type) {
-    if(type instanceof ChoiceItemType) return (AtomType) type.union(this);
+    if(type instanceof ChoiceItemType || type instanceof EnumType) {
+      return (AtomType) type.union(this);
+    }
     if(type.instanceOf(this)) return this;
 
     if(type instanceof AtomType) {
@@ -1173,8 +1172,7 @@ public enum AtomType implements Type {
     if(Token.eq(XS_URI, uri)) {
       tb.add(XS_PREFIX).add(':').add(name);
     } else {
-      tb.add(name);
-      if(this != ENUM) tb.add("()");
+      tb.add(name).add("()");
     }
     return tb.toString();
   }
