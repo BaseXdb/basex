@@ -104,9 +104,10 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   }
 
   @Override
-  public void onWebSocketError(final Throwable cause) {
-    run("[WS-ERROR] " + request.getRequestURL() + ": " + cause.getMessage(), null,
-        () -> findAndProcess(Annotation._WS_ERROR, cause.getMessage()));
+  public void onWebSocketError(final Throwable th) {
+    final String m1 = th.getMessage(), m2 = Util.message(th), msg = m1 != null ? m1 : m2;
+    run("[WS-ERROR] " + request.getRequestURL() + ": " + msg, null,
+        () -> findAndProcess(Annotation._WS_ERROR, msg));
   }
 
   @Override
@@ -189,7 +190,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /**
    * Runs a function and creates log output.
    * @param info log string
-   * @param status close status
+   * @param status close status (can be {@code null})
    * @param func function to be run
    */
   private void run(final String info, final Integer status, final Runnable func) {
