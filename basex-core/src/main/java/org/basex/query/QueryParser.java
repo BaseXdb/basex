@@ -3070,7 +3070,7 @@ public class QueryParser extends InputParser {
       if(type.atomic() == null) throw error(INVALIDCAST_X, type);
     } else {
       final QNm name = eQName(sc.elemNS, TYPEINVALID);
-      if(!name.hasURI() && eq(name.local(), token("enum"))) {
+      if(!name.hasURI() && eq(name.local(), token(ENUM))) {
         if(!wsConsume("(")) throw error(WHICHCAST_X, AtomType.similar(name));
         type = enumerationType();
       } else {
@@ -3130,7 +3130,7 @@ public class QueryParser extends InputParser {
     SeqType st = null;
     Type type;
     final QNm name = eQName(null, TYPEINVALID);
-    if(!name.hasURI() && eq(name.local(), token("enum"))) {
+    if(!name.hasURI() && eq(name.local(), token(ENUM))) {
       if(!wsConsume("(")) throw error(WHICHCAST_X, AtomType.similar(name));
       type = enumerationType();
     } else {
