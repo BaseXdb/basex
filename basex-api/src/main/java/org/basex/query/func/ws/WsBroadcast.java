@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class WsBroadcast extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    WsPool.broadcast(arg(0).atomItem(qc, info), ws(qc).id);
+    WsPool.broadcast(arg(0).item(qc, info), ws(qc).id);
     return Empty.VALUE;
   }
 }
