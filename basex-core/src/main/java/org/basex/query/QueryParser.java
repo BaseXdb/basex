@@ -2168,7 +2168,7 @@ public class QueryParser extends InputParser {
           } while(wsConsume("["));
           expr = new CachedFilter(info(), expr, el.finish());
         } else if(current('(')) {
-          expr = Functions.dynamic(expr, argumentList(true, null));
+          expr = Functions.dynamic(expr, argumentList(false, null));
         } else {
           final int p = pos;
           if(consume("?") && !consume(':')) {
