@@ -2116,11 +2116,10 @@ public class QueryParser extends InputParser {
       final Test test = simpleNodeTest(nodeType, true);
       checkTest(test, element);
       if(test == null) return null;
-      tests.add(test);
+      if(!tests.contains(test)) tests.add(test);
     } while(wsConsume("|"));
     if(!consume(')')) throw error(WRONGCHAR_X_X, ')', found());
-    return tests.size() == 1 ? tests.get(0)
-                             : new UnionTest(tests.toArray(Test[]::new));
+    return Test.get(tests);
   }
 
   /**
@@ -3293,7 +3292,7 @@ public class QueryParser extends InputParser {
     final ArrayList<Test> tests = nameTestUnion(type);
     if(tests == null) return null;
 
-    final Test test = Test.get(tests.toArray(Test[]::new));
+    final Test test = Test.get(tests);
     if(wsConsumeWs(",")) {
       final QNm name = eQName(sc.elemNS, QNAME_X);
       Type ann = ListType.find(name);

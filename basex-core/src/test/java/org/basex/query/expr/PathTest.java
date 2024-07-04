@@ -282,12 +282,17 @@ public final class PathTest extends SandboxTest {
   /** Union node tests. */
   @Test public void unionNodeTest() {
     final String el = "<x a='a'><e>e</e>t<!--c--><?p p?></x>";
-    check(el + "/attribute::(document-node()|a|e|text())!string()", "a");
-    check(el + "/@(a|processing-instruction())!string()", "a");
-    check(el + "/attribute::(node()|processing-instruction())!string()", "a");
-    check(el + "/child::(a|e|text())!string()", "e\nt");
-    check(el + "/child::(a|e|processing-instruction())!string()", "e\np");
-    check(el + "/child::(a|e|text()|comment())!string()", "e\nt\nc");
-    check(el + "/descendant-or-self::(text()|*|comment())!string()", "et\ne\ne\nt\nc");
+    query(el + "/attribute::(document-node()|a|e|text()) ! string()", "a");
+    query(el + "/@(a|processing-instruction()) ! string()", "a");
+    query(el + "/attribute::(node()|processing-instruction()) ! string()", "a");
+    query(el + "/child::(a|e|text()) ! string()", "e\nt");
+    query(el + "/child::(a|e|processing-instruction()) ! string()", "e\np");
+    query(el + "/child::(a|e|text()|comment()) ! string()", "e\nt\nc");
+    query(el + "/descendant-or-self::(text()|*|comment()) ! string()", "et\ne\ne\nt\nc");
+
+    check(el + "/child::(text()|text()) ! string()", "t",
+        type(IterStep.class, "text()*"));
+    check(el + "/child::(text()|e|text()) ! string()", "e\nt",
+        type(IterStep.class, "(text()|element(e))*"));
   }
 }

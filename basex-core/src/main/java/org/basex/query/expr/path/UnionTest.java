@@ -44,7 +44,7 @@ public final class UnionTest extends Test {
       final Test t = test.optimize(data);
       if(t != null) list.add(t);
     }
-    return tests.length != list.size() ? get(list.toArray(Test[]::new)) : this;
+    return tests.length != list.size() ? get(list) : this;
   }
 
   @Override
@@ -98,7 +98,7 @@ public final class UnionTest extends Test {
       final Test t2 = t.intersect(test);
       if(t2 != null) list.add(t2);
     }
-    return get(list.toArray(Test[]::new));
+    return get(list);
   }
 
   @Override

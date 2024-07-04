@@ -543,7 +543,7 @@ public final class SeqType {
     // ignore general type of empty sequence
     final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
-    final Test ts = st.zero() ? test : zero() ? st.test : Test.get(test, st.test);
+    final Test ts = st.zero() ? test : zero() ? st.test : Test.get(Arrays.asList(test, st.test));
     return get(tp, oc, ts);
   }
 

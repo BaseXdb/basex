@@ -1169,7 +1169,7 @@ public final class RewritingsTest extends SandboxTest {
   /** List to union. */
   @Test public void gh1818() {
     check("<a/>[b, text()]", "", count(SingleIterPath.class, 1),
-        type(IterStep.class, "element(b)|text()*"));
+        type(IterStep.class, "(element(b)|text())*"));
 
     // union expression will be further rewritten to single path
     check("<a/>[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
@@ -1968,9 +1968,9 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1914() {
     check("<a/>/(self::*|self::a)", "<a/>", root(CElem.class));
 
-    check("<a/>/(* | a)", "", type(IterStep.class, "element()|element(a)*"));
-    check("<a/>/(a | *)", "", type(IterStep.class, "element(a)|element()*"));
-    check("<a/>/(a | * | b)", "", type(IterStep.class, "element(a)|element()|element(b)*"));
+    check("<a/>/(* | a)", "", type(IterStep.class, "(element()|element(a))*"));
+    check("<a/>/(a | *)", "", type(IterStep.class, "(element(a)|element())*"));
+    check("<a/>/(a | * | b)", "", type(IterStep.class, "(element(a)|element()|element(b))*"));
 
     check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
     check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));

@@ -46,16 +46,15 @@ public abstract class Test extends ExprInfo {
    * @param tests tests to be merged (can contain {@code null} references)
    * @return single test, union test, or {@code null} if test cannot be created.
    */
-  public static Test get(final Test... tests) {
-    final int tl = tests.length;
+  public static Test get(final List<Test> tests) {
+    final int tl = tests.size();
     if(tl == 0) return null;
-    if(tl == 1) return tests[0];
-
-    for(final Test test : tests) if(test == null) return null;
+    if(tl == 1) return tests.get(0);
 
     // merge name tests
     final List<Test> list = new ArrayList<>(tl);
     for(final Test test : tests) {
+      if(test == null) return null;
       if(test instanceof UnionTest) {
         for(final Test t : ((UnionTest) test).tests) {
           if(!list.contains(t)) list.add(t);
