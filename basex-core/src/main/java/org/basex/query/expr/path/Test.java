@@ -42,7 +42,7 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Creates a single test with the same node type.
+   * Creates a single test.
    * @param tests tests to be merged (can contain {@code null} references)
    * @return single test, union test, or {@code null} if test cannot be created.
    */
@@ -51,17 +51,11 @@ public abstract class Test extends ExprInfo {
     if(tl == 0) return null;
     if(tl == 1) return tests[0];
 
-    // find common node type
-    NodeType type = null;
-    for(final Test test : tests) {
-      if(test == null || type != null && type != test.type) return null;
-      type = test.type;
-    }
+    for(final Test test : tests) if(test == null) return null;
 
     // merge name tests
     final List<Test> list = new ArrayList<>(tl);
     for(final Test test : tests) {
-      if(test instanceof KindTest) return test;
       if(test instanceof UnionTest) {
         for(final Test t : ((UnionTest) test).tests) {
           if(!list.contains(t)) list.add(t);
@@ -70,7 +64,7 @@ public abstract class Test extends ExprInfo {
         list.add(test);
       }
     }
-    return list.size() == 1 ? list.get(0) : new UnionTest(type, list.toArray(Test[]::new));
+    return list.size() == 1 ? list.get(0) : new UnionTest(list.toArray(Test[]::new));
   }
 
   /**

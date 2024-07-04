@@ -1168,7 +1168,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** List to union. */
   @Test public void gh1818() {
-    check("<a/>[b, text()]", "", exists(Union.class), count(SingleIterPath.class, 2));
+    check("<a/>[b, text()]", "", count(SingleIterPath.class, 1),
+        type(IterStep.class, "element(b)|text()*"));
 
     // union expression will be further rewritten to single path
     check("<a/>[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
@@ -1967,9 +1968,9 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1914() {
     check("<a/>/(self::*|self::a)", "<a/>", root(CElem.class));
 
-    check("<a/>/(* | a)", "", type(IterStep.class, "element()*"));
-    check("<a/>/(a | *)", "", type(IterStep.class, "element()*"));
-    check("<a/>/(a | * | b)", "", type(IterStep.class, "element()*"));
+    check("<a/>/(* | a)", "", type(IterStep.class, "element()|element(a)*"));
+    check("<a/>/(a | *)", "", type(IterStep.class, "element(a)|element()*"));
+    check("<a/>/(a | * | b)", "", type(IterStep.class, "element(a)|element()|element(b)*"));
 
     check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
     check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
@@ -3234,18 +3235,22 @@ public final class RewritingsTest extends SandboxTest {
         count(IterStep.class, 1), "//@axis = 'descendant-or-self'");
 
     check("<A><B/></A>/descendant-or-self::node()/(* | text())", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
+        count(IterStep.class, 1), "//@axis = 'descendant'");
+    check("<A><B/>X</A>/descendant-or-self::node()/(* | text())", "<B/>\nX",
+        count(IterStep.class, 1), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
+        count(IterStep.class, 1), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
+        count(IterStep.class, 1), "//@axis = 'descendant'");
 
     check("<A><B/></A>/descendant-or-self::node()/(* | text())[..]", "<B/>",
-        count(IterStep.class, 3), "//@axis = 'descendant'");
+        count(IterStep.class, 2), "//@axis = 'descendant'");
+    check("<A><B/>X</A>/descendant-or-self::node()/(* | text())[..]", "<B/>\nX",
+        count(IterStep.class, 2), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())[..]", "<B/>",
-        count(IterStep.class, 3), "//@axis = 'descendant'");
+        count(IterStep.class, 2), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())[..]", "<B/>",
-        count(IterStep.class, 3), "//@axis = 'descendant'");
+        count(IterStep.class, 2), "//@axis = 'descendant'");
   }
 
   /** Refine parameter types to arguments types of function call. */

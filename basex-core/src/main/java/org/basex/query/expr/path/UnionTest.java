@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Union test for nodes of common type.
+ * Union test for nodes.
  *
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
@@ -19,12 +19,22 @@ public final class UnionTest extends Test {
 
   /**
    * Constructor.
-   * @param type common node type
-   * @param tests tests ({@link NameTest}, {@link DocTest} and {@link InvDocTest} instances)
+   * @param tests tests
    */
-  UnionTest(final NodeType type, final Test[] tests) {
-    super(type);
+  public UnionTest(final Test[] tests) {
+    super(unionType(tests));
     this.tests = tests;
+  }
+
+  /**
+   * Calculate union type of tests.
+   * @param tests tests
+   * @return union type
+   */
+  private static NodeType unionType(final Test[] tests) {
+    Type unionType = tests[0].type;
+    for (int i = 1; i < tests.length; ++i) unionType = unionType.union(tests[i].type);
+    return (NodeType) unionType;
   }
 
   @Override
