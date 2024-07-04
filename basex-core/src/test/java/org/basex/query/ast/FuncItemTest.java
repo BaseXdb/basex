@@ -199,6 +199,11 @@ public final class FuncItemTest extends SandboxTest {
         "return $f(function() { 1, 2 })", INVCONVERT_X_X_X);
     error("let $x as fn (xs:byte) as item() := fn($x as item()) {$x} return $x(384)",
         FUNCCAST_X_X_X);
+    error("let $x as fn(xs:anyAtomicType) as xs:string? := { 1:'A', 'x':'B' } return $x?*",
+        LOOKUP_X);
+    error("let $x as fn(xs:integer) as xs:integer := [1, 2] return $x?*", LOOKUP_X);
+    error("let $x as fn(*) := { 1:'A', 'x':'B' } return $x?*", LOOKUP_X);
+    error("let $x as fn(*) := [1, 2] return $x?*", LOOKUP_X);
   }
 
   /** Checks if nested closures are inlined. */

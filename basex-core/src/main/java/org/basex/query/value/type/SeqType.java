@@ -446,7 +446,8 @@ public final class SeqType {
 
     // check if function arguments must be coerced
     boolean coerce = false;
-    final SeqType[] argTypes = type instanceof FuncType ? ((FuncType) type).argTypes : null;
+    boolean toFunc = type instanceof FuncType;
+    final SeqType[] argTypes = toFunc ? ((FuncType) type).argTypes : null;
     if(argTypes != null) {
       for(final SeqType at : argTypes) {
         if(!at.eq(ITEM_ZM)) {
@@ -458,11 +459,11 @@ public final class SeqType {
 
     // check if value must be coerced
     if(!coerce) {
-      if(instance(value)) return value;
+      if(instance(value) && (!toFunc || value instanceof FuncItem)) return value;
 
       for(final Item item : value) {
         qc.checkStop();
-        if(!instance(item)) {
+        if(!instance(item) || toFunc && !(item instanceof FuncItem)) {
           coerce = true;
           break;
         }
@@ -542,7 +543,8 @@ public final class SeqType {
         items.add(it);
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
-      items.add(((FItem) item).coerceTo((FuncType) type, qc, cc, info));
+      final FuncType ft = type == FUNCTION ? item.funcType() : (FuncType) type;
+      items.add(((FItem) item).coerceTo(ft, qc, cc, info));
     } else {
       throw error.get();
     }
