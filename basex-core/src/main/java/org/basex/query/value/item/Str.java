@@ -66,7 +66,7 @@ public final class Str extends AStr {
    * @param type type
    * @return instance
    */
-  public static Str get(final byte[] value, final AtomType type) {
+  public static Str get(final byte[] value, final Type type) {
     return type == AtomType.STRING ? get(value) : new Str(value, type);
   }
 
@@ -143,13 +143,13 @@ public final class Str extends AStr {
   @Override
   public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
-    return type == AtomType.ENUM ? get(string()) : this;
+    return type instanceof EnumType ? get(string()) : this;
   }
 
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    return type != AtomType.ENUM;
+    return !(type instanceof EnumType);
   }
 
   @Override

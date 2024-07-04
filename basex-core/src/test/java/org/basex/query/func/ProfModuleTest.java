@@ -66,6 +66,7 @@ public final class ProfModuleTest extends SandboxTest {
     query(func.args(1), 1);
     query(func.args(" (1, 2, 3)"), "1\n2\n3");
     query(func.args(" <x a='1' b='2' c='3'/>/@*/data()"), "1\n2\n3");
+    query(func.args(" ('x' cast as enum('a', 'x'), 'y' cast as enum('b', 'y'))"), "x\ny");
   }
 
   /** Test method. */

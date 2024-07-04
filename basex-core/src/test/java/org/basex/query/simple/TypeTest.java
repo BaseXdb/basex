@@ -33,8 +33,15 @@ public final class TypeTest extends QueryTest {
         { "Type 5", booleans(false), "1 instance of xs:string" },
         { "Type 6", booleans(false), "1 instance of xs:untypedAtomic" },
         { "Type 7", booleans(true),
-            "{1: 1, 'a': 2} instance of map((xs:integer|xs:string), item()) "},
+            "{1: 1, 'a': 2} instance of map((xs:integer|xs:string), item())"},
         { "Type 8", booleans(false), "{1: 1} instance of map((xs:unsignedByte|xs:byte), item())"},
+        { "Type 9", booleans(true),
+            "{'a' cast as enum('a'): 1} instance of map(enum('a'), item())"},
+        { "Type 10", booleans(false),
+            "{'b' cast as enum('b'): 1} instance of map(enum('a'), item())"},
+        { "Type 11", booleans(true), "fn($a as (enum('a')|enum('b'))) as item()* {$a} "
+            + "instance of fn(enum('a', 'b')) as item()*"
+        },
 
         { "TypeErr 1", "1 instance of xs:abcde" },
         { "TypeErr 2", "1 instance of xs:string()" },

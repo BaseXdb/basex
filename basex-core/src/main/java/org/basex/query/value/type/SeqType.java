@@ -213,8 +213,6 @@ public final class SeqType {
   public final Occ occ;
   /** Node kind test (can be {@code null}). */
   private final Test test;
-  /** Enumeration values (can be {@code null}). */
-  private final EnumValues values;
   /** Array type (lazy instantiation). */
   private ArrayType arrayType;
   /** Map types (lazy instantiation). */
@@ -226,7 +224,7 @@ public final class SeqType {
    * @param occ occurrence
    */
   SeqType(final Type type, final Occ occ) {
-    this(type, occ, null, null);
+    this(type, occ, null);
   }
 
   /**
@@ -234,13 +232,11 @@ public final class SeqType {
    * @param type type
    * @param occ occurrence indicator
    * @param test node kind test (can be {@code null})
-   * @param values enumeration values (can be {@code null})
    */
-  private SeqType(final Type type, final Occ occ, final Test test, final EnumValues values) {
+  private SeqType(final Type type, final Occ occ, final Test test) {
     this.type = type;
     this.occ = occ;
     this.test = test;
-    this.values = values;
   }
 
   /**
@@ -262,33 +258,7 @@ public final class SeqType {
    */
   public static SeqType get(final Type type, final Occ occ, final Test test) {
     return occ == ZERO || test == null || !(type instanceof NodeType) ?
-      get(type, occ) : new SeqType(type, occ, test, null);
-  }
-
-  /**
-   * Returns a sequence type.
-   * @param type type
-   * @param occ occurrence indicator
-   * @param values enumeration values (can be {@code null}; ignored if this is not an enum type)
-   * @return sequence type
-   */
-  public static SeqType get(final Type type, final Occ occ, final EnumValues values) {
-    return occ == ZERO || values == null || type != ENUM ?
-      get(type, occ) : new SeqType(type, occ, null, values);
-  }
-
-  /**
-   * Returns a sequence type.
-   * @param type type
-   * @param occ occurrence indicator
-   * @param test kind test (can be {@code null}; ignored if this is no node type)
-   * @param values enum values (can be {@code null}; ignored if this is not an enum type)
-   * @return sequence type
-   */
-  private static SeqType get(final Type type, final Occ occ, final Test test,
-      final EnumValues values) {
-    return occ == ZERO || (test == null || !(type instanceof NodeType)) &&
-        (values == null || type != ENUM) ? get(type, occ) : new SeqType(type, occ, test, values);
+      get(type, occ) : new SeqType(type, occ, test);
   }
 
   /**
@@ -316,7 +286,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType with(final Occ oc) {
-    return oc == occ ? this : get(type, oc, test, values);
+    return oc == occ ? this : get(type, oc, test);
   }
 
   /**
@@ -325,7 +295,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType union(final Occ oc) {
-    return oc == occ ? this : get(type, occ.union(oc), test, values);
+    return oc == occ ? this : get(type, occ.union(oc), test);
   }
 
   /**
@@ -365,8 +335,7 @@ public final class SeqType {
       }
       return false;
     }
-    return item.instanceOf(type) && (test == null || test.matches(item)) &&
-        (values == null || values.matches(((Str) item).string()));
+    return item.instanceOf(type) && (test == null || test.matches(item));
   }
 
   /**
@@ -415,11 +384,7 @@ public final class SeqType {
     // enable light-weight error handling
     if(!error && info != null) info.internal(true);
     try {
-      if(values != null) {
-        final byte[] string = item.string(info);
-        if(!values.matches(string)) throw typeError(item, type, info);
-        if(item.type != ENUM) return Str.get(string, ENUM);
-      } else if(!item.type.eq(type)) {
+      if(!item.type.eq(type)) {
         return type.cast(item, qc, info);
       }
       return item;
@@ -512,7 +477,7 @@ public final class SeqType {
       }
       throw error.get();
     }
-    if(type instanceof AtomType) {
+    if(type instanceof AtomType || type instanceof EnumType) {
       final Iter iter = item.atomValue(qc, info).iter();
       for(Item it; (it = qc.next(iter)) != null;) {
         Item relabel = null;
@@ -579,9 +544,7 @@ public final class SeqType {
     final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
     final Test ts = st.zero() ? test : zero() ? st.test : Test.get(test, st.test);
-    final EnumValues ev = st.zero() ? values : zero() ? st.values :
-      EnumValues.union(values, st.values);
-    return get(tp, oc, ts, ev);
+    return get(tp, oc, ts);
   }
 
   /**
@@ -611,10 +574,6 @@ public final class SeqType {
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
-    if(values != null || st.values != null) {
-      final EnumValues ev = EnumValues.intersect(values, st.values);
-      return ev == null ? null : get(tp, oc, ev);
-    }
     if(test == null || st.test == null || test.equals(st.test))
       return get(tp, oc, test != null ? test : st.test);
     final Test kn = test.intersect(st.test);
@@ -685,8 +644,7 @@ public final class SeqType {
   public boolean instanceOf(final SeqType st) {
     // empty sequence: only check cardinality
     return this == st || (zero() ? !st.oneOrMore() :
-      type.instanceOf(st.type) && occ.instanceOf(st.occ) &&
-      kindInstanceOf(st) && valuesInstanceOf(st));
+      type.instanceOf(st.type) && occ.instanceOf(st.occ) && kindInstanceOf(st));
   }
 
   /**
@@ -697,16 +655,6 @@ public final class SeqType {
    */
   public boolean kindInstanceOf(final SeqType st) {
     return st.test == null || test != null && test.instanceOf(st.test);
-  }
-
-  /**
-   * Checks if the enum values of this sequence type are instances of the enum values of the
-   * specified sequence type.
-   * @param st sequence type to check
-   * @return result of check
-   */
-  public boolean valuesInstanceOf(final SeqType st) {
-    return st.values == null || values != null && values.instanceOf(st.values);
   }
 
   /**
@@ -723,8 +671,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType st) {
-    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(test, st.test) &&
-        Objects.equals(values, st.values);
+    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(test, st.test);
   }
 
   @Override
@@ -737,7 +684,7 @@ public final class SeqType {
    * {@link ChoiceItemType}, while {@link #mapTypes} is being maintained as a {@link HashMap}.
    * Since {@link MapType#keyType} is guaranteed to be an atomic type, we expect it to be called
    * only on {@link #SeqType} instances based on some {@link AtomType}, where suitable hash codes
-   * are available for {@link #type}, {@link #occ}, and {@link #values}.
+   * are available for {@link #type}, and {@link #occ}.
    */
   @Override
   public int hashCode() {
@@ -746,7 +693,6 @@ public final class SeqType {
     int result = 1;
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     result = prime * result + ((occ == null) ? 0 : occ.hashCode());
-    result = prime * result + ((values == null) ? 0 : values.hashCode());
     return result;
   }
 
@@ -756,7 +702,7 @@ public final class SeqType {
    */
   public String typeString() {
     return zero() ? QueryText.EMPTY_SEQUENCE + "()" : test != null ? test.toString() :
-      values != null ? values.toString() : type.toString();
+      type.toString();
   }
 
   @Override

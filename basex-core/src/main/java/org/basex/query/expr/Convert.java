@@ -70,8 +70,7 @@ abstract class Convert extends Single {
       if(es != -1 && (es < castType.occ.min || es > castType.occ.max)) return false;
 
       final Type et = est.type;
-      if(castType.type != AtomType.ENUM && et.instanceOf(castType.type) &&
-          est.occ.instanceOf(castType.occ) &&
+      if(et.instanceOf(castType.type) && est.occ.instanceOf(castType.occ) &&
           (et.eq(castType.type) || castType.type == AtomType.NUMERIC)) return true;
     }
     return null;
