@@ -17,7 +17,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Partial function application.
+ * Partially applied function.
  *
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
@@ -110,8 +110,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), placeholders,
-        placeholderPerm == null ? null : placeholderPerm.clone()));
+    return copyType(new PartFunc(info, copyAll(cc, vm, exprs), placeholders, placeholderPerm));
   }
 
   @Override

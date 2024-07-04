@@ -472,8 +472,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @return parameter names
    */
   public QNm[] paramNames() {
-    final QNm[] names = new QNm[params.length];
-    for(int p = 0; p < names.length; ++p) names[p] = paramName(p);
+    final int pl = params.length;
+    final QNm[] names = new QNm[pl];
+    for(int p = 0; p < pl; ++p) names[p] = paramName(p);
     return names;
   }
 }
