@@ -15,6 +15,7 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -47,25 +48,25 @@ public class ArchiveCreate extends ArchiveFn {
 
   /**
    * Creates the archive.
-   * @param files entries to add to the archive
+   * @param entries entries to add to the archive
    * @param opts create options
    * @param os output stream
    * @param qc query context
    * @throws QueryException query exception
    */
-  final void create(final Map<String, Entry<Item, Item>> files, final CreateOptions opts,
+  final void create(final Map<String, Entry<Item, Item>> entries, final CreateOptions opts,
       final OutputStream os, final QueryContext qc) throws QueryException {
 
     // check options
     final String format = opts.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
-    if(format.equals(GZIP) && files.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
+    if(format.equals(GZIP) && entries.size() > 1) throw ARCHIVE_SINGLE_X.get(info, format);
 
     final int level = level(opts);
     try(ArchiveOut out = ArchiveOut.get(format, info, os)) {
       out.level(level);
       try {
-        for(final Entry<Item, Item> file : files.values()) {
-          add(file, out, level, "", qc);
+        for(final Entry<Item, Item> entry : entries.values()) {
+          add(entry, out, level, "", qc);
         }
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);
@@ -119,8 +120,8 @@ public class ArchiveCreate extends ArchiveFn {
     final Item content = file.getValue();
     if(content instanceof Bin) {
       out.write(ze, (Bin) content, info);
-    } else {
-      out.write(ze, encode(toBytes(content), encoding(header), false, qc));
+    } else if(content != XQArray.empty()) {
+      out.write(ze, encode(toBytes(content, qc), encoding(header), false, qc));
     }
   }
 
@@ -138,15 +139,15 @@ public class ArchiveCreate extends ArchiveFn {
     final Map<String, Entry<Item, Item>> files = new LinkedHashMap<>();
     int e = 0, c = 0;
     while(true) {
-      final Item item = qc.next(entrs), cn = cntnts.next();
-      if(item == null || cn == null) {
+      final Item entry = qc.next(entrs), content = cntnts.next();
+      if(entry == null || content == null) {
         // count remaining entries
-        if(cn != null) do c++; while(cntnts.next() != null);
-        if(item != null) do e++; while(entrs.next() != null);
+        if(content != null) do c++; while(cntnts.next() != null);
+        if(entry != null) do e++; while(entrs.next() != null);
         if(e != c) throw ARCHIVE_NUMBER_X_X.get(info, e, c);
         break;
       }
-      files.put(toString(item, qc), new SimpleEntry<>(item, cn));
+      files.put(toString(entry, qc), new SimpleEntry<>(entry, content));
       e++;
       c++;
     }

@@ -40,7 +40,7 @@ public abstract class WebFn extends StandardFunc {
 
     final XQMap map = params.isEmpty() ? XQMap.empty() : toMap(params);
     final TokenBuilder url = createUrl(href, map, info);
-    if(anchor.length > 0) url.add('#').add(Token.encodeUri(anchor, false));
+    if(anchor.length > 0) url.add('#').add(Token.encodeUri(anchor, false, false));
     return url.toString();
   }
 
@@ -60,8 +60,8 @@ public abstract class WebFn extends StandardFunc {
     for(final Item key : params.keys()) {
       final byte[] name = key.string(info);
       for(final Item item : params.get(key)) {
-        url.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, false));
-        url.add('=').add(Token.encodeUri(item.string(info), false));
+        url.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, false, false));
+        url.add('=').add(Token.encodeUri(item.string(info), false, false));
       }
     }
     return url;

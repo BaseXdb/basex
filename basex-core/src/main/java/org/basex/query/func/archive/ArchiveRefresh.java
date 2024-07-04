@@ -11,6 +11,7 @@ import java.util.Map.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -36,16 +37,18 @@ public final class ArchiveRefresh extends ArchiveCreate {
           final Path path = fs.getPath(file.getKey());
           final Entry<Item, Item> entry = file.getValue();
           final Item header = entry.getKey(), content = entry.getValue();
-          try(OutputStream os = Files.newOutputStream(path)) {
+          if(content == XQArray.empty()) {
+            if(Files.exists(path)) Files.delete(path);
+          } else {
             if(content instanceof Bin) {
-              IO.write(content.input(info), os);
+              Files.copy(((Bin) content).input(info), path, StandardCopyOption.REPLACE_EXISTING);
             } else {
-              os.write(encode(toBytes(content), encoding(header), false, qc));
+              Files.write(path, encode(toBytes(content, qc), encoding(header), false, qc));
             }
+            final long time = timestamp(header, qc);
+            final FileTime ft = FileTime.fromMillis(time < 0 ? System.currentTimeMillis() : time);
+            Files.setLastModifiedTime(path, ft);
           }
-          final long time = timestamp(header, qc);
-          final FileTime ft = FileTime.fromMillis(time < 0 ? System.currentTimeMillis() : time);
-          Files.setLastModifiedTime(path, ft);
         }
       }
     } catch(final IOException ex) {

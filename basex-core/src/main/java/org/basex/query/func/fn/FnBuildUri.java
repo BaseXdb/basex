@@ -53,7 +53,8 @@ public class FnBuildUri extends FnJsonDoc {
       int a = 0;
       for(final Item segment : segments) {
         if(a++ != 0) uri.add(sep);
-        uri.add(encodeUri(toToken(segment, qc), false));
+        final byte[] token = toToken(segment, qc);
+        uri.add(encodeUri(token, false, true));
       }
     } else {
       uri.add(get(parts, PATH, qc));
@@ -66,8 +67,8 @@ public class FnBuildUri extends FnJsonDoc {
       toMap(qp, qc).apply((key, value) -> {
         for(final Item item : value) {
           query.add(query.isEmpty() ? "?" : sep);
-          query.add(encodeUri(toToken(key), false)).add('=');
-          query.add(encodeUri(toToken(item), false));
+          query.add(encodeUri(toToken(key), false, false)).add('=');
+          query.add(encodeUri(toToken(item), false, false));
         }
       });
       uri.add(query);

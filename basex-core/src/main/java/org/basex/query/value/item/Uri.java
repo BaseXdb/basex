@@ -143,7 +143,7 @@ public final class Uri extends AStr {
    * @return parsed URI
    */
   private ParsedUri parsed() {
-    if(parsed == null) parsed = UriParser.parse(Token.string(Token.encodeUri(value, true)));
+    if(parsed == null) parsed = UriParser.parse(Token.string(Token.encodeUri(value, true, false)));
     return parsed;
   }
 

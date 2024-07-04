@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
-import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -28,6 +27,9 @@ public final class ArchiveModuleTest extends SandboxTest {
 
     // simple zip files
     countEntries(func.args("X", ""), 1);
+    countEntries(func.args("X", " []"), 0);
+    countEntries(func.args(" ('X', 'Y')", " ('', [])"), 1);
+    countEntries(func.args(" ('X', 'Y')", " (['x'], [])"), 1);
 
     // simple zip files
     countEntries(func.args(" <archive:entry>X</archive:entry>", ""), 1);
@@ -224,7 +226,7 @@ public final class ArchiveModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void extractTo() {
     final Function func = _ARCHIVE_EXTRACT_TO;
-    final String tmp = new IOFile(sandbox(), "tmp").path();
+    final String tmp = Prop.TEMPDIR + NAME + "extractTo";
     // write archive and count number of entries
     query(func.args(tmp, ZIP));
     countEntries(ZIP, 5);
@@ -323,9 +325,11 @@ public final class ArchiveModuleTest extends SandboxTest {
   @Test public void write() {
     final Function func = _ARCHIVE_WRITE;
 
-    final String file = new IOFile(sandbox(), "tmp").path() + "write.zip";
-    query(func.args(file, "1", "1"));
-    query(_ARCHIVE_EXTRACT_TEXT.args(_FILE_READ_BINARY.args(file)), 1);
+    final String tmp = Prop.TEMPDIR + NAME + "write";
+    query(func.args(tmp, "file", "123"));
+    query(_ARCHIVE_EXTRACT_TEXT.args(tmp), 123);
+    query(func.args(tmp, "file", " []"));
+    query(_ARCHIVE_EXTRACT_BINARY.args(tmp), "");
   }
 
   /**
