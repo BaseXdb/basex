@@ -119,8 +119,8 @@ function dba:database(
                 html:button('backup-create', 'Create…') update {
                   if($db-exists) then () else insert node attribute disabled { '' } into .
                 },
-                html:button('backup-restore', 'Restore', ('check', 'CONFIRM')),
-                html:button('backup-drop', 'Drop', ('check', 'CONFIRM'))
+                html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
+                html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
               )
               let $params := { 'name': $name }
               return html:table($headers, $entries, $buttons, $params)

@@ -192,7 +192,7 @@ declare function html:checkbox(
 declare function html:button(
   $action   as xs:string,
   $label    as xs:string,
-  $options  as xs:string*  := ()
+  $options  as enum('CONFIRM', 'CHECK')*  := ()
 ) as element(button) {
   <button>{
     attribute formaction { $action }[$action],
