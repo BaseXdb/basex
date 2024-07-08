@@ -248,13 +248,13 @@ public final class Payload {
     final HashMap<String, Value> data = new HashMap<>();
     final ByteList cont = new ByteList();
     int lines = -1;
-    String name = "", filename = null;
+    String name = "", filename = "";
     for(byte[] line; (line = readLine()) != null;) {
       if(lines >= 0) {
         if(startsWith(line, bound)) {
           // get old value
           Value value = data.get(name);
-          if(filename != null) {
+          if(!filename.isEmpty()) {
             // assign file and contents, join multiple files
             final XQMap map = value instanceof XQMap ? (XQMap) value : XQMap.empty();
             final Str file = Str.get(filename);
@@ -277,9 +277,9 @@ public final class Payload {
       } else if(startsWith(lc(line), CONTENT_DISPOSITION)) {
         // get key and file name
         name = contains(line, token("name=")) ?
-          string(line).replaceAll("^.*?name=\"|\".*", "").replaceAll("\\[]", "") : null;
+          string(line).replaceAll("^.*?name=\"|\".*", "").replaceAll("\\[]", "") : "";
         filename = contains(line, token("filename=")) ?
-          string(line).replaceAll("^.*filename=\"|\"$", "") : null;
+          string(line).replaceAll("^.*filename=\"|\"$", "") : "";
       } else if(line.length == 0) {
         lines = 0;
       }
