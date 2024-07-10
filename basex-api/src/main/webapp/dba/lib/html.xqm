@@ -302,7 +302,7 @@ declare function html:table(
             then fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
             else identity(?)
           case 'dynamic' return
-            fn { if(. instance of function(*)) then string-join(.()) else . }
+            fn { if(. instance of fn(*)) then string-join(.()) else . }
           default return
             identity(?)
       )
@@ -402,7 +402,7 @@ declare function html:table(
             html:date(xs:dateTime($v))
           ) else if($type = 'time') then (
             html:time(xs:dateTime($v))
-          ) else if($v instance of function(*)) then (
+          ) else if($v instance of fn(*)) then (
             $v()
           ) else (
             string($v)
