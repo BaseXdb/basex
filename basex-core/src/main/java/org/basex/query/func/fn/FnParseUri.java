@@ -68,7 +68,7 @@ public class FnParseUri extends FnJsonDoc {
     final Regex r = new Regex();
     if(r.has(string, "^(.*?)#(.*)$")) {
       string = r.group(1);
-      fragment = decode(r.group(2));
+      fragment = r.group(2);
     }
     if(r.has(string, "^(.*?)\\?(.*)$")) {
       string = r.group(1);
@@ -96,9 +96,6 @@ public class FnParseUri extends FnJsonDoc {
       filepath = string;
     } else if((scheme.isEmpty() || scheme.equals(FILE)) && r.has(string, "^/*(/[a-zA-Z][:|].*)$")) {
       string = r.group(1).replaceAll("^(..)\\|", "$1:");
-    } else if(r.has(string, "^///*([^/]+)?$")) {
-      authority = r.group(1);
-      string = "";
     } else if(r.has(string, "^///*([^/]+)?(/.*)?$")) {
       authority = r.group(1);
       string = r.group(2);
