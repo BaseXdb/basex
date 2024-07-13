@@ -101,7 +101,6 @@ final class ProjectCache implements Iterable<String> {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-
   }
 
   @Override

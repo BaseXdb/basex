@@ -144,7 +144,6 @@ public abstract class CLI extends Main {
    */
   protected static Entry<String, String> commands(final String input) throws IOException {
     return isFile(input) ? script(input) : new SimpleEntry<>("", input);
-
   }
 
   /**

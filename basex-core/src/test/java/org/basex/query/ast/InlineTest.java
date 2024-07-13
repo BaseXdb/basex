@@ -141,7 +141,6 @@ public final class InlineTest extends SandboxTest {
     check("declare %basex:lock('x') function local:x($x) { $x }; local:x(123)",
         123,
         exists(StaticFunc.class));
-
   }
 
   /** Tests if all let clauses are removed. */

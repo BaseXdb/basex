@@ -106,7 +106,6 @@ public abstract class Step extends Preds {
     return pos ?
       new IterPosStep(info, axis, test, preds) :
       new IterStep(info, axis, test, preds);
-
   }
 
   /**

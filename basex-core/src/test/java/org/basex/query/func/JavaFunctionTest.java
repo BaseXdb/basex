@@ -235,7 +235,6 @@ public final class JavaFunctionTest extends SandboxTest {
     error("rest:XYZ()", WHICHFUNC_X);
     error("Q{java.lang.String}XYZ()", WHICHFUNC_X);
     error("Q{java:java.lang.String}XYZ()", JAVAMEMBER_X);
-
   }
 
   /** Pass on Java items to functions. */

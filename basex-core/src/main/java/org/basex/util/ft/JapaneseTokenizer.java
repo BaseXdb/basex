@@ -306,8 +306,8 @@ final class JapaneseTokenizer extends Tokenizer {
       if(!currToken.isMark() && !currToken.isAttachedWord()) return true;
     }
     return false;
-
   }
+
   @Override
   public boolean hasNext() {
     return wc ? moreWC() : more();
