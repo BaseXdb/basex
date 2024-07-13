@@ -95,11 +95,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Available collations. */
   public TokenObjMap<Collation> collations;
-
-  /** Number of successive tail calls. */
-  public int tailCalls;
-  /** Maximum number of successive tail calls (will be set before compilation). */
-  public int maxCalls;
+  /** Perform tail-call optimizations. */
+  public boolean tco;
 
   /** Function for the next tail call. */
   private XQFunction tcFunc;
@@ -275,7 +272,7 @@ public final class QueryContext extends Job implements Closeable {
     run(info.compiling, () -> {
       // assign tail call option after compiling options
       options.compile();
-      maxCalls = context.options.get(MainOptions.TAILCALLS);
+      tco = context.options.get(MainOptions.TAILCALLS) >= 0;
 
       // bind external variables
       if(parent == null) {
@@ -546,11 +543,11 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Registers a tail-called function and its arguments to this query context.
    * @param fn function to call
-   * @param arg arguments to pass to {@code fn}
+   * @param args arguments to pass to {@code fn}
    */
-  public void registerTailCall(final XQFunction fn, final Value[] arg) {
+  public void registerTailCall(final XQFunction fn, final Value[] args) {
     tcFunc = fn;
-    tcArgs = arg;
+    tcArgs = args;
   }
 
   /**
@@ -568,9 +565,9 @@ public final class QueryContext extends Job implements Closeable {
    * @return argument values if a tail call was registered, {@code null} otherwise
    */
   public Value[] pollTailArgs() {
-    final Value[] as = tcArgs;
+    final Value[] args = tcArgs;
     tcArgs = null;
-    return as;
+    return args;
   }
 
   /**
