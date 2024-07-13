@@ -86,7 +86,7 @@ public final class List extends Arr {
       }
 
       // size will be small enough to be cast to an integer
-      Value value = Seq.get((int) size, type, values);
+      Value value = Value.get((int) size, type, values);
       if(value == null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
         for(int v = 0; v < vl; v++) vb.add(values[v]);

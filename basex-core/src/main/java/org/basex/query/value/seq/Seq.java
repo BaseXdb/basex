@@ -339,43 +339,6 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Tries to create a compactified version of the specified values.
-   * @param size size of resulting sequence
-   * @param type type
-   * @param values values
-   * @return value, or {@code null} if sequence could not be created
-   * @throws QueryException query exception
-   */
-  public static Value get(final long size, final Type type, final Value... values)
-      throws QueryException {
-
-    if((values.length != 1 || values[0] instanceof TreeSeq || values[0] instanceof ItemSeq) &&
-        type instanceof AtomType) {
-      switch((AtomType) type) {
-        case BOOLEAN:
-          return BlnSeq.get(size, values);
-        case STRING:
-          return StrSeq.get(size, values);
-        case BYTE:
-          return BytSeq.get(size, values);
-        case SHORT:
-          return ShrSeq.get(size, values);
-        case FLOAT:
-          return FltSeq.get(size, values);
-        case DOUBLE:
-          return DblSeq.get(size, values);
-        case DECIMAL:
-          return DecSeq.get(size, values);
-        case UNSIGNED_LONG:
-          return null;
-        default:
-          if(type.instanceOf(AtomType.INTEGER)) return IntSeq.get(type, size, values);
-      }
-    }
-    return null;
-  }
-
-  /**
    * Returns an initial array capacity for the expected result size.
    * Throws an exception if the requested size will take too much memory.
    * @param size expected result size

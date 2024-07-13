@@ -97,7 +97,7 @@ public final class ShrSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  static Value get(final long size, final Value... values) throws QueryException {
+  public static Value get(final long size, final Value... values) throws QueryException {
     final ShortList tmp = new ShortList(size);
     for(final Value value : values) {
       // speed up construction, depending on input

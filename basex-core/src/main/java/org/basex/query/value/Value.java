@@ -15,6 +15,8 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -85,8 +87,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns a materialized version of this value without dependencies to persistent data.
-   * Raises an error if the value contains function items
-   * @param test check if a contained node can be adopted unchanged
+   * Raises an error if the value contains function items.
+   * @param test test to check if a node can be adopted unchanged
    * @param ii input info (can be {@code null})
    * @param qc query context
    * @return materialized value
@@ -98,7 +100,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Checks if this value is materialized, i.e., contains no persistent database nodes or
    * function items.
-   * @param test check if a contained node can be adopted unchanged
+   * @param test test to check if a node can be adopted unchanged
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
@@ -246,6 +248,44 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   public void refineType() {
     refineType(this);
+  }
+
+  /**
+   * Returns a compactified version of this value.
+   * @return compactified value or self reference
+   * @throws QueryException query exception
+   */
+  public Value compactify() throws QueryException {
+    refineType();
+    final Value compact = get(size(), type, this);
+    return compact != null ? compact : this;
+  }
+
+  /**
+   * Tries to create a compactified version of the specified values.
+   * @param size size of resulting sequence
+   * @param type type
+   * @param values values
+   * @return value, or {@code null} if sequence could not be created
+   * @throws QueryException query exception
+   */
+  public static Value get(final long size, final Type type, final Value... values)
+      throws QueryException {
+    if((values.length != 1 || values[0] instanceof TreeSeq || values[0] instanceof ItemSeq) &&
+        type instanceof AtomType) {
+      switch((AtomType) type) {
+        case BOOLEAN: return BlnSeq.get(size, values);
+        case STRING: return StrSeq.get(size, values);
+        case BYTE: return BytSeq.get(size, values);
+        case SHORT: return ShrSeq.get(size, values);
+        case FLOAT: return FltSeq.get(size, values);
+        case DOUBLE: return DblSeq.get(size, values);
+        case DECIMAL: return DecSeq.get(size, values);
+        case UNSIGNED_LONG: return null;
+        default: if(type.instanceOf(AtomType.INTEGER)) return IntSeq.get(type, size, values);
+      }
+    }
+    return null;
   }
 
   /**
