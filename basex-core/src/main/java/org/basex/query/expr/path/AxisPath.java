@@ -2,12 +2,9 @@ package org.basex.query.expr.path;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.PathCache.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -48,32 +45,25 @@ public abstract class AxisPath extends Path {
    */
   private Value cache(final QueryContext qc) throws QueryException {
     final PathCache cache = qc.threads.get(this).get();
+    final Value value = qc.focus.value;
     switch(cache.state) {
       case INIT:
-        // first invocation: initialize caching flag
-        cache.state = !hasFreeVars() && !has(Flag.NDT) ? State.ENABLED : State.DISABLED;
-        return cache(qc);
-      case ENABLED:
-        // second invocation, caching is enabled: cache context value (copy light-weight db nodes)
-        final Value value = qc.focus.value;
-        cache.initial = value instanceof DBNode ? ((DBNode) value).finish() : value;
-        cache.state = State.READY;
+        // first invocation: find out if caching is possible
+        cache.init(value, this);
         break;
-      case READY:
-        // third invocation, ready for caching: cache result if context has not changed
-        if(cache.sameContext(qc.focus.value, root)) {
-          cache.result = iterator(qc).value(qc, this);
-          cache.state = State.CACHED;
+      case ENABLED:
+        // second invocation (ready for caching): cache result
+        if(cache.valid(value)) {
+          cache.cache(nodes(qc));
         } else {
-          // disable caching if context has changed
-          cache.state = State.DISABLED;
+          // disable caching otherwise (expected to change frequently)
+          cache.disable();
         }
         break;
       case CACHED:
-        // further invocations, result is cached: disable caching if context has changed
-        if(!cache.sameContext(qc.focus.value, root)) {
-          cache.result = null;
-          cache.state = State.DISABLED;
+        // further invocations (result is cached): cache again if context has changed
+        if(!cache.valid(value)) {
+          cache.update(value, nodes(qc));
         }
         break;
       case DISABLED:

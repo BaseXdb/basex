@@ -380,7 +380,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared in this expression,
    *         {@code false} otherwise
    */
-  protected boolean hasFreeVars() {
+  public boolean hasFreeVars() {
     final BitSet declared = new BitSet();
     return !accept(new ASTVisitor() {
       @Override

@@ -2474,6 +2474,13 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void takeWhile() {
+    final Function func = TAKE_WHILE;
+
+    query(func.args(" <x><a/><a/><c/></x>/*", " fn($n) { boolean($n/self::a) }"), "<a/>\n<a/>");
+  }
+
+  /** Test method. */
   @Test public void tokenize() {
     final Function func = TOKENIZE;
     query(func.args("a", "", "j"), "\na\n");
