@@ -17,7 +17,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public final class MapType extends FType {
+public class MapType extends FType {
   /** Key type of the map. */
   public final Type keyType;
   /** Value types (can be {@code null}, indicating that no type was specified). */
@@ -65,7 +65,7 @@ public final class MapType extends FType {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(!(type instanceof MapType)) return false;
+    if(type.getClass() != MapType.class) return false;
     final MapType mt = (MapType) type;
     return keyType.eq(mt.keyType) && valueType.eq(mt.valueType);
   }
@@ -73,7 +73,9 @@ public final class MapType extends FType {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == SeqType.MAP && type == SeqType.RECORD) return true;
     if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
+    if(type instanceof RecordType) return false;
     if(type instanceof MapType) {
       final MapType mt = (MapType) type;
       return valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
@@ -89,6 +91,7 @@ public final class MapType extends FType {
   @Override
   public Type union(final Type type) {
     if(type instanceof ChoiceItemType) return type.union(this);
+    if(type == SeqType.RECORD) return SeqType.MAP;
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
@@ -103,6 +106,7 @@ public final class MapType extends FType {
   @Override
   public Type intersect(final Type type) {
     if(type instanceof ChoiceItemType) return type.intersect(this);
+    if(type == SeqType.RECORD) return SeqType.RECORD;
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 

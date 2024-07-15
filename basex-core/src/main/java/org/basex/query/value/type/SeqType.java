@@ -18,6 +18,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Stores a sequence type definition.
@@ -175,6 +176,8 @@ public final class SeqType {
   public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
   /** Java function type. */
   public static final FuncType JAVA = new FuncType(null);
+  /** The general record type. */
+  public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>());
   /** The general map type. */
   public static final MapType MAP = ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
   /** The general array type. */
@@ -194,6 +197,8 @@ public final class SeqType {
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
+  /** Single record. */
+  public static final SeqType RECORD_O = RECORD.seqType();
   /** Single map. */
   public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */

@@ -203,6 +203,7 @@ public final class XQMap extends XQData {
 
   @Override
   public boolean instanceOf(final Type tp) {
+    if(tp instanceof RecordType) return ((RecordType) tp).instance(this);
     if(type.instanceOf(tp)) return true;
 
     if(tp instanceof MapType) {

@@ -1021,6 +1021,10 @@ public enum QueryError {
   /** Error code. */
   CASTTYPE_X(XPST, 3, "%"),
   /** Error code. */
+  NOSTRNCN_X(XPST, 3, "Expecting string or NCName, found '%'."),
+  /** Error code. */
+  DUPFIELD_X(XPST, 3, "Duplicate field name: '%'."),
+  /** Error code. */
   STATIC_X(XPST, 5, "No XML Schema support: %."),
   /** Error code. */
   VARUNDEF_X(XPST, 8, "Undeclared variable: %."),

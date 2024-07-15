@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.RecordType.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.junit.jupiter.api.*;
 
@@ -248,6 +250,10 @@ public final class SeqTypeTest {
     assertTrue(FUNCTION_O.instanceOf(c6));
     assertFalse(c6.instanceOf(STRING_O));
     assertTrue(STRING_O.instanceOf(c6));
+
+    assertTrue(RECORD_O.instanceOf(FUNCTION_O));
+    assertTrue(MAP_O.instanceOf(RECORD_O));
+    assertTrue(RECORD_O.instanceOf(MAP_O));
   }
 
   /** Tests for {@link SeqType#union(SeqType)}. */
@@ -407,6 +413,52 @@ public final class SeqTypeTest {
     combine(c6, op);
     combine(c6, FUNCTION_O, ITEM_O, op);
     combine(c6, STRING_O, ITEM_O, op);
+
+    final TokenObjMap<Field> fld1 = new TokenObjMap<>(),
+        fld2 = new TokenObjMap<>(),
+        fld3 = new TokenObjMap<>(),
+        fld4 = new TokenObjMap<>(),
+        fld5 = new TokenObjMap<>(),
+        fld6 = new TokenObjMap<>(),
+        fld7 = new TokenObjMap<>();
+    fld1.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld2.put(Token.token("a"), new Field(false, STRING_O));
+    fld3.put(Token.token("a"), new Field(false, ANY_ATOMIC_TYPE_O));
+    fld4.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld5.put(Token.token("a"), new Field(true, INTEGER_O));
+    fld6.put(Token.token("b"), new Field(true, INTEGER_O));
+    fld7.put(Token.token("a"), new Field(true, INTEGER_O));
+    fld7.put(Token.token("b"), new Field(true, INTEGER_O));
+    final SeqType
+      // record(a as xs:integer)
+      r1 = SeqType.get(new RecordType(false, fld1), EXACTLY_ONE),
+      // record(a as xs:string)
+      r2 = SeqType.get(new RecordType(false, fld2), EXACTLY_ONE),
+      // record(a as xs:anyAtomicType)
+      r3 = SeqType.get(new RecordType(false, fld3), EXACTLY_ONE),
+      // record(a as xs:integer, *)
+      r4 = SeqType.get(new RecordType(true, fld4), EXACTLY_ONE),
+      // record(a as xs:integer?, *)
+      r5 = SeqType.get(new RecordType(true, fld5), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r6 = SeqType.get(new RecordType(true, fld6), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r7 = SeqType.get(new RecordType(true, fld7), EXACTLY_ONE);
+
+    combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
+    combine(RECORD_O, MAP_O, MAP_O, op);
+    combine(RECORD_O, r1, RECORD_O, op);
+    combine(FUNCTION_O, r1, FUNCTION_O, op);
+    combine(MAP_O, r1, MAP_O, op);
+    combine(r1, r2, r3, op);
+    combine(r1, r3, r3, op);
+    combine(r4, r1, r4, op);
+    combine(r5, r1, r5, op);
+    combine(r5, r4, r5, op);
+    combine(r1, r6, r6, op);
+    combine(r2, r6, r6, op);
+    combine(r4, r6, r7, op);
+    combine(r5, r6, r7, op);
   }
 
   /** Tests for {@link SeqType#intersect(SeqType)}. */
@@ -576,6 +628,52 @@ public final class SeqTypeTest {
     combine(c6, FUNCTION_O, FUNCTION_O, op);
     combine(c6, STRING_O, STRING_O, op);
     combine(c6, INTEGER_O, null, op);
+
+    final TokenObjMap<Field> fld1 = new TokenObjMap<>(),
+        fld2 = new TokenObjMap<>(),
+        fld3 = new TokenObjMap<>(),
+        fld4 = new TokenObjMap<>(),
+        fld5 = new TokenObjMap<>(),
+        fld6 = new TokenObjMap<>(),
+        fld7 = new TokenObjMap<>();
+    fld1.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld2.put(Token.token("a"), new Field(false, STRING_O));
+    fld3.put(Token.token("a"), new Field(false, ANY_ATOMIC_TYPE_O));
+    fld4.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld5.put(Token.token("a"), new Field(true, INTEGER_O));
+    fld6.put(Token.token("b"), new Field(true, INTEGER_O));
+    fld7.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld7.put(Token.token("b"), new Field(false, INTEGER_O));
+    final SeqType
+      // record(a as xs:integer)
+      r1 = SeqType.get(new RecordType(false, fld1), EXACTLY_ONE),
+      // record(a as xs:string)
+      r2 = SeqType.get(new RecordType(false, fld2), EXACTLY_ONE),
+      // record(a as xs:anyAtomicType)
+      r3 = SeqType.get(new RecordType(false, fld3), EXACTLY_ONE),
+      // record(a as xs:integer, *)
+      r4 = SeqType.get(new RecordType(true, fld4), EXACTLY_ONE),
+      // record(a as xs:integer?, *)
+      r5 = SeqType.get(new RecordType(true, fld5), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r6 = SeqType.get(new RecordType(true, fld6), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r7 = SeqType.get(new RecordType(true, fld7), EXACTLY_ONE);
+
+    combine(RECORD_O, FUNCTION_O, RECORD_O, op);
+    combine(RECORD_O, MAP_O, RECORD_O, op);
+    combine(RECORD_O, r1, r1, op);
+    combine(FUNCTION_O, r1, r1, op);
+    combine(MAP_O, r1, r1, op);
+    combine(r1, r2, null, op);
+    combine(r1, r3, r1, op);
+    combine(r4, r1, r1, op);
+    combine(r5, r1, r1, op);
+    combine(r5, r4, r4, op);
+    combine(r1, r6, r1, op);
+    combine(r2, r6, r2, op);
+    combine(r4, r6, r7, op);
+    combine(r5, r6, r7, op);
   }
 
   /**

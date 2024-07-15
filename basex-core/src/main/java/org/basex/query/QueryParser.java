@@ -41,6 +41,7 @@ import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.RecordType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -3208,6 +3209,23 @@ public class QueryParser extends InputParser {
       return type;
     }
 
+    // record
+    if(type instanceof RecordType) {
+      final TokenObjMap<Field> fields = new TokenObjMap<>();
+      do {
+        if(wsConsume("*")) {
+          wsCheck(")");
+          return SeqType.RECORD;
+        }
+        final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X);
+        final boolean optional = wsConsume("?");
+        final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
+        if(fields.contains(name)) throw error(DUPFIELD_X, name);
+        fields.put(name, new Field(optional, seqType));
+      } while(wsConsume(","));
+      check(')');
+      return new RecordType(false, fields);
+    }
     // map
     if(type instanceof MapType) {
       final Type key = itemType().type;

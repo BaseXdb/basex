@@ -42,6 +42,10 @@ public final class TypeTest extends QueryTest {
         { "Type 11", booleans(true), "fn($a as (enum('a')|enum('b'))) as item()* {$a} "
             + "instance of fn(enum('a', 'b')) as item()*"
         },
+        { "Type 12", booleans(true), "fn() as record(a as xs:integer) {map{'a': 42}} instance of "
+            + "fn() as record(a? as xs:integer)"},
+        { "Type 13", booleans(false), "fn() as record(a? as xs:integer) {map{}} instance of "
+            + "fn() as record(a as xs:integer)"},
 
         { "TypeErr 1", "1 instance of xs:abcde" },
         { "TypeErr 2", "1 instance of xs:string()" },
