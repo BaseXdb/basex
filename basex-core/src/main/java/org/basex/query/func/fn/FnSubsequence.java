@@ -176,6 +176,14 @@ public class FnSubsequence extends StandardFunc {
     return l == Long.MAX_VALUE ? l : l + first - 1;
   }
 
+  /**
+   * Checks if this is a range function.
+   * @return result of check
+   */
+  protected boolean range() {
+    return false;
+  }
+
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values
@@ -260,6 +268,12 @@ public class FnSubsequence extends StandardFunc {
           // subsequence(E, 3, count(E) - 1)  ->  subsequence(E, 3)
           return cc.function(SUBSEQUENCE, info, input, arg(1));
         }
+      }
+    } else if(arg(2) instanceof Int && !range()) {
+      // safe because same case is handled in UtilRange#opt
+      // subsequence(EXPR, START, 1)  ->  items-at(EXPR, START)
+      if(((Int) arg(2)).itr() == 1 && arg(1).seqType().instanceOf(SeqType.INTEGER_O)) {
+        return cc.function(ITEMS_AT, info, arg(0), arg(1));
       }
     }
 

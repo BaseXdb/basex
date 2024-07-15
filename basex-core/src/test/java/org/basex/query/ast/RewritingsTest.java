@@ -358,8 +358,9 @@ public final class RewritingsTest extends SandboxTest {
     check("for $i in (1, 2) return 'a'[position() = $i]", "a", root(Str.class));
     check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", root(Str.class));
 
+    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, root(DualMap.class));
+
     check("for $i in (1, 2)[. > 0] return 9[position() = $i to $i + 1]", 9, exists(_UTIL_RANGE));
-    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() >= $i]", 9, exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() > $i]", "", exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() <= $i]", "9\n9", exists(_UTIL_RANGE));

@@ -2308,6 +2308,9 @@ public final class FnModuleTest extends SandboxTest {
     query("<x/> ! subsequence((., *), 1, 1)", "<x/>");
     query("<x/> ! subsequence((., *), 1, 2)", "<x/>");
     query("<x/> ! subsequence((., *), 1, 3)", "<x/>");
+
+    // GH-2315
+    check("(1 to 6) ! " + func.args(" <a/>/*", " .", 1), "", root(_UTIL_RANGE));
   }
 
   /** Test method. */
