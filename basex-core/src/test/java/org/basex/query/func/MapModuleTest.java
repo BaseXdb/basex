@@ -67,7 +67,6 @@ public final class MapModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void contains() {
-    System.out.println(context.options.get(MainOptions.INLINELIMIT));
     final Function func = _MAP_CONTAINS;
     query(func.args(" map { }", 1), false);
     query(func.args(_MAP_ENTRY.args(1, 2), 1), true);
