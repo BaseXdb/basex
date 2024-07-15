@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -48,12 +49,25 @@ public final class MapModuleTest extends SandboxTest {
 
     query("for $f in (1, 2, 3, 4, string#1, 6)"
         + "[. instance of function(*)] return " + func.args(8, " $f"), "{\"8\":8}");
+    query("map:for-each(" + func.args(1, " fn { 'x' }", " fn { 'y' }") + ", concat#2)", "xy");
 
-    query("map:for-each(map:build(1, fn { 'x' }, fn { 'y' }), concat#2)", "xy");
+    inline(true);
+    try {
+      check(func.args("a", " fn($x) { if($x instance of xs:string) then 1 else 'x' }"),
+          "{1:\"a\"}", type(func, "map(xs:integer, xs:string+)"));
+    } finally {
+      inline(false);
+    }
+
+    // GH-2312
+    query("map:for-each(" + func.args("a", " ()", " fn($f) { 1[$f = 'x'] }") +
+        ", fn($_, $v) { $v })", "");
+    query(func.args(" <a>A</a>"), "{\"A\":<a>A</a>}");
   }
 
   /** Test method. */
   @Test public void contains() {
+    System.out.println(context.options.get(MainOptions.INLINELIMIT));
     final Function func = _MAP_CONTAINS;
     query(func.args(" map { }", 1), false);
     query(func.args(_MAP_ENTRY.args(1, 2), 1), true);

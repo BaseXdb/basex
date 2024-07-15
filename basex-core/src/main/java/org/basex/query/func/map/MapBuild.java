@@ -45,27 +45,29 @@ public final class MapBuild extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
-    final SeqType st = input.seqType();
+    final SeqType st = input.seqType(), s1t = st.with(Occ.EXACTLY_ONE);
     if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
-    SeqType rst = st;
-    AtomType kt = null;
-    if(defined(1)) {
-      final FuncType ft = arg(1).funcType();
-      if(ft != null) {
-        kt = ft.declType.type.atomic();
-        if(kt != null) {
-          final SeqType dt = kt.seqType(Occ.ZERO_OR_MORE);
-          arg(1, arg -> refineFunc(arg, cc, dt, st.with(Occ.EXACTLY_ONE)));
-        }
-      }
+    final boolean fiKey = arg(1) instanceof FuncItem;
+    Type kt = arg(1).size() == 0 || fiKey ? s1t.type : AtomType.ITEM;
+    if(fiKey) {
+      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, s1t));
+      kt = arg(1).funcType().declType.type;
     }
-    if(defined(2)) {
-      final FuncType ft = arg(2).funcType();
-      rst = ft != null ? ft.declType : null;
-    }
+    kt = kt.atomic();
     if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
-    if(rst != null && !defined(3)) exprType.assign(MapType.get(kt, rst.with(Occ.ONE_OR_MORE)));
+
+    final boolean fiValue = arg(2) instanceof FuncItem;
+    SeqType vt = arg(2).size() == 0 || fiValue ? s1t : SeqType.ITEM_ZM;
+    if(fiValue) {
+      arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, s1t));
+      vt = arg(2).funcType().declType;
+    }
+
+    // do not refine value type if function for combining items exists
+    if(arg(3).size() != 0) vt = SeqType.ITEM_ZM;
+
+    exprType.assign(MapType.get(kt, vt.union(Occ.ONE_OR_MORE)));
     return this;
   }
 
