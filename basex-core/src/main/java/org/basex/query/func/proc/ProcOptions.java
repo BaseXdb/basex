@@ -15,7 +15,7 @@ public final class ProcOptions extends Options {
   public static final StringOption INPUT = new StringOption("input");
   /** Process directory. */
   public static final StringOption DIR = new StringOption("dir");
-  /** Process directory. */
+  /** Process environment variables. If empty, the environment of the current process is inherited. */
   public static final OptionsOption<Options> ENVIRONMENT =
       new OptionsOption<>("environment", new Options());
 }
