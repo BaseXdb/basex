@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.core.jobs.*;
 import org.basex.query.*;
@@ -13,7 +14,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * Process function.
@@ -59,16 +59,16 @@ abstract class ProcFn extends StandardFunc {
     }
     final long seconds = options.get(ProcOptions.TIMEOUT);
     final String dir = options.get(ProcOptions.DIR);
-    final Options env = options.get(ProcOptions.ENVIRONMENT);
+    final Map<String, String> env = options.get(ProcOptions.ENVIRONMENT).free();
     final String input = options.get(ProcOptions.INPUT);
 
     final ProcResult result = new ProcResult();
     final Process proc;
     final ProcessBuilder pb = new ProcessBuilder(args.finish());
     if(dir != null) pb.directory(toPath(dir).toFile());
-    if (!env.free().isEmpty()) {
+    if(!env.isEmpty()) {
       pb.environment().clear();
-      pb.environment().putAll(env.free());
+      pb.environment().putAll(env);
     }
 
     try {
