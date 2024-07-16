@@ -13,6 +13,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * Process function.
@@ -58,12 +59,15 @@ abstract class ProcFn extends StandardFunc {
     }
     final long seconds = options.get(ProcOptions.TIMEOUT);
     final String dir = options.get(ProcOptions.DIR);
+    final Options env = options.get(ProcOptions.ENVIRONMENT);
     final String input = options.get(ProcOptions.INPUT);
 
     final ProcResult result = new ProcResult();
     final Process proc;
     final ProcessBuilder pb = new ProcessBuilder(args.finish());
     if(dir != null) pb.directory(toPath(dir).toFile());
+    pb.environment().putAll(env.free());
+
     try {
       proc = pb.start();
     } catch(final IOException ex) {
