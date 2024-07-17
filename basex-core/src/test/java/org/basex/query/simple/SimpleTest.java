@@ -94,6 +94,7 @@ public final class SimpleTest extends QueryTest {
 
       { "ExtVar 1", integers(1), "declare variable $a external; 1" },
       { "ExtVar 2", "declare variable $a external; $a" },
+      { "ExtVar 3", strings("a"), "declare variable $x as enum('a', 'b') := 'a'; $x" },
 
       { "If  1", booleans(true), "if(true()) then true() else false()" },
       { "If  2", booleans(false), "if(false()) then true() else false()" },

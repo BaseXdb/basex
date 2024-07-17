@@ -1099,8 +1099,6 @@ public enum QueryError {
   /** Error code. */
   INVCONVERT_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
   /** Error code. */
-  INVTREAT_X_X_X(XPTY, 4, "Cannot treat % as %: %."),
-  /** Error code. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
@@ -1646,7 +1644,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final InputInfo info) {
-    return typeError(expr, st, null, info, true);
+    return typeError(expr, st, null, info);
   }
 
 
@@ -1656,12 +1654,11 @@ public enum QueryError {
    * @param st target type
    * @param name name (can be {@code null})
    * @param info input info (can be {@code null})
-   * @param coerce coerce or treat as
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
-      final InputInfo info, final boolean coerce) {
-    return typeError(expr, st, name, info, coerce ? INVCONVERT_X_X_X : INVTREAT_X_X_X);
+      final InputInfo info) {
+    return typeError(expr, st, name, info, INVCONVERT_X_X_X);
   }
 
   /**

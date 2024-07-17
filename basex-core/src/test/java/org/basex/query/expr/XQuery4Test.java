@@ -32,7 +32,7 @@ public final class XQuery4Test extends SandboxTest {
     query("declare context value as item()* := (1, 2); .", "1\n2");
     query("declare context value as xs:integer* := (1, 2); .", "1\n2");
 
-    error("declare context value as xs:integer := (1, 2); .", INVTREAT_X_X_X);
+    error("declare context value as xs:integer := (1, 2); .", INVCONVERT_X_X_X);
     error("declare context value := 1; declare context value := 2; .", DUPLVALUE);
     error("declare context value := 1; declare context item := 2; .", DUPLVALUE);
     error("declare context item := 1; declare context item := 2; .", DUPLVALUE);

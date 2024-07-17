@@ -1713,7 +1713,7 @@ public class QueryParser extends InputParser {
     final Expr expr = castable();
     if(!wsConsumeWs(COERCE)) return expr;
     wsCheck(TO);
-    return new TypeCheck(info(), expr, sequenceType(), true);
+    return new TypeCheck(info(), expr, sequenceType());
   }
 
   /**

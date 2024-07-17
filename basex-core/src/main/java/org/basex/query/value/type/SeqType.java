@@ -446,7 +446,7 @@ public final class SeqType {
       val = items.value(type);
     }
 
-    if(!occ.check(val.size())) throw typeError(value, this, name, info, true);
+    if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;
   }
 
@@ -464,7 +464,7 @@ public final class SeqType {
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     final QuerySupplier<QueryException> error = () ->
-      typeError(item, with(EXACTLY_ONE), name, info, true);
+      typeError(item, with(EXACTLY_ONE), name, info);
     if(type instanceof ChoiceItemType) {
       final int sz = items.size();
       for(final SeqType tp : ((ChoiceItemType) type).alts) {

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.value.type.*;
@@ -29,7 +30,12 @@ public final class Treat extends TypeCheck {
   }
 
   @Override
-  TypeCheck get(final Expr ex, final SeqType st) {
+  Treat get(final Expr ex, final SeqType st) {
     return new Treat(info, ex, st);
+  }
+
+  @Override
+  public void toString(final QueryString qs) {
+    qs.token("(").token(expr).token(TREAT).token(AS).token(seqType()).token(')');
   }
 }

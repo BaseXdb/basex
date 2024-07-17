@@ -10,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -24,7 +23,7 @@ import org.basex.util.hash.*;
  */
 public class TypeCheck extends Single {
   /** Coercion flag. */
-  public final boolean coerce;
+  private final boolean coerce;
   /** Only check occurrence indicator. */
   private boolean occ;
 
@@ -35,10 +34,20 @@ public class TypeCheck extends Single {
    * @param seqType target type
    * @param coerce coercion flag
    */
-  public TypeCheck(final InputInfo info, final Expr expr, final SeqType seqType,
+  TypeCheck(final InputInfo info, final Expr expr, final SeqType seqType,
       final boolean coerce) {
     super(info, expr, seqType);
     this.coerce = coerce;
+  }
+
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
+   * @param expr expression to be promoted
+   * @param seqType target type
+   */
+  public TypeCheck(final InputInfo info, final Expr expr, final SeqType seqType) {
+    this(info, expr, seqType, true);
   }
 
   @Override
@@ -207,7 +216,7 @@ public class TypeCheck extends Single {
    * @return error code
    */
   public QueryError error() {
-    return coerce ? INVCONVERT_X_X_X : INVTREAT_X_X_X;
+    return INVCONVERT_X_X_X;
   }
 
   /**
@@ -227,7 +236,7 @@ public class TypeCheck extends Single {
    * @return error code
    */
   TypeCheck get(final Expr ex, final SeqType st) {
-    return new TypeCheck(info, ex, st, coerce);
+    return new TypeCheck(info, ex, st);
   }
 
   @Override
@@ -247,16 +256,11 @@ public class TypeCheck extends Single {
 
   @Override
   public final void toXml(final QueryPlan plan) {
-    final FBuilder elem = plan.create(this, AS, seqType());
-    if(coerce) plan.addAttribute(elem, COERCE, true);
-    plan.add(elem, expr);
+    plan.add(plan.create(this, AS, seqType()), expr);
   }
 
   @Override
-  public final void toString(final QueryString qs) {
-    qs.token("(").token(expr);
-    if(coerce) qs.token(COERCE).token(TO);
-    else qs.token(TREAT).token(AS);
-    qs.token(seqType()).token(')');
+  public void toString(final QueryString qs) {
+    qs.token("(").token(expr).token(COERCE).token(TO).token(seqType()).token(')');
   }
 }

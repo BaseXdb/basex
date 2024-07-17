@@ -2109,7 +2109,7 @@ public final class RewritingsTest extends SandboxTest {
     check("for $a in 1 to 2 group by $b := data($a) return $b", "1\n2", root(RangeSeq.class));
 
     check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
-    check("for $a in (1, 3) group by $a return $a", "1\n3", root(SmallSeq.class));
+    check("for $a in (1, 3) group by $a return $a", "1\n3", root(IntSeq.class));
     check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
 
     check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",
