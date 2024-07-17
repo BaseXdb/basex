@@ -6,8 +6,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -96,55 +94,6 @@ public final class TypeCheck extends Single {
     }
 
     return this;
-  }
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final SeqType st = seqType();
-    final Iter iter = expr.iter(qc);
-    if(iter.valueIter()) {
-      final Value value = iter.value(qc, null);
-      if(st.instance(value)) return iter;
-    }
-
-    // only check occurrence indicator
-    if(occ) {
-      return new Iter() {
-        int c;
-
-        @Override
-        public Item next() throws QueryException {
-          final Item item = qc.next(iter);
-          if(item != null ? ++c > st.occ.max : c < st.occ.min) throw error(expr, st);
-          return item;
-        }
-      };
-    }
-
-    // check item type and (optionally) occurrence indicator
-    return new Iter() {
-      final ItemList items = new ItemList();
-      int i, c;
-
-      @Override
-      public Item next() throws QueryException {
-        while(i == items.size()) {
-          items.reset();
-          i = 0;
-          final Item item = qc.next(iter);
-          if(item == null || st.instance(item)) {
-            items.add(item);
-          } else {
-            st.coerce(item, null, items, qc, null, info);
-          }
-        }
-
-        final Item item = items.get(i);
-        items.set(i++, null);
-        if(item != null ? ++c > st.occ.max : c < st.occ.min) throw error(expr, st);
-        return item;
-      }
-    };
   }
 
   @Override

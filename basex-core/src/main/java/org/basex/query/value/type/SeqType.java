@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -253,12 +252,12 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
-   * @param test kind test (can be {@code null}; ignored if this is no node type)
+   * @param test kind test (can be {@code null}; {@link KindTest} is redundant and ignored)
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return occ == ZERO || test == null || !(type instanceof NodeType) ?
-      get(type, occ) : new SeqType(type, occ, test);
+    return occ == ZERO || test == null || test instanceof KindTest ? get(type, occ) :
+      new SeqType(type, occ, test);
   }
 
   /**
@@ -330,7 +329,7 @@ public final class SeqType {
    */
   public boolean instance(final Item item) {
     if(type instanceof ChoiceItemType) {
-      for(final SeqType tp : ((ChoiceItemType) type).alts) {
+      for(final SeqType tp : ((ChoiceItemType) type).types) {
         if(tp.instance(item)) return true;
       }
       return false;
@@ -410,8 +409,7 @@ public final class SeqType {
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     // check if function arguments must be coerced
-    boolean coerce = false;
-    boolean toFunc = type instanceof FuncType;
+    boolean coerce = false, toFunc = type instanceof FuncType;
     final SeqType[] argTypes = toFunc ? ((FuncType) type).argTypes : null;
     if(argTypes != null) {
       for(final SeqType at : argTypes) {
@@ -438,12 +436,12 @@ public final class SeqType {
     // coerce items if required
     Value val = value;
     if(coerce) {
-      final ItemList items = new ItemList(Seq.initialCapacity(value.size()));
+      final ValueBuilder vb = new ValueBuilder(qc);
       for(final Item item : value) {
         qc.checkStop();
-        coerce(item, name, items, qc, cc, info);
+        coerce(item, name, vb, qc, cc, info);
       }
-      val = items.value(type);
+      val = vb.value(type);
     }
 
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
@@ -454,25 +452,26 @@ public final class SeqType {
    * Converts the specified item to this type.
    * @param item item to promote
    * @param name variable name (used for error message, can be {@code null})
-   * @param items item cache
+   * @param vb value builder
    * @param qc query context
    * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public void coerce(final Item item, final QNm name, final ItemList items, final QueryContext qc,
+  public void coerce(final Item item, final QNm name, final ValueBuilder vb, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     final QuerySupplier<QueryException> error = () ->
       typeError(item, with(EXACTLY_ONE), name, info);
     if(type instanceof ChoiceItemType) {
-      final int sz = items.size();
-      for(final SeqType tp : ((ChoiceItemType) type).alts) {
+      for(final SeqType st : ((ChoiceItemType) type).types) {
         try {
-          tp.coerce(item, name, items, qc, cc, info);
+          final ValueBuilder tmp = new ValueBuilder(qc);
+          st.coerce(item, name, tmp, qc, cc, info);
+          vb.add(tmp.value(type));
           return;
-        } catch (@SuppressWarnings("unused") final QueryException ex) {
-          while(items.size() > sz) items.pop();
+        } catch(final QueryException ex) {
+          Util.debug(ex);
         }
       }
       throw error.get();
@@ -505,11 +504,11 @@ public final class SeqType {
           it = (Item) cast(it, true, qc, info);
           if(relabel != null && !it.equal(relabel, null, info)) throw error.get();
         }
-        items.add(it);
+        vb.add(it);
       }
     } else if(item instanceof FItem && type instanceof FuncType) {
       final FuncType ft = type == FUNCTION ? item.funcType() : (FuncType) type;
-      items.add(((FItem) item).coerceTo(ft, qc, cc, info));
+      vb.add(((FItem) item).coerceTo(ft, qc, cc, info));
     } else {
       throw error.get();
     }
