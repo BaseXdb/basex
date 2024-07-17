@@ -1658,7 +1658,7 @@ public enum QueryError {
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
       final InputInfo info) {
-    return typeError(expr, st, name, info, INVCONVERT_X_X_X);
+    return typeError(expr, st, name, info, true);
   }
 
   /**
@@ -1667,14 +1667,15 @@ public enum QueryError {
    * @param st target type
    * @param name variable name (can be {@code null})
    * @param info input info (can be {@code null})
-   * @param error error code
+   * @param coerce coerce or treat
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
-      final InputInfo info, final QueryError error) {
+      final InputInfo info, final boolean coerce) {
 
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) tb.add('$').add(name.string()).add(" := ");
+    final QueryError error = coerce ? INVCONVERT_X_X_X : NOTREAT_X_X_X;
     return error.get(info, expr.seqType(), st, tb.add(expr.toErrorString()).finish());
   }
 

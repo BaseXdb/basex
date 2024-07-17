@@ -1984,14 +1984,14 @@ public final class RewritingsTest extends SandboxTest {
         + "  case 'a' return <a/> "
         + "  case 'b' return <b/> "
         + "  default  return error()"
-        + ") treat as element(a)",
-        "<a/>", exists("SwitchGroup/Treat"));
+        + ") coerce to element(a)",
+        "<a/>", exists("SwitchGroup/TypeCheck"));
     check("for $e in (<a/>, <b/>) "
         + "return (typeswitch($e) "
         + "  case element(a) return <a/> "
         + "  case element(b) return <b/> "
         + "  default return error() "
-        + ") treat as element()",
+        + ") coerce to element()",
         "<a/>\n<b/>", empty(Treat.class));
   }
 
