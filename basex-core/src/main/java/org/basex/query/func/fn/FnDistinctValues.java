@@ -19,6 +19,8 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -33,10 +35,27 @@ public final class FnDistinctValues extends StandardFunc {
     final Collation collation = toCollation(arg(1), qc);
 
     final ItemSet set = CollationItemSet.get(collation, info);
+    final IntSet ints = new IntSet();
+
     return new Iter() {
+      boolean intseq = seqType().instanceOf(SeqType.INTEGER_ZM);
+
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(values)) != null;) {
+          if(intseq) {
+            if(item.type == AtomType.INTEGER) {
+              final long l = item.itr(info);
+              final int i = (int) l;
+              if(i == l) {
+                if(ints.add(i)) return item;
+                continue;
+              }
+            }
+            // fallback (input is no 32bit integer)
+            intseq = false;
+            for(int i : ints.toArray()) set.add(Int.get(i));
+          }
           if(set.add(item)) return item;
         }
         return null;
@@ -46,7 +65,34 @@ public final class FnDistinctValues extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    final Iter values = arg(0).atomIter(qc, info);
+    final Collation collation = toCollation(arg(1), qc);
+
+    final ItemSet set = CollationItemSet.get(collation, info);
+    final IntSet ints = new IntSet();
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final LongList list = new LongList();
+
+    boolean intseq = seqType().instanceOf(SeqType.INTEGER_ZM);
+    for(Item item; (item = qc.next(values)) != null;) {
+      if(intseq) {
+        if(item.type == AtomType.INTEGER) {
+          final long l = item.itr(info);
+          final int i = (int) l;
+          if(i == l) {
+            if(ints.add(i)) list.add(i);
+            continue;
+          }
+        }
+        // fallback (input is no 32bit integer)
+        intseq = false;
+        for(int i : ints.toArray()) set.add(Int.get(i));
+        for(long l : list.finish()) vb.add(Int.get(l));
+      }
+      if(set.add(item)) vb.add(item);
+    }
+    return intseq ? IntSeq.get(list.finish()) : vb.value(this);
   }
 
   @Override

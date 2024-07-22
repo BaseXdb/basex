@@ -149,7 +149,7 @@ public final class Var extends ExprInfo {
 
     if(declType != null) {
       if(declType.occ.intersect(st.occ) == null)
-        throw INVTREAT_X_X_X.get(info, st, declType, Token.concat('$', name.string()));
+        throw INVCONVERT_X_X_X.get(info, st, declType, Token.concat('$', name.string()));
       if(st.instanceOf(declType)) {
         if(cc != null) cc.info(OPTTYPE_X, this);
         declType = null;
@@ -174,7 +174,7 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
-    return declType != null ? new TypeCheck(info, expr, declType, true).optimize(cc) : expr;
+    return declType != null ? new TypeCheck(info, expr, declType).optimize(cc) : expr;
   }
 
   /**
@@ -211,8 +211,7 @@ public final class Var extends ExprInfo {
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
     if(!(et.type instanceof NodeType) && !et.promotable(vt)) {
-      throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) :
-        typeError(expr, vt, name, info, true);
+      throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) : typeError(expr, vt, name, info);
     }
   }
 

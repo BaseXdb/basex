@@ -1714,7 +1714,7 @@ public class QueryParser extends InputParser {
     final Expr expr = castable();
     if(!wsConsumeWs(COERCE)) return expr;
     wsCheck(TO);
-    return new TypeCheck(info(), expr, sequenceType(), true);
+    return new TypeCheck(info(), expr, sequenceType());
   }
 
   /**
@@ -3160,34 +3160,32 @@ public class QueryParser extends InputParser {
     Type type;
     final QNm name = eQName(null, TYPEINVALID);
     if(!name.hasURI() && eq(name.local(), token(ENUM))) {
+      // enumeration
       if(!wsConsume("(")) throw error(WHICHCAST_X, AtomType.similar(name));
       type = enumerationType();
-    } else {
-      // parse type
-      if(wsConsume("(")) {
-        // function type
-        type = FuncType.find(name);
-        if(type != null) return functionTest(anns, type).seqType();
-        // node type
-        type = NodeType.find(name);
-        if(type != null) {
-          // extended node type
-          if(!wsConsume(")")) st = SeqType.get(type, Occ.EXACTLY_ONE, kindTest((NodeType) type));
-        } else if(name.eq(AtomType.ITEM.qname())) {
-          // item type
-          type = AtomType.ITEM;
-          wsCheck(")");
-        }
-        // no type found
-        if(type == null) throw error(WHICHTYPE_X, Type.similar(name));
-      } else {
-        // attach default element namespace
-        if(!name.hasURI()) name.uri(sc.elemNS);
-        // atomic type
-        type = AtomType.find(name, false);
-        // no type found
-        if(type == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
+    } else if(wsConsume("(")) {
+      // function type
+      type = FuncType.find(name);
+      if(type != null) return functionTest(anns, type).seqType();
+      // node type
+      type = NodeType.find(name);
+      if(type != null) {
+        // extended node type
+        if(!wsConsume(")")) st = SeqType.get(type, Occ.EXACTLY_ONE, kindTest((NodeType) type));
+      } else if(name.eq(AtomType.ITEM.qname())) {
+        // item type
+        type = AtomType.ITEM;
+        wsCheck(")");
       }
+      // no type found
+      if(type == null) throw error(WHICHTYPE_X, Type.similar(name));
+    } else {
+      // attach default element namespace
+      if(!name.hasURI()) name.uri(sc.elemNS);
+      // atomic type
+      type = AtomType.find(name, false);
+      // no type found
+      if(type == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
     }
     // annotations are not allowed for remaining types
     if(!anns.isEmpty()) throw error(NOANN);
@@ -3381,8 +3379,11 @@ public class QueryParser extends InputParser {
     do {
       final SeqType st = itemType();
       // collect alternative item type, combining nested ChoiceItemTypes into a single instance
-      if(!(st.type instanceof ChoiceItemType)) types.add(st);
-      else for(SeqType alt : ((ChoiceItemType) st.type).alts) types.add(alt);
+      if(st.type instanceof ChoiceItemType) {
+        for(final SeqType ast : ((ChoiceItemType) st.type).types) types.add(ast);
+      } else {
+        types.add(st);
+      }
     } while(wsConsume("|"));
     check(')');
     return types.size() == 1 ? types.get(0).type : new ChoiceItemType(types);

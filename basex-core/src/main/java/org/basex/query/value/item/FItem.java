@@ -101,7 +101,7 @@ public abstract class FItem extends Item implements XQFunction {
       final SeqType dt = ft.declType;
       FuncType tp = funcType();
       if(!tp.declType.instanceOf(dt)) {
-        body = new TypeCheck(info, body, dt, true);
+        body = new TypeCheck(info, body, dt);
         if(cc != null) body = body.optimize(cc);
       }
 

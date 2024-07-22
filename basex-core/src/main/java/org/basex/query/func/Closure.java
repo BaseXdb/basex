@@ -275,8 +275,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // create the return clause
     final Expr body = expr.copy(cc, vm).optimize(cc);
-    final Expr rtrn = declType == null ? body :
-      new TypeCheck(info, body, declType, true).optimize(cc);
+    final Expr rtrn = declType == null ? body : new TypeCheck(info, body, declType).optimize(cc);
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
@@ -306,10 +305,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } else {
       // check at each call: reject impossible arities
       if(argType.type.instanceOf(declType.type) && argType.occ.intersect(declType.occ) == null &&
-        !body.has(Flag.NDT)) {
-        throw typeError(body, declType, name, info, true);
+          !body.has(Flag.NDT)) {
+        throw typeError(body, declType, name, info);
       }
-      checked = new TypeCheck(info, body, declType, true);
+      checked = new TypeCheck(info, body, declType);
     }
 
     final FuncType ft = (FuncType) seqType().type;

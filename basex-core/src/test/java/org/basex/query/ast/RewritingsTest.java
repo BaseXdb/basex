@@ -358,8 +358,9 @@ public final class RewritingsTest extends SandboxTest {
     check("for $i in (1, 2) return 'a'[position() = $i]", "a", root(Str.class));
     check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", root(Str.class));
 
+    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, root(DualMap.class));
+
     check("for $i in (1, 2)[. > 0] return 9[position() = $i to $i + 1]", 9, exists(_UTIL_RANGE));
-    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() >= $i]", 9, exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() > $i]", "", exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() <= $i]", "9\n9", exists(_UTIL_RANGE));
@@ -1005,9 +1006,9 @@ public final class RewritingsTest extends SandboxTest {
     check("<a>1</a> coerce to xs:string", 1, root(Str.class));
     check(wrap(1) + "coerce to xs:string", 1, root(TypeCheck.class));
     check("(1, 2) coerce to xs:double+", "1\n2",
-        empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
+        empty(TypeCheck.class), root(SmallSeq.class), count(Dbl.class, 2));
     check("(-128, 127) coerce to xs:byte+", "-128\n127",
-        empty(TypeCheck.class), root(ItemSeq.class), count(Int.class, 2));
+        empty(TypeCheck.class), root(SmallSeq.class), count(Int.class, 2));
 
     error("<a/> coerce to empty-sequence()", INVCONVERT_X_X_X);
     error("(1, 128) coerce to xs:byte+", FUNCCAST_X_X_X);
@@ -1983,14 +1984,14 @@ public final class RewritingsTest extends SandboxTest {
         + "  case 'a' return <a/> "
         + "  case 'b' return <b/> "
         + "  default  return error()"
-        + ") treat as element(a)",
-        "<a/>", exists("SwitchGroup/Treat"));
+        + ") coerce to element(a)",
+        "<a/>", exists("SwitchGroup/TypeCheck"));
     check("for $e in (<a/>, <b/>) "
         + "return (typeswitch($e) "
         + "  case element(a) return <a/> "
         + "  case element(b) return <b/> "
         + "  default return error() "
-        + ") treat as element()",
+        + ") coerce to element()",
         "<a/>\n<b/>", empty(Treat.class));
   }
 
@@ -2108,7 +2109,7 @@ public final class RewritingsTest extends SandboxTest {
     check("for $a in 1 to 2 group by $b := data($a) return $b", "1\n2", root(RangeSeq.class));
 
     check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
-    check("for $a in (1, 3) group by $a return $a", "1\n3", root(SmallSeq.class));
+    check("for $a in (1, 3) group by $a return $a", "1\n3", root(IntSeq.class));
     check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
 
     check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",

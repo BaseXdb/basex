@@ -418,6 +418,25 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(wrap("A")), "A", root(DATA));
     check("(<a/>, <b/>) ! " + func.args(" ."), "\n", root(DATA));
     check("(1 to 2) ! " + func.args(" ."), "1\n2", root(RangeSeq.class));
+
+    // integer runtime optimizations
+    query("sum(" + func.args(" (3, 1 to 1000000)") + ")", 500000500000L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000)") + "))", 500000500000L);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + ")", 500000500000L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + "))", 500000500000L);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + ")", 500000499999L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + "))", 500000499999L);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + ")", 500000499999L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + "))", 500000499999L);
+
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + ")", 55);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + "))", 55);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + ")", 55);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + "))", 55);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + ")", 54);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + "))", 54);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + ")", 54);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + "))", 54);
   }
 
   /** Test method. */
@@ -543,6 +562,25 @@ public final class FnModuleTest extends SandboxTest {
     check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
     check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
     check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
+
+    // integer runtime optimizations
+    query("sum(" + func.args(" (3, 1 to 1000000)") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000)") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + ")", 2);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + "))", 2);
+
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + ")", 2);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + "))", 2);
   }
 
   /** Test method. */
@@ -2308,6 +2346,9 @@ public final class FnModuleTest extends SandboxTest {
     query("<x/> ! subsequence((., *), 1, 1)", "<x/>");
     query("<x/> ! subsequence((., *), 1, 2)", "<x/>");
     query("<x/> ! subsequence((., *), 1, 3)", "<x/>");
+
+    // GH-2315
+    check("(1 to 6) ! " + func.args(" <a/>/*", " .", 1), "", root(_UTIL_RANGE));
   }
 
   /** Test method. */
@@ -2468,6 +2509,13 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class), empty(TAIL));
     check(func.args(" (<a/>, <b/>, <c/>)"), "<b/>\n<c/>", root(List.class), empty(TAIL));
     check(func.args(" (1 to 2, <a/>)"), "2\n<a/>", root(List.class), empty(TAIL));
+  }
+
+  /** Test method. */
+  @Test public void takeWhile() {
+    final Function func = TAKE_WHILE;
+
+    query(func.args(" <x><a/><a/><c/></x>/*", " fn($n) { boolean($n/self::a) }"), "<a/>\n<a/>");
   }
 
   /** Test method. */

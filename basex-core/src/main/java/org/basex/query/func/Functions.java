@@ -56,7 +56,9 @@ public final class Functions {
     for(final FuncDefinition fd : DEFINITIONS) {
       URIS.add(fd.uri);
       final QNm qnm = new QNm(fd.local(), fd.uri());
-      CACHE.put(qnm.unique(), qnm);
+      final byte[] id = qnm.unique();
+      if(CACHE.contains(id)) throw Util.notExpected("Function % is defined twice.", id);
+      CACHE.put(id, qnm);
     }
   }
 

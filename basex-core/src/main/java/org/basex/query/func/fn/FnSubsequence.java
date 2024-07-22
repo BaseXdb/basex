@@ -176,10 +176,18 @@ public class FnSubsequence extends StandardFunc {
     return l == Long.MAX_VALUE ? l : l + first - 1;
   }
 
+  /**
+   * Checks if this is a range function.
+   * @return result of check
+   */
+  protected boolean range() {
+    return false;
+  }
+
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values
-    final Expr input = arg(0);
+    final Expr input = arg(0), first = arg(1), second = arg(2);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
@@ -247,9 +255,9 @@ public class FnSubsequence extends StandardFunc {
           if(!one) break;
         }
       }
-    } else if(arg(1) instanceof Int) {
-      final long start = ((Int) arg(1)).itr();
-      final long diff = FnItemsAt.countInputDiff(arg(0), arg(2)) + start;
+    } else if(first instanceof Int) {
+      final long start = ((Int) first).itr();
+      final long diff = FnItemsAt.countInputDiff(input, second) + start;
       if(diff == (int) diff) {
         if(start <= 1) {
           // subsequence(E, 1, count(E) - 1)  ->  trunk(E)
@@ -258,8 +266,16 @@ public class FnSubsequence extends StandardFunc {
           if(diff >= 1) return input;
         } else if(start <= diff) {
           // subsequence(E, 3, count(E) - 1)  ->  subsequence(E, 3)
-          return cc.function(SUBSEQUENCE, info, input, arg(1));
+          return cc.function(SUBSEQUENCE, info, input, first);
         }
+      }
+    } else if(second instanceof Int) {
+      if(!range() && first.seqType().instanceOf(SeqType.INTEGER_O)) {
+        final long length = ((Int) second).itr();
+        // subsequence(EXPR, START, 1)  ->  items-at(EXPR, START)
+        if(length == 1) return cc.function(ITEMS_AT, info, input, first);
+        // subsequence(EXPR, START, 0)  ->  void(EXPR)
+        if(length <= 0) return cc.voidAndReturn(input, Empty.VALUE, info);
       }
     }
 

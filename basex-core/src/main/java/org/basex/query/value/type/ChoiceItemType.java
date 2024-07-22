@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class ChoiceItemType implements Type {
   /** Alternative item types. */
-  public final List<SeqType> alts;
+  public final List<SeqType> types;
   /** Common ancestor type. */
   private final Type union;
 
@@ -27,12 +27,12 @@ public final class ChoiceItemType implements Type {
 
   /**
    * Constructor.
-   * @param alts alternative item types
+   * @param types alternative item types
    */
-  public ChoiceItemType(final List<SeqType> alts) {
-    this.alts = alts;
+  public ChoiceItemType(final List<SeqType> types) {
+    this.types = types;
     Type tp = null;
-    for(final SeqType st : alts) {
+    for(final SeqType st : types) {
       tp = tp == null ? st.type : tp.union(st.type);
     }
     union = tp;
@@ -41,7 +41,7 @@ public final class ChoiceItemType implements Type {
   @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    for(final SeqType st : alts) {
+    for(final SeqType st : types) {
       final Value val = st.cast(item, false, qc, info);
       if(val != null) return val;
     }
@@ -51,7 +51,7 @@ public final class ChoiceItemType implements Type {
   @Override
   public Value cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    for(final SeqType st : alts) {
+    for(final SeqType st : types) {
       try {
         return st.type.cast(value, qc, info);
       } catch(final QueryException ex) {
@@ -76,12 +76,12 @@ public final class ChoiceItemType implements Type {
   @Override
   public boolean eq(final Type type) {
     return this == type ||
-        type instanceof ChoiceItemType && alts.equals(((ChoiceItemType) type).alts);
+        type instanceof ChoiceItemType && types.equals(((ChoiceItemType) type).types);
   }
 
   @Override
   public boolean instanceOf(final Type type) {
-    for(final SeqType st : alts) {
+    for(final SeqType st : types) {
       if(!st.type.instanceOf(type)) return false;
     }
     return true;
@@ -94,14 +94,14 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public Type intersect(final Type type) {
-    final ArrayList<Type> types = new ArrayList<>();
-    for(final SeqType st : alts) {
+    final ArrayList<Type> list = new ArrayList<>();
+    for(final SeqType st : types) {
       final Type tp = type.intersect(st.type);
-      if(tp != null) types.add(tp);
+      if(tp != null) list.add(tp);
     }
-    if(types.isEmpty()) return null;
+    if(list.isEmpty()) return null;
     Type is = AtomType.ITEM;
-    for(final Type tp : types) {
+    for(final Type tp : list) {
       is = is.intersect(tp);
       if(is == null) return null;
     }
@@ -145,7 +145,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean nsSensitive() {
-    for(final SeqType st : alts) {
+    for(final SeqType st : types) {
       if(st.type.nsSensitive()) return true;
     }
     return false;
@@ -157,7 +157,7 @@ public final class ChoiceItemType implements Type {
    * @return result of check
    */
   boolean hasInstance(final Type type) {
-    for(final SeqType st : alts) {
+    for(final SeqType st : types) {
       if(type.instanceOf(st.type)) return true;
     }
     return false;
@@ -165,19 +165,20 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public int hashCode() {
-    return alts.hashCode();
+    return types.hashCode();
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof ChoiceItemType && alts.equals(((ChoiceItemType) obj).alts);
+    return this == obj || obj instanceof ChoiceItemType &&
+        types.equals(((ChoiceItemType) obj).types);
   }
 
   @Override
   public String toString() {
     final QueryString qs = new QueryString().token('(');
-    int n = alts.size();
-    for(final SeqType st : alts) {
+    int n = types.size();
+    for(final SeqType st : types) {
       qs.token(st.toString());
       if(--n != 0) qs.token('|');
     }

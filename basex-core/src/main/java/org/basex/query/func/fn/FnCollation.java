@@ -30,8 +30,6 @@ public final class FnCollation extends StandardFunc {
 
     // generate and check collation URI
     final byte[] href = Prop.ICU ? Collation.ICU : Collation.BASEX;
-    final Uri uri = Uri.get(WebFn.createUrl(href, map.map(), info).finish());
-    toCollation(uri, qc);
-    return uri;
+    return Uri.get(WebFn.createUrl(href, map.map(), info).finish());
   }
 }

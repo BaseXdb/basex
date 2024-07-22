@@ -1,7 +1,5 @@
 package org.basex.query.func.util;
 
-import static org.basex.query.func.Function.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.fn.*;
@@ -25,11 +23,15 @@ public final class UtilRange extends FnSubsequence {
   }
 
   @Override
+  protected boolean range() {
+    return true;
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(arg(1) instanceof Int && ((Int) arg(1)).itr() < 1) {
-      final Expr[] args = exprs.clone();
-      args[1] = Int.ONE;
-      return cc.function(_UTIL_RANGE, info, args);
+    if(arg(1) instanceof Int) {
+      // util:range(EXPR, -5, END)  ->  util:range(EXPR, 1, END)
+      if(((Int) arg(1)).itr() < 1) arg(1, arg -> Int.ONE);
     }
     return super.opt(cc);
   }
