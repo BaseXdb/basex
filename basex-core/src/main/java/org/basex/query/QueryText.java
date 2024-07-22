@@ -130,6 +130,7 @@ public interface QueryText {
   /** Parser token. */ String PROCESSING_INSTRUCTION = "processing-instruction";
   /** Parser token. */ String PRESERVE = "preserve";
   /** Parser token. */ String PREVIOUS = "previous";
+  /** Parser token. */ String RECORD = "record";
   /** Parser token. */ String RELATIONSHIP = "relationship";
   /** Parser token. */ String RENAME = "rename";
   /** Parser token. */ String REPLACE = "replace";

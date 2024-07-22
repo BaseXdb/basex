@@ -183,6 +183,7 @@ public class FuncType extends FType {
         case QueryText.FUNCTION:
         case QueryText.FN:       return SeqType.FUNCTION;
         case QueryText.MAP:      return SeqType.MAP;
+        case QueryText.RECORD:   return SeqType.RECORD;
         case QueryText.ARRAY:    return SeqType.ARRAY;
       }
     }
