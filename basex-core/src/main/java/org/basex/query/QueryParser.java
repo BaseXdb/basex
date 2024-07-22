@@ -3210,10 +3210,11 @@ public class QueryParser extends InputParser {
     // record
     if(type instanceof RecordType) {
       final TokenObjMap<Field> fields = new TokenObjMap<>();
+      boolean extensible = false;
       do {
         if(wsConsume("*")) {
-          wsCheck(")");
-          return SeqType.RECORD;
+          extensible = true;
+          break;
         }
         final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X);
         final boolean optional = wsConsume("?");
@@ -3221,8 +3222,8 @@ public class QueryParser extends InputParser {
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
         fields.put(name, new Field(optional, seqType));
       } while(wsConsume(","));
-      check(')');
-      return new RecordType(false, fields);
+      wsCheck(")");
+      return fields.isEmpty() ? SeqType.RECORD : new RecordType(extensible, fields);
     }
     // map
     if(type instanceof MapType) {

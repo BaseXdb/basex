@@ -502,4 +502,25 @@ public final class XQuery4Test extends SandboxTest {
         + "only end $e when $e = 3 "
         + "return sum($w)", "6\n5\n3");
   }
+
+  /** Record tests. */
+  @Test public void recordTest() {
+    query("{} instance of record(*)", true);
+    query("{} instance of record(x?, *)", true);
+    query("{} instance of record(x?, y?, *)", true);
+    query("{ 'x': 1 } instance of record(x, y?, *)", true);
+    query("{ 'y': 1 } instance of record(x?, y, *)", true);
+    query("{ 'x': 1 } instance of record(x as xs:integer)", true);
+    query("{ 'x': 1 } instance of record(x as xs:integer, *)", true);
+
+    query("{} instance of record(x, *)", false);
+    query("{ 'x': 1 } instance of record(x?, y, *)", false);
+    query("{ 'y': 1 } instance of record(x, y?, *)", false);
+    query("{ 'x': 1 } instance of record(x as xs:string)", false);
+    query("{ 'x': 1 } instance of record(x as xs:string, *)", false);
+    query("{ 'x': 1 } instance of record(x? as xs:string)", false);
+    query("{ 'x': 1 } instance of record(x? as xs:string, *)", false);
+
+    error("{} instance of record(*, x)", WRONGCHAR_X_X);
+  }
 }
