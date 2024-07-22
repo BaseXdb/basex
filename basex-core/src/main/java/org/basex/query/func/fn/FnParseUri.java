@@ -68,7 +68,7 @@ public class FnParseUri extends FnJsonDoc {
     final Regex r = new Regex();
     if(r.has(string, "^(.*?)#(.*)$")) {
       string = r.group(1);
-      fragment = r.group(2);
+      fragment = decode(r.group(2));
     }
     if(r.has(string, "^(.*?)\\?(.*)$")) {
       string = r.group(1);
@@ -76,31 +76,40 @@ public class FnParseUri extends FnJsonDoc {
     }
 
     // attempt to identify the scheme
-    if(r.has(string, "^[a-zA-Z][:|].*$")) {
-      scheme = FILE;
-      string = string.replaceAll("^(.)\\|", "$1:");
-      filepath = string;
-      string = "/" + string;
-    } else if(r.has(string, "^([a-zA-Z][-+.A-Za-z0-9]*):(.*)$")) {
+    if(r.has(string, "^([a-zA-Z][-+.A-Za-z0-9]+):(.*)$")) {
       scheme = r.group(1);
       string = r.group(2);
+    }
+    if(scheme.isEmpty() || scheme.equalsIgnoreCase(FILE)) {
+      if(r.has(string, "^/*([a-zA-Z][:|].*)$")) {
+        scheme = FILE;
+        string = '/' + r.group(1).replaceAll("^(.)\\|", "$1:");
+      } else if(options.get(UriOptions.UNC_PATH)) {
+        scheme = FILE;
+      }
     }
 
     // determine if the URI is hierarchical
     final Item hierarchical = NON_HIERARCHICAL.contains(scheme) ? Bln.FALSE :
       string.isEmpty() ? Empty.VALUE : Bln.get(string.startsWith("/"));
 
-    // examine the remaining parts of the string
-    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && r.has(string, "^//[^/].*$")) {
-      scheme = FILE;
+    // identify the remaining components
+    if(scheme.equalsIgnoreCase(FILE)) {
+      if(options.get(UriOptions.UNC_PATH) && r.has(string, "^/*(//[^/].*)$")) {
+        string = r.group(1);
+      } else {
+        string = string.replaceAll("^/+", "/");
+      }
       filepath = string;
-    } else if((scheme.isEmpty() || scheme.equals(FILE)) && r.has(string, "^/*(/[a-zA-Z][:|].*)$")) {
-      string = r.group(1).replaceAll("^(..)\\|", "$1:");
-    } else if(r.has(string, "^///*([^/]+)?(/.*)?$")) {
-      authority = r.group(1);
-      string = r.group(2);
+    } else if(hierarchical == Bln.TRUE) {
+      if(r.has(string, "^//([^/]+)$")) {
+        authority = r.group(1);
+        string = "";
+      } else if(r.has(string, "^//([^/]*)(/.*)$")) {
+        authority = r.group(1);
+        string = r.group(2);
+      }
     }
-    if(string == null) string = "";
 
     // parse userinfo
     if(r.has(authority, "^(([^@]*)@)(.*)(:([^:]*))?$")) {
@@ -128,7 +137,7 @@ public class FnParseUri extends FnJsonDoc {
     if(omitPort(port, scheme, options)) port = "";
 
     path = string;
-    if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equals(FILE))) {
+    if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equalsIgnoreCase(FILE))) {
       filepath = string;
     }
 
