@@ -2,6 +2,8 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -14,11 +16,11 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public final class RecordType extends MapType {
+public final class RecordType extends MapType implements Iterable<byte[]> {
   /** Extensible flag. */
-  final boolean extensible;
+  private final boolean extensible;
   /** Field declarations. */
-  final TokenObjMap<Field> fields;
+  private final TokenObjMap<Field> fields;
 
   /**
    * Constructor.
@@ -45,6 +47,28 @@ public final class RecordType extends MapType {
       unionType = unionType == null ? st : unionType.union(st);
     }
     return unionType;
+  }
+
+  @Override
+  public Iterator<byte[]> iterator() {
+    return fields.iterator();
+  }
+
+  /**
+   * Indicates if this record type is extensible.
+   * @return result of check
+   */
+  public boolean isExtensible() {
+    return extensible;
+  }
+
+  /**
+   * Returns the field with the specified key.
+   * @param key key to be looked up
+   * @return field, or {@code null} if nothing was found
+   */
+  public Field getField(final byte[] key) {
+    return fields.get(key);
   }
 
   /**
@@ -234,6 +258,14 @@ public final class RecordType extends MapType {
     public Field(final boolean optional, final SeqType seqType) {
       this.optional = optional;
       this.seqType = seqType;
+    }
+
+    /**
+     * Indicates if this field is optional.
+     * @return result of check
+     */
+    public boolean isOptional() {
+      return optional;
     }
 
     /**

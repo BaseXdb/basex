@@ -15,6 +15,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -511,6 +512,9 @@ public final class SeqType {
         }
         vb.add(it);
       }
+    } else if(item instanceof XQMap && type instanceof RecordType) {
+      final RecordType rt = (RecordType) type;
+      vb.add(((XQMap) item).coerceTo(rt, qc, cc, info));
     } else if(item instanceof FItem && type instanceof FuncType) {
       final FuncType ft = type == FUNCTION ? item.funcType() : (FuncType) type;
       vb.add(((FItem) item).coerceTo(ft, qc, cc, info));

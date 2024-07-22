@@ -19,6 +19,7 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.RecordType.*;
 import org.basex.util.*;
 
 /**
@@ -283,6 +284,36 @@ public final class XQMap extends XQData {
    */
   public void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
     root.apply(func);
+  }
+
+  /**
+   * Converts this map to the given record type.
+   * @param rt record type
+   * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
+   * @param ii input info (can be {@code null})
+   * @return coerced map
+   * @throws QueryException query exception
+   */
+  public XQMap coerceTo(final RecordType rt, final QueryContext qc, final CompileContext cc,
+      final InputInfo ii) throws QueryException {
+    for(final byte[] key : rt) {
+      if(!rt.getField(key).isOptional() && !contains(Str.get(key))) {
+        throw typeError(this, rt.seqType(), null, ii);
+      }
+    }
+    final MapBuilder mb = new MapBuilder();
+    for(final Item key : keys()) {
+      qc.checkStop();
+      Value value = get(key);
+      final Field field = !key.instanceOf(AtomType.STRING) ? null : rt.getField(key.string(null));
+      if(field != null) {
+        final SeqType st = field.seqType();
+        if(!st.instance(value)) value = st.coerce(value, null, qc, cc, ii);
+      } else if(!rt.isExtensible()) throw typeError(this, rt.seqType(), null, ii);
+      mb.put(key, value);
+    }
+    return mb.map();
   }
 
   @Override
