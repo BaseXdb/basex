@@ -93,7 +93,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
         }
       }
       return true;
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }
   }
@@ -128,9 +128,10 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
         final Field rtf = rt.fields.get(name);
         if(fields.contains(name)) {
           final Field f = fields.get(name);
-          if(!rtf.optional && f.optional) return false;
-          if(!f.seqType().instanceOf(rtf.seqType())) return false;
-        } else if(!rtf.optional || extensible && rtf.seqType() != SeqType.ITEM_ZM) return false;
+          if(!rtf.optional && f.optional || !f.seqType().instanceOf(rtf.seqType())) return false;
+        } else if(!rtf.optional || extensible && rtf.seqType() != SeqType.ITEM_ZM) {
+          return false;
+        }
       }
       return true;
     }

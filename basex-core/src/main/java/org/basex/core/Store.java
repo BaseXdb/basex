@@ -254,7 +254,7 @@ public final class Store implements Closeable {
         CLASS_IDS.put(classes[c], c);
         METHODS[c] = lookup.findStatic(classes[c], "read", mt);
       }
-    } catch(NoSuchMethodException | IllegalAccessException ex) {
+    } catch(final NoSuchMethodException | IllegalAccessException ex) {
       Util.stack(ex);
       throw Util.notExpected(ex);
     }

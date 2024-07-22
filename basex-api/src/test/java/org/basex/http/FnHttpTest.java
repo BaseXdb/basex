@@ -377,7 +377,7 @@ public class FnHttpTest extends HTTPTest {
         final RequestParser rp = new RequestParser(null);
         rp.parse(dbNode.childIter().next(), Empty.VALUE);
         error.append(name).append(": Request did not fail.");
-      } catch (final QueryException ex) {
+      } catch(final QueryException ex) {
         if(!ex.getMessage().contains(ErrType.HC.toString())) {
           error.append(name).append(": Wrong error code (").append(ex.getMessage()).append(")");
         }

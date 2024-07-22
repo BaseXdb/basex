@@ -306,7 +306,7 @@ public final class XQMap extends XQData {
     for(final Item key : keys()) {
       qc.checkStop();
       Value value = get(key);
-      final Field field = !key.instanceOf(AtomType.STRING) ? null : rt.getField(key.string(null));
+      final Field field = key.instanceOf(AtomType.STRING) ? rt.getField(key.string(null)) : null;
       if(field != null) {
         final SeqType st = field.seqType();
         if(!st.instance(value)) value = st.coerce(value, null, qc, cc, ii);

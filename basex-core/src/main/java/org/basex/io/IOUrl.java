@@ -241,7 +241,7 @@ public final class IOUrl extends IO {
           public void checkServerTrusted(final X509Certificate[] x509, final String type) { }
         }
       }, new SecureRandom());
-    } catch(NoSuchAlgorithmException | KeyManagementException ex) {
+    } catch(final NoSuchAlgorithmException | KeyManagementException ex) {
       Util.stack(ex);
     }
   }
