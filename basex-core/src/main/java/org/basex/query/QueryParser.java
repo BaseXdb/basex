@@ -2229,7 +2229,7 @@ public class QueryParser extends InputParser {
 
     final int cp = current();
     // direct constructor
-    if(cp == '<') return dirConstructor();
+    if(cp == '<') return dirConstructor(true);
     // string constructor and template
     if(cp == '`') return stringConstructor();
     // variables
@@ -2681,35 +2681,47 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "DirectConstructor" rule.
+   * @param root root call
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr dirConstructor() throws QueryException {
+  private Expr dirConstructor(final boolean root) throws QueryException {
+    final int p = pos;
     check('<');
-    return consume('!') ? dirComment() : consume('?') ? dirPI() : dirElement();
+    final Expr expr = consume('!') ? dirComment() : consume('?') ? dirPI() : dirElement(root);
+    if(expr != null) return expr;
+    pos = p;
+    return null;
   }
 
   /**
    * Parses the "DirElemConstructor" rule.
    * Parses the "DirAttributeList" rules.
-   * @return query expression
+   * @param root root call
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr dirElement() throws QueryException {
+  private Expr dirElement(final boolean root) throws QueryException {
+    final InputInfo ii = info();
+    final byte[] qnm = qName(root ? null : ELEMNAME_X);
+    consumeWS();
+    int cp = current();
+    if(qnm.length == 0 || root && cp != '/' && cp != '>' && !XMLToken.isNCStartChar(cp)) {
+      return null;
+    }
+
     // cache namespace information
     final int size = sc.ns.size();
     final byte[] nse = sc.elemNS;
     final int npos = qnames.size();
 
-    final InputInfo ii = info();
-    final QNm name = new QNm(qName(ELEMNAME_X));
+    final QNm name = new QNm(qnm);
     qnames.add(name, ii);
-    consumeWS();
 
     final Atts ns = new Atts();
     final ExprList cont = new ExprList();
 
-    // parse attributes...
+    // parse attributes
     boolean xmlDecl = false; // xml prefix explicitly declared?
     ArrayList<QNm> atts = null;
     while(true) {
@@ -2718,7 +2730,11 @@ public class QueryParser extends InputParser {
 
       final ExprList attv = new ExprList();
       consumeWS();
-      check('=');
+      if(root) {
+        if(!consume('=')) return null;
+      } else {
+        check('=');
+      }
       consumeWS();
       final int delim = consume();
       if(!quote(delim)) throw error(NOQUOTE_X, found());
@@ -2727,7 +2743,7 @@ public class QueryParser extends InputParser {
       boolean simple = true;
       while(true) {
         while(!consume(delim)) {
-          final int cp = current();
+          cp = current();
           switch(cp) {
             case '{':
               if(next() == '{') {
@@ -2841,7 +2857,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "DirElemContent" rule.
    * @param name name of opening element
-   * @return query expression
+   * @return query expression or {@code null}
    * @throws QueryException query exception
    */
   private Expr dirElemContent(final byte[] name) throws QueryException {
@@ -2855,7 +2871,7 @@ public class QueryParser extends InputParser {
           strip = false;
         } else {
           final Str txt = text(tb, strip);
-          return txt != null ? txt : next() == '/' ? null : dirConstructor();
+          return txt != null ? txt : next() == '/' ? null : dirConstructor(false);
         }
       } else if(cp == '{') {
         if(next() == '{') {
