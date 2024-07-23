@@ -19,7 +19,7 @@ public final class ArrayIndexOf extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final Value search = arg(1).atomValue(qc, info);
+    final Value target = arg(1).value(qc);
     final Collation collation = toCollation(arg(2), qc);
 
     int c = 0;
@@ -27,7 +27,7 @@ public final class ArrayIndexOf extends ArrayFn {
     final LongList list = new LongList();
     for(final Value member : array.members()) {
       ++c;
-      if(deep.equal(member, search)) list.add(c);
+      if(deep.equal(member, target)) list.add(c);
     }
     return IntSeq.get(list.finish());
   }
