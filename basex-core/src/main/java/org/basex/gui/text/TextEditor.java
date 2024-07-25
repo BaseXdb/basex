@@ -861,13 +861,13 @@ public final class TextEditor {
       } else if(ch == '-') {
         // closes XML comments
         if(prev == '-' && pprv == '!' && pos > 2 && text[pos - 3] == '<') {
-          sb.append("  -->\n");
+          sb.append("  -->");
           move = 2;
         }
       } else if(ch == '?') {
         // closes XML processing instructions
         if(prev == '<') {
-          sb.append(" ?>\n");
+          sb.append(" ?>");
           move = 1;
         }
       }
