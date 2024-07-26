@@ -54,8 +54,10 @@ abstract class Ids extends ContextFn {
       for(Item item; (item = iter.next()) != null;) {
         // check attribute name; check root if database has more than one document
         final ANode attr = (ANode) item;
-        if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
+        if(XMLToken.isId(attr.name(), idref) && (idref || idSet.remove(attr.string()) != 0) &&
+            (data.meta.ndocs == 1 || attr.root().is(root))) {
           list.add(idref ? attr : attr.parent());
+        }
       }
     } else {
       // otherwise, do sequential scan: parse node and its descendants
@@ -92,11 +94,11 @@ abstract class Ids extends ContextFn {
     for(final ANode attr : node.attributeIter()) {
       if(XMLToken.isId(attr.name(), idref)) {
         // id/idref found
-        for(final byte[] token : distinctTokens(attr.string())) {
-          // correct value: add to results
-          if(idSet.contains(token)) {
+        boolean found = false;
+        for(final byte[] id : distinctTokens(attr.string())) {
+          if((idref ? idSet.contains(id) : idSet.remove(id) != 0) && !found) {
             results.add(idref ? attr.finish() : node.finish());
-            break;
+            found = true;
           }
         }
       }

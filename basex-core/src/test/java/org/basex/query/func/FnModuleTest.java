@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.*;
 
 import org.basex.*;
+import org.basex.core.cmd.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
@@ -1073,6 +1074,34 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
+  }
+
+  /** Test method. */
+  @Test public void id() {
+    final Function func = ID;
+    final String doc = "<foo xml:id=\"a1\" x=\"x\"><bar xml:id=\"a1\" y=\"y\"/></foo>";
+    String input = " document { " + doc + " }";
+    query(func.args("a1", input), doc);
+    query(func.args("a2", input), "");
+    query(func.args("a1", input + "/*"), doc);
+    query(func.args("a2", input + "/*"), "");
+    query(input + " ! " + func.args("a1"), doc);
+    query(input + " ! " + func.args("a2"), "");
+    query(input + "/* ! " + func.args("a1"), doc);
+    query(input + "/* ! " + func.args("a2"), "");
+
+    input = " doc('db')";
+    execute(new CreateDB("db", doc));
+    query(func.args("a1", input), doc);
+    query(func.args("a2", input), "");
+    query(func.args("a1", input + "/*"), doc);
+    query(func.args("a2", input + "/*"), "");
+    query(input + " ! " + func.args("a1"), doc);
+    query(input + " ! " + func.args("a2"), "");
+    query(input + "/* ! " + func.args("a1"), doc);
+    query(input + "/* ! " + func.args("a2"), "");
+
+    error(func.args("a2", " <a/>"), IDDOC);
   }
 
   /** Test method. */
