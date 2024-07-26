@@ -15,7 +15,7 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
    * Default constructor.
    */
   public ExprList() {
-    this(1);
+    this(2);
   }
 
   /**

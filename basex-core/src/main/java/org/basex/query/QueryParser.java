@@ -971,7 +971,7 @@ public class QueryParser extends InputParser {
     }
 
     if(!wsConsume(",")) return expr;
-    final ExprList el = new ExprList(expr);
+    final ExprList el = new ExprList().add(expr);
     do add(el, single()); while(wsConsume(","));
     return new List(info(), el.finish());
   }
@@ -1371,7 +1371,7 @@ public class QueryParser extends InputParser {
     final ArrayList<SwitchGroup> groups = new ArrayList<>();
     ExprList exprs;
     do {
-      exprs = new ExprList((Expr) null);
+      exprs = new ExprList().add((Expr) null);
       while(wsConsumeWs(CASE)) add(exprs, check(expr(), NOSWITCH));
       if(exprs.size() == 1) {
         // add default case
@@ -1559,7 +1559,7 @@ public class QueryParser extends InputParser {
   private Expr otherwise() throws QueryException {
     final Expr expr = stringConcat();
     if(expr == null || !wsConsumeWs(OTHERWISE)) return expr;
-    final ExprList el = new ExprList(expr);
+    final ExprList el = new ExprList().add(expr);
     do add(el, stringConcat()); while(wsConsume(OTHERWISE));
     return new Otherwise(info(), el.finish());
   }
@@ -1573,7 +1573,7 @@ public class QueryParser extends InputParser {
     final Expr expr = range();
     if(expr == null || !consume("||")) return expr;
 
-    final ExprList el = new ExprList(expr);
+    final ExprList el = new ExprList().add(expr);
     do add(el, range()); while(wsConsume("||"));
     return new Concat(info(), el.finish());
   }
@@ -1630,7 +1630,7 @@ public class QueryParser extends InputParser {
   private Expr union() throws QueryException {
     final Expr expr = intersect();
     if(expr == null || !isUnion()) return expr;
-    final ExprList el = new ExprList(expr);
+    final ExprList el = new ExprList().add(expr);
     do add(el, intersect()); while(isUnion());
     return new Union(info(), el.finish());
   }
@@ -1665,7 +1665,7 @@ public class QueryParser extends InputParser {
         el = null;
       }
       lastIs = is;
-      if(el == null) el = new ExprList(expr);
+      if(el == null) el = new ExprList().add(expr);
       add(el, instanceOf());
     }
     return el != null ? intersectExcept(lastIs, el) : expr;
@@ -1919,7 +1919,7 @@ public class QueryParser extends InputParser {
     if(expr != null) {
       final int next = next();
       if(next != '=' && next != '!' && wsConsumeWs("!")) {
-        final ExprList el = new ExprList(expr);
+        final ExprList el = new ExprList().add(expr);
         do add(el, path()); while(next() != '=' && wsConsumeWs("!"));
         return new CachedMap(info(), el.finish());
       }
@@ -2242,10 +2242,11 @@ public class QueryParser extends InputParser {
     // computed constructors
     expr = compConstructor();
     if(expr != null) return expr;
-    // ordered expression
-    if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
     // map constructor
-    if(current('{') || wsConsumeWs(MAP, MAPCONSTR, "{")) return new CMap(info(), keyValues());
+    if(current('{') || wsConsumeWs(MAP, MAPCONSTR, "{")) return mapConstructor();
+    // square array constructor
+    expr = arrayConstructor();
+    if(expr != null) return expr;
     // curly array constructor
     if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
       wsCheck("{");
@@ -2253,8 +2254,8 @@ public class QueryParser extends InputParser {
       wsCheck("}");
       return exp == null ? new CArray(info(), false) : new CArray(info(), false, exp);
     }
-    // square array constructor
-    if(wsConsume("[")) return new CArray(info(), true, values());
+    // ordered expression
+    if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
     // unary lookup
     final int p = pos;
     if(consume("?")) {
@@ -2296,12 +2297,13 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses keys and values of maps.
-   * @return map literals
+   * Returns a map constructor.
+   * @return map constructor or {@code null}
    * @throws QueryException query exception
    */
-  private Expr[] keyValues() throws QueryException {
-    wsCheck("{");
+  private CMap mapConstructor() throws QueryException {
+    if(!wsConsume("{")) return null;
+    final InputInfo info = info();
     final ExprList el = new ExprList();
     if(!wsConsume("}")) {
       do {
@@ -2311,15 +2313,17 @@ public class QueryParser extends InputParser {
       } while(wsConsume(","));
       wsCheck("}");
     }
-    return el.finish();
+    return new CMap(info, el.finish());
   }
 
   /**
-   * Parses values of arrays.
-   * @return array literals
+   * Returns an array constructor.
+   * @return array constructor or {@code null}
    * @throws QueryException query exception
    */
-  private Expr[] values() throws QueryException {
+  private CArray arrayConstructor() throws QueryException {
+    if(!wsConsume("[")) return null;
+    final InputInfo info = info();
     final ExprList el = new ExprList();
     if(!wsConsume("]")) {
       do {
@@ -2327,7 +2331,7 @@ public class QueryParser extends InputParser {
       } while(wsConsume(","));
       wsCheck("]");
     }
-    return el.finish();
+    return new CArray(info, true, el.finish());
   }
 
   /**
@@ -3944,8 +3948,8 @@ public class QueryParser extends InputParser {
       final Expr expr = check(single(), INCOMPLETE);
       fl = Array.add(fl, new Let(localVars.add(var), expr));
     } while(wsConsumeWs(","));
-    wsCheck(MODIFY);
 
+    wsCheck(MODIFY);
     final InputInfo ii = info();
     final Expr m = check(single(), INCOMPLETE);
     wsCheck(RETURN);
