@@ -85,14 +85,14 @@ public final class PartFunc extends Arr {
     final Var[] params = new Var[placeholders];
     for(int p = 0, e = 0; e < el; e++) {
       final Expr expr = exprs[e];
+      final SeqType at = ft.argTypes[e];
       if(placeholder(expr)) {
-        final SeqType at = ft.argTypes[e];
         final Var param = vs.addNew(func.paramName(e), at, qc, info);
         args[e] = new VarRef(info, param);
         params[placeholderPerm == null ? p : placeholderPerm[p]] = param;
         ++p;
       } else {
-        args[e] = expr.value(qc);
+        args[e] = at.coerce(expr.value(qc), null, qc, null, ii);
       }
     }
     final AnnList anns = func.annotations();
