@@ -100,6 +100,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWTREE = new BooleanOption("SHOWTREE", false);
   /** Flag for activated project structure. */
   public static final BooleanOption SHOWPROJECT = new BooleanOption("SHOWPROJECT", true);
+  /** Indent result. */
+  public static final BooleanOption INDENTRESULT = new BooleanOption("INDENTRESULT", false);
 
   /** Preferences tab. */
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);

@@ -30,11 +30,13 @@ import org.basex.gui.view.text.*;
 import org.basex.gui.view.tree.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
+import org.basex.util.options.Options.*;
 
 /**
  * This class is the main window of the GUI. It is the central instance for user interactions.
@@ -222,6 +224,10 @@ public final class GUI extends JFrame implements BaseXWindow {
     setVisible(true);
     views.updateViews();
     refreshControls(true);
+
+    // apply GUI-specific indentation globally
+    final SerializerOptions sopts = context.options.get(MainOptions.SERIALIZER);
+    sopts.put(SerializerOptions.INDENT, gopts.get(GUIOptions.INDENTRESULT) ? YesNo.YES : YesNo.NO);
 
     // update check (skip if beta/snapshot version is running)
     if(gopts.get(GUIOptions.CHECKUPDATES) && !Strings.contains(Prop.VERSION, ' ')) {

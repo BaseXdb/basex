@@ -56,8 +56,6 @@ public final class EditorView extends View {
 
   /** Project files. */
   final ProjectView project;
-  /** Go button. */
-  final AbstractButton go;
   /** Test button. */
   final AbstractButton test;
 
@@ -120,11 +118,10 @@ public final class EditorView extends View {
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_EXTERNAL_VARIABLES, gui);
+    final AbstractButton go = BaseXButton.command(GUIMenuCmd.C_GO, gui);
 
     history = BaseXButton.get("c_history", BaseXLayout.addShortcut(RECENTLY_OPENED,
         BaseXKeys.HISTORY.toString()), false, gui);
-    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
-        BaseXKeys.EXEC.toString()), false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
     test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
@@ -202,7 +199,6 @@ public final class EditorView extends View {
       stop.setEnabled(false);
       gui.stop();
     });
-    go.addActionListener(e -> run(getEditor(), Action.EXECUTE));
     test.addActionListener(e -> run(getEditor(), Action.TEST));
     tabs.addChangeListener(e -> {
       final EditorArea ea = getEditor();
@@ -544,8 +540,15 @@ public final class EditorView extends View {
 
   /**
    * Parses or evaluates the current file.
+   */
+  public void run() {
+    run(getEditor(), Action.EXECUTE);
+  }
+
+  /**
+   * Parses or evaluates the query in the specified editor.
+   * @param editor editor
    * @param action action
-   * @param editor current editor
    */
   void run(final EditorArea editor, final Action action) {
     refreshControls(editor, false);

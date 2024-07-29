@@ -131,7 +131,7 @@ public final class EditorArea extends TextPanel {
   @Override
   public void keyReleased(final KeyEvent e) {
     if(EXEC.is(e)) {
-      if(gui.editor.go.isEnabled()) release(Action.EXECUTE);
+      release(Action.EXECUTE);
     } else if(TESTS.is(e)) {
       if(gui.editor.test.isEnabled()) release(Action.TEST);
     } else if(HISTORY.is(e)) {

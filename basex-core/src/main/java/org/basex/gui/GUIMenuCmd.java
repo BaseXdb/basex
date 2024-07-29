@@ -190,6 +190,19 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Runs the currently opened query. */
+  C_GO(RUN_QUERY, "% ENTER", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.run();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Edits external variables. */
   C_EXTERNAL_VARIABLES(EXTERNAL_VARIABLES, "% shift E", false, false) {
     @Override
@@ -207,15 +220,15 @@ public enum GUIMenuCmd implements GUICommand {
   C_INDENT_RESULT(INDENT_RESULT, "% shift I", false, true) {
     @Override
     public void execute(final GUI gui) {
+      final boolean indent = gui.gopts.invert(GUIOptions.INDENTRESULT);
       final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
-      sopts.put(SerializerOptions.INDENT, selected(gui) ? YesNo.NO : YesNo.YES);
+      sopts.put(SerializerOptions.INDENT, indent ? YesNo.YES : YesNo.NO);
       gui.layoutViews();
     }
 
     @Override
     public boolean selected(final GUI gui) {
-      final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
-      return sopts.get(SerializerOptions.INDENT) == YesNo.YES;
+      return gui.gopts.get(GUIOptions.INDENTRESULT);
     }
   },
 
