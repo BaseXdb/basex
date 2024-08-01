@@ -1,6 +1,7 @@
 package org.basex.http.ws;
 
 import java.io.*;
+import java.time.*;
 
 import org.basex.http.*;
 import org.eclipse.jetty.websocket.server.*;
@@ -16,6 +17,7 @@ import jakarta.servlet.*;
 public final class WsServlet extends JettyWebSocketServlet {
   @Override
   public void configure(final JettyWebSocketServletFactory factory) {
+    factory.setIdleTimeout(Duration.ofHours(1));
     factory.setCreator(new WsCreator());
   }
 
