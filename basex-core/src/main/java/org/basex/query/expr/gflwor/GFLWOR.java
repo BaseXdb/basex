@@ -119,7 +119,7 @@ public final class GFLWOR extends ParseExpr {
         forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedClauses(cc) | unusedVars(cc) |
         cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) | optimizeOrderBy(cc));
 
-    mergeWheres();
+    mergeWheres(cc);
 
     final Expr expr = simplify(cc);
     if(expr != null) {
@@ -912,31 +912,31 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Merges consecutive {@code where} clauses.
+   * @param cc compilation context
+   * @throws QueryException query exception
    */
-  private void mergeWheres() {
-    Where before = null;
-    final Iterator<Clause> iter = clauses.iterator();
-    while(iter.hasNext()) {
-      final Clause clause = iter.next();
+  private void mergeWheres(final CompileContext cc) throws QueryException {
+    final ExprList list = new ExprList();
+    final QueryConsumer<Integer> merge = c -> {
+      final int ls = list.size();
+      final Clause clause = clauses.get(c - ls);
+      for(int l = 1; l < ls; l++) clauses.remove(c - ls);
+      final Expr and = new And(clause.info(), list.next()).optimize(cc);
+      clauses.set(c - ls, new Where(and, clause.info()).optimize(cc));
+    };
+    for(int c = 0; c < clauses.size(); c++) {
+      final Clause clause = clauses.get(c);
+      final int ls = list.size();
       if(clause instanceof Where) {
-        final Where wh = (Where) clause;
-        if(wh.expr == Bln.FALSE) return;
-        if(before != null) {
-          iter.remove();
-          final Expr expr = before.expr;
-          if(expr instanceof And) {
-            final And and = (And) expr;
-            and.exprs = ExprList.concat(and.exprs, wh.expr);
-          } else {
-            before.expr = new And(before.info(), expr, wh.expr);
-          }
-        } else {
-          before = wh;
-        }
+        list.add(((Where) clause).expr);
+      } else if(ls > 1) {
+        merge.accept(c);
+        c -= ls + 1;
       } else {
-        before = null;
+        list.reset();
       }
     }
+    if(list.size() > 1) merge.accept(clauses.size());
   }
 
   @Override

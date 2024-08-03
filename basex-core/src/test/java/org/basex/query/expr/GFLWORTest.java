@@ -462,4 +462,24 @@ public final class GFLWORTest extends SandboxTest {
     query("for sliding window $w in 1 to 3 start at $p when true()"
         + "only end when $p = 2 return <w>{ $w }</w>", "<w>2</w>");
   }
+
+  /** Merge where clauses. */
+  @Test public void mergeWhere() {
+    check("for $i at $p in (1 to 4) where $i <= 3 return $p",
+        "1\n2\n3", count(Where.class, 1));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $i >= 2 return $p",
+        "2\n3", count(Where.class, 1));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $i >= 2 where $p < 5 return $p",
+        "2\n3", count(Where.class, 1));
+
+    check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
+        + "for $j at $q in ($i to 2) return $q",
+        "1\n2\n1", count(Where.class, 1));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
+        + "for $j at $q in ($i to 2) where $q < 5 return $q",
+        "1\n2\n1", count(Where.class, 2));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
+        + "for $j at $q in ($i to 2) where $j > 1 where $p < 5 return $q",
+        "2\n1", count(Where.class, 2));
+  }
 }
