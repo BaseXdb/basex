@@ -482,4 +482,34 @@ public final class GFLWORTest extends SandboxTest {
         + "for $j at $q in ($i to 2) where $j > 1 where $p < 5 return $q",
         "2\n1", count(Where.class, 2));
   }
+
+  /** Merge where clauses. */
+  @Test public void mergeWhile() {
+    check("for $i at $p in (1 to 4) while $i <= 3 return $p",
+        "1\n2\n3", count(While.class, 1));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $i >= 0 return $p",
+        "1\n2\n3", count(While.class, 1));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $i >= 0 while $p < 5 return $p",
+        "1\n2\n3", count(While.class, 1));
+
+    check("for $i at $p in (1 to 4) while $i <= 3 while $p < 5 "
+        + "for $j at $q in ($i to 2) return $q",
+        "1\n2\n1", count(While.class, 1));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $p < 5 "
+        + "for $j at $q in ($i to 2) while $q < 5 return $q",
+        "1\n2\n1", count(While.class, 2));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $p < 5 "
+        + "for $j at $q in ($i to 2) while $j >= 1 while $p < 5 return $q",
+        "1\n2\n1", count(While.class, 2));
+  }
+
+  /** While clause optimizations. */
+  @Test public void whilee() {
+    check("for $i in 1 to 6 while true() return $i", "1\n2\n3\n4\n5\n6", root(RangeSeq.class));
+    check("for $i in 1 to 6 while false() return $i", "", empty());
+
+    check("for $i in 1 to 6 let $j := text { $i } while $i < 2 return ($j, $j + 1)",
+        "1\n2", exists(DualIterMap.class));
+    check("let $a := <a/>[text()] while $a return $a", "", root(IterFilter.class));
+  }
 }

@@ -117,9 +117,11 @@ public final class GFLWOR extends ParseExpr {
     // apply all optimizations in a row until nothing changes anymore
     while(flattenReturn(cc) | flattenFor(cc) | unnestFLWR(cc) | unnestLets(cc) | ifToWhere(cc) |
         forToLet(cc) | slideLetsOut(cc) | inlineForLet(cc) | unusedClauses(cc) | unusedVars(cc) |
-        cleanDeadVars() | optimizeWhere(cc) | optimizePos(cc) | optimizeOrderBy(cc));
+        cleanDeadVars() | optimizeCond(cc, true) | optimizeCond(cc, false) | optimizePos(cc) |
+        optimizeOrderBy(cc));
 
-    mergeWheres(cc);
+    mergeWheres(cc, true);
+    mergeWheres(cc, false);
 
     final Expr expr = simplify(cc);
     if(expr != null) {
@@ -603,79 +605,80 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Slides where clauses upwards and removes those that do not filter anything.
+   * Slides where/while clauses upwards and removes those that do not filter anything.
    * @param cc compilation context
+   * @param where where/while flag
    * @return change flag
    * @throws QueryException query exception
    */
-  private boolean optimizeWhere(final CompileContext cc) throws QueryException {
+  private boolean optimizeCond(final CompileContext cc, final boolean where) throws QueryException {
     boolean changed = false;
-    final HashSet<ForLet> optimize = new HashSet<>();
+    final java.util.function.Function<Clause, Expr> get = clause ->
+      (where ? clause instanceof Where : clause instanceof While) ?
+        where ? ((Where) clause).expr : ((While) clause).expr : null;
+    final HashSet<ForLet> optimized = new HashSet<>();
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
-      if(!(clause instanceof Where)) continue;
-
-      final Where where = (Where) clause;
-      if(where.expr instanceof Bln) {
-        cc.info(QueryText.OPTREMOVE_X_X, where.expr, (Supplier<?>) this::description);
+      final Expr expr = get.apply(clause);
+      if(expr instanceof Bln) {
+        cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         changed = true;
-        if(where.expr == Bln.TRUE) {
-          // test is always true: remove it
+        if(expr == Bln.TRUE) {
+          // for $i in 1 to 2 while true() return $i  ->  for $i in 1 to 3 return $i
           clauses.remove(c--);
         } else {
-          // otherwise, remove remaining clauses
+          // for $i in 1 to 2 where false() return $i  ->  for $i in 1 to 3 return ()
           clauses.subList(c, clauses.size()).clear();
           rtrn = Empty.VALUE;
         }
-      } else if(!clause.has(Flag.NDT)) {
+      } else if(expr != null && !expr.has(Flag.NDT)) {
         // find insertion position
         int insert = -1;
         for(int j = c; --j >= 0;) {
           final Clause curr = clauses.get(j);
-          if(curr.has(Flag.NDT) || !curr.skippable(where)) break;
+          if(curr.has(Flag.NDT) || !curr.skippable(clause)) break;
           // where clauses are always moved to avoid unnecessary computations,
-          // but skipping only other where clauses can cause infinite loops
-          if(!(curr instanceof Where)) insert = j;
+          // but skipping other where/while clauses can cause infinite loops
+          if(!(curr instanceof Where) && !(curr instanceof While)) insert = j;
         }
-
         if(insert == -1) {
           insert = c;
         } else {
           clauses.add(insert, clauses.remove(c));
-          cc.info(QueryText.OPTMOVE_X, where.expr);
+          cc.info(QueryText.OPTMOVE_X, expr);
           changed = true;
           // it's safe to go on because clauses below the current one are never touched
         }
 
-        // rewrite where clause
+        // rewrite clause
         if(!clause.has(Flag.CTX)) {
           for(int i = insert; --i >= 0;) {
             final Clause before = clauses.get(i);
-            // skip where clauses
-            if(before instanceof Where) continue;
+            // skip clauses
+            if(get.apply(before) != null) continue;
             // analyze for/let clauses, abort otherwise
             if(before instanceof ForLet) {
               final ForLet fl = (ForLet) before;
-              final Predicate<Expr> varRef = expr ->
-                expr instanceof VarRef && ((VarRef) expr).var == fl.var;
+              final Predicate<Expr> varRef = e -> e instanceof VarRef && ((VarRef) e).var == fl.var;
               final boolean let = before instanceof Let;
-              if(let && before.seqType().instanceOf(SeqType.NODE_ZO) && varRef.test(where.expr)) {
-                // let $a := <a/>[text()] where $a  ->  for $a in <a/>[text()]
+              if(let && before.seqType().instanceOf(SeqType.NODE_ZO) && varRef.test(expr)) {
+                // let $n := ZERO-OR-ONE-NODE where $n  ->  for $n in ZERO-OR-ONE-NODE
+                // let $a := <a/>[text()] while $a  ->  for $a in <a/>[text()]
                 clauses.set(i, ((Let) before).toFor(cc).optimize(cc));
                 clauses.remove(insert);
                 changed = true;
                 c--;
-              } else if((!let || c + 1 == clauses.size() && (
+              } else if(where && (!let || c + 1 == clauses.size() && (
                 varRef.test(rtrn) ||
                 rtrn instanceof Filter && varRef.test(((Filter) rtrn).root) ||
                 rtrn instanceof Path && varRef.test(((Path) rtrn).root)
-              )) && fl.toPredicate(cc, where.expr)) {
+              )) && fl.toPredicate(cc, expr)) {
                 // for $b in /a/b where $b/c  ->  for $b in /a/b[c]
                 // let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] ...
                 // let $a := <a/> where $a = '' return $a/self::a  ->  let $a := <a/>[. = ''] ...
-                optimize.add(fl);
+                optimized.add(fl);
                 clauses.remove(insert);
-                cc.info(QueryText.OPTPRED_X, where.expr);
+                cc.info(QueryText.OPTPRED_X, expr);
                 changed = true;
                 c--;
               }
@@ -686,7 +689,7 @@ public final class GFLWOR extends ParseExpr {
       }
     }
     // optimize on rewritten expressions (only once per clause)
-    for(final ForLet fl : optimize) fl.expr = fl.expr.optimize(cc);
+    for(final ForLet fl : optimized) fl.expr = fl.expr.optimize(cc);
     return changed;
   }
 
@@ -911,24 +914,26 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Merges consecutive {@code where} clauses.
+   * Merges consecutive {@code where}/{@code while} clauses.
+   * @param where merge where/while
    * @param cc compilation context
    * @throws QueryException query exception
    */
-  private void mergeWheres(final CompileContext cc) throws QueryException {
+  private void mergeWheres(final CompileContext cc, final boolean where) throws QueryException {
     final ExprList list = new ExprList();
     final QueryConsumer<Integer> merge = c -> {
       final int ls = list.size();
       final Clause clause = clauses.get(c - ls);
       for(int l = 1; l < ls; l++) clauses.remove(c - ls);
-      final Expr and = new And(clause.info(), list.next()).optimize(cc);
-      clauses.set(c - ls, new Where(and, clause.info()).optimize(cc));
+      final InputInfo ii = clause.info();
+      final Expr and = new And(ii, list.next()).optimize(cc);
+      clauses.set(c - ls, (where ? new Where(and, ii) : new While(and, ii)).optimize(cc));
     };
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
       final int ls = list.size();
-      if(clause instanceof Where) {
-        list.add(((Where) clause).expr);
+      if(where ? clause instanceof Where : clause instanceof While) {
+        list.add(where ? ((Where) clause).expr : ((While) clause).expr);
       } else if(ls > 1) {
         merge.accept(c);
         c -= ls + 1;
@@ -1039,7 +1044,7 @@ public final class GFLWOR extends ParseExpr {
     // check if an outer clause can prevent the error
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
-      if(b4 instanceof For || b4 instanceof Window || b4 instanceof Where) {
+      if(b4 instanceof For || b4 instanceof Window || b4 instanceof Where || b4 instanceof While) {
         iter.next();
         while(iter.hasNext()) {
           iter.next();
@@ -1062,21 +1067,17 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Checks if this FLWOR expression has only 'for', 'let' and 'where' clauses.
+   * Checks if this FLWOR expression has only 'for', 'let', 'where', and 'while' clauses.
    * @return result of check
    */
   private boolean isFLW() {
-    for(final Clause clause : clauses)
-      if(!(clause instanceof For || clause instanceof Let || clause instanceof Where)) return false;
-    return true;
+    return ((Checks<Clause>) clause -> clause instanceof For || clause instanceof Let ||
+        clause instanceof Where || clause instanceof While).all(clauses);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Clause clause : clauses) {
-      if(!clause.accept(visitor)) return false;
-    }
-    return rtrn.accept(visitor);
+    return ((Checks<Clause>) clause -> clause.accept(visitor)).all(clauses) && rtrn.accept(visitor);
   }
 
   @Override
