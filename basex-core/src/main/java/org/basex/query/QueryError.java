@@ -957,6 +957,8 @@ public enum QueryError {
   /** Error code. */
   NOWHERE(XPST, 3, "Expecting valid expression after 'where'."),
   /** Error code. */
+  NOWHILE(XPST, 3, "Expecting valid expression after 'while'."),
+  /** Error code. */
   ORDERBY(XPST, 3, "Expecting valid expression after 'order by'."),
   /** Error code. */
   GRPBY(XPST, 3, "Expecting valid expression after 'group by'."),

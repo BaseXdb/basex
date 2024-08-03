@@ -523,4 +523,14 @@ public final class XQuery4Test extends SandboxTest {
 
     error("{} instance of record(*, x)", WRONGCHAR_X_X);
   }
+
+  /** While clause. */
+  @Test public void whilee() {
+    query("for $i in 1 to 4 while $i > 2 return $i", "");
+    query("for $i in 1 to 4 while $i < 3 return $i", "1\n2");
+    query("for $i in 1 to 4 while $i return $i", "1\n2\n3\n4");
+    query("for $i in 1 to 4 order by $i descending while $i > 2 return $i", "4\n3");
+    query("for $i allowing empty in () while count($i) = 0 return 1", 1);
+    query("for $i allowing empty in () while count($i) != 0 return 1", "");
+  }
 }

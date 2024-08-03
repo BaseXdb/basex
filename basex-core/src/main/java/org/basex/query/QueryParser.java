@@ -1002,6 +1002,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "FLWORExpr" rule.
    * Parses the "WhereClause" rule.
+   * Parses the "WhileClause" rule.
    * Parses the "OrderByClause" rule.
    * Parses the "OrderSpecList" rule.
    * Parses the "GroupByClause" rule.
@@ -1030,6 +1031,11 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(WHERE)) {
         alterPos = pos;
         clauses.add(new Where(check(single(), NOWHERE), info()));
+      }
+
+      if(wsConsumeWs(WHILE)) {
+        alterPos = pos;
+        clauses.add(new While(check(single(), NOWHILE), info()));
       }
 
       if(wsConsumeWs(GROUP)) {

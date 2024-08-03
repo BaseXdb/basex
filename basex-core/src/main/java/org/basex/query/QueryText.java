@@ -181,6 +181,7 @@ public interface QueryText {
   /** Parser token. */ String WEIGHT = "weight";
   /** Parser token. */ String WHEN = "when";
   /** Parser token. */ String WHERE = "where";
+  /** Parser token. */ String WHILE = "while";
   /** Parser token. */ String WILDCARDS = "wildcards";
   /** Parser token. */ String WINDOW = "window";
   /** Parser token. */ String WITH = "with";
