@@ -927,6 +927,8 @@ public enum QueryError {
   /** Error code. */
   FUNCNAME(XPST, 3, "Expecting function name."),
   /** Error code. */
+  TYPENAME(XPST, 3, "Expecting type name."),
+  /** Error code. */
   RESERVED_X(XPST, 3, "'%' is a reserved keyword."),
   /** Error code. */
   NOVARNAME(XPST, 3, "Variable name expected, '%' found."),
@@ -1012,6 +1014,8 @@ public enum QueryError {
   ANNVALUE_X(XPST, 3, "Literal expected, '%' found."),
   /** Error code. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
+  /** Error code. */
+  UPDATINGTYPE(XPST, 3, "Type cannot be updating."),
   /** Error code. */
   SIMPLETYPE_X(XPST, 3, "Simple type expected, function found: %(."),
   /** Error code. */
@@ -1234,6 +1238,8 @@ public enum QueryError {
   /** Error code. */
   ANNWHICH_X_X(XQST, 45, "Annotation %% is in reserved namespace."),
   /** Error code. */
+  TYPERESERVED_X(XQST, 45, "Type % is in reserved namespace."),
+  /** Error code. */
   INVURI_X(XQST, 46, "Invalid URI: %."),
   /** Error code. */
   DUPLMODULE_X(XQST, 47, "Module namespace is declared twice: %."),
@@ -1339,6 +1345,8 @@ public enum QueryError {
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** Error code. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
+  /** Error code. */
+  DUPLTYPE_X(XQST, 146, "Duplicate declaration of type %."),
   /** Error code. */
   PARAMOPTIONAL_X(XQST, 148, "Parameter must be declared as optional: $%."),
 

@@ -82,6 +82,10 @@ public class QueryParser extends InputParser {
   private final ArrayList<StaticVar> vars = new ArrayList<>();
   /** Parsed functions. */
   private final ArrayList<StaticFunc> funcs = new ArrayList<>();
+  /** Types. */
+  private final QNmMap<SeqType> declaredTypes = new QNmMap<>();
+  /** Public types. */
+  private final QNmMap<SeqType> publicTypes = new QNmMap<>();
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
@@ -145,7 +149,7 @@ public class QueryParser extends InputParser {
 
       final VarScope vs = localVars.popContext();
       final MainModule mm = new MainModule(expr, vs, sc);
-      mm.set(funcs, vars, moduleURIs, namespaces, moduleDoc);
+      mm.set(funcs, vars, publicTypes, moduleURIs, namespaces, moduleDoc);
       finish(mm);
       check(mm);
       return mm;
@@ -195,7 +199,7 @@ public class QueryParser extends InputParser {
 
       qc.modStack.pop();
       final LibraryModule lm = new LibraryModule(sc);
-      lm.set(funcs, vars, moduleURIs, namespaces, moduleDoc);
+      lm.set(funcs, vars, publicTypes, moduleURIs, namespaces, moduleDoc);
       return lm;
     } catch(final QueryException expr) {
       mark();
@@ -381,6 +385,10 @@ public class QueryParser extends InputParser {
           varDecl(anns.check(true, true));
         } else if(wsConsumeWs(FUNCTION)) {
           functionDecl(anns.check(false, true));
+        } else if(wsConsumeWs(ITEM_TYPE)) {
+          // types cannot be updating
+          if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
+          itemTypeDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -800,6 +808,12 @@ public class QueryParser extends InputParser {
       }
     }
     qc.modStack.pop();
+
+    // import the module's public types
+    for(final QNm qn : lib.types) {
+      if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+      declaredTypes.put(qn, lib.types.get(qn));
+    }
   }
 
   /**
@@ -915,6 +929,24 @@ public class QueryParser extends InputParser {
    */
   private static boolean reserved(final QNm name) {
     return !name.hasPrefix() && KEYWORDS.contains(name.string());
+  }
+
+  /**
+   * Parses the "ItemTypeDecl" rule.
+   * @param anns annotations
+   * @throws QueryException query exception
+   */
+  private void itemTypeDecl(final AnnList anns) throws QueryException {
+    final QNm qn = eQName(sc.elemNS, TYPENAME);
+    if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+    if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
+    wsCheck(AS);
+    final SeqType itemType = itemType();
+    if(!anns.contains(Annotation.PRIVATE)) {
+      if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
+      publicTypes.put(qn, itemType);
+    }
+    declaredTypes.put(qn, itemType);
   }
 
   /**
@@ -3122,7 +3154,6 @@ public class QueryParser extends InputParser {
     Type type;
     if(wsConsume("(")) {
       type = choiceItemType();
-      if(type.atomic() == null) throw error(INVALIDCAST_X, type);
     } else {
       final QNm name = eQName(sc.elemNS, TYPEINVALID);
       if(!name.hasURI() && eq(name.local(), token(ENUM))) {
@@ -3136,11 +3167,15 @@ public class QueryParser extends InputParser {
           if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
             type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
             throw error(INVALIDCAST_X, name.prefixId(XML));
-          if(type == null)
-            throw error(WHICHCAST_X, AtomType.similar(name));
+          if(type == null) {
+            final SeqType st = declaredTypes.get(name);
+            if(st == null) throw error(WHICHCAST_X, AtomType.similar(name));
+            type = st.type;
+          }
         }
       }
     }
+    if(type.atomic() == null) throw error(INVALIDCAST_X, type);
     skipWs();
     return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
   }
@@ -3210,8 +3245,12 @@ public class QueryParser extends InputParser {
       if(!name.hasURI()) name.uri(sc.elemNS);
       // atomic type
       type = AtomType.find(name, false);
-      // no type found
-      if(type == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
+      // declared type
+      if(type == null) {
+        st = declaredTypes.get(name);
+        // no type found
+        if(st == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
+      }
     }
     // annotations are not allowed for remaining types
     if(!anns.isEmpty()) throw error(NOANN);
