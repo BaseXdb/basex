@@ -42,3 +42,9 @@ declare %private %Q{ns}ignored function hello:internal() as xs:string {
 declare function hello:closure() {
   count#1(1)
 };
+
+(:~ Private type. :)
+declare %private item-type hello:private-int as xs:integer;
+
+(:~ Public type. :)
+declare item-type hello:int as hello:private-int;
