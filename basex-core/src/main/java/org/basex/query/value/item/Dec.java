@@ -3,8 +3,10 @@ package org.basex.query.value.item;
 import static org.basex.util.Token.*;
 
 import java.math.*;
+import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -124,10 +126,38 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public Dec round(final int scale, final boolean even) {
-    final int s = value.signum();
-    return s == 0 ? this : get(value.setScale(scale, even ? RoundingMode.HALF_EVEN :
-           s == 1 ? RoundingMode.HALF_UP : RoundingMode.HALF_DOWN));
+  public Dec round(final int prec, final RoundMode mode) {
+    if(value.signum() == 0) return this;
+    final BigDecimal v = round(value, prec, mode);
+    return v.equals(value) ? this : get(v);
+  }
+
+  /**
+   * Returns a rounded value.
+   * @param value decimal value
+   * @param prec precision
+   * @param mode rounding mode
+   * @return rounded value
+   */
+  static BigDecimal round(final BigDecimal value, final int prec, final RoundMode mode) {
+    if(prec >= value.scale()) return value;
+
+    final BigDecimal l = value.setScale(prec, RoundingMode.FLOOR);
+    final BigDecimal u = value.setScale(prec, RoundingMode.CEILING);
+    final boolean pos = value.signum() >= 0;
+    final BooleanSupplier mw = () -> l.add(u).divide(BigDecimal.valueOf(2)).compareTo(value) == 0;
+    final Supplier<BigDecimal> n = () -> value.setScale(prec, RoundingMode.HALF_UP);
+    switch(mode) {
+      case FLOOR:               return l;
+      case CEILING:             return u;
+      case TOWARD_ZERO:         return pos ? l : u;
+      case AWAY_FROM_ZERO:      return pos ? u : l;
+      case HALF_TO_FLOOR:       return mw.getAsBoolean() ? l : n.get();
+      case HALF_TO_CEILING:     return mw.getAsBoolean() ? u : n.get();
+      case HALF_TOWARD_ZERO:    return mw.getAsBoolean() ? pos ? l : u : n.get();
+      case HALF_AWAY_FROM_ZERO: return mw.getAsBoolean() ? pos ? u : l : n.get();
+      default:                  return value.setScale(prec, RoundingMode.HALF_EVEN);
+    }
   }
 
   @Override

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -78,9 +79,10 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public ANum round(final int scale, final boolean even) {
-    return scale >= 0 ? this :
-      Int.get(Dec.get(new BigDecimal(value)).round(scale, even).dec(null).longValue());
+  public ANum round(final int prec, final RoundMode mode) {
+    if(value.equals(BigInteger.ZERO) || prec >= 0) return this;
+    final BigInteger v = Dec.round(new BigDecimal(value), prec, mode).toBigInteger();
+    return v.equals(value) ? this : new Uln(v);
   }
 
   @Override

@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -103,11 +104,11 @@ public abstract class ANum extends Item {
 
   /**
    * Returns a rounded value.
-   * @param scale scale
-   * @param even half-to-even flag
+   * @param prec precision
+   * @param mode rounding mode
    * @return rounded value
    */
-  public abstract ANum round(int scale, boolean even);
+  public abstract ANum round(int prec, RoundMode mode);
 
   @Override
   public final boolean comparable(final Item item) {

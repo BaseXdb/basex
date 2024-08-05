@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -20,6 +21,8 @@ public final class Flt extends ANum {
   public static final Flt NAN = new Flt(Float.NaN);
   /** Value "0". */
   public static final Flt ZERO = new Flt(0);
+  /** Value "-0". */
+  public static final Flt NEGATIVE_ZERO = new Flt(-0e0f);
   /** Value "1". */
   public static final Flt ONE = new Flt(1);
   /** Data. */
@@ -73,7 +76,7 @@ public final class Flt extends ANum {
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Float.isNaN(value) || Float.isInfinite(value))
       throw valueError(AtomType.DECIMAL, string(), ii);
-    return new BigDecimal(value);
+    return BigDecimal.valueOf(value);
   }
 
   @Override
@@ -94,9 +97,11 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public Flt round(final int scale, final boolean even) {
-    final float f = Dbl.get(value).round(scale, even).flt();
-    return value == f ? this : get(f);
+  public Flt round(final int prec, final RoundMode mode) {
+    if(value == 0 || Float.isNaN(value) || Float.isInfinite(value)) return this;
+    final float f = Dec.round(BigDecimal.valueOf(value), prec, mode).floatValue();
+    return f == 0 && Float.floatToRawIntBits(value) < 0 ? NEGATIVE_ZERO :
+      f == value ? this : Flt.get(f);
   }
 
   @Override

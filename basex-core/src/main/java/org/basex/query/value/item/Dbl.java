@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -20,6 +21,8 @@ public final class Dbl extends ANum {
   public static final Dbl NAN = new Dbl(Double.NaN);
   /** Value "0". */
   public static final Dbl ZERO = new Dbl(0);
+  /** Value "-0". */
+  public static final Dbl NEGATIVE_ZERO = new Dbl(-0e0);
   /** Value "1". */
   public static final Dbl ONE = new Dbl(1);
   /** Data. */
@@ -73,7 +76,7 @@ public final class Dbl extends ANum {
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Double.isNaN(value) || Double.isInfinite(value))
       throw valueError(AtomType.DECIMAL, string(), ii);
-    return new BigDecimal(value);
+    return BigDecimal.valueOf(value);
   }
 
   @Override
@@ -94,39 +97,11 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public Dbl round(final int scale, final boolean even) {
-    final double v = rnd(scale, even);
-    return v == value ? this : get(v);
-  }
-
-  /**
-   * Returns a rounded value.
-   * @param s scale
-   * @param e half-to-even flag
-   * @return result
-   */
-  private double rnd(final int s, final boolean e) {
-    double v = value;
-    if(v == 0 || Double.isNaN(v) || Double.isInfinite(v) || s > 322) return v;
-    if(s < -308) return 0;
-    if(!e && s == 0) {
-      if(v >= -0.5 && v < 0.0) return -0.0;
-      if(v > Long.MIN_VALUE && v < Long.MAX_VALUE) return Math.round(v);
-    }
-
-    final boolean n = v < 0;
-    final double f = StrictMath.pow(10, s + 1);
-    v = (n ? -v : v) * f;
-    if(Double.isInfinite(v)) {
-      final RoundingMode m = e ? RoundingMode.HALF_EVEN : RoundingMode.HALF_UP;
-      v = new BigDecimal(value).setScale(s, m).doubleValue();
-    } else {
-      final double r = v % 10;
-      v += r < 5 ? -r : (e ? r > 5 : r >= 5) ? 10 - r : e ? v % 20 == 15 ? 5 : -5 : 0;
-      v /= f;
-      if(n) v = -v;
-    }
-    return v;
+  public Dbl round(final int prec, final RoundMode mode) {
+    if(value == 0 || Double.isNaN(value) || Double.isInfinite(value)) return this;
+    final double d = Dec.round(BigDecimal.valueOf(value), prec, mode).doubleValue();
+    return d == 0 && Double.doubleToRawLongBits(value) < 0 ? NEGATIVE_ZERO :
+      d == value ? this : Dbl.get(d);
   }
 
   @Override

@@ -172,7 +172,7 @@ public abstract class QueryTest extends SandboxTest {
    * @return iterator
    */
   protected static Item decimal(final int integer) {
-    return Dec.get(new BigDecimal(integer));
+    return Dec.get(BigDecimal.valueOf(integer));
   }
 
   /**

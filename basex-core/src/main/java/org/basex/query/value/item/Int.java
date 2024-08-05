@@ -5,6 +5,7 @@ import java.math.*;
 
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -131,30 +132,10 @@ public final class Int extends ANum {
   }
 
   @Override
-  public Int round(final int scale, final boolean even) {
-    final long v = rnd(scale, even);
+  public Int round(final int prec, final RoundMode mode) {
+    if(value == 0 || prec >= 0) return this;
+    final long v = Dec.round(BigDecimal.valueOf(value), prec, mode).longValue();
     return v == value ? this : get(v);
-  }
-
-  /**
-   * Returns a rounded value.
-   * @param s scale
-   * @param e half-to-even flag
-   * @return result
-   */
-  private long rnd(final int s, final boolean e) {
-    long v = value;
-    if(s >= 0 || v == 0) return v;
-    if(s < -15) return Dec.get(new BigDecimal(v)).round(s, e).itr();
-
-    long f = 1;
-    final int c = -s;
-    for(long i = 0; i < c; i++) f = (f << 3) + (f << 1);
-    final boolean n = v < 0;
-    final long a = n ? -v : v, m = a % f, d = m << 1;
-    v = a - m;
-    if(e ? d > f || d == f && v % (f << 1) != 0 : n ? d > f : d >= f) v += f;
-    return n ? -v : v;
   }
 
   @Override

@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class FnRoundHalfToEven extends FnRound {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return round(qc, true);
+    return round(qc, RoundMode.HALF_TO_EVEN);
   }
 }

@@ -9,6 +9,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -510,7 +511,7 @@ public final class DecFormatter extends FormatUtil {
               exp > 0 ? BigDecimal.ONE.divide(n, MathContext.DECIMAL64) : n), info);
         }
       }
-      num = num.round(pic.maxFrac, true).abs();
+      num = num.round(pic.maxFrac, RoundMode.HALF_TO_EVEN).abs();
 
       // convert positive number to string; chop leading 0
       String s = (num instanceof Dbl || num instanceof Flt ?
