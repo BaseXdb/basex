@@ -2435,8 +2435,7 @@ public class QueryParser extends InputParser {
       }
     }
 
-    boolean range = false;
-    long l = 0;
+    BigInteger l = BigInteger.ZERO;
     boolean us = false;
     for(int c; (c = current()) != 0;) {
       if(consume('_')) {
@@ -2446,8 +2445,7 @@ public class QueryParser extends InputParser {
         if(n >= base || !(c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')) {
           break;
         }
-        l = l * base + n;
-        if(l < 0 || l == 0 && c != '0') range = true;
+        l = l.multiply(BigInteger.valueOf(base)).add(BigInteger.valueOf(n));
         token.add(consume());
         us = false;
       }
@@ -2484,10 +2482,10 @@ public class QueryParser extends InputParser {
     // integer value
     if(token.isEmpty()) throw error(NUMBER_X, token);
     // out of range
-    if(range || max != 0 && l > max) return FnError.get(RANGE_X.get(info(), token),
-        SeqType.INTEGER_O);
+    if(l.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0)
+      return FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O);
 
-    return Int.get(negate ? -l : l);
+    return Int.get(negate ? -l.longValue() : l.longValue());
   }
 
   /**
@@ -3395,19 +3393,19 @@ public class QueryParser extends InputParser {
       public boolean add(final SeqType st) {
         // collect alternative item type, combining consecutive EnumTypes into a single instance
         if(!(st.type instanceof EnumType) || isEmpty()) return super.add(st);
-        int i = size() - 1;
-        Type tp = get(i).type;
+        final int i = size() - 1;
+        final Type tp = get(i).type;
         if(!(tp instanceof EnumType)) return super.add(st);
         set(i, tp.union(st.type).seqType());
         return true;
-      };
+      }
     };
 
     do {
       final SeqType st = itemType();
       // collect alternative item type, combining nested ChoiceItemTypes into a single instance
       if(st.type instanceof ChoiceItemType) {
-        for(final SeqType ast : ((ChoiceItemType) st.type).types) types.add(ast);
+        types.addAll(((ChoiceItemType) st.type).types);
       } else {
         types.add(st);
       }
