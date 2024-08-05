@@ -533,7 +533,7 @@ public enum Function implements AFunction {
   ROOT(FnRoot::new, "root([node])",
       params(NODE_ZO), NODE_ZO),
   /** XQuery function. */
-  ROUND(FnRound::new, "round(value[,precision,rounding-mode])",
+  ROUND(FnRound::new, "round(value[,precision,mode])",
       params(NUMERIC_ZO, INTEGER_ZO, STRING_ZO), NUMERIC_ZO),
   /** XQuery function. */
   ROUND_HALF_TO_EVEN(FnRoundHalfToEven::new, "round-half-to-even(value[,precision])",
