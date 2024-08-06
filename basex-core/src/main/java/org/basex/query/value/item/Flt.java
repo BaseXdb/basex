@@ -76,7 +76,7 @@ public final class Flt extends ANum {
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Float.isNaN(value) || Float.isInfinite(value))
       throw valueError(AtomType.DECIMAL, string(), ii);
-    return BigDecimal.valueOf(value);
+    return new BigDecimal(value);
   }
 
   @Override

@@ -76,7 +76,7 @@ public final class Dbl extends ANum {
   public BigDecimal dec(final InputInfo ii) throws QueryException {
     if(Double.isNaN(value) || Double.isInfinite(value))
       throw valueError(AtomType.DECIMAL, string(), ii);
-    return BigDecimal.valueOf(value);
+    return new BigDecimal(value);
   }
 
   @Override
@@ -99,7 +99,7 @@ public final class Dbl extends ANum {
   @Override
   public Dbl round(final int prec, final RoundMode mode) {
     if(value == 0 || Double.isNaN(value) || Double.isInfinite(value)) return this;
-    final double d = Dec.round(BigDecimal.valueOf(value), prec, mode).doubleValue();
+    final double d = Dec.round(new BigDecimal(value), prec, mode).doubleValue();
     return d == 0 && Double.doubleToRawLongBits(value) < 0 ? NEGATIVE_ZERO :
       d == value ? this : Dbl.get(d);
   }
