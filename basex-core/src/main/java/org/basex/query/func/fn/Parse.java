@@ -50,12 +50,13 @@ public abstract class Parse extends StandardFunc {
    * @param qc query context
    * @param check only check if text is available
    * @param options options argument or {@code null}
+   * @param lines parse lines
    * @return content string, {@link Empty#VALUE} if no URL is supplied, or boolean success flag
    *   if availability is checked
    * @throws QueryException query exception
    */
-  final Item unparsedText(final QueryContext qc, final boolean check, final Expr options)
-      throws QueryException {
+  final Item unparsedText(final QueryContext qc, final boolean check, final boolean lines,
+      final Expr options) throws QueryException {
     try {
       IO io = input;
       if(io == null) {
@@ -75,6 +76,10 @@ public abstract class Parse extends StandardFunc {
         }
       }
       final Boolean normalize = po.get(ParseOptions.NORMALIZE_NEWLINES);
+      if(normalize != null && lines) {
+        throw OPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
+      }
+
       String encoding = toEncodingOrNull(po.get(ParseOptions.ENCODING), ENCODING_X);
 
       // only required for test APIs

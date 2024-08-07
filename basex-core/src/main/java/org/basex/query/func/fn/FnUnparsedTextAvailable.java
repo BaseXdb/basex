@@ -17,7 +17,7 @@ import org.basex.util.*;
 public class FnUnparsedTextAvailable extends Parse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return unparsedText(qc, true, arg(1));
+    return unparsedText(qc, true, false, arg(1));
   }
 
   @Override
