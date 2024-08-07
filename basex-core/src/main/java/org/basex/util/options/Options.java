@@ -490,24 +490,33 @@ public class Options implements Iterable<Option<?>> {
 
   /**
    * Returns an error string for an unknown option.
-   * @param name name of option
+   * @param option option
    * @return error string
    */
-  public final synchronized String similar(final String name) {
-    return similar(name, definitions);
+  public final synchronized String similar(final Object option) {
+    return similar(option, definitions);
   }
 
   /**
    * Returns an error string for an unknown option.
-   * @param name name of option
+   * @param option option
    * @param options options
    * @return error string
    */
-  public static final String similar(final String name, final Map<String, Option<?>> options) {
-    final Object similar = Levenshtein.similar(token(name),
+  public static final String similar(final Object option, final Map<String, Option<?>> options) {
+    final Object similar = Levenshtein.similar(token(option),
         options.keySet().toArray(String[]::new));
-    return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, name, similar) :
-      Util.info(Text.UNKNOWN_OPTION_X, name);
+    return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, option, similar) :
+      unknown(option);
+  }
+
+  /**
+   * Returns an error string for an unknown option.
+   * @param option option
+   * @return error string
+   */
+  public static final String unknown(final Object option) {
+    return Util.info(Text.UNKNOWN_OPTION_X, option);
   }
 
   /**

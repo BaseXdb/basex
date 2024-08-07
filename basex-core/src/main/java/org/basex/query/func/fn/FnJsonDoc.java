@@ -11,6 +11,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -75,6 +76,11 @@ public class FnJsonDoc extends Parse {
     if(format != null) options.set(JsonOptions.FORMAT, format);
 
     final JsonConverter jc = JsonConverter.get(options);
+    final JsonFormat jf = options.get(JsonOptions.FORMAT);
+    if(options.get(JsonParserOptions.VALIDATE) != null && jf != JsonFormat.BASIC) {
+      throw OPTION_X.get(info, Options.unknown(JsonParserOptions.VALIDATE));
+    }
+
     final Value fallback = options.get(JsonParserOptions.FALLBACK);
     if(!fallback.isEmpty()) {
       final FItem fb = toFunction(fallback, 1, qc);
@@ -88,7 +94,11 @@ public class FnJsonDoc extends Parse {
       final FItem np = toFunction(numberParser, 1, qc);
       jc.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
     }
-    jc.nullValue(options.get(JsonParserOptions.NULL));
+    final Value nll = options.get(JsonParserOptions.NULL);
+    if(nll != Empty.VALUE && jf != JsonFormat.XQUERY) {
+      throw OPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
+    }
+    jc.nullValue(nll);
     return jc;
   }
 }

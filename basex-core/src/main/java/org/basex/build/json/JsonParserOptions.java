@@ -25,7 +25,7 @@ public final class JsonParserOptions extends JsonOptions {
   /** Option: null item (parse-json). */
   public static final ValueOption NULL = new ValueOption("null", SeqType.ITEM_ZM);
   /** Option: validation (json-to-xml). */
-  public static final BooleanOption VALIDATE = new BooleanOption("validate", false);
+  public static final BooleanOption VALIDATE = new BooleanOption("validate");
   /** Option: encoding (custom). */
   public static final StringOption ENCODING = new StringOption("encoding");
 
