@@ -401,11 +401,13 @@ final class StringParser extends CommandParser {
       return null;
     }
 
-    // output error for similar commands
-    final byte[] name = uc(token(token));
-    final Object similar = Levenshtein.similar(name, startWith(complete, null),
-        o -> ((Enum<?>) o).name());
-    if(similar != null) throw error(alt, UNKNOWN_SIMILAR_X_X, name, similar);
+    // include similar command in error message
+    if(token.matches("^\\w+$")) {
+      final byte[] name = uc(token(token));
+      final Object similar = Levenshtein.similar(name, startWith(complete, null),
+          cmd -> ((Enum<?>) cmd).name());
+      if(similar != null) throw error(alt, UNKNOWN_SIMILAR_X_X, name, similar);
+    }
 
     // show unknown command error or available command extensions
     throw parent == null ? error(alt, UNKNOWN_TRY_X, token) : help(alt, parent);
