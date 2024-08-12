@@ -100,7 +100,7 @@ public final class IOFile extends IO {
     try {
       return new URL(uri).toURI().getPath();
     } catch(final Exception ex) {
-      Util.errln(ex);
+      Util.debug(ex);
       return uri;
     }
   }
