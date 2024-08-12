@@ -44,7 +44,6 @@ public final class StaticVar extends StaticDecl {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     if(expr == null) throw VAREMPTY_X.get(info, name());
-    if(dontEnter) throw CIRCVAR_X.get(info, name());
     if(!compiled) {
       compiled = dontEnter = true;
 
@@ -58,8 +57,8 @@ public final class StaticVar extends StaticDecl {
       } finally {
         cc.removeScope(this);
         cc.qc.focus = focus;
+        dontEnter = false;
       }
-      dontEnter = false;
 
       // dynamic compilation, eager evaluation: pre-evaluate expressions
       if(expr instanceof Value || cc.dynamic && !lazy) {
