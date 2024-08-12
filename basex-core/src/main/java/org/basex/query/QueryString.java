@@ -171,6 +171,15 @@ public final class QueryString {
   }
 
   /**
+   * Adds a newline.
+   * @return self reference
+   */
+  public QueryString newline() {
+    tb.add(Prop.NL);
+    return this;
+  }
+
+  /**
    * Adds a space if appropriate.
    * @return self reference
    */

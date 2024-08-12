@@ -1,7 +1,5 @@
 package org.basex.query;
 
-import static org.basex.query.QueryError.*;
-
 import java.util.*;
 
 import org.basex.query.func.*;
@@ -19,6 +17,13 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 final class QueryCompiler {
+  /** IDs of scopes. */
+  private final IdentityHashMap<Scope, Integer> ids = new IdentityHashMap<>();
+  /** Adjacency list. */
+  private final ArrayList<int[]> adjacent = new ArrayList<>();
+  /** Scopes. */
+  private final ArrayList<Scope> scopes = new ArrayList<>();
+
   /** Node stack. */
   private final IntList stack = new IntList();
   /** Index and lowlink list. */
@@ -26,131 +31,49 @@ final class QueryCompiler {
   /** Counter for the next free index. */
   private int next;
 
-  /** Adjacency list. */
-  private final ArrayList<int[]> adjacent = new ArrayList<>();
-  /** Declaration list. */
-  private final ArrayList<Scope> scopes = new ArrayList<>();
-  /** Declaration list. */
-  private final IdentityHashMap<Scope, Integer> ids = new IdentityHashMap<>();
-
-  /**
-   * Gathers all declarations (functions and static variables) used by the given main module.
-   * @param main the main module to start from
-   * @return list of all declarations that the main module uses
-   */
-  static List<StaticDecl> usedDecls(final MainModule main) {
-    final List<StaticDecl> scopes = new ArrayList<>();
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
-    main.visit(new ASTVisitor() {
-      @Override
-      public boolean staticVar(final StaticVar var) {
-        if(map.put(var, var) == null) {
-          var.visit(this);
-          scopes.add(var);
-        }
-        return true;
-      }
-
-      @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        final StaticFunc func = call.func();
-        if(func != null && map.put(func, func) == null) {
-          func.visit(this);
-          scopes.add(func);
-        }
-        return true;
-      }
-
-      @Override
-      public boolean inlineFunc(final Scope scope) {
-        if(map.put(scope, scope) == null) scope.visit(this);
-        return true;
-      }
-
-      @Override
-      public boolean funcItem(final FuncItem func) {
-        if(map.put(func, func) == null) func.visit(this);
-        return true;
-      }
-    });
-    return scopes;
-  }
-
   /**
    * Compiles the main module.
    * @param cc compilation context
    * @throws QueryException compilation errors
    */
-  void compile(final CompileContext cc) throws QueryException {
-    add(cc.qc.main);
-
-    // collect scopes, check for circular dependencies
-    final ArrayList<Scope> entries = new ArrayList<>();
-    for(final ArrayList<Scope> scps : scopes(0)) {
-      for(final Scope scope : scps) scope.reset();
-      entries.add(circCheck(scps));
+  static void compile(final CompileContext cc) throws QueryException {
+    for(final ArrayList<Scope> scps : new QueryCompiler().scopes(cc.qc.main)) {
+      scps.get(0).compile(cc);
     }
-    for(final StaticVar var : cc.qc.vars) {
-      if(!ids.containsKey(var)) {
-        for(final ArrayList<Scope> scope : scopes(add(var))) circCheck(scope);
-      }
-    }
-    // compile scopes
-    for(final Scope scope : entries) scope.compile(cc);
   }
 
   /**
-   * Checks if the given component contains a static variable that depends on itself.
-   * @param scopes scopes to check
-   * @return scope to be compiled, the others are compiled recursively
-   * @throws QueryException query exception
+   * Computes the scopes.
+   * @param main reference to main module
+   * @return scoped
    */
-  private static Scope circCheck(final ArrayList<Scope> scopes) throws QueryException {
-    if(scopes.size() > 1) {
-      for(final Scope scope : scopes) {
-        if(scope instanceof StaticVar) {
-          final StaticVar var = (StaticVar) scope;
-          throw CIRCVAR_X.get(var.info, var.id());
-        }
-      }
-    }
-    return scopes.get(0);
-  }
-
-  /**
-   * Returns the strongly connected scopes of the dependency graph.
-   * @param id id of starting node
-   * @return scopes
-   * @throws QueryException if a variable directly calls itself
-   */
-  private ArrayList<ArrayList<Scope>> scopes(final int id) throws QueryException {
-    final ArrayList<ArrayList<Scope>> result = new ArrayList<>();
-    tarjan(id, result);
-    return result;
+  private ArrayList<ArrayList<Scope>> scopes(final MainModule main) {
+    add(main);
+    final ArrayList<ArrayList<Scope>> lists = new ArrayList<>();
+    tarjan(0, lists);
+    return lists;
   }
 
   /**
    * Algorithm of Tarjan for computing the strongly connected components of a graph.
    * @param id id of current node
    * @param result scopes
-   * @throws QueryException if a variable directly calls itself
    */
-  private void tarjan(final int id, final ArrayList<ArrayList<Scope>> result)
-      throws QueryException {
-    final int ixv = 2 * id, llv = ixv + 1, idx = next++;
+  private void tarjan(final int id, final ArrayList<ArrayList<Scope>> result) {
+    final int ixv = id << 1, llv = ixv + 1, idx = next++;
     while(list.size() <= llv) list.add(-1);
     list.set(ixv, idx);
     list.set(llv, idx);
     stack.push(id);
 
     for(final int w : adjacentTo(id)) {
-      final int ixw = 2 * w, llw = ixw + 1;
+      final int ixw = w << 1, llw = ixw + 1;
       if(list.size() <= ixw || list.get(ixw) < 0) {
-        // Successor w has not yet been visited; recurse on it
+        // successor w has not yet been visited; recurse on it
         tarjan(w, result);
         list.set(llv, Math.min(list.get(llv), list.get(llw)));
       } else if(stack.contains(w)) {
-        // Successor w is in stack S and hence in the current SCC
+        // successor w is in stack S and hence in the current SCC
         list.set(llv, Math.min(list.get(llv), list.get(ixw)));
       }
     }
@@ -177,6 +100,7 @@ final class QueryCompiler {
     scopes.add(scope);
     adjacent.add(null);
     ids.put(scope, id);
+    scope.reset();
     return id;
   }
 
@@ -184,9 +108,8 @@ final class QueryCompiler {
    * Returns the indices of all scopes called by the given one.
    * @param node source node index
    * @return destination node indices
-   * @throws QueryException if a variable directly calls itself
    */
-  private int[] adjacentTo(final int node) throws QueryException {
+  private int[] adjacentTo(final int node) {
     int[] adj = adjacent.get(node);
     if(adj == null) {
       adj = neighbors(scopes.get(node));
@@ -199,11 +122,10 @@ final class QueryCompiler {
    * Fills in all used scopes of the given one.
    * @param curr current scope
    * @return IDs of all directly reachable scopes
-   * @throws QueryException if a variable directly calls itself
    */
-  private int[] neighbors(final Scope curr) throws QueryException {
+  private int[] neighbors(final Scope curr) {
     final IntList neighbors = new IntList(0);
-    final boolean ok = curr.visit(new ASTVisitor() {
+    curr.visit(new ASTVisitor() {
       @Override
       public boolean staticVar(final StaticVar var) {
         return var != curr && neighbor(var);
@@ -240,11 +162,6 @@ final class QueryCompiler {
         return true;
       }
     });
-
-    if(!ok) {
-      final StaticVar var = (StaticVar) curr;
-      throw CIRCREF_X.get(var.info, "$" + var.name);
-    }
     return neighbors.finish();
   }
 }

@@ -335,7 +335,7 @@ public final class QueryContext extends Job implements Closeable {
         }
       }
       if(main != null) {
-        new QueryCompiler().compile(cc);
+        QueryCompiler.compile(cc);
       } else {
         // required for XQueryParse
         functions.compileAll(cc);
@@ -480,7 +480,7 @@ public final class QueryContext extends Job implements Closeable {
     // only show root node if functions or variables exist
     final QueryPlan plan = new QueryPlan(compiled, closed, full);
     if(main != null) {
-      for(final StaticScope ss : QueryCompiler.usedDecls(main)) ss.toXml(plan);
+      for(final StaticDecl ss : main.references()) ss.toXml(plan);
       main.toXml(plan);
     } else {
       functions.toXml(plan);
@@ -582,7 +582,7 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public String toString() {
-    return main != null ? QueryInfo.usedDecls(main) : info.query;
+    return main != null ? main.toString() : info.query;
   }
 
   // CLASS METHODS ================================================================================

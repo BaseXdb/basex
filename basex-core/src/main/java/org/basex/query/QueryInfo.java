@@ -3,17 +3,11 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.io.*;
-import org.basex.query.func.*;
-import org.basex.query.scope.*;
-import org.basex.query.util.*;
-import org.basex.query.value.item.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -144,7 +138,7 @@ public final class QueryInfo {
         tb.add(optimize).add(NL);
       }
       tb.add(OPTIMIZED_QUERY).add(COL).add(NL);
-      tb.add(qp.qc.main == null ? qp.qc.functions : usedDecls(qp.qc.main)).add(NL);
+      tb.add(qp.qc.main == null ? qp.qc.functions : qp.qc.main).add(NL);
       tb.add(NL);
       if(!evaluate.isEmpty()) {
         tb.add(EVALUATING).add(COL).add(NL);
@@ -171,48 +165,5 @@ public final class QueryInfo {
       tb.add(NL).addExt(QUERY_EXECUTED_X_X, name, total);
     }
     return tb.toString();
-  }
-
-  /**
-   * Serializes all functions and variables reachable from the given main module.
-   * @param module module to start from
-   * @return the string representation
-   */
-  static String usedDecls(final MainModule module) {
-    final IdentityHashMap<Scope, Object> map = new IdentityHashMap<>();
-    final StringBuilder sb = new StringBuilder();
-    module.visit(new ASTVisitor() {
-      @Override
-      public boolean staticVar(final StaticVar var) {
-        if(map.put(var, var) == null) {
-          var.visit(this);
-          sb.append(var).append(NL);
-        }
-        return true;
-      }
-
-      @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        final StaticFunc func = call.func();
-        if(func != null && map.put(func, func) == null) {
-          func.visit(this);
-          sb.append(func).append(NL);
-        }
-        return true;
-      }
-
-      @Override
-      public boolean inlineFunc(final Scope scope) {
-        if(map.put(scope, scope) == null) scope.visit(this);
-        return true;
-      }
-
-      @Override
-      public boolean funcItem(final FuncItem func) {
-        if(map.put(func, func) == null) func.visit(this);
-        return true;
-      }
-    });
-    return sb.append(module).toString();
   }
 }

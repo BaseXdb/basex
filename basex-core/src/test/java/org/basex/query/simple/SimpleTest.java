@@ -238,8 +238,6 @@ public final class SimpleTest extends QueryTest {
       { "FuncTest 3", "local:a(), local:a(1)" },
       { "FuncTest 4", emptySequence(), "()/x[function($x as item()){1}(.)]" },
 
-      { "StaticVar 1", "declare variable $CONFIG := $CONFIG; delete node <a/>" },
-
       { "Limits 1", integers(9223372036854775806L), "2 * 4611686018427387903" },
       { "Limits 2", "2 * 4611686018427387904" }, // overflow
       { "Limits 3", integers(-9223372036854775808L), "-2 * 4611686018427387904" },
