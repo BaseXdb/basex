@@ -86,6 +86,10 @@ public class QueryParser extends InputParser {
   private final QNmMap<SeqType> declaredTypes = new QNmMap<>();
   /** Public types. */
   private final QNmMap<SeqType> publicTypes = new QNmMap<>();
+  /** Named record types. */
+  private final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
+  /** Named record type references. */
+  private final QNmMap<RecordType.Ref> recordTypeRefs = new QNmMap<>();
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
@@ -258,6 +262,7 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
+    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
   }
 
   /**
@@ -389,6 +394,10 @@ public class QueryParser extends InputParser {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
           itemTypeDecl(anns.check(false, true));
+        } else if(wsConsumeWs(RECORD)) {
+          // types cannot be updating
+          if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
+          namedRecordTypeDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -947,6 +956,50 @@ public class QueryParser extends InputParser {
       publicTypes.put(qn, itemType);
     }
     declaredTypes.put(qn, itemType);
+  }
+
+  /**
+   * Parses the "NamedRecordTypeDecl" rule.
+   * @param anns annotations
+   * @throws QueryException query exception
+   */
+  private void namedRecordTypeDecl(final AnnList anns) throws QueryException {
+    final QNm qn = eQName(sc.elemNS, TYPENAME);
+    if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+    if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
+    wsCheck("(");
+    final TokenObjMap<Field> fields = new TokenObjMap<>();
+    boolean extensible = false;
+    boolean exprRequired = false;
+    do {
+      skipWs();
+      if(!fields.isEmpty() && consume("*")) {
+        extensible = true;
+        break;
+      }
+      final byte[] name = ncName(NOSTRNCN_X);
+      final boolean optional = wsConsume("?");
+      final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
+      if(fields.contains(name)) throw error(DUPFIELD_X, name);
+      skipWs();
+      Expr expr = null;
+      if(exprRequired && !optional || current() == ':') {
+        consume(":=");
+        localVars.pushContext(false);
+        expr = check(single(), NOEXPR);
+        localVars.popContext();
+        exprRequired = true;
+      }
+      fields.put(name, new Field(optional, seqType, expr));
+    } while(wsConsume(","));
+    wsCheck(")");
+    final RecordType rt = new RecordType(extensible, fields);
+    declaredTypes.put(qn, rt.seqType());
+    declaredRecordTypes.put(qn, rt);
+    if(!anns.contains(Annotation.PRIVATE)) {
+      if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
+      publicTypes.put(qn, rt.seqType());
+    }
   }
 
   /**
@@ -3246,8 +3299,14 @@ public class QueryParser extends InputParser {
       // declared type
       if(type == null) {
         st = declaredTypes.get(name);
-        // no type found
-        if(st == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
+        if(st == null) {
+          RecordType.Ref ref  = recordTypeRefs.get(name);
+          if(ref == null) {
+            ref = new RecordType.Ref(name, info());
+            recordTypeRefs.put(name, ref);
+          }
+          type = ref;
+        }
       }
     }
     // annotations are not allowed for remaining types

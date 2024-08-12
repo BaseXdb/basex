@@ -2,9 +2,13 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryText.*;
 
+import java.io.*;
 import java.util.*;
 
+import org.basex.io.in.DataInput;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -16,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public final class RecordType extends MapType implements Iterable<byte[]> {
+public class RecordType extends MapType implements Iterable<byte[]> {
   /** Extensible flag. */
   private final boolean extensible;
   /** Field declarations. */
@@ -243,6 +247,23 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
   }
 
   /**
+   * Resolve named record references with named record declarations. Throw "unknown type" when a
+   * reference cannot be resolved.
+   * @param recordTypeRefs record type references
+   * @param declaredRecordTypes record type declarations
+   * @throws QueryException query exception
+   */
+  public static void resolveRefs(final QNmMap<Ref> recordTypeRefs,
+      final QNmMap<RecordType> declaredRecordTypes) throws QueryException {
+    for(final QNm name : recordTypeRefs) {
+      final Ref ref = recordTypeRefs.get(name);
+      final RecordType rt = declaredRecordTypes.get(name);
+      if(rt == null) throw QueryError.TYPEUNKNOWN_X.get(ref.info, AtomType.similar(name));
+      ref.type = rt;
+    }
+  }
+
+  /**
    * Field declaration.
    */
   public static class Field {
@@ -250,6 +271,20 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     private final boolean optional;
     /** Field type (can be {@code null}). */
     private final SeqType seqType;
+    /** Initializing expression (can be {@code null}). */
+    private final Expr expr;
+
+    /**
+     * Constructor.
+     * @param optional optional flag
+     * @param seqType field type (can be {@code null})
+     * @param expr initializing expression (can be {@code null})
+     */
+    public Field(final boolean optional, final SeqType seqType, final Expr expr) {
+      this.optional = optional;
+      this.seqType = seqType;
+      this.expr = expr;
+    }
 
     /**
      * Constructor.
@@ -257,8 +292,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
      * @param seqType field type (can be {@code null})
      */
     public Field(final boolean optional, final SeqType seqType) {
-      this.optional = optional;
-      this.seqType = seqType;
+      this(optional, seqType, null);
     }
 
     /**
@@ -283,6 +317,98 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       if(!(obj instanceof Field)) return false;
       final Field other = (Field) obj;
       return optional == other.optional && seqType().equals(other.seqType());
+    }
+  }
+
+  /**
+   * Reference to a named record type, that is initially unknown, and later resolved with the
+   * declaration.
+   */
+  public static class Ref extends RecordType {
+    /** Record type name. */
+    private final QNm name;
+    /** Input info. */
+    private final InputInfo info;
+    /** Record type (set to SeqType.RECORD, before it has been resolved with declaration). */
+    private RecordType type;
+
+    /**
+     * Constructor.
+     * @param name record type name
+     * @param info input info
+     */
+    public Ref(final QNm name, final InputInfo info) {
+      super(true, new TokenObjMap<>());
+      this.name = name;
+      this.info = info;
+      this.type = SeqType.RECORD;
+    }
+
+    @Override
+    public XQMap cast(final Item item, final QueryContext qc, final InputInfo ii)
+        throws QueryException {
+      return type.cast(item, qc, ii);
+    }
+
+    @Override
+    public XQMap read(final DataInput in, final QueryContext qc)
+        throws IOException, QueryException {
+      return type.read(in, qc);
+    }
+
+    @Override
+    public boolean eq(final Type tp) {
+      return type.eq(tp);
+    }
+
+    @Override
+    public boolean instanceOf(final Type tp) {
+      return type.instanceOf(tp);
+    }
+
+    @Override
+    public Type union(final Type tp) {
+      return type.union(tp);
+    }
+
+    @Override
+    public Type intersect(final Type tp) {
+      return type.intersect(tp);
+    }
+
+    @Override
+    public AtomType atomic() {
+      return type.atomic();
+    }
+
+    @Override
+    public ID id() {
+      return type.id();
+    }
+
+    @Override
+    public Iterator<byte[]> iterator() {
+      return type.iterator();
+    }
+
+    @Override
+    public boolean isExtensible() {
+      return type.extensible;
+    }
+
+    @Override
+    public Field getField(final byte[] key) {
+      return type.getField(key);
+    }
+
+    @Override
+    public boolean instance(final XQMap map) {
+      return type.instance(map);
+    }
+
+    @Override
+    public String toString() {
+      return name.toString();
     }
   }
 }

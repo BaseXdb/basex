@@ -102,4 +102,19 @@ public final class MapTest extends SandboxTest {
   @Test public void atomKey() {
     query("map { 'x': 42 }([ 'x' ])", 42);
   }
+
+  /** Recursive records. */
+  @Test public void recRec() {
+    query("declare variable $v as list := {'value':42,'next':{'value':43,'next':{'value':44}}};"
+        + "declare record list(value as item()*, next? as list); $v",
+        "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44}}}");
+    query("declare variable $v := {'value':42,'next':{'value':43,'next':{'value':44}}} instance of "
+        + "list; declare record list(value as item()*, next? as list); $v", true);
+    query("declare variable $v := {'value':42,'next':{'value':43,'next':{'value':44,'next':()}}} "
+        + "instance of list; declare record list(value as item()*, next? as list); $v", false);
+
+    error("declare variable $v as list := {'value':42,'next':{'value':43,'next':{'value':44,"
+        + "'next':()}}}; declare record list(value as item()*, next? as list); $v",
+        INVCONVERT_X_X_X);
+  }
 }

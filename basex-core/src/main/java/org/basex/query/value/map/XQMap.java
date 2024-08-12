@@ -313,7 +313,9 @@ public final class XQMap extends XQData {
       } else if(!rt.isExtensible()) throw typeError(this, rt.seqType(), null, ii);
       mb.put(key, value);
     }
-    return mb.map();
+    final XQMap map = mb.map();
+    map.type = rt;
+    return map;
   }
 
   @Override
