@@ -97,10 +97,14 @@ public class FnParseUri extends FnJsonDoc {
     if(scheme.equalsIgnoreCase(FILE)) {
       if(options.get(UriOptions.UNC_PATH) && r.has(string, "^/*(//[^/].*)$")) {
         string = r.group(1);
+        filepath = string;
+      } else if(r.has(string, "^/+[A-Za-z]:/.*$")) {
+        string = string.replaceAll("^/+", "/");
+        filepath = string.replaceAll("^/", "");
       } else {
         string = string.replaceAll("^/+", "/");
+        filepath = string;
       }
-      filepath = string;
     } else if(hierarchical == Bln.TRUE) {
       if(r.has(string, "^//([^/]+)$")) {
         authority = r.group(1);
