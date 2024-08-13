@@ -2344,8 +2344,11 @@ public class QueryParser extends InputParser {
     final InputInfo info = info();
     final ExprList el = new ExprList();
     if(!wsConsume("}")) {
+      final HashItemSet set = new HashItemSet(false, info);
       do {
-        add(el, check(single(), INVMAPKEY));
+        final Expr key = single();
+        add(el, check(key, INVMAPKEY));
+        if(key instanceof Item && !set.add((Item) key)) throw error(MAPDUPLKEY_X, key);
         if(!wsConsume(":")) throw error(WRONGCHAR_X_X, ":", found());
         add(el, check(single(), INVMAPVAL));
       } while(wsConsume(","));

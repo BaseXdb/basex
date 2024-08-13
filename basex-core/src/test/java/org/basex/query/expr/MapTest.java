@@ -35,8 +35,8 @@ public final class MapTest extends SandboxTest {
   /** Tests keys. */
   @Test public void keys() {
     error(" map { ('a', 'b'): 'b' }", SEQFOUND_X);
-    error(" map { 'a': 'b', 'a': 'c' }", MAPDUPLKEY_X_X_X);
-    error(" map { xs:time('01:01:01'): 1, xs:time('01:01:01'): 1 }", MAPDUPLKEY_X_X_X);
+    error(" map { 'a': 'b', 'a': 'c' }", MAPDUPLKEY_X);
+    error(" map { xs:time('01:01:01'): 1, xs:time('01:01:01'): 1 }", MAPDUPLKEY_X);
 
     query(_MAP_SIZE.args(" map { xs:time('01:01:01'): 1, xs:time('02:02:02'): 2 }"), 2);
     query("let $k1 := xs:time('01:01:01')"

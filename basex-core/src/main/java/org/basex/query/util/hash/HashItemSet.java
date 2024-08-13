@@ -15,8 +15,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public class HashItemSet extends ASet implements ItemSet {
-  /** Equality vs. equivalence check. */
-  private final boolean eq;
   /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Deep equality comparisons (can be {@code null}). */
@@ -33,9 +31,8 @@ public class HashItemSet extends ASet implements ItemSet {
    */
   public HashItemSet(final boolean eq, final InputInfo info) {
     super(Array.INITIAL_CAPACITY);
-    this.eq = eq;
     this.info = info;
-    deep = new DeepEqual(info);
+    deep = eq ? null : new DeepEqual(info);
     keys = new Item[capacity()];
     hash = new int[capacity()];
   }
@@ -64,7 +61,7 @@ public class HashItemSet extends ASet implements ItemSet {
   public int id(final Item key) throws QueryException {
     final int b = key.hash() & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq ? keys[id].equal(key, null, info) : deep.equal(keys[id], key)) return id;
+      if(deep != null ? deep.equal(keys[id], key) : keys[id].equal(key, null, info)) return id;
     }
     return 0;
   }
@@ -80,7 +77,7 @@ public class HashItemSet extends ASet implements ItemSet {
     final int h = key.hash();
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(eq ? keys[id].equal(key, null, info) : deep.equal(keys[id], key)) return -id;
+      if(deep != null ? deep.equal(keys[id], key) : keys[id].equal(key, null, info)) return -id;
     }
     final int s = size++;
     if(checkCapacity()) b = h & capacity() - 1;

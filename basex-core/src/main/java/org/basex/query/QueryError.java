@@ -1211,7 +1211,7 @@ public enum QueryError {
   /** Error code. */
   DUPLNSCONS_X(XQDY, 102, "Duplicate declaration of namespace '%'."),
   /** Error code. */
-  MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
+  MAPDUPLKEY_X(XQDY, 137, "Map contains duplicate key: %."),
 
   /** Error code. */
   IMPLSCHEMA(XQST, 9, "No XML Schema support."),
