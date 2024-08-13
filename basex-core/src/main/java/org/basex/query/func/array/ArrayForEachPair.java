@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -22,11 +23,11 @@ public final class ArrayForEachPair extends ArrayFn {
     final XQArray array1 = toArray(arg(0), qc), array2 = toArray(arg(1), qc);
     final FItem action = toFunction(arg(2), 3, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(3, action);
     final ArrayBuilder ab = new ArrayBuilder();
     final Iterator<Value> as = array1.iterator(0), bs = array2.iterator(0);
     while(as.hasNext() && bs.hasNext()) {
-      ab.append(action.invoke(qc, info, as.next(), bs.next(), Int.get(++p)));
+      ab.append(invoke(action, args.set(0, as.next()).set(1, bs.next()).inc(), qc));
     }
     return ab.array(this);
   }

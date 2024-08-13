@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -20,14 +21,13 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
     final XQArray array = toArray(arg(0), qc);
     final FItem action = action(qc);
 
-    Value result = arg(1).value(qc);
+    final HofArgs args = new HofArgs(3, action).set(1, arg(1).value(qc));
     long p = array.arraySize();
     for(final ListIterator<Value> iter = array.iterator(p); iter.hasPrevious();) {
-      final Value value = iter.previous();
-      result = action.invoke(qc, info, value, result, Int.get(p--));
-      if(skip(qc, value, result)) break;
+      args.set(1, invoke(action, args.set(0, iter.previous()).pos(p--), qc));
+      if(skip(qc, args)) break;
     }
-    return result;
+    return args.get(1);
   }
 
   @Override

@@ -25,6 +25,7 @@ public class MapForEach extends StandardFunc {
     final BasicIter<Item> keys = map.keys().iter();
 
     return new Iter() {
+      final HofArgs args = new HofArgs(2);
       Iter iter = Empty.ITER;
 
       @Override
@@ -34,7 +35,7 @@ public class MapForEach extends StandardFunc {
           if(item != null) return item;
           final Item key = keys.next();
           if(key == null) return null;
-          iter = action.invoke(qc, info, key, map.get(key)).iter();
+          iter = invoke(action, args.set(0, key).set(1, map.get(key)), qc).iter();
         }
       }
     };
@@ -45,8 +46,9 @@ public class MapForEach extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
     final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
 
+    final HofArgs args = new HofArgs(2);
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> vb.add(action.invoke(qc, info, key, value)));
+    map.apply((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value), qc)));
     return vb.value(this);
   }
 

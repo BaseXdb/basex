@@ -26,10 +26,10 @@ public class FnForEach extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = toFunction(arg(1), 2, this instanceof UpdateForEach, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, action);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
-      vb.add(action.invoke(qc, info, item, Int.get(++p)));
+      vb.add(invoke(action, args.set(0, item).inc(), qc));
     }
     return vb.value(this);
   }

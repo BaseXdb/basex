@@ -701,17 +701,30 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns the boolean result of a function invocation.
-   * @param qc query context
+   * Returns the boolean result of a higher-order function invocation.
    * @param predicate function to be invoked
-   * @param args arguments
+   * @param args higher-order function arguments
+   * @param qc query context
    * @return result
    * @throws QueryException query exception
    */
-  protected final boolean toBoolean(final QueryContext qc, final FItem predicate,
-      final Value... args) throws QueryException {
-    final Item item = predicate.invoke(qc, info, args).atomItem(qc, info);
+  protected final boolean test(final FItem predicate, final HofArgs args,
+      final QueryContext qc) throws QueryException {
+    final Item item = invoke(predicate, args, qc).atomItem(qc, info);
     return !item.isEmpty() && toBoolean(item);
+  }
+
+  /**
+   * Invokes a higher-order function.
+   * @param function function to be invoked
+   * @param args higher-order function arguments
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  protected final Value invoke(final FItem function, final HofArgs args, final QueryContext qc)
+      throws QueryException {
+    return function.invoke(qc, info, args.get());
   }
 
   /**

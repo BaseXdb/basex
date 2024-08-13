@@ -22,13 +22,14 @@ public final class HofFoldLeft1 extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = toFunction(arg(1), 3, qc);
 
-    int p = 0;
-    Value value = input.next();
-    if(value == null) return Empty.VALUE;
+    final Value first = input.next();
+    if(first == null) return Empty.VALUE;
+
+    final HofArgs args = new HofArgs(3).set(0, first);
     for(Item item; (item = input.next()) != null;) {
-      value = action.invoke(qc, info, value, item, Int.get(++p));
+      args.set(0, invoke(action, args.set(1, item).inc(), qc));
     }
-    return value;
+    return args.get(0);
   }
 
   @Override

@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -24,13 +25,13 @@ public final class FnPartition extends ArrayFn {
     final FItem splitWhen = toFunction(arg(1), 3, qc);
     return new Iter() {
       Value value = Empty.VALUE;
-      int p;
+      final HofArgs args = new HofArgs(3, splitWhen);
 
       @Override
       public Item next() throws QueryException {
         while(value != null) {
           final Item item = input.next();
-          if(item == null || toBoolean(qc, splitWhen, value, item, Int.get(++p))) {
+          if(item == null || test(splitWhen, args.set(0, value).set(1, item).inc(), qc)) {
             final Value val = value;
             value = item;
             if(!val.isEmpty()) {

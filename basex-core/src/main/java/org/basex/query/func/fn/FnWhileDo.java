@@ -17,13 +17,11 @@ public class FnWhileDo extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem predicate = toFunction(arg(1), 2, qc), action = toFunction(arg(2), 2, qc);
-    Value value = arg(0).value(qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, predicate, action).set(0, arg(0).value(qc));
     while(true) {
-      final Int pos = Int.get(++p);
-      if(!toBoolean(qc, predicate, value, pos)) return value;
-      value = action.invoke(qc, info, value, pos);
+      if(!test(predicate, args.inc(), qc)) return args.get(0);
+      args.set(0, invoke(action, args, qc));
     }
   }
 

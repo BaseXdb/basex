@@ -22,7 +22,7 @@ public final class ArrayGet extends StandardFunc {
     final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
     final Value value = array.getInternal(position, qc, info, fallback == null);
-    return value != null ? value : fallback.invoke(qc, info, position);
+    return value != null ? value : invoke(fallback, new HofArgs(position), qc);
   }
 
   @Override

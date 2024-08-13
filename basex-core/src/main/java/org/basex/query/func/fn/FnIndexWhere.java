@@ -27,10 +27,10 @@ public final class FnIndexWhere extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, predicate);
     final LongList list = new LongList();
     for(Item item; (item = input.next()) != null;) {
-      if(toBoolean(qc, predicate, item, Int.get(++p))) list.add(p);
+      if(test(predicate, args.set(0, item).inc(), qc)) list.add(args.pos());
     }
     return IntSeq.get(list.finish());
   }

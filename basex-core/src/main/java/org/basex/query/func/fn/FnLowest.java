@@ -39,11 +39,13 @@ public class FnLowest extends StandardFunc {
     final Collation collation = toCollation(arg(1), qc);
     final FItem key = toFunctionOrNull(arg(2), 1, qc);
 
+    final HofArgs args = key != null ? new HofArgs(1) : null;
     final ItemList result = new ItemList();
     Value lowest = null;
     for(Item item; (item = input.next()) != null;) {
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(final Item it : (key == null ? item : key.invoke(qc, info, item)).atomValue(qc, info)) {
+      final Value value = key != null ? invoke(key, args.set(0, item), qc) : item;
+      for(final Item it : value.atomValue(qc, info)) {
         vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
       }
       final Value low = vb.value();

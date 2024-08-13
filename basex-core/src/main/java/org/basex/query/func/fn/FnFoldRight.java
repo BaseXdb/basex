@@ -20,16 +20,15 @@ import org.basex.query.value.seq.tree.*;
 public final class FnFoldRight extends FnFoldLeft {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem action = action(qc);
-    Value result = arg(1).value(qc);
-
     final Iter input = arg(0).iter(qc);
+    final FItem action = action(qc);
+
+    final HofArgs args = new HofArgs(3, action).set(1, arg(1).value(qc));
     long p = input.size();
     if(p != -1) {
       for(; p > 0; p--) {
-        final Item item = input.get(p - 1);
-        result = action.invoke(qc, info, item, result, Int.get(p));
-        if(skip(qc, item, result)) break;
+        args.set(1, invoke(action, args.set(0, input.get(p - 1)).pos(p), qc));
+        if(skip(qc, args)) break;
       }
     } else {
       final Value value = input.value(qc, arg(0));
@@ -37,19 +36,17 @@ public final class FnFoldRight extends FnFoldLeft {
       if(value instanceof TreeSeq) {
         final TreeSeq seq = (TreeSeq) value;
         for(final ListIterator<Item> iter = seq.iterator(p); iter.hasPrevious();) {
-          final Item item = iter.previous();
-          result = action.invoke(qc, info, item, result, Int.get(p--));
-          if(skip(qc, item, result)) break;
+          args.set(1, invoke(action, args.set(0, iter.previous()).pos(p--), qc));
+          if(skip(qc, args)) break;
         }
       } else {
         for(; p > 0; p--) {
-          final Item item = value.itemAt(p - 1);
-          result = action.invoke(qc, info, item, result, Int.get(p));
-          if(skip(qc, item, result)) break;
+          args.set(1, invoke(action, args.set(0, value.itemAt(p - 1)).pos(p), qc));
+          if(skip(qc, args)) break;
         }
       }
     }
-    return result;
+    return args.get(1);
   }
 
   @Override

@@ -24,7 +24,8 @@ public class FnContainsSubsequence extends StandardFunc {
 
     final QueryBiFunction<Item, Item, Boolean> cmp;
     if(compare != null) {
-      cmp = (item1, item2) -> toBoolean(qc, compare, item1, item2);
+      final HofArgs args = new HofArgs(2);
+      cmp = (item1, item2) -> test(compare, args.set(0, item1).set(1, item2), qc);
     } else {
       cmp = new DeepEqual(info, null, qc)::equal;
     }

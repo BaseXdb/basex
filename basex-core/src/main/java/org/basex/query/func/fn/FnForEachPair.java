@@ -25,8 +25,8 @@ public class FnForEachPair extends StandardFunc {
         ? Math.min(input1.size(), input2.size()) : -1;
 
     return new Iter() {
+      final HofArgs args = new HofArgs(3, action);
       Iter iter = Empty.ITER;
-      int p;
 
       @Override
       public Item next() throws QueryException {
@@ -35,13 +35,14 @@ public class FnForEachPair extends StandardFunc {
           if(item != null) return item;
           final Item item1 = input1.next(), item2 = input2.next();
           if(item1 == null || item2 == null) return null;
-          iter = action.invoke(qc, info, item1, item2, Int.get(++p)).iter();
+          iter = invoke(action, args.set(0, item1).set(1, item2).inc(), qc).iter();
         }
       }
 
       @Override
       public Item get(final long i) throws QueryException {
-        return action.invoke(qc, info, input1.get(i), input2.get(i), Int.get(i)).item(qc, info);
+        final Item item1 = input1.get(i), item2 = input2.get(i);
+        return invoke(action, args.set(0, item1).set(1, item2), qc).item(qc, info);
       }
 
       @Override
@@ -56,10 +57,10 @@ public class FnForEachPair extends StandardFunc {
     final Iter input1 = arg(0).iter(qc), input2 = arg(1).iter(qc);
     final FItem action = toFunction(arg(2), 3, this instanceof UpdateForEachPair, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(3, action);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item1, item2; (item1 = input1.next()) != null && (item2 = input2.next()) != null;) {
-      vb.add(action.invoke(qc, info, item1, item2, Int.get(++p)));
+      vb.add(invoke(action, args.set(0, item1).set(1, item2).inc(), qc));
     }
     return vb.value(this);
   }

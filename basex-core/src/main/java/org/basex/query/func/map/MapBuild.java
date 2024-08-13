@@ -24,16 +24,16 @@ public final class MapBuild extends StandardFunc {
     final FItem value = toFunctionOrNull(arg(2), 2, qc);
     final FItem combine = toFunctionOrNull(arg(3), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, key, value), cargs = new HofArgs(2);
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(input)) != null;) {
-      final Int pos = Int.get(++p);
-      final Iter iter = (key != null ? key.invoke(qc, info, item, pos) : item).atomIter(qc, info);
+      args.set(0, item).inc();
+      final Iter iter = (key != null ? invoke(key, args, qc) : item).atomIter(qc, info);
       for(Item k; (k = qc.next(iter)) != null;) {
-        Value val = value != null ? value.invoke(qc, info, item, pos) : item;
+        Value val = value != null ? invoke(value, args, qc) : item;
         if(result.contains(k)) {
           final Value old = result.get(k);
-          val = combine != null ? combine.invoke(qc, info, old, val) :
+          val = combine != null ? invoke(combine, cargs.set(0, old).set(1, val), qc) :
             ValueBuilder.concat(old, val, qc);
         }
         result = result.put(k, val);

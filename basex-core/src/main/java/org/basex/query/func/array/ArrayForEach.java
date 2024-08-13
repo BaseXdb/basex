@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -20,10 +21,10 @@ public final class ArrayForEach extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final FItem action = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, action);
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      ab.append(action.invoke(qc, info, value, Int.get(++p)));
+      ab.append(invoke(action, args.set(0, value).inc(), qc));
     }
     return ab.array(this);
   }

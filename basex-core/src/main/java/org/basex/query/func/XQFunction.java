@@ -52,7 +52,7 @@ public interface XQFunction extends XQFunctionExpr {
    * @return result of the function call
    * @throws QueryException query exception
    */
-  default Value invokeTail(final QueryContext qc, final InputInfo info, final Value... args)
+  default Value invokeTail(final QueryContext qc, final InputInfo info, final Value[] args)
       throws QueryException {
 
     qc.checkStop();

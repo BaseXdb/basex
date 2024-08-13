@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -20,10 +21,10 @@ public final class ArrayFilter extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, predicate).set(0, arg(0).value(qc));
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.members()) {
-      if(toBoolean(qc, predicate, value, Int.get(++p))) ab.append(value);
+      if(test(predicate, args.set(0, value).inc(), qc)) ab.append(value);
     }
     return ab.array(this);
   }

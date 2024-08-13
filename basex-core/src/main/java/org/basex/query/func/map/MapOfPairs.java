@@ -22,6 +22,7 @@ public final class MapOfPairs extends StandardFunc {
     final Iter pairs = arg(0).iter(qc);
     final FItem combine = toFunctionOrNull(arg(1), 2, qc);
 
+    final HofArgs cargs = combine != null ? new HofArgs(2) : null;
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(pairs)) != null;) {
       // extract key/value record entries
@@ -30,7 +31,7 @@ public final class MapOfPairs extends StandardFunc {
       Value value = map.get(Str.VALUE);
       if(result.contains(key)) {
         final Value old = result.get(key);
-        value = combine != null ? combine.invoke(qc, info, old, value) :
+        value = combine != null ? invoke(combine, cargs.set(0, old).set(1, value), qc) :
           ValueBuilder.concat(old, value, qc);
       }
       result = result.put(key, value);

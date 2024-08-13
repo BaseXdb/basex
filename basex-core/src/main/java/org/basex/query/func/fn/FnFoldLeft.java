@@ -25,13 +25,13 @@ public class FnFoldLeft extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = action(qc);
 
-    int p = 0;
-    Value result = arg(1).value(qc);
+    final HofArgs args = new HofArgs(3, action).set(0, arg(1).value(qc));
     for(Item item; (item = input.next()) != null;) {
-      if(skip(qc, result, item)) break;
-      result = action.invoke(qc, info, result, item, Int.get(++p));
+      args.set(1, item).inc();
+      if(skip(qc, args)) break;
+      args.set(0, invoke(action, args, qc));
     }
-    return result;
+    return args.get(0);
   }
 
   /**
@@ -41,8 +41,8 @@ public class FnFoldLeft extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean skip(final QueryContext qc, final Value... args) throws QueryException {
-    return iff != null && toBoolean(qc, iff[0], args);
+  public final boolean skip(final QueryContext qc, final HofArgs args) throws QueryException {
+    return iff != null && test(iff[0], args, qc);
   }
 
   /**

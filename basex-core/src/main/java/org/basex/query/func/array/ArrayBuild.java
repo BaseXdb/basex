@@ -21,10 +21,10 @@ public final class ArrayBuild extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = toFunctionOrNull(arg(1), 2, qc);
 
-    int p = 0;
     final ArrayBuilder ab = new ArrayBuilder();
+    final HofArgs args = action != null ? new HofArgs(2, action) : null;
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.append(action != null ? action.invoke(qc, info, item, Int.get(++p)) : item);
+      ab.append(action != null ? invoke(action, args.set(0, item).inc(), qc) : item);
     }
     return ab.array();
   }

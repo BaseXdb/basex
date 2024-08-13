@@ -25,11 +25,11 @@ public class FnEvery extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunctionOrNull(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = predicate != null ? new HofArgs(2, predicate) : null;
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
       final boolean test = (predicate == null ? item :
-        predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info)).test(qc, ii, 0);
+        invoke(predicate, args.set(0, item).inc(), qc).item(qc, info)).test(qc, ii, 0);
       if(test == some) return Bln.get(some);
     }
     return Bln.get(!some);

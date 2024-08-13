@@ -1,6 +1,7 @@
 package org.basex.query.func.store;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
@@ -18,7 +19,7 @@ public final class StoreGetOrPut extends StoreFn {
 
     Value value = store(qc).get(key);
     if(value.isEmpty()) {
-      value = put.invoke(qc, info);
+      value = invoke(put, new HofArgs(), qc);
       store(key, value, qc);
     }
     return value;

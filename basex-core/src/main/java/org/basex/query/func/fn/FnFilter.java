@@ -25,10 +25,10 @@ public final class FnFilter extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, predicate);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
-      if(toBoolean(qc, predicate, item, Int.get(++p))) vb.add(item);
+      if(test(predicate, args.set(0, item).inc(), qc)) vb.add(item);
     }
     return vb.value(this);
   }
