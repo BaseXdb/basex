@@ -49,7 +49,7 @@ public class FnForEach extends StandardFunc {
       final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, info), vm) : null;
       final For fr = new For(i, p, null, input, false).optimize(cc);
 
-      final Expr act = coerce(1, cc, arity);
+      final Expr act = coerceFunc(1, cc, arity);
       final boolean updating = this instanceof UpdateForEach, ndt = act.has(Flag.NDT);
       final ExprList args = new ExprList(new VarRef(info, i).optimize(cc));
       if(arity == 2) args.add(new VarRef(info, p).optimize(cc));

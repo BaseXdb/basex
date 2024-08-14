@@ -42,7 +42,7 @@ public final class HofFoldLeft1 extends StandardFunc {
     if(action instanceof Value && arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final Expr func = coerce(1, cc, arity);
+        final Expr func = coerceFunc(1, cc, arity);
         Expr expr = unroll.get(0);
         final long is = unroll.size();
         for(int i = 1; i < is; i++) {

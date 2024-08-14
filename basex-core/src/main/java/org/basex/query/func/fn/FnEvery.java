@@ -69,7 +69,7 @@ public class FnEvery extends StandardFunc {
       }
 
       final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-      final Expr rtrn =  func ? new DynFuncCall(info, coerce(1, cc, arity), args).optimize(cc) :
+      final Expr rtrn =  func ? new DynFuncCall(info, coerceFunc(1, cc, arity), args).optimize(cc) :
         cc.function(Function.BOOLEAN, info, args);
       result = new GFLWOR(info, fr, rtrn).optimize(cc);
     }

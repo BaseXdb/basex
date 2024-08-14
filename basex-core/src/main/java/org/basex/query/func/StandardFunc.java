@@ -243,25 +243,25 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns a coerced function item argument.
+   * Returns a coerced version of a function item argument.
    * @param i index of argument
    * @param cc compilation context
    * @return coerced argument
    * @throws QueryException query exception
    */
-  public final Expr coerce(final int i, final CompileContext cc) throws QueryException {
-    return coerce(i, cc, -1);
+  public final Expr coerceFunc(final int i, final CompileContext cc) throws QueryException {
+    return coerceFunc(i, cc, -1);
   }
 
   /**
-   * Returns a coerced function item argument.
+   * Returns a coerced version of a function item argument.
    * @param i index of function argument
    * @param cc compilation context
    * @param arity arity of target function (ignored if {@code -1})
    * @return coerced argument
    * @throws QueryException query exception
    */
-  public final Expr coerce(final int i, final CompileContext cc, final int arity)
+  public final Expr coerceFunc(final int i, final CompileContext cc, final int arity)
       throws QueryException {
 
     FuncType ft = (FuncType) definition.types[i].type;

@@ -66,7 +66,7 @@ public class FnFoldLeft extends StandardFunc {
     if(action instanceof Value && arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final Expr func = coerce(2, cc, arity);
+        final Expr func = coerceFunc(2, cc, arity);
         expr = zero;
         for(final Expr ex : unroll) {
           expr = new DynFuncCall(info, func, expr, ex).optimize(cc);

@@ -43,7 +43,7 @@ public final class FnFilter extends StandardFunc {
     if(arity == 1) {
       // INPUT[PREDICATE(.)]
       final Expr pred = cc.get(input, () ->
-        new DynFuncCall(info, coerce(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
+        new DynFuncCall(info, coerceFunc(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
       );
       return Filter.get(cc, info, input, pred);
     } else if(arity == 2) {
@@ -55,7 +55,7 @@ public final class FnFilter extends StandardFunc {
       final Var p = cc.copy(new Var(new QNm("pos"), SeqType.INTEGER_O, cc.qc, info), vm);
       clauses.add(new For(i, p, null, input, false).optimize(cc));
 
-      final Expr pred = coerce(1, cc);
+      final Expr pred = coerceFunc(1, cc);
       final Expr item = new VarRef(info, i).optimize(cc);
       final Expr pos = new VarRef(info, p).optimize(cc);
       final Expr dfc = new DynFuncCall(info, pred, item, pos).optimize(cc);
