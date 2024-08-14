@@ -121,6 +121,7 @@ public final class FuncItem extends FItem implements Scope {
     // use shortcut if focus is not accessed
     if(simple) return expr.value(qc);
 
+    // reset context and evaluate function
     final QueryFocus qf = qc.focus;
     qc.focus = focus != null ? focus : new QueryFocus();
     try {

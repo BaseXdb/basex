@@ -42,6 +42,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
+  /** Indicates if the query focus is accessed or modified. */
+  private boolean simple;
 
   /**
    * Function constructor.
@@ -73,6 +75,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public Expr compile(final CompileContext cc) {
     if(!compiled && expr != null) {
       compiled = true;
+      simple = !expr.has(Flag.CTX);
 
       // dynamic compilation: refine parameter types to arguments types of function call
       final SeqType[] callTypes = cc.dynamic ? cc.qc.functions.seqTypes(this) : null;
@@ -174,13 +177,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) qc.set(params[a], args[a]);
+
+    // use shortcut if focus is not accessed
+    if(simple) return expr.value(qc);
+
     // reset context and evaluate function
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
     qf.value = null;
     try {
-      final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return expr.value(qc);
     } finally {
       qf.value = qv;
