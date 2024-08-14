@@ -1436,7 +1436,7 @@ public final class Token {
      * @return result of check
      */
     abstract boolean literal(int ch);
-  };
+  }
 
   /**
    * Returns a URI-encoded token.

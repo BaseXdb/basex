@@ -54,7 +54,7 @@ public final class FnDistinctValues extends StandardFunc {
             }
             // fallback (input is no 32bit integer)
             intseq = false;
-            for(int i : ints.toArray()) set.add(Int.get(i));
+            for(final int i : ints.toArray()) set.add(Int.get(i));
           }
           if(set.add(item)) return item;
         }
@@ -87,8 +87,8 @@ public final class FnDistinctValues extends StandardFunc {
         }
         // fallback (input is no 32bit integer)
         intseq = false;
-        for(int i : ints.toArray()) set.add(Int.get(i));
-        for(long l : list.finish()) vb.add(Int.get(l));
+        for(final int i : ints.toArray()) set.add(Int.get(i));
+        for(final long l : list.finish()) vb.add(Int.get(l));
       }
       if(set.add(item)) vb.add(item);
     }

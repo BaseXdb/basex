@@ -42,7 +42,7 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr values = arg(0);
+    final Expr values = arg(0);
     final Expr variadic = variadic();
     if(variadic != values) return cc.function(CODEPOINTS_TO_STRING, info, variadic.optimize(cc));
 

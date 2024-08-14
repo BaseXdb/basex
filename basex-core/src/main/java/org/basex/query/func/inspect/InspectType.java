@@ -42,7 +42,8 @@ public final class InspectType extends StandardFunc {
     final Mode mode = options.get(InspectOptions.MODE);
     final boolean item = options.get(InspectOptions.ITEM);
 
-    SeqType et = arg(0).seqType(), st = value.seqType();
+    final SeqType et = arg(0).seqType();
+    SeqType st = value.seqType();
     switch(mode) {
       case EXPRESSION:
         st = et;

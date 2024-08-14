@@ -415,21 +415,13 @@ public final class SeqType {
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     // check if function arguments must be coerced
-    boolean coerce = false, toFunc = type instanceof FuncType;
+    final boolean toFunc = type instanceof FuncType;
     final SeqType[] argTypes = toFunc ? ((FuncType) type).argTypes : null;
-    if(argTypes != null) {
-      for(final SeqType at : argTypes) {
-        if(!at.eq(ITEM_ZM)) {
-          coerce = true;
-          break;
-        }
-      }
-    }
+    boolean coerce = argTypes != null && ((Checks<SeqType>) at -> !at.eq(ITEM_ZM)).any(argTypes);
 
     // check if value must be coerced
     if(!coerce) {
       if(instance(value) && (!toFunc || value instanceof FuncItem)) return value;
-
       for(final Item item : value) {
         qc.checkStop();
         if(!instance(item) || toFunc && !(item instanceof FuncItem)) {
@@ -697,11 +689,7 @@ public final class SeqType {
   @Override
   public int hashCode() {
     if(test != null) throw Util.notExpected();
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    result = prime * result + ((occ == null) ? 0 : occ.hashCode());
-    return result;
+    return (type == null ? 0 : type.hashCode()) + (occ == null ? 0 : occ.hashCode());
   }
 
   /**

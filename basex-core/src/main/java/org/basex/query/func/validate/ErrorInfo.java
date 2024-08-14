@@ -22,7 +22,7 @@ final class ErrorInfo {
     public String toString() {
       return Strings.capitalize(EnumOption.string(this));
     }
-  };
+  }
 
   /** Message. */
   final String message;
