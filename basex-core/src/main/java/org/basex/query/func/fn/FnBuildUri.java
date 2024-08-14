@@ -53,7 +53,7 @@ public class FnBuildUri extends FnJsonDoc {
       int a = 0;
       for(final Item segment : segments) {
         if(a++ != 0) uri.add(sep);
-        uri.add(encodeUri(toToken(segment, qc), false, true));
+        uri.add(encodeUri(toToken(segment, qc), UriEncoder.BUILD));
       }
     } else {
       uri.add(get(parts, PATH, qc));
@@ -64,10 +64,10 @@ public class FnBuildUri extends FnJsonDoc {
       final TokenBuilder query = new TokenBuilder();
       final String sep = options.get(UriOptions.QUERY_SEPARATOR);
       toMap(qp, qc).apply((key, value) -> {
-        final byte[] k = encodeUri(toToken(key), false, true);
+        final byte[] k = encodeUri(toToken(key), UriEncoder.BUILD);
         for(final Item item : value) {
           query.add(query.isEmpty() ? "?" : sep);
-          query.add(k).add('=').add(encodeUri(toToken(item), false, true));
+          query.add(k).add('=').add(encodeUri(toToken(item), UriEncoder.BUILD));
         }
       });
       uri.add(query);

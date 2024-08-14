@@ -12,6 +12,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.UriParser.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.Token.*;
 
 /**
  * URI item ({@code xs:anyURI}).
@@ -143,7 +144,9 @@ public final class Uri extends AStr {
    * @return parsed URI
    */
   private ParsedUri parsed() {
-    if(parsed == null) parsed = UriParser.parse(Token.string(Token.encodeUri(value, true, false)));
+    if(parsed == null) {
+      parsed = UriParser.parse(Token.string(Token.encodeUri(value, UriEncoder.IRI)));
+    }
     return parsed;
   }
 

@@ -43,7 +43,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** HTML5 flag. */
   final boolean html5;
   /** URI escape flag. */
-  final boolean escuri;
+  final boolean escape;
   /** Standalone 'omit' flag. */
   final boolean saomit;
   /** Include content type flag. */
@@ -83,7 +83,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     docsys  = sopts.get(DOCTYPE_SYSTEM);
     docpub  = sopts.get(DOCTYPE_PUBLIC);
     media   = sopts.get(MEDIA_TYPE);
-    escuri  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
+    escape  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
     content = sopts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = sopts.yes(UNDECLARE_PREFIXES);
     indAttr = sopts.yes(INDENT_ATTRIBUTES);

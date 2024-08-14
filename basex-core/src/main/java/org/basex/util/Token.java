@@ -106,12 +106,6 @@ public final class Token {
 
   /** Hex codes. */
   public static final byte[] HEX_TABLE = token("0123456789ABCDEF");
-  /** Reserved characters. */
-  private static final byte[] IRI_CHARACTERS = token("!#$%&*'()+,-./:;=?@[]~_");
-  /** Reserved characters. */
-  private static final byte[] URI_CHARACTERS = token("-._~");
-  /** URI path characters. */
-  private static final byte[] URI_PATH = token("\r\n\t %/?#+[]");
 
   /** Character lengths. */
   private static final int[] CHLEN = { 1, 1, 1, 1, 2, 2, 3, 4 };
@@ -1409,36 +1403,47 @@ public final class Token {
     return i == -1 ? name : substring(name, i + 1);
   }
 
+  /** URI encoder. */
+  public enum UriEncoder {
+    /** IRI. */ IRI {
+      @Override
+      boolean literal(final int ch) { return "!#$%&*'()+,-./:;=?@[]~_".indexOf(ch) != -1; }
+    },
+    /** URI. */ URI {
+      @Override
+      boolean literal(final int ch) { return "-._~".indexOf(ch) != -1; }
+    },
+    /** Build URI. */ BUILD {
+      @Override
+      boolean literal(final int ch) { return "\r\n\t %/?#+[]".indexOf(ch) == -1; }
+    },
+    /** Escape URI. */ ESCAPE {
+      @Override
+      boolean literal(final int ch) { return ch >= 0x20 && ch <= 0x7e; }
+    };
+
+    /**
+     * Test if characters needs to be encoded.
+     * @param ch character
+     * @return result of check
+     */
+    abstract boolean literal(int ch);
+  };
+
   /**
    * Returns a URI-encoded token.
    * @param token token
-   * @param iri input
-   * @param path uri path
+   * @param encoder test encoding
    * @return encoded token
    */
-  public static byte[] encodeUri(final byte[] token, final boolean iri, final boolean path) {
+  public static byte[] encodeUri(final byte[] token, final UriEncoder encoder) {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte b : token) {
-      if(path ? !contains(URI_PATH, b) :
-        letterOrDigit(b) || contains(iri ? IRI_CHARACTERS : URI_CHARACTERS, b)) {
-        tb.addByte(b);
+      if(letterOrDigit(b) || encoder.literal(b)) {
+        tb.add(b);
       } else {
         tb.add('%').add(hex(b, 2));
       }
-    }
-    return tb.finish();
-  }
-
-  /**
-   * Escapes the specified token.
-   * @param token token
-   * @return escaped token
-   */
-  public static byte[] escape(final byte[] token) {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte b : token) {
-      if(b >= 0x20 && b <= 0x7e) tb.addByte(b);
-      else tb.add('%').add(hex(b, 2));
     }
     return tb.finish();
   }

@@ -32,7 +32,8 @@ final class XHTMLSerializer extends MarkupSerializer {
 
     // escape URI attributes
     final byte[] nm = concat(lc(elem.local()), COLON, lc(name));
-    final byte[] val = escuri && HTMLSerializer.URIS.contains(nm) ? escape(value) : value;
+    final byte[] val = escape && HTMLSerializer.URIS.contains(nm) ?
+      encodeUri(value, UriEncoder.ESCAPE) : value;
     super.attribute(name, val, standalone);
   }
 
