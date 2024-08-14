@@ -270,36 +270,17 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Refines the type of a function item argument.
-   * @param expr function
+   * Creates a new function item with refined types.
+   * @param expr expression to refine
    * @param cc compilation context
    * @param declType declared return type
-   * @param argTypes argument types
-   * @return old or new expression
+   * @param argTypes required argument types
+   * @return original expression or refined function item
    * @throws QueryException query context
    */
   public final Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType declType,
       final SeqType... argTypes) throws QueryException {
-
-    // check if argument is function item
-    if(!(expr instanceof FuncItem)) return expr;
-
-    // check number of arguments
-    final FuncItem func = (FuncItem) expr;
-    final int nargs = argTypes.length, arity = func.arity();
-    if(arity > nargs) return expr;
-
-    // select most specific argument and return types
-    final FuncType oldType = func.funcType();
-    final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
-    for(int a = 0; a < arity; a++) {
-      newArgTypes[a] = argTypes[a].instanceOf(oldArgTypes[a]) ? argTypes[a] : oldArgTypes[a];
-    }
-    final SeqType newDecl = declType.instanceOf(oldType.declType) ? declType : oldType.declType;
-    final FuncType newType = FuncType.get(newDecl, newArgTypes);
-
-    // new type is more specific: coerce to new function type
-    return !newType.eq(oldType) ? func.coerceTo(newType, cc.qc, cc, info) : expr;
+    return expr instanceof FuncItem ? ((FuncItem) expr).refine(declType, argTypes, cc) : expr;
   }
 
   /**

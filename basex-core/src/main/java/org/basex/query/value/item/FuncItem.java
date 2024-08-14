@@ -296,6 +296,43 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   /**
+   * Creates a new function item with refined types.
+   * @param declType declared return type
+   * @param argTypes argument types
+   * @param cc compilation context
+   * @return original or refined function item
+   * @throws QueryException query context
+   */
+  public FuncItem refine(final SeqType declType, final SeqType[] argTypes, final CompileContext cc)
+      throws QueryException {
+    // skip refinement if function has too many parameters
+    final int nargs = argTypes.length, arity = arity();
+    if(nargs >= arity) {
+      // select more specific types arguments and return types
+      final FuncType oldType = funcType();
+      final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
+      for(int a = 0; a < arity; a++) {
+        final SeqType at = argTypes[a], oat = oldArgTypes[a];
+        newArgTypes[a] = at.instanceOf(oat) ? at : oat;
+      }
+      final SeqType ot = oldType.declType, newDecl = declType.instanceOf(ot) ? declType : ot;
+      final FuncType newType = FuncType.get(newDecl, newArgTypes);
+      // coerce to refined function type
+      final FuncItem fitem = newType.eq(oldType) ? this :
+        (FuncItem) coerceTo(newType, cc.qc, cc, info);
+
+      // drop redundant types
+      final Var[] vars = fitem.params;
+      for(int a = 0; a < arity; a++) {
+        final SeqType vt = vars[a].declType;
+        if(vt != null && argTypes[a].instanceOf(vt)) vars[a].declType = null;
+      }
+      return fitem;
+    }
+    return this;
+  }
+
+  /**
    * A visitor for checking inlined expressions.
    *
    * @author BaseX Team 2005-24, BSD License
