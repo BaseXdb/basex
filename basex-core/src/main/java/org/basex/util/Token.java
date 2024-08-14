@@ -1413,13 +1413,21 @@ public final class Token {
       @Override
       boolean literal(final int ch) { return "-._~".indexOf(ch) != -1; }
     },
-    /** Build URI. */ BUILD {
-      @Override
-      boolean literal(final int ch) { return "\r\n\t %/?#+[]".indexOf(ch) == -1; }
-    },
     /** Escape URI. */ ESCAPE {
       @Override
       boolean literal(final int ch) { return ch >= 0x20 && ch <= 0x7e; }
+    },
+    /** Path component. */ PATH {
+      @Override
+      boolean literal(final int ch) { return ch >= 0x20 && " %#+[]/?".indexOf(ch) == -1; }
+    },
+    /** Query component. */ QUERY {
+      @Override
+      boolean literal(final int ch) { return ch >= 0x20 && " %#+[]=&".indexOf(ch) == -1; }
+    },
+    /** Fragment component. */ FRAGMENT {
+      @Override
+      boolean literal(final int ch) { return ch >= 0x20 && " %#+[]".indexOf(ch) == -1; }
     };
 
     /**

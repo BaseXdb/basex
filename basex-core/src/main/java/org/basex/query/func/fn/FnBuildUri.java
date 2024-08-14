@@ -53,7 +53,7 @@ public class FnBuildUri extends FnJsonDoc {
       int a = 0;
       for(final Item segment : segments) {
         if(a++ != 0) uri.add(sep);
-        uri.add(encodeUri(toToken(segment, qc), UriEncoder.BUILD));
+        uri.add(encodeUri(toToken(segment, qc), UriEncoder.PATH));
       }
     } else {
       uri.add(get(parts, PATH, qc));
@@ -64,16 +64,16 @@ public class FnBuildUri extends FnJsonDoc {
       final TokenBuilder query = new TokenBuilder();
       final String sep = options.get(UriOptions.QUERY_SEPARATOR);
       toMap(qp, qc).apply((key, value) -> {
-        final byte[] k = encodeUri(toToken(key), UriEncoder.BUILD);
+        final byte[] k = encodeUri(toToken(key), UriEncoder.QUERY);
         for(final Item item : value) {
           query.add(query.isEmpty() ? "?" : sep);
-          query.add(k).add('=').add(encodeUri(toToken(item), UriEncoder.BUILD));
+          query.add(k).add('=').add(encodeUri(toToken(item), UriEncoder.QUERY));
         }
       });
       uri.add(query);
     }
     final String fragment = get(parts, FRAGMENT, qc);
-    if(!fragment.isEmpty()) uri.add('#').add(fragment);
+    if(!fragment.isEmpty()) uri.add('#').add(encodeUri(token(fragment), UriEncoder.FRAGMENT));
 
     return Str.get(uri.finish());
   }
