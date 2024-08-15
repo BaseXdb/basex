@@ -57,19 +57,33 @@ public class FnFoldLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = optType(cc, false, true);
-    if(expr != this) return expr;
+    final Expr expr = optType(cc, false, true);
+    return expr != this ? expr : unroll(cc, true);
+  }
 
-    // unroll fold
+  /**
+   * Unrolls the fold.
+   * @param cc compilation context
+   * @param left indicates if this is a left/right fold
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  public final Expr unroll(final CompileContext cc, final boolean left) throws QueryException {
     final Expr input = arg(0), zero = arg(1), action = arg(2);
     final int arity = arity(action);
     if(arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
         final Expr func = coerceFunc(2, cc, arity);
-        expr = zero;
-        for(final Expr ex : unroll) {
-          expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
+        Expr expr = zero;
+        if(left) {
+          for(final Expr ex : unroll) {
+            expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
+          }
+        } else {
+          for(int es = unroll.size() - 1; es >= 0; es--) {
+            expr = new DynFuncCall(info, func, unroll.get(es), expr).optimize(cc);
+          }
         }
         return expr;
       }

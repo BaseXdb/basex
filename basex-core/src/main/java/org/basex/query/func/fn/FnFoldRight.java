@@ -6,7 +6,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.tree.*;
@@ -51,23 +50,7 @@ public final class FnFoldRight extends FnFoldLeft {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = optType(cc, false, false);
-    if(expr != this) return expr;
-
-    // unroll fold
-    final Expr input = arg(0), zero = arg(1), action = arg(2);
-    final int arity = arity(action);
-    if(action instanceof Value && arity == 2) {
-      final ExprList unroll = cc.unroll(input, true);
-      if(unroll != null) {
-        final Expr func = coerceFunc(2, cc, arity);
-        expr = zero;
-        for(int es = unroll.size() - 1; es >= 0; es--) {
-          expr = new DynFuncCall(info, func, unroll.get(es), expr).optimize(cc);
-        }
-        return expr;
-      }
-    }
-    return this;
+    final Expr expr = optType(cc, false, false);
+    return expr != this ? expr : unroll(cc, false);
   }
 }

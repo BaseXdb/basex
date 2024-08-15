@@ -15,7 +15,6 @@ import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -393,28 +392,32 @@ public final class CompileContext {
   }
 
   /**
-   * Returns an expression list for unrolling an expression.
+   * Returns an unrolled expression list.
    * @param expr expression to analyze
-   * @param items unroll lists only if all its expressions yield items the number of which
-   *   do not exceed limit
+   * @param single unroll expressions and medium-size lists that yield single items
    * @return expression list or {@code null}
    */
-  public ExprList unroll(final Expr expr, final boolean items) {
+  public ExprList unroll(final Expr expr, final boolean single) {
+    final Consumer<ExprList> add;
     final long size = expr.size(), limit = qc.context.options.get(MainOptions.UNROLLLIMIT);
-    final boolean value = expr instanceof Seq && size <= limit;
-    final boolean list = expr instanceof List && (
-        items ? size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args())
-              : expr.args().length <= limit
-    );
-    if(!(value || list)) return null;
+    if(single && size == 1) {
+      // expression yielding single item: <a/>
+      add = exprs -> exprs.add(expr);
+    } else if(expr instanceof Seq && size <= limit) {
+      // sequence: 'a', 'b', 'c'
+      add = exprs -> { for(final Item item : (Seq) expr) exprs.add(item); };
+    } else if(expr instanceof List && (single ?
+        size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args()) :
+        expr.args().length <= limit)) {
+      // list: <a/>, <b/>
+      add = exprs -> { for(final Expr ex : expr.args()) exprs.add(ex); };
+    } else {
+      return null;
+    }
 
     info(QueryText.OPTUNROLL_X, expr);
-    final ExprList exprs = new ExprList((int) size);
-    if(value) {
-      for(final Item item : (Value) expr) exprs.add(item);
-    } else {
-      for(final Expr arg : expr.args()) exprs.add(arg);
-    }
+    final ExprList exprs = new ExprList(size);
+    add.accept(exprs);
     return exprs;
   }
 }
