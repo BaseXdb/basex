@@ -273,14 +273,13 @@ public abstract class StandardFunc extends Arr {
    * Creates a new function item with refined types.
    * @param expr expression to refine
    * @param cc compilation context
-   * @param declType declared return type
    * @param argTypes required argument types
    * @return original expression or refined function item
    * @throws QueryException query context
    */
-  public final Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType declType,
-      final SeqType... argTypes) throws QueryException {
-    return expr instanceof FuncItem ? ((FuncItem) expr).refine(declType, argTypes, cc) : expr;
+  public final Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType... argTypes)
+      throws QueryException {
+    return expr instanceof FuncItem ? ((FuncItem) expr).refine(argTypes, cc) : expr;
   }
 
   /**

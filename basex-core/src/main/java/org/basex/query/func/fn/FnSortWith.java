@@ -27,12 +27,10 @@ public final class FnSortWith extends StandardFunc {
     int c = 0;
     for(final Item item : comparators) cmps[c++] = toFunction(item, 2, qc);
 
-    final HofArgs args = new HofArgs(2);
     final Comparator<Item> comparator = (item1, item2) -> {
       try {
-        args.set(0, item1).set(1, item2);
         for(final FItem cmp : cmps) {
-          final long diff = toLong(invoke(cmp, args, qc).item(qc, info));
+          final long diff = toLong(cmp.invoke(qc, info, item1, item2).item(qc, info));
           if(diff != 0) return diff < 0 ? -1 : 1;
         }
         return 0;

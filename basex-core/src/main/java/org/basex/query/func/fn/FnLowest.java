@@ -78,7 +78,7 @@ public class FnLowest extends StandardFunc {
     if(st.zero()) return input;
 
     if(defined(2)) {
-      arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
+      arg(2, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE)));
     } else if(!defined(1)) {
       final Predicate<Type> noCheck = type -> type.isSortable() && !type.isUntyped();
       if(st.zeroOrOne() && noCheck.test(st.type)) return input;

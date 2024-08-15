@@ -34,7 +34,7 @@ public final class MapKeysWhere extends StandardFunc {
     if(tp instanceof MapType) {
       final MapType mt = (MapType) tp;
       final Type kt = mt.keyType;
-      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, kt.seqType()));
+      arg(1, arg -> refineFunc(arg, cc, kt.seqType()));
       exprType.assign(kt);
     }
     return this;

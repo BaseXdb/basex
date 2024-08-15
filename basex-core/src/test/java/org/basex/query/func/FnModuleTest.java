@@ -684,7 +684,7 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
-    check(func.args(" <a>1</a>", " xs:byte(1)", " function($n, $_) {" +
+    check(func.args(" 1 to 10", " xs:byte(1)", " function($n, $_) {" +
         " if($n instance of xs:byte ) then xs:short  (1) else" +
         " if($n instance of xs:short) then xs:int    (1) else" +
         " if($n instance of xs:int  ) then xs:long   (1) else" +

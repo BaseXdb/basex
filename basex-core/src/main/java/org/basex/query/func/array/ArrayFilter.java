@@ -36,8 +36,7 @@ public final class ArrayFilter extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).memberType,
-          SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, ((ArrayType) type).memberType, SeqType.INTEGER_O));
       exprType.assign(type);
     }
     return this;

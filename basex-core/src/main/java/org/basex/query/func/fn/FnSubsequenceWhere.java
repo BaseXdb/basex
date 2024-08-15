@@ -54,8 +54,8 @@ public class FnSubsequenceWhere extends StandardFunc {
     if(!(from || to) || ist.zero()) return input;
 
     final SeqType[] types = { ist.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O };
-    if(from) arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, types));
-    if(to) arg(2, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, types));
+    if(from) arg(1, arg -> refineFunc(arg, cc, types));
+    if(to) arg(2, arg -> refineFunc(arg, cc, types));
 
     exprType.assign(ist);
     return this;

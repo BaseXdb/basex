@@ -63,7 +63,7 @@ public class FnFoldLeft extends StandardFunc {
     // unroll fold
     final Expr input = arg(0), zero = arg(1), action = arg(2);
     final int arity = arity(action);
-    if(action instanceof Value && arity == 2) {
+    if(arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
         final Expr func = coerceFunc(2, cc, arity);
@@ -101,38 +101,17 @@ public class FnFoldLeft extends StandardFunc {
         if(fold instanceof FuncItem[]) iff = (FuncItem[]) fold;
       }
 
-      // function argument is a single function item
-      final SeqType zst = zero.seqType(), curr = array && ist.type instanceof ArrayType ?
-        ((ArrayType) ist.type).memberType : ist.with(Occ.EXACTLY_ONE);
+      final SeqType zst = zero.seqType(), i1t = array ? ist.type instanceof ArrayType ?
+        ((ArrayType) ist.type).memberType : SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
+      SeqType st = zst, ost;
+      do {
+        final SeqType[] types = { left ? st : i1t, left ? i1t : st, SeqType.INTEGER_O };
+        arg(2, arg -> refineFunc(action, cc, types));
+        ost = st;
+        st = st.union(arg(2).funcType().declType);
+      } while(!st.eq(ost));
 
-      // assign item type of iterated value, optimize function
-      final SeqType[] types = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM,
-        SeqType.INTEGER_O };
-      Expr optFunc = refineFunc(action, cc, SeqType.ITEM_ZM, types);
-
-      final FuncType ft = optFunc.funcType();
-      final int i = left ? 0 : 1;
-      SeqType st = zst, output = ft.declType;
-
-      // if initial item has more specific type, assign it and check optimized result type
-      if(i < ft.argTypes.length) {
-        final SeqType at = ft.argTypes[i];
-        if(!st.eq(at) && st.instanceOf(at)) {
-          while(true) {
-            types[i] = st;
-            optFunc = refineFunc(action, cc, ft.declType, types);
-            output = optFunc.funcType().declType;
-
-            // optimized type is instance of input type: abort
-            if(output.instanceOf(st)) break;
-            // combine input and output type, optimize again
-            st = st.union(output);
-          }
-        }
-      }
-
-      exprType.assign(!array && ist.oneOrMore() ? output : output.union(zst));
-      exprs[2] = optFunc;
+      exprType.assign(st);
     }
     return this;
   }

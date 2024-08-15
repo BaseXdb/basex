@@ -51,7 +51,7 @@ public final class MapBuild extends StandardFunc {
     final boolean fiKey = arg(1) instanceof FuncItem;
     Type kt = arg(1).size() == 0 || fiKey ? s1t.type : AtomType.ITEM;
     if(fiKey) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, s1t));
+      arg(1, arg -> refineFunc(arg, cc, s1t));
       kt = arg(1).funcType().declType.type;
     }
     kt = kt.atomic();
@@ -60,7 +60,7 @@ public final class MapBuild extends StandardFunc {
     final boolean fiValue = arg(2) instanceof FuncItem;
     SeqType vt = arg(2).size() == 0 || fiValue ? s1t : SeqType.ITEM_ZM;
     if(fiValue) {
-      arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, s1t));
+      arg(2, arg -> refineFunc(arg, cc, s1t));
       vt = arg(2).funcType().declType;
     }
 

@@ -298,14 +298,12 @@ public final class FuncItem extends FItem implements Scope {
 
   /**
    * Creates a new function item with refined types.
-   * @param declType declared return type
    * @param argTypes argument types
    * @param cc compilation context
    * @return original or refined function item
    * @throws QueryException query context
    */
-  public FuncItem refine(final SeqType declType, final SeqType[] argTypes, final CompileContext cc)
-      throws QueryException {
+  public FuncItem refine(final SeqType[] argTypes, final CompileContext cc) throws QueryException {
     // skip refinement if function has too many parameters
     final int nargs = argTypes.length, arity = arity();
     if(nargs >= arity) {
@@ -316,8 +314,7 @@ public final class FuncItem extends FItem implements Scope {
         final SeqType at = argTypes[a], oat = oldArgTypes[a];
         newArgTypes[a] = at.instanceOf(oat) ? at : oat;
       }
-      final SeqType ot = oldType.declType, newDecl = declType.instanceOf(ot) ? declType : ot;
-      final FuncType newType = FuncType.get(newDecl, newArgTypes);
+      final FuncType newType = FuncType.get(oldType.declType, newArgTypes);
       // coerce to refined function type
       final FuncItem fitem = newType.eq(oldType) ? this :
         (FuncItem) coerceTo(newType, cc.qc, cc, info);

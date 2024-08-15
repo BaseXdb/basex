@@ -36,8 +36,7 @@ public final class ArrayBuild extends StandardFunc {
     if(st.zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
 
     if(defined(1)) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE),
-          SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O));
       final FuncType ft = arg(1).funcType();
       if(ft != null) exprType.assign(ArrayType.get(ft.declType));
     }

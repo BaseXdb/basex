@@ -177,7 +177,7 @@ public class FnSort extends StandardFunc {
 
     if(defined(2)) {
       if(arg(2).size() == 1) {
-        arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
+        arg(2, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE)));
       }
     } else if(!defined(1)) {
       if(st.zeroOrOne() && st.type.isSortable()) return input;
