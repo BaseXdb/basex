@@ -118,18 +118,19 @@ public final class XQMap extends XQData {
    * @throws QueryException query exception
    */
   public Value get(final Item key) throws QueryException {
-    final Value value = getInternal(key);
-    return value != null ? value : Empty.VALUE;
+    return getInternal(key, true);
   }
 
   /**
    * Gets the internal map value.
    * @param key key to look for
+   * @param empty if {@code true}, return empty sequence if key is not found
    * @return value or {@code null}
    * @throws QueryException query exception
    */
-  public Value getInternal(final Item key) throws QueryException {
-    return root.get(key.hash(), key, 0);
+  public Value getInternal(final Item key, final boolean empty) throws QueryException {
+    final Value value = root.get(key.hash(), key, 0);
+    return value != null ? value : empty ? Empty.VALUE : null;
   }
 
   /**

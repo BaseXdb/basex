@@ -22,9 +22,8 @@ public final class MapGet extends StandardFunc {
     final Item key = toAtomItem(arg(1), qc);
     final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
-    final Value value = map.getInternal(key);
-    return value != null ? value : fallback != null ? invoke(fallback, new HofArgs(key), qc) :
-      Empty.VALUE;
+    final Value value = map.getInternal(key, fallback == null);
+    return value != null ? value : fallback.invoke(qc, info, key);
   }
 
   @Override
