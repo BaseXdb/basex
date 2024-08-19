@@ -33,11 +33,17 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     for(final Expr expr : exprs) {
-      if(expr.test(qc, info, 0)) return Bln.TRUE;
+      if(expr.test(qc, info, 0)) return true;
     }
-    return Bln.FALSE;
+    return false;
   }
 
   @Override

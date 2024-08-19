@@ -288,13 +288,19 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Iter iter1 = exprs[0].atomIter(qc, info);
     final long size1 = iter1.size();
-    if(size1 == 0) return Bln.FALSE;
+    if(size1 == 0) return false;
     final Iter iter2 = exprs[1].atomIter(qc, info);
     final long size2 = iter2.size();
-    return size2 == 0 ? Bln.FALSE : compare(iter1, iter2, size1, size2, qc);
+    return size2 == 0 ? false : compare(iter1, iter2, size1, size2, qc);
   }
 
   /**
@@ -307,30 +313,30 @@ public class CmpG extends Cmp {
    * @return result of check
    * @throws QueryException query exception
    */
-  Bln compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
+  boolean compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
       final QueryContext qc) throws QueryException {
 
     // evaluate single items
     Iter ir1 = iter1, ir2 = iter2;
     final boolean single1 = size1 == 1, single2 = size2 == 1;
-    if(single1 && single2) return Bln.get(eval(ir1.next(), ir2.next()));
+    if(single1 && single2) return eval(ir1.next(), ir2.next());
 
     if(single1) {
       // first iterator yields single result
       final Item item1 = ir1.next();
       for(Item item2; (item2 = qc.next(ir2)) != null;) {
-        if(eval(item1, item2)) return Bln.TRUE;
+        if(eval(item1, item2)) return true;
       }
-      return Bln.FALSE;
+      return false;
     }
 
     if(single2) {
       // second iterator yields single result
       final Item item2 = ir2.next();
       for(Item item1; (item1 = qc.next(ir1)) != null;) {
-        if(eval(item1, item2)) return Bln.TRUE;
+        if(eval(item1, item2)) return true;
       }
-      return Bln.FALSE;
+      return false;
     }
 
     // swap iterators if first iterator returns more results than second
@@ -345,11 +351,11 @@ public class CmpG extends Cmp {
     for(Item item1; (item1 = ir1.next()) != null;) {
       if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
       for(Item item2; (item2 = qc.next(ir2)) != null;) {
-        if(swap ? eval(item2, item1) : eval(item1, item2)) return Bln.TRUE;
+        if(swap ? eval(item2, item1) : eval(item1, item2)) return true;
       }
       ir2 = null;
     }
-    return Bln.FALSE;
+    return false;
   }
 
   /**

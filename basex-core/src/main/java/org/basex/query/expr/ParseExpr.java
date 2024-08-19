@@ -64,7 +64,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
 
     // single item

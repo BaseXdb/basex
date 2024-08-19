@@ -15,11 +15,17 @@ import org.basex.util.*;
 public final class FnStartsWith extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] substring = toZeroToken(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);
 
-    return Bln.get(collation == null ? Token.startsWith(value, substring) :
-      collation.startsWith(value, substring, info));
+    return collation == null ? Token.startsWith(value, substring) :
+      collation.startsWith(value, substring, info);
   }
 }

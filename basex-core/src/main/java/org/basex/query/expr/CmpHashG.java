@@ -31,7 +31,7 @@ public final class CmpHashG extends CmpG {
    * Overwrites the original comparator.
    */
   @Override
-  Bln compare(final Iter iter1, final Iter iter2, final long is1, final long is2,
+  boolean compare(final Iter iter1, final Iter iter2, final long is1, final long is2,
       final QueryContext qc) throws QueryException {
 
     // check if iterator is based on value with more than one item
@@ -49,21 +49,21 @@ public final class CmpHashG extends CmpG {
           // check if item has already been cached
           if(set.contains(item1)) {
             cache.hits++;
-            return Bln.TRUE;
+            return true;
           }
 
           // cache remaining items (stop after first hit)
           if(ir2 != null) {
             for(Item item2; (item2 = qc.next(ir2)) != null;) {
               set.add(item2);
-              if(set.contains(item1)) return Bln.TRUE;
+              if(set.contains(item1)) return true;
             }
             // iterator is exhausted, all items are cached
             cache.iter = null;
             ir2 = null;
           }
         }
-        return Bln.FALSE;
+        return false;
       }
     }
     return super.compare(iter1, iter2, is1, is2, qc);

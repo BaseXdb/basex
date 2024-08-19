@@ -62,29 +62,35 @@ public final class Instance extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     // check instance of value
     final Iter iter = expr.iter(qc);
-    if(iter.valueIter()) return Bln.get(seqType.instance(iter.value(qc, expr)));
+    if(iter.valueIter()) return seqType.instance(iter.value(qc, expr));
 
     // only check item type
     if(check == 1) {
       for(Item item; (item = qc.next(iter)) != null;) {
-        if(!seqType.instance(item)) return Bln.FALSE;
+        if(!seqType.instance(item)) return false;
       }
-      return Bln.TRUE;
+      return true;
     }
 
     // only check occurrence indicator
     final long max = seqType.occ.max;
-    if(check == 2) return Bln.get(iter.next() == null ? !seqType.oneOrMore() :
-      max > 1 || max > 0 && iter.next() == null);
+    if(check == 2) return iter.next() == null ? !seqType.oneOrMore() :
+      max > 1 || max > 0 && iter.next() == null;
 
     // check both occurrence indicator and type
     long c = 0;
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(++c > max || !seqType.instance(item)) return Bln.FALSE;
+      if(++c > max || !seqType.instance(item)) return false;
     }
-    return Bln.get(c != 0 || !seqType.oneOrMore());
+    return c != 0 || !seqType.oneOrMore();
   }
 
   @Override

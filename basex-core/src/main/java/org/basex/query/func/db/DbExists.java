@@ -18,19 +18,25 @@ import org.basex.util.*;
  */
 public final class DbExists extends DbAccess {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     try {
       final Data data = toData(qc);
-      if(!defined(1)) return Bln.TRUE;
+      if(!defined(1)) return true;
       final String path = toDbPath(arg(1), qc);
 
       final Checks<ResourceType> exists = type -> {
         final IOFile bin = data.meta.file(path, type);
         return bin != null && bin.exists() && !bin.isDir();
       };
-      return Bln.get(data.resources.doc(path) != -1 || exists.any(Resources.BINARIES));
+      return data.resources.doc(path) != -1 || exists.any(Resources.BINARIES);
     } catch(final QueryException ex) {
-      if(ex.error() == DB_OPEN2_X) return Bln.FALSE;
+      if(ex.error() == DB_OPEN2_X) return false;
       throw ex;
     }
   }

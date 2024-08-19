@@ -15,7 +15,12 @@ import org.basex.util.*;
 public final class MapEmpty extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XQMap map = toMap(arg(0), qc);
-    return Bln.get(map == XQMap.empty());
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return toMap(arg(0), qc) == XQMap.empty();
   }
 }

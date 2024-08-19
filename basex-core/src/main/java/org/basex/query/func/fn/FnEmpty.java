@@ -20,8 +20,17 @@ import org.basex.util.*;
  */
 public class FnEmpty extends StandardFunc {
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(empty(qc));
+  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final Expr input = arg(0);
+    return input.seqType().zeroOrOne() ?
+      input.item(qc, info).isEmpty() :
+      input.iter(qc).next() == null;
   }
 
   @Override
@@ -94,18 +103,5 @@ public class FnEmpty extends StandardFunc {
       return expr.mergeEbv(this, or, cc);
     }
     return null;
-  }
-
-  /**
-   * Evaluates the function.
-   * @param qc query context
-   * @return boolean result
-   * @throws QueryException query exception
-   */
-  final boolean empty(final QueryContext qc) throws QueryException {
-    final Expr input = arg(0);
-    return input.seqType().zeroOrOne() ?
-      input.item(qc, info).isEmpty() :
-      input.iter(qc).next() == null;
   }
 }

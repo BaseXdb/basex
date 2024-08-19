@@ -18,15 +18,21 @@ import org.basex.util.*;
 public final class FnMatches extends RegEx {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);
 
     if(flags.length == 0) {
       final int ch = patternChar(pattern);
-      if(ch != -1) return Bln.get(contains(value, ch));
+      if(ch != -1) return contains(value, ch);
     }
-    return Bln.get(pattern(pattern, flags, false).matcher(string(value)).find());
+    return pattern(pattern, flags, false).matcher(string(value)).find();
   }
 
   @Override

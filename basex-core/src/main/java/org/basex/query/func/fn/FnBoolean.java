@@ -17,7 +17,13 @@ import org.basex.util.*;
 public final class FnBoolean extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(arg(0).test(qc, info, 0));
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return arg(0).test(qc, info, 0);
   }
 
   @Override

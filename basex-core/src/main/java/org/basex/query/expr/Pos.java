@@ -162,15 +162,21 @@ public final class Pos extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     ctxValue(qc);
 
     final Value value = expr.value(qc);
-    if(value.isEmpty()) return Bln.FALSE;
+    if(value.isEmpty()) return false;
 
-    final long pos = qc.focus.pos, vs = value.size();
+    final long p = qc.focus.pos, vs = value.size();
     final double min = toDouble(value.itemAt(0));
     final double max = vs == 1 ? min : toDouble(value.itemAt(vs - 1));
-    return Bln.get(pos >= min && pos <= max);
+    return p >= min && p <= max;
   }
 
   @Override
