@@ -85,21 +85,27 @@ final class SimplePos extends Arr implements CmpPos {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     ctxValue(qc);
-    final long p = qc.focus.pos;
+
     final Item min = exprs[0].atomItem(qc, info);
     if(min.isEmpty()) return false;
+
+    final long p = qc.focus.pos;
     if(exact()) return p == toDouble(min);
 
     final Item max = exprs[1].atomItem(qc, info);
     if(max.isEmpty()) return false;
+
     return p >= toDouble(min) && p <= toDouble(max);
   }
 
   @Override
   public Value positions(final QueryContext qc) throws QueryException {
     final Item min = exprs[0].atomItem(qc, info);
+    if(min.isEmpty()) return Empty.VALUE;
+
     final Item max = exact() ? min : exprs[1].atomItem(qc, info);
-    if(min.isEmpty() || max.isEmpty()) return Empty.VALUE;
+    if(max.isEmpty()) return Empty.VALUE;
+
     final long mn = (long) Math.ceil(toDouble(min)), mx = (long) Math.floor(toDouble(max));
     return RangeSeq.get(mn, mx - mn + 1, true);
   }

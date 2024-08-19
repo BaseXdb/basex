@@ -108,6 +108,16 @@ public final class CmpN extends Cmp {
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final ANode n1 = toNodeOrNull(exprs[0], qc);
+    if(n1 == null) return false;
+    final ANode n2 = toNodeOrNull(exprs[1], qc);
+    if(n2 == null) return false;
+    return op.eval(n1, n2);
+  }
+
+  @Override
   public Expr invert() {
     return null;
   }

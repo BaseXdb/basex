@@ -17,7 +17,13 @@ import org.basex.util.*;
  */
 public class FnContainsSubsequence extends StandardFunc {
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
     final FItem compare = toFunctionOrNull(arg(2), 2, qc);
@@ -29,7 +35,7 @@ public class FnContainsSubsequence extends StandardFunc {
     } else {
       cmp = new DeepEqual(info, null, qc)::equal;
     }
-    return Bln.get(compare(input, subsequence, cmp));
+    return test(input, subsequence, cmp);
   }
 
   /**
@@ -40,7 +46,7 @@ public class FnContainsSubsequence extends StandardFunc {
    * @return result of comparison
    * @throws QueryException query exception
    */
-  boolean compare(final Value input, final Value subsequence,
+  boolean test(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 
     final long is = input.size(), ss = subsequence.size(), ps = is - ss;
