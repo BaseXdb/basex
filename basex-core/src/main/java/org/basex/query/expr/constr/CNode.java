@@ -44,7 +44,7 @@ public abstract class CNode extends Arr {
    */
   final void optValue(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.STRING, cc);
-    if(allAreValues(true) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
+    if(values(true, cc) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
       exprs = new Expr[] { Str.get(atomValue(cc.qc, true)) };
     }
   }

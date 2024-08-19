@@ -51,7 +51,7 @@ public final class Pos extends Single {
 
     if(op == OpV.EQ) {
       // normalize positions (sort, remove duplicates and illegal positions)
-      if(pos instanceof Value && pos.size() <= CompileContext.MAX_PREEVAL) pos = ddo((Value) pos);
+      if(cc.values(true, pos)) pos = ddo((Value) pos);
       if(pos == Empty.VALUE) return Bln.FALSE;
 
       // range sequence. example: position() = 5 to 10

@@ -95,7 +95,7 @@ public final class CmpN extends Cmp {
     if(st1.oneOrMore() && st2.oneOrMore()) exprType.assign(Occ.EXACTLY_ONE);
 
     final Expr expr = emptyExpr();
-    return expr == this && allAreValues(false) ? cc.preEval(this) : cc.replaceWith(this, expr);
+    return expr == this && values(false, cc) ? cc.preEval(this) : cc.replaceWith(this, expr);
   }
 
   @Override

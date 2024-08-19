@@ -152,8 +152,8 @@ public class FnReplicate extends StandardFunc {
   }
 
   @Override
-  protected boolean allAreValues(final boolean limit) {
-    return super.allAreValues(limit) && arg(1) instanceof Int &&
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return super.values(false, cc) && arg(1) instanceof Int &&
         Util.inBounds(arg(0).size(), ((Int) arg(1)).itr());
   }
 

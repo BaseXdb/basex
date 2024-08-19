@@ -195,7 +195,7 @@ public class FnItemsAt extends StandardFunc {
     exprType.assign(ist.with(occ)).data(input);
 
     // ignore standard limitation for large values to speed up evaluation of result
-    return allAreValues(false) ? value(cc.qc) : embed(cc, false);
+    return values(false, cc) ? value(cc.qc) : embed(cc, false);
   }
 
   /**

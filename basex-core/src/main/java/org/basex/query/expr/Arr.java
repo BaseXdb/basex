@@ -94,16 +94,13 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Returns true if all arguments are values (possibly of small size).
-   * @param limit check if result size of any expression exceeds {@link CompileContext#MAX_PREEVAL}
+   * Returns true if all expressions are values (possibly of small size).
+   * @param limit check if result size of any expression is not too large
+   * @param cc compilation context
    * @return result of check
    */
-  protected boolean allAreValues(final boolean limit) {
-    for(final Expr expr : exprs) {
-      if(!(expr instanceof Value) || limit && expr.size() > CompileContext.MAX_PREEVAL)
-        return false;
-    }
-    return true;
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return cc.values(limit, exprs);
   }
 
   /**

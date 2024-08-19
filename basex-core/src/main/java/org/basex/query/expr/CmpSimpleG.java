@@ -33,7 +33,8 @@ public final class CmpSimpleG extends CmpG {
     final Item item1 = exprs[0].item(qc, info);
     if(item1.isEmpty()) return false;
     final Item item2 = exprs[1].item(qc, info);
-    return item2.isEmpty() ? false : eval(item1, item2);
+    if(item2.isEmpty()) return false;
+    return eval(item1, item2);
   }
 
   @Override

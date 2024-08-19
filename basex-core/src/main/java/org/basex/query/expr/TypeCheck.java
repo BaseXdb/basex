@@ -73,10 +73,7 @@ public final class TypeCheck extends Single {
     }
 
     // pre-evaluate (check value and result size)
-    final long es = expr.size();
-    if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) {
-      return cc.preEval(this);
-    }
+    if(cc.values(true, expr)) return cc.preEval(this);
 
     // push type check inside expression
     final Expr checked = expr.typeCheck(this, cc);
@@ -89,7 +86,7 @@ public final class TypeCheck extends Single {
     if(!et.mayBeArray()) {
       final Occ o = et.occ.intersect(st.occ);
       if(o == null) throw error(expr, st);
-      exprType.assign(st, o, et.occ == st.occ ? es : -1).
+      exprType.assign(st, o, et.occ == st.occ ? expr.size() : -1).
         data(type instanceof NodeType ? expr : null);
     }
 

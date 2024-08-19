@@ -40,7 +40,7 @@ public class Arith extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.NUMBER, cc);
-    if(allAreValues(false)) return cc.preEval(this);
+    if(values(false, cc)) return cc.preEval(this);
 
     // move values to second position
     // 1 + position()  ->  position() + 1

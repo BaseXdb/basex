@@ -61,7 +61,7 @@ public final class CMap extends Arr {
     }
     exprType.assign(MapType.get(kt, vt != null ? vt : SeqType.ITEM_ZM));
 
-    return allAreValues(true) ? cc.preEval(this) : this;
+    return values(true, cc) ? cc.preEval(this) : this;
   }
 
   @Override

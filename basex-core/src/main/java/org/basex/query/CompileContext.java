@@ -15,6 +15,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -97,7 +98,7 @@ public final class CompileContext {
   }
 
   /** Limit for the size of sequences that are pre-evaluated. */
-  public static final int MAX_PREEVAL = 1 << 18;
+  private static final int MAX_PREEVAL = 1 << 18;
 
   /** Query context. */
   public final QueryContext qc;
@@ -419,5 +420,27 @@ public final class CompileContext {
     final ExprList exprs = new ExprList(size);
     add.accept(exprs);
     return exprs;
+  }
+
+  /**
+   * Checks if all specified expressions are values (possibly of small size).
+   * @param limit check if result size of any expression exceeds {@link #MAX_PREEVAL}
+   * @param exprs expressions
+   * @return result of check
+   */
+  public boolean values(final boolean limit, final Expr... exprs) {
+    for(final Expr expr : exprs) {
+      if(!(expr instanceof Value) || limit && largeResult(expr)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if an expression yields a large result.
+   * @param expr expression
+   * @return result of check
+   */
+  public boolean largeResult(final Expr expr) {
+    return expr.size() > MAX_PREEVAL;
   }
 }

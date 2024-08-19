@@ -45,7 +45,7 @@ public final class Range extends Arr {
 
     Expr expr = emptyExpr();
     if(expr == this) {
-      if(allAreValues(false)) return cc.preEval(this);
+      if(values(false, cc)) return cc.preEval(this);
 
       final Expr min = exprs[0], max = exprs[1];
       final SeqType st1 = min.seqType(), st2 = max.seqType();

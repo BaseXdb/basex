@@ -27,6 +27,6 @@ public class DbGet extends DbAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return cc.dynamic && allAreValues(true) ? value(cc.qc) : compileData(cc);
+    return cc.dynamic && values(true, cc) ? value(cc.qc) : compileData(cc);
   }
 }

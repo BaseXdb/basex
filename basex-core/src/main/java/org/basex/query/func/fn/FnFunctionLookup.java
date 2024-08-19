@@ -26,7 +26,7 @@ public final class FnFunctionLookup extends StandardFunc {
     // make sure that all functions are compiled
     cc.qc.functions.compileAll(cc);
 
-    if(allAreValues(false)) {
+    if(values(false, cc)) {
       final Expr expr = item(cc.qc);
       if(expr != null) return expr;
     }

@@ -199,8 +199,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // only evaluate if:
     // - the closure is empty, so we don't lose variables
-    // - the result size does not exceed a specific limit
-    return global.isEmpty() && expr.size() <= CompileContext.MAX_PREEVAL ? cc.preEval(this) : this;
+    // - the result size is not too large
+    return global.isEmpty() && !cc.largeResult(expr) ? cc.preEval(this) : this;
   }
 
   @Override
