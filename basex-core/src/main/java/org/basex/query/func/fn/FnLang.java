@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class FnLang extends Ids {
+public final class FnLang extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(test(qc, ii, 0));
@@ -38,5 +38,10 @@ public final class FnLang extends Ids {
       }
     }
     return false;
+  }
+
+  @Override
+  public int contextIndex() {
+    return 1;
   }
 }

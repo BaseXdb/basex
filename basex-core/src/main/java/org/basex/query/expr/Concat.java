@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -42,7 +41,7 @@ public final class Concat extends Arr {
     final ExprList list = new ExprList(el);
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
-      if(expr instanceof Value) {
+      if(cc.values(true, expr)) {
         for(final Item item : expr.atomValue(cc.qc, info)) tb.add(item.string(info));
       } else {
         if(!tb.isEmpty()) list.add(Str.get(tb.next()));

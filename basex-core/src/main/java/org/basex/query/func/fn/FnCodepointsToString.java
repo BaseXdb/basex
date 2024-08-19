@@ -24,17 +24,19 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Expr values = variadic();
+
     // input is single integer
-    if(singleInt) return toStr(variadic().item(qc, info).itr(info), info);
+    if(singleInt) return toStr(values.item(qc, info).itr(info), info);
 
     // current input is single item
-    final Iter values = variadic().atomIter(qc, info);
-    final long size = values.size();
-    if(size == 1) return toStr(toLong(values.next()), info);
+    final Iter iter = values.atomIter(qc, info);
+    final long size = iter.size();
+    if(size == 1) return toStr(toLong(iter.next()), info);
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Seq.initialCapacity(size));
-    for(Item item; (item = qc.next(values)) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       tb.add(toCodepoint(toLong(item), info));
     }
     return Str.get(tb.finish());
@@ -51,6 +53,11 @@ public final class FnCodepointsToString extends StandardFunc {
 
     singleInt = values.seqType().instanceOf(SeqType.INTEGER_O);
     return this;
+  }
+
+  @Override
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return super.values(true, cc);
   }
 
   /**

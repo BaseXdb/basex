@@ -50,4 +50,8 @@ public final class FnStringJoin extends StandardFunc {
     return (st.zero() || st.one() && st.type.isStringOrUntyped()) &&
         stSep.type.isStringOrUntyped() ? cc.function(Function.STRING, info, values) : this;
   }
+  @Override
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return super.values(true, cc);
+  }
 }

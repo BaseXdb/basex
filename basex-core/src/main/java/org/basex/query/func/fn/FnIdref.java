@@ -1,8 +1,5 @@
 package org.basex.query.func.fn;
 
-import org.basex.query.*;
-import org.basex.query.value.*;
-
 /**
  * Function implementation.
  *
@@ -11,7 +8,7 @@ import org.basex.query.value.*;
  */
 public final class FnIdref extends Ids {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return ids(qc, true);
+  boolean idref() {
+    return true;
   }
 }
