@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -29,9 +30,24 @@ public final class Concat extends Arr {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
-      for(final Item item : expr.atomValue(qc, info)) tb.add(item.string(info));
+      final Iter iter = expr.atomIter(qc, info);
+      for(Item item; (item = iter.next()) != null;) {
+        tb.add(item.string(info));
+      }
     }
     return Str.get(tb.finish());
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    for(final Expr expr : exprs) {
+      final Iter iter = expr.atomIter(qc, info);
+      for(Item item; (item = iter.next()) != null;) {
+        if(item.string(info).length > 0) return true;
+      }
+    }
+    return false;
   }
 
   @Override

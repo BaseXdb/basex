@@ -313,6 +313,49 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void codepointsToString() {
     final Function func = CODEPOINTS_TO_STRING;
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ')'), "ABC", root(STRING));
+
+    query(func.args(" ()"), "");
+    query(func.args(" (1 to 1000)[. > 1000]"), "");
+    query(func.args(" 0x41"), "A");
+    query(func.args(" (0x41, 0x42)"), "AB");
+    query(func.args(" (0x41 to 0x5A)"), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    query(func.args(" (1 to 1000)[. = 0x41]"), "A");
+
+    // GH-2326
+    query(func.args(" ()") + " => boolean()", false);
+    query(func.args(" (1 to 1000)[. > 1000]") + " => boolean()", false);
+    query(func.args(" 0x41") + " => boolean()", true);
+    query(func.args(" (0x41, 0x42)") + " => boolean()", true);
+    query(func.args(" (0x1000 to 0xA000)") + " => boolean()", true);
+    query(func.args(" (1 to 1000) ! (0x1000 to 0xA000)") + " => boolean()", true);
+    query(func.args(" (1 to 1000)[. > 999]") + " => boolean()", true);
+  }
+
+  /** Test method. */
+  @Test public void concat() {
+    final Function func = CONCAT;
+
+    query(func.args(""), "");
+    query(func.args("", ""), "");
+    query(func.args(" ('', '')"), "");
+    query(func.args(" <?_?>"), "");
+    query(func.args(" <?_?>", " <?_?>"), "");
+    query(func.args(" (<?_?>, <?_?>)"), "");
+
+    // GH-2326
+    query(func.args("") + " => boolean()", false);
+    query(func.args("", "") + " => boolean()", false);
+    query(func.args(" ('', '')") + " => boolean()", false);
+    query(func.args(" <?_?>") + " => boolean()", false);
+    query(func.args(" <?_?>", " <?_?>") + " => boolean()", false);
+    query(func.args(" (<?_?>, <?_?>)") + " => boolean()", false);
+
+    query(func.args("", " 1") + " => boolean()", true);
+    query(func.args(" ('', '1')") + " => boolean()", true);
+    query(func.args(" 1") + " => boolean()", true);
+    query(func.args("", " 1 to 10000000000") + " => boolean()", true);
+    query(func.args(" (1, 1 to 10000000000)") + " => boolean()", true);
+    query(func.args(" 1", " 1 to 10000000000", "") + " => boolean()", true);
   }
 
   /** Test method. */
@@ -1101,6 +1144,9 @@ public final class FnModuleTest extends SandboxTest {
     query(input + "/* ! " + func.args("a1"), doc);
     query(input + "/* ! " + func.args("a2"), "");
 
+    query(input + "/* ! boolean(" + func.args("a1") + ")", true);
+    query(input + "/* ! boolean(" + func.args("a2") + ")", false);
+
     error(func.args("a2", " <a/>"), IDDOC);
   }
 
@@ -1529,6 +1575,30 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
+  }
+
+  /** Test method. */
+  @Test public void normalizeSpace() {
+    final Function func = NORMALIZE_SPACE;
+
+    query(func.args(""), "");
+    query(func.args("x"), "x");
+    query(func.args(" ' x '"), "x");
+    query(func.args(" <?_ x?>"), "x");
+    query(func.args(" <?_  x ?>"), "x");
+    query("string-length(" + func.args(" string-join((1 to 100000) ! ' ')") + ')', 0);
+    query("string-length(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', 100000);
+
+    // GH-2326
+    query("boolean(" + func.args("") + ')', false);
+    query("boolean(" + func.args(" <?_?>") + ')', false);
+    query("boolean(" + func.args(" string-join((1 to 100000) ! ' ')") + ')', false);
+
+    query("boolean(" + func.args("x") + ')', true);
+    query("boolean(" + func.args(" ' x '") + ')', true);
+    query("boolean(" + func.args(" <?_ x?>") + ')', true);
+    query("boolean(" + func.args(" <?_  x ?>") + ')', true);
+    query("boolean(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', true);
   }
 
   /** Test method. */
@@ -2225,6 +2295,35 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(CHARACTERS.args(wrap("ABC"))), "ABC", root(STRING));
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ") ! codepoints-to-string(.)"),
         "ABC", root(STRING));
+
+    query(func.args(" ()", ""), "");
+    query(func.args(" ()", "x"), "");
+    query(func.args("", "x"), "");
+    query(func.args(" (1 to 100000000) ! ''"), "");
+
+    query(func.args("x", ""), "x");
+    query(func.args("x", "x"), "x");
+    query(func.args(" ('', '')", "x"), "x");
+    query(func.args(" ('x', '')", ""), "x");
+    query(func.args(" ('', 'x')", ""), "x");
+    query(func.args(" ('', 'x')", "x"), "xx");
+    query(func.args(" 1 to 6"), "123456");
+    query(func.args(" (1 to 6) ! 'x'"), "xxxxxx");
+
+    // GH-2326
+    query(func.args(" ()", "") + " => boolean()", false);
+    query(func.args(" ()", "x") + " => boolean()", false);
+    query(func.args("", "x") + " => boolean()", false);
+    query(func.args(" (1 to 100000000) ! ''") + " => boolean()", false);
+
+    query(func.args("x", "") + " => boolean()", true);
+    query(func.args("x", "x") + " => boolean()", true);
+    query(func.args(" ('', '')", "x") + " => boolean()", true);
+    query(func.args(" ('x', '')", "") + " => boolean()", true);
+    query(func.args(" ('', 'x')", "") + " => boolean()", true);
+    query(func.args(" ('', 'x')", "x") + " => boolean()", true);
+    query(func.args(" 1 to 100000000") + " => boolean()", true);
+    query(func.args(" (1 to 100000000) ! 'x'") + " => boolean()", true);
   }
 
   /** Test method. */

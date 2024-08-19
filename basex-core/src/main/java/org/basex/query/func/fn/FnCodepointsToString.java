@@ -43,6 +43,12 @@ public final class FnCodepointsToString extends StandardFunc {
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return variadic().atomIter(qc, info).next() != null;
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0);
     final Expr variadic = variadic();

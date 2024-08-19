@@ -94,13 +94,13 @@ public abstract class Path extends ParseExpr {
     }
     final Expr rt = root instanceof ContextValue || root instanceof Dummy ? null : root;
     final Expr[] stps = tmp.finish();
-    final boolean single = rt == null && stps.length == 1;
+    final Expr step = rt == null && stps.length == 1 ? stps[0] : null;
 
     // choose best implementation
     if(axes) {
       if(iterative(root, stps)) {
         // example: a
-        if(single && !stps[0].has(Flag.POS)) return new SingleIterPath(info, stps[0]);
+        if(step != null && !step.has(Flag.POS)) return new SingleIterPath(info, step);
         // example: a/b
         return new IterPath(info, rt, stps);
       }
@@ -109,7 +109,9 @@ public abstract class Path extends ParseExpr {
     }
 
     // example: 'text'
-    if(single && stps[0].seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM)) return stps[0];
+    if(step != null && step.seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM)) {
+      return stps[0];
+    }
     // example: (1 to 10)/<xml/>
     return new MixedPath(info, rt, stps);
   }

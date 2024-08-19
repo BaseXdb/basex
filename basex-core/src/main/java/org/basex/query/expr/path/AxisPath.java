@@ -37,6 +37,13 @@ public abstract class AxisPath extends Path {
     return result != null ? result : nodes(qc);
   }
 
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final Value result = cache(qc);
+    return result != null ? !result.isEmpty() : iterator(qc).next() != null;
+  }
+
   /**
    * Updates the cache and returns a cached value.
    * @param qc query context

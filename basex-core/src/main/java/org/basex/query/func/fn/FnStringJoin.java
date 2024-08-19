@@ -39,6 +39,20 @@ public final class FnStringJoin extends StandardFunc {
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final Iter values = arg(0).atomIter(qc, info);
+    final boolean separator = toZeroToken(arg(1), qc).length > 0;
+
+    boolean more = false;
+    for(Item item; (item = values.next()) != null;) {
+      if(more && separator || item.string(info).length > 0) return true;
+      more = true;
+    }
+    return false;
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0), separator = defined(1) ? arg(1) : Str.EMPTY;
 
@@ -50,6 +64,7 @@ public final class FnStringJoin extends StandardFunc {
     return (st.zero() || st.one() && st.type.isStringOrUntyped()) &&
         stSep.type.isStringOrUntyped() ? cc.function(Function.STRING, info, values) : this;
   }
+
   @Override
   protected boolean values(final boolean limit, final CompileContext cc) {
     return super.values(true, cc);

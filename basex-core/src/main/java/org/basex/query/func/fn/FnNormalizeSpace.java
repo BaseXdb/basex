@@ -20,6 +20,12 @@ public final class FnNormalizeSpace extends ContextFn {
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return !Token.ws(toZeroToken(context(qc), qc));
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {

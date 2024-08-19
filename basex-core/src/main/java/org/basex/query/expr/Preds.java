@@ -68,7 +68,7 @@ public abstract class Preds extends Arr {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean match(final Item item, final QueryContext qc) throws QueryException {
+  protected final boolean test(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
