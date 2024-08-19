@@ -145,7 +145,7 @@ public class RecordType extends MapType implements Iterable<byte[]> {
         if(!pairs.contains(pair)) {
           Set<Pair> activePairs = pairs.isEmpty() ? new HashSet<>() : pairs;
           activePairs.add(pair);
-          if(!((RecordType) ft).eq(type, activePairs)) return false;
+          if(!((RecordType) ft).eq(rtft, activePairs)) return false;
         }
       }
       else if(!ft.eq(rtft)) return false;
@@ -201,7 +201,7 @@ public class RecordType extends MapType implements Iterable<byte[]> {
                 if(!pairs.contains(pair)) {
                   Set<Pair> activePairs = pairs.isEmpty() ? new HashSet<>() : pairs;
                   activePairs.add(pair);
-                  if(!((RecordType) ft).instanceOf(type, activePairs)) return false;
+                  if(!((RecordType) ft).instanceOf(rtft, activePairs)) return false;
                 }
               }
               else if(!ft.instanceOf(rtft)) return false;

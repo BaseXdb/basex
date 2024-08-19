@@ -126,10 +126,9 @@ public final class MapTest extends SandboxTest {
     error("declare variable $v as list := {'value':42,'next':{'value':43,'next':{'value':44,"
         + "'next':()}}}; declare record list(value as item()*, next? as list); $v",
         INVCONVERT_X_X_X);
-// this one still fails
-//  error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 {$f($l)};"
-//      + "declare record list1(value, next? as list1);declare record list2(value, next? as record("
-//      + "value as xs:string, next? as list2));local:f2(fn($l as list1) as list2 {$l}, {'value': "
-//      + "42, 'next': {'value': 43}})", INVCONVERT_X_X_X);
+    error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 {$f($l)};"
+        + "declare record list1(value, next? as list1);declare record list2(value, next? as record("
+        + "value as xs:string, next? as list2));local:f2(fn($l as list1) as list2 {$l}, {'value': "
+        + "42, 'next': {'value': 43}})", INVCONVERT_X_X_X);
   }
 }
