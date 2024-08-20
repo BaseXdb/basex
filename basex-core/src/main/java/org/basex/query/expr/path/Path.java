@@ -108,8 +108,8 @@ public abstract class Path extends ParseExpr {
       return new CachedPath(info, rt, stps);
     }
 
-    // example: 'text'
-    if(step != null && step.seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM)) {
+    // examples: 'text', (a union b)
+    if(step != null && (step.seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM) || step.ddo())) {
       return stps[0];
     }
     // example: (1 to 10)/<xml/>
