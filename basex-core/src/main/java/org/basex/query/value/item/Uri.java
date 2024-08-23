@@ -134,9 +134,12 @@ public final class Uri extends AStr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[xs:anyURI('x')]  ->  E[true()]
-    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?
-      Bln.get(value.length != 0) : this, mode);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E[xs:anyURI('x')]  ->  E[true()]
+      expr = Bln.get(value.length != 0);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   /**

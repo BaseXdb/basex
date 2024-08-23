@@ -77,7 +77,7 @@ public final class If extends Arr {
       swap();
       cc.info(QueryText.OPTSWAP_X, this);
     }
-    // if(exists(nodes))  ->  if(nodes)
+    // if(exists($nodes))  ->  if($nodes)
     cond = cond.simplifyFor(Simplify.EBV, cc);
 
     return cc.replaceWith(this, opt(cc));

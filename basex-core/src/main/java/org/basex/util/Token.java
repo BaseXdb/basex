@@ -97,6 +97,9 @@ public final class Token {
     'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
   };
 
+  /** Hex codes. */
+  public static final byte[] HEX_TABLE = token("0123456789ABCDEF");
+
   /** Maximum number of hash operations. */
   private static final byte MAX_HASH_OPS = 127;
   /** Maximum values for converting tokens to integer values. */
@@ -104,11 +107,6 @@ public final class Token {
   /** Maximum values for converting tokens to long values. */
   private static final long MAX_LONG = Long.MAX_VALUE / 10;
 
-  /** Hex codes. */
-  public static final byte[] HEX_TABLE = token("0123456789ABCDEF");
-
-  /** Character lengths. */
-  private static final int[] CHLEN = { 1, 1, 1, 1, 2, 2, 3, 4 };
   /** Table with integer sizes. */
   private static final int[] INTSIZE = {
     9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, Integer.MAX_VALUE
@@ -209,9 +207,9 @@ public final class Token {
    * @return tokens
    */
   public static byte[][] tokens(final String... strings) {
-    final byte[][] tokens = new byte[strings.length][];
-    final int tl = tokens.length;
-    for(int t = 0; t < tl; ++t) tokens[t] = token(strings[t]);
+    final int sl = strings.length;
+    final byte[][] tokens = new byte[sl][];
+    for(int s = 0; s < sl; ++s) tokens[s] = token(strings[s]);
     return tokens;
   }
 
@@ -266,40 +264,40 @@ public final class Token {
   }
 
   /**
-   * Returns the codepoint (unicode value) of the specified token, starting at
-   * the specified position. Returns a unicode replacement character for invalid values.
+   * Returns the codepoint of a character at the specified position.
+   * Returns a replacement character for invalid values.
    * @param token token
    * @param pos character position
    * @return current character
    */
   public static int cp(final byte[] token, final int pos) {
     // 0xxxxxxx
-    final byte v = token[pos];
-    if((v & 0xFF) < 192) return v & 0xFF;
+    final byte b = token[pos];
+    if(b >= 0) return b;
     // number of bytes to be read
-    final int vl = cl(v);
-    if(pos + vl > token.length) return REPLACEMENT;
+    final int cl = cl(b);
+    if(pos + cl > token.length) return REPLACEMENT;
     // 110xxxxx 10xxxxxx
-    if(vl == 2) return (v & 0x1F) << 6 | token[pos + 1] & 0x3F;
+    if(cl == 2) return (b & 0x1F) << 6 | token[pos + 1] & 0x3F;
     // 1110xxxx 10xxxxxx 10xxxxxx
-    if(vl == 3) return (v & 0x0F) << 12 | (token[pos + 1] & 0x3F) << 6 |
+    if(cl == 3) return (b & 0x0F) << 12 | (token[pos + 1] & 0x3F) << 6 |
       token[pos + 2] & 0x3F;
     // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-    return (v & 0x07) << 18 | (token[pos + 1] & 0x3F) << 12 |
+    return (b & 0x07) << 18 | (token[pos + 1] & 0x3F) << 12 |
       (token[pos + 2] & 0x3F) << 6 | token[pos + 3] & 0x3F;
   }
 
   /**
-   * Returns the length of the specified UTF8 byte.
-   * @param cp codepoint
+   * Returns the byte length of a UTF-8 character.
+   * @param b first byte of a token
    * @return character length
    */
-  public static int cl(final byte cp) {
-    return cp >= 0 ? 1 : CHLEN[cp >> 4 & 0x7];
+  public static int cl(final byte b) {
+    return b >= 0 || b < -64 ? 1 : b >= -64 && b < -32 ? 2 : b >= -32 && b < -16 ? 3 : 4;
   }
 
   /**
-   * Returns the byte length of a codepoint at the specified position.
+   * Returns the byte length of a UTF-8 character at the specified position.
    * @param token token
    * @param pos position
    * @return character length
@@ -309,61 +307,50 @@ public final class Token {
   }
 
   /**
-   * Converts a token to a sequence of codepoints.
+   * Returns the codepoints of a token.
    * @param token token
    * @return codepoints
    */
   public static int[] cps(final byte[] token) {
-    return cps(token, ascii(token));
-  }
-
-  /**
-   * Converts a token to a sequence of codepoints.
-   * @param token token
-   * @param ascii ASCII flag
-   * @return codepoints
-   */
-  public static int[] cps(final byte[] token, final boolean ascii) {
-    final int cl = token.length;
-    final int[] cps = new int[cl];
-    if(ascii) {
-      for(int c = 0; c < cl; c++) cps[c] = token[c];
+    final int tl = token.length;
+    if(ascii(token)) {
+      final int[] cps = new int[tl];
+      for(int t = 0; t < tl; t++) cps[t] = token[t];
       return cps;
     }
-
-    int pos = 0;
-    for(int c = 0; c < cl; c += cl(token, c)) cps[pos++] = cp(token, c);
-    return pos < cl ? Arrays.copyOf(cps, pos) : cps;
+    final IntList list = new IntList(tl);
+    for(int t = 0; t < tl; t += cl(token, t)) list.add(cp(token, t));
+    return list.finish();
   }
 
   /**
-   * Converts a codepoint to a token.
-   * @param cp codepoint of the character
+   * Converts a character to a token.
+   * @param ch codepoint of the character
    * @return token
    */
-  public static byte[] cpToken(final int cp) {
-    if(cp <= 0x7F) return new byte[] {
-      (byte) cp
+  public static byte[] cpToken(final int ch) {
+    if(ch <= 0x7F) return new byte[] {
+      (byte) ch
     };
-    if(cp <= 0x7FF) return new byte[] {
-      (byte) (cp >>  6 & 0x1F | 0xC0), (byte) (cp & 0x3F | 0x80)
+    if(ch <= 0x7FF) return new byte[] {
+      (byte) (ch >>  6 & 0x1F | 0xC0), (byte) (ch & 0x3F | 0x80)
     };
-    if(cp <= 0xFFFF) return new byte[] {
-      (byte) (cp >> 12 & 0x0F | 0xE0), (byte) (cp >>  6 & 0x3F | 0x80), (byte) (cp & 0x3F | 0x80)
+    if(ch <= 0xFFFF) return new byte[] {
+      (byte) (ch >> 12 & 0x0F | 0xE0), (byte) (ch >>  6 & 0x3F | 0x80), (byte) (ch & 0x3F | 0x80)
     };
     return new byte[] {
-      (byte) (cp >> 18 & 0x07 | 0xF0), (byte) (cp >> 12 & 0x3F | 0x80),
-      (byte) (cp >>  6 & 0x3F | 0x80), (byte) (cp & 0x3F | 0x80)
+      (byte) (ch >> 18 & 0x07 | 0xF0), (byte) (ch >> 12 & 0x3F | 0x80),
+      (byte) (ch >>  6 & 0x3F | 0x80), (byte) (ch & 0x3F | 0x80)
     };
   }
 
   /**
-   * Returns the byte length of a codepoint.
-   * @param cp codepoint of the character
+   * Returns the UTF-8 byte length of a character.
+   * @param ch codepoint of the character
    * @return length
    */
-  public static int cpLength(final int cp) {
-    return cp <= 0x7F ? 1 : cp <= 0x7FF ? 2 : cp <= 0xFFFF ? 3 : 4;
+  public static int cpLength(final int ch) {
+    return ch <= 0x7F ? 1 : ch <= 0x7FF ? 2 : ch <= 0xFFFF ? 3 : 4;
   }
 
   /**
@@ -563,9 +550,9 @@ public final class Token {
   public static byte[] chopNumber(final byte[] token) {
     if(!contains(token, '.') || contains(token, 'e') || contains(token, 'E')) return token;
     // remove trailing zeroes
-    int l = token.length;
-    while(--l > 0 && token[l] == '0');
-    return substring(token, 0, token[l] == '.' ? l : l + 1);
+    int tl = token.length;
+    while(--tl > 0 && token[tl] == '0');
+    return substring(token, 0, token[tl] == '.' ? tl : tl + 1);
   }
 
   /** Constant float values. */
@@ -828,7 +815,7 @@ public final class Token {
    * Checks if the first token contains the second token.
    * @param token token
    * @param sub token to be found
-   * @return result of test
+   * @return result of check
    */
   public static boolean contains(final byte[] token, final byte[] sub) {
     return contains(token, sub, 0);
@@ -839,7 +826,7 @@ public final class Token {
    * @param token token
    * @param sub token to be found
    * @param pos start position
-   * @return result of test
+   * @return result of check
    */
   public static boolean contains(final byte[] token, final byte[] sub, final int pos) {
     return indexOf(token, sub, pos) != -1;
@@ -849,28 +836,28 @@ public final class Token {
    * Checks if the first token contains the specified character.
    * @param token token
    * @param ch character to be found
-   * @return result of test
+   * @return result of check
    */
   public static boolean contains(final byte[] token, final int ch) {
     return indexOf(token, ch) != -1;
   }
 
   /**
-   * Returns the position of the specified character or -1.
+   * Returns the position of the specified character.
    * @param token token
    * @param ch character to be found
-   * @return position or {@code -1}
+   * @return position, or {@code -1} if token is not found.
    */
   public static int indexOf(final byte[] token, final int ch) {
     return indexOf(token, ch, 0);
   }
 
   /**
-   * Returns the position of the specified character or -1.
+   * Returns the position of the specified character.
    * @param token token
    * @param ch character to be found
    * @param pos start position
-   * @return position or {@code -1}
+   * @return position, or {@code -1} if token is not found.
    */
   public static int indexOf(final byte[] token, final int ch, final int pos) {
     final int tl = token.length;
@@ -887,15 +874,15 @@ public final class Token {
   }
 
   /**
-   * Returns the last position of the specified character or -1.
+   * Returns the last position of the specified character.
    * @param token token
    * @param ch character to be found
-   * @return position or {@code -1}
+   * @return position, or {@code -1} if token is not found.
    */
   public static int lastIndexOf(final byte[] token, final int ch) {
     final int tl = token.length;
     int p = -1;
-    if(ch < 128) {
+    if(ch < 0x80) {
       for(int t = tl - 1; t >= 0; --t) {
         if(token[t] == ch) return t;
       }
@@ -908,21 +895,21 @@ public final class Token {
   }
 
   /**
-   * Returns the position of the specified token or -1.
+   * Returns the position of the specified token.
    * @param token token
    * @param sub token to be found
-   * @return position or {@code -1}
+   * @return position, or {@code -1} if token is not found.
    */
   public static int indexOf(final byte[] token, final byte[] sub) {
     return indexOf(token, sub, 0);
   }
 
   /**
-   * Returns the position of the specified token or -1.
+   * Returns the position of the specified token.
    * @param token token
    * @param sub token to be found
    * @param pos start position
-   * @return result of test
+   * @return position, or {@code -1} if token is not found.
    */
   public static int indexOf(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
@@ -944,7 +931,7 @@ public final class Token {
    * Checks if the first token starts with the specified character.
    * @param token token
    * @param ch character to be found
-   * @return result of test
+   * @return result of check
    */
   public static boolean startsWith(final byte[] token, final int ch) {
     return startsWith(token, ch, 0);
@@ -955,7 +942,7 @@ public final class Token {
    * @param token token
    * @param ch character to be found
    * @param pos start position
-   * @return result of test
+   * @return result of check
    */
   private static boolean startsWith(final byte[] token, final int ch, final int pos) {
     return pos < token.length && token[pos] == ch;
@@ -965,7 +952,7 @@ public final class Token {
    * Checks if the first token starts with the second token.
    * @param token token
    * @param sub token to be found
-   * @return result of test
+   * @return result of check
    */
   public static boolean startsWith(final byte[] token, final byte[] sub) {
     return startsWith(token, sub, 0);
@@ -976,7 +963,7 @@ public final class Token {
    * @param token token
    * @param sub token to be found
    * @param pos start position
-   * @return result of test
+   * @return result of check
    */
   public static boolean startsWith(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
@@ -991,7 +978,7 @@ public final class Token {
    * Checks if the first token starts with the specified character.
    * @param token token
    * @param ch character to be bound
-   * @return result of test
+   * @return result of check
    */
   public static boolean endsWith(final byte[] token, final int ch) {
     return token.length != 0 && token[token.length - 1] == ch;
@@ -1001,7 +988,7 @@ public final class Token {
    * Checks if the first token ends with the second token.
    * @param token token
    * @param sub token to be found
-   * @return result of test
+   * @return result of check
    */
   public static boolean endsWith(final byte[] token, final byte[] sub) {
     final int sl = sub.length;
@@ -1090,11 +1077,11 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder();
     final int tl = token.length;
     for(int t = 0; t < tl; t += cl(token, t)) {
-      final int c = cp(token, t);
-      if(c == separator) {
+      final int cp = cp(token, t);
+      if(cp == separator) {
         if(empty || !tb.isEmpty()) split.add(tb.next());
       } else {
-        tb.add(c);
+        tb.add(cp);
       }
     }
     if(empty || !tb.isEmpty()) split.add(tb.finish());
@@ -1220,11 +1207,11 @@ public final class Token {
    */
   public static byte[] delete(final byte[] token, final int ch) {
     // ascii character
+    final int tl = token.length;
     if(ch < 0x80) {
       // skip deletion if character is not found
       if(!contains(token, ch)) return token;
 
-      final int tl = token.length;
       final TokenBuilder tb = new TokenBuilder(tl);
       for(final byte b : token) {
         if(b != ch) tb.add(b);
@@ -1232,11 +1219,10 @@ public final class Token {
       return tb.finish();
     }
     // remove character
-    final int tl = token.length;
-    final TokenBuilder tb = new TokenBuilder(tl);
-    for(int i = 0; i < tl; i += cl(token, i)) {
-      final int c = cp(token, i);
-      if(c != ch) tb.add(c);
+    final TokenBuilder tb = new TokenBuilder();
+    for(int t = 0; t < tl; t += cl(token, t)) {
+      final int cp = cp(token, t);
+      if(cp != ch) tb.add(cp);
     }
     return tb.finish();
   }
@@ -1264,7 +1250,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a whitespace.
-   * @param ch the letter to be checked
+   * @param ch the character to be checked
    * @return result of check
    */
   public static boolean ws(final int ch) {
@@ -1273,7 +1259,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a computer letter (A - Z, a - z, _).
-   * @param ch the letter to be checked
+   * @param ch the character to be checked
    * @return result of check
    */
   public static boolean letter(final int ch) {
@@ -1282,7 +1268,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a digit (0 - 9).
-   * @param ch the letter to be checked
+   * @param ch the character to be checked
    * @return result of check
    */
   public static boolean digit(final int ch) {
@@ -1291,7 +1277,7 @@ public final class Token {
 
   /**
    * Checks if the specified character is a computer letter or digit.
-   * @param ch the letter to be checked
+   * @param ch the character to be checked
    * @return result of check
    */
   public static boolean letterOrDigit(final int ch) {
@@ -1331,11 +1317,11 @@ public final class Token {
   public static byte[] tc(final byte[] token) {
     final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder(tl);
-    boolean del = false;
+    boolean lod = false;
     for(int t = 0; t < tl; t += cl(token, t)) {
       final int cp = cp(token, t);
-      tb.add(del ? lc(cp) : uc(cp));
-      del = Character.isLetterOrDigit(cp);
+      tb.add(lod ? lc(cp) : uc(cp));
+      lod = Character.isLetterOrDigit(cp);
     }
     return tb.finish();
   }

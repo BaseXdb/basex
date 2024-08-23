@@ -276,6 +276,14 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("AMP"), "&");
     query(func.args("amp"), "&");
     query(func.args("Tab"), "\t");
+
+    error(func.args(1), CHARINV_X);
+    error(func.args(11111111111111L), CHARINV_X);
+    error(func.args("\\x"), CHARINV_X);
+    error(func.args(""), CHARINV_X);
+    error(func.args("x"), CHARINV_X);
+    error(func.args("xy"), CHARINV_X);
+    error(func.args("xyz"), CHARINV_X);
   }
 
   /** Test method. */
@@ -302,6 +310,8 @@ public final class FnModuleTest extends SandboxTest {
     query("subsequence(" + func.args(wrap("")) + ", 3)", "");
     query("subsequence(" + func.args(wrap("aeiou")) + ", 3)", "i\no\nu");
     query("subsequence(" + func.args(wrap("äeiöü")) + ", 3)", "i\nö\nü");
+
+    query("sort(" + func.args("cba") + ")", "a\nb\nc");
 
     check("count(" + func.args(" string-join(" +
         REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));

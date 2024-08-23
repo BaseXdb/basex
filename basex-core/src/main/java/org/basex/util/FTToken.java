@@ -39,8 +39,8 @@ public final class FTToken {
   public static byte[] noDiacritics(final byte[] token) {
     final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder(tl);
-    for(int c = 0; c < tl; c += Token.cl(token, c)) {
-      int cp = Token.cp(token, c);
+    for(int t = 0; t < tl; t += Token.cl(token, t)) {
+      int cp = Token.cp(token, t);
       if(cp >= 0x80) {
         if(isCombining(Character.getType(cp))) continue;
         cp = noDiacritics(cp);

@@ -483,16 +483,16 @@ public final class BaseXLayout {
     if(w < 10) return;
     int j = string.length;
     try {
-      for(int k = 0, l = 0, fw = 0; k < j; k += l) {
-        final int ww = width(g, cp(string, k));
+      for(int s = 0, l = 0, fw = 0; s < j; s += l) {
+        final int ww = width(g, cp(string, s));
         if(fw + ww >= w - 4) {
-          j = Math.max(1, k - l);
-          if(k > 1) fw -= width(g, cp(string, k - 1));
+          j = Math.max(1, s - l);
+          if(s > 1) fw -= width(g, cp(string, s - 1));
           g.drawString("..", x + fw, y + fs);
           break;
         }
         fw += ww;
-        l = cl(string, k);
+        l = cl(string, s);
       }
     } catch(final Exception ex) {
       Util.debug(ex);
@@ -511,8 +511,8 @@ public final class BaseXLayout {
     int fw = 0;
     try {
       // ignore faulty character sets
-      final int l = string.length;
-      for(int k = 0; k < l; k += cl(string, k)) fw += width(g, cp(string, k));
+      final int sl = string.length;
+      for(int s = 0; s < sl; s += cl(string, s)) fw += width(g, cp(string, s));
     } catch(final Exception ex) {
       Util.debug(ex);
     }

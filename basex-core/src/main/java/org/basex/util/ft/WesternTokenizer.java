@@ -140,26 +140,26 @@ public final class WesternTokenizer extends Tokenizer {
     final int txtl = txt.length;
 
     // parse whitespace
-    int cp = epos;
+    int t = epos;
     boolean bs = false, pa = false, sn = false;
-    for(; cp < txtl; cp += cl(txt, cp)) {
-      final int ch = cp(txt, cp);
+    for(; t < txtl; t += cl(txt, t)) {
+      final int cp = cp(txt, t);
       if(wc && !bs) {
-        bs = ch == '\\';
+        bs = cp == '\\';
         if(bs) continue;
-        if(ch == '.') break;
+        if(cp == '.') break;
       }
-      if(!sn && (ch == '.' || ch == '!' || ch == '?')) {
+      if(!sn && (cp == '.' || cp == '!' || cp == '?')) {
         sn = true;
         ++sentence;
-        punct = ch;
-      } else if(!pa && ch == '\n') {
+        punct = cp;
+      } else if(!pa && cp == '\n') {
         pa = true;
         ++paragraph;
-      } else if(lod(ch)) {
+      } else if(lod(cp)) {
         // backslash (bs) followed by any character is the character itself:
         if(bs) {
-          --cp;
+          --t;
           bs = false;
         }
         break;
@@ -168,34 +168,34 @@ public final class WesternTokenizer extends Tokenizer {
     }
 
     // parse token
-    final int lp = cp;
-    spos = cp;
-    for(; cp < txtl; cp += cl(txt, cp)) {
-      int ch = cp(txt, cp);
+    final int lp = t;
+    spos = t;
+    for(; t < txtl; t += cl(txt, t)) {
+      int cp = cp(txt, t);
       // parse wildcards
       if(wc && !bs) {
-        bs = ch == '\\';
+        bs = cp == '\\';
         if(bs) continue;
-        if(ch == '.') {
-          ch = cp + 1 < txtl ? txt[cp + 1] : 0;
-          if(ch == '?' || ch == '*' || ch == '+') {
-            ++cp;
-          } else if(ch == '{') {
-            while(++cp < txtl && txt[cp] != '}');
-            if(cp == txtl) break;
+        if(cp == '.') {
+          cp = t + 1 < txtl ? txt[t + 1] : 0;
+          if(cp == '?' || cp == '*' || cp == '+') {
+            ++t;
+          } else if(cp == '{') {
+            while(++t < txtl && txt[t] != '}');
+            if(t == txtl) break;
           }
           continue;
         }
       }
-      if(!lod(ch)) {
-        if(bs) --cp;
+      if(!lod(cp)) {
+        if(bs) --t;
         break;
       }
       bs = false;
     }
-    epos = cp;
+    epos = t;
     ++pos;
-    return lp < cp;
+    return lp < t;
   }
 
   /**
@@ -207,31 +207,31 @@ public final class WesternTokenizer extends Tokenizer {
     final int txtl = txt.length;
 
     // parse whitespace
-    int cp = epos;
+    int t = epos;
 
-    final int lp = cp;
-    spos = cp;
+    final int lp = t;
+    spos = t;
     boolean pa = false, sp = false;
-    for(; cp < txtl; cp += cl(txt, cp)) {
-      final int ch = cp(txt, cp);
-      if(ch == '\n') pa = true;
-      else if(lod(ch)) break;
+    for(; t < txtl; t += cl(txt, t)) {
+      final int cp = cp(txt, t);
+      if(cp == '\n') pa = true;
+      else if(lod(cp)) break;
       sp = true;
     }
     para = pa;
     spec = sp;
-    epos = cp;
+    epos = t;
     // token delimiters found
-    if(lp < cp) return true;
+    if(lp < t) return true;
 
     // parse token
-    for(; cp < txtl; cp += cl(txt, cp)) {
-      final int ch = cp(txt, cp);
-      if(!lod(ch)) break;
+    for(; t < txtl; t += cl(txt, t)) {
+      final int cp = cp(txt, t);
+      if(!lod(cp)) break;
     }
-    epos = cp;
+    epos = t;
     ++pos;
-    return lp < cp;
+    return lp < t;
   }
 
   /**
@@ -285,8 +285,7 @@ public final class WesternTokenizer extends Tokenizer {
   static byte[] lower(final byte[] token, final boolean ascii) {
     final int tl = token.length;
     if(ascii) {
-      for(int i = 0; i < tl; ++i)
-        token[i] = (byte) lc(token[i]);
+      for(int i = 0; i < tl; ++i) token[i] = (byte) lc(token[i]);
       return token;
     }
     final TokenBuilder tb = new TokenBuilder();

@@ -284,7 +284,7 @@ public abstract class Formatter extends FormatUtil {
           // limit maximum length of numeric output
           int mx = 0;
           final int fl = fp.primary.length;
-          for(int s = 0; s < fl; s += cl(fp.primary, s)) mx++;
+          for(int f = 0; f < fl; f += cl(fp.primary, f)) mx++;
           if(mx > 1) fp.max = mx;
         }
 
@@ -524,7 +524,7 @@ public abstract class Formatter extends FormatUtil {
     final int al = a.length();
     if(n > al) alpha(tb, (n - 1) / al, a);
     if(n > 0) tb.add(a.charAt((int) ((n - 1) % al)));
-    else tb.add(ZERO);
+    else tb.add('0');
   }
 
   /**
@@ -626,7 +626,7 @@ public abstract class Formatter extends FormatUtil {
     final int zero = fp.zeroes(first);
 
     // cache characters of presentation modifier
-    final int[] mod = new TokenParser(fp.primary).toArray();
+    final int[] mod = cps(fp.primary);
     final int modSize = mod.length;
     int modStart = 0;
     while(modStart < modSize && mod[modStart] == '#') modStart++;

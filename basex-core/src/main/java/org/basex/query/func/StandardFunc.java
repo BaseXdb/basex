@@ -19,7 +19,6 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -134,7 +133,7 @@ public abstract class StandardFunc extends Arr {
    *   <li> Sets the occurrence indicator to 1 if the argument returns at least one item.</li>
    * </ul>
    * @param occ assign occurrence indicator
-   *   ({@code true} if function will always yield a result if first argument is non-empty)
+   *   ({@code true} if function will always yield one result if first argument is non-empty)
    * @param atom argument will be atomized
    * @param value context value (ignored if {@code null})
    * @return original or optimized expression
@@ -772,19 +771,6 @@ public abstract class StandardFunc extends Arr {
       list.add(name);
       return list;
     });
-  }
-
-  /**
-   * Merge variadic arguments.
-   * @return merged arguments
-   */
-  protected final Expr variadic() {
-    final int al = args().length;
-    if(al == 0) return Empty.VALUE;
-    if(al == 1) return arg(0);
-    final ExprList list = new ExprList(al);
-    for(final Expr expr : args()) list.add(expr);
-    return new List(info, list.finish());
   }
 
   @Override

@@ -122,8 +122,8 @@ public abstract class OutputSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   protected final void printChars(final byte[] text) throws IOException {
-    final int al = text.length;
-    for(int a = 0; a < al; a += cl(text, a)) printChar(cp(text, a));
+    final int tl = text.length;
+    for(int t = 0; t < tl; t += cl(text, t)) printChar(cp(text, t));
   }
 
   /**

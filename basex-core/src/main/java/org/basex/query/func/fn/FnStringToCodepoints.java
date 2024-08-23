@@ -46,9 +46,9 @@ public final class FnStringToCodepoints extends StandardFunc {
       @Override
       public Int next() {
         if(t == tl) return null;
-        final int cp = cp(token, t);
-        t += cl(token, t);
-        return Int.get(cp);
+        final int s = t;
+        t += cl(token, s);
+        return Int.get(cp(token, s));
       }
     };
   }
@@ -66,5 +66,11 @@ public final class FnStringToCodepoints extends StandardFunc {
       for(int t = 0; t < tl; t += cl(token, t)) list.add(cp(token, t));
     }
     return IntSeq.get(list.finish());
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Expr value = arg(0);
+    return value.seqType().zero() ? value : this;
   }
 }

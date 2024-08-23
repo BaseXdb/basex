@@ -83,34 +83,27 @@ public final class Str extends AStr {
    * Returns a valid string representation of the specified value.
    * @param value object (can be {@code null}, will be converted to token otherwise)
    * @param qc query context
-   * @param inf input info
+   * @param info input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Str get(final Object value, final QueryContext qc, final InputInfo inf)
+  public static Str get(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
 
     if(value == null) return Str.EMPTY;
 
+    // invalid Unicode characters: raise error or add replacement character
     final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
-    final byte[] bytes = Token.token(value);
-
-    // check if string is valid
-    boolean valid = true;
-    final TokenParser pt = new TokenParser(bytes);
-    while(valid && pt.more()) {
-      final int cp = pt.next();
-      valid = XMLToken.valid(cp);
-      if(!valid && validate) throw INVCODE_X.get(inf, Integer.toHexString(cp));
-    }
-    if(valid) return get(bytes);
-
-    // if not, replace invalid characters with replacement character
-    final TokenBuilder tb = new TokenBuilder(bytes.length);
-    pt.reset();
-    while(pt.more()) {
-      final int cp = pt.next();
-      tb.add(XMLToken.valid(cp) ? cp : Token.REPLACEMENT);
+    final TokenBuilder tb = new TokenBuilder();
+    final TokenParser tp = new TokenParser(Token.token(value));
+    while(tp.more()) {
+      final int cp = tp.next();
+      if(XMLToken.valid(cp)) {
+        tb.add(cp);
+      } else {
+        if(validate) throw INVCODE_X.get(info, Integer.toHexString(cp));
+        tb.add(Token.REPLACEMENT);
+      }
     }
     return get(tb.finish());
   }
@@ -135,9 +128,12 @@ public final class Str extends AStr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E['x']  ->  E[true()]
-    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?
-      Bln.get(this != EMPTY) : this, mode);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E['x']  ->  E[true()]
+      expr = Bln.get(this != EMPTY);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

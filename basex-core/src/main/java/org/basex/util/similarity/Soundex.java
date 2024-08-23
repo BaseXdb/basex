@@ -2,7 +2,6 @@ package org.basex.util.similarity;
 
 import static org.basex.util.Token.*;
 
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -19,8 +18,7 @@ public final class Soundex {
   private Soundex() { }
 
   /** Mapping for 26 ASCII letters (0: no encoding). */
-  private static final int[] MAPPING =
-      new TokenParser(token("01230120022455012623010202")).toArray();
+  private static final byte[] MAPPING = token("01230120022455012623010202");
 
   /**
    * Computes the Soundex value for the specified codepoints.
@@ -57,7 +55,7 @@ public final class Soundex {
    * @param mapping Soundex mapping
    * @return code
    */
-  private static int map(final int[] cps, final int index, final int[] mapping) {
+  private static int map(final int[] cps, final int index, final byte[] mapping) {
     final int c = mapping[cps[index] - 'A'];
     if(index > 1 && c != '0') {
       final int pc = cps[index - 1];

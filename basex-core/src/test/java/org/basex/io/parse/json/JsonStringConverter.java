@@ -98,9 +98,9 @@ final class JsonStringConverter extends JsonConverter {
   @Override
   void stringLit(final byte[] value) {
     tb.add('"');
-    final int vl = value.length;
-    for(int v = 0; v < vl; v += Token.cl(value, v)) {
-      final int cp = Token.cp(value, v);
+    final TokenParser tp = new TokenParser(value);
+    while(tp.more()) {
+      final int cp = tp.next();
       switch(cp) {
         case '\\':
         case '"':

@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -111,6 +112,24 @@ public final class Union extends Set {
         return node;
       }
     };
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return toNodeOrNull(mergeExprs().iter(qc).next()) != null;
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      for(final Expr ex : exprs) {
+        // boolean(a union <a/>)  ->  boolean(true())
+        if(ex.seqType().instanceOf(SeqType.NODE_OM) && !expr.has(Flag.NDT)) expr = Bln.TRUE;
+      }
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

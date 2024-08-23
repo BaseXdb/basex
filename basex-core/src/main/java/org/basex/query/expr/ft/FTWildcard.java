@@ -44,28 +44,28 @@ public final class FTWildcard {
    */
   private boolean parse(final byte[] token) {
     final int[] input = cps(token);
-    final int ql = input.length;
-    cps = new int[ql];
-    min = new int[ql];
-    max = new int[ql];
+    final int il = input.length;
+    cps = new int[il];
+    min = new int[il];
+    max = new int[il];
     size = 0;
 
-    for(int qi = 0; qi < ql;) {
+    for(int i = 0; i < il;) {
       int mn = 1, mx = 1;
       // parse wildcards
-      if(input[qi] == '.') {
-        int c = ++qi < ql ? input[qi] : 0;
+      if(input[i] == '.') {
+        int c = ++i < il ? input[i] : 0;
         // minimum/maximum number of occurrence
         if(c == '?') { // .?
-          ++qi;
+          ++i;
           mn = 0;
           mx = 1;
         } else if(c == '*') { // .*
-          ++qi;
+          ++i;
           mn = 0;
           mx = Integer.MAX_VALUE;
         } else if(c == '+') { // .+
-          ++qi;
+          ++i;
           mn = 1;
           mx = Integer.MAX_VALUE;
         } else if(c == '{') { // .{m,n}
@@ -73,7 +73,7 @@ public final class FTWildcard {
           mx = 0;
           boolean f = false;
           while(true) {
-            c = ++qi < ql ? input[qi] : 0;
+            c = ++i < il ? input[i] : 0;
             if(digit(c)) mn = (mn << 3) + (mn << 1) + c - '0';
             else if(f && c == ',') break;
             else return false;
@@ -81,19 +81,19 @@ public final class FTWildcard {
           }
           f = false;
           while(true) {
-            c = ++qi < ql ? input[qi] : 0;
+            c = ++i < il ? input[i] : 0;
             if(digit(c)) mx = (mx << 3) + (mx << 1) + c - '0';
             else if(f && c == '}') break;
             else return false;
             f = true;
           }
-          ++qi;
+          ++i;
           if(mn > mx) return false;
         }
         cps[size] = DOT;
       } else {
-        if(input[qi] == '\\' && ++qi == ql) return false;
-        cps[size] = input[qi++];
+        if(input[i] == '\\' && ++i == il) return false;
+        cps[size] = input[i++];
       }
       min[size] = mn;
       max[size] = mx;
@@ -137,11 +137,11 @@ public final class FTWildcard {
 
   /**
    * Checks if the wildcard can match a sub-string in a string.
-   * @param tok token to search for match
+   * @param token token to search for match
    * @return {@code true} if a match is found
    */
-  public boolean match(final byte[] tok) {
-    return match(cps(tok), 0, 0);
+  public boolean match(final byte[] token) {
+    return match(cps(token), 0, 0);
   }
 
   /**
@@ -154,25 +154,25 @@ public final class FTWildcard {
 
   /**
    * Checks if the wildcard can match a sub-string in a string.
-   * @param tok token to search for match
+   * @param token token to search for match
    * @param tp input position
    * @param qp query position
    * @return {@code true} if a match is found
    */
-  private boolean match(final int[] tok, final int tp, final int qp) {
-    final int tl = tok.length;
+  private boolean match(final int[] token, final int tp, final int qp) {
+    final int tl = token.length;
     int qi = qp, ti = tp;
     while(qi < size) {
       if(cps[qi] == DOT) {
         int n = min[qi];
         final int m = max[qi++];
         // recursively evaluates wildcards (non-greedy)
-        while(!match(tok, ti + n, qi)) {
+        while(!match(token, ti + n, qi)) {
           if(ti + ++n > tl) return false;
         }
         if(n > m) return false;
         ti += n;
-      } else if(ti >= tl || tok[ti++] != cps[qi++]) {
+      } else if(ti >= tl || token[ti++] != cps[qi++]) {
         return false;
       }
     }

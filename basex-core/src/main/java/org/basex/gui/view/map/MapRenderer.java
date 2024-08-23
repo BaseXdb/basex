@@ -112,15 +112,15 @@ final class MapRenderer {
           int twl = 2 * BaseXLayout.width(g, '.');
           if(twl >= ww) return Integer.MAX_VALUE;
 
-          int n = 0;
-          for(; n < tl; n += cl(token, n)) {
-            final int l = BaseXLayout.width(g, cp(token, n));
+          int t = 0;
+          for(; t < tl; t += cl(token, t)) {
+            final int l = BaseXLayout.width(g, cp(token, t));
             if(twl + l >= ww) break;
             twl += l;
           }
-          token = Arrays.copyOf(token, n + 2);
-          token[n] = '.';
-          token[n + 1] = '.';
+          token = Arrays.copyOf(token, t + 2);
+          token[t] = '.';
+          token[t + 1] = '.';
         }
       }
 
@@ -533,7 +533,7 @@ final class MapRenderer {
           }
 
           l = 0;
-          for(int n = 0; n < ts; n += cl(tok, n)) l += BaseXLayout.width(g, cp(tok, n));
+          for(int t = 0; t < ts; t += cl(tok, t)) l += BaseXLayout.width(g, cp(tok, t));
           if(si > i && ll + l + sp >= w / 2.0d) break;
           ll += l + sp;
 
@@ -583,7 +583,7 @@ final class MapRenderer {
           if(apm) tok[ts - 1] = (byte) data4[psl - 1];
           sl += apm ? sl : ts;
 
-          for(int n = 0; n < ts; n += cl(tok, n)) l += BaseXLayout.width(g, cp(tok, n));
+          for(int t = 0; t < ts; t += cl(tok, t)) l += BaseXLayout.width(g, cp(tok, t));
           if(ll + l + sp + 2 * sd >= w / 2.0d) break;
           ll += l + sp;
 
@@ -631,22 +631,22 @@ final class MapRenderer {
    * @param rect view rectangle
    * @param x x value
    * @param y y value
-   * @param tl token list
+   * @param list token list
    */
-  void drawToolTip(final MapRect rect, final int x, final int y, final TokenList tl) {
-    if(tl == null || tl.isEmpty()) return;
+  void drawToolTip(final MapRect rect, final int x, final int y, final TokenList list) {
+    if(list == null || list.isEmpty()) return;
     final int sw = BaseXLayout.width(g, ' ');
     int wl = 0;
     int nl = 1;
     int wi = rect.w / 2;
     final IntList len = new IntList();
-    final int ts = tl.size();
+    final int ts = list.size();
     for(int i = 0; i < ts; i++) {
       int l = 0;
-      final byte[] tok = tl.get(i);
-      final int ns = tok.length;
-      for(int n = 0; n < ns; n += cl(tok, n)) {
-        l += BaseXLayout.width(g, cp(tok, n));
+      final byte[] tok = list.get(i);
+      final int tl = tok.length;
+      for(int t = 0; t < tl; t += cl(tok, t)) {
+        l += BaseXLayout.width(g, cp(tok, t));
       }
       if(wl + l + sw < wi) {
         wl += l + sw;
@@ -670,16 +670,16 @@ final class MapRenderer {
     g.fillRect(xx - 2, yy - fontSize, ww + 2, fontSize * nl + 6);
     g.setColor(color(20));
     wl = 0;
-    final int is = tl.size();
+    final int is = list.size();
     for(int i = 0; i < is; ++i) {
       final int l = len.get(i);
       if(wl + l + sw >= wi) {
         yy += fontSize + 1;
         wl = 0;
       }
-      final boolean pm = !lod(tl.get(i)[tl.get(i).length - 1]);
+      final boolean pm = !lod(list.get(i)[list.get(i).length - 1]);
       if(ttcol.get(i)) g.setColor(GREEN);
-      g.drawString(string(tl.get(i)), xx + wl, yy);
+      g.drawString(string(list.get(i)), xx + wl, yy);
       if(i == ul) {
         g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);
       }

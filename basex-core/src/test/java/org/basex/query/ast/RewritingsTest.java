@@ -3310,4 +3310,10 @@ public final class RewritingsTest extends SandboxTest {
     query("db:create('test')");
     query("db:put('test', <a/>, 'a.xml'), db:optimize('test', true(), map { 'updindex': true() })");
   }
+
+  /** Faster EBV checks. */
+  @Test public void gh2326() {
+    query("let $b := <a><b/></a> return <a/>[* union $b/b]", "<a/>");
+    check("let $b := <a><b/></a> return <a/>[* union <b/>]", "<a/>", root(CElem.class));
+  }
 }

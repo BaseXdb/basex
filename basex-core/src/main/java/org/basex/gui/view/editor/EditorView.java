@@ -890,19 +890,19 @@ public final class EditorView extends View {
    * @return position
    */
   private static int pos(final byte[] text, final int line, final int col) {
-    final int ll = text.length;
-    int ep = ll;
-    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(text, p)) {
+    final int tl = text.length;
+    int ep = tl;
+    for(int t = 0, l = 1, c = 1; t < tl; ++c, t += cl(text, t)) {
       if(l > line || l == line && c == col) {
-        ep = p;
+        ep = t;
         break;
       }
-      if(text[p] == '\n') {
+      if(text[t] == '\n') {
         ++l;
         c = 0;
       }
     }
-    if(ep < ll && Character.isLetterOrDigit(cp(text, ep))) {
+    if(ep < tl && Character.isLetterOrDigit(cp(text, ep))) {
       while(ep > 0 && Character.isLetterOrDigit(cp(text, ep - 1))) ep--;
     }
     return ep;

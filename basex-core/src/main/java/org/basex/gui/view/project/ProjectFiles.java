@@ -75,7 +75,7 @@ final class ProjectFiles {
 
     final long id = ++filterId;
     final StringList results = new StringList();
-    final int[] search = new TokenParser(Token.lc(Token.token(contents))).toArray();
+    final int[] search = contents.toLowerCase(Locale.ENGLISH).codePoints().toArray();
 
     // glob pattern
     final ProjectCache pc = cache(root);

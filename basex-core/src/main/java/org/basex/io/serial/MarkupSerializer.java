@@ -142,8 +142,8 @@ abstract class MarkupSerializer extends StandardSerializer {
     out.print(ATT1);
     final byte[] val = normalize(value, form);
     final int vl = val.length;
-    for(int k = 0; k < vl; k += cl(val, k)) {
-      final int cp = cp(val, k);
+    for(int v = 0; v < vl; v += cl(val, v)) {
+      final int cp = cp(val, v);
       if(cp == '"') {
         out.print(E_QUOT);
       } else if(cp == 0x9 || cp == 0xA) {
@@ -177,14 +177,14 @@ abstract class MarkupSerializer extends StandardSerializer {
       final QNmSet qnames = cdata();
       final int vl = val.length;
       if(qnames.isEmpty() || opened.isEmpty() || !qnames.contains(opened.peek())) {
-        for(int k = 0; k < vl; k += cl(val, k)) {
-          printChar(cp(val, k));
+        for(int v = 0; v < vl; v += cl(val, v)) {
+          printChar(cp(val, v));
         }
       } else {
         out.print(CDATA_O);
         int c = 0;
-        for(int k = 0; k < vl; k += cl(val, k)) {
-          final int cp = cp(val, k);
+        for(int v = 0; v < vl; v += cl(val, v)) {
+          final int cp = cp(val, v);
           if(cp == ']') {
             ++c;
           } else {

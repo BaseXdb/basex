@@ -489,7 +489,7 @@ public final class DecFormatter extends FormatUtil {
 
     if(Double.isInfinite(num.dbl(info))) {
       // Rule 4: infinity
-      intgr.add(new TokenParser(inf).toArray());
+      intgr.add(cps(inf));
     } else {
       // Rule 5: exponent
       if(pic.minExp != 0 && d != 0) {

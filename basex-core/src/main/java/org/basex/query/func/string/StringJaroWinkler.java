@@ -17,7 +17,7 @@ public final class StringJaroWinkler extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
 
-    final int[] cps1 = new TokenParser(value1).toArray(), cps2 = new TokenParser(value2).toArray();
+    final int[] cps1 = Token.cps(value1), cps2 = Token.cps(value2);
     return Dbl.get(JaroWinkler.distance(cps1, cps2));
   }
 }

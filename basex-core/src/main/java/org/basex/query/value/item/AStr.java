@@ -19,9 +19,9 @@ public abstract class AStr extends Item {
   /** ASCII offset flag. */
   private static final int[] ASCII = {};
 
-  /** String data ({@code null} if not initialized yet). */
+  /** String data ({@code null} if not cached yet). */
   byte[] value;
-  /** Character offsets. {@code null}: unknown, {@code ASCII}: ASCII, otherwise: offsets. */
+  /** Character offsets. {@code null}: not cached yet, {@code ASCII}: ASCII, otherwise: offsets. */
   private int[] offsets;
 
   /**

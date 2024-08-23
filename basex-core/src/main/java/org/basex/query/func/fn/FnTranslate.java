@@ -20,9 +20,9 @@ public final class FnTranslate extends StandardFunc {
   public AStr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc), replace = toStr(arg(1), qc), with = toStr(arg(2), qc);
 
-    final int[] cps = cps(value.string(info), value.ascii(info));
-    final int[] rplc = cps(replace.string(info), replace.ascii(info));
-    final int[] wth = cps(with.string(info), with.ascii(info));
+    final int[] cps = cps(value.string(info));
+    final int[] rplc = cps(replace.string(info));
+    final int[] wth = cps(with.string(info));
     final int cl = cps.length, rl = rplc.length, wl = wth.length;
     if(cl == 0 || rl == 0) return value;
 
@@ -46,6 +46,7 @@ public final class FnTranslate extends StandardFunc {
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) && replace == Str.EMPTY &&
         withSt.one() && withSt.type.isStringOrUntyped()) {
+      // tokenize($value, '', 'abcde')  ->  string($value)
       return cc.function(Function.STRING, info, value);
     }
     return this;

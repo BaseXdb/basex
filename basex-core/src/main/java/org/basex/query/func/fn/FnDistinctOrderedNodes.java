@@ -11,6 +11,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -21,7 +22,7 @@ import org.basex.query.value.type.*;
 public final class FnDistinctOrderedNodes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter nodes = variadic().iter(qc);
+    final Iter nodes = mergeExprs().iter(qc);
     if(nodes.valueIter()) {
       final Value value = nodes.value(qc, null);
       if(value instanceof DBNodeSeq) return value;
@@ -35,10 +36,16 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return toNodeOrNull(mergeExprs().iter(qc).next()) != null;
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     Expr nodes = arg(0);
-    final Expr variadic = variadic();
-    if(variadic != nodes) return cc.function(DISTINCT_ORDERED_NODES, info, variadic.optimize(cc));
+    final Expr merged = mergeExprs();
+    if(merged != nodes) return cc.function(DISTINCT_ORDERED_NODES, info, merged.optimize(cc));
 
     // replace list with union:
     // distinct-ordered-nodes((<a/>, <b/>))  ->  <a/> | <b/>

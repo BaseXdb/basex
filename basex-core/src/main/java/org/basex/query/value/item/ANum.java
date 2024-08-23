@@ -124,11 +124,14 @@ public abstract class ANum extends Item {
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    // predicate: E[0]  ->  E[false()]
-    // EBV: if(0)  ->  if(false())
+    Expr expr = this;
     final double d = dbl();
-    return cc.simplify(this, mode == Simplify.PREDICATE && (d != itr() || d < 1) ||
-        mode == Simplify.EBV && d == 0 ? Bln.FALSE : this, mode);
+    if(mode == Simplify.PREDICATE && (d != itr() || d < 1) || mode == Simplify.EBV && d == 0) {
+      // predicate: E[0]  ->  E[false()]
+      // EBV: if(0)  ->  if(false())
+      expr = Bln.FALSE;
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

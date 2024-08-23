@@ -17,7 +17,7 @@ public final class StringColognePhonetic extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
 
-    final int[] encoded = ColognePhonetic.encode(new TokenParser(value).toArray());
+    final int[] encoded = ColognePhonetic.encode(Token.cps(value));
     final TokenBuilder tb = new TokenBuilder(encoded.length);
     for(final int cp : encoded) tb.add(cp);
     return Str.get(tb.finish());

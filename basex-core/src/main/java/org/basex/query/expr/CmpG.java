@@ -486,10 +486,15 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[local-name() = 'a']  ->  E[self::*:a]
-    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this,
-      mode);
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E[local-name() = 'a']  ->  E[self::*:a]
+      expr = optPred(cc);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   /**

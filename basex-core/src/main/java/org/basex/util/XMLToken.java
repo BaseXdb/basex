@@ -86,8 +86,8 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isNCName(final byte[] value) {
-    final int l = value.length;
-    return l != 0 && ncName(value, 0) == l;
+    final int vl = value.length;
+    return vl != 0 && ncName(value, 0) == vl;
   }
 
   /**
@@ -96,12 +96,12 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isName(final byte[] value) {
-    final int l = value.length;
-    for(int i = 0; i < l; i += cl(value, i)) {
-      final int cp = cp(value, i);
-      if(i == 0 ? !isStartChar(cp) : !isChar(cp)) return false;
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += cl(value, v)) {
+      final int cp = cp(value, v);
+      if(v == 0 ? !isStartChar(cp) : !isChar(cp)) return false;
     }
-    return l != 0;
+    return vl != 0;
   }
 
   /**
@@ -110,11 +110,11 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isNMToken(final byte[] value) {
-    final int l = value.length;
-    for(int i = 0; i < l; i += cl(value, i)) {
-      if(!isChar(cp(value, i))) return false;
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += cl(value, v)) {
+      if(!isChar(cp(value, v))) return false;
     }
-    return l != 0;
+    return vl != 0;
   }
 
   /**
@@ -123,13 +123,13 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isQName(final byte[] value) {
-    final int l = value.length;
-    if(l == 0) return false;
+    final int vl = value.length;
+    if(vl == 0) return false;
     final int i = ncName(value, 0);
-    if(i == l) return true;
+    if(i == vl) return true;
     if(i == 0 || value[i] != ':') return false;
     final int j = ncName(value, i + 1);
-    return j == l && j != i + 1;
+    return j == vl && j != i + 1;
   }
 
   /**
@@ -139,12 +139,12 @@ public final class XMLToken {
    * @return end position
    */
   private static int ncName(final byte[] value, final int start) {
-    final int l = value.length;
-    for(int i = start; i < l; i += cl(value, i)) {
-      final int c = cp(value, i);
-      if(i == start ? !isNCStartChar(c) : !isNCChar(c)) return i;
+    final int vl = value.length;
+    for(int v = start; v < vl; v += cl(value, v)) {
+      final int cp = cp(value, v);
+      if(v == start ? !isNCStartChar(cp) : !isNCChar(cp)) return v;
     }
-    return l;
+    return vl;
   }
 
   /**
@@ -156,8 +156,8 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isId(final byte[] name, final boolean idref) {
-    final byte[] n = lc(local(name));
-    return idref ? contains(n, REF) : contains(n, ID) && !contains(n, REF);
+    final byte[] id = lc(local(name));
+    return idref ? contains(id, REF) : contains(id, ID) && !contains(id, REF);
   }
 
   /**
@@ -289,9 +289,9 @@ public final class XMLToken {
    * @return invalid character or {@code -1}
    */
   public static int invalid(final byte[] token) {
-    final TokenParser tp = new TokenParser(token);
-    while(tp.more()) {
-      final int cp = tp.next();
+    final int tl = token.length;
+    for(int t = 0; t < tl; t += cl(token, t)) {
+      final int cp = cp(token, t);
       if(!XMLToken.valid(cp)) return cp;
     }
     return -1;

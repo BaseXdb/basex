@@ -22,7 +22,7 @@ public final class StringLevenshtein extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
 
-    final int[] cps1 = new TokenParser(value1).toArray(), cps2 = new TokenParser(value2).toArray();
+    final int[] cps1 = Token.cps(value1), cps2 = Token.cps(value2);
     final int cl1 = cps1.length, cl2 = cps2.length;
     if(cl1 > MAX_LENGTH || cl2 > MAX_LENGTH) throw STRING_BOUNDS_X.get(info, MAX_LENGTH);
     return Dbl.get(Levenshtein.distance(cps1, cps2));

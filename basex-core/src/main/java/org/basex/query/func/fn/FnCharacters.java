@@ -48,10 +48,9 @@ public class FnCharacters extends StandardFunc {
       @Override
       public Str next() {
         if(t == tl) return null;
-        final int e = t + cl(token, t);
-        final byte[] string = Arrays.copyOfRange(token, t, e);
+        final int s = t, e = s + cl(token, s);
         t = e;
-        return Str.get(string);
+        return Str.get(Arrays.copyOfRange(token, s, e));
       }
     };
   }
@@ -73,5 +72,11 @@ public class FnCharacters extends StandardFunc {
       }
     }
     return StrSeq.get(list);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Expr value = arg(0);
+    return value.seqType().zero() ? value : this;
   }
 }

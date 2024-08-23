@@ -110,8 +110,8 @@ public abstract class Preds extends Arr {
   private void optimize(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
-    // E[exists(nodes)]  ->  E[nodes]
-    // E[count(nodes)]  will not be rewritten
+    // E[exists($nodes)]  ->  E[$nodes]
+    // E[count($nodes)]  will not be rewritten
     Expr expr = pred.simplifyFor(Simplify.PREDICATE, cc);
 
     // map operator: E[. ! ...]  ->  E[...], E[E ! ...]  ->  E[...]
