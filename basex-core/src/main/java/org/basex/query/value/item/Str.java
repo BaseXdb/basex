@@ -11,6 +11,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * String item ({@code xs:string}, {@code xs:normalizedString}, {@code xs:language}, etc.).
@@ -26,6 +27,17 @@ public final class Str extends AStr {
   /** Value string. */
   public static final Str VALUE = Str.get("value");
 
+  /** Unicode character cache. */
+  private static final IntObjMap<Str> CACHE = new IntObjMap<>();
+  /** Single ASCII characters. */
+  private static final Str[] CHAR;
+
+  // caches single ASCII characters
+  static {
+    final int nl = 128;
+    CHAR = new Str[nl];
+    for(int n = 0; n < nl; n++) CHAR[n] = new Str(Token.cpToken(n));
+  }
 
   /**
    * Constructor.
@@ -50,7 +62,11 @@ public final class Str extends AStr {
    * @return instance
    */
   public static Str get(final byte[] value) {
-    return value.length == 0 ? EMPTY : new Str(value);
+    final int vl = value.length;
+    return vl == 0 ? EMPTY :
+      vl == 1 ? CHAR[value[0]] :
+      vl > 4 || vl > Token.cl(value, 0) ? new Str(value) :
+      CACHE.computeIfAbsent(Token.cp(value, 0), () -> new Str(value));
   }
 
   /**
@@ -59,7 +75,7 @@ public final class Str extends AStr {
    * @return instance
    */
   public static Str get(final int cp) {
-    return new Str(Token.cpToken(cp));
+    return cp < 128 ? CHAR[cp] : CACHE.computeIfAbsent(cp, () -> new Str(Token.cpToken(cp)));
   }
 
   /**
