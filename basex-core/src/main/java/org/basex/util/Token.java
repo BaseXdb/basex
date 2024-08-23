@@ -3,6 +3,7 @@ package org.basex.util;
 import static org.basex.query.util.DeepEqualOptions.*;
 
 import java.math.*;
+import java.nio.charset.*;
 import java.text.*;
 import java.util.*;
 import java.util.function.*;
@@ -99,7 +100,7 @@ public final class Token {
   private static final int[] INTSIZE = {
     9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, Integer.MAX_VALUE
   };
-  /** Single characters. */
+  /** Cache for single ASCII-character tokens. */
   private static final byte[][] CHAR;
 
   static {
@@ -128,42 +129,7 @@ public final class Token {
    * @return string
    */
   public static String string(final byte[] token, final int start, final int length) {
-    if(length == 0) return "";
-    /// check if string contains non-ascii characters
-    final int e = start + length;
-    for(int p = start; p < e; ++p) {
-      if(token[p] < 0) return utf8(token, start, length);
-    }
-    /// copy ascii characters to character array
-    final char[] str = new char[length];
-    for(int p = 0; p < length; ++p) str[p] = (char) token[start + p];
-    return new String(str);
-  }
-
-  /**
-   * Converts the specified UTF8 token to a string.
-   * @param token token
-   * @param start start position
-   * @param length length
-   * @return string
-   */
-  private static String utf8(final byte[] token, final int start, final int length) {
-    // input is assumed to be correct UTF8. if input contains codepoints
-    // larger than Character.MAX_CODE_POINT, results might be unexpected.
-
-    final StringBuilder sb = new StringBuilder(Array.newCapacity(length));
-    final int il = Math.min(start + length, token.length);
-    for(int i = start; i < il; i += cl(token, i)) {
-      final int cp = cp(token, i);
-      if(cp < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
-        sb.append((char) cp);
-      } else {
-        final int o = cp - Character.MIN_SUPPLEMENTARY_CODE_POINT;
-        sb.append((char) ((o >>> 10) + Character.MIN_HIGH_SURROGATE));
-        sb.append((char) ((o & 0x3ff) + Character.MIN_LOW_SURROGATE));
-      }
-    }
-    return sb.toString();
+    return length == 0 ? "" : new String(token, start, length, StandardCharsets.UTF_8);
   }
 
   /**
@@ -187,17 +153,10 @@ public final class Token {
    */
   public static byte[] token(final String string) {
     final int sl = string.length();
-    if(sl == 0) return EMPTY;
-    if(sl == 1 || sl == 2 && Character.isHighSurrogate(string.charAt(0))) {
-      return cpToken(string.codePointAt(0));
-    }
-    final byte[] b = new byte[sl];
-    for(int s = 0; s < sl; ++s) {
-      final char c = string.charAt(s);
-      if(c > 0x7F) return utf8(string);
-      b[s] = (byte) c;
-    }
-    return b;
+    return sl == 0 ? EMPTY :
+      sl == 1 || sl == 2 && Character.isHighSurrogate(string.charAt(0)) ?
+        cpToken(string.codePointAt(0)) :
+      string.getBytes(StandardCharsets.UTF_8);
   }
 
   /**
@@ -210,24 +169,6 @@ public final class Token {
     final byte[][] tokens = new byte[sl][];
     for(int s = 0; s < sl; ++s) tokens[s] = token(strings[s]);
     return tokens;
-  }
-
-  /**
-   * Converts a string to a UTF8 byte array.
-   * @param string string to be converted
-   * @return byte array
-   */
-  private static byte[] utf8(final String string) {
-    final char[] arr = string.toCharArray();
-    final int al = arr.length;
-    final TokenBuilder tb = new TokenBuilder(Array.newCapacity(al));
-    for(int c = 0; c < al; ++c) {
-      final char ch = arr[c];
-      tb.add(Character.isHighSurrogate(ch) && c < al - 1
-          && Character.isLowSurrogate(arr[c + 1])
-           ? Character.toCodePoint(ch, arr[++c]) : ch);
-    }
-    return tb.finish();
   }
 
   /**
@@ -321,7 +262,6 @@ public final class Token {
     forEachCp(token, cp -> list.add(cp));
     return list.finish();
   }
-
 
   /**
    * Returns the codepoint offsets for Unicode tokens.
