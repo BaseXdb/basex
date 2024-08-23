@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.util.Token.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -20,9 +18,9 @@ public final class FnTranslate extends StandardFunc {
   public AStr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc), replace = toStr(arg(1), qc), with = toStr(arg(2), qc);
 
-    final int[] cps = cps(value.string(info));
-    final int[] rplc = cps(replace.string(info));
-    final int[] wth = cps(with.string(info));
+    final int[] cps = value.codepoints(info);
+    final int[] rplc = replace.codepoints(info);
+    final int[] wth = with.codepoints(info);
     final int cl = cps.length, rl = rplc.length, wl = wth.length;
     if(cl == 0 || rl == 0) return value;
 

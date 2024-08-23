@@ -322,6 +322,21 @@ public final class Token {
     return list.finish();
   }
 
+
+  /**
+   * Returns the codepoint offsets for Unicode tokens.
+   * @param token token
+   * @return codepoint offsets, or {@code null} if the token is ASCII only
+   */
+  public static int[] cpOffsets(final byte[] token) {
+    if(ascii(token)) return null;
+
+    final int tl = token.length;
+    final IntList list = new IntList(tl);
+    for(int t = 0; t < tl; t += cl(token, t)) list.add(t);
+    return list.finish();
+  }
+
   /**
    * Converts a character to a token.
    * @param ch codepoint of the character

@@ -11,7 +11,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -35,9 +34,7 @@ public class FnCharacters extends StandardFunc {
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
-          final TokenList list = new TokenList(value.length(info));
-          for(final byte b : token) list.add(new byte[] { b });
-          return StrSeq.get(list);
+          return StrSeq.get(value.characters(info));
         }
       };
     }
@@ -58,20 +55,7 @@ public class FnCharacters extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
-    final byte[] token = toToken(value);
-
-    final TokenList list = new TokenList(value.length(info));
-    if(value.ascii(info)) {
-      for(final byte b : token) list.add(new byte[] { b });
-    } else {
-      final int tl = token.length;
-      for(int t = 0; t < tl;) {
-        final int e = t + cl(token, t);
-        list.add(Arrays.copyOfRange(token, t, e));
-        t = e;
-      }
-    }
-    return StrSeq.get(list);
+    return StrSeq.get(value.characters(info));
   }
 
   @Override
