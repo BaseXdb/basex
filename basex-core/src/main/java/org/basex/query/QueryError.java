@@ -1661,7 +1661,6 @@ public enum QueryError {
     return typeError(expr, st, null, info);
   }
 
-
   /**
    * Throws a type exception.
    * @param expr expression

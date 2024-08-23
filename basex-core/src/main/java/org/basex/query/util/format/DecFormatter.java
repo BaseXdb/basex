@@ -174,7 +174,6 @@ public final class DecFormatter extends FormatUtil {
     return null;
   }
 
-
   /**
    * Returns the decimal format options.
    * @return options

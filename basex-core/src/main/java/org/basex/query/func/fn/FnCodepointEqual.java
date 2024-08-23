@@ -20,7 +20,7 @@ public final class FnCodepointEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Boolean test = test(qc);
-    return test != null ? Bln.get(test.booleanValue()) : Empty.VALUE;
+    return test != null ? Bln.get(test) : Empty.VALUE;
   }
 
   @Override
@@ -41,7 +41,7 @@ public final class FnCodepointEqual extends StandardFunc {
     if(value1.isEmpty()) return null;
     final Item value2 = arg(1).atomItem(qc, info);
     if(value2.isEmpty()) return null;
-    return Boolean.valueOf(eq(toToken(value1), toToken(value2)));
+    return eq(toToken(value1), toToken(value2));
   }
 
 
