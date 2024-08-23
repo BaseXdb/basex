@@ -21,18 +21,11 @@ import org.basex.util.*;
 public final class Str extends AStr {
   /** Zero-length string. */
   public static final Str EMPTY = new Str(Token.EMPTY);
-  /** Single-spaced string. */
-  public static final Str SPACE = Str.get(" ");
   /** Key string. */
   public static final Str KEY = Str.get("key");
   /** Value string. */
   public static final Str VALUE = Str.get("value");
-  /** Tab string. */
-  public static final Str TAB = Str.get("\t");
-  /** Newline string. */
-  public static final Str NL = Str.get("\n");
-  /** Carriage return string. */
-  public static final Str CR = Str.get("\r");
+
 
   /**
    * Constructor.
@@ -58,6 +51,15 @@ public final class Str extends AStr {
    */
   public static Str get(final byte[] value) {
     return value.length == 0 ? EMPTY : new Str(value);
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param cp codepoint
+   * @return instance
+   */
+  public static Str get(final int cp) {
+    return new Str(Token.cpToken(cp));
   }
 
   /**

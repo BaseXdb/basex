@@ -199,7 +199,7 @@ public final class DataBuilder {
    * @return pre value of next node
    */
   private int addPI(final ANode node, final int pre, final int par) {
-    final byte[] value = trim(concat(node.name(), SPACE, node.string()));
+    final byte[] value = trim(concat(node.name(), cpToken(' '), node.string()));
     data.text(pre - par, value, Data.PI);
     data.insert(data.meta.size);
     return pre + 1;

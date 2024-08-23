@@ -55,20 +55,8 @@ public final class Token {
   public static final byte[] MIN_LONG = token("-9223372036854775808");
   /** Minimum integer. */
   public static final byte[] MIN_INT = token("-2147483648");
-  /** Space. */
-  public static final byte[] SPACE = { ' ' };
-  /** Number '0'. */
-  public static final byte[] ZERO = { '0' };
   /** Number '-0'. */
   public static final byte[] NEGATIVE_ZERO = { '-', '0' };
-  /** Number '1'. */
-  public static final byte[] ONE = { '1' };
-  /** Slash. */
-  public static final byte[] SLASH = { '/' };
-  /** Colon. */
-  public static final byte[] COLON = { ':' };
-  /** Dollar. */
-  public static final byte[] DOLLAR = { '$' };
 
   /** Comparator for byte arrays. */
   public static final Comparator<byte[]> COMPARATOR = Token::compare;
@@ -132,7 +120,7 @@ public final class Token {
    * @return string
    */
   public static String string(final byte[] token, final int start, final int length) {
-    if(length <= 0) return "";
+    if(length == 0) return "";
     /// check if string contains non-ascii characters
     final int e = start + length;
     for(int p = start; p < e; ++p) {
@@ -391,7 +379,7 @@ public final class Token {
    * @return integer value in byte array
    */
   public static byte[] token(final int integer) {
-    if(integer == 0) return ZERO;
+    if(integer == 0) return cpToken('0');
     if(integer == Integer.MIN_VALUE) return MIN_INT;
 
     int n = integer;
@@ -532,7 +520,7 @@ public final class Token {
   private static byte[] tok(final double value) {
     if(value == Double.POSITIVE_INFINITY) return INF;
     if(value == Double.NEGATIVE_INFINITY) return NEGATVE_INF;
-    if(value == 0) return 1 / value > 0 ? ZERO : NEGATIVE_ZERO;
+    if(value == 0) return 1 / value > 0 ? cpToken('0') : NEGATIVE_ZERO;
     if(Double.isNaN(value)) return NAN;
     final double a = Math.abs(value);
     if(a < 1.0e6) {

@@ -531,7 +531,7 @@ public class CmpG extends Cmp {
           // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1}* | self::Q{URI2}*
           for(final Item item : value) {
             final byte[] uri = item.string(info);
-            if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.COLON, uri));
+            if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.cpToken(':'), uri));
           }
           if(qnames.size() == value.size()) part = NamePart.URI;
         } else if(NAME.is(func)) {

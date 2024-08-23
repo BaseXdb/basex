@@ -165,7 +165,7 @@ final class DialogResources extends BaseXBack {
    */
   private void filter() {
     final byte[] filterPath = ResourceNode.preparePath(token(filterText.getText()));
-    if(eq(filterPath, SLASH)) {
+    if(eq(filterPath, cpToken('/'))) {
       refreshFolder(root);
       return;
     }

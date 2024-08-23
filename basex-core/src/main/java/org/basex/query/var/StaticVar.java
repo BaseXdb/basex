@@ -124,7 +124,7 @@ public final class StaticVar extends StaticDecl {
    * @return identifier
    */
   public byte[] id() {
-    return Token.concat(Token.DOLLAR, name.unique());
+    return Token.concat(Token.cpToken('$'), name.unique());
   }
 
   /**
@@ -132,7 +132,7 @@ public final class StaticVar extends StaticDecl {
    * @return name
    */
   private String name() {
-    return Strings.concat(Token.DOLLAR, name.string());
+    return Strings.concat(Token.cpToken('$'), name.string());
   }
 
   /**

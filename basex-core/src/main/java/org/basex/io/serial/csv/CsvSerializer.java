@@ -66,9 +66,9 @@ abstract class CsvSerializer extends StandardSerializer {
           throw CSV_SERIALIZE_X_X.getIO("Output must be put into quotes", txt);
 
         if(quotes && (delim || special)) tb.add('"');
-        final int tl = txt.length;
-        for(int t = 0; t < tl; t += cl(txt, t)) {
-          final int cp = cp(txt, t);
+        final TokenParser tp = new TokenParser(txt);
+        while(tp.more()) {
+          final int cp = tp.next();
           if(backslashes) {
             if(cp == '\n') tb.add("\\n");
             else if(cp == '\r') tb.add("\\r");

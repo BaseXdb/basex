@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  */
 public final class FnTokenize extends RegEx {
   /** Default pattern. */
-  private static final byte[] DEFAULT = { ' ' };
+  private static final byte[] DEFAULT = Token.cpToken(' ');
   /** Placeholder for default search. */
   private static final byte[] WHITESPACE = Token.token("\\s+");
 
@@ -131,7 +131,7 @@ public final class FnTokenize extends RegEx {
 
     // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
     if(NORMALIZE_SPACE.is(value) && pattern instanceof Str &&
-        Token.eq(((Str) pattern).string(), Token.SPACE)) {
+        Token.eq(((Str) pattern).string(), Token.cpToken(' '))) {
       final Expr arg = value.args().length == 1 ? value.arg(0) : ContextValue.get(cc, info);
       return cc.function(TOKENIZE, info, arg);
     }

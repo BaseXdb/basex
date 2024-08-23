@@ -47,7 +47,7 @@ public interface JsonConstants {
   /** Supported data types. */
   byte[][] TYPES = { OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, NULL };
   /** Plural. */
-  byte[] S = { 's' };
+  byte[] S = cpToken('s');
   /** Global data type attributes. */
   byte[][] ATTRS = {
     concat(OBJECT, S), concat(ARRAY, S), concat(STRING, S),

@@ -15,6 +15,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.table.TableData.TableCol;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * This is the header of the table view.
@@ -159,7 +160,7 @@ final class TableHeader extends BaseXPanel {
     g.setFont(bfont);
 
     o = !header && clicked ? 1 : 0;
-    final byte[] reset = { 'x' };
+    final byte[] reset = Token.cpToken('x');
     x += (bs - BaseXLayout.width(g, reset)) / 2.0d;
     BaseXLayout.chopString(g, reset, (int) x + o, hh + o + 1, w, fsz);
   }

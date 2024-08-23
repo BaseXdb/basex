@@ -21,7 +21,7 @@ public final class BinHex extends BinFn {
     if(string == null) return Empty.VALUE;
 
     // add leading zero
-    if((string.length & 1) != 0) string = concat(ZERO, string);
+    if((string.length & 1) != 0) string = concat(cpToken('0'), string);
     try {
       return B64.get(Hex.parse(string, info));
     } catch(final QueryException ex) {

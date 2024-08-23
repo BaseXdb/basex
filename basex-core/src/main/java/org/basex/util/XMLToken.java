@@ -18,9 +18,6 @@ import org.basex.util.similarity.*;
 public final class XMLToken {
   /** Index for all HTML entities (lazy initialization). */
   private static TokenMap entities;
-  /** The underscore. */
-  private static final byte[] UNDERSCORE = { '_' };
-
   /** Hidden constructor. */
   private XMLToken() { }
 
@@ -170,7 +167,7 @@ public final class XMLToken {
     // lax encoding: trim whitespace
     final byte[] nm = lax ? trim(name) : name;
     final int nl = nm.length;
-    if(nl == 0) return UNDERSCORE;
+    if(nl == 0) return cpToken('_');
 
     for(int n = 0; n < nl; n += cl(nm, n)) {
       int cp = cp(nm, n);
@@ -207,7 +204,7 @@ public final class XMLToken {
    * @param cp char
    */
   private static void addEsc(final TokenBuilder tb, final int cp) {
-    tb.addByte(UNDERSCORE[0]);
+    tb.addByte((byte) '_');
     final int a = cp >>> 12;
     tb.addByte((byte) (a + (a > 9 ? 87 : '0')));
     final int b = cp >>> 8 & 0x0F;

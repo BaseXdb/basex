@@ -183,9 +183,9 @@ public interface DataText {
   byte[] PI_C = token("?>");
 
   /** Element output. */
-  byte[] ELEM_O = { '<' };
+  byte[] ELEM_O = cpToken('<');
   /** Element output. */
-  byte[] ELEM_C = { '>' };
+  byte[] ELEM_C = cpToken('>');
   /** Element output. */
   byte[] ELEM_OS = token("</");
   /** Element output. */
@@ -205,7 +205,7 @@ public interface DataText {
   /** Processing instruction output. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
-  byte[] ATT = { '@' };
+  byte[] ATT = cpToken('@');
   /** CDATA output. */
   byte[] CDATA_O = token("<![CDATA[");
   /** CDATA output. */

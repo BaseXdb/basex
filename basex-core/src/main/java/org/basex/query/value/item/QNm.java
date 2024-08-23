@@ -90,7 +90,7 @@ public final class QNm extends Item {
    * @param uri namespace uri
    */
   public QNm(final byte[] prefix, final String local, final byte[] uri) {
-    this(concat(prefix, COLON, token(local)), uri);
+    this(concat(prefix, cpToken(':'), token(local)), uri);
   }
 
   /**
@@ -110,7 +110,7 @@ public final class QNm extends Item {
    */
   public QNm(final QName name) {
     this(token(name.getPrefix().isEmpty() ? name.getLocalPart() :
-      concat(name.getPrefix(), COLON, name.getLocalPart())), token(name.getNamespaceURI()));
+      concat(name.getPrefix(), cpToken(':'), name.getLocalPart())), token(name.getNamespaceURI()));
   }
 
   @Override
@@ -263,7 +263,7 @@ public final class QNm extends Item {
     final byte[] u = uri();
     if(ns != null && Token.eq(u, ns)) return local();
     final byte[] p = NSGlobal.prefix(u);
-    return p.length != 0 ? concat(p, COLON, local()) : unique();
+    return p.length != 0 ? concat(p, cpToken(':'), local()) : unique();
   }
 
   /**

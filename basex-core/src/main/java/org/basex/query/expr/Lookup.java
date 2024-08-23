@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  */
 public final class Lookup extends Arr {
   /** Wildcard string. */
-  public static final Str WILDCARD = Str.get(new byte[] { '*' });
+  public static final Str WILDCARD = Str.get('*');
 
   /**
    * Constructor.

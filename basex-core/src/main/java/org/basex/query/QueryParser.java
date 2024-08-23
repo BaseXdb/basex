@@ -2185,7 +2185,9 @@ public class QueryParser extends InputParser {
     if(consume("Q{")) {
       // name test: Q{uri}*
       final byte[] uri = bracedURILiteral();
-      if(consume('*')) return new NameTest(new QNm(COLON, uri), NamePart.URI, type, sc.elemNS);
+      if(consume('*')) {
+        return new NameTest(new QNm(cpToken(':'), uri), NamePart.URI, type, sc.elemNS);
+      }
     }
     pos = p;
 
@@ -2205,7 +2207,7 @@ public class QueryParser extends InputParser {
         NamePart part = NamePart.FULL;
         if(!name.hasPrefix() && consume(":*")) {
           // name test: prefix:*
-          name = new QNm(concat(name.string(), COLON));
+          name = new QNm(concat(name.string(), cpToken(':')));
           part = NamePart.URI;
         }
         // name test: prefix:name, name, Q{uri}name
@@ -2707,7 +2709,7 @@ public class QueryParser extends InputParser {
       if(constr ? consume('`') && consume('{') : consume('{') && !consume('{')) {
         if(!tb.isEmpty()) el.add(Str.get(tb.next()));
         final Expr expr = expr();
-        if(expr != null) el.add(Function.STRING_JOIN.get(info(), expr, Str.SPACE));
+        if(expr != null) el.add(Function.STRING_JOIN.get(info(), expr, Str.get(' ')));
         skipWs();
         check('}');
         if(constr) check('`');

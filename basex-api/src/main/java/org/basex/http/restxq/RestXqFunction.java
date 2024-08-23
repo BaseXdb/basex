@@ -462,14 +462,14 @@ public final class RestXqFunction extends WebFunction {
       } else if(err.endsWith(":*")) {
         final byte[] prefix = token(err.substring(0, err.length() - 2));
         if(!XMLToken.isNCName(prefix)) throw error(INV_CODE_X, err);
-        name = new QNm(concat(prefix, COLON), function.sc);
+        name = new QNm(concat(prefix, cpToken(':')), function.sc);
         part = NamePart.URI;
       } else {
         final Matcher m = EQNAME.matcher(err);
         if(m.matches()) {
           final byte[] uri = token(m.group(1)), local = token(m.group(2));
           if(local.length == 1 && local[0] == '*') {
-            name = new QNm(COLON, uri);
+            name = new QNm(cpToken(':'), uri);
             part = NamePart.URI;
           } else {
             if(!XMLToken.isNCName(local) || !Uri.get(uri).isValid()) throw error(INV_CODE_X, err);

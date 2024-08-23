@@ -21,9 +21,7 @@ public class FnChar extends StandardFunc {
     if(value instanceof Int) {
       // codepoint integer
       final long cp = toLong(value, 1);
-      if(cp >= 0 && cp <= Integer.MAX_VALUE && XMLToken.valid((int) cp)) {
-        return Str.get(new TokenBuilder().add((int) cp).finish());
-      }
+      if(cp >= 0 && cp <= Integer.MAX_VALUE && XMLToken.valid((int) cp)) return Str.get((int) cp);
     } else {
       // codepoint string
       final byte[] token = toToken(value);
@@ -31,9 +29,9 @@ public class FnChar extends StandardFunc {
       if(nl == 2 && token[0] == '\\') {
         // backslash-escape sequence
         final int cp = token[1];
-        if(cp == 't') return Str.TAB;
-        if(cp == 'n') return Str.NL;
-        if(cp == 'r') return Str.CR;
+        if(cp == 't') return Str.get('\t');
+        if(cp == 'n') return Str.get('\n');
+        if(cp == 'r') return Str.get('\r');
       } else if(nl > 0) {
         // HTML character reference name
         final byte[] result = XMLToken.getEntity(token);

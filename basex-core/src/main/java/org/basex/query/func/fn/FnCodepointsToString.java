@@ -27,12 +27,12 @@ public final class FnCodepointsToString extends StandardFunc {
     final Expr values = mergeExprs();
 
     // input is single integer
-    if(singleInt) return toStr(values.item(qc, info).itr(info), info);
+    if(singleInt) return Str.get(toCodepoint(values.item(qc, info).itr(info), info));
 
     // current input is single item
     final Iter iter = values.atomIter(qc, info);
     final long size = iter.size();
-    if(size == 1) return toStr(toLong(iter.next()), info);
+    if(size == 1) return Str.get(toCodepoint(toLong(iter.next()), info));
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Seq.initialCapacity(size));
@@ -69,17 +69,6 @@ public final class FnCodepointsToString extends StandardFunc {
   @Override
   protected boolean values(final boolean limit, final CompileContext cc) {
     return super.values(true, cc);
-  }
-
-  /**
-   * Converts a single codepoint to a string.
-   * @param value value
-   * @param info input info (can be {@code null})
-   * @return codepoint as string
-   * @throws QueryException query exception
-   */
-  private static Str toStr(final long value, final InputInfo info) throws QueryException {
-    return Str.get(Token.cpToken(toCodepoint(value, info)));
   }
 
   /**
