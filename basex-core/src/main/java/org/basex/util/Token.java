@@ -99,6 +99,14 @@ public final class Token {
   private static final int[] INTSIZE = {
     9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, Integer.MAX_VALUE
   };
+  /** Single characters. */
+  private static final byte[][] CHAR;
+
+  static {
+    final int nl = 0x80;
+    CHAR = new byte[nl][];
+    for(int n = 0; n < nl; n++) CHAR[n] = new byte[] { (byte) n };
+  }
 
   /** Hidden constructor. */
   private Token() { }
@@ -180,6 +188,9 @@ public final class Token {
   public static byte[] token(final String string) {
     final int sl = string.length();
     if(sl == 0) return EMPTY;
+    if(sl == 1 || sl == 2 && Character.isHighSurrogate(string.charAt(0))) {
+      return cpToken(string.codePointAt(0));
+    }
     final byte[] b = new byte[sl];
     for(int s = 0; s < sl; ++s) {
       final char c = string.charAt(s);
@@ -317,9 +328,7 @@ public final class Token {
    * @return token
    */
   public static byte[] cpToken(final int ch) {
-    if(ch <= 0x7F) return new byte[] {
-      (byte) ch
-    };
+    if(ch <= 0x7F) return CHAR[ch];
     if(ch <= 0x7FF) return new byte[] {
       (byte) (ch >>  6 & 0x1F | 0xC0), (byte) (ch & 0x3F | 0x80)
     };
