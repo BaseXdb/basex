@@ -272,7 +272,7 @@ public final class WesternTokenizer extends Tokenizer {
       return token;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(token, i)) tb.add(uc(cp(token, i)));
+    forEachCp(token, cp -> tb.add(uc(cp)));
     return tb.finish();
   }
 
@@ -289,7 +289,7 @@ public final class WesternTokenizer extends Tokenizer {
       return token;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(token, i)) tb.add(lc(cp(token, i)));
+    forEachCp(token, cp -> tb.add(lc(cp)));
     return tb.finish();
   }
 

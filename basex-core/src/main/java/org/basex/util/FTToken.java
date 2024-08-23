@@ -39,14 +39,13 @@ public final class FTToken {
   public static byte[] noDiacritics(final byte[] token) {
     final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder(tl);
-    for(int t = 0; t < tl; t += Token.cl(token, t)) {
-      int cp = Token.cp(token, t);
-      if(cp >= 0x80) {
-        if(isCombining(Character.getType(cp))) continue;
-        cp = noDiacritics(cp);
+    Token.forEachCp(token, cp -> {
+      if(cp < 0x80) {
+        tb.add(cp);
+      } else if(!isCombining(Character.getType(cp))) {
+        tb.add(noDiacritics(cp));
       }
-      tb.add(cp);
-    }
+    });
     return tb.finish();
   }
 

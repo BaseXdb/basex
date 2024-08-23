@@ -307,7 +307,7 @@ public final class Token {
       return cps;
     }
     final IntList list = new IntList(tl);
-    for(int t = 0; t < tl; t += cl(token, t)) list.add(cp(token, t));
+    forEachCp(token, cp -> list.add(cp));
     return list.finish();
   }
 
@@ -339,6 +339,16 @@ public final class Token {
    */
   public static int cpLength(final int ch) {
     return ch <= 0x7F ? 1 : ch <= 0x7FF ? 2 : ch <= 0xFFFF ? 3 : 4;
+  }
+
+  /**
+   * Applies an operation with the codepoints of a token.
+   * @param token token
+   * @param op operation
+   */
+  public static void forEachCp(final byte[] token, final IntConsumer op) {
+    final int tl = token.length;
+    for(int t = 0; t < tl; t += cl(token, t)) op.accept(cp(token, t));
   }
 
   /**
@@ -1063,15 +1073,13 @@ public final class Token {
   public static byte[][] split(final byte[] token, final int separator, final boolean empty) {
     final TokenList split = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
-    final int tl = token.length;
-    for(int t = 0; t < tl; t += cl(token, t)) {
-      final int cp = cp(token, t);
+    forEachCp(token, cp -> {
       if(cp == separator) {
         if(empty || !tb.isEmpty()) split.add(tb.next());
       } else {
         tb.add(cp);
       }
-    }
+    });
     if(empty || !tb.isEmpty()) split.add(tb.finish());
     return split.finish();
   }
@@ -1119,11 +1127,7 @@ public final class Token {
     if(!contains(token, search)) return token;
 
     final TokenBuilder tb = new TokenBuilder(token.length);
-    final int tl = token.length;
-    for(int i = 0; i < tl; i += cl(token, i)) {
-      final int c = cp(token, i);
-      tb.add(c == search ? replace : c);
-    }
+    forEachCp(token, cp -> tb.add(cp == search ? replace : cp));
     return tb.finish();
   }
 
@@ -1207,11 +1211,8 @@ public final class Token {
       return tb.finish();
     }
     // remove character
-    final TokenBuilder tb = new TokenBuilder();
-    for(int t = 0; t < tl; t += cl(token, t)) {
-      final int cp = cp(token, t);
-      if(cp != ch) tb.add(cp);
-    }
+    final TokenBuilder tb = new TokenBuilder(tl);
+    forEachCp(token, cp -> { if(cp != ch) tb.add(cp); });
     return tb.finish();
   }
 
