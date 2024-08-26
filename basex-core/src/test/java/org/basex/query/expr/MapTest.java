@@ -112,20 +112,33 @@ public final class MapTest extends SandboxTest {
         + "list; declare record list(value as item()*, next? as list); $v", true);
     query("declare variable $v := {'value':42,'next':{'value':43,'next':{'value':44,'next':()}}} "
         + "instance of list; declare record list(value as item()*, next? as list); $v", false);
+    // recursive RecordType.instanceOf
     query("declare record list1(value, next? as list1);declare record list2(value, next? as list2);"
         + "fn($l as list2) as list1 {$l} ({'value': ()})", "{\"value\":()}");
+    // recursive RecordType.eq and RecordType.instanceOf
     query("declare record list1(value, next? as list1);declare record list2(value, next? as list2);"
         + "declare function local:f1($l as list1) as list2 {$l};declare function local:f2($f as fn("
         + "list2) as list1, $l as list1) as list2 {$f($l)};local:f2(local:f1#1, {'value': ()})",
         "{\"value\":()}");
+    // recursive RecordType.eq and RecordType.instanceOf
     query("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 {$f($l)};"
         + "declare record list1(value, next? as list1);declare record list2(value, next? as record("
         + "value, next? as list2));local:f2(fn($l as list1) as list2 {$l}, {'value': 42, 'next': {"
         + "'value': 43}})", "{\"value\":42,\"next\":{\"value\":43}}");
+    // recursive RecordType.union
+    query("declare record list1(value, next? as list1);declare record list2(item, next? as list2);"
+        + "fn($l1 as list1, $l2 as list2) {map:merge(($l1, $l2))} ({'value':42,'next':{'value':43}}"
+        + ",{'item':44,'next':{'item':45}})", "{\"value\":42,\"next\":{\"value\":43},\"item\":44}");
+    // recursive RecordType.intersect
+    query("declare record list1(next? as list1, x, y?);declare record list2(next? as list2, x, z?);"
+        + "let $f := fn($r as record(next? as list2, x as xs:boolean)) as xs:boolean {$r?x} let $r "
+        + "as record(next? as list1, x as xs:untypedAtomic) := {'x':<a>0</a>} return $f($r)",
+        "false");
 
     error("declare variable $v as list := {'value':42,'next':{'value':43,'next':{'value':44,"
         + "'next':()}}}; declare record list(value as item()*, next? as list); $v",
         INVCONVERT_X_X_X);
+    // recursive RecordType.eq and RecordType.instanceOf
     error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 {$f($l)};"
         + "declare record list1(value, next? as list1);declare record list2(value, next? as record("
         + "value as xs:string, next? as list2));local:f2(fn($l as list1) as list2 {$l}, {'value': "

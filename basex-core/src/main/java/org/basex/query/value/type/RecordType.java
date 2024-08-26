@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.Set;
 
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
@@ -141,12 +142,8 @@ public class RecordType extends MapType implements Iterable<byte[]> {
       if(fst.occ != rtfst.occ) return false;
       final Type ft = fst.type, rtft = rtfst.type;
       if(ft instanceof RecordType && rtft instanceof RecordType) {
-        Pair pair = new Pair(ft, rtft);
-        if(!pairs.contains(pair)) {
-          Set<Pair> activePairs = pairs.isEmpty() ? new HashSet<>() : pairs;
-          activePairs.add(pair);
-          if(!((RecordType) ft).eq(rtft, activePairs)) return false;
-        }
+        final Pair pair = new Pair(ft, rtft);
+        if(!pairs.contains(pair) && !((RecordType) ft).eq(rtft, pair.addTo(pairs))) return false;
       }
       else if(!ft.eq(rtft)) return false;
     }
@@ -197,12 +194,9 @@ public class RecordType extends MapType implements Iterable<byte[]> {
               if(!fst.occ.instanceOf(rtfst.occ)) return false;
               final Type ft = fst.type, rtft = rtfst.type;
               if(ft instanceof RecordType && rtft instanceof RecordType) {
-                Pair pair = new Pair(ft, rtft);
-                if(!pairs.contains(pair)) {
-                  Set<Pair> activePairs = pairs.isEmpty() ? new HashSet<>() : pairs;
-                  activePairs.add(pair);
-                  if(!((RecordType) ft).instanceOf(rtft, activePairs)) return false;
-                }
+                final Pair pair = new Pair(ft, rtft);
+                if(!pairs.contains(pair) && !((RecordType) ft).instanceOf(rtft, pair.addTo(pairs)))
+                  return false;
               }
               else if(!ft.instanceOf(rtft)) return false;
             }
@@ -231,6 +225,18 @@ public class RecordType extends MapType implements Iterable<byte[]> {
 
   @Override
   public Type union(final Type type) {
+    return union(type, emptySet());
+  }
+
+  /**
+   * Computes the union between this type and the given one, i.e. the least common ancestor of both
+   * types in the type hierarchy. This implementation uses the <code>pairs</code> argument to keep
+   * track of pairs of RecordTypes being checked, in order to prevent infinite recursion.
+   * @param type other type
+   * @param pairs pairs of RecordTypes that are currently being checked, or have been checked before
+   * @return union type
+   */
+  public Type union(final Type type, final Set<Pair> pairs) {
     if(type instanceof ChoiceItemType) return type.union(this);
     if(type == SeqType.MAP) return SeqType.MAP;
     if(instanceOf(type)) return type;
@@ -244,7 +250,19 @@ public class RecordType extends MapType implements Iterable<byte[]> {
         if(rt.getFields().contains(name)) {
           // common field
           final Field rtf = rt.getFields().get(name);
-          fld.put(name, new Field(f.optional || rtf.optional, f.seqType().union(rtf.seqType())));
+          final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
+          final Type ft = fst.type, rtft = rtfst.type;
+          final SeqType union;
+          if(ft instanceof RecordType && rtft instanceof RecordType && !fst.zero()
+              && !rtfst.zero()) {
+            final Pair pair = new Pair(ft, rtft);
+            if(pairs.contains(pair)) return SeqType.RECORD;
+            union = SeqType.get(((RecordType) ft).union(rtft, pair.addTo(pairs)),
+                fst.occ.union(rtfst.occ));
+          } else {
+            union = fst.union(rtfst);
+          }
+          fld.put(name, new Field(f.optional || rtf.optional, union));
         } else {
           // field missing in type
           fld.put(name, new Field(true, f.seqType));
@@ -268,6 +286,19 @@ public class RecordType extends MapType implements Iterable<byte[]> {
 
   @Override
   public Type intersect(final Type type) {
+    return intersect(type, emptySet());
+  }
+
+  /**
+   * Computes the intersection between this type and the given one, i.e. the least specific type
+   * that is subtype of both types. If no such type exists, {@code null} is returned. This
+   * implementation uses the <code>pairs</code> argument to keep track of pairs of RecordTypes being
+   * checked, in order to prevent infinite recursion.
+   * @param type other type
+   * @param pairs pairs of RecordTypes that are currently being checked, or have been checked before
+   * @return intersection type or {@code null}
+   */
+  public Type intersect(final Type type, final Set<Pair> pairs) {
     if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
@@ -280,7 +311,18 @@ public class RecordType extends MapType implements Iterable<byte[]> {
       if(rt.getFields().contains(name)) {
         // common field
         final Field rtf = rt.getFields().get(name);
-        final SeqType is = f.seqType().intersect(rtf.seqType());
+        final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
+        final Type ft = fst.type, rtft = rtfst.type;
+        final SeqType is;
+        if(ft instanceof RecordType && rtft instanceof RecordType) {
+          final Pair pair = new Pair(ft, rtft);
+          if(pairs.contains(pair))
+            return null;
+          final Type it = ((RecordType) ft).intersect(rtft, pair.addTo(pairs));
+          is = it == null ? null : SeqType.get(it, fst.occ.intersect(rtfst.occ));
+        } else {
+          is = fst.intersect(rtfst);
+        }
         if(is == null) return null;
         fld.put(name, new Field(f.optional && rtf.optional, is));
       } else {
@@ -392,6 +434,14 @@ public class RecordType extends MapType implements Iterable<byte[]> {
       final Field other = (Field) obj;
       return optional == other.optional && seqType().equals(other.seqType());
     }
+
+    @Override
+    public String toString() {
+      final QueryString qs = new QueryString();
+      if(optional) qs.token('?');
+      qs.token(AS).token(seqType());
+      return qs.toString();
+    }
   }
 
   /**
@@ -424,6 +474,27 @@ public class RecordType extends MapType implements Iterable<byte[]> {
     @Override
     public int hashCode() {
       return o1.hashCode() + o2.hashCode();
+    }
+
+    /**
+     * Add this {@code Pair} to the given set of {@code Pair}s, creating a new set, if the given set
+     * is empty.
+     * @param pairs set of {@code Pair}s
+     * @return the augmented set of pairs
+     */
+    public Set<Pair> addTo(final Set<Pair> pairs) {
+      if(pairs.isEmpty()) {
+        Set<Pair> set = new HashSet<>();
+        set.add(this);
+        return set;
+      }
+      pairs.add(this);
+      return pairs;
+    }
+
+    @Override
+    public String toString() {
+      return new QueryString().token('[').token(o1).token(',').token(o2).token(']').toString();
     }
   }
 
@@ -489,8 +560,18 @@ public class RecordType extends MapType implements Iterable<byte[]> {
     }
 
     @Override
+    public Type union(final Type tp, final Set<Pair> pairs) {
+      return type.union(tp, pairs);
+    }
+
+    @Override
     public Type intersect(final Type tp) {
       return type.intersect(tp);
+    }
+
+    @Override
+    public Type intersect(final Type tp, final Set<Pair> pairs) {
+      return type.intersect(tp, pairs);
     }
 
     @Override
