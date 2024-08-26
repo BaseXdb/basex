@@ -89,7 +89,7 @@ public class QueryParser extends InputParser {
   /** Named record types. */
   private final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
   /** Named record type references. */
-  private final QNmMap<RecordType.Ref> recordTypeRefs = new QNmMap<>();
+  private final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
@@ -3300,9 +3300,9 @@ public class QueryParser extends InputParser {
       if(type == null) {
         st = declaredTypes.get(name);
         if(st == null) {
-          RecordType.Ref ref  = recordTypeRefs.get(name);
+          RecordType ref  = recordTypeRefs.get(name);
           if(ref == null) {
-            ref = new RecordType.Ref(name, info());
+            ref = new RecordType(name, info());
             recordTypeRefs.put(name, ref);
           }
           type = ref;

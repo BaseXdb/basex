@@ -119,9 +119,9 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
-      r1 = SeqType.get(new RecordType.Ref(r1Name, ii), EXACTLY_ONE),
+      r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
       // r2 record(next? as r2, x)
-      r2 = SeqType.get(new RecordType.Ref(r2Name, ii), EXACTLY_ONE);
+      r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
 
     fld1.put(Token.token("next"), new Field(true, r1));
     fld1.put(Token.token("x"), new Field(false, ITEM_ZM));
@@ -129,10 +129,10 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new Field(true, r2));
     fld2.put(Token.token("x"), new Field(false, ITEM_ZM));
 
-    final QNmMap<Ref> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r1Name, (RecordType.Ref) r1.type);
-    recordTypeRefs.put(r2Name, (RecordType.Ref) r2.type);
+    recordTypeRefs.put(r1Name, (RecordType) r1.type);
+    recordTypeRefs.put(r2Name, (RecordType) r2.type);
     declaredRecordTypes.put(r1Name, new RecordType(false, fld1));
     declaredRecordTypes.put(r2Name, new RecordType(false, fld2));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
@@ -297,9 +297,9 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
-      r1 = SeqType.get(new RecordType.Ref(r1Name, ii), EXACTLY_ONE),
+      r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
       // r2 record(next? as r2, x)
-      r2 = SeqType.get(new RecordType.Ref(r2Name, ii), EXACTLY_ONE);
+      r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
 
     fld1.put(Token.token("next"), new Field(true, r1));
     fld1.put(Token.token("x"), new Field(false, ITEM_ZM));
@@ -307,10 +307,10 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new Field(true, r2));
     fld2.put(Token.token("x"), new Field(false, ITEM_ZM));
 
-    final QNmMap<Ref> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r1Name, (RecordType.Ref) r1.type);
-    recordTypeRefs.put(r2Name, (RecordType.Ref) r2.type);
+    recordTypeRefs.put(r1Name, (RecordType) r1.type);
+    recordTypeRefs.put(r2Name, (RecordType) r2.type);
     declaredRecordTypes.put(r1Name, new RecordType(false, fld1));
     declaredRecordTypes.put(r2Name, new RecordType(false, fld2));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
@@ -524,9 +524,9 @@ public final class SeqTypeTest {
       // record(b as xs:integer?, *)
       r7 = SeqType.get(new RecordType(true, fld7), EXACTLY_ONE),
       // r8 record(next? as r8, x, y)
-      r8 = SeqType.get(new RecordType.Ref(r8Name, ii), EXACTLY_ONE),
+      r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
       // r9 record(next? as r8, x, z)
-      r9 = SeqType.get(new RecordType.Ref(r9Name, ii), EXACTLY_ONE),
+      r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE),
       // r10 record(next? as record(*), x, y, z)
       r10 = SeqType.get(new RecordType(false, fld10), EXACTLY_ONE);
 
@@ -538,10 +538,10 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new Field(false, ITEM_ZM));
     fld9.put(Token.token("z"), new Field(false, ITEM_ZM));
 
-    final QNmMap<Ref> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r8Name, (RecordType.Ref) r8.type);
-    recordTypeRefs.put(r9Name, (RecordType.Ref) r9.type);
+    recordTypeRefs.put(r8Name, (RecordType) r8.type);
+    recordTypeRefs.put(r9Name, (RecordType) r9.type);
     declaredRecordTypes.put(r8Name, new RecordType(false, fld8));
     declaredRecordTypes.put(r9Name, new RecordType(false, fld9));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
@@ -770,9 +770,9 @@ public final class SeqTypeTest {
       // record(b as xs:integer?, *)
       r7 = SeqType.get(new RecordType(true, fld7), EXACTLY_ONE),
       // r8 record(next? as r8, x, y)
-      r8 = SeqType.get(new RecordType.Ref(r8Name, ii), EXACTLY_ONE),
+      r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
       // r9 record(next? as r8, x, z)
-      r9 = SeqType.get(new RecordType.Ref(r9Name, ii), EXACTLY_ONE);
+      r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE);
 
     fld8.put(Token.token("next"), new Field(true, r8));
     fld8.put(Token.token("x"), new Field(false, ITEM_ZM));
@@ -782,10 +782,10 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new Field(false, ITEM_ZM));
     fld9.put(Token.token("z"), new Field(false, ITEM_ZM));
 
-    final QNmMap<Ref> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r8Name, (RecordType.Ref) r8.type);
-    recordTypeRefs.put(r9Name, (RecordType.Ref) r9.type);
+    recordTypeRefs.put(r8Name, (RecordType) r8.type);
+    recordTypeRefs.put(r9Name, (RecordType) r9.type);
     declaredRecordTypes.put(r8Name, new RecordType(false, fld8));
     declaredRecordTypes.put(r9Name, new RecordType(false, fld9));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);

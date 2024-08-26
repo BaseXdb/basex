@@ -19,9 +19,9 @@ import org.basex.util.*;
  */
 public class MapType extends FType {
   /** Key type of the map. */
-  public final Type keyType;
+  public Type keyType;
   /** Value types (can be {@code null}, indicating that no type was specified). */
-  public final SeqType valueType;
+  public SeqType valueType;
 
   /**
    * Constructor.
