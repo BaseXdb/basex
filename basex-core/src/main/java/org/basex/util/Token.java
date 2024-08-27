@@ -1119,9 +1119,9 @@ public final class Token {
    * @return chopped token
    */
   public static byte[] chop(final byte[] token, final int max) {
-    if(token.length <= max) return token;
+    if(length(token) <= max) return token;
     final TokenBuilder tb = new TokenBuilder(max + 3);
-    for(int t = 0; t < max; t += cl(token, t)) tb.add(cp(token, t));
+    for(int c = 0, t = 0; c < max; c++, t += cl(token, t)) tb.add(cp(token, t));
     return tb.add('.').add('.').add('.').finish();
   }
 

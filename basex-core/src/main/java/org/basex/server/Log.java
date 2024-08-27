@@ -121,7 +121,8 @@ public final class Log implements QueryTracer {
       final String address, final String user) {
 
     // check if logging is disabled
-    if(!sopts.get(StaticOptions.LOG)) return;
+    final String log = sopts.get(StaticOptions.LOG);
+    if(Strings.no(log)) return;
 
     // construct log text
     final Date date = new Date();
@@ -142,7 +143,9 @@ public final class Log implements QueryTracer {
         if(file != null && !file.valid(name)) close();
         if(file == null) file = LogFile.create(name, dir());
         // write log entry
-        file.write(tb.finish());
+        final byte[] token = tb.toArray();
+        file.write(token);
+        if(log.equals("stdout")) Util.println(string(token));
       }
     } catch(final IOException ex) {
       Util.stack(ex);

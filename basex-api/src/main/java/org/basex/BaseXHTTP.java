@@ -286,7 +286,7 @@ public final class BaseXHTTP extends CLI {
             Prop.put(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Prop.put(StaticOptions.LOG, Boolean.toString(false));
+            Prop.put(StaticOptions.LOG, Boolean.FALSE.toString());
             break;
           default:
             throw arg.usage();
