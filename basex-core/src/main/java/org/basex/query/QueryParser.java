@@ -1958,7 +1958,7 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs("~")) {
         final ExprList el = new ExprList(expr);
         do add(el, itemMap()); while(wsConsumeWs("~"));
-        return new CachedValueMap(info(), el.finish());
+        return new ValueMap(info(), el.finish());
       }
     }
     return expr;
@@ -2422,7 +2422,7 @@ public class QueryParser extends InputParser {
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
           params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
-          expr = new CachedValueMap(ii, localVars.resolve(name, ii), enclosedExpr());
+          expr = new ValueMap(ii, localVars.resolve(name, ii), enclosedExpr());
         }
         final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))

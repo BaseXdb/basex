@@ -65,9 +65,9 @@ public final class SimpleMapTest extends SandboxTest {
     check("(1, (2, 3)[. = 2]) ! .", "1\n2", root(List.class));
     check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", root(RangeSeq.class));
     check("<a/> ! . ! .", "<a/>", root(CElem.class));
-    check("(1, 2)[. ! number() = 2]", 2, empty(ItemMap.class));
+    check("(1, 2)[. ! number() = 2]", 2, empty(DualMap.class));
 
-    check("trace(1) ! (. + 1)", 2, exists(SingleValueMap.class));
+    check("trace(1) ! (. + 1)", 2, exists(ValueMap.class));
     check("<_>1</_>[. = 1] ! trace(.)", "<_>1</_>", exists(TRACE));
   }
 
@@ -75,13 +75,13 @@ public final class SimpleMapTest extends SandboxTest {
   @Test public void types() {
     check("(1, 2)[. != 0] ! .[. = 1]", 1, root(IterFilter.class));
     check("(1, 2)[. != 0] ! <_>{ . }</_>[. = 1]", "<_>1</_>", exists(DualMap.class));
-    check("<_>1</_>[. = 1] ! 2", "2", type(ItemMap.class, "xs:integer?"));
+    check("<_>1</_>[. = 1] ! 2", "2", type(DualMap.class, "xs:integer?"));
     check("<_>4</_>[. = 4] ! (4, 5)[. = 4]", 4, type(DualIterMap.class, "xs:integer*"));
   }
 
   /** Flatten nested operators. */
   @Test public void flatten() {
-    check("(1, 2)[. != 0] ! ((. + .) ! (. * .))", "4\n16", count(SingleValueMap.class, 1));
+    check("(1, 2)[. != 0] ! ((. + .) ! (. * .))", "4\n16", count(ValueMap.class, 1));
     // do not rewrite positional access
     check("(1, 2)[. != 0] ! ((1 to .) ! position())", "1\n1\n2", count(CachedMap.class, 1));
   }

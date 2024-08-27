@@ -1056,13 +1056,13 @@ public final class RewritingsTest extends SandboxTest {
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
-        root(SingleValueMap.class), empty(IterPath.class), empty(IterMap.class));
+        root(ValueMap.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
     check("<a><b/></a>[b ! ..]", "<a><b/></a>", exists(CachedPath.class));
 
     // absolute paths
-    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(DualIterMap.class));
+    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(ValueMap.class));
     check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
     check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
   }
@@ -1812,7 +1812,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // do not generate nested node constructors
     check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()",
-        "x", root(SingleValueMap.class));
+        "x", root(ValueMap.class));
   }
 
   /** Rewritings of positional tests. */
@@ -1999,7 +1999,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Rewrite side-effecting let expressions. */
   @Test public void gh1917() {
     check("let $a := (# basex:nondeterministic #) { <a/> } return $a ! name()",
-        "a", root(SingleValueMap.class));
+        "a", root(ValueMap.class));
   }
 
   /** Rewrite list to replicate. */
@@ -2584,7 +2584,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Rewrite let/where to for. */
   @Test public void gh2058() {
     check("let $a := <a/>[data()] where $a return $a", "", root(IterFilter.class));
-    check("let $a := <a/>[data()] where $a return string($a)", "", root(ItemMap.class));
+    check("let $a := <a/>[data()] where $a return string($a)", "", root(DualMap.class));
   }
 
   /** Rewrite fn:not, comparisons (related to GH-1775). */
@@ -2968,8 +2968,8 @@ public final class RewritingsTest extends SandboxTest {
     check("subsequence((1 to 6) ! (. * 2), 2, 2)", "4\n6", root(DualMap.class));
 
     check(TRUNK.args(" (1 to 10)[. > 7] ! (. * .)"), "64\n81", root(DualMap.class));
-    check(ITEMS_AT.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(ItemMap.class));
-    check(FOOT.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(ItemMap.class));
+    check(ITEMS_AT.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(DualMap.class));
+    check(FOOT.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(DualMap.class));
   }
 
   /** Check existence of paths in predicates. */
@@ -3055,7 +3055,7 @@ public final class RewritingsTest extends SandboxTest {
         "a", root(SUBSTRING_BEFORE));
     check("for $b in <?_ a-1?> group by $c := substring-before($b, '-') " +
         "return ($c, string-length($c))",
-        "a\n1", root(CachedValueMap.class));
+        "a\n1", root(ValueMap.class));
   }
 
   /** Inlined type check. */
@@ -3081,10 +3081,10 @@ public final class RewritingsTest extends SandboxTest {
 
     // GH-2182: EBV tests, rewriting to descendant::text()
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
-    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(ItemMap.class));
+    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(DualMap.class));
 
     // GH-2215: Unexpected exception of mapping double attributes
-    check("boolean((<a/> ! (a, b)))", false, exists(IterPath.class));
+    check("boolean((<a/> ! (a, b)))", false, exists(ValueMap.class));
     check("boolean(count(<T/>//*[@id = '1'] ! (@a, @b)))", false, exists(IterPath.class));
   }
 
@@ -3128,7 +3128,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a>A</a> ! (if(text()) then data() else ())",
         "A", root(DATA), empty(If.class));
     check("<a>A</a> ! (if(text()) then string() else ())",
-        "A", root(ItemMap.class), empty(If.class));
+        "A", root(DualMap.class), empty(If.class));
   }
 
   /** Compare untyped atomics with QNames. */

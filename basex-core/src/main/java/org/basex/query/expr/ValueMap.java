@@ -1,14 +1,13 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-
-import java.util.function.*;
-
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
-import org.basex.query.value.type.*;
+import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Value map expression.
@@ -16,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public abstract class ValueMap extends Mapping {
+public final class ValueMap extends Mapping {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -37,73 +36,94 @@ public abstract class ValueMap extends Mapping {
   public static Expr get(final CompileContext cc, final InputInfo info, final Expr... exprs)
       throws QueryException {
     final int el = exprs.length;
-    return el > 1 ? new CachedValueMap(info, exprs).optimize(cc) : exprs[0];
+    return el > 1 ? new ValueMap(info, exprs).optimize(cc) : exprs[0];
   }
 
   @Override
-  final boolean items() {
-    return false;
-  }
+  public Expr optimize(final CompileContext cc) throws QueryException {
+    flatten(cc);
 
-  @Override
-  public final Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr ex = flattenMaps(cc);
-    if(ex != null) return ex;
     final Expr[] merged = merge(cc);
     if(merged != null) return get(cc, info, merged);
 
     final int el = exprs.length;
     exprType.assign(exprs[el - 1]);
-
-    // use faster implementation for single items
-    if(!(this instanceof SingleValueMap)) {
-      int e = -1;
-      while(++e < el) {
-        final SeqType st = exprs[e].seqType();
-        if(exprs[e].has(Flag.POS) || !(e < el - 1 ? st.one() : st.zeroOrOne())) break;
-      }
-      if(e == el) return copyType(new SingleValueMap(info, exprs));
-    }
     return this;
   }
 
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return new Iter() {
+      QueryFocus qf;
+      Iter iter;
+
+      @Override
+      public Item next() throws QueryException {
+        final QueryFocus focus = qc.focus;
+        try {
+          if(iter == null) {
+            qf = map(qc);
+            iter = exprs[exprs.length - 1].iter(qc);
+          }
+          qc.focus = qf;
+          return iter.next();
+        } finally {
+          qc.focus = focus;
+        }
+      }
+    };
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final QueryFocus focus = qc.focus;
+    try {
+      map(qc);
+      return exprs[exprs.length - 1].value(qc);
+    } finally {
+      qc.focus = focus;
+    }
+  }
+
   /**
-   * Flattens nested map expressions.
-   * @param cc compilation context
-   * @return optimized expression or {@code null}
+   * Performs value mapping for all operands except for the last.
+   * @param qc query context
+   * @return new query focus
    * @throws QueryException query exception
    */
-  private Expr flattenMaps(final CompileContext cc) throws QueryException {
-    // EXPR1 ~ ((ITEM1 ! ITEM2) ~ EXPR2)  ->  EXPR1 ~ ITEM1 ~ ITEM2 ~ EXPR2
-    final ExprList list = new ExprList();
-    for(final Expr expr : exprs) {
-      if(expr instanceof ValueMap || expr instanceof ItemMap) {
-        list.add(expr.args());
-        cc.info(OPTFLAT_X_X, expr, (Supplier<?>) this::description);
-      } else {
-        list.add(expr);
-      }
+  private QueryFocus map(final QueryContext qc) throws QueryException {
+    final QueryFocus qf = new QueryFocus();
+    qf.value = exprs[0].value(qc);
+    qc.focus = qf;
+    final int last = exprs.length - 1;
+    for(int e = 1; e < last; e++) {
+      qf.value = exprs[e].value(qc);
     }
-    return list.size() != exprs.length ? get(cc, info, list.finish()) : null;
+    return qf;
   }
 
   @Override
-  final Expr merge(final Expr expr, final Expr next, final CompileContext cc)
-      throws QueryException {
-    if(!expr.has(Flag.NDT)) {
-      if(!next.has(Flag.CTX)) return next;
-      return inline(expr, next, cc);
-    }
-    return null;
+  boolean items() {
+    return false;
   }
 
   @Override
-  public final boolean equals(final Object obj) {
+  Expr merge(final Expr expr, final Expr next, final CompileContext cc) throws QueryException {
+    return expr.has(Flag.NDT) ? null : next.has(Flag.CTX) ? inline(expr, next, cc) : next;
+  }
+
+  @Override
+  public ValueMap copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new ValueMap(info, Arr.copyAll(cc, vm, exprs)));
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
     return this == obj || obj instanceof ValueMap && super.equals(obj);
   }
 
   @Override
-  public final void toString(final QueryString qs) {
+  public void toString(final QueryString qs) {
     qs.tokens(exprs, " ~ ", true);
   }
 }
