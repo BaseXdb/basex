@@ -145,7 +145,7 @@ public final class Log implements QueryTracer {
         // write log entry
         final byte[] token = tb.toArray();
         file.write(token);
-        if(log.equals("stdout")) Util.println(string(token));
+        if(log.equals("stdout")) Util.print(string(token));
       }
     } catch(final IOException ex) {
       Util.stack(ex);
