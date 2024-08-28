@@ -216,19 +216,22 @@ public abstract class Mapping extends Arr {
      *   ($n + 2) ! abs(.) ->  abs(. + 2)
      * values
      *   (<X/>, <Y/>) ~ count(.)  ->  count((<X/>, <Y/>))
-     * skip nested node constructors
-     *   <X/> ! <X xmlns='x'>{ . }</X>
+     * skip positional access and higher-order functions
+     *   <X/> ! function-lookup#2(xs:QName('fn:name'), 0)()
+     *   <X/> ! last#0()
      */
-    final InlineContext ic = new InlineContext(null, expr, cc);
-    if(ic.inlineable(next)) {
-      Expr ex;
-      try {
-        ex = ic.inline(next);
-      } catch(final QueryException qe) {
-        // replace original expression with error
-        ex = cc.error(qe, next);
+    if(!next.has(Flag.POS, Flag.HOF)) {
+      final InlineContext ic = new InlineContext(null, expr, cc);
+      if(ic.inlineable(next)) {
+        Expr ex;
+        try {
+          ex = ic.inline(next);
+        } catch(final QueryException qe) {
+          // replace original expression with error
+          ex = cc.error(qe, next);
+        }
+        return ex;
       }
-      return ex;
     }
     return null;
   }

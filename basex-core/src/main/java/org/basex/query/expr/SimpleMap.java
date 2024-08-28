@@ -63,18 +63,22 @@ public abstract class SimpleMap extends Mapping {
     if(merged != null) return merged.length == 1 ? merged[0] : get(cc, info, merged);
 
     // choose best implementation
-    boolean cached = false, value = true, dual = exprs.length == 2, dualiter = dual;
+    boolean value = true, cached = false, dual = exprs.length == 2, dualiter = dual;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       final Expr expr = exprs[e];
       final SeqType st = expr.seqType();
-      cached = cached || expr.has(Flag.POS);
       value = value && (st.one() || e == el - 1);
+      cached = cached || e > 0 && expr.has(Flag.POS);
       dual = dual && (st.zeroOrOne() || e == 0);
     }
+    if(!value && cached) {
+      Util.errln("► %", this);
+    }
+
     return copyType(
-      cached ? new CachedMap(info, exprs) :
       value ? new ValueMap(info, exprs) :
+      cached ? new CachedMap(info, exprs) :
       dual ? new DualMap(info, exprs) :
       dualiter ? new DualIterMap(info, exprs) :
       new IterMap(info, exprs)
