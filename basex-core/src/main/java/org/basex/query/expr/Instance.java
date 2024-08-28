@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 public final class Instance extends Single {
   /** Sequence type to check for. */
   private final SeqType seqType;
-  /** Check: 1: only check item type, 2: only check occurrence indicator. */
+  /** Check: 1: only check occurrence indicator, 2: only check item type. */
   private int check;
 
   /**
@@ -55,8 +55,7 @@ public final class Instance extends Single {
     }
 
     // 1: only check item type, 2: only check occurrence indicator
-    check = et.occ.instanceOf(seqType.occ) ? 1 : et.type.instanceOf(seqType.type) &&
-      et.kindInstanceOf(seqType) ? 2 : 0;
+    check = et.with(seqType.occ).instanceOf(seqType) ? 1 : et.occ.instanceOf(seqType.occ) ? 2 : 0;
     return this;
   }
 
@@ -73,7 +72,7 @@ public final class Instance extends Single {
     if(iter.valueIter()) return seqType.instance(iter.value(qc, expr));
 
     // only check item type
-    if(check == 1) {
+    if(check == 2) {
       for(Item item; (item = qc.next(iter)) != null;) {
         if(!seqType.instance(item)) return false;
       }
@@ -82,7 +81,7 @@ public final class Instance extends Single {
 
     // only check occurrence indicator
     final long max = seqType.occ.max;
-    if(check == 2) return iter.next() == null ? !seqType.oneOrMore() :
+    if(check == 1) return iter.next() == null ? !seqType.oneOrMore() :
       max > 1 || max > 0 && iter.next() == null;
 
     // check both occurrence indicator and type
