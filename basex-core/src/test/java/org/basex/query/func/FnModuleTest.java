@@ -443,6 +443,27 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void distinctOrderedNodes() {
+    final Function func = DISTINCT_ORDERED_NODES;
+    query(func.args(" <a/>"), "<a/>");
+    query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
+
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)", 10)), "<a/>\n<b/>",
+        empty(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 2, true)), "<a/>\n<a/>",
+        exists(REPLICATE));
+
+    check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(REVERSE));
+    check("(<a><b/></a> ! (., *)) => sort() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(SORT));
+    check("(<a><b/></a> ! (., *)) => sort() => reverse() => sort() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(SORT), empty(REVERSE));
+
+    error(func.args(1), INVCONVERT_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void distinctValues() {
     final Function func = DISTINCT_VALUES;
 
