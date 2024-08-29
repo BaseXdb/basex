@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.regex.*;
 import java.util.stream.*;
 
+import org.basex.*;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
@@ -15,7 +17,7 @@ import org.junit.jupiter.params.provider.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public class RegexTest {
+public class RegexTest extends SandboxTest {
 
   /**
    * Test.
@@ -55,5 +57,10 @@ public class RegexTest {
             new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 14}),
         Arguments.of("^(?:\\-\\-((0[1-9])|(1(1|2)))\\-\\-)(?:$(?!\\s))", new int[] {0, 1, 1, 3})
     );
+  }
+
+  /** Test method. */
+  @Test public void gh2328() {
+    query("for $p in ('[^0', '[^0-') return try {matches('a', $p)} catch * {}", "");
   }
 }
