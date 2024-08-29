@@ -327,13 +327,14 @@ PARSER_END(RegExParser)
   RegExp charRange(boolean isBegin) : {
     int a = -1, b = -1;
   } {
-    ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE })
+    ( LOOKAHEAD({ getToken(2).kind == CHAR && "-".equals(getToken(2).image)
+        && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF })
       (a = charOrEsc() <CHAR> b = charOrEsc()) {
         if(a > b) throw new ParseException("Illegal range: " +
             Literal.escape(a) + " > " + Literal.escape(b));
       }
     | a = XmlChar() {
-        if(a == '-' && ! (isBegin || getToken(1).kind == BR_CLOSE)) throw new ParseException(
+        if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != EOF) throw new ParseException(
           "The - character is a valid character range only at the beginning or end of a positive character group.");
       }
     ) {

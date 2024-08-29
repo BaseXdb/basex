@@ -520,7 +520,8 @@ for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
    * @throws ParseException parsing exception
    */
   final public   RegExp charRange(boolean isBegin) throws ParseException {int a = -1, b = -1;
-    if (getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE) {
+    if (getToken(2).kind == CHAR && "-".equals(getToken(2).image)
+            && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF) {
       a = charOrEsc();
       jj_consume_token(CHAR);
       b = charOrEsc();
@@ -531,7 +532,7 @@ if(a > b) {if (true) throw new ParseException("Illegal range: " +
       case CHAR:
       case DIGIT:{
         a = XmlChar();
-if(a == '-' && ! (isBegin || getToken(1).kind == BR_CLOSE)) {if (true) throw new ParseException(
+if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != EOF) {if (true) throw new ParseException(
           "The - character is a valid character range only at the beginning or end of a positive character group.");}
         break;
         }
@@ -641,6 +642,12 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
+  private boolean jj_3R_charRange_336_7_9()
+ {
+    if (jj_3R_XmlChar_366_5_11()) return true;
+    return false;
+  }
+
   private boolean jj_3_3()
  {
     if (jj_3R_charRange_330_5_6()) return true;
@@ -658,12 +665,6 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_charRange_335_7_9()
- {
-    if (jj_3R_XmlChar_365_5_11()) return true;
-    return false;
-  }
-
   private boolean jj_3R_posCharGroup_313_5_5()
  {
     Token xsp;
@@ -675,23 +676,34 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_353_7_13()
+  private boolean jj_3R_charOrEsc_354_7_13()
  {
     if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
-  private boolean jj_3R_charRange_330_7_8()
+  private boolean jj_3R_charOrEsc_353_7_12()
  {
-    if (jj_3R_charOrEsc_352_5_10()) return true;
-    if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_352_5_10()) return true;
+    if (jj_3R_XmlChar_366_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_352_7_12()
+  private boolean jj_3R_charRange_330_7_8()
  {
-    if (jj_3R_XmlChar_365_5_11()) return true;
+    if (jj_3R_charOrEsc_353_5_10()) return true;
+    if (jj_scan_token(CHAR)) return true;
+    if (jj_3R_charOrEsc_353_5_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_charOrEsc_353_5_10()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_charOrEsc_353_7_12()) {
+    jj_scanpos = xsp;
+    if (jj_3R_charOrEsc_354_7_13()) return true;
+    }
     return false;
   }
 
@@ -700,22 +712,12 @@ cp = Escape.getCp(token.image);
     Token xsp;
     xsp = jj_scanpos;
     jj_lookingAhead = true;
-    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image) && getToken(3).kind != BR_CLOSE;
+    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image)
+        && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF;
     jj_lookingAhead = false;
     if (!jj_semLA || jj_3R_charRange_330_7_8()) {
     jj_scanpos = xsp;
-    if (jj_3R_charRange_335_7_9()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3R_charOrEsc_352_5_10()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_352_7_12()) {
-    jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_353_7_13()) return true;
+    if (jj_3R_charRange_336_7_9()) return true;
     }
     return false;
   }
@@ -732,7 +734,7 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_XmlChar_365_5_11()
+  private boolean jj_3R_XmlChar_366_5_11()
  {
     Token xsp;
     xsp = jj_scanpos;
