@@ -216,7 +216,7 @@ public final class Token {
     if(b >= 0) return b;
     // number of bytes to be read
     final int cl = cl(b);
-    if(pos + cl > token.length) return REPLACEMENT;
+    if(b < -64 || pos + cl > token.length) return REPLACEMENT;
     // 110xxxxx 10xxxxxx
     if(cl == 2) return (b & 0x1F) << 6 | token[pos + 1] & 0x3F;
     // 1110xxxx 10xxxxxx 10xxxxxx
