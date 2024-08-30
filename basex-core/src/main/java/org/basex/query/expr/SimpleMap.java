@@ -72,10 +72,6 @@ public abstract class SimpleMap extends Mapping {
       cached = cached || e > 0 && expr.has(Flag.POS);
       dual = dual && (st.zeroOrOne() || e == 0);
     }
-    if(!value && cached) {
-      Util.errln("► %", this);
-    }
-
     return copyType(
       value ? new ValueMap(info, exprs) :
       cached ? new CachedMap(info, exprs) :
