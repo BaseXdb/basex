@@ -147,6 +147,8 @@ public final class ValueAccess extends IndexAccess {
     );
 
     final IndexIterator iter = index ? data.iter(new StringToken(type, term)) : scan(term, data);
+    if(iter.size() == 0) return BasicNodeIter.EMPTY;
+
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
     final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
 
@@ -194,13 +196,21 @@ public final class ValueAccess extends IndexAccess {
       }
       @Override
       public DBNode get(final long i) {
-        while(i >= list.size() && next() != null);
+        while(i >= list.size() && iter.more()) list.add(iter.pre());
         tmp.pre(list.get((int) i));
         return tmp.finish();
       }
       @Override
       public long size() {
         return iter.size();
+      }
+      @Override
+      public Value value(final QueryContext qc, final Expr ex) {
+        while(iter.more()) {
+          qc.checkStop();
+          list.add(iter.pre());
+        }
+        return DBNodeSeq.get(list.finish(), data, ex);
       }
     };
   }

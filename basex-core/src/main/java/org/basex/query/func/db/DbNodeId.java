@@ -20,6 +20,8 @@ public class DbNodeId extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
+    if(nodes.valueIter()) return ids(nodes.value(qc, null)).iter();
+
     return new Iter() {
       @Override
       public Int next() throws QueryException {
@@ -31,10 +33,29 @@ public class DbNodeId extends StandardFunc {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Iter nodes = arg(0).iter(qc);
-    final LongList list = new LongList(Seq.initialCapacity(nodes.size()));
-    for(Item item; (item = qc.next(nodes)) != null;) list.add(id(toDBNode(item, false)));
-    return IntSeq.get(list.finish());
+    return ids(arg(0).value(qc));
+  }
+
+  /**
+   * Creates the result.
+   * @param nodes nodes
+   * @return node IDs
+   * @throws QueryException query exception
+   */
+  final Value ids(final Value nodes) throws QueryException {
+    final LongList ids = new LongList(Seq.initialCapacity(nodes.size()));
+    addIds(nodes, ids);
+    return IntSeq.get(ids.finish());
+  }
+
+  /**
+   * Adds the IDs.
+   * @param nodes nodes
+   * @param ids ID list
+   * @throws QueryException query exception
+   */
+  protected void addIds(final Value nodes, final LongList ids) throws QueryException {
+    for(final Item node : nodes) ids.add(id(toDBNode(node, false)));
   }
 
   @Override
