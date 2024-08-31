@@ -253,7 +253,7 @@ public final class ValueAccess extends IndexAccess {
    * @param data data reference
    * @return node iterator
    */
-  private BasicNodeIter scanEmpty(final Data data) {
+  private DBNodeIter scanEmpty(final Data data) {
     return new DBNodeIter(data) {
       final DBNode tmp = new DBNode(data, 0, Data.ELEM);
       final int sz = data.meta.size;

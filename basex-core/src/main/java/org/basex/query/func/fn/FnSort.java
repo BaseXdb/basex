@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.db.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
@@ -185,18 +186,23 @@ public class FnSort extends StandardFunc {
         arg(2, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE)));
       }
     } else if(!defined(1)) {
-      if(st.zeroOrOne() && st.type.isSortable()) return input;
-      // enforce pre-evaluation as remaining arguments may not be values
-      if(input instanceof Value) {
+      if(st.zeroOrOne() && st.type.isSortable()) {
+        return input;
+      } else if(input instanceof Value) {
         final Value value = quickValue((Value) input);
         if(value != null) return value;
       } else if(REVERSE.is(input) || SORT.is(input)) {
+        // sort(reverse(EXPR))  ->  sort(EXPR)
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
         return cc.function(SORT, info, args);
       } else if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
+        // sort(replicate(10, 5))  ->  replicate(10, 5)
         final SeqType rst = input.arg(0).seqType();
         if(rst.zeroOrOne() && rst.type.isSortable()) return input;
+      } else if(_DB_NODE_PRE.is(input) && ((DbNodeId) input).arg(0).ddo()) {
+        // sort(db:node-pre(db:text(...)))  ->  db:node-pre(db:text(...))
+        return input;
       }
     }
     return adoptType(input);
