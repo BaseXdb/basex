@@ -214,42 +214,6 @@ public final class FuncItem extends FItem implements Scope {
     return st != null && st.zero() && !expr.has(Flag.UPD);
   }
 
-  @Override
-  public InputInfo info() {
-    return info;
-  }
-
-  @Override
-  public String description() {
-    return FUNCTION + ' ' + ITEM;
-  }
-
-  @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), params, expr);
-  }
-
-  @Override
-  public String toErrorString() {
-    final QueryString qs = new QueryString();
-    if(name != null) {
-      qs.concat(name.prefixId(), "#", arity());
-    } else {
-      final StringList list = new StringList(arity());
-      for(final Var param : params) list.add(param.toErrorString());
-      qs.token(anns).token(FN).params(list.finish());
-      qs.token(AS).token(funcType().declType).brace(expr);
-    }
-    return qs.toString();
-  }
-
-  @Override
-  public void toString(final QueryString qs) {
-    qs.token(anns);
-    if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
-  }
-
   /**
    * Optimizes the function item for a fold operation.
    * @param input input sequence
@@ -328,6 +292,42 @@ public final class FuncItem extends FItem implements Scope {
       return fitem;
     }
     return this;
+  }
+
+  @Override
+  public InputInfo info() {
+    return info;
+  }
+
+  @Override
+  public String description() {
+    return FUNCTION + ' ' + ITEM;
+  }
+
+  @Override
+  public void toXml(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), params, expr);
+  }
+
+  @Override
+  public String toErrorString() {
+    final QueryString qs = new QueryString();
+    if(name != null) {
+      qs.concat(name.prefixId(), "#", arity());
+    } else {
+      final StringList list = new StringList(arity());
+      for(final Var param : params) list.add(param.toErrorString());
+      qs.token(anns).token(FN).params(list.finish());
+      qs.token(AS).token(funcType().declType).brace(expr);
+    }
+    return qs.toString();
+  }
+
+  @Override
+  public void toString(final QueryString qs) {
+    qs.token(anns);
+    if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
+    qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 
   /**

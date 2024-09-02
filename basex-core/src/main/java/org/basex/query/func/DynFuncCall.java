@@ -117,8 +117,7 @@ public final class DynFuncCall extends FuncCall {
    */
   public void markInlined(final FuncItem item) {
     final int hash = item.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } :
-      org.basex.util.Array.add(inlinedFrom, hash);
+    inlinedFrom = inlinedFrom == null ? new int[] { hash } : Array.add(inlinedFrom, hash);
   }
 
   /**
@@ -149,9 +148,9 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(cc, vm, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = new DynFuncCall(info, updating, ndt, copy[last], args);
+    final DynFuncCall call = copyType(new DynFuncCall(info, updating, ndt, copy[last], args));
     if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
-    return copyType(call);
+    return call;
   }
 
   @Override
