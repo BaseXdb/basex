@@ -4,6 +4,7 @@ import static org.basex.query.func.fn.FnParseUri.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -15,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnBuildUri extends FnJsonDoc {
+public final class FnBuildUri extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap parts = toMap(arg(0), qc);
@@ -49,29 +50,32 @@ public class FnBuildUri extends FnJsonDoc {
 
     final Value segments = parts.get(Str.get(PATH_SEGMENTS));
     if(!segments.isEmpty()) {
-      final String sep = options.get(UriOptions.PATH_SEPARATOR);
+      final String ps = options.get(UriOptions.PATH_SEPARATOR);
       int a = 0;
       for(final Item segment : segments) {
-        if(a++ != 0) uri.add(sep);
+        if(a++ != 0) uri.add(ps);
         uri.add(encodeUri(toToken(segment, qc), UriEncoder.PATH));
       }
     } else {
       uri.add(get(parts, PATH, qc));
     }
 
-    final Value qp = parts.get(Str.get(QUERY_PARAMETERS));
+    final Value qp = parts.get(Str.get(QUERY_PARAMETERS)), query = parts.get(Str.get(QUERY));
     if(!qp.isEmpty()) {
-      final TokenBuilder query = new TokenBuilder();
-      final String sep = options.get(UriOptions.QUERY_SEPARATOR);
+      final TokenBuilder tmp = new TokenBuilder();
+      final String qs = options.get(UriOptions.QUERY_SEPARATOR);
       toMap(qp, qc).apply((key, value) -> {
         final byte[] k = encodeUri(toToken(key), UriEncoder.QUERY);
         for(final Item item : value) {
-          query.add(query.isEmpty() ? "?" : sep);
-          query.add(k).add('=').add(encodeUri(toToken(item), UriEncoder.QUERY));
+          tmp.add(tmp.isEmpty() ? "?" : qs);
+          tmp.add(k).add('=').add(encodeUri(toToken(item), UriEncoder.QUERY));
         }
       });
-      uri.add(query);
+      uri.add(tmp);
+    } else if(!query.isEmpty()) {
+      uri.add('?').add(encodeUri(toToken(query, qc), UriEncoder.QUERY));
     }
+
     final String fragment = get(parts, FRAGMENT, qc);
     if(!fragment.isEmpty()) uri.add('#').add(encodeUri(token(fragment), UriEncoder.FRAGMENT));
 

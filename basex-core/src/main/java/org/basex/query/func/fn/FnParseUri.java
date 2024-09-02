@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -19,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnParseUri extends FnJsonDoc {
+public final class FnParseUri extends StandardFunc {
   /** URI part. */
   static final String URI = "uri";
   /** URI part. */
