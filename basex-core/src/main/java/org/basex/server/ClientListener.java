@@ -100,7 +100,7 @@ public final class ClientListener extends Thread implements ClientInfo {
             put();
           } else if(sc == ServerCmd.PUTBINARY) {
             putBinary();
-          } else if(sc != ServerCmd.COMMAND) {
+          } else if(sc != ServerCmd.EXECUTE) {
             query(sc);
           } else {
             // database command
@@ -112,7 +112,7 @@ public final class ClientListener extends Thread implements ClientInfo {
           close();
           break;
         }
-        if(sc != ServerCmd.COMMAND) continue;
+        if(sc != ServerCmd.EXECUTE) continue;
 
         // parse input and create command instance
         try {
