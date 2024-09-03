@@ -264,7 +264,7 @@ public final class StaticFuncs extends ExprInfo {
       for(final Closure literal : literals) {
         final int arity = literal.arity();
         for(final StaticFunc func : funcs) {
-          if(arity < func.min || arity > func.arity()) {
+          if(arity >= func.min && arity <= func.arity()) {
             literal.setSignature(func.funcType());
             break;
           }
