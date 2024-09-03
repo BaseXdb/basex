@@ -139,7 +139,7 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("map { '0': () }", "{'0':null}", format);
     serialize("map { '-1': () }", "{'-1':null}", format);
 
-    // atomic values
+    // atomic items
     serialize("()", "null", format);
     serialize("'A'", "'A'", format);
     serialize("true()", "true", format);

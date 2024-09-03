@@ -159,7 +159,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw JSON_SERIALIZE_X.getIO("Atomic values cannot be serialized");
+    throw JSON_SERIALIZE_X.getIO("Atomic items cannot be serialized");
   }
 
   /**

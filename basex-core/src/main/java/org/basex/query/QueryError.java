@@ -744,7 +744,7 @@ public enum QueryError {
   REGACTION_X(FORX, 5, "Both replacement string and action supplied: %."),
 
   /** Error code. */
-  FIATOMIZE_X(FOTY, 13, "Atomic value required, function item found: %."),
+  FIATOMIZE_X(FOTY, 13, "Atomic item required, function item found: %."),
   /** Error code. */
   FISTRING_X(FOTY, 14, "Function item has no string value: %."),
 

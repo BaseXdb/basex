@@ -93,6 +93,6 @@ abstract class CsvSerializer extends StandardSerializer {
 
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw CSV_SERIALIZE_X.getIO("Atomic values cannot be serialized");
+    throw CSV_SERIALIZE_X.getIO("Atomic items cannot be serialized");
   }
 }

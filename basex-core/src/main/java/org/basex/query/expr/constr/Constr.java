@@ -162,7 +162,7 @@ public final class Constr {
       }
       more = false;
     } else {
-      // type: atomic value
+      // type: atomic item
       if(more) text.add(' ');
       text.add(item.string(info));
       more = true;

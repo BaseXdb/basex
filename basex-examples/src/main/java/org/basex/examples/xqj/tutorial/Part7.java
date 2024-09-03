@@ -47,7 +47,7 @@ public final class Part7 extends Main {
           // Any other type
           default:
             String a = xqs.getAtomicValue();
-            System.out.println("Atomic Value: " + a);
+            System.out.println("Atomic Item: " + a);
             break;
         }
       } else {
