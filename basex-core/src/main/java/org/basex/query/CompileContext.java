@@ -103,6 +103,8 @@ public final class CompileContext {
   public final QueryContext qc;
   /** Dynamic compilation. */
   public final boolean dynamic;
+  /** Currently inlined function expressions. */
+  public final ArrayDeque<XQFunctionExpr> inlined = new ArrayDeque<>();
 
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();

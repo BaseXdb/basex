@@ -30,8 +30,6 @@ public final class DynFuncCall extends FuncCall {
   private final boolean updating;
   /** Nondeterministic flag. */
   private boolean ndt;
-  /** Hash values of all function items that this call was copied from, possibly {@code null}. */
-  private int[] inlinedFrom;
 
   /**
    * Function constructor.
@@ -89,13 +87,18 @@ public final class DynFuncCall extends FuncCall {
       if(values(false, cc)) return cc.preEval(this);
     }
 
+    // try to inline the function; avoid recursive inlining
     if(func instanceof XQFunctionExpr) {
-      // try to inline the function
-      if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
-        final XQFunctionExpr fe = (XQFunctionExpr) func;
+      final XQFunctionExpr fe = (XQFunctionExpr) func;
+      if(!cc.inlined.contains(fe)) {
         checkUp(fe, updating);
-        final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
-        if(inlined != null) return inlined;
+        cc.inlined.push(fe);
+        try {
+          final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
+          if(inlined != null) return inlined;
+        } finally {
+          cc.inlined.pop();
+        }
       }
     } else if(func instanceof Value) {
       // raise error (values tested at this stage are no functions)
@@ -112,30 +115,6 @@ public final class DynFuncCall extends FuncCall {
   }
 
   /**
-   * Marks this call after it was inlined from the given function item.
-   * @param item the function item
-   */
-  public void markInlined(final FuncItem item) {
-    final int hash = item.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } : Array.add(inlinedFrom, hash);
-  }
-
-  /**
-   * Checks if this call was inlined from the body of the given function item.
-   * @param item function item
-   * @return result of check
-   */
-  private boolean comesFrom(final FuncItem item) {
-    if(inlinedFrom != null) {
-      final int hash = item.hashCode();
-      for(final int h : inlinedFrom) {
-        if(hash == h) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Returns the function body expression.
    * @return body
    */
@@ -148,14 +127,7 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(cc, vm, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = copyType(new DynFuncCall(info, updating, ndt, copy[last], args));
-    if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
-    return call;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.dynFuncCall(this) && visitAll(visitor, exprs);
+    return copyType(new DynFuncCall(info, updating, ndt, copy[last], args));
   }
 
   @Override

@@ -179,7 +179,6 @@ public final class FuncItem extends FItem implements Scope {
 
     // create the return clause
     final Expr rtrn = expr.copy(cc, vm).optimize(cc);
-    rtrn.accept(new InlineVisitor());
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
@@ -328,24 +327,5 @@ public final class FuncItem extends FItem implements Scope {
     qs.token(anns);
     if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
     qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
-  }
-
-  /**
-   * A visitor for checking inlined expressions.
-   *
-   * @author BaseX Team 2005-24, BSD License
-   * @author Leo Woerteler
-   */
-  private final class InlineVisitor extends ASTVisitor {
-    @Override
-    public boolean inlineFunc(final Scope scope) {
-      return scope.visit(this);
-    }
-
-    @Override
-    public boolean dynFuncCall(final DynFuncCall call) {
-      call.markInlined(FuncItem.this);
-      return true;
-    }
   }
 }

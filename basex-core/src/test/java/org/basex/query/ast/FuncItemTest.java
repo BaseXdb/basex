@@ -248,6 +248,14 @@ public final class FuncItemTest extends SandboxTest {
     );
   }
 
+  /** Tests if recursive function items are inlined only once. */
+  @Test public void gh2033() {
+    check("let $p := function($c, $q) { $c/* ! $q(?, $q)(.) } return $p((), $p)",
+        "",
+        empty()
+    );
+  }
+
   /** Tests if not-yet-known function references are parsed correctly. */
   @Test public void gh953() {
     check("declare function local:go ($n) { $n, for-each($n/*, local:go(?)) };" +
