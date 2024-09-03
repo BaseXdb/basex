@@ -30,12 +30,31 @@ public final class FnHash extends StandardFunc {
     if(value.isEmpty()) return Empty.VALUE;
 
     final String algorithm = options.get(HashOptions.ALGORITHM).trim().toUpperCase(Locale.ENGLISH);
+    return new Hex(hash(value, algorithm, qc));
+  }
+
+  /**
+   * Computes the hash value.
+   * @param value value to be hashed
+   * @param algorithm algorithm
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private byte[] hash(final Item value, final String algorithm, final QueryContext qc)
+      throws QueryException {
+
     if(algorithm.equals("CRC-32")) {
       final CRC32 crc = new CRC32();
       crc.update(toBytes(value));
-      final byte[] r = new byte[4];
-      for(int i = r.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8) r[i] = (byte) c;
-      return new Hex(r);
+      final byte[] result = new byte[4];
+      for(int i = result.length, c = (int) crc.getValue(); i-- > 0; c >>>= 8)
+        result[i] = (byte) c;
+      return result;
+    }
+
+    if(algorithm.equals("BLAKE3")) {
+      return new Blake3().digest(toBytes(value));
     }
 
     final MessageDigest md;
@@ -52,7 +71,7 @@ public final class FnHash extends StandardFunc {
         while(true) {
           qc.checkStop();
           final int n = bi.read(tmp);
-          if(n == -1) return B64.get(md.digest());
+          if(n == -1) return md.digest();
           md.update(tmp, 0, n);
         }
       } catch(final IOException ex) {
@@ -60,7 +79,7 @@ public final class FnHash extends StandardFunc {
       }
     }
     // non-streaming item, string
-    return new Hex(md.digest(toBytes(value)));
+    return md.digest(toBytes(value));
   }
 
   /** Hash options. */

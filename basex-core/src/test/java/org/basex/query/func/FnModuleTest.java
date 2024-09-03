@@ -1057,11 +1057,14 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void crc32() {
+  @Test public void hash() {
     final Function func = HASH;
     query(func.args(" ()", " { 'algorithm': 'crc-32' }"), "");
     query("string( " + func.args("", " { 'algorithm': 'CRC-32' }") + ')', "00000000");
     query("string( " + func.args("BaseX", " { 'algorithm': 'CRC-32' }") + ')', "4C06FC7F");
+
+    query("string( " + func.args("X", " { 'algorithm': 'BLAKE3' }") + ')',
+        "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
   }
 
   /** Test method. */
