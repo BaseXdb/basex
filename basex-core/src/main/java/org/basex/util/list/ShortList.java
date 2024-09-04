@@ -10,9 +10,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class ShortList extends ElementList {
+public final class ShortList extends ElementList {
   /** Element container. */
-  protected short[] list;
+  private short[] list;
 
   /**
    * Default constructor.
@@ -51,7 +51,7 @@ public class ShortList extends ElementList {
    * @param elements elements to be added
    * @return self reference
    */
-  public final ShortList add(final short... elements) {
+  public ShortList add(final short... elements) {
     short[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {

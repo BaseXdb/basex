@@ -383,7 +383,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to a number.
+   * Evaluates an expression to a number.
    * @param expr expression
    * @param qc query context
    * @return number

@@ -10,9 +10,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class DoubleList extends ElementList {
+public final class DoubleList extends ElementList {
   /** Element container. */
-  protected double[] list;
+  private double[] list;
 
   /**
    * Default constructor.
@@ -34,7 +34,7 @@ public class DoubleList extends ElementList {
    * @param element element to be added
    * @return self reference
    */
-  public final DoubleList add(final double element) {
+  public DoubleList add(final double element) {
     double[] lst = list;
     final int s = size;
     if(s == lst.length) {
@@ -51,7 +51,7 @@ public class DoubleList extends ElementList {
    * @param elements elements to be added
    * @return self reference
    */
-  public final DoubleList add(final double... elements) {
+  public DoubleList add(final double... elements) {
     double[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {
@@ -68,7 +68,7 @@ public class DoubleList extends ElementList {
    * @param index index of the element to return
    * @return element
    */
-  public final double get(final int index) {
+  public double get(final int index) {
     return list[index];
   }
 
@@ -76,7 +76,7 @@ public class DoubleList extends ElementList {
    * Returns an array with all elements.
    * @return array
    */
-  public final double[] toArray() {
+  public double[] toArray() {
     return Arrays.copyOf(list, size);
   }
 

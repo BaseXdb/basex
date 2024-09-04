@@ -120,14 +120,6 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Returns a unique identifier for this variable.
-   * @return identifier
-   */
-  public byte[] id() {
-    return Token.concat(Token.cpToken('$'), name.unique());
-  }
-
-  /**
    * Returns the name of the variable.
    * @return name
    */

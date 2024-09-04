@@ -106,7 +106,6 @@ public enum BaseXKeys {
 
   // General
 
-  /** Run query.             */ EXEC(META, VK_ENTER),
   /** Run test.              */ TESTS(META | SHIFT, VK_ENTER),
 
   /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),

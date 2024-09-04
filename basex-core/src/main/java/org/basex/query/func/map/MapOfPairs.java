@@ -19,12 +19,12 @@ import org.basex.util.*;
 public final class MapOfPairs extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter pairs = arg(0).iter(qc);
+    final Iter input = arg(0).iter(qc);
     final FItem combine = toFunctionOrNull(arg(1), 2, qc);
 
     final HofArgs cargs = combine != null ? new HofArgs(2) : null;
     XQMap result = XQMap.empty();
-    for(Item item; (item = qc.next(pairs)) != null;) {
+    for(Item item; (item = qc.next(input)) != null;) {
       // extract key/value record entries
       final XQMap map = toRecord(item, Str.KEY, Str.VALUE);
       final Item key = toAtomItem(map.get(Str.KEY), qc);

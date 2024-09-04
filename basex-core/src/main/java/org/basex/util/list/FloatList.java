@@ -10,9 +10,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FloatList extends ElementList {
+public final class FloatList extends ElementList {
   /** Element container. */
-  protected float[] list;
+  private float[] list;
 
   /**
    * Default constructor.
@@ -34,7 +34,7 @@ public class FloatList extends ElementList {
    * @param element element to be added
    * @return self reference
    */
-  public final FloatList add(final float element) {
+  public FloatList add(final float element) {
     float[] lst = list;
     final int s = size;
     if(s == lst.length) {
@@ -51,7 +51,7 @@ public class FloatList extends ElementList {
    * @param elements elements to be added
    * @return self reference
    */
-  public final FloatList add(final float... elements) {
+  public FloatList add(final float... elements) {
     float[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {
@@ -68,7 +68,7 @@ public class FloatList extends ElementList {
    * @param index index of the element to return
    * @return element
    */
-  public final float get(final int index) {
+  public float get(final int index) {
     return list[index];
   }
 
@@ -76,7 +76,7 @@ public class FloatList extends ElementList {
    * Returns an array with all elements.
    * @return array
    */
-  public final float[] toArray() {
+  public float[] toArray() {
     return Arrays.copyOf(list, size);
   }
 

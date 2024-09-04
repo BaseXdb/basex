@@ -230,7 +230,7 @@ public enum Function implements AFunction {
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
       params(STRING_O), STRING_ZO),
   /** XQuery function. */
-  ERROR(FnError::new, "error([code,description,error-object])",
+  ERROR(FnError::new, "error([code,description,value])",
       params(QNAME_ZO, STRING_ZO, ITEM_ZM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   ESCAPE_HTML_URI(FnEscapeHtmlUri::new, "escape-html-uri(value)",
@@ -480,7 +480,7 @@ public enum Function implements AFunction {
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_O), QNAME_O),
   /** XQuery function. */
-  PARSE_URI(FnParseUri::new, "parse-uri(uri[,options])",
+  PARSE_URI(FnParseUri::new, "parse-uri(value[,options])",
       params(STRING_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
@@ -642,7 +642,7 @@ public enum Function implements AFunction {
   TRUNK(FnTrunk::new, "trunk(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  UNIX_TIME(FnUnixTime::new, "unix-time(value)",
+  UNIX_TIME(FnUnixTime::new, "unix-time([value])",
       params(INTEGER_ZO), DATE_TIME_O),
   /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
@@ -732,7 +732,7 @@ public enum Function implements AFunction {
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_ZO), MAP_O, MAP_URI),
   /** XQuery function. */
-  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(pairs[,combine])",
+  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,combine])",
       params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */

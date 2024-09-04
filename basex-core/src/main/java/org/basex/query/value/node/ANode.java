@@ -223,6 +223,21 @@ public abstract class ANode extends Item {
     return true;
   }
 
+  /**
+   * Returns if whitespace needs to be preserved.
+   * @return node kind
+   */
+  private boolean preserve() {
+    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
+    for(ANode node = this; node != null; node = node.parent()) {
+      if(node.type == ELEMENT) {
+        final byte[] v = node.attribute(xs);
+        if(v != null) return Token.eq(v, DataText.PRESERVE);
+      }
+    }
+    return false;
+  }
+
   @Override
   public final Item atomValue(final QueryContext qc, final InputInfo ii) {
     return atomItem(qc, ii);
@@ -318,21 +333,6 @@ public abstract class ANode extends Item {
     }
     if(sc != null) sc.ns.inScope(ns);
     return ns;
-  }
-
-  /**
-   * Returns if whitespace needs to be preserved.
-   * @return node kind
-   */
-  public boolean preserve() {
-    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
-    for(ANode node = this; node != null; node = node.parent()) {
-      if(node.type == ELEMENT) {
-        final byte[] v = node.attribute(xs);
-        if(v != null) return Token.eq(v, DataText.PRESERVE);
-      }
-    }
-    return false;
   }
 
   /**

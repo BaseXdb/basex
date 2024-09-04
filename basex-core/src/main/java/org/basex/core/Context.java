@@ -70,7 +70,7 @@ public final class Context {
   public int focused = -1;
 
   /**
-   * Default constructor, which is usually called once in the lifetime of a project.
+   * Default constructor, to be called once in the lifetime of a project.
    */
   public Context() {
     this(true);

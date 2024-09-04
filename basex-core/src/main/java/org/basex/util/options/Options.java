@@ -451,44 +451,6 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Returns a map representation of the comma-separated options string.
-   * @param opts options string
-   * @return map
-   */
-  public static Map<String, String> toMap(final String opts) {
-    final HashMap<String, String> map = new HashMap<>();
-    final StringBuilder key = new StringBuilder(), value = new StringBuilder();
-
-    boolean left = true;
-    final int sl = opts.length();
-    for(int s = 0; s < sl; s++) {
-      final char ch = opts.charAt(s);
-      if(left) {
-        if(ch == '=') {
-          left = false;
-        } else {
-          key.append(ch);
-        }
-      } else {
-        if(ch == ',') {
-          if(s + 1 == sl || opts.charAt(s + 1) != ',') {
-            map.put(key.toString().trim(), value.toString());
-            key.setLength(0);
-            value.setLength(0);
-            left = true;
-            continue;
-          }
-          // literal commas are escaped by a second comma
-          s++;
-        }
-        value.append(ch);
-      }
-    }
-    if(!left) map.put(key.toString().trim(), value.toString());
-    return map;
-  }
-
-  /**
    * Returns an error string for an unknown option.
    * @param option option
    * @return error string
@@ -634,6 +596,84 @@ public class Options implements Iterable<Option<?>> {
   }
 
   // STATIC METHODS ===============================================================================
+
+  /**
+   * Assigns a value to an option.
+   * @param option option
+   * @param value value to be assigned
+   * @param index index (optional, can be {@code -1})
+   * @param assign function to assign the value
+   * @param definitions option definitions (can be {@code null})
+   * @return string or {@code null}
+   */
+  public static String assign(final Option<?> option, final String value, final int index,
+      final Consumer<Object> assign, final Options definitions) {
+
+    final String name = option.name();
+    if(option instanceof BooleanOption) {
+      final boolean v;
+      if(value.isEmpty() && definitions != null) {
+        final Boolean b = definitions.get((BooleanOption) option);
+        if(b == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, "");
+        v = !b;
+      } else {
+        v = Strings.toBoolean(value);
+        if(!v && !Strings.no(value)) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
+      }
+      assign.accept(v);
+    } else if(option instanceof NumberOption) {
+      final int v = Strings.toInt(value);
+      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+      assign.accept(v);
+    } else if(option instanceof StringOption) {
+      assign.accept(value);
+    } else if(option instanceof EnumOption) {
+      final EnumOption<?> eo = (EnumOption<?>) option;
+      final Object v = eo.get(value);
+      if(v == null) return allowed(option, value, (Object[]) eo.values());
+      assign.accept(v);
+    } else if(option instanceof OptionsOption) {
+      final Options o = ((OptionsOption<?>) option).newInstance();
+      try {
+        o.assign(value);
+      } catch(final BaseXException ex) {
+        Util.debug(ex);
+        return ex.getMessage();
+      }
+      assign.accept(o);
+    } else if(option instanceof NumbersOption && definitions != null) {
+      final int v = Strings.toInt(value);
+      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+      int[] ii = (int[]) definitions.get(option);
+      if(index == -1) {
+        if(ii == null) ii = new int[0];
+        final IntList il = new IntList(ii.length + 1);
+        for(final int i : ii) il.add(i);
+        assign.accept(il.add(v).finish());
+      } else {
+        if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
+        ii[index] = v;
+      }
+    } else if(option instanceof StringsOption && definitions != null) {
+      String[] ss = (String[]) definitions.get(option);
+      if(index == -1) {
+        if(ss == null) ss = new String[0];
+        final StringList sl = new StringList(ss.length + 1);
+        for(final String s : ss) sl.add(s);
+        assign.accept(sl.add(value).finish());
+      } else if(index == 0) {
+        final int i = Strings.toInt(value);
+        if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+        definitions.values.put(name, new String[i]);
+      } else {
+        if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
+        ss[index - 1] = value;
+      }
+    } else {
+      throw Util.notExpected("Unsupported option: " + option);
+    }
+    return null;
+  }
 
   /**
    * Returns a message with allowed keys.
@@ -844,80 +884,40 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Assigns a value to an option.
-   * @param option option
-   * @param value value to be assigned
-   * @param index index (optional, can be {@code -1})
-   * @param assign function to assign the value
-   * @param definitions option definitions (can be {@code null})
-   * @return string or {@code null}
+   * Returns a map representation of the comma-separated options string.
+   * @param opts options string
+   * @return map
    */
-  public static String assign(final Option<?> option, final String value, final int index,
-      final Consumer<Object> assign, final Options definitions) {
+  private static Map<String, String> toMap(final String opts) {
+    final HashMap<String, String> map = new HashMap<>();
+    final StringBuilder key = new StringBuilder(), value = new StringBuilder();
 
-    final String name = option.name();
-    if(option instanceof BooleanOption) {
-      final boolean v;
-      if(value.isEmpty() && definitions != null) {
-        final Boolean b = definitions.get((BooleanOption) option);
-        if(b == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, "");
-        v = !b;
+    boolean left = true;
+    final int sl = opts.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = opts.charAt(s);
+      if(left) {
+        if(ch == '=') {
+          left = false;
+        } else {
+          key.append(ch);
+        }
       } else {
-        v = Strings.toBoolean(value);
-        if(!v && !Strings.no(value)) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
+        if(ch == ',') {
+          if(s + 1 == sl || opts.charAt(s + 1) != ',') {
+            map.put(key.toString().trim(), value.toString());
+            key.setLength(0);
+            value.setLength(0);
+            left = true;
+            continue;
+          }
+          // literal commas are escaped by a second comma
+          s++;
+        }
+        value.append(ch);
       }
-      assign.accept(v);
-    } else if(option instanceof NumberOption) {
-      final int v = Strings.toInt(value);
-      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-      assign.accept(v);
-    } else if(option instanceof StringOption) {
-      assign.accept(value);
-    } else if(option instanceof EnumOption) {
-      final EnumOption<?> eo = (EnumOption<?>) option;
-      final Object v = eo.get(value);
-      if(v == null) return allowed(option, value, (Object[]) eo.values());
-      assign.accept(v);
-    } else if(option instanceof OptionsOption) {
-      final Options o = ((OptionsOption<?>) option).newInstance();
-      try {
-        o.assign(value);
-      } catch(final BaseXException ex) {
-        Util.debug(ex);
-        return ex.getMessage();
-      }
-      assign.accept(o);
-    } else if(option instanceof NumbersOption && definitions != null) {
-      final int v = Strings.toInt(value);
-      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-      int[] ii = (int[]) definitions.get(option);
-      if(index == -1) {
-        if(ii == null) ii = new int[0];
-        final IntList il = new IntList(ii.length + 1);
-        for(final int i : ii) il.add(i);
-        assign.accept(il.add(v).finish());
-      } else {
-        if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
-        ii[index] = v;
-      }
-    } else if(option instanceof StringsOption && definitions != null) {
-      String[] ss = (String[]) definitions.get(option);
-      if(index == -1) {
-        if(ss == null) ss = new String[0];
-        final StringList sl = new StringList(ss.length + 1);
-        for(final String s : ss) sl.add(s);
-        assign.accept(sl.add(value).finish());
-      } else if(index == 0) {
-        final int i = Strings.toInt(value);
-        if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-        definitions.values.put(name, new String[i]);
-      } else {
-        if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
-        ss[index - 1] = value;
-      }
-    } else {
-      throw Util.notExpected("Unsupported option: " + option);
     }
-    return null;
+    if(!left) map.put(key.toString().trim(), value.toString());
+    return map;
   }
 }

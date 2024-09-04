@@ -105,16 +105,6 @@ public final class MapBuilder {
   }
 
   /**
-   * Returns the value of a map.
-   * @param key key to look for
-   * @return value or empty sequence
-   * @throws QueryException query exception
-   */
-  public Value get(final Item key) throws QueryException {
-    return map.get(key);
-  }
-
-  /**
    * Returns the resulting map and invalidates the internal reference.
    * @return map
    */

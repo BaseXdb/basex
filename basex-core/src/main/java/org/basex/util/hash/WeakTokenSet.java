@@ -15,13 +15,13 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public class WeakTokenSet extends ASet {
+public final class WeakTokenSet extends ASet {
   /** Hashed keys. */
-  protected WeakTokenRef[] keys;
+  private WeakTokenRef[] keys;
   /** Garbage collected keys. */
-  protected ReferenceQueue<byte[]> gcedKeys = new ReferenceQueue<>();
+  private ReferenceQueue<byte[]> gcedKeys = new ReferenceQueue<>();
   /** Head of free id list. */
-  protected int free;
+  private int free;
 
   /**
    * Default constructor.
@@ -36,7 +36,7 @@ public class WeakTokenSet extends ASet {
    * @param key key to be stored
    * @return key, or its equivalent that is stored in this set
    */
-  public final byte[] put(final byte[] key) {
+  public byte[] put(final byte[] key) {
     final int h = Token.hash(key), c = capacity();
     int b = h & c - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
@@ -63,7 +63,7 @@ public class WeakTokenSet extends ASet {
    * Removes garbage collected keys from the set. The deletion of keys will lead to empty entries.
    * If {@link #size} is called after deletions, the original number of entries will be returned.
    */
-  protected void cleanUp() {
+  private void cleanUp() {
     for(WeakTokenRef key; (key = (WeakTokenRef) gcedKeys.poll()) != null;) {
       final int b = key.bucket;
       for(int p = 0, id = buckets[b];; p = id, id = next[id]) {
@@ -94,7 +94,7 @@ public class WeakTokenSet extends ASet {
   }
 
   @Override
-  public void clear() {
+  protected void clear() {
     gcedKeys = new ReferenceQueue<>();
     free = 0;
     Arrays.fill(keys, null);
