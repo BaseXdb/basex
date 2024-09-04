@@ -2799,6 +2799,15 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void unixTime() {
+    final Function func = UNIX_TIME;
+    query(func.args(), "1970-01-01T00:00:00Z");
+    query(func.args(0), "1970-01-01T00:00:00Z");
+    query(func.args(-1), "1969-12-31T23:59:59.999Z");
+    query(func.args(86400000), "1970-01-02T00:00:00Z");
+  }
+
+  /** Test method. */
   @Test public void unparsedText() {
     final Function func = UNPARSED_TEXT;
     contains(func.args(TEXT), "<html");
