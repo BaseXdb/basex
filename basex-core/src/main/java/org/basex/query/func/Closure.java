@@ -465,15 +465,4 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     qs.token(AS).token(declType != null ? declType : SeqType.ITEM_ZM).brace(expr);
     if(inlined) qs.token(')');
   }
-
-  /**
-   * Parameter names.
-   * @return parameter names
-   */
-  public QNm[] paramNames() {
-    final int pl = params.length;
-    final QNm[] names = new QNm[pl];
-    for(int p = 0; p < pl; ++p) names[p] = paramName(p);
-    return names;
-  }
 }
