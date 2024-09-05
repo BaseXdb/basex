@@ -67,11 +67,11 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Registers a function literal.
-   * @param literal wrapped literal
+   * Registers a closure.
+   * @param closure wrapped literal
    */
-  public void register(final Closure literal) {
-    cache(literal.funcName().prefixId()).add(literal);
+  public void register(final Closure closure) {
+    cache(closure.funcName().prefixId()).add(closure);
   }
 
   /**
@@ -230,11 +230,11 @@ public final class StaticFuncs extends ExprInfo {
     final ArrayList<StaticFunc> funcs = new ArrayList<>(1);
     /** Function calls. */
     final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
-    /** Function literals. */
-    final ArrayList<Closure> literals = new ArrayList<>(0);
+    /** Function closures. */
+    final ArrayList<Closure> closures = new ArrayList<>(0);
 
     /**
-     * Initializes the function calls and literals.
+     * Initializes the function calls and closures.
      * @param qc query context
      * @throws QueryException query exception
      */
@@ -260,12 +260,12 @@ public final class StaticFuncs extends ExprInfo {
         }
       }
 
-      // assign function signatures to function literals
-      for(final Closure literal : literals) {
-        final int arity = literal.arity();
+      // assign function signatures to function closures
+      for(final Closure closure : closures) {
+        final int arity = closure.arity();
         for(final StaticFunc func : funcs) {
           if(arity >= func.min && arity <= func.arity()) {
-            literal.setSignature(func.funcType());
+            closure.setSignature(func.funcType());
             break;
           }
         }
@@ -281,8 +281,9 @@ public final class StaticFuncs extends ExprInfo {
       /* Reject a function with a conflicting arity range. Examples:
        * f($a), f($b)
        * f($a), f($a, $b := ()) */
+      final int nargs = func.arity();
       for(final StaticFunc sf : funcs) {
-        if(func.arity() >= sf.min && func.min <= sf.arity()) return false;
+        if(nargs >= sf.min && func.min <= sf.arity()) return false;
       }
       funcs.add(func);
       return true;
@@ -323,18 +324,18 @@ public final class StaticFuncs extends ExprInfo {
      * @throws QueryException query exception
      */
     boolean setJava(final StaticFuncCall call, final QueryContext qc) throws QueryException {
-      final JavaCall java = literals.isEmpty() ?
+      final JavaCall java = closures.isEmpty() ?
         JavaCall.get(call.name, call.exprs, qc, call.info()) : null;
       call.setExternal(java);
       return java != null;
     }
 
     /**
-     * Adds a function literal.
-     * @param literal literal
+     * Adds a closure.
+     * @param closure closure
      */
-    void add(final Closure literal) {
-      literals.add(literal);
+    void add(final Closure closure) {
+      closures.add(closure);
     }
 
     /**

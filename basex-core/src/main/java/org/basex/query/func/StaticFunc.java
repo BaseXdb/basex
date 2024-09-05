@@ -31,7 +31,7 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class StaticFunc extends StaticDecl implements XQFunction {
-  /** Formal parameters. */
+  /** Parameters. */
   public final Var[] params;
   /** Default expressions (entries can be {@code null} references). */
   final Expr[] defaults;

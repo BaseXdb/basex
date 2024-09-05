@@ -31,7 +31,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
 
   /** Input info (can be {@code null}). */
   public InputInfo info;
-  /** Name of the declaration (can be {@code null}). */
+  /** Name of the scope (can be {@code null}). */
   public QNm name;
 
   /** Variable scope. */

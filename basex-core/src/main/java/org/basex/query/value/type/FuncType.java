@@ -194,7 +194,7 @@ public class FuncType extends FType {
    * Getter for a function's type.
    * @param anns annotations
    * @param declType declared return type (can be {@code null})
-   * @param params formal parameters
+   * @param params parameters
    * @return function type
    */
   public static FuncType get(final AnnList anns, final SeqType declType, final Var[] params) {

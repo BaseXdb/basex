@@ -31,7 +31,7 @@ public final class FuncItem extends FItem implements Scope {
   /** Function expression. */
   public final Expr expr;
 
-  /** Formal parameters. */
+  /** Parameters. */
   private final Var[] params;
   /** Annotations. */
   private final AnnList anns;
@@ -50,7 +50,7 @@ public final class FuncItem extends FItem implements Scope {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param params formal parameters
+   * @param params parameters
    * @param anns function annotations
    * @param type function type
    * @param stackSize stack-frame size
@@ -65,7 +65,7 @@ public final class FuncItem extends FItem implements Scope {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param params formal parameters
+   * @param params parameters
    * @param anns function annotations
    * @param type function type
    * @param stackSize stack-frame size

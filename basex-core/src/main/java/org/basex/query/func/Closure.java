@@ -33,7 +33,7 @@ import org.basex.util.hash.*;
 public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Function name, {@code null} if not specified. */
   private final QNm name;
-  /** Formal parameters. */
+  /** Parameters. */
   private final Var[] params;
   /** Value type, {@code null} if not specified. */
   private SeqType declType;
@@ -70,7 +70,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * Package-private constructor allowing a name.
    * @param info input info (can be {@code null})
    * @param expr function expression
-   * @param params formal parameters
+   * @param params parameters
    * @param anns annotations
    * @param vs variable scope
    * @param global bindings for non-local variables (can be {@code null})
@@ -355,8 +355,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       if(!(entry.getValue().accept(visitor) && visitor.declared(entry.getKey()))) return false;
     }
-    for(final Var var : params) {
-      if(!visitor.declared(var)) return false;
+    for(final Var param : params) {
+      if(!visitor.declared(param)) return false;
     }
     return expr.accept(visitor);
   }
@@ -427,9 +427,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private void checkUpdating() throws QueryException {
     // derive updating flag from function body
     updating = expr.has(Flag.UPD);
-    final boolean annUpdating = anns.contains(Annotation.UPDATING);
-    if(updating != annUpdating) {
-      if(!annUpdating) anns = anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
+    final boolean upd = anns.contains(Annotation.UPDATING);
+    if(updating != upd) {
+      if(!upd) anns = anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
       else if(!expr.vacuous()) throw UPEXPECTF.get(info);
     }
   }
@@ -448,8 +448,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     });
 
     final FBuilder elem = plan.create(this);
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) plan.addAttribute(elem, ARG + p, params[p].name.string());
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) plan.addAttribute(elem, ARG + a, params[a].name.string());
     plan.add(elem, list.toArray());
   }
 

@@ -25,7 +25,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   private final VarScope vs;
   /** Function name. */
   private final QNm name;
-  /** Formal parameters. */
+  /** Parameters. */
   private final Var[] params;
   /** Annotations. */
   private final AnnList anns;
@@ -34,7 +34,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param params formal parameters
+   * @param params parameters
    * @param anns annotations
    * @param seqType sequence type
    * @param name function name
