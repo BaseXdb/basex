@@ -92,7 +92,7 @@ public final class WsResponse extends WebResponse {
     final SerialMethod method = sopts.get(SerializerOptions.METHOD);
     for(Item item; (item = iter.next()) != null;) {
       // serialize maps and arrays as JSON
-      final boolean json = method == SerialMethod.BASEX && item instanceof XQData;
+      final boolean json = method == SerialMethod.BASEX && item instanceof XQStruct;
       sopts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
       // interpret result as binary or string
       final ArrayOutput ao = item.serialize(sopts);

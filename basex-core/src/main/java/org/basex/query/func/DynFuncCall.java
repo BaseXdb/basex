@@ -80,7 +80,7 @@ public final class DynFuncCall extends FuncCall {
       exprType.assign(ft.declType);
     }
 
-    if(func instanceof XQData) {
+    if(func instanceof XQStruct) {
       // lookup key must be atomic
       if(nargs == 1) arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values

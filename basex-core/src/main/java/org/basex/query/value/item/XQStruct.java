@@ -15,12 +15,12 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public abstract class XQData extends FItem {
+public abstract class XQStruct extends FItem {
   /**
    * Constructor.
    * @param type function type
    */
-  protected XQData(final Type type) {
+  protected XQStruct(final Type type) {
     super(type);
   }
 

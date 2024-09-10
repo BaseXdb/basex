@@ -27,7 +27,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public abstract class XQArray extends XQData {
+public abstract class XQArray extends XQStruct {
   /** Minimum size of a leaf. */
   static final int MIN_LEAF = 8;
   /** Maximum size of a leaf. */

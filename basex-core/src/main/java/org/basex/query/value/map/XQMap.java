@@ -28,7 +28,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public final class XQMap extends XQData {
+public final class XQMap extends XQStruct {
   /** The empty map. */
   private static final XQMap EMPTY = new XQMap(TrieNode.EMPTY, SeqType.MAP);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
