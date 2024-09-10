@@ -69,9 +69,9 @@ public final class CsvXQuerySerializer extends CsvSerializer {
   private void record(final Value line, final TokenList tl) throws QueryException, IOException {
     if(!(line instanceof XQArray))
       throw CSV_SERIALIZE_X_X.getIO("Array expected, found", line.seqType());
-    for(final Value entry : ((XQArray) line).members()) {
-      if(!entry.isItem()) throw CSV_SERIALIZE_X_X.getIO("Item expected, found" + entry.seqType());
-      tl.add(((Item) entry).string(null));
+    for(final Value value : ((XQArray) line).iterable()) {
+      if(!value.isItem()) throw CSV_SERIALIZE_X_X.getIO("Item expected, found" + value.seqType());
+      tl.add(((Item) value).string(null));
     }
     record(tl);
   }

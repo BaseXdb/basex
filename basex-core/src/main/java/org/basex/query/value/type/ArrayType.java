@@ -18,24 +18,24 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FType {
-  /** Type of the array members. */
-  public final SeqType memberType;
+  /** Type of the array values. */
+  public final SeqType valueType;
 
   /**
    * Constructor.
-   * @param memberType member type
+   * @param valueType value type
    */
-  ArrayType(final SeqType memberType) {
-    this.memberType = memberType;
+  ArrayType(final SeqType valueType) {
+    this.valueType = valueType;
   }
 
   /**
    * Creates an array type.
-   * @param memberType member type
+   * @param valueType value type
    * @return array type
    */
-  public static ArrayType get(final SeqType memberType) {
-    return memberType.arrayType();
+  public static ArrayType get(final SeqType valueType) {
+    return valueType.arrayType();
   }
 
   @Override
@@ -60,16 +60,16 @@ public final class ArrayType extends FType {
   @Override
   public boolean eq(final Type type) {
     return this == type ||
-        type instanceof ArrayType && memberType.eq(((ArrayType) type).memberType);
+        type instanceof ArrayType && valueType.eq(((ArrayType) type).valueType);
   }
 
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(type instanceof ArrayType) return memberType.instanceOf(((ArrayType) type).memberType);
+    if(type instanceof ArrayType) return valueType.instanceOf(((ArrayType) type).valueType);
     if(type instanceof FuncType) {
       final FuncType ft = (FuncType) type;
-      return memberType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
+      return valueType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
     }
     if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
@@ -82,7 +82,7 @@ public final class ArrayType extends FType {
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
-    if(type instanceof ArrayType) return get(memberType.union(((ArrayType) type).memberType));
+    if(type instanceof ArrayType) return get(valueType.union(((ArrayType) type).valueType));
     return type instanceof MapType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
@@ -94,7 +94,7 @@ public final class ArrayType extends FType {
     if(type.instanceOf(this)) return (ArrayType) type;
 
     if(type instanceof ArrayType) {
-      final SeqType mt = memberType.intersect(((ArrayType) type).memberType);
+      final SeqType mt = valueType.intersect(((ArrayType) type).valueType);
       if(mt != null) return get(mt);
     }
     return null;
@@ -102,12 +102,12 @@ public final class ArrayType extends FType {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(memberType, SeqType.INTEGER_O);
+    return FuncType.get(valueType, SeqType.INTEGER_O);
   }
 
   @Override
   public AtomType atomic() {
-    return memberType.type.atomic();
+    return valueType.type.atomic();
   }
 
   @Override
@@ -117,7 +117,7 @@ public final class ArrayType extends FType {
 
   @Override
   public String toString() {
-    final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { memberType };
+    final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { valueType };
     return new QueryString().token(QueryText.ARRAY).params(param).toString();
   }
 }

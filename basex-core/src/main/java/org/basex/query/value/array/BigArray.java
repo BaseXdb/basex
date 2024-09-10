@@ -50,7 +50,7 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  public long arraySize() {
+  public long structSize() {
     // O(1) because the middle tree caches its size
     return left.length + middle.size() + right.length;
   }

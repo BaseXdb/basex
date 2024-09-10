@@ -24,7 +24,7 @@ public final class ArrayIndexWhere extends ArrayFn {
 
     final HofArgs args = new HofArgs(2, predicate);
     final LongList list = new LongList();
-    for(final Value value : array.members()) {
+    for(final Value value : array.iterable()) {
       if(test(predicate, args.set(0, value).inc(), qc)) list.add(args.pos());
     }
     return IntSeq.get(list.finish());
@@ -37,7 +37,7 @@ public final class ArrayIndexWhere extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> refineFunc(arg, cc, ((ArrayType) type).memberType, SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, ((ArrayType) type).valueType, SeqType.INTEGER_O));
     }
     return this;
   }

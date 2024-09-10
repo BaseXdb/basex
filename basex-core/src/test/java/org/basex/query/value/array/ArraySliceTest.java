@@ -20,11 +20,11 @@ public final class ArraySliceTest extends ArrayTest {
   @Test public void testSlice() {
     XQArray array = XQArray.empty();
     for(int len = 0; len < 100; len++) {
-      assertEquals(len, array.arraySize());
+      assertEquals(len, array.structSize());
       for(int pos = 0; pos < len; pos++) {
         for(int k = 0; k <= len - pos; k++) {
           final XQArray sub = array.subArray(pos, k, qc);
-          assertEquals(k, sub.arraySize());
+          assertEquals(k, sub.structSize());
           sub.checkInvariants();
           final Iterator<Value> iter = sub.iterator(0);
           for(int i = 0; i < k; i++) {

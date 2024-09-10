@@ -97,7 +97,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   @Override
   protected void function(final FItem item) throws IOException {
     if(!(item instanceof XQArray)) throw SERFUNC_X.getIO(item.seqType());
-    for(final Value value : ((XQArray) item).members()) {
+    for(final Value value : ((XQArray) item).iterable()) {
       for(final Item it : value) serialize(it);
     }
   }
@@ -158,7 +158,7 @@ public abstract class StandardSerializer extends OutputSerializer {
    */
   static ItemList flatten(final XQArray array) {
     final ItemList list = new ItemList();
-    for(final Value value : array.members()) {
+    for(final Value value : array.iterable()) {
       for(final Item item : value) {
         if(item instanceof XQArray) {
           list.add(flatten((XQArray) item));

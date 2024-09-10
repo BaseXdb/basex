@@ -23,7 +23,7 @@ public class ArraySplit extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
-      final Iterator<Value> members = array.members().iterator();
+      final Iterator<Value> members = array.iterable().iterator();
 
       @Override
       public XQArray next() {
@@ -35,7 +35,7 @@ public class ArraySplit extends ArrayFn {
       }
       @Override
       public long size() {
-        return array.arraySize();
+        return array.structSize();
       }
     };
   }
@@ -45,7 +45,7 @@ public class ArraySplit extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(XQArray.singleton(member));
+    for(final Value member : array.iterable()) vb.add(XQArray.singleton(member));
     return vb.value();
   }
 

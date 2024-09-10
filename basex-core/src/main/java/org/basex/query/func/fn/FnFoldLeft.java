@@ -116,7 +116,7 @@ public class FnFoldLeft extends StandardFunc {
       }
 
       final SeqType zst = zero.seqType(), i1t = array ? ist.type instanceof ArrayType ?
-        ((ArrayType) ist.type).memberType : SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
+        ((ArrayType) ist.type).valueType : SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
       SeqType st = zst, ost;
       do {
         final SeqType[] types = { left ? st : i1t, left ? i1t : st, SeqType.INTEGER_O };

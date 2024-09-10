@@ -110,7 +110,7 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder append(final XQArray array) {
     if(!(array instanceof BigArray)) {
-      for(final Value value : array.members()) append(value);
+      for(final Value value : array.iterable()) append(value);
     } else {
       final BigArray big = (BigArray) array;
       final Value[] ls = big.left, rs = big.right;

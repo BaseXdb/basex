@@ -24,7 +24,7 @@ public class ArrayValues extends StandardFunc {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
-      final Iterator<Value> members = array.members().iterator();
+      final Iterator<Value> values = array.iterator(0);
       Iter ir;
 
       @Override
@@ -34,8 +34,8 @@ public class ArrayValues extends StandardFunc {
             final Item item = qc.next(ir);
             if(item != null) return item;
           }
-          if(!members.hasNext()) return null;
-          ir = members.next().iter();
+          if(!values.hasNext()) return null;
+          ir = values.next().iter();
         }
       }
       @Override
@@ -44,7 +44,7 @@ public class ArrayValues extends StandardFunc {
       }
       @Override
       public long size() {
-        return array.funcType().declType.one() ? array.arraySize() : -1;
+        return array.funcType().declType.one() ? array.structSize() : -1;
       }
     };
   }
@@ -54,14 +54,14 @@ public class ArrayValues extends StandardFunc {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(member);
+    for(final Value member : array.iterable()) vb.add(member);
     return vb.value(this);
   }
 
   @Override
   protected final Expr opt(final CompileContext cc) {
     final Type tp = arg(0).seqType().type;
-    if(tp instanceof ArrayType) exprType.assign(((ArrayType) tp).memberType.with(Occ.ZERO_OR_MORE));
+    if(tp instanceof ArrayType) exprType.assign(((ArrayType) tp).valueType.with(Occ.ZERO_OR_MORE));
     return this;
   }
 

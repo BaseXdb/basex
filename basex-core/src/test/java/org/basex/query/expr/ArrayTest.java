@@ -249,7 +249,7 @@ public final class ArrayTest extends SandboxTest {
     query("array:get([ 'x' ], 1.0)", "x");
   }
 
-  /** Tests if {@link XQArray#members()} uses the array's offset correctly. */
+  /** Tests if {@link XQArray#iterable()} uses the array's offset correctly. */
   @Test public void gh1047() {
     query("array:head(array:for-each(array:subarray([ 1, 2, 3 ], 2), function($x) { $x }))",
         2);

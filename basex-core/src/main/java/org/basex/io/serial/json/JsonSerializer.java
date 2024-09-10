@@ -108,7 +108,7 @@ public abstract class JsonSerializer extends StandardSerializer {
         out.print('[');
 
         boolean s = false;
-        for(final Value value : ((XQArray) item).members()) {
+        for(final Value value : ((XQArray) item).iterable()) {
           if(s) out.print(',');
           indent();
           serialize(value);

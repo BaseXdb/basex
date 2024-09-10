@@ -26,8 +26,8 @@ public class FnApply extends StandardFunc {
     final FItem function = checkUp(toFunction(arg(0), qc), this instanceof UpdateApply);
     final XQArray arguments = toArray(arg(1), qc);
 
-    final ValueList args = new ValueList(arguments.arraySize());
-    for(final Value arg : arguments.members()) args.add(arg);
+    final ValueList args = new ValueList(arguments.structSize());
+    for(final Value arg : arguments.iterable()) args.add(arg);
     return apply(function, args, qc);
   }
 
@@ -42,7 +42,7 @@ public class FnApply extends StandardFunc {
       if(args instanceof XQArray) {
         // argument is a value: final types are known
         final XQArray array = (XQArray) args;
-        final int as = Math.max(0, (int) array.arraySize());
+        final int as = Math.max(0, (int) array.structSize());
         final SeqType[] ast = new SeqType[as];
         for(int a = 0; a < as; a++) ast[a] = array.get(a).seqType();
         arg(0, arg -> refineFunc(arg, cc, ast));
@@ -51,7 +51,7 @@ public class FnApply extends StandardFunc {
         final SeqType[] at = ft.argTypes;
         if(at != null) {
           final SeqType[] ast = new SeqType[at.length];
-          Arrays.fill(ast, ((ArrayType) tpArgs).memberType);
+          Arrays.fill(ast, ((ArrayType) tpArgs).valueType);
           arg(0, arg -> refineFunc(arg, cc, ast));
         }
       }

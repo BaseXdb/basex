@@ -23,7 +23,7 @@ public final class ArrayFilter extends ArrayFn {
 
     final HofArgs args = new HofArgs(2, predicate).set(0, arg(0).value(qc));
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final Value value : array.members()) {
+    for(final Value value : array.iterable()) {
       if(test(predicate, args.set(0, value).inc(), qc)) ab.append(value);
     }
     return ab.array(this);
@@ -36,7 +36,7 @@ public final class ArrayFilter extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> refineFunc(arg, cc, ((ArrayType) type).memberType, SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, ((ArrayType) type).valueType, SeqType.INTEGER_O));
       exprType.assign(type);
     }
     return this;

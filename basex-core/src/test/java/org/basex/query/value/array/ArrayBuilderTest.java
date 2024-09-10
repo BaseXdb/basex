@@ -22,7 +22,7 @@ public final class ArrayBuilderTest extends ArrayTest {
       for(int i = 0; i < len; i++) ab.append(Int.get(i));
       final XQArray array = ab.array();
       array.checkInvariants();
-      assertEquals(len, array.arraySize());
+      assertEquals(len, array.structSize());
       final Iterator<Value> iter = array.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
@@ -39,7 +39,7 @@ public final class ArrayBuilderTest extends ArrayTest {
       for(int i = 0; i < len; i++) ab.prepend(Int.get(len - 1 - i));
       final XQArray array = ab.array();
       array.checkInvariants();
-      assertEquals(len, array.arraySize());
+      assertEquals(len, array.structSize());
       final Iterator<Value> iter = array.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
@@ -72,7 +72,7 @@ public final class ArrayBuilderTest extends ArrayTest {
 
       final XQArray array = ab.array();
       array.checkInvariants();
-      assertEquals(len, array.arraySize());
+      assertEquals(len, array.structSize());
       final Iterator<Value> iter = array.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
@@ -106,7 +106,7 @@ public final class ArrayBuilderTest extends ArrayTest {
 
       final XQArray array = ab.array();
       array.checkInvariants();
-      assertEquals(len, array.arraySize());
+      assertEquals(len, array.structSize());
       final Iterator<Integer> iter1 = deque.iterator();
       final Iterator<Value> iter2 = array.iterator(0);
       while(iter1.hasNext()) {
@@ -144,7 +144,7 @@ public final class ArrayBuilderTest extends ArrayTest {
         append(XQArray.singleton(Int.get(999))).append(right).array();
     result.checkInvariants();
 
-    assertEquals(left.arraySize() + 1 + right.arraySize(), result.arraySize());
+    assertEquals(left.structSize() + 1 + right.structSize(), result.structSize());
   }
 
   /**

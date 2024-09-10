@@ -25,9 +25,9 @@ public final class ArrayIndexOf extends ArrayFn {
     int c = 0;
     final DeepEqual deep = new DeepEqual(info, collation, qc);
     final LongList list = new LongList();
-    for(final Value member : array.members()) {
+    for(final Value value : array.iterable()) {
       ++c;
-      if(deep.equal(member, target)) list.add(c);
+      if(deep.equal(value, target)) list.add(c);
     }
     return IntSeq.get(list.finish());
   }
