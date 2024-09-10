@@ -1127,7 +1127,9 @@ public enum QueryError {
   /** Error code. */
   VALUETYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
   /** Error code. */
-  LOOKUP_X(XPTY, 4, "Input of lookup operator must be map or array: %."),
+  LOOKUP_X(XPTY, 4, "Input of lookup must be map or array: %."),
+  /** Error code. */
+  STRUCT_FILTER_X(XPTY, 4, "Input of filter must be map or array: %."),
   /** Error code. */
   INVALIDOPT_X(XPTY, 4, "%"),
   /** Error code. */

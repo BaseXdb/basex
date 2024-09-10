@@ -40,7 +40,8 @@ public abstract class Preds extends Arr {
     // called at an early stage as it affects the optimization of predicates
     final Expr root = type(cc.qc.focus.value);
     final int el = exprs.length;
-    if(el != 0) cc.get(this, true, () -> {
+    final boolean value = this instanceof StructFilter;
+    if(el != 0) cc.get(value ? null : this, !value, () -> {
       if(root != null) {
         final long size = root.size();
         if(size != -1) cc.qc.focus.size = size;
@@ -314,6 +315,13 @@ public abstract class Preds extends Arr {
       }
     }
     return true;
+  }
+
+  @Override
+  public int exprSize() {
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
   }
 
   @Override
