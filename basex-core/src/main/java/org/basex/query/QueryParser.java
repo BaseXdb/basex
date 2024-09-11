@@ -1955,9 +1955,9 @@ public class QueryParser extends InputParser {
   private Expr valueMap() throws QueryException {
     final Expr expr = itemMap();
     if(expr != null) {
-      if(wsConsumeWs("~")) {
+      if(wsConsumeWs("->")) {
         final ExprList el = new ExprList(expr);
-        do add(el, itemMap()); while(wsConsumeWs("~"));
+        do add(el, itemMap()); while(wsConsumeWs("->"));
         return new ValueMap(info(), el.finish());
       }
     }
