@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class FnParseUri extends StandardFunc {
+public class FnParseUri extends StandardFunc {
   /** URI part. */
   static final String URI = "uri";
   /** URI part. */
@@ -149,14 +149,12 @@ public final class FnParseUri extends StandardFunc {
 
     final TokenList segments = new TokenList();
     if(!string.isEmpty()) {
-      final String separator = Pattern.quote(options.get(UriOptions.PATH_SEPARATOR));
-      for(final String s : string.split(separator, -1)) segments.add(decode(s));
+      for(final String s : string.split("/", -1)) segments.add(decode(s));
     }
 
     XQMap queries = XQMap.empty();
     if(!query.isEmpty()) {
-      final String separator = Pattern.quote(options.get(UriOptions.QUERY_SEPARATOR));
-      for(final String q : query.split(separator)) {
+      for(final String q : query.split("&")) {
         final int eq = q.indexOf('=');
         final Str key = eq == -1 ? Str.EMPTY : Str.get(decode(q.substring(0, eq)));
         final Str val = Str.get(decode(q.substring(eq + 1)));

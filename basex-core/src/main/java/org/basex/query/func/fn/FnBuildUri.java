@@ -1,10 +1,8 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.func.fn.FnParseUri.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -16,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class FnBuildUri extends StandardFunc {
+public final class FnBuildUri extends FnParseUri {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap parts = toMap(arg(0), qc);
@@ -28,7 +26,8 @@ public final class FnBuildUri extends StandardFunc {
     if(!scheme.isEmpty()) {
       uri.add(scheme);
       final Value hierarchical = parts.get(Str.get(HIERARCHICAL));
-      final boolean hrrchcl = hierarchical.isEmpty() || toBoolean(hierarchical, qc);
+      final boolean hrrchcl = hierarchical.isEmpty() ? !NON_HIERARCHICAL.contains(scheme) :
+        toBoolean(hierarchical, qc);
       uri.add(hrrchcl ? "://" : ":");
       if(scheme.equals(FILE) && options.get(UriOptions.UNC_PATH)) uri.add("//");
     }
@@ -50,10 +49,9 @@ public final class FnBuildUri extends StandardFunc {
 
     final Value segments = parts.get(Str.get(PATH_SEGMENTS));
     if(!segments.isEmpty()) {
-      final String ps = options.get(UriOptions.PATH_SEPARATOR);
       int a = 0;
       for(final Item segment : segments) {
-        if(a++ != 0) uri.add(ps);
+        if(a++ != 0) uri.add("/");
         uri.add(encodeUri(toToken(segment, qc), UriEncoder.PATH));
       }
     } else {
@@ -63,12 +61,12 @@ public final class FnBuildUri extends StandardFunc {
     final Value qp = parts.get(Str.get(QUERY_PARAMETERS)), query = parts.get(Str.get(QUERY));
     if(!qp.isEmpty()) {
       final TokenBuilder tmp = new TokenBuilder();
-      final String qs = options.get(UriOptions.QUERY_SEPARATOR);
       toMap(qp, qc).apply((key, value) -> {
         final byte[] k = encodeUri(toToken(key), UriEncoder.QUERY);
         for(final Item item : value) {
-          tmp.add(tmp.isEmpty() ? "?" : qs);
-          tmp.add(k).add('=').add(encodeUri(toToken(item), UriEncoder.QUERY));
+          tmp.add(tmp.isEmpty() ? "?" : "&");
+          if(k.length != 0) tmp.add(k).add('=');
+          tmp.add(encodeUri(toToken(item), UriEncoder.QUERY));
         }
       });
       uri.add(tmp);

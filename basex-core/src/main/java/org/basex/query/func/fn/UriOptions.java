@@ -10,12 +10,6 @@ import org.basex.util.options.*;
  */
 public final class UriOptions extends Options {
   /** Option. */
-  public static final StringOption PATH_SEPARATOR =
-      new StringOption("path-separator", "/");
-  /** Option. */
-  public static final StringOption QUERY_SEPARATOR =
-      new StringOption("query-separator", "&");
-  /** Option. */
   public static final BooleanOption ALLOW_DEPRECATED_FEATURES =
       new BooleanOption("allow-deprecated-features", false);
   /** Option. */
