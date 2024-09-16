@@ -3317,4 +3317,9 @@ public final class RewritingsTest extends SandboxTest {
     query("let $b := <a><b/></a> return <a/>[* union $b/b]", "<a/>");
     check("let $b := <a><b/></a> return <a/>[* union <b/>]", "<a/>", root(CElem.class));
   }
+
+  /** for clause: coercion. */
+  @Test public void gh2334() {
+    query("for $a as xs:integer in [ 1, 2 ] return $a", "1\n2");
+  }
 }
