@@ -47,6 +47,8 @@ public class FnParseUri extends StandardFunc {
   static final String QUERY_PARAMETERS = "query-parameters";
   /** URI part. */
   static final String FILEPATH = "filepath";
+  /** Absolute. */
+  static final String ABSOLUTE = "absolute";
 
   /** File scheme. */
   static final String FILE = "file";
@@ -82,6 +84,8 @@ public class FnParseUri extends StandardFunc {
       scheme = r.group(1);
       string = r.group(2);
     }
+    boolean absolute = !scheme.isEmpty() && fragment.isEmpty();
+
     if(scheme.isEmpty() || scheme.equalsIgnoreCase(FILE)) {
       if(r.has(string, "^/*([a-zA-Z][:|].*)$")) {
         scheme = FILE;
@@ -94,6 +98,7 @@ public class FnParseUri extends StandardFunc {
     // determine if the URI is hierarchical
     final Item hierarchical = NON_HIERARCHICAL.contains(scheme) ? Bln.FALSE :
       string.isEmpty() ? Empty.VALUE : Bln.get(string.startsWith("/"));
+    if(hierarchical == Bln.FALSE) absolute = false;
 
     // identify the remaining components
     if(scheme.equalsIgnoreCase(FILE)) {
@@ -177,6 +182,7 @@ public class FnParseUri extends StandardFunc {
     add(mb, PATH_SEGMENTS, StrSeq.get(segments));
     add(mb, QUERY_PARAMETERS, queries);
     add(mb, FILEPATH, filepath);
+    if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
     return mb.map();
   }
 

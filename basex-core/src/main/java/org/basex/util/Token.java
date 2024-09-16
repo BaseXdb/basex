@@ -1358,15 +1358,15 @@ public final class Token {
     },
     /** Path component. */ PATH {
       @Override
-      boolean literal(final int ch) { return ch >= 0x20 && " %#+[]/?".indexOf(ch) == -1; }
+      boolean literal(final int ch) { return (ch < 0 || ch > ' ') && "%#+[]/?".indexOf(ch) == -1; }
     },
     /** Query component. */ QUERY {
       @Override
-      boolean literal(final int ch) { return ch >= 0x20 && " %#+[]=&".indexOf(ch) == -1; }
+      boolean literal(final int ch) { return (ch < 0 || ch > ' ') && "%#+[]=&".indexOf(ch) == -1; }
     },
     /** Fragment component. */ FRAGMENT {
       @Override
-      boolean literal(final int ch) { return ch >= 0x20 && " %#+[]".indexOf(ch) == -1; }
+      boolean literal(final int ch) { return (ch < 0 || ch > ' ') && "%#+[]".indexOf(ch) == -1; }
     };
 
     /**
