@@ -326,8 +326,8 @@ public abstract class ANode extends Item {
       final Atts nsp = node.namespaces();
       if(nsp != null) {
         for(int a = nsp.size() - 1; a >= 0; a--) {
-          final byte[] key = nsp.name(a);
-          if(!ns.contains(key)) ns.add(key, nsp.value(a));
+          final byte[] name = nsp.name(a);
+          if(!ns.contains(name)) ns.add(name, nsp.value(a));
         }
       }
     }

@@ -24,11 +24,11 @@ public final class FnInScopeNamespaces extends StandardFunc {
     final MapBuilder mb = new MapBuilder();
     final int as = atts.size();
     for(int a = 0; a < as; ++a) {
-      final byte[] key = atts.name(a), value = atts.value(a);
-      final int kl = key.length, vl = value.length;
-      if(kl + vl != 0) {
-        final Type kt = kl != 0 ? AtomType.NCNAME : new EnumType(new TokenSet(Token.EMPTY));
-        mb.put(Str.get(key, kt), Uri.get(value));
+      final byte[] name = atts.name(a), value = atts.value(a);
+      final int nl = name.length, vl = value.length;
+      if(nl + vl != 0) {
+        final Type nt = nl != 0 ? AtomType.NCNAME : new EnumType(new TokenSet(Token.EMPTY));
+        mb.put(Str.get(name, nt), Uri.get(value));
       }
     }
     return mb.map();
