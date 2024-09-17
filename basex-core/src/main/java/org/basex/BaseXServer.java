@@ -259,7 +259,7 @@ public final class BaseXServer extends CLI implements Runnable {
             service = !daemon;
             break;
           case 'z': // suppress logging
-            context.soptions.set(StaticOptions.LOG, Boolean.FALSE.toString());
+            context.soptions.set(StaticOptions.LOG, "");
             break;
           default:
             throw arg.usage();

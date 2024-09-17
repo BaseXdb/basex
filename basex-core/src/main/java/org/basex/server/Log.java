@@ -37,10 +37,20 @@ public final class Log implements QueryTracer {
     /** Error.   */ ERROR,
     /** OK.      */ OK
   }
+  /** Log targets. */
+  private enum LogTarget {
+    /** Standard out.       */ STDOUT,
+    /** Standard error.     */ STDERR,
+    /** Database directory. */ DATA
+  }
 
   /** Static options. */
   private final StaticOptions sopts;
+  /** Maximum length of log messages. */
+  private final int maxLen;
 
+  /** Log targets. */
+  private Set<LogTarget> targets;
   /** Current log file. */
   private LogFile file;
 
@@ -50,6 +60,7 @@ public final class Log implements QueryTracer {
    */
   public Log(final StaticOptions sopts) {
     this.sopts = sopts;
+    maxLen = sopts.get(StaticOptions.LOGMSGMAXLEN);
   }
 
   /**
@@ -117,35 +128,41 @@ public final class Log implements QueryTracer {
    * @param address address string ({@code SERVER} is written if value is {@code null})
    * @param user user ({@code admin} is written if value is {@code null})
    */
-  private void write(final String type, final String info, final Performance perf,
+  private synchronized void write(final String type, final String info, final Performance perf,
       final String address, final String user) {
 
-    // check if logging is disabled
-    final String log = sopts.get(StaticOptions.LOG);
-    if(Strings.no(log)) return;
+    if(skip()) return;
 
     // construct log text
     final Date date = new Date();
-    final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
     final TokenBuilder tb = new TokenBuilder();
     tb.add(DateTime.format(date, DateTime.TIME));
     tb.add('\t').add(address != null ? address.replaceFirst("^/", "") : SERVER);
     tb.add('\t').add(user != null ? user : UserText.ADMIN);
     tb.add('\t').add(type);
-    tb.add('\t').add(info != null ? chop(normalize(token(info)), ml) : EMPTY);
+    tb.add('\t').add(info != null ? chop(normalize(token(info)), maxLen) : EMPTY);
     if(perf != null) tb.add('\t').add(perf);
     tb.add(Prop.NL);
+    final byte[] token = tb.finish();
 
     try {
-      synchronized(sopts) {
-        // create new log file and write log entry
-        final String name = DateTime.format(date, DateTime.DATE);
-        if(file != null && !file.valid(name)) close();
-        if(file == null) file = LogFile.create(name, dir());
-        // write log entry
-        final byte[] token = tb.toArray();
-        file.write(token);
-        if(log.equals("stdout")) Util.print(string(token));
+      // use existing or create new log file
+      final String name = DateTime.format(date, DateTime.DATE);
+      if(file != null && !file.valid(name)) close();
+      if(file == null) file = LogFile.create(name, dir());
+
+      // write log entry to requested targets
+      for(final LogTarget target : targets) {
+        switch(target) {
+          case STDOUT:
+            Util.print(string(token));
+            break;
+          case STDERR:
+            Util.err(string(token));
+            break;
+          default:
+            file.write(token);
+        }
       }
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -153,15 +170,39 @@ public final class Log implements QueryTracer {
   }
 
   /**
+   * Checks if logging is requested. Initializes the log targets if not done yet
+   * (not part of the constructor to consider command-line arguments).
+   * @return result of check
+   */
+  private boolean skip() {
+    if(targets == null) {
+      final String log = sopts.get(StaticOptions.LOG);
+      final Set<LogTarget> set = EnumSet.noneOf(LogTarget.class);
+      for(final String target : log.trim().toUpperCase().split("\\s*,\\s*")) {
+        if(Strings.no(target)) {
+          set.clear();
+          break;
+        } else if(Strings.toBoolean(target)) {
+          set.add(LogTarget.DATA);
+        } else {
+          for(final LogTarget lt : LogTarget.values()) {
+            if(target.equals(lt.name())) set.add(lt);
+          }
+        }
+      }
+      targets = set;
+    }
+    return targets.isEmpty();
+  }
+
+  /**
    * Closes the log file.
    */
-  public void close() {
+  public synchronized void close() {
     try {
-      synchronized(sopts) {
-        if(file != null) {
-          file.close();
-          file = null;
-        }
+      if(file != null) {
+        file.close();
+        file = null;
       }
     } catch(final IOException ex) {
       Util.stack(ex);
