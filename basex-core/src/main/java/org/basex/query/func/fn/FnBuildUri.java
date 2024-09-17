@@ -22,12 +22,12 @@ public final class FnBuildUri extends FnParseUri {
 
     final TokenBuilder uri = new TokenBuilder();
     final String scheme = get(parts, SCHEME, qc);
+    final Value hierarchical = parts.get(Str.get(HIERARCHICAL));
+    final boolean hrrchcl = hierarchical.isEmpty() ? !NON_HIERARCHICAL.contains(scheme) :
+      toBoolean(hierarchical, qc);
 
     if(!scheme.isEmpty()) {
       uri.add(scheme);
-      final Value hierarchical = parts.get(Str.get(HIERARCHICAL));
-      final boolean hrrchcl = hierarchical.isEmpty() ? !NON_HIERARCHICAL.contains(scheme) :
-        toBoolean(hierarchical, qc);
       uri.add(hrrchcl ? "://" : ":");
       if(scheme.equals(FILE) && options.get(UriOptions.UNC_PATH)) uri.add("//");
     }
@@ -52,7 +52,8 @@ public final class FnBuildUri extends FnParseUri {
       int a = 0;
       for(final Item segment : segments) {
         if(a++ != 0) uri.add("/");
-        uri.add(encodeUri(toToken(segment, qc), UriEncoder.PATH));
+        final byte[] sgmnt = toToken(segment, qc);
+        uri.add(hrrchcl ? encodeUri(sgmnt, UriEncoder.PATH) : sgmnt);
       }
     } else {
       uri.add(get(parts, PATH, qc));
