@@ -66,10 +66,11 @@ declare %basex:lazy %private variable $config:OPTIONS := (
           map:entry($key,
             let $option := $options/*[name() = $key]
             return if($option) then (
-              typeswitch($value)
+              typeswitch($value) {
                 case xs:numeric  return xs:integer($option)
                 case xs:boolean  return xs:boolean($option)
                 default          return xs:string($option)
+              }
             ) else (
               $value
             )
