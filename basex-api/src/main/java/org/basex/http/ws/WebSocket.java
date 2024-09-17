@@ -15,10 +15,10 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.exceptions.*;
 

@@ -1,4 +1,4 @@
-package org.basex.server;
+package org.basex.util.log;
 
 import java.io.*;
 
@@ -7,7 +7,7 @@ import org.basex.io.in.*;
 import org.basex.util.list.*;
 
 /**
- * Log file instance.
+ * Log file.
  *
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen

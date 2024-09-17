@@ -11,6 +11,7 @@ import org.basex.query.util.pkg.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 
 /**
  * This class serves as a central database context.

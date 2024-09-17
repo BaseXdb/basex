@@ -14,9 +14,9 @@ import org.basex.core.users.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 
 /**
  * Server-side client session in the client-server architecture.

@@ -5,8 +5,8 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 
 /**
  * Function implementation.

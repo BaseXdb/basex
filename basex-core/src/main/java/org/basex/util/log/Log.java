@@ -1,6 +1,4 @@
-package org.basex.server;
-
-import static org.basex.util.Token.*;
+package org.basex.util.log;
 
 import java.io.*;
 import java.util.*;
@@ -12,8 +10,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class writes daily log files to disk.
- * The log format has been updated in Version 7.4; it now has the following columns:
+ * This class processes log entries. The log format:
  * <ul>
  *   <li><b>Time</b>: timestamp (format: {@code xs:time})</li>
  *   <li><b>Address</b>: host name and port of the requesting client</li>
@@ -29,20 +26,6 @@ import org.basex.util.*;
 public final class Log implements QueryTracer {
   /** Server string. */
   private static final String SERVER = "SERVER";
-  /** Log types. */
-  public enum LogType {
-    /** Request. */ REQUEST,
-    /** Trace.   */ TRACE,
-    /** Info.    */ INFO,
-    /** Error.   */ ERROR,
-    /** OK.      */ OK
-  }
-  /** Log targets. */
-  private enum LogTarget {
-    /** Standard out.       */ STDOUT,
-    /** Standard error.     */ STDERR,
-    /** Database directory. */ DATA
-  }
 
   /** Static options. */
   private final StaticOptions sopts;
@@ -51,8 +34,8 @@ public final class Log implements QueryTracer {
 
   /** Log targets. */
   private Set<LogTarget> targets;
-  /** Current log file. */
-  private LogFile file;
+  /** Current (daily) log file. */
+  LogFile file;
 
   /**
    * Constructor.
@@ -133,39 +116,25 @@ public final class Log implements QueryTracer {
 
     if(skip()) return;
 
-    // construct log text
-    final Date date = new Date();
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(DateTime.format(date, DateTime.TIME));
-    tb.add('\t').add(address != null ? address.replaceFirst("^/", "") : SERVER);
-    tb.add('\t').add(user != null ? user : UserText.ADMIN);
-    tb.add('\t').add(type);
-    tb.add('\t').add(info != null ? chop(normalize(token(info)), maxLen) : EMPTY);
-    if(perf != null) tb.add('\t').add(perf);
-    tb.add(Prop.NL);
-    final byte[] token = tb.finish();
+    final LogEntry entry = new LogEntry();
+    entry.log = this;
+    entry.date = new Date();
+    entry.time = DateTime.format(entry.date, DateTime.TIME);
+    entry.address = address != null ? address.replaceFirst("^/", "") : SERVER;
+    entry.user = user != null ? user : UserText.ADMIN;
+    entry.type = type;
+    final String inf = info != null ? info : "";
+    final int len = inf.codePointCount(0, inf.length());
+    entry.info = len > maxLen ? inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "..." : inf;
+    if(perf != null) entry.runtime = perf.toString();
 
-    try {
-      // use existing or create new log file
-      final String name = DateTime.format(date, DateTime.DATE);
-      if(file != null && !file.valid(name)) close();
-      if(file == null) file = LogFile.create(name, dir());
-
-      // write log entry to requested targets
-      for(final LogTarget target : targets) {
-        switch(target) {
-          case STDOUT:
-            Util.print(string(token));
-            break;
-          case STDERR:
-            Util.err(string(token));
-            break;
-          default:
-            file.write(token);
-        }
+    // write log entry to requested targets
+    for(final LogTarget target : targets) {
+      try {
+        target.write(this, entry);
+      } catch(final IOException ex) {
+        Util.stack(ex);
       }
-    } catch(final IOException ex) {
-      Util.stack(ex);
     }
   }
 
@@ -215,6 +184,18 @@ public final class Log implements QueryTracer {
    */
   public IOFile[] files() {
     return dir().children(".*\\" + IO.LOGSUFFIX);
+  }
+
+  /**
+   * Writes an entry to the daily database log file.
+   * @param entry log entry
+   * @throws IOException I/O exception
+   */
+  public void write(final LogEntry entry) throws IOException {
+    final String name = DateTime.format(entry.date, DateTime.DATE);
+    if(file != null && !file.valid(name)) close();
+    if(file == null) file = LogFile.create(name, dir());
+    file.write(Token.token(entry + Prop.NL));
   }
 
   /**

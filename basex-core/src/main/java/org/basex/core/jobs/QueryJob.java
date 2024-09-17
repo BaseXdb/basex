@@ -11,8 +11,8 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 
 /**
  * Scheduled XQuery job.

@@ -12,8 +12,8 @@ import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.server.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 
 /**
  * This is the starter class for running the database server. It handles
