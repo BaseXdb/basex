@@ -101,6 +101,10 @@ public class BaseX extends CLI {
             out = new PrintOutput(new IOFile(value));
             session().setOutputStream(out);
             break;
+          case 'O':
+            String[] kv = value.split("=", 2);
+            execute(new Set(kv[0], kv.length > 1 ? kv[1] : ""), false);
+            break;
           case 'q':
             console = false;
             execute(new XQuery(value), verbose);
@@ -118,7 +122,7 @@ public class BaseX extends CLI {
             break;
           case 's':
             if(sopts == null) sopts = new SerializerOptions();
-            final String[] kv = value.split("=", 2);
+            kv = value.split("=", 2);
             sopts.assign(kv[0], kv.length > 1 ? kv[1] : "");
             execute(new Set(MainOptions.SERIALIZER, sopts), false);
             break;
@@ -215,8 +219,8 @@ public class BaseX extends CLI {
         if(c == 'd') {
           // activate debug mode
           Prop.debug = true;
-        } else if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' || c == 'o' ||
-            c == 'q' || c == 'Q' || c == 'r' || c == 's' || c == 't' && local()) {
+        } else if(c == 't' && local() || c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' ||
+            c == 'o' || c == 'O' || c == 'q' || c == 'Q' || c == 'r' || c == 's') {
           // options followed by a string
           v = arg.string();
         } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
