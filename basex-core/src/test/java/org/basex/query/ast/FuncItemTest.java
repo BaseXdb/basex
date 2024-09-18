@@ -359,4 +359,13 @@ public final class FuncItemTest extends SandboxTest {
         + "return ($result[1] instance of xs:string, $result[2] instance of xs:integer)",
         "true\ntrue");
   }
+
+  /** Variable declarations with function-lookup. */
+  @Test public void gh2324() {
+    query("declare variable $a := function-lookup(xs:QName('local:f'), 0);"
+        + "declare variable $b := $a;"
+        + "declare function local:f() { $b };"
+        + "local:f() => function-name()",
+        "local:f");
+  }
 }

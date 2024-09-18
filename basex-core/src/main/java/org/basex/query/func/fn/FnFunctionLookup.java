@@ -24,7 +24,7 @@ public final class FnFunctionLookup extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // make sure that all functions are compiled
-    cc.qc.functions.compileAll(cc);
+    if(!cc.dynamic) cc.qc.functions.compileAll(cc);
 
     if(values(false, cc)) {
       final Expr expr = item(cc.qc);
