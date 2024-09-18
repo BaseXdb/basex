@@ -254,6 +254,19 @@ public final class FuncItemTest extends SandboxTest {
         "",
         empty()
     );
+    // GH-2324
+    query("declare variable $f := map {"
+        + "  'A': function($r, $f) { $r/x ! $f?B(., $f) },"
+        + "  'B': function($r, $f) { $r/x ! $f?A(., $f) }"
+        + "};"
+        + "$f?A(<a/>, $f)", "");
+    query("let $even := fn($n, $self, $odd) {"
+        + "  $n = 0 and $odd($n - 1, $odd, $self)"
+        + "}"
+        + "let $odd := fn($n, $self, $even) {"
+        + "  $n != 0 or $even($n - 1, $even, $self)"
+        + "}"
+        + "return $even(1, $even, $odd)", false);
   }
 
   /** Tests if not-yet-known function references are parsed correctly. */
