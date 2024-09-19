@@ -53,6 +53,8 @@ public abstract class AxisPath extends Path {
   private Value cache(final QueryContext qc) throws QueryException {
     final PathCache cache = qc.threads.get(this).get();
     final Value value = qc.focus.value;
+    if(value != null && value.isEmpty()) return value;
+
     switch(cache.state) {
       case INIT:
         // first invocation: find out if caching is possible
