@@ -27,21 +27,21 @@ public abstract class AxisPath extends Path {
 
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final Value result = cache(qc);
-    return result != null ? result.iter() : iterator(qc);
+    final Value cached = cache(qc);
+    return cached != null ? cached.iter() : iterator(qc);
   }
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    final Value result = cache(qc);
-    return result != null ? result : nodes(qc);
+    final Value cached = cache(qc);
+    return cached != null ? cached : nodes(qc);
   }
 
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    final Value result = cache(qc);
-    return result != null ? !result.isEmpty() : iterator(qc).next() != null;
+    final Value cached = cache(qc);
+    return cached != null ? !cached.isEmpty() : iterator(qc).next() != null;
   }
 
   /**
@@ -51,10 +51,10 @@ public abstract class AxisPath extends Path {
    * @throws QueryException query context
    */
   private Value cache(final QueryContext qc) throws QueryException {
-    final PathCache cache = qc.threads.get(this).get();
     final Value value = qc.focus.value;
-    if(value != null && value.isEmpty()) return value;
+    if(root == null && value != null && value.isEmpty()) return value;
 
+    final PathCache cache = qc.threads.get(this).get();
     switch(cache.state) {
       case INIT:
         // first invocation: find out if caching is possible
