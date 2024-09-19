@@ -476,7 +476,7 @@ public final class GFLWOR extends ParseExpr {
       final InlineContext ic = new InlineContext(fl.var, new ContextValue(info), cc);
       if(ic.inlineable(expr)) {
         final Expr inlined = cc.get(inline, item, () -> ic.inline(expr));
-        return let ? ValueMap.get(cc, info, inline, inlined) :
+        return let ? Focus.get(cc, info, inline, inlined) :
           SimpleMap.get(cc, info, inline, inlined);
       }
     }

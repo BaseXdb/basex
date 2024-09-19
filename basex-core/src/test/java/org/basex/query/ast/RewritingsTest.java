@@ -1056,13 +1056,13 @@ public final class RewritingsTest extends SandboxTest {
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
-        root(ValueMap.class), empty(IterPath.class), empty(IterMap.class));
+        root(Focus.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
     check("<a><b/></a>[b ! ..]", "<a><b/></a>", exists(CachedPath.class));
 
     // absolute paths
-    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(ValueMap.class));
+    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(Focus.class));
     check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
     check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
   }
@@ -1812,7 +1812,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // do not generate nested node constructors
     check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()",
-        "x", root(ValueMap.class));
+        "x", root(Focus.class));
   }
 
   /** Rewritings of positional tests. */
@@ -1999,7 +1999,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Rewrite side-effecting let expressions. */
   @Test public void gh1917() {
     check("let $a := (# basex:nondeterministic #) { <a/> } return $a ! name()",
-        "a", root(ValueMap.class));
+        "a", root(Focus.class));
   }
 
   /** Rewrite list to replicate. */
@@ -3055,7 +3055,7 @@ public final class RewritingsTest extends SandboxTest {
         "a", root(SUBSTRING_BEFORE));
     check("for $b in <?_ a-1?> group by $c := substring-before($b, '-') " +
         "return ($c, string-length($c))",
-        "a\n1", root(ValueMap.class));
+        "a\n1", root(Focus.class));
   }
 
   /** Inlined type check. */
@@ -3084,7 +3084,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(DualMap.class));
 
     // GH-2215: Unexpected exception of mapping double attributes
-    check("boolean((<a/> ! (a, b)))", false, exists(ValueMap.class));
+    check("boolean((<a/> ! (a, b)))", false, exists(Focus.class));
     check("boolean(count(<T/>//*[@id = '1'] ! (@a, @b)))", false, exists(IterPath.class));
   }
 

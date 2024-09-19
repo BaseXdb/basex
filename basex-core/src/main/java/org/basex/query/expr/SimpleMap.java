@@ -73,7 +73,7 @@ public abstract class SimpleMap extends Mapping {
       dual = dual && (st.zeroOrOne() || e == 0);
     }
     return copyType(
-      value ? new ValueMap(info, exprs) :
+      value ? new Focus(info, exprs) :
       cached ? new CachedMap(info, exprs) :
       dual ? new DualMap(info, exprs) :
       dualiter ? new DualIterMap(info, exprs) :

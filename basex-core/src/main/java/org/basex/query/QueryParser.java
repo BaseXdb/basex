@@ -1027,7 +1027,7 @@ public class QueryParser extends InputParser {
     if(expr == null) expr = replace();
     if(expr == null) expr = updatingFunctionCall();
     if(expr == null) expr = copyModify();
-    if(expr == null) expr = or();
+    if(expr == null) expr = focus();
     return expr;
   }
 
@@ -1517,6 +1517,23 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Parses the "FocusExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr focus() throws QueryException {
+    final Expr expr = or();
+    if(expr != null) {
+      if(wsConsumeWs("->")) {
+        final ExprList el = new ExprList(expr);
+        do add(el, or()); while(wsConsumeWs("->"));
+        return new Focus(info(), el.finish());
+      }
+    }
+    return expr;
+  }
+
+  /**
    * Parses the "OrExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
@@ -1635,7 +1652,7 @@ public class QueryParser extends InputParser {
   private Expr additive() throws QueryException {
     Expr expr = multiplicative();
     while(expr != null) {
-      final Calc c = consume('+') ? Calc.ADD : consume('-') ? Calc.SUBTRACT : null;
+      final Calc c = consume('+') ? Calc.ADD : next() != '>' && consume('-') ? Calc.SUBTRACT : null;
       if(c == null) break;
       expr = new Arith(info(), expr, check(multiplicative(), CALCEXPR), c);
     }
@@ -1868,7 +1885,7 @@ public class QueryParser extends InputParser {
   private Expr value() throws QueryException {
     validate();
     final Expr expr = extension();
-    return expr == null ? valueMap() : expr;
+    return expr == null ? itemMap() : expr;
   }
 
   /**
@@ -1945,23 +1962,6 @@ public class QueryParser extends InputParser {
       pos += 2;
     } while(wsConsumeWs("(#"));
     return el.toArray(Pragma[]::new);
-  }
-
-  /**
-   * Parses the "ValueMapExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr valueMap() throws QueryException {
-    final Expr expr = itemMap();
-    if(expr != null) {
-      if(wsConsumeWs("->")) {
-        final ExprList el = new ExprList(expr);
-        do add(el, itemMap()); while(wsConsumeWs("->"));
-        return new ValueMap(info(), el.finish());
-      }
-    }
-    return expr;
   }
 
   /**
@@ -2430,7 +2430,7 @@ public class QueryParser extends InputParser {
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
           params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
-          expr = new ValueMap(ii, localVars.resolve(name, ii), enclosedExpr());
+          expr = new Focus(ii, localVars.resolve(name, ii), enclosedExpr());
         }
         final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))

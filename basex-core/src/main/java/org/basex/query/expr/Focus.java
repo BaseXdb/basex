@@ -10,18 +10,18 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Value map expression.
+ * Focus expression.
  *
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class ValueMap extends Mapping {
+public final class Focus extends Mapping {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param exprs expressions
    */
-  public ValueMap(final InputInfo info, final Expr... exprs) {
+  public Focus(final InputInfo info, final Expr... exprs) {
     super(info, exprs[exprs.length - 1].seqType(), exprs);
   }
 
@@ -36,7 +36,7 @@ public final class ValueMap extends Mapping {
   public static Expr get(final CompileContext cc, final InputInfo info, final Expr... exprs)
       throws QueryException {
     final int el = exprs.length;
-    return el > 1 ? new ValueMap(info, exprs).optimize(cc) : exprs[0];
+    return el > 1 ? new Focus(info, exprs).optimize(cc) : exprs[0];
   }
 
   @Override
@@ -62,7 +62,7 @@ public final class ValueMap extends Mapping {
         final QueryFocus focus = qc.focus;
         try {
           if(iter == null) {
-            qf = map(qc);
+            qf = eval(qc);
             iter = exprs[exprs.length - 1].iter(qc);
           }
           qc.focus = qf;
@@ -78,7 +78,7 @@ public final class ValueMap extends Mapping {
   public Value value(final QueryContext qc) throws QueryException {
     final QueryFocus focus = qc.focus;
     try {
-      map(qc);
+      eval(qc);
       return exprs[exprs.length - 1].value(qc);
     } finally {
       qc.focus = focus;
@@ -86,12 +86,12 @@ public final class ValueMap extends Mapping {
   }
 
   /**
-   * Performs value mapping for all operands except for the last.
+   * Evaluates all operands except for the last.
    * @param qc query context
    * @return new query focus
    * @throws QueryException query exception
    */
-  private QueryFocus map(final QueryContext qc) throws QueryException {
+  private QueryFocus eval(final QueryContext qc) throws QueryException {
     final QueryFocus qf = new QueryFocus();
     qf.value = exprs[0].value(qc);
     qc.focus = qf;
@@ -113,13 +113,13 @@ public final class ValueMap extends Mapping {
   }
 
   @Override
-  public ValueMap copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new ValueMap(info, Arr.copyAll(cc, vm, exprs)));
+  public Focus copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new Focus(info, Arr.copyAll(cc, vm, exprs)));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof ValueMap && super.equals(obj);
+    return this == obj || obj instanceof Focus && super.equals(obj);
   }
 
   @Override

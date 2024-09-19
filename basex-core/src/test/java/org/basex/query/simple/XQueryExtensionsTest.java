@@ -31,41 +31,45 @@ public final class XQueryExtensionsTest extends SandboxTest {
         "return try { $f() } catch * { count($err:additional) }", 2);
   }
 
-  /** Value map. */
-  @Test public void valueMap() {
+  /** Focus expression. */
+  @Test public void focus() {
     query(wrap(1) + " -> (., . to 6)", "1\n1\n2\n3\n4\n5\n6");
     query("count(" + wrap(1) + " -> (., . to 6))", 7);
 
     check("2 -> .", 2, root(Int.class));
     check("2 -> .", 2, root(Int.class));
 
-    check("void() -> void() -> 2", 2, root(ValueMap.class), count(VOID, 2));
-    check("void() -> 2", 2, root(ValueMap.class));
-    check("void() -> . -> 2", 2, root(ValueMap.class), empty(ContextValue.class));
-    check("(void() -> void()) -> 2", 2, count(ValueMap.class, 1));
+    check("void() -> void() -> 2", 2, root(Focus.class), count(VOID, 2));
+    check("void() -> 2", 2, root(Focus.class));
+    check("void() -> . -> 2", 2, root(Focus.class), empty(ContextValue.class));
+    check("(void() -> void()) -> 2", 2, count(Focus.class, 1));
 
+    check("(1, 2) -> head(.) + tail(.)", 3, root(Int.class));
     check("(1, 2) -> (head(.) + tail(.))", 3, root(Int.class));
-    check("(<a/>, <b/>) -> (foot(.), head(.))", "<b/>\n<a/>", root(ValueMap.class));
+    check("(<a/>, <b/>) -> (foot(.), head(.))", "<b/>\n<a/>", root(Focus.class));
 
+    check("2 -> . * .", 4, root(Int.class));
     check("2 -> (. * .)", 4, root(Int.class));
+    check("<a>2</a> -> . * .", 4, root(Dbl.class));
     check("<a>2</a> -> (. * .)", 4, root(Dbl.class));
-    check("<?_ 2?> -> xs:integer() -> (. * .)", 4, root(ValueMap.class));
+    check("<?_ 2?> -> xs:integer() -> . * .", 4, root(Focus.class));
+    check("<?_ 2?> -> xs:integer() -> (. * .)", 4, root(Focus.class));
 
     check("<?_ 2?> ! xs:integer() ! (. * .) ! (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
     check("<?_ 2?> ! xs:integer() ! (. * .) -> (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
     check("<?_ 2?> ! xs:integer() -> (. * .) ! (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
     check("<?_ 2?> -> xs:integer() ! (. * .) ! (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
     check("<?_ 2?> ! xs:integer() -> (. * .) -> (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
     check("<?_ 2?> -> xs:integer() ! (. * .) -> (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
     check("<?_ 2?> -> xs:integer() -> (. * .) ! (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
     check("<?_ 2?> -> xs:integer() -> (. * .) -> (. * .)", 16,
-        count(ValueMap.class, 1), root(ValueMap.class));
+        count(Focus.class, 1), root(Focus.class));
   }
 }
