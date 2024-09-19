@@ -124,6 +124,6 @@ public final class ValueMap extends Mapping {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " ~ ", true);
+    qs.tokens(exprs, " -> ", true);
   }
 }
