@@ -51,34 +51,33 @@ public enum Flag {
   FCS;
 
   /**
-   * Removes this flag from the specified array.
-   * @param flags flags
-   * @return new array
-   */
-  public Flag[] remove(final Flag[] flags) {
-    final int i = indexOf(flags);
-    return i == -1 ? flags : Array.remove(flags, i);
-  }
-
-  /**
-   * Checks this flag is contained in the specified array.
+   * Checks if this is one of the specified flags.
    * @param flags flags
    * @return result of check
    */
-  public boolean in(final Flag[] flags) {
-    return indexOf(flags) != -1;
+  public boolean oneOf(final Flag[] flags) {
+    for(final Flag flag : flags) {
+      if(this == flag) return true;
+    }
+    return false;
   }
 
   /**
-   * Returns the index of this flag in the array.
+   * Removes flags from a flags array.
    * @param flags flags
-   * @return index or {@code -1}
+   * @param remove flags to be removed
+   * @return new array
    */
-  private int indexOf(final Flag[] flags) {
-    final int fl = flags.length;
-    for(int f = 0; f < fl; f++) {
-      if(flags[f] == this) return f;
+  public static Flag[] remove(final Flag[] flags, final Flag... remove) {
+    Flag[] flgs = flags;
+    for(int f = flgs.length - 1; f >= 0; f--) {
+      for(int r = remove.length - 1; r >= 0; r--) {
+        if(remove[r] == flgs[f]) {
+          flgs = Array.remove(flgs, f);
+          break;
+        }
+      }
     }
-    return -1;
+    return flgs;
   }
 }

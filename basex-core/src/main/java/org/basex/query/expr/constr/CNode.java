@@ -90,7 +90,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.CNS.in(flags) || super.has(flags);
+    return Flag.CNS.oneOf(flags) || super.has(flags);
   }
 
   @Override

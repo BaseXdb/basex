@@ -43,8 +43,8 @@ public abstract class AFilter extends Preds {
 
   @Override
   public final boolean has(final Flag... flags) {
-    if(Flag.FCS.in(flags) || root.has(flags)) return true;
-    final Flag[] flgs = Flag.FCS.remove(Flag.POS.remove(Flag.CTX.remove(flags)));
+    if(Flag.FCS.oneOf(flags) || root.has(flags)) return true;
+    final Flag[] flgs = Flag.remove(flags, Flag.FCS, Flag.POS, Flag.CTX);
     return flgs.length != 0 && super.has(flgs);
   }
 

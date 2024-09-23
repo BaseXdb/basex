@@ -227,11 +227,11 @@ public abstract class Path extends ParseExpr {
   public final boolean has(final Flag... flags) {
     // Context dependency, positional access: only check root expression.
     // Examples: text(); ./abc; position()/a
-    if(Flag.FCS.in(flags) ||
-       Flag.CTX.in(flags) && (root == null || root.has(Flag.CTX)) ||
-       Flag.POS.in(flags) && root != null && root.has(Flag.POS)) return true;
+    if(Flag.FCS.oneOf(flags) ||
+       Flag.CTX.oneOf(flags) && (root == null || root.has(Flag.CTX)) ||
+       Flag.POS.oneOf(flags) && root != null && root.has(Flag.POS)) return true;
     // check remaining flags
-    final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
+    final Flag[] flgs = Flag.remove(flags, Flag.POS, Flag.CTX);
     if(flgs.length == 0) return false;
     for(final Expr step : steps) {
       if(step.has(flgs)) return true;

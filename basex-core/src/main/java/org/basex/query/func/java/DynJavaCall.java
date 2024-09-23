@@ -94,7 +94,7 @@ abstract class DynJavaCall extends JavaCall {
 
   @Override
   public final boolean has(final Flag... flags) {
-    return Flag.NDT.in(flags) || super.has(flags);
+    return Flag.NDT.oneOf(flags) || super.has(flags);
   }
 
   /**

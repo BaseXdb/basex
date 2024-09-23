@@ -186,7 +186,7 @@ public final class Pos extends Single {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
+    return Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags) || super.has(flags);
   }
 
   @Override

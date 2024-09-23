@@ -52,7 +52,7 @@ public final class ContextValue extends Simple {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags);
+    return Flag.CTX.oneOf(flags);
   }
 
   @Override

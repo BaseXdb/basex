@@ -64,11 +64,11 @@ public abstract class Mapping extends Arr {
   public final boolean has(final Flag... flags) {
     // Context dependency, positional access: only check first expression.
     // Examples: . ! abc, position() ! a
-    if(Flag.FCS.in(flags) ||
-       Flag.CTX.in(flags) && exprs[0].has(Flag.CTX) ||
-       Flag.POS.in(flags) && exprs[0].has(Flag.POS)) return true;
+    if(Flag.FCS.oneOf(flags) ||
+       Flag.CTX.oneOf(flags) && exprs[0].has(Flag.CTX) ||
+       Flag.POS.oneOf(flags) && exprs[0].has(Flag.POS)) return true;
     // check remaining flags
-    final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
+    final Flag[] flgs = Flag.remove(flags, Flag.POS, Flag.CTX);
     return flgs.length != 0 && super.has(flgs);
   }
 

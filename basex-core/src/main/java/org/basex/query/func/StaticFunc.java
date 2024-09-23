@@ -228,7 +228,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   boolean has(final Flag... flags) {
     // function itself does not perform any updates
-    final Flag[] flgs = Flag.UPD.remove(flags);
+    final Flag[] flgs = Flag.remove(flags, Flag.UPD);
     return flgs.length != 0 && check(flgs);
   }
 

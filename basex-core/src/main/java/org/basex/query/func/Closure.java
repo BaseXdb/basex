@@ -318,7 +318,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   @Override
   public boolean has(final Flag... flags) {
     // closure does not perform any updates
-    if(Flag.UPD.in(flags)) return false;
+    if(Flag.UPD.oneOf(flags)) return false;
 
     // handle recursive calls: check which flags are already or currently assigned
     final ArrayList<Flag> flgs = new ArrayList<>();

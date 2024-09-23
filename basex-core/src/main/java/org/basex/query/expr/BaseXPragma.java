@@ -40,7 +40,7 @@ public final class BaseXPragma extends Pragma {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.NDT.in(flags) && ndt;
+    return Flag.NDT.oneOf(flags) && ndt;
   }
 
   @Override
