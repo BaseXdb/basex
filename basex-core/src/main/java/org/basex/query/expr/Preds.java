@@ -309,7 +309,8 @@ public abstract class Preds extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue && ic.var != null) {
+    // do not replace $v with .:  EXPR[. = $v]
+    if(ic.var != null && ic.expr.has(Flag.CTX)) {
       for(final Expr expr : exprs) {
         if(expr.uses(ic.var)) return false;
       }

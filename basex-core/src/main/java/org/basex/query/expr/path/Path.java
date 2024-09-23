@@ -1131,7 +1131,8 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue && ic.var != null) {
+    // do not replace $v with .:  EXPR/$v
+    if(ic.var != null && ic.expr.has(Flag.CTX)) {
       for(final Expr step : steps) {
         if(step.uses(ic.var)) return false;
       }

@@ -88,7 +88,7 @@ public abstract class Mapping extends Arr {
       final boolean items = items();
       final int el = exprs.length;
       for(int e = 1; e < el && uses != VarUsage.MORE_THAN_ONCE; e++) {
-        // EXPR ~ ($a)  -> single use
+        // EXPR -> ($a)  -> single use
         // EXPR ! ($a)  -> more than one use
         final VarUsage vu = exprs[e].count(var);
         if(vu != VarUsage.NEVER) uses = items ? VarUsage.MORE_THAN_ONCE : uses.plus(vu);
@@ -99,7 +99,8 @@ public abstract class Mapping extends Arr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue && ic.var != null) {
+    // do not replace $v with .:  EXPR ! $v
+    if(ic.var != null && ic.expr.has(Flag.CTX)) {
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
         if(exprs[e].uses(ic.var)) return false;
@@ -215,7 +216,7 @@ public abstract class Mapping extends Arr {
      *   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
      *   ($n + 2) ! abs(.) ->  abs(. + 2)
      * values
-     *   (<X/>, <Y/>) ~ count(.)  ->  count((<X/>, <Y/>))
+     *   (<X/>, <Y/>) -> count(.)  ->  count((<X/>, <Y/>))
      * skip positional access and higher-order functions
      *   <X/> ! function-lookup#2(xs:QName('fn:name'), 0)()
      *   <X/> ! last#0()

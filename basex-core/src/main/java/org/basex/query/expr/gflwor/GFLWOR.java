@@ -469,7 +469,7 @@ public final class GFLWOR extends ParseExpr {
     // rewrite for/let clause to simple map
     //   for $c in (1, 2, 3) return ($c + $c)  ->  (1, 2, 3) ! (. + .)
     //   let $c := <_/> return (name($c), $c)  ->  <_/> ! (name(.), .)
-    //   let $c := (<a/>, <b/> return count($c)  ->  (<a/>, <b/> ~ count(.)
+    //   let $c := (<a/>, <b/> return count($c)  ->  (<a/>, <b/> -> count(.)
     // skip expressions with context reference
     //   <_/>[for $c in (1, 2) return (., $c)]
     if((let || item) && !expr.has(Flag.CTX)) {
