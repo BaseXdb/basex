@@ -82,7 +82,7 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : steps) {
       Expr expr = step;
       if(expr instanceof ContextValue) {
-        // rewrite context item to self step
+        // rewrite context value reference to self step
         expr = Step.get(expr.info(info), SELF, KindTest.NODE);
       } else if(expr instanceof Filter) {
         // rewrite filter expression to self step with predicates

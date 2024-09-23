@@ -310,7 +310,7 @@ public final class EditorView extends View {
       // close database
       if(Close.close(gui.context)) gui.notify.init();
       doc = new DBNode(file);
-      // remove context item binding
+      // remove context value binding
       final Map<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
       map.remove("");
       DialogBindings.assign(map, gui);

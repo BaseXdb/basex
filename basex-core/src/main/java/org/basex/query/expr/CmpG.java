@@ -512,7 +512,7 @@ public class CmpG extends Cmp {
     final OpV opV = opV();
     if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof ContextFn &&
         expr2 instanceof Value && opV == OpV.EQ) {
-      // skip functions that do not refer to the current context item
+      // skip functions that do not refer to the current context value
       final ContextFn func = (ContextFn) expr1;
       final Value value = (Value) expr2;
       if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;

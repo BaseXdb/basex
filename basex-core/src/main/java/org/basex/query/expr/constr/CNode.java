@@ -95,6 +95,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
+    // do not change context of constructed nodes:  <x/> ! <y xmlns='y'>{ <x/> }</y>
     return !ic.expr.has(Flag.CNS) && super.inlineable(ic);
   }
 
