@@ -468,7 +468,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>[.][.]", "<a/>", exists(CElem.class), empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
-    check("('a', 'b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
+    check("('a', 'b')[. ! position()]", "a", exists(Focus.class));
     check("(1, 0)[.]", 1, exists(ContextValue.class));
     error("true#0[.]", ARGTYPE_X_X_X);
     error("(true#0, false#0)[.]", ARGTYPE_X_X_X);
