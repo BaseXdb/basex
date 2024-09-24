@@ -177,7 +177,7 @@ public final class SeqType {
   /** Java function type. */
   public static final FuncType JAVA = new FuncType(null);
   /** The general record type. */
-  public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>());
+  public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>(), null);
   /** The general map type. */
   public static final MapType MAP = ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
   /** The general array type. */

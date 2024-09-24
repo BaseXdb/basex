@@ -86,8 +86,6 @@ public class QueryParser extends InputParser {
   private final QNmMap<SeqType> declaredTypes = new QNmMap<>();
   /** Public types. */
   private final QNmMap<SeqType> publicTypes = new QNmMap<>();
-  /** Named record types. */
-  private final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
   /** Named record type references. */
   private final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
 
@@ -262,7 +260,7 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
-    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+    RecordType.resolveRefs(recordTypeRefs, qc.recordTypes);
   }
 
   /**
@@ -993,9 +991,9 @@ public class QueryParser extends InputParser {
       fields.put(name, new Field(optional, seqType, expr));
     } while(wsConsume(","));
     wsCheck(")");
-    final RecordType rt = new RecordType(extensible, fields);
+    final RecordType rt = new RecordType(extensible, fields, qn);
     declaredTypes.put(qn, rt.seqType());
-    declaredRecordTypes.put(qn, rt);
+    qc.recordTypes.put(qn, rt);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
       publicTypes.put(qn, rt.seqType());
@@ -3345,7 +3343,7 @@ public class QueryParser extends InputParser {
         fields.put(name, new Field(optional, seqType));
       } while(wsConsume(","));
       wsCheck(")");
-      return fields.isEmpty() ? SeqType.RECORD : new RecordType(extensible, fields);
+      return fields.isEmpty() ? SeqType.RECORD : new RecordType(extensible, fields, null);
     }
     // map
     if(type instanceof MapType) {

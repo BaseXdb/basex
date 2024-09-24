@@ -11,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -34,20 +35,21 @@ public class RecordType extends MapType implements Iterable<byte[]> {
    * Constructor for RecordType declarations and literal RecordType instances.
    * @param extensible extensible flag
    * @param fields field declarations
+   * @param name record type name (can be {@code null})
    */
-  public RecordType(final boolean extensible, final TokenObjMap<Field> fields) {
+  public RecordType(final boolean extensible, final TokenObjMap<Field> fields, final QNm name) {
     super(extensible ? AtomType.ANY_ATOMIC_TYPE : AtomType.STRING,
         extensible ? SeqType.ITEM_ZM : unionType(fields));
     this.extensible = extensible;
     this.fields = fields;
-    this.recordName = null;
+    this.recordName = name;
     this.info = null;
   }
 
   /**
    * Constructor for RecordType references.
-     * @param name record type name
-     * @param info input info
+   * @param name record type name
+   * @param info input info
    */
   public RecordType(final QNm name, final InputInfo info) {
     super(AtomType.ANY_ATOMIC_TYPE, SeqType.ITEM_ZM);
@@ -283,7 +285,7 @@ public class RecordType extends MapType implements Iterable<byte[]> {
           fld.put(name, new Field(true, rt.fields.get(name).seqType));
         }
       }
-      return new RecordType(extensible || rt.extensible, fld);
+      return new RecordType(extensible || rt.extensible, fld, null);
     }
     if(type instanceof MapType) {
       final MapType mt = (MapType) type;
@@ -347,7 +349,7 @@ public class RecordType extends MapType implements Iterable<byte[]> {
         fld.put(name, new Field(false, rt.fields.get(name).seqType));
       }
     }
-    return new RecordType(extensible && rt.extensible, fld);
+    return new RecordType(extensible && rt.extensible, fld, null);
   }
 
   @Override
@@ -390,6 +392,55 @@ public class RecordType extends MapType implements Iterable<byte[]> {
       ref.info = null;
       ref.keyType = rt.keyType;
       ref.valueType = rt.valueType;
+    }
+  }
+
+  /**
+   * Named record type constructor function.
+   */
+  public class Constructor extends Arr {
+    /** Function type. */
+    private FuncType funcType;
+
+    /**
+     * Constructor.
+     * @param info input info (can be {@code null})
+     * @param args function arguments
+     */
+    public Constructor(final InputInfo info, final Expr[] args) {
+      super(info, RecordType.this.seqType(), args);
+      final SeqType[] argTypes = new SeqType[args.length];
+      for(int i = 0; i < args.length; ++i) argTypes[i] = args[i].seqType();
+      funcType = new FuncType(RecordType.this.seqType(), argTypes);
+    }
+
+    @Override
+    public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+      final MapBuilder mb = new MapBuilder();
+      final Expr[] args = args();
+      int i = 0;
+      for(byte[] key : fields) {
+        final var value = args[i].value(qc);
+        System.out.println("value.seqType(): " + value.seqType());
+        mb.put(key, value);
+        ++i;
+      }
+      return mb.map();
+    }
+
+    @Override
+    public FuncType funcType() {
+      return funcType;
+    }
+
+    @Override
+    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+      return copyType(new Constructor(info, copyAll(cc, vm, args())));
+    }
+
+    @Override
+    public void toString(final QueryString qs) {
+      qs.token(recordName).params(exprs);
     }
   }
 

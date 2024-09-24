@@ -134,6 +134,11 @@ public final class MapTest extends SandboxTest {
         + "let $f := fn($r as record(next? as list2, x as xs:boolean)) as xs:boolean {$r?x} let $r "
         + "as record(next? as list1, x as xs:untypedAtomic) := {'x':<a>0</a>} return $f($r)",
         "false");
+    // record type constructor function
+    query("declare namespace my = 'MY'; declare function local:f($x, $y) {my:list($x, $y)}; "
+        + "declare record my:list (value as item()*, next? as my:list); local:f(42, local:f(43, "
+        + "local:f(44, ())))",
+        "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44,\"next\":()}}}");
 
     error("declare variable $v as list := {'value':42,'next':{'value':43,'next':{'value':44,"
         + "'next':()}}}; declare record list(value as item()*, next? as list); $v",
