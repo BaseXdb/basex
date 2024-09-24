@@ -118,13 +118,20 @@ public class XQueryEval extends StandardFunc {
           if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATE2.get(info);
         }
 
+        final Value value;
         final Iter iter = qctx.iter();
-        // value-based iterator: return result unchanged
-        if(iter.valueIter()) return iter.value(qctx, this);
-        // collect resulting items
-        final ValueBuilder vb = new ValueBuilder(qc);
-        for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
-        return vb.value();
+        if(iter.valueIter()) {
+          // value-based iterator: return result unchanged
+          value = iter.value(qctx, this);
+        } else {
+          // collect resulting items
+          final ValueBuilder vb = new ValueBuilder(qc);
+          for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
+          value = vb.value();
+        }
+        // return cached result
+        value.cache(false, info);
+        return value;
       } catch(final JobException ex) {
         QueryError error = null;
         if(qctx.state == JobState.TIMEOUT) error = XQUERY_TIMEOUT;
