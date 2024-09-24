@@ -642,7 +642,7 @@ public enum Function implements AFunction {
   TRUNK(FnTrunk::new, "trunk(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  UNIX_TIME(FnUnixTime::new, "unix-time([value])",
+  UNIX_DATETIME(FnUnixDateTime::new, "unix-dateTime([value])",
       params(INTEGER_ZO), DATE_TIME_O),
   /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
