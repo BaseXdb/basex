@@ -12,6 +12,7 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -26,11 +27,18 @@ public final class FnHash extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    final HashOptions options = toOptions(arg(1), new HashOptions(), qc);
+    final Item arg = arg(1).item(qc, info);
+
+    final String algorithm;
+    if(arg instanceof XQMap) {
+      algorithm = toOptions(arg, new HashOptions(), qc).get(HashOptions.ALGORITHM);
+    } else {
+      final Item item = arg.atomItem(qc, info);
+      algorithm = item.isEmpty() ? HashOptions.ALGORITHM.value() : toString(item);
+    }
     if(value.isEmpty()) return Empty.VALUE;
 
-    final String algorithm = options.get(HashOptions.ALGORITHM).trim().toUpperCase(Locale.ENGLISH);
-    return new Hex(hash(value, algorithm, qc));
+    return new Hex(hash(value, algorithm.trim().toUpperCase(Locale.ENGLISH), qc));
   }
 
   /**

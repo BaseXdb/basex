@@ -312,8 +312,8 @@ public enum Function implements AFunction {
   HAS_CHILDREN(FnHasChildren::new, "has-children([node])",
       params(NODE_ZM), BOOLEAN_O),
   /** XQuery function. */
-  HASH(FnHash::new, "hash(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), HEX_BINARY_O),
+  HASH(FnHash::new, "hash(value[,algorithm,options])",
+      params(ANY_ATOMIC_TYPE_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
   /** XQuery function. */
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),
