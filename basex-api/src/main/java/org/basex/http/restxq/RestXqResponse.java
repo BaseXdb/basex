@@ -202,7 +202,7 @@ final class RestXqResponse extends WebResponse {
         }
       } else if(T_OUTPUT_SERIAL.matches(node)) {
         // parse output:serialization-parameters
-        sp = FuncOptions.serializer(node, func.sopts, func.function.info);
+        sp = FuncOptions.serializer(node, func.sopts, func.function.info, qc);
       } else {
         throw func.error(UNEXP_NODE_X, node);
       }

@@ -21,7 +21,7 @@ public final class FnSerialize extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final Item options = arg(1).item(qc, info);
 
-    final SerializerOptions sopts = FuncOptions.serializer(options, info);
+    final SerializerOptions sopts = FuncOptions.serializer(options, info, qc);
     return Str.get(serialize(input, sopts, SERPARAM_X, qc));
   }
 }

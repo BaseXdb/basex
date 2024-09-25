@@ -562,7 +562,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final HashMap<String, String> toOptions(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return new FuncOptions(info).assign(expr.item(qc, info), new Options()).free();
+    return new FuncOptions(info).assign(expr.item(qc, info), new Options(), qc).free();
   }
 
   /**
@@ -576,7 +576,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final Expr expr, final E options,
       final QueryContext qc) throws QueryException {
-    return new FuncOptions(info).assign(expr.item(qc, info), options);
+    return new FuncOptions(info).assign(expr.item(qc, info), options, qc);
   }
 
   /**

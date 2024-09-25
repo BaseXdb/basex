@@ -63,12 +63,14 @@ public final class FuncOptions {
    * @param item item to be converted (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
+   * @param qc query context
    * @return specified options
    * @throws QueryException query exception
    */
-  public <T extends Options> T assign(final Item item, final T options) throws QueryException {
+  public <T extends Options> T assign(final Item item, final T options, final QueryContext qc)
+      throws QueryException {
     enforceKnown = options.getClass() != Options.class;
-    return assign(item, options, INVALIDOPT_X);
+    return assign(item, options, INVALIDOPT_X, qc);
   }
 
   /**
@@ -77,16 +79,17 @@ public final class FuncOptions {
    * @param options options
    * @param <T> option type
    * @param error error to be raised
+   * @param qc query context (can be {@code null})
    * @return specified options
    * @throws QueryException query exception
    */
-  private <T extends Options> T assign(final Item item, final T options, final QueryError error)
-      throws QueryException {
+  private <T extends Options> T assign(final Item item, final T options, final QueryError error,
+      final QueryContext qc) throws QueryException {
 
     if(!item.isEmpty()) {
       try {
         if(item instanceof XQMap) {
-          options.assign((XQMap) item, enforceKnown ? OPTION_X : null, info);
+          options.assign((XQMap) item, enforceKnown ? OPTION_X : null, info, qc);
         } else {
           final Type type = item.type;
           if(test == null) throw MAP_X_X.get(info, type, item);
@@ -190,14 +193,15 @@ public final class FuncOptions {
    * Converts the specified output parameter item to serialization parameters.
    * @param item input item
    * @param info input info (can be {@code null})
+   * @param qc query context
    * @return serialization parameters
    * @throws QueryException query exception
    */
-  public static SerializerOptions serializer(final Item item, final InputInfo info)
-      throws QueryException {
+  public static SerializerOptions serializer(final Item item, final InputInfo info,
+      final QueryContext qc) throws QueryException {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
-    return serializer(item, sopts, info);
+    return serializer(item, sopts, info, qc);
   }
 
   /**
@@ -205,11 +209,12 @@ public final class FuncOptions {
    * @param item input item
    * @param sopts serialization parameters
    * @param info input info (can be {@code null})
+   * @param qc query context (can be {@code null})
    * @return serialization parameters
    * @throws QueryException query exception
    */
   public static SerializerOptions serializer(final Item item, final SerializerOptions sopts,
-      final InputInfo info) throws QueryException {
-    return new FuncOptions(Q_SERIALIZTION_PARAMETERS, info).assign(item, sopts, SEROPT_X);
+      final InputInfo info, final QueryContext qc) throws QueryException {
+    return new FuncOptions(Q_SERIALIZTION_PARAMETERS, info).assign(item, sopts, SEROPT_X, qc);
   }
 }

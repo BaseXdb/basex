@@ -212,7 +212,7 @@ public final class SerializerOptions extends Options {
         throw OUTDOC_X.get(info, ex);
       }
 
-      if(root != null) FuncOptions.serializer(root, this, info);
+      if(root != null) FuncOptions.serializer(root, this, info, null);
 
       final HashMap<String, String> free = free();
       if(!free.isEmpty()) throw SERINVALID_X.get(info, free.keySet().iterator().next());

@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -382,10 +383,11 @@ public class Options implements Iterable<Option<?>> {
    * @param value value to be assigned
    * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param qc query context (can be {@code null})
    * @throws QueryException query exception
    */
   public synchronized void assign(final Item name, final Value value, final QueryError error,
-      final InputInfo info) throws QueryException {
+      final InputInfo info, final QueryContext qc) throws QueryException {
 
     final String nm;
     if(name instanceof QNm) {
@@ -395,10 +397,22 @@ public class Options implements Iterable<Option<?>> {
     } else {
       throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, name.type, name);
     }
-    if(definitions.isEmpty()) {
-      free.put(nm, serialize(value, info));
+
+    final Value atomic;
+    if(qc != null) {
+      final ItemList list = new ItemList();
+      for(final Item item : value) {
+        list.add(item.type.atomic() != null ? item.atomValue(qc, info) : item);
+      }
+      atomic = list.value();
     } else {
-      assign(nm, value, error, info);
+      atomic = value;
+    }
+
+    if(definitions.isEmpty()) {
+      free.put(nm, serialize(atomic, info));
+    } else {
+      assign(nm, atomic, error, info, qc);
     }
   }
 
@@ -411,23 +425,21 @@ public class Options implements Iterable<Option<?>> {
    */
   private static String serialize(final Value value, final InputInfo info) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    if(value instanceof XQMap) {
-      final XQMap map = (XQMap) value;
-      for(final Item key : map.keys()) {
-        if(!tb.isEmpty()) tb.add(',');
-        tb.add(key.string(info)).add('=');
-        final Value v = map.get(key);
-        if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
-        tb.add(string(((Item) v).string(info)).replace(",", ",,"));
-      }
-    } else if(value instanceof QNm) {
-      tb.add(((QNm) value).unique());
-    } else if(value instanceof Item) {
-      tb.add(((Item) value).string(info));
-    } else {
-      for(final Item item : value) {
-        if(!tb.isEmpty()) tb.add(' ');
-        tb.add(serialize(item, info));
+    for(final Item item : value) {
+      if(!tb.isEmpty()) tb.add(' ');
+      if(item instanceof XQMap) {
+        final XQMap map = (XQMap) item;
+        for(final Item key : map.keys()) {
+          if(!tb.isEmpty()) tb.add(',');
+          tb.add(key.string(info)).add('=');
+          final Value v = map.get(key);
+          if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
+          tb.add(string(((Item) v).string(info)).replace(",", ",,"));
+        }
+      } else if(item instanceof QNm) {
+        tb.add(((QNm) item).unique());
+      } else {
+        tb.add(item.string(info));
       }
     }
     return tb.toString();
@@ -544,12 +556,13 @@ public class Options implements Iterable<Option<?>> {
    * @param map map
    * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param qc query context (can be {@code null})
    * @throws QueryException query exception
    */
   public final synchronized void assign(final XQMap map, final QueryError error,
-      final InputInfo info) throws QueryException {
+      final InputInfo info, final QueryContext qc) throws QueryException {
     for(final Item name : map.keys()) {
-      assign(name, map.get(name), error, info);
+      assign(name, map.get(name), error, info, qc);
     }
   }
 
@@ -796,10 +809,11 @@ public class Options implements Iterable<Option<?>> {
    * @param value value to be assigned
    * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param qc query context (can be {@code null})
    * @throws QueryException query exception
    */
   private synchronized void assign(final String name, final Value value, final QueryError error,
-      final InputInfo info) throws QueryException {
+      final InputInfo info, final QueryContext qc) throws QueryException {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
@@ -807,20 +821,23 @@ public class Options implements Iterable<Option<?>> {
       return;
     }
 
-    Object result = null, expected = null;
     final Item item = value.isItem() ? (Item) value : null;
     final SeqType st = value.seqType();
+    final QueryFunction<Object, QueryException> expected = type ->
+      INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
+
+    Object result = null;
     if(option instanceof ValueOption) {
       final SeqType est = ((ValueOption) option).seqType();
-      if(!st.instanceOf(est)) expected = est;
-      else result = value;
+      if(!st.instanceOf(est)) throw expected.apply(est);
+      result = value;
     } else if(option instanceof BooleanOption) {
       final Boolean b = item != null ? Strings.toBoolean(string(item.string(info))) : null;
-      if(b == null) expected = AtomType.BOOLEAN;
-      else result = b.booleanValue();
+      if(b == null) throw expected.apply(AtomType.BOOLEAN);
+      result = b.booleanValue();
     } else if(option instanceof NumberOption) {
-      if(item == null) expected = AtomType.INTEGER;
-      else result = (int) item.itr(info);
+      if(item == null) throw expected.apply(AtomType.INTEGER);
+      result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
       result = serialize(value, info);
     } else if(option instanceof EnumOption) {
@@ -831,14 +848,10 @@ public class Options implements Iterable<Option<?>> {
       result = eo.get(string);
       if(result == null) throw OPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
     } else if(option instanceof OptionsOption) {
-      if(!(item instanceof XQMap)) {
-        expected = SeqType.MAP;
-      } else {
-        result = ((OptionsOption<?>) option).newInstance();
-        ((Options) result).assign((XQMap) item, error, info);
-      }
+      if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
+      result = ((OptionsOption<?>) option).newInstance();
+      ((Options) result).assign((XQMap) item, error, info, qc);
     }
-    if(expected != null) throw INVALIDOPTION_X_X_X_X.get(info, name, expected, st, value);
     put(option, result);
   }
 

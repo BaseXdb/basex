@@ -39,7 +39,7 @@ public final class FnPut extends StandardFunc {
     // check if all target paths are unique
     if(!updates.putPaths.add(path)) throw UPURIDUP_X.get(info, path);
 
-    final SerializerOptions sopts = FuncOptions.serializer(options, info);
+    final SerializerOptions sopts = FuncOptions.serializer(options, info, qc);
     updates.add(new Put(target.pre(), target.data(), path, sopts, info), qc);
     return Empty.VALUE;
   }

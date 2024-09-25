@@ -25,7 +25,7 @@ public final class DbExport extends DbAccess {
     final String path = toString(arg(1), qc);
     final Item options = arg(2).item(qc, info);
 
-    final SerializerOptions sopts = FuncOptions.serializer(options, info);
+    final SerializerOptions sopts = FuncOptions.serializer(options, info, qc);
     try {
       Export.export(data, path, sopts, null);
     } catch(final IOException ex) {

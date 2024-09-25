@@ -37,7 +37,7 @@ public class FileWrite extends FileFn {
     final Path path = toParent(toPath(arg(0), qc));
     final Iter input = arg(1).iter(qc);
     final Item options = arg(2).item(qc, info);
-    final SerializerOptions sopts = FuncOptions.serializer(options, info);
+    final SerializerOptions sopts = FuncOptions.serializer(options, info, qc);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       try(Serializer ser = Serializer.get(out, sopts)) {
