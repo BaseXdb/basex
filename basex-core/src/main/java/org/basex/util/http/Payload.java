@@ -28,7 +28,7 @@ import org.basex.util.Base64;
 import org.basex.util.list.*;
 
 /**
- * HTTP payload helper functions.
+ * Helper functions for payload of HTTP response.
  *
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
@@ -72,9 +72,7 @@ public final class Payload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  FNode parse(final MediaType type, final String encoding)
-      throws IOException, QueryException {
-
+  FNode parse(final MediaType type, final String encoding) throws IOException, QueryException {
     final FBuilder body;
     if(type.isMultipart()) {
       // multipart response

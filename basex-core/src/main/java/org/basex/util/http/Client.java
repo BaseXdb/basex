@@ -311,6 +311,10 @@ public final class Client {
         method = SerialMethod.HTML.toString();
       } else if(mt.isXml()) {
         method = SerialMethod.XML.toString();
+      } else if(mt.isJSON()) {
+        method = SerialMethod.JSON.toString();
+      } else if(mt.isCSV()) {
+        method = SerialMethod.CSV.toString();
       } else if(mt.isText()) {
         method = SerialMethod.TEXT.toString();
       }
