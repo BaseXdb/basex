@@ -69,7 +69,7 @@ public final class Client {
     final URI uri = uri(href, req);
     final String mediaType = req.attribute(OVERRIDE_MEDIA_TYPE);
     final String status = req.attribute(STATUS_ONLY);
-    final boolean body = status == null || !Strings.toBoolean(status);
+    final boolean body = status == null || Strings.isFalse(status);
 
     final MainOptions mopts = new MainOptions(options);
     try {
@@ -159,13 +159,13 @@ public final class Client {
     }
 
     final String fw = request.attribute(FOLLOW_REDIRECT);
-    final HttpClient client = IOUrl.client(fw == null || Strings.toBoolean(fw));
+    final HttpClient client = IOUrl.client(fw == null || Strings.isTrue(fw));
     final BodyHandler<InputStream> handler = HttpResponse.BodyHandlers.ofInputStream();
 
     // send request (with optional authorization)
     try {
       final UserInfo ui = new UserInfo(uri, request);
-      final boolean sa = Strings.toBoolean(request.attribute(SEND_AUTHORIZATION));
+      final boolean sa = Strings.isTrue(request.attribute(SEND_AUTHORIZATION));
       if(sa && request.authMethod == AuthMethod.BASIC) {
         ui.basic(rb);
       } else {

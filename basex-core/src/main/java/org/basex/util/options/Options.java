@@ -416,9 +416,9 @@ public class Options implements Iterable<Option<?>> {
       for(final Item key : map.keys()) {
         if(!tb.isEmpty()) tb.add(',');
         tb.add(key.string(info)).add('=');
-        final Value val = map.get(key);
-        if(!val.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, val.seqType(), val);
-        tb.add(string(((Item) val).string(info)).replace(",", ",,"));
+        final Value v = map.get(key);
+        if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
+        tb.add(string(((Item) v).string(info)).replace(",", ",,"));
       }
     } else if(value instanceof QNm) {
       tb.add(((QNm) value).unique());
@@ -601,25 +601,25 @@ public class Options implements Iterable<Option<?>> {
    * Assigns a value to an option.
    * @param option option
    * @param value value to be assigned
-   * @param index index (optional, can be {@code -1})
+   * @param index index of an array value (optional, can be {@code -1})
    * @param assign function to assign the value
-   * @param definitions option definitions (can be {@code null})
+   * @param options current options (can be {@code null})
    * @return string or {@code null}
    */
   public static String assign(final Option<?> option, final String value, final int index,
-      final Consumer<Object> assign, final Options definitions) {
+      final Consumer<Object> assign, final Options options) {
 
     final String name = option.name();
     if(option instanceof BooleanOption) {
-      final boolean v;
-      if(value.isEmpty() && definitions != null) {
-        final Boolean b = definitions.get((BooleanOption) option);
-        if(b == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, "");
-        v = !b;
+      Boolean v;
+      if(value.isEmpty() && options != null) {
+        // no value given: invert current value
+        v = options.get((BooleanOption) option);
+        if(v != null) v = !v.booleanValue();
       } else {
         v = Strings.toBoolean(value);
-        if(!v && !Strings.no(value)) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
       }
+      if(v == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
       assign.accept(v);
     } else if(option instanceof NumberOption) {
       final int v = Strings.toInt(value);
@@ -630,21 +630,20 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof EnumOption) {
       final EnumOption<?> eo = (EnumOption<?>) option;
       final Object v = eo.get(value);
-      if(v == null) return allowed(option, value, (Object[]) eo.values());
+      if(v == null) return allowed(eo, value, (Object[]) eo.values());
       assign.accept(v);
     } else if(option instanceof OptionsOption) {
       final Options o = ((OptionsOption<?>) option).newInstance();
       try {
         o.assign(value);
       } catch(final BaseXException ex) {
-        Util.debug(ex);
-        return ex.getMessage();
+        return Util.message(ex);
       }
       assign.accept(o);
-    } else if(option instanceof NumbersOption && definitions != null) {
+    } else if(option instanceof NumbersOption && options != null) {
       final int v = Strings.toInt(value);
       if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-      int[] ii = (int[]) definitions.get(option);
+      int[] ii = (int[]) options.get(option);
       if(index == -1) {
         if(ii == null) ii = new int[0];
         final IntList il = new IntList(ii.length + 1);
@@ -654,8 +653,8 @@ public class Options implements Iterable<Option<?>> {
         if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
         ii[index] = v;
       }
-    } else if(option instanceof StringsOption && definitions != null) {
-      String[] ss = (String[]) definitions.get(option);
+    } else if(option instanceof StringsOption && options != null) {
+      String[] ss = (String[]) options.get(option);
       if(index == -1) {
         if(ss == null) ss = new String[0];
         final StringList sl = new StringList(ss.length + 1);
@@ -664,7 +663,7 @@ public class Options implements Iterable<Option<?>> {
       } else if(index == 0) {
         final int i = Strings.toInt(value);
         if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-        definitions.values.put(name, new String[i]);
+        options.values.put(name, new String[i]);
       } else {
         if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
         ss[index - 1] = value;
@@ -808,63 +807,46 @@ public class Options implements Iterable<Option<?>> {
       return;
     }
 
-    Object val = null, expected = null;
+    Object result = null, expected = null;
     final Item item = value.isItem() ? (Item) value : null;
     final SeqType st = value.seqType();
     if(option instanceof ValueOption) {
       final SeqType est = ((ValueOption) option).seqType();
-      if(st.instanceOf(est)) val = value;
-      else expected = est;
+      if(!st.instanceOf(est)) expected = est;
+      else result = value;
     } else if(option instanceof BooleanOption) {
-      if(item != null) {
-        if(st.type == AtomType.BOOLEAN) {
-          val = item.bool(info);
-        } else {
-          final String s = string(item.string(info));
-          val = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
-        }
-      }
-      if(val == null) expected = AtomType.BOOLEAN;
+      final Boolean b = item != null ? Strings.toBoolean(string(item.string(info))) : null;
+      if(b == null) expected = AtomType.BOOLEAN;
+      else result = b.booleanValue();
     } else if(option instanceof NumberOption) {
-      if(item != null) val = (int) item.itr(info);
-      else expected = AtomType.INTEGER;
+      if(item == null) expected = AtomType.INTEGER;
+      else result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
-      val = serialize(value, info);
+      result = serialize(value, info);
     } else if(option instanceof EnumOption) {
-      byte[] token = null;
-      if(item != null) {
-        if(st.type == AtomType.BOOLEAN || !st.type.isNumber()) {
-          token = item.string(info);
-        } else {
-          final long l = item.itr(info);
-          token = l == 1 ? TRUE : l == 0 ? FALSE : null;
-        }
-      }
-      if(token == null) {
-        expected = AtomType.STRING;
-      } else {
-        final EnumOption<?> eo = (EnumOption<?>) option;
-        val = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
-        if(val == null) throw OPTION_X.get(info,
-            allowed(option, string(token), (Object[]) eo.values()));
-      }
+      String string = serialize(value, info);
+      final Boolean b = Strings.toBoolean(string);
+      string = b == Boolean.TRUE ? Text.YES : b == Boolean.FALSE ? Text.NO : string;
+      final EnumOption<?> eo = (EnumOption<?>) option;
+      result = eo.get(string);
+      if(result == null) throw OPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
     } else if(option instanceof OptionsOption) {
-      if(item instanceof XQMap) {
-        val = ((OptionsOption<?>) option).newInstance();
-        ((Options) val).assign((XQMap) item, error, info);
-      } else {
+      if(!(item instanceof XQMap)) {
         expected = SeqType.MAP;
+      } else {
+        result = ((OptionsOption<?>) option).newInstance();
+        ((Options) result).assign((XQMap) item, error, info);
       }
     }
     if(expected != null) throw INVALIDOPTION_X_X_X_X.get(info, name, expected, st, value);
-    put(option, val);
+    put(option, result);
   }
 
   /**
    * Assigns the specified name and value.
    * @param name name of option
    * @param value value to be assigned
-   * @param index index (optional, can be {@code -1})
+   * @param index index of an array value (optional, can be {@code -1})
    * @param error raise error if the option is unknown
    * @return success flag
    * @throws BaseXException database exception

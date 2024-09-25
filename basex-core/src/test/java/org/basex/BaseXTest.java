@@ -203,6 +203,7 @@ public abstract class BaseXTest extends SandboxTest {
   @Test public void noSerialization() throws IOException {
     equals("", "-z", "-q1");
   }
+
   /**
    * Runs a request with the specified arguments.
    * @param args command-line arguments
