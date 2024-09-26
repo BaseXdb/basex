@@ -845,6 +845,10 @@ public enum QueryError {
   /** Error code. */
   SERINVALID_X(SEPM, 17, "Serialization parameter '%' is invalid."),
   /** Error code. */
+  SERCHARDUP_X(SEPM, 18, "Character '%' is specified twice."),
+  /** Error code. */
+  SERDUP_X(SEPM, 19, "Serialization parameter '%' is specified twice."),
+  /** Error code. */
   SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
   /** Error code. */
   SERJSONFUNC_X(SERE, 21, "% items cannot be serialized."),

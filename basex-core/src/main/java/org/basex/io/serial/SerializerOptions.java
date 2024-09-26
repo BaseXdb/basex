@@ -190,17 +190,10 @@ public final class SerializerOptions extends Options {
    */
   public void parse(final String name, final byte[] value, final InputInfo info)
       throws QueryException {
-    try {
-      assign(name, string(value));
-    } catch(final BaseXException ex) {
-      for(final Option<?> o : this) {
-        if(o.name().equals(name)) throw SERPARAM_X.get(info, ex);
-      }
-      throw OUTPUT_X.get(info, ex);
-    }
 
-    // parse parameters and character map
-    if(name.equals(PARAMETER_DOCUMENT.name())) {
+    final Option<?> option = option(name);
+    if(option == PARAMETER_DOCUMENT) {
+      // parse parameters and character map
       Uri uri = Uri.get(value);
       if(!uri.isValid()) throw INVURI_X.get(info, value);
       if(!uri.isAbsolute()) uri = info.sc().baseURI().resolve(uri, info);
@@ -211,7 +204,6 @@ public final class SerializerOptions extends Options {
       } catch(final IOException ex) {
         throw OUTDOC_X.get(info, ex);
       }
-
       if(root != null) FuncOptions.serializer(root, this, info, null);
 
       final HashMap<String, String> free = free();
@@ -222,8 +214,16 @@ public final class SerializerOptions extends Options {
         if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
           final String map = characterMap(child);
           if(map == null) throw SERINVALID_X.get(info, USE_CHARACTER_MAPS.name());
+          if(!map.contains("=")) throw SERCHARDUP_X.get(info, map);
           set(USE_CHARACTER_MAPS, map);
         }
+      }
+    } else {
+      // parse remaining parameters
+      try {
+        assign(name, string(value));
+      } catch(final BaseXException ex) {
+        throw (option != null ? SERPARAM_X : OUTPUT_X).get(info, ex);
       }
     }
   }
@@ -249,7 +249,8 @@ public final class SerializerOptions extends Options {
           else if(eq(att, MAP_STRING)) val = attr.string();
           else return null;
         }
-        if(key == null || val == null || map.get(key) != null) return null;
+        if(key == null || val == null) return null;
+        if(map.get(key) != null) return string(key);
         map.put(key, val);
       } else {
         return null;

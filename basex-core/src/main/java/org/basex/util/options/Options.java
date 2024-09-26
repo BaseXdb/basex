@@ -642,7 +642,7 @@ public class Options implements Iterable<Option<?>> {
       assign.accept(value);
     } else if(option instanceof EnumOption) {
       final EnumOption<?> eo = (EnumOption<?>) option;
-      final Object v = eo.get(value);
+      final Object v = eo.get(option instanceof EnumOption ? normalize(value) : value);
       if(v == null) return allowed(eo, value, (Object[]) eo.values());
       assign.accept(v);
     } else if(option instanceof OptionsOption) {
@@ -841,9 +841,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof StringOption) {
       result = serialize(value, info);
     } else if(option instanceof EnumOption) {
-      String string = serialize(value, info);
-      final Boolean b = Strings.toBoolean(string);
-      string = b == Boolean.TRUE ? Text.YES : b == Boolean.FALSE ? Text.NO : string;
+      final String string = normalize(serialize(value, info));
       final EnumOption<?> eo = (EnumOption<?>) option;
       result = eo.get(string);
       if(result == null) throw OPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
@@ -853,6 +851,18 @@ public class Options implements Iterable<Option<?>> {
       ((Options) result).assign((XQMap) item, error, info, qc);
     }
     put(option, result);
+  }
+
+  /**
+   * Normalizes an enumeration value.
+   * @param value value
+   * @return normalized value
+   */
+  private static synchronized String normalize(final String value) {
+    final String v = value.trim();
+    if(v.isEmpty()) return YesNoOmit.OMIT.toString();
+    final Boolean b = Strings.toBoolean(v);
+    return b == Boolean.TRUE ? Text.YES : b == Boolean.FALSE ? Text.NO : v;
   }
 
   /**

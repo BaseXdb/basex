@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -24,7 +26,7 @@ import org.basex.util.options.*;
  */
 public final class FuncOptions {
   /** QName. */
-  public static final QNm Q_SERIALIZTION_PARAMETERS =
+  public static final QNm Q_SERIALIZATION_PARAMETERS =
       new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
   /** Value. */
   private static final byte[] VALUE = token("value");
@@ -70,7 +72,7 @@ public final class FuncOptions {
   public <T extends Options> T assign(final Item item, final T options, final QueryContext qc)
       throws QueryException {
     enforceKnown = options.getClass() != Options.class;
-    return assign(item, options, INVALIDOPT_X, qc);
+    return assign(item, options, false, qc);
   }
 
   /**
@@ -78,12 +80,12 @@ public final class FuncOptions {
    * @param item item to be parsed (can be {@link Empty#VALUE})
    * @param options options
    * @param <T> option type
-   * @param error error to be raised
+   * @param serializer serialization parameters
    * @param qc query context (can be {@code null})
    * @return specified options
    * @throws QueryException query exception
    */
-  private <T extends Options> T assign(final Item item, final T options, final QueryError error,
+  private <T extends Options> T assign(final Item item, final T options, final boolean serializer,
       final QueryContext qc) throws QueryException {
 
     if(!item.isEmpty()) {
@@ -94,10 +96,11 @@ public final class FuncOptions {
           final Type type = item.type;
           if(test == null) throw MAP_X_X.get(info, type, item);
           if(!test.matches(item)) throw ELMMAP_X_X_X.get(info, root.prefixId(XML), type, item);
-          options.assign(toString((ANode) item, error));
+
+          options.assign(toString((ANode) item, serializer, new HashSet<>()));
         }
       } catch(final BaseXException ex) {
-        throw error.get(info, ex);
+        throw (serializer ? SEROPT_X : INVALIDOPT_X).get(info, ex);
       }
     }
     return options;
@@ -106,11 +109,15 @@ public final class FuncOptions {
   /**
    * Builds a string representation of the specified node.
    * @param node node
-   * @param error error to be raised
+   * @param serializer serialization parameters
+   * @param cache name cache
    * @return string
    * @throws QueryException query exception
    */
-  private String toString(final ANode node, final QueryError error) throws QueryException {
+  private String toString(final ANode node, final boolean serializer, final HashSet<String> cache)
+      throws QueryException {
+
+    final QueryError error = serializer ? SEROPT_X : INVALIDOPT_X;
     final ANode n = node.attributeIter().next();
     if(n != null) throw error.get(info, Util.info("Invalid attribute: '%'", n.name()));
 
@@ -128,22 +135,23 @@ public final class FuncOptions {
       }
       // retrieve key from element name and value from "value" attribute or text node
       final String name = string(qname.local());
-      String value = null;
+      if(serializer && !cache.add(name)) throw SERDUP_X.get(info, name);
 
-      if(name.equals(SerializerOptions.USE_CHARACTER_MAPS.name())) {
+      String value = null;
+      if(serializer && name.equals(SerializerOptions.USE_CHARACTER_MAPS.name())) {
         value = SerializerOptions.characterMap(child);
         if(value == null) throw error.get(info, "Character map is invalid.");
+        if(!value.contains("=")) throw SERCHARDUP_X.get(info, value);
       } else if(hasElements(child)) {
-        value = toString(child, error);
+        value = toString(child, serializer, cache);
       } else {
         for(final ANode attr : child.attributeIter()) {
           if(eq(attr.name(), VALUE)) {
             value = string(attr.string());
-            if(name.equals(SerializerOptions.CDATA_SECTION_ELEMENTS.name())) {
+            if(serializer && name.equals(SerializerOptions.CDATA_SECTION_ELEMENTS.name())) {
               value = cDataSectionElements(child, value);
             }
           } else {
-            // Conflicts with QT3TS, Serialization-json-34 etc.
             throw error.get(info, Util.info("Invalid attribute: '%'", attr.name()));
           }
         }
@@ -215,6 +223,6 @@ public final class FuncOptions {
    */
   public static SerializerOptions serializer(final Item item, final SerializerOptions sopts,
       final InputInfo info, final QueryContext qc) throws QueryException {
-    return new FuncOptions(Q_SERIALIZTION_PARAMETERS, info).assign(item, sopts, SEROPT_X, qc);
+    return new FuncOptions(Q_SERIALIZATION_PARAMETERS, info).assign(item, sopts, true, qc);
   }
 }
