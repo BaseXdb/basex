@@ -444,6 +444,7 @@ public abstract class Path extends ParseExpr {
     }
     return false;
   }
+
   /**
    * Checks if a path can be evaluated iteratively (i.e., if all results will be in distinct
    * document order without final sorting).
