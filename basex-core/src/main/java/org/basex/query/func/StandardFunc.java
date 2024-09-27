@@ -571,10 +571,7 @@ public abstract class StandardFunc extends Arr {
     if(item instanceof XQMap) {
       options.assign((XQMap) item, info, qc);
     } else if(!item.isEmpty()) {
-      if(!SerializerOptions.T_ROOT.matches(item)) {
-        throw ELMMAP_X_X_X.get(info, SerializerOptions.Q_ROOT.prefixId(XML), item.type, item);
-      }
-      options.assign((ANode) item, info);
+      options.assign(item, info);
     }
     return options;
   }

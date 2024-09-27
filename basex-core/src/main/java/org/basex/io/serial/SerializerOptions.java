@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -192,13 +193,14 @@ public final class SerializerOptions extends Options {
 
   /**
    * Converts the specified output parameter item to serializer options.
-   * @param node node with serialization parameters
+   * @param item node with serialization parameters
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public void assign(final ANode node, final InputInfo info) throws QueryException {
+  public void assign(final Item item, final InputInfo info) throws QueryException {
+    if(!T_ROOT.matches(item)) throw ELMMAP_X_X_X.get(info, Q_ROOT.prefixId(XML), item.type, item);
     try {
-      assign(toString(node, new HashSet<>(), info));
+      assign(toString((ANode) item, new QNmSet(), info));
     } catch(final BaseXException ex) {
       throw SEROPT_X.get(info, ex);
     }
@@ -225,7 +227,7 @@ public final class SerializerOptions extends Options {
       try {
         root = new DBNode(io).childIter().next();
       } catch(final IOException ex) {
-        throw OUTDOC_X.get(info, ex);
+        throw PARAMDOC_X.get(info, ex);
       }
       if(root != null) assign(root, info);
 
@@ -234,7 +236,7 @@ public final class SerializerOptions extends Options {
 
       for(final ANode child : root.childIter()) {
         if(child.type != NodeType.ELEMENT) continue;
-        if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
+        if(option(string(child.qname().local())) == USE_CHARACTER_MAPS) {
           set(USE_CHARACTER_MAPS, characterMap(child, info));
         }
       }
@@ -297,7 +299,7 @@ public final class SerializerOptions extends Options {
    * @return string
    * @throws QueryException query exception
    */
-  private String toString(final ANode node, final HashSet<String> cache, final InputInfo info)
+  private String toString(final ANode node, final QNmSet cache, final InputInfo info)
       throws QueryException {
 
     final ANode att = node.attributeIter().next();
@@ -310,16 +312,17 @@ public final class SerializerOptions extends Options {
 
       // ignore elements in other namespace
       final QNm qname = child.qname();
+      if(!cache.add(qname)) throw SERDUP_X.get(info, qname);
+
       if(!eq(qname.uri(), Q_ROOT.uri())) {
         if(qname.uri().length != 0) continue;
         throw SEROPT_X.get(info, Util.info("Element has no namespace: '%'", qname));
       }
       // retrieve key from element name and value from "value" attribute or text node
       final String name = string(qname.local());
-      if(!cache.add(name)) throw SERDUP_X.get(info, name);
-
+      final Option<?> option = option(name);
       String value = null;
-      if(name.equals(USE_CHARACTER_MAPS.name())) {
+      if(option == USE_CHARACTER_MAPS) {
         value = characterMap(child, info);
       } else if(hasElements(child)) {
         value = toString(child, cache, info);
@@ -327,9 +330,7 @@ public final class SerializerOptions extends Options {
         for(final ANode attr : child.attributeIter()) {
           if(eq(attr.name(), VALUE)) {
             value = string(attr.string());
-            if(name.equals(CDATA_SECTION_ELEMENTS.name())) {
-              value = cDataSectionElements(child, value);
-            }
+            if(option == CDATA_SECTION_ELEMENTS) value = cdataSectionElements(child, value);
           } else {
             throw SEROPT_X.get(info, Util.info("Invalid attribute: '%'", attr.name()));
           }
@@ -342,24 +343,23 @@ public final class SerializerOptions extends Options {
   }
 
   /**
-   * Converts QName with prefixes to the EQName notation.
+   * Converts QNames with prefixes to the EQName notation.
    * @param elem root element
    * @param value value
    * @return name with resolved QNames
    */
-  private static String cDataSectionElements(final ANode elem, final String value) {
+  private static String cdataSectionElements(final ANode elem, final String value) {
     if(!Strings.contains(value, ':')) return value;
 
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] name : distinctTokens(token(value))) {
+      byte[] qname = name;
       final int i = indexOf(name, ':');
-      if(i == -1) {
-        tb.add(name);
-      } else {
+      if(i != -1) {
         final byte[] uri = elem.nsScope(null).value(substring(name, 0, i));
-        tb.add(uri != null ? QNm.eqName(uri, substring(name, i + 1)) : name);
+        if(uri != null) qname = QNm.eqName(uri, substring(name, i + 1));
       }
-      tb.add(' ');
+      tb.add(qname).add(' ');
     }
     return tb.toString();
   }

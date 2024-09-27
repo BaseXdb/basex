@@ -382,7 +382,7 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value to be assigned
    * @param info input info (can be {@code null})
-   * @param qc query context (can be {@code null})
+   * @param qc query context
    * @throws QueryException query exception
    */
   public synchronized void assign(final Item name, final Value value, final InputInfo info,
@@ -397,17 +397,11 @@ public class Options implements Iterable<Option<?>> {
       throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, name.type, name);
     }
 
-    final Value atomic;
-    if(qc != null) {
-      final ItemList list = new ItemList();
-      for(final Item item : value) {
-        list.add(item.type.atomic() != null ? item.atomValue(qc, info) : item);
-      }
-      atomic = list.value();
-    } else {
-      Util.errln("► %", this);
-      atomic = value;
+    final ItemList list = new ItemList();
+    for(final Item item : value) {
+      list.add(item.type.atomic() != null ? item.atomValue(qc, info) : item);
     }
+    final Value atomic = list.value();
 
     if(definitions.isEmpty()) {
       free.put(nm, serialize(atomic, info));
@@ -554,7 +548,7 @@ public class Options implements Iterable<Option<?>> {
    * Parses and assigns options from the specified map.
    * @param map map
    * @param info input info (can be {@code null})
-   * @param qc query context (can be {@code null})
+   * @param qc query context
    * @throws QueryException query exception
    */
   public final synchronized void assign(final XQMap map, final InputInfo info,
@@ -806,7 +800,7 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value to be assigned
    * @param info input info (can be {@code null})
-   * @param qc query context (can be {@code null})
+   * @param qc query context
    * @throws QueryException query exception
    */
   private synchronized void assign(final String name, final Value value, final InputInfo info,
@@ -887,17 +881,18 @@ public class Options implements Iterable<Option<?>> {
 
   /**
    * Returns a map representation of the comma-separated options string.
-   * @param opts options string
+   * @param string options string
    * @return map
    */
-  private static Map<String, String> toMap(final String opts) {
+  private static Map<String, String> toMap(final String string) {
     final HashMap<String, String> map = new HashMap<>();
     final StringBuilder key = new StringBuilder(), value = new StringBuilder();
+    final Runnable add = () -> map.put(key.toString().trim(), value.toString());
 
     boolean left = true;
-    final int sl = opts.length();
+    final int sl = string.length();
     for(int s = 0; s < sl; s++) {
-      final char ch = opts.charAt(s);
+      final char ch = string.charAt(s);
       if(left) {
         if(ch == '=') {
           left = false;
@@ -906,8 +901,8 @@ public class Options implements Iterable<Option<?>> {
         }
       } else {
         if(ch == ',') {
-          if(s + 1 == sl || opts.charAt(s + 1) != ',') {
-            map.put(key.toString().trim(), value.toString());
+          if(s + 1 == sl || string.charAt(s + 1) != ',') {
+            add.run();
             key.setLength(0);
             value.setLength(0);
             left = true;
@@ -919,7 +914,7 @@ public class Options implements Iterable<Option<?>> {
         value.append(ch);
       }
     }
-    if(!left) map.put(key.toString().trim(), value.toString());
+    if(!left) add.run();
     return map;
   }
 }

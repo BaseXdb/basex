@@ -1344,7 +1344,7 @@ public enum QueryError {
   /** Error code. */
   TAGWRONG_X_X(XQST, 118, "Different start and end tag: <%>...</%>."),
   /** Error code. */
-  OUTDOC_X(XQST, 119, "Parameter document cannot be parsed: %."),
+  PARAMDOC_X(XQST, 119, "Parameter document: %."),
   /** Error code. */
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** Error code. */
