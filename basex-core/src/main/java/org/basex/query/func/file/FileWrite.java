@@ -6,7 +6,6 @@ import java.nio.file.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -36,11 +35,10 @@ public class FileWrite extends FileFn {
 
     final Path path = toParent(toPath(arg(0), qc));
     final Iter input = arg(1).iter(qc);
-    final Item options = arg(2).item(qc, info);
-    final SerializerOptions sopts = FuncOptions.serializer(options, info, qc);
+    final SerializerOptions options = toSerializerOptions(arg(2), qc);
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
-      try(Serializer ser = Serializer.get(out, sopts)) {
+      try(Serializer ser = Serializer.get(out, options)) {
         for(Item item; (item = qc.next(input)) != null;) {
           ser.serialize(item);
         }

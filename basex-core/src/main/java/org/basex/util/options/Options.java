@@ -381,13 +381,12 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param value value to be assigned
-   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
    * @param qc query context (can be {@code null})
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Value value, final QueryError error,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+  public synchronized void assign(final Item name, final Value value, final InputInfo info,
+      final QueryContext qc) throws QueryException {
 
     final String nm;
     if(name instanceof QNm) {
@@ -406,13 +405,14 @@ public class Options implements Iterable<Option<?>> {
       }
       atomic = list.value();
     } else {
+      Util.errln("► %", this);
       atomic = value;
     }
 
     if(definitions.isEmpty()) {
       free.put(nm, serialize(atomic, info));
     } else {
-      assign(nm, atomic, error, info, qc);
+      assign(nm, atomic, info, qc);
     }
   }
 
@@ -534,7 +534,6 @@ public class Options implements Iterable<Option<?>> {
       if(definitions.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
       } else {
-        // ignore unknown options
         assign(entry.getKey(), entry.getValue(), -1, false);
       }
     }
@@ -554,15 +553,14 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses and assigns options from the specified map.
    * @param map map
-   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
    * @param qc query context (can be {@code null})
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final QueryError error,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+  public final synchronized void assign(final XQMap map, final InputInfo info,
+      final QueryContext qc) throws QueryException {
     for(final Item name : map.keys()) {
-      assign(name, map.get(name), error, info, qc);
+      assign(name, map.get(name), info, qc);
     }
   }
 
@@ -617,7 +615,7 @@ public class Options implements Iterable<Option<?>> {
    * @param index index of an array value (optional, can be {@code -1})
    * @param assign function to assign the value
    * @param options current options (can be {@code null})
-   * @return string or {@code null}
+   * @return error string or {@code null}
    */
   public static String assign(final Option<?> option, final String value, final int index,
       final Consumer<Object> assign, final Options options) {
@@ -807,18 +805,17 @@ public class Options implements Iterable<Option<?>> {
    * Assigns the specified name and value.
    * @param name name of option
    * @param value value to be assigned
-   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
    * @param qc query context (can be {@code null})
    * @throws QueryException query exception
    */
-  private synchronized void assign(final String name, final Value value, final QueryError error,
-      final InputInfo info, final QueryContext qc) throws QueryException {
+  private synchronized void assign(final String name, final Value value, final InputInfo info,
+      final QueryContext qc) throws QueryException {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
-      if(error != null && !name.startsWith("Q{")) throw OPTION_X.get(info, similar(name));
-      return;
+      if(getClass() == Options.class || name.startsWith("Q{")) return;
+      throw OPTION_X.get(info, similar(name));
     }
 
     final Item item = value.isItem() ? (Item) value : null;
@@ -848,7 +845,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
       result = ((OptionsOption<?>) option).newInstance();
-      ((Options) result).assign((XQMap) item, error, info, qc);
+      ((Options) result).assign((XQMap) item, info, qc);
     }
     put(option, result);
   }

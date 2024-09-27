@@ -554,6 +554,32 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Evaluates an expression and returns serialization parameters.
+   * Constructor for serialization functions.
+   * @param expr expression (can be empty)
+   * @param qc query context
+   * @return serialization parameters
+   * @throws QueryException query exception
+   */
+  protected final SerializerOptions toSerializerOptions(final Expr expr, final QueryContext qc)
+      throws QueryException {
+
+    final SerializerOptions options = new SerializerOptions();
+    options.set(SerializerOptions.METHOD, SerialMethod.XML);
+
+    final Item item = expr.item(qc, info);
+    if(item instanceof XQMap) {
+      options.assign((XQMap) item, info, qc);
+    } else if(!item.isEmpty()) {
+      if(!SerializerOptions.T_ROOT.matches(item)) {
+        throw ELMMAP_X_X_X.get(info, SerializerOptions.Q_ROOT.prefixId(XML), item.type, item);
+      }
+      options.assign((ANode) item, info);
+    }
+    return options;
+  }
+
+  /**
    * Evaluates an expression to a map with string keys and values.
    * @param expr expression (can be empty)
    * @param qc query context
@@ -562,7 +588,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final HashMap<String, String> toOptions(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return new FuncOptions(info).assign(expr.item(qc, info), new Options(), qc).free();
+    return toOptions(expr, new Options(), qc).free();
   }
 
   /**
@@ -576,7 +602,10 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final Expr expr, final E options,
       final QueryContext qc) throws QueryException {
-    return new FuncOptions(info).assign(expr.item(qc, info), options, qc);
+
+    final Item item = expr.item(qc, info);
+    if(!item.isEmpty()) options.assign(toMap(item), info, qc);
+    return options;
   }
 
   /**

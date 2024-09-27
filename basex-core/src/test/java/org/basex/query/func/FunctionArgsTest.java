@@ -58,7 +58,7 @@ public final class FunctionArgsTest extends SandboxTest {
         final String query = qu.append(')').toString();
         // wrong types: XPTY0004, FORG0006, FODC0002, BXDB0001, BXDB0004, FORG0001
         if(in) error(query, INVCONVERT_X_X_X, NONUMBER_X_X, INVFUNCITEM_X_X, NODOC_X,
-            BINARY_X, STRBIN_X_X, WHICHRES_X, DB_NODE_X, MAP_X_X, FUNCCAST_X_X);
+            BINARY_X, STRBIN_X_X, WHICHRES_X, DB_NODE_X, FUNCCAST_X_X);
         // wrong number of arguments: XPST0017
         else error(query, INVNARGS_X_X_X);
       }

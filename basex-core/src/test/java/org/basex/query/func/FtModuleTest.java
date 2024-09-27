@@ -80,7 +80,7 @@ public final class FtModuleTest extends SandboxTest {
     // check buggy options
     error(func.args("x", "x", " map { 'x': 'y' }"), OPTION_X);
     error(func.args("x", "x", " map { 'mode': '' }"), OPTION_X);
-    error(func.args("x", "x", " 1"), MAP_X_X);
+    error(func.args("x", "x", " 1"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -203,7 +203,7 @@ public final class FtModuleTest extends SandboxTest {
     // check buggy options
     error(func.args(NAME, "x", " map { 'x': 'y' }"), OPTION_X);
     error(func.args(NAME, "x", " map { 'mode': '' }"), OPTION_X);
-    error(func.args(NAME, "x", " 1"), MAP_X_X);
+    error(func.args(NAME, "x", " 1"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */

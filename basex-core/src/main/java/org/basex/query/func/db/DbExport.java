@@ -7,7 +7,6 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -23,11 +22,10 @@ public final class DbExport extends DbAccess {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final String path = toString(arg(1), qc);
-    final Item options = arg(2).item(qc, info);
+    final SerializerOptions options = toSerializerOptions(arg(2), qc);
 
-    final SerializerOptions sopts = FuncOptions.serializer(options, info, qc);
     try {
-      Export.export(data, path, sopts, null);
+      Export.export(data, path, options, null);
     } catch(final IOException ex) {
       throw SERPARAM_X.get(info, ex);
     }

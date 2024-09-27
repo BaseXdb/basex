@@ -6,13 +6,14 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -123,6 +124,14 @@ public final class SerializerOptions extends Options {
   public static final EnumOption<YesNo> INDENT_ATTRIBUTES =
       new EnumOption<>("indent-attributes", YesNo.NO);
 
+  /** QName. */
+  public static final QNm Q_ROOT =
+      new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
+  /** Name test. */
+  public static final NameTest T_ROOT = new NameTest(Q_ROOT);
+  /** Value. */
+  private static final byte[] VALUE = token("value");
+
   /** Newlines. */
   public enum Newline {
     /** NL.   */ NL("\\n", "\n"),
@@ -182,6 +191,20 @@ public final class SerializerOptions extends Options {
   }
 
   /**
+   * Converts the specified output parameter item to serializer options.
+   * @param node node with serialization parameters
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public void assign(final ANode node, final InputInfo info) throws QueryException {
+    try {
+      assign(toString(node, new HashSet<>(), info));
+    } catch(final BaseXException ex) {
+      throw SEROPT_X.get(info, ex);
+    }
+  }
+
+  /**
    * Parses options.
    * @param name name of option
    * @param value value
@@ -204,7 +227,7 @@ public final class SerializerOptions extends Options {
       } catch(final IOException ex) {
         throw OUTDOC_X.get(info, ex);
       }
-      if(root != null) FuncOptions.serializer(root, this, info, null);
+      if(root != null) assign(root, info);
 
       final HashMap<String, String> free = free();
       if(!free.isEmpty()) throw SERINVALID_X.get(info, free.keySet().iterator().next());
@@ -212,10 +235,7 @@ public final class SerializerOptions extends Options {
       for(final ANode child : root.childIter()) {
         if(child.type != NodeType.ELEMENT) continue;
         if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
-          final String map = characterMap(child);
-          if(map == null) throw SERINVALID_X.get(info, USE_CHARACTER_MAPS.name());
-          if(!map.contains("=")) throw SERCHARDUP_X.get(info, map);
-          set(USE_CHARACTER_MAPS, map);
+          set(USE_CHARACTER_MAPS, characterMap(child, info));
         }
       }
     } else {
@@ -231,10 +251,13 @@ public final class SerializerOptions extends Options {
   /**
    * Extracts a character map.
    * @param elem child node
+   * @param info input info
    * @return character map or {@code null} if map is invalid
+   * @throws QueryException query exception
    */
-  public static String characterMap(final ANode elem) {
-    if(elem.attributeIter().next() != null) return null;
+  public static String characterMap(final ANode elem, final InputInfo info) throws QueryException {
+    final Supplier<QueryException> error = () -> SERINVALID_X.get(info, USE_CHARACTER_MAPS.name());
+    if(elem.attributeIter().next() != null) throw error.get();
 
     // parse characters
     final TokenMap map = new TokenMap();
@@ -247,13 +270,13 @@ public final class SerializerOptions extends Options {
           final byte[] att = attr.name();
           if(eq(att, CHARACTER)) key = attr.string();
           else if(eq(att, MAP_STRING)) val = attr.string();
-          else return null;
+          else throw error.get();
         }
-        if(key == null || val == null) return null;
-        if(map.get(key) != null) return string(key);
+        if(key == null || val == null) throw error.get();
+        if(map.get(key) != null) throw SERCHARDUP_X.get(info, key);
         map.put(key, val);
       } else {
-        return null;
+        throw error.get();
       }
     }
 
@@ -264,5 +287,92 @@ public final class SerializerOptions extends Options {
       tb.add(key).add('=').add(string(map.get(key)).replace(",", ",,"));
     }
     return tb.toString();
+  }
+
+  /**
+   * Builds a string representation of the specified node.
+   * @param node node
+   * @param cache name cache
+   * @param info input info
+   * @return string
+   * @throws QueryException query exception
+   */
+  private String toString(final ANode node, final HashSet<String> cache, final InputInfo info)
+      throws QueryException {
+
+    final ANode att = node.attributeIter().next();
+    if(att != null) throw SEROPT_X.get(info, Util.info("Invalid attribute: '%'", att.name()));
+
+    final StringBuilder sb = new StringBuilder();
+    // interpret options
+    for(final ANode child : node.childIter()) {
+      if(child.type != NodeType.ELEMENT) continue;
+
+      // ignore elements in other namespace
+      final QNm qname = child.qname();
+      if(!eq(qname.uri(), Q_ROOT.uri())) {
+        if(qname.uri().length != 0) continue;
+        throw SEROPT_X.get(info, Util.info("Element has no namespace: '%'", qname));
+      }
+      // retrieve key from element name and value from "value" attribute or text node
+      final String name = string(qname.local());
+      if(!cache.add(name)) throw SERDUP_X.get(info, name);
+
+      String value = null;
+      if(name.equals(USE_CHARACTER_MAPS.name())) {
+        value = characterMap(child, info);
+      } else if(hasElements(child)) {
+        value = toString(child, cache, info);
+      } else {
+        for(final ANode attr : child.attributeIter()) {
+          if(eq(attr.name(), VALUE)) {
+            value = string(attr.string());
+            if(name.equals(CDATA_SECTION_ELEMENTS.name())) {
+              value = cDataSectionElements(child, value);
+            }
+          } else {
+            throw SEROPT_X.get(info, Util.info("Invalid attribute: '%'", attr.name()));
+          }
+        }
+        if(value == null) value = string(child.string());
+      }
+      sb.append(name).append('=').append(value.trim().replace(",", ",,")).append(',');
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Converts QName with prefixes to the EQName notation.
+   * @param elem root element
+   * @param value value
+   * @return name with resolved QNames
+   */
+  private static String cDataSectionElements(final ANode elem, final String value) {
+    if(!Strings.contains(value, ':')) return value;
+
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] name : distinctTokens(token(value))) {
+      final int i = indexOf(name, ':');
+      if(i == -1) {
+        tb.add(name);
+      } else {
+        final byte[] uri = elem.nsScope(null).value(substring(name, 0, i));
+        tb.add(uri != null ? QNm.eqName(uri, substring(name, i + 1)) : name);
+      }
+      tb.add(' ');
+    }
+    return tb.toString();
+  }
+
+  /**
+   * Checks if the specified node has elements as children.
+   * @param node node
+   * @return result of check
+   */
+  private static boolean hasElements(final ANode node) {
+    for(final ANode nd : node.childIter()) {
+      if(nd.type == NodeType.ELEMENT) return true;
+    }
+    return false;
   }
 }

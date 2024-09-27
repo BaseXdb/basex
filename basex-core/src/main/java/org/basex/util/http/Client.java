@@ -85,6 +85,7 @@ public final class Client {
       throw HC_ERROR_X.get(info, ex);
     }
   }
+
   /**
    * Assigns parser options.
    * @param <O> option type

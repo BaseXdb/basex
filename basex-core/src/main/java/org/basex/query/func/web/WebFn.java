@@ -101,7 +101,7 @@ public abstract class WebFn extends StandardFunc {
       for(final String entry : output.keySet())
         if(sopts.option(entry) == null) throw QueryError.INVALIDOPTION_X.get(info, entry);
 
-      final FBuilder param = FElem.build(FuncOptions.Q_SERIALIZATION_PARAMETERS).declareNS();
+      final FBuilder param = FElem.build(SerializerOptions.Q_ROOT).declareNS();
       output.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);

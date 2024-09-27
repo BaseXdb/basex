@@ -1147,8 +1147,6 @@ public enum QueryError {
   /** Error code. */
   STRNOD_X_X(XPTY, 4, "String or node expected, % found: %."),
   /** Error code. */
-  MAP_X_X(XPTY, 4, "Map expected, % found: %."),
-  /** Error code. */
   ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
   /** Error code. */
   ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
