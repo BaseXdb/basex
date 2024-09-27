@@ -839,7 +839,7 @@ public enum QueryError {
   /** Error code. */
   SERPARAM_X(SEPM, 16, "%"),
   /** Error code. */
-  SERMAP_X(SEPM, 17, "Character map is not valid: %."),
+  SERMAP_X(SEPM, 17, "Key in character map is not a single character: %."),
   /** Error code. */
   SEROPT_X(SEPM, 17, "%"),
   /** Error code. */

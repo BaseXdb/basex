@@ -60,15 +60,14 @@ public abstract class StandardSerializer extends OutputSerializer {
       }
     }
 
-    final String maps = sopts.get(USE_CHARACTER_MAPS);
-    if(maps.isEmpty()) {
+    if(sopts.get(USE_CHARACTER_MAPS).isEmpty()) {
       map = null;
     } else {
       map = new IntObjMap<>();
       for(final Map.Entry<String, String> entry : sopts.toMap(USE_CHARACTER_MAPS).entrySet()) {
         final String key = entry.getKey();
-        if(key.length() != 1) throw SERMAP_X.getIO(key);
-        map.put(key.charAt(0), token(entry.getValue()));
+        if(key.codePoints().count() != 1) throw SERMAP_X.getIO(key);
+        map.put(key.codePointAt(0), token(entry.getValue()));
       }
     }
   }
@@ -122,7 +121,9 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   protected final void printChar(final int cp) throws IOException {
-    if(!characterMap(cp)) print(cp);
+    final byte[] value = map != null ? map.get(cp) : null;
+    if(value != null) out.print(value);
+    else print(cp);
   }
 
   /**
@@ -132,23 +133,6 @@ public abstract class StandardSerializer extends OutputSerializer {
    */
   protected void print(final int cp) throws IOException {
     out.print(cp);
-  }
-
-  /**
-   * Replaces a character with an entry from the character map.
-   * @param cp codepoint
-   * @return {@code true} if replacement was found
-   * @throws IOException I/O exception
-   */
-  protected final boolean characterMap(final int cp) throws IOException {
-    if(map != null) {
-      final byte[] value = map.get(cp);
-      if(value != null) {
-        out.print(value);
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
