@@ -46,8 +46,8 @@ public class FnDuplicateValues extends StandardFunc {
             }
             // fallback (input is no 32bit integer)
             intseq = false;
-            for(int i : ints1.toArray()) set1.add(Int.get(i));
-            for(int i : ints2.toArray()) set2.add(Int.get(i));
+            for(final int i : ints1.toArray()) set1.add(Int.get(i));
+            for(final int i : ints2.toArray()) set2.add(Int.get(i));
           }
           if(!set1.add(item) && set2.add(item)) return item;
         }
@@ -81,9 +81,9 @@ public class FnDuplicateValues extends StandardFunc {
         }
         // fallback (input is no 32bit integer)
         intseq = false;
-        for(int i : ints1.toArray()) set1.add(Int.get(i));
-        for(int i : ints2.toArray()) set2.add(Int.get(i));
-        for(long l : list.finish()) vb.add(Int.get(l));
+        for(final int i : ints1.toArray()) set1.add(Int.get(i));
+        for(final int i : ints2.toArray()) set2.add(Int.get(i));
+        for(final long l : list.finish()) vb.add(Int.get(l));
       }
       if(!set1.add(item) && set2.add(item)) vb.add(item);
     }

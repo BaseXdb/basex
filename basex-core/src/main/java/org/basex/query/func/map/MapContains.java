@@ -16,10 +16,15 @@ import org.basex.util.*;
 public final class MapContains extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
-
-    return Bln.get(map.contains(key));
+    return map.contains(key);
   }
 
   @Override

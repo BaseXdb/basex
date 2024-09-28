@@ -19,11 +19,31 @@ import org.basex.util.*;
 public final class FnCodepointEqual extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value1 = arg(0).atomItem(qc, info);
-    final Item value2 = arg(1).atomItem(qc, info);
-    return value1.isEmpty() || value2.isEmpty() ? Empty.VALUE :
-      Bln.get(eq(toToken(value1), toToken(value2)));
+    final Boolean test = test(qc);
+    return test != null ? Bln.get(test) : Empty.VALUE;
   }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final Boolean test = test(qc);
+    return test != null && test.booleanValue();
+  }
+
+  /**
+   * Performs the test.
+   * @param qc query context
+   * @return result of check, or {@code null} if one input is an empty sequence
+   * @throws QueryException query exception
+   */
+  private Boolean test(final QueryContext qc) throws QueryException {
+    final Item value1 = arg(0).atomItem(qc, info);
+    if(value1.isEmpty()) return null;
+    final Item value2 = arg(1).atomItem(qc, info);
+    if(value2.isEmpty()) return null;
+    return eq(toToken(value1), toToken(value2));
+  }
+
 
   @Override
   protected Expr opt(final CompileContext cc) {

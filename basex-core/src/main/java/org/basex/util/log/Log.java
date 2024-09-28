@@ -1,6 +1,4 @@
-package org.basex.server;
-
-import static org.basex.util.Token.*;
+package org.basex.util.log;
 
 import java.io.*;
 import java.util.*;
@@ -12,8 +10,7 @@ import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * This class writes daily log files to disk.
- * The log format has been updated in Version 7.4; it now has the following columns:
+ * This class processes log entries. The log format:
  * <ul>
  *   <li><b>Time</b>: timestamp (format: {@code xs:time})</li>
  *   <li><b>Address</b>: host name and port of the requesting client</li>
@@ -29,20 +26,16 @@ import org.basex.util.*;
 public final class Log implements QueryTracer {
   /** Server string. */
   private static final String SERVER = "SERVER";
-  /** Log types. */
-  public enum LogType {
-    /** Request. */ REQUEST,
-    /** Trace.   */ TRACE,
-    /** Info.    */ INFO,
-    /** Error.   */ ERROR,
-    /** OK.      */ OK
-  }
 
   /** Static options. */
   private final StaticOptions sopts;
+  /** Maximum length of log messages. */
+  private final int maxLen;
 
-  /** Current log file. */
-  private LogFile file;
+  /** Log targets. */
+  private Set<LogTarget> targets;
+  /** Current (daily) log file. */
+  LogFile file;
 
   /**
    * Constructor.
@@ -50,6 +43,7 @@ public final class Log implements QueryTracer {
    */
   public Log(final StaticOptions sopts) {
     this.sopts = sopts;
+    maxLen = sopts.get(StaticOptions.LOGMSGMAXLEN);
   }
 
   /**
@@ -117,48 +111,68 @@ public final class Log implements QueryTracer {
    * @param address address string ({@code SERVER} is written if value is {@code null})
    * @param user user ({@code admin} is written if value is {@code null})
    */
-  private void write(final String type, final String info, final Performance perf,
+  private synchronized void write(final String type, final String info, final Performance perf,
       final String address, final String user) {
 
-    // check if logging is disabled
-    if(!sopts.get(StaticOptions.LOG)) return;
+    if(skip()) return;
 
-    // construct log text
-    final Date date = new Date();
-    final int ml = sopts.get(StaticOptions.LOGMSGMAXLEN);
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(DateTime.format(date, DateTime.TIME));
-    tb.add('\t').add(address != null ? address.replaceFirst("^/", "") : SERVER);
-    tb.add('\t').add(user != null ? user : UserText.ADMIN);
-    tb.add('\t').add(type);
-    tb.add('\t').add(info != null ? chop(normalize(token(info)), ml) : EMPTY);
-    if(perf != null) tb.add('\t').add(perf);
-    tb.add(Prop.NL);
+    final LogEntry entry = new LogEntry();
+    entry.log = this;
+    entry.date = new Date();
+    entry.time = DateTime.format(entry.date, DateTime.TIME);
+    entry.address = address != null ? address.replaceFirst("^/", "") : SERVER;
+    entry.user = user != null ? user : UserText.ADMIN;
+    entry.type = type;
+    final String inf = info != null ? info : "";
+    final int len = inf.codePointCount(0, inf.length());
+    entry.info = len > maxLen ? inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "..." : inf;
+    if(perf != null) entry.runtime = perf.toString();
 
-    try {
-      synchronized(sopts) {
-        // create new log file and write log entry
-        final String name = DateTime.format(date, DateTime.DATE);
-        if(file != null && !file.valid(name)) close();
-        if(file == null) file = LogFile.create(name, dir());
-        // write log entry
-        file.write(tb.finish());
+    // write log entry to requested targets
+    for(final LogTarget target : targets) {
+      try {
+        target.write(this, entry);
+      } catch(final IOException ex) {
+        Util.stack(ex);
       }
-    } catch(final IOException ex) {
-      Util.stack(ex);
     }
+  }
+
+  /**
+   * Checks if logging is requested. Initializes the log targets if not done yet
+   * (not part of the constructor to consider command-line arguments).
+   * @return result of check
+   */
+  private boolean skip() {
+    if(targets == null) {
+      final String log = sopts.get(StaticOptions.LOG);
+      final Set<LogTarget> set = EnumSet.noneOf(LogTarget.class);
+      for(final String target : log.trim().toUpperCase().split("\\s*,\\s*")) {
+        final Boolean enable = Strings.toBoolean(target);
+        if(enable == null) {
+          for(final LogTarget lt : LogTarget.values()) {
+            if(target.equals(lt.name())) set.add(lt);
+          }
+        } else if(enable) {
+          set.add(LogTarget.DATA);
+        } else {
+          set.clear();
+          break;
+        }
+      }
+      targets = set;
+    }
+    return targets.isEmpty();
   }
 
   /**
    * Closes the log file.
    */
-  public void close() {
+  public synchronized void close() {
     try {
-      synchronized(sopts) {
-        if(file != null) {
-          file.close();
-          file = null;
-        }
+      if(file != null) {
+        file.close();
+        file = null;
       }
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -171,6 +185,18 @@ public final class Log implements QueryTracer {
    */
   public IOFile[] files() {
     return dir().children(".*\\" + IO.LOGSUFFIX);
+  }
+
+  /**
+   * Writes an entry to the daily database log file.
+   * @param entry log entry
+   * @throws IOException I/O exception
+   */
+  public void write(final LogEntry entry) throws IOException {
+    final String name = DateTime.format(entry.date, DateTime.DATE);
+    if(file != null && !file.valid(name)) close();
+    if(file == null) file = LogFile.create(name, dir());
+    file.write(Token.token(entry + Prop.NL));
   }
 
   /**

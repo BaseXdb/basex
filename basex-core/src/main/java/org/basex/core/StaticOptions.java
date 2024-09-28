@@ -66,7 +66,7 @@ public final class StaticOptions extends Options {
   /** Defines the number of parallel readers. */
   public static final NumberOption PARALLEL = new NumberOption("PARALLEL", 8);
   /** Logging flag. */
-  public static final BooleanOption LOG = new BooleanOption("LOG", true);
+  public static final StringOption LOG = new StringOption("LOG", "data");
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
   /** Write trace output to the logs. */

@@ -19,7 +19,7 @@ public final class SingleIterPath extends AxisPath {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param step axis step
+   * @param step {@link IterStep} instance
    */
   SingleIterPath(final InputInfo info, final Expr step) {
     super(info, null, step);
@@ -33,6 +33,12 @@ public final class SingleIterPath extends AxisPath {
   @Override
   protected Value nodes(final QueryContext qc) throws QueryException {
     return steps[0].value(qc);
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return steps[0].test(qc, ii, 0);
   }
 
   @Override

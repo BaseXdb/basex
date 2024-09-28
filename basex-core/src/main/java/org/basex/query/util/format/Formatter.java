@@ -26,7 +26,7 @@ public abstract class Formatter extends FormatUtil {
   /** Military timezones. */
   private static final byte[] MIL = token("YXWVUTSRQPONZABCDEFGHIKLM");
   /** Token: n. */
-  private static final byte[] N = { 'n' };
+  private static final byte[] N = cpToken('n');
   /** Allowed calendars. */
   private static final byte[][] CALENDARS = tokens(
     "ISO", "AD", "AH", "AME", "AM", "AP", "AS", "BE", "CB", "CE", "CL", "CS", "EE", "FE",
@@ -186,7 +186,7 @@ public abstract class Formatter extends FormatUtil {
 
         // parse component specifier
         final int compSpec = ch(marker, 0);
-        byte[] pres = ONE;
+        byte[] pres = cpToken('1');
         boolean max = false;
         BigDecimal frac = null;
         long num = 0;
@@ -284,7 +284,7 @@ public abstract class Formatter extends FormatUtil {
           // limit maximum length of numeric output
           int mx = 0;
           final int fl = fp.primary.length;
-          for(int s = 0; s < fl; s += cl(fp.primary, s)) mx++;
+          for(int f = 0; f < fl; f += cl(fp.primary, f)) mx++;
           if(mx > 1) fp.max = mx;
         }
 
@@ -308,7 +308,7 @@ public abstract class Formatter extends FormatUtil {
           } else {
             // fallback representation
             fp.first = '0';
-            fp.primary = ONE;
+            fp.primary = cpToken('1');
             tb.add(formatInt(num, fp));
           }
         } else if(frac != null) {
@@ -418,7 +418,7 @@ public abstract class Formatter extends FormatUtil {
     byte[] in = tb.finish();
     if(fp.cs == Case.LOWER) in = lc(in);
     if(fp.cs == Case.UPPER) in = uc(in);
-    return sign ? concat(new byte[] { '-' }, in) : in;
+    return sign ? concat(cpToken('-'), in) : in;
   }
 
   /**
@@ -436,7 +436,7 @@ public abstract class Formatter extends FormatUtil {
     final boolean mil = uc && ch(marker, 1) == 'Z';
 
     // ignore values without timezone. exception: military timezone
-    if(num == Short.MAX_VALUE) return mil ? new byte[] { 'J' } : EMPTY;
+    if(num == Short.MAX_VALUE) return mil ? cpToken('J') : EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     if(!mil || !addMilZone(num, tb)) {
@@ -524,7 +524,7 @@ public abstract class Formatter extends FormatUtil {
     final int al = a.length();
     if(n > al) alpha(tb, (n - 1) / al, a);
     if(n > 0) tb.add(a.charAt((int) ((n - 1) % al)));
-    else tb.add(ZERO);
+    else tb.add('0');
   }
 
   /**
@@ -626,7 +626,7 @@ public abstract class Formatter extends FormatUtil {
     final int zero = fp.zeroes(first);
 
     // cache characters of presentation modifier
-    final int[] mod = new TokenParser(fp.primary).toArray();
+    final int[] mod = cps(fp.primary);
     final int modSize = mod.length;
     int modStart = 0;
     while(modStart < modSize && mod[modStart] == '#') modStart++;

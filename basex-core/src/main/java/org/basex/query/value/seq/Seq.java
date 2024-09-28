@@ -346,7 +346,7 @@ public abstract class Seq extends Value {
    * @throws QueryException query exception
    */
   public static int initialCapacity(final long size) throws QueryException {
-    if(size > Array.MAX_SIZE) throw ARRAY_X_X.get(null, Array.MAX_SIZE, size);
+    if(size > Array.MAX_SIZE) throw MAX_SIZE_X_X.get(null, Array.MAX_SIZE, size);
     return Array.initialCapacity(size);
   }
 }

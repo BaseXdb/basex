@@ -54,9 +54,15 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     ctxValue(qc);
-    final long pos = qc.focus.pos;
-    return Bln.get(pos >= min && pos <= max);
+    final long p = qc.focus.pos;
+    return p >= min && p <= max;
   }
 
   @Override
@@ -109,7 +115,7 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
+    return Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags) || super.has(flags);
   }
 
   @Override

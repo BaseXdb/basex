@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
  */
 public final class FnStartsWithSubsequence extends FnContainsSubsequence {
   @Override
-  boolean compare(final Value input, final Value subsequence,
+  boolean test(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 
     final long is = input.size(), ss = subsequence.size();

@@ -51,7 +51,7 @@ public final class Pos extends Single {
 
     if(op == OpV.EQ) {
       // normalize positions (sort, remove duplicates and illegal positions)
-      if(pos instanceof Value && pos.size() <= CompileContext.MAX_PREEVAL) pos = ddo((Value) pos);
+      if(cc.values(true, pos)) pos = ddo((Value) pos);
       if(pos == Empty.VALUE) return Bln.FALSE;
 
       // range sequence. example: position() = 5 to 10
@@ -162,15 +162,21 @@ public final class Pos extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     ctxValue(qc);
 
     final Value value = expr.value(qc);
-    if(value.isEmpty()) return Bln.FALSE;
+    if(value.isEmpty()) return false;
 
-    final long pos = qc.focus.pos, vs = value.size();
+    final long p = qc.focus.pos, vs = value.size();
     final double min = toDouble(value.itemAt(0));
     final double max = vs == 1 ? min : toDouble(value.itemAt(vs - 1));
-    return Bln.get(pos >= min && pos <= max);
+    return p >= min && p <= max;
   }
 
   @Override
@@ -180,7 +186,7 @@ public final class Pos extends Single {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
+    return Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags) || super.has(flags);
   }
 
   @Override

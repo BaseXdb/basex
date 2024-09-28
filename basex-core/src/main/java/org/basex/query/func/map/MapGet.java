@@ -32,7 +32,7 @@ public final class MapGet extends StandardFunc {
     final boolean fallback = defined(2);
     if(fallback) {
       final Type type = arg(1).seqType().type.atomic();
-      if(type != null) arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, type.seqType()));
+      arg(2, arg -> refineFunc(arg, cc, type != null ? type.seqType() : SeqType.ANY_ATOMIC_TYPE_O));
     } else if(map == XQMap.empty()) {
       return Empty.VALUE;
     }

@@ -25,7 +25,7 @@ public final class CryptoGenerateSignature extends StandardFunc {
     final ANode arg7 = toNodeOrNull(arg(7), qc);
 
     final byte[] path = arg6 == null || arg6 instanceof ANode ? Token.EMPTY : toToken(arg6);
-    final ANode cert = arg7 != null ? arg7 : arg6 instanceof ANode ? toNode(arg6) : null;
+    final ANode cert = arg7 != null ? arg7 : arg6 instanceof ANode ? (ANode) arg6 : null;
     return new DigitalSignature(info).generate(node, can, dig, sig, ns, tp, path, cert, qc);
   }
 }

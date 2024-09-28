@@ -24,27 +24,40 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Expr values = mergeExprs();
+
     // input is single integer
-    if(singleInt) return toStr(variadic().item(qc, info).itr(info), info);
+    if(singleInt) return Str.get(toCodepoint(values.item(qc, info).itr(info), info));
 
     // current input is single item
-    final Iter values = variadic().atomIter(qc, info);
-    final long size = values.size();
-    if(size == 1) return toStr(toLong(values.next()), info);
+    final Iter iter = values.atomIter(qc, info);
+    final long size = iter.size();
+    if(size == 1) return Str.get(toCodepoint(toLong(iter.next()), info));
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Seq.initialCapacity(size));
-    for(Item item; (item = qc.next(values)) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       tb.add(toCodepoint(toLong(item), info));
     }
     return Str.get(tb.finish());
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    if(!singleInt) {
+      final Item item = mergeExprs().atomIter(qc, info).next();
+      if(item == null) return false;
+      toLong(item);
+    }
+    return true;
+  }
+
+  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr values = arg(0);
-    final Expr variadic = variadic();
-    if(variadic != values) return cc.function(CODEPOINTS_TO_STRING, info, variadic.optimize(cc));
+    final Expr values = arg(0);
+    final Expr merged = mergeExprs();
+    if(merged != values) return cc.function(CODEPOINTS_TO_STRING, info, merged.optimize(cc));
 
     // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
     if(STRING_TO_CODEPOINTS.is(values)) return cc.function(STRING, info, values.args());
@@ -53,15 +66,9 @@ public final class FnCodepointsToString extends StandardFunc {
     return this;
   }
 
-  /**
-   * Converts a single codepoint to a string.
-   * @param value value
-   * @param info input info (can be {@code null})
-   * @return codepoint as string
-   * @throws QueryException query exception
-   */
-  private static Str toStr(final long value, final InputInfo info) throws QueryException {
-    return Str.get(Token.cpToken(toCodepoint(value, info)));
+  @Override
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return super.values(true, cc);
   }
 
   /**

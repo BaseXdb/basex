@@ -40,7 +40,8 @@ public abstract class Preds extends Arr {
     // called at an early stage as it affects the optimization of predicates
     final Expr root = type(cc.qc.focus.value);
     final int el = exprs.length;
-    if(el != 0) cc.get(this, () -> {
+    final boolean value = this instanceof StructFilter;
+    if(el != 0) cc.get(value ? null : this, !value, () -> {
       if(root != null) {
         final long size = root.size();
         if(size != -1) cc.qc.focus.size = size;
@@ -68,7 +69,7 @@ public abstract class Preds extends Arr {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean match(final Item item, final QueryContext qc) throws QueryException {
+  protected final boolean test(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
@@ -91,7 +92,7 @@ public abstract class Preds extends Arr {
    * @throws QueryException query exception
    */
   protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
-    return cc.ok(root, () -> {
+    return cc.ok(root, true, () -> {
       final ExprList list = new ExprList(exprs.length);
       for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();
@@ -110,8 +111,8 @@ public abstract class Preds extends Arr {
   private void optimize(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
-    // E[exists(nodes)]  ->  E[nodes]
-    // E[count(nodes)]  will not be rewritten
+    // E[exists($nodes)]  ->  E[$nodes]
+    // E[count($nodes)]  will not be rewritten
     Expr expr = pred.simplifyFor(Simplify.PREDICATE, cc);
 
     // map operator: E[. ! ...]  ->  E[...], E[E ! ...]  ->  E[...]
@@ -308,12 +309,20 @@ public abstract class Preds extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue && ic.var != null) {
+    // do not replace $v with .:  EXPR[. = $v]
+    if(ic.var != null && ic.expr.has(Flag.CTX)) {
       for(final Expr expr : exprs) {
         if(expr.uses(ic.var)) return false;
       }
     }
     return true;
+  }
+
+  @Override
+  public int exprSize() {
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
   }
 
   @Override

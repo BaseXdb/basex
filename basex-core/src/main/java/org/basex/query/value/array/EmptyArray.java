@@ -48,7 +48,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public long arraySize() {
+  public long structSize() {
     return 0;
   }
 

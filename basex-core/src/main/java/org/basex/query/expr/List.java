@@ -72,7 +72,7 @@ public final class List extends Arr {
     exprType.assign(st != null ? st : SeqType.EMPTY_SEQUENCE_Z, occ, size).data(exprs);
 
     // pre-evaluate list; skip expressions with large result sizes
-    if(allAreValues(true)) {
+    if(values(true, cc)) {
       Type type = null;
       final Value[] values = new Value[el];
       int vl = 0;

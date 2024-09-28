@@ -3,8 +3,8 @@ package org.basex.http.web;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.io.serial.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -108,7 +108,7 @@ public interface WebText {
   QNm Q_MEDIA_TYPE = new QNm("mediaType");
 
   /** Serializer node test. */
-  NameTest T_OUTPUT_SERIAL = new NameTest(FuncOptions.Q_SERIALIZTION_PARAMETERS);
+  NameTest T_OUTPUT_SERIAL = SerializerOptions.T_ROOT;
   /** HTTP Response test. */
   NameTest T_HTTP_RESPONSE = new NameTest(new QNm("response", HTTP_URI));
   /** RESTXQ Response test. */

@@ -211,6 +211,10 @@ public enum Function implements AFunction {
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
+  ELEMENT_NUMBER(FnElementNumber::new, "element-number([element,root,predicate])",
+      params(ELEMENT_ZO, NODE_ZO,
+      FuncType.get(BOOLEAN_ZO, ELEMENT_O).seqType().with(Occ.ZERO_OR_ONE)), INTEGER_ZO),
+  /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
   /** XQuery function. */
@@ -230,7 +234,7 @@ public enum Function implements AFunction {
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
       params(STRING_O), STRING_ZO),
   /** XQuery function. */
-  ERROR(FnError::new, "error([code,description,error-object])",
+  ERROR(FnError::new, "error([code,description,value])",
       params(QNAME_ZO, STRING_ZO, ITEM_ZM), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   ESCAPE_HTML_URI(FnEscapeHtmlUri::new, "escape-html-uri(value)",
@@ -298,7 +302,7 @@ public enum Function implements AFunction {
       params(FUNCTION_O), INTEGER_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup::new, "function-lookup(name,arity)",
-      params(QNAME_O, INTEGER_O), FUNCTION_ZO, flag(POS, CTX, CNS, NDT), FN_URI, Perm.ADMIN),
+      params(QNAME_O, INTEGER_O), FUNCTION_ZO, flag(POS, CTX, CNS, NDT, HOF), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName::new, "function-name(function)",
       params(FUNCTION_O), QNAME_ZO),
@@ -312,8 +316,8 @@ public enum Function implements AFunction {
   HAS_CHILDREN(FnHasChildren::new, "has-children([node])",
       params(NODE_ZM), BOOLEAN_O),
   /** XQuery function. */
-  HASH(FnHash::new, "hash(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), HEX_BINARY_O),
+  HASH(FnHash::new, "hash(value[,algorithm,options])",
+      params(ANY_ATOMIC_TYPE_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
   /** XQuery function. */
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),
@@ -472,7 +476,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
-      params(STRING_O, INTEGER_O), INTEGER_O),
+      params(STRING_ZO, INTEGER_O), INTEGER_O),
   /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(value[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(CNS, HOF)),
@@ -480,7 +484,7 @@ public enum Function implements AFunction {
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_O), QNAME_O),
   /** XQuery function. */
-  PARSE_URI(FnParseUri::new, "parse-uri(uri[,options])",
+  PARSE_URI(FnParseUri::new, "parse-uri(value[,options])",
       params(STRING_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value)",
@@ -642,6 +646,9 @@ public enum Function implements AFunction {
   TRUNK(FnTrunk::new, "trunk(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
+  UNIX_DATETIME(FnUnixDateTime::new, "unix-dateTime([value])",
+      params(INTEGER_ZO), DATE_TIME_O),
+  /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
@@ -729,7 +736,7 @@ public enum Function implements AFunction {
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_ZO), MAP_O, MAP_URI),
   /** XQuery function. */
-  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(pairs[,combine])",
+  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,combine])",
       params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
@@ -1512,7 +1519,7 @@ public enum Function implements AFunction {
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([href])",
-      params(STRING_O), FUNCTION_ZM, flag(POS, CTX, CNS, NDT), INSPECT_URI, Perm.ADMIN),
+      params(STRING_O), FUNCTION_ZM, flag(POS, CTX, CNS, NDT, HOF), INSPECT_URI, Perm.ADMIN),
   /** XQuery function. */
   _INSPECT_MODULE(InspectModule::new, "module(href)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),

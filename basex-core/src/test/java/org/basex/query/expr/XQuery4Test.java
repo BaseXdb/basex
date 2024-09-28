@@ -533,4 +533,45 @@ public final class XQuery4Test extends SandboxTest {
     query("for $i allowing empty in () while count($i) = 0 return 1", 1);
     query("for $i allowing empty in () while count($i) != 0 return 1", "");
   }
+
+  /** Structure filter. */
+  @Test public void structFilter() {
+    query("[]?[true()]", "[]");
+    query("[]?[false()]", "[]");
+
+    query("[ 1 ]?[true()]", "[1]");
+    query("[ 1 ]?[false()]", "[]");
+
+    query("[ 1, 2 ]?[true()]", "[1,2]");
+    query("[ 1, 2 ]?[false()]", "[]");
+
+    query("[ 1, 2 ]?[1]", "[1]");
+    query("[ 1, 2 ]?[3]", "[]");
+    query("[ 1, 2 ]?['a']", "[1,2]");
+    query("[ 1, 2 ]?['']", "[]");
+
+    query("[ 1, 2 ]?['a']?['a']?['a']", "[1,2]");
+    query("[ 1, 2 ]?[1]?[1]?[1]", "[1]");
+
+    query("{}?[true()]", "{}");
+    query("{}?[false()]", "{}");
+
+    query("{ 1: 2 }?[true()]", "{1:2}");
+    query("{ 1: 2 }?[false()]", "{}");
+
+    query("{ 1: 2, 3: 4}?[true()]", "{1:2,3:4}");
+    query("{ 1: 2, 3: 4}?[false()]", "{}");
+
+    query("{ 1: 2, 3: 4}?[?key = 1]", "{1:2}");
+    query("{ 1: 2, 3: 4}?[?key = 8]", "{}");
+    query("{ 1: 2, 3: 4}?[?value = 2]", "{1:2}");
+    query("{ 1: 2, 3: 4}?[?value = 9]", "{}");
+    query("{ 1: 2, 3: 4}?['a']", "{1:2,3:4}");
+    query("{ 1: 2, 3: 4}?['']", "{}");
+
+    query("{ 1: 2, 3: 4}?['a']?['a']?['a']", "{1:2,3:4}");
+    query("{ 1: 2, 3: 4}?[?key = 1]?[?key = 1]?[?key = 1]", "{1:2}");
+    query("{ 1: 2, 3: 4}?[?value = 2]?[?value = 2]?[?value = 2]", "{1:2}");
+
+  }
 }

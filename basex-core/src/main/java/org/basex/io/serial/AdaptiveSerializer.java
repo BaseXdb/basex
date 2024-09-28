@@ -142,7 +142,7 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void array(final XQArray array) throws IOException {
     final TokenBuilder tb = new TokenBuilder().add('[');
     int c = 0;
-    for(final Value value : array.members()) {
+    for(final Value value : array.iterable()) {
       if(c++ > 0) {
         tb.add(',');
         if(indent) tb.add(' ');
@@ -172,15 +172,15 @@ public class AdaptiveSerializer extends OutputSerializer {
     final TokenBuilder tb = new TokenBuilder().add('{');
     int c = 0;
     ++level;
-    for(final Item key : map.keys()) {
-      if(c++ > 0) tb.add(',');
-      printChars(tb.next());
-      indent();
-      more = false;
-      serialize(key);
-      tb.add(':');
-      if(indent) tb.add(' ');
-      try {
+    try {
+      for(final Item key : map.keys()) {
+        if(c++ > 0) tb.add(',');
+        printChars(tb.next());
+        indent();
+        more = false;
+        serialize(key);
+        tb.add(':');
+        if(indent) tb.add(' ');
         final Value value = map.get(key);
         final boolean par = value.size() != 1;
         if(par) tb.add('(');
@@ -195,9 +195,9 @@ public class AdaptiveSerializer extends OutputSerializer {
           serialize(item);
         }
         if(par) tb.add(')');
-      } catch(final QueryException ex) {
-        throw new QueryIOException(ex);
       }
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
     }
     printChars(tb.next());
     --level;

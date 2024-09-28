@@ -14,9 +14,6 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public class RegExLexer implements TokenManager, RegExParserConstants {
-  /** End-of-file token. */
-  private static final Token EOF_TOKEN = new Token(EOF);
-
   /** The input string. */
   private final byte[] input;
   /** Input position. */
@@ -283,7 +280,7 @@ public class RegExLexer implements TokenManager, RegExParserConstants {
 
   @Override
   public Token getNextToken() {
-    if(pos >= input.length) return EOF_TOKEN;
+    if(pos >= input.length) return new Token(EOF);
     final int start = pos;
     payload = null;
     final int type = state > 0 ? inClass() : state < 0 ? inQuantifier() : normal();

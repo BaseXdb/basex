@@ -19,9 +19,9 @@ public abstract class AStr extends Item {
   /** ASCII offset flag. */
   private static final int[] ASCII = {};
 
-  /** String data ({@code null} if not initialized yet). */
+  /** String data ({@code null} if not cached yet). */
   byte[] value;
-  /** Character offsets. {@code null}: unknown, {@code ASCII}: ASCII, otherwise: offsets. */
+  /** Character offsets. {@code null}: not cached yet, {@code ASCII}: ASCII, otherwise: offsets. */
   private int[] offsets;
 
   /**
@@ -54,15 +54,8 @@ public abstract class AStr extends Item {
    */
   public boolean ascii(final InputInfo info) throws QueryException {
     if(offsets == null) {
-      final byte[] token = string(info);
-      if(Token.ascii(token)) {
-        offsets = ASCII;
-      } else {
-        final IntList list = new IntList();
-        final int tl = token.length;
-        for(int t = 0; t < tl; t += Token.cl(token, t)) list.add(t);
-        offsets = list.finish();
-      }
+      final int[] off = Token.cpOffsets(string(info));
+      offsets = off == null ? ASCII : off;
     }
     return offsets == ASCII;
   }
@@ -75,6 +68,42 @@ public abstract class AStr extends Item {
    */
   public int length(final InputInfo info) throws QueryException {
     return ascii(info) ? string(info).length : offsets.length;
+  }
+
+  /**
+   * Returns the single characters of the string.
+   * @param info input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public byte[][] characters(final InputInfo info) throws QueryException {
+    final TokenList list = new TokenList(length(info));
+    Token.forEachCp(string(info), cp -> list.add(Token.cpToken(cp)));
+    return list.finish();
+  }
+
+  /**
+   * Returns the codepoints of the string.
+   * @param info input info (can be {@code null})
+   * @return codepoints
+   * @throws QueryException query exception
+   */
+  public int[] codepoints(final InputInfo info) throws QueryException {
+    final IntList list = new IntList(length(info));
+    Token.forEachCp(string(info), cp -> list.add(cp));
+    return list.finish();
+  }
+
+  /**
+   * Returns the codepoints of the string in a long array.
+   * @param info input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public long[] longCodepoints(final InputInfo info) throws QueryException {
+    final LongList list = new LongList(length(info));
+    Token.forEachCp(string(info), cp -> list.add(cp));
+    return list.finish();
   }
 
   /**

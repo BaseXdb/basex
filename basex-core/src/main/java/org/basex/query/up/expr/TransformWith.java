@@ -35,7 +35,7 @@ public final class TransformWith extends Copy {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     arg(target(), arg -> arg.compile(cc));
-    cc.pushFocus(new Dummy(arg(target()).seqType(), null));
+    cc.pushFocus(new Dummy(arg(target()), true), true);
     try {
       arg(update(), arg -> arg.compile(cc));
     } finally {
@@ -88,16 +88,17 @@ public final class TransformWith extends Copy {
   public boolean has(final Flag... flags) {
     // Context dependency, positional access: only check first expression.
     // Example: . update { delete node a }
-    return Flag.CNS.in(flags) ||
-        Flag.CTX.in(flags) && arg(target()).has(Flag.CTX) ||
-        Flag.POS.in(flags) && arg(target()).has(Flag.POS) ||
-        super.has(Flag.UPD.remove(Flag.POS.remove(Flag.CTX.remove(flags))));
+    if(Flag.CNS.oneOf(flags) ||
+        Flag.CTX.oneOf(flags) && arg(target()).has(Flag.CTX) ||
+        Flag.POS.oneOf(flags) && arg(target()).has(Flag.POS)) return true;
+    final Flag[] flgs = Flag.remove(flags, Flag.UPD, Flag.POS, Flag.CTX);
+    return flgs.length != 0 && super.has(flgs);
   }
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    return arg(target()).inlineable(ic) &&
-        !(ic.expr instanceof ContextValue && arg(update()).uses(ic.var));
+    // do not replace $v with .:  EXPR update { rename node . as $v }
+    return arg(target()).inlineable(ic) && !(ic.expr.has(Flag.CTX) && arg(update()).uses(ic.var));
   }
 
   @Override
@@ -113,7 +114,7 @@ public final class TransformWith extends Copy {
     if(changed) arg(1, arg -> inlined);
 
     // do not inline context reference in updating expressions
-    changed |= ic.var != null && ic.cc.ok(arg(target()), () -> {
+    changed |= ic.var != null && ic.cc.ok(arg(target()), true, () -> {
       final Expr expr = arg(update()).inline(ic);
       if(expr == null) return false;
       arg(update(), arg -> expr);
@@ -135,6 +136,6 @@ public final class TransformWith extends Copy {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(target()).token(UPDATE).brace(update());
+    qs.token(arg(target())).token(UPDATE).brace(arg(update()));
   }
 }

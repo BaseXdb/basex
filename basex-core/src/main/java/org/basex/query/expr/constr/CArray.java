@@ -37,7 +37,7 @@ public final class CArray extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final boolean values = allAreValues(true);
+    final boolean values = values(true, cc);
     if(exprs.length == 1 && (sequences || exprs[0].size() == 1)) {
       return cc.replaceWith(this, values
           ? XQArray.singleton(exprs[0].value(cc.qc))
@@ -55,7 +55,7 @@ public final class CArray extends Arr {
     }
     if(mt != null) exprType.assign(ArrayType.get(mt));
 
-    return allAreValues(true) ? cc.preEval(this) : this;
+    return values ? cc.preEval(this) : this;
   }
 
   @Override

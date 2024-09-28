@@ -292,7 +292,7 @@ declare function html:table(
       let $header := $headers[?key = $key]
       let $value := (
         let $desc := $header?order = 'desc'
-        return switch($header?type)
+        return switch($header?type) {
           case 'decimal' case 'number' case 'bytes' return
             if($desc)
             then fn { 0 - number() }
@@ -305,6 +305,7 @@ declare function html:table(
             fn { if(. instance of fn(*)) then string-join(.()) else . }
           default return
             identity(?)
+        }
       )
       for $entry in $entries
       order by $value($entry($key)) empty greatest collation '?lang=en'

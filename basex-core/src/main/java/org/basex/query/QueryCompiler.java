@@ -45,10 +45,10 @@ final class QueryCompiler {
   /**
    * Computes the scopes.
    * @param main reference to main module
-   * @return scoped
+   * @return scopes
    */
   private ArrayList<ArrayList<Scope>> scopes(final MainModule main) {
-    add(main);
+    addScope(main);
     final ArrayList<ArrayList<Scope>> lists = new ArrayList<>();
     tarjan(0, lists);
     return lists;
@@ -61,7 +61,6 @@ final class QueryCompiler {
    */
   private void tarjan(final int id, final ArrayList<ArrayList<Scope>> result) {
     final int ixv = id << 1, llv = ixv + 1, idx = next++;
-    while(list.size() <= llv) list.add(-1);
     list.set(ixv, idx);
     list.set(llv, idx);
     stack.push(id);
@@ -93,9 +92,9 @@ final class QueryCompiler {
   /**
    * Adds a new scope and returns its ID.
    * @param scope scope to add
-   * @return the scope's ID
+   * @return the scope ID
    */
-  private int add(final Scope scope) {
+  private int addScope(final Scope scope) {
     final int id = scopes.size();
     scopes.add(scope);
     adjacent.add(null);
@@ -128,13 +127,13 @@ final class QueryCompiler {
     curr.visit(new ASTVisitor() {
       @Override
       public boolean staticVar(final StaticVar var) {
-        return var != curr && neighbor(var);
+        return var != curr && add(var);
       }
 
       @Override
       public boolean staticFuncCall(final StaticFuncCall call) {
         final StaticFunc func = call.func();
-        return func == null || neighbor(func);
+        return func == null || add(func);
       }
 
       @Override
@@ -144,7 +143,7 @@ final class QueryCompiler {
 
       @Override
       public boolean funcItem(final FuncItem func) {
-        return neighbor(func);
+        return add(func);
       }
 
       /**
@@ -152,12 +151,12 @@ final class QueryCompiler {
        * @param scope the neighbor
        * @return {@code true} for convenience
        */
-      private boolean neighbor(final Scope scope) {
+      private boolean add(final Scope scope) {
         final Integer old = ids.get(scope);
         if(old == null) {
-          neighbors.add(add(scope));
-        } else if(!neighbors.contains(old)) {
-          neighbors.add(old);
+          neighbors.add(addScope(scope));
+        } else {
+          neighbors.addUnique(old);
         }
         return true;
       }

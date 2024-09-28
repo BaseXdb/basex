@@ -61,7 +61,7 @@ public final class CMap extends Arr {
     }
     exprType.assign(MapType.get(kt, vt != null ? vt : SeqType.ITEM_ZM));
 
-    return allAreValues(true) ? cc.preEval(this) : this;
+    return values(true, cc) ? cc.preEval(this) : this;
   }
 
   @Override
@@ -71,7 +71,7 @@ public final class CMap extends Arr {
     for(int e = 0; e < el; e += 2) {
       final Item key = toAtomItem(exprs[e], qc);
       final Value value = exprs[e + 1].value(qc);
-      if(mb.contains(key)) throw MAPDUPLKEY_X_X_X.get(info, key, mb.get(key), value);
+      if(mb.contains(key)) throw MAPDUPLKEY_X.get(info);
       mb.put(key, value);
     }
     return mb.map();

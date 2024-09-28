@@ -95,7 +95,7 @@ final class TextIterator {
    * @return string
    */
   String substring(final int s, final int e) {
-    return string(text, s, e - s);
+    return s < e ? string(text, s, e - s) : "";
   }
 
   /**

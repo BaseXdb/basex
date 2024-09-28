@@ -53,8 +53,8 @@ public final class Part4 extends Main {
       System.out.println(price);
     }
 
-    // Print atomic values
-    info("Print atomic values");
+    // Print atomic items
+    info("Print atomic items");
 
     xqs = xqe.executeQuery("'Hello world!', 123, 1E1, xs:QName('abc')");
     while(xqs.next()) {

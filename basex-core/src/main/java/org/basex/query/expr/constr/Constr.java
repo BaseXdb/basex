@@ -88,7 +88,7 @@ public final class Constr {
    */
   private boolean add(final Item item, final QNmSet qnames) throws QueryException {
     if(item instanceof XQArray) {
-      for(final Value value : ((XQArray) item).members()) {
+      for(final Value value : ((XQArray) item).iterable()) {
         for(final Item it : value) {
           if(!add(it, qnames)) return false;
         }
@@ -162,7 +162,7 @@ public final class Constr {
       }
       more = false;
     } else {
-      // type: atomic value
+      // type: atomic item
       if(more) text.add(' ');
       text.add(item.string(info));
       more = true;
@@ -221,7 +221,7 @@ public final class Constr {
 
         final byte[] auri = qnm.uri(), npref = addNS(inscopeNS, prefix, auri);
         if(npref != null) {
-          final QNm aname = qc.shared.qName(concat(npref, COLON, qnm.local()), auri);
+          final QNm aname = qc.shared.qName(concat(npref, cpToken(':'), qnm.local()), auri);
           attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
         }
       }

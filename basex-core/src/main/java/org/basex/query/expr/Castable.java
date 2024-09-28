@@ -43,7 +43,13 @@ public final class Castable extends Convert {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(seqType.cast(expr.atomValue(qc, info), false, qc, info) != null);
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return seqType.cast(expr.atomValue(qc, info), false, qc, info) != null;
   }
 
   @Override

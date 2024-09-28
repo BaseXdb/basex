@@ -71,7 +71,7 @@ public final class FnPath extends ContextFn {
       node = nodes.get(s);
       if(node.type == NodeType.ELEMENT) paths.put(node, tb.toArray());
     }
-    return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());
+    return Str.get(tb.isEmpty() ? Token.cpToken('/') : tb.finish());
   }
 
   /**

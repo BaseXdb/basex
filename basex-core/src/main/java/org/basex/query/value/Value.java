@@ -139,8 +139,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value subsequence(long start, long length, QueryContext qc);
 
   /**
-   * Caches lazy values.
-   * @param lazy lazy caching
+   * Caches data of lazy items (i.e., those implementing the {@link Lazy} interface).
+   * By calling this method, the streaming feature of lazy items will be disabled.
+   * @param lazy if {@code false}, cache immediately. if {@code true}, caching is deferred
+   *   until the data is actually requested
    * @param ii input info (can be {@code null})
    * @throws QueryException query exception
    */

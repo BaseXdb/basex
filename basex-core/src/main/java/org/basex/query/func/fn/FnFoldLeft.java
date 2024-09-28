@@ -25,13 +25,13 @@ public class FnFoldLeft extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = action(qc);
 
-    int p = 0;
-    Value result = arg(1).value(qc);
+    final HofArgs args = new HofArgs(3, action).set(0, arg(1).value(qc));
     for(Item item; (item = input.next()) != null;) {
-      if(skip(qc, result, item)) break;
-      result = action.invoke(qc, info, result, item, Int.get(++p));
+      args.set(1, item).inc();
+      if(skip(qc, args)) break;
+      args.set(0, invoke(action, args, qc));
     }
-    return result;
+    return args.get(0);
   }
 
   /**
@@ -41,8 +41,8 @@ public class FnFoldLeft extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean skip(final QueryContext qc, final Value... args) throws QueryException {
-    return iff != null && toBoolean(qc, iff[0], args);
+  public final boolean skip(final QueryContext qc, final HofArgs args) throws QueryException {
+    return iff != null && test(iff[0], args, qc);
   }
 
   /**
@@ -57,19 +57,33 @@ public class FnFoldLeft extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    Expr expr = optType(cc, false, true);
-    if(expr != this) return expr;
+    final Expr expr = optType(cc, false, true);
+    return expr != this ? expr : unroll(cc, true);
+  }
 
-    // unroll fold
+  /**
+   * Unrolls the fold.
+   * @param cc compilation context
+   * @param left indicates if this is a left/right fold
+   * @return optimized or original expression
+   * @throws QueryException query exception
+   */
+  public final Expr unroll(final CompileContext cc, final boolean left) throws QueryException {
     final Expr input = arg(0), zero = arg(1), action = arg(2);
     final int arity = arity(action);
-    if(action instanceof Value && arity == 2) {
+    if(arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
-        final Expr func = coerce(2, cc, arity);
-        expr = zero;
-        for(final Expr ex : unroll) {
-          expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
+        final Expr func = coerceFunc(2, cc, arity);
+        Expr expr = zero;
+        if(left) {
+          for(final Expr ex : unroll) {
+            expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
+          }
+        } else {
+          for(int es = unroll.size() - 1; es >= 0; es--) {
+            expr = new DynFuncCall(info, func, unroll.get(es), expr).optimize(cc);
+          }
         }
         return expr;
       }
@@ -101,38 +115,17 @@ public class FnFoldLeft extends StandardFunc {
         if(fold instanceof FuncItem[]) iff = (FuncItem[]) fold;
       }
 
-      // function argument is a single function item
-      final SeqType zst = zero.seqType(), curr = array && ist.type instanceof ArrayType ?
-        ((ArrayType) ist.type).memberType : ist.with(Occ.EXACTLY_ONE);
+      final SeqType zst = zero.seqType(), i1t = array ? ist.type instanceof ArrayType ?
+        ((ArrayType) ist.type).valueType : SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
+      SeqType st = zst, ost;
+      do {
+        final SeqType[] types = { left ? st : i1t, left ? i1t : st, SeqType.INTEGER_O };
+        arg(2, arg -> refineFunc(action, cc, types));
+        ost = st;
+        st = st.union(arg(2).funcType().declType);
+      } while(!st.eq(ost));
 
-      // assign item type of iterated value, optimize function
-      final SeqType[] types = { left ? SeqType.ITEM_ZM : curr, left ? curr : SeqType.ITEM_ZM,
-        SeqType.INTEGER_O };
-      Expr optFunc = refineFunc(action, cc, SeqType.ITEM_ZM, types);
-
-      final FuncType ft = optFunc.funcType();
-      final int i = left ? 0 : 1;
-      SeqType st = zst, output = ft.declType;
-
-      // if initial item has more specific type, assign it and check optimized result type
-      if(i < ft.argTypes.length) {
-        final SeqType at = ft.argTypes[i];
-        if(!st.eq(at) && st.instanceOf(at)) {
-          while(true) {
-            types[i] = st;
-            optFunc = refineFunc(action, cc, ft.declType, types);
-            output = optFunc.funcType().declType;
-
-            // optimized type is instance of input type: abort
-            if(output.instanceOf(st)) break;
-            // combine input and output type, optimize again
-            st = st.union(output);
-          }
-        }
-      }
-
-      exprType.assign(!array && ist.oneOrMore() ? output : output.union(zst));
-      exprs[2] = optFunc;
+      exprType.assign(st);
     }
     return this;
   }

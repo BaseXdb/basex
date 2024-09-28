@@ -95,9 +95,10 @@ public final class Transform extends Copy {
     for(final Let copy : copies) {
       if(copy.has(flags)) return true;
     }
-    return Flag.CNS.in(flags) ||
-        Flag.UPD.in(flags) && arg(target()).has(Flag.UPD) ||
-        super.has(Flag.UPD.remove(flags));
+    if(Flag.CNS.oneOf(flags) ||
+        Flag.UPD.oneOf(flags) && arg(target()).has(Flag.UPD)) return true;
+    final Flag[] flgs = Flag.remove(flags, Flag.UPD);
+    return flgs.length != 0 && super.has(flgs);
   }
 
   @Override

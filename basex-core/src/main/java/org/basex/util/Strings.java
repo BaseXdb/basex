@@ -41,9 +41,8 @@ public final class Strings {
 
   /**
    * Converts the specified string into a long value.
-   * {@link Long#MIN_VALUE} is returned if the input is invalid.
    * @param string string to be converted
-   * @return resulting long value
+   * @return resulting long value, or {@link Long#MIN_VALUE} if the input is invalid.
    */
   public static long toLong(final String string) {
     return Token.toLong(Token.token(string));
@@ -51,21 +50,38 @@ public final class Strings {
 
   /**
    * Converts the specified string into an integer value.
-   * {@link Integer#MIN_VALUE} is returned if the input is invalid.
    * @param string string to be converted
-   * @return resulting integer value
+   * @return resulting integer value, or {@link Integer#MIN_VALUE} if the input is invalid
    */
   public static int toInt(final String string) {
     return Token.toInt(Token.token(string));
   }
 
   /**
-   * Checks if the specified string is "yes", "true", "on" or "1".
+   * Converts the specified string to a boolean value.
    * @param string string to be checked
+   * @return result of check, or {@code null} if the input is invalid
+   */
+  public static Boolean toBoolean(final String string) {
+    return isTrue(string) ? Boolean.TRUE : isFalse(string) ? Boolean.FALSE : null;
+  }
+
+  /**
+   * Checks if the specified string is "yes", "true", "on" or "1".
+   * @param string string to be checked (can be {@code null})
    * @return result of check
    */
-  public static boolean toBoolean(final String string) {
+  public static boolean isTrue(final String string) {
     return eqic(string, "1", Text.TRUE, Text.YES, Text.ON);
+  }
+
+  /**
+   * Checks if the specified string is "no", "false", "off" or "0".
+   * @param string string to be checked (can be {@code null})
+   * @return result of check
+   */
+  public static boolean isFalse(final String string) {
+    return eqic(string, Text.FALSE, Text.NO, Text.OFF, "0");
   }
 
   /**
@@ -81,7 +97,7 @@ public final class Strings {
   /**
    * Compares several strings for equality.
    * @param string first string (can be {@code null})
-   * @param strings strings to be compared (can be {@code null})
+   * @param strings strings to be compared (can contain {@code null} references)
    * @return {@code true} if one test is successful
    */
   public static boolean eq(final String string, final String... strings) {
@@ -93,8 +109,8 @@ public final class Strings {
 
   /**
    * Compares several strings for equality, ignoring the case.
-   * @param string first string
-   * @param strings strings to be compared
+   * @param string first string (can be {@code null})
+   * @param strings strings to be compared (can contain {@code null} references)
    * @return {@code true} if test is successful
    */
   public static boolean eqic(final String string, final String... strings) {
@@ -247,15 +263,6 @@ public final class Strings {
     if(!string.isEmpty())
       sb.append(Character.toUpperCase(string.charAt(0))).append(string.substring(1));
     return sb.toString();
-  }
-
-  /**
-   * Checks if the specified string is "no", "false", "off" or "0".
-   * @param string string to be checked
-   * @return result of check
-   */
-  public static boolean no(final String string) {
-    return eqic(string, Text.FALSE, Text.NO, Text.OFF, "0");
   }
 
   /**

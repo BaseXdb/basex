@@ -126,28 +126,34 @@ public final class CmpIR extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return Bln.get(!item.isEmpty() && inRange(item));
+      return !item.isEmpty() && inRange(item);
     }
 
     // pre-evaluate ranges
     if(expr instanceof Range || expr instanceof RangeSeq) {
       final Value value = expr.value(qc);
       final long size = value.size();
-      if(size == 0) return Bln.FALSE;
-      if(size == 1) return Bln.get(inRange((Item) value));
+      if(size == 0) return false;
+      if(size == 1) return inRange((Item) value);
       final RangeSeq rs = (RangeSeq) value;
-      return Bln.get(rs.max() >= min && rs.min() <= max);
+      return rs.max() >= min && rs.min() <= max;
     }
 
     // iterative evaluation
     final Iter iter = expr.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(inRange(item)) return Bln.TRUE;
+      if(inRange(item)) return true;
     }
-    return Bln.FALSE;
+    return false;
   }
 
   /**

@@ -66,9 +66,9 @@ abstract class CsvSerializer extends StandardSerializer {
           throw CSV_SERIALIZE_X_X.getIO("Output must be put into quotes", txt);
 
         if(quotes && (delim || special)) tb.add('"');
-        final int len = txt.length;
-        for(int c = 0; c < len; c += cl(txt, c)) {
-          final int cp = cp(txt, c);
+        final TokenParser tp = new TokenParser(txt);
+        while(tp.more()) {
+          final int cp = tp.next();
           if(backslashes) {
             if(cp == '\n') tb.add("\\n");
             else if(cp == '\r') tb.add("\\r");
@@ -93,6 +93,6 @@ abstract class CsvSerializer extends StandardSerializer {
 
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw CSV_SERIALIZE_X.getIO("Atomic values cannot be serialized");
+    throw CSV_SERIALIZE_X.getIO("Atomic items cannot be serialized");
   }
 }

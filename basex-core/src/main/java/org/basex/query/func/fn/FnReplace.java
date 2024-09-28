@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -36,13 +37,14 @@ public final class FnReplace extends RegEx {
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
     if(action != null) {
+      final HofArgs args = new HofArgs(2);
       final StringBuilder sb = new StringBuilder();
       while(matcher.find()) {
-        final Atm group = Atm.get(matcher.group());
         final ValueBuilder groups = new ValueBuilder(qc);
         final int gc = matcher.groupCount();
         for(int g = 0; g < gc; g++) groups.add(Atm.get(matcher.group(g + 1)));
-        final Item item = action.invoke(qc, info, group, groups.value()).atomItem(qc, info);
+        args.set(0, Atm.get(matcher.group())).set(1, groups.value());
+        final Item item = invoke(action, args, qc).atomItem(qc, info);
         matcher.appendReplacement(sb, item.isEmpty() ? "" :
           string(item.string(info)).replace("\\", "\\\\").replace("$", "\\$"));
       }

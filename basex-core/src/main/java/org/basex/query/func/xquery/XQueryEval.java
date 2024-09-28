@@ -118,17 +118,24 @@ public class XQueryEval extends StandardFunc {
           if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATE2.get(info);
         }
 
+        final Value value;
         final Iter iter = qctx.iter();
-        // value-based iterator: return result unchanged
-        if(iter.valueIter()) return iter.value(qctx, this);
-        // collect resulting items
-        final ValueBuilder vb = new ValueBuilder(qc);
-        for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
-        return vb.value();
+        if(iter.valueIter()) {
+          // value-based iterator: return result unchanged
+          value = iter.value(qctx, this);
+        } else {
+          // collect resulting items
+          final ValueBuilder vb = new ValueBuilder(qc);
+          for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
+          value = vb.value();
+        }
+        // return cached result
+        value.cache(false, info);
+        return value;
       } catch(final JobException ex) {
         QueryError error = null;
         if(qctx.state == JobState.TIMEOUT) error = XQUERY_TIMEOUT;
-        else if(qctx.state == JobState.MEMORY)  error = XQUERY_MEMORY;
+        else if(qctx.state == JobState.MEMORY) error = XQUERY_MEMORY;
         if(error != null) throw error.get(pass ? new InputInfo(query.path(), 1, 1) : info);
         throw ex;
       } catch(final QueryException ex) {
@@ -140,6 +147,9 @@ public class XQueryEval extends StandardFunc {
         // pass on error info: assign (possibly empty) path of module which caused the error
         throw qe.info(pass ? ii.path().equals(info.path()) ?
           new InputInfo(query.path(), ii.line(), ii.column()) : ii : info);
+      } catch(final StackOverflowError er) {
+        // pass on error info: assign (possibly empty) path of module which caused the error
+        throw XQUERY_UNEXPECTED_X.get(info, er);
       }
     } finally {
       if(to != null) to.cancel();

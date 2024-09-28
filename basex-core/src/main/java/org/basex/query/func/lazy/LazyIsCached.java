@@ -13,8 +13,14 @@ import org.basex.util.*;
  */
 public final class LazyIsCached extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Item value = toAtomItem(arg(0), qc);
-    return Bln.get(value instanceof Lazy && ((Lazy) value).isCached());
+    return value instanceof Lazy && ((Lazy) value).isCached();
   }
 }

@@ -94,16 +94,13 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Returns true if all arguments are values (possibly of small size).
-   * @param limit check if result size of any expression exceeds {@link CompileContext#MAX_PREEVAL}
+   * Returns true if all expressions are values (possibly of small size).
+   * @param limit check if result size of any expression is not too large
+   * @param cc compilation context
    * @return result of check
    */
-  protected boolean allAreValues(final boolean limit) {
-    for(final Expr expr : exprs) {
-      if(!(expr instanceof Value) || limit && expr.size() > CompileContext.MAX_PREEVAL)
-        return false;
-    }
-    return true;
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return cc.values(limit, exprs);
   }
 
   /**
@@ -355,6 +352,15 @@ public abstract class Arr extends ParseExpr {
   public final void arg(final int a, final QueryFunction<Expr, Expr> rewrite)
       throws QueryException {
     exprs[a] = rewrite.apply(arg(a));
+  }
+
+  /**
+   * Return multiple expressions as a list.
+   * @return merged arguments
+   */
+  protected final Expr mergeExprs() {
+    final int el = exprs.length;
+    return el == 0 ? Empty.VALUE : el == 1 ? exprs[0] : new List(info, exprs);
   }
 
   @Override

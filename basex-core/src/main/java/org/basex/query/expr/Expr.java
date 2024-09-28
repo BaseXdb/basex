@@ -6,12 +6,10 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
@@ -192,15 +190,14 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if inlining is possible.
-   * This function is called by {@link InlineContext#inlineable} and:
-   * {@link CNode#inlineable} returns false if the new expression construct new nodes.
+   * This function is called by {@link InlineContext#inlineable}.
    *
-   * The following tests might reject inlining if the expression is a context reference:
+   * The following tests might reject inlining if the expression depends on the context value:
    * <ul>
    *   <li>{@link Preds#inlineable}</li>
    *   <li>{@link Path#inlineable}</li>
    *   <li>{@link SimpleMap#inlineable}</li>
-   *   <li>{@link StaticJavaCall#inlineable}</li>
+   *   <li>{@link Focus#inlineable}</li>
    *   <li>{@link TransformWith#inlineable}</li>
    * </ul>
    *
@@ -212,7 +209,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks how often a variable or context reference is used in this expression.
    *
-   * This function is called by:
+   * This function is, among others, called by:
    * <ul>
    *   <li> {@link Closure#optimize}</li>
    *   <li> {@link GFLWOR#inlineForLet}</li>

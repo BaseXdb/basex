@@ -5,7 +5,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -45,10 +44,6 @@ abstract class TrieNode {
         final QueryContext qc, final InputInfo info) { return branch; }
     @Override
     boolean verify() { return true; }
-    @Override
-    void keys(final ItemList ks) { }
-    @Override
-    void values(final ValueBuilder vs) { }
     @Override
     void cache(final boolean lazy, final InputInfo info) { }
     @Override
@@ -179,18 +174,6 @@ abstract class TrieNode {
    * @return check result
    */
   abstract boolean verify();
-
-  /**
-   * Collects all keys in this subtree.
-   * @param ks key cache
-   */
-  abstract void keys(ItemList ks);
-
-  /**
-   * Collects all values in this subtree.
-   * @param vs value cache
-   */
-  abstract void values(ValueBuilder vs);
 
   /**
    * Caches all keys and values.

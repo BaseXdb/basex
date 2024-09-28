@@ -41,7 +41,7 @@ public final class SqlConnect extends SqlFn {
     final Connection conn;
     try {
       conn = DriverManager.getConnection(url, props);
-      if(auto != null) conn.setAutoCommit(Strings.toBoolean(auto.toString()));
+      if(auto != null) conn.setAutoCommit(Strings.isTrue(auto.toString()));
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }

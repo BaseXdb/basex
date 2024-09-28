@@ -108,7 +108,7 @@ public abstract class JsonSerializer extends StandardSerializer {
         out.print('[');
 
         boolean s = false;
-        for(final Value value : ((XQArray) item).members()) {
+        for(final Value value : ((XQArray) item).iterable()) {
           if(s) out.print(',');
           indent();
           serialize(value);
@@ -153,9 +153,9 @@ public abstract class JsonSerializer extends StandardSerializer {
    */
   protected final void string(final byte[] string) throws IOException {
     out.print('"');
-    final byte[] str = normalize(string, form);
-    final int sl = str.length;
-    for(int s = 0; s < sl; s += cl(str, s)) printChar(cp(str, s));
+    final byte[] norm = normalize(string, form);
+    final int nl = norm.length;
+    for(int n = 0; n < nl; n += cl(norm, n)) printChar(cp(norm, n));
     out.print('"');
   }
 

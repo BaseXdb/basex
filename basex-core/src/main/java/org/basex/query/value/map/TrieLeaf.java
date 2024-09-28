@@ -8,7 +8,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -182,16 +181,6 @@ final class TrieLeaf extends TrieNode {
   @Override
   boolean verify() {
     return key.hash() == hash;
-  }
-
-  @Override
-  void keys(final ItemList keys) {
-    keys.add(key);
-  }
-
-  @Override
-  void values(final ValueBuilder vs) {
-    vs.add(value);
   }
 
   @Override

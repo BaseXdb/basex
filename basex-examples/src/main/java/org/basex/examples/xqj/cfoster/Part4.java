@@ -74,8 +74,8 @@ public final class Part4 extends Main {
     }
     System.out.println();
 
-    // Create items from atomic values
-    info("Create items from atomic values");
+    // Create items from atomic items
+    info("Create items from atomic items");
 
     XQItemType date = // xs:date
     conn.createAtomicType(XQItemType.XQBASETYPE_DATE);
@@ -92,7 +92,7 @@ public final class Part4 extends Main {
     System.out.println();
 
     // Create items from Java objects
-    info("Create items from atomic values");
+    info("Create items from atomic items");
     items = new XQItem[3];
 
     // Create an XQItem with a type of xs:int

@@ -28,7 +28,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public final class XQMap extends XQData {
+public final class XQMap extends XQStruct {
   /** The empty map. */
   private static final XQMap EMPTY = new XQMap(TrieNode.EMPTY, SeqType.MAP);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
@@ -69,7 +69,7 @@ public final class XQMap extends XQData {
 
   @Override
   public void write(final DataOutput out) throws IOException, QueryException {
-    out.writeNum(mapSize());
+    out.writeNum((int) structSize());
     for(final Item key : keys()) {
       Store.write(out, key);
       Store.write(out, get(key));
@@ -77,16 +77,8 @@ public final class XQMap extends XQData {
   }
 
   @Override
-  public QNm paramName(final int pos) {
-    return new QNm("key", "");
-  }
-
-  @Override
   public void refineType(final Expr expr) {
-    if(root.size != 0) {
-      final Type tp = type.intersect(expr.seqType().type);
-      if(tp != null) type = tp;
-    }
+    if(root.size != 0) super.refineType(expr);
   }
 
   @Override
@@ -251,30 +243,27 @@ public final class XQMap extends XQData {
     return mkt == kt && mvt.eq(vt) ? type : MapType.get(mkt.union(kt), mvt.union(vt));
   }
 
-  /**
-   * Number of values contained in this map.
-   * @return size
-   */
-  public int mapSize() {
+  @Override
+  public long structSize() {
     return root.size;
   }
 
   /**
    * All keys defined in this map.
    * @return list of keys
+   * @throws QueryException query exception
    */
-  public Value keys() {
+  public Value keys() throws QueryException {
     final ItemList items = new ItemList(root.size);
-    root.keys(items);
+    apply((key, value) -> items.add(key));
     return items.value(((MapType) type).keyType);
   }
 
-  /**
-   * Adds all values defined in this map to the specified value builder.
-   * @param vb value builder
-   */
-  public void values(final ValueBuilder vb) {
-    root.values(vb);
+  @Override
+  public Value values(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    apply((key, value) -> vb.add(value));
+    return vb.value(((MapType) type).valueType.type);
   }
 
   /**
@@ -377,10 +366,10 @@ public final class XQMap extends XQData {
   @Override
   public void toXml(final QueryPlan plan) {
     try {
-      final int size = mapSize();
+      final long size = structSize();
       final Value keys = keys();
       final ExprList list = new ExprList();
-      final int max = Math.min(size, 5);
+      final long max = Math.min(size, 5);
       for(long i = 0; i < max; i++) {
         final Item key = keys.itemAt(i);
         list.add(key).add(get(key));

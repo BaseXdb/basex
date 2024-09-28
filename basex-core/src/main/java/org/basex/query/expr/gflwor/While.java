@@ -56,7 +56,7 @@ public final class While extends Clause {
 
   @Override
   public While optimize(final CompileContext cc) throws QueryException {
-    // while exists(nodes)  ->  while nodes
+    // while exists($nodes)  ->  while $nodes
     expr = expr.simplifyFor(Simplify.EBV, cc);
     if(expr instanceof Value && !(expr instanceof Bln)) {
       expr = cc.replaceWith(expr, Bln.get(expr.test(cc.qc, info, 0)));

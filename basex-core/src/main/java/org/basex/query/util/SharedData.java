@@ -59,7 +59,7 @@ public final class SharedData {
    */
   public QNm qName(final byte[] name, final byte[] uri) {
     return qnames.computeIfAbsent(
-      uri != null ? Token.concat(name, Token.SPACE, uri) : name,
+      uri != null ? Token.concat(name, Token.cpToken(' '), uri) : name,
       () -> new QNm(name, uri)
     );
   }

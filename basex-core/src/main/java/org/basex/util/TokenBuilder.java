@@ -32,7 +32,7 @@ public final class TokenBuilder {
   public static final int ULINE = PRIVATE_END - 4;
 
   /** Limit for info strings. */
-  private static final int LIMIT = 100;
+  private static final int LIMIT = 128;
   /** Byte array, storing all characters as UTF8. */
   private byte[] chars;
   /** Current token size. */
@@ -387,8 +387,7 @@ public final class TokenBuilder {
    * @return token
    */
   public byte[] toArray() {
-    final int s = size;
-    return s == 0 ? EMPTY : Arrays.copyOf(chars, s);
+    return finish(chars, size, true);
   }
 
   /**
@@ -398,9 +397,8 @@ public final class TokenBuilder {
    */
   public byte[] next() {
     final int s = size;
-    if(s == 0) return EMPTY;
     size = 0;
-    return Arrays.copyOf(chars, s);
+    return finish(chars, s, true);
   }
 
   /**
@@ -411,8 +409,21 @@ public final class TokenBuilder {
   public byte[] finish() {
     final byte[] chrs = chars;
     chars = null;
-    final int s = size;
-    return s == 0 ? EMPTY : s == chrs.length ? chrs : Arrays.copyOf(chrs, s);
+    return finish(chrs, size, false);
+  }
+
+  /**
+   * Returns the token as byte array.
+   * @param chars characters
+   * @param size token size
+   * @param copy copy token
+   * @return token
+   */
+  private static byte[] finish(final byte[] chars, final int size, final boolean copy) {
+    return size == 0 ? EMPTY :
+           size == 1 && chars[0] >= 0 ? cpToken(chars[0]) :
+           size != chars.length || copy ? Arrays.copyOf(chars, size) :
+           chars;
   }
 
   /**

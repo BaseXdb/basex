@@ -31,7 +31,7 @@ public final class ArrayRemove extends ArrayFn {
     // delete entries backwards
     for(int l = pos.size() - 1; l >= 0; l--) {
       final long p = pos.get(l);
-      if(p < array.arraySize()) array = array.remove(p, qc);
+      if(p < array.structSize()) array = array.remove(p, qc);
     }
     return array;
   }

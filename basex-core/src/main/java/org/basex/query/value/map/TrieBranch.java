@@ -5,7 +5,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -192,20 +191,6 @@ final class TrieBranch extends TrieNode {
       if(act) c += kids[i].size;
     }
     return c == size;
-  }
-
-  @Override
-  void keys(final ItemList ks) {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.keys(ks);
-    }
-  }
-
-  @Override
-  void values(final ValueBuilder vs) {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.values(vs);
-    }
   }
 
   @Override

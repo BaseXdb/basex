@@ -44,7 +44,7 @@ public abstract class CNode extends Arr {
    */
   final void optValue(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.STRING, cc);
-    if(allAreValues(true) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
+    if(values(true, cc) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
       exprs = new Expr[] { Str.get(atomValue(cc.qc, true)) };
     }
   }
@@ -59,13 +59,13 @@ public abstract class CNode extends Arr {
   final byte[] atomValue(final QueryContext qc, final boolean empty) throws QueryException {
     TokenBuilder tb = null;
     for(final Expr expr : exprs) {
-      boolean space = false;
+      boolean more = false;
       final Iter iter = expr.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {
         if(tb == null) tb = new TokenBuilder();
-        else if(space) tb.add(' ');
+        else if(more) tb.add(' ');
         tb.add(item.string(info));
-        space = true;
+        more = true;
       }
     }
     return tb != null ? tb.finish() : empty ? Token.EMPTY : null;
@@ -90,11 +90,12 @@ public abstract class CNode extends Arr {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.CNS.in(flags) || super.has(flags);
+    return Flag.CNS.oneOf(flags) || super.has(flags);
   }
 
   @Override
   public boolean inlineable(final InlineContext ic) {
+    // do not change context of constructed nodes:  <x/> ! <y xmlns='y'>{ <x/> }</y>
     return !ic.expr.has(Flag.CNS) && super.inlineable(ic);
   }
 

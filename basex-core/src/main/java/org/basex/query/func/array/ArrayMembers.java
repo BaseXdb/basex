@@ -24,11 +24,11 @@ public final class ArrayMembers extends StandardFunc {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
-      final Iterator<Value> members = array.members().iterator();
+      final Iterator<Value> values = array.iterable().iterator();
 
       @Override
       public XQMap next() {
-        return members.hasNext() ? record(members.next()) : null;
+        return values.hasNext() ? record(values.next()) : null;
       }
       @Override
       public Item get(final long i) {
@@ -36,7 +36,7 @@ public final class ArrayMembers extends StandardFunc {
       }
       @Override
       public long size() {
-        return array.arraySize();
+        return array.structSize();
       }
     };
   }
@@ -46,7 +46,7 @@ public final class ArrayMembers extends StandardFunc {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(record(member));
+    for(final Value member : array.iterable()) vb.add(record(member));
     return vb.value(this);
   }
 
@@ -54,7 +54,7 @@ public final class ArrayMembers extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Type tp = arg(0).seqType().type;
     if(tp instanceof ArrayType) {
-      exprType.assign(MapType.get(AtomType.STRING, ((ArrayType) tp).memberType));
+      exprType.assign(MapType.get(AtomType.STRING, ((ArrayType) tp).valueType));
     }
     return this;
   }

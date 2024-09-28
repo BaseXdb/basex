@@ -3,8 +3,10 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -16,8 +18,9 @@ import org.basex.util.*;
 public final class FnParseInteger extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toToken(arg(0), qc);
+    final byte[] value = toTokenOrNull(arg(0), qc);
     final Item radix = arg(1).atomItem(qc, info);
+    if(value == null) return Empty.VALUE;
 
     final long rdx = radix.isEmpty() ? 10 : toLong(radix);
     if(rdx < 2 || rdx > 36) throw INTRADIX_X.get(info, rdx);
@@ -38,5 +41,10 @@ public final class FnParseInteger extends StandardFunc {
       if(res < 0) throw INTRANGE_X.get(info, value);
     }
     return Int.get(neg == Boolean.TRUE ? -res : res);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    return optFirst();
   }
 }

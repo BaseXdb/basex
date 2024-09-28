@@ -72,7 +72,7 @@ final class SmallArray extends XQArray {
   }
 
   @Override
-  public long arraySize() {
+  public long structSize() {
     return members.length;
   }
 

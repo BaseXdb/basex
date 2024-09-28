@@ -248,6 +248,27 @@ public final class FuncItemTest extends SandboxTest {
     );
   }
 
+  /** Tests if recursive function items are inlined only once. */
+  @Test public void gh2033() {
+    check("let $p := function($c, $q) { $c/* ! $q(?, $q)(.) } return $p((), $p)",
+        "",
+        empty()
+    );
+    // GH-2324
+    query("declare variable $f := map {"
+        + "  'A': function($r, $f) { $r/x ! $f?B(., $f) },"
+        + "  'B': function($r, $f) { $r/x ! $f?A(., $f) }"
+        + "};"
+        + "$f?A(<a/>, $f)", "");
+    query("let $even := fn($n, $self, $odd) {"
+        + "  $n = 0 and $odd($n - 1, $odd, $self)"
+        + "}"
+        + "let $odd := fn($n, $self, $even) {"
+        + "  $n != 0 or $even($n - 1, $even, $self)"
+        + "}"
+        + "return $even(1, $even, $odd)", false);
+  }
+
   /** Tests if not-yet-known function references are parsed correctly. */
   @Test public void gh953() {
     check("declare function local:go ($n) { $n, for-each($n/*, local:go(?)) };" +
@@ -337,5 +358,14 @@ public final class FuncItemTest extends SandboxTest {
         + "let $result := local:f(i := ?, s := ?)(4.0, xs:anyURI('XQuery'))"
         + "return ($result[1] instance of xs:string, $result[2] instance of xs:integer)",
         "true\ntrue");
+  }
+
+  /** Variable declarations with function-lookup. */
+  @Test public void gh2324() {
+    query("declare variable $a := function-lookup(xs:QName('local:f'), 0);"
+        + "declare variable $b := $a;"
+        + "declare function local:f() { $b };"
+        + "local:f() => function-name()",
+        "local:f");
   }
 }

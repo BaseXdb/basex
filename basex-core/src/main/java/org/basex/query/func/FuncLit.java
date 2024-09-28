@@ -20,12 +20,12 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public final class FuncLit extends Single implements Scope {
+public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   /** Variable scope. */
   private final VarScope vs;
   /** Function name. */
   private final QNm name;
-  /** Formal parameters. */
+  /** Parameters. */
   private final Var[] params;
   /** Annotations. */
   private final AnnList anns;
@@ -34,7 +34,7 @@ public final class FuncLit extends Single implements Scope {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param params formal parameters
+   * @param params parameters
    * @param anns annotations
    * @param seqType sequence type
    * @param name function name
@@ -48,6 +48,36 @@ public final class FuncLit extends Single implements Scope {
     this.params = params;
     this.anns = anns;
     this.vs = vs;
+  }
+
+  @Override
+  public int arity() {
+    return params.length;
+  }
+
+  @Override
+  public QNm funcName() {
+    return name;
+  }
+
+  @Override
+  public QNm paramName(final int pos) {
+    return params[pos].name;
+  }
+
+  @Override
+  public AnnList annotations() {
+    return anns;
+  }
+
+  @Override
+  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
+    return null;
+  }
+
+  @Override
+  public boolean vacuousBody() {
+    return false;
   }
 
   @Override
@@ -95,7 +125,7 @@ public final class FuncLit extends Single implements Scope {
     }
   }
 
-    @Override
+  @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Var var : params) {
       if(!visitor.declared(var)) return false;

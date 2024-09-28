@@ -227,10 +227,13 @@ function logEntries(key) {
   if(reset && _logInput === input) return false;
   _logInput = input;
   return query("log", input, reset).then((text) => {
+    setText("", "");
     document.getElementById("output").innerHTML = text;
     var e = document.getElementById(window.location.hash.replace(/^#/, ""));
     if(e) e.scrollIntoView();
     if(reset) window.history.replaceState(null, "", replaceParam(window.location.href, "page", 1));
+  }, (response) => {
+    showError(response);
   }).finally(() => {
     // refresh browser history
     window.history.replaceState(null, "", replaceParam(window.location.href, "input", input));

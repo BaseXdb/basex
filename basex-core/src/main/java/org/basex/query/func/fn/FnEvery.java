@@ -21,18 +21,24 @@ import org.basex.util.hash.*;
 public class FnEvery extends StandardFunc {
   @Override
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunctionOrNull(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = predicate != null ? new HofArgs(2, predicate) : null;
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
       final boolean test = (predicate == null ? item :
-        predicate.invoke(qc, info, item, Int.get(++p)).item(qc, info)).test(qc, ii, 0);
-      if(test == some) return Bln.get(some);
+        invoke(predicate, args.set(0, item).inc(), qc).item(qc, info)).test(qc, ii, 0);
+      if(test == some) return some;
     }
-    return Bln.get(!some);
+    return !some;
   }
 
   @Override
@@ -69,7 +75,7 @@ public class FnEvery extends StandardFunc {
       }
 
       final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-      final Expr rtrn =  func ? new DynFuncCall(info, coerce(1, cc, arity), args).optimize(cc) :
+      final Expr rtrn =  func ? new DynFuncCall(info, coerceFunc(1, cc, arity), args).optimize(cc) :
         cc.function(Function.BOOLEAN, info, args);
       result = new GFLWOR(info, fr, rtrn).optimize(cc);
     }
@@ -90,7 +96,7 @@ public class FnEvery extends StandardFunc {
   }
 
   @Override
-  public int hofIndex() {
+  public final int hofIndex() {
     return 1;
   }
 }

@@ -59,6 +59,12 @@ public abstract class ANode extends Item {
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return true;
+  }
+
+  @Override
   public final boolean bool(final InputInfo ii) {
     return true;
   }
@@ -79,8 +85,10 @@ public abstract class ANode extends Item {
       throws QueryException {
     Expr expr = this;
     if(mode == Simplify.STRING) {
+      // boolean(<a>A</a>)  ->  boolean('A')
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+      // data(<a>A</a>)  ->  data(xs:untypedAtomic('A'))
       expr = Atm.get(string());
     }
     return cc.simplify(this, expr, mode);
@@ -215,6 +223,21 @@ public abstract class ANode extends Item {
     return true;
   }
 
+  /**
+   * Returns if whitespace needs to be preserved.
+   * @return node kind
+   */
+  private boolean preserve() {
+    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
+    for(ANode node = this; node != null; node = node.parent()) {
+      if(node.type == ELEMENT) {
+        final byte[] v = node.attribute(xs);
+        if(v != null) return Token.eq(v, DataText.PRESERVE);
+      }
+    }
+    return false;
+  }
+
   @Override
   public final Item atomValue(final QueryContext qc, final InputInfo ii) {
     return atomItem(qc, ii);
@@ -303,28 +326,13 @@ public abstract class ANode extends Item {
       final Atts nsp = node.namespaces();
       if(nsp != null) {
         for(int a = nsp.size() - 1; a >= 0; a--) {
-          final byte[] key = nsp.name(a);
-          if(!ns.contains(key)) ns.add(key, nsp.value(a));
+          final byte[] name = nsp.name(a);
+          if(!ns.contains(name)) ns.add(name, nsp.value(a));
         }
       }
     }
     if(sc != null) sc.ns.inScope(ns);
     return ns;
-  }
-
-  /**
-   * Returns if whitespace needs to be preserved.
-   * @return node kind
-   */
-  public boolean preserve() {
-    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
-    for(ANode node = this; node != null; node = node.parent()) {
-      if(node.type == ELEMENT) {
-        final byte[] v = node.attribute(xs);
-        if(v != null) return Token.eq(v, DataText.PRESERVE);
-      }
-    }
-    return false;
   }
 
   /**

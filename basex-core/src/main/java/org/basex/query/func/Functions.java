@@ -120,8 +120,10 @@ public final class Functions {
     if(fb.keywords == null) {
       args = fb.args();
     } else {
-      // expr will always be Closure
-      final QNm[] names = ((Closure) expr).paramNames();
+      final XQFunctionExpr fe = (XQFunctionExpr) expr;
+      final int arity = fe.arity();
+      final QNm[] names = new QNm[arity];
+      for(int a = 0; a < arity; ++a) names[a] = fe.paramName(a);
       args = prepareArgs(fb, names, expr);
       if(ph > 0) phPerm = preparePlaceholders(fb, names, args);
     }

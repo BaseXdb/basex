@@ -13,6 +13,6 @@ import org.basex.query.func.*;
 public abstract class DynamicFn extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return cc.dynamic && allAreValues(true) ? value(cc.qc) : this;
+    return cc.dynamic && values(true, cc) ? value(cc.qc) : this;
   }
 }

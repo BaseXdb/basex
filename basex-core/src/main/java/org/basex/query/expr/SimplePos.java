@@ -78,22 +78,34 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     ctxValue(qc);
-    final long pos = qc.focus.pos;
+
     final Item min = exprs[0].atomItem(qc, info);
-    if(min.isEmpty()) return Bln.FALSE;
-    if(exact()) return Bln.get(pos == toDouble(min));
+    if(min.isEmpty()) return false;
+
+    final long p = qc.focus.pos;
+    if(exact()) return p == toDouble(min);
 
     final Item max = exprs[1].atomItem(qc, info);
-    if(max.isEmpty()) return Bln.FALSE;
-    return Bln.get(pos >= toDouble(min) && pos <= toDouble(max));
+    if(max.isEmpty()) return false;
+
+    return p >= toDouble(min) && p <= toDouble(max);
   }
 
   @Override
   public Value positions(final QueryContext qc) throws QueryException {
     final Item min = exprs[0].atomItem(qc, info);
+    if(min.isEmpty()) return Empty.VALUE;
+
     final Item max = exact() ? min : exprs[1].atomItem(qc, info);
-    if(min.isEmpty() || max.isEmpty()) return Empty.VALUE;
+    if(max.isEmpty()) return Empty.VALUE;
+
     final long mn = (long) Math.ceil(toDouble(min)), mx = (long) Math.floor(toDouble(max));
     return RangeSeq.get(mn, mx - mn + 1, true);
   }
@@ -142,7 +154,7 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
+    return Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags) || super.has(flags);
   }
 
   @Override

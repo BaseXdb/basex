@@ -205,7 +205,7 @@ public abstract class Step extends Preds {
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
     // do not inline context value
-    return ic.var != null && ic.cc.ok(this, () -> ic.inline(exprs)) ? optimize(ic.cc) : null;
+    return ic.var != null && ic.cc.ok(this, true, () -> ic.inline(exprs)) ? optimize(ic.cc) : null;
   }
 
   @Override

@@ -51,7 +51,7 @@ public final class InlineTest extends SandboxTest {
         "return $type",
         "<type>a</type>",
         empty(Let.class),
-        root(ItemMap.class));
+        root(Focus.class));
   }
 
   /** Typing and Function items: XPTY0004. */
@@ -91,7 +91,7 @@ public final class InlineTest extends SandboxTest {
         exists(Util.className(Int.class) + "[. = '42']"));
   }
 
-  /** Checks that the simple map operator prohibits inlining a context item into its RHS. */
+  /** Checks that the simple map operator prohibits inlining a context value into its RHS. */
   @Test public void gh1055() {
     inline(true);
     check("(let $d := for-each(1 to 100, function($a) { $a }) "
@@ -154,7 +154,7 @@ public final class InlineTest extends SandboxTest {
     check("let $a := function($d) { trace($d) }"
         + "let $b := nondeterministic $a('1st') let $c := nondeterministic $a('2nd') "
         + "return $b", "1st",
-        root(ItemMap.class),
+        root(Focus.class),
         "//FnTrace[. = '1st'] << //FnTrace[. = '2nd']");
   }
 
@@ -182,6 +182,6 @@ public final class InlineTest extends SandboxTest {
         exists(DynFuncCall.class),
         empty(StaticFunc.class),
         empty(Closure.class),
-        root(ItemMap.class));
+        root(Focus.class));
   }
 }

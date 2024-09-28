@@ -33,7 +33,7 @@ public final class CTxt extends CNode {
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.STRING, cc);
 
-    if(allAreValues(true) && !(exprs[0] instanceof Str)) {
+    if(values(true, cc) && !(exprs[0] instanceof Str)) {
       final byte[] value = atomValue(cc.qc, false);
       exprs[0] = value != null ? Str.get(value) : Empty.VALUE;
     }

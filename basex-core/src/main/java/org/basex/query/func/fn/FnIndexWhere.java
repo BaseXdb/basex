@@ -27,10 +27,10 @@ public final class FnIndexWhere extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, predicate);
     final LongList list = new LongList();
     for(Item item; (item = input.next()) != null;) {
-      if(toBoolean(qc, predicate, item, Int.get(++p))) list.add(p);
+      if(test(predicate, args.set(0, item).inc(), qc)) list.add(args.pos());
     }
     return IntSeq.get(list.finish());
   }
@@ -54,7 +54,7 @@ public final class FnIndexWhere extends StandardFunc {
       final Expr item = new VarRef(info, i).optimize(cc);
       final Expr pos = new VarRef(info, p).optimize(cc);
       final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-      final Expr dfc = new DynFuncCall(info, coerce(1, cc, arity), args).optimize(cc);
+      final Expr dfc = new DynFuncCall(info, coerceFunc(1, cc, arity), args).optimize(cc);
       clauses.add(new Where(dfc, info).optimize(cc));
 
       return new GFLWOR(info, clauses, new VarRef(info, p).optimize(cc)).optimize(cc);

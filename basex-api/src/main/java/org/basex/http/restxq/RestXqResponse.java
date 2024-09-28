@@ -14,7 +14,6 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -164,7 +163,7 @@ final class RestXqResponse extends WebResponse {
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
-    SerializerOptions sp = func.sopts;
+    SerializerOptions sopts = func.sopts;
     String cType = null;
     for(final ANode node : response.childIter()) {
       // process http:response element
@@ -202,7 +201,7 @@ final class RestXqResponse extends WebResponse {
         }
       } else if(T_OUTPUT_SERIAL.matches(node)) {
         // parse output:serialization-parameters
-        sp = FuncOptions.serializer(node, func.sopts, func.function.info);
+        sopts.assign(node, func.function.info);
       } else {
         throw func.error(UNEXP_NODE_X, node);
       }
@@ -210,7 +209,7 @@ final class RestXqResponse extends WebResponse {
     if(status == null) status = SC_OK;
 
     // set content type and serialize data
-    if(cType != null) sp.set(SerializerOptions.MEDIA_TYPE, cType);
-    return sp;
+    if(cType != null) sopts.set(SerializerOptions.MEDIA_TYPE, cType);
+    return sopts;
   }
 }

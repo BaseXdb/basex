@@ -28,11 +28,13 @@ public final class CmpSimpleG extends CmpG {
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Item item1 = exprs[0].item(qc, info);
-    if(item1.isEmpty()) return Bln.FALSE;
+    if(item1.isEmpty()) return false;
     final Item item2 = exprs[1].item(qc, info);
-    return item2.isEmpty() ? Bln.FALSE : Bln.get(eval(item1, item2));
+    if(item2.isEmpty()) return false;
+    return eval(item1, item2);
   }
 
   @Override

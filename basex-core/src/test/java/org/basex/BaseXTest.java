@@ -180,12 +180,30 @@ public abstract class BaseXTest extends SandboxTest {
   }
 
   /**
+   * Test options flag.
+   * @throws IOException I/O exception
+   */
+  @Test public void options() throws IOException {
+    equals("", "-Oserialize=false", "-q1");
+    equals("", "-Oserialize=no", "-q1");
+    equals("", "-Oserialize=0", "-q1");
+
+    equals("1", "-Oserialize=true", "-q1");
+    equals("1", "-Oserialize=yes", "-q1");
+    equals("1", "-Oserialize=1", "-q1");
+
+    equals("", "-Oserialize=", "-q1");
+    equals("1", "-Oserialize=", "-Oserialize=", "-q1");
+  }
+
+  /**
    * Turn off serialization.
    * @throws IOException I/O exception
    */
   @Test public void noSerialization() throws IOException {
     equals("", "-z", "-q1");
   }
+
   /**
    * Runs a request with the specified arguments.
    * @param args command-line arguments

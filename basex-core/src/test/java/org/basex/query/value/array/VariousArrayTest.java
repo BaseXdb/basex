@@ -26,7 +26,7 @@ public final class VariousArrayTest extends ArrayTest {
       array = array.prepend(val).append(val);
     }
 
-    assertEquals(2 * n, array.arraySize());
+    assertEquals(2 * n, array.structSize());
     for(long i = 0; i < 2 * n; i++) {
       final long diff = i - n, j = diff < 0 ? -(diff + 1) : diff;
       assertEquals(j, ((Int) array.get(i)).itr());
@@ -42,17 +42,17 @@ public final class VariousArrayTest extends ArrayTest {
     for(int i = 0; i < k; i++) array = array.prepend(Int.get(i));
 
     for(int i = k; i < n; i++) {
-      assertEquals(k, array.arraySize());
+      assertEquals(k, array.structSize());
       assertEquals(i - k, ((Int) array.foot()).itr());
       array = array.trunk();
       array = array.prepend(Int.get(i));
     }
 
-    assertEquals(k, array.arraySize());
+    assertEquals(k, array.structSize());
     for(int i = 0; i < k; i++) {
       assertEquals(n - k + i, ((Int) array.foot()).itr());
       array = array.trunk();
-      assertEquals(k - i - 1, array.arraySize());
+      assertEquals(k - i - 1, array.structSize());
     }
 
     assertSame(array, XQArray.empty());
@@ -66,26 +66,26 @@ public final class VariousArrayTest extends ArrayTest {
     XQArray array = XQArray.empty();
 
     for(int i = 0; i < n; i++) {
-      assertEquals(i, array.arraySize());
+      assertEquals(i, array.structSize());
       final Int val = Int.get(i);
       array = array.prepend(val).prepend(val);
       assertEquals(i, ((Int) array.head()).itr());
       array = array.tail();
     }
 
-    assertEquals(n, array.arraySize());
+    assertEquals(n, array.structSize());
 
     for(int i = n; --i >= 0;) {
       assertEquals(i, ((Int) array.head()).itr());
       array = array.tail();
-      assertEquals(i, array.arraySize());
+      assertEquals(i, array.structSize());
     }
 
     assertSame(array, XQArray.empty());
   }
 
   /**
-   * Test for {@link XQArray#members()}.
+   * Test for {@link XQArray#iterable()}.
    */
   @Test public void iteratorTest() {
     final int n = 1_000;
@@ -115,9 +115,9 @@ public final class VariousArrayTest extends ArrayTest {
     }
 
     assertEquals(0, ((Int) array.head()).itr());
-    assertEquals(15, array.arraySize());
+    assertEquals(15, array.structSize());
     array = array.tail();
     assertEquals(1, ((Int) array.head()).itr());
-    assertEquals(14, array.arraySize());
+    assertEquals(14, array.structSize());
   }
 }

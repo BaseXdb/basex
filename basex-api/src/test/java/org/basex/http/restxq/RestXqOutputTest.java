@@ -32,6 +32,7 @@ public final class RestXqOutputTest extends RestXqTest {
             "</R:response>," +
             "<X>1</X> };", "");
   }
+
   /**
    * Erroneous serialization parameters and elements.
    * @throws Exception exception

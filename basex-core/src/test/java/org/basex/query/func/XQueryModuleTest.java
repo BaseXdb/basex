@@ -26,11 +26,16 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args("1+"), CALCEXPR);
     error("declare variable $a:=1;" + func.args("$a"), VARUNDEF_X);
     error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
+
     // check updating expressions
     error(func.args("delete node ()"), XQUERY_UPDATE1);
     error(func.args("declare %updating function local:x() {()}; local:x()"), XQUERY_UPDATE1);
     query(func.args("declare %updating function local:x() {()}; 1"));
     query(func.args(DOC.args(PATH).trim()));
+
+    // GH-2332
+    query("try {" + func.args("declare function local:f() { local:f() }; local:f()") +
+        "} catch xquery:error { 'STOP' }", "STOP");
   }
 
   /** Test method. */

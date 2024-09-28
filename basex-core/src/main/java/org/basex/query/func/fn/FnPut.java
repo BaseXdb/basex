@@ -25,7 +25,7 @@ public final class FnPut extends StandardFunc {
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNode(arg(0), qc);
     final byte[] href = toZeroToken(arg(1), qc);
-    final Item options = arg(2).item(qc, info);
+    final SerializerOptions options = toSerializerOptions(arg(2), qc);
 
     if(!node.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
       throw UPFOTYPE_X.get(info, arg(0));
@@ -39,8 +39,7 @@ public final class FnPut extends StandardFunc {
     // check if all target paths are unique
     if(!updates.putPaths.add(path)) throw UPURIDUP_X.get(info, path);
 
-    final SerializerOptions sopts = FuncOptions.serializer(options, info);
-    updates.add(new Put(target.pre(), target.data(), path, sopts, info), qc);
+    updates.add(new Put(target.pre(), target.data(), path, options, info), qc);
     return Empty.VALUE;
   }
 }

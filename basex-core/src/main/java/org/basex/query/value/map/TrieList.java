@@ -9,7 +9,6 @@ import java.util.function.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -274,16 +273,6 @@ final class TrieList extends TrieNode {
       return false;
     }
     return true;
-  }
-
-  @Override
-  void keys(final ItemList ks) {
-    for(final Item key : keys) ks.add(key);
-  }
-
-  @Override
-  void values(final ValueBuilder vs) {
-    for(final Value value : values) vs.add(value);
   }
 
   @Override

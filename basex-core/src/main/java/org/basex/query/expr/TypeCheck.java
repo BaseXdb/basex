@@ -20,8 +20,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class TypeCheck extends Single {
-  /** Only check occurrence indicator. */
-  private boolean occ;
+  /** Check: 1: only check occurrence indicator. */
+  private int check;
 
   /**
    * Constructor.
@@ -40,28 +40,47 @@ public final class TypeCheck extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final SeqType st = seqType();
+    SeqType st = seqType();
     final Type type = st.type;
+
     if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+      // data(EXPR) coerce to xs:int  ->  EXPR coerce to xs:int
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
-
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
         st.occ.instanceOf(expr.seqType().occ)) {
+      // exactly-one(ITEM) coerce to item()  ->  ITEM coerce to item()
       expr = cc.replaceWith(expr, expr.arg(0));
     }
 
-    final SeqType et = expr.seqType();
-    occ = et.type.instanceOf(type) && et.kindInstanceOf(st);
+    final SeqType et = expr.seqType(), nst = et.with(st.occ);
+    check = nst.instanceOf(st) ? 1 : 0;
+
+    // refine type check (ignore arrays as coerced result may have a different size)
+    if(!et.mayBeArray() || !type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+      // occurrence indicator:
+      //   exactly-one/one-or-more  ->  exactly-one
+      final Occ nocc = et.occ.intersect(st.occ);
+      // raise static error if no intersection is possible:
+      //   () coerce to item()
+      if(nocc == null) throw error(expr, st);
+      // refine result type:
+      //   INTEGERS coerce to item()  ->  INTEGERS coerce to xs:integer
+      if(check == 1) st = nst;
+      // adopt result size and data reference from input expression
+      exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).
+        data(type instanceof NodeType ? expr : null);
+    }
 
     // remove redundant type check
     if(expr instanceof TypeCheck && st.instanceOf(et)) {
-      final TypeCheck tc = (TypeCheck) expr;
-      return cc.replaceWith(this, new TypeCheck(info, tc.expr, st).optimize(cc));
+      // (EXPR coerce to xs:integer) coerce to xs:int  ->  EXPR coerce to xs:int
+      return cc.replaceWith(this, new TypeCheck(info, ((TypeCheck) expr).expr, st).optimize(cc));
     }
 
-    // skip check if return type is already correct
+    // skip check if return type is correct
     if(et.instanceOf(st)) {
+      // (1, 3) coerce to xs:integer*  ->  (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
     }
@@ -72,25 +91,14 @@ public final class TypeCheck extends Single {
       return cc.replaceWith(this, ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, cc, info));
     }
 
-    // pre-evaluate (check value and result size)
-    final long es = expr.size();
-    if(expr instanceof Value && es <= CompileContext.MAX_PREEVAL) {
-      return cc.preEval(this);
-    }
+    // pre-evaluate
+    if(cc.values(true, expr)) return cc.preEval(this);
 
     // push type check inside expression
     final Expr checked = expr.typeCheck(this, cc);
     if(checked != null) {
       cc.info(OPTTYPE_X_X, st, checked);
       return checked;
-    }
-
-    // refine occurrence indicator and result size
-    if(!et.mayBeArray()) {
-      final Occ o = et.occ.intersect(st.occ);
-      if(o == null) throw error(expr, st);
-      exprType.assign(st, o, et.occ == st.occ ? es : -1).
-        data(type instanceof NodeType ? expr : null);
     }
 
     return this;
@@ -102,11 +110,10 @@ public final class TypeCheck extends Single {
     final SeqType st = seqType();
 
     // only check occurrence indicator
-    if(occ) {
+    if(check == 1) {
       if(!st.occ.check(value.size())) throw error(value, st);
       return value;
     }
-    // check occurrence indicator and item type
     return st.coerce(value, null, qc, null, info);
   }
 
@@ -140,7 +147,7 @@ public final class TypeCheck extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final TypeCheck ex = copyType(new TypeCheck(info, expr.copy(cc, vm), seqType()));
-    ex.occ = occ;
+    ex.check = check;
     return ex;
   }
 

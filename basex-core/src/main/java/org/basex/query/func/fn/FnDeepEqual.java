@@ -20,6 +20,12 @@ import org.basex.util.*;
 public final class FnDeepEqual extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Iter input1 = arg(0).iter(qc), input2 = arg(1).iter(qc);
     final Item options = arg(2).item(qc, info);
 
@@ -37,7 +43,7 @@ public final class FnDeepEqual extends StandardFunc {
     final Value ie = deo.get(DeepEqualOptions.ITEMS_EQUAL);
     if(!ie.isEmpty()) de.itemsEqual = toFunction(ie, 2, qc);
 
-    return Bln.get(de.equal(input1, input2));
+    return de.equal(input1, input2);
   }
 
   @Override

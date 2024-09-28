@@ -54,7 +54,7 @@ public final class Part8 extends Main {
     xqp.bindObject(new QName("v2"), 174, xsinteger);
     print("Bind integers to external variables", xqp);
 
-    // Bind atomic values
+    // Bind atomic items
     xqp = xqc.prepareExpression(
         "declare variable $v1 external; " +
         "declare variable $v2 external; " +

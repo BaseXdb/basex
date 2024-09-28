@@ -68,16 +68,6 @@ public abstract class ASTVisitor {
   }
 
   /**
-   * Notifies the visitor of a dynamic function call.
-   * @param call function call
-   * @return if more expressions should be visited ({@code true} by default)
-   */
-  @SuppressWarnings("unused")
-  public boolean dynFuncCall(final DynFuncCall call) {
-    return true;
-  }
-
-  /**
    * Notifies the visitor of a function item.
    * @param func the function item
    * @return if more expressions should be visited ({@code true} by default)

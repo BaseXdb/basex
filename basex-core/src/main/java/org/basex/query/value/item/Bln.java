@@ -156,8 +156,8 @@ public final class Bln extends Item {
    */
   public static Boolean parse(final byte[] value) {
     final byte[] v = Token.trim(value);
-    if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.ONE)) return Boolean.TRUE;
-    if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.ZERO)) return Boolean.FALSE;
+    if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.cpToken('1'))) return Boolean.TRUE;
+    if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.cpToken('0'))) return Boolean.FALSE;
     return null;
   }
 }

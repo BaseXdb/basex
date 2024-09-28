@@ -19,13 +19,14 @@ public class FnTakeWhile extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
+
     return new Iter() {
-      int p;
+      final HofArgs args = new HofArgs(2, predicate);
 
       @Override
       public Item next() throws QueryException {
         final Item item = qc.next(input);
-        return item != null && toBoolean(qc, predicate, item, Int.get(++p)) ? item : null;
+        return item != null && test(predicate, args.set(0, item).inc(), qc) ? item : null;
       }
     };
   }
@@ -41,9 +42,7 @@ public class FnTakeWhile extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE),
-        SeqType.INTEGER_O));
-
+    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O));
     exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;
   }

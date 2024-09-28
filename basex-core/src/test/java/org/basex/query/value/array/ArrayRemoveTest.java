@@ -37,7 +37,7 @@ public final class ArrayRemoveTest extends ArrayTest {
         assertFalse(iter2.hasNext());
       }
       array1 = array1.append(Int.get(k));
-      assertEquals(k + 1, array1.arraySize());
+      assertEquals(k + 1, array1.structSize());
       assertEquals(k, ((Int) array1.foot()).itr());
     }
   }
@@ -205,7 +205,7 @@ public final class ArrayRemoveTest extends ArrayTest {
       list.remove(delPos);
       array = array.remove(delPos, qc);
       final int size = n - i - 1;
-      assertEquals(size, array.arraySize());
+      assertEquals(size, array.structSize());
       assertEquals(size, list.size());
 
       if(i % 1000 == 999) {
@@ -225,10 +225,10 @@ public final class ArrayRemoveTest extends ArrayTest {
     XQArray array1 = XQArray.empty();
 
     for(int k = 0; k < n; k++) {
-      assertEquals(k, array1.arraySize());
+      assertEquals(k, array1.structSize());
       for(int i = 0; i < k; i++) {
         final XQArray array2 = array1.remove(i, qc);
-        assertEquals(k - 1, array2.arraySize());
+        assertEquals(k - 1, array2.structSize());
 
         final Iterator<Value> iter2 = array2.iterator(0);
         for(int j = 0; j < k - 1; j++) {

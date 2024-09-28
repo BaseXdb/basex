@@ -43,9 +43,14 @@ final class MixedPos extends Single implements CmpPos {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     ctxValue(qc);
-    final long pos = qc.focus.pos;
-    return Bln.get(expr.value(qc).test(qc, info, pos));
+    return expr.value(qc).test(qc, info, qc.focus.pos);
   }
 
   @Override
@@ -71,7 +76,7 @@ final class MixedPos extends Single implements CmpPos {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
+    return Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags) || super.has(flags);
   }
 
   @Override

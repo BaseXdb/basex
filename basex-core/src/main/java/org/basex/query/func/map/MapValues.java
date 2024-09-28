@@ -41,10 +41,7 @@ public class MapValues extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    map.values(vb);
-    return vb.value(this);
+    return map.values(qc);
   }
 
   @Override

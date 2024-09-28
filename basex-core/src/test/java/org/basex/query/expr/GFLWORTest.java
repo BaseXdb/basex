@@ -46,7 +46,7 @@ public final class GFLWORTest extends SandboxTest {
         "a\na",
         empty(Let.class),
         empty(For.class),
-        root(DualIterMap.class),
+        root(Focus.class),
         exists(REPLICATE)
     );
   }
@@ -72,8 +72,8 @@ public final class GFLWORTest extends SandboxTest {
         "let $b as xs:string := $seq[$j] " +
         "return concat($i, $j, $b, $b)",
         "12bb\n13cc\n23cc",
-        Util.info("every $f in //% satisfies $f << //%[starts-with(@name, '$b')]",
-            For.class, Let.class)
+        "every $f in //For satisfies $f << //" + Util.className(Focus.class),
+        empty(Let.class)
     );
   }
 
@@ -98,7 +98,7 @@ public final class GFLWORTest extends SandboxTest {
         "<x/>\n<x/>",
         empty(Let.class),
         empty(For.class),
-        root(DualIterMap.class),
+        root(Focus.class),
         exists(REPLICATE)
     );
 
@@ -109,7 +109,7 @@ public final class GFLWORTest extends SandboxTest {
         "<x/>\n<x/>",
         empty(Let.class),
         empty(For.class),
-        root(DualIterMap.class),
+        root(Focus.class),
         exists(REPLICATE)
     );
   }
@@ -256,7 +256,7 @@ public final class GFLWORTest extends SandboxTest {
     check("for $i in 1 to 10 let $rnd := " + _RANDOM_DOUBLE.args() + " return $i * $rnd",
         null,
         empty(Let.class),
-        exists(ItemMap.class)
+        exists(Focus.class)
     );
   }
 
@@ -362,7 +362,7 @@ public final class GFLWORTest extends SandboxTest {
     check("let $rnd := " + _RANDOM_DOUBLE.args() + " return (1 to 10) ! $rnd",
         null,
         empty(Let.class),
-        root(DualIterMap.class),
+        root(Focus.class),
         exists(REPLICATE)
     );
   }
@@ -509,7 +509,7 @@ public final class GFLWORTest extends SandboxTest {
     check("for $i in 1 to 6 while false() return $i", "", empty());
 
     check("for $i in 1 to 6 let $j := text { $i } while $i < 2 return ($j, $j + 1)",
-        "1\n2", exists(DualIterMap.class));
+        "1\n2", exists(Focus.class));
     check("let $a := <a/>[text()] while $a return $a", "", root(IterFilter.class));
   }
 }

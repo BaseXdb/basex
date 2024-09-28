@@ -27,8 +27,14 @@ public final class FnCollationAvailable extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] collation = toToken(arg(0), qc);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+   final byte[] collation = toToken(arg(0), qc);
     final Value usage = arg(1).value(qc);
 
     try {
@@ -36,8 +42,8 @@ public final class FnCollationAvailable extends StandardFunc {
       for(final Item use : usage) toEnum(use, Usage.class);
     } catch(final QueryException ex) {
       Util.debug(ex);
-      return Bln.FALSE;
+      return false;
     }
-    return Bln.TRUE;
+    return true;
   }
 }

@@ -22,6 +22,12 @@ import org.basex.util.*;
 public final class UtilCountWithin extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final long[] minMax = minMax(qc);
     final long min = minMax[0], max = minMax[1];
 
@@ -37,7 +43,7 @@ public final class UtilCountWithin extends StandardFunc {
         do ++size; while(size <= max && qc.next(input) != null);
       }
     }
-    return Bln.get(size >= min && size <= max);
+    return size >= min && size <= max;
   }
 
   @Override

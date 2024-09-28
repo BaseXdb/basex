@@ -14,9 +14,9 @@ import org.basex.core.users.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 
 /**
  * Server-side client session in the client-server architecture.
@@ -100,7 +100,7 @@ public final class ClientListener extends Thread implements ClientInfo {
             put();
           } else if(sc == ServerCmd.PUTBINARY) {
             putBinary();
-          } else if(sc != ServerCmd.COMMAND) {
+          } else if(sc != ServerCmd.EXECUTE) {
             query(sc);
           } else {
             // database command
@@ -112,7 +112,7 @@ public final class ClientListener extends Thread implements ClientInfo {
           close();
           break;
         }
-        if(sc != ServerCmd.COMMAND) continue;
+        if(sc != ServerCmd.EXECUTE) continue;
 
         // parse input and create command instance
         try {

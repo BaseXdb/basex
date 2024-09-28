@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.Token.*;
 import org.basex.util.http.*;
 import org.basex.util.options.*;
 
@@ -40,7 +41,7 @@ public abstract class WebFn extends StandardFunc {
 
     final XQMap map = params.isEmpty() ? XQMap.empty() : toMap(params);
     final TokenBuilder url = createUrl(href, map, info);
-    if(anchor.length > 0) url.add('#').add(Token.encodeUri(anchor, false, false));
+    if(anchor.length > 0) url.add('#').add(Token.encodeUri(anchor, UriEncoder.URI));
     return url.toString();
   }
 
@@ -60,8 +61,8 @@ public abstract class WebFn extends StandardFunc {
     for(final Item key : params.keys()) {
       final byte[] name = key.string(info);
       for(final Item item : params.get(key)) {
-        url.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, false, false));
-        url.add('=').add(Token.encodeUri(item.string(info), false, false));
+        url.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, UriEncoder.URI));
+        url.add('=').add(Token.encodeUri(item.string(info), UriEncoder.URI));
       }
     }
     return url;
@@ -100,7 +101,7 @@ public abstract class WebFn extends StandardFunc {
       for(final String entry : output.keySet())
         if(sopts.option(entry) == null) throw QueryError.INVALIDOPTION_X.get(info, entry);
 
-      final FBuilder param = FElem.build(FuncOptions.Q_SERIALIZTION_PARAMETERS).declareNS();
+      final FBuilder param = FElem.build(SerializerOptions.Q_ROOT).declareNS();
       output.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);

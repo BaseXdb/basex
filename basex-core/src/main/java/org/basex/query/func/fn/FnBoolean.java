@@ -17,7 +17,13 @@ import org.basex.util.*;
 public final class FnBoolean extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(arg(0).test(qc, info, 0));
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return arg(0).test(qc, info, 0);
   }
 
   @Override
@@ -41,10 +47,13 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // if(boolean(number))  ->  if(number)
-    // E[boolean(nodes)]  ->  E[nodes]
+    Expr expr = this;
     final Expr input = arg(0);
-    return cc.simplify(this, mode == Simplify.EBV || mode == Simplify.PREDICATE &&
-        !input.seqType().mayBeNumber() ? input : this, mode);
+    if(mode == Simplify.EBV || mode == Simplify.PREDICATE && !input.seqType().mayBeNumber()) {
+      // if(boolean($number))  ->  if($number)
+      // E[boolean($nodes)]  ->  E[$nodes]
+      expr = input;
+    }
+    return cc.simplify(this, expr, mode);
   }
 }

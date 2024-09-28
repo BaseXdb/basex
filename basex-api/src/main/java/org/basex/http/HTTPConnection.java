@@ -18,11 +18,11 @@ import org.basex.core.users.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.server.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 
 /**
  * Single HTTP connection.

@@ -38,7 +38,7 @@ public final class Part9 extends Main {
       if(xqs.instanceOf(xqt)) {
         System.out.println("Node: " + xqs.getNode());
       } else {
-        System.out.println("Atomic Value: " + xqs.getAtomicValue());
+        System.out.println("Atomic Item: " + xqs.getAtomicValue());
       }
     }
 

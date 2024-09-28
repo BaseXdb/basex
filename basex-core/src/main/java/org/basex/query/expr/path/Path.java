@@ -82,7 +82,7 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : steps) {
       Expr expr = step;
       if(expr instanceof ContextValue) {
-        // rewrite context item to self step
+        // rewrite context value reference to self step
         expr = Step.get(expr.info(info), SELF, KindTest.NODE);
       } else if(expr instanceof Filter) {
         // rewrite filter expression to self step with predicates
@@ -94,13 +94,13 @@ public abstract class Path extends ParseExpr {
     }
     final Expr rt = root instanceof ContextValue || root instanceof Dummy ? null : root;
     final Expr[] stps = tmp.finish();
-    final boolean single = rt == null && stps.length == 1;
+    final Expr step = rt == null && stps.length == 1 ? stps[0] : null;
 
     // choose best implementation
     if(axes) {
       if(iterative(root, stps)) {
         // example: a
-        if(single && !stps[0].has(Flag.POS)) return new SingleIterPath(info, stps[0]);
+        if(step != null && !step.has(Flag.POS)) return new SingleIterPath(info, step);
         // example: a/b
         return new IterPath(info, rt, stps);
       }
@@ -108,8 +108,10 @@ public abstract class Path extends ParseExpr {
       return new CachedPath(info, rt, stps);
     }
 
-    // example: 'text'
-    if(single && stps[0].seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM)) return stps[0];
+    // examples: 'text', (a union b)
+    if(step != null && (step.seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM) || step.ddo())) {
+      return stps[0];
+    }
     // example: (1 to 10)/<xml/>
     return new MixedPath(info, rt, stps);
   }
@@ -132,12 +134,12 @@ public abstract class Path extends ParseExpr {
       rt = cc.qc.focus.value;
     }
 
-    cc.get(rt, () -> {
+    cc.get(rt, true, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr step = cc.compileOrError(steps[s], root == null && s == 0);
         steps[s] = step;
-        cc.updateFocus(step);
+        cc.updateFocus(step, true);
       }
       return null;
     });
@@ -217,7 +219,7 @@ public abstract class Path extends ParseExpr {
   public final Expr removePredicate(final CompileContext cc) throws QueryException {
     final ExprList list = new ExprList(steps.length).add(steps);
     final Step step = ((Step) list.pop()).removePredicate();
-    list.add(cc.get(root, () -> step.optimize(cc)));
+    list.add(cc.get(root, true, () -> step.optimize(cc)));
     return copyType(get(cc, info, root, list.finish()));
   }
 
@@ -225,11 +227,11 @@ public abstract class Path extends ParseExpr {
   public final boolean has(final Flag... flags) {
     // Context dependency, positional access: only check root expression.
     // Examples: text(); ./abc; position()/a
-    if(Flag.FCS.in(flags) ||
-       Flag.CTX.in(flags) && (root == null || root.has(Flag.CTX)) ||
-       Flag.POS.in(flags) && root != null && root.has(Flag.POS)) return true;
+    if(Flag.FCS.oneOf(flags) ||
+       Flag.CTX.oneOf(flags) && (root == null || root.has(Flag.CTX)) ||
+       Flag.POS.oneOf(flags) && root != null && root.has(Flag.POS)) return true;
     // check remaining flags
-    final Flag[] flgs = Flag.POS.remove(Flag.CTX.remove(flags));
+    final Flag[] flgs = Flag.remove(flags, Flag.POS, Flag.CTX);
     if(flgs.length == 0) return false;
     for(final Expr step : steps) {
       if(step.has(flgs)) return true;
@@ -442,6 +444,7 @@ public abstract class Path extends ParseExpr {
     }
     return false;
   }
+
   /**
    * Checks if a path can be evaluated iteratively (i.e., if all results will be in distinct
    * document order without final sorting).
@@ -840,7 +843,7 @@ public abstract class Path extends ParseExpr {
     }
     // add created steps, followed by remaining predicates
     if(!invSteps.isEmpty()) {
-      lastPreds.add(cc.get(indexStep != null ? indexStep : indexRoot,
+      lastPreds.add(cc.get(indexStep != null ? indexStep : indexRoot, true,
         () -> get(cc, info, null, invSteps.finish())));
     }
     lastPreds.add(Array.remove(index.step.exprs, predIndex));
@@ -920,7 +923,7 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    changed |= cc.ok(root, () -> {
+    changed |= cc.ok(root, true, () -> {
       boolean chngd = false;
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
@@ -929,7 +932,7 @@ public abstract class Path extends ParseExpr {
           steps[s] = step;
           chngd = true;
         }
-        cc.updateFocus(step);
+        cc.updateFocus(step, true);
       }
       return chngd;
     });
@@ -946,7 +949,7 @@ public abstract class Path extends ParseExpr {
   private Expr mergeSteps(final CompileContext cc) throws QueryException {
     final int sl = steps.length;
     final ExprList stps = new ExprList(sl);
-    return cc.ok(root, () -> {
+    return cc.ok(root, true, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         Expr curr = steps[s];
@@ -970,7 +973,7 @@ public abstract class Path extends ParseExpr {
           }
         }
         stps.add(curr);
-        cc.updateFocus(curr);
+        cc.updateFocus(curr, true);
       }
       return chngd;
     }) ? get(info, root, stps.finish()) : this;
@@ -987,7 +990,7 @@ public abstract class Path extends ParseExpr {
     // a[b]/b      ->  a/b
     // a[b]/b/c    ->  a/b/c
     // a[b/c]/b/c  ->  a/b/c
-    return cc.get(root, () -> {
+    return cc.get(root, true, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
         final Expr curr = steps[s];
@@ -995,7 +998,7 @@ public abstract class Path extends ParseExpr {
           final Expr ex = movePredicates(s);
           if(ex != null) return ex;
         }
-        cc.updateFocus(curr);
+        cc.updateFocus(curr, true);
       }
       return this;
     });
@@ -1129,7 +1132,8 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue && ic.var != null) {
+    // do not replace $v with .:  EXPR/$v
+    if(ic.var != null && ic.expr.has(Flag.CTX)) {
       for(final Expr step : steps) {
         if(step.uses(ic.var)) return false;
       }
@@ -1165,15 +1169,15 @@ public abstract class Path extends ParseExpr {
     final CompileContext cc = ic.cc;
     final int sl = steps.length;
     final Expr rt = root != null ? root : cc.qc.focus.value;
-    if(changed) cc.get(rt, () -> {
+    if(changed) cc.get(rt, true, () -> {
       for(int s = 0; s < sl; s++) {
         steps[s] = steps[s].optimize(cc);
-        cc.updateFocus(steps[s]);
+        cc.updateFocus(steps[s], true);
       }
       return null;
     });
 
-    changed |= ic.var != null && cc.ok(rt, () -> {
+    changed |= ic.var != null && cc.ok(rt, true, () -> {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         final Expr step = steps[s].inline(ic);
@@ -1181,7 +1185,7 @@ public abstract class Path extends ParseExpr {
           steps[s] = step;
           chngd = true;
         }
-        cc.updateFocus(steps[s]);
+        cc.updateFocus(steps[s], true);
       }
       return chngd;
     });

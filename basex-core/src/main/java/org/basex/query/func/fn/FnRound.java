@@ -29,7 +29,7 @@ public class FnRound extends NumericFn {
     public String toString() {
       return EnumOption.string(this);
     }
-  };
+  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

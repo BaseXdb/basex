@@ -15,12 +15,12 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public abstract class XQData extends FItem {
+public abstract class XQStruct extends FItem {
   /**
    * Constructor.
    * @param type function type
    */
-  protected XQData(final Type type) {
+  protected XQStruct(final Type type) {
     super(type);
   }
 
@@ -55,9 +55,23 @@ public abstract class XQData extends FItem {
   }
 
   @Override
-  boolean updating() {
+  public final boolean updating() {
     return false;
   }
+
+  /**
+   * Returns the number of entries of this structure.
+   * @return number of entries
+   */
+  public abstract long structSize();
+
+  /**
+   * Returns all values of this structure.
+   * @param qc query context
+   * @return values
+   * @throws QueryException query exception
+   */
+  public abstract Value values(QueryContext qc) throws QueryException;
 
   /**
    * Returns the key for accessing a function value.
@@ -72,6 +86,17 @@ public abstract class XQData extends FItem {
     final Item item = key.atomItem(qc, ii);
     if(item.isEmpty()) throw EMPTYFOUND.get(ii);
     return item;
+  }
+
+  @Override
+  public final QNm paramName(final int pos) {
+    return new QNm("key", "");
+  }
+
+  @Override
+  public void refineType(final Expr expr) {
+    final Type tp = type.intersect(expr.seqType().type);
+    if(tp != null) type = tp;
   }
 
   @Override

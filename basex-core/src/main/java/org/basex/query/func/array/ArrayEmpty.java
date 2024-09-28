@@ -14,7 +14,13 @@ import org.basex.util.*;
 public final class ArrayEmpty extends ArrayFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    return Bln.get(array == XQArray.empty());
+    return array == XQArray.empty();
   }
 }

@@ -48,6 +48,11 @@ public final class FtSearch extends FtAccess {
   }
 
   @Override
+  public boolean ddo() {
+    return true;
+  }
+
+  @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     arg(1, arg -> arg.simplifyFor(Simplify.STRING, cc));
     super.simplifyArgs(cc);

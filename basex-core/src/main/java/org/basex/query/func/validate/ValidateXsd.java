@@ -69,7 +69,7 @@ public class ValidateXsd extends ValidateFn {
 
         final String url = schema == null ? "" : prepare(read(schema, null)).url();
         final String caching = options.remove("cache");
-        final boolean cache = caching != null && Strings.toBoolean(caching);
+        final boolean cache = Strings.isTrue(caching);
 
         Schema s = cache ? MAP.get(url) : null;
         if(s == null) {
@@ -95,7 +95,7 @@ public class ValidateXsd extends ValidateFn {
 
           // assign parser features
           for(final Entry<String, String> entry : options.entrySet()) {
-            sf.setFeature(entry.getKey(), Strings.toBoolean(entry.getValue()));
+            sf.setFeature(entry.getKey(), Strings.isTrue(entry.getValue()));
           }
           // schema declaration is included in document, or specified as string
           s = url.isEmpty() ? sf.newSchema() : sf.newSchema(new URL(url));

@@ -276,6 +276,14 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("AMP"), "&");
     query(func.args("amp"), "&");
     query(func.args("Tab"), "\t");
+
+    error(func.args(1), CHARINV_X);
+    error(func.args(11111111111111L), CHARINV_X);
+    error(func.args("\\x"), CHARINV_X);
+    error(func.args(""), CHARINV_X);
+    error(func.args("x"), CHARINV_X);
+    error(func.args("xy"), CHARINV_X);
+    error(func.args("xyz"), CHARINV_X);
   }
 
   /** Test method. */
@@ -303,6 +311,8 @@ public final class FnModuleTest extends SandboxTest {
     query("subsequence(" + func.args(wrap("aeiou")) + ", 3)", "i\no\nu");
     query("subsequence(" + func.args(wrap("äeiöü")) + ", 3)", "i\nö\nü");
 
+    query("sort(" + func.args("cba") + ")", "a\nb\nc");
+
     check("count(" + func.args(" string-join(" +
         REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));
     check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)",
@@ -313,6 +323,49 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void codepointsToString() {
     final Function func = CODEPOINTS_TO_STRING;
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ')'), "ABC", root(STRING));
+
+    query(func.args(" ()"), "");
+    query(func.args(" (1 to 1000)[. > 1000]"), "");
+    query(func.args(" 0x41"), "A");
+    query(func.args(" (0x41, 0x42)"), "AB");
+    query(func.args(" (0x41 to 0x5A)"), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    query(func.args(" (1 to 1000)[. = 0x41]"), "A");
+
+    // GH-2326
+    query(func.args(" ()") + " => boolean()", false);
+    query(func.args(" (1 to 1000)[. > 1000]") + " => boolean()", false);
+    query(func.args(" 0x41") + " => boolean()", true);
+    query(func.args(" (0x41, 0x42)") + " => boolean()", true);
+    query(func.args(" (0x1000 to 0xA000)") + " => boolean()", true);
+    query(func.args(" (1 to 1000) ! (0x1000 to 0xA000)") + " => boolean()", true);
+    query(func.args(" (1 to 1000)[. > 999]") + " => boolean()", true);
+  }
+
+  /** Test method. */
+  @Test public void concat() {
+    final Function func = CONCAT;
+
+    query(func.args(""), "");
+    query(func.args("", ""), "");
+    query(func.args(" ('', '')"), "");
+    query(func.args(" <?_?>"), "");
+    query(func.args(" <?_?>", " <?_?>"), "");
+    query(func.args(" (<?_?>, <?_?>)"), "");
+
+    // GH-2326
+    query(func.args("") + " => boolean()", false);
+    query(func.args("", "") + " => boolean()", false);
+    query(func.args(" ('', '')") + " => boolean()", false);
+    query(func.args(" <?_?>") + " => boolean()", false);
+    query(func.args(" <?_?>", " <?_?>") + " => boolean()", false);
+    query(func.args(" (<?_?>, <?_?>)") + " => boolean()", false);
+
+    query(func.args("", " 1") + " => boolean()", true);
+    query(func.args(" ('', '1')") + " => boolean()", true);
+    query(func.args(" 1") + " => boolean()", true);
+    query(func.args("", " 1 to 10000000000") + " => boolean()", true);
+    query(func.args(" (1, 1 to 10000000000)") + " => boolean()", true);
+    query(func.args(" 1", " 1 to 10000000000", "") + " => boolean()", true);
   }
 
   /** Test method. */
@@ -387,6 +440,27 @@ public final class FnModuleTest extends SandboxTest {
     query("let $a := reverse((<a/>, <b/>)) return " + func.args(" $a/.", " $a/."), true);
     query("deep-equal(1 to 1000000000, 1 to 1000000000)", true);
     query("deep-equal(1 to 1000000000, 1 to 1000000001)", false);
+  }
+
+  /** Test method. */
+  @Test public void distinctOrderedNodes() {
+    final Function func = DISTINCT_ORDERED_NODES;
+    query(func.args(" <a/>"), "<a/>");
+    query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
+
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)", 10)), "<a/>\n<b/>",
+        empty(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 2, true)), "<a/>\n<a/>",
+        exists(REPLICATE));
+
+    check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(REVERSE));
+    check("(<a><b/></a> ! (., *)) => sort() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(SORT));
+    check("(<a><b/></a> ! (., *)) => sort() => reverse() => sort() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(SORT), empty(REVERSE));
+
+    error(func.args(1), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -684,7 +758,7 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
-    check(func.args(" <a>1</a>", " xs:byte(1)", " function($n, $_) {" +
+    check(func.args(" 1 to 10", " xs:byte(1)", " function($n, $_) {" +
         " if($n instance of xs:byte ) then xs:short  (1) else" +
         " if($n instance of xs:short) then xs:int    (1) else" +
         " if($n instance of xs:int  ) then xs:long   (1) else" +
@@ -983,11 +1057,15 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void crc32() {
+  @Test public void hash() {
     final Function func = HASH;
-    query(func.args(" ()", " { 'algorithm': 'crc-32' }"), "");
-    query("string( " + func.args("", " { 'algorithm': 'CRC-32' }") + ')', "00000000");
-    query("string( " + func.args("BaseX", " { 'algorithm': 'CRC-32' }") + ')', "4C06FC7F");
+    query(func.args(" ()", "crc-32"), "");
+    query("string( " + func.args("", "CRC-32") + ')', "00000000");
+    query("string( " + func.args("BaseX", "CRC-32") + ')', "4C06FC7F");
+    query("string( " + func.args("BaseX", "CRC-32", " {}") + ')', "4C06FC7F");
+
+    query("string( " + func.args("X", "BLAKE3") + ')',
+        "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
   }
 
   /** Test method. */
@@ -1100,6 +1178,9 @@ public final class FnModuleTest extends SandboxTest {
     query(input + " ! " + func.args("a2"), "");
     query(input + "/* ! " + func.args("a1"), doc);
     query(input + "/* ! " + func.args("a2"), "");
+
+    query(input + "/* ! boolean(" + func.args("a1") + ")", true);
+    query(input + "/* ! boolean(" + func.args("a2") + ")", false);
 
     error(func.args("a2", " <a/>"), IDDOC);
   }
@@ -1378,7 +1459,7 @@ public final class FnModuleTest extends SandboxTest {
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) + 1"),
         "", empty());
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) - 1"),
-        9, root(GFLWOR.class));
+        9, root(Focus.class));
 
     check(func.args(VOID.args(" ()"), 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
@@ -1529,6 +1610,30 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
+  }
+
+  /** Test method. */
+  @Test public void normalizeSpace() {
+    final Function func = NORMALIZE_SPACE;
+
+    query(func.args(""), "");
+    query(func.args("x"), "x");
+    query(func.args(" ' x '"), "x");
+    query(func.args(" <?_ x?>"), "x");
+    query(func.args(" <?_  x ?>"), "x");
+    query("string-length(" + func.args(" string-join((1 to 100000) ! ' ')") + ')', 0);
+    query("string-length(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', 100000);
+
+    // GH-2326
+    query("boolean(" + func.args("") + ')', false);
+    query("boolean(" + func.args(" <?_?>") + ')', false);
+    query("boolean(" + func.args(" string-join((1 to 100000) ! ' ')") + ')', false);
+
+    query("boolean(" + func.args("x") + ')', true);
+    query("boolean(" + func.args(" ' x '") + ')', true);
+    query("boolean(" + func.args(" <?_ x?>") + ')', true);
+    query("boolean(" + func.args(" <?_  x ?>") + ')', true);
+    query("boolean(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', true);
   }
 
   /** Test method. */
@@ -2009,7 +2114,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("1", " map { 'indent': false() }"), 1);
     query(func.args("1", " map { 'indent': true() }"), 1);
     query(func.args("1", " map { 'indent': 1 }"), 1);
-    error(func.args("1", " map { 'indent': 2 }"), INVALIDOPTION_X_X_X_X);
+    error(func.args("1", " map { 'indent': 2 }"), OPTION_X);
 
     query(func.args("<html/>", " map { 'html-version': 5 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " map { 'html-version': 5.0 }"), "&lt;html/&gt;");
@@ -2225,6 +2330,35 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(CHARACTERS.args(wrap("ABC"))), "ABC", root(STRING));
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ") ! codepoints-to-string(.)"),
         "ABC", root(STRING));
+
+    query(func.args(" ()", ""), "");
+    query(func.args(" ()", "x"), "");
+    query(func.args("", "x"), "");
+    query(func.args(" (1 to 100000000) ! ''"), "");
+
+    query(func.args("x", ""), "x");
+    query(func.args("x", "x"), "x");
+    query(func.args(" ('', '')", "x"), "x");
+    query(func.args(" ('x', '')", ""), "x");
+    query(func.args(" ('', 'x')", ""), "x");
+    query(func.args(" ('', 'x')", "x"), "xx");
+    query(func.args(" 1 to 6"), "123456");
+    query(func.args(" (1 to 6) ! 'x'"), "xxxxxx");
+
+    // GH-2326
+    query(func.args(" ()", "") + " => boolean()", false);
+    query(func.args(" ()", "x") + " => boolean()", false);
+    query(func.args("", "x") + " => boolean()", false);
+    query(func.args(" (1 to 100000000) ! ''") + " => boolean()", false);
+
+    query(func.args("x", "") + " => boolean()", true);
+    query(func.args("x", "x") + " => boolean()", true);
+    query(func.args(" ('', '')", "x") + " => boolean()", true);
+    query(func.args(" ('x', '')", "") + " => boolean()", true);
+    query(func.args(" ('', 'x')", "") + " => boolean()", true);
+    query(func.args(" ('', 'x')", "x") + " => boolean()", true);
+    query(func.args(" 1 to 100000000") + " => boolean()", true);
+    query(func.args(" (1 to 100000000) ! 'x'") + " => boolean()", true);
   }
 
   /** Test method. */
@@ -2663,6 +2797,14 @@ public final class FnModuleTest extends SandboxTest {
         "<a>1</a>\n<a>4</a>", root(SUBSEQUENCE));
 
     query(func.args(" subsequence(<x><a/><a/><a/></x>/*, 3)"), "");
+  }
+
+  /** Test method. */
+  @Test public void unixDateTime() {
+    final Function func = UNIX_DATETIME;
+    query(func.args(), "1970-01-01T00:00:00Z");
+    query(func.args(0), "1970-01-01T00:00:00Z");
+    query(func.args(86400000), "1970-01-02T00:00:00Z");
   }
 
   /** Test method. */

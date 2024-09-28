@@ -20,9 +20,10 @@ public final class MapKeysWhere extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
+    final HofArgs args = new HofArgs(2);
     final ValueBuilder vb = new ValueBuilder(qc);
     map.apply((key, value) -> {
-      if(toBoolean(qc, predicate, key, value)) vb.add(key);
+      if(test(predicate, args.set(0, key).set(1, value), qc)) vb.add(key);
     });
     return vb.value(this);
   }
@@ -33,7 +34,7 @@ public final class MapKeysWhere extends StandardFunc {
     if(tp instanceof MapType) {
       final MapType mt = (MapType) tp;
       final Type kt = mt.keyType;
-      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, kt.seqType()));
+      arg(1, arg -> refineFunc(arg, cc, kt.seqType()));
       exprType.assign(kt);
     }
     return this;

@@ -52,6 +52,11 @@ public class DbText extends DbAccess {
     return this;
   }
 
+  @Override
+  public final boolean ddo() {
+    return true;
+  }
+
   /**
    * Returns the index type (overwritten by implementing functions).
    * @return index type

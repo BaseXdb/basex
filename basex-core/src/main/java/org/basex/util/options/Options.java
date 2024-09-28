@@ -14,6 +14,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -380,12 +381,12 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param value value to be assigned
-   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Value value, final QueryError error,
-      final InputInfo info) throws QueryException {
+  public synchronized void assign(final Item name, final Value value, final InputInfo info,
+      final QueryContext qc) throws QueryException {
 
     final String nm;
     if(name instanceof QNm) {
@@ -395,10 +396,17 @@ public class Options implements Iterable<Option<?>> {
     } else {
       throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, name.type, name);
     }
+
+    final ItemList list = new ItemList();
+    for(final Item item : value) {
+      list.add(item.type.atomic() != null ? item.atomValue(qc, info) : item);
+    }
+    final Value atomic = list.value();
+
     if(definitions.isEmpty()) {
-      free.put(nm, serialize(value, info));
+      free.put(nm, serialize(atomic, info));
     } else {
-      assign(nm, value, error, info);
+      assign(nm, atomic, info, qc);
     }
   }
 
@@ -411,23 +419,21 @@ public class Options implements Iterable<Option<?>> {
    */
   private static String serialize(final Value value, final InputInfo info) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
-    if(value instanceof XQMap) {
-      final XQMap map = (XQMap) value;
-      for(final Item key : map.keys()) {
-        if(!tb.isEmpty()) tb.add(',');
-        tb.add(key.string(info)).add('=');
-        final Value val = map.get(key);
-        if(!val.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, val.seqType(), val);
-        tb.add(string(((Item) val).string(info)).replace(",", ",,"));
-      }
-    } else if(value instanceof QNm) {
-      tb.add(((QNm) value).unique());
-    } else if(value instanceof Item) {
-      tb.add(((Item) value).string(info));
-    } else {
-      for(final Item item : value) {
-        if(!tb.isEmpty()) tb.add(' ');
-        tb.add(serialize(item, info));
+    for(final Item item : value) {
+      if(!tb.isEmpty()) tb.add(' ');
+      if(item instanceof XQMap) {
+        final XQMap map = (XQMap) item;
+        for(final Item key : map.keys()) {
+          if(!tb.isEmpty()) tb.add(',');
+          tb.add(key.string(info)).add('=');
+          final Value v = map.get(key);
+          if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
+          tb.add(string(((Item) v).string(info)).replace(",", ",,"));
+        }
+      } else if(item instanceof QNm) {
+        tb.add(((QNm) item).unique());
+      } else {
+        tb.add(item.string(info));
       }
     }
     return tb.toString();
@@ -448,44 +454,6 @@ public class Options implements Iterable<Option<?>> {
    */
   public final Map<String, String> toMap(final StringOption option) {
     return toMap(get(option));
-  }
-
-  /**
-   * Returns a map representation of the comma-separated options string.
-   * @param opts options string
-   * @return map
-   */
-  public static Map<String, String> toMap(final String opts) {
-    final HashMap<String, String> map = new HashMap<>();
-    final StringBuilder key = new StringBuilder(), value = new StringBuilder();
-
-    boolean left = true;
-    final int sl = opts.length();
-    for(int s = 0; s < sl; s++) {
-      final char ch = opts.charAt(s);
-      if(left) {
-        if(ch == '=') {
-          left = false;
-        } else {
-          key.append(ch);
-        }
-      } else {
-        if(ch == ',') {
-          if(s + 1 == sl || opts.charAt(s + 1) != ',') {
-            map.put(key.toString().trim(), value.toString());
-            key.setLength(0);
-            value.setLength(0);
-            left = true;
-            continue;
-          }
-          // literal commas are escaped by a second comma
-          s++;
-        }
-        value.append(ch);
-      }
-    }
-    if(!left) map.put(key.toString().trim(), value.toString());
-    return map;
   }
 
   /**
@@ -560,7 +528,6 @@ public class Options implements Iterable<Option<?>> {
       if(definitions.isEmpty()) {
         free.put(entry.getKey(), entry.getValue());
       } else {
-        // ignore unknown options
         assign(entry.getKey(), entry.getValue(), -1, false);
       }
     }
@@ -580,14 +547,14 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses and assigns options from the specified map.
    * @param map map
-   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param qc query context
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final QueryError error,
-      final InputInfo info) throws QueryException {
+  public final synchronized void assign(final XQMap map, final InputInfo info,
+      final QueryContext qc) throws QueryException {
     for(final Item name : map.keys()) {
-      assign(name, map.get(name), error, info);
+      assign(name, map.get(name), info, qc);
     }
   }
 
@@ -634,6 +601,83 @@ public class Options implements Iterable<Option<?>> {
   }
 
   // STATIC METHODS ===============================================================================
+
+  /**
+   * Assigns a value to an option.
+   * @param option option
+   * @param value value to be assigned
+   * @param index index of an array value (optional, can be {@code -1})
+   * @param assign function to assign the value
+   * @param options current options (can be {@code null})
+   * @return error string or {@code null}
+   */
+  public static String assign(final Option<?> option, final String value, final int index,
+      final Consumer<Object> assign, final Options options) {
+
+    final String name = option.name();
+    if(option instanceof BooleanOption) {
+      Boolean v;
+      if(value.isEmpty() && options != null) {
+        // no value given: invert current value
+        v = options.get((BooleanOption) option);
+        if(v != null) v = !v.booleanValue();
+      } else {
+        v = Strings.toBoolean(value);
+      }
+      if(v == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
+      assign.accept(v);
+    } else if(option instanceof NumberOption) {
+      final int v = Strings.toInt(value);
+      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+      assign.accept(v);
+    } else if(option instanceof StringOption) {
+      assign.accept(value);
+    } else if(option instanceof EnumOption) {
+      final EnumOption<?> eo = (EnumOption<?>) option;
+      final Object v = eo.get(option instanceof EnumOption ? normalize(value) : value);
+      if(v == null) return allowed(eo, value, (Object[]) eo.values());
+      assign.accept(v);
+    } else if(option instanceof OptionsOption) {
+      final Options o = ((OptionsOption<?>) option).newInstance();
+      try {
+        o.assign(value);
+      } catch(final BaseXException ex) {
+        return Util.message(ex);
+      }
+      assign.accept(o);
+    } else if(option instanceof NumbersOption && options != null) {
+      final int v = Strings.toInt(value);
+      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+      int[] ii = (int[]) options.get(option);
+      if(index == -1) {
+        if(ii == null) ii = new int[0];
+        final IntList il = new IntList(ii.length + 1);
+        for(final int i : ii) il.add(i);
+        assign.accept(il.add(v).finish());
+      } else {
+        if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
+        ii[index] = v;
+      }
+    } else if(option instanceof StringsOption && options != null) {
+      String[] ss = (String[]) options.get(option);
+      if(index == -1) {
+        if(ss == null) ss = new String[0];
+        final StringList sl = new StringList(ss.length + 1);
+        for(final String s : ss) sl.add(s);
+        assign.accept(sl.add(value).finish());
+      } else if(index == 0) {
+        final int i = Strings.toInt(value);
+        if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
+        options.values.put(name, new String[i]);
+      } else {
+        if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
+        ss[index - 1] = value;
+      }
+    } else {
+      throw Util.notExpected("Unsupported option: " + option);
+    }
+    return null;
+  }
 
   /**
    * Returns a message with allowed keys.
@@ -755,76 +799,68 @@ public class Options implements Iterable<Option<?>> {
    * Assigns the specified name and value.
    * @param name name of option
    * @param value value to be assigned
-   * @param error error to be raised if option is unknown (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param qc query context
    * @throws QueryException query exception
    */
-  private synchronized void assign(final String name, final Value value, final QueryError error,
-      final InputInfo info) throws QueryException {
+  private synchronized void assign(final String name, final Value value, final InputInfo info,
+      final QueryContext qc) throws QueryException {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
-      if(error != null && !name.startsWith("Q{")) throw OPTION_X.get(info, similar(name));
-      return;
+      if(getClass() == Options.class || name.startsWith("Q{")) return;
+      throw OPTION_X.get(info, similar(name));
     }
 
-    Object val = null, expected = null;
     final Item item = value.isItem() ? (Item) value : null;
     final SeqType st = value.seqType();
+    final QueryFunction<Object, QueryException> expected = type ->
+      INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
+
+    Object result = null;
     if(option instanceof ValueOption) {
       final SeqType est = ((ValueOption) option).seqType();
-      if(st.instanceOf(est)) val = value;
-      else expected = est;
+      if(!st.instanceOf(est)) throw expected.apply(est);
+      result = value;
     } else if(option instanceof BooleanOption) {
-      if(item != null) {
-        if(st.type == AtomType.BOOLEAN) {
-          val = item.bool(info);
-        } else {
-          final String s = string(item.string(info));
-          val = Strings.toBoolean(s) ? Boolean.TRUE : Strings.no(s) ? Boolean.FALSE : null;
-        }
-      }
-      if(val == null) expected = AtomType.BOOLEAN;
+      final Boolean b = item != null ? Strings.toBoolean(string(item.string(info))) : null;
+      if(b == null) throw expected.apply(AtomType.BOOLEAN);
+      result = b.booleanValue();
     } else if(option instanceof NumberOption) {
-      if(item != null) val = (int) item.itr(info);
-      else expected = AtomType.INTEGER;
+      if(item == null) throw expected.apply(AtomType.INTEGER);
+      result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
-      val = serialize(value, info);
+      result = serialize(value, info);
     } else if(option instanceof EnumOption) {
-      byte[] token = null;
-      if(item != null) {
-        if(st.type == AtomType.BOOLEAN || !st.type.isNumber()) {
-          token = item.string(info);
-        } else {
-          final long l = item.itr(info);
-          token = l == 1 ? TRUE : l == 0 ? FALSE : null;
-        }
-      }
-      if(token == null) {
-        expected = AtomType.STRING;
-      } else {
-        final EnumOption<?> eo = (EnumOption<?>) option;
-        val = eo.get(eq(token, TRUE) ? Text.YES : eq(token, FALSE) ? Text.NO : string(token));
-        if(val == null) throw OPTION_X.get(info,
-            allowed(option, string(token), (Object[]) eo.values()));
-      }
+      final String string = normalize(serialize(value, info));
+      final EnumOption<?> eo = (EnumOption<?>) option;
+      result = eo.get(string);
+      if(result == null) throw OPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
     } else if(option instanceof OptionsOption) {
-      if(item instanceof XQMap) {
-        val = ((OptionsOption<?>) option).newInstance();
-        ((Options) val).assign((XQMap) item, error, info);
-      } else {
-        expected = SeqType.MAP;
-      }
+      if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
+      result = ((OptionsOption<?>) option).newInstance();
+      ((Options) result).assign((XQMap) item, info, qc);
     }
-    if(expected != null) throw INVALIDOPTION_X_X_X_X.get(info, name, expected, st, value);
-    put(option, val);
+    put(option, result);
+  }
+
+  /**
+   * Normalizes an enumeration value.
+   * @param value value
+   * @return normalized value
+   */
+  private static synchronized String normalize(final String value) {
+    final String v = value.trim();
+    if(v.isEmpty()) return YesNoOmit.OMIT.toString();
+    final Boolean b = Strings.toBoolean(v);
+    return b == Boolean.TRUE ? Text.YES : b == Boolean.FALSE ? Text.NO : v;
   }
 
   /**
    * Assigns the specified name and value.
    * @param name name of option
    * @param value value to be assigned
-   * @param index index (optional, can be {@code -1})
+   * @param index index of an array value (optional, can be {@code -1})
    * @param error raise error if the option is unknown
    * @return success flag
    * @throws BaseXException database exception
@@ -844,80 +880,41 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
-   * Assigns a value to an option.
-   * @param option option
-   * @param value value to be assigned
-   * @param index index (optional, can be {@code -1})
-   * @param assign function to assign the value
-   * @param definitions option definitions (can be {@code null})
-   * @return string or {@code null}
+   * Returns a map representation of the comma-separated options string.
+   * @param string options string
+   * @return map
    */
-  public static String assign(final Option<?> option, final String value, final int index,
-      final Consumer<Object> assign, final Options definitions) {
+  private static Map<String, String> toMap(final String string) {
+    final HashMap<String, String> map = new HashMap<>();
+    final StringBuilder key = new StringBuilder(), value = new StringBuilder();
+    final Runnable add = () -> map.put(key.toString().trim(), value.toString());
 
-    final String name = option.name();
-    if(option instanceof BooleanOption) {
-      final boolean v;
-      if(value.isEmpty() && definitions != null) {
-        final Boolean b = definitions.get((BooleanOption) option);
-        if(b == null) return Util.info(Text.OPT_BOOLEAN_X_X, name, "");
-        v = !b;
+    boolean left = true;
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = string.charAt(s);
+      if(left) {
+        if(ch == '=') {
+          left = false;
+        } else {
+          key.append(ch);
+        }
       } else {
-        v = Strings.toBoolean(value);
-        if(!v && !Strings.no(value)) return Util.info(Text.OPT_BOOLEAN_X_X, name, value);
+        if(ch == ',') {
+          if(s + 1 == sl || string.charAt(s + 1) != ',') {
+            add.run();
+            key.setLength(0);
+            value.setLength(0);
+            left = true;
+            continue;
+          }
+          // literal commas are escaped by a second comma
+          s++;
+        }
+        value.append(ch);
       }
-      assign.accept(v);
-    } else if(option instanceof NumberOption) {
-      final int v = Strings.toInt(value);
-      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-      assign.accept(v);
-    } else if(option instanceof StringOption) {
-      assign.accept(value);
-    } else if(option instanceof EnumOption) {
-      final EnumOption<?> eo = (EnumOption<?>) option;
-      final Object v = eo.get(value);
-      if(v == null) return allowed(option, value, (Object[]) eo.values());
-      assign.accept(v);
-    } else if(option instanceof OptionsOption) {
-      final Options o = ((OptionsOption<?>) option).newInstance();
-      try {
-        o.assign(value);
-      } catch(final BaseXException ex) {
-        Util.debug(ex);
-        return ex.getMessage();
-      }
-      assign.accept(o);
-    } else if(option instanceof NumbersOption && definitions != null) {
-      final int v = Strings.toInt(value);
-      if(v == Integer.MIN_VALUE) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-      int[] ii = (int[]) definitions.get(option);
-      if(index == -1) {
-        if(ii == null) ii = new int[0];
-        final IntList il = new IntList(ii.length + 1);
-        for(final int i : ii) il.add(i);
-        assign.accept(il.add(v).finish());
-      } else {
-        if(index < 0 || index >= ii.length) return Util.info(Text.OPT_OFFSET_X, name);
-        ii[index] = v;
-      }
-    } else if(option instanceof StringsOption && definitions != null) {
-      String[] ss = (String[]) definitions.get(option);
-      if(index == -1) {
-        if(ss == null) ss = new String[0];
-        final StringList sl = new StringList(ss.length + 1);
-        for(final String s : ss) sl.add(s);
-        assign.accept(sl.add(value).finish());
-      } else if(index == 0) {
-        final int i = Strings.toInt(value);
-        if(i < 0) return Util.info(Text.OPT_NUMBER_X_X, name, value);
-        definitions.values.put(name, new String[i]);
-      } else {
-        if(index <= 0 || index > ss.length) return Util.info(Text.OPT_OFFSET_X, name);
-        ss[index - 1] = value;
-      }
-    } else {
-      throw Util.notExpected("Unsupported option: " + option);
     }
-    return null;
+    if(!left) add.run();
+    return map;
   }
 }

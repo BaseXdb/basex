@@ -457,7 +457,7 @@ public final class TextEditor {
    */
   boolean comment(final Syntax syntax) {
     final byte[] st = syntax.commentOpen(), en = syntax.commentEnd();
-    final byte[] ste = concat(st, SPACE), ene = concat(SPACE, en);
+    final byte[] ste = concat(st, cpToken(' ')), ene = concat(cpToken(' '), en);
     final int sl = st.length, el = en.length, sle = ste.length, ele = ene.length;
 
     if(!isSelected()) {

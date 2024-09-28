@@ -34,7 +34,7 @@ public class MapEntries extends StandardFunc {
       }
       @Override
       public long size() {
-        return map.mapSize();
+        return map.structSize();
       }
     };
   }

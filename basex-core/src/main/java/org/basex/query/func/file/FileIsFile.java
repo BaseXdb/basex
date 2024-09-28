@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileIsFile extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws QueryException {
+  public Bln item(final QueryContext qc) throws QueryException {
     return Bln.get(Files.isRegularFile(toPath(arg(0), qc)));
   }
 }

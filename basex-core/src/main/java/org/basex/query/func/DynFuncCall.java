@@ -30,8 +30,6 @@ public final class DynFuncCall extends FuncCall {
   private final boolean updating;
   /** Nondeterministic flag. */
   private boolean ndt;
-  /** Hash values of all function items that this call was copied from, possibly {@code null}. */
-  private int[] inlinedFrom;
 
   /**
    * Function constructor.
@@ -82,20 +80,25 @@ public final class DynFuncCall extends FuncCall {
       exprType.assign(ft.declType);
     }
 
-    if(func instanceof XQData) {
+    if(func instanceof XQStruct) {
       // lookup key must be atomic
       if(nargs == 1) arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values
-      if(allAreValues(false)) return cc.preEval(this);
+      if(values(false, cc)) return cc.preEval(this);
     }
 
+    // try to inline the function; avoid recursive inlining
     if(func instanceof XQFunctionExpr) {
-      // try to inline the function
-      if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
-        final XQFunctionExpr fe = (XQFunctionExpr) func;
+      final XQFunctionExpr fe = (XQFunctionExpr) func;
+      if(!cc.inlined.contains(fe)) {
         checkUp(fe, updating);
-        final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
-        if(inlined != null) return inlined;
+        cc.inlined.push(fe);
+        try {
+          final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
+          if(inlined != null) return inlined;
+        } finally {
+          cc.inlined.pop();
+        }
       }
     } else if(func instanceof Value) {
       // raise error (values tested at this stage are no functions)
@@ -112,31 +115,6 @@ public final class DynFuncCall extends FuncCall {
   }
 
   /**
-   * Marks this call after it was inlined from the given function item.
-   * @param item the function item
-   */
-  public void markInlined(final FuncItem item) {
-    final int hash = item.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } :
-      org.basex.util.Array.add(inlinedFrom, hash);
-  }
-
-  /**
-   * Checks if this call was inlined from the body of the given function item.
-   * @param item function item
-   * @return result of check
-   */
-  private boolean comesFrom(final FuncItem item) {
-    if(inlinedFrom != null) {
-      final int hash = item.hashCode();
-      for(final int h : inlinedFrom) {
-        if(hash == h) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Returns the function body expression.
    * @return body
    */
@@ -149,14 +127,7 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(cc, vm, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = new DynFuncCall(info, updating, ndt, copy[last], args);
-    if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
-    return copyType(call);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.dynFuncCall(this) && visitAll(visitor, exprs);
+    return copyType(new DynFuncCall(info, updating, ndt, copy[last], args));
   }
 
   @Override
@@ -172,9 +143,9 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag... flags) {
-    if(Flag.UPD.in(flags) && (updating || sc().mixUpdates)) return true;
-    if(Flag.NDT.in(flags) && (ndt || updating || sc().mixUpdates)) return true;
-    final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
+    if(Flag.UPD.oneOf(flags) && (updating || sc().mixUpdates)) return true;
+    if(Flag.NDT.oneOf(flags) && (ndt || updating || sc().mixUpdates)) return true;
+    final Flag[] flgs = Flag.remove(flags, Flag.NDT, Flag.UPD);
     return flgs.length != 0 && super.has(flgs);
   }
 

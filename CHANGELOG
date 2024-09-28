@@ -1,3 +1,25 @@
+VERSION 11.3 (September 19, 2024) --------------------------------------
+
+ - [ADD] New XQuery 4 features
+ - [ADD] Options: LOG, support for stdout/stderr/slf4j targets
+ - [ADD] XQuery: focus expression (A -> B; experimental)
+ - [MOD] XQuery, processing single chars: reduced memory consumption
+ - [MOD] XQuery, db:node-id, db:node-pre: faster retrieval
+ - [FIX] XQuery: self-recursiveness of functions and variables revised
+ - [FIX] XQuery: inspect:function has become more robust
+
+VERSION 11.2 (August 15, 2024) -----------------------------------------
+
+ - [ADD] New XQuery 4 features
+ - [ADD] XQuery: proc:system: new 'environment' option
+ - [MOD] GUI: Global Ctrl-ENTER shortcut
+ - [MOD] XQuery: faster evaluation of recursive functions
+ - [MOD] XQuery: faster invocation of HOF function parameters
+ - [MOD] XQuery: distinct-values: faster processing of numeric input
+ - [MOD] XQuery: fewer redundant type checks
+ - [FIX] XQuery: circularity/self-dependency checks revised
+ - [FIX] WebSockets (Jetty 11): Idle timeout increased to 1 hour
+
 VERSION 11.1 (July 10, 2024) -------------------------------------------
 
  - [FIX] Duplicate libraries removed from distribution packages

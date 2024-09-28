@@ -3,9 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
-import org.basex.query.expr.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -31,19 +28,6 @@ public final class HofModuleTest extends SandboxTest {
     check(func.args(" 1 to 6", " function($a, $b) { $a + $b }"),
         21,
         exists(func));
-
-    // should be unrolled and evaluated at compile time
-    unroll(true);
-    check(func.args(" 1 to 5", " function($a, $b) { $a + $b }"),
-        15,
-        empty(func),
-        exists(Int.class));
-    // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 5", " function($a, $b) { 0 * " + _RANDOM_DOUBLE.args() + " + $b }"),
-        5,
-        exists(Int.class),
-        empty(func),
-        count(Util.className(Arith.class) + "[@op = '+']", 4));
   }
 
   /** Test method. */

@@ -249,10 +249,7 @@ public abstract class Collation {
    */
   public static byte[] key(final byte[] string) {
     final ByteList bl = new ByteList(string.length * 3L);
-    for(final TokenParser tp = new TokenParser(string); tp.more();) {
-      final int n = tp.next();
-      bl.add(n >>> 16).add(n >>> 8).add(n);
-    }
+    Token.forEachCp(string, cp -> bl.add(cp >>> 16).add(cp >>> 8).add(cp));
     return bl.finish();
   }
 }

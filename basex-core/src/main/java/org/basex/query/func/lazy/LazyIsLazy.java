@@ -14,6 +14,12 @@ import org.basex.util.*;
 public final class LazyIsLazy extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(toAtomItem(arg(0), qc) instanceof Lazy);
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return toAtomItem(arg(0), qc) instanceof Lazy;
   }
 }

@@ -40,7 +40,7 @@ public class Arith extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.NUMBER, cc);
-    if(allAreValues(false)) return cc.preEval(this);
+    if(values(false, cc)) return cc.preEval(this);
 
     // move values to second position
     // 1 + position()  ->  position() + 1
@@ -119,8 +119,8 @@ public class Arith extends Arr {
     final Item item1 = exprs[0].atomItem(qc, info);
     if(item1.isEmpty()) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
-    return item2.isEmpty() ? Empty.VALUE : calcOpt != null ? calcOpt.eval(item1, item2, info) :
-      calc.eval(item1, item2, info);
+    if(item2.isEmpty()) return Empty.VALUE;
+    return calcOpt != null ? calcOpt.eval(item1, item2, info) : calc.eval(item1, item2, info);
   }
 
   @Override

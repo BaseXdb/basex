@@ -154,11 +154,11 @@ public final class StaticFuncCall extends FuncCall {
     // check arguments, which will be evaluated previous to the function body
     if(super.has(flags)) return true;
     // function code: position or context references of expression body have no effect
-    if(Flag.POS.in(flags) || Flag.CTX.in(flags)) return false;
+    if(Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags)) return false;
     // function code: check for updates
-    if(Flag.UPD.in(flags) && func != null && func.updating()) return true;
+    if(Flag.UPD.oneOf(flags) && func != null && func.updating()) return true;
     // check remaining flags
-    final Flag[] flgs = Flag.UPD.remove(flags);
+    final Flag[] flgs = Flag.remove(flags, Flag.UPD);
     return flgs.length != 0 && func != null && func.has(flgs);
   }
 

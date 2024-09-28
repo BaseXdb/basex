@@ -178,8 +178,9 @@ public final class Util {
     if(th instanceof ReflectiveOperationException) {
       if(th.getCause() != null) msg += "; " + th.getCause();
     }
-    if(th instanceof FileNotFoundException || th instanceof NoSuchFileException)
+    if(th instanceof FileNotFoundException || th instanceof NoSuchFileException) {
       return info(RES_NOT_FOUND_X, msg);
+    }
     if(th instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
     if(th instanceof SSLException) return "SSL: " + msg;
 

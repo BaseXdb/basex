@@ -15,9 +15,9 @@ import org.basex.util.similarity.*;
 public final class StringJaroWinkler extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value1 = toToken(arg(0), qc), value2 = toToken(arg(1), qc);
+    final AStr value1 = toStr(arg(0), qc), value2 = toStr(arg(1), qc);
 
-    final int[] cps1 = new TokenParser(value1).toArray(), cps2 = new TokenParser(value2).toArray();
+    final int[] cps1 = value1.codepoints(info), cps2 = value2.codepoints(info);
     return Dbl.get(JaroWinkler.distance(cps1, cps2));
   }
 }

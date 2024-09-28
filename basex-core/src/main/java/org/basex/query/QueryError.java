@@ -744,7 +744,7 @@ public enum QueryError {
   REGACTION_X(FORX, 5, "Both replacement string and action supplied: %."),
 
   /** Error code. */
-  FIATOMIZE_X(FOTY, 13, "Atomic value required, function item found: %."),
+  FIATOMIZE_X(FOTY, 13, "Atomic item required, function item found: %."),
   /** Error code. */
   FISTRING_X(FOTY, 14, "Function item has no string value: %."),
 
@@ -839,11 +839,15 @@ public enum QueryError {
   /** Error code. */
   SERPARAM_X(SEPM, 16, "%"),
   /** Error code. */
-  SERMAP_X(SEPM, 17, "Character map is not valid: %."),
+  SERMAP_X(SEPM, 17, "Key in character map is not a single character: %."),
   /** Error code. */
   SEROPT_X(SEPM, 17, "%"),
   /** Error code. */
   SERINVALID_X(SEPM, 17, "Serialization parameter '%' is invalid."),
+  /** Error code. */
+  SERCHARDUP_X(SEPM, 18, "Character '%' is specified twice."),
+  /** Error code. */
+  SERDUP_X(SEPM, 19, "Serialization parameter '%' is specified twice."),
   /** Error code. */
   SERNUMBER_X(SERE, 20, "Numeric value cannot be represented: '%'"),
   /** Error code. */
@@ -864,7 +868,7 @@ public enum QueryError {
   /** Error code. */
   NOTREAT_X_X_X(XPDY, 50, "Cannot treat % as %: %."),
   /** Error code. */
-  ARRAY_X_X(XPDY, 130, "Maximum size exceeded (%): %."),
+  MAX_SIZE_X_X(XPDY, 130, "Maximum size exceeded (%): %."),
 
   /** Error code. */
   QUERYEMPTY(XPST, 3, "Empty query."),
@@ -1127,7 +1131,9 @@ public enum QueryError {
   /** Error code. */
   VALUETYPES_X_X(XPTY, 4, "Incompatible types in context value declarations: % vs. %."),
   /** Error code. */
-  LOOKUP_X(XPTY, 4, "Input of lookup operator must be map or array: %."),
+  LOOKUP_X(XPTY, 4, "Input of lookup must be map or array: %."),
+  /** Error code. */
+  STRUCT_FILTER_X(XPTY, 4, "Input of filter must be map or array: %."),
   /** Error code. */
   INVALIDOPT_X(XPTY, 4, "%"),
   /** Error code. */
@@ -1140,8 +1146,6 @@ public enum QueryError {
   STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
   /** Error code. */
   STRNOD_X_X(XPTY, 4, "String or node expected, % found: %."),
-  /** Error code. */
-  MAP_X_X(XPTY, 4, "Map expected, % found: %."),
   /** Error code. */
   ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
   /** Error code. */
@@ -1211,7 +1215,7 @@ public enum QueryError {
   /** Error code. */
   DUPLNSCONS_X(XQDY, 102, "Duplicate declaration of namespace '%'."),
   /** Error code. */
-  MAPDUPLKEY_X_X_X(XQDY, 137, "Key % already exists in map (values: % vs. %)."),
+  MAPDUPLKEY_X(XQDY, 137, "Map contains duplicate key: %."),
 
   /** Error code. */
   IMPLSCHEMA(XQST, 9, "No XML Schema support."),
@@ -1340,7 +1344,7 @@ public enum QueryError {
   /** Error code. */
   TAGWRONG_X_X(XQST, 118, "Different start and end tag: <%>...</%>."),
   /** Error code. */
-  OUTDOC_X(XQST, 119, "Parameter document cannot be parsed: %."),
+  PARAMDOC_X(XQST, 119, "Parameter document: %."),
   /** Error code. */
   NOVISALLOWED(XQST, 125, "No visibility annotation allowed in inline function."),
   /** Error code. */
@@ -1660,7 +1664,6 @@ public enum QueryError {
   public static QueryException typeError(final Expr expr, final SeqType st, final InputInfo info) {
     return typeError(expr, st, null, info);
   }
-
 
   /**
    * Throws a type exception.

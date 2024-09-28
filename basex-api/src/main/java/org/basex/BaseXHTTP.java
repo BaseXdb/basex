@@ -11,8 +11,8 @@ import java.util.function.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.gzip.*;
@@ -286,7 +286,7 @@ public final class BaseXHTTP extends CLI {
             Prop.put(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Prop.put(StaticOptions.LOG, Boolean.toString(false));
+            Prop.put(StaticOptions.LOG, "");
             break;
           default:
             throw arg.usage();

@@ -28,7 +28,7 @@ public final class ArrayInsertTest extends ArrayTest {
       list.add(insPos, i);
       array = array.insertBefore(insPos, Int.get(i), qc);
       final int size = i + 1;
-      assertEquals(size, array.arraySize());
+      assertEquals(size, array.structSize());
       assertEquals(size, list.size());
 
       if(i % 1000 == 999) {
@@ -48,13 +48,13 @@ public final class ArrayInsertTest extends ArrayTest {
     XQArray array = XQArray.empty();
 
     for(int i = 0; i < n; i++) array = array.append(Int.get(i));
-    assertEquals(n, array.arraySize());
+    assertEquals(n, array.structSize());
 
     final Int val = Int.get(n);
     for(int i = 0; i <= n; i++) {
       final XQArray array2 = array.insertBefore(i, val, qc);
       assertEquals(n, ((Int) array2.get(i)).itr());
-      assertEquals(n + 1L, array2.arraySize());
+      assertEquals(n + 1L, array2.structSize());
       for(int j = 0; j < n; j++) {
         assertEquals(j, ((Int) array2.get(j < i ? j : j + 1)).itr());
       }

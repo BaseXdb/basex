@@ -25,10 +25,10 @@ public final class FnFilter extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, predicate);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
-      if(toBoolean(qc, predicate, item, Int.get(++p))) vb.add(item);
+      if(test(predicate, args.set(0, item).inc(), qc)) vb.add(item);
     }
     return vb.value(this);
   }
@@ -42,8 +42,8 @@ public final class FnFilter extends StandardFunc {
     final int arity = arity(predicate);
     if(arity == 1) {
       // INPUT[PREDICATE(.)]
-      final Expr pred = cc.get(input, () ->
-        new DynFuncCall(info, coerce(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
+      final Expr pred = cc.get(input, true, () ->
+        new DynFuncCall(info, coerceFunc(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
       );
       return Filter.get(cc, info, input, pred);
     } else if(arity == 2) {
@@ -55,7 +55,7 @@ public final class FnFilter extends StandardFunc {
       final Var p = cc.copy(new Var(new QNm("pos"), SeqType.INTEGER_O, cc.qc, info), vm);
       clauses.add(new For(i, p, null, input, false).optimize(cc));
 
-      final Expr pred = coerce(1, cc);
+      final Expr pred = coerceFunc(1, cc);
       final Expr item = new VarRef(info, i).optimize(cc);
       final Expr pos = new VarRef(info, p).optimize(cc);
       final Expr dfc = new DynFuncCall(info, pred, item, pos).optimize(cc);

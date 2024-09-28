@@ -104,7 +104,7 @@ public abstract class Serializer implements Closeable {
   // PUBLIC METHODS ===============================================================================
 
   /**
-   * Serializes the specified item, which may be a node or an atomic value.
+   * Serializes the specified item, which may be a node or an atomic item.
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
@@ -317,7 +317,7 @@ public abstract class Serializer implements Closeable {
   protected void pi(final byte[] name, final byte[] value) throws IOException { }
 
   /**
-   * Serializes an atomic value.
+   * Serializes an atomic item.
    * @param item item
    * @throws IOException I/O exception
    */

@@ -182,7 +182,7 @@ public final class CmpV extends Cmp {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.STRING, cc);
-    if(allAreValues(false)) return cc.preEval(this);
+    if(values(false, cc)) return cc.preEval(this);
 
     // swap operands
     if(swap()) {
@@ -205,9 +205,12 @@ public final class CmpV extends Cmp {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[@x eq 'x']  ->  E[@x = 'x']  (triggers further optimizations)
-    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? toGeneral(cc, false) :
-      this, mode);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E[@x eq 'x']  ->  E[@x = 'x']  (enables further optimizations)
+      expr = toGeneral(cc, false);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   /**
@@ -233,7 +236,28 @@ public final class CmpV extends Cmp {
     if(item1.isEmpty()) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
     if(item2.isEmpty()) return Empty.VALUE;
-    if(item1.comparable(item2)) return Bln.get(opV.eval(item1, item2, info));
+    return Bln.get(test(item1, item2));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final Item item1 = exprs[0].atomItem(qc, info);
+    if(item1.isEmpty()) return false;
+    final Item item2 = exprs[1].atomItem(qc, info);
+    if(item2.isEmpty()) return false;
+    return test(item1, item2);
+  }
+
+  /**
+   * Performs the test.
+   * @param item1 first item
+   * @param item2 second item
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean test(final Item item1, final Item item2) throws QueryException {
+    if(item1.comparable(item2)) return opV.eval(item1, item2, info);
     throw compareError(item1, item2, info);
   }
 

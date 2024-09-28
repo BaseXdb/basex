@@ -514,7 +514,7 @@ public abstract class Data {
     meta.update();
 
     if(kind == PI) {
-      updateText(pre, trim(concat(name, SPACE, atom(pre))), PI);
+      updateText(pre, trim(concat(name, cpToken(' '), atom(pre))), PI);
     } else {
       // check if namespace has changed
       final byte[] prefix = prefix(name);
@@ -567,7 +567,7 @@ public abstract class Data {
    * @param value value to be updated (text, comment, pi, attribute, document name)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
-    final byte[] val = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
+    final byte[] val = kind == PI ? trim(concat(name(pre, kind), cpToken(' '), value)) : value;
     if(eq(val, text(pre, kind != ATTR))) return;
 
     meta.update();

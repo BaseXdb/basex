@@ -99,18 +99,24 @@ public final class CmpSR extends Single {
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return Bln.get(!item.isEmpty() && eval(item));
+      return !item.isEmpty() && eval(item);
     }
 
     // iterative evaluation
     final Iter iter = expr.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(eval(item)) return Bln.TRUE;
+      if(eval(item)) return true;
     }
-    return Bln.FALSE;
+    return false;
   }
 
   /**
