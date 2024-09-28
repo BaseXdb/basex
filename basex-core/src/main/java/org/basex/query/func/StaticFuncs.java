@@ -241,7 +241,7 @@ public final class StaticFuncs extends ExprInfo {
     void init(final QueryContext qc) throws QueryException {
       // assign functions to function calls
       for(final StaticFuncCall call : calls) {
-        if(call.func == null && !setFunc(call) && !setRecConstr(call, qc) && !setJava(call, qc)) {
+        if(call.func == null && !setFunc(call) && !setJava(call, qc)) {
           // function is unknown: raise error
           if(!calls.isEmpty()) {
             final IntList arities = new IntList();
@@ -313,23 +313,6 @@ public final class StaticFuncs extends ExprInfo {
         }
       }
       return false;
-    }
-
-    /**
-     * Tries to assign a record constructor to a static function call.
-     * @param call static function call
-     * @param qc query context
-     * @return success flag
-     * @throws QueryException query exception
-     */
-    boolean setRecConstr(final StaticFuncCall call, final QueryContext qc) throws QueryException {
-      final RecordType rt = qc.recordTypes.get(call.name);
-      if(rt == null) return false;
-      final InputInfo info = call.info();
-      final StaticFunc func = new StaticFunc(call.name, new Params(),
-          rt.new Constructor(info, call.args()), AnnList.EMPTY, new VarScope(), info, null);
-      call.setFunc(func);
-      return true;
     }
 
     /**

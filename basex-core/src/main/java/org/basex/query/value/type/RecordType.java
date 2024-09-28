@@ -9,6 +9,7 @@ import java.util.Set;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.var.*;
@@ -398,20 +399,24 @@ public class RecordType extends MapType implements Iterable<byte[]> {
   /**
    * Named record type constructor function.
    */
-  public class Constructor extends Arr {
+  public static class RecordConstructor extends Arr {
+    /** Record type. */
+    private RecordType recordType;
     /** Function type. */
     private FuncType funcType;
 
     /**
      * Constructor.
+     * @param recordType record type
      * @param info input info (can be {@code null})
      * @param args function arguments
      */
-    public Constructor(final InputInfo info, final Expr[] args) {
-      super(info, RecordType.this.seqType(), args);
+    public RecordConstructor(final InputInfo info, final RecordType recordType, final Expr[] args) {
+      super(info, recordType.seqType(), args);
+      this.recordType = recordType;
       final SeqType[] argTypes = new SeqType[args.length];
       for(int i = 0; i < args.length; ++i) argTypes[i] = args[i].seqType();
-      funcType = new FuncType(RecordType.this.seqType(), argTypes);
+      funcType = new FuncType(recordType.seqType(), argTypes);
     }
 
     @Override
@@ -419,11 +424,16 @@ public class RecordType extends MapType implements Iterable<byte[]> {
       final MapBuilder mb = new MapBuilder();
       final Expr[] args = args();
       int i = 0;
-      for(byte[] key : fields) {
-        final var value = args[i].value(qc);
-        System.out.println("value.seqType(): " + value.seqType());
-        mb.put(key, value);
-        ++i;
+      for(byte[] key : recordType.fields) {
+        final Value value = args[i++].value(qc);
+        final boolean omit;
+        if(value.isEmpty()) {
+          final Field field = recordType.getField(key);
+          omit = field.isOptional() && field.initExpr == null;
+        } else {
+          omit = false;
+        }
+        if(!omit) mb.put(key, value);
       }
       return mb.map();
     }
@@ -435,12 +445,12 @@ public class RecordType extends MapType implements Iterable<byte[]> {
 
     @Override
     public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-      return copyType(new Constructor(info, copyAll(cc, vm, args())));
+      return copyType(new RecordConstructor(info, recordType, copyAll(cc, vm, args())));
     }
 
     @Override
     public void toString(final QueryString qs) {
-      qs.token(recordName).params(exprs);
+      qs.token(recordType.recordName).params(exprs);
     }
   }
 
@@ -453,18 +463,18 @@ public class RecordType extends MapType implements Iterable<byte[]> {
     /** Field type (can be {@code null}). */
     private final SeqType seqType;
     /** Initializing expression (can be {@code null}). */
-    private final Expr expr;
+    private final Expr initExpr;
 
     /**
      * Constructor.
      * @param optional optional flag
      * @param seqType field type (can be {@code null})
-     * @param expr initializing expression (can be {@code null})
+     * @param initExpr initializing expression (can be {@code null})
      */
-    public Field(final boolean optional, final SeqType seqType, final Expr expr) {
+    public Field(final boolean optional, final SeqType seqType, final Expr initExpr) {
       this.optional = optional;
       this.seqType = seqType;
-      this.expr = expr;
+      this.initExpr = initExpr;
     }
 
     /**
@@ -482,6 +492,14 @@ public class RecordType extends MapType implements Iterable<byte[]> {
      */
     public boolean isOptional() {
       return optional;
+    }
+
+    /**
+     * Returns the initializing expression.
+     * @return initializing expression (can be {@code null})
+     */
+    public Expr getInitExpr() {
+      return initExpr;
     }
 
     /**

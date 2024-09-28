@@ -56,8 +56,6 @@ public final class QueryContext extends Job implements Closeable {
   public final Variables vars = new Variables();
   /** Functions. */
   public final StaticFuncs functions = new StaticFuncs();
-  /** Named record types. */
-  public final QNmMap<RecordType> recordTypes = new QNmMap<>();
   /** Query resources. */
   public final QueryResources resources;
   /** Parent query context. */
