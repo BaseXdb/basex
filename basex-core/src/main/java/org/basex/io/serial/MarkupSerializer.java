@@ -8,6 +8,7 @@ import static org.basex.util.Token.normalize;
 
 import java.io.*;
 
+import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.hash.*;
@@ -169,6 +170,13 @@ abstract class MarkupSerializer extends StandardSerializer {
     out.print(' ');
   }
 
+  /** Fallback function. */
+  private final Fallback fallbackCDATA = cp -> {
+    out.print(CDATA_C);
+    printHex(cp);
+    out.print(CDATA_O);
+  };
+
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
     if(opened.isEmpty()) checkRoot(null);
@@ -194,7 +202,7 @@ abstract class MarkupSerializer extends StandardSerializer {
             }
             c = 0;
           }
-          out.print(cp);
+          out.print(cp, fallbackCDATA);
         }
         out.print(CDATA_C);
       }
@@ -285,6 +293,9 @@ abstract class MarkupSerializer extends StandardSerializer {
     super.atomic(item);
   }
 
+  /** Fallback function. */
+  private final Fallback fallback = cp -> printHex(cp);
+
   @Override
   protected void print(final int cp) throws IOException {
     if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0) {
@@ -298,12 +309,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     } else if(cp == 0x2028) {
       out.print(E_2028);
     } else {
-      try {
-        super.print(cp);
-      } catch(final QueryIOException ex) {
-        if(ex.getCause().error() == SERENC_X_X) printHex(cp);
-        else throw ex;
-      }
+      out.print(cp, fallback);
     }
   }
 

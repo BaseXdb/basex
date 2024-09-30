@@ -40,7 +40,8 @@ public final class JsonMLSerializer extends JsonSerializer {
       out.print(',');
       indent();
     }
-    out.print("[\"");
+    out.print('[');
+    out.print('"');
     for(final byte ch : name.local()) printChar(ch);
     out.print('"');
     att = false;
@@ -53,22 +54,24 @@ public final class JsonMLSerializer extends JsonSerializer {
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
 
-    out.print(",");
+    out.print(',');
     out.print(' ');
     if(!att) {
-      out.print("{");
+      out.print('{');
       att = true;
     }
     out.print('"');
     for(final byte ch : Token.local(name)) printChar(ch);
-    out.print("\":\"");
+    out.print('"');
+    out.print(':');
+    out.print('"');
     for(final byte ch : Token.normalize(value, form)) printChar(ch);
-    out.print("\"");
+    out.print('"');
   }
 
   @Override
   protected void finishOpen() throws IOException {
-    if(att) out.print("}");
+    if(att) out.print('}');
   }
 
   @Override

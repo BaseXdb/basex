@@ -8,6 +8,7 @@ import java.nio.*;
 import java.nio.charset.*;
 
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class is a wrapper for outputting texts with specific encodings.
@@ -16,37 +17,42 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class EncoderOutput extends PrintOutput {
-  /** Encoding. */
-  private final Charset encoding;
+  /** Cache with encoded characters. */
+  private final IntObjMap<byte[]> cache = new IntObjMap<>();
   /** Charset encoder. */
   private final CharsetEncoder encoder;
-  /** Encoding buffer. */
-  private final TokenBuilder encbuffer;
+  /** Character set. */
+  private final Charset charset;
 
   /**
    * Constructor, given an output stream.
    * @param os output stream reference
-   * @param encoding encoding
+   * @param charset character set
    */
-  public EncoderOutput(final OutputStream os, final Charset encoding) {
+  public EncoderOutput(final OutputStream os, final Charset charset) {
     super(os);
-    this.encoding = encoding;
-    encoder = encoding.newEncoder();
-    encbuffer = new TokenBuilder();
+    this.charset = charset;
+    encoder = charset.newEncoder();
   }
 
   @Override
-  public void print(final int ch) throws IOException {
-    encbuffer.reset();
-    encoder.reset();
+  public void print(final int cp, final Fallback fallback) throws IOException {
     try {
-      final ByteBuffer bb = encoder.encode(CharBuffer.wrap(encbuffer.add(ch).toString()));
-      write(bb.array(), 0, bb.limit());
-    } catch(final UnmappableCharacterException ex) {
-      Util.debug(ex);
-      throw SERENC_X_X.getIO(Integer.toHexString(ch), encoding);
+      byte[] bytes = cache.get(cp);
+      if(bytes == null) {
+        bytes = encoder.encode(CharBuffer.wrap(Character.toChars(cp))).array();
+        cache.put(cp, bytes);
+      }
+      write(bytes);
+    } catch(final CharacterCodingException ex) {
+      if(fallback != null) {
+        fallback.print(cp);
+      } else {
+        Util.debug(ex);
+        throw SERENC_X_X.getIO(Integer.toHexString(cp), charset);
+      }
     }
-    lineLength = ch == '\n' ? 0 : lineLength + 1;
+    lineLength = cp == '\n' ? 0 : lineLength + 1;
   }
 
   @Override
@@ -56,6 +62,6 @@ public final class EncoderOutput extends PrintOutput {
 
   @Override
   public void print(final String string) throws IOException {
-    write(string.getBytes(encoding));
+    for(final int cp : string.codePoints().toArray()) print(cp);
   }
 }

@@ -7,9 +7,10 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
+import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -124,14 +125,12 @@ public class AdaptiveSerializer extends OutputSerializer {
     }
   }
 
+  /** Fallback function. */
+  private final Fallback fallback = cp -> printHex(cp);
+
   @Override
   protected void printChar(final int cp) throws IOException {
-    try {
-      out.print(cp);
-    } catch(final QueryIOException ex) {
-      if(ex.getCause().error() == QueryError.SERENC_X_X) printHex(cp);
-      else throw ex;
-    }
+    out.print(cp, fallback);
   }
 
   /**

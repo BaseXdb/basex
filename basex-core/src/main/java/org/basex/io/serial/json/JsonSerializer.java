@@ -2,20 +2,22 @@ package org.basex.io.serial.json;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.Token.normalize;
 
 import java.io.*;
 
 import org.basex.build.json.*;
+import org.basex.io.out.PrintOutput.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.XQMap;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
-import org.basex.util.options.Options.YesNo;
+import org.basex.util.options.Options.*;
 
 /**
  * Abstract JSON serializer class.
@@ -159,66 +161,64 @@ public abstract class JsonSerializer extends StandardSerializer {
     out.print('"');
   }
 
+  /** Fallback function. */
+  private final Fallback fallback = cp -> {
+    if(Character.isBmpCodePoint(cp)) {
+      out.print('\\');
+      out.print('u');
+      out.print(hex(cp, 4));
+    } else {
+      out.print('\\');
+      out.print('u');
+      out.print(hex(Character.highSurrogate(cp), 4));
+      out.print('\\');
+      out.print('u');
+      out.print(hex(Character.lowSurrogate(cp), 4));
+    }
+  };
+
   @Override
   protected final void print(final int cp) throws IOException {
-    try {
-      if(escape) {
-        switch(cp) {
-          case '\b':
-            out.print('\\');
-            out.print('b');
-            break;
-          case '\f':
-            out.print('\\');
-            out.print('f');
-            break;
-          case '\n':
-            out.print('\\');
-            out.print('n');
-            break;
-          case '\r':
-            out.print('\\');
-            out.print('r');
-            break;
-          case '\t':
-            out.print('\\');
-            out.print('t');
-            break;
-          case '"' :
-            out.print('\\');
-            out.print('"');
-            break;
-          case '/' :
-            if(escapeSolidus) out.print('\\');
-            out.print('/');
-            break;
-          case '\\':
-            out.print('\\');
-            out.print('\\');
-            break;
-          default:
-            out.print(cp);
-            break;
-        }
-      } else {
-        out.print(cp);
+    if(escape) {
+      switch(cp) {
+        case '\b':
+          out.print('\\');
+          out.print('b');
+          break;
+        case '\f':
+          out.print('\\');
+          out.print('f');
+          break;
+        case '\n':
+          out.print('\\');
+          out.print('n');
+          break;
+        case '\r':
+          out.print('\\');
+          out.print('r');
+          break;
+        case '\t':
+          out.print('\\');
+          out.print('t');
+          break;
+        case '"' :
+          out.print('\\');
+          out.print('"');
+          break;
+        case '/' :
+          if(escapeSolidus) out.print('\\');
+          out.print('/');
+          break;
+        case '\\':
+          out.print('\\');
+          out.print('\\');
+          break;
+        default:
+          out.print(cp, fallback);
+          break;
       }
-    } catch(final QueryIOException ex) {
-      if(ex.getCause().error() == SERENC_X_X) {
-        if(Character.isBmpCodePoint(cp)) {
-          out.print('\\');
-          out.print('u');
-          out.print(hex(cp, 4));
-        } else {
-          out.print('\\');
-          out.print('u');
-          out.print(hex(Character.highSurrogate(cp), 4));
-          out.print('\\');
-          out.print('u');
-          out.print(hex(Character.lowSurrogate(cp), 4));
-        }
-      }
-      else throw ex;
+    } else {
+      out.print(cp, fallback);
     }
   }
 

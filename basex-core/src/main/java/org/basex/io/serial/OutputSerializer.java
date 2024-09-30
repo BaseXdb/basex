@@ -139,7 +139,9 @@ public abstract class OutputSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   protected final void printHex(final int cp) throws IOException {
-    out.print("&#x");
+    out.print('&');
+    out.print('#');
+    out.print('x');
     boolean o = false;
     for(int i = 3; i >= 0; i--) {
       final int b = cp >> (i << 3) & 0xFF;

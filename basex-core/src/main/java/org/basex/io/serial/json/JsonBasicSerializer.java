@@ -86,7 +86,8 @@ public final class JsonBasicSerializer extends JsonSerializer {
         key = escape(key, escapedKey, true);
         out.print('"');
         out.print(normalize(key, form));
-        out.print("\":");
+        out.print('"');
+        out.print(':');
       }
 
       if(eq(local, NULL)) {

@@ -206,9 +206,9 @@ public interface DataText {
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
   byte[] ATT = cpToken('@');
-  /** CDATA output. */
+  /** Opening CDATA. */
   byte[] CDATA_O = token("<![CDATA[");
-  /** CDATA output. */
+  /** Closing CDATA. */
   byte[] CDATA_C = token("]]>");
 
   /** XML spaces: attribute name. */
