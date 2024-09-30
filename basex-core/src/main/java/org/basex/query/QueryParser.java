@@ -39,6 +39,7 @@ import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.RecordType.*;
@@ -978,7 +979,7 @@ public class QueryParser extends InputParser {
         extensible = true;
         break;
       }
-      final byte[] name = ncName(NOSTRNCN_X);
+      final byte[] name = ncName(NONCNAME_X);
       final boolean optional = wsConsume("?");
       final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
       if(fields.contains(name)) throw error(DUPFIELD_X, name);
@@ -1019,6 +1020,15 @@ public class QueryParser extends InputParser {
         final SeqType pst = optional ? fst.union(Occ.ZERO) : fst;
         final Expr init = initExpr == null && optional ? Empty.VALUE : initExpr;
         params.add(new QNm(key), pst, init, null);
+      }
+      if(rt.isExtensible()) {
+        byte[] key;
+        int i = -1;
+        do {
+          final String name = ++i == 0 ? "options" : "options" + i;
+          key = Token.token(name);
+        } while(fields.contains(key));
+        params.add(new QNm(key), SeqType.MAP_O, XQMap.empty(), null);
       }
       params.seqType(rt.seqType()).finish(qc, localVars);
 

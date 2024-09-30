@@ -1033,7 +1033,7 @@ public enum QueryError {
   /** Error code. */
   NOSTRNCN_X(XPST, 3, "Expecting string or NCName, found '%'."),
   /** Error code. */
-  DUPFIELD_X(XPST, 3, "Duplicate field name: '%'."),
+  NONCNAME_X(XPST, 3, "Expecting NCName, found '%'."),
   /** Error code. */
   STATIC_X(XPST, 5, "No XML Schema support: %."),
   /** Error code. */
@@ -1070,6 +1070,8 @@ public enum QueryError {
   JAVACLASS_X(XPST, 17, "Unknown class: %."),
   /** Error code. */
   JAVAMEMBER_X(XPST, 17, "Unknown method or field: %."),
+  /** Error code. */
+  DUPFIELD_X(XPST, 21, "Duplicate field name: '%'."),
   /** Error code. */
   TYPEUNKNOWN_X(XPST, 51, "Unknown type: %."),
   /** Error code. */

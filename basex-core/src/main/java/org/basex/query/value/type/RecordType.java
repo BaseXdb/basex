@@ -402,8 +402,6 @@ public class RecordType extends MapType implements Iterable<byte[]> {
   public static class RecordConstructor extends Arr {
     /** Record type. */
     private RecordType recordType;
-    /** Function type. */
-    private FuncType funcType;
 
     /**
      * Constructor.
@@ -414,9 +412,6 @@ public class RecordType extends MapType implements Iterable<byte[]> {
     public RecordConstructor(final InputInfo info, final RecordType recordType, final Expr[] args) {
       super(info, recordType.seqType(), args);
       this.recordType = recordType;
-      final SeqType[] argTypes = new SeqType[args.length];
-      for(int i = 0; i < args.length; ++i) argTypes[i] = args[i].seqType();
-      funcType = new FuncType(recordType.seqType(), argTypes);
     }
 
     @Override
@@ -435,12 +430,10 @@ public class RecordType extends MapType implements Iterable<byte[]> {
         }
         if(!omit) mb.put(key, value);
       }
-      return mb.map();
-    }
-
-    @Override
-    public FuncType funcType() {
-      return funcType;
+      final XQMap map = mb.map();
+      if(!recordType.isExtensible()) return map;
+      final XQMap options = toMap(arg(i), qc);
+      return map.addAll(options, MergeDuplicates.USE_FIRST, qc, ii);
     }
 
     @Override
