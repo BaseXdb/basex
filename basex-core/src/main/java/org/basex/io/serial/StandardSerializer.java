@@ -47,7 +47,6 @@ public abstract class StandardSerializer extends OutputSerializer {
 
     super(os, sopts);
 
-    // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
     if(norm.equals(NORMALIZATION_FORM.value())) {
       form = null;
@@ -59,14 +58,14 @@ public abstract class StandardSerializer extends OutputSerializer {
         throw SERNORM_X.getIO(norm);
       }
     }
-
     if(sopts.get(USE_CHARACTER_MAPS).isEmpty()) {
       map = null;
     } else {
       map = new IntObjMap<>();
       for(final Map.Entry<String, String> entry : sopts.toMap(USE_CHARACTER_MAPS).entrySet()) {
         final String key = entry.getKey();
-        if(key.codePoints().count() != 1) throw SERMAP_X.getIO(key);
+        if(key.codePoints().count() != 1) throw SERPARAM_X.getIO(
+            Util.info("Key in character map is not a single character: %.", key));
         map.put(key.codePointAt(0), token(entry.getValue()));
       }
     }

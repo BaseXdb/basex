@@ -839,11 +839,7 @@ public enum QueryError {
   /** Error code. */
   SERPARAM_X(SEPM, 16, "%"),
   /** Error code. */
-  SERMAP_X(SEPM, 17, "Key in character map is not a single character: %."),
-  /** Error code. */
-  SEROPT_X(SEPM, 17, "%"),
-  /** Error code. */
-  SERINVALID_X(SEPM, 17, "Serialization parameter '%' is invalid."),
+  SERDOC_X(SEPM, 17, "%"),
   /** Error code. */
   SERCHARDUP_X(SEPM, 18, "Character '%' is specified twice."),
   /** Error code. */

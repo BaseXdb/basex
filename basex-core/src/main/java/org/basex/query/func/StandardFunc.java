@@ -569,7 +569,7 @@ public abstract class StandardFunc extends Arr {
 
     final Item item = expr.item(qc, info);
     if(item instanceof XQMap) {
-      options.assign((XQMap) item, info, qc);
+      toOptions((XQMap) item, options, qc);
     } else if(!item.isEmpty()) {
       options.assign(item, info);
     }
@@ -601,7 +601,31 @@ public abstract class StandardFunc extends Arr {
       final QueryContext qc) throws QueryException {
 
     final Item item = expr.item(qc, info);
-    if(!item.isEmpty()) options.assign(toMap(item), info, qc);
+    return item.isEmpty() ? options : toOptions(toMap(item), options, qc);
+  }
+
+  /**
+   * Evaluates an expression and returns options.
+   * @param <E> options type
+   * @param map map with options
+   * @param options options template
+   * @param qc query context
+   * @return options
+   * @throws QueryException query exception
+   */
+  protected final <E extends Options> E toOptions(final XQMap map, final E options,
+      final QueryContext qc) throws QueryException {
+
+    XQMap mp = map;
+    if(!mp.funcType().declType.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM)) {
+      // atomize values of map
+      final MapBuilder mb = new MapBuilder();
+      map.apply((key, value) -> {
+        mb.put(key, value.type.atomic() != null ? value.atomValue(qc, info) : value);
+      });
+      mp = mb.map();
+    }
+    options.assign(mp, info);
     return options;
   }
 

@@ -14,7 +14,6 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -382,11 +381,10 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value to be assigned
    * @param info input info (can be {@code null})
-   * @param qc query context
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Value value, final InputInfo info,
-      final QueryContext qc) throws QueryException {
+  public synchronized void assign(final Item name, final Value value, final InputInfo info)
+      throws QueryException {
 
     final String nm;
     if(name instanceof QNm) {
@@ -397,16 +395,10 @@ public class Options implements Iterable<Option<?>> {
       throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, name.type, name);
     }
 
-    final ItemList list = new ItemList();
-    for(final Item item : value) {
-      list.add(item.type.atomic() != null ? item.atomValue(qc, info) : item);
-    }
-    final Value atomic = list.value();
-
     if(definitions.isEmpty()) {
-      free.put(nm, serialize(atomic, info));
+      free.put(nm, serialize(value, info));
     } else {
-      assign(nm, atomic, info, qc);
+      assign(nm, value, info);
     }
   }
 
@@ -546,15 +538,14 @@ public class Options implements Iterable<Option<?>> {
 
   /**
    * Parses and assigns options from the specified map.
-   * @param map map
+   * @param map options map
    * @param info input info (can be {@code null})
-   * @param qc query context
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final InputInfo info,
-      final QueryContext qc) throws QueryException {
+  public final synchronized void assign(final XQMap map, final InputInfo info)
+      throws QueryException {
     for(final Item name : map.keys()) {
-      assign(name, map.get(name), info, qc);
+      assign(name, map.get(name), info);
     }
   }
 
@@ -800,11 +791,10 @@ public class Options implements Iterable<Option<?>> {
    * @param name name of option
    * @param value value to be assigned
    * @param info input info (can be {@code null})
-   * @param qc query context
    * @throws QueryException query exception
    */
-  private synchronized void assign(final String name, final Value value, final InputInfo info,
-      final QueryContext qc) throws QueryException {
+  private synchronized void assign(final String name, final Value value, final InputInfo info)
+      throws QueryException {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
@@ -839,7 +829,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
       result = ((OptionsOption<?>) option).newInstance();
-      ((Options) result).assign((XQMap) item, info, qc);
+      ((Options) result).assign((XQMap) item, info);
     }
     put(option, result);
   }

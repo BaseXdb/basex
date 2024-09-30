@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.build.csv.*;
@@ -131,7 +130,7 @@ public final class SerializerOptions extends Options {
   /** Name test. */
   public static final NameTest T_ROOT = new NameTest(Q_ROOT);
   /** Value. */
-  private static final byte[] VALUE = token("value");
+  private static final QNm VALUE = new QNm("value");
 
   /** Newlines. */
   public enum Newline {
@@ -202,7 +201,7 @@ public final class SerializerOptions extends Options {
     try {
       assign(toString((ANode) item, new QNmSet(), info));
     } catch(final BaseXException ex) {
-      throw SEROPT_X.get(info, ex);
+      throw SERDOC_X.get(info, ex);
     }
   }
 
@@ -231,9 +230,6 @@ public final class SerializerOptions extends Options {
       }
       if(root != null) assign(root, info);
 
-      final HashMap<String, String> free = free();
-      if(!free.isEmpty()) throw SERINVALID_X.get(info, free.keySet().iterator().next());
-
       for(final ANode child : root.childIter()) {
         if(child.type != NodeType.ELEMENT) continue;
         if(option(string(child.qname().local())) == USE_CHARACTER_MAPS) {
@@ -258,10 +254,10 @@ public final class SerializerOptions extends Options {
    * @throws QueryException query exception
    */
   public static String characterMap(final ANode elem, final InputInfo info) throws QueryException {
-    final Supplier<QueryException> error = () -> SERINVALID_X.get(info, USE_CHARACTER_MAPS.name());
+    final Supplier<QueryException> error = () -> SERDOC_X.get(info,
+        Util.info("Serialization parameter '%' is invalid.", USE_CHARACTER_MAPS.name()));
     if(elem.attributeIter().next() != null) throw error.get();
 
-    // parse characters
     final TokenMap map = new TokenMap();
     for(final ANode child : elem.childIter()) {
       if(child.type != NodeType.ELEMENT) continue;
@@ -276,6 +272,8 @@ public final class SerializerOptions extends Options {
         }
         if(key == null || val == null) throw error.get();
         if(map.get(key) != null) throw SERCHARDUP_X.get(info, key);
+        if(length(key) != 1) throw SERDOC_X.get(info,
+            Util.info("Key in character map is not a single character: %.", key));
         map.put(key, val);
       } else {
         throw error.get();
@@ -303,7 +301,7 @@ public final class SerializerOptions extends Options {
       throws QueryException {
 
     final ANode att = node.attributeIter().next();
-    if(att != null) throw SEROPT_X.get(info, Util.info("Invalid attribute: '%'", att.name()));
+    if(att != null) throw SERDOC_X.get(info, Util.info("Invalid attribute: '%'", att.name()));
 
     final StringBuilder sb = new StringBuilder();
     // interpret options
@@ -316,7 +314,7 @@ public final class SerializerOptions extends Options {
 
       if(!eq(qname.uri(), Q_ROOT.uri())) {
         if(qname.uri().length != 0) continue;
-        throw SEROPT_X.get(info, Util.info("Element has no namespace: '%'", qname));
+        throw SERDOC_X.get(info, Util.info("Element has no namespace: '%'", qname));
       }
       // retrieve key from element name and value from "value" attribute or text node
       final String name = string(qname.local());
@@ -328,14 +326,14 @@ public final class SerializerOptions extends Options {
         value = toString(child, cache, info);
       } else {
         for(final ANode attr : child.attributeIter()) {
-          if(eq(attr.name(), VALUE)) {
+          if(attr.qname().eq(VALUE)) {
             value = string(attr.string());
             if(option == CDATA_SECTION_ELEMENTS) value = cdataSectionElements(child, value);
           } else {
-            throw SEROPT_X.get(info, Util.info("Invalid attribute: '%'", attr.name()));
+            throw SERDOC_X.get(info, Util.info("Invalid attribute: '%'", attr.name()));
           }
         }
-        if(value == null) value = string(child.string());
+        if(value == null) throw SERDOC_X.get(info, "Missing 'value' attribute.");
       }
       sb.append(name).append('=').append(value.trim().replace(",", ",,")).append(',');
     }
