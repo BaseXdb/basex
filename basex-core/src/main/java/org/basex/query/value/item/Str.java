@@ -63,10 +63,13 @@ public final class Str extends AStr {
    */
   public static Str get(final byte[] value) {
     final int vl = value.length;
-    return vl == 0 ? EMPTY :
-      vl == 1 ? CHAR[value[0]] :
-      vl > 4 || vl > Token.cl(value, 0) ? new Str(value) :
-      CACHE.computeIfAbsent(Token.cp(value, 0), () -> new Str(value));
+    if(vl == 0) return EMPTY;
+    if(vl == 1) return CHAR[value[0]];
+    if(vl > 4 || vl > Token.cl(value, 0)) return new Str(value);
+    // cache single characters
+    synchronized(CACHE) {
+      return CACHE.computeIfAbsent(Token.cp(value, 0), () -> new Str(value));
+    }
   }
 
   /**
@@ -75,7 +78,10 @@ public final class Str extends AStr {
    * @return instance
    */
   public static Str get(final int cp) {
-    return cp < 128 ? CHAR[cp] : CACHE.computeIfAbsent(cp, () -> new Str(Token.cpToken(cp)));
+    if(cp < 128) return CHAR[cp];
+    synchronized(CACHE) {
+      return CACHE.computeIfAbsent(cp, () -> new Str(Token.cpToken(cp)));
+    }
   }
 
   /**
