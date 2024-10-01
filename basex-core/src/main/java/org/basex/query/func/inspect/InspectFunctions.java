@@ -30,8 +30,8 @@ public final class InspectFunctions extends StandardFunc {
     }
 
     // URI specified: compile module and return all newly added functions
-    final IOContent content = toContent(toString(arg(0), qc), qc);
-    Value funcs = qc.resources.functions(content.path());
+    final IOContent source = toContent(toString(arg(0), qc), qc);
+    Value funcs = qc.resources.functions(source.path());
     if(funcs != null) return funcs;
 
     // cache existing functions
@@ -39,7 +39,7 @@ public final class InspectFunctions extends StandardFunc {
     Collections.addAll(old, qc.functions.funcs());
 
     try {
-      qc.parse(content.toString(), content.path());
+      qc.parse(source.toString(), source.path());
       qc.functions.compileAll(new CompileContext(qc, true));
     } catch(final QueryException ex) {
       throw INSPECT_PARSE_X.get(info, ex);
@@ -51,7 +51,7 @@ public final class InspectFunctions extends StandardFunc {
       if(!old.contains(sf)) vb.add(Functions.item(sf, sf.info, qc));
     }
     funcs = vb.value(this);
-    qc.resources.addFunctions(content.path(), funcs);
+    qc.resources.addFunctions(source.path(), funcs);
     return funcs;
   }
 

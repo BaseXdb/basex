@@ -24,14 +24,14 @@ public final class FnPut extends StandardFunc {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNode(arg(0), qc);
-    final byte[] href = toZeroToken(arg(1), qc);
+    final byte[] source = toZeroToken(arg(1), qc);
     final SerializerOptions options = toSerializerOptions(arg(2), qc);
 
     if(!node.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
       throw UPFOTYPE_X.get(info, arg(0));
 
-    final Uri uri = Uri.get(href);
-    if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, href);
+    final Uri uri = Uri.get(source);
+    if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, source);
     final Updates updates = qc.updates();
     final DBNode target = updates.determineDataRef(node, qc);
 

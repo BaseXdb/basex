@@ -24,7 +24,7 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr values = mergeExprs();
+    final Expr values = arg(0);
 
     // input is single integer
     if(singleInt) return Str.get(toCodepoint(values.item(qc, info).itr(info), info));
@@ -46,7 +46,7 @@ public final class FnCodepointsToString extends StandardFunc {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     if(!singleInt) {
-      final Item item = mergeExprs().atomIter(qc, info).next();
+      final Item item = arg(0).atomIter(qc, info).next();
       if(item == null) return false;
       toLong(item);
     }
@@ -56,8 +56,6 @@ public final class FnCodepointsToString extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0);
-    final Expr merged = mergeExprs();
-    if(merged != values) return cc.function(CODEPOINTS_TO_STRING, info, merged.optimize(cc));
 
     // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
     if(STRING_TO_CODEPOINTS.is(values)) return cc.function(STRING, info, values.args());

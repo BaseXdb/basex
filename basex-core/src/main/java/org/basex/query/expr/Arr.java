@@ -354,15 +354,6 @@ public abstract class Arr extends ParseExpr {
     exprs[a] = rewrite.apply(arg(a));
   }
 
-  /**
-   * Return multiple expressions as a list.
-   * @return merged arguments
-   */
-  protected final Expr mergeExprs() {
-    final int el = exprs.length;
-    return el == 0 ? Empty.VALUE : el == 1 ? exprs[0] : new List(info, exprs);
-  }
-
   @Override
   public int exprSize() {
     int size = 1;

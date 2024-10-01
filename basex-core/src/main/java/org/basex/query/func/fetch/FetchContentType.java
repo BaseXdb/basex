@@ -21,20 +21,20 @@ import org.basex.util.http.*;
 public final class FetchContentType extends FetchDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IO io = toIO(arg(0), qc);
+    final IO source = toIO(arg(0), qc);
 
     MediaType mt = null;
-    if(io instanceof IOUrl) {
+    if(source instanceof IOUrl) {
       try {
-        final HttpHeaders headers = ((IOUrl) io).response().headers();
+        final HttpHeaders headers = ((IOUrl) source).response().headers();
         final Optional<String> value = headers.firstValue(HTTPText.CONTENT_TYPE);
         if(value.isPresent()) mt = new MediaType(value.get());
       } catch(final IOException ex) {
         throw FETCH_OPEN_X.get(info, ex);
       }
-    } else if(io instanceof IOContent) {
+    } else if(source instanceof IOContent) {
       mt = MediaType.APPLICATION_XML;
     }
-    return Str.get((mt == null ? MediaType.get(io.path()) : mt).toString());
+    return Str.get((mt == null ? MediaType.get(source.path()) : mt).toString());
   }
 }

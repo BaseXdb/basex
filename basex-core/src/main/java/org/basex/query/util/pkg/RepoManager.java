@@ -51,24 +51,24 @@ public final class RepoManager {
 
   /**
    * Installs a package.
-   * @param path package path
+   * @param source source
    * @return {@code true} if existing package was replaced
    * @throws QueryException query exception
    */
-  public boolean install(final String path) throws QueryException {
+  public boolean install(final String source) throws QueryException {
     // check if package exists, and cache contents
-    final IO io = IO.get(path);
+    final IO io = IO.get(source);
     final byte[] content;
     try {
       content = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw REPO_NOTFOUND_X.get(info, path);
+      throw REPO_NOTFOUND_X.get(info, source);
     }
 
     try {
-      if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(content, path);
-      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(content, path);
+      if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(content, source);
+      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(content, source);
       return installXAR(content);
     } catch(final IOException ex) {
       throw REPO_PARSE_X_X.get(info, io.name(), ex);

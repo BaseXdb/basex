@@ -117,7 +117,14 @@ public final class Union extends Set {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return toNodeOrNull(mergeExprs().iter(qc).next()) != null;
+    for(final Expr expr : exprs) {
+      final Item item = expr.iter(qc).next();
+      if(item != null) {
+        toNode(item);
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

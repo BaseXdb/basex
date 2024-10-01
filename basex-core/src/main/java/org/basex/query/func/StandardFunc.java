@@ -472,15 +472,15 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Returns an input resource.
-   * @param uri URI
+   * @param source source
    * @param qc query context
    * @return input resource
    * @throws QueryException query exception
    */
-  protected final IOContent toContent(final String uri, final QueryContext qc)
+  protected final IOContent toContent(final String source, final QueryContext qc)
       throws QueryException {
     checkPerm(qc, Perm.ADMIN);
-    final IO io = toIO(uri);
+    final IO io = toIO(source);
     try {
       return new IOContent(io.string(), io.url());
     } catch(final IOException ex) {

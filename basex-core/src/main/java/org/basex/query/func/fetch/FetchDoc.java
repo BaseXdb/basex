@@ -29,17 +29,17 @@ public class FetchDoc extends StandardFunc {
 
   /**
    * Parses the input and creates an XML document.
-   * @param io input data
+   * @param source source
    * @param qc query context
    * @return node
    * @throws QueryException query exception
    */
-  protected DBNode fetch(final IO io, final QueryContext qc) throws QueryException {
+  protected DBNode fetch(final IO source, final QueryContext qc) throws QueryException {
     final HashMap<String, String> options = toOptions(arg(1), qc);
     final DBOptions dbopts = new DBOptions(options, MainOptions.PARSING, info);
     final MainOptions mopts = dbopts.assignTo(new MainOptions());
     try {
-      return new DBNode(Parser.singleParser(io, mopts, ""));
+      return new DBNode(Parser.singleParser(source, mopts, ""));
     } catch(final IOException ex) {
       throw FETCH_OPEN_X.get(info, ex);
     }

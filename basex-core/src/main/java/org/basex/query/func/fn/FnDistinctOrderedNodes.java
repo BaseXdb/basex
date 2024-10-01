@@ -22,7 +22,7 @@ import org.basex.util.*;
 public final class FnDistinctOrderedNodes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter nodes = mergeExprs().iter(qc);
+    final Iter nodes = arg(0).iter(qc);
     if(nodes.valueIter()) {
       final Value value = nodes.value(qc, null);
       if(value instanceof DBNodeSeq) return value;
@@ -38,14 +38,15 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return toNodeOrNull(mergeExprs().iter(qc).next()) != null;
+    final Item item = arg(0).iter(qc).next();
+    if(item == null) return false;
+    toNode(item);
+    return true;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     Expr nodes = arg(0);
-    final Expr merged = mergeExprs();
-    if(merged != nodes) return cc.function(DISTINCT_ORDERED_NODES, info, merged.optimize(cc));
 
     // replace list with union:
     // distinct-ordered-nodes((<a/>, <b/>))  ->  <a/> | <b/>

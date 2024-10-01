@@ -20,8 +20,8 @@ import org.basex.util.*;
 public class JsonDoc extends FnJsonDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String href = toStringOrNull(arg(0), qc);
-    return href != null ? parse(toIO(href), qc) : Empty.VALUE;
+    final String source = toStringOrNull(arg(0), qc);
+    return source != null ? parse(toIO(source), qc) : Empty.VALUE;
   }
 
   /**

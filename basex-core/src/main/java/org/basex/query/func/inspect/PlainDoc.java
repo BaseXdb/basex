@@ -46,8 +46,8 @@ final class PlainDoc extends Inspect {
   }
 
   @Override
-  public FNode parse(final IOContent content) throws QueryException {
-    final AModule module = parseModule(content);
+  public FNode parse(final IOContent source) throws QueryException {
+    final AModule module = parseModule(source);
     final FBuilder root = element("module");
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;

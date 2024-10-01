@@ -119,7 +119,7 @@ public enum Function implements AFunction {
   CODEPOINT_EQUAL(FnCodepointEqual::new, "codepoint-equal(value1,value2)",
       params(STRING_ZO, STRING_ZO), BOOLEAN_ZO),
   /** XQuery function. */
-  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(values...)",
+  CODEPOINTS_TO_STRING(FnCodepointsToString::new, "codepoints-to-string(values)",
       params(INTEGER_ZM), STRING_O),
   /** XQuery function. */
   COLLATION(FnCollation::new, "collation(options)",
@@ -189,16 +189,16 @@ public enum Function implements AFunction {
   DEFAULT_LANGUAGE(FnDefaultLanguage::new, "default-language()",
       params(), LANGUAGE_O),
   /** XQuery function. */
-  DISTINCT_ORDERED_NODES(FnDistinctOrderedNodes::new, "distinct-ordered-nodes(nodes...)",
+  DISTINCT_ORDERED_NODES(FnDistinctOrderedNodes::new, "distinct-ordered-nodes(nodes)",
       params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
   DISTINCT_VALUES(FnDistinctValues::new, "distinct-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
-  DOC(FnDoc::new, "doc(href)",
+  DOC(FnDoc::new, "doc(source)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(NDT)),
   /** XQuery function. */
-  DOC_AVAILABLE(FnDocAvailable::new, "doc-available(href)",
+  DOC_AVAILABLE(FnDocAvailable::new, "doc-available(source)",
       params(STRING_ZO), BOOLEAN_O, flag(NDT)),
   /** XQuery function. */
   DOCUMENT_URI(FnDocumentUri::new, "document-uri([node])",
@@ -378,7 +378,7 @@ public enum Function implements AFunction {
   ITEMS_AT(FnItemsAt::new, "items-at(input,at[,sorted])",
       params(ITEM_ZM, NUMERIC_ZM, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
-  JSON_DOC(FnJsonDoc::new, "json-doc(href[,options])",
+  JSON_DOC(FnJsonDoc::new, "json-doc(source[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(HOF), FN_URI, Perm.CREATE),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
@@ -506,7 +506,7 @@ public enum Function implements AFunction {
   PREFIX_FROM_QNAME(FnPrefixFromQName::new, "prefix-from-QName(value)",
       params(QNAME_ZO), NCNAME_ZO),
   /** XQuery function. */
-  PUT(FnPut::new, "put(node,href[,options])",
+  PUT(FnPut::new, "put(node,source[,options])",
       params(NODE_O, STRING_ZO, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(UPD), FN_URI, Perm.CREATE),
   /** XQuery function. */
   QNAME(FnQName::new, "QName(uri,qname)",
@@ -652,13 +652,13 @@ public enum Function implements AFunction {
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
-  UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(href[,options])",
+  UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(source[,options])",
       params(STRING_ZO, ITEM_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(href[,options])",
+  UNPARSED_TEXT_AVAILABLE(FnUnparsedTextAvailable::new, "unparsed-text-available(source[,options])",
       params(STRING_ZO, ITEM_ZO), BOOLEAN_O, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
-  UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(href[,options])",
+  UNPARSED_TEXT_LINES(FnUnparsedTextLines::new, "unparsed-text-lines(source[,options])",
       params(STRING_ZO, ITEM_ZO), STRING_ZM, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   UPPER_CASE(FnUpperCase::new, "upper-case(value)",
@@ -1143,7 +1143,7 @@ public enum Function implements AFunction {
   // CSV Module
 
   /** XQuery function. */
-  _CSV_DOC(CsvDoc::new, "doc(href[,options])",
+  _CSV_DOC(CsvDoc::new, "doc(source[,options])",
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI),
   /** XQuery function. */
   _CSV_PARSE(CsvParse::new, "parse(value[,options])",
@@ -1284,19 +1284,19 @@ public enum Function implements AFunction {
   // Fetch Module
 
   /** XQuery function. */
-  _FETCH_BINARY(FetchBinary::new, "binary(href)",
+  _FETCH_BINARY(FetchBinary::new, "binary(source)",
       params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_BINARY_DOC(FetchBinaryDoc::new, "binary-doc(value[,options])",
       params(BINARY_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(href)",
+  _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(source)",
       params(STRING_O), STRING_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_DOC(FetchDoc::new, "doc(href[,options])",
+  _FETCH_DOC(FetchDoc::new, "doc(source[,options])",
       params(STRING_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
-  _FETCH_TEXT(FetchText::new, "text(href[,encoding,fallback])",
+  _FETCH_TEXT(FetchText::new, "text(source[,encoding,fallback])",
       params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI),
 
   // File Module
@@ -1473,7 +1473,7 @@ public enum Function implements AFunction {
   // HTML Module
 
   /** XQuery function. */
-  _HTML_DOC(HtmlDoc::new, "doc(href[,options])",
+  _HTML_DOC(HtmlDoc::new, "doc(source[,options])",
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value[,options])",
@@ -1518,10 +1518,10 @@ public enum Function implements AFunction {
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([href])",
+  _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([source])",
       params(STRING_O), FUNCTION_ZM, flag(POS, CTX, CNS, NDT, HOF), INSPECT_URI, Perm.ADMIN),
   /** XQuery function. */
-  _INSPECT_MODULE(InspectModule::new, "module(href)",
+  _INSPECT_MODULE(InspectModule::new, "module(source)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
   /** XQuery function. */
   _INSPECT_TYPE(InspectType::new, "type(value[,options])",
@@ -1530,7 +1530,7 @@ public enum Function implements AFunction {
   _INSPECT_STATIC_CONTEXT(InspectStaticContext::new, "static-context(function,name)",
       params(FUNCTION_O, STRING_O), ITEM_ZM, INSPECT_URI),
   /** XQuery function. */
-  _INSPECT_XQDOC(InspectXqdoc::new, "xqdoc(href)",
+  _INSPECT_XQDOC(InspectXqdoc::new, "xqdoc(source)",
       params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
 
   // Jobs Module
@@ -1569,7 +1569,7 @@ public enum Function implements AFunction {
   // JSON Module
 
   /** XQuery function. */
-  _JSON_DOC(JsonDoc::new, "doc(href[,options])",
+  _JSON_DOC(JsonDoc::new, "doc(source[,options])",
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), JSON_URI),
   /** XQuery function. */
   _JSON_PARSE(JsonParse::new, "parse(value[,options])",
@@ -1675,10 +1675,10 @@ public enum Function implements AFunction {
   // Repository Module
 
   /** XQuery function. */
-  _REPO_DELETE(RepoDelete::new, "delete(href)",
+  _REPO_DELETE(RepoDelete::new, "delete(package)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), REPO_URI, Perm.CREATE),
   /** XQuery function. */
-  _REPO_INSTALL(RepoInstall::new, "install(href)",
+  _REPO_INSTALL(RepoInstall::new, "install(source)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), REPO_URI, Perm.CREATE),
   /** XQuery function. */
   _REPO_LIST(RepoList::new, "list()",

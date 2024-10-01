@@ -477,17 +477,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final ANode toNodeOrNull(final Expr expr, final QueryContext qc) throws QueryException {
-    return toNodeOrNull(expr.item(qc, info));
-  }
-
-  /**
-   * Evaluates an item to a node.
-   * @param item item or {@code null}
-   * @return node, or {@code null} if the item is {@code null}
-   * @throws QueryException query exception
-   */
-  protected final ANode toNodeOrNull(final Item item) throws QueryException {
-    return item == null || item.isEmpty() ? null : toNode(item);
+    final Item item = expr.item(qc, info);
+    return item.isEmpty() ? null : toNode(item);
   }
 
   /**
