@@ -63,7 +63,8 @@ public abstract class SimpleMap extends Mapping {
     if(merged != null) return merged.length == 1 ? merged[0] : get(cc, info, merged);
 
     // choose best implementation
-    boolean value = true, cached = false, dual = exprs.length == 2, dualiter = dual;
+    boolean value = true, cached = false, dual = exprs.length == 2;
+    final boolean dualiter = dual;
     final int el = exprs.length;
     for(int e = 0; e < el; e++) {
       final Expr expr = exprs[e];

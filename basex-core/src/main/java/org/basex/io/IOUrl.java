@@ -198,8 +198,8 @@ public final class IOUrl extends IO {
     int u = url.indexOf(':');
     if(u < 2 || u + 1 == ul || !isJarURL(url) && url.charAt(u + 1) != '/') return false;
     while(--u >= 0) {
-      final char c = url.charAt(u);
-      if(!(c >= 'a' && c <= 'z' || c == '+' || c == '-' || c == '.' || c == '_')) return false;
+      final char ch = url.charAt(u);
+      if(!(ch >= 'a' && ch <= 'z' || Strings.contains("+-._", ch))) return false;
     }
     return true;
   }

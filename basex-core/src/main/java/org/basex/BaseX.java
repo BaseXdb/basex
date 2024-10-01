@@ -212,24 +212,22 @@ public class BaseX extends CLI {
 
     final MainParser arg = new MainParser(this);
     while(arg.more()) {
-      final char c;
+      final char ch;
       String v = null;
       if(arg.dash()) {
-        c = arg.next();
-        if(c == 'd') {
+        ch = arg.next();
+        if(ch == 'd') {
           // activate debug mode
           Prop.debug = true;
-        } else if(c == 't' && local() || c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' ||
-            c == 'o' || c == 'O' || c == 'q' || c == 'Q' || c == 'r' || c == 's') {
+        } else if(Strings.contains("t", ch) && local() || Strings.contains("bcCiIoOqQrs", ch)) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
-            c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
-          // options to be toggled
+        } else if(Strings.contains("Du", ch) && local() || Strings.contains("RvVwWxXz", ch)) {
+          // toggle options
           v = "";
         } else if(!local()) {
           // client options: need to be set before other options
-          switch(c) {
+          switch(ch) {
             // set server name
             case 'n': context.soptions.set(StaticOptions.HOST, arg.string()); break;
             // set server port
@@ -245,10 +243,10 @@ public class BaseX extends CLI {
         }
       } else {
         v = arg.string().trim();
-        c = isFile(v) ? v.endsWith(IO.BXSSUFFIX) ? 'C' : 'Q' : 'q';
+        ch = isFile(v) ? v.endsWith(IO.BXSSUFFIX) ? 'C' : 'Q' : 'q';
       }
       if(v != null) {
-        ops.add(c);
+        ops.add(ch);
         vals.add(v);
       }
     }

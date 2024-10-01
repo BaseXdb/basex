@@ -294,7 +294,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   /** Fallback function. */
-  private final Fallback fallback = cp -> printHex(cp);
+  private final Fallback fallback = this::printHex;
 
   @Override
   protected void print(final int cp) throws IOException {

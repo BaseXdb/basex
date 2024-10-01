@@ -126,7 +126,7 @@ public class AdaptiveSerializer extends OutputSerializer {
   }
 
   /** Fallback function. */
-  private final Fallback fallback = cp -> printHex(cp);
+  private final Fallback fallback = this::printHex;
 
   @Override
   protected void printChar(final int cp) throws IOException {
