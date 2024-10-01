@@ -163,7 +163,7 @@ final class RestXqResponse extends WebResponse {
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
-    SerializerOptions sopts = func.sopts;
+    final SerializerOptions sopts = func.sopts;
     String cType = null;
     for(final ANode node : response.childIter()) {
       // process http:response element
