@@ -1,3 +1,11 @@
+VERSION 11.4 (October 2, 2024) -----------------------------------------
+
+ - [ADD] New XQuery 4 features (fn:element-number, others)
+ - [FIX] XQuery: Inlining of sequences
+ - [FIX] XQuery: better support for JSON payloads in HTTP requests
+ - [FIX] XQuery: improved processing of serialization parameters
+ - [FIX] Core: concurrent string caching
+
 VERSION 11.3 (September 19, 2024) --------------------------------------
 
  - [ADD] New XQuery 4 features
