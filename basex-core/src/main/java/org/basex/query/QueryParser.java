@@ -3422,7 +3422,8 @@ public class QueryParser extends InputParser {
     }
     // map
     if(type instanceof MapType) {
-      final Type key = itemType().type;
+      Type key = itemType().type;
+      if(key instanceof RecordType) key = ((RecordType) key).getDeclaration(namedRecordTypes);
       if(!key.instanceOf(AtomType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
       wsCheck(",");
       final MapType tp = MapType.get(key, sequenceType());

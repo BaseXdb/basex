@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import static java.util.Collections.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
@@ -29,7 +30,7 @@ public class RecordType extends MapType implements Iterable<byte[]> {
   private TokenObjMap<Field> fields;
   /** Record type name (can be {@code null}). */
   public final QNm recordName;
-  /** Input info (can be {@code null}). */
+  /** Input info ({@code null}, if this is not an unresolved reference). */
   private InputInfo info;
 
   /**
@@ -386,14 +387,29 @@ public class RecordType extends MapType implements Iterable<byte[]> {
       final QNmMap<RecordType> declaredRecordTypes) throws QueryException {
     for(final QNm name : recordTypeRefs) {
       final RecordType ref = recordTypeRefs.get(name);
-      final RecordType rt = declaredRecordTypes.get(name);
-      if(rt == null) throw QueryError.TYPEUNKNOWN_X.get(ref.info, AtomType.similar(name));
-      ref.extensible = rt.extensible;
-      ref.fields = rt.fields;
+      final RecordType dec = ref.getDeclaration(declaredRecordTypes);
+      ref.extensible = dec.extensible;
+      ref.fields = dec.fields;
       ref.info = null;
-      ref.keyType = rt.keyType;
-      ref.valueType = rt.valueType;
+      ref.keyType = dec.keyType;
+      ref.valueType = dec.valueType;
     }
+  }
+
+  /**
+   * Returns the declaration of this record type. If this is an unresolved instance, the declaration
+   * is expected to be present in the (already) declared named record types. Otherwise this instance
+   * is returned.
+   * @param declaredRecordTypes the (already) declared named record types
+   * @return the declared record type
+   * @throws QueryException an "unknown type" error, if this is a reference that cannot be resolved.
+   */
+  public RecordType getDeclaration(final QNmMap<RecordType> declaredRecordTypes)
+      throws QueryException {
+    if(info == null) return this;
+    RecordType rt = declaredRecordTypes.get(recordName);
+    if(rt == null) throw TYPEUNKNOWN_X.get(info, AtomType.similar(recordName));
+    return rt;
   }
 
   /**
