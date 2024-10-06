@@ -821,6 +821,10 @@ public class Options implements Iterable<Option<?>> {
       result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
       result = serialize(value, info);
+    } else if(option instanceof StringsOption) {
+      final StringList list = new StringList();
+      for(final Item it :  value) list.add(serialize(it, info));
+      result = list.finish();
     } else if(option instanceof EnumOption) {
       final String string = normalize(serialize(value, info));
       final EnumOption<?> eo = (EnumOption<?>) option;
