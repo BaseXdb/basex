@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnCollation extends StandardFunc {
   @Override
-  public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap options = toMap(arg(0), qc);
 
     final MapBuilder map = new MapBuilder();
@@ -30,6 +30,6 @@ public final class FnCollation extends StandardFunc {
 
     // generate and check collation URI
     final byte[] href = Prop.ICU ? Collation.ICU : Collation.BASEX;
-    return Uri.get(WebFn.createUrl(href, map.map(), info).finish());
+    return Str.get(WebFn.createUrl(href, map.map(), info).finish());
   }
 }

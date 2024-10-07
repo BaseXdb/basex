@@ -83,8 +83,12 @@ public final class SeqType {
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
   /** Single language. */
   public static final SeqType LANGUAGE_O = LANGUAGE.seqType();
-  /** Single string. */
+  /** Single untyped atomic. */
+  public static final SeqType UNTYPED_ATOMIC_O = UNTYPED_ATOMIC.seqType();
+  /** Zero or one untyped atomic. */
   public static final SeqType UNTYPED_ATOMIC_ZO = UNTYPED_ATOMIC.seqType(ZERO_OR_ONE);
+  /** Zero or more untyped atomics. */
+  public static final SeqType UNTYPED_ATOMIC_ZM = UNTYPED_ATOMIC.seqType(ZERO_OR_MORE);
 
   /** Single URI. */
   public static final SeqType ANY_URI_O = ANY_URI.seqType();

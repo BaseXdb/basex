@@ -18,11 +18,11 @@ import org.basex.util.*;
  */
 public final class FnAnalyzeString extends RegEx {
   /** QName. */
-  private static final QNm Q_ANALYZE = new QNm("analyze-string-result", FN_URI);
+  private static final QNm Q_ANALYZE_STRING_RESULT = new QNm("analyze-string-result", FN_URI);
   /** QName. */
   private static final QNm Q_MATCH = new QNm("match", FN_URI);
   /** QName. */
-  private static final QNm Q_NONMATCH = new QNm("non-match", FN_URI);
+  private static final QNm Q_NON_MATCH = new QNm("non-match", FN_URI);
   /** QName. */
   private static final QNm Q_MGROUP = new QNm("group", FN_URI);
   /** QName. */
@@ -36,7 +36,7 @@ public final class FnAnalyzeString extends RegEx {
 
     final RegExpr regExpr = regExpr(pattern, flags, true);
     final Matcher matcher = regExpr.pattern.matcher(value);
-    final FBuilder root = FElem.build(Q_ANALYZE).declareNS();
+    final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).declareNS();
     int start = 0;
     while(matcher.find()) {
       if(start != matcher.start()) nonmatch(value.substring(start, matcher.start()), root);
@@ -86,6 +86,6 @@ public final class FnAnalyzeString extends RegEx {
    * @param parent root node
    */
   private static void nonmatch(final String text, final FBuilder parent) {
-    parent.add(FElem.build(Q_NONMATCH).add(text));
+    parent.add(FElem.build(Q_NON_MATCH).add(text));
   }
 }
