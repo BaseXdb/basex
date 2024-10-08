@@ -203,7 +203,7 @@ public abstract class ADate extends ADateDur {
    */
   private void add(final BigDecimal add) {
     // normalized modulo: sc % 60  vs.  (-sc + sc % 60 + 60 + sc) % 60
-    final BigDecimal sc = sec().add(add);
+    final BigDecimal sc = seconds().add(add);
     seconds = sc.signum() >= 0 ? sc.remainder(BD_60) :
       sc.negate().add(sc.remainder(BD_60)).add(BD_60).add(sc).remainder(BD_60);
 
@@ -270,7 +270,7 @@ public abstract class ADate extends ADateDur {
         t = (short) ((c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000);
       } else {
         t = (short) (dur.minute() + dur.hour() * 60);
-        if(dur.sec().signum() != 0) throw ZONESEC_X.get(info, dur);
+        if(dur.seconds().signum() != 0) throw ZONESEC_X.get(info, dur);
         if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALZONE_X.get(info, dur);
       }
 
@@ -306,8 +306,16 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final BigDecimal sec() {
+  public final BigDecimal seconds() {
     return seconds == null ? BigDecimal.ZERO : seconds;
+  }
+
+  /**
+   * Returns the seconds component.
+   * @return seconds or {@code null})
+   */
+  public final BigDecimal sec() {
+    return seconds;
   }
 
   /**
@@ -345,7 +353,7 @@ public abstract class ADate extends ADateDur {
       prefix(tb, minute(), 2);
       tb.add(':');
       if(seconds.intValue() < 10) tb.add('0');
-      tb.add(Token.chopNumber(Token.token(sec().abs().toPlainString())));
+      tb.add(Token.chopNumber(Token.token(seconds().abs().toPlainString())));
     }
     zone(tb);
     return tb.finish();
@@ -398,7 +406,7 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final int hash() {
-    return seconds().intValue();
+    return toSeconds().intValue();
   }
 
   /**
@@ -421,7 +429,7 @@ public abstract class ADate extends ADateDur {
    */
   private int compare(final Item item, final InputInfo info) throws QueryException {
     final ADate dat = (ADate) (item instanceof ADate ? item : type.cast(item, null, info));
-    return seconds().compareTo(dat.seconds());
+    return toSeconds().compareTo(dat.toSeconds());
   }
 
   @Override
@@ -441,7 +449,7 @@ public abstract class ADate extends ADateDur {
    * Returns the date in seconds.
    * @return seconds
    */
-  final BigDecimal seconds() {
+  final BigDecimal toSeconds() {
     return daySeconds().add(days().multiply(BD_864000));
   }
 

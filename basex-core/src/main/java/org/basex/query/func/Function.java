@@ -172,7 +172,7 @@ public enum Function implements AFunction {
       params(DATE_ZO), INTEGER_ZO),
   /** XQuery function. */
   DAY_FROM_DATETIME(FnDayFromDateTime::new, "day-from-dateTime(value)",
-      params(DATE_TIME_ZO), INTEGER_ZO),
+      params(GREGORIAN_ZO), INTEGER_ZO),
   /** XQuery function. */
   DAYS_FROM_DURATION(FnDayFromDuration::new, "days-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
@@ -327,7 +327,7 @@ public enum Function implements AFunction {
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   HOURS_FROM_DATETIME(FnHoursFromDateTime::new, "hours-from-dateTime(value)",
-      params(DATE_TIME_ZO), INTEGER_ZO),
+      params(GREGORIAN_ZO), INTEGER_ZO),
   /** XQuery function. */
   HOURS_FROM_DURATION(FnHoursFromDuration::new, "hours-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
@@ -416,7 +416,7 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZO),
   /** XQuery function. */
   MINUTES_FROM_DATETIME(FnMinutesFromDateTime::new, "minutes-from-dateTime(value)",
-      params(DATE_TIME_ZO), INTEGER_ZO),
+      params(GREGORIAN_ZO), INTEGER_ZO),
   /** XQuery function. */
   MINUTES_FROM_DURATION(FnMinutesFromDuration::new, "minutes-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
@@ -428,7 +428,7 @@ public enum Function implements AFunction {
       params(DATE_ZO), INTEGER_ZO),
   /** XQuery function. */
   MONTH_FROM_DATETIME(FnMonthFromDateTime::new, "month-from-dateTime(value)",
-      params(DATE_TIME_ZO), INTEGER_ZO),
+      params(GREGORIAN_ZO), INTEGER_ZO),
   /** XQuery function. */
   MONTHS_FROM_DURATION(FnMonthsFromDuration::new, "months-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),
@@ -548,7 +548,7 @@ public enum Function implements AFunction {
       params(DECIMAL_ZO), DAY_TIME_DURATION_ZO),
   /** XQuery function. */
   SECONDS_FROM_DATETIME(FnSecondsFromDateTime::new, "seconds-from-dateTime(value)",
-      params(DATE_TIME_ZO), DECIMAL_ZO),
+      params(GREGORIAN_ZO), DECIMAL_ZO),
   /** XQuery function. */
   SECONDS_FROM_DURATION(FnSecondsFromDuration::new, "seconds-from-duration(value)",
       params(DURATION_ZO), DECIMAL_ZO),
@@ -624,7 +624,7 @@ public enum Function implements AFunction {
       params(DATE_ZO), DAY_TIME_DURATION_ZO),
   /** XQuery function. */
   TIMEZONE_FROM_DATETIME(FnTimezoneFromDateTime::new, "timezone-from-dateTime(value)",
-      params(DATE_TIME_ZO), DAY_TIME_DURATION_ZO),
+      params(GREGORIAN_ZO), DAY_TIME_DURATION_ZO),
   /** XQuery function. */
   TIMEZONE_FROM_TIME(FnTimezoneFromTime::new, "timezone-from-time(value)",
       params(TIME_ZO), DAY_TIME_DURATION_ZO),
@@ -682,7 +682,7 @@ public enum Function implements AFunction {
       params(DATE_ZO), INTEGER_ZO),
   /** XQuery function. */
   YEAR_FROM_DATETIME(FnYearFromDateTime::new, "year-from-dateTime(value)",
-      params(DATE_TIME_ZO), INTEGER_ZO),
+      params(GREGORIAN_ZO), INTEGER_ZO),
   /** XQuery function. */
   YEARS_FROM_DURATION(FnYearsFromDuration::new, "years-from-duration(value)",
       params(DURATION_ZO), INTEGER_ZO),

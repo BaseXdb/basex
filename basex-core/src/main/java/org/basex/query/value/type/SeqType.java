@@ -172,6 +172,12 @@ public final class SeqType {
   /** Zero or more text nodes. */
   public static final SeqType TEXT_ZM = TEXT.seqType(ZERO_OR_MORE);
 
+  /** Gregorian type. */
+  public static final SeqType GREGORIAN_ZO = new ChoiceItemType(Arrays.asList(
+      DATE_TIME.seqType(), DATE.seqType(), TIME.seqType(), G_YEAR.seqType(),
+      G_YEAR_MONTH.seqType(), G_MONTH.seqType(), G_MONTH_DAY.seqType(), G_DAY.seqType())).
+      seqType(ZERO_OR_ONE);
+
   // function types must be placed here due to circular dependencies
 
   /** Any function type. */

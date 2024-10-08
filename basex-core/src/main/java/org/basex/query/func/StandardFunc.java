@@ -333,6 +333,18 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Converts an item to a date.
+   * @param item item
+   * @param qc query context
+   * @return date
+   * @throws QueryException query exception
+   */
+  protected final ADate toGregorian(final Item item, final QueryContext qc)
+      throws QueryException {
+    return (ADate) SeqType.GREGORIAN_ZO.coerce(item, null, qc, null, info);
+  }
+
+  /**
    * Converts an item to a date of the specified type.
    * @param item item
    * @param type expected type

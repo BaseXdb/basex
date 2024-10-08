@@ -251,12 +251,12 @@ public abstract class Formatter extends FormatUtil {
             err = dat;
             break;
           case 's':
-            num = date.sec().intValue();
+            num = date.seconds().intValue();
             pres = token("01");
             err = dat;
             break;
           case 'f':
-            frac = date.sec().remainder(BigDecimal.ONE);
+            frac = date.seconds().remainder(BigDecimal.ONE);
             err = dat;
             break;
           case 'Z':

@@ -162,7 +162,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final BigDecimal sec() {
+  public final BigDecimal seconds() {
     return seconds.remainder(BD_60);
   }
 
@@ -227,7 +227,7 @@ public class Dur extends ADateDur {
     if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }
     final long m = minute();
     if(m != 0) { tb.addLong(Math.abs(m)); tb.add('M'); }
-    final BigDecimal sc = sec();
+    final BigDecimal sc = seconds();
     if(sc.signum() == 0) return;
     tb.add(Token.chopNumber(Token.token(sc.abs().toPlainString()))).add('S');
   }

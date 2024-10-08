@@ -57,7 +57,7 @@ public abstract class ADateDur extends Item {
    * Returns the seconds (0-59), including the fractional part.
    * @return day
    */
-  public abstract BigDecimal sec();
+  public abstract BigDecimal seconds();
 
   /**
    * Throws a date format exception.
