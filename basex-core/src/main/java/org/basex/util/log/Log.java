@@ -123,7 +123,7 @@ public final class Log implements QueryTracer {
     entry.address = address != null ? address.replaceFirst("^/", "") : SERVER;
     entry.user = user != null ? user : UserText.ADMIN;
     entry.type = type;
-    final String inf = info != null ? info : "";
+    final String inf = info != null ? info.trim().replaceAll("\\s+", " ") : "";
     final int len = inf.codePointCount(0, inf.length());
     entry.info = len > maxLen ? inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "..." : inf;
     if(perf != null) entry.runtime = perf.toString();
