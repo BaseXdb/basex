@@ -212,7 +212,7 @@ public final class SerializerOptions extends Options {
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public void parse(final String name, final byte[] value, final InputInfo info)
+  public void parse(final String name, final String value, final InputInfo info)
       throws QueryException {
 
     final Option<?> option = option(name);
@@ -239,7 +239,7 @@ public final class SerializerOptions extends Options {
     } else {
       // parse remaining parameters
       try {
-        assign(name, string(value));
+        assign(name, value);
       } catch(final BaseXException ex) {
         throw (option != null ? SERPARAM_X : OUTPUT_X).get(info, ex);
       }

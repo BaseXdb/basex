@@ -1318,17 +1318,17 @@ public enum QueryError {
   /** Error code. */
   DUPLVALUE(XQST, 99, "Duplicate context value declaration."),
   /** Error code. */
-  DUPLWIND_X(XQST, 103, "Duplicate declaration of %."),
+  DUPLWIND_X(XQST, 103, "Duplicate declaration: %."),
   /** Error code. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** Error code. */
   DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
   /** Error code. */
-  OUTPUTLIB_X(XQST, 108, "Output declaration not allowed in library module: %."),
+  OUTPUTLIB_X(XQST, 108, "Declaration not allowed in library module: output:%."),
   /** Error code. */
   OUTPUT_X(XQST, 109, "%"),
   /** Error code. */
-  OUTDUPL_X(XQST, 110, "Duplicate declaration of 'output:%'."),
+  OUTDUPL_X(XQST, 110, "Duplicate declaration: output:%."),
   /** Error code. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
   /** Error code. */

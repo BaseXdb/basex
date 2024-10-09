@@ -89,6 +89,8 @@ public class QueryParser extends InputParser {
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
+  /** Output declarations. */
+  private final HashMap<String, Object> sparams = new HashMap<>();
   /** QName cache. */
   private final QNmCache qnames = new QNmCache();
   /** Local variable. */
@@ -400,6 +402,18 @@ public class QueryParser extends InputParser {
       skipWs();
       check(';');
     }
+
+    // parse serialization parameters
+    if(!sparams.isEmpty()) {
+      final QueryBiConsumer<String, Object[]> parse = (k, v) ->
+        qc.parameters().parse(k, (String) v[0], (InputInfo) v[1]);
+      final String key = SerializerOptions.PARAMETER_DOCUMENT.name();
+      final Object value = sparams.remove(key);
+      if(value != null) parse.accept(key, (Object[]) value);
+      for(final Map.Entry<String, Object> entry : sparams.entrySet()) {
+        parse.accept(entry.getKey(), (Object[]) entry.getValue());
+      }
+    }
   }
 
   /**
@@ -538,26 +552,21 @@ public class QueryParser extends InputParser {
   private void optionDecl() throws QueryException {
     skipWs();
     final QNm qname = eQName(XQ_URI, QNAME_X);
-    final byte[] value = stringLiteral();
-    final String name = string(qname.local());
+    final String name = string(qname.local()), value = string(stringLiteral());
+    final byte[] uri = qname.uri();
 
-    if(eq(qname.uri(), OUTPUT_URI)) {
+    if(eq(uri, OUTPUT_URI)) {
       // output declaration
-      if(sc.module != null) throw error(OUTPUTLIB_X, qname.string());
-
-      final SerializerOptions sopts = qc.parameters();
-      if(!decl.add("S " + name)) throw error(OUTDUPL_X, name);
-      sopts.parse(name, value, info());
-
-    } else if(eq(qname.uri(), DB_URI)) {
+      if(sc.module != null) throw error(OUTPUTLIB_X, name);
+      if(sparams.put(name, new Object[] { value, info() }) != null) throw error(OUTDUPL_X, name);
+    } else if(eq(uri, DB_URI)) {
       // project-specific declaration
-      if(sc.module != null) throw error(BASEX_OPTIONSLIB_X, qname.local());
+      if(sc.module != null) throw error(BASEX_OPTIONSLIB_X, name);
       qc.options.add(name, value, this);
-
-    } else if(eq(qname.uri(), BASEX_URI)) {
+    } else if(eq(uri, BASEX_URI)) {
       // query-specific options
       if(!name.equals(LOCK)) throw error(BASEX_OPTIONSINV_X, name);
-      for(final String lock : Locking.queryLocks(value)) qc.locks.add(lock);
+      for(final String lock : Locking.queryLocks(token(value))) qc.locks.add(lock);
     }
     // ignore unknown options
   }

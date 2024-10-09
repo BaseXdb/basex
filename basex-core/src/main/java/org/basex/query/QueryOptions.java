@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.Map.*;
@@ -41,7 +40,7 @@ final class QueryOptions {
    * @param parser query parser
    * @throws QueryException query exception
    */
-  void add(final String name, final byte[] value, final QueryParser parser) throws QueryException {
+  void add(final String name, final String value, final QueryParser parser) throws QueryException {
     final String key = name.toUpperCase(Locale.ENGLISH);
     final MainOptions options = qc.context.options;
     final Option<?> option = options.option(key);
@@ -50,7 +49,7 @@ final class QueryOptions {
     // try to assign option to dummy options
     if(dummyOptions == null) dummyOptions = new MainOptions(false);
     try {
-      dummyOptions.assign(key, string(value));
+      dummyOptions.assign(key, value);
     } catch(final BaseXException ex) {
       Util.debug(ex);
       throw BASEX_OPTIONS_X_X.get(parser.info(), key, value);
