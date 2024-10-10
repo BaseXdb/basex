@@ -39,6 +39,7 @@ import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.RecordType.*;
@@ -86,6 +87,10 @@ public class QueryParser extends InputParser {
   private final QNmMap<SeqType> declaredTypes = new QNmMap<>();
   /** Public types. */
   private final QNmMap<SeqType> publicTypes = new QNmMap<>();
+  /** Named record types. */
+  private final QNmMap<RecordType> namedRecordTypes = new QNmMap<>();
+  /** Named record type references. */
+  private final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
@@ -260,6 +265,7 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
+    RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
   }
 
   /**
@@ -391,6 +397,10 @@ public class QueryParser extends InputParser {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
           itemTypeDecl(anns.check(false, true));
+        } else if(wsConsumeWs(RECORD)) {
+          // types cannot be updating
+          if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
+          namedRecordTypeDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -956,6 +966,92 @@ public class QueryParser extends InputParser {
       publicTypes.put(qn, itemType);
     }
     declaredTypes.put(qn, itemType);
+  }
+
+  /**
+   * Parses the "NamedRecordTypeDecl" rule.
+   * @param anns annotations
+   * @throws QueryException query exception
+   */
+  private void namedRecordTypeDecl(final AnnList anns) throws QueryException {
+    final InputInfo ii = info();
+    final QNm qn = eQName(sc.elemNS, TYPENAME);
+    if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+    if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
+    wsCheck("(");
+    final TokenObjMap<Field> fields = new TokenObjMap<>();
+    boolean extensible = false;
+    boolean exprRequired = false;
+    do {
+      skipWs();
+      if(!fields.isEmpty() && consume("*")) {
+        extensible = true;
+        break;
+      }
+      final byte[] name = ncName(NONCNAME_X);
+      final boolean optional = wsConsume("?");
+      final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
+      if(fields.contains(name)) throw error(DUPFIELD_X, name);
+      skipWs();
+      Expr expr = null;
+      if(exprRequired && !optional || current() == ':') {
+        consume(":=");
+        localVars.pushContext(false);
+        expr = check(single(), NOEXPR);
+        localVars.popContext();
+        exprRequired = true;
+      }
+      fields.put(name, new Field(optional, seqType, expr));
+    } while(wsConsume(","));
+    wsCheck(")");
+    final RecordType rt = new RecordType(extensible, fields, qn);
+    declaredTypes.put(qn, rt.seqType());
+    namedRecordTypes.put(qn, rt);
+    if(!anns.contains(Annotation.PRIVATE)) {
+      if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
+      publicTypes.put(qn, rt.seqType());
+    }
+
+    if(qn.uri().length != 0) {
+      localVars.pushContext(false);
+      final Params params = new Params();
+      boolean defaults = false;
+      for(final byte[] key : rt) {
+        final Field field = rt.getField(key);
+        final boolean optional = field.isOptional();
+        final Expr initExpr = field.getInitExpr();
+        if(optional || initExpr != null) {
+          defaults = true;
+        } else if(defaults) {
+          throw error(PARAMOPTIONAL_X, key);
+        }
+        final SeqType fst = field.seqType();
+        final SeqType pst = optional ? fst.union(Occ.ZERO) : fst;
+        final Expr init = initExpr == null && optional ? Empty.VALUE : initExpr;
+        params.add(new QNm(key), pst, init, null);
+      }
+      if(rt.isExtensible()) {
+        byte[] key;
+        int i = -1;
+        do {
+          final String name = ++i == 0 ? "options" : "options" + i;
+          key = Token.token(name);
+        } while(fields.contains(key));
+        params.add(new QNm(key), SeqType.MAP_O, XQMap.empty(), null);
+      }
+      params.seqType(rt.seqType()).finish(qc, localVars);
+
+      final Var[] pv = params.vars();
+      final Expr[] args = new Expr[pv.length];
+      for(int i = 0; i < pv.length; ++i) {
+        args[i] = new VarRef(null, pv[i]);
+      }
+      final Expr expr = new RecordConstructor(ii, rt, args);
+      final String doc = docBuilder.toString();
+      final VarScope vs = localVars.popContext();
+      final StaticFunc func = qc.functions.declare(qn, params, expr, anns, doc, vs, info());
+      funcs.add(func);
+    }
   }
 
   /**
@@ -3285,8 +3381,14 @@ public class QueryParser extends InputParser {
       // declared type
       if(type == null) {
         st = declaredTypes.get(name);
-        // no type found
-        if(st == null) throw error(TYPEUNKNOWN_X, AtomType.similar(name));
+        if(st == null) {
+          RecordType ref  = recordTypeRefs.get(name);
+          if(ref == null) {
+            ref = new RecordType(name, info());
+            recordTypeRefs.put(name, ref);
+          }
+          type = ref;
+        }
       }
     }
     // annotations are not allowed for remaining types
@@ -3325,11 +3427,12 @@ public class QueryParser extends InputParser {
         fields.put(name, new Field(optional, seqType));
       } while(wsConsume(","));
       wsCheck(")");
-      return fields.isEmpty() ? SeqType.RECORD : new RecordType(extensible, fields);
+      return fields.isEmpty() ? SeqType.RECORD : new RecordType(extensible, fields, null);
     }
     // map
     if(type instanceof MapType) {
-      final Type key = itemType().type;
+      Type key = itemType().type;
+      if(key instanceof RecordType) key = ((RecordType) key).getDeclaration(namedRecordTypes);
       if(!key.instanceOf(AtomType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
       wsCheck(",");
       final MapType tp = MapType.get(key, sequenceType());
