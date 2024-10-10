@@ -96,7 +96,7 @@ final class SnowballStemmer extends Stemmer {
   }
 
   /** Structure, containing stemming methods. */
-  private static class StemmerClass {
+  private static final class StemmerClass {
     /** Class implementing the stemmer. */
     final Class<?> clz;
     /** Method {@code setCurrent}. */

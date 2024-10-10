@@ -12,6 +12,19 @@ import org.junit.jupiter.api.*;
  * @author Gunther Rademacher
  */
 public final class RecordTest extends SandboxTest {
+  /** Empty record. */
+  @Test public void instanceOf() {
+    query("declare record x(x); { 'x': () } instance of x", true);
+
+    query("{ 'x': () } instance of record(x)", true);
+    query("{ } instance of record(x)", false);
+
+    query("{ 'x': (), 'y': () } instance of record(x, *)", true);
+    query("{ 'x': (), 'y': () } instance of record(x)", false);
+    query("{ 'x': (), 0: () } instance of record(x, *)", true);
+    query("{ 'x': (), 0: () } instance of record(x)", false);
+  }
+
   /** Recursive records. */
   @Test public void recRec() {
     query("declare variable $v as list := {'value':42,'next':{'value':43,'next':{'value':44}}};\n"

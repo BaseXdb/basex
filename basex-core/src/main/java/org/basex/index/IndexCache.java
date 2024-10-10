@@ -206,7 +206,7 @@ public final class IndexCache {
    * Cache buckets entry. Used to implement a linked list of cache entries for each bucket.
    * It also stores the hash of the current entry for better performance.
    */
-  private static class BucketEntry extends SoftReference<IndexEntry> {
+  private static final class BucketEntry extends SoftReference<IndexEntry> {
     /** Hash code of the stored cache entry key. */
     final int hash;
     /** Next bucket entry or {@code null} if the last one for this bucket. */

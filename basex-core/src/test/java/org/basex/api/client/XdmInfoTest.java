@@ -80,7 +80,7 @@ public final class XdmInfoTest extends SandboxTest {
   /**
    * Extends the client session.
    */
-  private static class TestSession extends ClientSession {
+  private static final class TestSession extends ClientSession {
     /**
      * Constructor.
      * @param host host name
@@ -121,7 +121,7 @@ public final class XdmInfoTest extends SandboxTest {
   /**
    * Extends the client session.
    */
-  private static class TestQuery extends ClientQuery {
+  private static final class TestQuery extends ClientQuery {
     /**
      * Constructor.
      * @param q query string

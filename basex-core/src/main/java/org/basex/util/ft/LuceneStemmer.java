@@ -130,7 +130,7 @@ final class LuceneStemmer extends Stemmer {
   }
 
   /** Structure, containing stemming methods. */
-  private static class StemmerClass {
+  private static final class StemmerClass {
     /** Class implementing the stemmer. */
     final Class<?> clz;
     /** Method {@code stem}. */

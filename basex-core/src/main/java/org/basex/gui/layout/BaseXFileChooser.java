@@ -177,7 +177,7 @@ public final class BaseXFileChooser {
   /**
    * Defines a file filter for a list of extensions.
    */
-  private static class Filter extends FileFilter {
+  private static final class Filter extends FileFilter {
     /** Suffixes. */
     final String[] suffixes;
     /** Description. */

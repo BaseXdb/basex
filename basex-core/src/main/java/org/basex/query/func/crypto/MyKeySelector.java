@@ -21,7 +21,7 @@ final class MyKeySelector extends KeySelector {
    * @author BaseX Team 2005-24, BSD License
    * @author Lukas Kircher
    */
-  private static class MyKeySelectorResult implements KeySelectorResult {
+  private static final class MyKeySelectorResult implements KeySelectorResult {
     /** Key. */
     private final Key pk;
 

@@ -94,7 +94,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
    * @param <N> node type
    * @param <E> element type
    */
-  private static class BufferNode<N, E> {
+  private static final class BufferNode<N, E> {
     /** Size of inner nodes to create. */
     private static final int NODE_SIZE = FingerTree.MAX_ARITY;
     /** Maximum number of elements in a digit. */
@@ -310,7 +310,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
    * Iterator over the elements in this builder.
    * @param <E> element type
    */
-  private static class BufferNodeIterator<E> implements Iterator<E> {
+  private static final class BufferNodeIterator<E> implements Iterator<E> {
     /** Stack of buffer nodes. */
     private BufferNode<?, E>[] stack = new BufferNode[8];
     /** Stack of position inside the buffer nodes. */

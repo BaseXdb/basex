@@ -210,7 +210,7 @@ public final class IdPreMapTest {
    * Dummy implementation of ID -> PRE map: very slow, but simple and correct.
    * @author Dimitar Popov
    */
-  private static class DummyIdPreMap extends IdPreMap {
+  private static final class DummyIdPreMap extends IdPreMap {
     /** ID list. */
     private final ArrayList<Integer> ids;
 

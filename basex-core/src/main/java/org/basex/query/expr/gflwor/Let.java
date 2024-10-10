@@ -122,7 +122,7 @@ public final class Let extends ForLet {
   }
 
   /** Evaluator for a block of {@code let} expressions. */
-  private static class LetEval extends Eval {
+  private static final class LetEval extends Eval {
     /** Let expressions of the current block, in declaration order. */
     private final ArrayList<Let> lets;
     /** Sub-evaluator. */

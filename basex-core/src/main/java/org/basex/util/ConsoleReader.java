@@ -47,7 +47,7 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
   }
 
   /** Simple console reader implementation. */
-  private static class SimpleConsoleReader extends ConsoleReader {
+  private static final class SimpleConsoleReader extends ConsoleReader {
     /** Input reader. */
     private final BufferedReader in;
 
@@ -78,7 +78,7 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
   }
 
   /** Implementation which provides advanced features, such as history. */
-  private static class JLineConsoleReader extends ConsoleReader {
+  private static final class JLineConsoleReader extends ConsoleReader {
     /** Console reader. */
     private final jline.console.ConsoleReader reader;
     /** File history. */

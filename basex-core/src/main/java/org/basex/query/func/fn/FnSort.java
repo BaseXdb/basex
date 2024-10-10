@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.db.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
@@ -200,7 +199,7 @@ public class FnSort extends StandardFunc {
         // sort(replicate(10, 5))  ->  replicate(10, 5)
         final SeqType rst = input.arg(0).seqType();
         if(rst.zeroOrOne() && rst.type.isSortable()) return input;
-      } else if(_DB_NODE_PRE.is(input) && ((DbNodeId) input).arg(0).ddo()) {
+      } else if(_DB_NODE_PRE.is(input) && input.arg(0).ddo()) {
         // sort(db:node-pre(db:text(...)))  ->  db:node-pre(db:text(...))
         return input;
       }

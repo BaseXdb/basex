@@ -98,7 +98,7 @@ public final class Part10 extends Main {
   /**
    * XQuery for Java filter.
    */
-  private static class XQJFilter extends XMLFilterImpl {
+  private static final class XQJFilter extends XMLFilterImpl {
     /** Prepared expression. */
     final XQPreparedExpression expression;
 
