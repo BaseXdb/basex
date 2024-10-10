@@ -110,10 +110,13 @@ public final class JsonBasicSerializer extends JsonSerializer {
       } else if(eq(local, NUMBER)) {
         final byte[] value = value(iter, local);
         if(value == null) throw error("Element '%' has no value.", local);
-        final double d = toDouble(value);
-        if(Double.isNaN(d) || Double.isInfinite(d))
-          throw error("Element '%' has invalid value: '%'.", local, value);
-        out.print(token(d));
+        final String string = Token.string(value).trim().
+            replaceAll("^\\+", "").
+            replaceAll("^(-?)0*([\\d])", "$1$2").
+            replaceAll("^(\\.)", "0$1").
+            replaceAll("(\\.)$", "$10");
+        if(!isNumber(string)) throw error("Element '%' has invalid value: '%'.", local, value);
+        out.print(token(string));
       } else if(eq(local, ARRAY)) {
         out.print('[');
         children(iter, false);
@@ -126,6 +129,39 @@ public final class JsonBasicSerializer extends JsonSerializer {
         throw error("Invalid element: '%'", name);
       }
     }
+  }
+
+  /**
+   * Checks if a string is a valid JSON number.
+   * @param number number string
+   * @return result of check
+   */
+  private static boolean isNumber(final String number) {
+    final InputParser ip = new InputParser(number);
+    int cp = ip.consume();
+    if(cp == '-') cp = ip.consume();
+    if(cp < '0' || cp > '9') return false;
+
+    final boolean zero = cp == '0';
+    cp = ip.consume();
+    if(zero && cp >= '0' && cp <= '9') return false;
+
+    while(cp != '.' && cp != 'e' && cp != 'E') {
+      if(cp < '0' || cp > '9') return cp == 0;
+      cp = ip.consume();
+    }
+    if(cp == '.') {
+      cp = ip.consume();
+      if(cp < '0' || cp > '9') return false;
+      do cp = ip.consume(); while(cp >= '0' && cp <= '9');
+      if(cp != 'e' && cp != 'E') return cp == 0;
+    }
+    cp = ip.consume();
+    if(cp == '-' || cp == '+') cp = ip.consume();
+
+    if(cp < '0' || cp > '9') return false;
+    do cp = ip.consume(); while(cp >= '0' && cp <= '9');
+    return cp == 0;
   }
 
   @Override
