@@ -393,10 +393,10 @@ public class QueryParser extends InputParser {
           varDecl(anns.check(true, true));
         } else if(wsConsumeWs(FUNCTION)) {
           functionDecl(anns.check(false, true));
-        } else if(wsConsumeWs(ITEM_TYPE)) {
+        } else if(wsConsumeWs(TYPE)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          itemTypeDecl(anns.check(false, true));
+          typeDecl(anns.check(false, true));
         } else if(wsConsumeWs(RECORD)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
@@ -955,17 +955,17 @@ public class QueryParser extends InputParser {
    * @param anns annotations
    * @throws QueryException query exception
    */
-  private void itemTypeDecl(final AnnList anns) throws QueryException {
+  private void typeDecl(final AnnList anns) throws QueryException {
     final QNm qn = eQName(sc.elemNS, TYPENAME);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck(AS);
-    final SeqType itemType = itemType();
+    final SeqType st = itemType();
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
-      publicTypes.put(qn, itemType);
+      publicTypes.put(qn, st);
     }
-    declaredTypes.put(qn, itemType);
+    declaredTypes.put(qn, st);
   }
 
   /**
@@ -980,8 +980,7 @@ public class QueryParser extends InputParser {
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
     final TokenObjMap<Field> fields = new TokenObjMap<>();
-    boolean extensible = false;
-    boolean exprRequired = false;
+    boolean extensible = false, exprRequired = false;
     do {
       skipWs();
       if(!fields.isEmpty() && consume("*")) {

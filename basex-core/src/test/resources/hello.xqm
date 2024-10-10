@@ -44,7 +44,7 @@ declare function hello:closure() {
 };
 
 (:~ Private type. :)
-declare %private item-type hello:private-int as xs:integer;
+declare %private type hello:private-int as xs:integer;
 
 (:~ Public type. :)
-declare item-type hello:int as hello:private-int;
+declare type hello:int as hello:private-int;

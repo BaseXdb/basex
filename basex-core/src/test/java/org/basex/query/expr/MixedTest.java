@@ -62,10 +62,10 @@ public final class MixedTest extends SandboxTest {
   @Test public void typesInModules() {
     query("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:int", 42);
     query("import module namespace a='world' at '" + XQMFILE + "';" +
-      "declare item-type a:private-int as a:int; '42' cast as a:private-int", 42);
+      "declare type a:private-int as a:int; '42' cast as a:private-int", 42);
 
     error("import module namespace a='world' at '" + XQMFILE + "';" +
-      "declare item-type Q{world}int as xs:double; '42' cast as a:int", DUPLTYPE_X);
+      "declare type Q{world}int as xs:double; '42' cast as a:int", DUPLTYPE_X);
     error("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:private-int",
       WHICHCAST_X);
   }
