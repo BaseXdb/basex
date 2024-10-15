@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -27,18 +28,18 @@ public final class SingleIterPath extends AxisPath {
 
   @Override
   protected Iter iterator(final QueryContext qc) throws QueryException {
-    return steps[0].iter(qc);
+    return qc.focus.value == Empty.VALUE ? Empty.ITER : steps[0].iter(qc);
   }
 
   @Override
   protected Value nodes(final QueryContext qc) throws QueryException {
-    return steps[0].value(qc);
+    return qc.focus.value == Empty.VALUE ? Empty.VALUE : steps[0].value(qc);
   }
 
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return steps[0].test(qc, ii, 0);
+    return qc.focus.value != Empty.VALUE && steps[0].test(qc, ii, 0);
   }
 
   @Override

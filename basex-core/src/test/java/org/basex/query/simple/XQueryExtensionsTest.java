@@ -36,6 +36,8 @@ public final class XQueryExtensionsTest extends SandboxTest {
     query(wrap(1) + " -> (., . to 6)", "1\n1\n2\n3\n4\n5\n6");
     query("count(" + wrap(1) + " -> (., . to 6))", 7);
 
+    query("<x/>/parent::* -> (self::y or count(*) eq 1)", false);
+
     check("2 -> .", 2, root(Int.class));
     check("2 -> .", 2, root(Int.class));
 
