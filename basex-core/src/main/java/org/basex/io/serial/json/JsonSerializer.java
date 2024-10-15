@@ -35,6 +35,8 @@ public abstract class JsonSerializer extends StandardSerializer {
   final boolean escape;
   /** Escape special solidus. */
   final boolean escapeSolidus;
+  /** Lines. */
+  final boolean lines;
   /** Allow duplicate names. */
   final boolean nodups;
 
@@ -50,13 +52,17 @@ public abstract class JsonSerializer extends StandardSerializer {
     escape = jopts.get(JsonSerialOptions.ESCAPE);
     escapeSolidus = escape && sopts.get(SerializerOptions.ESCAPE_SOLIDUS) == YesNo.YES;
     nodups = sopts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
+    lines = sopts.get(SerializerOptions.JSON_LINES) == YesNo.YES;
     final Boolean ji = jopts.get(JsonSerialOptions.INDENT);
     if(ji != null) indent = ji;
   }
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(sep) throw SERJSON.getIO();
+    if(sep) {
+      if(!lines) throw SERJSON.getIO();
+      out.print('\n');
+    }
     if(item == null || item instanceof QNm && ((QNm) item).eq(FN_NULL)) {
       out.print(JsonConstants.NULL);
     } else {
@@ -148,6 +154,12 @@ public abstract class JsonSerializer extends StandardSerializer {
     }
   }
 
+  @Override
+  protected void indent() throws IOException {
+    if(!lines) super.indent();
+    else if(indent) out.print(' ');
+  }
+
   /**
    * Serializes a JSON string.
    * @param string string
@@ -224,7 +236,7 @@ public abstract class JsonSerializer extends StandardSerializer {
 
   @Override
   public void close() throws IOException {
-    if(!sep) out.print(JsonConstants.NULL);
+    if(!sep && !lines) out.print(JsonConstants.NULL);
     super.close();
   }
 }

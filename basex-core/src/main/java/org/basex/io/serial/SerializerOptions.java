@@ -97,6 +97,9 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter: xml/xhtml/html/text. */
   public static final EnumOption<SerialMethod> JSON_NODE_OUTPUT_METHOD =
       new EnumOption<>("json-node-output-method", SerialMethod.XML);
+  /** Serialization parameter: yes/no. */
+  public static final EnumOption<YesNo> JSON_LINES =
+      new EnumOption<>("json-lines", YesNo.NO);
 
   /** Specific serialization parameter. */
   public static final OptionsOption<CsvOptions> CSV =
