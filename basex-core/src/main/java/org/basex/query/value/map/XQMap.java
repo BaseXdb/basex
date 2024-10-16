@@ -276,6 +276,29 @@ public final class XQMap extends XQStruct {
   }
 
   /**
+   * Converts this map to the given map type.
+   * @param mt map type
+   * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
+   * @param ii input info (can be {@code null})
+   * @return coerced map
+   * @throws QueryException query exception
+   */
+  public XQMap coerceTo(final MapType mt, final QueryContext qc, final CompileContext cc,
+      final InputInfo ii) throws QueryException {
+
+    final SeqType kt = mt.keyType.seqType(), vt = mt.valueType;
+    final MapBuilder mb = new MapBuilder();
+    apply((key, value) -> {
+      qc.checkStop();
+      final Item k = (Item) kt.coerce(key, null, qc, cc, ii);
+      if(mb.contains(k)) throw typeError(this, mt.seqType(), ii);
+      mb.put(k, vt.coerce(value, null, qc, cc, ii));
+    });
+    return mb.map();
+  }
+
+  /**
    * Converts this map to the given record type.
    * @param rt record type
    * @param qc query context

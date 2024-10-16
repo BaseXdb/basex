@@ -383,6 +383,26 @@ public abstract class XQArray extends XQStruct {
     return true;
   }
 
+  /**
+   * Converts this array to the given array type.
+   * @param at array type
+   * @param qc query context
+   * @param cc compilation context ({@code null} during runtime)
+   * @param ii input info (can be {@code null})
+   * @return coerced array
+   * @throws QueryException query exception
+   */
+  public XQArray coerceTo(final ArrayType at, final QueryContext qc, final CompileContext cc,
+      final InputInfo ii) throws QueryException {
+
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(final Value value : iterable()) {
+      qc.checkStop();
+      ab.append(at.valueType.coerce(value, null, qc, cc, ii));
+    }
+    return ab.array();
+  }
+
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;

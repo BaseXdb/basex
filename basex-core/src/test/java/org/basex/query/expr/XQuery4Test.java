@@ -575,7 +575,6 @@ public final class XQuery4Test extends SandboxTest {
     query("{ 1: 2, 3: 4}?[?value = 2]?[?value = 2]?[?value = 2]", "{1:2}");
   }
 
-
   /** Lookup arrow. */
   @Test public void lookupArrow() {
     query("{ 'size': map:size#1 } =?> size()", 1);
@@ -601,5 +600,30 @@ public final class XQuery4Test extends SandboxTest {
     error("{} =?> f()", INVCONVERT_X_X_X);
     error("{ 'f': 1 } =?> f()", INVCONVERT_X_X_X);
     error("{ 'f': true#0 } =?> f()", INVARITY_X_X);
+  }
+
+  /** Array coercion. */
+  @Test public void arrayCoercion() {
+    query("fn($a as array(xs:integer)) { $a }([ 1.0 ])", "[1]");
+    query("fn($a as array(xs:double)) { $a }([ 1, 2 ])", "[1.0e0,2.0e0]");
+    query("fn($a as array(xs:byte)) { $a }([ 1, 2 ])", "[1,2]");
+
+    query("fn($a as array(xs:double)) { $a }([ 1, 2 ]) instance of array(xs:double)", true);
+    query("fn($a as array(xs:byte)) { $a }([ 1, 2 ]) instance of array(xs:byte)", true);
+    query("fn($a as array(xs:double)) { $a }([ 1, 2 ]) instance of array(xs:integer)", false);
+
+    error("fn($a as array(xs:integer)) { $a }([ 1.2 ])", INVCONVERT_X_X_X);
+  }
+
+  /** Map coercion. */
+  @Test public void mapCoercion() {
+    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 })", "{1.2e0:0}");
+
+    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 }) instance of map(xs:double, item())",
+        true);
+    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 }) instance of map(xs:integer, item())",
+        false);
+
+    error("fn($a as map(xs:float, item())) { $a }({ 1.2: 0, 1.2000000001: 0 })", INVCONVERT_X_X_X);
   }
 }
