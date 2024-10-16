@@ -63,7 +63,7 @@ public final class TypeCheck extends Single {
       final Occ nocc = et.occ.intersect(st.occ);
       // raise static error if no intersection is possible:
       //   () coerce to item()
-      if(nocc == null) throw error(expr, st);
+      if(nocc == null) throw typeError(expr, st, info);
       // refine result type:
       //   INTEGERS coerce to item()  ->  INTEGERS coerce to xs:integer
       if(check == 1) st = nst;
@@ -87,7 +87,7 @@ public final class TypeCheck extends Single {
 
     // function item coercion
     if(expr instanceof FuncItem && type instanceof FuncType) {
-      if(!st.occ.check(1)) throw error(expr, st);
+      if(!st.occ.check(1)) throw typeError(expr, st, info);
       return cc.replaceWith(this, ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, cc, info));
     }
 
@@ -111,7 +111,7 @@ public final class TypeCheck extends Single {
 
     // only check occurrence indicator
     if(check == 1) {
-      if(!st.occ.check(value.size())) throw error(value, st);
+      if(!st.occ.check(value.size())) throw typeError(value, st, info);
       return value;
     }
     return st.coerce(value, null, qc, null, info);
@@ -132,16 +132,6 @@ public final class TypeCheck extends Single {
   public Expr check(final Expr ex, final CompileContext cc) throws QueryException {
     final SeqType st = seqType();
     return ex.seqType().instanceOf(st) ? null : new TypeCheck(info, ex, st).optimize(cc);
-  }
-
-  /**
-   * Throws a type error.
-   * @param ex expression that triggers the error
-   * @param st target type
-   * @return query exception
-   */
-  private QueryException error(final Expr ex, final SeqType st) {
-    return typeError(ex, st, null, info);
   }
 
   @Override

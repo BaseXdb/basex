@@ -180,10 +180,10 @@ public final class XQMap extends XQStruct {
     if(materialized(test, ii)) return this;
 
     final MapBuilder mb = new MapBuilder();
-    for(final Item key : keys()) {
+    apply((key, value) -> {
       qc.checkStop();
-      mb.put(key, get(key).materialize(test, ii, qc));
-    }
+      mb.put(key, value.materialize(test, ii, qc));
+    });
     return mb.map();
   }
 
@@ -286,22 +286,26 @@ public final class XQMap extends XQStruct {
    */
   public XQMap coerceTo(final RecordType rt, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
+
     for(final byte[] key : rt) {
       if(!rt.getField(key).isOptional() && !contains(Str.get(key))) {
-        throw typeError(this, rt.seqType(), null, ii);
+        throw typeError(this, rt.seqType(), ii);
       }
     }
     final MapBuilder mb = new MapBuilder();
-    for(final Item key : keys()) {
+    apply((key, value) -> {
       qc.checkStop();
-      Value value = get(key);
       final Field field = key.instanceOf(AtomType.STRING) ? rt.getField(key.string(null)) : null;
+      final Value v;
       if(field != null) {
-        final SeqType st = field.seqType();
-        if(!st.instance(value)) value = st.coerce(value, null, qc, cc, ii);
-      } else if(!rt.isExtensible()) throw typeError(this, rt.seqType(), null, ii);
-      mb.put(key, value);
-    }
+        v = field.seqType().coerce(value, null, qc, cc, ii);
+      } else if(rt.isExtensible()) {
+        v = value;
+      } else {
+        throw typeError(this, rt.seqType(), ii);
+      }
+      mb.put(key, v);
+    });
     final XQMap map = mb.map();
     map.type = rt;
     return map;

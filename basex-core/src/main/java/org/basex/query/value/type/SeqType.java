@@ -394,13 +394,12 @@ public final class SeqType {
   private Value cast(final Item item, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
+    if(item.type.eq(type)) return item;
+
     // enable light-weight error handling
     if(!error && info != null) info.internal(true);
     try {
-      if(!item.type.eq(type)) {
-        return type.cast(item, qc, info);
-      }
-      return item;
+      return type.cast(item, qc, info);
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
