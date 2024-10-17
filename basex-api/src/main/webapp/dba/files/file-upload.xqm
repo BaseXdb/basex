@@ -21,11 +21,13 @@ declare
   %rest:path('/dba/file-upload')
   %rest:form-param('files', '{$files}')
 function dba:file-upload(
-  $files  as map(xs:string, xs:base64Binary)
+  $files  as item()?
 ) as element(rest:response) {
   (: save files :)
   let $dir := config:files-dir()
-  return try {
+  return if ($files instance of xs:string) then web:redirect($dba:CAT) else
+    
+  try {
     (: Parse all XQuery files; reject files that cannot be parsed :)
     map:for-each($files, fn($name, $content) {
       if(matches($name, '\.xq(m|l|y|u|uery)?$')) then (

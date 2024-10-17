@@ -20,11 +20,13 @@ declare
   %rest:path('/dba/backup-upload')
   %rest:form-param('files', '{$files}')
 function dba:file-upload(
-  $files  as map(xs:string, xs:base64Binary)
+  $files  as item()?
 ) as element(rest:response) {
   (: save files :)
   let $dir := db:option('dbpath') || '/'
-  return try {
+  return if ($files instance of xs:string) then web:redirect($dba:CAT) else
+
+  try {
     (: reject backups with invalid content :)
     map:for-each($files, fn($file, $content) {
       let $name := replace($file, $utils:BACKUP-ZIP-REGEX, '$1')
