@@ -30,7 +30,7 @@ public class FileCreateTempFile extends FileFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final synchronized Str createTemp(final boolean dir, final QueryContext qc)
+  final Str createTemp(final boolean dir, final QueryContext qc)
       throws QueryException, IOException {
 
     final String prefix = toString(arg(0), qc);

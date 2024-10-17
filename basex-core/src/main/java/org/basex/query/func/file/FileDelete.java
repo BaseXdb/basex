@@ -33,7 +33,7 @@ public final class FileDelete extends FileFn {
    * @param qc query context
    * @throws IOException I/O exception
    */
-  private synchronized void delete(final Path path, final QueryContext qc) throws IOException {
+  private void delete(final Path path, final QueryContext qc) throws IOException {
     if(Files.isDirectory(path)) {
       try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
         qc.checkStop();

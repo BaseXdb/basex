@@ -34,9 +34,7 @@ public class FileWriteText extends FileFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final synchronized void write(final boolean append, final QueryContext qc)
-      throws QueryException, IOException {
-
+  final void write(final boolean append, final QueryContext qc) throws QueryException, IOException {
     final Path path = toParent(toPath(arg(0), qc));
     Item value = toAtomItem(arg(1), qc);
     final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);

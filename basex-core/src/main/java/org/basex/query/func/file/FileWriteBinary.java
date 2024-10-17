@@ -32,9 +32,7 @@ public class FileWriteBinary extends FileFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final synchronized void write(final boolean append, final QueryContext qc)
-      throws QueryException, IOException {
-
+  final void write(final boolean append, final QueryContext qc) throws QueryException, IOException {
     final Path path = toParent(toPath(arg(0), qc));
     if(defined(2)) {
       // write file chunk
