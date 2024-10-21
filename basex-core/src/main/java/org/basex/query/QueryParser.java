@@ -1932,7 +1932,8 @@ public class QueryParser extends InputParser {
           arg = expr;
         }
         final FuncBuilder fb = argumentList(name != null, arg);
-        expr = name != null ? Functions.get(name, fb, qc) : Functions.dynamic(ex, fb);
+        expr = name != null ? Functions.get(name, fb, qc, moduleURIs.contains(name.uri()))
+                            : Functions.dynamic(ex, fb);
         if(mapping) {
           expr = new GFLWOR(ii, fr, expr);
           localVars.closeScope(s);
@@ -2555,7 +2556,7 @@ public class QueryParser extends InputParser {
       if(Function.ERROR.is(num)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, num);
       final int arity = (int) ((Int) num).itr();
-      return Functions.item(name, arity, false, info(), qc);
+      return Functions.item(name, arity, false, info(), qc, moduleURIs.contains(name.uri()));
     }
     pos = p;
     return null;
@@ -2773,7 +2774,9 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && !reserved(name)) {
       skipWs();
-      if(current('(')) return Functions.get(name, argumentList(true, null), qc);
+      if(current('(')) {
+        return Functions.get(name, argumentList(true, null), qc, moduleURIs.contains(name.uri()));
+      }
     }
     pos = p;
     return null;

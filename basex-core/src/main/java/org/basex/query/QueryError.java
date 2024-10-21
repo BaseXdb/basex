@@ -1049,6 +1049,8 @@ public enum QueryError {
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
+  INVISIBLEFUNC_X(XPST, 17, "Function not imported: %."),
+  /** Error code. */
   KEYWORDTWICE_X(XPST, 17, "Keyword supplied twice: %."),
   /** Error code. */
   ARGMISSING_X_X(XPST, 17, "%: No argument supplied: %."),

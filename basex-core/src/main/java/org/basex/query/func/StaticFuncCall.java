@@ -32,6 +32,8 @@ public final class StaticFuncCall extends FuncCall {
   QNmMap<Expr> keywords;
   /** Placeholder for an external call (if not {@code null}, will be returned by the compiler). */
   ParseExpr external;
+  /** Indicates whether a module import for the function name's URI was present. */
+  final boolean hasImport;
 
   /**
    * Function call constructor.
@@ -39,10 +41,11 @@ public final class StaticFuncCall extends FuncCall {
    * @param args positional arguments
    * @param keywords keyword arguments (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param hasImport indicates whether a module import for the function name's URI was present
    */
   public StaticFuncCall(final QNm name, final Expr[] args, final QNmMap<Expr> keywords,
-      final InputInfo info) {
-    this(name, args, (StaticFunc) null, info);
+      final InputInfo info, final boolean hasImport) {
+    this(name, args, (StaticFunc) null, info, hasImport);
     this.keywords = keywords;
   }
 
@@ -52,12 +55,14 @@ public final class StaticFuncCall extends FuncCall {
    * @param args arguments
    * @param func referenced function (can be {@code null})
    * @param info input info (can be {@code null})
+   * @param hasImport indicates whether a module import for the function name's URI was present
    */
   private StaticFuncCall(final QNm name, final Expr[] args, final StaticFunc func,
-      final InputInfo info) {
+      final InputInfo info, final boolean hasImport) {
     super(info, args);
     this.name = name;
     this.func = func;
+    this.hasImport = hasImport;
   }
 
   @Override
@@ -85,7 +90,7 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public StaticFuncCall copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new StaticFuncCall(name, Arr.copyAll(cc, vm, exprs), func, info));
+    return copyType(new StaticFuncCall(name, Arr.copyAll(cc, vm, exprs), func, info, hasImport));
   }
 
   /**

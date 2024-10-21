@@ -99,4 +99,32 @@ public final class ModuleTest extends SandboxTest {
       assertEquals(qp.value().serialize().toString(), "OK");
     }
   }
+
+  /** Tests rejection of functions, that are not explicitly imported. */
+  @Test public void gh2048() {
+    final IOFile sandbox = sandbox();
+    final IOFile b = new IOFile(sandbox, "b.xqm");
+    write(b, "module namespace b = 'b';\n"
+        + "import module namespace c = 'c' at 'c.xqm';");
+    write(new IOFile(sandbox, "c.xqm"), "module namespace c  = 'c';\n"
+        + "declare function c:hello(){\n"
+        + "  \"can you see me now\"\n"
+        + "};");
+
+    // function is still visible to fn:function-lookup
+    query("import module namespace b  = 'b'   at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "fn:function-lookup(xs:QName('c:hello'), 0)()", "can you see me now");
+    // function is still visible to inspect:functions
+    query("import module namespace b  = 'b'   at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "inspect:functions()", "Q{c}hello#0");
+
+    error("import module namespace b  = 'b'   at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "c:hello()", QueryError.INVISIBLEFUNC_X);
+    error("import module namespace b  = 'b'   at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "c:hello#0()", QueryError.INVISIBLEFUNC_X);
+  }
 }
