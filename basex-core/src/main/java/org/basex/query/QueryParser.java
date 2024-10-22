@@ -2786,8 +2786,7 @@ public class QueryParser extends InputParser {
    * @return function arguments
    * @throws QueryException query exception
    */
-  private FuncBuilder argumentList(final boolean keywords, final Expr expr)
-      throws QueryException {
+  private FuncBuilder argumentList(final boolean keywords, final Expr expr) throws QueryException {
     final FuncBuilder fb  = new FuncBuilder(info());
     if(expr != null) fb.add(expr, null);
     wsCheck("(");
@@ -2806,9 +2805,12 @@ public class QueryParser extends InputParser {
           }
         }
         if(!kw || name != null) {
-          final Expr arg = single();
-          if(arg == null && !wsConsume("?")) throw error(FUNCARG_X, found());
-          if(fb.add(arg != null ? arg : Empty.UNDEFINED, name)) throw error(KEYWORDTWICE_X, name);
+          Expr arg = single();
+          if(arg == null) {
+            arg = Empty.UNDEFINED;
+            if(!wsConsume("?")) throw error(FUNCARG_X, found());
+          }
+          if(fb.add(arg, name)) throw error(KEYWORDTWICE_X, name);
         }
       } while(wsConsumeWs(","));
       if(!consume(")")) throw error(FUNCARG_X, found());

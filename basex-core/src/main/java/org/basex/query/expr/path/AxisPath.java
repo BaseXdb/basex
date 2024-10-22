@@ -115,7 +115,7 @@ public abstract class AxisPath extends Path {
   public final Expr addPredicates(final CompileContext cc, final Expr... preds)
       throws QueryException {
 
-    final ExprList list = new ExprList(steps.length).add(steps);
+    final ExprList list = new ExprList(steps);
     final Step step = ((Step) list.pop()).addPredicates(preds);
     list.add(cc.get(step, true, () -> step.optimize(root, cc)));
 

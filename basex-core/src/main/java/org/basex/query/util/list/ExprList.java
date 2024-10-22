@@ -37,16 +37,22 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
 
   /**
    * Concatenates entries.
-   * @param source source elements
-   * @param add elements to be added
+   * @param first first elements
+   * @param second next element(s)
    * @return array
    */
-  public static Expr[] concat(final Expr[] source, final Expr... add) {
-    final int sl = source.length, al = add.length;
-    final Expr[] tmp = new Expr[sl + al];
-    Array.copy(source, sl, tmp);
-    Array.copyFromStart(add, al, tmp, sl);
-    return tmp;
+  public static Expr[] concat(final Expr[] first, final Expr... second) {
+    return new ExprList(first.length + second.length).add(first).add(second).finish();
+  }
+
+  /**
+   * Concatenates entries.
+   * @param first first element
+   * @param second next element(s)
+   * @return array
+   */
+  public static Expr[] concat(final Expr first, final Expr... second) {
+    return new ExprList(second.length + 1).add(first).add(second).finish();
   }
 
   @Override
