@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
@@ -572,6 +573,33 @@ public final class XQuery4Test extends SandboxTest {
     query("{ 1: 2, 3: 4}?['a']?['a']?['a']", "{1:2,3:4}");
     query("{ 1: 2, 3: 4}?[?key = 1]?[?key = 1]?[?key = 1]", "{1:2}");
     query("{ 1: 2, 3: 4}?[?value = 2]?[?value = 2]?[?value = 2]", "{1:2}");
+  }
 
+
+  /** Lookup arrow. */
+  @Test public void lookupArrow() {
+    query("{ 'size': map:size#1 } =?> size()", 1);
+    query("{ 'size': map:size#1, 'map': identity#1 } =?> map() =?> size()", 2);
+    query("<a/>[. = 'x'] =?> f()", "");
+
+    query("let $data := { 'size': map:size#1 } return $data =?> size()", 1);
+    query("for $i in 1 let $map := { 'n': fn { $i } } return $map =?> n()", 1);
+    query("for $i in 1 to 2 let $map := { 'n': fn { $i } } return $map =?> n()", "1\n2");
+    query("for $i in 1 to 6 let $map := { 'n': fn { $i } } return $map =?> n()",
+        "1\n2\n3\n4\n5\n6");
+
+    check("() =?> f()", "", empty());
+    check("(<a/>[. = 'x'] =?> f(), 1)", 1, exists(List.class));
+    check("(<a/>[. = 'x'] =?> f(), <a/>[. = 'x'] =?> f())", "", exists(REPLICATE));
+    check("let $f := fn($m) { $m =?> f() } return $f({ 'f': count#1 })", 1,
+        root(DynFuncCall.class));
+    inline(true);
+    check("let $f := fn($m) { $m =?> f() } return $f({ 'f': count#1 })", 1,
+        root(LookupArrow.class));
+
+    error("'f' =?> f()", INVCONVERT_X_X_X);
+    error("{} =?> f()", INVCONVERT_X_X_X);
+    error("{ 'f': 1 } =?> f()", INVCONVERT_X_X_X);
+    error("{ 'f': true#0 } =?> f()", INVARITY_X_X_X);
   }
 }

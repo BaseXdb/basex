@@ -1908,34 +1908,44 @@ public class QueryParser extends InputParser {
   private Expr arrow() throws QueryException {
     Expr expr = transformWith();
     if(expr != null) {
-      for(boolean mapping; (mapping = wsConsume("=!>")) || consume("=>");) {
-        QNm name = null;
-        Expr ex;
-        skipWs();
-        if(current('$')) {
-          ex = varRef();
-        } else if(current('(')) {
-          ex = parenthesized();
+      while(true) {
+        if(wsConsume("=?>")) {
+          skipWs();
+          final Str name = Str.get(ncName(ARROWSPEC));
+          final FuncBuilder fb = argumentList(false, null);
+          expr = new LookupArrow(info(), name, ExprList.concat(expr, fb.args()));
         } else {
-          ex = functionItem();
-          if(ex == null) name = checkReserved(eQName(sc.funcNS, ARROWSPEC));
-        }
-        final InputInfo ii = info();
-        final Expr arg;
-        For fr = null;
-        int s = 0;
-        if(mapping) {
-          s = localVars.openScope();
-          fr = new For(new Var(new QNm("item"), null, qc, ii), expr);
-          arg = new VarRef(ii, fr.var);
-        } else {
-          arg = expr;
-        }
-        final FuncBuilder fb = argumentList(name != null, arg);
-        expr = name != null ? Functions.get(name, fb, qc) : Functions.dynamic(ex, fb);
-        if(mapping) {
-          expr = new GFLWOR(ii, fr, expr);
-          localVars.closeScope(s);
+          final boolean mapping = wsConsume("=!>");
+          if(!mapping && !consume("=>")) break;
+
+          QNm name = null;
+          Expr ex;
+          skipWs();
+          if(current('$')) {
+            ex = varRef();
+          } else if(current('(')) {
+            ex = parenthesized();
+          } else {
+            ex = functionItem();
+            if(ex == null) name = checkReserved(eQName(sc.funcNS, ARROWSPEC));
+          }
+          final InputInfo ii = info();
+          final Expr arg;
+          For fr = null;
+          int s = 0;
+          if(mapping) {
+            s = localVars.openScope();
+            fr = new For(new Var(new QNm("item"), null, qc, ii), expr);
+            arg = new VarRef(ii, fr.var);
+          } else {
+            arg = expr;
+          }
+          final FuncBuilder fb = argumentList(name != null, arg);
+          expr = name != null ? Functions.get(name, fb, qc) : Functions.dynamic(ex, fb);
+          if(mapping) {
+            expr = new GFLWOR(ii, fr, expr);
+            localVars.closeScope(s);
+          }
         }
       }
     }
