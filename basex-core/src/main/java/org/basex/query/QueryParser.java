@@ -478,8 +478,11 @@ public class QueryParser extends InputParser {
           if(def.single && anns.contains(def)) throw error(BASEX_ANN3_X_X, ii, "%", def.id());
 
           final long arity = items.size();
-          if(arity < def.minMax[0] || arity > def.minMax[1])
-            throw error(BASEX_ANN2_X_X, ii, def, arguments(arity));
+          if(arity < def.minMax[0] || arity > def.minMax[1]) {
+            final IntList arities = new IntList();
+            for(int m = def.minMax[0]; m <= def.minMax[1]; m++) arities.add(m);
+            throw error(BASEX_ANN2_X_X, ii, def, arity(arguments(arity), arities));
+          }
           final int al = def.params.length;
           for(int a = 0; a < arity; a++) {
             final SeqType st = def.params[Math.min(al - 1, a)];

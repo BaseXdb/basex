@@ -8,6 +8,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains all query error messages.
@@ -22,7 +23,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_ANNOTATION1_X_X(BASEX, "annotation", "Annotation %% is unknown."),
   /** Error code. */
-  BASEX_ANN2_X_X(BASEX, "annotation", "%: % supplied."),
+  BASEX_ANN2_X_X(BASEX, "annotation", "%: %."),
   /** Error code. */
   BASEX_ANN3_X_X(BASEX, "annotation", "Annotation %% is declared twice."),
   /** Error code. */
@@ -1045,7 +1046,7 @@ public enum QueryError {
   /** Error code. */
   FUNCPRIVATE_X(XPST, 17, "Function not visible: %."),
   /** Error code. */
-  INVNARGS_X_X_X(XPST, 17, "%: % supplied, % expected."),
+  INVNARGS_X_X(XPST, 17, "%: %."),
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
   /** Error code. */
@@ -1123,7 +1124,7 @@ public enum QueryError {
   /** Error code. */
   DOCNS_X(XPTY, 4, "Cannot add namespaces to a document node: %."),
   /** Error code. */
-  INVARITY_X_X_X(XPTY, 4, "% supplied, % expected: %."),
+  INVARITY_X_X(XPTY, 4, "%: %."),
   /** Error code. */
   INVNCNAME_X(XPTY, 4, "Invalid NCName: '%'."),
   /** Error code. */
@@ -1705,9 +1706,9 @@ public enum QueryError {
    */
   public static QueryException arityError(final Expr expr, final int supplied, final int expected,
       final boolean param, final InputInfo info) {
-    final String string = param ? "Function with " + plural(supplied, "parameter") :
-      arguments(supplied);
-    return INVARITY_X_X_X.get(info, string, expected, expr.toErrorString());
+    final String input = param ? "Function with " + parameters(supplied) : arguments(supplied);
+    final String arity = arity(input, new IntList().add(expected));
+    return INVARITY_X_X.get(info, arity, expr.toErrorString());
   }
 
   /**
@@ -1768,21 +1769,62 @@ public enum QueryError {
   }
 
   /**
-   * Returns a plural suffix or an empty string.
-   * @param number long number
+   * Returns a singular or plural form for 'argument'.
+   * @param number number of arguments
    * @return string
    */
   public static String arguments(final long number) {
-    return plural(number, "argument");
+    return numberAndString(number, "argument");
   }
 
   /**
-   * Returns the correct singular/plural form for the specified number and string.
+   * Returns a singular or plural form for 'argument'.
+   * @param number number of parameters
+   * @return string
+   */
+  public static String parameters(final long number) {
+    return numberAndString(number, "parameter");
+  }
+
+  /**
+   * Returns an information string for the supplied input and the expected arity.
+   * @param supplied arguments
+   * @param arities allowed arities (if single arity is negative, function is variadic)
+   * @return string
+   */
+  public static String arity(final String supplied, final IntList arities) {
+    final String expected;
+    final int as = arities.ddo().size();
+    if(as == 1 && arities.peek() < 0) {
+      expected = "at least " + -arities.peek();
+    } else {
+      int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+      for(int a = 0; a < as; a++) {
+        final int m = arities.get(a);
+        if(m < min) min = m;
+        if(m > max) max = m;
+      }
+      final TokenBuilder tb = new TokenBuilder();
+      if(as > 2 && max - min + 1 == as) {
+        tb.addInt(min).add('-').addInt(max);
+      } else {
+        for(int a = 0; a < as; a++) {
+          if(a != 0) tb.add(a + 1 < as ? ", " : " or ");
+          tb.addInt(arities.get(a));
+        }
+      }
+      expected = tb.toString();
+    }
+    return Util.info("% supplied, % expected", supplied, expected);
+  }
+
+  /**
+   * Returns a correct singular/plural form for the specified number and string.
    * @param number number
    * @param string string
    * @return string
    */
-  private static String plural(final long number, final String string) {
+  private static String numberAndString(final long number, final String string) {
     final TokenBuilder tb = new TokenBuilder().addLong(number).add(' ').add(string);
     if(number != 1) tb.add('s');
     return tb.toString();

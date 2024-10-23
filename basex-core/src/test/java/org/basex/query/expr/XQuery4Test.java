@@ -600,6 +600,6 @@ public final class XQuery4Test extends SandboxTest {
     error("'f' =?> f()", INVCONVERT_X_X_X);
     error("{} =?> f()", INVCONVERT_X_X_X);
     error("{ 'f': 1 } =?> f()", INVCONVERT_X_X_X);
-    error("{ 'f': true#0 } =?> f()", INVARITY_X_X_X);
+    error("{ 'f': true#0 } =?> f()", INVARITY_X_X);
   }
 }
