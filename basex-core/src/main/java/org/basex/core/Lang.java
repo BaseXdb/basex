@@ -97,13 +97,12 @@ public final class Lang {
         final String pre = conn.getEntryName();
         final JarFile jar = conn.getJarFile();
 
-        final Enumeration<JarEntry> je = jar.entries();
-        while(je.hasMoreElements()) {
-          final JarEntry entry = je.nextElement();
+        for(final JarEntry entry : Collections.list(jar.entries())) {
           final String name = entry.getName();
-          if(!name.startsWith(pre) || !name.endsWith(SUFFIX)) continue;
-          langs.add(name.replaceAll(".*/|." + SUFFIX, ""));
-          creds.add(credits(new IOStream(jar.getInputStream(entry)).read()));
+          if(name.startsWith(pre) && name.endsWith(SUFFIX)) {
+            langs.add(name.replaceAll(".*/|." + SUFFIX, ""));
+            creds.add(credits(new IOStream(jar.getInputStream(entry)).read()));
+          }
         }
       } else {
         for(final IO file : ((IOFile) IO.get(url.toString())).children()) {

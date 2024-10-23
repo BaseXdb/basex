@@ -42,9 +42,8 @@ public abstract class BaseXServlet extends HttpServlet {
     }
 
     // parse servlet-specific user and authentication method
-    final Enumeration<String> en = config.getInitParameterNames();
-    while(en.hasMoreElements()) {
-      String name = en.nextElement();
+    for(final String n : Collections.list(config.getInitParameterNames())) {
+      String name = n;
       final String value = config.getInitParameter(name);
       if(name.startsWith(Prop.DBPREFIX)) {
         name = name.substring(Prop.DBPREFIX.length());
@@ -93,8 +92,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } finally {
       if(Prop.debug) {
         Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());
-        for(final Enumeration<String> en = request.getHeaderNames(); en.hasMoreElements();) {
-          final String name = en.nextElement();
+        for(final String name : Collections.list(request.getHeaderNames())) {
           Util.errln("* " + name + ": " + request.getHeader(name));
         }
         Util.errln("Response: " + response.getStatus());

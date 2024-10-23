@@ -9,6 +9,7 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+import javax.swing.tree.*;
 
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -172,9 +173,8 @@ public final class ProjectView extends BaseXPanel {
   void refreshHighlight(final ProjectNode node) {
     // loop through all tree nodes
     final Set<String> errPaths = errors().keySet();
-    final Enumeration<?> en = node.depthFirstEnumeration();
-    while(en.hasMoreElements()) {
-      final ProjectNode child = (ProjectNode) en.nextElement();
+    for(final TreeNode tn : Collections.list(node.depthFirstEnumeration())) {
+      final ProjectNode child = (ProjectNode) tn;
       final IOFile file = child.file;
       if(file != null) child.error = find(errPaths, file);
     }
@@ -267,9 +267,8 @@ public final class ProjectView extends BaseXPanel {
    * @return node or {@code null}
    */
   private ProjectNode find(final String path) {
-    final Enumeration<?> en = root.depthFirstEnumeration();
-    while(en.hasMoreElements()) {
-      final ProjectNode node = (ProjectNode) en.nextElement();
+    for(final TreeNode tn : Collections.list(root.depthFirstEnumeration())) {
+      final ProjectNode node = (ProjectNode) tn;
       if(node.file != null && node.file.path().equals(path)) return node;
     }
     return null;

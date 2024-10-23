@@ -253,11 +253,8 @@ public final class RepoManager {
       final String pkgPath = path.replaceAll(IO.JARSUFFIX + '$', "");
       final String pkgName = target.name().replaceAll(IO.JARSUFFIX + '$', "");
       try(JarFile jarFile = new JarFile(target.file())) {
-        final Enumeration<JarEntry> entries = jarFile.entries();
-        while(entries.hasMoreElements()) {
-          final JarEntry entry = entries.nextElement();
+        for(final JarEntry entry : Collections.list(jarFile.entries())) {
           final String name = entry.getName();
-
           IOFile trg = null;
           if(name.matches("^lib/[^/]+\\.jar")) {
             // extract JARs from a zipped lib/ directory to the repository

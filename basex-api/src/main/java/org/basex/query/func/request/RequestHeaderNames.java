@@ -18,8 +18,9 @@ public final class RequestHeaderNames extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
-    final Enumeration<String> en = request(qc).getHeaderNames();
-    while(en.hasMoreElements()) tl.add(en.nextElement());
+    for(final String name : Collections.list(request(qc).getHeaderNames())) {
+      tl.add(name);
+    }
     return StrSeq.get(tl);
   }
 }

@@ -76,9 +76,7 @@ public final class HTTPContext {
     Prop.put(StaticOptions.WEBPATH, webapp);
 
     // set all parameters that start with "org.basex." as global options
-    final Enumeration<String> en = sc.getInitParameterNames();
-    while(en.hasMoreElements()) {
-      final String name = en.nextElement();
+    for(final String name : Collections.list(sc.getInitParameterNames())) {
       String value = sc.getInitParameter(name);
       if(name.startsWith(Prop.DBPREFIX) && name.endsWith("path") && !new File(value).isAbsolute()) {
         // prefix relative path with absolute servlet path
