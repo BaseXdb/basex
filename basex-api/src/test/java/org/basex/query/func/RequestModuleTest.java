@@ -91,6 +91,28 @@ public final class RequestModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
+  @Test public void parameter() throws Exception {
+    final ApiFunction func = _REQUEST_PARAMETER;
+    get("b", "", "query", func.args("a"), "a", "b");
+    get("b,c", "", "query", "string-join(" + func.args("a") + ", ',')", "a", "b", "a", "c");
+    get("b", "", "query", func.args("a", "c"), "a", "b");
+    get("c", "", "query", func.args("x", "c"), "a", "b");
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test public void parameterMap() throws Exception {
+    final ApiFunction func = _REQUEST_PARAMETER_MAP;
+    get("b", "", "query", func.args() + "?a", "a", "b");
+    get("b,c", "", "query", "string-join(" + func.args() + "?a, ',')", "a", "b", "a", "c");
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
   @Test public void parameterNames() throws Exception {
     final ApiFunction func = _REQUEST_PARAMETER_NAMES;
     final String query = "count(" + func.args() + ")";
@@ -103,12 +125,20 @@ public final class RequestModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test public void parameter() throws Exception {
-    final ApiFunction func = _REQUEST_PARAMETER;
-    get("b", "", "query", func.args("a"), "a", "b");
-    get("b,c", "", "query", "string-join(" + func.args("a") + ", ',')", "a", "b", "a", "c");
-    get("b", "", "query", func.args("a", "c"), "a", "b");
-    get("c", "", "query", func.args("x", "c"), "a", "b");
+  @Test public void header() throws Exception {
+    final ApiFunction func = _REQUEST_HEADER;
+    get("localhost:" + HTTP_PORT, "", "query", func.args("Host"));
+    get("def", "", "query", func.args("ABC", "def"));
+  }
+
+  /**
+   * Function test.
+   * @throws Exception exception
+   */
+  @Test public void headerMap() throws Exception {
+    final ApiFunction func = _REQUEST_HEADER_MAP;
+    get("localhost:" + HTTP_PORT, "", "query", func.args() + "?Host");
+    get("", "", "query", func.args() + "?ABC");
   }
 
   /**
@@ -126,10 +156,9 @@ public final class RequestModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test public void header() throws Exception {
-    final ApiFunction func = _REQUEST_HEADER;
-    get("localhost:" + HTTP_PORT, "", "query", func.args("Host"));
-    get("def", "", "query", func.args("ABC", "def"));
+  @Test public void cookie() throws Exception {
+    final ApiFunction func = _REQUEST_COOKIE;
+    get("0", "", "query", "count(" + func.args("X") + ")");
   }
 
   /**
@@ -145,19 +174,20 @@ public final class RequestModuleTest extends HTTPTest {
    * Function test.
    * @throws Exception exception
    */
-  @Test public void cookie() throws Exception {
-    final ApiFunction func = _REQUEST_COOKIE;
-    get("0", "", "query", "count(" + func.args("X") + ")");
+  @Test public void attribute() throws Exception {
+    final ApiFunction func = _REQUEST_ATTRIBUTE;
+    get("", "", "query", func.args("A"));
+    get("B", "", "query", "request:set-attribute('A', 'B')," + func.args("A"));
   }
 
   /**
    * Function test.
    * @throws Exception exception
    */
-  @Test public void attribute() throws Exception {
-    final ApiFunction func = _REQUEST_ATTRIBUTE;
-    get("", "", "query", func.args("A"));
-    get("B", "", "query", "request:set-attribute('A', 'B')," + func.args("A"));
+  @Test public void attributeMap() throws Exception {
+    final ApiFunction func = _REQUEST_ATTRIBUTE_MAP;
+    get("", "", "query", func.args() + "?A");
+    get("B", "", "query", "request:set-attribute('A', 'B')," + func.args() + "?A");
   }
 
   /**

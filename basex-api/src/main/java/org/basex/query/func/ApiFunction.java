@@ -34,6 +34,9 @@ public enum ApiFunction implements AFunction {
   _REQUEST_ATTRIBUTE(RequestAttribute::new, "attribute(name[,default])",
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
+  _REQUEST_ATTRIBUTE_MAP(RequestAttributeMap::new, "attribute-map()",
+      params(), MAP_O, REQUEST_URI),
+  /** XQuery function. */
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames::new, "attribute-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
@@ -43,11 +46,17 @@ public enum ApiFunction implements AFunction {
   _REQUEST_COOKIE(RequestCookie::new, "cookie(name[,default])",
       params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
   /** XQuery function. */
+  _REQUEST_COOKIE_MAP(RequestCookieMap::new, "cookie-map()",
+      params(), MAP_O, REQUEST_URI),
+  /** XQuery function. */
   _REQUEST_COOKIE_NAMES(RequestCookieNames::new, "cookie-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER(RequestHeader::new, "header(name[,default])",
       params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_HEADER_MAP(RequestHeaderMap::new, "header-map()",
+      params(), MAP_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER_NAMES(RequestHeaderNames::new, "header-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -60,6 +69,9 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_PARAMETER(RequestParameter::new, "parameter(name[,default])",
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_PARAMETER_MAP(RequestParameterMap::new, "parameter-map()",
+      params(), MAP_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER_NAMES(RequestParameterNames::new, "parameter-names()",
       params(), STRING_ZM, REQUEST_URI),

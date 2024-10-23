@@ -54,27 +54,11 @@ public final class ShowOptions extends Command {
     } else {
       // retrieve value of specific option
       final String name = args[0].toUpperCase(Locale.ENGLISH);
-      final Object value = get(name, context);
+      final Object value = context.option(name);
       if(value == null) return error(context.options.similar(name));
       out.println(name + COLS + value);
     }
     return true;
-  }
-
-  /**
-   * Returns the value of the specified option.
-   * @param name name of option
-   * @param ctx database context
-   * @return value
-   */
-  public static Object get(final String name, final Context ctx) {
-    Options opts = ctx.options;
-    Option<?> opt = opts.option(name);
-    if(opt == null && ctx.user().has(Perm.ADMIN)) {
-      opts = ctx.soptions;
-      opt = opts.option(name);
-    }
-    return opt == null ? null : opts.get(opt);
   }
 
   @Override

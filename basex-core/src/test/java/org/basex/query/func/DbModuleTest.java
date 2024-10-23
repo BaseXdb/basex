@@ -799,6 +799,17 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void optionMap() {
+    final Function func = _DB_OPTION_MAP;
+    query(func.args() + "?addraw", false);
+    query(func.args() + "?ADDRAW", "");
+    query(func.args() + "?runs", 1);
+    query(func.args() + "?bindings", "");
+    query(func.args() + "?serializer?indent", "no");
+    query(func.args() + "?xyz", "");
+  }
+
+  /** Test method. */
   @Test public void path() {
     final Function func = _DB_PATH;
     query(func.args(_DB_GET.args(NAME)), XML.replaceAll(".*/", ""));
@@ -810,7 +821,16 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void property() {
     final Function func = _DB_PROPERTY;
     query(func.args(NAME, "name"), NAME);
+    query(func.args(NAME, "NAME"), NAME);
     error(func.args(NAME, "xyz"), DB_PROPERTY_X);
+  }
+
+  /** Test method. */
+  @Test public void propertyMap() {
+    final Function func = _DB_PROPERTY_MAP;
+    query(func.args(NAME) + "?name", NAME);
+    query(func.args(NAME) + "?NAME", "");
+    query(func.args(NAME) + "?xyz", "");
   }
 
   /** Test method. */

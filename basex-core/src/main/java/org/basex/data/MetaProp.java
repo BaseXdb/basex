@@ -186,16 +186,4 @@ public enum MetaProp {
    * @return value
    */
   public abstract Object value(MetaData meta);
-
-  /**
-   * Returns a property matching the specified string.
-   * @param name name of enumeration
-   * @return permission, or {@code null} if no match is found
-   */
-  public static MetaProp get(final String name) {
-    for(final MetaProp prop : ENUMS) {
-      if(prop.toString().toLowerCase(Locale.ENGLISH).equals(name)) return prop;
-    }
-    return null;
-  }
 }
