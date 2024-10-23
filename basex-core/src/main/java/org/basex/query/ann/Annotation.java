@@ -138,6 +138,8 @@ public enum Annotation {
   _REST_HEAD("HEAD()", params(), REST_URI),
   /** XQuery annotation. */
   _REST_OPTIONS("OPTIONS()", params(), REST_URI),
+  /** XQuery annotation. */
+  _REST_PATCH("PATCH([body])", params(STRING_O), REST_URI),
 
   /** XQuery annotation. */
   _UNIT_AFTER("after([function])", params(STRING_O), UNIT_URI),
