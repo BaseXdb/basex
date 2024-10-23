@@ -354,8 +354,8 @@ public final class RestXqFunction extends WebFunction {
 
     if(body != null) {
       final Method m = Method.get(method);
-      if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
-      if(requestBody != null) throw error(info, ANN_BODYVAR);
+      if(m != null && !m.body) throw error(info, METHOD_BODY_X, m);
+      if(requestBody != null) throw error(info, ANN_BODY_TWICE);
       requestBody = checkVariable(toString(body), declared);
     }
     if(methods.contains(method)) throw error(info, ANN_TWICE_X_X, "%", method);
