@@ -648,18 +648,16 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to a map and checks its entries.
+   * Converts an item to a record.
    * @param item item to check
-   * @param keys record keys
+   * @param type record type
+   * @param qc query context
    * @return map
    * @throws QueryException query exception
    */
-  protected final XQMap toRecord(final Item item, final AStr... keys) throws QueryException {
-    final XQMap map = toMap(item);
-    for(final AStr key : keys) {
-      if(!map.contains(key)) throw INVCONVERT_X_X_X.get(info, item.type, "record()", item);
-    }
-    return map;
+  protected final XQMap toRecord(final Item item, final RecordType type, final QueryContext qc)
+      throws QueryException {
+    return (XQMap) type.seqType().coerce(item, null, qc, null, info);
   }
 
   /**

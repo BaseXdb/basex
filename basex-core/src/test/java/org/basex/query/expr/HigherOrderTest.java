@@ -121,23 +121,23 @@ public final class HigherOrderTest extends SandboxTest {
 
   /**  Tests the creation of a cast function as function item. */
   @Test public void wrongArityTest() {
-    error("count(concat#2('1'))", INVARITY_X_X_X);
+    error("count(concat#2('1'))", INVARITY_X_X);
   }
 
   /** Tests the coercion of a map to a function. */
   @Test public void mapCoercion() {
     query("function($a as function(item()*         ) as item()*) {$a(1)} (map {1: true()})", true);
-    error("function($a as function() as item()*) {$a()} (map {1: true()})", INVARITY_X_X_X);
+    error("function($a as function() as item()*) {$a()} (map {1: true()})", INVARITY_X_X);
     error("function($a as function(item()*, item()*) as item()*) {$a(1)} (map {1: true()})",
-        INVARITY_X_X_X);
+        INVARITY_X_X);
   }
 
   /** Tests the coercion of a map to a function. */
   @Test public void arrayCoercion() {
     query("function($a as function(item()*         ) as item()*) {$a(1)} ([true()])", true);
-    error("function($a as function() as item()*) {$a()} ([true()])", INVARITY_X_X_X);
+    error("function($a as function() as item()*) {$a()} ([true()])", INVARITY_X_X);
     error("function($a as function(item()*, item()*) as item()*) {$a(1)} ([true()])",
-        INVARITY_X_X_X);
+        INVARITY_X_X);
   }
 
   /** Tests using a partial function application as the context value. */

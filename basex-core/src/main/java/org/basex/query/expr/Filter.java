@@ -53,7 +53,7 @@ public abstract class Filter extends AFilter {
     if(root instanceof Filter) {
       final Filter filter = (Filter) root;
       root = filter.root;
-      exprs = new ExprList().add(filter.exprs).add(exprs).finish();
+      exprs = ExprList.concat(filter.exprs, exprs);
     }
 
     // return empty root
@@ -198,8 +198,7 @@ public abstract class Filter extends AFilter {
    * @throws QueryException query exception
    */
   public final Expr addPredicate(final CompileContext cc, final Expr pred) throws QueryException {
-    exprs = new ExprList(exprs.length + 1).add(exprs).add(pred).finish();
-    return copyType(get(cc, info, root, exprs));
+    return copyType(get(cc, info, root, ExprList.concat(exprs, pred)));
   }
 
   @Override

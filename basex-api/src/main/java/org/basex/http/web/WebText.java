@@ -42,7 +42,7 @@ public interface WebText {
   /** Error message. */
   String ANN_CONFLICT_X = "Conflicting annotations: %.";
   /** Error message. */
-  String ANN_BODYVAR = "More than one body request variable specified.";
+  String ANN_BODY_TWICE = "More than one body variable specified.";
   /** Error message. */
   String ANN_TWICE_X_X = "Annotation %% is specified twice.";
   /** Error message. */
@@ -74,7 +74,7 @@ public interface WebText {
   /** Error message. */
   String HEAD_METHOD = "HEAD method must return a single 'restxq:response' element.";
   /** Error message. */
-  String METHOD_VALUE_X = "Method % does not allow values.";
+  String METHOD_BODY_X = "Method % cannot have a body.";
   /** Error message. */
   String BODY_TYPE_X_X = "Body cannot be parsed as %: %.";
   /** Error message. */

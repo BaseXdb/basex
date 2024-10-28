@@ -57,8 +57,7 @@ public final class ASession {
    */
   public Value names() {
     final TokenList tl = new TokenList();
-    final Enumeration<String> en = session.getAttributeNames();
-    while(en.hasMoreElements()) tl.add(en.nextElement());
+    for(final String name : Collections.list(session.getAttributeNames())) tl.add(name);
     return StrSeq.get(tl);
   }
 

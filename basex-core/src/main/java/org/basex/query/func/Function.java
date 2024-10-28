@@ -1246,11 +1246,17 @@ public enum Function implements AFunction {
   _DB_OPTION(DbOption::new, "option(name)",
       params(STRING_ZO), ITEM_O, DB_URI),
   /** XQuery function. */
+  _DB_OPTION_MAP(DbOptionMap::new, "option-map()",
+      params(), MAP_O, DB_URI),
+  /** XQuery function. */
   _DB_PATH(DbPath::new, "path(node)",
       params(NODE_O), STRING_O, DB_URI),
   /** XQuery function. */
   _DB_PROPERTY(DbProperty::new, "property(database,name)",
       params(STRING_O, STRING_O), ANY_ATOMIC_TYPE_O, flag(NDT), DB_URI),
+  /** XQuery function. */
+  _DB_PROPERTY_MAP(DbPropertyMap::new, "property-map(database)",
+      params(STRING_O), MAP_O, DB_URI),
   /** XQuery function. */
   _DB_PUT(DbPut::new, "put(database,input,path[,options])",
       params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),

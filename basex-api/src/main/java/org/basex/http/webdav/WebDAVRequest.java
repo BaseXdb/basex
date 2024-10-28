@@ -92,11 +92,8 @@ final class WebDAVRequest extends AbstractRequest {
   @Override
   public Map<String, String> getHeaders() {
     final Map<String, String> map = new HashMap<>();
-    final Enumeration<String> en = request.getHeaderNames();
-    while(en.hasMoreElements()) {
-      final String name = en.nextElement();
-      final String val = request.getHeader(name);
-      map.put(name, val);
+    for(final String name : Collections.list(request.getHeaderNames())) {
+      map.put(name, request.getHeader(name));
     }
     return map;
   }

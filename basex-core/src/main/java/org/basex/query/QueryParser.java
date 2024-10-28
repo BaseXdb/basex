@@ -478,8 +478,11 @@ public class QueryParser extends InputParser {
           if(def.single && anns.contains(def)) throw error(BASEX_ANN3_X_X, ii, "%", def.id());
 
           final long arity = items.size();
-          if(arity < def.minMax[0] || arity > def.minMax[1])
-            throw error(BASEX_ANN2_X_X, ii, def, arguments(arity));
+          if(arity < def.minMax[0] || arity > def.minMax[1]) {
+            final IntList arities = new IntList();
+            for(int m = def.minMax[0]; m <= def.minMax[1]; m++) arities.add(m);
+            throw error(BASEX_ANN2_X_X, ii, def, arity(arguments(arity), arities));
+          }
           final int al = def.params.length;
           for(int a = 0; a < arity; a++) {
             final SeqType st = def.params[Math.min(al - 1, a)];
@@ -1908,35 +1911,45 @@ public class QueryParser extends InputParser {
   private Expr arrow() throws QueryException {
     Expr expr = transformWith();
     if(expr != null) {
-      for(boolean mapping; (mapping = wsConsume("=!>")) || consume("=>");) {
-        QNm name = null;
-        Expr ex;
-        skipWs();
-        if(current('$')) {
-          ex = varRef();
-        } else if(current('(')) {
-          ex = parenthesized();
+      while(true) {
+        if(wsConsume("=?>")) {
+          skipWs();
+          final Str name = Str.get(ncName(ARROWSPEC));
+          final FuncBuilder fb = argumentList(false, null);
+          expr = new LookupArrow(info(), name, ExprList.concat(expr, fb.args()));
         } else {
-          ex = functionItem();
-          if(ex == null) name = checkReserved(eQName(sc.funcNS, ARROWSPEC));
-        }
-        final InputInfo ii = info();
-        final Expr arg;
-        For fr = null;
-        int s = 0;
-        if(mapping) {
-          s = localVars.openScope();
-          fr = new For(new Var(new QNm("item"), null, qc, ii), expr);
-          arg = new VarRef(ii, fr.var);
-        } else {
-          arg = expr;
-        }
-        final FuncBuilder fb = argumentList(name != null, arg);
-        expr = name != null ? Functions.get(name, fb, qc, moduleURIs.contains(name.uri()))
-                            : Functions.dynamic(ex, fb);
-        if(mapping) {
-          expr = new GFLWOR(ii, fr, expr);
-          localVars.closeScope(s);
+          final boolean mapping = wsConsume("=!>");
+          if(!mapping && !consume("=>")) break;
+
+          QNm name = null;
+          Expr ex;
+          skipWs();
+          if(current('$')) {
+            ex = varRef();
+          } else if(current('(')) {
+            ex = parenthesized();
+          } else {
+            ex = functionItem();
+            if(ex == null) name = checkReserved(eQName(sc.funcNS, ARROWSPEC));
+          }
+          final InputInfo ii = info();
+          final Expr arg;
+          For fr = null;
+          int s = 0;
+          if(mapping) {
+            s = localVars.openScope();
+            fr = new For(new Var(new QNm("item"), null, qc, ii), expr);
+            arg = new VarRef(ii, fr.var);
+          } else {
+            arg = expr;
+          }
+          final FuncBuilder fb = argumentList(name != null, arg);
+          expr = name != null ? Functions.get(name, fb, qc, moduleURIs.contains(name.uri()))
+                              : Functions.dynamic(ex, fb);
+          if(mapping) {
+            expr = new GFLWOR(ii, fr, expr);
+            localVars.closeScope(s);
+          }
         }
       }
     }
@@ -2789,8 +2802,7 @@ public class QueryParser extends InputParser {
    * @return function arguments
    * @throws QueryException query exception
    */
-  private FuncBuilder argumentList(final boolean keywords, final Expr expr)
-      throws QueryException {
+  private FuncBuilder argumentList(final boolean keywords, final Expr expr) throws QueryException {
     final FuncBuilder fb  = new FuncBuilder(info());
     if(expr != null) fb.add(expr, null);
     wsCheck("(");
@@ -2809,9 +2821,12 @@ public class QueryParser extends InputParser {
           }
         }
         if(!kw || name != null) {
-          final Expr arg = single();
-          if(arg == null && !wsConsume("?")) throw error(FUNCARG_X, found());
-          if(fb.add(arg != null ? arg : Empty.UNDEFINED, name)) throw error(KEYWORDTWICE_X, name);
+          Expr arg = single();
+          if(arg == null) {
+            arg = Empty.UNDEFINED;
+            if(!wsConsume("?")) throw error(FUNCARG_X, found());
+          }
+          if(fb.add(arg, name)) throw error(KEYWORDTWICE_X, name);
         }
       } while(wsConsumeWs(","));
       if(!consume(")")) throw error(FUNCARG_X, found());

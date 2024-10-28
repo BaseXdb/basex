@@ -76,7 +76,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified GET request and returns the result.
    * @param expected expected result
    * @param request request
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @throws IOException I/O exception
    */
   protected static void get(final String expected, final String request, final Object... params)
@@ -88,7 +88,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified GET request and returns the result.
    * @param status status code to check
    * @param request request
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
@@ -101,7 +101,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified DELETE request.
    * @param status status code to check
    * @param request request
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @return response code
    * @throws IOException I/O exception
    */
@@ -114,7 +114,7 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified HEAD request and returns the result.
    * @param status status code to check
    * @param request request
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
@@ -126,7 +126,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Executes the specified OPTIONS request and returns the result.
    * @param request request
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
@@ -154,7 +154,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param payload payload
    * @param type media type
    * @param request path
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @return string result
    * @throws IOException I/O exception
    */
@@ -178,7 +178,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param status status code to check
    * @param is input stream (can be {@code null})
    * @param request query
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @throws IOException I/O exception
    */
   protected static void put(final int status, final InputStream is, final String request,
@@ -193,7 +193,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param is input stream (can be {@code null})
    * @param type media type (optional, may be {@code null})
    * @param request query
-   * @param params parameters
+   * @param params query parameters (keys and values)
    * @return string result
    * @throws IOException I/O exception
    */

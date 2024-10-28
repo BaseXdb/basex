@@ -225,7 +225,7 @@ public final class Functions {
   /**
    * Raises an error for the wrong number of function arguments.
    * @param nargs number of supplied arguments
-   * @param arities available arities (if first arity is negative, function is variadic)
+   * @param arities available arities (if single arity is negative, function is variadic)
    * @param literal literal flag
    * @param info input info (can be {@code null})
    * @param function function (for error messages)
@@ -234,29 +234,8 @@ public final class Functions {
   public static QueryException wrongArity(final int nargs, final IntList arities,
       final boolean literal, final InputInfo info, final Object function) {
 
-    final String supplied = literal ? "Arity " + nargs : arguments(nargs), expected;
-    if(!arities.isEmpty() && arities.peek() < 0) {
-      expected = "at least " + -arities.peek();
-    } else {
-      final int as = arities.ddo().size();
-      int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-      for(int a = 0; a < as; a++) {
-        final int m = arities.get(a);
-        if(m < min) min = m;
-        if(m > max) max = m;
-      }
-      final TokenBuilder tb = new TokenBuilder();
-      if(as > 2 && max - min + 1 == as) {
-        tb.addInt(min).add('-').addInt(max);
-      } else {
-        for(int a = 0; a < as; a++) {
-          if(a != 0) tb.add(a + 1 < as ? ", " : " or ");
-          tb.addInt(arities.get(a));
-        }
-      }
-      expected = tb.toString();
-    }
-    return INVNARGS_X_X_X.get(info, function, supplied, expected);
+    final String arity = arity(literal ? "Arity " + nargs : arguments(nargs), arities);
+    return INVNARGS_X_X.get(info, function, arity);
   }
 
   /**

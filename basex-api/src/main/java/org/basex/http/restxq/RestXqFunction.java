@@ -226,19 +226,18 @@ public final class RestXqFunction extends WebFunction {
     // bind header parameters
     for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      final Enumeration<?> en = conn.request.getHeaders(rxp.name);
-      while(en.hasMoreElements()) {
-        for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
+      for(final String header : Collections.list(conn.request.getHeaders(rxp.name))) {
+        for(final String s : header.split(", *")) tl.add(s);
       }
       bind(rxp, args, StrSeq.get(tl), qc);
     }
 
     // bind cookie parameters
-    final Cookie[] ck = conn.request.getCookies();
+    final Cookie[] cookies = conn.request.getCookies();
     for(final WebParam rxp : cookieParams) {
       Value value = Empty.VALUE;
-      if(ck != null) {
-        for(final Cookie c : ck) {
+      if(cookies != null) {
+        for(final Cookie c : cookies) {
           if(rxp.name.equals(c.getName())) value = Str.get(c.getValue());
         }
       }
@@ -354,8 +353,8 @@ public final class RestXqFunction extends WebFunction {
 
     if(body != null) {
       final Method m = Method.get(method);
-      if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
-      if(requestBody != null) throw error(info, ANN_BODYVAR);
+      if(m != null && !m.body) throw error(info, METHOD_BODY_X, m);
+      if(requestBody != null) throw error(info, ANN_BODY_TWICE);
       requestBody = checkVariable(toString(body), declared);
     }
     if(methods.contains(method)) throw error(info, ANN_TWICE_X_X, "%", method);

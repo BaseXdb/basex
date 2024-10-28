@@ -33,7 +33,7 @@ public final class IterPath extends AxisPath {
 
     return new Iter() {
       final int sz = steps.length + (rt ? 0 : -1);
-      final Expr[] exprs = rt ? new ExprList(sz + 1).add(root).add(steps).finish() : steps;
+      final Expr[] exprs = rt ? ExprList.concat(root, steps) : steps;
       final Iter[] iter = new Iter[sz + 1];
       int pos;
 

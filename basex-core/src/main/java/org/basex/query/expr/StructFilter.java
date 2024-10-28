@@ -36,7 +36,7 @@ public final class StructFilter extends AFilter {
     if(root instanceof StructFilter) {
       final StructFilter filter = (StructFilter) root;
       root = filter.root;
-      exprs = new ExprList().add(filter.exprs).add(exprs).finish();
+      exprs = ExprList.concat(filter.exprs, exprs);
     }
     // return empty root
     if(root == XQArray.empty() || root == XQMap.empty()) return cc.replaceWith(this, root);

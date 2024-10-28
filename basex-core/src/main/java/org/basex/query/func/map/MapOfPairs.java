@@ -26,7 +26,8 @@ public final class MapOfPairs extends StandardFunc {
     XQMap result = XQMap.empty();
     for(Item item; (item = qc.next(input)) != null;) {
       // extract key/value record entries
-      final XQMap map = toRecord(item, Str.KEY, Str.VALUE);
+
+      final XQMap map = toRecord(item, RecordType.PAIR, qc);
       final Item key = toAtomItem(map.get(Str.KEY), qc);
       Value value = map.get(Str.VALUE);
       if(result.contains(key)) {
