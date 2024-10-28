@@ -136,7 +136,7 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode tmp = target;
-    final BasicNodeIter iter = target.ancestorIter();
+    final BasicNodeIter iter = target.ancestorIter(false);
     for(ANode n; (n = iter.next()) != null;) {
       tmp = n;
     }

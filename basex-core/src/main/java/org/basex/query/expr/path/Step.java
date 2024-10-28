@@ -308,9 +308,13 @@ public abstract class Step extends Preds {
       case CHILD:
       case DESCENDANT:
       case FOLLOWING:
+      case FOLLOWING_OR_SELF:
       case FOLLOWING_SIBLING:
+      case FOLLOWING_SIBLING_OR_SELF:
       case PRECEDING:
+      case PRECEDING_OR_SELF:
       case PRECEDING_SIBLING:
+      case PRECEDING_SIBLING_OR_SELF:
         return type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT,
             NodeType.DOCUMENT_NODE, NodeType.NAMESPACE_NODE);
       default:
@@ -331,6 +335,10 @@ public abstract class Step extends Preds {
       switch(axis) {
         case SELF:
         case ANCESTOR_OR_SELF:
+        case FOLLOWING_OR_SELF:
+        case FOLLOWING_SIBLING_OR_SELF:
+        case PRECEDING_OR_SELF:
+        case PRECEDING_SIBLING_OR_SELF:
           return !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
         case CHILD:
         case DESCENDANT:

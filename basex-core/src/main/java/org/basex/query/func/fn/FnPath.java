@@ -83,7 +83,7 @@ public final class FnPath extends ContextFn {
    */
   private static int element(final ANode node, final QNm qname, final QueryContext qc) {
     int p = 1;
-    final BasicNodeIter iter = node.precedingSiblingIter();
+    final BasicNodeIter iter = node.precedingSiblingIter(false);
     for(ANode fs; (fs = iter.next()) != null;) {
       qc.checkStop();
       final QNm qnm = fs.qname();
@@ -100,7 +100,7 @@ public final class FnPath extends ContextFn {
    */
   private static int textComment(final ANode node, final QueryContext qc) {
     int p = 1;
-    final BasicNodeIter iter = node.precedingSiblingIter();
+    final BasicNodeIter iter = node.precedingSiblingIter(false);
     for(ANode fs; (fs = iter.next()) != null;) {
       qc.checkStop();
       if(fs.type == node.type) p++;
@@ -116,7 +116,7 @@ public final class FnPath extends ContextFn {
    * @return index
    */
   private static int pi(final ANode node, final QNm qname, final QueryContext qc) {
-    final BasicNodeIter iter = node.precedingSiblingIter();
+    final BasicNodeIter iter = node.precedingSiblingIter(false);
     int p = 1;
     final Type type = node.type;
     for(ANode fs; (fs = iter.next()) != null;) {

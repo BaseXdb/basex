@@ -29,7 +29,7 @@ public final class FnElementNumber extends ContextFn {
 
     int n = 0;
     final HofArgs args = new HofArgs(1);
-    for(final ANode nd : rt.descendantOrSelfIter()) {
+    for(final ANode nd : rt.descendantIter(true)) {
       if(nd.type != NodeType.ELEMENT || !(pred != null ? test(pred, args.set(0, nd), qc) :
         nd.qname().eq(element.qname()))) continue;
       if(nd.compare(element) > 0) break;

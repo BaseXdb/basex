@@ -127,7 +127,7 @@ public final class MixedTest extends SandboxTest {
     query("(<a><b><c/></b></a> update {})/b/c ! name(..)", "b");
     query("(<a><b><c/></b></a> update {})/b/c/.. ! name(..)", "a");
 
-    query("<a><b/></a>  ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
+    query("<a><b/></a> ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
     query("(<a><b/></a> update {}) ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
 
     query("<A>{ <a><b/><c/></a>/* }</A>/b/following-sibling::c", "<c/>");

@@ -468,6 +468,7 @@ public abstract class Path extends ParseExpr {
           break;
         case PARENT:
         case FOLLOWING_SIBLING:
+        case FOLLOWING_SIBLING_OR_SELF:
           // can overlap, preserves level
           if(!atMostOne) return false;
           break;
@@ -484,10 +485,13 @@ public abstract class Path extends ParseExpr {
         case ANCESTOR:
         case ANCESTOR_OR_SELF:
         case PRECEDING:
+        case PRECEDING_OR_SELF:
         case PRECEDING_SIBLING:
+        case PRECEDING_SIBLING_OR_SELF:
           // backwards axes must be reordered
           return false;
         case FOLLOWING:
+        case FOLLOWING_OR_SELF:
           // can overlap
           if(!atMostOne) return false;
           sameDepth = false;

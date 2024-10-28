@@ -4,6 +4,7 @@ import static org.basex.query.util.DeepEqualOptions.*;
 import static org.basex.query.value.type.NodeType.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
@@ -456,78 +457,77 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level ancestor axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * Overwritten by {@link DBNode#ancestorIter()}.
+   * Returns a light-weight ancestor-or-self axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public BasicNodeIter ancestorIter() {
+  public BasicNodeIter ancestorIter(final boolean self) {
     return new BasicNodeIter() {
       private ANode node = ANode.this;
+      private boolean slf = self;
 
       @Override
       public ANode next() {
-        node = node.parent();
+        if(slf) {
+          slf = false;
+        } else {
+          node = node.parent();
+        }
         return node;
       }
     };
   }
 
   /**
-   * Returns a light-weight ancestor-or-self axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * Overwritten by {@link DBNode#ancestorOrSelfIter()}.
-   * @return iterator
-   */
-  public BasicNodeIter ancestorOrSelfIter() {
-    return new BasicNodeIter() {
-      private ANode node = ANode.this;
-
-      @Override
-      public ANode next() {
-        if(node == null) return null;
-        final ANode n = node;
-        node = n.parent();
-        return n;
-      }
-    };
-  }
-
-  /**
-   * Returns a light-weight, low-level attribute axis iterator with {@link Iter#size()} and
+   * Returns a light-weight attribute axis iterator with {@link Iter#size()} and
    * {@link Iter#get(long)} implemented.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
   public abstract BasicNodeIter attributeIter();
 
   /**
-   * Returns a light-weight, low-level child axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight child axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
   public abstract BasicNodeIter childIter();
 
   /**
-   * Returns a light-weight, low-level descendant axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * @return iterator
+   * Returns an iterator for all descendant nodes.
+   * @param self include self node
+   * @return node iterator
    */
-  public abstract BasicNodeIter descendantIter();
+  public BasicNodeIter descendantIter(final boolean self) {
+    return new BasicNodeIter() {
+      private final Stack<BasicNodeIter> iters = new Stack<>();
+      private ANode last;
+
+      @Override
+      public ANode next() {
+        final BasicNodeIter ir = last != null ? last.childIter() : self ? selfIter() : childIter();
+        last = ir.next();
+        if(last == null) {
+          while(!iters.isEmpty()) {
+            last = iters.peek().next();
+            if(last != null) break;
+            iters.pop();
+          }
+        } else {
+          iters.add(ir);
+        }
+        return last;
+      }
+    };
+  }
 
   /**
-   * Returns a light-weight, low-level descendant-or-self axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * @return iterator
+   * Returns an iterator for all descendant nodes.
+   * @param self include self node
+   * @return node iterator
    */
-  public abstract BasicNodeIter descendantOrSelfIter();
-
-  /**
-   * Returns a light-weight, low-level following axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * @return iterator
-   */
-  public BasicNodeIter followingIter() {
+  public BasicNodeIter followingIter(final boolean self) {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -535,6 +535,7 @@ public abstract class ANode extends Item {
       public ANode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
+          if(self) list.add(finish());
           ANode node = ANode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
@@ -545,7 +546,7 @@ public abstract class ANode extends Item {
             }
             for(final ANode nd : ir) {
               list.add(nd.finish());
-              addDesc(nd.childIter(), list);
+              addDescendants(nd.childIter(), list);
             }
             node = root;
             root = root.parent();
@@ -558,13 +559,15 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level following-sibling axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight following-sibling axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public BasicNodeIter followingSiblingIter() {
+  public BasicNodeIter followingSiblingIter(final boolean self) {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
+      private boolean found;
 
       @Override
       public ANode next() {
@@ -572,7 +575,12 @@ public abstract class ANode extends Item {
           final ANode root = parent();
           if(root == null) return null;
           iter = root.childIter();
-          for(ANode n; (n = iter.next()) != null && !n.is(ANode.this););
+        }
+        for(ANode n; !found && (n = iter.next()) != null;) {
+          if(n.is(ANode.this)) {
+            found = true;
+            if(self) return n;
+          }
         }
         return iter.next();
       }
@@ -580,8 +588,8 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level parent axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight parent axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
   public final BasicNodeIter parentIter() {
@@ -598,11 +606,12 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level preceding axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight preceding axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public final BasicNodeIter precedingIter() {
+  public BasicNodeIter precedingIter(final boolean self) {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -610,6 +619,7 @@ public abstract class ANode extends Item {
       public ANode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
+          if(self) list.add(finish());
           ANode node = ANode.this, root = node.parent();
           while(root != null) {
             if(node.type != ATTRIBUTE) {
@@ -617,7 +627,7 @@ public abstract class ANode extends Item {
               for(final ANode c : root.childIter()) {
                 if(c.is(node)) break;
                 tmp.add(c.finish());
-                addDesc(c.childIter(), tmp);
+                addDescendants(c.childIter(), tmp);
               }
               for(int t = tmp.size() - 1; t >= 0; t--) list.add(tmp.get(t));
             }
@@ -632,31 +642,31 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level preceding-sibling axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight preceding-sibling axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public final BasicNodeIter precedingSiblingIter() {
-    return new BasicNodeIter() {
-      private BasicNodeIter iter;
-      private int i;
+  public final BasicNodeIter precedingSiblingIter(final boolean self) {
+    return type == ATTRIBUTE ? self ? selfIter() : BasicNodeIter.EMPTY : new BasicNodeIter() {
+      private ANodeList list;
+      private int l;
 
       @Override
       public ANode next() {
-        if(iter == null) {
-          if(type == ATTRIBUTE) return null;
+        if(list == null) {
           final ANode root = parent();
           if(root == null) return null;
 
-          final ANodeList list = new ANodeList();
+          list = new ANodeList();
           for(final ANode node : root.childIter()) {
-            if(node.is(ANode.this)) break;
-            list.add(node.finish());
+            final boolean last = node.is(ANode.this);
+            if(!last || self) list.add(node.finish());
+            if(last) break;
           }
-          i = list.size();
-          iter = list.iter();
+          l = list.size();
         }
-        return i > 0 ? iter.get(--i) : null;
+        return l > 0 ? list.get(--l) : null;
       }
     };
   }
@@ -679,14 +689,14 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Adds children of a sub node.
+   * Adds nodes of a child iterator and its descendants.
    * @param children child nodes
    * @param nodes node cache
    */
-  private static void addDesc(final BasicNodeIter children, final ANodeList nodes) {
+  private static void addDescendants(final BasicNodeIter children, final ANodeList nodes) {
     for(final ANode node : children) {
       nodes.add(node.finish());
-      addDesc(node.childIter(), nodes);
+      addDescendants(node.childIter(), nodes);
     }
   }
 

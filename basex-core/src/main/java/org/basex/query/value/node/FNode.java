@@ -1,7 +1,5 @@
 package org.basex.query.value.node;
 
-import java.util.*;
-
 import org.basex.api.dom.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.type.*;
@@ -74,16 +72,6 @@ public abstract class FNode extends ANode {
     return false;
   }
 
-  @Override
-  public final BasicNodeIter descendantIter() {
-    return desc(false);
-  }
-
-  @Override
-  public final BasicNodeIter descendantOrSelfIter() {
-    return desc(true);
-  }
-
   /**
    * Returns the string value for the specified nodes.
    * @param nodes nodes
@@ -128,34 +116,6 @@ public abstract class FNode extends ANode {
           break;
       }
     }
-  }
-
-  /**
-   * Returns an iterator for all descendant nodes.
-   * @param self include self node
-   * @return node iterator
-   */
-  private BasicNodeIter desc(final boolean self) {
-    return new BasicNodeIter() {
-      private final Stack<BasicNodeIter> iters = new Stack<>();
-      private ANode last;
-
-      @Override
-      public ANode next() {
-        final BasicNodeIter ir = last != null ? last.childIter() : self ? selfIter() : childIter();
-        last = ir.next();
-        if(last == null) {
-          while(!iters.isEmpty()) {
-            last = iters.peek().next();
-            if(last != null) break;
-            iters.pop();
-          }
-        } else {
-          iters.add(ir);
-        }
-        return last;
-      }
-    };
   }
 
   @Override
