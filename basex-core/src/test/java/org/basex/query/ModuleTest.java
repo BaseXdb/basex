@@ -129,6 +129,6 @@ public final class ModuleTest extends SandboxTest {
         + "c:hello#0()", QueryError.INVISIBLEFUNC_X);
     error("import module namespace b  = 'b'   at '" + b.path() + "';\n"
         + "declare namespace c = 'c';\n"
-        + "$c:hello", QueryError.INVISIBLEFUNC_X);
+        + "$c:hello", QueryError.INVISIBLEVAR_X);
   }
 }
