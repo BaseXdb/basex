@@ -255,10 +255,11 @@ public final class StaticFuncs extends ExprInfo {
           final StaticFunc func = call.func;
           if(func != null) {
             if(!call.hasImport) {
-              byte[] funcModule = func.sc.module == null ? Token.EMPTY : func.sc.module.uri();
-              byte[] callModule = call.info().sc().module == null ? Token.EMPTY
-                                                                  : call.info().sc().module.uri();
-              if(!Token.eq(funcModule, callModule)) {
+              final QNm funcMod = func.sc.module;
+              final QNm callMod = call.info().sc().module;
+              final byte[] funcModUri = funcMod == null ? Token.EMPTY : funcMod.uri();
+              final byte[] callModUri = callMod == null ? Token.EMPTY : callMod.uri();
+              if(!Token.eq(funcModUri, callModUri)) {
                 throw INVISIBLEFUNC_X.get(call.info(), call.name);
               }
             }

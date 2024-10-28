@@ -23,15 +23,18 @@ final class StaticVarRef extends ParseExpr {
   private final QNm name;
   /** Referenced variable. */
   private StaticVar var;
-
+  /** Indicates whether a module import for the variable name's URI was present. */
+  final boolean hasImport;
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param name variable name
+   * @param hasImport indicates whether a module import for the variable name's URI was present
    */
-  StaticVarRef(final InputInfo info, final QNm name) {
+  StaticVarRef(final InputInfo info, final QNm name, final boolean hasImport) {
     super(info, SeqType.ITEM_ZM);
     this.name = name;
+    this.hasImport = hasImport;
   }
 
   @Override
@@ -72,7 +75,7 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final StaticVarRef ref = new StaticVarRef(info, name);
+    final StaticVarRef ref = new StaticVarRef(info, name, hasImport);
     ref.var = var;
     return copyType(ref);
   }
