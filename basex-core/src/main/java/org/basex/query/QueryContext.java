@@ -107,6 +107,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Parsed modules, containing the file path and module uri. */
   public final TokenMap modParsed = new TokenMap();
+  /** Parsed modules, containing the file path and library module. */
+  public final TokenObjMap<LibraryModule> libs = new TokenObjMap<>();
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
   final TokenMap modDeclared = new TokenMap();
   /** Stack of module files that are currently parsed. */
@@ -251,7 +253,7 @@ public final class QueryContext extends Job implements Closeable {
           sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, Int.ZERO));
         }
         // create and assign function call
-        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info);
+        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info, true);
         call.setFunc(sf);
         main = new MainModule(call, new VarScope(), sf.sc);
         updating = sf.updating();

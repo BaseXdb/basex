@@ -99,4 +99,58 @@ public final class ModuleTest extends SandboxTest {
       assertEquals(qp.value().serialize().toString(), "OK");
     }
   }
+
+  /** Tests type import. */
+  @Test public void importedTypes() {
+    final IOFile sandbox = sandbox();
+    final IOFile a = new IOFile(sandbox, "a.xqm");
+    write(a, "module namespace a = 'a';\n"
+        + "import module namespace b = 'b' at 'b.xqm';\n"
+        + "declare variable $a:v as b:t := 42;");
+    final IOFile b = new IOFile(sandbox, "b.xqm");
+    write(b, "module namespace b = 'b';\n"
+        + "declare type b:t as xs:integer;"
+        + "declare %private type b:p as xs:string;");
+
+    // type is visible from second import of module b
+    query("import module namespace a = 'a' at '" + a.path() + "';\n"
+        + "import module namespace b = 'b' at '" + b.path() + "';\n"
+        + "let $v as b:t := $a:v return $v");
+
+    // private type remains invisible
+    error("import module namespace b = 'b' at '" + b.path() + "';\n"
+        + "let $v as b:p := 'b:p should not be visible' return $v", QueryError.TYPEUNKNOWN_X);
+  }
+
+  /** Tests rejection of functions and variables, when their modules are not explicitly imported. */
+  @Test public void gh2048() {
+    final IOFile sandbox = sandbox();
+    final IOFile b = new IOFile(sandbox, "b.xqm");
+    write(b, "module namespace b = 'b';\n"
+        + "import module namespace c = 'c' at 'c.xqm';");
+    write(new IOFile(sandbox, "c.xqm"), "module namespace c = 'c';\n"
+        + "declare function c:hello(){\n"
+        + "  $c:hello\n"
+        + "};\n"
+        + "declare variable $c:hello := 'can you see me now';");
+
+    // function is still visible to fn:function-lookup
+    query("import module namespace b = 'b'  at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "fn:function-lookup(xs:QName('c:hello'), 0)()", "can you see me now");
+    // function is still visible to inspect:functions
+    query("import module namespace b  = 'b'  at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "inspect:functions()", "Q{c}hello#0");
+
+    error("import module namespace b = 'b'  at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "c:hello()", QueryError.INVISIBLEFUNC_X);
+    error("import module namespace b = 'b'  at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "c:hello#0()", QueryError.INVISIBLEFUNC_X);
+    error("import module namespace b = 'b'  at '" + b.path() + "';\n"
+        + "declare namespace c = 'c';\n"
+        + "$c:hello", QueryError.INVISIBLEVAR_X);
+  }
 }

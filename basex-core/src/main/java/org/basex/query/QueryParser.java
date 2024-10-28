@@ -799,42 +799,47 @@ public class QueryParser extends InputParser {
     final byte[] tUri = token(uri), pUri = qc.modParsed.get(tPath);
     if(pUri != null) {
       if(!eq(tUri, pUri)) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, pUri);
-      return;
     }
-    qc.modParsed.put(tPath, tUri);
+    else {
+      qc.modParsed.put(tPath, tUri);
 
-    // read module
-    final String query;
-    try {
-      query = io.string();
-    } catch(final IOException expr) {
-      Util.debug(expr);
-      throw error(WHICHMODFILE_X, info, io);
-    }
-
-    qc.modStack.push(tPath);
-    final QueryParser qp = new QueryParser(query, io.path(), qc, null);
-
-    // check if import and declaration uri match
-    final LibraryModule lib = qp.parseLibrary(false);
-    final byte[] muri = lib.sc.module.uri();
-    if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, muri);
-
-    // check if context value declaration types are compatible to each other
-    final StaticContext sctx = qp.sc;
-    if(sctx.contextType != null) {
-      if(sc.contextType == null) {
-        sc.contextType = sctx.contextType;
-      } else if(!sctx.contextType.eq(sc.contextType)) {
-        throw error(VALUETYPES_X_X, sctx.contextType, sc.contextType);
+      // read module
+      final String query;
+      try {
+        query = io.string();
+      } catch(final IOException expr) {
+        Util.debug(expr);
+        throw error(WHICHMODFILE_X, info, io);
       }
+
+      qc.modStack.push(tPath);
+      final QueryParser qp = new QueryParser(query, io.path(), qc, null);
+
+      // check if import and declaration uri match
+      final LibraryModule lib = qp.parseLibrary(false);
+      qc.libs.put(tPath, lib);
+      final byte[] muri = lib.sc.module.uri();
+      if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, muri);
+
+      // check if context value declaration types are compatible to each other
+      final StaticContext sctx = qp.sc;
+      if(sctx.contextType != null) {
+        if(sc.contextType == null) {
+          sc.contextType = sctx.contextType;
+        } else if(!sctx.contextType.eq(sc.contextType)) {
+          throw error(VALUETYPES_X_X, sctx.contextType, sc.contextType);
+        }
+      }
+      qc.modStack.pop();
     }
-    qc.modStack.pop();
 
     // import the module's public types
-    for(final QNm qn : lib.types) {
-      if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
-      declaredTypes.put(qn, lib.types.get(qn));
+    LibraryModule lib = qc.libs.get(tPath);
+    if(lib != null) {
+      for(final QNm qn : lib.types) {
+        if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
+        declaredTypes.put(qn, lib.types.get(qn));
+      }
     }
   }
 
@@ -1935,7 +1940,8 @@ public class QueryParser extends InputParser {
             arg = expr;
           }
           final FuncBuilder fb = argumentList(name != null, arg);
-          expr = name != null ? Functions.get(name, fb, qc) : Functions.dynamic(ex, fb);
+          expr = name != null ? Functions.get(name, fb, qc, moduleURIs.contains(name.uri()))
+                              : Functions.dynamic(ex, fb);
           if(mapping) {
             expr = new GFLWOR(ii, fr, expr);
             localVars.closeScope(s);
@@ -2559,7 +2565,7 @@ public class QueryParser extends InputParser {
       if(Function.ERROR.is(num)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, num);
       final int arity = (int) ((Int) num).itr();
-      return Functions.item(name, arity, false, info(), qc);
+      return Functions.item(name, arity, false, info(), qc, moduleURIs.contains(name.uri()));
     }
     pos = p;
     return null;
@@ -2777,7 +2783,9 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && (name.hasPrefix() || !KEYWORDS.contains(name.string()))) {
       skipWs();
-      if(current('(')) return Functions.get(name, argumentList(true, null), qc);
+      if(current('(')) {
+        return Functions.get(name, argumentList(true, null), qc, moduleURIs.contains(name.uri()));
+      }
     }
     pos = p;
     return null;

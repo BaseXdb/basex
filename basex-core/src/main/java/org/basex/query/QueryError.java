@@ -1038,6 +1038,8 @@ public enum QueryError {
   /** Error code. */
   VARUNDEF_X(XPST, 8, "Undeclared variable: %."),
   /** Error code. */
+  INVISIBLEVAR_X(XPST, 8, "Variable requires missing module import: %."),
+  /** Error code. */
   CIRCREF_X(XPST, 8, "Static variable references itself: %"),
   /** Error code. */
   VARPRIVATE_X(XPST, 8, "Variable % is private."),
@@ -1051,6 +1053,8 @@ public enum QueryError {
   INVNARGS_X_X(XPST, 17, "%: %."),
   /** Error code. */
   WHICHFUNC_X(XPST, 17, "Unknown function: %."),
+  /** Error code. */
+  INVISIBLEFUNC_X(XPST, 17, "Function requires missing module import: %."),
   /** Error code. */
   KEYWORDTWICE_X(XPST, 17, "Keyword supplied twice: %."),
   /** Error code. */

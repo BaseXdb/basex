@@ -54,22 +54,34 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public void check() throws QueryException {
     for(final VarEntry ve : vars.values()) {
-      if(ve.var == null) {
-        final StaticVarRef vr = ve.refs.get(0);
-        throw VARUNDEF_X.get(vr.info(), vr);
+      final StaticVar var = ve.var;
+      if(var == null) {
+        final StaticVarRef ref = ve.refs.get(0);
+        throw VARUNDEF_X.get(ref.info(), ref);
+      }
+      final QNm varMod = var.info.sc().module;
+      final byte[] varModUri = varMod == null ? Token.EMPTY : varMod.uri();
+      for(StaticVarRef ref : ve.refs) {
+        if(!ref.hasImport) {
+          final QNm refMod = ref.info().sc().module;
+          final byte[] refModUri = refMod == null ? Token.EMPTY : refMod.uri();
+          if(!Token.eq(varModUri, refModUri))  throw INVISIBLEVAR_X.get(ref.info(), var.name);
+        }
       }
     }
   }
 
   /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
-   * @param info input info (can be {@code null})
    * @param name variable name
+   * @param info input info (can be {@code null})
+   * @param hasImport indicates whether a module import for the variable name's URI was present
    * @return reference
    * @throws QueryException if the variable is not visible
    */
-  public StaticVarRef newRef(final QNm name, final InputInfo info) throws QueryException {
-    final StaticVarRef ref = new StaticVarRef(info, name);
+  public StaticVarRef newRef(final QNm name, final InputInfo info, final boolean hasImport)
+      throws QueryException {
+    final StaticVarRef ref = new StaticVarRef(info, name, hasImport);
     varEntry(name).addRef(ref);
     return ref;
   }

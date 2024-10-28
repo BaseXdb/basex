@@ -254,6 +254,15 @@ public final class StaticFuncs extends ExprInfo {
           // check if all implementations exist for all functions, set updating flag
           final StaticFunc func = call.func;
           if(func != null) {
+            if(!call.hasImport) {
+              final QNm funcMod = func.sc.module;
+              final QNm callMod = call.info().sc().module;
+              final byte[] funcModUri = funcMod == null ? Token.EMPTY : funcMod.uri();
+              final byte[] callModUri = callMod == null ? Token.EMPTY : callMod.uri();
+              if(!Token.eq(funcModUri, callModUri)) {
+                throw INVISIBLEFUNC_X.get(call.info(), call.name);
+              }
+            }
             if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
             if(func.updating) qc.updating();
           } else if(((JavaCall) call.external).updating) qc.updating();
