@@ -896,11 +896,13 @@ public enum QueryError {
   /** Error code. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** Error code. */
+  NONSNAME(XPST, 3, "Expecting name of namespace."),
+  /** Error code. */
+  NOPINAME(XPST, 3, "Expecting name of processing instruction."),
+  /** Error code. */
   NOEXPR(XPST, 3, "Expecting expression."),
   /** Error code. */
   NOCOMMENT(XPST, 3, "Expecting comment."),
-  /** Error code. */
-  INVALPI(XPST, 3, "Expecting name of processing instruction."),
   /** Error code. */
   PIXML_X(XPST, 3, "Name of processing instruction is illegal: '%'."),
   /** Error code. */

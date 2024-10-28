@@ -39,7 +39,7 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param name name
+   * @param name name (possibly prefixed)
    */
   public QNm(final byte[] name) {
     super(AtomType.QNAME);
@@ -49,7 +49,7 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param name name
+   * @param name name (possibly prefixed)
    */
   public QNm(final String name) {
     this(token(name));
@@ -57,7 +57,7 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param name name
+   * @param name name (possibly prefixed)
    * @param uri namespace URI
    */
   public QNm(final byte[] name, final byte[] uri) {
@@ -67,7 +67,7 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param name name
+   * @param name name (possibly prefixed)
    * @param uri namespace URI
    */
   public QNm(final String name, final byte[] uri) {
@@ -76,7 +76,7 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param name name
+   * @param name name (possibly prefixed)
    * @param uri namespace URI
    */
   public QNm(final String name, final String uri) {
@@ -96,7 +96,7 @@ public final class QNm extends Item {
   /**
    * Constructor, binding a statically known namespace.
    * If no namespace is found, the namespace uri is set to {@code null}.
-   * @param name name
+   * @param name name (possibly prefixed)
    * @param sc static context
    */
   public QNm(final byte[] name, final StaticContext sc) {
@@ -244,6 +244,7 @@ public final class QNm extends Item {
   /**
    * Returns a unique representation of the QName.
    * @return QName as token
+   * @see #prefixId(byte[])
    */
   public byte[] prefixId() {
     return prefixId(null);

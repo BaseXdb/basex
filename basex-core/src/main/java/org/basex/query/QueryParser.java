@@ -940,17 +940,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private QNm checkReserved(final QNm name) throws QueryException {
-    if(reserved(name)) throw error(RESERVED_X, name.local());
-    return name;
-  }
-
-  /**
-   * Checks if the specified name equals reserved function names.
-   * @param name name to be checked
-   * @return result of check
-   */
-  private static boolean reserved(final QNm name) {
-    return !name.hasPrefix() && KEYWORDS.contains(name.string());
+    if(name.hasPrefix() || !KEYWORDS.contains(name.string())) return name;
+    throw error(RESERVED_X, name.local());
   }
 
   /**
@@ -2784,7 +2775,7 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = pos;
     final QNm name = eQName(sc.funcNS, null);
-    if(name != null && !reserved(name)) {
+    if(name != null && (name.hasPrefix() || !KEYWORDS.contains(name.string()))) {
       skipWs();
       if(current('(')) return Functions.get(name, argumentList(true, null), qc);
     }
@@ -3120,7 +3111,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr dirPI() throws QueryException {
-    final byte[] name = ncName(INVALPI);
+    final byte[] name = ncName(NOPINAME);
     if(eq(lc(name), XML)) throw error(PIXML_X, name);
 
     final boolean space = skipWs();
@@ -3161,34 +3152,15 @@ public class QueryParser extends InputParser {
    */
   private Expr compConstructor() throws QueryException {
     final int p = pos;
-    return consume(
-      wsConsumeWs(DOCUMENT) ? compDoc() :
+    final Expr expr = wsConsumeWs(DOCUMENT) ? compDoc() :
       wsConsumeWs(ELEMENT) ? compElement() :
       wsConsumeWs(ATTRIBUTE) ? compAttribute() :
       wsConsumeWs(NAMESPACE) ? compNamespace() :
       wsConsumeWs(TEXT) ? compText() :
       wsConsumeWs(COMMENT) ? compComment() :
-      wsConsumeWs(PROCESSING_INSTRUCTION) ? compPI() : null, p);
-  }
-
-  /**
-   * Consumes the specified expression or resets the query position.
-   * @param expr expression
-   * @param p query position
-   * @return expression or {@code null}
-   */
-  private Expr consume(final Expr expr, final int p) {
+      wsConsumeWs(PROCESSING_INSTRUCTION) ? compPI() : null;
     if(expr == null) pos = p;
     return expr;
-  }
-
-  /**
-   * Parses the "CompDocConstructor" rule.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private Expr compDoc() throws QueryException {
-    return current('{') ? new CDoc(info(), false, enclosedExpr()) : null;
   }
 
   /**
@@ -3198,18 +3170,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compElement() throws QueryException {
-    final Expr name;
-    final InputInfo ii = info();
-    final QNm qnm = eQName(SKIPCHECK, null);
-    if(qnm != null) {
-      name = qnm;
-      qnames.add(qnm, ii);
-    } else {
-      if(!wsConsume("{")) return null;
-      name = check(expr(), NOELEMNAME);
-      wsCheck("}");
-    }
-
+    final Expr name = compName(NOELEMNAME, true);
+    if(name == null) return null;
+    if(name instanceof QNm) qnames.add((QNm) name, info());
     skipWs();
     return current('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
   }
@@ -3220,18 +3183,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compAttribute() throws QueryException {
-    final Expr name;
-    final InputInfo ii = info();
-    final QNm qnm = eQName(SKIPCHECK, null);
-    if(qnm != null) {
-      name = qnm;
-      qnames.add(qnm, false, ii);
-    } else {
-      if(!wsConsume("{")) return null;
-      name = check(expr(), NOATTNAME);
-      wsCheck("}");
-    }
-
+    final Expr name = compName(NOATTNAME, true);
+    if(name == null) return null;
+    if(name instanceof QNm) qnames.add((QNm) name, false, info());
     skipWs();
     return current('{') ? new CAttr(info(), true, name, enclosedExpr()) : null;
   }
@@ -3242,16 +3196,53 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
-    final Expr name;
-    final byte[] str = ncName(null);
-    if(str.length == 0) {
-      if(!current('{')) return null;
-      name = enclosedExpr();
-    } else {
-      name = Str.get(str);
-    }
+    final Expr name = compName(NONSNAME, false);
+    if(name == null) return null;
     skipWs();
     return current('{') ? new CNSpace(info(), true, name, enclosedExpr()) : null;
+  }
+
+  /**
+   * Parses the "CompPIConstructor" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr compPI() throws QueryException {
+    final Expr name = compName(NOPINAME, false);
+    if(name == null) return null;
+    skipWs();
+    return current('{') ? new CPI(info(), true, name, enclosedExpr()) : null;
+  }
+
+  /**
+   * Parses a computed name.
+   * @param error error message
+   * @param qname QName or NCName
+   * @return name or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr compName(final QueryError error, final boolean qname) throws QueryException {
+    // parse name enclosed in curly braces
+    if(consume("{")) {
+      final Expr name = check(expr(), error);
+      wsCheck("}");
+      return name;
+    }
+    // parse name enclosed in quotes
+    if(quote(current())) return Str.get(stringLiteral());
+    // parse literal name
+    if(qname) return eQName(SKIPCHECK, null);
+    final byte[] string = ncName(null);
+    return string.length != 0 ? Str.get(string) : null;
+  }
+
+  /**
+   * Parses the "CompDocConstructor" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr compDoc() throws QueryException {
+    return current('{') ? new CDoc(info(), false, enclosedExpr()) : null;
   }
 
   /**
@@ -3270,26 +3261,6 @@ public class QueryParser extends InputParser {
    */
   private Expr compComment() throws QueryException {
     return current('{') ? new CComm(info(), true, enclosedExpr()) : null;
-  }
-
-  /**
-   * Parses the "CompPIConstructor" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr compPI() throws QueryException {
-    final Expr name;
-    final byte[] str = ncName(null);
-    if(str.length == 0) {
-      if(!wsConsume("{")) return null;
-      name = check(expr(), INVALPI);
-      wsCheck("}");
-    } else {
-      name = Str.get(str);
-    }
-
-    skipWs();
-    return current('{') ? new CPI(info(), true, name, enclosedExpr()) : null;
   }
 
   /**
