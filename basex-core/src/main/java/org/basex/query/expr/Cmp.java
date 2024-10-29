@@ -45,34 +45,31 @@ public abstract class Cmp extends Arr {
   }
 
   /**
-   * Swaps the operands of the expression if this might improve performance.
-   * The operator itself needs to be swapped by the calling expression.
-   * @return resulting expression
+   * Checks if the operands of the expression can be swapped to improve performance.
+   * @return {@code true} if operands were swapped
    */
   final boolean swap() {
-    // move value, or path without root, to second position
     final Expr expr1 = exprs[0], expr2 = exprs[1];
 
-    final boolean swap = POSITION.is(expr2) || !(expr2 instanceof Value) && (
-      // move static value to the right: $words = 'words'
-      expr1 instanceof Value ||
-      // hashed comparisons: move larger sequences to the right: $small = $large
-      expr1.size() > 1 && expr1.size() > expr2.size() &&
-      expr1.seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE) ||
-      // hashed comparisons: . = $words
-      expr1 instanceof VarRef && expr1.seqType().occ.max > 1 &&
-        !(expr2 instanceof VarRef && expr2.seqType().occ.max > 1) ||
-      // context value: . = $item
-      expr1 instanceof VarRef && expr2 instanceof ContextValue ||
-      // index rewritings: move path to the left: word/text() = $word
-      !(expr1 instanceof Path && ((Path) expr1).root == null) &&
-        expr2 instanceof Path && ((Path) expr2).root == null
-    );
+    // keep dedicated function calls as left-hand operand
+    if(COUNT.is(expr1) || POSITION.is(expr1)) return false;
 
-    if(swap) {
-      exprs[0] = expr2;
-      exprs[1] = expr1;
-    }
+    // move position() and count() to the left: position() = 123
+    boolean swap = COUNT.is(expr2) || POSITION.is(expr2);
+    // keep right operand if it is a value
+    if(!swap && expr2 instanceof Value) return false;
+
+    // move static value to the right: $words = 'words'
+    if(!swap) swap = expr1 instanceof Value;
+    // move larger input to the right: $small = $large
+    if(!swap) swap = expr1.size() > 1 && expr1.size() > expr2.size();
+    // move context item to the left: . = $input
+    if(!swap) swap = expr2 instanceof ContextValue && expr2.size() == 1 &&
+        !(expr1 instanceof ContextValue);
+    // move path to the left: word/text() = $word
+    if(!swap) swap = !(expr1 instanceof Path && ((Path) expr1).root == null) &&
+      expr2 instanceof Path && ((Path) expr2).root == null;
+
     return swap;
   }
 

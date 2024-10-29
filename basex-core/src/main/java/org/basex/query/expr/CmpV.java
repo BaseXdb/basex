@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -187,6 +188,7 @@ public final class CmpV extends Cmp {
     // swap operands
     if(swap()) {
       cc.info(OPTSWAP_X, this);
+      Collections.reverse(Arrays.asList(exprs));
       opV = opV.swap();
     }
 

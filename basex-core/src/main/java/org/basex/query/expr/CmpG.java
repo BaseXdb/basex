@@ -196,6 +196,7 @@ public class CmpG extends Cmp {
     // swap operands
     if(swap()) {
       cc.info(QueryText.OPTSWAP_X, this);
+      Collections.reverse(Arrays.asList(exprs));
       op = op.swap();
     }
 
