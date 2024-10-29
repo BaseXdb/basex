@@ -1,3 +1,10 @@
+VERSION 11.5 (October 29, 2024) ----------------------------------------
+
+ - [ADD] New XQuery 4 features (support for named record type, etc)
+ - [MOD] XQuery: tweaked rules for swapping comparison operands
+ - [FIX] Logging: Whitespace normalized
+ - [FIX] XQuery: transitive module imports
+
 VERSION 11.4 (October 2, 2024) -----------------------------------------
 
  - [ADD] New XQuery 4 features (fn:element-number, others)
