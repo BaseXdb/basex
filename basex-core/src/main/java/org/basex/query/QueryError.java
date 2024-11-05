@@ -655,6 +655,8 @@ public enum QueryError {
   INVALZONE_X(FODT, 3, "Timezone out of range (-14:00 to +14:00): %."),
   /** Error code. */
   ZONESEC_X(FODT, 3, "No seconds allowed in timezone: %."),
+  /** Error code. */
+  PLACE_X(FODT, 4, "Unknown place: %."),
 
   /** Error code. */
   FUNERR1(FOER, 0, "Halted on error()."),

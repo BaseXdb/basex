@@ -116,6 +116,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   CHARACTERS(FnCharacters::new, "characters(value)", params(STRING_ZO), STRING_ZM),
   /** XQuery function. */
+  CIVIL_TIMEZONE(FnCivilTimezone::new, "civil-timezone(value[,place])",
+      params(DATE_TIME_O, STRING_ZO), DAY_TIME_DURATION_O),
+  /** XQuery function. */
   CODEPOINT_EQUAL(FnCodepointEqual::new, "codepoint-equal(value1,value2)",
       params(STRING_ZO, STRING_ZO), BOOLEAN_ZO),
   /** XQuery function. */
