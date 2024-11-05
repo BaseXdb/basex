@@ -1480,6 +1480,23 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void loadXQueryModule() {
+    final Function func = LOAD_XQUERY_MODULE;
+    query("let $expr := '2 + 2'\n"
+        + "let $module := `xquery version '4.0'; \n"
+        + "                module namespace dyn='http://example.com/dyn';\n"
+        + "                declare %public variable $dyn:value := {$expr};`\n"
+        + "let $exec := load-xquery-module('http://example.com/dyn', \n"
+        + "                                {'content':$module})\n"
+        + "let $variables := $exec?variables\n"
+        + "return $variables(QName('http://example.com/dyn', 'value'))", 4);
+
+    error(func.args(""), MODULE_URI_EMPTY);
+    error(func.args("x"), MODULE_NOT_FOUND_X);
+    error(func.args("x", " {'content': '%@?$'}"), MODULE_STATIC_ERROR_X_X);
+  }
+
+  /** Test method. */
   @Test public void lowest() {
     final Function func = LOWEST;
     query(func.args(" ()"), "");

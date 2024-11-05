@@ -692,6 +692,18 @@ public enum QueryError {
   NSDECL_X(FONS, 4, "Namespace prefix not declared: %."),
 
   /** Error code. */
+  MODULE_URI_EMPTY(FOQM, 1, "Module URI is a zero-length string."),
+  /** Error code. */
+  MODULE_NOT_FOUND_X(FOQM, 2, "Module not found: '%'"),
+  /** Error code. */
+  MODULE_STATIC_ERROR_X_X(FOQM, 3, "Static error in dynamically loaded XQuery module '%': %"),
+  /** Error code. */
+  MODULE_PARAMETER_TYPE(FOQM, 5,
+      "Parameter for dynamically loaded XQuery module has incorrect type: '%'"),
+  /** Error code. */
+  MODULE_XQUERY_VERSION(FOQM, 6, "No suitable XQuery processor available: '%'"),
+
+  /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** Error code. */
   FUNCCAST_X_X(FORG, 1, "Cannot convert to %: %."),
@@ -1567,6 +1579,7 @@ public enum QueryError {
     /** Error type. */ FOJS,
     /** Error type. */ FONS,
     /** Error type. */ FORG,
+    /** Error type. */ FOQM,
     /** Error type. */ FORX,
     /** Error type. */ FOTY,
     /** Error type. */ FOUP,

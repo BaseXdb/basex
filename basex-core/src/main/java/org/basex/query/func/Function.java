@@ -390,6 +390,9 @@ public enum Function implements AFunction {
   LAST(FnLast::new, "last()",
       params(), INTEGER_O, flag(POS, CTX)),
   /** XQuery function. */
+  LOAD_XQUERY_MODULE(FnLoadXQueryModule::new, "load-xquery-module(module-uri[,options])",
+      params(STRING_O, MAP_ZO), MAP_O),
+  /** XQuery function. */
   LOCAL_NAME(FnLocalName::new, "local-name([node])",
       params(NODE_ZO), STRING_O),
   /** XQuery function. */
