@@ -341,25 +341,30 @@ public class DBNode extends ANode {
 
     return new DBNodeIter(data) {
       private final DBNode node = finish();
-      int kind = kind(), curr = pre + (self ? 0 : data.size(pre, kind())), size = -1;
+      int curr = self ? -2 : -1, size;
 
       @Override
       public DBNode next() {
         // initialize iterator: find last node that needs to be scanned
-        if(size == -1) {
-          if(data.meta.ndocs > 1) {
-            int p = pre;
-            for(final ANode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
-            size = p + data.size(p, data.kind(p));
-          } else {
-            size = data.meta.size;
+        if(curr == -2) {
+          ++curr;
+        } else {
+          if(curr == -1) {
+            curr = pre + data.size(pre, kind());
+            if(data.meta.ndocs > 1) {
+              int p = pre;
+              for(final ANode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
+              size = p + data.size(p, data.kind(p));
+            } else {
+              size = data.meta.size;
+            }
           }
-        }
+          if(curr == size) return null;
 
-        if(curr == size) return null;
-        kind = data.kind(curr);
-        node.set(curr, kind);
-        curr += data.attSize(curr, kind);
+          final int kind = data.kind(curr);
+          node.set(curr, kind);
+          curr += data.attSize(curr, kind);
+        }
         return node;
       }
     };
@@ -367,13 +372,14 @@ public class DBNode extends ANode {
 
   @Override
   public final BasicNodeIter followingSiblingIter(final boolean self) {
-    final int k = kind(), parent = data.parent(pre, k);
-    if(parent == -1) return root != null ? super.followingSiblingIter(self) : BasicNodeIter.EMPTY;
+    final int parent = data.parent(pre, kind());
+    if(parent == -1) return root != null ? super.followingSiblingIter(self) :
+      self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new DBNodeIter(data) {
       final DBNode node = finish();
       final int last = parent + data.size(parent, data.kind(parent));
-      int curr = pre + (self ? 0 : data.size(pre, k));
+      int curr = pre + (self ? 0 : data.size(pre, kind()));
 
       @Override
       public DBNode next() {
