@@ -474,19 +474,15 @@ public class QueryParser extends InputParser {
           }
           ann = new Ann(ii, name, items.value());
         } else {
-          // check if annotation is specified more than once
           if(def.single && anns.contains(def)) throw error(BASEX_ANN3_X_X, ii, "%", def.id());
+          final int is = items.size();
+          final IntList arities = Functions.checkArity(is, def.minMax[0], def.minMax[1]);
+          if(arities != null) throw error(BASEX_ANN2_X_X, ii, def, arity(arguments(is), arities));
 
-          final long arity = items.size();
-          if(arity < def.minMax[0] || arity > def.minMax[1]) {
-            final IntList arities = new IntList();
-            for(int m = def.minMax[0]; m <= def.minMax[1]; m++) arities.add(m);
-            throw error(BASEX_ANN2_X_X, ii, def, arity(arguments(arity), arities));
-          }
           final int al = def.params.length;
-          for(int a = 0; a < arity; a++) {
-            final SeqType st = def.params[Math.min(al - 1, a)];
-            final Item item = items.get(a);
+          for(int i = 0; i < is; i++) {
+            final SeqType st = def.params[Math.min(al - 1, i)];
+            final Item item = items.get(i);
             if(!st.instance(item)) throw error(BASEX_ANN_X_X_X, ii, def, st, item.seqType());
           }
           ann = new Ann(ii, def, items.value());
