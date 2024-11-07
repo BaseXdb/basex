@@ -216,6 +216,8 @@ public final class SeqType {
   public static final SeqType MAP_ZM = MAP.seqType(ZERO_OR_MORE);
   /** Single array. */
   public static final SeqType ARRAY_O = ARRAY.seqType();
+  /** Zero or one array. */
+  public static final SeqType ARRAY_ZO = ARRAY.seqType(ZERO_OR_ONE);
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
   /** Single NMTOKENS. */

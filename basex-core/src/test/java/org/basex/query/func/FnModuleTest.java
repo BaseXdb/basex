@@ -1278,26 +1278,6 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void intersperse() {
-    final Function func = INTERSPERSE;
-
-    query(func.args(" ()", " ()"), "");
-    query(func.args(" ()", 1), "");
-    query(func.args(1, " ()"), 1);
-    query(func.args(" (1, 2)", " ()"), "1\n2");
-
-    query(func.args(1, "a"), 1);
-    query(func.args(1, " ('a', 'b')"), 1);
-    query(func.args(" (1, 2)", "a"), "1\na\n2");
-    query(func.args(" (1, 2)", " ('a', 'b')"), "1\na\nb\n2");
-
-    check(func.args(1, "a") + " => count()", 1, root(Int.class));
-    check(func.args(" 1[. = <_>1</_>]", "a"), 1, root(If.class));
-    check(func.args(" (1, 2)[. = <_>3</_>]", " 'a'"), "", root(func));
-    check(func.args(" (1, 2)", " 'a'[. = <_/>]"), "1\n2", root(func));
-  }
-
-  /** Test method. */
   @Test public void invisibleXml() {
     final Function func = INVISIBLE_XML;
     // unambiguous grammar
@@ -2096,6 +2076,26 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" (1 to 6, (7 to " + wrap(13) + ")[. > 12], (14 to " + wrap(20) + ")[. > 18])"),
         "20\n19\n13\n6\n5\n4\n3\n2\n1", count(REVERSE, 2));
+  }
+
+  /** Test method. */
+  @Test public void sequenceJoin() {
+    final Function func = SEQUENCE_JOIN;
+
+    query(func.args(" ()", " ()"), "");
+    query(func.args(" ()", 1), "");
+    query(func.args(1, " ()"), 1);
+    query(func.args(" (1, 2)", " ()"), "1\n2");
+
+    query(func.args(1, "a"), 1);
+    query(func.args(1, " ('a', 'b')"), 1);
+    query(func.args(" (1, 2)", "a"), "1\na\n2");
+    query(func.args(" (1, 2)", " ('a', 'b')"), "1\na\nb\n2");
+
+    check(func.args(1, "a") + " => count()", 1, root(Int.class));
+    check(func.args(" 1[. = <_>1</_>]", "a"), 1, root(If.class));
+    check(func.args(" (1, 2)[. = <_>3</_>]", " 'a'"), "", root(func));
+    check(func.args(" (1, 2)", " 'a'[. = <_/>]"), "1\n2", root(func));
   }
 
   /** Test method. */

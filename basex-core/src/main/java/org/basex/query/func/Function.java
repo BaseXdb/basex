@@ -366,7 +366,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   INSERT_BEFORE(FnInsertBefore::new, "insert-before(input,position,insert)",
       params(ITEM_ZM, INTEGER_O, ITEM_ZM), ITEM_ZM),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   INTERSPERSE(FnIntersperse::new, "intersperse(input,separator)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
@@ -559,8 +559,14 @@ public enum Function implements AFunction {
   SECONDS_FROM_TIME(FnSecondsFromTime::new, "seconds-from-time(value)",
       params(TIME_ZO), DECIMAL_ZO),
   /** XQuery function. */
+  SEQUENCE_JOIN(FnSequenceJoin::new, "sequence-join(input,separator)",
+      params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
+  /** XQuery function. */
   SERIALIZE(FnSerialize::new, "serialize(input[,options])",
       params(ITEM_ZM, ITEM_ZO), STRING_O),
+  /** XQuery function. */
+  SIBLINGS(FnSiblings::new, "siblings([node])",
+      params(NODE_ZO), NODE_ZO),
   /** XQuery function. */
   SLICE(FnSlice::new, "slice(input[,start,end,step])",
       params(ITEM_ZM, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ITEM_ZM),
@@ -816,8 +822,8 @@ public enum Function implements AFunction {
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore::new, "insert-before(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_JOIN(ArrayJoin::new, "join(arrays)",
-      params(ARRAY_ZM), ARRAY_O, ARRAY_URI),
+  _ARRAY_JOIN(ArrayJoin::new, "join(arrays[,separator])",
+      params(ARRAY_ZM, ARRAY_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
       params(ARRAY_O), MAP_ZM, ARRAY_URI),
