@@ -2,6 +2,8 @@ package org.basex.core.jobs;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * Result of a query job.
@@ -42,5 +44,20 @@ public final class QueryJobResult {
    */
   public boolean cached() {
     return job.state == JobState.CACHED;
+  }
+
+  /**
+   * Returns the outcome of a query (result or exception).
+   * @return value
+   * @throws QueryException exception
+   */
+  public Value get() throws QueryException {
+    if(exception != null) throw exception;
+    return value != null ? value : Empty.VALUE;
+  }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '[' + (exception != null ? exception : value) + ']';
   }
 }

@@ -33,12 +33,7 @@ public final class JobResult extends StandardFunc {
     final QueryJobResult result = results.get(id);
     if(result == null) return Empty.VALUE;
     if(result.value == null && result.exception == null) throw JOBS_RUNNING_X.get(info, id);
-
-    try {
-      if(result.exception != null) throw result.exception;
-      return result.value;
-    } finally {
-      if(!options.get(ResultOptions.KEEP)) results.remove(id);
-    }
+    if(!options.get(ResultOptions.KEEP)) results.remove(id);
+    return result.get();
   }
 }

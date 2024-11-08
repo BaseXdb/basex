@@ -1558,8 +1558,11 @@ public enum Function implements AFunction {
   _JOB_CURRENT(JobCurrent::new, "current()",
       params(), STRING_O, flag(NDT), JOB_URI),
   /** XQuery function. */
-  _JOB_EVAL(JobEval::new, "eval(input[,bindings,options])",
+  _JOB_EVAL(JobEval::new, "eval(query[,bindings,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), JOB_URI, Perm.ADMIN),
+  /** XQuery function. */
+  _JOB_EXECUTE(JobExecute::new, "execute(query[,bindings])",
+      params(ANY_ATOMIC_TYPE_O, MAP_ZO), ITEM_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_FINISHED(JobFinished::new, "finished(id)",
       params(STRING_O), BOOLEAN_O, flag(NDT), JOB_URI, Perm.ADMIN),
