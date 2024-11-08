@@ -1946,17 +1946,17 @@ public enum Function implements AFunction {
   // XQuery Module
 
   /** XQuery function. */
-  _XQUERY_EVAL(XQueryEval::new, "eval(input[,bindings,options])",
+  _XQUERY_EVAL(XQueryEval::new, "eval(query[,bindings,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
-  _XQUERY_EVAL_UPDATE(XQueryEvalUpdate::new, "eval-update(input[,bindings,options])",
+  _XQUERY_EVAL_UPDATE(XQueryEvalUpdate::new, "eval-update(query[,bindings,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), EMPTY_SEQUENCE_Z,
       flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions[,options])",
       params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI, Perm.ADMIN),
   /** XQuery function. */
-  _XQUERY_PARSE(XQueryParse::new, "parse(input[,options])",
+  _XQUERY_PARSE(XQueryParse::new, "parse(query[,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO), NODE_O, flag(NDT), XQUERY_URI, Perm.CREATE),
 
   // XSLT Module
