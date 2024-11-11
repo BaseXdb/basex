@@ -451,6 +451,9 @@ public enum Function implements AFunction {
   NILLED(FnNilled::new, "nilled([node])",
       params(NODE_ZO), BOOLEAN_ZO),
   /** XQuery function. */
+  NODE_KIND(FnNodeKind::new, "node-kind([node])",
+      params(NODE_ZO), STRING_ZO),
+  /** XQuery function. */
   NODE_NAME(FnNodeName::new, "node-name([node])",
       params(NODE_ZO), QNAME_ZO),
   /** XQuery function. */
