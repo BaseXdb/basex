@@ -2,6 +2,8 @@ package org.basex.core.jobs;
 
 import java.util.*;
 
+import org.basex.util.*;
+
 /**
  * Scheduled job.
  *
@@ -50,5 +52,14 @@ public final class QueryJobTask extends TimerTask {
     }
     // skip execution if same job is still running
     if(!jobs.active.containsKey(job.jc().id())) new Thread(job).start();
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[').append(job);
+    sb.append(", interval:").append(interval);
+    sb.append(", start:").append(start);
+    if(end != Long.MAX_VALUE) sb.append(", end:").append(end);
+    return sb.append(']').toString();
   }
 }

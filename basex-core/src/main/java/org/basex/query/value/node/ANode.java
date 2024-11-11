@@ -565,17 +565,15 @@ public abstract class ANode extends Item {
    * @return iterator
    */
   public BasicNodeIter followingSiblingIter(final boolean self) {
+    final ANode root = parent();
+    if(root == null || type == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+
     return new BasicNodeIter() {
-      private BasicNodeIter iter;
+      private BasicNodeIter iter = root.childIter();
       private boolean found;
 
       @Override
       public ANode next() {
-        if(iter == null) {
-          final ANode root = parent();
-          if(root == null) return null;
-          iter = root.childIter();
-        }
         for(ANode n; !found && (n = iter.next()) != null;) {
           if(n.is(ANode.this)) {
             found = true;
@@ -648,16 +646,16 @@ public abstract class ANode extends Item {
    * @return iterator
    */
   public final BasicNodeIter precedingSiblingIter(final boolean self) {
-    return type == ATTRIBUTE ? self ? selfIter() : BasicNodeIter.EMPTY : new BasicNodeIter() {
+    final ANode root = parent();
+    if(root == null || type == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+
+    return new BasicNodeIter() {
       private ANodeList list;
       private int l;
 
       @Override
       public ANode next() {
         if(list == null) {
-          final ANode root = parent();
-          if(root == null) return null;
-
           list = new ANodeList();
           for(final ANode node : root.childIter()) {
             final boolean last = node.is(ANode.this);

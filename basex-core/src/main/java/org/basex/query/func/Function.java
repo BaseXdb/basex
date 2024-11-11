@@ -116,6 +116,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   CHARACTERS(FnCharacters::new, "characters(value)", params(STRING_ZO), STRING_ZM),
   /** XQuery function. */
+  CIVIL_TIMEZONE(FnCivilTimezone::new, "civil-timezone(value[,place])",
+      params(DATE_TIME_O, STRING_ZO), DAY_TIME_DURATION_O),
+  /** XQuery function. */
   CODEPOINT_EQUAL(FnCodepointEqual::new, "codepoint-equal(value1,value2)",
       params(STRING_ZO, STRING_ZO), BOOLEAN_ZO),
   /** XQuery function. */
@@ -363,7 +366,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   INSERT_BEFORE(FnInsertBefore::new, "insert-before(input,position,insert)",
       params(ITEM_ZM, INTEGER_O, ITEM_ZM), ITEM_ZM),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   INTERSPERSE(FnIntersperse::new, "intersperse(input,separator)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
@@ -559,8 +562,14 @@ public enum Function implements AFunction {
   SECONDS_FROM_TIME(FnSecondsFromTime::new, "seconds-from-time(value)",
       params(TIME_ZO), DECIMAL_ZO),
   /** XQuery function. */
+  SEQUENCE_JOIN(FnSequenceJoin::new, "sequence-join(input,separator)",
+      params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
+  /** XQuery function. */
   SERIALIZE(FnSerialize::new, "serialize(input[,options])",
       params(ITEM_ZM, ITEM_ZO), STRING_O),
+  /** XQuery function. */
+  SIBLINGS(FnSiblings::new, "siblings([node])",
+      params(NODE_ZO), NODE_ZO),
   /** XQuery function. */
   SLICE(FnSlice::new, "slice(input[,start,end,step])",
       params(ITEM_ZM, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ITEM_ZM),
@@ -816,8 +825,8 @@ public enum Function implements AFunction {
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore::new, "insert-before(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_JOIN(ArrayJoin::new, "join(arrays)",
-      params(ARRAY_ZM), ARRAY_O, ARRAY_URI),
+  _ARRAY_JOIN(ArrayJoin::new, "join(arrays[,separator])",
+      params(ARRAY_ZM, ARRAY_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
       params(ARRAY_O), MAP_ZM, ARRAY_URI),
@@ -1552,8 +1561,11 @@ public enum Function implements AFunction {
   _JOB_CURRENT(JobCurrent::new, "current()",
       params(), STRING_O, flag(NDT), JOB_URI),
   /** XQuery function. */
-  _JOB_EVAL(JobEval::new, "eval(input[,bindings,options])",
+  _JOB_EVAL(JobEval::new, "eval(query[,bindings,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), STRING_O, flag(NDT), JOB_URI, Perm.ADMIN),
+  /** XQuery function. */
+  _JOB_EXECUTE(JobExecute::new, "execute(query[,bindings])",
+      params(ANY_ATOMIC_TYPE_O, MAP_ZO), ITEM_ZM, flag(NDT), JOB_URI, Perm.ADMIN),
   /** XQuery function. */
   _JOB_FINISHED(JobFinished::new, "finished(id)",
       params(STRING_O), BOOLEAN_O, flag(NDT), JOB_URI, Perm.ADMIN),
@@ -1937,17 +1949,17 @@ public enum Function implements AFunction {
   // XQuery Module
 
   /** XQuery function. */
-  _XQUERY_EVAL(XQueryEval::new, "eval(input[,bindings,options])",
+  _XQUERY_EVAL(XQueryEval::new, "eval(query[,bindings,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI),
   /** XQuery function. */
-  _XQUERY_EVAL_UPDATE(XQueryEvalUpdate::new, "eval-update(input[,bindings,options])",
+  _XQUERY_EVAL_UPDATE(XQueryEvalUpdate::new, "eval-update(query[,bindings,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), EMPTY_SEQUENCE_Z,
       flag(UPD), XQUERY_URI),
   /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions[,options])",
       params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(HOF), XQUERY_URI, Perm.ADMIN),
   /** XQuery function. */
-  _XQUERY_PARSE(XQueryParse::new, "parse(input[,options])",
+  _XQUERY_PARSE(XQueryParse::new, "parse(query[,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO), NODE_O, flag(NDT), XQUERY_URI, Perm.CREATE),
 
   // XSLT Module

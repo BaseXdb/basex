@@ -164,7 +164,8 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      checkArity(arity, fd.minMax[0], fd.minMax[1], true, info, fd);
+      final IntList arts = checkArity(arity, fd.minMax[0], fd.minMax[1]);
+      if(arts != null) throw wrongArity(arity, arts, true, info, fd);
 
       final FuncType ft = fd.type(arity, fb.anns);
       final QNm[] names = fd.paramNames(arity);
@@ -359,27 +360,23 @@ public final class Functions {
   }
 
   /**
-   * Raises an error for the wrong number of function arguments.
+   * Checks if the specified number of arguments matches the allowed min/max range.
+   * If not, returns an array with the allowed numbers of parameters.
    * @param nargs number of supplied arguments
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
-   * @param literal literal
-   * @param info input info (can be {@code null})
-   * @param function function (for error messages)
-   * @throws QueryException query exception
+   * @return arities or {@code null}
    */
-  private static void checkArity(final int nargs, final int min, final int max,
-      final boolean literal, final InputInfo info, final Object function) throws QueryException {
+  public static IntList checkArity(final long nargs, final int min, final int max) {
+    if(nargs >= min && nargs <= max) return null;
 
-    if(nargs < min || nargs > max) {
-      final IntList arities = new IntList();
-      if(max != Integer.MAX_VALUE) {
-        for(int m = min; m <= max; m++) arities.add(m);
-      } else {
-        arities.add(-min);
-      }
-      throw wrongArity(nargs, arities, literal, info, function);
+    final IntList arities = new IntList();
+    if(max != Integer.MAX_VALUE) {
+      for(int m = min; m <= max; m++) arities.add(m);
+    } else {
+      arities.add(-min);
     }
+    return arities;
   }
 
   /**
@@ -436,7 +433,8 @@ public final class Functions {
         args[a] = Empty.UNDEFINED;
       }
     }
-    checkArity(arity, min, max, false, fb.info, function);
+    final IntList arities = checkArity(arity, min, max);
+    if(arities != null) throw wrongArity(arity, arities, false, fb.info, function);
     return args;
   }
 

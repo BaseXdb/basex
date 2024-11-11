@@ -34,7 +34,7 @@ public final class QueryJob extends Job implements Runnable {
   private boolean remove;
 
   /**
-   * Constructor.
+   * Constructor, which creates and registers the specified job.
    * @param job job info
    * @param context database context
    * @param info input info (can be {@code null})
