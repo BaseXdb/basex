@@ -214,10 +214,6 @@ public enum Function implements AFunction {
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
-  ELEMENT_NUMBER(FnElementNumber::new, "element-number([element,root,predicate])",
-      params(ELEMENT_ZO, NODE_ZO,
-      FuncType.get(BOOLEAN_ZO, ELEMENT_O).seqType().with(Occ.ZERO_OR_ONE)), INTEGER_ZO),
-  /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
   /** XQuery function. */
