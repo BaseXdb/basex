@@ -52,7 +52,7 @@ final class SyntaxXQuery extends Syntax {
       }
       for(final Axis a : Axis.VALUES) Collections.addAll(KEYWORDS, a.name);
       for(final OpV o : OpV.VALUES) Collections.addAll(KEYWORDS, o.name);
-      for(final OpN o : OpN.VALUES) Collections.addAll(KEYWORDS, o.name);
+      for(final OpN o : OpN.VALUES) Collections.addAll(KEYWORDS, o.names[0]);
       final Atts ns = NSGlobal.NS;
       for(int n = 0; n < ns.size(); n++) KEYWORDS.add(string(ns.name(n)));
     } catch(final Exception ex) {
