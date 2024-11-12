@@ -432,7 +432,7 @@ public final class QT3TS extends Main {
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
-    "'staticTyping', 'typedData', 'XQUpdate', 'fn-transform-XSLT', 'fn-load-xquery-module')";
+    "'staticTyping', 'typedData', 'XQUpdate', 'fn-transform-XSLT')";
 
   /**
    * Checks if the current test case is supported.

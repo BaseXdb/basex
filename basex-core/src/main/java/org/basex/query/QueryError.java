@@ -700,10 +700,10 @@ public enum QueryError {
   /** Error code. */
   MODULE_STATIC_ERROR_X_X(FOQM, 3, "Static error in dynamically loaded XQuery module '%': %"),
   /** Error code. */
-  MODULE_PARAMETER_TYPE(FOQM, 5,
-      "Parameter for dynamically loaded XQuery module has incorrect type: '%'"),
+  MODULE_PARAMETER_TYPE_X_X(FOQM, 5,
+      "Parameter for dynamically loaded XQuery module '%' has incorrect type: %"),
   /** Error code. */
-  MODULE_XQUERY_VERSION(FOQM, 6, "No suitable XQuery processor available: '%'"),
+  MODULE_XQUERY_VERSION_X(FOQM, 6, "No suitable XQuery processor available: '%'"),
 
   /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),

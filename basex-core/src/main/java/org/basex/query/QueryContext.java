@@ -110,7 +110,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Parsed modules, containing the file path and library module. */
   public final TokenObjMap<LibraryModule> libs = new TokenObjMap<>();
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
-  final TokenMap modDeclared = new TokenMap();
+  public final TokenMap modDeclared = new TokenMap();
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
@@ -283,7 +283,7 @@ public final class QueryContext extends Job implements Closeable {
           bind(entry.getKey(), Atm.get(entry.getValue()), null, main.sc);
         }
       }
-      vars.bindExternal(this, bindings);
+      vars.bindExternal(this, bindings, true);
 
       return compile(false);
     });
