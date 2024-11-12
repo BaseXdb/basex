@@ -751,13 +751,13 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,combine])",
       params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
-      MAP_O, flag(HOF), MAP_URI),
+      PAIR_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_PAIR(MapPair::new, "pair(key,value)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), PAIR_O, MAP_URI),
   /** XQuery function. */
   _MAP_PAIRS(MapPairs::new, "pairs(map)",
-      params(MAP_O), MAP_ZM, MAP_URI),
+      params(MAP_O), PAIR_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_PUT(MapPut::new, "put(map,key,value)",
       params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
@@ -829,10 +829,10 @@ public enum Function implements AFunction {
       params(ARRAY_ZM, ARRAY_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
-      params(ARRAY_O), MAP_ZM, ARRAY_URI),
+      params(ARRAY_O), MEMBER_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_OF_MEMBERS(ArrayOfMembers::new, "of-members(input)",
-      params(MAP_ZM), ARRAY_O, ARRAY_URI),
+      params(MEMBER_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
