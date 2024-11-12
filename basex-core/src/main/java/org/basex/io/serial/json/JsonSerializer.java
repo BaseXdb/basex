@@ -50,7 +50,8 @@ public abstract class JsonSerializer extends StandardSerializer {
     super(os, sopts);
     jopts = sopts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
-    escapeSolidus = escape && sopts.get(SerializerOptions.ESCAPE_SOLIDUS) == YesNo.YES;
+    escapeSolidus = escape && jopts.get(JsonSerialOptions.ESCAPE_SOLIDUS) &&
+        sopts.get(SerializerOptions.ESCAPE_SOLIDUS) == YesNo.YES;
     nodups = sopts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
     lines = sopts.get(SerializerOptions.JSON_LINES) == YesNo.YES;
     final Boolean ji = jopts.get(JsonSerialOptions.INDENT);
