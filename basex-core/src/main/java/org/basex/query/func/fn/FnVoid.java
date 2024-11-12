@@ -22,16 +22,9 @@ public class FnVoid extends StandardFunc {
     final Expr input = arg(0);
     final boolean evaluate = toBooleanOrFalse(arg(1), qc);
 
-    // ensure that deterministic input will be evaluated
+    // ensure that nondeterministic input will be evaluated
     if(evaluate || input.has(Flag.NDT)) {
-      final Iter iter = input.iter(qc);
-      if(iter.valueIter()) {
-        iter.value(qc, null).cache(false, info);
-      } else {
-        for(Item item; (item = qc.next(iter)) != null;) {
-          item.cache(false, info);
-        }
-      }
+      for(final Iter iter = input.iter(qc); (qc.next(iter)) != null;);
     }
     return Empty.VALUE;
   }
