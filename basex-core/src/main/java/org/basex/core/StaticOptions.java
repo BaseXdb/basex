@@ -67,6 +67,10 @@ public final class StaticOptions extends Options {
   public static final NumberOption PARALLEL = new NumberOption("PARALLEL", 8);
   /** Logging flag. */
   public static final StringOption LOG = new StringOption("LOG", "data");
+  /** Log filter. */
+  public static final StringOption LOGFILTER = new StringOption("LOGFILTER", "");
+  /** Log remove patterb. */
+  public static final StringOption LOGREMOVE = new StringOption("LOGREMOVE", "");
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
   /** Write trace output to the logs. */
