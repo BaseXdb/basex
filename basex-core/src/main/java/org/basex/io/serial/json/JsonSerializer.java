@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.Token.normalize;
 
 import java.io.*;
+import java.math.*;
 
 import org.basex.build.json.*;
 import org.basex.io.out.PrintOutput.*;
@@ -141,11 +142,17 @@ public abstract class JsonSerializer extends StandardSerializer {
   protected void atomic(final Item item) throws IOException {
     try {
       final Type type = item.type;
-      if(type.isNumber()) {
-        final byte[] str = item.string(null);
-        if(eq(str, NAN, INF, NEGATVE_INF)) throw SERNUMBER_X.getIO(str);
-        out.print(str);
-      } else if(type == AtomType.BOOLEAN) {
+      if(type == AtomType.BOOLEAN) {
+        out.print(item.string(null));
+      } else if(type.oneOf(AtomType.DOUBLE, AtomType.FLOAT)) {
+        final double d = item.dbl(null);
+        if(Double.isNaN(d) || Double.isInfinite(d)) throw SERNUMBER_X.getIO(d);
+        final BigDecimal bd = BigDecimal.valueOf(d).stripTrailingZeros();
+        final double abs = Math.abs(d);
+        out.print(d == 0 && Double.doubleToRawLongBits(d) < 0 ? "-0" :
+          abs >= 1e-6 && abs < 1e21 ? bd.toPlainString() :
+          bd.toString().replace('E', 'e').replace("e+", "e"));
+      } else if(type.isNumber()) {
         out.print(item.string(null));
       } else {
         string(item.string(null));
