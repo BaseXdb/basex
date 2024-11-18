@@ -371,8 +371,8 @@ public final class CompileContext {
   public Expr voidAndReturn(final Expr expr, final Expr result, final InputInfo info)
       throws QueryException {
     // a nondeterministic expression may get deterministic when optimizing the query
-    return expr.has(Flag.NDT) ?
-      List.get(this, info, function(Function.VOID, info, expr, Bln.TRUE), result) : result;
+    return expr.has(Flag.NDT) ? List.get(this, info, function(Function.VOID, info, expr), result) :
+      result;
   }
 
   /**

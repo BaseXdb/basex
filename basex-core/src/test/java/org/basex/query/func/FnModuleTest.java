@@ -469,7 +469,7 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
-    check(func.args(VOID.args(1)), "", root(VOID));
+    check(func.args(VOID.args(1, true)), "", root(VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
 
     // remove duplicate expressions
@@ -2230,17 +2230,17 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (" + wrap("1") + " + 1, 3)", 1, 2), "2\n3", root(List.class));
     check(func.args(" replicate(" + wrap("1") + " + 1, 3)", 2), "2\n2", root(REPLICATE));
 
-    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + VOID.args(true),
         "", empty(func));
-    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + VOID.args(true),
         "", empty(func), exists(TAIL));
-    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + VOID.args(true),
         "", empty(func), exists(_UTIL_RANGE));
-    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + VOID.args(true),
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + VOID.args(true),
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + VOID.args(true),
         "", empty(func), exists(_UTIL_RANGE));
   }
 
@@ -2846,9 +2846,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("1, 2"), "");
     query(func.args("1, 2", true), "");
 
-    check(func.args("(1 to 10000000000000) ! string()", true), "", empty());
-    error(func.args(" 1 + <a/>", false), FUNCCAST_X_X);
-    query(func.args(" 1 + <a/>", true), "");
+    check(func.args(" (1 to 10000000000000) ! string()"), "", empty());
+    query(func.args(" 1 + <a/>"), "");
+    query(func.args(" 2 + <a/>", false), "");
+    error(func.args(" 3 + <a/>", true), FUNCCAST_X_X);
 
     // GH-2139: Simplify inlined nondeterministic code
     check("let $doc := doc('" + TEXT + "') let $a := 1 return $a", 1, root(Int.class));

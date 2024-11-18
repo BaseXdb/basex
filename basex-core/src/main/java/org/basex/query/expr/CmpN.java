@@ -31,7 +31,7 @@ public final class CmpN extends Cmp {
     },
 
     /** Node comparison: before. */
-    ET("<<") {
+    ET("<<", "\uFF1C\uFF1C") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.compare(node2) < 0;
@@ -39,7 +39,7 @@ public final class CmpN extends Cmp {
     },
 
     /** Node comparison: after. */
-    GT(">>") {
+    GT(">>", "\uFF1E\uFF1E") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.compare(node2) > 0;
@@ -48,15 +48,15 @@ public final class CmpN extends Cmp {
 
     /** Cached enums (faster). */
     public static final OpN[] VALUES = values();
-    /** String representation. */
-    public final String name;
+    /** String representations. */
+    public final String[] names;
 
     /**
      * Constructor.
-     * @param name string representation
+     * @param names string representations
      */
-    OpN(final String name) {
-      this.name = name;
+    OpN(final String... names) {
+      this.names = names;
     }
 
     /**
@@ -69,7 +69,7 @@ public final class CmpN extends Cmp {
 
     @Override
     public String toString() {
-      return name;
+      return names[0];
     }
   }
 
@@ -149,7 +149,7 @@ public final class CmpN extends Cmp {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, OP, op.name), exprs);
+    plan.add(plan.create(this, OP, op.names[0]), exprs);
   }
 
   @Override

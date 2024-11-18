@@ -142,8 +142,10 @@ public enum NodeType implements Type {
     ATTRIBUTE, COMMENT, NAMESPACE_NODE, PROCESSING_INSTRUCTION, TEXT
   };
 
-  /** Name. */
-  private final byte[] name;
+  /** Test. */
+  private final byte[] test;
+  /** Kind. */
+  private final byte[] kind;
   /** Parent type. */
   private final Type parent;
   /** Type id . */
@@ -151,8 +153,6 @@ public enum NodeType implements Type {
 
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
-  /** QName (lazy instantiation). */
-  private QNm qnm;
 
   /**
    * Constructor.
@@ -161,7 +161,8 @@ public enum NodeType implements Type {
    * @param id type id
    */
   NodeType(final String name, final Type parent, final ID id) {
-    this.name = Token.token(name);
+    this.test = Token.token(name);
+    this.kind = Token.token(name.replace("-node", ""));;
     this.parent = parent;
     this.id = id;
   }
@@ -217,12 +218,19 @@ public enum NodeType implements Type {
   }
 
   /**
-   * Returns the name of a node type.
-   * @return name
+   * Returns the node kind.
+   * @return kind
    */
-  public final QNm qname() {
-    if(qnm == null) qnm = new QNm(name);
-    return qnm;
+  public final byte[] kind() {
+    return kind;
+  }
+
+  /**
+   * Returns the name of the node type.
+   * @return type
+   */
+  public final byte[] test() {
+    return test;
   }
 
   @Override
@@ -291,7 +299,7 @@ public enum NodeType implements Type {
    * @return string representation
    */
   public final String toString(final String arg) {
-    return new TokenBuilder().add(name).add('(').add(arg).add(')').toString();
+    return new TokenBuilder().add(test).add('(').add(arg).add(')').toString();
   }
 
   /**
@@ -303,7 +311,7 @@ public enum NodeType implements Type {
     if(name.uri().length == 0) {
       final byte[] ln = name.local();
       for(final NodeType type : VALUES) {
-        if(Token.eq(ln, type.name)) return type;
+        if(Token.eq(ln, type.test)) return type;
       }
     }
     return null;

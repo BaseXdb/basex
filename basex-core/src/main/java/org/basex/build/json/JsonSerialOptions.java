@@ -13,4 +13,6 @@ public final class JsonSerialOptions extends JsonOptions {
   public static final BooleanOption INDENT = new BooleanOption("indent");
   /** Option: escape special characters (custom). */
   public static final BooleanOption ESCAPE = new BooleanOption("escape", true);
+  /** Option: escape solidus (custom). */
+  public static final BooleanOption ESCAPE_SOLIDUS = new BooleanOption("escape-solidus", true);
 }

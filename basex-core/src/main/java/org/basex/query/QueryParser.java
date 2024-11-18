@@ -1623,9 +1623,9 @@ public class QueryParser extends InputParser {
   private Expr focus() throws QueryException {
     final Expr expr = or();
     if(expr != null) {
-      if(wsConsumeWs("->")) {
+      if(wsConsumeWs("->") || wsConsumeWs("-\uFF1E")) {
         final ExprList el = new ExprList(expr);
-        do add(el, or()); while(wsConsumeWs("->"));
+        do add(el, or()); while(wsConsumeWs("->") || wsConsumeWs("-\uFF1E"));
         return new Focus(info(), el.finish());
       }
     }
@@ -1674,7 +1674,9 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(c.name)) return new CmpV(info(), expr, check(ftContains(), CMPEXPR), c);
       }
       for(final OpN c : OpN.VALUES) {
-        if(wsConsumeWs(c.name)) return new CmpN(info(), expr, check(ftContains(), CMPEXPR), c);
+        for(final String name : c.names) {
+          if(wsConsumeWs(name)) return new CmpN(info(), expr, check(ftContains(), CMPEXPR), c);
+        }
       }
       for(final OpG c : OpG.VALUES) {
         if(wsConsumeWs(c.name)) return new CmpG(info(), expr, check(ftContains(), CMPEXPR), c);
@@ -1904,14 +1906,14 @@ public class QueryParser extends InputParser {
     Expr expr = transformWith();
     if(expr != null) {
       while(true) {
-        if(wsConsume("=?>")) {
+        if(wsConsume("=?>") || wsConsume("=?\uFF1E")) {
           skipWs();
           final Str name = Str.get(ncName(ARROWSPEC));
           final FuncBuilder fb = argumentList(false, null);
           expr = new LookupArrow(info(), name, ExprList.concat(expr, fb.args()));
         } else {
-          final boolean mapping = wsConsume("=!>");
-          if(!mapping && !consume("=>")) break;
+          final boolean mapping = wsConsume("=!>") || wsConsume("=!\uFF1E");
+          if(!mapping && !consume("=>") && !consume("=\uFF1E")) break;
 
           QNm name = null;
           Expr ex;

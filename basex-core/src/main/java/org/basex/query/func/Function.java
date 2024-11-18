@@ -214,10 +214,6 @@ public enum Function implements AFunction {
   DUPLICATE_VALUES(FnDuplicateValues::new, "duplicate-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
-  ELEMENT_NUMBER(FnElementNumber::new, "element-number([element,root,predicate])",
-      params(ELEMENT_ZO, NODE_ZO,
-      FuncType.get(BOOLEAN_ZO, ELEMENT_O).seqType().with(Occ.ZERO_OR_ONE)), INTEGER_ZO),
-  /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
   /** XQuery function. */
@@ -454,6 +450,9 @@ public enum Function implements AFunction {
   NILLED(FnNilled::new, "nilled([node])",
       params(NODE_ZO), BOOLEAN_ZO),
   /** XQuery function. */
+  NODE_KIND(FnNodeKind::new, "node-kind([node])",
+      params(NODE_ZO), STRING_ZO),
+  /** XQuery function. */
   NODE_NAME(FnNodeName::new, "node-name([node])",
       params(NODE_ZO), QNAME_ZO),
   /** XQuery function. */
@@ -680,7 +679,7 @@ public enum Function implements AFunction {
   URI_COLLECTION(FnUriCollection::new, "uri-collection([source])",
       params(STRING_ZO), ANY_URI_ZM, flag(NDT)),
   /** XQuery function. */
-  VOID(FnVoid::new, "void([input,skip])",
+  VOID(FnVoid::new, "void([input,evaluate])",
       params(ITEM_ZM, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT)),
   /** XQuery function. */
   WHILE_DO(FnWhileDo::new, "while-do(input,predicate,action)",
@@ -751,13 +750,13 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,combine])",
       params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
-      MAP_O, flag(HOF), MAP_URI),
+      PAIR_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_PAIR(MapPair::new, "pair(key,value)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), PAIR_O, MAP_URI),
   /** XQuery function. */
   _MAP_PAIRS(MapPairs::new, "pairs(map)",
-      params(MAP_O), MAP_ZM, MAP_URI),
+      params(MAP_O), PAIR_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_PUT(MapPut::new, "put(map,key,value)",
       params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
@@ -829,10 +828,10 @@ public enum Function implements AFunction {
       params(ARRAY_ZM, ARRAY_ZO), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
-      params(ARRAY_O), MAP_ZM, ARRAY_URI),
+      params(ARRAY_O), MEMBER_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_OF_MEMBERS(ArrayOfMembers::new, "of-members(input)",
-      params(MAP_ZM), ARRAY_O, ARRAY_URI),
+      params(MEMBER_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_PUT(ArrayPut::new, "put(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),

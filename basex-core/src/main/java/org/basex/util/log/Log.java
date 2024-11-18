@@ -2,12 +2,15 @@ package org.basex.util.log;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * This class processes log entries. The log format:
@@ -29,6 +32,12 @@ public final class Log implements QueryTracer {
 
   /** Static options. */
   private final StaticOptions sopts;
+  /** Log filter. */
+  private final Pattern filter;
+  /** Log remove pattern. */
+  private final Pattern remove;
+  /** Cached filtered entries. */
+  private final HashMap<String, Long> cache = new HashMap<>();
   /** Maximum length of log messages. */
   private final int maxLen;
 
@@ -43,6 +52,19 @@ public final class Log implements QueryTracer {
    */
   public Log(final StaticOptions sopts) {
     this.sopts = sopts;
+
+    final Function<StringOption, Pattern> pattern = option -> {
+      final String value = sopts.get(option);
+      try {
+        return value.isEmpty() ? null : Pattern.compile(value);
+      } catch(final IllegalArgumentException ex) {
+        Util.debug(ex);
+        Util.errln("Invalid % pattern: %", option, value);
+      }
+      return null;
+    };
+    filter = pattern.apply(StaticOptions.LOGFILTER);
+    remove = pattern.apply(StaticOptions.LOGREMOVE);
     maxLen = sopts.get(StaticOptions.LOGMSGMAXLEN);
   }
 
@@ -63,32 +85,7 @@ public final class Log implements QueryTracer {
    * @param info info string (can be {@code null})
    */
   public void writeServer(final LogType type, final String info) {
-    write(type.toString(), info, null, null, null);
-  }
-
-  /**
-   * Writes an entry to the log file.
-   * @param type type
-   * @param info info string (can be {@code null})
-   * @param perf performance object (can be {@code null})
-   * @param ctx database context
-   */
-  public void write(final LogType type, final String info, final Performance perf,
-      final Context ctx) {
-    write(type.toString(), info, perf, ctx);
-  }
-
-  /**
-   * Writes an entry to the log file.
-   * @param type type
-   * @param info info string (can be {@code null})
-   * @param perf performance object (can be {@code null})
-   * @param address address (can be {@code null})
-   * @param ctx database context
-   */
-  public void write(final LogType type, final String info, final Performance perf,
-      final String address, final Context ctx) {
-    write(type.toString(), info, perf, address, ctx.clientName());
+    write(type, info, null, null, (String) null);
   }
 
   /**
@@ -100,7 +97,7 @@ public final class Log implements QueryTracer {
    */
   public void write(final Object type, final String info, final Performance perf,
       final Context ctx) {
-    write(type.toString(), info, perf, ctx.clientAddress(), ctx.clientName());
+    write(type, info, perf, ctx.clientAddress(), ctx);
   }
 
   /**
@@ -108,13 +105,34 @@ public final class Log implements QueryTracer {
    * @param type type ({@link LogType}, HTTP status code or custom string)
    * @param info info string (can be {@code null})
    * @param perf performance object (can be {@code null})
-   * @param address address string ({@code SERVER} is written if value is {@code null})
+   * @param address address/source (can be {@code null})
+   * @param ctx database context
+   */
+  public void write(final Object type, final String info, final Performance perf,
+      final String address, final Context ctx) {
+    write(type, info, perf, address, ctx.clientName());
+  }
+
+  /**
+   * Writes an entry to the log file.
+   * @param type type ({@link LogType}, HTTP status code or custom string)
+   * @param info info string (can be {@code null})
+   * @param perf performance object (can be {@code null})
+   * @param address address/source ({@code SERVER} is written if value is {@code null})
    * @param user user ({@code admin} is written if value is {@code null})
    */
-  private synchronized void write(final String type, final String info, final Performance perf,
+  private synchronized void write(final Object type, final String info, final Performance perf,
       final String address, final String user) {
 
-    if(skip()) return;
+    if(noTargets()) return;
+
+    String inf = info != null ? info.trim().replaceAll("\\s+", " ") : "";
+    if(filter(type, inf, address)) return;
+
+    // normalize info string
+    if(remove != null) inf = remove.matcher(inf).replaceAll("");
+    final int len = inf.codePointCount(0, inf.length());
+    if(len > maxLen) inf = inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "...";
 
     final LogEntry entry = new LogEntry();
     entry.log = this;
@@ -122,10 +140,8 @@ public final class Log implements QueryTracer {
     entry.time = DateTime.format(entry.date, DateTime.TIME);
     entry.address = address != null ? address.replaceFirst("^/", "") : SERVER;
     entry.user = user != null ? user : UserText.ADMIN;
-    entry.type = type;
-    final String inf = info != null ? info.trim().replaceAll("\\s+", " ") : "";
-    final int len = inf.codePointCount(0, inf.length());
-    entry.info = len > maxLen ? inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "..." : inf;
+    entry.type = type.toString();
+    entry.info = inf;
     if(perf != null) entry.runtime = perf.toString();
 
     // write log entry to requested targets
@@ -143,7 +159,7 @@ public final class Log implements QueryTracer {
    * (not part of the constructor to consider command-line arguments).
    * @return result of check
    */
-  private boolean skip() {
+  private boolean noTargets() {
     if(targets == null) {
       final String log = sopts.get(StaticOptions.LOG);
       final Set<LogTarget> set = EnumSet.noneOf(LogTarget.class);
@@ -163,6 +179,33 @@ public final class Log implements QueryTracer {
       targets = set;
     }
     return targets.isEmpty();
+  }
+
+  /**
+   * Checks if a log entry is filtered out.
+   * Maintains a cache to filter out matching log entries.
+   * @param type type ({@link LogType}, HTTP status code or custom string)
+   * @param info info string (can be {@code null})
+   * @param address address/source ({@code SERVER} is written if value is {@code null})
+   * @return result of check
+   */
+  private boolean filter(final Object type, final String info, final String address) {
+    if(filter == null) return false;
+
+    final boolean found = filter.matcher(info).find();
+
+    // cache entries that may have multiple log entries (log types, HTTP status; see AdminLogs#logs)
+    if(address != null && (type == LogType.REQUEST || type == LogType.OK || type == LogType.ERROR ||
+        type.toString().matches("\\d+"))) {
+      // find matching entry, remove outdated entries
+      final long ms = System.currentTimeMillis();
+      final boolean cached = cache.containsKey(address);
+      cache.values().removeIf(time -> cached || ms - time >= 3_600_000);
+      if(cached) return true;
+      // cache new entry
+      if(found) cache.put(address, ms);
+    }
+    return found;
   }
 
   /**

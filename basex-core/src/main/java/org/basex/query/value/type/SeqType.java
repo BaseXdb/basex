@@ -173,6 +173,9 @@ public final class SeqType {
   /** Zero or more text nodes. */
   public static final SeqType TEXT_ZM = TEXT.seqType(ZERO_OR_MORE);
 
+  /** Single NMTOKENS. */
+  public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
+
   /** Gregorian type. */
   public static final SeqType GREGORIAN_ZO = new ChoiceItemType(Arrays.asList(
       DATE_TIME.seqType(), DATE.seqType(), TIME.seqType(), G_YEAR.seqType(),
@@ -206,8 +209,6 @@ public final class SeqType {
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
-  /** Single record. */
-  public static final SeqType RECORD_O = RECORD.seqType();
   /** Single map. */
   public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */
@@ -220,8 +221,14 @@ public final class SeqType {
   public static final SeqType ARRAY_ZO = ARRAY.seqType(ZERO_OR_ONE);
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
-  /** Single NMTOKENS. */
-  public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
+  /** Single record. */
+  public static final SeqType RECORD_O = RECORD.seqType();
+  /** Single pair. */
+  public static final SeqType PAIR_O = RecordType.PAIR.seqType();
+  /** Zero or more pairs. */
+  public static final SeqType PAIR_ZM = RecordType.PAIR.seqType(ZERO_OR_MORE);
+  /** Zero or more members. */
+  public static final SeqType MEMBER_ZM = RecordType.MEMBER.seqType(ZERO_OR_MORE);
 
   /** Item type. */
   public final Type type;

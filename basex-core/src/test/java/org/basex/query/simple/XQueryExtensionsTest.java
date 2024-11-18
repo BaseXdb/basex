@@ -41,10 +41,10 @@ public final class XQueryExtensionsTest extends SandboxTest {
     check("2 -> .", 2, root(Int.class));
     check("2 -> .", 2, root(Int.class));
 
-    check("void() -> void() -> 2", 2, root(Focus.class), count(VOID, 2));
-    check("void() -> 2", 2, root(Focus.class));
-    check("void() -> . -> 2", 2, root(Focus.class), empty(ContextValue.class));
-    check("(void() -> void()) -> 2", 2, count(Focus.class, 1));
+    check("void((), true()) -> void((), true()) -> 2", 2, root(Focus.class), count(VOID, 2));
+    check("void((), true()) -> 2", 2, root(Focus.class));
+    check("void((), true()) -> . -> 2", 2, root(Focus.class), empty(ContextValue.class));
+    check("(void((), true()) -> void((), true())) -> 2", 2, count(Focus.class, 1));
 
     check("(1, 2) -> head(.) + tail(.)", 3, root(Int.class));
     check("(1, 2) -> (head(.) + tail(.))", 3, root(Int.class));

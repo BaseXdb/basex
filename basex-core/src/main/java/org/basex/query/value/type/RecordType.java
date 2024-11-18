@@ -33,10 +33,10 @@ public class RecordType extends MapType implements Iterable<byte[]> {
     TokenObjMap<Field> map = new TokenObjMap<>();
     map.put(Str.KEY.string(), new Field(false, SeqType.ANY_ATOMIC_TYPE_O));
     map.put(Str.VALUE.string(), new Field(false, SeqType.ITEM_ZM));
-    PAIR = new RecordType(true, map, null);
+    PAIR = new RecordType(false, map, null);
     map = new TokenObjMap<>();
     map.put(Str.VALUE.string(), new Field(false, SeqType.ITEM_ZM));
-    MEMBER = new RecordType(true, map, null);
+    MEMBER = new RecordType(false, map, null);
   }
 
   /** Extensible flag. */

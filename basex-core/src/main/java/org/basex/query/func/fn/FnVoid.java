@@ -20,18 +20,11 @@ public class FnVoid extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr input = arg(0);
-    final boolean skip = toBooleanOrFalse(arg(1), qc);
+    final boolean evaluate = toBooleanOrFalse(arg(1), qc);
 
-    // ensure that deterministic input will be evaluated
-    if(!skip || input.has(Flag.NDT)) {
-      final Iter iter = input.iter(qc);
-      if(iter.valueIter()) {
-        iter.value(qc, null).cache(false, info);
-      } else {
-        for(Item item; (item = qc.next(iter)) != null;) {
-          item.cache(false, info);
-        }
-      }
+    // ensure that nondeterministic input will be evaluated
+    if(evaluate || input.has(Flag.NDT)) {
+      for(final Iter iter = input.iter(qc); (qc.next(iter)) != null;);
     }
     return Empty.VALUE;
   }
@@ -41,7 +34,7 @@ public class FnVoid extends StandardFunc {
     final Expr input = arg(0);
     if(input.has(Flag.NDT)) {
       if(input.size() == 0) return input;
-    } else if(defined(1) && arg(1) instanceof Value && toBoolean(arg(1), cc.qc)) {
+    } else if(!defined(1) || arg(1) instanceof Value && !toBoolean(arg(1), cc.qc)) {
       return Empty.VALUE;
     }
     return this;

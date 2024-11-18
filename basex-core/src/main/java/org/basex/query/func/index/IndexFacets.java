@@ -26,16 +26,19 @@ public final class IndexFacets extends IndexFn {
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final boolean flat = defined(1) && eq(toToken(arg(1), qc), FLAT);
-    return FDoc.build().add(flat ? flat(data) : tree(data, data.paths.root().get(0))).finish();
+
+    return FDoc.build().add(flat ? flat(data, qc) :
+      tree(data, data.paths.root().get(0), qc)).finish();
   }
 
   /**
    * Returns a flat facet representation.
    * @param data data reference
+   * @param qc query context
    * @return element
    */
-  private static FBuilder flat(final Data data) {
-    final FBuilder elem = FElem.build(NodeType.DOCUMENT_NODE.qname());
+  private static FBuilder flat(final Data data, final QueryContext qc) {
+    final FBuilder elem = FElem.build(qc.shared.qName(NodeType.DOCUMENT_NODE.kind()));
     index(data.elemNames, Q_ELEMENT, elem);
     index(data.attrNames, Q_ATTRIBUTE, elem);
     return elem;
@@ -45,15 +48,16 @@ public final class IndexFacets extends IndexFn {
    * Returns a tree facet representation.
    * @param data data reference
    * @param root root node
+   * @param qc query context
    * @return element
    */
-  private static FBuilder tree(final Data data, final PathNode root) {
-    final FBuilder elem = FElem.build(ANode.type(root.kind).qname());
+  private static FBuilder tree(final Data data, final PathNode root, final QueryContext qc) {
+    final FBuilder elem = FElem.build(qc.shared.qName(ANode.type(root.kind).kind()));
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.elemNames : data.attrNames;
     if(root.kind == Data.ATTR || elm) elem.add(Q_NAME, names.key(root.name));
     stats(root.stats, elem);
-    for(final PathNode pn : root.children) elem.add(tree(data, pn));
+    for(final PathNode pn : root.children) elem.add(tree(data, pn, qc));
     return elem;
   }
 
