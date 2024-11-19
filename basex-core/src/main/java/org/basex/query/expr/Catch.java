@@ -8,6 +8,7 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -26,12 +27,15 @@ import org.basex.util.hash.*;
 public final class Catch extends Single {
   /** Error Strings. */
   public static final String[] NAMES = {
-    "code", "description", "value", "module", "line-number", "column-number", "additional", "map"
+    "code", "description", "value", "module",
+    "line-number", "column-number", "additional", "stack-trace",
+    "map"
   };
   /** Error types. */
   public static final SeqType[] TYPES = {
     SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO,
-    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.ITEM_ZM, SeqType.MAP_O
+    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.ITEM_ZM, SeqType.FUNCTION_O,
+    SeqType.MAP_O
   };
   /** Error QNames. */
   public static final QNm[] QNAMES = new QNm[NAMES.length];
@@ -149,9 +153,12 @@ public final class Catch extends Single {
       qe.line() != 0 ? Int.get(qe.line()) : Empty.VALUE,
       qe.column() != 0 ? Int.get(qe.column()) : Empty.VALUE,
       StrSeq.get(qe.stack()),
+      new FuncItem(null, qe.stackTrace(), new Var[0], AnnList.EMPTY,
+          FuncType.get(SeqType.STRING_O), 0, null),
       null
     };
-    // assign map as last value
+
+    // add all values to map
     final MapBuilder mb = new MapBuilder();
     final int nl = NAMES.length - 1;
     for(int n = 0; n < nl; n++) {
