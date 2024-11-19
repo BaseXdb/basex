@@ -1,5 +1,6 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryContext.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.fn.FnLoadXQueryModule.LoadXQueryModuleOptions.*;
 
@@ -12,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
@@ -29,8 +31,8 @@ import org.basex.util.options.*;
  * @author Gunther Rademacher
  */
 public final class FnLoadXQueryModule extends Parse {
-  /** The type of the value of the 'variables' option. */
-  public static final MapType VARIABLES_TYPE = MapType.get(AtomType.QNAME, SeqType.ITEM_ZM);
+  /** The type of the value of the 'variables' and 'vendor-options' option. */
+  public static final MapType QNAME_MAP_TYPE = MapType.get(AtomType.QNAME, SeqType.ITEM_ZM);
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -56,16 +58,26 @@ public final class FnLoadXQueryModule extends Parse {
 
     final QNmMap<Value> bindings = new QNmMap<>();
     if(opt.contains(VARIABLES)) {
-      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(VARIABLES_TYPE, qc, null, ii);
+      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, null, ii);
       for(final Item name : vars.keys()) bindings.put((QNm) name, vars.get(name));
     }
 
+    if(opt.contains(VENDOR_OPTIONS)) {
+      ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(QNAME_MAP_TYPE, qc, null, ii);
+    }
+
+    if (opt.contains(XQUERY_VERSION)) {
+      final String version = opt.get(XQUERY_VERSION).toString();
+      if (!isSupportedXQueryVersion(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
+    }
+
     final QueryContext mqc = new QueryContext(qc);
-    final CompileContext cc = new CompileContext(mqc, true);
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     for(final IO src : srcs) {
+      mqc.finalContext = false;
       try {
-        mqc.parse(src.string(), src.path());
+        final String path = src.path();
+        mqc.parse(src.string(), path.isEmpty() ? Token.string(info.sc().baseURI().string()) : path);
       } catch(final IOException ex) {
         Util.debug(ex);
         throw WHICHMODFILE_X.get(info, src);
@@ -77,9 +89,23 @@ public final class FnLoadXQueryModule extends Parse {
         mqc.vars.bindExternal(mqc, bindings, false);
       } catch(final QueryException ex) {
         Util.debug(ex);
-        throw MODULE_PARAMETER_TYPE_X_X.get(info, modUri, ex.getLocalizedMessage());
+        throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_PARAMETER_TYPE_X_X.get(info, modUri,
+            ex.getLocalizedMessage());
       }
-      mqc.functions.compileAll(cc);
+      if(!mqc.finalContext && opt.contains(CONTEXT_ITEM)) {
+        Value val = opt.get(CONTEXT_ITEM);
+        try {
+          if(mqc.contextType != null)  val = mqc.contextType.coerce(val, null, mqc, null, info);
+        } catch (final QueryException ex) {
+          Util.debug(ex);
+          throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_CONTEXT_TYPE_X_X.get(info, modUri,
+              ex.getLocalizedMessage());
+        }
+        mqc.contextValue = new ContextScope(val, mqc.contextType, new VarScope(), info.sc(), null,
+            null);
+        mqc.finalContext = true;
+      }
+      mqc.compile(true);
     }
 
     final QNmMap<Map<Integer, Expr>> funcs = new QNmMap<>();
@@ -128,18 +154,20 @@ public final class FnLoadXQueryModule extends Parse {
    */
   public static final class LoadXQueryModuleOptions extends Options {
     /** load-xquery-module option xquery-version. */
-    public static final NumberOption XQUERY_VERSION = new NumberOption("xquery-version");
+    public static final ValueOption XQUERY_VERSION = new ValueOption("xquery-version",
+        SeqType.DECIMAL_O, null);
     /** load-xquery-module option location-hints. */
     public static final StringsOption LOCATION_HINTS = new StringsOption("location-hints",
         (String[]) null);
     /** load-xquery-module option content. */
     public static final StringOption CONTENT = new StringOption("content");
     /** load-xquery-module option context-item. */
-    public static final ValueOption CONTEXT_ITEM = new ValueOption("context-item", SeqType.ITEM_ZO);
+    public static final ValueOption CONTEXT_ITEM = new ValueOption("context-item", SeqType.ITEM_ZO,
+        null);
     /** load-xquery-module option variable. */
     public static final ValueOption VARIABLES = new ValueOption("variables", SeqType.MAP_O, null);
     /** load-xquery-module option vendor-options. */
     public static final ValueOption VENDOR_OPTIONS = new ValueOption("vendor-options",
-        SeqType.MAP_O);
+        SeqType.MAP_O, null);
   }
 }

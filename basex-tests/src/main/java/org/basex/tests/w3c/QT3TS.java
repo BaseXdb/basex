@@ -444,6 +444,8 @@ public final class QT3TS extends Main {
     final String query = all ? "*:test[@update = 'true']" : "*:dependency[" +
       // skip various features
       "@type = 'feature' and @value = " + NOSUPPORT + " and string(@satisfied) = ('', 'true') or " +
+      // skip supported features when test asks for non-support
+      "@type = 'feature' and not(@value = " + NOSUPPORT + ") and string(@satisfied) = 'false' or " +
       // skip fully-normalized unicode tests
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests

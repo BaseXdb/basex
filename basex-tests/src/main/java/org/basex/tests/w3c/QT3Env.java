@@ -123,8 +123,17 @@ final class QT3Env {
    */
   static HashMap<String, String> map(final Context ctx, final XdmValue env) {
     final HashMap<String, String> map = new HashMap<>();
-    for(final XdmItem item : new XQuery("@*", ctx).context(env))
-      map.put(item.getName().getLocalPart(), item.getString());
+    for(final XdmItem item : new XQuery("@*", ctx).context(env)) {
+      final QName qnm = item.getName();
+      final String name = qnm.getLocalPart();
+      String value = item.getString();
+      if(name.equals("name") && value.contains(":") && !value.startsWith("Q{")) {
+        value = new XQuery(
+            "@Q{" + qnm.getNamespaceURI() + "}name!expanded-QName(resolve-QName(., ..))",
+            ctx).context(env).value().getString();
+      }
+      map.put(name, value);
+    }
     return map;
   }
 

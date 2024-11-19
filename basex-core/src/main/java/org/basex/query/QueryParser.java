@@ -302,7 +302,7 @@ public class QueryParser extends InputParser {
     if(version) {
       // parse xquery version
       final String string = string(stringLiteral()).replaceAll("0+(\\d)", "$1");
-      if(!Strings.eq(string, "1.0", "1.1", "3.0", "3.1", "4.0")) throw error(XQUERYVER_X, string);
+      if(!QueryContext.isSupportedXQueryVersion(string)) throw error(XQUERYVER_X, string);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
     if(wsConsumeWs(ENCODING)) {
@@ -853,6 +853,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(AS)) {
       st = item ? itemType() : sequenceType();
       sc.contextType = st;
+      qc.contextType = st;
       if(cst != null && !cst.eq(st)) throw error(VALUETYPES_X_X, cst, st);
     }
 
