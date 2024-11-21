@@ -140,7 +140,6 @@ public final class FnElementsToMaps extends StandardFunc {
         }
       }
     }
-    Util.errln("%: %", l, node);
     return l;
   }
 
