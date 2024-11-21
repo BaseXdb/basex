@@ -218,9 +218,16 @@ public abstract class Preds extends Arr {
       if(max == 0) return true;
     }
 
+    // (1, 'x')[. instance of xs:integer]  ->  xs:integer*
     SeqType st = root.seqType();
-    st = max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO);
-    exprType.assign(st, exact ? max : -1);
+    for(final Expr expr : exprs) {
+      if(expr instanceof Instance && expr.arg(0) instanceof ContextValue) {
+        st = st.intersect(((Instance) expr).seqType.with(st.occ));
+        // E[. instance of xs:integer][. instance of xs:string]  ->  ()
+        if(st == null) return true;
+      }
+    }
+    exprType.assign(max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO), exact ? max : -1);
     return false;
   }
 

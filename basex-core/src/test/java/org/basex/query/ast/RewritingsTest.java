@@ -3318,4 +3318,16 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh2334() {
     query("for $a as xs:integer in [ 1, 2 ] return $a", "1\n2");
   }
+
+  /** Typing: Filters, instance of. */
+  @Test public void gh2345() {
+    check("(1 to 10000000000000, 'x')[. instance of xs:integer] instance of xs:integer*",
+        true, root(Bln.class));
+    check("(1 to 10, 'x')[. instance of xs:byte] instance of xs:byte*",
+        true, root(Bln.class));
+    check("(1 to 10, 'x')[. instance of array(*)] instance of fn(*)*",
+        true, root(Bln.class));
+    check("(1 to 10000000000000, 'x')[. instance of xs:integer][. instance of xs:string]",
+        "", empty());
+  }
 }
