@@ -415,7 +415,7 @@ public final class CompileContext {
     }
 
     info(QueryText.OPTUNROLL_X, expr);
-    final ExprList exprs = new ExprList(size);
+    final ExprList exprs = new ExprList();
     add.accept(exprs);
     return exprs;
   }
