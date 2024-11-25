@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  */
 public final class Instance extends Single {
   /** Sequence type to check for. */
-  private final SeqType seqType;
+  public final SeqType seqType;
   /** Check: 1: only check occurrence indicator, 2: only check item type. */
   private int check;
 

@@ -252,7 +252,7 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean hasAttributes() {
-    return data.attSize(pre, kind()) > 0;
+    return data.attSize(pre, kind()) > 1;
   }
 
   @Override

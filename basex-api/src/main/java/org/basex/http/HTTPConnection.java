@@ -267,16 +267,21 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientName() {
-    // check for request id
-    Object value = request.getAttribute(HTTPText.CLIENT_ID);
-
-    // check for session id (DBA, global)
-    if(value == null) {
-      final HttpSession session = request.getSession(false);
-      if(session != null) {
-        final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
-        value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
+    Object value = null;
+    try {
+      // check for request id
+      value = request.getAttribute(HTTPText.CLIENT_ID);
+      // check for session id (DBA, global)
+      if(value == null) {
+        final HttpSession session = request.getSession(false);
+        if(session != null) {
+          final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
+          value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
+        }
       }
+    } catch(final IllegalStateException ex) {
+      // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
+      Util.debug(ex);
     }
     return clientName(value, context);
   }

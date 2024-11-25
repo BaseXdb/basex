@@ -347,7 +347,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a size value (number of descendant table entries).
+   * Returns the size value (number of descendant table entries).
    * @param pre pre value
    * @param kind node kind
    * @return size value
@@ -357,7 +357,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a number of attributes.
+   * Returns the number of attributes plus 1.
    * @param pre pre value
    * @param kind node kind
    * @return number of attributes
@@ -365,7 +365,9 @@ public abstract class Data {
   public final int attSize(final int pre, final int kind) {
     int s = kind == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
     // skip additional attributes if value is larger than maximum range
-    if(s == IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+    if(s == IO.MAXATTS) {
+      while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+    }
     return s;
   }
 

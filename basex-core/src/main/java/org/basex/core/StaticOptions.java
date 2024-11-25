@@ -68,9 +68,9 @@ public final class StaticOptions extends Options {
   /** Logging flag. */
   public static final StringOption LOG = new StringOption("LOG", "data");
   /** Log filter. */
-  public static final StringOption LOGFILTER = new StringOption("LOGFILTER", "");
-  /** Log remove patterb. */
-  public static final StringOption LOGREMOVE = new StringOption("LOGREMOVE", "");
+  public static final StringOption LOGEXCLUDE = new StringOption("LOGEXCLUDE", "");
+  /** Log remove pattern. */
+  public static final StringOption LOGCUT = new StringOption("LOGCUT", "");
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
   /** Write trace output to the logs. */

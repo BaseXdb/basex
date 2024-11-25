@@ -113,4 +113,9 @@ public final class MapBuilder {
     map = null;
     return m;
   }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '[' + map + ']';
+  }
 }
