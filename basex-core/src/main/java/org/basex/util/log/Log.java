@@ -32,10 +32,10 @@ public final class Log implements QueryTracer {
 
   /** Static options. */
   private final StaticOptions sopts;
-  /** Log filter. */
-  private final Pattern filter;
-  /** Log remove pattern. */
-  private final Pattern remove;
+  /** Logs messages to exclude. */
+  private final Pattern exclude;
+  /** Log messages to cut. */
+  private final Pattern cut;
   /** Cached filtered entries. */
   private final HashMap<String, Long> cache = new HashMap<>();
   /** Maximum length of log messages. */
@@ -63,8 +63,8 @@ public final class Log implements QueryTracer {
       }
       return null;
     };
-    filter = pattern.apply(StaticOptions.LOGFILTER);
-    remove = pattern.apply(StaticOptions.LOGREMOVE);
+    exclude = pattern.apply(StaticOptions.LOGEXCLUDE);
+    cut = pattern.apply(StaticOptions.LOGCUT);
     maxLen = sopts.get(StaticOptions.LOGMSGMAXLEN);
   }
 
@@ -127,10 +127,10 @@ public final class Log implements QueryTracer {
     if(noTargets()) return;
 
     String inf = info != null ? info.trim().replaceAll("\\s+", " ") : "";
-    if(filter(type, inf, address)) return;
+    if(exclude(type, inf, address)) return;
 
     // normalize info string
-    if(remove != null) inf = remove.matcher(inf).replaceAll("");
+    if(cut != null) inf = cut.matcher(inf).replaceAll("");
     final int len = inf.codePointCount(0, inf.length());
     if(len > maxLen) inf = inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "...";
 
@@ -189,10 +189,10 @@ public final class Log implements QueryTracer {
    * @param address address/source ({@code SERVER} is written if value is {@code null})
    * @return result of check
    */
-  private boolean filter(final Object type, final String info, final String address) {
-    if(filter == null) return false;
+  private boolean exclude(final Object type, final String info, final String address) {
+    if(exclude == null) return false;
 
-    final boolean found = filter.matcher(info).find();
+    final boolean found = exclude.matcher(info).find();
 
     // cache entries that may have multiple log entries (log types, HTTP status; see AdminLogs#logs)
     if(address != null && (type == LogType.REQUEST || type == LogType.OK || type == LogType.ERROR ||
