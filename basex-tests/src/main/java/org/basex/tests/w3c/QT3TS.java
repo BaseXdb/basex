@@ -296,7 +296,7 @@ public final class QT3TS extends Main {
     if(base) query.baseURI(baseURI);
 
     // add modules
-    final String qm = "for $m in *:module return ($m/@uri, $m/@file)";
+    final String qm = "for $m in *:module where $m/@uri return ($m/@uri, $m/@file)";
     final XQuery qmod = new XQuery(qm, ctx).context(test);
     while(true) {
       final XdmItem uri = qmod.next();
@@ -304,6 +304,32 @@ public final class QT3TS extends Main {
       final XdmItem file = qmod.next();
       if(file == null) break;
       query.addModule(uri.getString(), new IOFile(baseDir, file.getString()).path());
+    }
+
+    // collect module locations (test cases modules-30, -31, -32, -33, -40, -41, -42, d1e78807j)
+    final Map<String, IO> locations = new HashMap<>();
+    final String ql = "for $m in *:module where $m/@location return ($m/@location, $m/@file)";
+    final XQuery qloc = new XQuery(ql, ctx).context(test);
+    while(true) {
+      final XdmItem location = qloc.next();
+      if(location == null) break;
+      final XdmItem file = qloc.next();
+      if(file == null) break;
+      locations.put(location.getString(), new IOFile(baseDir, file.getString()));
+    }
+
+    if(!locations.isEmpty()) {
+      final QueryProcessor qp = query.qp();
+      qp.uriResolver(new UriResolver() {
+        @Override
+        public IO resolve(final String path, final String uri, final Uri bas) {
+          qp.uriResolver(null);
+          final IO io = qp.sc.resolve(path, uri);
+          qp.uriResolver(this);
+          final IO file = locations.get(io.path());
+          return file == null ? io : file;
+        }
+      });
     }
 
     final QT3Result returned = new QT3Result();
