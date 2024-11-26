@@ -22,7 +22,6 @@ public final class RequestParameterMap extends ApiFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final MapBuilder map = new MapBuilder();
-
     final RequestContext requestCtx = requestContext(qc);
     try {
       // cache parameter names

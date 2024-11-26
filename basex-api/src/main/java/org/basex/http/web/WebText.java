@@ -27,6 +27,8 @@ public interface WebText {
   String METHOD = "method";
   /** Parameters. */
   String PARAMETERS = "parameters";
+  /** Headers. */
+  String HEADERS = "headers";
   /** Permission token. */
   String AUTHORIZATION = "authorization";
 

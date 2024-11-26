@@ -1,10 +1,15 @@
 package org.basex.query.func.request;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
+
+import jakarta.servlet.http.*;
 
 /**
  * Function implementation.
@@ -15,10 +20,12 @@ import org.basex.query.value.seq.*;
 public final class RequestHeader extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final HttpServletRequest request = request(qc);
     final String name = toString(arg(0), qc);
-    final String value = request(qc).getHeader(name);
-    if(value != null) return Str.get(value);
 
-    return defined(1) ? Str.get(toToken(arg(1), qc)) : Empty.VALUE;
+    final TokenList list = new TokenList(1);
+    for(final String value : Collections.list(request.getHeaders(name))) list.add(value);
+    return !list.isEmpty() ? StrSeq.get(list) : defined(1) ? Str.get(toToken(arg(1), qc)) :
+      Empty.VALUE;
   }
 }

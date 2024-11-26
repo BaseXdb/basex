@@ -54,6 +54,7 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
       put(ALLOW, StrSeq.get(func.allows.toArray())).
       put(PATH, conn.path()).
       put(METHOD, conn.method).
+      put(HEADERS, conn.requestCtx.headers()).
       put(PARAMETERS, parameters.map()).
       put(AUTHORIZATION, conn.request.getHeader(HTTPText.AUTHORIZATION)).map();
   }

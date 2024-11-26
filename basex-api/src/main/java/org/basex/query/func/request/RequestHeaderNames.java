@@ -17,10 +17,8 @@ import org.basex.util.list.*;
 public final class RequestHeaderNames extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final TokenList tl = new TokenList();
-    for(final String name : Collections.list(request(qc).getHeaderNames())) {
-      tl.add(name);
-    }
-    return StrSeq.get(tl);
+    final TokenList list = new TokenList();
+    for(final String name : Collections.list(request(qc).getHeaderNames())) list.add(name);
+    return StrSeq.get(list);
   }
 }

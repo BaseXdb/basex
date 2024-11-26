@@ -2,10 +2,8 @@ package org.basex.http;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.*;
 import java.util.*;
-
-import jakarta.servlet.http.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -14,9 +12,14 @@ import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.list.*;
+
+import jakarta.servlet.http.*;
 
 /**
  * Request of an HTTP or WebSocket connection.
@@ -34,6 +37,8 @@ public final class RequestContext {
   private Map<String, Value> values;
   /** Form parameters. */
   private Map<String, Value> form;
+  /** Headers. */
+  private XQMap headers;
   /** Content body. */
   private IOContent body;
 
@@ -43,6 +48,24 @@ public final class RequestContext {
    */
   public RequestContext(final HttpServletRequest request) {
     this.request = request;
+  }
+
+  /**
+   * Returns the query headers.
+   * @return headers
+   * @throws QueryException query exception
+   */
+  public XQMap headers() throws QueryException {
+    if(headers == null) {
+      final MapBuilder map = new MapBuilder();
+      for(final String name : Collections.list(request.getHeaderNames())) {
+        final TokenList list = new TokenList(1);
+        for(final String value : Collections.list(request.getHeaders(name))) list.add(value);
+        map.put(name, StrSeq.get(list));
+      }
+      headers = map.map();
+    }
+    return headers;
   }
 
   /**
@@ -77,7 +100,7 @@ public final class RequestContext {
     if(values == null) {
       values = new HashMap<>();
       queryStrings().forEach((key, value) -> {
-        final ItemList items = new ItemList();
+        final ItemList items = new ItemList(value.length);
         for(final String string : value) items.add(Atm.get(string));
         values.put(key, items.value(AtomType.UNTYPED_ATOMIC));
       });
