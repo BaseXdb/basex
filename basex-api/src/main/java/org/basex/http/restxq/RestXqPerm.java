@@ -2,8 +2,12 @@ package org.basex.http.restxq;
 
 import static org.basex.http.web.WebText.*;
 
+import java.io.*;
+import java.util.*;
+
 import org.basex.http.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -38,12 +42,19 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    * @param conn HTTP connection
    * @return permission information
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  static XQMap map(final RestXqFunction func, final HTTPConnection conn) throws QueryException {
+  static XQMap map(final RestXqFunction func, final HTTPConnection conn)
+      throws QueryException, IOException {
+    final MapBuilder parameters = new MapBuilder();
+    for(final Map.Entry<String, Value> entry : conn.requestCtx.queryValues().entrySet()) {
+      parameters.put(entry.getKey(), entry.getValue());
+    }
     return new MapBuilder().
       put(ALLOW, StrSeq.get(func.allows.toArray())).
       put(PATH, conn.path()).
       put(METHOD, conn.method).
+      put(PARAMETERS, parameters.map()).
       put(AUTHORIZATION, conn.request.getHeader(HTTPText.AUTHORIZATION)).map();
   }
 

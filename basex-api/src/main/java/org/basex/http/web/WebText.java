@@ -25,6 +25,8 @@ public interface WebText {
   String PATH = "path";
   /** Permission token. */
   String METHOD = "method";
+  /** Parameters. */
+  String PARAMETERS = "parameters";
   /** Permission token. */
   String AUTHORIZATION = "authorization";
 
