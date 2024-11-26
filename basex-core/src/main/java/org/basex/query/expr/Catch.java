@@ -8,7 +8,6 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -34,7 +33,7 @@ public final class Catch extends Single {
   /** Error types. */
   public static final SeqType[] TYPES = {
     SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO,
-    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.ITEM_ZM, SeqType.FUNCTION_O,
+    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.STRING_O, SeqType.STRING_O,
     SeqType.MAP_O
   };
   /** Error QNames. */
@@ -145,6 +144,7 @@ public final class Catch extends Single {
    * @throws QueryException query exception
    */
   public static Value[] values(final QueryException qe) throws QueryException {
+    final Str stack = qe.stackTrace();
     final Value[] values = {
       qe.qname(),
       Str.get(qe.getLocalizedMessage()),
@@ -152,9 +152,8 @@ public final class Catch extends Single {
       qe.file() != null ? Str.get(qe.file()) : Empty.VALUE,
       qe.line() != 0 ? Int.get(qe.line()) : Empty.VALUE,
       qe.column() != 0 ? Int.get(qe.column()) : Empty.VALUE,
-      StrSeq.get(qe.stack()),
-      new FuncItem(null, qe.stackTrace(), new Var[0], AnnList.EMPTY,
-          FuncType.get(SeqType.STRING_O), 0, null),
+      stack,
+      stack,
       null
     };
 
