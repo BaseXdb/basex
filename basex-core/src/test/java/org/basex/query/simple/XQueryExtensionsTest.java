@@ -28,7 +28,9 @@ public final class XQueryExtensionsTest extends SandboxTest {
   @Test public void errAdditional() {
     query("try { error() } catch * { count($err:additional) }", 1);
     query("let $f := function () { error() } " +
-        "return try { $f() } catch * { count($err:additional) }", 2);
+        "return try { $f() } catch * { count($err:additional) }", 1);
+    query("let $f := function () { error() } " +
+        "return try { $f() } catch * { count($err:stack-trace) }", 1);
   }
 
   /** Focus expression. */
