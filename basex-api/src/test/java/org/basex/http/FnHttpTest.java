@@ -33,7 +33,6 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +41,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team 2005-24, BSD License
  * @author Rositsa Shadura
  */
-public class FnHttpTest extends HTTPTest {
+public abstract class FnHttpTest extends HTTPTest {
   /** Example url. */
   static final String REST_URL = REST_ROOT + NAME;
 
@@ -59,19 +58,10 @@ public class FnHttpTest extends HTTPTest {
   static Context ctx;
 
   /**
-   * Start server.
-   * @throws Exception exception
-   */
-  @BeforeAll public static void start() throws Exception {
-    init(REST_URL, true);
-    ctx = new Context();
-  }
-
-  /**
    * Test sending of HTTP PUT requests.
    * @throws Exception exception
    */
-  @Test public void put() throws Exception {
+  @Test public final void put() throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
@@ -84,7 +74,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP POST requests.
    * @throws Exception exception
    */
-  @Test public void putPost() throws Exception {
+  @Test public final void putPost() throws Exception {
     // PUT - query
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='put' status-only='true'>"
@@ -122,7 +112,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP GET requests.
    * @throws Exception exception
    */
-  @Test public void get() throws Exception {
+  @Test public final void get() throws Exception {
     // GET1 - just send a GET request
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='get' href='" + REST_ROOT + "'/>"), ctx)) {
@@ -152,7 +142,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP DELETE requests.
    * @throws Exception exception
    */
-  @Test public void putDelete() throws Exception {
+  @Test public final void putDelete() throws Exception {
     // add document to be deleted
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='put'>"
@@ -178,7 +168,7 @@ public class FnHttpTest extends HTTPTest {
    * Test sending of HTTP request without any attributes - error shall be thrown
    * that mandatory attributes are missing.
    */
-  @Test public void emptyReq() {
+  @Test public final void emptyReq() {
     try {
       new XQuery(_HTTP_SEND_REQUEST.args(" <http:request/>")).execute(ctx);
       fail("Error expected");
@@ -190,7 +180,7 @@ public class FnHttpTest extends HTTPTest {
   /**
    * Tests http:send-request((),()).
    */
-  @Test public void noParams() {
+  @Test public final void noParams() {
     final Command cmd = new XQuery(_HTTP_SEND_REQUEST.args(" ()"));
     try {
       cmd.execute(ctx);
@@ -204,7 +194,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests an erroneous query.
    * @throws Exception exception
    */
-  @Test public void unknown() throws Exception {
+  @Test public final void unknown() throws Exception {
     try(QueryProcessor qp = new QueryProcessor(_HTTP_SEND_REQUEST.args(
         " <http:request method='get'/>", REST_URL + "unknown") + "[1]/@status/data()", ctx)) {
       assertEquals("404", qp.value().serialize().toString());
@@ -215,7 +205,7 @@ public class FnHttpTest extends HTTPTest {
    * Parse normal request.
    * @throws Exception exception
    */
-  @Test public void parseRequest() throws Exception {
+  @Test public final void parseRequest() throws Exception {
     // Simple HTTP request with no errors
     final String request = "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
@@ -237,7 +227,7 @@ public class FnHttpTest extends HTTPTest {
    * Parse multipart request.
    * @throws Exception exception
    */
-  @Test public void parseMultipartReq() throws Exception {
+  @Test public final void parseMultipartReq() throws Exception {
     final String multiReq = "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
@@ -283,7 +273,7 @@ public class FnHttpTest extends HTTPTest {
    * Parse multipart request when the contents for each part are set from the $bodies parameter.
    * @throws Exception exception
    */
-  @Test public void parseMultipartReqBodies() throws Exception {
+  @Test public final void parseMultipartReqBodies() throws Exception {
     final String multiReq = "<http:request xmlns:http='http://expath.org/ns/http-client' "
         + "method='POST' href='" + REST_ROOT + "'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
@@ -334,7 +324,7 @@ public class FnHttpTest extends HTTPTest {
    * <http:request/>, <http:body/> or <http:multipart/>.
    * @throws IOException I/O Exception
    */
-  @Test public void errors() throws IOException {
+  @Test public final void errors() throws IOException {
     // Incorrect requests
     final HashMap<String, String> queries = new HashMap<>();
 
@@ -390,7 +380,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests method setRequestContent of HttpClient.
    * @throws IOException I/O Exception
    */
-  @Test public void writeMultipartMessage() throws IOException {
+  @Test public final void writeMultipartMessage() throws IOException {
     final Request request = new Request();
     request.isMultipart = true;
     request.payloadAtts.put("media-type", "multipart/alternative");
@@ -429,7 +419,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests method setRequestContent of HttpClient.
    * @throws IOException I/O Exception
    */
-  @Test public void writeMultipartBinary() throws IOException {
+  @Test public final void writeMultipartBinary() throws IOException {
     final Request request = new Request();
     request.isMultipart = true;
     request.payloadAtts.put("media-type", "multipart/mixed");
@@ -453,7 +443,7 @@ public class FnHttpTest extends HTTPTest {
    * attributes media-type and method.
    * @throws IOException IO exception
    */
-  @Test public void writeMessage() throws IOException {
+  @Test public final void writeMessage() throws IOException {
     // Case 1: No method, media-type='text/xml'
     Request request = new Request();
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "text/xml");
@@ -487,7 +477,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing of body content when @method is binary and output is xs:base64Binary.
    * @throws IOException I/O Exception
    */
-  @Test public void writeBase64() throws IOException {
+  @Test public final void writeBase64() throws IOException {
     // Case 1: content is xs:base64Binary
     Request request = new Request();
     request.payloadAtts.put("method", SerialMethod.BASEX.toString());
@@ -505,7 +495,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing text nodes (children of http:send-request bodies).
    * @throws IOException I/O Exception
    */
-  @Test public void writeText() throws IOException {
+  @Test public final void writeText() throws IOException {
     Request request = new Request();
     request.payloadAtts.put(SerializerOptions.MEDIA_TYPE.name(), "application/octet-stream");
     request.payload.add(new FTxt("&"));
@@ -522,7 +512,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing of body content when @method is binary and output is xs:hexBinary.
    * @throws IOException I/O Exception
    */
-  @Test public void writeHex() throws IOException {
+  @Test public final void writeHex() throws IOException {
     // Case 1: content is xs:hexBinary
     Request request = new Request();
     request.payloadAtts.put("method", SerialMethod.BASEX.toString());
@@ -540,7 +530,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests writing of request content when @src is set.
    * @throws IOException I/O Exception
    */
-  @Test public void writeFromResource() throws IOException {
+  @Test public final void writeFromResource() throws IOException {
     // Create a file form which will be read
     final IOFile file = new IOFile(Prop.TEMPDIR, Util.className(FnHttpTest.class));
     file.write("test");
@@ -561,7 +551,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests response handling with specified charset in the header 'Content-Type'.
    * @throws Exception exception
    */
-  @Test public void responseWithCharset() throws Exception {
+  @Test public final void responseWithCharset() throws Exception {
     // Create fake HTTP connection
     final FakeHttpResponse response = new FakeHttpResponse();
     // Set content type
@@ -578,7 +568,7 @@ public class FnHttpTest extends HTTPTest {
    * Tests content-type parsing.
    * @throws Exception exception
    */
-  @Test public void parseContentType() throws Exception {
+  @Test public final void parseContentType() throws Exception {
     final FakeHttpResponse response = new FakeHttpResponse();
     // upper case attribute, quoted string
     response.header("Content-Type", "text/plain; CHARSET=\"CP1252\"");
@@ -602,7 +592,7 @@ public class FnHttpTest extends HTTPTest {
    * @throws IOException I/O Exception
    * @throws Exception exception
    */
-  @Test public void multipartResponse() throws Exception {
+  @Test public final void multipartResponse() throws Exception {
     // Create fake HTTP connection
     final FakeHttpResponse response = new FakeHttpResponse();
     response.header("From", "Nathaniel Borenstein <nsb@bellcore.com>");
@@ -650,7 +640,7 @@ public class FnHttpTest extends HTTPTest {
    * @throws IOException I/O Exception
    * @throws Exception exception
    */
-  @Test public void multipartRespPreamble() throws Exception {
+  @Test public final void multipartRespPreamble() throws Exception {
     // Create fake HTTP connection
     final FakeHttpResponse response = new FakeHttpResponse();
     response.header("From", "Nathaniel Borenstein <nsb@bellcore.com>");
@@ -703,6 +693,21 @@ public class FnHttpTest extends HTTPTest {
   }
 
   /**
+   * Tests nested multipart responses.
+   * @throws Exception exception
+   */
+  @Test public final void nestedMultipart() throws Exception {
+    // Create fake HTTP connection
+    final String boundary = "batchresponse_4c4c5223-efa7-4aba-9865-fb4cb102cfd2";
+
+    final FakeHttpResponse response = new FakeHttpResponse();
+    response.header("Content-Type", "multipart/mixed;boundary=\"" + boundary + '"');
+    response.input(new IOFile("src/test/resources/response.txt").read());
+
+    new Response(null, ctx.options).getResponse(response, true, null);
+  }
+
+  /**
    * Compares results.
    * @param expected expected result
    * @param returned returned result
@@ -742,21 +747,6 @@ public class FnHttpTest extends HTTPTest {
     try(QueryProcessor qp = new QueryProcessor(query, ctx).context(xml)) {
       return qp.iter().next();
     }
-  }
-
-  /**
-   * Tests nested multipart responses.
-   * @throws Exception exception
-   */
-  @Test public void nestedMultipart() throws Exception {
-    // Create fake HTTP connection
-    final String boundary = "batchresponse_4c4c5223-efa7-4aba-9865-fb4cb102cfd2";
-
-    final FakeHttpResponse response = new FakeHttpResponse();
-    response.header("Content-Type", "multipart/mixed;boundary=\"" + boundary + '"');
-    response.input(new IOFile("src/test/resources/response.txt").read());
-
-    new Response(null, ctx.options).getResponse(response, true, null);
   }
 
   /**
