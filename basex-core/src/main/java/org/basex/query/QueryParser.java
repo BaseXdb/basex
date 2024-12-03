@@ -977,30 +977,35 @@ public class QueryParser extends InputParser {
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
     final TokenObjMap<Field> fields = new TokenObjMap<>();
-    boolean extensible = false, exprRequired = false;
-    do {
-      skipWs();
-      if(!fields.isEmpty() && consume("*")) {
-        extensible = true;
-        break;
-      }
-      final byte[] name = ncName(NONCNAME_X);
-      final boolean optional = wsConsume("?");
-      final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
-      if(fields.contains(name)) throw error(DUPFIELD_X, name);
-      skipWs();
-      Expr expr = null;
-      if(exprRequired && !optional || current() == ':') {
-        consume(":=");
-        localVars.pushContext(false);
-        expr = check(single(), NOEXPR);
-        localVars.popContext();
-        exprRequired = true;
-      }
-      fields.put(name, new Field(optional, seqType, expr));
-    } while(wsConsume(","));
-    wsCheck(")");
-    final RecordType rt = new RecordType(extensible, fields, qn);
+    final RecordType rt;
+    if(wsConsume(")")) {
+      rt = new RecordType(false, fields, qn);
+    } else {
+      boolean extensible = false, exprRequired = false;
+      do {
+        skipWs();
+        if(!fields.isEmpty() && consume("*")) {
+          extensible = true;
+          break;
+        }
+        final byte[] name = ncName(NONCNAME_X);
+        final boolean optional = wsConsume("?");
+        final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
+        if(fields.contains(name)) throw error(DUPFIELD_X, name);
+        skipWs();
+        Expr expr = null;
+        if(exprRequired && !optional || current() == ':') {
+          consume(":=");
+          localVars.pushContext(false);
+          expr = check(single(), NOEXPR);
+          localVars.popContext();
+          exprRequired = true;
+        }
+        fields.put(name, new Field(optional, seqType, expr));
+      } while(wsConsume(","));
+      wsCheck(")");
+      rt = new RecordType(extensible, fields, qn);
+    }
     declaredTypes.put(qn, rt.seqType());
     namedRecordTypes.put(qn, rt);
     if(!anns.contains(Annotation.PRIVATE)) {
@@ -3407,6 +3412,7 @@ public class QueryParser extends InputParser {
     // record
     if(type instanceof RecordType) {
       final TokenObjMap<Field> fields = new TokenObjMap<>();
+      if(consume(')')) return new RecordType(false, fields, null);
       boolean extensible = false;
       do {
         if(wsConsume("*")) {

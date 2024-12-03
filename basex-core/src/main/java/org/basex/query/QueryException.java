@@ -9,10 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -240,22 +237,14 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns a stack trace.
-   * @return stack trace
-   */
-  public byte[][] stack() {
-    final TokenList list = new TokenList();
-    if(info != null) list.add(info.toString());
-    for(final InputInfo ii : stack) list.add(ii.toString());
-    return list.finish();
-  }
-
-  /**
    * Returns a stack trace expression.
    * @return expression
    */
-  public StackTrace stackTrace() {
-    return new StackTrace();
+  public Str stackTrace() {
+    final TokenBuilder tb = new TokenBuilder();
+    if(info != null) tb.add(info).add('\n');
+    for(final InputInfo stck : stack) tb.add(stck).add('\n');
+    return Str.get(tb.finish());
   }
 
   /**
@@ -288,41 +277,5 @@ public class QueryException extends Exception {
       list.add(normalize(e instanceof ExprInfo ? ((ExprInfo) e).toErrorString() : e, info));
     }
     return Util.info(text, (Object[]) list.finish());
-  }
-
-  /** Stack trace function. */
-  private final class StackTrace extends Simple {
-    /** Constructor. */
-    protected StackTrace() {
-      super(QueryException.this.info, SeqType.STRING_O);
-    }
-
-    @Override
-    public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-      final TokenBuilder tb = new TokenBuilder();
-      if(info != null) tb.add(info).add(NL);
-      for(final InputInfo stck : stack) tb.add(stck).add(NL);
-      return Str.get(tb.finish());
-    }
-
-    @Override
-    public Expr inline(final InlineContext ic) throws QueryException {
-      return this;
-    }
-
-    @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-      return this;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-      return obj == this;
-    }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token("stack-trace");
-    }
   }
 }

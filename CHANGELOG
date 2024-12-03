@@ -1,3 +1,13 @@
+VERSION 11.6 (November 28, 2024) ---------------------------------------
+
+ - [ADD] New XQuery 4 features (sibling axes, civil-timezone, etc)
+ - [ADD] job:execute: Run XQuery scripts
+ - [ADD] Permissions: Access to request headers and query parameters
+ - [ADD] New options: LOGEXCLUDE, LOGCUT
+ - [ADD] JSON serialization: Improved double representation
+ - [ADD] JSON serialization: json-lines support
+ - [FIX] Tomcat: improved job handling
+
 VERSION 11.5 (October 29, 2024) ----------------------------------------
 
  - [ADD] New XQuery 4 features (support for named record type, etc)
