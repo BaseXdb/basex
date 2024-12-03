@@ -16,6 +16,11 @@ public final class RecordTest extends SandboxTest {
   @Test public void instanceOf() {
     query("declare record x(x); { 'x': () } instance of x", true);
 
+    query("{ } instance of record()", true);
+    query("{ 'x': () } instance of record()", false);
+    query("declare record local:empty(); {} instance of local:empty", true);
+    query("declare record local:empty(); { 'x': () } instance of local:empty", false);
+
     query("{ 'x': () } instance of record(x)", true);
     query("{ } instance of record(x)", false);
 
