@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.math.*;
 import java.text.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -33,30 +34,41 @@ public final class DecFormatter extends FormatUtil {
   private final byte[] actives;
 
   /** Zero-digit character. */
-  public final int zero;
+  private final int zero;
 
   /** Infinity. */
-  public byte[] inf = Token.INFINITY;
+  private byte[] inf = Token.INFINITY;
   /** NaN. */
-  public byte[] nan = Token.NAN;
+  private byte[] nan = Token.NAN;
   /** Pattern-separator character. */
-  public int pattern = ';';
+  private int pattern = ';';
 
   /** Decimal-separator character. */
-  public int decimal = '.';
+  private int decimal = '.';
   /** Exponent-separator character. */
-  public int exponent = 'e';
+  private int exponent = 'e';
   /** Grouping-separator character. */
-  public int grouping = ',';
+  private int grouping = ',';
   /** Optional-digit character. */
-  public int digit = '#';
+  private int digit = '#';
 
-  /** Minus character. */
-  public int minus = '-';
+  /** Minus rendition. */
+  private int[] minus = { '-' };
   /** Percent character. */
-  public int percent = '%';
+  private int percent = '%';
   /** Permille character. */
-  public int permille = '\u2030';
+  private int permille = '\u2030';
+
+  /** Decimal-separator rendition. */
+  private int[] decimalRendition = { decimal };
+  /** Decimal-separator rendition. */
+  private int[] exponentRendition = { exponent };
+  /** Decimal-separator rendition. */
+  private int[] groupingRendition = { grouping };
+  /** Decimal-separator rendition. */
+  private int[] percentRendition = { percent };
+  /** Decimal-separator rendition. */
+  private int[] permilleRendition = { permille };
 
   /**
    * Constructor.
@@ -85,24 +97,29 @@ public final class DecFormatter extends FormatUtil {
         inf = v;
       } else if(option == DecFormatOptions.NAN) {
         nan = v;
+      } else if(option == DecFormatOptions.DECIMAL_SEPARATOR) {
+        decimalRendition = renditionValue(k, v, info);
+        decimal = cp(v, 0);
+      } else if(option == DecFormatOptions.GROUPING_SEPARATOR) {
+        groupingRendition = renditionValue(k, v, info);
+        grouping = cp(v, 0);
+      } else if(option == DecFormatOptions.EXPONENT_SEPARATOR) {
+        exponentRendition = renditionValue(k, v, info);
+        exponent = cp(v, 0);
+      } else if(option == DecFormatOptions.PERCENT) {
+        percentRendition = renditionValue(k, v, info);
+        percent = cp(v, 0);
+      } else if(option == DecFormatOptions.PER_MILLE) {
+        permilleRendition = renditionValue(k, v, info);
+        permille = cp(v, 0);
+      } else if(option == DecFormatOptions.MINUS_SIGN) {
+        minus = cps(v);
       } else if(v.length != 0 && cl(v, 0) == v.length) {
         final int cp = cp(v, 0);
-        if(option == DecFormatOptions.DECIMAL_SEPARATOR) {
-          decimal = cp;
-        } else if(option == DecFormatOptions.GROUPING_SEPARATOR) {
-          grouping = cp;
-        } else if(option == DecFormatOptions.EXPONENT_SEPARATOR) {
-          exponent = cp;
-        } else if(option == DecFormatOptions.PATTERN_SEPARATOR) {
+        if(option == DecFormatOptions.PATTERN_SEPARATOR) {
           pattern = cp;
-        } else if(option == DecFormatOptions.MINUS_SIGN) {
-          minus = cp;
         } else if(option == DecFormatOptions.DIGIT) {
           digit = cp;
-        } else if(option == DecFormatOptions.PERCENT) {
-          percent = cp;
-        } else if(option == DecFormatOptions.PER_MILLE) {
-          permille = cp;
         } else if(option == DecFormatOptions.ZERO_DIGIT) {
           z = zeroes(cp);
           if(z == -1) throw INVDECFORM_X_X.get(info, k, v);
@@ -131,6 +148,26 @@ public final class DecFormatter extends FormatUtil {
     // decimal-digit-family: added above. pattern-separator: will never occur at this stage
     actives = tb.add(decimal).add(exponent).add(grouping).add(digit).finish();
     // "all other characters (...) are classified as passive characters."
+  }
+
+  /**
+   * Get the rendition value from an option value matching the pattern '.|.:.*', where the first
+   * character identifies the marker, and the optional part following a colon is the rendition.
+   * In absence of the colon part, the rendition value defaults to the marker character.
+   * @param name the option name
+   * @param value the option value
+   * @param info input info
+   * @return the rendition value
+   * @throws QueryException query exception
+   */
+  private int[] renditionValue(final String name, final byte[] value, final InputInfo info)
+      throws QueryException {
+    if(value.length != 0) {
+      final int[] cps = cps(value);
+      if(cps.length == 1) return cps;
+      if(cps[1] == ':') return Arrays.copyOfRange(cps, 2, cps.length);
+    }
+    throw INVDECFORM_X_X.get(info, name, value);
   }
 
   /**
@@ -188,18 +225,29 @@ public final class DecFormatter extends FormatUtil {
    * @throws QueryException query exception
    */
   public XQMap toMap() throws QueryException {
+    final Function<int[], byte[]> cpToken = rendition -> {
+      final TokenBuilder tb = new TokenBuilder(rendition.length);
+      for(final int r : rendition) tb.add(cpToken(r));
+      return tb.finish();
+    };
+    final BiFunction<Integer, int[], byte[]> value = (marker, rendition) -> {
+      final byte[] m = cpToken(marker);
+      if(rendition.length == 1 && marker == rendition[0]) return m;
+      return new TokenBuilder(rendition.length + 2).add(m).add(':').add(
+          cpToken.apply(rendition)).finish();
+    };
     final MapBuilder map = new MapBuilder();
-    map.put(DecFormatOptions.DECIMAL_SEPARATOR.name(), cpToken(decimal));
-    map.put(DecFormatOptions.EXPONENT_SEPARATOR.name(), cpToken(exponent));
-    map.put(DecFormatOptions.GROUPING_SEPARATOR.name(), cpToken(grouping));
-    map.put(DecFormatOptions.PERCENT.name(), cpToken(percent));
-    map.put(DecFormatOptions.PER_MILLE.name(), cpToken(permille));
+    map.put(DecFormatOptions.DECIMAL_SEPARATOR.name(), value.apply(decimal, decimalRendition));
+    map.put(DecFormatOptions.EXPONENT_SEPARATOR.name(), value.apply(exponent, exponentRendition));
+    map.put(DecFormatOptions.GROUPING_SEPARATOR.name(), value.apply(grouping, groupingRendition));
+    map.put(DecFormatOptions.PERCENT.name(), value.apply(percent, percentRendition));
+    map.put(DecFormatOptions.PER_MILLE.name(), value.apply(permille, permilleRendition));
     map.put(DecFormatOptions.ZERO_DIGIT.name(), cpToken(zero));
     map.put(DecFormatOptions.DIGIT.name(), cpToken(digit));
     map.put(DecFormatOptions.PATTERN_SEPARATOR.name(), cpToken(pattern));
     map.put(DecFormatOptions.INFINITY.name(), inf);
     map.put(DecFormatOptions.NAN.name(), nan);
-    map.put(DecFormatOptions.MINUS_SIGN.name(), cpToken(minus));
+    map.put(DecFormatOptions.MINUS_SIGN.name(), cpToken.apply(minus));
     return map.map();
   }
 
@@ -397,10 +445,18 @@ public final class DecFormatter extends FormatUtil {
           act = true;
         } else {
           // passive characters
-          pic.pc |= ch == percent;
-          pic.pm |= ch == permille;
           // add to prefix or suffix
-          (frac || act ? pic.suffix : pic.prefix).add(ch);
+          final IntList pix = frac || act ? pic.suffix : pic.prefix;
+          if(ch == percent) {
+            pic.pc = true;
+            pix.add(percentRendition);
+          }
+          else if (ch == permille) {
+            pic.pm = true;
+            pix.add(permilleRendition);
+          } else {
+            pix.add(ch);
+          }
         }
       }
       // finalize integer-part-grouping-positions
@@ -530,14 +586,14 @@ public final class DecFormatter extends FormatUtil {
       if(pic.isRegular && pic.groupInt.get(0) > 0) {
         // regular pattern with repeating separators
         for(int i = intgr.size() - 1; i > 0; --i) {
-          if(i % pic.groupInt.get(0) == 0) intgr.insert(intgr.size() - i, grouping);
+          if(i % pic.groupInt.get(0) == 0) intgr.insert(intgr.size() - i, groupingRendition);
         }
       } else {
         // irregular pattern, or no separators at all
         final int gil = pic.groupInt.size();
         for(int g = 0; g < gil; g++) {
           final int pos = intgr.size() - pic.groupInt.get(g);
-          if(pos > 0) intgr.insert(pos, grouping);
+          if(pos > 0) intgr.insert(pos, groupingRendition);
         }
       }
 
@@ -550,7 +606,7 @@ public final class DecFormatter extends FormatUtil {
       final int ul = fract.size();
       for(int p = pic.groupFrac.size() - 1; p >= 0; p--) {
         final int pos = pic.groupFrac.get(p);
-        if(pos < ul) fract.insert(pos, grouping);
+        if(pos < ul) fract.insert(pos, groupingRendition);
       }
     }
 
@@ -559,10 +615,10 @@ public final class DecFormatter extends FormatUtil {
     // add prefix and integer part
     res.add(pic.prefix.toArray()).add(intgr.finish());
     // add fractional part
-    if(!fract.isEmpty()) res.add(decimal).add(fract.finish());
+    if(!fract.isEmpty()) res.add(decimalRendition).add(fract.finish());
     // add exponent
     if(pic.minExp != 0) {
-      res.add(exponent);
+      res.add(exponentRendition);
       if(exp < 0) res.add(minus);
       final String s = Integer.toString(Math.abs(exp));
       final int sl = s.length();
