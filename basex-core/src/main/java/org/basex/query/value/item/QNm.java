@@ -188,7 +188,9 @@ public final class QNm extends Item {
    * @return result of check
    */
   public boolean eq(final QNm qnm) {
-    return qnm == this || Token.eq(uri(), qnm.uri()) && Token.eq(local(), qnm.local());
+    if(qnm == this) return true;
+    return uri == null && qnm.uri == null ? Token.eq(name,
+        qnm.name) : Token.eq(uri(), qnm.uri()) && Token.eq(local(), qnm.local());
   }
 
   @Override

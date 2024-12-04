@@ -663,9 +663,17 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instanceOf(final SeqType st) {
+    if(this == st) return true;
     // empty sequence: only check cardinality
-    return this == st || (zero() ? !st.oneOrMore() :
-      type.instanceOf(st.type) && occ.instanceOf(st.occ) && kindInstanceOf(st));
+    if(zero()) return !st.oneOrMore();
+    if(!occ.instanceOf(st.occ)) return false;
+    if(type instanceof ChoiceItemType) {
+      return ((ChoiceItemType) type).instanceOf(st.with(EXACTLY_ONE));
+    }
+    if(st.type instanceof ChoiceItemType) {
+      return ((ChoiceItemType) st.type).hasInstance(this.with(EXACTLY_ONE));
+    }
+    return type.instanceOf(st.type) && kindInstanceOf(st);
   }
 
   /**
