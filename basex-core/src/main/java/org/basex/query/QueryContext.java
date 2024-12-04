@@ -110,12 +110,14 @@ public final class QueryContext extends Job implements Closeable {
   /** Parsed modules, containing the file path and library module. */
   public final TokenObjMap<LibraryModule> libs = new TokenObjMap<>();
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
-  final TokenMap modDeclared = new TokenMap();
+  public final TokenMap modDeclared = new TokenMap();
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
   /** Main module (root expression). */
   public MainModule main;
+  /** Context value type. */
+  public SeqType contextType;
   /** Context scope. */
   public ContextScope contextValue;
   /** Indicates if context scope exists and is final. */
@@ -283,7 +285,7 @@ public final class QueryContext extends Job implements Closeable {
           bind(entry.getKey(), Atm.get(entry.getValue()), null, main.sc);
         }
       }
-      vars.bindExternal(this, bindings);
+      vars.bindExternal(this, bindings, true);
 
       return compile(false);
     });
@@ -321,7 +323,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Void compile(final boolean dynamic) throws QueryException {
+  public Void compile(final boolean dynamic) throws QueryException {
     checkStop();
 
     info.runtime = false;
@@ -777,5 +779,14 @@ public final class QueryContext extends Job implements Closeable {
    */
   private static QNm qname(final String name, final StaticContext sc) throws QueryException {
     return QNm.parse(token(Strings.startsWith(name, '$') ? name.substring(1) : name), sc);
+  }
+
+  /**
+   * Checks whether the given string contains a valid XQuery version number.
+   * @param string the string to be checked
+   * @return true, if string contains a valid XQuery version number.
+   */
+  public static boolean isSupportedXQueryVersion(final String string) {
+    return Strings.eq(string, "1.0", "1.1", "3.0", "3.1", "4.0");
   }
 }

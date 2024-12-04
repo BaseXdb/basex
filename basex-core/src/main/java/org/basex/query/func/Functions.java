@@ -346,7 +346,7 @@ public final class Functions {
    * @return function item
    * @throws QueryException query exception
    */
-  private static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc,
+  public static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc,
       final boolean hasImport) throws QueryException {
 
     final FuncType sft = sf.funcType();

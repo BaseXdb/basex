@@ -104,15 +104,16 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * Binds all external variables.
    * @param qc query context
    * @param bindings variable bindings
+   * @param cast cast flag, value will be coerced if false
    * @throws QueryException query exception
    */
-  public void bindExternal(final QueryContext qc, final QNmMap<Value> bindings)
+  public void bindExternal(final QueryContext qc, final QNmMap<Value> bindings, final boolean cast)
       throws QueryException {
 
     for(final QNm qnm : bindings) {
       if(qnm != QNm.EMPTY) {
         final VarEntry ve = vars.get(qnm);
-        if(ve != null) ve.var.bind(bindings.get(qnm), qc);
+        if(ve != null) ve.var.bind(bindings.get(qnm), qc, cast);
       }
     }
   }
