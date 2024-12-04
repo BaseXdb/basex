@@ -50,6 +50,17 @@ public final class TypeTest extends QueryTest {
         { "TypeErr 1", "1 instance of xs:abcde" },
         { "TypeErr 2", "1 instance of xs:string()" },
         { "TypeErr 3", "1 instance of item" },
+
+        { "Subtyping 1", booleans(true), "declare namespace p1='p1'; declare namespace p2='p2'; "
+            + "declare variable $x external := ''; function() as element(p1:a)? {$x} "
+            + "instance of function() as element(p1:*)?" },
+        { "Subtyping 1", booleans(false), "declare namespace p1='p1'; declare namespace p2='p2'; "
+            + "declare variable $x external := ''; function() as element(p1:*|p2:*)? {$x} "
+            + "instance of function() as element(p1:*)?" },
+        { "Subtyping 1", booleans(true), "declare variable $x external := ''; function() as "
+            + "element(a|b)? {$x} instance of function() as element(*:a|*:b)?" },
+        { "Subtyping 1", booleans(false), "declare variable $x external := ''; function() as "
+            + "element(a|b|c)? {$x} instance of function() as (element(a)|element(b))?" },
     };
   }
 }

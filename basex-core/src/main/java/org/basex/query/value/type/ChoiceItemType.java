@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -77,6 +78,19 @@ public final class ChoiceItemType implements Type {
   public boolean eq(final Type type) {
     return this == type ||
         type instanceof ChoiceItemType && types.equals(((ChoiceItemType) type).types);
+  }
+
+  /**
+   * Checks if this choice item type is an instance of the specified sequence type.
+   * @param seqType sequence type to check
+   * @return result of check
+   */
+  public boolean instanceOf(final SeqType seqType) {
+    if(!seqType.one()) throw Util.notExpected();
+    for(final SeqType st : types) {
+      if(!st.instanceOf(seqType)) return false;
+    }
+    return true;
   }
 
   @Override
@@ -152,13 +166,34 @@ public final class ChoiceItemType implements Type {
   }
 
   /**
-   * Checks if the given type is an instance of the this type.
+   * Checks if the given type is an instance of this type.
    * @param type type to be checked
    * @return result of check
    */
   boolean hasInstance(final Type type) {
     for(final SeqType st : types) {
       if(type.instanceOf(st.type)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the given sequence type is an instance of this type.
+   * @param seqType sequence type to be checked
+   * @return result of check
+   */
+  boolean hasInstance(final SeqType seqType) {
+    if(!seqType.one()) throw Util.notExpected();
+    final Test test = seqType.test();
+    if(test instanceof UnionTest) {
+      final UnionTest ut = (UnionTest) test;
+      for (final Test t : ut.tests) {
+        if(!hasInstance(SeqType.get(seqType.type, Occ.EXACTLY_ONE, t))) return false;
+      }
+      return true;
+    }
+    for(final SeqType st : types) {
+      if(seqType.instanceOf(st)) return true;
     }
     return false;
   }

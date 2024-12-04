@@ -200,7 +200,14 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     // only evaluate if:
     // - the closure is empty, so we don't lose variables
     // - the result size is not too large
-    return global.isEmpty() && !cc.largeResult(expr) ? cc.preEval(this) : this;
+    if(global.isEmpty() && !cc.largeResult(expr)) {
+      try {
+        return cc.preEval(this);
+      } catch(final QueryException qe) {
+        expr = cc.error(qe, expr);
+      }
+    }
+    return this;
   }
 
   @Override
