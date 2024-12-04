@@ -698,6 +698,12 @@ public enum QueryError {
   /** Error code. */
   MODULE_NOT_FOUND_X(FOQM, 2, "Module not found: '%'"),
   /** Error code. */
+  MODULE_FOUND_MAIN_X(FOQM, 2, "Found main module instead of library module '%'."),
+  /** Error code. */
+  MODULE_FOUND_OTHER_X(FOQM, 2, "Did not find expected module '%'."),
+  /** Error code. */
+  MODULE_FOUND_OTHER_X_X(FOQM, 2, "Did not find expected module '%' in '%'."),
+  /** Error code. */
   MODULE_STATIC_ERROR_X_X(FOQM, 3, "Static error in dynamically loaded XQuery module '%': %"),
   /** Error code. */
   MODULE_PARAMETER_TYPE_X_X(FOQM, 5,

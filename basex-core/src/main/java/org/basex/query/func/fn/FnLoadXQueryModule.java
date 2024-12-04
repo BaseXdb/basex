@@ -73,6 +73,7 @@ public final class FnLoadXQueryModule extends Parse {
 
     final QueryContext mqc = new QueryContext(qc);
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
+    int nParsed = 0;
     for(final IO src : srcs) {
       mqc.finalContext = false;
       try {
@@ -106,6 +107,16 @@ public final class FnLoadXQueryModule extends Parse {
         mqc.finalContext = true;
       }
       mqc.compile(true);
+      if(mqc.main != null) throw MODULE_FOUND_MAIN_X.get(info, modUri);
+      final Iterator<byte[]> it = mqc.modParsed.values().iterator();
+      for(int i = 0; i < nParsed; ++i) it.next();
+      final byte[] uri = it.next();
+      if(!Token.eq(modUri, uri)) {
+        final String path = src.path();
+        throw path.isEmpty() ? MODULE_FOUND_OTHER_X.get(info, modUri)
+                             : MODULE_FOUND_OTHER_X_X.get(info, modUri, path);
+      }
+      nParsed = mqc.modParsed.size();
     }
 
     final QNmMap<Map<Integer, Expr>> funcs = new QNmMap<>();

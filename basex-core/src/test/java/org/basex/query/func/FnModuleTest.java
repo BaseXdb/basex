@@ -1474,6 +1474,9 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
     error(func.args("x", " {'content': '%@?$'}"), MODULE_STATIC_ERROR_X_X);
+    error(func.args("x", " {'content': 'module namespace y = \"y\";'}"), MODULE_FOUND_OTHER_X);
+    error(func.args("x.xq", " { 'content': 'declare function local:f() {}; ()' }"),
+        MODULE_FOUND_MAIN_X);
   }
 
   /** Test method. */
