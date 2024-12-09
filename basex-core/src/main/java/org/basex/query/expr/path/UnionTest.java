@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class UnionTest extends Test {
   /** Tests. */
-  final Test[] tests;
+  public final Test[] tests;
 
   /**
    * Constructor.

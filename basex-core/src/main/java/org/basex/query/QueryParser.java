@@ -3284,7 +3284,7 @@ public class QueryParser extends InputParser {
   private SeqType castTarget() throws QueryException {
     Type type;
     if(wsConsume("(")) {
-      type = choiceItemType();
+      type = choiceItemType().type;
     } else {
       final QNm name = eQName(sc.elemNS, TYPEINVALID);
       if(!name.hasURI() && eq(name.local(), token(ENUM))) {
@@ -3343,7 +3343,7 @@ public class QueryParser extends InputParser {
    */
   private SeqType itemType() throws QueryException {
     // choice item type
-    if(wsConsume("(")) return SeqType.get(choiceItemType(), Occ.EXACTLY_ONE);
+    if(wsConsume("(")) return choiceItemType();
 
     // parse annotations and type name
     final AnnList anns = annotations(false).check(false, false);
@@ -3567,7 +3567,7 @@ public class QueryParser extends InputParser {
    * @return item type
    * @throws QueryException query exception
    */
-  private Type choiceItemType() throws QueryException {
+  private SeqType choiceItemType() throws QueryException {
     final ArrayList<SeqType> types = new ArrayList<>() {
       @Override
       public boolean add(final SeqType st) {
@@ -3591,7 +3591,7 @@ public class QueryParser extends InputParser {
       }
     } while(wsConsume("|"));
     check(')');
-    return types.size() == 1 ? types.get(0).type : new ChoiceItemType(types);
+    return types.size() == 1 ? types.get(0) : new ChoiceItemType(types).seqType();
   }
 
   /**
