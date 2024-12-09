@@ -122,6 +122,29 @@ public final class ModuleTest extends SandboxTest {
         + "let $v as b:p := 'b:p should not be visible' return $v", QueryError.TYPEUNKNOWN_X);
   }
 
+  /** Tests fn:load-xquery-module with nested module imports. */
+  @Test public void dynamicNestedImport() {
+    final IOFile sandbox = sandbox();
+    final IOFile m1 = new IOFile(sandbox, "m1.xqm");
+    write(m1, "module namespace m = 'm';\n"
+        + "import module namespace n = 'n' at 'n.xqm';");
+    final IOFile m2 = new IOFile(sandbox, "m2.xqm");
+    write(m2, "module namespace m = 'm';\n"
+        + "import module namespace o = 'o' at 'o.xqm';\n"
+        + "declare variable $m:v := 42;");
+    final IOFile n = new IOFile(sandbox, "n.xqm");
+    write(n, "module namespace n = 'n';");
+    final IOFile o = new IOFile(sandbox, "o.xqm");
+    write(o, "module namespace o = 'o';");
+
+    // import of m works from m1, m2
+    query("fn:load-xquery-module('m',"
+        + "{'location-hints': ('" + m1.path() + "', '" + m2.path() + "')})?variables?*", 42);
+    // import of m fails from m1, m2, o
+    error("fn:load-xquery-module('m', {'location-hints': ('" + m1.path() + "', '" + m2.path()
+        + "', '" + o.path() + "')})", QueryError.MODULE_FOUND_OTHER_X_X);
+  }
+
   /** Tests rejection of functions and variables, when their modules are not explicitly imported. */
   @Test public void gh2048() {
     final IOFile sandbox = sandbox();
