@@ -208,22 +208,6 @@ public final class Functions {
   }
 
   /**
-   * Creates a function item for a user-defined function.
-   * @param sf static function
-   * @param info input info (can be {@code null})
-   * @param qc query context
-   * @param hasImport indicates whether a module import for the function name's URI was present
-   * @return function item
-   * @throws QueryException query exception
-   */
-  public static FuncItem item(final StaticFunc sf, final InputInfo info, final QueryContext qc,
-      final boolean hasImport) throws QueryException {
-    // safe cast (no context dependency, runtime evaluation)
-    final FuncBuilder fb = new FuncBuilder(info, sf.arity(), true);
-    return (FuncItem) item(sf, fb, qc, hasImport);
-  }
-
-  /**
    * Raises an error for the wrong number of function arguments.
    * @param nargs number of supplied arguments
    * @param arities available arities (if single arity is negative, function is variadic)

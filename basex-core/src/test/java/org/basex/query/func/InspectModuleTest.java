@@ -73,12 +73,18 @@ public final class InspectModuleTest extends SandboxTest {
     final String url = "src/test/resources/hello.xqm";
     query("declare function local:x() { 1 }; " + COUNT.args(func.args()), 1);
     query("declare function local:x() { 2 }; " + func.args() + "()", 2);
+    query("declare function local:x($a := (), $b := (), $c := ()) {}; " + COUNT.args(func.args()),
+        4);
     query("import module namespace hello='world' at '" + url + "';" +
         func.args() + "[last()] instance of function(*)", true);
 
     query("for $f in " + func.args(url)
         + "where local-name-from-QName(function-name($f)) = 'world' "
         + "return $f()", "hello world");
+    query("for $f in " + func.args(url)
+        + "where local-name-from-QName(function-name($f)) = 'hello' "
+        + "return if(function-arity($f) eq 0) then $f() else $f('BaseX')",
+        "hello world\nhello BaseX");
 
     // ensure that closures will be compiled (GH-1194)
     query(func.args(url)
