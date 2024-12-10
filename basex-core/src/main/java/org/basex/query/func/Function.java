@@ -453,9 +453,6 @@ public enum Function implements AFunction {
   NILLED(FnNilled::new, "nilled([node])",
       params(NODE_ZO), BOOLEAN_ZO),
   /** XQuery function. */
-  NODE_KIND(FnNodeKind::new, "node-kind([node])",
-      params(NODE_ZO), STRING_ZO),
-  /** XQuery function. */
   NODE_NAME(FnNodeName::new, "node-name([node])",
       params(NODE_ZO), QNAME_ZO),
   /** XQuery function. */
@@ -660,6 +657,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   TRUNK(FnTrunk::new, "trunk(input)",
       params(ITEM_ZM), ITEM_ZM),
+  /** XQuery function. */
+  TYPE_OF(FnTypeOf::new, "type-of(value)",
+      params(ITEM_ZM), STRING_O),
   /** XQuery function. */
   UNIX_DATETIME(FnUnixDateTime::new, "unix-dateTime([value])",
       params(INTEGER_ZO), DATE_TIME_O),
