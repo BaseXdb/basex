@@ -783,10 +783,10 @@ public final class QueryContext extends Job implements Closeable {
 
   /**
    * Checks whether the given string contains a valid XQuery version number.
-   * @param string the string to be checked
+   * @param version version string
    * @return true, if string contains a valid XQuery version number.
    */
-  public static boolean isSupportedXQueryVersion(final String string) {
-    return Strings.eq(string, "1.0", "1.1", "3.0", "3.1", "4.0");
+  public static boolean isSupported(final String version) {
+    return Strings.eq(version, "1.0", "1.1", "3.0", "3.1", "4.0");
   }
 }

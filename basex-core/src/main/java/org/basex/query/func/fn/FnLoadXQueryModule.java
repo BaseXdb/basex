@@ -68,7 +68,7 @@ public final class FnLoadXQueryModule extends Parse {
 
     if (opt.contains(XQUERY_VERSION)) {
       final String version = opt.get(XQUERY_VERSION).toString();
-      if (!isSupportedXQueryVersion(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
+      if (!isSupported(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
     }
 
     final QueryContext mqc = new QueryContext(qc);
@@ -124,15 +124,9 @@ public final class FnLoadXQueryModule extends Parse {
       if(sf.updating()) mqc.updating();
       if(!sf.anns.contains(Annotation.PRIVATE) && Token.eq(sf.sc.module.uri(), modUri)) {
         for(int a = sf.minArity(); a <= sf.arity(); ++a) {
-          final int arity = a;
           final FuncBuilder fb = new FuncBuilder(info, a, true);
           final Expr item = Functions.item(sf, fb, mqc, true);
-          Map<Integer, Expr> map = funcs.get(sf.name);
-          if(map == null) {
-            map = new HashMap<>();
-            funcs.put(sf.name, map);
-          }
-          map.put(arity, item);
+          funcs.computeIfAbsent(sf.name, () -> new HashMap<Integer, Expr>()).put(a, item);
         }
       }
     }

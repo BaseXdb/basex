@@ -175,7 +175,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(" map { 'a': 'b' }"), "map(xs:string, xs:string)");
     query(func.args(" array { 1, <a/> }"), "array(item())");
     query(func.args(" array { 1, 2 }"), "array(xs:integer)");
-    query(func.args(" function() { 1 }"), "fn() as xs:integer");
+    query(func.args(" function() { 1 }"), "function() as xs:integer");
 
     query(func.args(" 1 to 2", " map { 'item': true() }"), "xs:integer");
     query(func.args(" (<a/>, <b/>)[name() = 'a']", " map { 'mode': 'expression' }"),

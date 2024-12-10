@@ -112,9 +112,9 @@ public final class JsonBasicSerializer extends JsonSerializer {
         if(value == null) throw error("Element '%' has no value.", local);
         final String string = Token.string(value).trim().
             replaceAll("^\\+", "").
-            replaceAll("^(-?)0*([\\d])", "$1$2").
+            replaceAll("^(-?)0+([\\d])", "$1$2").
             replaceAll("^(\\.)", "0$1").
-            replaceAll("(\\.)$", "$10");
+            replaceAll("(\\.)([\\D]|$)", "$10$2");
         if(!isNumber(string)) throw error("Element '%' has invalid value: '%'.", local, value);
         out.print(token(string));
       } else if(eq(local, ARRAY)) {
@@ -136,7 +136,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    * @param number number string
    * @return result of check
    */
-  private static boolean isNumber(final String number) {
+  public static boolean isNumber(final String number) {
     final InputParser ip = new InputParser(number);
     int cp = ip.consume();
     if(cp == '-') cp = ip.consume();

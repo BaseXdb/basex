@@ -12,7 +12,6 @@ import org.basex.query.util.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -73,19 +72,15 @@ public final class InspectFunctions extends StandardFunc {
    * builder.
    * @param vb value builder
    * @param sf static function
-   * @param qc query contect
+   * @param qc query context
    * @throws QueryException query exception
    */
-  private void addItems(final ValueBuilder vb, final StaticFunc sf, final QueryContext qc)
+  private static void addItems(final ValueBuilder vb, final StaticFunc sf, final QueryContext qc)
       throws QueryException {
     for(int a = sf.minArity(); a <= sf.arity(); ++a) {
       final FuncBuilder fb = new FuncBuilder(sf.info, a, true);
-      try {
-        // safe cast (no context dependency, runtime evaluation)
-        vb.add((FuncItem) Functions.item(sf, fb, qc, true));
-      } catch (ClassCastException ex) {
-        throw Util.notExpected(ex);
-      }
+      // safe cast (no context dependency, runtime evaluation)
+      vb.add((FuncItem) Functions.item(sf, fb, qc, true));
     }
   }
 }

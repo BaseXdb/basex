@@ -302,7 +302,7 @@ public class QueryParser extends InputParser {
     if(version) {
       // parse xquery version
       final String string = string(stringLiteral()).replaceAll("0+(\\d)", "$1");
-      if(!QueryContext.isSupportedXQueryVersion(string)) throw error(XQUERYVER_X, string);
+      if(!QueryContext.isSupported(string)) throw error(XQUERYVER_X, string);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
     if(wsConsumeWs(ENCODING)) {
