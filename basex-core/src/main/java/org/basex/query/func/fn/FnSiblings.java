@@ -19,23 +19,21 @@ public final class FnSiblings extends ContextFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final ANode node = toNodeOrNull(context(qc), qc);
-    if(node != null) {
-      if(!node.type.oneOf(NodeType.ATTRIBUTE, NodeType.NAMESPACE_NODE)) {
-        final ANode parent = node.parent();
-        if(parent != null) {
-          final Iter iter = parent.childIter();
-          return new NodeIter() {
-            @Override
-            public ANode next() throws QueryException {
-              qc.checkStop();
-              final Item next = iter.next();
-              return next != null ? ((ANode) next).finish() : null;
-            }
-          };
-        }
+    if(node == null) return Empty.ITER;
+
+    final ANode parent = node.parent();
+    if(node.type.oneOf(NodeType.ATTRIBUTE, NodeType.NAMESPACE_NODE) || parent == null)
+      return node.iter();
+
+    final Iter iter = parent.childIter();
+    return new NodeIter() {
+      @Override
+      public ANode next() throws QueryException {
+        qc.checkStop();
+        final Item next = iter.next();
+        return next != null ? ((ANode) next).finish() : null;
       }
-    }
-    return Empty.ITER;
+    };
   }
 
   @Override
