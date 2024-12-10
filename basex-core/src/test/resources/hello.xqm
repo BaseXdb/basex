@@ -33,6 +33,11 @@ declare %public function hello:world() as xs:string {
   hello:internal()
 };
 
+(:~ Function with default parameter value. :)
+declare function hello:hello($who := "world") as xs:string {
+  "hello " || $who
+};
+
 (:~ Private function returning a simple string. :)
 declare %private %Q{ns}ignored function hello:internal() as xs:string {
   "hello world"

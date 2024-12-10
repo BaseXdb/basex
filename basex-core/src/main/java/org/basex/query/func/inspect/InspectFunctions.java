@@ -9,7 +9,10 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -23,9 +26,7 @@ public final class InspectFunctions extends StandardFunc {
     // returns all functions from the query context
     if(!defined(0)) {
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(final StaticFunc sf : qc.functions.funcs()) {
-        vb.add(Functions.item(sf, sf.info, qc, true));
-      }
+      for(final StaticFunc sf : qc.functions.funcs()) addItems(vb, sf, qc);
       return vb.value(this);
     }
 
@@ -48,7 +49,7 @@ public final class InspectFunctions extends StandardFunc {
     // collect new functions
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final StaticFunc sf : qc.functions.funcs()) {
-      if(!old.contains(sf)) vb.add(Functions.item(sf, sf.info, qc, true));
+      if(!old.contains(sf)) addItems(vb, sf, qc);
     }
     funcs = vb.value(this);
     qc.resources.addFunctions(source.path(), funcs);
@@ -65,5 +66,26 @@ public final class InspectFunctions extends StandardFunc {
   public boolean accept(final ASTVisitor visitor) {
     // locked resources cannot be detected statically
     return visitor.lock((String) null) && super.accept(visitor);
+  }
+
+  /**
+   * Build function items for all arities of a static function and add them to the given value
+   * builder.
+   * @param vb value builder
+   * @param sf static function
+   * @param qc query contect
+   * @throws QueryException query exception
+   */
+  private void addItems(final ValueBuilder vb, final StaticFunc sf, final QueryContext qc)
+      throws QueryException {
+    for(int a = sf.minArity(); a <= sf.arity(); ++a) {
+      final FuncBuilder fb = new FuncBuilder(sf.info, a, true);
+      try {
+        // safe cast (no context dependency, runtime evaluation)
+        vb.add((FuncItem) Functions.item(sf, fb, qc, true));
+      } catch (ClassCastException ex) {
+        throw Util.notExpected(ex);
+      }
+    }
   }
 }
