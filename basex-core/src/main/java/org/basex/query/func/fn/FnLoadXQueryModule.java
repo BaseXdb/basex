@@ -156,7 +156,7 @@ public final class FnLoadXQueryModule extends Parse {
           throw ex;
         } catch (Exception ex) {
           Util.debug(ex);
-          throw VAREMPTY_X.get(info, var.name);
+          throw VAREMPTY_X.get(info, var.name());
         }
       }
     }

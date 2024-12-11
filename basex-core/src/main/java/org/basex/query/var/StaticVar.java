@@ -125,7 +125,7 @@ public final class StaticVar extends StaticDecl {
    * Returns the name of the variable.
    * @return name
    */
-  private String name() {
+  public String name() {
     return Strings.concat(Token.cpToken('$'), name.string());
   }
 
