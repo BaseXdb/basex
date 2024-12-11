@@ -1462,6 +1462,11 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void loadXQueryModule() {
     final Function func = LOAD_XQUERY_MODULE;
+    final String module = "src/test/resources/hello.xqm";
+    query(_REPO_INSTALL.args(module));
+
+    query(func.args("world", " {'variables': {QName('world', 'ext'): 42}}")
+        + "?variables(QName('world', 'ext'))", 42);
     query("let $expr := '2 + 2'\n"
         + "let $module := `xquery version '4.0'; \n"
         + "                module namespace dyn='http://example.com/dyn';\n"
@@ -1477,6 +1482,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("x", " {'content': 'module namespace y = \"y\";'}"), MODULE_FOUND_OTHER_X);
     error(func.args("x.xq", " { 'content': 'declare function local:f() {}; ()' }"),
         MODULE_FOUND_MAIN_X);
+    error(func.args("world"), VAREMPTY_X);
   }
 
   /** Test method. */
