@@ -465,7 +465,7 @@ public class RecordType extends MapType implements Iterable<byte[]> {
       final XQMap map = mb.map();
       if(!recordType.isExtensible()) return map;
       final XQMap options = toMap(arg(i), qc);
-      return map.addAll(options, MergeDuplicates.USE_FIRST, qc, ii);
+      return map.merge(options, MergeDuplicates.USE_FIRST, qc, ii);
     }
 
     @Override

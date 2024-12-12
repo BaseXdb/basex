@@ -36,7 +36,7 @@ public final class MapMerge extends StandardFunc {
     final MergeDuplicates merge = options.get(MergeOptions.DUPLICATES);
     XQMap map = XQMap.empty();
     for(Item item; (item = qc.next(maps)) != null;) {
-      map = map.addAll(toMap(item), merge, qc, info);
+      map = map.merge(toMap(item), merge, qc, info);
     }
     return map;
   }

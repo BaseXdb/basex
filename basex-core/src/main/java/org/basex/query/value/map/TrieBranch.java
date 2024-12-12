@@ -1,13 +1,9 @@
 package org.basex.query.value.map;
 
-import java.util.function.*;
-
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -101,17 +97,7 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  boolean contains(final int hash, final Item key, final int level) throws QueryException {
-    final int k = key(hash, level);
-    final TrieNode sub = kids[k];
-    return sub != null && sub.contains(hash, key, level + 1);
-  }
-
-  /** End strings. */
-  private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
-
-  @Override
-  TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
+  TrieNode merge(final TrieNode node, final int level, final MergeDuplicates merge,
       final QueryContext qc, final InputInfo info) throws QueryException {
     return node.add(this, level, merge, qc, info);
   }
@@ -170,7 +156,7 @@ final class TrieBranch extends TrieNode {
     for(int k = 0; k < kl; k++) {
       final TrieNode n = kids[k], ok = branch.kids[k];
       if(ok != null) {
-        final TrieNode kid = n == null ? ok : ok.addAll(n, level + 1, merge, qc, info);
+        final TrieNode kid = n == null ? ok : ok.merge(n, level + 1, merge, qc, info);
         if(kid != n) {
           if(ch == null) ch = copyKids();
           ch[k] = kid;
@@ -194,22 +180,6 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  void cache(final boolean lazy, final InputInfo info) throws QueryException {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.cache(lazy, info);
-    }
-  }
-
-  @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo info)
-      throws QueryException {
-    for(final TrieNode nd : kids) {
-      if(nd != null && !nd.materialized(test, info)) return false;
-    }
-    return true;
-  }
-
-  @Override
   void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
     for(final TrieNode nd : kids) {
       if(nd != null) nd.apply(func);
@@ -217,9 +187,9 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  boolean instanceOf(final Type kt, final SeqType dt) {
+  boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
     for(final TrieNode nd : kids) {
-      if(nd != null && !nd.instanceOf(kt, dt)) return false;
+      if(nd != null && !nd.test(func)) return false;
     }
     return true;
   }
@@ -240,6 +210,9 @@ final class TrieBranch extends TrieNode {
     return true;
   }
 
+  /** End strings. */
+  private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
+
   @Override
   void add(final TokenBuilder tb, final String indent) {
     final int s = Integer.bitCount(used);
@@ -248,13 +221,6 @@ final class TrieBranch extends TrieNode {
       final int e = i == s - 1 ? 2 : 0;
       tb.add(indent).add(ENDS[e]).add(String.format("%x", j)).add('\n');
       kids[j].add(tb, indent + ENDS[e + 1]);
-    }
-  }
-
-  @Override
-  void add(final TokenBuilder tb) {
-    for(int k = 0; k < KIDS && tb.moreInfo(); k++) {
-      if(kids[k] != null) kids[k].add(tb);
     }
   }
 }

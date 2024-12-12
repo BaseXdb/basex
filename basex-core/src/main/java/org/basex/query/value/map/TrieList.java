@@ -1,17 +1,13 @@
 package org.basex.query.value.map;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.function.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -127,16 +123,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  boolean contains(final int hs, final Item key, final int level) throws QueryException {
-    if(hs == hash) {
-      for(int k = keys.length; k-- != 0;)
-        if(key.atomicEqual(keys[k])) return true;
-    }
-    return false;
-  }
-
-  @Override
-  TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
+  TrieNode merge(final TrieNode node, final int level, final MergeDuplicates merge,
       final QueryContext qc, final InputInfo info) throws QueryException {
     return node.add(this, level, merge, qc, info);
   }
@@ -255,7 +242,7 @@ final class TrieList extends TrieNode {
     final int k = key(hash, level);
     final TrieNode[] ch = branch.copyKids();
     final TrieNode old = ch[k];
-    ch[k] = old == null ? this : old.addAll(this, level + 1, merge, qc, info);
+    ch[k] = old == null ? this : old.merge(this, level + 1, merge, qc, info);
     return new TrieBranch(ch, branch.used | 1 << k,
         branch.size + size - (old != null ? old.size : 0));
   }
@@ -276,38 +263,14 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  void cache(final boolean lazy, final InputInfo info) throws QueryException {
-    for(int i = 0; i < size; i++) {
-      keys[i].cache(lazy, info);
-      values[i].cache(lazy, info);
-    }
-  }
-
-  @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo info)
-      throws QueryException {
-    for(final Value value : values)  {
-      if(!value.materialized(test, info)) return false;
-    }
-    return true;
-  }
-
-  @Override
   void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
     for(int i = 0; i < size; i++) func.accept(keys[i], values[i]);
   }
 
   @Override
-  boolean instanceOf(final Type kt, final SeqType dt) {
-    if(kt != null) {
-      for(final Item key : keys) {
-        if(!key.type.instanceOf(kt)) return false;
-      }
-    }
-    if(dt != null) {
-      for(final Value value : values) {
-        if(!dt.instance(value)) return false;
-      }
+  boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
+    for(int i = 0; i < size; i++) {
+      if(!func.test(keys[i], values[i])) return false;
     }
     return true;
   }
@@ -346,14 +309,6 @@ final class TrieList extends TrieNode {
     final int kl = keys.length;
     for(int k = 0; k < kl; k++) {
       tb.add(indent).add("      ").add(keys[k]).add(" => ").add(values[k]).add('\n');
-    }
-  }
-
-  @Override
-  void add(final TokenBuilder tb) {
-    final int kl = keys.length;
-    for(int k = 0; k < kl && tb.moreInfo(); k++) {
-      tb.add(keys[k]).add(MAPASG).add(values[k]).add(SEP);
     }
   }
 }
