@@ -12,7 +12,10 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public final class StemDir extends TokenMap {
+public final class StemDir {
+  /** Map. */
+  private TokenMap map = new TokenMap();
+
   /**
    * Reads a stop words file.
    * @param fl file reference
@@ -23,7 +26,7 @@ public final class StemDir extends TokenMap {
       for(final String line : fl.string().split("\\n")) {
         final String[] terms = line.split("\\s+");
         final int tl = terms.length;
-        for(int t = 1; t < tl; t++) put(terms[t], terms[0]);
+        for(int t = 1; t < tl; t++) map.put(terms[t], terms[0]);
       }
       return true;
     } catch(final IOException ex) {
@@ -38,7 +41,7 @@ public final class StemDir extends TokenMap {
    * @return resulting token
    */
   byte[] stem(final byte[] word) {
-    final byte[] token = get(word);
+    final byte[] token = map.get(word);
     return token != null ? token : word;
   }
 }

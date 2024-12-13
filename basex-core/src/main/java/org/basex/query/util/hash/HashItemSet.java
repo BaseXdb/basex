@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class HashItemSet extends ASet implements ItemSet {
+public final class HashItemSet extends ASet implements ItemSet {
   /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Deep equality comparisons (can be {@code null}). */

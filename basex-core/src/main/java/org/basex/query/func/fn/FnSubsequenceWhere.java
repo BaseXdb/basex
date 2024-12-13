@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnSubsequenceWhere extends StandardFunc {
+public final class FnSubsequenceWhere extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
@@ -47,7 +47,7 @@ public class FnSubsequenceWhere extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final boolean from = defined(1), to = defined(2);
     final SeqType ist = input.seqType();

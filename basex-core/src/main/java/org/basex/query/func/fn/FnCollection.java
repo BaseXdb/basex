@@ -19,7 +19,7 @@ public class FnCollection extends Docs {
   }
 
   @Override
-  public boolean ddo() {
+  public final boolean ddo() {
     return true;
   }
 

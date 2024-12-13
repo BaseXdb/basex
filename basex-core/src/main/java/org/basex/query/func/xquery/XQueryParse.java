@@ -19,7 +19,7 @@ import org.basex.util.options.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class XQueryParse extends StandardFunc {
+public final class XQueryParse extends StandardFunc {
   /** QName. */
   private static final QNm Q_LIBRARY_MODULE = new QNm("LibraryModule");
   /** QName. */

@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-23, BSD License
  * @author Leo Woerteler
  */
-public class FnTakeWhile extends StandardFunc {
+public final class FnTakeWhile extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
@@ -32,12 +32,12 @@ public class FnTakeWhile extends StandardFunc {
   }
 
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     return iter(qc).value(qc, this);
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;

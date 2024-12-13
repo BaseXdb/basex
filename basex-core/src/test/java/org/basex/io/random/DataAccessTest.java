@@ -22,7 +22,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Dimitar Popov
  */
-public class DataAccessTest {
+public final class DataAccessTest {
   /** String. */
   private static final String STR = "string with characters: 10";
   /** Long string. */
@@ -90,18 +90,18 @@ public class DataAccessTest {
   }
 
   /** Test method for {@link DataAccess#cursor()}. */
-  @Test public final void testCursor() {
+  @Test public void testCursor() {
     assertEquals(0L, da.cursor());
   }
 
   /** Test method for {@link DataAccess#length()}. */
-  @Test public final void testLength() {
+  @Test public void testLength() {
     final long len = BLOCK_BOUNDARY_POS + STR_BIN.length;
     assertEquals(len, da.length());
   }
 
   /** Test method for {@link DataAccess#more()}. */
-  @Test public final void testMore() {
+  @Test public void testMore() {
     assertTrue(da.more());
 
     da.cursor(da.length());
@@ -109,46 +109,46 @@ public class DataAccessTest {
   }
 
   /** Test method for {@link DataAccess#read1(long)}. */
-  @Test public final void testRead1Long() {
+  @Test public void testRead1Long() {
     final long off = STR_BIN.length;
     assertEquals(BYTE, da.read1(off));
   }
 
   /** Test method for {@link DataAccess#read1()}. */
-  @Test public final void testRead1() {
+  @Test public void testRead1() {
     final long off = STR_BIN.length;
     da.cursor(off);
     assertEquals(BYTE, da.read1());
   }
 
   /** Test method for {@link DataAccess#read4(long)}. */
-  @Test public final void testRead4Long() {
+  @Test public void testRead4Long() {
     final long off = STR_BIN.length + BYTE_BIN.length + LONG_BIN.length;
     assertEquals(INT, da.read4(off));
   }
 
   /** Test method for {@link DataAccess#read4()}. */
-  @Test public final void testRead4() {
+  @Test public void testRead4() {
     final long off = STR_BIN.length + BYTE_BIN.length + LONG_BIN.length;
     da.cursor(off);
     assertEquals(INT, da.read4());
   }
 
   /** Test method for {@link DataAccess#read5(long)}. */
-  @Test public final void testRead5Long() {
+  @Test public void testRead5Long() {
     final long off = STR_BIN.length + BYTE_BIN.length;
     assertEquals(LONG, da.read5(off));
   }
 
   /** Test method for {@link DataAccess#read5()}. */
-  @Test public final void testRead5() {
+  @Test public void testRead5() {
     final long off = STR_BIN.length + BYTE_BIN.length;
     da.cursor(off);
     assertEquals(LONG, da.read5());
   }
 
   /** Test method for {@link DataAccess#readNum(long)}. */
-  @Test public final void testReadNumLong() {
+  @Test public void testReadNumLong() {
     long off = STR_BIN.length + BYTE_BIN.length + LONG_BIN.length +
         INT_BIN.length;
     assertEquals(CINT5, da.readNum(off));
@@ -161,7 +161,7 @@ public class DataAccessTest {
   }
 
   /** Test method for {@link DataAccess#readNum()}. */
-  @Test public final void testReadNum() {
+  @Test public void testReadNum() {
     final long off = STR_BIN.length + BYTE_BIN.length + LONG_BIN.length +
         INT_BIN.length;
     da.cursor(off);
@@ -172,18 +172,18 @@ public class DataAccessTest {
   }
 
   /** Test method for {@link DataAccess#readToken(long)}. */
-  @Test public final void testReadTokenLong() {
+  @Test public void testReadTokenLong() {
     assertEquals(STR, Token.string(da.readToken(0L)));
     assertEquals(STR, Token.string(da.readToken(BLOCK_BOUNDARY_POS)));
   }
 
   /** Test method for {@link DataAccess#readToken()}. */
-  @Test public final void testReadToken() {
+  @Test public void testReadToken() {
     assertEquals(STR, Token.string(da.readToken()));
   }
 
   /** Test method for {@link DataAccess#readBytes(long, int)}. */
-  @Test public final void testReadBytesLongInt() {
+  @Test public void testReadBytesLongInt() {
     final byte[] bytes = Token.token(STR);
     final long off = numToByteArray(bytes.length).length;
 
@@ -191,7 +191,7 @@ public class DataAccessTest {
   }
 
   /** Test method for {@link DataAccess#readBytes(int)}. */
-  @Test public final void testReadBytesInt() {
+  @Test public void testReadBytesInt() {
     final byte[] bytes = Token.token(STR);
     final long off = numToByteArray(bytes.length).length;
 
@@ -200,7 +200,7 @@ public class DataAccessTest {
   }
 
   /** Test method for {@link DataAccess#cursor(long)}. */
-  @Test public final void testCursorLong() {
+  @Test public void testCursorLong() {
     long off = STR_BIN.length + BYTE_BIN.length + LONG_BIN.length +
         INT_BIN.length + CINT5_BIN.length + CINT4_BIN.length + CINT2_BIN.length;
     da.cursor(off);
@@ -239,7 +239,7 @@ public class DataAccessTest {
    * Test method for {@link DataAccess#write4(long, int)}.
    * @throws IOException I/O exception
    */
-  @Test public final void testWrite4LongInt() throws IOException {
+  @Test public void testWrite4LongInt() throws IOException {
     final long pos = RANDOM_POS;
     da.write4(pos, INT);
     da.flush();
@@ -251,7 +251,7 @@ public class DataAccessTest {
    * Test method for {@link DataAccess#write4(int)}.
    * @throws IOException I/O exception
    */
-  @Test public final void testWrite4Int() throws IOException {
+  @Test public void testWrite4Int() throws IOException {
     final long pos = RANDOM_POS;
     da.cursor(pos);
     da.write4(pos, INT);
@@ -264,7 +264,7 @@ public class DataAccessTest {
    * Test method for {@link DataAccess#writeToken(long, byte[])}.
    * @throws IOException I/O exception
    */
-  @Test public final void testWriteToken() throws IOException {
+  @Test public void testWriteToken() throws IOException {
     final long pos = RANDOM_POS;
     da.writeToken(pos, Token.token(STR));
     da.flush();
@@ -276,7 +276,7 @@ public class DataAccessTest {
    * Test method for {@link DataAccess#writeToken(long, byte[])}.
    * @throws IOException I/O exception
    */
-  @Test public final void testWriteTokenBig() throws IOException {
+  @Test public void testWriteTokenBig() throws IOException {
     final long pos = RANDOM_POS;
     da.writeToken(pos, Token.token(STR_LONG));
     da.flush();
@@ -285,7 +285,7 @@ public class DataAccessTest {
   }
 
   /** Performance test for {@link DataAccess#writeToken(long, byte[])}. */
-  @Test public final void testPerfWriteTokenBig() {
+  @Test public void testPerfWriteTokenBig() {
     final byte[] token = Token.token(STR_LONG);
     for(int i = 0; i < 10000; ++i) da.writeToken(da.cursor(), token);
   }
@@ -294,7 +294,7 @@ public class DataAccessTest {
    * Test method for {@link DataAccess#writeNum(int)}.
    * @throws IOException I/O exception
    */
-  @Test public final void testWriteNum() throws IOException {
+  @Test public void testWriteNum() throws IOException {
     long pos = RANDOM_POS;
     da.cursor(pos);
     da.writeNum(CINT5);
@@ -314,7 +314,7 @@ public class DataAccessTest {
 
   /** Test method for {@link DataAccess#free(long, int)}. */
   @Disabled
-  @Test public final void testFree() {
+  @Test public void testFree() {
     fail("Not yet implemented");
   }
 

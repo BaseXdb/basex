@@ -17,8 +17,7 @@ import org.junit.jupiter.params.provider.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public class RegexTest extends SandboxTest {
-
+public final class RegexTest extends SandboxTest {
   /**
    * Test.
    * @param regex regular expression

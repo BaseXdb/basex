@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class ArraySplit extends ArrayFn {
+public final class ArraySplit extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);

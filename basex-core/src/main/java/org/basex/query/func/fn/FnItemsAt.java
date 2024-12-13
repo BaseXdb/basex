@@ -24,7 +24,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnItemsAt extends StandardFunc {
+public final class FnItemsAt extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return seqType().zeroOrOne() ? evalItem(qc).iter() : evalIter(qc);

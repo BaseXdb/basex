@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * @author Dominik Abend
  * @author Christian Gruen
  */
-public class CatalogTest extends SandboxTest {
+public final class CatalogTest extends SandboxTest {
   /** Test folder. */
   private static final String DIR = "src/test/resources/catalog/";
   /** Catalog file. */

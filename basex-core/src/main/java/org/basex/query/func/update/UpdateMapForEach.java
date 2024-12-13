@@ -8,5 +8,5 @@ import org.basex.query.func.map.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class UpdateMapForEach extends MapForEach {
+public final class UpdateMapForEach extends MapForEach {
 }

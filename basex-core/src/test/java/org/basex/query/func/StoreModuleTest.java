@@ -16,7 +16,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class StoreModuleTest extends SandboxTest {
+public final class StoreModuleTest extends SandboxTest {
   /** Invalid characters for database names. */
   private static final char[] INVALID = ",*?;\\/:\"<>|".toCharArray();
 

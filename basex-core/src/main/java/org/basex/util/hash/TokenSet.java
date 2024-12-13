@@ -184,7 +184,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   @Override
-  protected int hash(final int id) {
+  protected final int hash(final int id) {
     return Token.hash(keys[id]);
   }
 

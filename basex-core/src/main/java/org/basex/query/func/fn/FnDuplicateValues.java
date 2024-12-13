@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnDuplicateValues extends StandardFunc {
+public final class FnDuplicateValues extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);

@@ -14,7 +14,7 @@ import org.opentest4j.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public class WeakTokenSetTest {
+public final class WeakTokenSetTest {
   /** The prefix for assertion messages, showing random seed for reproducing potential failures. */
   private static String msgPrefix;
   /** Random value generator. */

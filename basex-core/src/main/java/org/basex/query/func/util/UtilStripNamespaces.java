@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class UtilStripNamespaces extends StandardFunc {
+public final class UtilStripNamespaces extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNode(arg(0), qc);

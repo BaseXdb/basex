@@ -15,7 +15,7 @@ import org.basex.server.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class LocalSession extends Session {
+public final class LocalSession extends Session {
   /** Database context. */
   private final Context ctx;
 

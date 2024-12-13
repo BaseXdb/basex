@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class MemValuesBuilder extends ValuesBuilder {
+public final class MemValuesBuilder extends ValuesBuilder {
   /**
    * Constructor.
    * @param data data reference

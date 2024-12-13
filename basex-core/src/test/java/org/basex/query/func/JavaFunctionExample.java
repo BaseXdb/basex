@@ -13,7 +13,7 @@ import org.w3c.dom.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class JavaFunctionExample {
+public final class JavaFunctionExample {
   /** Value. */
   Boolean var;
 

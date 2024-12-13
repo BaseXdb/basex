@@ -13,7 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
  * @author BaseX Team 2005-24, BSD License
  * @author Dimitar Popov
  */
-public class UriTest {
+public final class UriTest {
   /**
    * Sample URIs.
    * @return object parameters

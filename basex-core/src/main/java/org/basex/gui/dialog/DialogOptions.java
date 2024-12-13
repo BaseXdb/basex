@@ -13,7 +13,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class DialogOptions extends BaseXBack {
+public final class DialogOptions extends BaseXBack {
   /** Dialog reference. */
   private final GUI gui;
 

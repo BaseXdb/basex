@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class ArchiveCreateFrom extends ArchiveCreate {
+public final class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IOFile root = new IOFile(toPath(arg(0), qc));

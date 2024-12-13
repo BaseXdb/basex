@@ -26,7 +26,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class DbList extends StandardFunc {
-
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return defined(0) ? resources(qc) : list(qc).iter();

@@ -18,9 +18,9 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class ArrayValues extends StandardFunc {
+public final class ArrayValues extends StandardFunc {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
@@ -50,7 +50,7 @@ public class ArrayValues extends StandardFunc {
   }
 
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -59,7 +59,7 @@ public class ArrayValues extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) {
     final Type tp = arg(0).seqType().type;
     if(tp instanceof ArrayType) exprType.assign(((ArrayType) tp).valueType.with(Occ.ZERO_OR_MORE));
     return this;

@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class ANodeList extends ObjectList<ANode, ANodeList> {
+public final class ANodeList extends ObjectList<ANode, ANodeList> {
   /**
    * Constructor.
    */

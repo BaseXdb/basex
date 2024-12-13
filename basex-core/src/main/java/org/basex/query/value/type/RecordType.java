@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public class RecordType extends MapType implements Iterable<byte[]> {
+public final class RecordType extends MapType implements Iterable<byte[]> {
   /** Pair. */
   public static final RecordType PAIR;
   /** Member. */

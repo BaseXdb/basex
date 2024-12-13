@@ -20,7 +20,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnOp extends StandardFunc {
+public final class FnOp extends StandardFunc {
   /** QName: X. */
   private static final QNm Q_X = new QNm("x");
   /** QName: Y. */

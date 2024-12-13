@@ -13,7 +13,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FileListRoots extends FileFn {
+public final class FileListRoots extends FileFn {
   @Override
   public Value value(final QueryContext qc) {
     final TokenList tl = new TokenList();

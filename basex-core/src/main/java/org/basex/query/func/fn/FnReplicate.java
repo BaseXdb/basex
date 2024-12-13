@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnReplicate extends StandardFunc {
+public final class FnReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
