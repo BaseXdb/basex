@@ -56,8 +56,9 @@ public class MapType extends FType {
   @Override
   public final XQMap read(final DataInput in, final QueryContext qc)
       throws IOException, QueryException {
-    final MapBuilder mb = new MapBuilder();
-    for(int s = in.readNum() - 1; s >= 0; s--) {
+    int s = in.readNum();
+    final MapBuilder mb = new MapBuilder(s);
+    while(--s >= 0) {
       mb.put((Item) Store.read(in, qc), Store.read(in, qc));
     }
     return mb.map();

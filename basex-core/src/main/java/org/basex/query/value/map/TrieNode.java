@@ -27,18 +27,6 @@ abstract class TrieNode {
     @Override
     Value get(final int hash, final Item key, final int level) { return null; }
     @Override
-    TrieNode merge(final TrieNode node, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo info) { return node; }
-    @Override
-    TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo info) { return leaf; }
-    @Override
-    TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo info) { return list; }
-    @Override
-    TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-        final QueryContext qc, final InputInfo info) { return branch; }
-    @Override
     boolean verify() { return true; }
     @Override
     boolean equal(final TrieNode node, final DeepEqual deep) { return this == node; }
@@ -94,60 +82,6 @@ abstract class TrieNode {
    * @throws QueryException query exception
    */
   abstract Value get(int hash, Item key, int level) throws QueryException;
-
-  /**
-   * <p> Inserts all bindings from the given node into this one.
-   * <p> This method is part of the <i>double dispatch</i> pattern and
-   *     should be implemented as {@code return o.add(this, lvl, info);}.
-   * @param node other node
-   * @param level level
-   * @param merge merge duplicates
-   * @param qc query context
-   * @param info input info (can be {@code null})
-   * @return updated map if changed, {@code this} otherwise
-   * @throws QueryException query exception
-   */
-  abstract TrieNode merge(TrieNode node, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo info) throws QueryException;
-
-  /**
-   * Add a leaf to this node if the key is not already used.
-   * @param leaf leaf to insert
-   * @param level level
-   * @param merge merge duplicates
-   * @param qc query context
-   * @param info input info (can be {@code null})
-   * @return updated map if changed, {@code this} otherwise
-   * @throws QueryException query exception
-   */
-  abstract TrieNode add(TrieLeaf leaf, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo info) throws QueryException;
-
-  /**
-   * Add an overflow list to this node if the key is not already used.
-   * @param list leaf to insert
-   * @param level level
-   * @param merge merge duplicates
-   * @param qc query context
-   * @param info input info (can be {@code null})
-   * @return updated map if changed, {@code this} otherwise
-   * @throws QueryException query exception
-   */
-  abstract TrieNode add(TrieList list, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo info) throws QueryException;
-
-  /**
-   * Add all bindings of the given branch to this node for which the key is not already used.
-   * @param branch leaf to insert
-   * @param level level
-   * @param merge merge duplicates
-   * @param qc query context
-   * @param info input info (can be {@code null})
-   * @return updated map if changed, {@code this} otherwise
-   * @throws QueryException query exception
-   */
-  abstract TrieNode add(TrieBranch branch, int level, MergeDuplicates merge, QueryContext qc,
-      InputInfo info) throws QueryException;
 
   /**
    * Verifies the tree.

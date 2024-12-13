@@ -59,7 +59,7 @@ public final class CsvXQueryConverter extends CsvConverter {
   @Override
   protected XQMap finish() throws QueryException {
     if(row != null) rows.add(row.array(STRING_ARRAY));
-    final MapBuilder mb = new MapBuilder();
+    final MapBuilder mb = new MapBuilder(headers.size());
     if(!headers.isEmpty()) {
       final ArrayBuilder names = new ArrayBuilder();
       for(final byte[] header : headers) names.append(Str.get(header));

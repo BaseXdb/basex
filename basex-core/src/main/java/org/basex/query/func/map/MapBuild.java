@@ -25,21 +25,21 @@ public final class MapBuild extends StandardFunc {
     final FItem combine = toFunctionOrNull(arg(3), 2, qc);
 
     final HofArgs args = new HofArgs(2, key, value), cargs = new HofArgs(2);
-    XQMap result = XQMap.empty();
+    final MapBuilder map = new MapBuilder(input.size());
     for(Item item; (item = qc.next(input)) != null;) {
       args.set(0, item).inc();
       final Iter iter = (key != null ? invoke(key, args, qc) : item).atomIter(qc, info);
       for(Item k; (k = qc.next(iter)) != null;) {
         Value val = value != null ? invoke(value, args, qc) : item;
-        if(result.contains(k)) {
-          final Value old = result.get(k);
+        final Value old = map.get(k);
+        if(old != null) {
           val = combine != null ? invoke(combine, cargs.set(0, old).set(1, val), qc) :
             ValueBuilder.concat(old, val, qc);
         }
-        result = result.put(k, val);
+        map.put(k, val);
       }
     }
-    return result;
+    return map.map();
   }
 
   @Override

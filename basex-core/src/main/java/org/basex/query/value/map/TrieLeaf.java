@@ -1,7 +1,5 @@
 package org.basex.query.value.map;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -65,107 +63,6 @@ final class TrieLeaf extends TrieNode {
   @Override
   Value get(final int hs, final Item ky, final int level) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? value : null;
-  }
-
-  @Override
-  TrieNode merge(final TrieNode node, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-    return node.add(this, level, merge, qc, info);
-  }
-
-  @Override
-  TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    qc.checkStop();
-    if(hash == leaf.hash) {
-      if(!key.atomicEqual(leaf.key))
-        return new TrieList(hash, key, value, leaf.key, leaf.value);
-
-      switch(merge) {
-        case USE_FIRST:
-        case USE_ANY:
-          return leaf;
-        case USE_LAST:
-          return this;
-        case COMBINE:
-          return new TrieLeaf(hash, key, ValueBuilder.concat(leaf.value, value, qc));
-        default:
-          throw MERGE_DUPLICATE_X.get(info, key);
-      }
-    }
-
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, level), ok = key(leaf.hash, level), nu;
-
-    // same key? add recursively
-    if(k == ok) {
-      ch[k] = add(leaf, level + 1, merge, qc, info);
-      nu = 1 << k;
-    } else {
-      ch[k] = this;
-      ch[ok] = leaf;
-      nu = 1 << k | 1 << ok;
-    }
-    return new TrieBranch(ch, nu, 2);
-  }
-
-  @Override
-  TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    // same hash? insert binding
-    if(hash == list.hash) {
-      for(int i = 0; i < list.size; i++) {
-        if(key.atomicEqual(list.keys[i])) {
-          final Item[] ks = list.keys.clone();
-          final Value[] vs = list.values.clone();
-          ks[i] = key;
-
-          switch(merge) {
-            case USE_FIRST:
-            case USE_ANY:
-              break;
-            case USE_LAST:
-              vs[i] = value;
-              break;
-            case COMBINE:
-              vs[i] = ValueBuilder.concat(list.values[i], value, qc);
-              break;
-            default:
-              throw MERGE_DUPLICATE_X.get(info, key);
-          }
-          return new TrieList(hash, ks, vs);
-        }
-      }
-      return new TrieList(hash, Array.add(list.keys, key), Array.add(list.values, value));
-    }
-
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, level), ok = key(list.hash, level), nu;
-
-    // same key? add recursively
-    if(k == ok) {
-      ch[k] = add(list, level + 1, merge, qc, info);
-      nu = 1 << k;
-    } else {
-      ch[k] = this;
-      ch[ok] = list;
-      nu = 1 << k | 1 << ok;
-    }
-    return new TrieBranch(ch, nu, list.size + 1);
-  }
-
-  @Override
-  TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    final int k = key(hash, level);
-    final TrieNode[] ch = branch.copyKids();
-    final TrieNode old = ch[k];
-    ch[k] = old == null ? this : old.merge(this, level + 1, merge, qc, info);
-    return new TrieBranch(ch, branch.used | 1 << k,
-        branch.size + ch[k].size - (old != null ? old.size : 0));
   }
 
   @Override

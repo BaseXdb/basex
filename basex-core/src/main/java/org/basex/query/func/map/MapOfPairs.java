@@ -23,21 +23,20 @@ public final class MapOfPairs extends StandardFunc {
     final FItem combine = toFunctionOrNull(arg(1), 2, qc);
 
     final HofArgs cargs = combine != null ? new HofArgs(2) : null;
-    XQMap result = XQMap.empty();
+    final MapBuilder map = new MapBuilder(input.size());
     for(Item item; (item = qc.next(input)) != null;) {
       // extract key/value record entries
-
-      final XQMap map = toRecord(item, RecordType.PAIR, qc);
-      final Item key = toAtomItem(map.get(Str.KEY), qc);
-      Value value = map.get(Str.VALUE);
-      if(result.contains(key)) {
-        final Value old = result.get(key);
+      final XQMap pair = toRecord(item, RecordType.PAIR, qc);
+      final Item key = toAtomItem(pair.get(Str.KEY), qc);
+      Value value = pair.get(Str.VALUE);
+      final Value old = map.get(key);
+      if(old != null) {
         value = combine != null ? invoke(combine, cargs.set(0, old).set(1, value), qc) :
           ValueBuilder.concat(old, value, qc);
       }
-      result = result.put(key, value);
+      map.put(key, value);
     }
-    return result;
+    return map.map();
   }
 
   @Override

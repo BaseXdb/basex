@@ -13,6 +13,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -30,7 +31,7 @@ import org.basex.util.*;
  */
 public abstract class XQMap extends XQStruct {
   /** The empty map. */
-  static final XQMap EMPTY = new XQTrieMap(TrieNode.EMPTY);
+  private static final XQMap EMPTY = new XQTrieMap(TrieNode.EMPTY);
 
   /**
    * Constructor.
@@ -58,6 +59,15 @@ public abstract class XQMap extends XQStruct {
     final XQMap map = new XQTrieMap(new TrieLeaf(key.hash(), key, value));
     map.type = MapType.get(key.type, value.seqType());
     return map;
+  }
+
+  /**
+   * Returns a map.
+   * @param ivm hash map
+   * @return map
+   */
+  public static XQMap map(final ItemValueMap ivm) {
+    return ivm.isEmpty() ? XQMap.EMPTY : new XQHashMap(ivm);
   }
 
   @Override
@@ -143,53 +153,6 @@ public abstract class XQMap extends XQStruct {
   abstract XQMap putInternal(Item key, Value value) throws QueryException;
 
   /**
-   * Merges two maps.
-   * @param map map to add
-   * @param merge merge duplicate keys
-   * @param qc query context
-   * @param ii input info (can be {@code null})
-   * @return merged map
-   * @throws QueryException query exception
-   */
-  public final XQMap merge(final XQMap map, final MergeDuplicates merge, final QueryContext qc,
-      final InputInfo ii) throws QueryException {
-
-    final XQMap updated;
-    if(structSize() == 0) {
-      updated = map;
-    } else if(map.structSize() == 0) {
-      updated = this;
-    } else {
-      updated = mergeInternal(map, merge, qc, ii);
-    }
-    // update type
-    if(updated != this && updated != map) {
-      final Type tp;
-      if(merge == MergeDuplicates.COMBINE) {
-        final MapType mt = (MapType) map.type;
-        final SeqType mst = mt.valueType;
-        tp = union(mt.keyType, mst.zero() ? mst : mst.with(Occ.ONE_OR_MORE));
-      } else {
-        tp = type.union(map.type);
-      }
-      updated.type = tp;
-    }
-    return updated;
-  }
-
-  /**
-   * Merges two maps.
-   * @param map map to add
-   * @param merge merge duplicate keys
-   * @param qc query context
-   * @param ii input info (can be {@code null})
-   * @return updated map
-   * @throws QueryException query exception
-   */
-  abstract XQMap mergeInternal(XQMap map, MergeDuplicates merge, QueryContext qc, InputInfo ii)
-      throws QueryException;
-
-  /**
    * Creates a union of two map types.
    * @param kt key type
    * @param vt value type
@@ -264,7 +227,7 @@ public abstract class XQMap extends XQStruct {
 
     if(materialized(test, ii)) return this;
 
-    final MapBuilder mb = new MapBuilder();
+    final MapBuilder mb = new MapBuilder(structSize());
     apply((key, value) -> {
       qc.checkStop();
       mb.put(key, value.materialize(test, ii, qc));
@@ -338,11 +301,11 @@ public abstract class XQMap extends XQStruct {
       final InputInfo ii) throws QueryException {
 
     final SeqType kt = mt.keyType.seqType(), vt = mt.valueType;
-    final MapBuilder mb = new MapBuilder();
+    final MapBuilder mb = new MapBuilder(structSize());
     apply((key, value) -> {
       qc.checkStop();
       final Item k = (Item) kt.coerce(key, null, qc, cc, ii);
-      if(mb.contains(k)) throw typeError(this, mt.seqType(), ii);
+      if(mb.get(k) != null) throw typeError(this, mt.seqType(), ii);
       mb.put(k, vt.coerce(value, null, qc, cc, ii));
     });
     return mb.map();
@@ -365,7 +328,7 @@ public abstract class XQMap extends XQStruct {
         throw typeError(this, rt.seqType(), ii);
       }
     }
-    final MapBuilder mb = new MapBuilder();
+    final MapBuilder mb = new MapBuilder(structSize());
     apply((key, value) -> {
       qc.checkStop();
       final Field field = key.instanceOf(AtomType.STRING) ? rt.getField(key.string(null)) : null;
@@ -400,8 +363,17 @@ public abstract class XQMap extends XQStruct {
     if(structSize() != map.structSize()) return false;
 
     // return identical map representations (faster)
-    if(getClass() == map.getClass()) return deepEqual(map, deep);
-    // return different representations (quadratic complexity)
+    return getClass() == map.getClass() ? deepEqual(map, deep) : deepEq(map, deep);
+  }
+
+  /**
+   * Compares two maps for equality (fallback, quadratic complexity).
+   * @param map map to be compared
+   * @param deep comparator
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  final boolean deepEq(final XQMap map, final DeepEqual deep) throws QueryException {
     return test((key, value) -> {
       if(deep != null && deep.qc != null) deep.qc.checkStop();
       for(final Item k : map.keys()) {

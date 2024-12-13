@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class TokenMap extends TokenSet {
-  /** Hash values. */
+  /** Map values. */
   private byte[][] values;
 
   /**
@@ -26,7 +26,7 @@ public final class TokenMap extends TokenSet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  public TokenMap(final long capacity) {
+  public TokenMap(final int capacity) {
     super(capacity);
     values = new byte[capacity()][];
   }
