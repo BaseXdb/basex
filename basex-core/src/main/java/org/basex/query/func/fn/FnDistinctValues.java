@@ -34,7 +34,7 @@ public final class FnDistinctValues extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set = CollationItemSet.get(collation, info);
+    final ItemSet set = ItemSet.get(collation, info);
     final IntSet ints = new IntSet();
 
     return new Iter() {
@@ -68,7 +68,7 @@ public final class FnDistinctValues extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set = CollationItemSet.get(collation, info);
+    final ItemSet set = ItemSet.get(collation, info);
     final IntSet ints = new IntSet();
 
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -166,7 +166,7 @@ public final class FnDistinctValues extends StandardFunc {
       final ArrayList<Stats> list = ((Path) values).pathStats();
       if(list != null) {
         final ValueBuilder vb = new ValueBuilder(cc.qc);
-        final ItemSet set = CollationItemSet.get(null, info);
+        final ItemSet set = ItemSet.get(null, info);
         for(final Stats stats : list) {
           if(!StatsType.isCategory(stats.type)) return null;
           for(final byte[] value : stats.values) {

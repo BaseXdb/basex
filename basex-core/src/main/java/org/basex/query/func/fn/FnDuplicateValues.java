@@ -25,8 +25,8 @@ public final class FnDuplicateValues extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set1 = CollationItemSet.get(collation, info);
-    final ItemSet set2 = CollationItemSet.get(collation, info);
+    final ItemSet set1 = ItemSet.get(collation, info);
+    final ItemSet set2 = ItemSet.get(collation, info);
     final IntSet ints1 = new IntSet(), ints2 = new IntSet();
 
     return new Iter() {
@@ -61,8 +61,8 @@ public final class FnDuplicateValues extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set1 = CollationItemSet.get(collation, info);
-    final ItemSet set2 = CollationItemSet.get(collation, info);
+    final ItemSet set1 = ItemSet.get(collation, info);
+    final ItemSet set2 = ItemSet.get(collation, info);
     final IntSet ints1 = new IntSet(), ints2 = new IntSet();
 
     final ValueBuilder vb = new ValueBuilder(qc);

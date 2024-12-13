@@ -15,10 +15,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class HashItemSet extends ASet implements ItemSet {
-  /** Input info (can be {@code null}). */
-  private final InputInfo info;
-  /** Deep equality comparisons (can be {@code null}). */
-  private final DeepEqual deep;
+  /** Equality function. */
+  private final QueryBiPredicate<Item, Item> equal;
   /** Hashed keys. */
   private Item[] keys;
   /** Hash values. */
@@ -26,15 +24,25 @@ public final class HashItemSet extends ASet implements ItemSet {
 
   /**
    * Default constructor.
-   * @param eq equality check
+   * @param mode comparison mode
    * @param info input info (can be {@code null})
    */
-  public HashItemSet(final boolean eq, final InputInfo info) {
+  public HashItemSet(final Mode mode, final InputInfo info) {
     super(Array.INITIAL_CAPACITY);
-    this.info = info;
-    deep = eq ? null : new DeepEqual(info);
-    keys = new Item[capacity()];
-    hash = new int[capacity()];
+    switch(mode) {
+      case ATOMIC:
+        this.equal = (k1, k2) -> k1.atomicEqual(k2);
+        break;
+      case EQUAL:
+        this.equal = (k1, k2) -> k1.equal(k2, null, info);
+        break;
+      default:
+        final DeepEqual deep = new DeepEqual(info);
+        this.equal = (k1, k2) -> deep.equal(k1, k2);
+    }
+    final int c = capacity();
+    keys = new Item[c];
+    hash = new int[c];
   }
 
   @Override
@@ -59,16 +67,13 @@ public final class HashItemSet extends ASet implements ItemSet {
    * @throws QueryException query exception
    */
   public int id(final Item key) throws QueryException {
-    final int b = key.hash() & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(deep != null ? deep.equal(keys[id], key) : keys[id].equal(key, null, info)) return id;
-    }
-    return 0;
+    return id(key, key.hash() & capacity() - 1);
   }
 
   /**
-   * Stores the specified key and returns its id, or returns the negative id if the key has already
-   * been stored. The public method {@link #add} can be used to check if an added value exists.
+   * Stores the specified key and returns its index, or returns the negative index if the key has
+   * already been stored. The public method {@link #add} can be used to check if an added value
+   * exists.
    * @param key key to be indexed
    * @return id, or negative id if key has already been stored
    * @throws QueryException query exception
@@ -76,9 +81,9 @@ public final class HashItemSet extends ASet implements ItemSet {
   private int index(final Item key) throws QueryException {
     final int h = key.hash();
     int b = h & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(deep != null ? deep.equal(keys[id], key) : keys[id].equal(key, null, info)) return -id;
-    }
+    final int id = id(key, b);
+    if(id > 0) return -id;
+
     final int s = size++;
     if(checkCapacity()) b = h & capacity() - 1;
     next[s] = buckets[b];
@@ -86,6 +91,20 @@ public final class HashItemSet extends ASet implements ItemSet {
     hash[s] = h;
     buckets[b] = s;
     return s;
+  }
+
+  /**
+   * Returns the id for the specified key and bucket, or {@code 0} if the key does not exist.
+   * @param key key to be looked up
+   * @return id, or {@code 0} if key does not exist
+   * @param b bucket index
+   * @throws QueryException query exception
+   */
+  private int id(final Item key, final int b) throws QueryException {
+    for(int id = buckets[b]; id != 0; id = next[id]) {
+      if(equal.test(keys[id], key)) return id;
+    }
+    return 0;
   }
 
   @Override

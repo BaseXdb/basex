@@ -2490,7 +2490,7 @@ public class QueryParser extends InputParser {
     final InputInfo info = info();
     final ExprList el = new ExprList();
     if(!wsConsume("}")) {
-      final HashItemSet set = new HashItemSet(false, info);
+      final ItemSet set = new HashItemSet(ItemSet.Mode.ATOMIC, info);
       do {
         final Expr key = single();
         add(el, check(key, INVMAPKEY));
