@@ -21,7 +21,7 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/users-info')
-  %rest:form-param('info', '{$info}')
+  %rest:query-param('info', '{$info}')
 function dba:users-info(
   $info  as xs:string
 ) as empty-sequence() {
@@ -49,11 +49,11 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/user-update')
-  %rest:form-param('name',    '{$name}')
-  %rest:form-param('newname', '{$newname}')
-  %rest:form-param('pw',      '{$pw}')
-  %rest:form-param('perm',    '{$perm}')
-  %rest:form-param('info',    '{$info}')
+  %rest:query-param('name',    '{$name}')
+  %rest:query-param('newname', '{$newname}')
+  %rest:query-param('pw',      '{$pw}')
+  %rest:query-param('perm',    '{$perm}')
+  %rest:query-param('info',    '{$info}')
 function dba:user-update(
   $name     as xs:string,
   $newname  as xs:string,
