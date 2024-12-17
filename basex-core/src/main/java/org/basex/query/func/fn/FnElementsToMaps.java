@@ -38,7 +38,7 @@ public final class FnElementsToMaps extends StandardFunc {
     public String toString() {
       return EnumOption.string(this);
     }
-  };
+  }
 
   /** Options. */
   public static class ElementsOptions extends Options {
@@ -149,7 +149,7 @@ public final class FnElementsToMaps extends StandardFunc {
    * @return result of check
    */
   private static boolean empty(final ANodeList nodes) {
-    return ((Checks<ANode>) node -> empty(node)).all(nodes);
+    return ((Checks<ANode>) FnElementsToMaps::empty).all(nodes);
   }
 
   /**
@@ -248,7 +248,7 @@ public final class FnElementsToMaps extends StandardFunc {
         name = qnm.local(); break;
       default:
         if(node.type == NodeType.ELEMENT ? (parent == null ? qnm.uri().length == 0 :
-          Token.eq(parent.qname().uri(), qnm.uri())) : qnm.uri().length == 0) {
+            Token.eq(parent.qname().uri(), qnm.uri())) : qnm.uri().length == 0) {
           name = qnm.local();
         } else {
           name = Token.eq(qnm.uri(), QueryText.XML_URI) ? qnm.string() : qnm.eqName();
@@ -401,7 +401,7 @@ public final class FnElementsToMaps extends StandardFunc {
         final MapBuilder map = attributes(node, format);
         final TokenObjMap<ANodeList> cache = new TokenObjMap<>();
         for(final ANode child : children(node, NodeType.ELEMENT)) {
-          cache.computeIfAbsent(nodeName(child, node, format), () -> new ANodeList()).add(child);
+          cache.computeIfAbsent(nodeName(child, node, format), ANodeList::new).add(child);
         }
         for(final byte[] name : cache) {
           final ArrayBuilder ab = new ArrayBuilder();

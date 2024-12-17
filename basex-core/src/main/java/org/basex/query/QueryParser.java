@@ -831,7 +831,7 @@ public class QueryParser extends InputParser {
     }
 
     // import the module's public types
-    LibraryModule lib = qc.libs.get(tPath);
+    final LibraryModule lib = qc.libs.get(tPath);
     if(lib != null) {
       for(final QNm qn : lib.types) {
         if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());

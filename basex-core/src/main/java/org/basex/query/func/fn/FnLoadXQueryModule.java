@@ -126,7 +126,7 @@ public final class FnLoadXQueryModule extends Parse {
         for(int a = sf.minArity(); a <= sf.arity(); ++a) {
           final FuncBuilder fb = new FuncBuilder(info, a, true);
           final Expr item = Functions.item(sf, fb, mqc, true);
-          funcs.computeIfAbsent(sf.name, () -> new HashMap<Integer, Expr>()).put(a, item);
+          funcs.computeIfAbsent(sf.name, HashMap::new).put(a, item);
         }
       }
     }

@@ -24,7 +24,7 @@ public final class FnVoid extends StandardFunc {
 
     // ensure that nondeterministic input will be evaluated
     if(evaluate || input.has(Flag.NDT)) {
-      for(final Iter iter = input.iter(qc); (qc.next(iter)) != null;);
+      for(final Iter iter = input.iter(qc); qc.next(iter) != null;);
     }
     return Empty.VALUE;
   }

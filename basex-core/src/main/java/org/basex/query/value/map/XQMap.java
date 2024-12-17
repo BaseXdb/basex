@@ -464,7 +464,7 @@ public abstract class XQMap extends XQStruct {
       apply((key, value) -> {
         if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
       });
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       Util.notExpected(ex);
     }
     qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");

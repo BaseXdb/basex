@@ -39,7 +39,7 @@ public class HashItemSet extends ASet implements ItemSet {
     super(capacity);
     switch(mode) {
       case ATOMIC:
-        this.equal = (k1, k2) -> k1.atomicEqual(k2);
+        this.equal = Item::atomicEqual;
         break;
       case EQUAL:
         this.equal = (k1, k2) -> k1.equal(k2, null, info);

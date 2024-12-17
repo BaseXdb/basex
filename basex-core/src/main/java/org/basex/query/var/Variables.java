@@ -61,7 +61,7 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       }
       final QNm varMod = var.info.sc().module;
       final byte[] varModUri = varMod == null ? Token.EMPTY : varMod.uri();
-      for(StaticVarRef ref : ve.refs) {
+      for(final StaticVarRef ref : ve.refs) {
         if(!ref.hasImport) {
           final QNm refMod = ref.info().sc().module;
           final byte[] refModUri = refMod == null ? Token.EMPTY : refMod.uri();

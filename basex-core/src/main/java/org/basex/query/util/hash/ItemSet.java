@@ -17,7 +17,7 @@ public interface ItemSet extends Iterable<Item> {
     /** Atomic equality. */ ATOMIC,
     /** Deep equality. */ DEEP,
     /** Equality. */ EQUAL,
-  };
+  }
 
   /**
    * Stores the specified key if it has not been stored before.

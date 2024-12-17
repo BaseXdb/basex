@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
  */
 public final class StemDir {
   /** Map. */
-  private TokenMap map = new TokenMap();
+  private final TokenMap map = new TokenMap();
 
   /**
    * Reads a stop words file.
