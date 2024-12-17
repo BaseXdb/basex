@@ -19,8 +19,6 @@ public class HashItemSet extends ASet implements ItemSet {
   Item[] keys;
   /** Equality function. */
   private final QueryBiPredicate<Item, Item> equal;
-  /** Hash values. */
-  private int[] hash;
 
   /**
    * Default constructor.
@@ -51,7 +49,6 @@ public class HashItemSet extends ASet implements ItemSet {
         this.equal = (k1, k2) -> deep.equal(k1, k2);
     }
     keys = new Item[capacity()];
-    hash = new int[capacity()];
   }
 
   /**
@@ -120,7 +117,6 @@ public class HashItemSet extends ASet implements ItemSet {
     if(checkCapacity()) b = h & capacity() - 1;
     next[s] = buckets[b];
     keys[s] = key;
-    hash[s] = h;
     buckets[b] = s;
     return s;
   }
@@ -141,13 +137,12 @@ public class HashItemSet extends ASet implements ItemSet {
 
   @Override
   protected final int hash(final int id) {
-    return hash[id];
+    return keys[id].hash();
   }
 
   @Override
   protected void rehash(final int newSize) {
     keys = Array.copy(keys, new Item[newSize]);
-    hash = Arrays.copyOf(hash, newSize);
   }
 
   @Override
