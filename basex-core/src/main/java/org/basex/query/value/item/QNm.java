@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -319,6 +320,17 @@ public final class QNm extends Item {
     for(final byte[] name : distinctTokens(token(value))) {
       if(name.length != 0) set.add(parse(name, sc == null ? null : sc.elemNS, sc, null));
     }
+    return set;
+  }
+
+  /**
+   * Returns the requested value as set of QNames.
+   * @param value value with QNames
+   * @return set with QNames
+   */
+  public static QNmSet set(final Value value) {
+    final QNmSet set = new QNmSet();
+    for(final Item item : value.iter()) set.add((QNm) item);
     return set;
   }
 

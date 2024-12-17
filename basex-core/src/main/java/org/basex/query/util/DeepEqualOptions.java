@@ -2,9 +2,9 @@ package org.basex.query.util;
 
 import java.text.*;
 
-import org.basex.query.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
@@ -73,8 +73,8 @@ public final class DeepEqualOptions extends Options {
   public static final BooleanOption TYPED_VALUES =
       new BooleanOption("typed-values", true);
   /** Option: unordered-elements. */
-  public static final StringOption UNORDERED_ELEMENTS =
-      new StringOption("unordered-elements", "");
+  public static final ValueOption UNORDERED_ELEMENTS =
+      new ValueOption("unordered-elements", SeqType.QNAME_ZM, Empty.VALUE);
   /** Option: whitespace. */
   public static final EnumOption<Whitespace> WHITESPACE =
       new EnumOption<>("whitespace", Whitespace.PRESERVE);
@@ -98,10 +98,9 @@ public final class DeepEqualOptions extends Options {
    * Checks if the specified QName is among the unordered element names.
    * @param qname QName
    * @return element names
-   * @throws QueryException query exception
    */
-  public boolean unordered(final QNm qname) throws QueryException {
-    if(unordered == null) unordered = QNm.set(get(UNORDERED_ELEMENTS), null);
+  public boolean unordered(final QNm qname) {
+    if(unordered == null) unordered = QNm.set(get(UNORDERED_ELEMENTS));
     return unordered.contains(qname);
   }
 }

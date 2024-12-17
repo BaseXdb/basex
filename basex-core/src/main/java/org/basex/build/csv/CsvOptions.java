@@ -74,9 +74,9 @@ public class CsvOptions extends Options {
   }
 
   @Override
-  public synchronized void assign(final Item name, final Value value, final InputInfo info)
-      throws QueryException {
-    super.assign(name, value, info);
+  public synchronized void assign(final Item name, final Value value, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    super.assign(name, value, qc, info);
     if(separator() == -1) throw OPTION_X.get(info, "Invalid separator: '%'", get(SEPARATOR));
   }
 

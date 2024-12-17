@@ -380,11 +380,12 @@ public class Options implements Iterable<Option<?>> {
    * it will be added as free option.
    * @param name name of option
    * @param value value to be assigned
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public synchronized void assign(final Item name, final Value value, final InputInfo info)
-      throws QueryException {
+  public synchronized void assign(final Item name, final Value value, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     final String nm;
     if(name instanceof QNm) {
@@ -398,7 +399,7 @@ public class Options implements Iterable<Option<?>> {
     if(definitions.isEmpty()) {
       free.put(nm, serialize(value, info));
     } else {
-      assign(nm, value, info);
+      assign(nm, value, qc, info);
     }
   }
 
@@ -539,13 +540,14 @@ public class Options implements Iterable<Option<?>> {
   /**
    * Parses and assigns options from the specified map.
    * @param map options map
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public final synchronized void assign(final XQMap map, final InputInfo info)
-      throws QueryException {
+  public final synchronized void assign(final XQMap map, final QueryContext qc,
+      final InputInfo info) throws QueryException {
     for(final Item name : map.keys()) {
-      assign(name, map.get(name), info);
+      assign(name, map.get(name), qc, info);
     }
   }
 
@@ -790,11 +792,12 @@ public class Options implements Iterable<Option<?>> {
    * Assigns the specified name and value.
    * @param name name of option
    * @param value value to be assigned
+   * @param qc query context
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  private synchronized void assign(final String name, final Value value, final InputInfo info)
-      throws QueryException {
+  private synchronized void assign(final String name, final Value value, final QueryContext qc,
+      final InputInfo info) throws QueryException {
 
     final Option<?> option = definitions.get(name);
     if(option == null) {
@@ -820,10 +823,13 @@ public class Options implements Iterable<Option<?>> {
       if(item == null) throw expected.apply(AtomType.INTEGER);
       result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
+      // expecting a single item, or a sequence of QNames (the latter is for handling
+      // SerializerOptions.CDATA_SECTION_ELEMENTS when passed as a QName sequence)
+      if(item == null && st.type != AtomType.QNAME) throw expected.apply(AtomType.STRING);
       result = serialize(value, info);
     } else if(option instanceof StringsOption) {
       final StringList list = new StringList();
-      for(final Item it :  value) list.add(serialize(it, info));
+      for(final Item it :  value.atomValue(qc, info)) list.add(serialize(it, info));
       result = list.finish();
     } else if(option instanceof EnumOption) {
       final String string = normalize(serialize(value, info));
@@ -833,7 +839,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof OptionsOption) {
       if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
       result = ((OptionsOption<?>) option).newInstance();
-      ((Options) result).assign((XQMap) item, info);
+      ((Options) result).assign((XQMap) item, qc, info);
     }
     put(option, result);
   }
