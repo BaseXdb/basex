@@ -156,6 +156,9 @@ public enum Function implements AFunction {
   COUNT(FnCount::new, "count(input)",
       params(ITEM_ZM), INTEGER_O),
   /** XQuery function. */
+  CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value[,options])",
+      params(STRING_ZO, MAP_ZO), ARRAY_ZM, flag(CNS, HOF)),
+  /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
       params(), DATE_O, flag(NDT)),
   /** XQuery function. */
@@ -476,6 +479,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   OUTERMOST(FnOutermost::new, "outermost(nodes)",
       params(NODE_ZM), NODE_ZM),
+  /** XQuery function. */
+  PARSE_CSV(FnParseCsv::new, "parse-csv(value[,options])",
+      params(STRING_ZO, MAP_ZO), MAP_O, flag(CNS, HOF)),
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate::new, "parse-ietf-date(value)",
       params(STRING_ZO), DATE_TIME_ZO),

@@ -4,6 +4,7 @@ import java.io.*;
 
 import org.basex.build.csv.*;
 import org.basex.io.in.*;
+import org.basex.query.*;
 import org.basex.util.*;
 
 /**
@@ -23,8 +24,16 @@ public final class CsvParser {
   private final boolean backslashes;
   /** Column separator (see {@link CsvOptions#SEPARATOR}). */
   private final int separator;
+  /** Row delimiter (see {@link CsvOptions#ROW_DELIMITER}). */
+  private final int rowDelimiter;
+  /** Quote character (see {@link CsvOptions#QUOTE_CHARACTER}). */
+  private final int quoteCharacter;
   /** Parse quotes.  */
   private final boolean quotes;
+  /** Trim whitespace. */
+  private final boolean trimWhitespace;
+  /** Strict quoting. */
+  private final boolean strictQuoting;
 
   /** First entry of a line. */
   private boolean first = true;
@@ -42,15 +51,21 @@ public final class CsvParser {
     this.conv = conv;
     header = opts.get(CsvOptions.HEADER);
     separator = opts.separator();
+    rowDelimiter = opts.rowDelimiter();
+    quoteCharacter = opts.quoteCharacter();
     quotes = opts.get(CsvOptions.QUOTES);
     backslashes = opts.get(CsvOptions.BACKSLASHES);
+    trimWhitespace = opts.get(CsvOptions.TRIM_WHITSPACE);
+    strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
   }
 
   /**
    * Parses a CSV expression.
+   * @param ii input info (can be @null)
+   * @throws QueryException query exception
    * @throws IOException query I/O exception
    */
-  public void parse() throws IOException {
+  public void parse(final InputInfo ii) throws QueryException, IOException {
     final TokenBuilder entry = new TokenBuilder();
     boolean quoted = false;
     data = !header;
@@ -59,33 +74,40 @@ public final class CsvParser {
     while(ch != -1) {
       if(quoted) {
         // quoted state
-        if(ch == '"') {
+        if(ch == quoteCharacter) {
           ch = input.read();
-          if(ch != '"') {
+          if(ch != quoteCharacter) {
             quoted = false;
+            if(strictQuoting && ch != separator && ch != rowDelimiter && ch != -1)
+              throw QueryError.CSV_QUOTING_X.get(ii,
+                  new String(Character.toChars(quoteCharacter)) + entry
+                      + new String(Character.toChars(quoteCharacter))
+                      + new String(Character.toChars(ch)));
             continue;
           }
-          if(backslashes) add(entry, '"');
+          if(backslashes) add(entry, quoteCharacter);
         } else if(ch == '\\' && backslashes) {
           ch = bs();
         }
         add(entry, ch);
-      } else if(ch == '"') {
-        if(quotes && entry.isEmpty()) {
+      } else if(ch == quoteCharacter) {
+        if(quotes) {
+          if(strictQuoting && !entry.isEmpty()) throw QueryError.CSV_QUOTING_X.get(ii,
+              entry + new String(Character.toChars(quoteCharacter)));
           // parse quote
           quoted = true;
         } else {
           ch = input.read();
-          if(ch != '"' || backslashes) add(entry, '"');
+          if(ch != quoteCharacter || backslashes) add(entry, quoteCharacter);
           continue;
         }
       } else if(ch == separator) {
         // parse separator
-        record(entry, true);
+        record(entry, false, false);
         first = false;
-      } else if(ch == '\n') {
+      } else if(ch == rowDelimiter) {
         // parse newline
-        record(entry, !entry.isEmpty());
+        record(entry, false, true);
         first = true;
         data = true;
       } else {
@@ -94,7 +116,9 @@ public final class CsvParser {
       }
       ch = input.read();
     }
-    record(entry, !entry.isEmpty());
+    if(quoted && strictQuoting)
+      throw QueryError.CSV_QUOTING_X.get(ii, new String(Character.toChars(quoteCharacter)) + entry);
+    record(entry, true, true);
   }
 
   /**
@@ -122,16 +146,22 @@ public final class CsvParser {
   /**
    * Adds a new record and entry.
    * @param entry entry to be added
-   * @param record add new record
+   * @param lastRow whether this is the last row
+   * @param lastField whether this is the last field of the row
    * @throws IOException I/O exception
    */
-  private void record(final TokenBuilder entry, final boolean record) throws IOException {
+  private void record(final TokenBuilder entry, final boolean lastRow, final boolean lastField)
+      throws IOException {
+    byte[] field = entry.next();
+    if(trimWhitespace) field = Token.trim(field);
+    final boolean record = !lastRow || field.length > 0;
     if(record && first && data) conv.record();
     if(record || !first) {
+      if(first && lastField && field.length == 0) return;
       if(data) {
-        conv.entry(entry.next());
+        conv.entry(field);
       } else {
-        conv.header(entry.next());
+        conv.header(field);
       }
     }
   }

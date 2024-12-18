@@ -596,6 +596,15 @@ public enum QueryError {
   CHARINV_X(FOCH, 5, "Invalid name, glyph or codepoint value: %."),
 
   /** Error code. */
+  CSV_ERROR_X(FOCV, 1, "CSV processing error: %."),
+  /** Error code. */
+  CSV_QUOTING_X(FOCV, 1, "CSV field quoting error: %."),
+  /** Error code. */
+  CSV_SINGLECHAR_X_X(FOCV, 2, "The value of % is not a single character: %."),
+  /** Error code. */
+  CSV_DELIMITER_X(FOCV, 3, "Duplicate CSV delimiter error: %."),
+
+  /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),
   /** Error code. */
   NODEERR_X_X(FODC, 2, "% cannot be created: %."),
@@ -1580,6 +1589,7 @@ public enum QueryError {
     /** Error type. */ FOAY,
     /** Error type. */ FOCA,
     /** Error type. */ FOCH,
+    /** Error type. */ FOCV,
     /** Error type. */ FODC,
     /** Error type. */ FODF,
     /** Error type. */ FODT,

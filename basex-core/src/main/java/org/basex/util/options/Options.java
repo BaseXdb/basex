@@ -820,6 +820,7 @@ public class Options implements Iterable<Option<?>> {
       if(item == null) throw expected.apply(AtomType.INTEGER);
       result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
+      if(item == null) throw expected.apply(AtomType.STRING);
       result = serialize(value, info);
     } else if(option instanceof StringsOption) {
       final StringList list = new StringList();
