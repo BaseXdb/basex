@@ -20,12 +20,12 @@ public final class Uln extends ANum {
   /** Maximum unsigned long values. */
   public static final BigDecimal MAXULN = BigDecimal.valueOf(Long.MAX_VALUE).
       multiply(Dec.BD_2).add(BigDecimal.ONE);
-  /** Decimal value. */
+  /** Integer value. */
   private final BigInteger value;
 
   /**
    * Constructor.
-   * @param value decimal value
+   * @param value integer value
    */
   public Uln(final BigInteger value) {
     super(AtomType.UNSIGNED_LONG);
@@ -105,6 +105,11 @@ public final class Uln extends ANum {
   @Override
   public Object toJava() {
     return new BigInteger(value.toString());
+  }
+
+  @Override
+  public int hash() {
+    return value.bitLength() < 32 ? value.intValue() : super.hash();
   }
 
   @Override

@@ -136,6 +136,13 @@ public final class Dbl extends ANum {
   }
 
   @Override
+  public int hash() {
+    final double v = value;
+    final int i = (int) v;
+    return v == i || Double.isNaN(v) || Double.isInfinite(v) ? i : super.hash();
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof Dbl && Double.compare(value, ((Dbl) obj).value) == 0;
   }
