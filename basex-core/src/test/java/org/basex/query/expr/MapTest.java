@@ -98,6 +98,18 @@ public final class MapTest extends SandboxTest {
         + "map { 'duplicates': 'reject' })?B2", MERGE_DUPLICATE_X);
   }
 
+  /** map:put: Always replace equal values of different type. */
+  @Test public void gh2358() {
+    query("let $m := { 48e0: 1 }"
+        + "return some(map:keys($m), fn { . instance of xs:double })", true);
+    query("let $m := { 48: 1 } => map:put(48e0, 2)"
+        + "return some(map:keys($m), fn { . instance of xs:double })", true);
+    query("let $m := { '0': 1 } => map:put(48, 2) => map:put(48e0, 3)"
+        + "return some(map:keys($m), fn { . instance of xs:double })", true);
+    query("let $m := { '0': 1 } => map:put(48, 2) => map:put(48.0, 3) => map:put(48e0, 4)"
+        + "return some(map:keys($m), fn { . instance of xs:double })", true);
+  }
+
   /** Atomize key. */
   @Test public void atomKey() {
     query("map { 'x': 42 }([ 'x' ])", 42);

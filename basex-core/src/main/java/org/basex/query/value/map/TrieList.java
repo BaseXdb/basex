@@ -84,10 +84,16 @@ final class TrieList extends TrieNode {
 
     // same hash, same value: replace
     for(int i = keys.length; i-- > 0;) {
-      if(ky.atomicEqual(keys[i])) {
+      final Item k = keys[i];
+      if(ky.atomicEqual(k)) {
+        Item[] ks = keys;
+        if(k.type != ky.type) {
+          ks = ks.clone();
+          ks[i] = ky;
+        }
         final Value[] vs = values.clone();
         vs[i] = vl;
-        return new TrieList(hs, keys, vs);
+        return new TrieList(hs, ks, vs);
       }
     }
     // same hash, different value: add to list
