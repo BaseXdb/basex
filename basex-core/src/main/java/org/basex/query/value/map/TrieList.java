@@ -49,11 +49,11 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item key, final int level) throws QueryException {
+  TrieNode delete(final int hs, final Item ky, final int lv) throws QueryException {
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
-        if(key.atomicEqual(keys[i])) {
+        if(ky.atomicEqual(keys[i])) {
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -76,43 +76,29 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item key, final Value value, final int level)
+  TrieNode put(final int hs, final Item ky, final Value vl, final int lv)
       throws QueryException {
 
-    // same hash, replace or merge
-    if(hs == hash) {
-      for(int i = keys.length; i-- > 0;) {
-        if(key.atomicEqual(keys[i])) {
-          // replace value
-          final Value[] vs = values.clone();
-          vs[i] = value;
-          return new TrieList(hs, keys, vs);
-        }
-      }
-      return new TrieList(hash, Array.add(keys, key), Array.add(values, value));
-    }
+    // different hash: create branch
+    if(hs != hash) return branch(hs, ky, vl, lv, hash, size);
 
-    // different hash, branch
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int a = key(hs, level), b = key(hash, level);
-    final int used;
-    if(a == b) {
-      ch[a] = put(hs, key, value, level + 1);
-      used = 1 << a;
-    } else {
-      ch[a] = new TrieLeaf(hs, key, value);
-      ch[b] = this;
-      used = 1 << a | 1 << b;
+    // same hash, same value: replace
+    for(int i = keys.length; i-- > 0;) {
+      if(ky.atomicEqual(keys[i])) {
+        final Value[] vs = values.clone();
+        vs[i] = vl;
+        return new TrieList(hs, keys, vs);
+      }
     }
-    // we definitely inserted one value
-    return new TrieBranch(ch, used, size + 1);
+    // same hash, different value: add to list
+    return new TrieList(hash, Array.add(keys, ky), Array.add(values, vl));
   }
 
   @Override
-  Value get(final int hs, final Item key, final int level) throws QueryException {
+  Value get(final int hs, final Item ky, final int lv) throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;) {
-        if(key.atomicEqual(keys[k])) return values[k];
+        if(ky.atomicEqual(keys[k])) return values[k];
       }
     }
     return null;

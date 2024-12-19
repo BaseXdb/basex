@@ -35,33 +35,22 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item ky, final Value vl, final int level) throws QueryException {
-    // same hash, replace or merge
-    if(hs == hash) return key.atomicEqual(ky) ? new TrieLeaf(hs, ky, vl) :
-      new TrieList(hs, key, value, ky, vl);
-
-    // different hash, branch
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int a = key(hs, level), b = key(hash, level);
-    final int used;
-    if(a == b) {
-      ch[a] = put(hs, ky, vl, level + 1);
-      used = 1 << a;
-    } else {
-      ch[a] = new TrieLeaf(hs, ky, vl);
-      ch[b] = this;
-      used = 1 << a | 1 << b;
-    }
-    return new TrieBranch(ch, used, 2);
+  TrieNode put(final int hs, final Item ky, final Value vl, final int lv) throws QueryException {
+    // different hash: create branch
+    if(hs != hash) return branch(hs, ky, vl, lv, hash, 1);
+    // same hash, same value: replace
+    if(key.atomicEqual(ky)) return new TrieLeaf(hs, ky, vl);
+    // same hash, different value: create list
+    return new TrieList(hs, key, value, ky, vl);
   }
 
   @Override
-  TrieNode delete(final int hs, final Item ky, final int level) throws QueryException {
+  TrieNode delete(final int hs, final Item ky, final int lv) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? null : this;
   }
 
   @Override
-  Value get(final int hs, final Item ky, final int level) throws QueryException {
+  Value get(final int hs, final Item ky, final int lv) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? value : null;
   }
 

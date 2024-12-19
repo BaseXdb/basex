@@ -23,16 +23,16 @@ abstract class TrieNode {
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
     @Override
-    TrieNode delete(final int hash, final Item key, final int level) { return this; }
+    TrieNode delete(final int hs, final Item ky, final int lv) { return this; }
     @Override
-    Value get(final int hash, final Item key, final int level) { return null; }
+    Value get(final int hs, final Item ky, final int lv) { return null; }
     @Override
     boolean verify() { return true; }
     @Override
     boolean equal(final TrieNode node, final DeepEqual deep) { return this == node; }
     @Override
-    public TrieNode put(final int hash, final Item key, final Value value, final int level) {
-      return new TrieLeaf(hash, key, value); }
+    public TrieNode put(final int hs, final Item ky, final Value vl, final int lv) {
+      return new TrieLeaf(hs, ky, vl); }
     @Override
     void apply(final QueryBiConsumer<Item, Value> func) { }
     @Override
@@ -54,34 +54,61 @@ abstract class TrieNode {
 
   /**
    * Puts the given value into this map and replaces existing keys.
-   * @param hash hash code used as key
-   * @param key key to insert
-   * @param value value to insert
-   * @param level level
+   * @param hs hash code used as key
+   * @param ky key to insert
+   * @param vl value to insert
+   * @param lv level
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode put(int hash, Item key, Value value, int level) throws QueryException;
+  abstract TrieNode put(int hs, Item ky, Value vl, int lv) throws QueryException;
+
+  /**
+   * Creates a node branch.
+   * @param hs hash code used as key
+   * @param ky key to insert
+   * @param vl value to insert
+   * @param lv level
+   * @param hash hash code of the existing key
+   * @param sz old node size
+   * @return branch
+   * @throws QueryException query exception
+   */
+  final TrieBranch branch(final int hs, final Item ky, final Value vl, final int lv,
+      final int hash, final int sz) throws QueryException {
+    // different hash, branch
+    final TrieNode[] ch = new TrieNode[KIDS];
+    final int a = hashKey(hs, lv), b = hashKey(hash, lv), used;
+    if(a == b) {
+      ch[a] = put(hs, ky, vl, lv + 1);
+      used = 1 << a;
+    } else {
+      ch[a] = new TrieLeaf(hs, ky, vl);
+      ch[b] = this;
+      used = 1 << a | 1 << b;
+    }
+    return new TrieBranch(ch, used, sz + 1);
+  }
 
   /**
    * Deletes a key from this map.
-   * @param hash hash code of the key
-   * @param key key to delete
-   * @param level level
+   * @param hs hash code of the key
+   * @param ky key to delete
+   * @param lv level
    * @return updated map if changed, {@code null} if deleted, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode delete(int hash, Item key, int level) throws QueryException;
+  abstract TrieNode delete(int hs, Item ky, int lv) throws QueryException;
 
   /**
    * Looks up the value associated with the given key.
-   * @param hash hash code
-   * @param key key to look up
-   * @param level level
+   * @param hs hash code
+   * @param ky key to look up
+   * @param lv level
    * @return bound value if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  abstract Value get(int hash, Item key, int level) throws QueryException;
+  abstract Value get(int hs, Item ky, int lv) throws QueryException;
 
   /**
    * Verifies the tree.
@@ -110,7 +137,7 @@ abstract class TrieNode {
    * @param level current level
    * @return hash key
    */
-  static int key(final int hash, final int level) {
+  static int hashKey(final int hash, final int level) {
     return hash >>> level * BITS & MASK;
   }
 

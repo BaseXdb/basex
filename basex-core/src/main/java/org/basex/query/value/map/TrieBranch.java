@@ -31,45 +31,32 @@ final class TrieBranch extends TrieNode {
     assert verify();
   }
 
-  /**
-   * Copies the children array.
-   * This is faster than {@code kids.clone()} according to
-   * <a href="http://www.javaspecialists.eu/archive/Issue124.html">Heinz M. Kabutz</a>.
-   * @return copy of the child array
-   */
-  TrieNode[] copyKids() {
-    final TrieNode[] copy = new TrieNode[KIDS];
-    Array.copy(kids, KIDS, copy);
-    return copy;
-  }
-
   @Override
-  TrieNode put(final int hs, final Item key, final Value value, final int level)
+  TrieNode put(final int hs, final Item ky, final Value vl, final int lv)
       throws QueryException {
-    final int k = key(hs, level);
+    final int k = hashKey(hs, lv), bs, rem;
     final TrieNode sub = kids[k], nsub;
-    final int bs, rem;
     if(sub != null) {
-      nsub = sub.put(hs, key, value, level + 1);
+      nsub = sub.put(hs, ky, vl, lv + 1);
       if(nsub == sub) return this;
       bs = used;
       rem = sub.size;
     } else {
-      nsub = new TrieLeaf(hs, key, value);
+      nsub = new TrieLeaf(hs, ky, vl);
       bs = used | 1 << k;
       rem = 0;
     }
-    final TrieNode[] ks = copyKids();
+    final TrieNode[] ks = kids.clone();
     ks[k] = nsub;
     return new TrieBranch(ks, bs, size - rem + nsub.size);
   }
 
   @Override
-  TrieNode delete(final int hash, final Item key, final int level) throws QueryException {
-    final int k = key(hash, level);
+  TrieNode delete(final int hs, final Item ky, final int lv) throws QueryException {
+    final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
     if(sub == null) return this;
-    final TrieNode nsub = sub.delete(hash, key, level + 1);
+    final TrieNode nsub = sub.delete(hs, ky, lv + 1);
     if(nsub == sub) return this;
 
     final int nu;
@@ -83,17 +70,16 @@ final class TrieBranch extends TrieNode {
     } else {
       nu = used;
     }
-
-    final TrieNode[] ks = copyKids();
+    final TrieNode[] ks = kids.clone();
     ks[k] = nsub;
     return new TrieBranch(ks, nu, size - 1);
   }
 
   @Override
-  Value get(final int hash, final Item key, final int level) throws QueryException {
-    final int k = key(hash, level);
+  Value get(final int hs, final Item ky, final int lv) throws QueryException {
+    final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
-    return sub == null ? null : sub.get(hash, key, level + 1);
+    return sub == null ? null : sub.get(hs, ky, lv + 1);
   }
 
   @Override
