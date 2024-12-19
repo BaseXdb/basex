@@ -55,7 +55,7 @@ public final class Atm extends Item {
 
   @Override
   public int hashCode() {
-    return Token.hash(value);
+    return Token.hashCode(value);
   }
 
   @Override

@@ -79,7 +79,7 @@ public final class StrLazy extends AStr implements Lazy {
   @Override
   public int hashCode() {
     try {
-      return Token.hash(string(null));
+      return Token.hashCode(string(null));
     } catch(final QueryException ex) {
       Util.stack(ex);
       return Integer.MAX_VALUE;

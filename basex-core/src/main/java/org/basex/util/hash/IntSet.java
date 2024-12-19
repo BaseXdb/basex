@@ -102,7 +102,7 @@ public class IntSet extends ASet {
   }
 
   @Override
-  protected final int hash(final int id) {
+  protected final int hashCode(final int id) {
     return keys[id];
   }
 

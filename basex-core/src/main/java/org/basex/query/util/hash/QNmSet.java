@@ -101,7 +101,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
   }
 
   @Override
-  protected final int hash(final int id) {
+  protected final int hashCode(final int id) {
     return hash[id];
   }
 

@@ -284,7 +284,7 @@ public final class QNm extends Item {
 
   @Override
   public int hashCode() {
-    return Token.hash(unique());
+    return Token.hashCode(unique());
   }
 
   @Override

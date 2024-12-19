@@ -147,7 +147,7 @@ public final class Str extends AStr {
 
   @Override
   public int hashCode() {
-    return Token.hash(value);
+    return Token.hashCode(value);
   }
 
   @Override

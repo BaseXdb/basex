@@ -136,7 +136,7 @@ public class HashItemSet extends ASet implements ItemSet {
   }
 
   @Override
-  protected final int hash(final int id) {
+  protected final int hashCode(final int id) {
     return keys[id].hashCode();
   }
 

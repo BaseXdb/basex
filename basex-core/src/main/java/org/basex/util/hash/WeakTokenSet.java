@@ -37,7 +37,7 @@ public final class WeakTokenSet extends ASet {
    * @return key, or its equivalent that is stored in this set
    */
   public byte[] put(final byte[] key) {
-    final int h = Token.hash(key), c = capacity();
+    final int h = Token.hashCode(key), c = capacity();
     int b = h & c - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       final byte[] stored = keys[id].get();
@@ -83,9 +83,9 @@ public final class WeakTokenSet extends ASet {
   }
 
   @Override
-  protected int hash(final int id) {
+  protected int hashCode(final int id) {
     final byte[] token = keys[id].get();
-    return token == null ? keys[id].bucket : Token.hash(token);
+    return token == null ? keys[id].bucket : Token.hashCode(token);
   }
 
   @Override

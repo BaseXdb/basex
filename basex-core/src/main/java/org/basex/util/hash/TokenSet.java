@@ -127,7 +127,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return id, or {@code 0} if key does not exist
    */
   public final int id(final byte[] key) {
-    final int b = Token.hash(key) & capacity() - 1;
+    final int b = Token.hashCode(key) & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(Token.eq(key, keys[id])) return id;
     }
@@ -152,7 +152,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return id of the deleted key, or {@code 0} if the key did not exist
    */
   public int remove(final byte[] key) {
-    final int b = Token.hash(key) & capacity() - 1;
+    final int b = Token.hashCode(key) & capacity() - 1;
     for(int p = 0, id = buckets[b]; id != 0; p = id, id = next[id]) {
       if(!Token.eq(key, keys[id])) continue;
       if(p == 0) buckets[b] = next[id];
@@ -170,7 +170,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return id, or negative id if key has already been stored
    */
   private int index(final byte[] key) {
-    final int h = Token.hash(key);
+    final int h = Token.hashCode(key);
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(Token.eq(key, keys[id])) return -id;
@@ -184,8 +184,8 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   @Override
-  protected final int hash(final int id) {
-    return Token.hash(keys[id]);
+  protected final int hashCode(final int id) {
+    return Token.hashCode(keys[id]);
   }
 
   @Override

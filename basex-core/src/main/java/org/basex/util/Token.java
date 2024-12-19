@@ -667,7 +667,7 @@ public final class Token {
    * @param token specified token
    * @return hash code
    */
-  public static int hash(final byte[] token) {
+  public static int hashCode(final byte[] token) {
     final int tl = token.length, s = Math.max(1, tl / MAX_HASH_OPS);
     int h = 0;
     for(int t = 0; t < tl; t += s) {

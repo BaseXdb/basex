@@ -1,7 +1,5 @@
 package org.basex.index;
 
-import static org.basex.util.Token.*;
-
 import java.lang.ref.*;
 import java.util.concurrent.locks.*;
 
@@ -29,7 +27,7 @@ public final class IndexCache {
    * @return cached entry or {@code null} if the entry is stale
    */
   public IndexEntry get(final byte[] key) {
-    final int hash = hash(key);
+    final int hash = Token.hashCode(key);
     rwl.readLock().lock();
 
     try {
@@ -37,7 +35,7 @@ public final class IndexCache {
       BucketEntry e = buckets[i];
       while(e != null) {
         final IndexEntry entry = e.get();
-        if(entry != null && e.hash == hash && eq(entry.key, key)) return entry;
+        if(entry != null && e.hash == hash && Token.eq(entry.key, key)) return entry;
         e = e.next;
       }
     } finally {
@@ -55,7 +53,7 @@ public final class IndexCache {
    * @return cache entry
    */
   public IndexEntry add(final byte[] key, final int count, final long offset) {
-    final int hash = hash(key);
+    final int hash = Token.hashCode(key);
     rwl.writeLock().lock();
 
     try {
@@ -67,7 +65,7 @@ public final class IndexCache {
         final IndexEntry entry = current.get();
         if(entry == null) {
           delete(i, current, prev, next);
-        } else if(current.hash == hash && eq(entry.key, key)) {
+        } else if(current.hash == hash && Token.eq(entry.key, key)) {
           update(entry, count, offset);
           return entry;
         }
@@ -88,7 +86,7 @@ public final class IndexCache {
    * @param key key
    */
   public void delete(final byte[] key) {
-    final int hash = hash(key);
+    final int hash = Token.hashCode(key);
     rwl.writeLock().lock();
 
     try {
@@ -100,7 +98,7 @@ public final class IndexCache {
         final IndexEntry entry = e.get();
         if(entry == null) {
           delete(i, e, prev, next);
-        } else if(e.hash == hash && eq(entry.key, key)) {
+        } else if(e.hash == hash && Token.eq(entry.key, key)) {
           delete(i, e, prev, next);
           break;
         }
