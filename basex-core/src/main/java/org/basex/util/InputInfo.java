@@ -20,7 +20,7 @@ public final class InputInfo {
   private boolean internal;
   /** Input path. */
   private final String path;
-  /** Static context. */
+  /** Static context (can be {@code null}). */
   private StaticContext sc;
   /** Input (can be {@code null}). */
   private int[] input;
@@ -89,7 +89,7 @@ public final class InputInfo {
 
   /**
    * Returns the static context.
-   * @return static context
+   * @return static context (can be {@code null})
    */
   public StaticContext sc() {
     return sc;

@@ -101,17 +101,9 @@ public final class FnElementsToMaps extends StandardFunc {
           descs.add(desc.finish());
         }
       }
-      // assign layout
+      // assign layouts
       for(final QNm name : names) {
-        if(!layouts.contains(name)) {
-          final ANodeList nodes = names.get(name);
-          for(final Layout l : Layout.VALUES) {
-            if(((Checks<ANode>) l::matches).all(nodes)) {
-              layouts.put(name, l);
-              break;
-            }
-          }
-        }
+        if(!layouts.contains(name)) layouts.put(name, layout(names.get(name).finish()));
       }
     }
 
@@ -131,14 +123,36 @@ public final class FnElementsToMaps extends StandardFunc {
    * @return layout
    */
   private static Layout layout(final ANode node, final Format format) {
-    Layout l = format.layouts.get(node.qname());
-    if(l == null) {
-      for(final Layout layout : Layout.VALUES) {
-        if(layout.matches(node)) {
-          l = layout;
-          break;
-        }
+    final Layout layout = format.layouts.get(node.qname());
+    return layout != null ? layout : layout(node);
+  }
+
+  /**
+   * Returns a matching layout for the specified nodes.
+   * @param nodes nodes
+   * @return layout
+   */
+  private static Layout layout(final ANode... nodes) {
+    final ANodeList attributes = children(NodeType.ATTRIBUTE, nodes);
+    final ANodeList elements = children(NodeType.ELEMENT, nodes);
+    final ANodeList texts = children(NodeType.TEXT, nodes);
+    final Layout l;
+    if(elements.isEmpty() && texts.isEmpty()) {
+      l = attributes.isEmpty() ? Layout.EMPTY : Layout.EMPTY_PLUS;
+    } else if(elements.isEmpty()) {
+      l = attributes.isEmpty() ? Layout.SIMPLE : Layout.SIMPLE_PLUS;
+    } else if(((Checks<ANode>) node -> empty(texts)).all(nodes)) {
+      if(equalNames(elements) && (
+        ((Checks<ANode>) node -> children(NodeType.ELEMENT, nodes).size() > 1).any(nodes)
+      )) {
+        l = attributes.isEmpty() ? Layout.LIST : Layout.LIST_PLUS;
+      } else if(((Checks<ANode>) node -> differentNames(elements)).all(nodes)) {
+        l = Layout.RECORD;
+      } else {
+        l = Layout.SEQUENCE;
       }
+    } else {
+      l = Layout.MIXED;
     }
     return l;
   }
@@ -149,36 +163,26 @@ public final class FnElementsToMaps extends StandardFunc {
    * @return result of check
    */
   private static boolean empty(final ANodeList nodes) {
-    return ((Checks<ANode>) FnElementsToMaps::empty).all(nodes);
+    return ((Checks<ANode>) node -> Token.normalize(node.string()).length == 0).all(nodes);
   }
 
   /**
-   * Checks if the string values of a node is empty.
-   * @param node node
+   * Returns the children of the specified type.
+   * @param type type to be found
+   * @param nodes nodes
    * @return result of check
    */
-  private static boolean empty(final ANode node) {
-    return Token.normalize(node.string()).length == 0;
-  }
-
-  /**
-   * Counts the children of the specified types.
-   * @param node node
-   * @param types types to be found
-   * @return result of check
-   */
-  private static ANodeList children(final ANode node, final NodeType... types) {
+  private static ANodeList children(final NodeType type, final ANode... nodes) {
     final ANodeList list = new ANodeList();
-
-    final boolean attr = ((Checks<NodeType>) type -> type == NodeType.ATTRIBUTE).any(types);
-    if(attr) {
-      for(final ANode child : node.attributeIter()) {
-        if(!Token.eq(child.qname().uri(), QueryText.XSI_URI)) list.add(child.finish());
-      }
-    }
-    if(types.length > (attr ? 1 : 0)) {
-      for(final ANode child : node.childIter()) {
-        if(child.type.oneOf(types)) list.add(child.finish());
+    for(final ANode node : nodes) {
+      if(type == NodeType.ATTRIBUTE) {
+        for(final ANode child : node.attributeIter()) {
+          if(!Token.eq(child.qname().uri(), QueryText.XSI_URI)) list.add(child.finish());
+        }
+      } else {
+        for(final ANode child : node.childIter()) {
+          if(child.type == type) list.add(child.finish());
+        }
       }
     }
     return list;
@@ -223,7 +227,7 @@ public final class FnElementsToMaps extends StandardFunc {
   private static MapBuilder attributes(final ANode node, final Format format)
       throws QueryException {
     final MapBuilder mb = new MapBuilder();
-    for(final ANode attr : children(node, NodeType.ATTRIBUTE)) {
+    for(final ANode attr : children(NodeType.ATTRIBUTE, node)) {
       mb.put(nodeName(attr, node, format), attr.string());
     }
     return mb;
@@ -272,7 +276,7 @@ public final class FnElementsToMaps extends StandardFunc {
       final boolean ignoreEmpty) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final ANode attr : children(node, NodeType.ATTRIBUTE)) {
+    for(final ANode attr : children(NodeType.ATTRIBUTE, node)) {
       ab.append(new MapBuilder().put(nodeName(attr, node, format), attr.string()).map());
     }
     for(final ANode child : node.childIter()) {
@@ -302,61 +306,35 @@ public final class FnElementsToMaps extends StandardFunc {
 
   /** Layouts. */
   private enum Layout {
-    /** Layout: empty(* | text() | @*). */
-    EMPTY() {
-      @Override
-      boolean matches(final ANode node) {
-        return !node.hasAttributes() && children(node, NodeType.ELEMENT, NodeType.TEXT).isEmpty();
-      }
+    /** Layout 'empty'. */ EMPTY() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) {
         return Str.EMPTY;
       }
     },
-    /** Layout: @* and empty(* | text()). */
-    EMPTY_PLUS() {
-      @Override
-      boolean matches(final ANode node) {
-        return children(node, NodeType.ELEMENT, NodeType.TEXT).isEmpty();
-      }
+    /** Layout 'empty-plus'. */ EMPTY_PLUS() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
         return attributes(node, format).map();
       }
     },
-    /** Layout: empty(* | @*). */
-    SIMPLE() {
-      @Override
-      boolean matches(final ANode node) {
-        return children(node, NodeType.ELEMENT).isEmpty() && !node.hasAttributes();
-      }
+    /** Layout 'simple'. */ SIMPLE() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) {
         return Str.get(node.string());
       }
     },
-    /** Layout: empty(*). */
-    SIMPLE_PLUS() {
-      @Override
-      boolean matches(final ANode node) {
-        return children(node, NodeType.ELEMENT).isEmpty();
-      }
+    /** Layout 'simple-plus'. */ SIMPLE_PLUS() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
         return attributes(node, format).put("#content", node.string()).map();
       }
     },
-    /** Layout: *[2] and all-equal(*!node-name()) and empty(text()[normalize-space()]) and
-     *   empty(@* | *!@*). */
-    LIST() {
-      @Override
-      boolean matches(final ANode node) {
-        return LIST_PLUS.matches(node) && !node.hasAttributes();
-      }
+    /** Layout 'list'. */ LIST() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
-        final ANodeList children = children(node, NodeType.ELEMENT);
-        if(!equalNames(children) || !empty(children(node, NodeType.TEXT))) {
+        final ANodeList children = children(NodeType.ELEMENT, node);
+        if(!equalNames(children) || !empty(children(NodeType.TEXT, node))) {
           return MIXED.apply(node, parent, format);
         }
         final ArrayBuilder ab = new ArrayBuilder();
@@ -366,17 +344,11 @@ public final class FnElementsToMaps extends StandardFunc {
         return ab.array();
       }
     },
-    /** Layout: *[2] and all-equal(*!node-name()) and empty(text()[normalize-space()]). */
-    LIST_PLUS() {
-      @Override
-      boolean matches(final ANode node) {
-        final ANodeList children = children(node, NodeType.ELEMENT);
-        return children.size() > 1 && equalNames(children) && empty(children(node, NodeType.TEXT));
-      }
+    /** Layout: 'list-plus'. */ LIST_PLUS() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
-        final ANodeList children = children(node, NodeType.ELEMENT);
-        if(!equalNames(children) || !empty(children(node, NodeType.TEXT))) {
+        final ANodeList children = children(NodeType.ELEMENT, node);
+        if(!equalNames(children) || !empty(children(NodeType.TEXT, node))) {
           return MIXED.apply(node, parent, format);
         }
         final MapBuilder map = attributes(node, format);
@@ -386,21 +358,14 @@ public final class FnElementsToMaps extends StandardFunc {
         return map.map();
       }
     },
-    /** Layout: * and all-different(*!node-name()) and empty(text()[normalize-space()]). */
-    RECORD() {
-      @Override
-      boolean matches(final ANode node) {
-        final ANodeList children = children(node, NodeType.ELEMENT);
-        return !children.isEmpty() && differentNames(children) &&
-            empty(children(node, NodeType.TEXT));
-      }
+    /** Layout: 'record'. */ RECORD() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
-        if(!empty(children(node, NodeType.TEXT))) return MIXED.apply(node, parent, format);
+        if(!empty(children(NodeType.TEXT, node))) return MIXED.apply(node, parent, format);
 
         final MapBuilder map = attributes(node, format);
         final TokenObjMap<ANodeList> cache = new TokenObjMap<>();
-        for(final ANode child : children(node, NodeType.ELEMENT)) {
+        for(final ANode child : children(NodeType.ELEMENT, node)) {
           cache.computeIfAbsent(nodeName(child, node, format), ANodeList::new).add(child);
         }
         for(final byte[] name : cache) {
@@ -414,34 +379,19 @@ public final class FnElementsToMaps extends StandardFunc {
         return map.map();
      }
     },
-    /** Layout: empty(text()[normalize-space()]). */
-    SEQUENCE() {
-      @Override
-      boolean matches(final ANode node) {
-        return empty(children(node, NodeType.TEXT));
-      }
+    /** Layout 'sequence'. */ SEQUENCE() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
         return mixed(node, parent, format, true);
       }
     },
-    /** Layout: *. */
-    MIXED() {
-      @Override
-      boolean matches(final ANode node) {
-        return !children(node, NodeType.ELEMENT).isEmpty();
-      }
+    /** Layout 'mixed'. */ MIXED() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
         return mixed(node, parent, format, false);
       }
     },
-    /** Layout. */
-    XML() {
-      @Override
-      boolean matches(final ANode node) {
-        return false;
-      }
+    /** Layout 'xml'. */ XML() {
       @Override
       Value apply(final ANode node, final ANode parent, final Format format) throws QueryException {
         final SerializerOptions sopts = new SerializerOptions();
@@ -452,13 +402,6 @@ public final class FnElementsToMaps extends StandardFunc {
         }
       }
     };
-
-    /**
-     * Checks if a layout matches for the given element node.
-     * @param node node
-     * @return result of check
-     */
-    abstract boolean matches(ANode node);
 
     /**
      * Creates a map value for the given node.
