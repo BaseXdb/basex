@@ -56,7 +56,7 @@ public abstract class XQMap extends XQStruct {
    * @return map
    */
   public static XQMap singleton(final Item key, final Value value) {
-    final XQMap map = new XQTrieMap(new TrieLeaf(key.hash(), key, value));
+    final XQMap map = new XQTrieMap(new TrieLeaf(key.hashCode(), key, value));
     map.type = MapType.get(key.type, value.seqType());
     return map;
   }

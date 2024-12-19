@@ -25,18 +25,18 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   Value getInternal(final Item key) throws QueryException {
-    return root.get(key.hash(), key, 0);
+    return root.get(key.hashCode(), key, 0);
   }
 
   @Override
   XQMap putInternal(final Item key, final Value value) throws QueryException {
-    final TrieNode node = root.put(key.hash(), key, value, 0);
+    final TrieNode node = root.put(key.hashCode(), key, value, 0);
     return node == root ? this : new XQTrieMap(node);
   }
 
   @Override
   public XQMap deleteInternal(final Item key) throws QueryException {
-    final TrieNode node = root.delete(key.hash(), key, 0);
+    final TrieNode node = root.delete(key.hashCode(), key, 0);
     return node == root ? this : node != null ? new XQTrieMap(node) : null;
   }
 

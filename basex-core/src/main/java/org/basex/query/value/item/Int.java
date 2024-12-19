@@ -172,10 +172,10 @@ public final class Int extends ANum {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     final long v = value;
     final int i = (int) v;
-    return v == i ? i : super.hash();
+    return v == i ? i : super.hashCode();
   }
 
   @Override

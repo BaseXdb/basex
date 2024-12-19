@@ -95,11 +95,11 @@ public class B64 extends Bin {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     try {
       return Token.hash(binary(null));
     } catch(final QueryException ex) {
-      Util.debug(ex);
+      Util.stack(ex);
       return Integer.MAX_VALUE;
     }
   }

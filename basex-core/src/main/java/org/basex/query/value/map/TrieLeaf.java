@@ -67,7 +67,7 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   boolean verify() {
-    return key.hash() == hash;
+    return key.hashCode() == hash;
   }
 
   @Override

@@ -152,11 +152,11 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public int hash() {
-    // makes sure that different numeric types return congruent hash values
+  public int hashCode() {
+    // equal values for different numeric types must return identical hash values!
     final long l = itr();
     final float f = flt();
-    // extract fractional part from a finite float; distribute bits
+    // extract fractional part from a finite float; distribute bits to improve hashing
     int h = floatToRawIntBits(f - l) ^ (int) (l ^ l >>> 32);
     h ^= h >>> 20 ^ h >>> 12;
     return h ^ h >>> 7 ^ h >>> 4;

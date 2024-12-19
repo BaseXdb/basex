@@ -136,10 +136,10 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     final float v = value;
     final int i = (int) v;
-    return v == i || Float.isNaN(value) || Float.isInfinite(value) ? i : super.hash();
+    return v == i || Float.isNaN(value) || Float.isInfinite(value) ? i : super.hashCode();
   }
 
   @Override

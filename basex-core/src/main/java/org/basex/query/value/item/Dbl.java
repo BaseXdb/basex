@@ -136,10 +136,10 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     final double v = value;
     final int i = (int) v;
-    return v == i || Double.isNaN(v) || Double.isInfinite(v) ? i : super.hash();
+    return v == i || Double.isNaN(v) || Double.isInfinite(v) ? i : super.hashCode();
   }
 
   @Override

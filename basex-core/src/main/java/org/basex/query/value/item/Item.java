@@ -291,15 +291,6 @@ public abstract class Item extends Value {
     return type.seqType();
   }
 
-  /**
-   * Returns a hash code for an atomic item.
-   * The returned values must be suitable for comparison according to the deep-equal rules.
-   * @return hash code
-   */
-  public int hash() {
-    throw Util.notExpected();
-  }
-
   @Override
   public long size() {
     return 1;

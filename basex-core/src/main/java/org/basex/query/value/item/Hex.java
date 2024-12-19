@@ -55,7 +55,7 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     return Token.hash(data);
   }
 

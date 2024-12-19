@@ -128,7 +128,7 @@ public final class Uri extends AStr {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     return Token.hash(value);
   }
 

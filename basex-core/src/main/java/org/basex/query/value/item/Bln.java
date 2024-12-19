@@ -72,7 +72,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     return Boolean.hashCode(value);
   }
 

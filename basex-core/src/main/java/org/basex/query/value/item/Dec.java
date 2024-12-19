@@ -190,12 +190,12 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     if(value.stripTrailingZeros().scale() <= 0) {
       final BigInteger bi = value.toBigInteger();
       if(bi.bitLength() < 32) return bi.intValue();
     }
-    return super.hash();
+    return super.hashCode();
   }
 
   @Override

@@ -108,8 +108,8 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public int hash() {
-    return value.bitLength() < 32 ? value.intValue() : super.hash();
+  public int hashCode() {
+    return value.bitLength() < 32 ? value.intValue() : super.hashCode();
   }
 
   @Override

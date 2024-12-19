@@ -94,7 +94,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * @throws QueryException query exception
    */
   public final int id(final Item key) throws QueryException {
-    return id(key, key.hash() & capacity() - 1);
+    return id(key, key.hashCode() & capacity() - 1);
   }
 
   /**
@@ -105,7 +105,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * @throws QueryException query exception
    */
   private int index(final Item key) throws QueryException {
-    final int h = key.hash();
+    final int h = key.hashCode();
     int b = h & capacity() - 1;
     final int id = id(key, b);
     if(id > 0) {
@@ -137,7 +137,7 @@ public class HashItemSet extends ASet implements ItemSet {
 
   @Override
   protected final int hash(final int id) {
-    return keys[id].hash();
+    return keys[id].hashCode();
   }
 
   @Override
