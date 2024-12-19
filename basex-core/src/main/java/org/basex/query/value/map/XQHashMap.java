@@ -49,9 +49,7 @@ public final class XQHashMap extends XQMap {
   @Override
   public void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
     final int is = ivm.size();
-    for(int i = 1; i <= is; i++) {
-      func.accept(ivm.key(i), ivm.value(i));
-    }
+    for(int i = 1; i <= is; i++) func.accept(ivm.key(i), ivm.value(i));
   }
 
   @Override
@@ -61,6 +59,11 @@ public final class XQHashMap extends XQMap {
       if(!func.test(ivm.key(i), ivm.value(i))) return false;
     }
     return true;
+  }
+
+  @Override
+  Item[] keysInternal() throws QueryException {
+    return ivm.keys();
   }
 
   @Override

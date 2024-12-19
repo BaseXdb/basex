@@ -130,8 +130,8 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
         }
       }
       if(!extensible) {
-        for(final Item item : map.keys()) {
-          if(!item.instanceOf(AtomType.STRING) || !fields.contains(item.string(null))) return false;
+        for(final Item key : map.keys()) {
+          if(!key.instanceOf(AtomType.STRING) || !fields.contains(key.string(null))) return false;
         }
       }
       return true;

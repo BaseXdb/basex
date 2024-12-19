@@ -340,8 +340,8 @@ public final class MapModuleTest extends SandboxTest {
 
     query(func.args(" map { xs:time('01:01:01'): 'b' }", "xs:time('01:01:02+01:00')", 1));
 
-    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6),
-        "{3:4,\"1\":2,\"5\":6}", empty(CElem.class));
+    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6) + "?* => sort()",
+        "2\n4\n6", empty(CElem.class));
 
     query("deep-equal(" + func.args(" map { 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
   }

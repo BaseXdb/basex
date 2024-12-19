@@ -415,13 +415,12 @@ public class Options implements Iterable<Option<?>> {
       if(!tb.isEmpty()) tb.add(' ');
       if(item instanceof XQMap) {
         final XQMap map = (XQMap) item;
-        for(final Item key : map.keys()) {
+        map.apply((key, v) -> {
           if(!tb.isEmpty()) tb.add(',');
           tb.add(key.string(info)).add('=');
-          final Value v = map.get(key);
           if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
           tb.add(string(((Item) v).string(info)).replace(",", ",,"));
-        }
+        });
       } else if(item instanceof QNm) {
         tb.add(((QNm) item).unique());
       } else {
@@ -544,9 +543,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void assign(final XQMap map, final InputInfo info)
       throws QueryException {
-    for(final Item name : map.keys()) {
-      assign(name, map.get(name), info);
-    }
+    map.apply((key, value) -> assign(key, value, info));
   }
 
   /**

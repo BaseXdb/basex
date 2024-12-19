@@ -1,6 +1,7 @@
 package org.basex.query.func.web;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -58,14 +59,14 @@ public abstract class WebFn extends StandardFunc {
       final char sep, final InputInfo info) throws QueryException {
 
     final TokenBuilder url = new TokenBuilder().add(href);
-    int c = 0;
-    for(final Item key : params.keys()) {
+    final AtomicInteger c = new AtomicInteger();
+    params.apply((key, value) -> {
       final byte[] name = key.string(info);
-      for(final Item item : params.get(key)) {
-        url.add(c++ == 0 ? '?' : sep).add(Token.encodeUri(name, UriEncoder.URI));
+      for(final Item item : value) {
+        url.add(c.getAndIncrement() == 0 ? '?' : sep).add(Token.encodeUri(name, UriEncoder.URI));
         url.add('=').add(Token.encodeUri(item.string(info), UriEncoder.URI));
       }
-    }
+    });
     return url;
   }
 

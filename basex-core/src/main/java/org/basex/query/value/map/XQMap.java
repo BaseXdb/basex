@@ -31,7 +31,7 @@ import org.basex.util.*;
  */
 public abstract class XQMap extends XQStruct {
   /** The empty map. */
-  private static final XQMap EMPTY = new XQTrieMap(TrieNode.EMPTY);
+  private static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE);
 
   /**
    * Constructor.
@@ -276,10 +276,16 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   public final Value keys() throws QueryException {
-    final ItemList items = new ItemList(structSize());
-    apply((key, value) -> items.add(key));
-    return items.value(((MapType) type).keyType);
+    final Item[] items = keysInternal();
+    return ItemSeq.get(items, items.length, ((MapType) type).keyType);
   }
+
+  /**
+   * Returns all keys.
+   * @return keys
+   * @throws QueryException query exception
+   */
+  abstract Item[] keysInternal() throws QueryException;
 
   @Override
   public final Value values(final QueryContext qc) throws QueryException {

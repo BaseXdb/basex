@@ -32,17 +32,16 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item ky, final Value vl, final int lv)
-      throws QueryException {
+  TrieNode put(final int hs, final int lv, final TrieUpdate update) throws QueryException {
     final int k = hashKey(hs, lv), bs, rem;
     final TrieNode sub = kids[k], nsub;
     if(sub != null) {
-      nsub = sub.put(hs, ky, vl, lv + 1);
+      nsub = sub.put(hs, lv + 1, update);
       if(nsub == sub) return this;
       bs = used;
       rem = sub.size;
     } else {
-      nsub = new TrieLeaf(hs, ky, vl);
+      nsub = new TrieLeaf(hs, update.key, update.value);
       bs = used | 1 << k;
       rem = 0;
     }
@@ -52,11 +51,11 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item ky, final int lv) throws QueryException {
+  TrieNode delete(final int hs, final int lv, final TrieUpdate update) throws QueryException {
     final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
     if(sub == null) return this;
-    final TrieNode nsub = sub.delete(hs, ky, lv + 1);
+    final TrieNode nsub = sub.delete(hs, lv + 1, update);
     if(nsub == sub) return this;
 
     final int nu;

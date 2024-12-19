@@ -65,7 +65,7 @@ public final class FnLoadXQueryModule extends Parse {
     final QNmMap<Value> bindings = new QNmMap<>();
     if(opt.contains(VARIABLES)) {
       final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, null, ii);
-      for(final Item name : vars.keys()) bindings.put((QNm) name, vars.get(name));
+      vars.apply((key, value) -> bindings.put((QNm) key, value));
     }
 
     if(opt.contains(VENDOR_OPTIONS)) {

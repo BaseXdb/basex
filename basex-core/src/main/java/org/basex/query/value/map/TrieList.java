@@ -49,11 +49,36 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item ky, final int lv) throws QueryException {
+  TrieNode put(final int hs, final int lv, final TrieUpdate update) throws QueryException {
+    // same hash
+    final boolean same = hs == hash;
+    if(same) {
+      for(int i = keys.length; i-- > 0;) {
+        final Item key = keys[i];
+        if(key.atomicEqual(update.key)) {
+          // same key: update key order if type differs
+          Item[] ks = keys;
+          if(key.type != update.key.type) {
+            ks = ks.clone();
+            ks[i] = update.key;
+          }
+          final Value[] vs = values.clone();
+          vs[i] = update.value;
+          return new TrieList(hs, ks, vs);
+        }
+      }
+    }
+    // different key: extend list of values or create branch
+    return same ? new TrieList(hash, Array.add(keys, update.key), Array.add(values, update.value)) :
+      branch(hs, lv, hash, size, update);
+  }
+
+  @Override
+  TrieNode delete(final int hs, final int lv, final TrieUpdate update) throws QueryException {
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
-        if(ky.atomicEqual(keys[i])) {
+        if(keys[i].atomicEqual(update.key)) {
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -73,31 +98,6 @@ final class TrieList extends TrieNode {
       }
     }
     return this;
-  }
-
-  @Override
-  TrieNode put(final int hs, final Item ky, final Value vl, final int lv)
-      throws QueryException {
-
-    // different hash: create branch
-    if(hs != hash) return branch(hs, ky, vl, lv, hash, size);
-
-    // same hash, same value: replace
-    for(int i = keys.length; i-- > 0;) {
-      final Item k = keys[i];
-      if(ky.atomicEqual(k)) {
-        Item[] ks = keys;
-        if(k.type != ky.type) {
-          ks = ks.clone();
-          ks[i] = ky;
-        }
-        final Value[] vs = values.clone();
-        vs[i] = vl;
-        return new TrieList(hs, ks, vs);
-      }
-    }
-    // same hash, different value: add to list
-    return new TrieList(hash, Array.add(keys, ky), Array.add(values, vl));
   }
 
   @Override

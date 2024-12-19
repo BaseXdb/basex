@@ -52,10 +52,7 @@ public final class ArrayValues extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.iterable()) vb.add(member);
-    return vb.value(this);
+    return array.values(qc);
   }
 
   @Override

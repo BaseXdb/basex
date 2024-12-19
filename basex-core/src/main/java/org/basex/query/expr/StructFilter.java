@@ -2,6 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.concurrent.atomic.*;
+
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -55,7 +57,7 @@ public final class StructFilter extends AFilter {
     try {
       for(final Expr expr : exprs) {
         qf.size = ((XQStruct) item).structSize();
-        int a = 0;
+        final AtomicInteger a = new AtomicInteger();
 
         // arrays
         if(item instanceof XQArray) {
@@ -63,8 +65,8 @@ public final class StructFilter extends AFilter {
           for(final Value value : ((XQArray) item).iterable()) {
             qc.checkStop();
             qf.value = value;
-            qf.pos = ++a;
-            if(expr.test(qc, info, a)) ab.append(value);
+            qf.pos = a.incrementAndGet();
+            if(expr.test(qc, info, a.get())) ab.append(value);
           }
           item = ab.array();
         } else {
@@ -72,13 +74,12 @@ public final class StructFilter extends AFilter {
           final MapBuilder mb = new MapBuilder();
           final XQMap map = (XQMap) item;
 
-          for(final Item key : map.keys()) {
-            final Value value = map.get(key);
+          map.apply((key, value) -> {
             qc.checkStop();
             qf.value = XQMap.singleton(Str.KEY, key).put(Str.VALUE, value);
-            qf.pos = ++a;
-            if(expr.test(qc, info, a)) mb.put(key, value);
-          }
+            qf.pos = a.incrementAndGet();
+            if(expr.test(qc, info, a.get())) mb.put(key, value);
+          });
           item = mb.map();
         }
       }
