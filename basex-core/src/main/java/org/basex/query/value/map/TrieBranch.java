@@ -39,6 +39,7 @@ final class TrieBranch extends TrieNode {
       bs = used;
       rem = sub.size;
     } else {
+      update.add(null);
       nsub = new TrieLeaf(hs, update.key, update.value);
       bs = used | 1 << k;
       rem = 0;
@@ -77,21 +78,6 @@ final class TrieBranch extends TrieNode {
     final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
     return sub == null ? null : sub.get(hs, ky, lv + 1);
-  }
-
-  @Override
-  void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.apply(func);
-    }
-  }
-
-  @Override
-  boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    for(final TrieNode nd : kids) {
-      if(nd != null && !nd.test(func)) return false;
-    }
-    return true;
   }
 
   @Override

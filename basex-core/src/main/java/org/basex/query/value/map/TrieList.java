@@ -55,6 +55,7 @@ final class TrieList extends TrieNode {
       for(int i = keys.length; i-- > 0;) {
         final Item key = keys[i];
         if(key.atomicEqual(update.key)) {
+          update.replace(key);
           // same key: update key order if type differs
           Item[] ks = keys;
           if(key.type != update.key.type) {
@@ -68,6 +69,7 @@ final class TrieList extends TrieNode {
       }
     }
     // different key: extend list of values or create branch
+    update.add(null);
     return same ? new TrieList(hash, Array.add(keys, update.key), Array.add(values, update.value)) :
       branch(hs, lv, hash, size, update);
   }
@@ -78,6 +80,7 @@ final class TrieList extends TrieNode {
       for(int i = size; i-- > 0;) {
         // still collisions?
         if(keys[i].atomicEqual(update.key)) {
+          update.remove(keys[i]);
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -107,19 +110,6 @@ final class TrieList extends TrieNode {
       }
     }
     return null;
-  }
-
-  @Override
-  void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    for(int i = 0; i < size; i++) func.accept(keys[i], values[i]);
-  }
-
-  @Override
-  boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    for(int i = 0; i < size; i++) {
-      if(!func.test(keys[i], values[i])) return false;
-    }
-    return true;
   }
 
   @Override

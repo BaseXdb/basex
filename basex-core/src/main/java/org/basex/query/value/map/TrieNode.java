@@ -88,21 +88,6 @@ abstract class TrieNode {
   abstract Value get(int hs, Item ky, int lv) throws QueryException;
 
   /**
-   * Applies a function on all entries.
-   * @param func function to apply on keys and values
-   * @throws QueryException query exception
-   */
-  abstract void apply(QueryBiConsumer<Item, Value> func) throws QueryException;
-
-  /**
-   * Tests all entries.
-   * @param func predicate function
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  abstract boolean test(QueryBiPredicate<Item, Value> func) throws QueryException;
-
-  /**
    * Calculates the hash key for the given level.
    * @param hash hash value
    * @param level current level

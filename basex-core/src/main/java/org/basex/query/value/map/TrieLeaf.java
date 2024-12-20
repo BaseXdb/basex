@@ -39,9 +39,11 @@ final class TrieLeaf extends TrieNode {
     final boolean same = hs == hash;
     if(same && key.atomicEqual(update.key)) {
       // same key: create new leaf
+      update.replace(key);
       return new TrieLeaf(hs, update.key, update.value);
     }
     // different key: create list of values or branch
+    update.add(key);
     return same ? new TrieList(hs, key, value, update.key, update.value) :
       branch(hs, lv, hash, 1, update);
   }
@@ -49,6 +51,7 @@ final class TrieLeaf extends TrieNode {
   @Override
   TrieNode remove(final int hs, final int lv, final TrieUpdate update) throws QueryException {
     if(hs == hash && key.atomicEqual(update.key)) {
+      update.remove(key);
       return null;
     }
     return this;
@@ -57,16 +60,6 @@ final class TrieLeaf extends TrieNode {
   @Override
   Value get(final int hs, final Item ky, final int lv) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? value : null;
-  }
-
-  @Override
-  void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    func.accept(key, value);
-  }
-
-  @Override
-  boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    return func.test(key, value);
   }
 
   @Override

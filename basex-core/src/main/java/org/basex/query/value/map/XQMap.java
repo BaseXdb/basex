@@ -31,7 +31,7 @@ import org.basex.util.*;
  */
 public abstract class XQMap extends XQStruct {
   /** The empty map. */
-  private static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE);
+  private static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE, null);
 
   /**
    * Constructor.
@@ -56,7 +56,7 @@ public abstract class XQMap extends XQStruct {
    * @return map
    */
   public static XQMap singleton(final Item key, final Value value) {
-    final XQMap map = new XQTrieMap(new TrieLeaf(key.hashCode(), key, value));
+    final XQMap map = new XQTrieMap(new TrieLeaf(key.hashCode(), key, value), null);
     map.type = MapType.get(key.type, value.seqType());
     return map;
   }

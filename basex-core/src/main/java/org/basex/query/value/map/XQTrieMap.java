@@ -2,7 +2,6 @@ package org.basex.query.value.map;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
@@ -15,13 +14,17 @@ import org.basex.query.value.item.*;
 public final class XQTrieMap extends XQMap {
   /** Root node. */
   private final TrieNode root;
+  /** Map order ({@code null} for empty and singleton maps). */
+  private TrieOrder order;
 
   /**
    * Constructor.
    * @param root root node
+   * @param order map order (can be ({@code null})
    */
-  XQTrieMap(final TrieNode root) {
+  XQTrieMap(final TrieNode root, final TrieOrder order) {
     this.root = root;
+    this.order = order;
   }
 
   @Override
@@ -31,16 +34,16 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   XQMap putInternal(final Item key, final Value value) throws QueryException {
-    final TrieUpdate update = new TrieUpdate(key, value);
+    final TrieUpdate update = new TrieUpdate(key, value, order);
     final TrieNode node = root.put(key.hashCode(), 0, update);
-    return new XQTrieMap(node);
+    return new XQTrieMap(node, update.newOrder);
   }
 
   @Override
   public XQMap removeInternal(final Item key) throws QueryException {
-    final TrieUpdate update = new TrieUpdate(key, null);
+    final TrieUpdate update = new TrieUpdate(key, null, order);
     final TrieNode node = root.remove(key.hashCode(), 0, update);
-    return node == root ? this : node != null ? new XQTrieMap(node) : null;
+    return node == root ? this : node != null ? new XQTrieMap(node, update.newOrder) : null;
   }
 
   @Override
@@ -50,19 +53,23 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   public void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    root.apply(func);
+    for(final Item key : keysInternal()) {
+      func.accept(key, get(key));
+    }
   }
 
   @Override
   public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    return root.test(func);
+    for(final Item key : keysInternal()) {
+      if(!func.test(key, get(key))) return false;
+    }
+    return true;
   }
 
   @Override
   Item[] keysInternal() throws QueryException {
-    final ItemList items = new ItemList(structSize());
-    apply((key, value) -> items.add(key));
-    return items.finish();
+    final long s = structSize();
+    return s == 0 ? new Item[0] : s == 1 ? new Item[] { ((TrieLeaf) root).key } : order.keys();
   }
 
   @Override

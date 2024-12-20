@@ -1,6 +1,5 @@
 package org.basex.query.value.map;
 
-import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -41,15 +40,6 @@ final class TrieEmpty extends TrieNode {
   @Override
   boolean equal(final TrieNode node, final DeepEqual deep) {
     return this == node;
-  }
-
-  @Override
-  void apply(final QueryBiConsumer<Item, Value> func) {
-  }
-
-  @Override
-  boolean test(final QueryBiPredicate<Item, Value> func) {
-    return true;
   }
 
   @Override
