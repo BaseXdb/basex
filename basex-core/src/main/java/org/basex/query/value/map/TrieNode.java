@@ -36,7 +36,7 @@ abstract class TrieNode {
    * @param hs hash code used as key
    * @param lv level
    * @param update update information
-   * @return updated map if changed, {@code this} otherwise
+   * @return updated map
    * @throws QueryException query exception
    */
   abstract TrieNode put(int hs, int lv, TrieUpdate update) throws QueryException;
@@ -68,14 +68,14 @@ abstract class TrieNode {
   }
 
   /**
-   * Deletes a key from this map.
+   * Removes a key from this map.
    * @param hs hash code of the key
    * @param lv level
    * @param update update information
-   * @return updated map if changed, {@code null} if deleted, {@code this} otherwise
+   * @return updated map if changed, {@code null} if removed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  abstract TrieNode delete(int hs, int lv, TrieUpdate update) throws QueryException;
+  abstract TrieNode remove(int hs, int lv, TrieUpdate update) throws QueryException;
 
   /**
    * Looks up the value associated with the given key.
@@ -86,12 +86,6 @@ abstract class TrieNode {
    * @throws QueryException query exception
    */
   abstract Value get(int hs, Item ky, int lv) throws QueryException;
-
-  /**
-   * Verifies the tree.
-   * @return check result
-   */
-  abstract boolean verify();
 
   /**
    * Applies a function on all entries.

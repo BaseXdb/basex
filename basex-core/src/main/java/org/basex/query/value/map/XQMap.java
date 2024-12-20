@@ -63,7 +63,7 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Returns a map.
-   * @param ivm hash map
+   * @param ivm mutable, but unmodified hash map instance
    * @return map
    */
   public static XQMap map(final ItemValueMap ivm) {
@@ -166,25 +166,25 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
-   * Deletes a key from this map.
-   * @param key key to delete
+   * Removed a key from this map.
+   * @param key key to remove
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public final XQMap delete(final Item key) throws QueryException {
-    final XQMap map = deleteInternal(key);
+  public final XQMap remove(final Item key) throws QueryException {
+    final XQMap map = removeInternal(key);
     if(map == null) return EMPTY;
     if(map != this) map.type = type;
     return map;
   }
 
   /**
-   * Deletes a key from this map.
-   * @param key key to delete
+   * Removes a key from this map.
+   * @param key key to remove
    * @return updated map
    * @throws QueryException query exception
    */
-  abstract XQMap deleteInternal(Item key) throws QueryException;
+  abstract XQMap removeInternal(Item key) throws QueryException;
 
   /**
    * Applies a function on all entries.

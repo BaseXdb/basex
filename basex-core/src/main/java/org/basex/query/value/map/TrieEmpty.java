@@ -29,18 +29,13 @@ final class TrieEmpty extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final int lv, final TrieUpdate update) {
+  TrieNode remove(final int hs, final int lv, final TrieUpdate update) {
     return this;
   }
 
   @Override
   Value get(final int hs, final Item ky, final int lv) {
     return null;
-  }
-
-  @Override
-  boolean verify() {
-    return true;
   }
 
   @Override

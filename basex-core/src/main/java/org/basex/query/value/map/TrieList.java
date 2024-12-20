@@ -32,7 +32,6 @@ final class TrieList extends TrieNode {
     this.keys = keys;
     this.values = values;
     this.hash = hash;
-    assert verify();
   }
 
   /**
@@ -74,7 +73,7 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final int lv, final TrieUpdate update) throws QueryException {
+  TrieNode remove(final int hs, final int lv, final TrieUpdate update) throws QueryException {
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
@@ -108,21 +107,6 @@ final class TrieList extends TrieNode {
       }
     }
     return null;
-  }
-
-  @Override
-  boolean verify() {
-    try {
-      for(int i = 1; i < size; i++) {
-        for(int j = i; j-- > 0;) {
-          if(keys[i].atomicEqual(keys[j])) return false;
-        }
-      }
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      return false;
-    }
-    return true;
   }
 
   @Override

@@ -12,13 +12,13 @@ import org.basex.query.value.item.*;
 final class TrieUpdate {
   /** Key. */
   final Item key;
-  /** Value (optional). */
-  Value value;
+  /** Value (can be {@code null}). */
+  final Value value;
 
   /**
    * Constructor.
    * @param key key
-   * @param value value
+   * @param value value ({@code null} for deletions)
    */
   TrieUpdate(final Item key, final Value value) {
     this.key = key;

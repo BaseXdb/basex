@@ -22,7 +22,7 @@ public final class MapRemove extends StandardFunc {
     final Iter keys = arg(1).iter(qc);
 
     for(Item item; (item = qc.next(keys)) != null;) {
-      map = map.delete(toAtomItem(item, qc));
+      map = map.remove(toAtomItem(item, qc));
     }
     return map;
   }

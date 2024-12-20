@@ -28,7 +28,6 @@ final class TrieBranch extends TrieNode {
     super(size);
     this.kids = kids;
     this.used = used;
-    assert verify();
   }
 
   @Override
@@ -37,7 +36,6 @@ final class TrieBranch extends TrieNode {
     final TrieNode sub = kids[k], nsub;
     if(sub != null) {
       nsub = sub.put(hs, lv + 1, update);
-      if(nsub == sub) return this;
       bs = used;
       rem = sub.size;
     } else {
@@ -51,11 +49,11 @@ final class TrieBranch extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final int lv, final TrieUpdate update) throws QueryException {
+  TrieNode remove(final int hs, final int lv, final TrieUpdate update) throws QueryException {
     final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
     if(sub == null) return this;
-    final TrieNode nsub = sub.delete(hs, lv + 1, update);
+    final TrieNode nsub = sub.remove(hs, lv + 1, update);
     if(nsub == sub) return this;
 
     final int nu;
@@ -79,17 +77,6 @@ final class TrieBranch extends TrieNode {
     final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
     return sub == null ? null : sub.get(hs, ky, lv + 1);
-  }
-
-  @Override
-  boolean verify() {
-    int c = 0;
-    for(int i = 0; i < KIDS; i++) {
-      final boolean bit = (used & 1 << i) != 0, act = kids[i] != null;
-      if(bit ^ act) return false;
-      if(act) c += kids[i].size;
-    }
-    return c == size;
   }
 
   @Override

@@ -33,13 +33,13 @@ public final class XQTrieMap extends XQMap {
   XQMap putInternal(final Item key, final Value value) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, value);
     final TrieNode node = root.put(key.hashCode(), 0, update);
-    return node == root ? this : new XQTrieMap(node);
+    return new XQTrieMap(node);
   }
 
   @Override
-  public XQMap deleteInternal(final Item key) throws QueryException {
+  public XQMap removeInternal(final Item key) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, null);
-    final TrieNode node = root.delete(key.hashCode(), 0, update);
+    final TrieNode node = root.remove(key.hashCode(), 0, update);
     return node == root ? this : node != null ? new XQTrieMap(node) : null;
   }
 

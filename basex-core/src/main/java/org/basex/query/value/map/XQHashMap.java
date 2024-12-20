@@ -37,8 +37,8 @@ public final class XQHashMap extends XQMap {
   }
 
   @Override
-  public XQMap deleteInternal(final Item key) throws QueryException {
-    return trie().deleteInternal(key);
+  public XQMap removeInternal(final Item key) throws QueryException {
+    return trie().removeInternal(key);
   }
 
   @Override

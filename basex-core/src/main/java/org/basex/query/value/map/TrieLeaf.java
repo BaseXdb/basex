@@ -31,7 +31,6 @@ final class TrieLeaf extends TrieNode {
     this.hash = hash;
     this.key = key;
     this.value = value;
-    assert verify();
   }
 
   @Override
@@ -48,18 +47,16 @@ final class TrieLeaf extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final int lv, final TrieUpdate update) throws QueryException {
-    return hs == hash && key.atomicEqual(update.key) ? null : this;
+  TrieNode remove(final int hs, final int lv, final TrieUpdate update) throws QueryException {
+    if(hs == hash && key.atomicEqual(update.key)) {
+      return null;
+    }
+    return this;
   }
 
   @Override
   Value get(final int hs, final Item ky, final int lv) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? value : null;
-  }
-
-  @Override
-  boolean verify() {
-    return key.hashCode() == hash;
   }
 
   @Override
