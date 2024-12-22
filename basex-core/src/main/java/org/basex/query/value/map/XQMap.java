@@ -62,6 +62,17 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
+   * Creates a map with 'key' and 'value' entries.
+   * @param key key
+   * @param value value
+   * @return map
+   * @throws QueryException query exception
+   */
+  public static XQMap pair(final Item key, final Value value) throws QueryException {
+    return singleton(Str.KEY, key).put(Str.VALUE, value);
+  }
+
+  /**
    * Returns a map.
    * @param ivm mutable, but unmodified hash map instance
    * @return map

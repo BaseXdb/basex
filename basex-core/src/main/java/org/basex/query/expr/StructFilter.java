@@ -76,7 +76,7 @@ public final class StructFilter extends AFilter {
 
           map.forEach((key, value) -> {
             qc.checkStop();
-            qf.value = XQMap.singleton(Str.KEY, key).put(Str.VALUE, value);
+            qf.value = XQMap.pair(key, value);
             qf.pos = a.incrementAndGet();
             if(expr.test(qc, info, a.get())) mb.put(key, value);
           });

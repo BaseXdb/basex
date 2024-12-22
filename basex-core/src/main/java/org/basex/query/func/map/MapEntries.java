@@ -56,7 +56,7 @@ public class MapEntries extends StandardFunc {
   }
 
   /**
-   * Creates a map pair.
+   * Returns a single map entry as a new map.
    * @param key key
    * @param value value
    * @return created map entry
