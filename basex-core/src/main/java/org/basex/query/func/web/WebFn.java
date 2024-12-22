@@ -60,7 +60,7 @@ public abstract class WebFn extends StandardFunc {
 
     final TokenBuilder url = new TokenBuilder().add(href);
     final AtomicInteger c = new AtomicInteger();
-    params.apply((key, value) -> {
+    params.forEach((key, value) -> {
       final byte[] name = key.string(info);
       for(final Item item : value) {
         url.add(c.getAndIncrement() == 0 ? '?' : sep).add(Token.encodeUri(name, UriEncoder.URI));

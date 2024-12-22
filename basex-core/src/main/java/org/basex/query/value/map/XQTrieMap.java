@@ -52,7 +52,7 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  public void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
+  public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
     for(final Item key : keysInternal()) {
       func.accept(key, get(key));
     }

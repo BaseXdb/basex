@@ -22,7 +22,7 @@ public final class MapKeysWhere extends StandardFunc {
 
     final HofArgs args = new HofArgs(2);
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> {
+    map.forEach((key, value) -> {
       if(test(predicate, args.set(0, key).set(1, value), qc)) vb.add(key);
     });
     return vb.value(this);

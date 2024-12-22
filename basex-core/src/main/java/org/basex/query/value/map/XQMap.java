@@ -86,7 +86,7 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
-    apply((key, value) -> {
+    forEach((key, value) -> {
       key.cache(lazy, ii);
       value.cache(lazy, ii);
     });
@@ -191,7 +191,7 @@ public abstract class XQMap extends XQStruct {
    * @param func function to apply on keys and values
    * @throws QueryException query exception
    */
-  public abstract void apply(QueryBiConsumer<Item, Value> func) throws QueryException;
+  public abstract void forEach(QueryBiConsumer<Item, Value> func) throws QueryException;
 
   /**
    * Tests all entries.
@@ -228,7 +228,7 @@ public abstract class XQMap extends XQStruct {
     if(materialized(test, ii)) return this;
 
     final MapBuilder mb = new MapBuilder(structSize());
-    apply((key, value) -> {
+    forEach((key, value) -> {
       qc.checkStop();
       mb.put(key, value.materialize(test, ii, qc));
     });
@@ -290,7 +290,7 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final Value values(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    apply((key, value) -> vb.add(value));
+    forEach((key, value) -> vb.add(value));
     return vb.value(((MapType) type).valueType.type);
   }
 
@@ -308,7 +308,7 @@ public abstract class XQMap extends XQStruct {
 
     final SeqType kt = mt.keyType.seqType(), vt = mt.valueType;
     final MapBuilder mb = new MapBuilder(structSize());
-    apply((key, value) -> {
+    forEach((key, value) -> {
       qc.checkStop();
       final Item k = (Item) kt.coerce(key, null, qc, cc, ii);
       if(mb.get(k) != null) throw typeError(this, mt.seqType(), ii);
@@ -335,7 +335,7 @@ public abstract class XQMap extends XQStruct {
       }
     }
     final MapBuilder mb = new MapBuilder(structSize());
-    apply((key, value) -> {
+    forEach((key, value) -> {
       qc.checkStop();
       final Field field = key.instanceOf(AtomType.STRING) ? rt.getField(key.string(null)) : null;
       final Value v;
@@ -357,7 +357,7 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final HashMap<Object, Object> toJava() throws QueryException {
     final HashMap<Object, Object> map = new HashMap<>((int) structSize());
-    apply((key, value) -> map.put(key.toJava(), value.toJava()));
+    forEach((key, value) -> map.put(key.toJava(), value.toJava()));
     return map;
   }
 
@@ -467,7 +467,7 @@ public abstract class XQMap extends XQStruct {
   public final void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     try {
-      apply((key, value) -> {
+      forEach((key, value) -> {
         if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
       });
     } catch(final QueryException ex) {

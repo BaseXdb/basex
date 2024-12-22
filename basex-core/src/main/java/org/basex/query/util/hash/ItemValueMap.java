@@ -58,14 +58,6 @@ public final class ItemValueMap extends HashItemSet {
     return values[id(key)];
   }
 
-  /**
-   * Returns all keys.
-   * @return keys
-   */
-  public Item[] keys() {
-    return Arrays.copyOfRange(keys, 1, size);
-  }
-
   @Override
   protected void rehash(final int newSize) {
     super.rehash(newSize);

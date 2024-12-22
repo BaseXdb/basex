@@ -49,7 +49,7 @@ public final class MapMerge extends StandardFunc {
     final Duplicates merge = options.get(MergeOptions.DUPLICATES);
     final MapBuilder mb = new MapBuilder();
     for(Item item; (item = qc.next(maps)) != null;) {
-      toMap(item).apply((k, v) -> {
+      toMap(item).forEach((k, v) -> {
         final Value old = mb.get(k);
         switch(merge) {
           case REJECT:

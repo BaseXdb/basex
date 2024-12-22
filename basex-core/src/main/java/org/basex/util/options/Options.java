@@ -415,7 +415,7 @@ public class Options implements Iterable<Option<?>> {
       if(!tb.isEmpty()) tb.add(' ');
       if(item instanceof XQMap) {
         final XQMap map = (XQMap) item;
-        map.apply((key, v) -> {
+        map.forEach((key, v) -> {
           if(!tb.isEmpty()) tb.add(',');
           tb.add(key.string(info)).add('=');
           if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
@@ -543,7 +543,7 @@ public class Options implements Iterable<Option<?>> {
    */
   public final synchronized void assign(final XQMap map, final InputInfo info)
       throws QueryException {
-    map.apply((key, value) -> assign(key, value, info));
+    map.forEach((key, value) -> assign(key, value, info));
   }
 
   /**

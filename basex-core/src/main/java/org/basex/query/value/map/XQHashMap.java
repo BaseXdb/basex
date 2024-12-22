@@ -47,7 +47,7 @@ public final class XQHashMap extends XQMap {
   }
 
   @Override
-  public void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
+  public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
     final int is = ivm.size();
     for(int i = 1; i <= is; i++) func.accept(ivm.key(i), ivm.value(i));
   }

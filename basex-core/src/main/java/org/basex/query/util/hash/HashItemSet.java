@@ -15,10 +15,10 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public class HashItemSet extends ASet implements ItemSet {
-  /** Hashed keys. */
-  Item[] keys;
   /** Equality function. */
   private final QueryBiPredicate<Item, Item> equal;
+  /** Hashed keys. */
+  Item[] keys;
 
   /**
    * Default constructor.
@@ -59,6 +59,14 @@ public class HashItemSet extends ASet implements ItemSet {
    */
   public final Item key(final int id) {
     return keys[id];
+  }
+
+  /**
+   * Returns all keys.
+   * @return keys
+   */
+  public Item[] keys() {
+    return Arrays.copyOfRange(keys, 1, size);
   }
 
   @Override

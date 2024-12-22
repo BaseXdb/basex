@@ -22,7 +22,7 @@ public final class MapFilter extends StandardFunc {
 
     final MapBuilder mb = new MapBuilder();
     final HofArgs args = new HofArgs(2);
-    map.apply((key, value) -> {
+    map.forEach((key, value) -> {
       if(test(predicate, args.set(0, key).set(1, value), qc)) mb.put(key, value);
     });
     return mb.map();

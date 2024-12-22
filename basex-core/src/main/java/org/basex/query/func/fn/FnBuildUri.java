@@ -62,7 +62,7 @@ public final class FnBuildUri extends FnParseUri {
     final Value qp = parts.get(Str.get(QUERY_PARAMETERS)), query = parts.get(Str.get(QUERY));
     if(!qp.isEmpty()) {
       final TokenBuilder tmp = new TokenBuilder();
-      toMap(qp, qc).apply((key, value) -> {
+      toMap(qp, qc).forEach((key, value) -> {
         final byte[] k = encodeUri(toToken(key), UriEncoder.QUERY);
         for(final Item item : value) {
           tmp.add(tmp.isEmpty() ? "?" : "&");
