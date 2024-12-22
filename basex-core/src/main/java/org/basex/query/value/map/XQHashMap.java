@@ -1,10 +1,14 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Unmodifiable hash map implementation.
@@ -62,8 +66,17 @@ public final class XQHashMap extends XQMap {
   }
 
   @Override
-  Item[] keysInternal() throws QueryException {
-    return ivm.keys();
+  public BasicIter<Item> keys() throws QueryException {
+    return new BasicIter<>(ivm.size()) {
+      @Override
+      public Item get(final long i) {
+        return ivm.key((int) i + 1);
+      }
+      @Override
+      public Value value(final QueryContext qc, final Expr expr) {
+        return ItemSeq.get(ivm.keys(), (int) size, ((MapType) type).keyType);
+      }
+    };
   }
 
   @Override
