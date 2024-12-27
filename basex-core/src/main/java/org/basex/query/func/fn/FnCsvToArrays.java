@@ -27,22 +27,13 @@ public class FnCsvToArrays extends Parse {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toTokenOrNull(arg(0), qc);
-    if(value == null) return Empty.VALUE;
-    final IO io = new IOContent(value);
     final CsvToArraysOptions options = toOptions(arg(1), new CsvToArraysOptions(), qc);
     options.validate(info);
 
-    final CsvParserOptions cpo = new CsvParserOptions();
-    cpo.set(CsvOptions.SEPARATOR, options.get(CsvToArraysOptions.FIELD_DELIMITER));
-    cpo.set(CsvOptions.ROW_DELIMITER, options.get(CsvToArraysOptions.ROW_DELIMITER));
-    cpo.set(CsvOptions.QUOTE_CHARACTER, options.get(CsvToArraysOptions.QUOTE_CHARACTER));
-    cpo.set(CsvOptions.TRIM_WHITSPACE, options.get(CsvToArraysOptions.TRIM_WHITESPACE));
-    cpo.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
-    cpo.set(CsvOptions.QUOTES, true);
-    cpo.set(CsvOptions.STRICT_QUOTING, true);
-
+    if(value == null) return Empty.VALUE;
+    final CsvParserOptions parserOpts = options.toCsvParserOptions();
     try {
-      final XQMap map = (XQMap) CsvConverter.get(cpo).convert(io, info);
+      final XQMap map = (XQMap) CsvConverter.get(parserOpts).convert(new IOContent(value), info);
       return map.get(CsvXQueryConverter.RECORDS);
     } catch(final IOException ex) {
       throw CSV_ERROR_X.get(info, ex);
@@ -67,7 +58,7 @@ public class FnCsvToArrays extends Parse {
      * @param ii input info
      * @throws QueryException query exception
      */
-    public void validate(final InputInfo ii) throws QueryException {
+    void validate(final InputInfo ii) throws QueryException {
       final IntSet delim = new IntSet();
       for(final StringOption opt : Arrays.asList(FIELD_DELIMITER, ROW_DELIMITER, QUOTE_CHARACTER)) {
         final String val = get(opt);
@@ -76,6 +67,22 @@ public class FnCsvToArrays extends Parse {
         final int cp = val.codePointAt(0);
         if(!delim.add(cp)) throw CSV_DELIMITER_X.get(ii, val);
       }
+    }
+
+    /**
+     * Convert the options to a CsvParserOptions object.
+     * @return the CsvParserOptions object
+     */
+    CsvParserOptions toCsvParserOptions() {
+      final CsvParserOptions parserOpts = new CsvParserOptions();
+      parserOpts.set(CsvOptions.SEPARATOR, get(FIELD_DELIMITER));
+      parserOpts.set(CsvOptions.ROW_DELIMITER, get(ROW_DELIMITER));
+      parserOpts.set(CsvOptions.QUOTE_CHARACTER, get(QUOTE_CHARACTER));
+      parserOpts.set(CsvOptions.TRIM_WHITSPACE, get(TRIM_WHITESPACE));
+      parserOpts.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
+      parserOpts.set(CsvOptions.QUOTES, true);
+      parserOpts.set(CsvOptions.STRICT_QUOTING, true);
+      return parserOpts;
     }
   }
 }

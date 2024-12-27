@@ -159,6 +159,9 @@ public enum Function implements AFunction {
   CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value[,options])",
       params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
   /** XQuery function. */
+  CSV_TO_XML(FnCsvToXml::new, "csv-to-xml(value[,options])",
+      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_O),
+  /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
       params(), DATE_O, flag(NDT)),
   /** XQuery function. */
