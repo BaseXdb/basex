@@ -9,7 +9,7 @@ import org.basex.query.value.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class ValidateRngInfo extends ValidateRng {
+public final class ValidateRngInfo extends ValidateRng {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return info(qc);

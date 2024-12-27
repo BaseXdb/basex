@@ -22,7 +22,7 @@ public class FnContainsSubsequence extends StandardFunc {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
@@ -74,7 +74,7 @@ public class FnContainsSubsequence extends StandardFunc {
   }
 
   @Override
-  public int hofIndex() {
+  public final int hofIndex() {
     return 2;
   }
 }

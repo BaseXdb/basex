@@ -22,7 +22,7 @@ public final class FnCollation extends StandardFunc {
     final XQMap options = toMap(arg(0), qc);
 
     final MapBuilder map = new MapBuilder();
-    options.apply((k, v) -> {
+    options.forEach((k, v) -> {
       final String key = Strings.camelCase(Token.string(k.string(info)));
       final Value value = v == Bln.TRUE ? Str.get(Text.YES) : v == Bln.FALSE ? Str.get(Text.NO) : v;
       map.put(key, value);

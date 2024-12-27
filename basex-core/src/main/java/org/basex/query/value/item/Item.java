@@ -189,7 +189,7 @@ public abstract class Item extends Value {
    * Compares items for deep equality.
    * Called by {@link DeepEqual}.
    * @param item item to be compared
-   * @param deep comparator
+   * @param deep comparator (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
@@ -289,15 +289,6 @@ public abstract class Item extends Value {
   @Override
   public SeqType seqType() {
     return type.seqType();
-  }
-
-  /**
-   * Returns a hash code for an atomic item.
-   * The returned values must be suitable for comparison according to the deep-equal rules.
-   * @return hash code
-   */
-  public int hash() {
-    throw Util.notExpected();
   }
 
   @Override

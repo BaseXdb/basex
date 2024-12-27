@@ -44,7 +44,7 @@ public class MapType extends FType {
   }
 
   @Override
-  public XQMap cast(final Item item, final QueryContext qc, final InputInfo info)
+  public final XQMap cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(item instanceof XQMap) {
       final XQMap m = (XQMap) item;
@@ -54,9 +54,11 @@ public class MapType extends FType {
   }
 
   @Override
-  public XQMap read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
-    final MapBuilder mb = new MapBuilder();
-    for(int s = in.readNum() - 1; s >= 0; s--) {
+  public final XQMap read(final DataInput in, final QueryContext qc)
+      throws IOException, QueryException {
+    int s = in.readNum();
+    final MapBuilder mb = new MapBuilder(s);
+    while(--s >= 0) {
       mb.put((Item) Store.read(in, qc), Store.read(in, qc));
     }
     return mb.map();
@@ -125,18 +127,18 @@ public class MapType extends FType {
   }
 
   @Override
-  public String toString() {
-    final Object[] param = this == SeqType.MAP ? WILDCARD : new Object[] { keyType, valueType};
-    return new QueryString().token(QueryText.MAP).params(param).toString();
-  }
-
-  @Override
-  public FuncType funcType() {
+  public final FuncType funcType() {
     return FuncType.get(valueType.union(Occ.ZERO), SeqType.ANY_ATOMIC_TYPE_O);
   }
 
   @Override
-  public AtomType atomic() {
+  public final AtomType atomic() {
     return null;
+  }
+
+  @Override
+  public String toString() {
+    final Object[] param = this == SeqType.MAP ? WILDCARD : new Object[] { keyType, valueType};
+    return new QueryString().token(QueryText.MAP).params(param).toString();
   }
 }

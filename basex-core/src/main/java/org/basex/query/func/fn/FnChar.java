@@ -13,9 +13,9 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnChar extends StandardFunc {
+public final class FnChar extends StandardFunc {
   @Override
-  public final Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).item(qc, info);
 
     if(value instanceof Int) {

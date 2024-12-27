@@ -36,7 +36,7 @@ public class FnOutermost extends StandardFunc {
    * @return outermost/innermost nodes
    * @throws QueryException exception
    */
-  Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
+  final Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
 
     final ANodeBuilder list = new ANodeBuilder();

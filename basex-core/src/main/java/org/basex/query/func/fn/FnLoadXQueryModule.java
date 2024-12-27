@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -50,7 +51,12 @@ public final class FnLoadXQueryModule extends Parse {
         locs = opt.get(LOCATION_HINTS);
       } else {
         final byte[] loc = qc.modDeclared.get(modUri);
-        locs = loc == null ? new String[0] : new String[] {Token.string(loc)};
+        if(loc != null) {
+          locs = new String[] { Token.string(loc) };
+        } else {
+          final String path = repoFilePath(modUri, qc.context);
+          locs = path == null ? new String[0] : new String[] { path };
+        }
       }
       if(locs.length == 0) throw MODULE_NOT_FOUND_X.get(info, modUri);
       for(final String loc : locs) srcs.add(ii.sc().resolve(loc, ii.path()));
@@ -59,7 +65,7 @@ public final class FnLoadXQueryModule extends Parse {
     final QNmMap<Value> bindings = new QNmMap<>();
     if(opt.contains(VARIABLES)) {
       final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, null, ii);
-      for(final Item name : vars.keys()) bindings.put((QNm) name, vars.get(name));
+      vars.forEach((key, value) -> bindings.put((QNm) key, value));
     }
 
     if(opt.contains(VENDOR_OPTIONS)) {
@@ -126,7 +132,7 @@ public final class FnLoadXQueryModule extends Parse {
         for(int a = sf.minArity(); a <= sf.arity(); ++a) {
           final FuncBuilder fb = new FuncBuilder(info, a, true);
           final Expr item = Functions.item(sf, fb, mqc, true);
-          funcs.computeIfAbsent(sf.name, () -> new HashMap<Integer, Expr>()).put(a, item);
+          funcs.computeIfAbsent(sf.name, HashMap::new).put(a, item);
         }
       }
     }
@@ -144,7 +150,14 @@ public final class FnLoadXQueryModule extends Parse {
     final MapBuilder variables = new MapBuilder();
     for(final StaticVar var : mqc.vars) {
       if(!var.anns.contains(Annotation.PRIVATE) && Token.eq(var.sc.module.uri(), modUri)) {
-        variables.put(var.name, var.value(mqc));
+        try {
+          variables.put(var.name, var.value(mqc));
+        } catch (QueryException ex) {
+          throw ex;
+        } catch (Exception ex) {
+          Util.debug(ex);
+          throw VAREMPTY_X.get(info, var.name());
+        }
       }
     }
 
@@ -152,6 +165,23 @@ public final class FnLoadXQueryModule extends Parse {
     result.put("functions", functions.map());
     result.put("variables", variables.map());
     return result.map();
+  }
+
+  /**
+   * Return the repository file path of the XQuery module with the given module URI, or
+   * {@code null}, if there is no such module in the repository.
+   * @param modUri module URI
+   * @param context database context
+   * @return the file path of the XQuery module in the repository (maybe {@code null})
+   */
+  private String repoFilePath(final byte[] modUri, final Context context) {
+    final String path = Strings.uri2path(Token.string(modUri));
+    final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
+    for(final String suffix : IO.XQSUFFIXES) {
+      final IOFile file = new IOFile(repoPath, path + suffix);
+      if(file.exists()) return file.path();
+    }
+    return null;
   }
 
   /**

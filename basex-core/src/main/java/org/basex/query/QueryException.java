@@ -218,12 +218,12 @@ public class QueryException extends Exception {
   }
 
   @Override
-  public String getLocalizedMessage() {
+  public final String getLocalizedMessage() {
     return super.getMessage();
   }
 
   @Override
-  public String getMessage() {
+  public final String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
     if(info != null) tb.add(STOPPED_AT).add(info).add(COL).add(NL);
     final byte[] code = name.local();
@@ -240,7 +240,7 @@ public class QueryException extends Exception {
    * Returns a stack trace expression.
    * @return expression
    */
-  public Str stackTrace() {
+  public final Str stackTrace() {
     final TokenBuilder tb = new TokenBuilder();
     if(info != null) tb.add(info).add('\n');
     for(final InputInfo stck : stack) tb.add(stck).add('\n');
@@ -251,7 +251,7 @@ public class QueryException extends Exception {
    * Checks if this exception can be caught by a {@code try/catch} expression.
    * @return result of check
    */
-  public boolean isCatchable() {
+  public final boolean isCatchable() {
     return catchable;
   }
 

@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public class FuncType extends FType {
+public final class FuncType extends FType {
   /** Annotations. */
   public final AnnList anns;
   /** Return type of the function. */

@@ -1,5 +1,6 @@
 package org.basex.query.func.map;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
@@ -21,11 +22,23 @@ import org.basex.util.options.*;
  * @author Leo Woerteler
  */
 public final class MapMerge extends StandardFunc {
+  /** Duplicate handling. */
+  public enum Duplicates {
+    /** Reject.    */ REJECT,
+    /** Use first. */ USE_FIRST,
+    /** Use last.  */ USE_LAST,
+    /** Use any.   */ USE_ANY,
+    /** Combine.   */ COMBINE;
+    @Override
+    public String toString() {
+      return EnumOption.string(this);
+    }
+  }
   /** Merge options. */
   public static final class MergeOptions extends Options {
     /** Handle duplicates. */
-    public static final EnumOption<MergeDuplicates> DUPLICATES =
-        new EnumOption<>("duplicates", MergeDuplicates.USE_FIRST);
+    public static final EnumOption<Duplicates> DUPLICATES =
+        new EnumOption<>("duplicates", Duplicates.USE_FIRST);
   }
 
   @Override
@@ -33,12 +46,28 @@ public final class MapMerge extends StandardFunc {
     final Iter maps = arg(0).iter(qc);
     final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
 
-    final MergeDuplicates merge = options.get(MergeOptions.DUPLICATES);
-    XQMap map = XQMap.empty();
+    final Duplicates merge = options.get(MergeOptions.DUPLICATES);
+    final MapBuilder mb = new MapBuilder();
     for(Item item; (item = qc.next(maps)) != null;) {
-      map = map.addAll(toMap(item), merge, qc, info);
+      toMap(item).forEach((k, v) -> {
+        final Value old = mb.get(k);
+        switch(merge) {
+          case REJECT:
+            if(old != null) throw MERGE_DUPLICATE_X.get(info, k);
+            mb.put(k, v);
+            break;
+          case USE_LAST:
+            mb.put(k, v);
+            break;
+          case COMBINE:
+            mb.put(k, old == null ? v : ValueBuilder.concat(old, v, qc));
+            break;
+          default:
+            if(old == null) mb.put(k, v);
+        }
+      });
     }
-    return map;
+    return mb.map();
   }
 
   @Override
@@ -72,13 +101,12 @@ public final class MapMerge extends StandardFunc {
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
       if(!vt.zero() && defined(1)) {
         if(!(arg(1) instanceof Value) || toOptions(arg(1), new MergeOptions(), cc.qc).
-            get(MergeOptions.DUPLICATES) == MergeDuplicates.COMBINE) {
+            get(MergeOptions.DUPLICATES) == Duplicates.COMBINE) {
           mt = MapType.get(mt.keyType, vt.union(Occ.ONE_OR_MORE));
         }
       }
       exprType.assign(mt);
     }
-
     return this;
   }
 }

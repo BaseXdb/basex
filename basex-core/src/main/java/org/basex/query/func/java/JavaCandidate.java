@@ -8,7 +8,7 @@ import java.lang.reflect.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class JavaCandidate {
+public final class JavaCandidate {
   /** Arguments. */
   final Object[] arguments;
 

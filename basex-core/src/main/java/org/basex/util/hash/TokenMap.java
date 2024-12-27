@@ -11,8 +11,8 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class TokenMap extends TokenSet {
-  /** Hash values. */
+public final class TokenMap extends TokenSet {
+  /** Map values. */
   private byte[][] values;
 
   /**
@@ -26,7 +26,7 @@ public class TokenMap extends TokenSet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  public TokenMap(final long capacity) {
+  public TokenMap(final int capacity) {
     super(capacity);
     values = new byte[capacity()][];
   }
@@ -37,7 +37,7 @@ public class TokenMap extends TokenSet {
    * @param key key
    * @param value value
    */
-  public final void put(final byte[] key, final byte[] value) {
+  public void put(final byte[] key, final byte[] value) {
     // array bounds are checked before array is resized
     final int i = put(key);
     values[i] = value;
@@ -48,7 +48,7 @@ public class TokenMap extends TokenSet {
    * @param key key
    * @param value value
    */
-  public final void put(final String key, final String value) {
+  public void put(final String key, final String value) {
     put(Token.token(key), Token.token(value));
   }
 
@@ -57,7 +57,7 @@ public class TokenMap extends TokenSet {
    * @param key key to be looked up
    * @return value, or {@code null} if nothing was found
    */
-  public final byte[] get(final byte[] key) {
+  public byte[] get(final byte[] key) {
     return key != null ? values[id(key)] : null;
   }
 
@@ -72,18 +72,18 @@ public class TokenMap extends TokenSet {
    * Returns a value iterator.
    * @return iterator
    */
-  public final Iterable<byte[]> values() {
+  public Iterable<byte[]> values() {
     return new ArrayIterator<>(values, 1, size);
   }
 
   @Override
-  public final void clear() {
+  public void clear() {
     Arrays.fill(values, null);
     super.clear();
   }
 
   @Override
-  protected final void rehash(final int newSize) {
+  protected void rehash(final int newSize) {
     super.rehash(newSize);
     values = Array.copyOf(values, newSize);
   }

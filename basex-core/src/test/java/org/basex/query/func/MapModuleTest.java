@@ -98,7 +98,7 @@ public final class MapModuleTest extends SandboxTest {
     query("exists(" + func.args(1, 2) + ')', true);
     query("exists(" + _MAP_MERGE.args(func.args(1, 2)) + ')', true);
 
-    check(func.args(" <_>A</_>", 0), "{\"A\":0}", empty(CElem.class), root(XQMap.class));
+    check(func.args(" <_>A</_>", 0), "{\"A\":0}", empty(CElem.class), root(XQTrieMap.class));
 
     error("exists(" + func.args(" ()", 2) + ')', EMPTYFOUND);
     error("exists(" + func.args(" (1, 2)", 2) + ')', SEQFOUND_X);
@@ -262,8 +262,8 @@ public final class MapModuleTest extends SandboxTest {
     final Function func = _MAP_MERGE;
     final Str[] keys = { Str.get("DENW21AL100077Hs"), Str.get("DENW21AL100076i5"),
         Str.get("DENW21AL100076hT") };
-    assertEquals(keys[0].hash(), keys[1].hash());
-    assertEquals(keys[1].hash(), keys[2].hash());
+    assertEquals(keys[0].hashCode(), keys[1].hashCode());
+    assertEquals(keys[1].hashCode(), keys[2].hashCode());
 
     final String mapAB = Util.info("map { '%': %, '%': % }", keys[0], 1, keys[1], 1);
     final String mapABC = Util.info("map { '%': %, '%': %, '%': % }",
@@ -340,8 +340,8 @@ public final class MapModuleTest extends SandboxTest {
 
     query(func.args(" map { xs:time('01:01:01'): 'b' }", "xs:time('01:01:02+01:00')", 1));
 
-    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6),
-        "{3:4,\"1\":2,\"5\":6}", empty(CElem.class));
+    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6) + "?* => sort()",
+        "2\n4\n6", empty(CElem.class));
 
     query("deep-equal(" + func.args(" map { 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
   }

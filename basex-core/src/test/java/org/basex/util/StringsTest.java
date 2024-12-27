@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class StringsTest {
+public final class StringsTest {
   /** Test. */
   @Test public void capitalize() {
     assertEquals("", Strings.capitalize(""));

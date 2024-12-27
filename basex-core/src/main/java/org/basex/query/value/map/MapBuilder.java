@@ -1,6 +1,7 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -14,7 +15,22 @@ import org.basex.util.*;
  */
 public final class MapBuilder {
   /** Map. */
-  private XQMap map = XQMap.empty();
+  private final ItemValueMap map;
+
+  /**
+   * Constructor.
+   */
+  public MapBuilder() {
+    this(Array.INITIAL_CAPACITY);
+  }
+
+  /**
+   * Constructor with initial capacity.
+   * @param capacity initial capacity (will be resized to a power of two)
+   */
+  public MapBuilder(final long capacity) {
+    map = new ItemValueMap(capacity);
+  }
 
   /**
    * Adds a key/value pair to the map.
@@ -24,7 +40,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final Item key, final Value value) throws QueryException {
-    map = map.put(key, value);
+    map.put(key, value);
     return this;
   }
 
@@ -95,13 +111,13 @@ public final class MapBuilder {
   }
 
   /**
-   * Checks if the given key exists.
+   * Returns the value for the specified key.
    * @param key key to look for
-   * @return result of check
+   * @return value, or {@code null} if nothing was found
    * @throws QueryException query exception
    */
-  public boolean contains(final Item key) throws QueryException {
-    return map.contains(key);
+  public Value get(final Item key) throws QueryException {
+    return map.get(key);
   }
 
   /**
@@ -109,9 +125,7 @@ public final class MapBuilder {
    * @return map
    */
   public XQMap map() {
-    final XQMap m = map;
-    map = null;
-    return m;
+    return XQMap.map(map);
   }
 
   @Override

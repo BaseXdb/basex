@@ -11,7 +11,7 @@ import org.basex.core.jobs.*;
  * @author Christian Gruen
  * @author gojomo
  */
-public class InterruptibleString implements CharSequence {
+public final class InterruptibleString implements CharSequence {
   /** String. */
   private final String string;
 

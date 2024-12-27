@@ -116,7 +116,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public int hash() {
+  public int hashCode() {
     return 0;
   }
 

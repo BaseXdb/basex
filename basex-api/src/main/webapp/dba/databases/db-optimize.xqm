@@ -97,10 +97,10 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/db-optimize-do')
-  %rest:form-param('name', '{$name}')
-  %rest:form-param('all',  '{$all}')
-  %rest:form-param('opts', '{$opts}')
-  %rest:form-param('lang', '{$lang}')
+  %rest:query-param('name', '{$name}')
+  %rest:query-param('all',  '{$all}')
+  %rest:query-param('opts', '{$opts}')
+  %rest:query-param('lang', '{$lang}')
 function dba:db-optimize-do(
   $name  as xs:string,
   $all   as xs:string?,

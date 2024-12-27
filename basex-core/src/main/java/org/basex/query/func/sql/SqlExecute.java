@@ -126,7 +126,6 @@ public class SqlExecute extends SqlFn {
           }
         }
       };
-
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnAvg extends FnSum {
+public final class FnAvg extends FnSum {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = sum(true, qc);

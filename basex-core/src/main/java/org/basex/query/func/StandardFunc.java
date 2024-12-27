@@ -630,7 +630,7 @@ public abstract class StandardFunc extends Arr {
     final HashMap<String, Value> hm = new HashMap<>();
     final Item item = expr.item(qc, info);
     final XQMap map = item.isEmpty() ? XQMap.empty() : toMap(item);
-    map.apply((key, value) -> {
+    map.forEach((key, value) -> {
       final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key).unique();
       hm.put(string(k), value);
     });

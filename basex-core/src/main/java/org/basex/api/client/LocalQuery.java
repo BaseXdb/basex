@@ -14,7 +14,7 @@ import org.basex.server.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class LocalQuery extends Query {
+public final class LocalQuery extends Query {
   /** Active query listener. */
   private final ServerQuery ql;
 

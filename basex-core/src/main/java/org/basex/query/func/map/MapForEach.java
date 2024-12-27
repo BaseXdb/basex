@@ -48,7 +48,7 @@ public class MapForEach extends StandardFunc {
 
     final HofArgs args = new HofArgs(2);
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value), qc)));
+    map.forEach((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value), qc)));
     return vb.value(this);
   }
 
@@ -71,7 +71,7 @@ public class MapForEach extends StandardFunc {
   }
 
   @Override
-  public int hofIndex() {
+  public final int hofIndex() {
     return 1;
   }
 }

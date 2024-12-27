@@ -29,7 +29,7 @@ public class FnSubsequence extends StandardFunc {
   private static final SeqRange EMPTY = new SeqRange(0, 0);
 
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
+  public final Iter iter(final QueryContext qc) throws QueryException {
     // no range: return empty sequence
     final SeqRange sr = range(qc);
     if(sr == EMPTY) return Empty.ITER;
@@ -82,7 +82,7 @@ public class FnSubsequence extends StandardFunc {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     // no range: return empty sequence
     final SeqRange sr = range(qc);
     if(sr == EMPTY) return Empty.VALUE;
@@ -123,7 +123,7 @@ public class FnSubsequence extends StandardFunc {
    * @return range or {@code null}
    * @throws QueryException query exception
    */
-  SeqRange range(final CompileContext cc) throws QueryException {
+  final SeqRange range(final CompileContext cc) throws QueryException {
     return arg(1) instanceof Value && (!defined(2) || arg(2) instanceof Value) ?
       range(cc.qc) : null;
   }

@@ -569,7 +569,7 @@ public abstract class ANode extends Item {
     if(root == null || type == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
-      private BasicNodeIter iter = root.childIter();
+      private final BasicNodeIter iter = root.childIter();
       private boolean found;
 
       @Override

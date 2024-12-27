@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnVoid extends StandardFunc {
+public final class FnVoid extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr input = arg(0);
@@ -24,7 +24,7 @@ public class FnVoid extends StandardFunc {
 
     // ensure that nondeterministic input will be evaluated
     if(evaluate || input.has(Flag.NDT)) {
-      for(final Iter iter = input.iter(qc); (qc.next(iter)) != null;);
+      for(final Iter iter = input.iter(qc); qc.next(iter) != null;);
     }
     return Empty.VALUE;
   }

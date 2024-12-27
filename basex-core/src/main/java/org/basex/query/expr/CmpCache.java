@@ -64,6 +64,6 @@ public final class CmpCache {
    * Initializes the hash item set.
    */
   private void init() {
-    set = new HashItemSet(true, info);
+    set = new HashItemSet(ItemSet.Mode.EQUAL, info);
   }
 }

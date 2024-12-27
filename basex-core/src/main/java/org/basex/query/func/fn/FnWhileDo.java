@@ -26,7 +26,7 @@ public class FnWhileDo extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected final Expr opt(final CompileContext cc) throws QueryException {
     final boolean until = this instanceof FnDoUntil;
     final int p = until ? 2 : 1, a = until ? 1 : 2;
     final Expr input = arg(0), action = arg(a);

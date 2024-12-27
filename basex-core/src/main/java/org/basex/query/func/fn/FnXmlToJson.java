@@ -19,7 +19,7 @@ import org.basex.util.options.Options.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnXmlToJson extends FnParseJson {
+public final class FnXmlToJson extends FnParseJson {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNodeOrNull(arg(0), qc);

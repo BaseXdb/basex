@@ -17,7 +17,6 @@ public final class MapKeys extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-
     return map.keys();
   }
 

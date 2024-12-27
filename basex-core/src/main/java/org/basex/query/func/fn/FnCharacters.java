@@ -18,9 +18,9 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class FnCharacters extends StandardFunc {
+public final class FnCharacters extends StandardFunc {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
     final byte[] token = toToken(value);
     final int tl = token.length;
@@ -53,7 +53,7 @@ public class FnCharacters extends StandardFunc {
   }
 
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
     return StrSeq.get(value.characters(info));
   }

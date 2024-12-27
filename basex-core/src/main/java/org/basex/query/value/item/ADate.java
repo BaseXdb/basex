@@ -405,7 +405,7 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final int hash() {
+  public final int hashCode() {
     return toSeconds().intValue();
   }
 

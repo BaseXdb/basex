@@ -430,7 +430,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public String toErrorString() {
+  public final String toErrorString() {
     final QueryString qs = new QueryString();
     toString(qs, true);
     return qs.toString();

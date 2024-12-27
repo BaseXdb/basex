@@ -44,7 +44,7 @@ public class MapEntries extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> vb.add(entry(key, value)));
+    map.forEach((key, value) -> vb.add(entry(key, value)));
     return vb.value(this);
   }
 
@@ -56,7 +56,7 @@ public class MapEntries extends StandardFunc {
   }
 
   /**
-   * Creates a map pair.
+   * Returns a single map entry as a new map.
    * @param key key
    * @param value value
    * @return created map entry

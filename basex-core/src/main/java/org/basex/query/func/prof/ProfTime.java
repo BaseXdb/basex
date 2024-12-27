@@ -31,7 +31,7 @@ public class ProfTime extends StandardFunc {
   }
 
   @Override
-  public boolean ddo() {
+  public final boolean ddo() {
     return arg(0).ddo();
   }
 

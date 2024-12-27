@@ -16,9 +16,9 @@ import org.basex.query.value.type.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class MapValues extends StandardFunc {
+public final class MapValues extends StandardFunc {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final BasicIter<Item> keys = map.keys().iter();
 
@@ -39,13 +39,13 @@ public class MapValues extends StandardFunc {
   }
 
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     return map.values(qc);
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) {
     final Type tp = arg(0).seqType().type;
     if(tp instanceof MapType) exprType.assign(((MapType) tp).valueType.with(Occ.ZERO_OR_MORE));
     return this;

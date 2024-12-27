@@ -157,7 +157,7 @@ public final class EnumType implements Type {
   public int hashCode() {
     int h = 0;
     for(final byte[] v : values) {
-      h = (h << 5) - h + Token.hash(v);
+      h = (h << 5) - h + Token.hashCode(v);
     }
     return h;
   }

@@ -13,7 +13,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Leo Woerteler
  */
-public class RegExLexer implements TokenManager, RegExParserConstants {
+public final class RegExLexer implements TokenManager, RegExParserConstants {
   /** The input string. */
   private final byte[] input;
   /** Input position. */

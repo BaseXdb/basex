@@ -152,17 +152,12 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final int hash() {
-    // makes sure the hashing is good for very small and very big numbers
-    final long i = itr();
+  public int hashCode() {
+    // equal values for different numeric types must return identical hash values!
+    final long l = itr();
     final float f = flt();
-
-    // extract fractional part from a finite float
-    final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY || isNaN(f) ? 0 :
-      floatToIntBits(f - i);
-    int h = frac ^ (int) (i ^ i >>> 32);
-
-    // this part ensures better distribution of bits (from java.util.HashMap)
+    // extract fractional part from a finite float; distribute bits to improve hashing
+    int h = floatToRawIntBits(f - l) ^ (int) (l ^ l >>> 32);
     h ^= h >>> 20 ^ h >>> 12;
     return h ^ h >>> 7 ^ h >>> 4;
   }

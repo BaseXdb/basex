@@ -131,7 +131,7 @@ public class FnFoldLeft extends StandardFunc {
   }
 
   @Override
-  public int hofIndex() {
+  public final int hofIndex() {
     return 2;
   }
 }

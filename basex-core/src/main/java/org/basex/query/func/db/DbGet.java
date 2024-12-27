@@ -12,7 +12,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class DbGet extends DbAccess {
+public final class DbGet extends DbAccess {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);

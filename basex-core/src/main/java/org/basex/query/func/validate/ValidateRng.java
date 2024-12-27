@@ -26,7 +26,7 @@ public class ValidateRng extends ValidateFn {
   }
 
   @Override
-  public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
+  public final ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
     return validate(new Validation() {
       @Override
       void validate() throws IOException, QueryException {

@@ -172,6 +172,13 @@ public final class Int extends ANum {
   }
 
   @Override
+  public int hashCode() {
+    final long v = value;
+    final int i = (int) v;
+    return v == i ? i : super.hashCode();
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof Int)) return false;

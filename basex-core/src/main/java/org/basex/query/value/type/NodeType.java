@@ -162,7 +162,7 @@ public enum NodeType implements Type {
    */
   NodeType(final String name, final Type parent, final ID id) {
     this.test = Token.token(name);
-    this.kind = Token.token(name.replace("-node", ""));;
+    this.kind = Token.token(name.replace("-node", ""));
     this.parent = parent;
     this.id = id;
   }

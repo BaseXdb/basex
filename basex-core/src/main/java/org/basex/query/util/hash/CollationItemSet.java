@@ -1,10 +1,10 @@
-package org.basex.query.util.collation;
+package org.basex.query.util.hash;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.hash.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -22,21 +22,11 @@ public final class CollationItemSet implements ItemSet {
   private final DeepEqual deep;
 
   /**
-   * Returns a hash item set.
-   * @param coll collation (can be {@code null})
-   * @param info input info (can be {@code null})
-   * @return item set
-   */
-  public static ItemSet get(final Collation coll, final InputInfo info) {
-    return coll == null ? new HashItemSet(false, info) : new CollationItemSet(coll, info);
-  }
-
-  /**
    * Constructor.
    * @param coll collation
    * @param info input info (can be {@code null})
    */
-  private CollationItemSet(final Collation coll, final InputInfo info) {
+  CollationItemSet(final Collation coll, final InputInfo info) {
     deep = new DeepEqual(info, coll, null);
   }
 

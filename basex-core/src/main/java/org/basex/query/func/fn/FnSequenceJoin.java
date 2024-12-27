@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  */
 public class FnSequenceJoin extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final Value separator = arg(1).value(qc);
 
@@ -31,7 +31,7 @@ public class FnSequenceJoin extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected final Expr opt(final CompileContext cc) {
     final Expr values = arg(0), separator = arg(1);
     final SeqType st = values.seqType(), stSep = separator.seqType();
     if(st.zeroOrOne() || separator == Empty.VALUE) return values;

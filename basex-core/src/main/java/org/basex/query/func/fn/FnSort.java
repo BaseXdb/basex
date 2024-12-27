@@ -164,7 +164,8 @@ public class FnSort extends StandardFunc {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
     Expr expr = this;
     if(mode == Simplify.COUNT) {
       // count(sort(A))  -> count(A)
@@ -231,7 +232,7 @@ public class FnSort extends StandardFunc {
   }
 
   @Override
-  public int hofIndex() {
+  public final int hofIndex() {
     return 2;
   }
 }

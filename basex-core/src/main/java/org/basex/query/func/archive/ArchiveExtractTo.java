@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Christian Gruen
  */
-public class ArchiveExtractTo extends ArchiveFn {
+public final class ArchiveExtractTo extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(arg(0), qc);

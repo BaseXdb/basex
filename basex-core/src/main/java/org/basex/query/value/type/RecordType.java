@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team 2005-24, BSD License
  * @author Gunther Rademacher
  */
-public class RecordType extends MapType implements Iterable<byte[]> {
+public final class RecordType extends MapType implements Iterable<byte[]> {
   /** Pair. */
   public static final RecordType PAIR;
   /** Member. */
@@ -130,8 +130,8 @@ public class RecordType extends MapType implements Iterable<byte[]> {
         }
       }
       if(!extensible) {
-        for(final Item item : map.keys()) {
-          if(!item.instanceOf(AtomType.STRING) || !fields.contains(item.string(null))) return false;
+        for(final Item key : map.keys()) {
+          if(!key.instanceOf(AtomType.STRING) || !fields.contains(key.string(null))) return false;
         }
       }
       return true;
@@ -462,10 +462,13 @@ public class RecordType extends MapType implements Iterable<byte[]> {
         }
         if(!omit) mb.put(key, value);
       }
-      final XQMap map = mb.map();
-      if(!recordType.isExtensible()) return map;
-      final XQMap options = toMap(arg(i), qc);
-      return map.addAll(options, MergeDuplicates.USE_FIRST, qc, ii);
+      if(recordType.isExtensible()) {
+        toMap(arg(i), qc).forEach((k, v) -> {
+          final Value old = mb.get(k);
+          if(old == null) mb.put(k, v);
+        });
+      }
+      return mb.map();
     }
 
     @Override
