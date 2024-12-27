@@ -10,6 +10,7 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -61,15 +62,16 @@ public abstract class CsvConverter extends Job {
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
+   * @param ii input info (can be {@code null})
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public final Item convert(final IO input) throws QueryException, IOException {
+  public final Item convert(final IO input, final InputInfo ii) throws QueryException, IOException {
     init(input.url());
     try(NewlineInput in = new NewlineInput(input)) {
       nli = in.encoding(copts.get(CsvParserOptions.ENCODING));
-      new CsvParser(in, copts, this).parse();
+      new CsvParser(in, copts, this).parse(ii);
     }
     return finish();
   }

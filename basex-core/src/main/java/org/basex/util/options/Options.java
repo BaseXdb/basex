@@ -817,11 +817,14 @@ public class Options implements Iterable<Option<?>> {
       if(item == null) throw expected.apply(AtomType.INTEGER);
       result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
-      if(item == null) throw expected.apply(AtomType.STRING);
       result = serialize(value, info);
     } else if(option instanceof StringsOption) {
       final StringList list = new StringList();
       for(final Item it :  value) list.add(serialize(it, info));
+      result = list.finish();
+    } else if(option instanceof NumbersOption) {
+      final IntList list = new IntList();
+      for(final Item it :  value) list.add(Strings.toInt(string(it.string(info))));
       result = list.finish();
     } else if(option instanceof EnumOption) {
       final String string = normalize(serialize(value, info));

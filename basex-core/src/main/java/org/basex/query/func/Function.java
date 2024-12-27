@@ -157,7 +157,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), INTEGER_O),
   /** XQuery function. */
   CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value[,options])",
-      params(STRING_ZO, MAP_ZO), ARRAY_ZM, flag(CNS, HOF)),
+      params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
   /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
       params(), DATE_O, flag(NDT)),
@@ -481,7 +481,7 @@ public enum Function implements AFunction {
       params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
   PARSE_CSV(FnParseCsv::new, "parse-csv(value[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O, flag(CNS, HOF)),
+      params(STRING_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate::new, "parse-ietf-date(value)",
       params(STRING_ZO), DATE_TIME_ZO),

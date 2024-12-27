@@ -71,6 +71,8 @@ public final class SeqType {
   public static final SeqType INTEGER_ZO = INTEGER.seqType(ZERO_OR_ONE);
   /** Zero or more integers. */
   public static final SeqType INTEGER_ZM = INTEGER.seqType(ZERO_OR_MORE);
+  /** Positive integer. */
+  public static final SeqType POSITIVE_INTEGER_O = POSITIVE_INTEGER.seqType();
   /** Zero or more bytes. */
   public static final SeqType BYTE_ZM = BYTE.seqType(ZERO_OR_MORE);
 
@@ -80,6 +82,8 @@ public final class SeqType {
   public static final SeqType STRING_ZO = STRING.seqType(ZERO_OR_ONE);
   /** Zero or more strings. */
   public static final SeqType STRING_ZM = STRING.seqType(ZERO_OR_MORE);
+  /** One or more strings. */
+  public static final SeqType STRING_OM = STRING.seqType(ONE_OR_MORE);
   /** Zero or one NCName. */
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
   /** Single language. */

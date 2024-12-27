@@ -5,7 +5,10 @@ import java.io.*;
 import org.basex.build.csv.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * A CSV parser generating parse events similar to a SAX XML parser.
@@ -32,21 +35,31 @@ public final class CsvParser {
   private final boolean quotes;
   /** Trim whitespace. */
   private final boolean trimWhitespace;
+  /** Trim whitespace. */
+  private final boolean trimRows;
   /** Strict quoting. */
   private final boolean strictQuoting;
+  /** Select columns. */
+  private final int[] selectColumns;
 
   /** First entry of a line. */
   private boolean first = true;
+  /** Number of fields in first row. */
+  private int rowSize = -1;
   /** Data mode. */
   private boolean data;
+  /** Fields of the current row. */
+  private final TokenList fields = new TokenList();
 
   /**
    * Constructor.
    * @param input input
    * @param opts options
    * @param conv converter
+   * @throws QueryException query exception
    */
-  public CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv) {
+  public CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv)
+      throws QueryException {
     this.input = input;
     this.conv = conv;
     header = opts.get(CsvOptions.HEADER);
@@ -56,7 +69,12 @@ public final class CsvParser {
     quotes = opts.get(CsvOptions.QUOTES);
     backslashes = opts.get(CsvOptions.BACKSLASHES);
     trimWhitespace = opts.get(CsvOptions.TRIM_WHITSPACE);
+    trimRows = opts.get(CsvOptions.TRIM_ROWS);
     strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
+    selectColumns = opts.get(CsvOptions.SELECT_COLUMNS);
+    for(final int sc : selectColumns) {
+      if(sc < 1) throw QueryError.typeError(Int.get(sc), SeqType.POSITIVE_INTEGER_O, null);
+    }
   }
 
   /**
@@ -152,17 +170,24 @@ public final class CsvParser {
    */
   private void record(final TokenBuilder entry, final boolean lastRow, final boolean lastField)
       throws IOException {
-    byte[] field = entry.next();
-    if(trimWhitespace) field = Token.trim(field);
-    final boolean record = !lastRow || field.length > 0;
-    if(record && first && data) conv.record();
-    if(record || !first) {
-      if(first && lastField && field.length == 0) return;
-      if(data) {
-        conv.entry(field);
-      } else {
-        conv.header(field);
+    final byte[] next = entry.next();
+    final byte[] field = trimWhitespace ? Token.trim(next) : next;
+    if(field.length > 0 || !(first && lastField)) fields.add(field);
+    if(lastField && !(lastRow && fields.isEmpty())) {
+      if(data) conv.record();
+      if(rowSize == -1) rowSize = fields.size();
+      final int n = selectColumns.length != 0 ? selectColumns.length
+                                              : trimRows ? rowSize : fields.size();
+      for(int i = 0; i < n; ++i) {
+        final int index = selectColumns.length != 0 ? selectColumns[i] - 1 : i;
+        final byte[] f = index < fields.size() ? fields.get(index) : Token.EMPTY;
+        if(data) {
+          conv.entry(f);
+        } else {
+          conv.header(f);
+        }
       }
+      fields.reset();
     }
   }
 }

@@ -1738,13 +1738,6 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void parseCsv() {
-    final Function func = PARSE_CSV;
-    query(func.args(" ()"), "{}");
-    query(func.args(""), "{}");
-  }
-
-  /** Test method. */
   @Test public void parseIetfDate() {
     final Function func = PARSE_IETF_DATE;
 

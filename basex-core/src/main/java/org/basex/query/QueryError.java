@@ -603,6 +603,8 @@ public enum QueryError {
   CSV_SINGLECHAR_X_X(FOCV, 2, "The value of % is not a single character: %."),
   /** Error code. */
   CSV_DELIMITER_X(FOCV, 3, "Duplicate CSV delimiter error: %."),
+  /** Error code. */
+  CSV_COLUMNNAME_X(FOCV, 4, "Argument supplied is not a known column name: %."),
 
   /** Error code. */
   IDDOC(FODC, 1, "Specified node has no document node as root."),

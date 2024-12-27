@@ -37,6 +37,10 @@ public class CsvOptions extends Options {
   public static final BooleanOption TRIM_WHITSPACE = new BooleanOption("trim-whitespace", false);
   /** Option: strict quoting. */
   public static final BooleanOption STRICT_QUOTING = new BooleanOption("strict-quoting", false);
+  /** Option: trim-rows. */
+  public static final BooleanOption TRIM_ROWS = new BooleanOption("trim-rows", false);
+  /** Option: select-columns. */
+  public static final NumbersOption SELECT_COLUMNS = new NumbersOption("select-columns");
 
   /** CSV formats. */
   public enum CsvFormat {

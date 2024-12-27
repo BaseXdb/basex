@@ -27,29 +27,22 @@ public class FnCsvToArrays extends Parse {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final byte[] value = toTokenOrNull(arg(0), qc);
-    return value != null ? parse(new IOContent(value), qc) : Empty.VALUE;
-  }
-
-  /**
-   * Parses the input and creates an XML document.
-   * @param io input data
-   * @param qc query context
-   * @return node
-   * @throws QueryException query exception
-   */
-  protected final Value parse(final IO io, final QueryContext qc) throws QueryException {
+    if(value == null) return Empty.VALUE;
+    final IO io = new IOContent(value);
     final CsvToArraysOptions options = toOptions(arg(1), new CsvToArraysOptions(), qc);
     options.validate(info);
+
+    final CsvParserOptions cpo = new CsvParserOptions();
+    cpo.set(CsvOptions.SEPARATOR, options.get(CsvToArraysOptions.FIELD_DELIMITER));
+    cpo.set(CsvOptions.ROW_DELIMITER, options.get(CsvToArraysOptions.ROW_DELIMITER));
+    cpo.set(CsvOptions.QUOTE_CHARACTER, options.get(CsvToArraysOptions.QUOTE_CHARACTER));
+    cpo.set(CsvOptions.TRIM_WHITSPACE, options.get(CsvToArraysOptions.TRIM_WHITESPACE));
+    cpo.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
+    cpo.set(CsvOptions.QUOTES, true);
+    cpo.set(CsvOptions.STRICT_QUOTING, true);
+
     try {
-      CsvParserOptions cpo = new CsvParserOptions();
-      cpo.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
-      cpo.set(CsvOptions.SEPARATOR, options.get(CsvToArraysOptions.FIELD_DELIMITER));
-      cpo.set(CsvOptions.ROW_DELIMITER, options.get(CsvToArraysOptions.ROW_DELIMITER));
-      cpo.set(CsvOptions.QUOTE_CHARACTER, options.get(CsvToArraysOptions.QUOTE_CHARACTER));
-      cpo.set(CsvOptions.TRIM_WHITSPACE, options.get(CsvToArraysOptions.TRIM_WHITESPACE));
-      cpo.set(CsvOptions.QUOTES, true);
-      cpo.set(CsvOptions.STRICT_QUOTING, true);
-      XQMap map = (XQMap) CsvConverter.get(cpo).convert(io, info);
+      final XQMap map = (XQMap) CsvConverter.get(cpo).convert(io, info);
       return map.get(CsvXQueryConverter.RECORDS);
     } catch(final IOException ex) {
       throw CSV_ERROR_X.get(info, ex);
