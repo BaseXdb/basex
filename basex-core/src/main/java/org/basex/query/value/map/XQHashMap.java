@@ -86,11 +86,12 @@ public final class XQHashMap extends XQMap {
     for(int i = 1; i <= is; i++) {
       final Item key = ivm.key(i), key2 = ivm2.key(i);
       final Value value = ivm.value(i), value2 = ivm2.value(i);
-      // no success: call fallback
-      if(!(deep != null ?
-        key.atomicEqual(key2) && deep.equal(value, value2) :
-        key.equals(key2) && value.equals(value2)
-      )) return deepEq(map, deep);
+      if(deep != null) {
+        // different order: call fallback
+        if(!(key.atomicEqual(key2) && deep.equal(value, value2))) return deepEq(map, deep);
+      } else {
+        if(!(key.equals(key2) && value.equals(value2))) return false;
+      }
     }
     return true;
   }

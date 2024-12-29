@@ -189,7 +189,7 @@ public abstract class Item extends Value {
    * Compares items for deep equality.
    * Called by {@link DeepEqual}.
    * @param item item to be compared
-   * @param deep comparator (can be {@code null})
+   * @param deep comparator ({@code null} if called by {@link FItem#equals(Object)})
    * @return result of check
    * @throws QueryException query exception
    */
