@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native double values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DoubleList extends ElementList {

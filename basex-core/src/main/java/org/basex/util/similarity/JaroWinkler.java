@@ -6,7 +6,7 @@ package org.basex.util.similarity;
  * <p>The implementation has been inspired by the Apache Commons Text algorithms
  * (https://commons.apache.org/proper/commons-text/).</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JaroWinkler {

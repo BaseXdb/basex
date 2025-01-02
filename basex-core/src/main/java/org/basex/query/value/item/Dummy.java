@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * Dummy item (only used at compile time).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Dummy extends Value {

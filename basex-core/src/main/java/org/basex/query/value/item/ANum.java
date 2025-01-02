@@ -14,7 +14,7 @@ import org.basex.util.*;
  * Abstract super class for all numeric items.
  * Useful for removing exceptions and unifying hash values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class ANum extends Item {

@@ -20,7 +20,7 @@ import org.basex.util.options.*;
  * Next, the instance of this class will be passed on to all operations, as it organizes concurrent
  * data access, ensuring that no job will concurrently write to the same data instances.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Context {

@@ -3,7 +3,7 @@
  *
  * Documentation: https://docs.basex.org/wiki/Clients
  *
- * (C) BaseX Team 2005-24, BSD License
+ * (C) BaseX Team, BSD License
  */
 using System;
 using System.Diagnostics;

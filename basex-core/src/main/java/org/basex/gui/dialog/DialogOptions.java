@@ -10,7 +10,7 @@ import org.basex.gui.layout.*;
 /**
  * Database options dialog.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DialogOptions extends BaseXBack {

@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Full-text cases.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum FTCase {

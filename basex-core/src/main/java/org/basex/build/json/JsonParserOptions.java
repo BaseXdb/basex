@@ -6,7 +6,7 @@ import org.basex.util.options.*;
 /**
  * Options for parsing JSON documents.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JsonParserOptions extends JsonOptions {

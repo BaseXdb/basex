@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Update primitive for the {@link Function#_DB_CREATE} function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 public final class DBCreate extends NameUpdate {

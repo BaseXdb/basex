@@ -19,7 +19,7 @@ import org.basex.util.log.*;
  * This is the starter class for running the database server. It handles
  * concurrent requests from multiple users.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */

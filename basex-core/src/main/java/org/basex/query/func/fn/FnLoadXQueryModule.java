@@ -28,7 +28,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class FnLoadXQueryModule extends Parse {

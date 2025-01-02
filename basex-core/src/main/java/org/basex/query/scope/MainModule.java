@@ -15,7 +15,7 @@ import org.basex.query.var.*;
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public class MainModule extends AModule {

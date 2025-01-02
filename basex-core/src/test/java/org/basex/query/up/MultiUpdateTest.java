@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 /**
  * Test for multiple targets in update expressions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MultiUpdateTest extends SandboxTest {

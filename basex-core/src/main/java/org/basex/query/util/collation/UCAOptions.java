@@ -16,7 +16,7 @@ import com.ibm.icu.util.*;
 /**
  * UCA collation options.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class UCAOptions extends CollationOptions {

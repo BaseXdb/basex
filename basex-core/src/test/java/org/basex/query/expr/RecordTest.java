@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for XQuery records.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class RecordTest extends SandboxTest {

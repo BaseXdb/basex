@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * This class is a wrapper for outputting texts with specific encodings.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class EncoderOutput extends PrintOutput {

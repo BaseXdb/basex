@@ -3,7 +3,7 @@ package org.basex.query;
 /**
  * Predicate that raises query exceptions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @param <T> the type of the first argument to the predicate
  * @param <U> the type of the second argument the predicate

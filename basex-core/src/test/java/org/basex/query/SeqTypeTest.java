@@ -19,7 +19,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for the {@link SeqType} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class SeqTypeTest {

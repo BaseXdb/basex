@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- |
 -- Module      : BaseXClient
--- Copyright   : (C) BaseX Team 2005-24
+-- Copyright   : (C) BaseX Team
 -- License     : BSD
 --
 -- Maintainer  : leo@woerteler.de

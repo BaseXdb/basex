@@ -20,7 +20,7 @@ import jakarta.servlet.http.*;
  * the source is integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

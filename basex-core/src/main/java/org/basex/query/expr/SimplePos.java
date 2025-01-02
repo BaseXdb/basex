@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Simple position range check.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class SimplePos extends Arr implements CmpPos {

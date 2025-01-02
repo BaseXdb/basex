@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * This class caches sizes and offsets from index results.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 public final class IndexCache {

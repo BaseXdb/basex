@@ -12,7 +12,7 @@ import org.basex.server.*;
 /**
  * This class offers methods to locally execute database commands.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class LocalSession extends Session {

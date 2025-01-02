@@ -12,7 +12,7 @@ import org.basex.util.options.*;
 /**
  * Query-specific database options.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class QueryOptions {

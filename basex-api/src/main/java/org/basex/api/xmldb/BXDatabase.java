@@ -12,7 +12,7 @@ import org.xmldb.api.base.Collection;
 /**
  * Implementation of the Database Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BXDatabase implements Database {

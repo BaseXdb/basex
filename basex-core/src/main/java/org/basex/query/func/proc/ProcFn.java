@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Process function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class ProcFn extends StandardFunc {

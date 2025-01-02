@@ -11,7 +11,7 @@ import com.bradmcevoy.http.*;
 /**
  * WebDAV servlet.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 public final class WebDAVServlet extends BaseXServlet {

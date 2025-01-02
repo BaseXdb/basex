@@ -10,7 +10,7 @@ import org.basex.util.options.*;
 /**
  * This enumeration lists available index types.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum IndexType {

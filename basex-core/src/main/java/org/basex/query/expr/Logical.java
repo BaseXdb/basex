@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Logical expression, extended by {@link And} and {@link Or}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Logical extends Arr {

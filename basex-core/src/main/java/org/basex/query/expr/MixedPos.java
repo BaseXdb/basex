@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Mixed position checks.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class MixedPos extends Single implements CmpPos {

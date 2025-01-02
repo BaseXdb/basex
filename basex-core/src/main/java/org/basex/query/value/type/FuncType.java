@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * XQuery 3.0 function types.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class FuncType extends FType {
