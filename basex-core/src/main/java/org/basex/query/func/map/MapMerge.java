@@ -45,29 +45,33 @@ public final class MapMerge extends StandardFunc {
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = arg(0).iter(qc);
     final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
-
     final Duplicates merge = options.get(MergeOptions.DUPLICATES);
-    final MapBuilder mb = new MapBuilder();
+
+    final Item first = qc.next(maps);
+    if(first == null) return XQMap.empty();
+
+    XQMap map = toMap(first);
     for(Item item; (item = qc.next(maps)) != null;) {
-      toMap(item).forEach((k, v) -> {
-        final Value old = mb.get(k);
+      final XQMap newMap = toMap(item);
+      for(final Item key : newMap.keys()) {
+        final Value value = newMap.get(key), old = map.get(key, false);
         switch(merge) {
           case REJECT:
-            if(old != null) throw MERGE_DUPLICATE_X.get(info, k);
-            mb.put(k, v);
+            if(old != null) throw MERGE_DUPLICATE_X.get(info, key);
+            map = map.put(key, value);
             break;
           case USE_LAST:
-            mb.put(k, v);
+            map = map.put(key, value);
             break;
           case COMBINE:
-            mb.put(k, old == null ? v : ValueBuilder.concat(old, v, qc));
+            map = map.put(key, old == null ? value : ValueBuilder.concat(old, value, qc));
             break;
           default:
-            if(old == null) mb.put(k, v);
+            if(old == null) map = map.put(key, value);
         }
-      });
+      }
     }
-    return mb.map();
+    return map;
   }
 
   @Override
