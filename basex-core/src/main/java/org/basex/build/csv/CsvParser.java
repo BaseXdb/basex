@@ -37,7 +37,7 @@ public final class CsvParser extends SingleParser {
   protected void parse() throws IOException {
     csv = pushJob(new CsvBuilder(copts, builder));
     try {
-      csv.convert(source, null);
+      csv.convert(source);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     } finally {

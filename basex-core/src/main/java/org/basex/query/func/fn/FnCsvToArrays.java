@@ -80,7 +80,6 @@ public class FnCsvToArrays extends Parse {
       parserOpts.set(CsvOptions.QUOTE_CHARACTER, get(QUOTE_CHARACTER));
       parserOpts.set(CsvOptions.TRIM_WHITESPACE, get(TRIM_WHITESPACE));
       parserOpts.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
-      parserOpts.set(CsvOptions.QUOTES, true);
       parserOpts.set(CsvOptions.STRICT_QUOTING, true);
       return parserOpts;
     }

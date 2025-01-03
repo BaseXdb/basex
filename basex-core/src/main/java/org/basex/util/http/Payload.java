@@ -310,7 +310,7 @@ public final class Payload {
     } else if(type.isCSV()) {
       final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
       opts.assign(type);
-      return CsvConverter.get(opts).convert(io, null);
+      return CsvConverter.get(opts).convert(io);
     } else if(type.is(MediaType.TEXT_HTML)) {
       final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
       opts.assign(type);

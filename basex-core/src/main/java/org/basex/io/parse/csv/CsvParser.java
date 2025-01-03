@@ -35,7 +35,7 @@ public final class CsvParser {
   private final boolean quotes;
   /** Trim whitespace. */
   private final boolean trimWhitespace;
-  /** Trim whitespace. */
+  /** Trim rows. */
   private final boolean trimRows;
   /** Strict quoting. */
   private final boolean strictQuoting;
@@ -66,11 +66,11 @@ public final class CsvParser {
     separator = opts.separator();
     rowDelimiter = opts.rowDelimiter();
     quoteCharacter = opts.quoteCharacter();
-    quotes = opts.get(CsvOptions.QUOTES);
+    strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
+    quotes = strictQuoting || opts.get(CsvOptions.QUOTES);
     backslashes = opts.get(CsvOptions.BACKSLASHES);
     trimWhitespace = opts.get(CsvOptions.TRIM_WHITESPACE);
     trimRows = opts.get(CsvOptions.TRIM_ROWS);
-    strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
     selectColumns = opts.get(CsvOptions.SELECT_COLUMNS);
     for(final int sc : selectColumns) {
       if(sc < 1) throw QueryError.typeError(Int.get(sc), SeqType.POSITIVE_INTEGER_O, null);
@@ -109,11 +109,12 @@ public final class CsvParser {
         }
         add(entry, ch);
       } else if(ch == quoteCharacter) {
-        if(quotes) {
-          if(strictQuoting && !entry.isEmpty()) throw QueryError.CSV_QUOTING_X.get(ii,
-              entry + new String(Character.toChars(quoteCharacter)));
+        if(quotes && entry.isEmpty()) {
           // parse quote
           quoted = true;
+        } else if (strictQuoting) {
+          throw QueryError.CSV_QUOTING_X.get(ii,
+              entry + new String(Character.toChars(quoteCharacter)));
         } else {
           ch = input.read();
           if(ch != quoteCharacter || backslashes) add(entry, quoteCharacter);

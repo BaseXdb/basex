@@ -127,7 +127,7 @@ final class DialogCsvParser extends DialogParser {
       lax.setEnabled(head && copts.get(CsvOptions.FORMAT) == CsvFormat.DIRECT);
       skipEmpty.setEnabled(head);
 
-      final Item item = CsvConverter.get(copts).convert(new IOContent(EXAMPLE), null);
+      final Item item = CsvConverter.get(copts).convert(new IOContent(EXAMPLE));
       example.setText(example(MainParser.CSV.name(), EXAMPLE, item));
     } catch(final QueryException | IOException ex) {
       example.setText(error(ex));

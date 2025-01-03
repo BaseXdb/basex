@@ -35,7 +35,7 @@ public class CsvOptions extends Options {
   public static final StringOption QUOTE_CHARACTER = new StringOption("quote", "\"");
   /** Option: trim whitespace. */
   public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
-  /** Option: strict quoting. */
+  /** Option: strict quoting (implies QUOTES). */
   public static final BooleanOption STRICT_QUOTING = new BooleanOption("strict-quoting", false);
   /** Option: trim-rows. */
   public static final BooleanOption TRIM_ROWS = new BooleanOption("trim-rows", false);
@@ -111,11 +111,7 @@ public class CsvOptions extends Options {
     for(final CsvSep s : CsvSep.values()) {
       if(sep.equals(s.toString())) return s.sep;
     }
-    if(sep.codePointCount(0, sep.length()) == 1) {
-      final int cp = sep.codePointAt(0);
-      if(XMLToken.valid(cp)) return cp;
-    }
-    return -1;
+    return validate(sep);
   }
 
   /**
@@ -123,12 +119,7 @@ public class CsvOptions extends Options {
    * @return separator
    */
   public int rowDelimiter() {
-    final String rd = get(ROW_DELIMITER);
-    if(rd.codePointCount(0, rd.length()) == 1) {
-      final int cp = rd.codePointAt(0);
-      if(XMLToken.valid(cp)) return cp;
-    }
-    return -1;
+    return validate(get(ROW_DELIMITER));
   }
 
   /**
@@ -136,9 +127,17 @@ public class CsvOptions extends Options {
    * @return separator
    */
   public int quoteCharacter() {
-    final String q = get(QUOTE_CHARACTER);
-    if(q.codePointCount(0, q.length()) == 1) {
-      final int cp = q.codePointAt(0);
+    return validate(get(QUOTE_CHARACTER));
+  }
+
+  /**
+   * Validates a single code point passed as a string.
+   * @param single single character string
+   * @return code point or {@code -1}
+   */
+  private int validate(final String single) {
+    if(single.codePointCount(0, single.length()) == 1) {
+      final int cp = single.codePointAt(0);
       if(XMLToken.valid(cp)) return cp;
     }
     return -1;

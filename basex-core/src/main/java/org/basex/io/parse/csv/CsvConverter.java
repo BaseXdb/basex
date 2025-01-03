@@ -62,6 +62,17 @@ public abstract class CsvConverter extends Job {
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
+   * @return result
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  public final Item convert(final IO input) throws QueryException, IOException {
+    return convert(input, null);
+  }
+
+  /**
+   * Converts the specified input to an XQuery value.
+   * @param input input
    * @param ii input info (can be {@code null})
    * @return result
    * @throws QueryException query exception
