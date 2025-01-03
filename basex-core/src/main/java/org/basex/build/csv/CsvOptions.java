@@ -34,7 +34,7 @@ public class CsvOptions extends Options {
   /** Option: quote character. */
   public static final StringOption QUOTE_CHARACTER = new StringOption("quote", "\"");
   /** Option: trim whitespace. */
-  public static final BooleanOption TRIM_WHITSPACE = new BooleanOption("trim-whitespace", false);
+  public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
   /** Option: strict quoting. */
   public static final BooleanOption STRICT_QUOTING = new BooleanOption("strict-quoting", false);
   /** Option: trim-rows. */

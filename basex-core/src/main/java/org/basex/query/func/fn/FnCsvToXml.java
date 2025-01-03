@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public class FnCsvToXml extends Parse {
@@ -35,7 +35,7 @@ public class FnCsvToXml extends Parse {
       if(options.columnNames != null) {
         for(final Item columnName : options.columnNames) {
           final byte[] token = toZeroToken(columnName, qc);
-          converter.header(names.add(token) ? token : Token.EMPTY);
+          converter.header(names.add(token) ? token : Token.EMPTY, false);
         }
       }
       return converter.convert(new IOContent(value), ii);

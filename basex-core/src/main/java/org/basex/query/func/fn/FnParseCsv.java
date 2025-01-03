@@ -25,7 +25,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public class FnParseCsv extends Parse {
@@ -38,8 +38,22 @@ public class FnParseCsv extends Parse {
     final CsvParserOptions parserOpts = options.toCsvParserOptions();
     try {
       final XQMap map = (XQMap) CsvConverter.get(parserOpts).convert(new IOContent(value), ii);
-      final Value columns = options.columnNames != null
-          ? options.columnNames : map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
+      final Value columns;
+      if(options.columnNames != null) {
+        columns = options.columnNames;
+      } else {
+        final Value names = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
+        if(parserOpts.get(CsvOptions.TRIM_WHITESPACE)) {
+          columns = names;
+        }
+        else {
+          final ValueBuilder vb = new ValueBuilder(qc);
+          for(final Item col : names) {
+            vb.add(Str.get(Token.trim(toZeroToken(col, qc))));
+          };
+          columns = vb.value();
+        }
+      }
       final MapBuilder columnIndexBuilder = new MapBuilder();
       int i = 0;
       for(final Item col : columns) {
@@ -156,7 +170,7 @@ public class FnParseCsv extends Parse {
       super.validate(ii);
       final Value header = get(HEADER);
       if(BOOLEAN_O.instance(header)) extractHeader = toBoolean((Item) header, ii);
-      else if(STRING_OM.instance(header)) columnNames = header;
+      else if(STRING_ZM.instance(header)) columnNames = header;
       else throw typeError(header, STRING_OM, ii);
     }
 

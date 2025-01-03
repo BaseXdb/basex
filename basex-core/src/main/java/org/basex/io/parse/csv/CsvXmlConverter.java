@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * This class converts CSV data to XML according to the rules of fn:csv-to-xml.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class CsvXmlConverter extends CsvConverter {
@@ -52,7 +52,16 @@ public final class CsvXmlConverter extends CsvConverter {
 
   @Override
   public void header(final byte[] value) {
-    headers.add(shared.token(value));
+    header(value, true);
+  }
+
+  /**
+   * Adds a new header.
+   * @param value header value
+   * @param trim whether to trim the header value
+   */
+  public void header(final byte[] value, final boolean trim) {
+    headers.add(shared.token(trim ? Token.trim(value) : value));
   }
 
   @Override

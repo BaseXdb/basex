@@ -395,6 +395,164 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void csvToArrays() {
+    final Function func = CSV_TO_ARRAYS;
+
+    // Handling trivial input:
+    query(func.args(" ()"), "");
+    query(func.args(""), "");
+    query(func.args(" char('\\n')"), "[]");
+    query(func.args(" ' '", " { 'trim-whitespace': true() }"), "");
+    query(func.args(" ' '", " { 'trim-whitespace': false() }"), "[\" \"]");
+    query(func.args(" ` {char('\\n')}`", " { 'trim-whitespace': true() }"), "[]");
+    query(func.args(" ` {char('\\n')}`", " { 'trim-whitespace': false() }"), "[\" \"]");
+    query(func.args(" `{char('\\n')} `", " { 'trim-whitespace': true() }"), "[]");
+    query(func.args(" `{char('\\n')} `", " { 'trim-whitespace': false() }"), "[]\n[\" \"]");
+    // Using newline separators:
+    query(func.args(
+        " `name,city{ char('\\n') }` ||\n"
+      + " `Bob,Berlin{ char('\\n') }` ||\n"
+      + " `Alice,Aachen{ char('\\n') }`"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    query(
+        " let $CRLF := `{ char('\\r') }{ char('\\n') }`\n"
+      + "return " + func.args(
+        "  `name,city{ $CRLF }` ||\n"
+      + "  `Bob,Berlin{ $CRLF }` ||\n"
+      + "  `Alice,Aachen{ $CRLF }`\n"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    // Quote handling:
+    query(func.args(
+        " string-join(\n"
+      + "    (`\"name\",\"city\"`, `\"Bob\",\"Berlin\"`, `\"Alice\",\"Aachen\"`),\n"
+      + "    char('\\n')\n"
+      + "  )"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    query(func.args(
+        "  `\"name\",\"city\"{ char('\\n') }` ||\n"
+      + "  `\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"{ char('\\n') }`"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"]");
+    // Non-default record- and field-delimiters:
+    query(func.args("name;city\u00A7Bob;Berlin\u00A7Alice;Aachen",
+      " { \"row-delimiter\": \"\u00A7\", \"field-delimiter\": \";\" }"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    // Non-default quote character:
+    query(func.args(
+        " string-join(\n"
+      + "    (\"|name|,|city|\", \"|Bob|,|Berlin|\"),\n"
+      + "    char('\\n')\n"
+      + "  )", " { \"quote-character\": \"|\" }"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]");
+    // Trimming whitespace in fields:
+    query(func.args(
+        " string-join(\n"
+      + "    (\"name  ,city    \", \"Bob   ,Berlin  \", \"Alice ,Aachen  \"),\n"
+      + "    char('\\n')\n"
+      + "  )", " { \"trim-whitespace\": true() }"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+  }
+
+  /** Test method. */
+  @Test public void csvToXml() {
+    final Function func = CSV_TO_XML;
+    final String queryPrefix =
+        "let $crlf := char('\\r') || char('\\n')\n"
+      + "let $csv-string := `name,city{ $crlf }Bob,Berlin{ $crlf }Alice,Aachen{ $crlf }`\n"
+      + "let $csv-uneven-cols := concat(\n"
+      + "  `date,name,city,amount,currency,original amount,note{ $crlf }`,\n"
+      + "  `2023-07-19,Bob,Berlin,10.00,USD,13.99{ $crlf }`,\n"
+      + "  `2023-07-20,Alice,Aachen,15.00{ $crlf }`,\n"
+      + "  `2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{ $crlf }`\n"
+      + ")\n"
+      + "return ";
+    final String resultTag = "<csv xmlns=\"http://www.w3.org/2005/xpath-functions\">";
+
+    // An empty CSV with default column extraction (false):
+    query(func.args(" ()"), "");
+    query(func.args(""), resultTag + "<rows/></csv>");
+    query(func.args(" char('\\n')"), resultTag + "<rows><row/></rows></csv>");
+    // An empty CSV with header extraction:
+    query(func.args("", " { 'header': true() }"), resultTag + "<rows/></csv>");
+    // An empty CSV with explicit column names:
+    query(func.args("", " { \"header\": (\"name\", \"\", \"city\") }"), resultTag + "<columns>"
+      + "<column>name</column><column/><column>city</column></columns><rows/></csv>");
+    // With defaults for delimiters and quotes, recognizing headers:
+    query(queryPrefix + func.args(" $csv-string", " { 'header': true() }"),
+      resultTag + "<columns><column>name</column><column>city</column></columns><rows><row><field "
+      + "column=\"name\">Bob</field><field column=\"city\">Berlin</field></row><row><field column="
+      + "\"name\">Alice</field><field column=\"city\">Aachen</field></row></rows></csv>");
+    // Filtering columns
+    query(queryPrefix + func.args(" $csv-uneven-cols",
+        " { \"header\": true(), \n"
+      + "  \"select-columns\": (2, 1, 4)\n"
+      + " }"),
+      resultTag + "<columns><column>name</column><column>date</column><column>amount</column>"
+      + "</columns><rows><row><field column=\"name\">Bob</field><field column=\"date\">2023-07-19"
+      + "</field><field column=\"amount\">10.00</field></row><row><field column=\"name\">Alice"
+      + "</field><field column=\"date\">2023-07-20</field><field column=\"amount\">15.00</field>"
+      + "</row><row><field column=\"name\">Charlie</field><field column=\"date\">2023-07-20</field>"
+      + "<field column=\"amount\">15.00</field></row></rows></csv>");
+    // Ragged rows
+    query(queryPrefix + func.args(" $csv-uneven-cols", " { \"header\": true() }"),
+      resultTag + "<columns><column>date</column><column>name</column><column>city</column><column>"
+      + "amount</column><column>currency</column><column>original amount</column><column>note"
+      + "</column></columns><rows><row><field column=\"date\">2023-07-19</field><field column="
+      + "\"name\">Bob</field><field column=\"city\">Berlin</field><field column=\"amount\">10.00"
+      + "</field><field column=\"currency\">USD</field><field column=\"original amount\">13.99"
+      + "</field></row><row><field column=\"date\">2023-07-20</field><field column=\"name\">Alice"
+      + "</field><field column=\"city\">Aachen</field><field column=\"amount\">15.00</field></row>"
+      + "<row><field column=\"date\">2023-07-20</field><field column=\"name\">Charlie</field><field"
+      + " column=\"city\">Celle</field><field column=\"amount\">15.00</field><field column="
+      + "\"currency\">GBP</field><field column=\"original amount\">11.99</field><field column="
+      + "\"note\">cake</field><field>not a lie</field></row></rows></csv>");
+    // Trimming rows to constant width
+    query(queryPrefix + func.args(" $csv-uneven-cols",
+        " { \"header\": true(),\n"
+      + "   \"trim-rows\": true()\n"
+      + " }"),
+      resultTag + "<columns><column>date</column><column>name</column><column>city</column><column>"
+      + "amount</column><column>currency</column><column>original amount</column><column>note"
+      + "</column></columns><rows><row><field column=\"date\">2023-07-19</field><field column="
+      + "\"name\">Bob</field><field column=\"city\">Berlin</field><field column=\"amount\">10.00"
+      + "</field><field column=\"currency\">USD</field><field column=\"original amount\">13.99"
+      + "</field><field column=\"note\"/></row><row><field column=\"date\">2023-07-20</field><field"
+      + " column=\"name\">Alice</field><field column=\"city\">Aachen</field><field column="
+      + "\"amount\">15.00</field><field column=\"currency\"/><field column=\"original amount\"/>"
+      + "<field column=\"note\"/></row><row><field column=\"date\">2023-07-20</field><field column="
+      + "\"name\">Charlie</field><field column=\"city\">Celle</field><field column=\"amount\">15.00"
+      + "</field><field column=\"currency\">GBP</field><field column=\"original amount\">11.99"
+      + "</field><field column=\"note\">cake</field></row></rows></csv>");
+    // Specifying a fixed number of columns
+    query(queryPrefix + func.args(" $csv-uneven-cols",
+        " { \"header\": true(),\n"
+      + "   \"select-columns\": 1 to 6\n"
+      + " }"),
+      resultTag + "<columns><column>date</column><column>name</column><column>city</column><column>"
+      + "amount</column><column>currency</column><column>original amount</column></columns><rows>"
+      + "<row><field column=\"date\">2023-07-19</field><field column=\"name\">Bob</field><field "
+      + "column=\"city\">Berlin</field><field column=\"amount\">10.00</field><field column="
+      + "\"currency\">USD</field><field column=\"original amount\">13.99</field></row><row><field "
+      + "column=\"date\">2023-07-20</field><field column=\"name\">Alice</field><field column="
+      + "\"city\">Aachen</field><field column=\"amount\">15.00</field><field column=\"currency\"/>"
+      + "<field column=\"original amount\"/></row><row><field column=\"date\">2023-07-20</field>"
+      + "<field column=\"name\">Charlie</field><field column=\"city\">Celle</field><field column="
+      + "\"amount\">15.00</field><field column=\"currency\">GBP</field><field column="
+      + "\"original amount\">11.99</field></row></rows></csv>");
+  }
+
+  /** Test method. */
   @Test public void decodeFromUri() {
     final Function func = DECODE_FROM_URI;
 
@@ -1735,6 +1893,164 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void outermost() {
     final Function func = INNERMOST;
     query("let $n := <li/> return " + func.args(" ($n, $n)"), "<li/>");
+  }
+
+  /** Test method. */
+  @Test public void parseCsv() {
+    final Function func = PARSE_CSV;
+    final String display =
+        "let $display := fn($result) {\n"
+      + "   (: tidy up the result for display (function items cannot be properly displayed) :) \n"
+      + "   map:put($result, \"get\", \"(: function :)\")\n"
+      + "}\n";
+
+    // Default delimiters, no column headers:
+    query(display
+      + "let $input := string-join(\n"
+      + "  (\"name,city\", \"Bob,Berlin\", \"Alice,Aachen\"),\n"
+      + "  char('\\n')\n"
+      + ")\n"
+      + "let $result := " + func.args(" $input") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(1, 2),\n"
+      + "  $result?get(2, 2)\n"
+      + ")",
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"name\",\"city\"],[\"Bob\",\"Berlin\"],"
+      + "[\"Alice\",\"Aachen\"]),\"get\":\"(: function :)\"}\n"
+      + "city\n"
+      + "Berlin");
+    // Default delimiters, column headers:
+    query(display
+      + "let $input := string-join(\n"
+      + "  (\"name,city\", \"Bob,Berlin\", \"Alice,Aachen\"),\n"
+      + "  char('\\n')\n"
+      + ")\n"
+      + "let $result := " + func.args(" $input", " { \"header\": true() }") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(1, \"name\"),\n"
+      + "  $result?get(2, \"city\")\n"
+      + ")",
+        "{\"columns\":(\"name\",\"city\"),\"column-index\":{\"name\":1,\"city\":2},\"rows\":("
+      + "[\"Bob\",\"Berlin\"],[\"Alice\",\"Aachen\"]),\"get\":\"(: function :)\"}\n"
+      + "Bob\n"
+      + "Aachen");
+    // Custom delimiters, no column headers:
+    query(display
+      + "let $options := {\n"
+      + "  \"row-delimiter\": \"\u00A7\", \n"
+      + "  \"field-delimiter\": \";\", \n"
+      + "  \"quote-character\": \"|\"\n"
+      + "}\n"
+      + "let $input := \"|name|;|city|\u00A7|Bob|;|Berlin|\u00A7|Alice|;|Aachen|\"\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(3, 1)\n"
+      + ")",
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"name\",\"city\"],[\"Bob\",\"Berlin\"],"
+      + "[\"Alice\",\"Aachen\"]),\"get\":\"(: function :)\"}\n"
+        + "Alice");
+    // Supplied column names:
+    query(display
+      + "let $headers := (\"Person\", \"Location\")\n"
+      + "let $options := { \"header\": $headers, \"row-delimiter\": \";\" }\n"
+      + "let $input := \"Alice,Aachen;Bob,Berlin;\"\n"
+      + "let $parsed-csv := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $parsed-csv => $display(),\n"
+      + "  $parsed-csv?get(2, \"Location\")\n"
+      + ")",
+        "{\"columns\":(\"Person\",\"Location\"),\"column-index\":{\"Person\":1,\"Location\":2},"
+      + "\"rows\":([\"Alice\",\"Aachen\"],[\"Bob\",\"Berlin\"]),\"get\":\"(: function :)\"}\n"
+      + "Berlin");
+    // Filtering columns, with ragged input and header: true()
+    query(display
+      + "let $input := string-join((\n"
+      + "   \"date,name,city,amount,currency,original amount,note\",\n"
+      + "   \"2023-07-19,Bob,Berlin,10.00,USD,13.99\",\n"
+      + "   \"2023-07-20,Alice,Aachen,15.00\",\n"
+      + "   \"2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := {\n"
+      + "  \"header\": true(),\n"
+      + "  \"select-columns\": (2, 1, 4)\n"
+      + "}\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(2, \"amount\")\n"
+      + ")",
+        "{\"columns\":(\"name\",\"date\",\"amount\"),\"column-index\":{\"name\":1,\"date\":2,"
+      + "\"amount\":3},\"rows\":([\"Bob\",\"2023-07-19\",\"10.00\"],[\"Alice\",\"2023-07-20\","
+      + "\"15.00\"],[\"Charlie\",\"2023-07-20\",\"15.00\"]),\"get\":\"(: function :)\"}\n"
+      + "15.00");
+    // Filtering columns, with supplied column map
+    query(display
+      + "let $input := string-join((\n"
+      + "  \"2023-07-20,Alice,Aachen,15.00\",\n"
+      + "  \"2023-07-19,Bob,Berlin,10.00,USD,13.99\",\n"
+      + "  \"2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := { \n"
+      + "  \"header\": ( \"Person\", \"\", \"Amount\" ),\n"
+      + "  \"select-columns\": (2, 1, 4)\n"
+      + "}\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(2, \"Person\"),\n"
+      + "  $result?get(2, \"Amount\")\n"
+      + ")",
+        "{\"columns\":(\"Person\",\"\",\"Amount\"),\"column-index\":{\"Person\":1,\"Amount\":3},"
+      + "\"rows\":([\"Alice\",\"2023-07-20\",\"15.00\"],[\"Bob\",\"2023-07-19\",\"10.00\"],"
+      + "[\"Charlie\",\"2023-07-20\",\"15.00\"]),\"get\":\"(: function :)\"}\n"
+      + "Bob\n"
+      + "10.00");
+    // Specifying the number of columns explicitly, with header: false()
+    query(display
+      + "let $input := string-join((\n"
+      + "  \"date,      name,     amount,    currency,   original amount\",\n"
+      + "  \"2023-07-19,Bob,      10.00,     USD,        13.99\",\n"
+      + "  \"2023-07-20,Alice,    15.00\",\n"
+      + "  \"2023-07-20,Charlie,  15.00,     GBP,        11.99,             extra data\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := {\n"
+      + "  \"header\": false(), \n"
+      + "  \"select-columns\": 1 to 5, \n"
+      + "  \"trim-whitespace\" :true()\n"
+      + "}\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(4, 3)\n"
+      + ")",
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"date\",\"name\",\"amount\",\"currency\","
+      + "\"original amount\"],[\"2023-07-19\",\"Bob\",\"10.00\",\"USD\",\"13.99\"],[\"2023-07-20\","
+      + "\"Alice\",\"15.00\",\"\",\"\"],[\"2023-07-20\",\"Charlie\",\"15.00\",\"GBP\",\"11.99\"]),"
+      + "\"get\":\"(: function :)\"}\n"
+      + "15.00");
+    // Specifying the number of columns with a number and header: true()
+    query(display
+      + "let $input := string-join((\n"
+      + "  \"date,name,city,amount,currency,original amount,note\",\n"
+      + "  \"2023-07-19,Bob,Berlin,10.00,USD,13.99\",\n"
+      + "  \"2023-07-20,Alice,Aachen,15.00\",\n"
+      + "  \"2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := { \"header\": true(), \"select-columns\": 1 to 6 }\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(3, \"original amount\")\n"
+      + ")",
+        "{\"columns\":(\"date\",\"name\",\"city\",\"amount\",\"currency\",\"original amount\"),"
+      + "\"column-index\":{\"date\":1,\"name\":2,\"city\":3,\"amount\":4,\"currency\":5,"
+      + "\"original amount\":6},\"rows\":([\"2023-07-19\",\"Bob\",\"Berlin\",\"10.00\",\"USD\","
+      + "\"13.99\"],[\"2023-07-20\",\"Alice\",\"Aachen\",\"15.00\",\"\",\"\"],[\"2023-07-20\","
+      + "\"Charlie\",\"Celle\",\"15.00\",\"GBP\",\"11.99\"]),\"get\":\"(: function :)\"}\n"
+      + "11.99");
   }
 
   /** Test method. */

@@ -20,7 +20,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public class FnCsvToArrays extends Parse {
@@ -78,7 +78,7 @@ public class FnCsvToArrays extends Parse {
       parserOpts.set(CsvOptions.SEPARATOR, get(FIELD_DELIMITER));
       parserOpts.set(CsvOptions.ROW_DELIMITER, get(ROW_DELIMITER));
       parserOpts.set(CsvOptions.QUOTE_CHARACTER, get(QUOTE_CHARACTER));
-      parserOpts.set(CsvOptions.TRIM_WHITSPACE, get(TRIM_WHITESPACE));
+      parserOpts.set(CsvOptions.TRIM_WHITESPACE, get(TRIM_WHITESPACE));
       parserOpts.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
       parserOpts.set(CsvOptions.QUOTES, true);
       parserOpts.set(CsvOptions.STRICT_QUOTING, true);
