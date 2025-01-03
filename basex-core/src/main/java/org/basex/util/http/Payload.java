@@ -30,7 +30,7 @@ import org.basex.util.list.*;
 /**
  * Helper functions for payload of HTTP response.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Payload {

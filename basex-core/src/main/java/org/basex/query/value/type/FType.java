@@ -12,7 +12,7 @@ import org.basex.util.*;
  * Abstract super class for function types.
  * This class is inherited by {@link MapType}, {@link ArrayType}, and {@link FuncType}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public abstract class FType implements Type {

@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Abstract superclass of all trie nodes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 abstract class TrieNode {

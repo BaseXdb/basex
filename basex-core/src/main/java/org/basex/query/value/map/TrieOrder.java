@@ -1,12 +1,13 @@
 package org.basex.query.value.map;
 
+import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
  * Order of map entries.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class TrieOrder {
@@ -16,10 +17,10 @@ final class TrieOrder {
   private TrieKeys removed;
 
   /**
-   * Returns all keys.
-   * @return keys
+   * Returns a key iterator.
+   * @return iterator
    */
-  Item[] keys() {
+  BasicIter<Item> keys() {
     cleanUp();
     return added.keys();
   }

@@ -2,14 +2,16 @@ package org.basex.query.value.map;
 
 import java.util.*;
 
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
  * Immutable list of map keys.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class TrieKeys implements Iterable<Item> {
@@ -58,11 +60,11 @@ final class TrieKeys implements Iterable<Item> {
   }
 
   /**
-   * Returns all keys.
-   * @return keys
+   * Returns a key iterator.
+   * @return iterator
    */
-  Item[] keys() {
-    return Arrays.copyOf(keys, size);
+  BasicIter<Item> keys() {
+    return ItemSeq.get(keys, size, null).iter();
   }
 
   /**

@@ -27,7 +27,7 @@ import org.xml.sax.*;
 /**
  * Functions for validating documents.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Michael Seiferle
  * @author Marco Lettere (greedy/verbose validation)
  */

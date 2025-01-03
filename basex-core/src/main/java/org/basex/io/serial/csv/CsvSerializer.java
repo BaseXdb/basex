@@ -14,7 +14,7 @@ import org.basex.util.list.*;
 /**
  * This class serializes items as CSV.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class CsvSerializer extends StandardSerializer {

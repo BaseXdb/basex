@@ -6,7 +6,7 @@ import org.basex.query.value.item.*;
 /**
  * Encapsulation of of higher-order functions arguments.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class HofArgs {

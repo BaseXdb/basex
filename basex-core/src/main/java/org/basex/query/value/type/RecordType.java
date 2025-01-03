@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * Type for record tests.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class RecordType extends MapType implements Iterable<byte[]> {

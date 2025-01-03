@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 /**
  * This is an efficient and memory-saving hash map for storing items and values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ItemValueMap extends HashItemSet {

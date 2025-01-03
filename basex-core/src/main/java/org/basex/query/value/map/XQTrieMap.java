@@ -1,14 +1,16 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Hash array mapped trie implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class XQTrieMap extends XQMap {
@@ -53,23 +55,23 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    for(final Item key : keysInternal()) {
+    for(final Item key : keys()) {
       func.accept(key, get(key));
     }
   }
 
   @Override
   public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    for(final Item key : keysInternal()) {
+    for(final Item key : keys()) {
       if(!func.test(key, get(key))) return false;
     }
     return true;
   }
 
   @Override
-  Item[] keysInternal() throws QueryException {
-    final long s = structSize();
-    return s == 0 ? new Item[0] : s == 1 ? new Item[] { ((TrieLeaf) root).key } : order.keys();
+  public BasicIter<Item> keys() throws QueryException {
+    final long size = structSize();
+    return size == 0 ? Empty.ITER : size == 1 ? ((TrieLeaf) root).key.iter() : order.keys();
   }
 
   @Override

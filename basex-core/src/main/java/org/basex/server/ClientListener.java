@@ -21,7 +21,7 @@ import org.basex.util.log.*;
 /**
  * Server-side client session in the client-server architecture.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

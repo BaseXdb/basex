@@ -11,7 +11,7 @@ import org.basex.query.value.*;
 /**
  * Store function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class StoreFn extends StandardFunc {

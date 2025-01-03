@@ -1,15 +1,19 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Unmodifiable hash map implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XQHashMap extends XQMap {
@@ -62,8 +66,17 @@ public final class XQHashMap extends XQMap {
   }
 
   @Override
-  Item[] keysInternal() throws QueryException {
-    return ivm.keys();
+  public BasicIter<Item> keys() throws QueryException {
+    return new BasicIter<>(ivm.size()) {
+      @Override
+      public Item get(final long i) {
+        return ivm.key((int) i + 1);
+      }
+      @Override
+      public Value value(final QueryContext qc, final Expr expr) {
+        return ItemSeq.get(ivm.keys(), (int) size, ((MapType) type).keyType);
+      }
+    };
   }
 
   @Override
@@ -73,11 +86,12 @@ public final class XQHashMap extends XQMap {
     for(int i = 1; i <= is; i++) {
       final Item key = ivm.key(i), key2 = ivm2.key(i);
       final Value value = ivm.value(i), value2 = ivm2.value(i);
-      // no success: call fallback
-      if(!(deep != null ?
-        key.atomicEqual(key2) && deep.equal(value, value2) :
-        key.equals(key2) && value.equals(value2)
-      )) return deepEq(map, deep);
+      if(deep != null) {
+        // different order: call fallback
+        if(!(key.atomicEqual(key2) && deep.equal(value, value2))) return deepEq(map, deep);
+      } else {
+        if(!(key.equals(key2) && value.equals(value2))) return false;
+      }
     }
     return true;
   }

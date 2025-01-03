@@ -1,7 +1,7 @@
 (:~
  : HTML components.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace html = 'dba/html';
 
@@ -45,7 +45,7 @@ declare function html:wrap(
       <meta charset='utf-8'/>
       <title>DBA{ ($header, tail($options?header)) ! (' » ' || .) }</title>
       <meta name='description' content='Database Administration'/>
-      <meta name='author' content='BaseX Team 2005-24, BSD License'/>
+      <meta name='author' content='BaseX Team, BSD License'/>
       <meta name="robots" content="noindex"/>
       <link rel='icon' href='static/basex.svg'/>
       <link rel='stylesheet' type='text/css' href='static/style.css'/>
@@ -121,7 +121,7 @@ declare function html:wrap(
       </table>
       <table width='100%'>{ $rows }</table>
       <hr/>
-      <div id='footer' class='right'><sup>BaseX Team 2005-24, BSD License</sup></div>
+      <div id='footer' class='right'><sup>BaseX Team, BSD License</sup></div>
       <div class='small'/>
       { html:js('buttons();') }
     </body>

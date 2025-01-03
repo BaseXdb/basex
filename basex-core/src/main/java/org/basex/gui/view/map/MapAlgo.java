@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Interface MapAlgorithms need to implement.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Joerg Hauser
  */
 abstract class MapAlgo {

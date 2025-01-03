@@ -24,7 +24,7 @@ import jakarta.servlet.http.*;
 /**
  * Request of an HTTP or WebSocket connection.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RequestContext {

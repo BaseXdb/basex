@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests String <-> Token conversions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class UTF8Test extends SandboxTest {

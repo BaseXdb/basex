@@ -13,7 +13,7 @@ import org.basex.query.*;
  * <p>The parser provides some options, which can be specified via the
  * {@link MainOptions#CSVPARSER} option.</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CsvParser extends SingleParser {

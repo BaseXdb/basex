@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with a single last() predicate.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IterLastStep extends Step {

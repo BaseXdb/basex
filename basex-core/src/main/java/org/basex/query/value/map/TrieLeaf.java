@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * A single binding of a {@link XQMap}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class TrieLeaf extends TrieNode {

@@ -12,6 +12,7 @@ import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
@@ -26,7 +27,7 @@ import org.basex.util.*;
 /**
  * The map item.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class XQMap extends XQStruct {
@@ -282,21 +283,11 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
-   * All keys defined in this map.
-   * @return list of keys
+   * Returns a key iterator.
+   * @return iterator
    * @throws QueryException query exception
    */
-  public final Value keys() throws QueryException {
-    final Item[] items = keysInternal();
-    return ItemSeq.get(items, items.length, ((MapType) type).keyType);
-  }
-
-  /**
-   * Returns all keys.
-   * @return keys
-   * @throws QueryException query exception
-   */
-  abstract Item[] keysInternal() throws QueryException;
+  public abstract BasicIter<Item> keys() throws QueryException;
 
   @Override
   public final Value values(final QueryContext qc) throws QueryException {
@@ -461,7 +452,7 @@ public abstract class XQMap extends XQStruct {
   public final void toXml(final QueryPlan plan) {
     try {
       final long size = structSize();
-      final Value keys = keys();
+      final Value keys = keys().value(null, null);
       final ExprList list = new ExprList();
       final long max = Math.min(size, 5);
       for(long i = 0; i < max; i++) {

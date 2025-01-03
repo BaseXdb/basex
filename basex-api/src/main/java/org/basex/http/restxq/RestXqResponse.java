@@ -23,7 +23,7 @@ import org.basex.util.http.*;
 /**
  * This class creates a new HTTP response.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class RestXqResponse extends WebResponse {

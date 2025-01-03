@@ -29,7 +29,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for all items.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
@@ -189,7 +189,7 @@ public abstract class Item extends Value {
    * Compares items for deep equality.
    * Called by {@link DeepEqual}.
    * @param item item to be compared
-   * @param deep comparator (can be {@code null})
+   * @param deep comparator ({@code null} if called by {@link FItem#equals(Object)})
    * @return result of check
    * @throws QueryException query exception
    */

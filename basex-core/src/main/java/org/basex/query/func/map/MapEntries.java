@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class MapEntries extends StandardFunc {
@@ -20,7 +20,7 @@ public class MapEntries extends StandardFunc {
   public final Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       final XQMap map = toMap(arg(0), qc);
-      final BasicIter<Item> keys = map.keys().iter();
+      final BasicIter<Item> keys = map.keys();
 
       @Override
       public XQMap next() throws QueryException {

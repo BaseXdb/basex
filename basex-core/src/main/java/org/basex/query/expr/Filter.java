@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract value filter expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Filter extends AFilter {

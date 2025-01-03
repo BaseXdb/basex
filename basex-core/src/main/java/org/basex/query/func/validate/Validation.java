@@ -16,7 +16,7 @@ import org.xml.sax.helpers.*;
 /**
  * Abstract validator class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class Validation extends DefaultHandler {

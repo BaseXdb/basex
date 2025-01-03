@@ -23,7 +23,7 @@ import org.basex.util.options.Options.*;
 /**
  * Abstract JSON serializer class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class JsonSerializer extends StandardSerializer {

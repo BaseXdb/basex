@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This is an efficient and memory-saving hash map for storing tokens.
  * It extends the {@link TokenSet} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class TokenMap extends TokenSet {

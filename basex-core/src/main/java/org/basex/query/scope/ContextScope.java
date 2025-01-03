@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * The scope of an XQuery context value.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ContextScope extends MainModule {

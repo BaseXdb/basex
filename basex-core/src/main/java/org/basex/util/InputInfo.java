@@ -9,7 +9,7 @@ import org.basex.query.value.type.*;
  * This class contains information on the original query, which will be evaluated for
  * error feedback and debugging purposes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class InputInfo {

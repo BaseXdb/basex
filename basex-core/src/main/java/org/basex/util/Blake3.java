@@ -6,7 +6,7 @@ import java.util.*;
  * Blake3 algorithm, inspired by the RUST reference algorithm:
  * https://github.com/BLAKE3-team/BLAKE3.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Blake3 {

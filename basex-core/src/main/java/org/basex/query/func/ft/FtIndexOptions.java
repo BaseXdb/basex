@@ -6,7 +6,7 @@ import org.basex.util.options.*;
 /**
  * Full-text index options.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FtIndexOptions extends Options {

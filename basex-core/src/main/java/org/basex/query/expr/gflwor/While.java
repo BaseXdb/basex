@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * GFLWOR {@code while} clause, accepting all tuples while predicate is satisfied.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class While extends Clause {
