@@ -69,6 +69,6 @@ final class CsvDirectConverter extends CsvConverter {
    * Finishes a record.
    */
   private void finishRecord() {
-    if(record != null && !record.isEmpty()) root.add(record);
+    if(record != null) root.add(record);
   }
 }

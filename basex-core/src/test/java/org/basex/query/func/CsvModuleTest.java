@@ -47,7 +47,23 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X,Y\n1,", header, "<csv><record><X>1</X><Y/></record></csv>");
     parse("X,Y\n1,", skipEmpty + ", " + header, "<csv><record><X>1</X></record></csv>");
     parse("X,Y\n,1", skipEmpty + ", " + header, "<csv><record><Y>1</Y></record></csv>");
-    parse("X,Y\n,", skipEmpty + ", " + header, "<csv/>");
+                                       // was: "<csv/>");
+    parse("X,Y\n,", skipEmpty + ", " + header, "<csv><record/></csv>");
+
+            // was: "<csv/>");
+    parse("\n", "", "<csv><record/></csv>");
+              // was: "<csv/>");
+    parse("\n\n", "", "<csv><record/><record/></csv>");
+               // was: "<csv><record><entry>X</entry></record></csv>");
+    parse("\n\nX", "", "<csv><record/><record/><record><entry>X</entry></record></csv>");
+               // was:  "...<entry>X</entry></record><record><entry>Y</entry>");
+    parse("X\n\nY", "", "...<entry>X</entry></record><record/><record><entry>Y</entry>");
+    parse("X\n", "", "<csv><record><entry>X</entry></record></csv>");
+               // was: "<csv><record><entry>X</entry></record></csv>");
+    parse("X\n\n", "", "<csv><record><entry>X</entry></record><record/></csv>");
+
+    parse(" ' \" X\"'", "'quotes': true()", "<csv><record><entry> \" X\"</entry></record></csv>");
+    parse(" '\"X \" '", "'quotes': true()", "<csv><record><entry>X  </entry></record></csv>");
 
     parseError("", "'x': 'y'");
     parseError("", "'format': 'abc'");
@@ -60,6 +76,24 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X\nY", "'header': false(), 'format': 'xquery'", "...[\"X\"],[\"Y\"]");
     parse("X\nY", "'header': false(), 'format': 'xquery'", "...\"records\":([\"X\"],[\"Y\"])");
     parse("X\nY", "'header': true(), 'format': 'xquery'", "...\"names\":[\"X\"]");
+
+    parse("", "'format': 'xquery'", "{\"records\":()}");
+                              // was: "{\"records\":()}");
+    parse("\n", "'format': 'xquery'", "{\"records\":[]}");
+                                // was: "{\"records\":()}");
+    parse("\n\n", "'format': 'xquery'", "{\"records\":([],[])}");
+                                 // was: "{\"records\":[\"X\"]}");
+    parse("\n\nX", "'format': 'xquery'", "{\"records\":([],[],[\"X\"])}");
+                                  // was: "{\"records\":([\"X\"],[\"Y\"])}");
+    parse("X\n\nY", "'format': 'xquery'", "{\"records\":([\"X\"],[],[\"Y\"])}");
+    parse("X\n", "'format': 'xquery'", "{\"records\":[\"X\"]}");
+                                 // was: "{\"records\":[\"X\"]}");
+    parse("X\n\n", "'format': 'xquery'", "{\"records\":([\"X\"],[])}");
+
+    parse(" ' \"\"'", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"\"\"]}");
+    parse(" ' \" X\"'", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"\" X\"\"\"]}");
+    parse(" '\"\" '", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"]}");
+    parse(" '\"X \" '", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\"X  \"]}");
   }
 
   /** Test method. */
