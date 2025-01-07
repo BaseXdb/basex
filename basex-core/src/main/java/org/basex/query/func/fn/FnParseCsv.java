@@ -66,8 +66,8 @@ public class FnParseCsv extends Parse {
       final Value rows = map.get(CsvXQueryConverter.RECORDS);
 
       final MapBuilder result = new MapBuilder();
-      result.put(Str.get("columns"), columns);
-      result.put(Str.get("column-index"), columnIndex);
+      result.put("columns", columns);
+      result.put("column-index", columnIndex);
       result.put("rows", rows);
       result.put("get", Get.funcItem(rows, columnIndex, qc, ii));
       return result.map();

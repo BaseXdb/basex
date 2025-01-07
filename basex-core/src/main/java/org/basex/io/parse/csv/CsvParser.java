@@ -33,11 +33,11 @@ public final class CsvParser {
   private final int quoteCharacter;
   /** Parse quotes.  */
   private final boolean quotes;
-  /** Trim whitespace. */
+  /** Trim whitespace (see {@link CsvOptions#TRIM_WHITESPACE}). */
   private final boolean trimWhitespace;
-  /** Trim rows. */
+  /** Trim rows (see {@link CsvOptions#TRIM_ROWS}). */
   private final boolean trimRows;
-  /** Strict quoting. */
+  /** Disallow field content outside of quotes. */
   private final boolean strictQuoting;
   /** Select columns. */
   private final int[] selectColumns;
