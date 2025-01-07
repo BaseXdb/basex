@@ -1939,7 +1939,7 @@ public class QueryParser extends InputParser {
           int s = 0;
           if(mapping) {
             s = localVars.openScope();
-            fr = new For(new Var(new QNm("item"), null, qc, ii), expr);
+            fr = new For(localVars.add(new Var(new QNm("item"), null, qc, ii)), expr);
             arg = new VarRef(ii, fr.var);
           } else {
             arg = expr;
