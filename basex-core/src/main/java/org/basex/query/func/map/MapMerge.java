@@ -47,31 +47,44 @@ public final class MapMerge extends StandardFunc {
     final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
     final Duplicates merge = options.get(MergeOptions.DUPLICATES);
 
+    // empty input: return empty map
     final Item first = qc.next(maps);
     if(first == null) return XQMap.empty();
 
-    XQMap map = toMap(first);
-    for(Item item; (item = qc.next(maps)) != null;) {
-      final XQMap newMap = toMap(item);
-      for(final Item key : newMap.keys()) {
-        final Value value = newMap.get(key), old = map.get(key, false);
+    // single input: return single map
+    XQMap mp = toMap(first);
+    Item current = qc.next(maps);
+    if(current == null) return mp;
+
+    // update first map if exactly 2 maps are supplied. otherwise, use map builder
+    Item next = qc.next(maps);
+    final MapBuilder mb = next == null ? null : new MapBuilder(arg(0).size());
+    if(mb != null) mp.forEach((k, v) -> mb.put(k,  v));
+
+    while(current != null) {
+      final XQMap map = toMap(current);
+      for(final Item key : map.keys()) {
+        final Value old = mb != null ? mb.get(key) : mp.get(key, false);
+        Value value = map.get(key);
         switch(merge) {
           case REJECT:
             if(old != null) throw MERGE_DUPLICATE_X.get(info, key);
-            map = map.put(key, value);
-            break;
-          case USE_LAST:
-            map = map.put(key, value);
             break;
           case COMBINE:
-            map = map.put(key, old == null ? value : ValueBuilder.concat(old, value, qc));
+            if(old != null) value = ValueBuilder.concat(old, value, qc);
+            break;
+          case USE_FIRST:
+            if(old != null) continue;
             break;
           default:
-            if(old == null) map = map.put(key, value);
         }
+        if(mb != null) mb.put(key, value);
+        else mp = mp.put(key, value);
       }
+      current = next;
+      next = current != null ? qc.next(maps) : null;
     }
-    return map;
+    return mb != null ? mb.map() : mp;
   }
 
   @Override
