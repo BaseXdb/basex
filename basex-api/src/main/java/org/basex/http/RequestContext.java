@@ -7,8 +7,8 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -27,13 +27,10 @@ import jakarta.servlet.http.*;
 public final class RequestContext {
   /** HTTP servlet request. */
   public final HttpServletRequest request;
-
-  /** Query parameters with string values. */
-  private Map<String, String[]> strings;
-  /** Query parameters with XQuery values. */
-  private Map<String, Value> values;
+  /** Query parameters. */
+  private XQMap values;
   /** Form parameters. */
-  private Map<String, Value> form;
+  private XQMap form;
   /** Headers. */
   private XQMap headers;
   /** Content body. */
@@ -75,54 +72,52 @@ public final class RequestContext {
 
   /**
    * Returns the query parameters as strings.
-   * @return map
+   * @return parameters
+   * @throws QueryException query exception
    */
-  public Map<String, String[]> queryStrings() {
-    if(strings == null) {
-      strings = new HashMap<>();
-      queryValues().forEach((key, value) -> {
-        final StringList list = new StringList(value.size());
-        for(final Item item : value) list.add(((Atm) item).toJava());
-        strings.put(key, list.finish());
-      });
-    }
+  public Map<String, String[]> queryStrings() throws QueryException {
+    final Map<String, String[]> strings = new HashMap<>();
+    queryValues().forEach((key, value) -> {
+      final StringList list = new StringList(value.size());
+      for(final Item item : value) list.add(((Atm) item).toJava());
+      strings.put(((Str) key).toJava(), list.finish());
+    });
     return strings;
   }
 
   /**
-   * Returns query parameters as XQuery values.
-   * @return map
+   * Returns the query parameters.
+   * @return parameters
+   * @throws QueryException query exception
    */
-  public Map<String, Value> queryValues() {
+  public XQMap queryValues() throws QueryException {
     if(values == null) {
-      values = new HashMap<>();
       final String string = request.getQueryString();
-      if(string != null) addParams(string, values);
+      values = string != null ? toMap(string) : XQMap.empty();
     }
     return values;
   }
 
   /**
-   * Returns form parameters as XQuery Values.
+   * Returns the form parameters.
    * @param options main options
    * @return parameters
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public Map<String, Value> formValues(final MainOptions options)
-      throws QueryException, IOException {
-
+  public XQMap formValues(final MainOptions options) throws QueryException, IOException {
     if(form == null) {
       final MediaType mt = HTTPConnection.mediaType(request);
-      form = new HashMap<>();
       if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
         try(InputStream is = body().inputStream()) {
-          form.putAll(new Payload(is, true, null, options).multiForm(mt));
+          form = new Payload(is, true, null, options).multiForm(mt);
         }
       } else if(mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
-        addParams(body().toString(), form);
+        form = toMap(body().toString());
+      } else {
+        form = XQMap.empty();
       }
     }
     return form;
@@ -148,22 +143,24 @@ public final class RequestContext {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Populates a map with URL-decoded parameters.
+   * Returns a map with URL-decoded parameters.
    * @param params query parameters
-   * @param map to populate
+   * @return map
+   * @throws QueryException query exception
    */
-  private static void addParams(final String params, final Map<String, Value> map) {
+  private static XQMap toMap(final String params) throws QueryException {
+    // collect values in item lists (faster)
+    final ItemObjectMap<ItemList> map = new ItemObjectMap<>();
     for(final String param : Strings.split(params, '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
-        final Atm atm = Atm.get(XMLToken.decodeUri(parts[1]));
-        map.merge(parts[0], atm, (value1, value2) -> {
-          final ItemList items = new ItemList();
-          for(final Item item : value1) items.add(item);
-          for(final Item item : value2) items.add(item);
-          return items.value();
-        });
+        final ItemList list = map.computeIfAbsent(Str.get(parts[0]), () -> new ItemList());
+        list.add(Atm.get(XMLToken.decodeUri(parts[1])));
       }
     }
+    // create final map
+    final MapBuilder mb = new MapBuilder();
+    for(final Item key : map) mb.put(key, map.get(key).value());
+    return mb.map();
   }
 }

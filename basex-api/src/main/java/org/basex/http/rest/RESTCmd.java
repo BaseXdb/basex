@@ -10,6 +10,7 @@ import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.http.*;
 import org.basex.io.out.*;
+import org.basex.query.*;
 import org.basex.util.options.*;
 
 /**
@@ -114,9 +115,10 @@ abstract class RESTCmd extends Command {
    * Assigns database options.
    * Throws an exception if an option is unknown.
    * @param session REST session
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  static void assignOptions(final RESTSession session) throws IOException {
+  static void assignOptions(final RESTSession session) throws QueryException, IOException {
     final HTTPConnection conn = session.conn;
     for(final Entry<String, String[]> entry : conn.requestCtx.queryStrings().entrySet()) {
       assign(conn.context.options, entry, true);

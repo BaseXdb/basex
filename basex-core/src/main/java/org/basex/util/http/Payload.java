@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.zip.*;
 
 import org.basex.build.csv.*;
@@ -239,33 +238,32 @@ public final class Payload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public HashMap<String, Value> multiForm(final MediaType type) throws IOException, QueryException {
+  public XQMap multiForm(final MediaType type) throws IOException, QueryException {
     // parse boundary, create helper arrays
     final byte[] bound = concat(DASHES, boundary(type)), last = concat(bound, DASHES);
 
-    final HashMap<String, Value> data = new HashMap<>();
+    XQMap data = XQMap.empty();
     final ByteList cont = new ByteList();
     int lines = -1;
-    String name = "", filename = "";
+    Str name = Str.EMPTY, filename = Str.EMPTY;
     for(byte[] line; (line = readLine()) != null;) {
       if(lines >= 0) {
         if(startsWith(line, bound)) {
           // get old value
           Value value = data.get(name);
-          if(!filename.isEmpty()) {
+          if(filename.string().length != 0) {
             // assign file and contents, join multiple files
             final XQMap map = value instanceof XQMap ? (XQMap) value : XQMap.empty();
-            final Str file = Str.get(filename);
             final B64 contents = B64.get(cont.next());
-            final Value files = new ItemList().add(map.get(file)).add(contents).value();
-            value = map.put(file, files);
+            final Value files = new ItemList().add(map.get(filename)).add(contents).value();
+            value = map.put(filename, files);
           } else {
             // assign string, join multiple strings
             final Str v = Str.get(cont.next());
             value = value == null ? v : new ItemList().add(value).add(v).value();
           }
 
-          if(!name.isEmpty()) data.put(name, value);
+          if(!name.isEmpty()) data = data.put(name, value);
           lines = -1;
           if(eq(line, last)) break;
         } else {
@@ -274,15 +272,14 @@ public final class Payload {
         }
       } else if(startsWith(lc(line), CONTENT_DISPOSITION)) {
         // get key and file name
-        name = contains(line, token("name=")) ?
-          string(line).replaceAll("^.*?name=\"|\".*", "").replaceAll("\\[]", "") : "";
-        filename = contains(line, token("filename=")) ?
-          string(line).replaceAll("^.*filename=\"|\"$", "") : "";
+        final String ln = string(line);
+        name = Str.get(ln.contains("name=") ? ln.replaceAll("^.*?name=\"|\".*", "").
+          replaceAll("\\[]", "") : "");
+        filename = Str.get(ln.contains("filename=") ? ln.replaceAll("^.*filename=\"|\"$", "") : "");
       } else if(line.length == 0) {
         lines = 0;
       }
     }
-
     return data;
   }
 

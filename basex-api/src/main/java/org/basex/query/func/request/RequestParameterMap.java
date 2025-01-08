@@ -3,12 +3,13 @@ package org.basex.query.func.request;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
 
@@ -25,13 +26,13 @@ public final class RequestParameterMap extends ApiFunc {
     final RequestContext requestCtx = requestContext(qc);
     try {
       // cache parameter names
-      final Map<String, Value> queryValues = requestCtx.queryValues();
-      final Map<String, Value> formValues = requestCtx.formValues(qc.context.options);
-      final HashSet<String> cache = new HashSet<>();
-      cache.addAll(queryValues.keySet());
-      cache.addAll(formValues.keySet());
+      final XQMap queryValues = requestCtx.queryValues();
+      final XQMap formValues = requestCtx.formValues(qc.context.options);
+      final HashItemSet names = new HashItemSet(ItemSet.Mode.ATOMIC, info);
+      for(final Item name : queryValues.keys()) names.add(name);
+      for(final Item name : formValues.keys()) names.add(name);
 
-      for(final String name : cache) {
+      for(final Item name : names) {
         final ValueBuilder vb = new ValueBuilder(qc);
         final Value query = queryValues.get(name);
         final Value form = formValues.get(name);
@@ -39,7 +40,6 @@ public final class RequestParameterMap extends ApiFunc {
         if(form != null) vb.add(form);
         map.put(name, vb.value());
       }
-
       return map.map();
     } catch(final IOException ex) {
       Util.debug(ex);

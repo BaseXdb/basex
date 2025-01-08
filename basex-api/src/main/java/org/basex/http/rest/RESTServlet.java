@@ -7,6 +7,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.query.*;
 import org.basex.util.http.*;
 
 /**
@@ -17,7 +18,7 @@ import org.basex.util.http.*;
  */
 public final class RESTServlet extends BaseXServlet {
   @Override
-  protected void run(final HTTPConnection conn) throws IOException {
+  protected void run(final HTTPConnection conn) throws Exception {
     // open database if name was specified
     final RESTSession session = new RESTSession(conn);
     final String db = conn.db(), path = conn.dbpath();
@@ -41,9 +42,10 @@ public final class RESTServlet extends BaseXServlet {
    * Creates and returns a REST command.
    * @param session session
    * @return code
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private static RESTCmd command(final RESTSession session) throws IOException {
+  private static RESTCmd command(final RESTSession session) throws QueryException, IOException {
     final String method = session.conn.method;
     if(method.equals(Method.GET.name()))    return RESTGet.get(session);
     if(method.equals(Method.POST.name()))   return RESTPost.get(session);

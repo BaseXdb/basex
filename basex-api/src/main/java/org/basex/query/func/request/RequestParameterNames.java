@@ -7,11 +7,11 @@ import java.io.*;
 import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -24,12 +24,10 @@ public final class RequestParameterNames extends ApiFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final RequestContext requestCtx = requestContext(qc);
     try {
-      final TokenSet cache = new TokenSet();
-      for(final String name : requestCtx.queryValues().keySet()) cache.add(name);
-      for(final String name : requestCtx.formValues(qc.context.options).keySet()) cache.add(name);
-      final TokenList names = new TokenList(cache.size());
-      for(final byte[] name : cache) names.add(name);
-      return StrSeq.get(names);
+      final HashItemSet cache = new HashItemSet(ItemSet.Mode.ATOMIC, info);
+      for(final Item name : requestCtx.queryValues().keys()) cache.add(name);
+      for(final Item name : requestCtx.formValues(qc.context.options).keys()) cache.add(name);
+      return ItemSeq.get(cache.keys(), cache.size(), null);
     } catch(final IOException ex) {
       Util.debug(ex);
       throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
