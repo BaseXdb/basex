@@ -30,7 +30,7 @@ public final class RequestParameterNames extends ApiFunc {
       return ItemSeq.get(cache.keys(), cache.size(), null);
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
+      throw REQUEST_PARAMETER.get(info);
     }
   }
 }

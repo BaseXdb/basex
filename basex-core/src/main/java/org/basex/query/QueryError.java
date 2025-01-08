@@ -409,7 +409,7 @@ public enum QueryError {
   // Request Module
 
   /** Error code. */
-  REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded: %."),
+  REQUEST_PARAMETER(REQUEST, "parameter", "Query string cannot be decoded."),
 
   // Session Module
 

@@ -31,7 +31,7 @@ public final class RequestParameter extends ApiFunc {
       return value.isEmpty() && defined(1) ? arg(1).value(qc) : value;
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
+      throw REQUEST_PARAMETER.get(info);
     }
   }
 }

@@ -43,7 +43,7 @@ public final class RequestParameterMap extends ApiFunc {
       return map.map();
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
+      throw REQUEST_PARAMETER.get(info);
     }
   }
 }

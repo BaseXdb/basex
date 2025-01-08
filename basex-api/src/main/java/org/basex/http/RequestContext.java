@@ -63,14 +63,6 @@ public final class RequestContext {
   }
 
   /**
-   * Returns the original query string.
-   * @return query string
-   */
-  public String queryString() {
-    return request.getQueryString();
-  }
-
-  /**
    * Returns the query parameters as strings.
    * @return parameters
    * @throws QueryException query exception
