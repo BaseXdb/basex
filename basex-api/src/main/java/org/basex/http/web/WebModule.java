@@ -61,9 +61,9 @@ public final class WebModule {
         // only add functions that are defined in the same module (file)
         if(sf.expr != null && name.equals(new IOFile(sf.info.path()).name())) {
           final RestXqFunction rxf = new RestXqFunction(sf, this, qc);
-          if(rxf.parseAnnotations(ctx)) functions.add(rxf);
+          if(rxf.parseAnnotations(null)) functions.add(rxf);
           final WsFunction wxq = new WsFunction(sf, this, qc);
-          if(wxq.parseAnnotations(ctx)) wsFunctions.add(wxq);
+          if(wxq.parseAnnotations(null)) wsFunctions.add(wxq);
         }
       }
     } catch(final QueryException ex) {

@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.*;
 
-import jakarta.servlet.http.*;
-
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
@@ -34,6 +32,8 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
+
+import jakarta.servlet.http.*;
 
 /**
  * This class represents a single RESTXQ function.
@@ -88,11 +88,10 @@ public final class RestXqFunction extends WebFunction {
   }
 
   @Override
-  public boolean parseAnnotations(final Context ctx) throws QueryException, IOException {
+  public boolean parseAnnotations(final MainOptions mopts) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.arity()];
     boolean found = false;
-    final MainOptions options = ctx.options;
 
     AnnList starts = AnnList.EMPTY;
     for(final Ann ann : function.anns) {
@@ -139,15 +138,6 @@ public final class RestXqFunction extends WebFunction {
       } else if(eq(def.uri, QueryText.REST_URI)) {
         final Item body = value.isEmpty() ? null : value.itemAt(0);
         addMethod(string(def.local()), body, declared, ann.info);
-      } else if(def == _INPUT_CSV) {
-        final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
-        options.set(MainOptions.CSVPARSER, parse(opts, ann));
-      } else if(def == _INPUT_JSON) {
-        final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
-        options.set(MainOptions.JSONPARSER, parse(opts, ann));
-      } else if(def == _INPUT_HTML) {
-        final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
-        options.set(MainOptions.HTMLPARSER, parse(opts, ann));
       } else if(eq(def.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         final String name = string(def.local()), val = toString(value.itemAt(0));
@@ -163,6 +153,17 @@ public final class RestXqFunction extends WebFunction {
         final QNm v = value.size() > 1 ? checkVariable(toString(value.itemAt(1)), declared) : null;
         permission = new RestXqPerm(p, v);
         starts = starts.attach(ann);
+      } else if(mopts != null) {
+        if(def == _INPUT_CSV) {
+          final CsvParserOptions opts = new CsvParserOptions(mopts.get(MainOptions.CSVPARSER));
+          mopts.set(MainOptions.CSVPARSER, parse(opts, ann));
+        } else if(def == _INPUT_JSON) {
+          final JsonParserOptions opts = new JsonParserOptions(mopts.get(MainOptions.JSONPARSER));
+          mopts.set(MainOptions.JSONPARSER, parse(opts, ann));
+        } else if(def == _INPUT_HTML) {
+          final HtmlOptions opts = new HtmlOptions(mopts.get(MainOptions.HTMLPARSER));
+          mopts.set(MainOptions.HTMLPARSER, parse(opts, ann));
+        }
       }
     }
 
@@ -183,12 +184,13 @@ public final class RestXqFunction extends WebFunction {
    * @param ext extended processing information (can be {@code null})
    * @param conn HTTP connection
    * @param qc query context
+   * @param mopts main options
    * @return arguments
    * @throws QueryException exception
    * @throws IOException I/O exception
    */
-  Expr[] bind(final Object ext, final HTTPConnection conn, final QueryContext qc)
-      throws QueryException, IOException {
+  Expr[] bind(final Object ext, final HTTPConnection conn, final QueryContext qc,
+      final MainOptions mopts) throws QueryException, IOException {
 
     // bind variables from segments
     final Expr[] args = new Expr[function.arity()];
@@ -202,7 +204,6 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind request body in the correct format
-    final MainOptions mopts = conn.context.options;
     if(requestBody != null) {
       final MediaType type = conn.mediaType();
       final byte[] body = conn.requestCtx.body().read();
@@ -328,16 +329,16 @@ public final class RestXqFunction extends WebFunction {
   /**
    * Assigns annotation values as options.
    * @param <O> option type
-   * @param opts options instance
+   * @param options options instance
    * @param ann annotation
    * @return options instance
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private static <O extends Options> O parse(final O opts, final Ann ann)
+  private static <O extends Options> O parse(final O options, final Ann ann)
       throws QueryException, IOException {
-    for(final Item arg : ann.value()) opts.assign(string(arg.string(ann.info)));
-    return opts;
+    for(final Item arg : ann.value()) options.assign(string(arg.string(ann.info)));
+    return options;
   }
 
   /**

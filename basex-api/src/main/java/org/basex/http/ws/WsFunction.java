@@ -39,7 +39,7 @@ public final class WsFunction extends WebFunction {
   }
 
   @Override
-  public boolean parseAnnotations(final Context ctx) throws QueryException {
+  public boolean parseAnnotations(final MainOptions mopts) throws QueryException {
     final boolean[] declared = new boolean[function.arity()];
     // counter for annotations that should occur only once
     boolean found = false;

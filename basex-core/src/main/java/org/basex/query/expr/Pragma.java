@@ -41,7 +41,7 @@ public abstract class Pragma extends ExprInfo {
   /**
    * Finalizes the pragma expression.
    * @param qc query context
-   * @param state state before pragmas was set
+   * @param state state before pragma was set
    */
   abstract void finish(QueryContext qc, Object state);
 

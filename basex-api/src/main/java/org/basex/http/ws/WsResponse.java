@@ -49,7 +49,7 @@ public final class WsResponse extends WebResponse {
     ctx.setExternal(new RequestContext(ws.request));
 
     func = new WsFunction(function.function, function.module, qc);
-    func.parseAnnotations(ctx);
+    func.parseAnnotations(null);
     return func.bind(data, ws.headers, qc);
   }
 

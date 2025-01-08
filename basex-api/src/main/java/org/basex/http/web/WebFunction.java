@@ -54,12 +54,12 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   /**
    * Checks a function for REST and permission annotations. This function is called both
    * when a module is parsed, and when the function is prepared for evaluation.
-   * @param ctx database context
+   * @param mopts main options (for evaluating the input options; {@code null} otherwise)
    * @return {@code true} if function contains relevant annotations
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public abstract boolean parseAnnotations(Context ctx) throws QueryException, IOException;
+  public abstract boolean parseAnnotations(MainOptions mopts) throws QueryException, IOException;
 
   /**
    * Creates an exception with the specified message.

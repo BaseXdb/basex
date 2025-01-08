@@ -8,6 +8,7 @@ import java.io.*;
 
 import jakarta.servlet.*;
 
+import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.io.out.*;
@@ -55,8 +56,9 @@ final class RestXqResponse extends WebResponse {
     ctx.setExternal(conn.requestCtx);
 
     func = new RestXqFunction(function.function, function.module, qc);
-    func.parseAnnotations(ctx);
-    return func.bind(data, conn, qc);
+    final MainOptions mopts = new MainOptions(ctx.options);
+    func.parseAnnotations(mopts);
+    return func.bind(data, conn, qc, mopts);
   }
 
   @Override
