@@ -1,28 +1,36 @@
 package org.basex.query.util.hash;
 
-import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing items and values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
+ * @param <E> generic value type
  */
-public final class ItemValueMap extends HashItemSet {
+public final class ItemObjectMap<E> extends HashItemSet {
   /** Map values. */
-  private Value[] values;
+  private Object[] values;
+
+  /**
+   * Constructor.
+   */
+  public ItemObjectMap() {
+    this(Array.INITIAL_CAPACITY);
+  }
 
   /**
    * Constructor with initial capacity.
    * @param capacity initial capacity (will be resized to a power of two)
    */
-  public ItemValueMap(final long capacity) {
+  public ItemObjectMap(final long capacity) {
     super(Mode.ATOMIC, null, capacity);
-    values = new Value[capacity()];
+    values = new Object[capacity()];
   }
 
   /**
@@ -31,8 +39,9 @@ public final class ItemValueMap extends HashItemSet {
    * @param id id of the value
    * @return value
    */
-  public Value value(final int id) {
-    return values[id];
+  @SuppressWarnings("unchecked")
+  public E value(final int id) {
+    return (E) values[id];
   }
 
   /**
@@ -42,10 +51,27 @@ public final class ItemValueMap extends HashItemSet {
    * @param value value
    * @throws QueryException query exception
    */
-  public void put(final Item key, final Value value) throws QueryException {
+  public void put(final Item key, final E value) throws QueryException {
     // array bounds are checked before array is resized
     final int i = put(key);
     values[i] = value;
+  }
+
+  /**
+   * Returns the value for the specified key.
+   * Creates a new value if none exists.
+   * @param key key
+   * @param func function that create a new value
+   * @return value
+   * @throws QueryException query exception
+   */
+  public E computeIfAbsent(final Item key, final Supplier<? extends E> func) throws QueryException {
+    E value = get(key);
+    if(value == null) {
+      value = func.get();
+      put(key, value);
+    }
+    return value;
   }
 
   /**
@@ -54,14 +80,15 @@ public final class ItemValueMap extends HashItemSet {
    * @return value, or {@code null} if nothing was found
    * @throws QueryException query exception
    */
-  public Value get(final Item key) throws QueryException {
-    return values[id(key)];
+  @SuppressWarnings("unchecked")
+  public E get(final Item key) throws QueryException {
+    return (E) values[id(key)];
   }
 
   @Override
   protected void rehash(final int newSize) {
     super.rehash(newSize);
-    values = Arrays.copyOf(values, newSize);
+    values = Array.copy(values, new Object[newSize]);
   }
 
   @Override

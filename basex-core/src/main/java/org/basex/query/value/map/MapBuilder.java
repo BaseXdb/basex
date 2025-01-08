@@ -15,7 +15,7 @@ import org.basex.util.*;
  */
 public final class MapBuilder {
   /** Map. */
-  private final ItemValueMap map;
+  private final ItemObjectMap<Value> map;
 
   /**
    * Constructor.
@@ -29,7 +29,7 @@ public final class MapBuilder {
    * @param capacity initial capacity (will be resized to a power of two)
    */
   public MapBuilder(final long capacity) {
-    map = new ItemValueMap(capacity);
+    map = new ItemObjectMap<>(capacity);
   }
 
   /**

@@ -75,11 +75,11 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Returns a map.
-   * @param ivm mutable, but unmodified hash map instance
+   * @param map unmodified mutable hash map instance
    * @return map
    */
-  public static XQMap map(final ItemValueMap ivm) {
-    return ivm.isEmpty() ? XQMap.EMPTY : new XQHashMap(ivm);
+  public static XQMap map(final ItemObjectMap<Value> map) {
+    return map.isEmpty() ? XQMap.EMPTY : new XQHashMap(map);
   }
 
   @Override
