@@ -91,7 +91,7 @@ public final class RestXqPathTest extends RestXqTest {
     get("1", "declare %R:path('%7b') function m:f() {1};", "%7B");
     get("1", "declare %R:path('%7B') function m:f() {1};", "%7b");
     get("1", "declare %R:path('%7C') function m:f() {1};", "%7C");
-    get("1", "declare %R:path('+') function m:f() {1};", "+");
+    get("1", "declare %R:path('+') function m:f() {1};", "%20");
     get("1", "declare %R:path(' ') function m:f() {1};", "%20");
     get("1", "declare %R:path('%2b') function m:f() {1};", "+");
     get("1", "declare %R:path('%20') function m:f() {1};", "%20");

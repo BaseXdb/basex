@@ -44,9 +44,9 @@ public final class WebModuleTest extends SandboxTest {
     query("let $s := codepoints-to-string((9, 10, 13, 32 to 55295, 57344 to 65533, 65536)) " +
         "return $s = web:decode-url(web:encode-url($s))", true);
 
-    error(func.args("%1"), WEB_INVALID2_X);
-    error(func.args("%1F"), WEB_INVALID1_X);
-    error(func.args("%D8%00"), WEB_INVALID1_X);
+    query(func.args("%1"), "\uFFFD");
+    query(func.args("%01"), "\uFFFD");
+    query(func.args("%D8%00"), "\uFFFD\uFFFD");
   }
 
   /** Test method. */

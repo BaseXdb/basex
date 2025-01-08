@@ -72,7 +72,7 @@ public class FnParseUri extends StandardFunc {
     final Regex r = new Regex();
     if(r.has(string, "^(.*?)#(.*)$")) {
       string = r.group(1);
-      fragment = decode(r.group(2));
+      fragment = XMLToken.decodeUri(r.group(2));
     }
     if(r.has(string, "^(.*?)\\?(.*)$")) {
       string = r.group(1);
@@ -154,19 +154,19 @@ public class FnParseUri extends StandardFunc {
 
     final TokenList segments = new TokenList();
     if(!string.isEmpty()) {
-      for(final String s : string.split("/", -1)) segments.add(decode(s));
+      for(final String s : string.split("/", -1)) segments.add(XMLToken.decodeUri(s));
     }
 
     XQMap queries = XQMap.empty();
     if(!query.isEmpty()) {
       for(final String q : query.split("&")) {
         final int eq = q.indexOf('=');
-        final Str key = eq == -1 ? Str.EMPTY : Str.get(decode(q.substring(0, eq)));
-        final Str val = Str.get(decode(q.substring(eq + 1)));
+        final Str key = eq == -1 ? Str.EMPTY : Str.get(XMLToken.decodeUri(q.substring(0, eq)));
+        final Str val = Str.get(XMLToken.decodeUri(q.substring(eq + 1)));
         queries = queries.put(key, ValueBuilder.concat(queries.get(key), val, qc));
       }
     }
-    filepath = decode(filepath);
+    filepath = XMLToken.decodeUri(filepath);
 
     final MapBuilder mb = new MapBuilder();
     add(mb, URI, value);
@@ -197,15 +197,6 @@ public class FnParseUri extends StandardFunc {
     final Value value = v instanceof Value ? (Value) v : v.toString().isEmpty() ? Empty.VALUE :
       Str.get(v.toString());
     if(!(value.isEmpty() || value == XQMap.empty())) mb.put(k, value);
-  }
-
-  /**
-   * URI-decodes a string.
-   * @param string encoded string
-   * @return decoded string
-   */
-  static String decode(final String string) {
-    return Token.string(XMLToken.decodeUri(Token.token(string), true));
   }
 
   /**

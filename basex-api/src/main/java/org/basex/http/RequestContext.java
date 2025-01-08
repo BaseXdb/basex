@@ -1,8 +1,6 @@
 package org.basex.http;
 
 import java.io.*;
-import java.net.*;
-import java.nio.charset.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -14,7 +12,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
@@ -79,31 +76,28 @@ public final class RequestContext {
   /**
    * Returns the query parameters as strings.
    * @return map
-   * @throws IOException I/O exception
    */
-  public Map<String, String[]> queryStrings() throws IOException {
-    try {
-      if(strings == null) strings = request.getParameterMap();
-      return strings;
-    } catch(final RuntimeException ex) {
-      // may be caused by too large input (#884) or illegal query parameters
-      throw new IOException(ex);
+  public Map<String, String[]> queryStrings() {
+    if(strings == null) {
+      strings = new HashMap<>();
+      queryValues().forEach((key, value) -> {
+        final StringList list = new StringList(value.size());
+        for(final Item item : value) list.add(((Atm) item).toJava());
+        strings.put(key, list.finish());
+      });
     }
+    return strings;
   }
 
   /**
    * Returns query parameters as XQuery values.
-   * @return query parameters
-   * @throws IOException I/O exception
+   * @return map
    */
-  public Map<String, Value> queryValues() throws IOException {
+  public Map<String, Value> queryValues() {
     if(values == null) {
       values = new HashMap<>();
-      queryStrings().forEach((key, value) -> {
-        final ItemList items = new ItemList(value.length);
-        for(final String string : value) items.add(Atm.get(string));
-        values.put(key, items.value(AtomType.UNTYPED_ATOMIC));
-      });
+      final String string = request.getQueryString();
+      if(string != null) addParams(string, values);
     }
     return values;
   }
@@ -119,14 +113,16 @@ public final class RequestContext {
       throws QueryException, IOException {
 
     if(form == null) {
-      form = new HashMap<>();
       final MediaType mt = HTTPConnection.mediaType(request);
+      form = new HashMap<>();
       if(mt.is(MediaType.MULTIPART_FORM_DATA)) {
         // convert multipart parameters encoded in a form
-        addMultipart(mt, options, form);
+        try(InputStream is = body().inputStream()) {
+          form.putAll(new Payload(is, true, null, options).multiForm(mt));
+        }
       } else if(mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
-        addURLEncoded(form);
+        addParams(body().toString(), form);
       }
     }
     return form;
@@ -152,31 +148,15 @@ public final class RequestContext {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Adds multipart form-data from the passed on request body.
-   * @param type media type
-   * @param options main options
-   * @param map form parameters
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
+   * Populates a map with URL-decoded parameters.
+   * @param params query parameters
+   * @param map to populate
    */
-  private void addMultipart(final MediaType type, final MainOptions options,
-      final Map<String, Value> map) throws QueryException, IOException {
-
-    try(InputStream is = body().inputStream()) {
-      map.putAll(new Payload(is, true, null, options).multiForm(type));
-    }
-  }
-
-  /**
-   * Adds URL-encoded parameters from the passed on request body.
-   * @param map form parameters
-   * @throws IOException I/O exception
-   */
-  private void addURLEncoded(final Map<String, Value> map) throws IOException {
-    for(final String param : Strings.split(body().toString(), '&')) {
+  private static void addParams(final String params, final Map<String, Value> map) {
+    for(final String param : Strings.split(params, '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
-        final Atm atm = Atm.get(URLDecoder.decode(parts[1], StandardCharsets.UTF_8));
+        final Atm atm = Atm.get(XMLToken.decodeUri(parts[1]));
         map.merge(parts[0], atm, (value1, value2) -> {
           final ItemList items = new ItemList();
           for(final Item item : value1) items.add(item);

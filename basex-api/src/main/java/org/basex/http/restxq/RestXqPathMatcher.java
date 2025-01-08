@@ -183,14 +183,13 @@ final class RestXqPathMatcher {
       final InputInfo info) throws QueryException {
 
     if(literals.length() > 0) {
-      final byte[] path = XMLToken.decodeUri(Token.token(literals.toString()), false);
-      if(Token.contains(path, Token.REPLACEMENT))
-        throw RestXqFunction.error(info, INV_ENCODING_X, literals);
-      final TokenBuilder tb = new TokenBuilder(path.length);
-      for(final byte b : path) {
-        if(".^&!?-:<>()[]{}$=,*+|".indexOf(b) >= 0) tb.addByte((byte) '\\');
-        tb.addByte(b);
-      }
+      final String path = XMLToken.decodeUri(literals.toString());
+      if(path.contains("\uFFFD")) throw RestXqFunction.error(info, INV_ENCODING_X, literals);
+      final TokenBuilder tb = new TokenBuilder(path.length());
+      path.codePoints().forEach(cp -> {
+        if(".^&!?-:<>()[]{}$=,*+|".indexOf(cp) >= 0) tb.addByte((byte) '\\');
+        tb.add(cp);
+      });
       result.append(tb);
       literals.setLength(0);
     }
