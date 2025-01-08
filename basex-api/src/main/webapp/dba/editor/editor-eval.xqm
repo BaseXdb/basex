@@ -51,6 +51,6 @@ declare
   %output:method('text')
 function dba:update(
   $query  as xs:string?
-) as empty-sequence() {
+) {
   utils:update(string($query))
 };

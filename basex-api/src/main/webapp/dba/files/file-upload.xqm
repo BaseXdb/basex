@@ -30,9 +30,9 @@ function dba:file-upload(
   try {
     (: Parse all XQuery files; reject files that cannot be parsed :)
     map:for-each($files, fn($name, $content) {
-      if(matches($name, '\.xq(m|l|y|u|uery)?$')) then (
+      if (matches($name, '\.xq(m|l|y|u|uery)?$')) {
         void(utils:query-parse(convert:binary-to-string($content), $dir || $name))
-      )
+      }
     }),
     map:for-each($files, fn($name, $content) {
       file:write-binary($dir || $name, $content)

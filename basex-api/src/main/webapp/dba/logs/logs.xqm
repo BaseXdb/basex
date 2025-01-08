@@ -1,5 +1,5 @@
 (:~
- : Logging page.
+ : Logs.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -12,37 +12,7 @@ import module namespace html = 'dba/html' at '../lib/html.xqm';
 declare variable $dba:CAT := 'logs';
 
 (:~
- : Redirects to the URL that creates a log entry table for the specified timestamp.
- : @param  $date  name of log file
- : @param  $time  timestamp to be found
- : @return redirection
- :)
-declare
-  %rest:GET
-  %rest:path('/dba/logs-jump')
-  %rest:query-param('date', '{$date}')
-  %rest:query-param('time', '{$time}')
-function dba:logs-jump(
-  $date  as xs:string,
-  $time  as xs:string
-) as element(rest:response) {
-  let $page := head((
-    let $ignore-logs := config:get($config:IGNORE-LOGS)
-    let $max := config:get($config:MAXROWS)
-    for $log at $pos in reverse(
-      admin:logs($date, true())[not($ignore-logs and matches(., $ignore-logs, 'i'))]
-    )
-    where $log/@time = $time
-    return ($pos - 1) idiv $max + 1,
-    1
-  ))
-  return web:redirect('/dba/logs', { 'name': $date, 'page': $page, 'time': $time }) update {
-    .//*:header/@value ! (replace value of node . with . || '#' || $time)
-  }
-};
-
-(:~
- : Logging page.
+ : Logs.
  : @param  $input  search input
  : @param  $name   name (date) of log file
  : @param  $sort   table sort key
@@ -75,7 +45,7 @@ function dba:logs(
 ) as element(html) {
   let $files := reverse(sort(admin:logs()))
   let $date := $name otherwise string(head($files))
-  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return (
     <tr>
       <td width='190'>
         <h2>{
@@ -84,7 +54,7 @@ function dba:logs(
                  onkeyup='logFilter();' class='smallinput'/>
         }</h2>
 
-        <form method='post' id='dates'>
+        <form method='post' id='dates' autocomplete='off'>
           <input type='hidden' name='date' id='date' value='{ $date }'/>
           <input type='hidden' name='sort' id='sort' value='{ $sort }'/>
           <input type='hidden' name='page' id='page' value='{ $page }'/>
@@ -108,7 +78,7 @@ function dba:logs(
                     (: enrich link targets with current search string :)
                     insert node attribute onclick { 'addInput(this);' } into .
                   }
-                  return if($date = $entry) then element b { $link } else $link
+                  return if ($date = $entry) then element b { $link } else $link
                 },
                 'size': $entry/@size
               }
@@ -118,20 +88,19 @@ function dba:logs(
       </td>
       <td class='vertical'/>
       <td>{
-        if($date) then (
+        if ($date) {
           <h3>{
             $date, '&#xa0;',
             <input type='hidden' name='name' value='{ $date }'/>,
             <input type='text' id='input' name='input' value='{ $input }' autocomplete='off'
-                   title='Enter regular expression' autofocus='autofocus'
-                   onkeyup='logEntries(event.key);'/>
+                   title='Enter regular expression' autofocus='' onkeyup='logEntries(event.key);'/>
           }</h3>,
           <div id='output'/>,
           html:js('logEntries();')
-        )
+        }
       }</td>
     </tr>
-  )
+  ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };
 
 (:~
@@ -145,7 +114,7 @@ function dba:logs(
  :)
 declare
   %rest:POST('{$input}')
-  %rest:path('/dba/log')
+  %rest:path('/dba/logs')
   %rest:query-param('date', '{$date}')
   %rest:query-param('sort', '{$sort}', 'time')
   %rest:query-param('page', '{$page}', '1')
@@ -175,8 +144,8 @@ function dba:log(
   let $entries := (
     let $ignore-logs := config:get($config:IGNORE-LOGS)
     let $regex-string := matches($input, '[+*?^$(){}|\[\]\\]')
-    let $terms := if($regex-string) then $input else tokenize($input)
-    let $joined-terms := if($regex-string) then $input else string-join($terms, '|')
+    let $terms := if ($regex-string) then $input else tokenize($input)
+    let $joined-terms := if ($regex-string) then $input else string-join($terms, '|')
 
     for $log in reverse(admin:logs($date, true()))
     let $text := string($log)
@@ -188,27 +157,29 @@ function dba:log(
         'type': string($log/@type),
         'text': $text
       }
-      return if($input) then (
-        if(every $term in $terms satisfies (
+      return if ($input) {
+        if (every $term in $terms satisfies (
           some $v in $map?* satisfies matches($v, $term, 'i')
-        )) then (
+        )) {
           map:merge(
             map:for-each($map, fn($k, $v) {
               map:entry($k, (
-                if(matches($v, $joined-terms, 'i')) then fn() {
-                  for $match in analyze-string($v, $joined-terms, 'i')/*
-                  let $value := string($match)
-                  return if($match/self::fn:match) then element b { $value } else $value
-                } else (
+                if (matches($v, $joined-terms, 'i')) {
+                  fn() {
+                    for $match in analyze-string($v, $joined-terms, 'i')/*
+                    let $value := string($match)
+                    return if ($match/self::fn:match) then element b { $value } else $value
+                  }
+                } else {
                   $v
-                )
+                }
               ))
             })
           )
-        )
-      ) else (
+        }
+      } else {
         $map
-      )
+      }
     )
 
     let $id := string($log/@time)
@@ -220,7 +191,7 @@ function dba:log(
         'ms': xs:decimal($log/@ms),
         'time': fn() {
           let $link := html:link($id, $dba:CAT || '-jump', { 'date': $date, 'time': $id })
-          return if(not($input) and $id = $time) then element b { $link } else $link
+          return if (not($input) and $id = $time) then element b { $link } else $link
         }
       }
     ))
@@ -228,4 +199,34 @@ function dba:log(
   let $params := { 'name': $date, 'input': $input }
   let $options := { 'sort': $sort, 'presort': 'time', 'page': xs:integer($page) }
   return html:table($headers, $entries, (), $params, $options)
+};
+
+(:~
+ : Redirects to the URL that returns logs for the specified timestamp.
+ : @param  $date  date
+ : @param  $time  time
+ : @return redirection
+ :)
+declare
+  %rest:GET
+  %rest:path('/dba/logs-jump')
+  %rest:query-param('date', '{$date}')
+  %rest:query-param('time', '{$time}')
+function dba:logs-jump(
+  $date  as xs:string,
+  $time  as xs:string
+) as element(rest:response) {
+  let $page := head((
+    let $ignore-logs := config:get($config:IGNORE-LOGS)
+    let $max := config:get($config:MAXROWS)
+    for $log at $pos in reverse(
+      admin:logs($date, true())[not($ignore-logs and matches(., $ignore-logs, 'i'))]
+    )
+    where $log/@time = $time
+    return ($pos - 1) idiv $max + 1,
+    1
+  ))
+  return web:redirect('/dba/logs', { 'name': $date, 'page': $page, 'time': $time }) update {
+    .//*:header/@value ! (replace value of node . with . || '#' || $time)
+  }
 };

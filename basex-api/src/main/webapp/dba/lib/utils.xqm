@@ -47,11 +47,10 @@ declare function utils:query(
 (:~
  : Runs an updating query.
  : @param  $query  query string
- : @return empty sequence
  :)
 declare %updating function utils:update(
   $query  as xs:string
-) as empty-sequence() {
+) {
   xquery:eval-update($query, (), utils:query-options()),
   
   let $result := update:cache(true())
@@ -101,11 +100,11 @@ declare function utils:start(
   $page  as xs:integer,
   $sort  as xs:string
 ) as xs:integer {
-  if($page and not($sort)) then (
+  if ($page and not($sort)) {
     ($page - 1) * config:get($config:MAXROWS) + 1
-  ) else (
+  } else {
     1
-  )
+  }
 };
 
 (:~
@@ -118,11 +117,11 @@ declare function utils:end(
   $page  as xs:integer,
   $sort  as xs:string
 ) as xs:integer {
-  if($page and not($sort)) then (
+  if ($page and not($sort)) {
     $page * config:get($config:MAXROWS)
-  ) else (
+  } else {
     999999999
-  )
+  }
 };
 
 (:~
@@ -135,11 +134,11 @@ declare function utils:chop(
   $string  as xs:string,
   $max     as xs:integer
 ) as xs:string {
-  if(string-length($string) > $max) then (
+  if (string-length($string) > $max) {
     substring($string, 1, $max) || '...'
-  ) else (
+  } else {
     $string
-  )
+  }
 };
 
 (:~
@@ -155,7 +154,7 @@ declare function utils:info(
   $action  as xs:string
 ) as xs:string {
   let $count := count($items)
-  return $count || ' ' || $name || (if($count != 1) then 's were ' else ' was ') || $action || '.'
+  return `{ $count } { $name || (if ($count != 1) then 's were ' else ' was ') || $action }.`
 };
 
 (:~
@@ -177,6 +176,6 @@ declare function utils:capitalize(
 declare %updating function utils:redirect(
   $url     as xs:string,
   $params  as map(*)
-) as empty-sequence() {
+) {
   update:output(web:redirect($url, $params))
 };

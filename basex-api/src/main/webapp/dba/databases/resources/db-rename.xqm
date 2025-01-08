@@ -14,47 +14,47 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Form for renaming a resource.
+ : Rename resource.
  : @param  $name      database
  : @param  $resource  resource
  : @param  $target    target path
- : @param  $error     error string
- : @return page
+ : @param  $do        perform update
+ : @return form or redirection
  :)
 declare
-  %rest:GET
+  %updating
   %rest:POST
   %rest:path('/dba/db-rename')
-  %rest:query-param('name',     '{$name}')
-  %rest:query-param('resource', '{$resource}')
-  %rest:query-param('target',   '{$target}')
-  %rest:query-param('error',    '{$error}')
+  %rest:form-param('name',     '{$name}')
+  %rest:form-param('resource', '{$resource}')
+  %rest:form-param('target',   '{$target}')
+  %rest:form-param('do',        '{$do}')
   %output:method('html')
   %output:html-version('5')
 function dba:db-rename(
   $name      as xs:string,
-  $resource  as xs:string,
+  $resource  as xs:string?,
   $target    as xs:string?,
-  $error     as xs:string?
-) as element(html) {
-  html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
+  $do        as xs:string?
+) {
+  html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
     <tr>
       <td>
         <form method='post' autocomplete='off'>
+          <input type='hidden' name='do' value='do'/>
           <input type='hidden' name='name' value='{ $name }'/>
           <input type='hidden' name='resource' value='{ $resource }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, { 'name': $name }), ' » ',
             html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
-            html:button('db-rename-do', 'Rename')
+            html:button('db-rename', 'Rename')
           }</h2>
           <table>
             <tr>
               <td>New path:</td>
               <td>
-                <input type='text' name='target' value='{ $target otherwise $resource }'
-                  autofocus='autofocus'/>
+                <input type='text' name='target' value='{ $target otherwise $resource }' autofocus=''/>
                 <div class='small'/>
               </td>
             </tr>
@@ -62,38 +62,12 @@ function dba:db-rename(
         </form>
       </td>
     </tr>
-  )
-};
-
-(:~
- : Renames a database resource.
- : @param  $name      database
- : @param  $resource  resource
- : @param  $target    new name of resource
- : @return redirection
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path('/dba/db-rename-do')
-  %rest:query-param('name',     '{$name}')
-  %rest:query-param('resource', '{$resource}')
-  %rest:query-param('target',   '{$target}')
-function dba:db-rename-do(
-  $name      as xs:string,
-  $resource  as xs:string,
-  $target    as xs:string
-) as empty-sequence() {
-  try {
-    if(db:exists($name, $target)) then (
+  }, fn() {
+    if (db:exists($name, $target)) {
       error((), 'Resource already exists.')
-    ) else (
+    } else {
       db:rename($name, $resource, $target),
       utils:redirect($dba:SUB, { 'name': $name, 'resource': $target, 'info': 'Resource was renamed.' })
-    )
-  } catch * {
-    utils:redirect('db-rename', {
-      'name': $name, 'resource': $resource, 'target': $target, 'error': $err:description
-    })
-  }
+    }
+  })
 };

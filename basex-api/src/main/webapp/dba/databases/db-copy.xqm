@@ -14,42 +14,42 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Form for copying a database.
+ : Copy database.
  : @param  $name     name of database
  : @param  $newname  new name
- : @param  $error    error string
- : @return page
+ : @param  $do       perform update
+ : @return form or redirection
  :)
 declare
-  %rest:GET
+  %updating
   %rest:POST
   %rest:path('/dba/db-copy')
-  %rest:query-param('name',    '{$name}')
-  %rest:query-param('newname', '{$newname}')
-  %rest:query-param('error',   '{$error}')
+  %rest:form-param('name',    '{$name}')
+  %rest:form-param('newname', '{$newname}')
+  %rest:form-param('do',      '{$do}')
   %output:method('html')
   %output:html-version('5')
 function dba:db-copy(
   $name     as xs:string,
   $newname  as xs:string?,
-  $error    as xs:string?
-) as element(html) {
-  html:wrap({ 'header': ($dba:CAT, $name), 'error': $error },
+  $do       as xs:string?
+) {
+  html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
     <tr>
       <td>
         <form method='post' autocomplete='off'>
+          <input type='hidden' name='do' value='do'/>
           <input type='hidden' name='name' value='{ $name }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
             html:link($name, $dba:SUB, { 'name': $name }), ' » ',
-            html:button('db-copy-do', 'Copy')
+            html:button('db-copy', 'Copy')
           }</h2>
           <table>
             <tr>
               <td>New name:</td>
               <td>
-                <input type='text' name='newname' value='{ $newname otherwise $name }'
-                  autofocus='autofocus'/>
+                <input type='text' name='newname' value='{ $newname otherwise $name }' autofocus=''/>
                 <div class='small'/>
               </td>
             </tr>
@@ -57,33 +57,14 @@ function dba:db-copy(
         </form>
       </td>
     </tr>
-  )
-};
-
-(:~
- : Copies a database.
- : @param  $name     name of database
- : @param  $newname  new name
- : @return redirection
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path('/dba/db-copy-do')
-  %rest:query-param('name',    '{$name}')
-  %rest:query-param('newname', '{$newname}')
-function dba:db-copy-do(
-  $name     as xs:string,
-  $newname  as xs:string
-) as empty-sequence() {
-  try {
-    if(db:exists($newname)) then (
-      error((), 'Database already exists.')
-    ) else (
-      db:copy($name, $newname)
-    ),
-    utils:redirect($dba:SUB, { 'name': $newname, 'info': 'Database was copied.' })
-  } catch * {
-    utils:redirect('db-copy', { 'name': $name, 'newname': $newname, 'error': $err:description })
-  }
+  }, fn() {
+    if ($name != $newname) {
+      if (db:exists($newname)) {
+        error((), 'Database already exists.')
+      } else {
+        db:copy($name, $newname)
+      },
+      utils:redirect($dba:SUB, { 'name': $newname, 'info': 'Database was copied.' })
+    }
+  })
 };

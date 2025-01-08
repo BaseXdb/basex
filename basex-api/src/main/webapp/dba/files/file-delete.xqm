@@ -19,7 +19,7 @@ declare variable $dba:CAT := 'files';
 declare
   %rest:POST
   %rest:path('/dba/file-delete')
-  %rest:query-param('name', '{$names}')
+  %rest:form-param('name', '{$names}')
 function dba:file-delete(
   $names  as xs:string*
 ) as element(rest:response) {

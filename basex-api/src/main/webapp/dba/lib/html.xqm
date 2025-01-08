@@ -13,30 +13,18 @@ declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
 
 (:~
  : Extends the specified table rows with the page template.
- : @param  $rows  tr elements
- : @return HTML page
- :)
-declare function html:wrap(
-  $rows  as element(tr)+
-) as element(html) {
-  html:wrap({}, $rows)
-};
-
-(:~
- : Extends the specified table rows with the page template.
  : The following options can be specified:
- : <ul>
- :   <li><b>header</b>: page headers</li>
- :   <li><b>error</b>: error string</li>
- :   <li><b>info</b>: info string</li>
- : </ul>
+ : * header: page headers
+ : * error: error string
+ : * info: info string
+ :
+ : @param  $rows     table rows
  : @param  $options  options
- : @param  $rows     tr elements
  : @return page
  :)
 declare function html:wrap(
-  $options  as map(*),
-  $rows     as element(tr)+
+  $rows     as element(tr)*,
+  $options  as map(*) := {}
 ) as element(html) {
   let $header := head($options?header) ! utils:capitalize(.)
   let $user := session:get($config:SESSION-KEY)
@@ -66,46 +54,42 @@ declare function html:wrap(
                   <span style='float:left'>
                     <h1>BaseX Database Administration</h1>
                   </span>,
-                  if($user) then (
+                  if ($user) {
                     <span style='float:right'>
                       <b>{ $user }</b> · <a href='logout'>logout</a>
                     </span>
-                  ) else ()
+                  }
                 }</td>
               </tr>
               <tr>
                 <td>
                   <div class='ellipsis'>{
-                    if($user) then (
+                    if ($user) {
                       let $cats := (
                         for $cat in ('Logs', 'Databases', 'Editor', 'Files', 'Jobs',
                           'Users', 'Sessions', 'Settings')
                         let $link := <a href='{ lower-case($cat) }'>{ $cat }</a>
-                        return if($link = $header) then (
-                          <b>{ $link }</b>
-                        ) else (
-                          $link
-                        )
+                        return if ($link = $header) then <b>{ $link }</b> else $link
                       )
                       return (
                         head($cats),
                         tail($cats) ! (' · ', .),
                         (1 to 3) ! '&#x2000;'
                       )
-                    ) else (
+                    } else {
                       <div class='note'>
                         Please enter your admin credentials:
                       </div>
-                    ),
+                    },
                     <span>{
                       element b {
                         attribute id { 'info' },
                         let $error := $options?error[.], $info := $options?info[.]
-                        return if($error) then (
+                        return if ($error) {
                           attribute class { 'error' }, $error
-                        ) else if($info) then (
+                        } else if ($info) {
                           attribute class { 'info' }, $info
-                        ) else ()
+                        }
                       }
                     }</span>
                   }</div>
@@ -160,7 +144,7 @@ declare function html:checkbox(
   html:checkbox($label, map:merge((
     { 'name':  $name },
     { 'value': $value },
-    if($checked) then { 'checked': $checked } else ()
+    { 'checked': $checked }[$checked]
   )))
 };
 
@@ -192,7 +176,7 @@ declare function html:checkbox(
 declare function html:button(
   $action   as xs:string,
   $label    as xs:string,
-  $options  as enum('CONFIRM', 'CHECK')*  := ()
+  $options  as enum('CONFIRM', 'CHECK')* := ()
 ) as element(button) {
   <button>{
     attribute formaction { $action }[$action],
@@ -223,9 +207,7 @@ declare function html:properties(
       return <tr>
         <td><b>{ upper-case($option/name()) }</b></td>
         <td>{
-          if($value = 'true') then '✓'
-          else if($value = 'false') then '–'
-          else $value
+          '✓'[$value = 'true'] otherwise '–'[$value = 'false'] otherwise $value
         }</td>
       </tr>
     )
@@ -271,38 +253,41 @@ declare function html:table(
   $headers  as map(*)*,
   $entries  as map(*)*,
   $buttons  as element(button)* := (),
-  $params   as map(*)           := {},
-  $options  as map(*)           := {}
+  $params   as map(*) := {},
+  $options  as map(*) := {}
 ) as element()+ {
   (: display buttons :)
-  if($buttons) then (
-    for $button in $buttons
-    return ($button, <span> </span>),
+  if ($buttons) {
+    $buttons ! (., <span> </span>),
     <br/>,
     <div class='small'/>
-  ) else (),
+  },
 
   (: sort entries :)
   let $sort := $options?sort
   let $sorted-entries := (
     let $key := head(($sort[.], head($headers)?key))
-    return if(not($sort) or $key = $options?presort) then (
+    return if (not($sort) or $key = $options?presort) {
       $entries
-    ) else (
+    } else {
       let $header := $headers[?key = $key]
       let $value := (
         let $desc := $header?order = 'desc'
         return switch($header?type) {
           case 'decimal' case 'number' case 'bytes' return
-            if($desc)
-            then fn { 0 - number() }
-            else fn { number() }
+            if ($desc) {
+              fn { 0 - number() }
+            } else {
+              fn { number() }
+            }
           case 'time' case 'dateTime' return
-            if($desc)
-            then fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
-            else identity(?)
+            if ($desc) {
+              fn { xs:dateTime('0001-01-01T00:00:00Z') - xs:dateTime(.) }
+            } else {
+              identity(?)
+            }
           case 'dynamic' return
-            fn { if(. instance of fn(*)) then string-join(.()) else . }
+            fn { if (. instance of fn(*)) then string-join(.()) else . }
           default return
             identity(?)
         }
@@ -310,7 +295,7 @@ declare function html:table(
       for $entry in $entries
       order by $value($entry($key)) empty greatest collation '?lang=en'
       return $entry
-    )
+    }
   )
 
   (: show results :)
@@ -325,9 +310,9 @@ declare function html:table(
     (: result summary :)
     element h3 {
       $entries,
-      if($entries = 1) then ' Entry' else 'Entries',
+      if ($entries = 1) then ' Entry' else 'Entries',
 
-      if(not($page-option) or $last-page = 1) then () else (
+      if ($page-option and $last-page != 1) {
         '(Page: ',
         let $pages := sort(distinct-values((
           1,
@@ -339,24 +324,24 @@ declare function html:table(
           $last-page
         ))[. >= 1 and . <= $last-page])
         for $page at $pos in $pages
-        let $suffix := (if($page = $last-page) then ')' else ' ') ||
-          (if($pages[$pos + 1] > $page + 1) then ' … ' else ())
-        return if($curr-page = $page) then (
+        let $suffix := (if ($page = $last-page) then ')' else ' ') ||
+          (if ($pages[$pos + 1] > $page + 1) then ' … ' else ())
+        return if ($curr-page = $page) {
           $page || $suffix
-        ) else (
+        } else {
           html:link(string($page), '', ($params, { 'page': $page, 'sort': $sort })),
           $suffix
-        )
-      )
+        }
+      }
     },
 
     (: list of results :)
-    let $shown-entries := if($count-option) then (
+    let $shown-entries := if ($count-option) {
       $sorted-entries
-    ) else (
+    } else {
       let $first := ($curr-page - 1) * $max-option + 1
       return $sorted-entries[position() >= $first][position() <= $max-option + 1]
-    )
+    }
     where exists($shown-entries)
     return element table {
       element tr {
@@ -365,22 +350,22 @@ declare function html:table(
         let $label := upper-case($header?label)
         return element th {
           attribute align {
-            if($header?type = $html:NUMBER) then 'right' else 'left'
+            if ($header?type = $html:NUMBER) then 'right' else 'left'
           },
 
-          if($pos = 1 and $buttons) then (
+          if ($pos = 1 and $buttons) {
             <input type='checkbox' onclick='toggle(this)'/>, ' '
-          ) else (),
+          },
 
-          if($header?type = 'id') then (
+          if ($header?type = 'id') {
             (: id columns: empty header column :)
-          ) else if(empty($sort) or $name = $sort) then (
+          } else if (empty($sort) or $name = $sort) {
             (: sorted column, xml column: only display label :)
             $label
-          ) else (
+          } else {
             (: generate sort link :)
             html:link($label, '', ($params, { 'sort': $name }))
-          )
+          }
         }
       },
 
@@ -395,34 +380,34 @@ declare function html:table(
         (: format value :)
         let $v := $entry($name)
         let $value := try {
-          if($type = 'bytes') then (
-            prof:human(if(exists($v)) then xs:integer($v) else 0)
-          ) else if($type = 'decimal') then (
-            format-number(if(exists($v)) then number($v) else 0, '0.00')
-          ) else if($type = 'dateTime') then (
+          if ($type = 'bytes') {
+            prof:human(if (exists($v)) then xs:integer($v) else 0)
+          } else if ($type = 'decimal') {
+            format-number(if (exists($v)) then number($v) else 0, '0.00')
+          } else if ($type = 'dateTime') {
             html:date(xs:dateTime($v))
-          ) else if($type = 'time') then (
+          } else if ($type = 'time') {
             html:time(xs:dateTime($v))
-          ) else if($v instance of fn(*)) then (
+          } else if ($v instance of fn(*)) {
             $v()
-          ) else (
+          } else {
             string($v)
-          )
+          }
         } catch * {
           $err:description
         }
         return element td {
-          attribute align { if($type = $html:NUMBER) then 'right' else 'left' },
-          if($pos = 1 and $buttons) then (
+          attribute align { if ($type = $html:NUMBER) then 'right' else 'left' },
+          if ($pos = 1 and $buttons) {
             <input type='checkbox' name='{ $name }' value='{ data($value) }'
               onclick='buttons(this)'/>,
             ' '
-          ) else (),
-          if($pos = 1 and exists($link)) then (
+          },
+          if ($pos = 1 and exists($link)) {
             html:link($value, $link, ($params, { $name: $value }))
-          ) else if($type = 'id') then () else (
+          } else if (not($type = 'id')) {
             $value
-          )
+          }
         }
       }
     }
@@ -439,7 +424,7 @@ declare function html:table(
 declare function html:link(
   $text    as xs:string,
   $href    as xs:string,
-  $params  as map(*)*    := {}
+  $params  as map(*)* := {}
 ) as element(a) {
   <a href='{ web:create-url($href, map:merge($params)) }'>{ $text }</a>
 };
@@ -530,4 +515,29 @@ declare function html:parameters(
       map:entry('_' || $name, $value)
     })
   ))
+};
+
+(:~
+ : Performs an update or returns an HTML output.
+ : @param  $do       perform update
+ : @param  $options  output options
+ : @param  $output   output function
+ : @param  $update   update function
+ : @return parse result
+ :)
+declare %updating function html:update(
+  $do       as xs:string?,
+  $options  as map(*),
+  $output   as function() as element(tr)*,
+  $update   as %updating function(*)
+) {
+  if ($do) {
+    try {
+      updating $update()
+    } catch * {
+      update:output(html:wrap($output(), map:put($options, 'error', $err:description)))
+    }
+  } else {
+    update:output(html:wrap($output(), $options))
+  }
 };

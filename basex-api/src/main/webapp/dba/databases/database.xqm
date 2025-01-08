@@ -1,5 +1,5 @@
 (:~
- : Database main page.
+ : Single database.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -14,7 +14,7 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Manages a single database.
+ : Single database.
  : @param  $name      database
  : @param  $resource  resource
  : @param  $sort      table sort key
@@ -42,25 +42,25 @@ function dba:database(
   $info      as xs:string?,
   $error     as xs:string?
 ) as element() {
-  if(not($name)) then web:redirect('databases') else
+  if (not($name)) then web:redirect('databases') else
 
   let $db-exists := db:exists($name)
-  return html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
+  return (
     <tr>{
       <td>
-        <form method='post'>
+        <form method='post' autocomplete='off'>
           <input type='hidden' name='name' value='{ $name }' id='name'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            $name ! (if(empty($resource)) then . else html:link(., $dba:SUB, { 'name': . } ))
+            $name ! (if (empty($resource)) then . else html:link(., $dba:SUB, { 'name': . } ))
           }</h2>
           {
-            if($db-exists) then (
+            if ($db-exists) {
               let $headers := (
-                { 'key': 'resource' , 'label': 'Name' },
-                { 'key': 'type' , 'label': 'Type' },
-                { 'key': 'binary' , 'label': 'Binary' },
-                { 'key': 'size' , 'label': 'Size', 'type': 'number', 'order': 'desc' }
+                { 'key': 'resource', 'label': 'Name' },
+                { 'key': 'type', 'label': 'Type' },
+                { 'key': 'binary', 'label': 'Binary' },
+                { 'key': 'size', 'label': 'Size', 'type': 'number', 'order': 'desc' }
               )
               let $entries :=
                 let $start := utils:start($page, $sort)
@@ -69,7 +69,7 @@ function dba:database(
                 return {
                   'resource': $res,
                   'type': $res/@type,
-                  'binary': if($res/@raw = 'true') then '✓' else '–',
+                  'binary': if ($res/@raw = 'true') then '✓' else '–',
                   'size': $res/@size
                 }
               let $buttons := (
@@ -87,14 +87,14 @@ function dba:database(
                 'count': count(db:list($name))
               }
               return html:table($headers, $entries, $buttons, $params, $options)
-            ) else ()
+            }
           }
         </form>
       </td>,
-      if(not($resource)) then (
+      if (not($resource)) {
         <td class='vertical'/>,
         <td>
-          <form method='post'>
+          <form method='post' autocomplete='off'>
             <input type='hidden' name='name' value='{ $name }'/>
             <h2>Backups</h2>
             {
@@ -117,7 +117,7 @@ function dba:database(
                 }
               let $buttons := (
                 html:button('backup-create', 'Create…') update {
-                  if($db-exists) then () else insert node attribute disabled { '' } into .
+                  if (not($db-exists)) then insert node attribute disabled { '' } into .
                 },
                 html:button('backup-restore', 'Restore', ('CHECK', 'CONFIRM')),
                 html:button('backup-drop', 'Drop', ('CHECK', 'CONFIRM'))
@@ -127,31 +127,32 @@ function dba:database(
             }
           </form>
         </td>
-      ),
+      },
       <td class='vertical'/>,
       <td>{
-        if($resource) then (
+        if ($resource) {
           <h2>Resource: { $resource }</h2>,
-          <form method='post'>
-            <input type='hidden' name='name' value='{ $name }'/>
-            <input type='hidden' name='resource' value='{ $resource }' id='resource'/>
-            {
-              html:button('db-rename', 'Rename…'), ' ',
-              html:button('db-download', 'Download'), ' ',
-              html:button('db-replace', 'Replace…')
-            }
-          </form>,
+          <form method='post'>{
+            <input type='hidden' name='name' value='{ $name }'/>,
+            <input type='hidden' name='resource' value='{ $resource }' id='resource'/>,
+            html:button('db-rename', 'Rename…'), ' ',
+            html:button('db-download', 'Download'), ' ',
+            html:button('db-replace', 'Replace…')
+          }</form>,
           <b>Enter your query…</b>,
-          <input type='text' style='width:100%' name='input' id='input' onkeyup='queryResource(false)'
-            autofocus='autofocus'/>,
+          <input type='text' style='width:100%' name='input' id='input'
+            onkeyup='queryResource(false)' autofocus=''>{
+            if (db:type($name, $resource) != 'xml') { attribute disabled {} }
+          }</input>,
           <div class='small'/>,
           <textarea name='output' id='output' readonly='' spellcheck='false'/>,
           html:js('loadCodeMirror("xml", false, true); queryResource(true);')
-        ) else if($db-exists) then (
+        } else if ($db-exists) {
           <h2>Information</h2>,
           html:properties(db:info($name))
-        ) else ()
+        }
       }</td>
     }</tr>
+    => html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error })
   )
 };

@@ -11,22 +11,21 @@ import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'jobs';
 
 (:~
- : Removes jobs.
+ : Remove jobs.
  : @param  $ids  job ids
  : @return redirection
  :)
 declare
   %rest:POST
   %rest:path('/dba/job-remove')
-  %rest:query-param('id', '{$ids}')
+  %rest:form-param('id', '{$ids}')
 function dba:job-remove(
   $ids  as xs:string*
 ) as element(rest:response) {
-  let $params := try {
+  try {
     $ids ! job:remove(.),
-    { 'info': utils:info($ids, 'job', 'removed') }
+    web:redirect($dba:CAT, { 'info': utils:info($ids, 'job', 'removed') })
   } catch * {
-    { 'error': $err:description }
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
-  return web:redirect($dba:CAT, $params)
 };

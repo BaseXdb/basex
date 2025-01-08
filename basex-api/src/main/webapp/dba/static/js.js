@@ -226,7 +226,7 @@ function logEntries(key) {
   var input = document.getElementById("input").value.trim();
   if(reset && _logInput === input) return false;
   _logInput = input;
-  return query("log", input, reset).then((text) => {
+  return query("logs", input, reset).then((text) => {
     setText("", "");
     document.getElementById("output").innerHTML = text;
     var e = document.getElementById(window.location.hash.replace(/^#/, ""));

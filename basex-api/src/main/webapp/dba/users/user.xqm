@@ -1,5 +1,5 @@
 (:~
- : User page.
+ : Single user.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -14,7 +14,7 @@ declare variable $dba:CAT := 'users';
 declare variable $dba:SUB := 'user';
 
 (:~
- : Returns a single user page.
+ : Single user.
  : @param  $name     username
  : @param  $newname  new name
  : @param  $pw       password
@@ -26,12 +26,12 @@ declare variable $dba:SUB := 'user';
 declare
   %rest:GET
   %rest:path('/dba/user')
-  %rest:query-param('name',     '{$name}')
-  %rest:query-param('newname',  '{$newname}')
-  %rest:query-param('pw',       '{$pw}')
-  %rest:query-param('perm',     '{$perm}')
-  %rest:query-param('error',    '{$error}')
-  %rest:query-param('info',     '{$info}')
+  %rest:query-param('name',    '{$name}')
+  %rest:query-param('newname', '{$newname}')
+  %rest:query-param('pw',      '{$pw}')
+  %rest:query-param('perm',    '{$perm}')
+  %rest:query-param('error',   '{$error}')
+  %rest:query-param('info',    '{$info}')
   %output:method('html')
   %output:html-version('5')
 function dba:user(
@@ -44,13 +44,10 @@ function dba:user(
 ) as element(html) {
   let $user := user:list-details($name)
   let $admin := $name eq 'admin'
-  return html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error },
+  return (
     <tr>
       <td>
         <form method='post' autocomplete='off'>
-          <!--  prevent chrome from auto-completing form -->
-          <input style='display:none' type='text' name='fake1'/>
-          <input style='display:none' type='password' name='fake2'/>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
             $name, ' » ',
@@ -59,12 +56,12 @@ function dba:user(
           <input type='hidden' name='name' value='{ $name }'/>
           <table>{
             let $admin := $name eq 'admin' return (
-              if($admin) then <input type='hidden' name='newname' value='admin'/> else (
+              if ($admin) then <input type='hidden' name='newname' value='admin'/> else (
                 <tr>
                   <td>Name:</td>
                   <td>
                     <input type='text' name='newname'
-                      value='{ $newname otherwise $name }' autofocus='autofocus'/>
+                      value='{ $newname otherwise $name }' autofocus=''/>
                     <div class='small'/>
                   </td>
                 </tr>
@@ -72,7 +69,7 @@ function dba:user(
               <tr>
                 <td>Password:</td>
                 <td>
-                  <input type='password' name='pw' value='{ $pw }' autofocus='autofocus'/>
+                  <input type='password' name='pw' value='{ $pw }' autocomplete='new-password'/>
                   &#xa0;
                   <span class='note'>
                     …only changed if a new one is entered<br/>
@@ -80,14 +77,14 @@ function dba:user(
                   <div class='small'/>
                 </td>
               </tr>,
-              if($admin) then <input type='hidden' name='perm' value='admin'/> else (
+              if ($admin) then <input type='hidden' name='perm' value='admin'/> else (
                 <tr>
                   <td>Permission:</td>
                   <td>
                     <select name='perm' size='5'>{
                       let $prm := $perm otherwise $user/@permission
                       for $p in $config:PERMISSIONS
-                      return element option { if($p = $prm) then attribute selected { }, $p }
+                      return element option { if ($p = $prm) then attribute selected { }, $p }
                     }</select>
                     <div class='small'/>
                   </td>
@@ -108,35 +105,37 @@ function dba:user(
       </td>
       <td class='vertical'/>
       <td>{
-        if($admin) then () else <_>
-          <h3>Local Permissions</h3>
-          <form method='post'>
-            <input type='hidden' name='name' value='{ $name }' id='name'/>
-            <div class='small'/>
-            {
-              let $headers := (
-                { 'key': 'pattern', 'label': 'Pattern' },
-                { 'key': 'permission', 'label': 'Local Permission' }
-              )
-              let $entries := $user/database ! {
-                'pattern': @pattern,
-                'permission': @permission
+        if (not($admin)) {
+          <_>
+            <h3>Local Permissions</h3>
+            <form method='post' autocomplete='off'>
+              <input type='hidden' name='name' value='{ $name }' id='name'/>
+              <div class='small'/>
+              {
+                let $headers := (
+                  { 'key': 'pattern', 'label': 'Pattern' },
+                  { 'key': 'permission', 'label': 'Local Permission' }
+                )
+                let $entries := $user/database ! {
+                  'pattern': @pattern,
+                  'permission': @permission
+                }
+                let $buttons := if (not($admin)) {
+                  html:button('pattern-add', 'Add…'),
+                  html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
+                }
+                return html:table($headers, $entries, $buttons)
               }
-              let $buttons := if($admin) then () else (
-                html:button('pattern-add', 'Add…'),
-                html:button('pattern-drop', 'Drop', ('CHECK', 'CONFIRM'))
-              )
-              return html:table($headers, $entries, $buttons)
-            }
-          </form>
-          <div class='note'>
-            A global permission can be overwritten by a local permission.<br/>
-            Local permissions are applied to those databases that match<br/>
-            a specified pattern. The pattern is based on the <a target='_blank'
-              href='https://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.<br/>
-          </div>
-        </_>/node()
+            </form>
+            <div class='note'>
+              A global permission can be overwritten by a local permission.<br/>
+              Local permissions are applied to those databases that match<br/>
+              a specified pattern. The pattern is based on the <a target='_blank'
+                href='https://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.<br/>
+            </div>
+          </_>/node()
+        }
       }</td>
     </tr>
-  )
+  ) => html:wrap({ 'header': ($dba:CAT, $name), 'info': $info, 'error': $error })
 };

@@ -22,13 +22,13 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/backup-restore')
-  %rest:query-param('name',   '{$name}', '')
-  %rest:query-param('backup', '{$backups}')
+  %rest:form-param('name',   '{$name}', '')
+  %rest:form-param('backup', '{$backups}')
 function dba:backup-restore(
   $name     as xs:string,
   $backups  as xs:string+
-) as empty-sequence() {
-  let $target := if($name) then $dba:SUB else $dba:CAT
+) {
+  let $target := if ($name) then $dba:SUB else $dba:CAT
   return try {
     db:restore($name || '-' || head($backups)),
     utils:redirect($target, { 'name': $name, 'info': utils:info($backups, 'backup', 'restored') })
@@ -46,10 +46,10 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/backups-restore')
-  %rest:query-param('name', '{$names}')
+  %rest:form-param('name', '{$names}')
 function dba:backups-restore(
   $names  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $names ! db:restore(.),
     utils:redirect($dba:CAT, { 'info': utils:info($names, 'backup', 'restored') })

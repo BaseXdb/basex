@@ -1,5 +1,5 @@
 (:~
- : Editor page.
+ : Editor.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -12,7 +12,7 @@ import module namespace html = 'dba/html' at '../lib/html.xqm';
 declare variable $dba:CAT := 'editor';
 
 (:~
- : Editor page.
+ : Editor.
  : @param  $error  error string
  : @param  $info   info string
  : @param  $name   name of edited file
@@ -32,18 +32,18 @@ function dba:editor(
   $name   as xs:string?
 ) as element(html) {
   (: register file to be edited :)
-  let $edited := if($name) then (
+  let $edited := if ($name) {
     config:set-edited-file(config:files-dir() || $name),
     $name
-  ) else (
+  } else {
     config:edited-file()
-  )
-  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error }, (
+  }
+  return (
     <tr>
       <td colspan='2'>
         <form autocomplete='off' action='javascript:void(0);'>{
           <datalist id='files'>{ config:editor-files() ! element option { . } }</datalist>,
-          intersperse((
+          sequence-join((
             <input type='text' id='file' name='file' placeholder='Name of file'
                    list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
             <button type='submit' name='open' id='open' disabled=''
@@ -60,7 +60,7 @@ function dba:editor(
     </tr>,
     <tr>
       <td width='50%'>
-        <textarea id='editor' autofocus='autofocus' spellcheck='false'/>
+        <textarea id='editor' autofocus='' spellcheck='false'/>
       </td>
       <td width='50%'>{
         <textarea id='output' readonly='' spellcheck='false'/>,
@@ -68,5 +68,5 @@ function dba:editor(
         $edited ! html:js('openFile("' || file:name(.) || '");')
       }</td>
     </tr>
-  ))
+  ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };

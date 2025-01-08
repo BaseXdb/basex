@@ -1,5 +1,5 @@
 (:~
- : Kill web sessions.
+ : Kill sessions.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -11,14 +11,14 @@ import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'sessions';
 
 (:~
- : Kills web sessions.
+ : Kill sessions.
  : @param  $ids  session ids (including names)
  : @return redirection
  :)
 declare
   %rest:POST
   %rest:path('/dba/session-kill')
-  %rest:query-param('id', '{$ids}')
+  %rest:form-param('id', '{$ids}')
 function dba:drop(
   $ids  as xs:string*
 ) as element(rest:response) {

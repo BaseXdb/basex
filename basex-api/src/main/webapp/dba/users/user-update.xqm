@@ -1,5 +1,5 @@
 (:~
- : Updates user information.
+ : Updates users.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -21,10 +21,10 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/users-info')
-  %rest:query-param('info', '{$info}')
+  %rest:form-param('info', '{$info}')
 function dba:users-info(
   $info  as xs:string
-) as empty-sequence() {
+) {
   try {
     (: change user info :)
     let $xml := dba:user-info($info)
@@ -49,38 +49,35 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/user-update')
-  %rest:query-param('name',    '{$name}')
-  %rest:query-param('newname', '{$newname}')
-  %rest:query-param('pw',      '{$pw}')
-  %rest:query-param('perm',    '{$perm}')
-  %rest:query-param('info',    '{$info}')
+  %rest:form-param('name',    '{$name}')
+  %rest:form-param('newname', '{$newname}')
+  %rest:form-param('pw',      '{$pw}')
+  %rest:form-param('perm',    '{$perm}')
+  %rest:form-param('info',    '{$info}')
 function dba:user-update(
   $name     as xs:string,
   $newname  as xs:string,
   $pw       as xs:string,
   $perm     as xs:string,
   $info     as xs:string
-) as empty-sequence() {
+) {
   try {
-    let $old := user:list-details($name)
-    return (
-      (: change name of user :)
-      if($name = $newname) then () else (
-        if(user:exists($newname)) then (
-           error((), 'User already exists.')
-         ) else (
-           user:alter($name, $newname)
-        )
-      ),
-      (: change password :)
-      if($pw = '') then () else user:password($name, $pw),
-      (: change permissions :)
-      if($perm = $old/@permission) then () else user:grant($name, $perm),
-      (: change user info :)
-      let $xml := dba:user-info($info)
-      where not(deep-equal(user:info($name), $xml))
-      return user:update-info($xml, $name)
-    ),
+    (: change name of user :)
+    if ($name != $newname) {
+      if (user:exists($newname)) {
+        error((), 'User already exists.')
+      } else {
+        user:alter($name, $newname)
+      }
+    },
+    (: change password :)
+    if ($pw != '') { user:password($name, $pw) },
+    (: change permissions :)
+    if ($perm != user:list-details($name)/@permission) { user:grant($name, $perm) },
+    (: change user info :)
+    let $xml := dba:user-info($info)
+    where not(deep-equal(user:info($name), $xml))
+    return user:update-info($xml, $name),
     utils:redirect($dba:CAT, { 'name': $newname, 'info': 'User was updated.' })
   } catch * {
     utils:redirect($dba:SUB, {
@@ -97,16 +94,20 @@ function dba:user-update(
 declare %private function dba:user-info(
   $info  as xs:string
 ) as element(info) {
-  if($info) then (
-    let $xml := parse-xml($info)/*
-    return if($xml/self::info) then (
+  if ($info) {
+    let $xml := try {
+      parse-xml($info)/*
+    } catch * {
+      error((), 'User information: XML is not well-formed.')
+    }
+    return if ($xml/self::info) {
       $xml update {
         delete node .//text()[not(normalize-space())]
       }
-    ) else (
-      error((), 'XML with "info" root element expected.')
-    )
-  ) else (
+    } else {
+      error((), 'User information: "info" root element expected.')
+    }
+  } else {
     element info { }
-  )
+  }
 };

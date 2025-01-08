@@ -16,7 +16,7 @@ declare %private variable $config:EDITED-FILE := 'dba-edited-file';
 declare variable $config:DBA-DIR := (
   for $dir in db:option('dbpath') || '/.dba'
   return (
-    if(file:exists($dir)) then () else file:create-dir($dir),
+    if (not(file:exists($dir))) { file:create-dir($dir) },
     file:path-to-native($dir)
   )
 );
@@ -57,7 +57,7 @@ declare %basex:lazy %private variable $config:DEFAULTS := {
 
 (:~ Currently assigned options. :)
 declare %basex:lazy %private variable $config:OPTIONS := (
-  if(file:exists($config:OPTIONS-FILE)) then (
+  if (file:exists($config:OPTIONS-FILE)) {
     try {
       (: merge defaults with saved options :)
       let $options := fetch:doc($config:OPTIONS-FILE)/options
@@ -65,15 +65,15 @@ declare %basex:lazy %private variable $config:OPTIONS := (
         map:for-each($config:DEFAULTS, fn($key, $value) {
           map:entry($key,
             let $option := $options/*[name() = $key]
-            return if($option) then (
+            return if ($option) {
               typeswitch($value) {
                 case xs:numeric  return xs:integer($option)
                 case xs:boolean  return xs:boolean($option)
                 default          return xs:string($option)
               }
-            ) else (
+            } else {
               $value
-            )
+            }
           )
         })
       )
@@ -81,9 +81,9 @@ declare %basex:lazy %private variable $config:OPTIONS := (
       (: use defaults if an error occurs while parsing the options :)
       $config:DEFAULTS
     }
-  ) else (
+  } else {
     $config:DEFAULTS
-  )
+  }
 );
 
 (:~

@@ -17,16 +17,14 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:path('/dba/dir-change')
-  %rest:query-param('dir', '{$dir}')
+  %rest:form-param('dir', '{$dir}')
 function dba:dir-change(
   $dir  as xs:string
 ) as element(rest:response) {
   try {
     let $sep := file:dir-separator()
-    let $path := file:path-to-native(if(contains($dir, $sep)) then (
-      $dir
-    ) else (
-      config:files-dir() || $dir || $sep)
+    let $path := file:path-to-native(
+      if (contains($dir, $sep)) then $dir else config:files-dir() || $dir || $sep
     )
     return (
       (: ensure that the directory can be accessed :)

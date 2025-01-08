@@ -1,5 +1,5 @@
 (:~
- : Files page.
+ : Files.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -12,10 +12,11 @@ import module namespace html = 'dba/html' at '../lib/html.xqm';
 declare variable $dba:CAT := 'files';
 
 (:~
- : Files page.
+ : Files.
  : @param  $sort   table sort key
  : @param  $error  error message
  : @param  $info   info message
+ : @param  $page   current page
  : @return page
  :)
 declare
@@ -34,11 +35,11 @@ function dba:files(
   $page   as xs:string
 ) as element(html) {
   let $dir := config:files-dir()
-  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return (
     <tr>
       <td>
         <h2>Directory</h2>
-        <form action='dir-change' method='post'>
+        <form action='dir-change' method='post' autocomplete='off'>
           <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
             let $dir-path := fn($path) {
               try {
@@ -74,7 +75,7 @@ function dba:files(
         </form>
         <p/>
 
-        <form method='post'>{
+        <form method='post' autocomplete='off'>{
           let $headers := (
             { 'key': 'name', 'label': 'Name', 'type': 'dynamic' },
             { 'key': 'date', 'label': 'Date', 'type': 'dateTime', 'order': 'desc' },
@@ -84,7 +85,7 @@ function dba:files(
           let $entries := (
             let $limit := config:get($config:MAXCHARS)
             let $jobs := job:list-details()
-            let $parent := if(file:parent($dir)) then ($dir || '..') else ()
+            let $parent := if (file:parent($dir)) { $dir || '..' }
             for $file in ($parent, file:children($dir))
             let $dir := file:is-dir($file)
             let $name := file:name($file)
@@ -95,31 +96,31 @@ function dba:files(
             let $size := file:size($file)
             return {
               'name': fn() {
-                if($dir) then html:link($name, 'dir-change', { 'dir': $name }) else $name
+                if ($dir) then html:link($name, 'dir-change', { 'dir': $name }) else $name
               },
               'date': $modified,
               'bytes': $size,
               'action': fn() {
-                intersperse(
-                  if($dir) then () else (
+                sequence-join(
+                  if (not($dir)) {
                     html:link('Download', 'file/' || encode-for-uri($name)),
-                    if($size <= $limit) then (
+                    if ($size <= $limit) {
                       html:link('Edit', 'editor', { 'name': $name })
-                    ) else (),
-                    if(matches($name, '\.xq$')) then (
+                    },
+                    if (matches($name, '\.xq$')) {
                       (: choose first running job :)
                       let $job := head(
                         let $uri := replace(file:path-to-uri($file), '^file:/*', '')
                         return $jobs[replace(., '^file:/*', '') = $uri]
                       )
                       let $id := string($job/@id)
-                      return if(empty($job)) then (
+                      return if (empty($job)) {
                         html:link('Start', 'file-start', { 'file': $name })
-                      ) else (
+                      } else {
                         html:link('Job', 'jobs', { 'job': $id })
-                      )
-                    ) else ()
-                  )
+                      }
+                    }
+                  }
                 , ' · ')
               }
             }
@@ -130,13 +131,13 @@ function dba:files(
         }</form>
 
         <h3>Create Directory</h3>
-        <form method='post'>{
+        <form method='post' autocomplete='off'>{
           <input type='text' name='name'/>, ' ',
           html:button('dir-create', 'Create')
         }</form>
 
         <h3>Upload Files</h3>
-        <form method='post' enctype='multipart/form-data'>{
+        <form method='post' enctype='multipart/form-data' autocomplete='off'>{
           <input type='file' name='files' multiple='multiple'/>,
           html:button('file-upload', 'Upload')
         }</form>
@@ -145,5 +146,6 @@ function dba:files(
         </div>
       </td>
     </tr>
+    => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
   )
 };

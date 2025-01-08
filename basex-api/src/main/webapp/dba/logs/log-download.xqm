@@ -16,17 +16,17 @@ declare variable $dba:CAT := 'logs';
 declare
   %rest:POST
   %rest:path('/dba/logs-download')
-  %rest:query-param('name', '{$names}')
+  %rest:form-param('name', '{$names}')
 function dba:logs-download(
   $names  as xs:string*
 ) as item()+ {
-  if(count($names) = 1) then (
+  if (count($names) = 1) {
     web:response-header(
       { 'media-type': 'text/plain' },
       { 'Content-Disposition': 'attachment; filename=' || $names || '.log' }
     ),
     file:read-binary(db:option('dbpath') || '/.logs/' || $names || '.log')
-  ) else (
+  } else {
     web:response-header(
       { 'media-type': 'application/zip' },
       { 'Content-Disposition': 'attachment; filename=' ||
@@ -37,5 +37,5 @@ function dba:logs-download(
       $logs,
       $logs ! file:read-binary(db:option('dbpath') || '/.logs/' || .)
     )
-  )
+  }
 };

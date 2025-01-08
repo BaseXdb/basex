@@ -13,47 +13,44 @@ import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'users';
 
 (:~
- : Form for creating a new user.
- : @param  $name   entered username
- : @param  $pw     entered password
- : @param  $perm   chosen permission
- : @param  $error  error string
- : @return page
+ : Create new user.
+ : @param  $name  entered username
+ : @param  $pw    entered password
+ : @param  $perm  chosen permission
+ : @param  $do    perform update
+ : @return form or redirection
  :)
 declare
-  %rest:GET
+  %updating
   %rest:POST
   %rest:path('/dba/user-create')
-  %rest:query-param('name',  '{$name}')
-  %rest:query-param('pw',    '{$pw}')
-  %rest:query-param('perm',  '{$perm}', 'none')
-  %rest:query-param('error', '{$error}')
+  %rest:form-param('name', '{$name}')
+  %rest:form-param('pw',   '{$pw}')
+  %rest:form-param('perm', '{$perm}', 'none')
+  %rest:form-param('do',   '{$do}')
   %output:method('html')
   %output:html-version('5')
 function dba:user-create(
-  $name   as xs:string?,
-  $pw     as xs:string?,
-  $perm   as xs:string,
-  $error  as xs:string?
-) as element(html) {
-  html:wrap({ 'header': $dba:CAT, 'error': $error },
+  $name  as xs:string?,
+  $pw    as xs:string?,
+  $perm  as xs:string,
+  $do    as xs:string?
+) {
+  html:update($do, { 'header': $dba:CAT }, fn() {
     <tr>
       <td>
         <form method='post' autocomplete='off'>
-          <!--  force chrome not to autocomplete form -->
-          <input style='display:none' type='text' name='fake1'/>
-          <input style='display:none' type='password' name='fake2'/>
+          <input type='hidden' name='do' value='do'/>
+          <!-- force chrome not to autocomplete form -->
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
-            html:button('user-create-do', 'Create')
+            html:button('user-create', 'Create')
           }</h2>
-          <!-- dummy value; prevents reset of options when nothing is selected -->
-          <input type='hidden' name='opts' value='x'/>
           <table>
             <tr>
               <td>Name:</td>
               <td>
-                <input type='text' name='name' value='{ $name }' autofocus='autofocus'/>
+                <input type='text' name='name' value='{ $name }' autofocus=''/>
                 <div class='small'/>
               </td>
             </tr>
@@ -78,38 +75,12 @@ function dba:user-create(
         </form>
       </td>
     </tr>
-  )
-};
-
-(:~
- : Creates a user.
- : @param  $name  username
- : @param  $pw    password
- : @param  $perm  permission
- : @return redirection
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path('/dba/user-create-do')
-  %rest:query-param('name', '{$name}')
-  %rest:query-param('pw',   '{$pw}')
-  %rest:query-param('perm', '{$perm}')
-function dba:user-create-do(
-  $name  as xs:string,
-  $pw    as xs:string,
-  $perm  as xs:string
-) as empty-sequence() {
-  try {
-    if(user:exists($name)) then (
+  }, fn() {
+    if (user:exists($name)) {
       error((), 'User already exists.')
-    ) else (
-      user:create($name, $pw, $perm)
-    ),
-    utils:redirect($dba:CAT, { 'info': 'User was created.' })
-  } catch * {
-    utils:redirect('user-create', {
-      'name': $name, 'pw': $pw, 'perm': $perm, 'error': $err:description
-    })
-  }
+    } else {
+      user:create($name, $pw, $perm),
+      utils:redirect($dba:CAT, { 'info': 'User was created.' })
+    }
+  })
 };

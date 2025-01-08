@@ -18,7 +18,7 @@ declare variable $dba:CAT := 'logs';
 declare
   %rest:POST
   %rest:path('/dba/logs-delete')
-  %rest:query-param('name', '{$names}')
+  %rest:form-param('name', '{$names}')
 function dba:logs-delete(
   $names  as xs:string*
 ) as element(rest:response) {

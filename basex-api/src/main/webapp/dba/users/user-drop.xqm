@@ -19,10 +19,10 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/user-drop')
-  %rest:query-param('name', '{$names}')
+  %rest:form-param('name', '{$names}')
 function dba:user-drop(
   $names  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $names ! user:drop(.),
     utils:redirect($dba:CAT, { 'info': utils:info($names, 'user', 'dropped') })

@@ -12,7 +12,7 @@ declare variable $dba:SUB := 'database';
 
 (:~
  : Deletes resources.
- : @param  $names     database
+ : @param  $name      database
  : @param  $resource  resources
  : @return redirection
  :)
@@ -20,12 +20,12 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/db-delete')
-  %rest:query-param('name',     '{$name}')
-  %rest:query-param('resource', '{$resources}')
+  %rest:form-param('name',     '{$name}')
+  %rest:form-param('resource', '{$resources}')
 function dba:db-delete(
   $name       as xs:string,
   $resources  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $resources ! db:delete($name, .),
     utils:redirect($dba:SUB, { 'name': $name, 'info': utils:info($resources, 'resource', 'deleted') })

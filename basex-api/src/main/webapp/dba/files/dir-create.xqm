@@ -18,7 +18,7 @@ declare variable $dba:CAT := 'files';
 declare
   %rest:POST
   %rest:path('/dba/dir-create')
-  %rest:query-param('name', '{$name}')
+  %rest:form-param('name', '{$name}')
 function dba:dir-create(
   $name  as xs:string
 ) as element(rest:response) {

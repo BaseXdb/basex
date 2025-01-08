@@ -11,7 +11,7 @@ import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 declare variable $dba:SUB := 'user';
 
 (:~
- : Drops a pattern.
+ : Drop pattern.
  : @param  $name      username
  : @param  $patterns  database patterns
  : @return redirection
@@ -20,12 +20,12 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/pattern-drop')
-  %rest:query-param('name',    '{$name}')
-  %rest:query-param('pattern', '{$patterns}')
+  %rest:form-param('name',    '{$name}')
+  %rest:form-param('pattern', '{$patterns}')
 function dba:pattern-drop(
   $name      as xs:string,
   $patterns  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $patterns ! user:drop($name, .),
     utils:redirect($dba:SUB, { 'name': $name, 'info': utils:info($patterns, 'pattern', 'dropped') })

@@ -1,5 +1,5 @@
 (:~
- : Main page.
+ : List of databases.
  :
  : @author Christian Grün, BaseX Team, BSD License
  :)
@@ -12,11 +12,11 @@ import module namespace utils = 'dba/utils' at '../lib/utils.xqm';
 declare variable $dba:CAT := 'databases';
 
 (:~
- : Main page.
+ : List of databases.
  : @param  $sort   table sort key
- : @param  $error  error string
- : @param  $info   info string
  : @param  $page   current page
+ : @param  $info   info string
+ : @param  $error  error string
  : @return page
  :)
 declare
@@ -57,10 +57,10 @@ function dba:databases(
       'date': $date
     }
   )
-  return html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return (
     <tr>
       <td>
-        <form method='post'>
+        <form method='post' autocomplete='off'>
           <h2>Databases</h2>
           {
             let $headers := (
@@ -91,7 +91,7 @@ function dba:databases(
       <td class='vertical'/>
       <td>
         <h2>Upload Backups</h2>
-        <form method='post' enctype='multipart/form-data'>{
+        <form method='post' enctype='multipart/form-data' autocomplete='off'>{
           <input type='file' name='files' multiple='multiple'/>,
           html:button('backup-upload', 'Upload')
         }</form>
@@ -99,7 +99,7 @@ function dba:databases(
           Ensure that your server has enough RAM assigned to upload large backups.
         </div>
         <div class='small'/>
-        <form method='post'>
+        <form method='post' autocomplete='off'>
           <input type='hidden' name='name' value=''/>
           <h2>General Backups</h2>
           <div class='note'>
@@ -141,5 +141,6 @@ function dba:databases(
         </form>
       </td>
     </tr>
+    => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
   )
 };

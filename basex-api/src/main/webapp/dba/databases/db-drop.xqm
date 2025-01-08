@@ -19,10 +19,10 @@ declare
   %updating
   %rest:POST
   %rest:path('/dba/dbs-drop')
-  %rest:query-param('name', '{$names}')
+  %rest:form-param('name', '{$names}')
 function dba:dbs-drop(
   $names  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $names ! db:drop(.),
     utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'dropped') })

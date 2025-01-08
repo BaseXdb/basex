@@ -9,9 +9,9 @@ import module namespace utils = 'dba/utils' at '../../lib/utils.xqm';
 
 (:~
  : Runs a query on a document and returns the result as string.
+ : @param  $query     query
  : @param  $name      name of database
  : @param  $resource  resource
- : @param  $query     query
  : @return result string
  :)
 declare
@@ -29,12 +29,12 @@ function dba:db-query(
   utils:query(
     $query[.] otherwise '.',
     let $type := db:type($name, $resource)
-    return head(if($type = 'xml') then (
+    return head(if ($type = 'xml') {
       db:get($name, $resource)
-    ) else if($type = 'binary') then (
+    } else if ($type = 'binary') {
       db:get-binary($name, $resource)
-    ) else (
+    } else {
       db:get-value($name, $resource)
-    ))
+    })
   )
 };
