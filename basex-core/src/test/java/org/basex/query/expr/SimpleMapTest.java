@@ -67,7 +67,7 @@ public final class SimpleMapTest extends SandboxTest {
     check("<a/> ! . ! .", "<a/>", root(CElem.class));
     check("(1, 2)[. ! number() = 2]", 2, empty(DualMap.class));
 
-    check("trace(1) ! (. + 1)", 2, exists(Focus.class));
+    check("trace(1) ! (. + 1)", 2, exists(Pipeline.class));
     check("<_>1</_>[. = 1] ! trace(.)", "<_>1</_>", exists(TRACE));
   }
 
@@ -81,7 +81,7 @@ public final class SimpleMapTest extends SandboxTest {
 
   /** Flatten nested operators. */
   @Test public void flatten() {
-    check("(1, 2)[. != 0] ! ((. + .) ! (. * .))", "4\n16", count(Focus.class, 1));
+    check("(1, 2)[. != 0] ! ((. + .) ! (. * .))", "4\n16", count(Pipeline.class, 1));
     // do not rewrite positional access
     check("(1, 2)[. != 0] ! ((1 to .) ! position())", "1\n1\n2", count(CachedMap.class, 1));
   }

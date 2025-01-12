@@ -43,37 +43,37 @@ public final class XQueryExtensionsTest extends SandboxTest {
     check("2 -> .", 2, root(Int.class));
     check("2 -> .", 2, root(Int.class));
 
-    check("void((), true()) -> void((), true()) -> 2", 2, root(Focus.class), count(VOID, 2));
-    check("void((), true()) -> 2", 2, root(Focus.class));
-    check("void((), true()) -> . -> 2", 2, root(Focus.class), empty(ContextValue.class));
-    check("(void((), true()) -> void((), true())) -> 2", 2, count(Focus.class, 1));
+    check("void((), true()) -> void((), true()) -> 2", 2, root(Pipeline.class), count(VOID, 2));
+    check("void((), true()) -> 2", 2, root(Pipeline.class));
+    check("void((), true()) -> . -> 2", 2, root(Pipeline.class), empty(ContextValue.class));
+    check("(void((), true()) -> void((), true())) -> 2", 2, count(Pipeline.class, 1));
 
     check("(1, 2) -> head(.) + tail(.)", 3, root(Int.class));
     check("(1, 2) -> (head(.) + tail(.))", 3, root(Int.class));
-    check("(<a/>, <b/>) -> (foot(.), head(.))", "<b/>\n<a/>", root(Focus.class));
+    check("(<a/>, <b/>) -> (foot(.), head(.))", "<b/>\n<a/>", root(Pipeline.class));
 
     check("2 -> . * .", 4, root(Int.class));
     check("2 -> (. * .)", 4, root(Int.class));
     check("<a>2</a> -> . * .", 4, root(Dbl.class));
     check("<a>2</a> -> (. * .)", 4, root(Dbl.class));
-    check("<?_ 2?> -> xs:integer() -> . * .", 4, root(Focus.class));
-    check("<?_ 2?> -> xs:integer() -> (. * .)", 4, root(Focus.class));
+    check("<?_ 2?> -> xs:integer() -> . * .", 4, root(Pipeline.class));
+    check("<?_ 2?> -> xs:integer() -> (. * .)", 4, root(Pipeline.class));
 
     check("<?_ 2?> ! xs:integer() ! (. * .) ! (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
     check("<?_ 2?> ! xs:integer() ! (. * .) -> (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
     check("<?_ 2?> ! xs:integer() -> (. * .) ! (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
     check("<?_ 2?> -> xs:integer() ! (. * .) ! (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
     check("<?_ 2?> ! xs:integer() -> (. * .) -> (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
     check("<?_ 2?> -> xs:integer() ! (. * .) -> (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
     check("<?_ 2?> -> xs:integer() -> (. * .) ! (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
     check("<?_ 2?> -> xs:integer() -> (. * .) -> (. * .)", 16,
-        count(Focus.class, 1), root(Focus.class));
+        count(Pipeline.class, 1), root(Pipeline.class));
   }
 }

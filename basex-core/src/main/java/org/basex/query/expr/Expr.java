@@ -197,7 +197,7 @@ public abstract class Expr extends ExprInfo {
    *   <li>{@link Preds#inlineable}</li>
    *   <li>{@link Path#inlineable}</li>
    *   <li>{@link SimpleMap#inlineable}</li>
-   *   <li>{@link Focus#inlineable}</li>
+   *   <li>{@link Pipeline#inlineable}</li>
    *   <li>{@link TransformWith#inlineable}</li>
    * </ul>
    *

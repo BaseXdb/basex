@@ -1133,7 +1133,7 @@ public class QueryParser extends InputParser {
     if(expr == null) expr = replace();
     if(expr == null) expr = updatingFunctionCall();
     if(expr == null) expr = copyModify();
-    if(expr == null) expr = focus();
+    if(expr == null) expr = or();
     return expr;
   }
 
@@ -1623,23 +1623,6 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FocusExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr focus() throws QueryException {
-    final Expr expr = or();
-    if(expr != null) {
-      if(wsConsumeWs("->") || wsConsumeWs("-\uFF1E")) {
-        final ExprList el = new ExprList(expr);
-        do add(el, or()); while(wsConsumeWs("->") || wsConsumeWs("-\uFF1E"));
-        return new Focus(info(), el.finish());
-      }
-    }
-    return expr;
-  }
-
-  /**
    * Parses the "OrExpr" rule.
    * @return query expression or {@code null}
    * @throws QueryException query exception
@@ -1898,10 +1881,46 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
-    final Expr expr = arrow();
+    final Expr expr = transformWith();
     if(!wsConsumeWs(CAST)) return expr;
     wsCheck(AS);
     return new Cast(info(), expr, castTarget());
+  }
+
+  /**
+   * Parses the "TransformWithExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr transformWith() throws QueryException {
+    Expr expr = pipeline();
+    while(expr != null) {
+      if(wsConsume(TRANSFORM)) {
+        wsCheck(WITH);
+      } else if(!wsConsume(UPDATE)) {
+        break;
+      }
+      qc.updating();
+      expr = new TransformWith(info(), expr, enclosedExpr());
+    }
+    return expr;
+  }
+
+  /**
+   * Parses the "PipelineExpr" rule.
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr pipeline() throws QueryException {
+    final Expr expr = arrow();
+    if(expr != null) {
+      if(wsConsumeWs("->") || wsConsumeWs("-\uFF1E")) {
+        final ExprList el = new ExprList(expr);
+        do add(el, arrow()); while(wsConsumeWs("->") || wsConsumeWs("-\uFF1E"));
+        return new Pipeline(info(), el.finish());
+      }
+    }
+    return expr;
   }
 
   /**
@@ -1910,7 +1929,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr arrow() throws QueryException {
-    Expr expr = transformWith();
+    Expr expr = unary();
     if(expr != null) {
       while(true) {
         if(wsConsume("=?>") || wsConsume("=?\uFF1E")) {
@@ -1953,25 +1972,6 @@ public class QueryParser extends InputParser {
           }
         }
       }
-    }
-    return expr;
-  }
-
-  /**
-   * Parses the "TransformWithExpr" rule.
-   * @return query expression or {@code null}
-   * @throws QueryException query exception
-   */
-  private Expr transformWith() throws QueryException {
-    Expr expr = unary();
-    while(expr != null) {
-      if(wsConsume(TRANSFORM)) {
-        wsCheck(WITH);
-      } else if(!wsConsume(UPDATE)) {
-        break;
-      }
-      qc.updating();
-      expr = new TransformWith(info(), expr, enclosedExpr());
     }
     return expr;
   }
@@ -2549,7 +2549,7 @@ public class QueryParser extends InputParser {
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
           params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
-          expr = new Focus(ii, localVars.resolve(name, ii), enclosedExpr());
+          expr = new Pipeline(ii, localVars.resolve(name, ii), enclosedExpr());
         }
         final VarScope vs = localVars.popContext();
         if(anns.contains(Annotation.PRIVATE) || anns.contains(Annotation.PUBLIC))

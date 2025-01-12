@@ -1439,7 +1439,7 @@ public final class FnModuleTest extends SandboxTest {
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) + 1"),
         "", empty());
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) - 1"),
-        9, root(Focus.class));
+        9, root(Pipeline.class));
 
     check(func.args(VOID.args(" ()"), 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));

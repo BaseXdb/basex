@@ -10,18 +10,18 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Focus expression.
+ * Pipeline expression.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Focus extends Mapping {
+public final class Pipeline extends Mapping {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param exprs expressions
    */
-  public Focus(final InputInfo info, final Expr... exprs) {
+  public Pipeline(final InputInfo info, final Expr... exprs) {
     super(info, exprs[exprs.length - 1].seqType(), exprs);
   }
 
@@ -36,7 +36,7 @@ public final class Focus extends Mapping {
   public static Expr get(final CompileContext cc, final InputInfo info, final Expr... exprs)
       throws QueryException {
     final int el = exprs.length;
-    return el > 1 ? new Focus(info, exprs).optimize(cc) : exprs[0];
+    return el > 1 ? new Pipeline(info, exprs).optimize(cc) : exprs[0];
   }
 
   @Override
@@ -113,13 +113,13 @@ public final class Focus extends Mapping {
   }
 
   @Override
-  public Focus copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Focus(info, Arr.copyAll(cc, vm, exprs)));
+  public Pipeline copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    return copyType(new Pipeline(info, Arr.copyAll(cc, vm, exprs)));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Focus && super.equals(obj);
+    return this == obj || obj instanceof Pipeline && super.equals(obj);
   }
 
   @Override
