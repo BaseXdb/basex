@@ -103,14 +103,6 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Fallback function for characters that cannot be encoded.
-   * @param cp codepoint to be printed
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void fallback(final int cp) throws IOException { }
-
-  /**
    * Prints a token to the output stream.
    * @param token token to be written
    * @throws IOException I/O exception

@@ -28,8 +28,6 @@ public final class LogEntry {
 
   /** Date. */
   Date date;
-  /** Logger. */
-  Log log;
 
   /** Cached string representation. */
   private String string;

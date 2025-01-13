@@ -280,20 +280,6 @@ public final class XMLToken {
   }
 
   /**
-   * Checks if the specified token contains invalid XML 1.0 characters.
-   * @param token the token to be checked
-   * @return invalid character or {@code -1}
-   */
-  public static int invalid(final byte[] token) {
-    final int tl = token.length;
-    for(int t = 0; t < tl; t += cl(token, t)) {
-      final int cp = cp(token, t);
-      if(!XMLToken.valid(cp)) return cp;
-    }
-    return -1;
-  }
-
-  /**
    * Returns a URI-decoded token.
    * @param token encoded token
    * @return decoded token

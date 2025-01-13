@@ -142,9 +142,8 @@ public final class FnElementsToMaps extends StandardFunc {
     } else if(elements.isEmpty()) {
       l = attributes.isEmpty() ? Layout.SIMPLE : Layout.SIMPLE_PLUS;
     } else if(((Checks<ANode>) node -> empty(texts)).all(nodes)) {
-      if(equalNames(elements) && (
-        ((Checks<ANode>) node -> children(NodeType.ELEMENT, nodes).size() > 1).any(nodes)
-      )) {
+      if(equalNames(elements) && ((Checks<ANode>) node ->
+          children(NodeType.ELEMENT, nodes).size() > 1).any(nodes)) {
         l = attributes.isEmpty() ? Layout.LIST : Layout.LIST_PLUS;
       } else if(((Checks<ANode>) node -> differentNames(elements)).all(nodes)) {
         l = Layout.RECORD;
@@ -251,8 +250,8 @@ public final class FnElementsToMaps extends StandardFunc {
       case LOCAL:
         name = qnm.local(); break;
       default:
-        if(node.type == NodeType.ELEMENT ? (parent == null ? qnm.uri().length == 0 :
-            Token.eq(parent.qname().uri(), qnm.uri())) : qnm.uri().length == 0) {
+        if(node.type == NodeType.ELEMENT ? parent == null ? qnm.uri().length == 0 :
+            Token.eq(parent.qname().uri(), qnm.uri()) : qnm.uri().length == 0) {
           name = qnm.local();
         } else {
           name = Token.eq(qnm.uri(), QueryText.XML_URI) ? qnm.string() : qnm.eqName();

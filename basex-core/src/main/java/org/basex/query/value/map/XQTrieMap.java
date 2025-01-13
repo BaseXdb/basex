@@ -17,7 +17,7 @@ public final class XQTrieMap extends XQMap {
   /** Root node. */
   private final TrieNode root;
   /** Map order ({@code null} for empty and singleton maps). */
-  private TrieOrder order;
+  private final TrieOrder order;
 
   /**
    * Constructor.

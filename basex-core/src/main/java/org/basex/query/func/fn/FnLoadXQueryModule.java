@@ -103,7 +103,7 @@ public final class FnLoadXQueryModule extends Parse {
         Value val = opt.get(CONTEXT_ITEM);
         try {
           if(mqc.contextType != null)  val = mqc.contextType.coerce(val, null, mqc, null, info);
-        } catch (final QueryException ex) {
+        } catch(final QueryException ex) {
           Util.debug(ex);
           throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_CONTEXT_TYPE_X_X.get(info, modUri,
               ex.getLocalizedMessage());
@@ -152,9 +152,9 @@ public final class FnLoadXQueryModule extends Parse {
       if(!var.anns.contains(Annotation.PRIVATE) && Token.eq(var.sc.module.uri(), modUri)) {
         try {
           variables.put(var.name, var.value(mqc));
-        } catch (QueryException ex) {
+        } catch(final QueryException ex) {
           throw ex;
-        } catch (Exception ex) {
+        } catch(final Exception ex) {
           Util.debug(ex);
           throw VAREMPTY_X.get(info, var.name());
         }

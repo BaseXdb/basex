@@ -146,7 +146,7 @@ public final class RequestContext {
     for(final String param : Strings.split(params, '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {
-        final ItemList list = map.computeIfAbsent(Str.get(parts[0]), () -> new ItemList());
+        final ItemList list = map.computeIfAbsent(Str.get(parts[0]), ItemList::new);
         list.add(Atm.get(XMLToken.decodeUri(parts[1])));
       }
     }

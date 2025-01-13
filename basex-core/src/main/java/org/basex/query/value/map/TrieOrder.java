@@ -65,6 +65,6 @@ final class TrieOrder {
   @Override
   public String toString() {
     return Util.className(this) + '[' + "Keys: " + added  +
-        (removed != null ? ("; removed: " + removed) : "") + ']';
+        (removed != null ? "; removed: " + removed : "") + ']';
   }
 }

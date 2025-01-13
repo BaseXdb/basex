@@ -135,7 +135,6 @@ public final class Log implements QueryTracer {
     if(len > maxLen) inf = inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "...";
 
     final LogEntry entry = new LogEntry();
-    entry.log = this;
     entry.date = new Date();
     entry.time = DateTime.format(entry.date, DateTime.TIME);
     entry.address = address != null ? address.replaceFirst("^/", "") : SERVER;

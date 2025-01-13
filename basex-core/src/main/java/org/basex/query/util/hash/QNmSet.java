@@ -70,16 +70,6 @@ public class QNmSet extends ASet implements Iterable<QNm> {
   }
 
   /**
-   * Returns the key with the specified id.
-   * All ids start with {@code 1} instead of {@code 0}.
-   * @param id id of the key to return
-   * @return key
-   */
-  public final QNm key(final int id) {
-    return keys[id];
-  }
-
-  /**
    * Stores the specified key and returns its id, or returns the negative id if the key has already
    * been stored. The public method {@link #add} can be used to check if an added value exists.
    * @param key key to be indexed

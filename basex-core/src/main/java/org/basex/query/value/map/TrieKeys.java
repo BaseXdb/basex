@@ -20,7 +20,7 @@ final class TrieKeys implements Iterable<Item> {
   /** Keys. */
   private Item[] keys;
   /** Number of keys. */
-  private int size;
+  private final int size;
 
   /**
    * Empty constructor.
