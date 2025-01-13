@@ -33,8 +33,8 @@ public final class XQueryExtensionsTest extends SandboxTest {
         "return try { $f() } catch * { count($err:stack-trace) }", 1);
   }
 
-  /** Focus expression. */
-  @Test public void focus() {
+  /** Pipeline operator. */
+  @Test public void pipeline() {
     query(wrap(1) + " -> (., . to 6)", "1\n1\n2\n3\n4\n5\n6");
     query("count(" + wrap(1) + " -> (., . to 6))", 7);
 
@@ -48,15 +48,11 @@ public final class XQueryExtensionsTest extends SandboxTest {
     check("void((), true()) -> . -> 2", 2, root(Pipeline.class), empty(ContextValue.class));
     check("(void((), true()) -> void((), true())) -> 2", 2, count(Pipeline.class, 1));
 
-    check("(1, 2) -> head(.) + tail(.)", 3, root(Int.class));
     check("(1, 2) -> (head(.) + tail(.))", 3, root(Int.class));
     check("(<a/>, <b/>) -> (foot(.), head(.))", "<b/>\n<a/>", root(Pipeline.class));
 
-    check("2 -> . * .", 4, root(Int.class));
     check("2 -> (. * .)", 4, root(Int.class));
-    check("<a>2</a> -> . * .", 4, root(Dbl.class));
     check("<a>2</a> -> (. * .)", 4, root(Dbl.class));
-    check("<?_ 2?> -> xs:integer() -> . * .", 4, root(Pipeline.class));
     check("<?_ 2?> -> xs:integer() -> (. * .)", 4, root(Pipeline.class));
 
     check("<?_ 2?> ! xs:integer() ! (. * .) ! (. * .)", 16,
