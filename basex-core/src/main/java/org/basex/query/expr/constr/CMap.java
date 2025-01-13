@@ -71,7 +71,7 @@ public final class CMap extends Arr {
     for(int e = 0; e < el; e += 2) {
       final Item key = toAtomItem(exprs[e], qc);
       final Value value = exprs[e + 1].value(qc);
-      if(mb.get(key) != null) throw MAPDUPLKEY_X.get(info);
+      if(mb.contains(key)) throw MAPDUPLKEY_X.get(info);
       mb.put(key, value);
     }
     return mb.map();

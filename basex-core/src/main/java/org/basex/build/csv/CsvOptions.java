@@ -17,8 +17,7 @@ import org.basex.util.options.*;
  */
 public class CsvOptions extends Options {
   /** Option: column separator. */
-  public static final StringOption SEPARATOR =
-      new StringOption("separator", CsvSep.COMMA.toString());
+  public static final StringOption SEPARATOR = new StringOption("separator", ",");
   /** Option: format. */
   public static final EnumOption<CsvFormat> FORMAT = new EnumOption<>("format", CsvFormat.DIRECT);
   /** Option: header line. */
@@ -32,7 +31,7 @@ public class CsvOptions extends Options {
   /** Option: row delimiter. */
   public static final StringOption ROW_DELIMITER = new StringOption("row-delimiter", "\n");
   /** Option: quote character. */
-  public static final StringOption QUOTE_CHARACTER = new StringOption("quote", "\"");
+  public static final StringOption QUOTE_CHARACTER = new StringOption("quote-character", "\"");
   /** Option: trim whitespace. */
   public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
   /** Option: strict quoting (implies QUOTES). */

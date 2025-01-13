@@ -97,10 +97,8 @@ public final class CsvParser {
           if(ch != quoteCharacter) {
             quoted = false;
             if(strictQuoting && ch != separator && ch != rowDelimiter && ch != -1)
-              throw QueryError.CSV_QUOTING_X.get(ii,
-                  new String(Character.toChars(quoteCharacter)) + entry
-                      + new String(Character.toChars(quoteCharacter))
-                      + new String(Character.toChars(ch)));
+              throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(
+                  quoteCharacter).add(entry).add(quoteCharacter).add(ch));
             continue;
           }
           if(backslashes) add(entry, quoteCharacter);
@@ -113,8 +111,7 @@ public final class CsvParser {
           // parse quote
           quoted = true;
         } else if (strictQuoting) {
-          throw QueryError.CSV_QUOTING_X.get(ii,
-              entry + new String(Character.toChars(quoteCharacter)));
+          throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(entry).add(quoteCharacter));
         } else {
           ch = input.read();
           if(ch != quoteCharacter || backslashes) add(entry, quoteCharacter);
@@ -136,7 +133,7 @@ public final class CsvParser {
       ch = input.read();
     }
     if(quoted && strictQuoting)
-      throw QueryError.CSV_QUOTING_X.get(ii, new String(Character.toChars(quoteCharacter)) + entry);
+      throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(quoteCharacter).add(entry));
     record(entry, true, true);
   }
 

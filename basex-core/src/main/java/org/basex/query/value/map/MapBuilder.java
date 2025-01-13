@@ -121,6 +121,16 @@ public final class MapBuilder {
   }
 
   /**
+   * Checks if the specified key exists in the map.
+   * @param key key to look for
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean contains(final Item key) throws QueryException {
+    return map.contains(key);
+  }
+
+  /**
    * Returns the resulting map and invalidates the internal reference.
    * @return map
    */

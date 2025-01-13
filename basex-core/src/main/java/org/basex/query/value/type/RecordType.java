@@ -464,8 +464,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       }
       if(recordType.isExtensible()) {
         toMap(arg(i), qc).forEach((k, v) -> {
-          final Value old = mb.get(k);
-          if(old == null) mb.put(k, v);
+          if(!mb.contains(k)) mb.put(k, v);
         });
       }
       return mb.map();

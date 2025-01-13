@@ -28,9 +28,9 @@ public class FnCsvToXml extends Parse {
     options.validate(ii);
 
     if(value == null) return Empty.VALUE;
-    final CsvParserOptions parserOpts = options.toCsvParserOptions();
+    final CsvParserOptions copts = options.toCsvParserOptions();
     try {
-      final CsvXmlConverter converter = new CsvXmlConverter(parserOpts);
+      final CsvXmlConverter converter = new CsvXmlConverter(copts);
       final TokenSet names = new TokenSet();
       if(options.columnNames != null) {
         for(final Item columnName : options.columnNames) {

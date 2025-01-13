@@ -35,22 +35,21 @@ public class FnParseCsv extends Parse {
     final ParseCsvOptions options = toOptions(arg(1), new ParseCsvOptions(), qc);
     options.validate(ii);
 
-    final CsvParserOptions parserOpts = options.toCsvParserOptions();
+    final CsvParserOptions copts = options.toCsvParserOptions();
     try {
-      final XQMap map = (XQMap) CsvConverter.get(parserOpts).convert(new IOContent(value), ii);
+      final XQMap map = (XQMap) CsvConverter.get(copts).convert(new IOContent(value), ii);
       final Value columns;
       if(options.columnNames != null) {
         columns = options.columnNames;
       } else {
         final Value names = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
-        if(parserOpts.get(CsvOptions.TRIM_WHITESPACE)) {
+        if(copts.get(CsvOptions.TRIM_WHITESPACE)) {
           columns = names;
-        }
-        else {
+        } else {
           final ValueBuilder vb = new ValueBuilder(qc);
           for(final Item col : names) {
             vb.add(Str.get(Token.trim(toZeroToken(col, qc))));
-          };
+          }
           columns = vb.value();
         }
       }
@@ -58,7 +57,7 @@ public class FnParseCsv extends Parse {
       int i = 0;
       for(final Item col : columns) {
         ++i;
-        if(toStr(col, qc).length(ii) > 0 && columnIndexBuilder.get(col) == null) {
+        if(toToken(col).length > 0 && !columnIndexBuilder.contains(col)) {
           columnIndexBuilder.put(col, Int.get(i));
         }
       }
@@ -92,8 +91,7 @@ public class FnParseCsv extends Parse {
      * @param columnIndex column name to index mapping
      * @param args function arguments
      */
-    private Get(final InputInfo ii, final Value rows, final XQMap columnIndex,
-        final Expr... args) {
+    private Get(final InputInfo ii, final Value rows, final XQMap columnIndex, final Expr... args) {
       super(ii, STRING_O, args);
       this.rows = rows;
       this.columnIndex = columnIndex;
@@ -102,17 +100,20 @@ public class FnParseCsv extends Parse {
     @Override
     public Value value(final QueryContext qc) throws QueryException {
       final long rowIndex = toLong(arg(0), qc);
-      if(rowIndex > rows.size()) return Str.EMPTY;
-      final XQArray row = (XQArray) rows.itemAt(rowIndex - 1);
-      if(row == null) return Str.EMPTY;
-      Item colIndex = toAtomItem(arg(1), qc);
-      if(STRING_O.instance(colIndex)) {
-        final Item it = (Item) columnIndex.get(colIndex);
-        if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
-        colIndex = it;
+      if(rowIndex <= rows.size()) {
+        final XQArray row = (XQArray) rows.itemAt(rowIndex - 1);
+        if(row != null) {
+          Item colIndex = toAtomItem(arg(1), qc);
+          if(STRING_O.instance(colIndex)) {
+            final Item it = (Item) columnIndex.get(colIndex);
+            if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
+            colIndex = it;
+          }
+          final Value val = row.getInternal(colIndex, qc, info, false);
+          if(val != null) return val;
+        }
       }
-      final Value val = row.getInternal(colIndex, qc, info, false);
-      return val == null ? Str.EMPTY : val;
+      return Str.EMPTY;
     }
 
     @Override
@@ -141,8 +142,7 @@ public class FnParseCsv extends Parse {
           Arrays.asList(STRING_O, POSITIVE_INTEGER_O)).seqType();
       final Var row = vs.addNew(new QNm("row"), rowType, qc, ii);
       final Var col = vs.addNew(new QNm("column"), colType, qc, ii);
-      final Get get = new Get(ii, rows, columnIndex,
-          new Expr[] { new VarRef(ii, row), new VarRef(ii, col) });
+      final Get get = new Get(ii, rows, columnIndex, new VarRef(ii, row), new VarRef(ii, col));
       final Var[] params = { row, col };
       final FuncType funcType = FuncType.get(STRING_O, rowType, colType);
       return new FuncItem(ii, get, params, AnnList.EMPTY, funcType, params.length, null);
@@ -176,11 +176,11 @@ public class FnParseCsv extends Parse {
 
     @Override
     CsvParserOptions toCsvParserOptions() {
-      final CsvParserOptions parserOpts = super.toCsvParserOptions();
-      parserOpts.set(CsvOptions.TRIM_ROWS, get(TRIM_ROWS));
-      parserOpts.set(CsvOptions.SELECT_COLUMNS, get(SELECT_COLUMNS));
-      parserOpts.set(CsvOptions.HEADER, extractHeader);
-      return parserOpts;
+      final CsvParserOptions copts = super.toCsvParserOptions();
+      copts.set(CsvOptions.TRIM_ROWS, get(TRIM_ROWS));
+      copts.set(CsvOptions.SELECT_COLUMNS, get(SELECT_COLUMNS));
+      copts.set(CsvOptions.HEADER, extractHeader);
+      return copts;
     }
   }
 }

@@ -216,7 +216,7 @@ public abstract class XQMap extends XQStruct {
   /**
    * Checks if the given key exists in the map.
    * @param key key to look for
-   * @return {@code true()} if the key exists, {@code false()} otherwise
+   * @return result of check
    * @throws QueryException query exception
    */
   public final boolean contains(final Item key) throws QueryException {
@@ -313,7 +313,7 @@ public abstract class XQMap extends XQStruct {
     forEach((key, value) -> {
       qc.checkStop();
       final Item k = (Item) kt.coerce(key, null, qc, cc, ii);
-      if(mb.get(k) != null) throw typeError(this, mt.seqType(), ii);
+      if(mb.contains(k)) throw typeError(this, mt.seqType(), ii);
       mb.put(k, vt.coerce(value, null, qc, cc, ii));
     });
     return mb.map();

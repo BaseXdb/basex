@@ -48,7 +48,7 @@ public final class InspectStaticContext extends StandardFunc {
         ns = nsp.size();
         for(int n = 0; n < ns; n++) {
           final Str key = Str.get(nsp.name(n));
-          if(mb.get(key) == null) mb.put(key, Str.get(nsp.value(n)));
+          if(!mb.contains(key)) mb.put(key, Str.get(nsp.value(n)));
         }
         return mb.map();
       case ELEMENT_NAMESPACE:

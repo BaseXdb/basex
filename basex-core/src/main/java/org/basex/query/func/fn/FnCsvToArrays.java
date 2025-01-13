@@ -31,9 +31,9 @@ public class FnCsvToArrays extends Parse {
     options.validate(info);
 
     if(value == null) return Empty.VALUE;
-    final CsvParserOptions parserOpts = options.toCsvParserOptions();
+    final CsvParserOptions copts = options.toCsvParserOptions();
     try {
-      final XQMap map = (XQMap) CsvConverter.get(parserOpts).convert(new IOContent(value), info);
+      final XQMap map = (XQMap) CsvConverter.get(copts).convert(new IOContent(value), info);
       return map.get(CsvXQueryConverter.RECORDS);
     } catch(final IOException ex) {
       throw CSV_ERROR_X.get(info, ex);
@@ -74,14 +74,14 @@ public class FnCsvToArrays extends Parse {
      * @return the CsvParserOptions object
      */
     CsvParserOptions toCsvParserOptions() {
-      final CsvParserOptions parserOpts = new CsvParserOptions();
-      parserOpts.set(CsvOptions.SEPARATOR, get(FIELD_DELIMITER));
-      parserOpts.set(CsvOptions.ROW_DELIMITER, get(ROW_DELIMITER));
-      parserOpts.set(CsvOptions.QUOTE_CHARACTER, get(QUOTE_CHARACTER));
-      parserOpts.set(CsvOptions.TRIM_WHITESPACE, get(TRIM_WHITESPACE));
-      parserOpts.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
-      parserOpts.set(CsvOptions.STRICT_QUOTING, true);
-      return parserOpts;
+      final CsvParserOptions copts = new CsvParserOptions();
+      copts.set(CsvOptions.SEPARATOR, get(FIELD_DELIMITER));
+      copts.set(CsvOptions.ROW_DELIMITER, get(ROW_DELIMITER));
+      copts.set(CsvOptions.QUOTE_CHARACTER, get(QUOTE_CHARACTER));
+      copts.set(CsvOptions.TRIM_WHITESPACE, get(TRIM_WHITESPACE));
+      copts.set(CsvOptions.FORMAT, CsvFormat.XQUERY);
+      copts.set(CsvOptions.STRICT_QUOTING, true);
+      return copts;
     }
   }
 }
