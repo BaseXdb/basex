@@ -341,6 +341,18 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final boolean toBoolean(final Item item) throws QueryException {
+    return toBoolean(item, info);
+  }
+
+  /**
+   * Converts an item to a boolean.
+   * @param item item to be converted
+   * @param info input info
+   * @return boolean
+   * @throws QueryException query exception
+   */
+  protected static final boolean toBoolean(final Item item, final InputInfo info)
+      throws QueryException {
     final Type type = item.type;
     if(type == BOOLEAN) return item.bool(info);
     if(type.isUntyped()) return Bln.parse(item, info);
