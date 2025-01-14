@@ -2,7 +2,6 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -36,7 +35,6 @@ public final class FnPath extends ContextFn {
 
     final TokenBuilder tb = new TokenBuilder();
     final TokenList steps = new TokenList();
-    final ANodeList nodes = new ANodeList();
     final boolean indexes = options.get(PathOptions.INDEXES);
     final Value ns = options.get(PathOptions.NAMESPACES);
     final XQMap namespaces = ns == null ? XQMap.empty() : toMap(ns, qc);
@@ -50,7 +48,7 @@ public final class FnPath extends ContextFn {
           tb.add(name(new QNm("root", QueryText.FN_URI), false, namespaces, qc)).add("()");
         break;
       }
-
+      // step: name/type
       final QNm qname = node.qname();
       if(type == NodeType.ATTRIBUTE) {
         tb.add('@').add(name(qname, true, namespaces, qc));
@@ -61,6 +59,7 @@ public final class FnPath extends ContextFn {
       } else if(type.oneOf(NodeType.COMMENT, NodeType.TEXT)) {
         tb.add(type.toString());
       }
+      // optional index
       if(indexes && type != NodeType.ATTRIBUTE) {
         int p = 1;
         for(final ANode nd : node.precedingSiblingIter(false)) {
@@ -71,7 +70,6 @@ public final class FnPath extends ContextFn {
         tb.add('[').addInt(p).add(']');
       }
       steps.add(tb.next());
-      nodes.add(node);
       node = parent;
     }
 

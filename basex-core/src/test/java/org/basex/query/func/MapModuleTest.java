@@ -84,11 +84,11 @@ public final class MapModuleTest extends SandboxTest {
     final Function func = _MAP_ENTRIES;
     query(func.args(" map { }"), "");
     query(func.args(" map { 1: 2 }") + " !" + _MAP_KEYS.args(" ."), 1);
-    query(func.args(" map { 1: 2 }") + " !" + _MAP_VALUES.args(" ."), 2);
+    query(func.args(" map { 1: 2 }") + " !" + _MAP_ITEMS.args(" ."), 2);
     query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_KEYS.args(" ."), 1);
-    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_VALUES.args(" ."), "2\n3");
+    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_ITEMS.args(" ."), "2\n3");
     query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_KEYS.args(" ."), "1\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_VALUES.args(" ."), "2\n4");
+    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_ITEMS.args(" ."), "2\n4");
   }
 
   /** Test method. */
@@ -166,6 +166,16 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(_MAP_ENTRY.args(1, 2), 3), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { }"), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { 4, 5 }"), "4\n5");
+  }
+
+  /** Test method. */
+  @Test public void items() {
+    final Function func = _MAP_ITEMS;
+
+    query(func.args(" map { }"), "");
+    query(func.args(" map { 1: 2 }"), 2);
+    query(func.args(" map { 1: (2, 3) }"), "2\n3");
+    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /** Test method. */
@@ -356,16 +366,6 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void size() {
     final Function func = _MAP_SIZE;
     query(func.args(" map { }"), 0);
-  }
-
-  /** Test method. */
-  @Test public void values() {
-    final Function func = _MAP_VALUES;
-
-    query(func.args(" map { }"), "");
-    query(func.args(" map { 1: 2 }"), 2);
-    query(func.args(" map { 1: (2, 3) }"), "2\n3");
-    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /**

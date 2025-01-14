@@ -226,6 +226,19 @@ public final class ArrayModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void items() {
+    final Function func = _ARRAY_ITEMS;
+
+    query(func.args(" []"), "");
+    query(func.args(" [ () ]"), "");
+    query(func.args(" [ 1 ]"), "1");
+    query(func.args(" [ 1, 2 ]"), "1\n2");
+    query(func.args(" [ (1, 2) ]"), "1\n2");
+    query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
+    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + FOOT.args(), "100000");
+  }
+
+  /** Test method. */
   @Test public void join() {
     final Function func = _ARRAY_JOIN;
     query(func.args(" [ ]"), "[]");
@@ -462,18 +475,4 @@ public final class ArrayModuleTest extends SandboxTest {
 
     error(func.args(" [ ]"), ARRAYEMPTY);
   }
-
-  /** Test method. */
-  @Test public void values() {
-    final Function func = _ARRAY_VALUES;
-
-    query(func.args(" []"), "");
-    query(func.args(" [ () ]"), "");
-    query(func.args(" [ 1 ]"), "1");
-    query(func.args(" [ 1, 2 ]"), "1\n2");
-    query(func.args(" [ (1, 2) ]"), "1\n2");
-    query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
-    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + FOOT.args(), "100000");
-  }
-
 }

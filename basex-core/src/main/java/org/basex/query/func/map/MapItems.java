@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapValues extends StandardFunc {
+public final class MapItems extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);

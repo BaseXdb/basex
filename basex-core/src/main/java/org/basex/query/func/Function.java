@@ -779,7 +779,7 @@ public enum Function implements AFunction {
   _MAP_SIZE(MapSize::new, "size(map)",
       params(MAP_O), INTEGER_O, MAP_URI),
   /** XQuery function. */
-  _MAP_VALUES(MapValues::new, "values(map)",
+  _MAP_ITEMS(MapItems::new, "items(map)",
       params(MAP_O), ITEM_ZM, MAP_URI),
 
   // Array Module
@@ -877,7 +877,7 @@ public enum Function implements AFunction {
   _ARRAY_TRUNK(ArrayTrunk::new, "trunk(array)",
       params(ARRAY_O), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_VALUES(ArrayValues::new, "values(array)",
+  _ARRAY_ITEMS(ArrayItems::new, "items(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
 
   // Math Module

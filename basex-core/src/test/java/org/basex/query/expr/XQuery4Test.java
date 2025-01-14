@@ -158,8 +158,8 @@ public final class XQuery4Test extends SandboxTest {
     query("for member $m at $p in [ 3, 4 ] return $p", "1\n2");
     query("for member $m at $p in [ (3, 2), 1, () ] return count($p)", "1\n1\n1");
 
-    check("for member $m in [ (3, 2), 1, () ] return sum($m)", "5\n1\n0", empty(_ARRAY_VALUES));
-    check("for member $m in [ (3, 2), 1, () ] return count($m)", "2\n1\n0", exists(_ARRAY_VALUES));
+    check("for member $m in [ (3, 2), 1, () ] return sum($m)", "5\n1\n0", empty(_ARRAY_ITEMS));
+    check("for member $m in [ (3, 2), 1, () ] return count($m)", "2\n1\n0", exists(_ARRAY_ITEMS));
 
     error("for member $m allowing empty in 1 return $m", WRONGCHAR_X_X);
   }

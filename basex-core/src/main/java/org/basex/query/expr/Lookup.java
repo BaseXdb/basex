@@ -81,7 +81,7 @@ public final class Lookup extends Arr {
     final long is = input.size();
     final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) ->
       keys == WILDCARD ? cc.function(input.seqType().type instanceof MapType ?
-      Function._MAP_VALUES : Function._ARRAY_VALUES, info, in) :
+      Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
       new DynFuncCall(info, in, arg).optimize(cc);
 
     // single keys

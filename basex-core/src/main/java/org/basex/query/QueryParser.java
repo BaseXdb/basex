@@ -1298,7 +1298,7 @@ public class QueryParser extends InputParser {
         final Var split = new Var(member.name, null, qc, ii);
         localVars.add(split, member);
         clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(ii, expr), false));
-        clauses.add(new Let(member, Function._ARRAY_VALUES.get(ii, new VarRef(ii, split))));
+        clauses.add(new Let(member, Function._ARRAY_ITEMS.get(ii, new VarRef(ii, split))));
       } else if(value == null) {
         // for key $k in EXPR
         // ->  for $k in map:keys(EXPR)
@@ -1310,7 +1310,7 @@ public class QueryParser extends InputParser {
         final Var entries = new Var(value.name, null, qc, ii);
         localVars.add(entries, value);
         clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(ii, expr), false));
-        clauses.add(new Let(value, Function._MAP_VALUES.get(ii, new VarRef(ii, entries))));
+        clauses.add(new Let(value, Function._MAP_ITEMS.get(ii, new VarRef(ii, entries))));
       } else {
         // for key $k value $v in EXPR
         // ->  for $v in map:entries(EXPR) let $k := map:keys($v) let $v := map:values($v)
@@ -1318,7 +1318,7 @@ public class QueryParser extends InputParser {
         localVars.add(entries, key, value);
         clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(ii, expr), false));
         clauses.add(new Let(key, Function._MAP_KEYS.get(ii, new VarRef(ii, entries))));
-        clauses.add(new Let(value, Function._MAP_VALUES.get(ii, new VarRef(ii, entries))));
+        clauses.add(new Let(value, Function._MAP_ITEMS.get(ii, new VarRef(ii, entries))));
       }
     } while(wsConsumeWs(","));
   }
