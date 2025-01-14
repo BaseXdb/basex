@@ -1,17 +1,17 @@
 package org.basex.query.func.fn;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -20,45 +20,55 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FnPath extends ContextFn {
-  /** Root function string. */
-  private static final byte[] ROOT = QNm.eqName(QueryText.FN_URI, Token.token("root()"));
-  /** Path cache. Caches the 1000 last accessed elements. */
-  private final Map<ANode, byte[]> paths = Collections.synchronizedMap(new PathMap());
+  /** Path options. */
+  public static class PathOptions extends Options {
+    /** Option. */
+    public static final ValueOption NAMESPACES = new ValueOption("namespaces", SeqType.MAP_O, null);
+    /** Option. */
+    public static final BooleanOption INDEXES = new BooleanOption("indexes", true);
+  }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ANode node = toNodeOrNull(context(qc), qc);
+    final PathOptions options = toOptions(arg(1), new PathOptions(), qc);
     if(node == null) return Empty.VALUE;
 
     final TokenBuilder tb = new TokenBuilder();
     final TokenList steps = new TokenList();
     final ANodeList nodes = new ANodeList();
+    final boolean indexes = options.get(PathOptions.INDEXES);
+    final Value ns = options.get(PathOptions.NAMESPACES);
+    final XQMap namespaces = ns == null ? XQMap.empty() : toMap(ns, qc);
 
     while(true) {
-      // skip ancestor traversal if cached path is found
-      final byte[] path = paths.get(node);
-      if(path != null) {
-        tb.add(path);
-        break;
-      }
       // root node: finalize traversal
       final ANode parent = node.parent();
       final NodeType type = (NodeType) node.type;
       if(parent == null) {
-        if(type != NodeType.DOCUMENT_NODE) tb.add(ROOT);
+        if(type != NodeType.DOCUMENT_NODE)
+          tb.add(name(new QNm("root", QueryText.FN_URI), false, namespaces, qc)).add("()");
         break;
       }
 
       final QNm qname = node.qname();
       if(type == NodeType.ATTRIBUTE) {
-        tb.add('@').add(qname.unique());
+        tb.add('@').add(name(qname, true, namespaces, qc));
       } else if(type == NodeType.ELEMENT) {
-        tb.add(qname.eqName()).add('[').addInt(element(node, qname, qc)).add(']');
+        tb.add(name(qname, false, namespaces, qc));
       } else if(type == NodeType.PROCESSING_INSTRUCTION) {
-        final String name = type.toString(Token.string(qname.local()));
-        tb.add(name).add('[').addInt(pi(node, qname, qc)).add(']');
+        tb.add(type.toString(Token.string(qname.local())));
       } else if(type.oneOf(NodeType.COMMENT, NodeType.TEXT)) {
-        tb.add(type.toString()).add('[').addInt(textComment(node, qc)).add(']');
+        tb.add(type.toString());
+      }
+      if(indexes && type != NodeType.ATTRIBUTE) {
+        int p = 1;
+        for(final ANode nd : node.precedingSiblingIter(false)) {
+          qc.checkStop();
+          if(nd.type == type && (type.oneOf(NodeType.COMMENT, NodeType.TEXT) ||
+              nd.qname().eq(qname))) p++;
+        }
+        tb.add('[').addInt(p).add(']');
       }
       steps.add(tb.next());
       nodes.add(node);
@@ -66,86 +76,30 @@ public final class FnPath extends ContextFn {
     }
 
     // add all steps in reverse order; cache element paths
-    for(int s = steps.size() - 1; s >= 0; --s) {
-      tb.add('/').add(steps.get(s));
-      node = nodes.get(s);
-      if(node.type == NodeType.ELEMENT) paths.put(node, tb.toArray());
-    }
+    for(int s = steps.size() - 1; s >= 0; --s) tb.add('/').add(steps.get(s));
     return Str.get(tb.isEmpty() ? Token.cpToken('/') : tb.finish());
   }
 
   /**
-   * Returns the child index of an element.
-   * @param node node
-   * @param qname QName
+   * Returns a name string for the specified QName.
+   * @param qnm QName
+   * @param attr attribute flag
+   * @param namespaces namespaces
    * @param qc query context
-   * @return index
+   * @return name
+   * @throws QueryException query exception
    */
-  private static int element(final ANode node, final QNm qname, final QueryContext qc) {
-    int p = 1;
-    final BasicNodeIter iter = node.precedingSiblingIter(false);
-    for(ANode fs; (fs = iter.next()) != null;) {
-      qc.checkStop();
-      final QNm qnm = fs.qname();
-      if(qnm != null && qnm.eq(qname)) p++;
+  private byte[] name(final QNm qnm, final boolean attr, final XQMap namespaces,
+      final QueryContext qc) throws QueryException {
+    for(final Item prefix : namespaces.keys()) {
+      if(Token.eq(qnm.uri(), toToken(namespaces.get(prefix), qc)))
+        return new QNm(toToken(prefix), qnm.local(), qnm.uri()).string();
     }
-    return p;
-  }
-
-  /**
-   * Returns the child index of a text or comment.
-   * @param node node
-   * @param qc query context
-   * @return index
-   */
-  private static int textComment(final ANode node, final QueryContext qc) {
-    int p = 1;
-    final BasicNodeIter iter = node.precedingSiblingIter(false);
-    for(ANode fs; (fs = iter.next()) != null;) {
-      qc.checkStop();
-      if(fs.type == node.type) p++;
-    }
-    return p;
-  }
-
-  /**
-   * Returns the child index of a processing instruction.
-   * @param node node
-   * @param qname QName
-   * @param qc query context
-   * @return index
-   */
-  private static int pi(final ANode node, final QNm qname, final QueryContext qc) {
-    final BasicNodeIter iter = node.precedingSiblingIter(false);
-    int p = 1;
-    final Type type = node.type;
-    for(ANode fs; (fs = iter.next()) != null;) {
-      qc.checkStop();
-      if(fs.type == type && fs.qname().eq(qname)) p++;
-    }
-    return p;
+    return attr ? qnm.unique() : qnm.eqName();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
     return optFirst(true, false, cc.qc.focus.value);
-  }
-
-  /**
-   * Path cache.
-   *
-   * @author BaseX Team, BSD License
-   * @author Christian Gruen
-   */
-  private static final class PathMap extends LinkedHashMap<ANode, byte[]> {
-    /** Constructor. */
-    private PathMap() {
-      super(16, 0.75f, true);
-    }
-
-    @Override
-    protected boolean removeEldestEntry(final Map.Entry<ANode, byte[]> eldest) {
-      return size() > 1000;
-    }
   }
 }

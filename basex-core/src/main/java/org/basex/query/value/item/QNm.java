@@ -58,7 +58,7 @@ public final class QNm extends Item {
   /**
    * Constructor.
    * @param name name (possibly prefixed)
-   * @param uri namespace URI
+   * @param uri namespace URI (can be {@code null}, or an empty or non-empty string)
    */
   public QNm(final byte[] name, final byte[] uri) {
     this(name);
@@ -68,7 +68,7 @@ public final class QNm extends Item {
   /**
    * Constructor.
    * @param name name (possibly prefixed)
-   * @param uri namespace URI
+   * @param uri namespace URI (can be {@code null}, or an empty or non-empty string)
    */
   public QNm(final String name, final byte[] uri) {
     this(token(name), uri);
@@ -85,12 +85,22 @@ public final class QNm extends Item {
 
   /**
    * Constructor.
-   * @param prefix non-empty prefix
+   * @param prefix prefix (can be empty)
    * @param local local name
-   * @param uri namespace uri
+   * @param uri namespace URI (can be {@code null}, or an empty or non-empty string)
    */
   public QNm(final byte[] prefix, final String local, final byte[] uri) {
-    this(concat(prefix, cpToken(':'), token(local)), uri);
+    this(prefix, token(local), uri);
+  }
+
+  /**
+   * Constructor.
+   * @param prefix prefix (can be empty)
+   * @param local local name
+   * @param uri namespace URI (can be {@code null}, or an empty or non-empty string)
+   */
+  public QNm(final byte[] prefix, final byte[] local, final byte[] uri) {
+    this(prefix.length > 0 ? concat(prefix, cpToken(':'), token(local)) : local, uri);
   }
 
   /**

@@ -511,8 +511,8 @@ public enum Function implements AFunction {
       params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
-  PATH(FnPath::new, "path([node])",
-      params(NODE_ZO), STRING_ZO),
+  PATH(FnPath::new, "path([node,options])",
+      params(NODE_ZO, MAP_ZO), STRING_ZO),
   /** XQuery function. */
   POSITION(FnPosition::new, "position()",
       params(), INTEGER_O, flag(POS, CTX)),
