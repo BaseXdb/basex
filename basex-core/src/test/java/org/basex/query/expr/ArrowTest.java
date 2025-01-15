@@ -38,7 +38,7 @@ public final class ArrowTest extends SandboxTest {
 
   /** Test. */
   @Test public void error() {
-    error("1 => 1", ARROWSPEC);
+    error("1 => 1", ARROWSPEC_X);
     error("1 => (1)()", INVFUNCITEM_X_X);
   }
 }

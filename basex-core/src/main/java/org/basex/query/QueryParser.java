@@ -923,7 +923,9 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
-    final QNm name = checkReserved(eQName(sc.funcNS, FUNCNAME));
+    final QNm name = eQName(sc.funcNS, FUNCNAME);
+    if(reserved(name)) throw error(RESERVED_X, name.local());
+
     wsCheck("(");
     if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
 
@@ -939,12 +941,10 @@ public class QueryParser extends InputParser {
   /**
    * Checks if the specified name equals a reserved keyword.
    * @param name name
-   * @return argument
-   * @throws QueryException query exception
+   * @return result of check
    */
-  private QNm checkReserved(final QNm name) throws QueryException {
-    if(name.hasPrefix() || !KEYWORDS.contains(name.string())) return name;
-    throw error(RESERVED_X, name.local());
+  private static boolean reserved(final QNm name) {
+    return !name.hasPrefix() && KEYWORDS.contains(name.string());
   }
 
   /**
@@ -1934,7 +1934,7 @@ public class QueryParser extends InputParser {
       while(true) {
         if(wsConsume("=?>") || wsConsume("=?\uFF1E")) {
           skipWs();
-          final Str name = Str.get(ncName(ARROWSPEC));
+          final Str name = Str.get(ncName(ARROWSPEC_X));
           final FuncBuilder fb = argumentList(false, null);
           expr = new LookupArrow(info(), name, ExprList.concat(expr, fb.args()));
         } else {
@@ -1950,7 +1950,10 @@ public class QueryParser extends InputParser {
             ex = parenthesized();
           } else {
             ex = functionItem();
-            if(ex == null) name = checkReserved(eQName(sc.funcNS, ARROWSPEC));
+            if(ex == null) {
+              name = eQName(sc.funcNS, ARROWSPEC_X);
+              if(reserved(name)) throw error(RESERVED_X, name.local());
+            }
           }
           final InputInfo ii = info();
           final Expr arg;
@@ -1963,9 +1966,9 @@ public class QueryParser extends InputParser {
           } else {
             arg = expr;
           }
-          final FuncBuilder fb = argumentList(name != null, arg);
-          expr = name != null ? Functions.get(name, fb, qc, moduleURIs.contains(name.uri()))
-                              : Functions.dynamic(ex, fb);
+          final FuncBuilder fb = argumentList(ex == null, arg);
+          expr = ex != null ? Functions.dynamic(ex, fb) :
+            Functions.get(name, fb, qc, moduleURIs.contains(name.uri()));
           if(mapping) {
             expr = new GFLWOR(ii, fr, expr);
             localVars.closeScope(s);
@@ -2477,7 +2480,7 @@ public class QueryParser extends InputParser {
       if(Function.ERROR.is(num) || num instanceof Int) return num;
       throw error(NUMBERITR_X_X, num.seqType(), num);
     }
-    return Str.get(ncName(KEYSPEC));
+    return Str.get(ncName(KEYSPEC_X));
   }
 
   /**
@@ -2565,7 +2568,7 @@ public class QueryParser extends InputParser {
     // named function reference
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && wsConsumeWs("#")) {
-      checkReserved(name);
+      if(reserved(name)) throw error(RESERVED_X, name.local());
       final Expr num = numericLiteral(Integer.MAX_VALUE, false);
       if(Function.ERROR.is(num)) return num;
       if(!(num instanceof Int)) throw error(ARITY_X, num);
@@ -2786,7 +2789,7 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = pos;
     final QNm name = eQName(sc.funcNS, null);
-    if(name != null && (name.hasPrefix() || !KEYWORDS.contains(name.string()))) {
+    if(name != null && !reserved(name)) {
       skipWs();
       if(current('(')) {
         return Functions.get(name, argumentList(true, null), qc, moduleURIs.contains(name.uri()));

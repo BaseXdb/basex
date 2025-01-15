@@ -1052,9 +1052,9 @@ public enum QueryError {
   /** Error code. */
   SIMPLETYPE_X(XPST, 3, "Simple type expected, function found: %(."),
   /** Error code. */
-  KEYSPEC(XPST, 3, "No specifier after lookup operator: '%'."),
+  KEYSPEC_X(XPST, 3, "No specifier after lookup operator: '%'."),
   /** Error code. */
-  ARROWSPEC(XPST, 3, "No specifier after arrow operator: '%'."),
+  ARROWSPEC_X(XPST, 3, "No specifier after arrow operator: '%'."),
   /** Error code. */
   FORMPROP_X(XPST, 3, "%."),
   /** Error code. */
