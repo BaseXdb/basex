@@ -190,7 +190,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
   DEEP_EQUAL(FnDeepEqual::new, "deep-equal(input1,input2[,options])",
-      params(ITEM_ZM, ITEM_ZM, ITEM_ZO), BOOLEAN_O),
+      params(ITEM_ZM, ITEM_ZM, ITEM_ZO), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   DEFAULT_COLLATION(FnDefaultCollation::new, "default-collation()",
       params(), STRING_O),
