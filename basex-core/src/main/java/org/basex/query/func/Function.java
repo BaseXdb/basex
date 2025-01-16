@@ -204,6 +204,9 @@ public enum Function implements AFunction {
   DISTINCT_VALUES(FnDistinctValues::new, "distinct-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
+  DIVIDE_DECIMALS(FnDivideDecimals::new, "divide-decimals(value[,divisor,precision])",
+      params(DECIMAL_O, DECIMAL_O, INTEGER_ZO), MAP_O),
+  /** XQuery function. */
   DOC(FnDoc::new, "doc(source)",
       params(STRING_ZO), DOCUMENT_NODE_ZO, flag(NDT)),
   /** XQuery function. */
