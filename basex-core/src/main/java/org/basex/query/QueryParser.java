@@ -3451,8 +3451,16 @@ public class QueryParser extends InputParser {
     SeqType[] args = { };
     if(!wsConsume(")")) {
       // function has got arguments
-      do args = Array.add(args, sequenceType());
-      while(wsConsume(","));
+      final QNmSet names = new QNmSet();
+      do {
+        skipWs();
+        if(current('$')) {
+          final QNm qnm = varName();
+          if(!names.add(qnm)) throw FUNCDUPL_X.get(info(), qnm);
+          wsCheck(AS);
+        }
+        args = Array.add(args, sequenceType());
+      } while(wsConsume(","));
       wsCheck(")");
     }
     wsCheck(AS);
