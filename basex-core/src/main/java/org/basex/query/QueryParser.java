@@ -1504,11 +1504,9 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(SWITCH, NOSWITCH, "(", "{", CASE)) return null;
 
     final InputInfo ii = info();
-    Expr cond = Bln.TRUE;
-    if(consume('(')) {
-      cond = check(expr(), NOSWITCH);
-      wsCheck(")");
-    }
+    check('(');
+    final Expr cond = expr();
+    wsCheck(")");
     final boolean brace = wsConsume("{");
 
     // collect all cases
@@ -1528,7 +1526,7 @@ public class QueryParser extends InputParser {
     } while(exprs.size() != 1);
 
     if(brace) wsCheck("}");
-    return new Switch(ii, cond, groups.toArray(SwitchGroup[]::new));
+    return new Switch(ii, cond != null ? cond : Bln.TRUE, groups.toArray(SwitchGroup[]::new));
   }
 
   /**
@@ -1539,7 +1537,7 @@ public class QueryParser extends InputParser {
   private Expr typeswitch() throws QueryException {
     if(!wsConsumeWs(TYPESWITCH, NOTYPESWITCH, "(")) return null;
     final InputInfo ii = info();
-    wsCheck("(");
+    check('(');
     final Expr ts = check(expr(), NOTYPESWITCH);
     wsCheck(")");
     final boolean brace = wsConsume("{");
