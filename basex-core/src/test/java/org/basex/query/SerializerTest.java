@@ -225,6 +225,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "1", 1);
     query(option + "1.0", 1);
     query(option + "1e0", "1.0e0");
+    query(option + "1234567890e0", "1.23456789e9");
     query(option + "xs:double('NaN')", "NaN");
     query(option + "xs:double('INF')", "INF");
     query(option + "xs:byte(1)", 1);
@@ -243,6 +244,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "[ 1 ]", "[1]");
     query(option + "[ 1.0 ]", "[1]");
     query(option + "[ 1e0 ]", "[1.0e0]");
+    query(option + "[ 1234567890e0 ]", "[1.23456789e9]");
     query(option + "[ xs:double('NaN') ]", "[NaN]");
     query(option + "[ xs:double('INF') ]", "[INF]");
     query(option + "[ xs:byte(1) ]", "[1]");
@@ -266,6 +268,7 @@ public final class SerializerTest extends SandboxTest {
     query("1", 1);
     query("1.0", 1);
     query("1e0", 1);
+    query("1234567890e0", 1234567890);
     query("xs:double('NaN')", "NaN");
     query("xs:double('INF')", "INF");
     query("xs:byte(1)", 1);
@@ -284,6 +287,7 @@ public final class SerializerTest extends SandboxTest {
     query("[ 1 ]", "[1]");
     query("[ 1.0 ]", "[1]");
     query("[ 1e0 ]", "[1]");
+    query("[ 1234567890e0 ]", "[1234567890]");
     query("[ xs:double('NaN') ]", "[NaN]");
     query("[ xs:double('INF') ]", "[INF]");
     query("[ xs:byte(1) ]", "[1]");

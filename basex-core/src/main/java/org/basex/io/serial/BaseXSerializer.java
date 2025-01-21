@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 
 /**
  * This class serializes items in a project-specific mode.
@@ -39,6 +40,8 @@ public final class BaseXSerializer extends AdaptiveSerializer {
           try(BufferInput bi = item.input(null)) {
             for(int b; (b = bi.read()) != -1;) out.write(b);
           }
+        } else if(item.type == AtomType.DOUBLE) {
+          printChars(Dbl.serialize(item.dbl(null)));
         } else {
           printChars(item.string(null));
         }

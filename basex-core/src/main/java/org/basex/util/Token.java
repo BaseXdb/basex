@@ -449,7 +449,7 @@ public final class Token {
    * @return byte array
    */
   public static byte[] token(final double dbl) {
-    final byte[] b = tok(dbl);
+    final byte[] b = fastToken(dbl);
     if(b != null) return b;
 
     final double a = Math.abs(dbl);
@@ -468,7 +468,7 @@ public final class Token {
    * @return byte array
    */
   public static byte[] token(final float flt) {
-    final byte[] b = tok(flt);
+    final byte[] b = fastToken(flt);
     if(b != null) return b;
 
     final int fl = FLT.length;
@@ -489,11 +489,11 @@ public final class Token {
   }
 
   /**
-   * Tries to create a byte array representation from a floating point.
+   * Tries to create a byte array representation from a double value.
    * @param value value to be converted
    * @return byte array or {@code null}
    */
-  private static byte[] tok(final double value) {
+  public static byte[] fastToken(final double value) {
     if(value == Double.POSITIVE_INFINITY) return INF;
     if(value == Double.NEGATIVE_INFINITY) return NEGATVE_INF;
     if(value == 0) return 1 / value > 0 ? cpToken('0') : NEGATIVE_ZERO;

@@ -88,10 +88,10 @@ public class AdaptiveSerializer extends OutputSerializer {
     try {
       if(type == DOUBLE) {
         final double d = item.dbl(null);
-        if(Double.isNaN(d) || Double.isInfinite(d)) {
-          tb.add(item.string(null));
-        } else if(plain) {
+        if(plain) {
           tb.add(Dbl.serialize(d));
+        } else if(Double.isNaN(d) || Double.isInfinite(d)) {
+          tb.add(item.string(null));
         } else {
           synchronized(Token.AD) {
             tb.add(Token.AD.format(d).toLowerCase(Locale.ENGLISH));

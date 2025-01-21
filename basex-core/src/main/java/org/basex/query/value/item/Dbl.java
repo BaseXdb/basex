@@ -173,11 +173,14 @@ public final class Dbl extends ANum {
    * @param d double value
    * @return string
    */
-  public static String serialize(final double d) {
+  public static byte[] serialize(final double d) {
+    final byte[] token = Token.fastToken(d);
+    if(token != null) return token;
+
     final BigDecimal bd = BigDecimal.valueOf(d).stripTrailingZeros();
     final double abs = Math.abs(d);
-    return d == 0 && Double.doubleToRawLongBits(d) < 0 ? "-0" :
-      abs >= 1e-6 && abs < 1e21 ? bd.toPlainString() :
-      bd.toString().replace('E', 'e').replace("e+", "e");
+    return d == 0 && Double.doubleToRawLongBits(d) < 0 ? Token.NEGATIVE_ZERO :
+      abs >= 1e-6 && abs < 1e21 ? Token.token(bd.toPlainString()) :
+        Token.token(bd.toString().replace('E', 'e').replace("e+", "e"));
   }
 }
