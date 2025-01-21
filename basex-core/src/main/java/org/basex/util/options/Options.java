@@ -361,6 +361,15 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Sets the value of an option.
+   * @param option option to be set
+   * @param value value to be set
+   */
+  public final synchronized void set(final ValueOption option, final Value value) {
+    put(option, value);
+  }
+
+  /**
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
