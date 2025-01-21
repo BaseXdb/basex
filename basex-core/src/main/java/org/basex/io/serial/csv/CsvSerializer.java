@@ -6,11 +6,14 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.build.csv.*;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.func.fn.FnCsvToArrays.*;
 import org.basex.query.func.fn.FnParseCsv.*;
+import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -64,7 +67,8 @@ public abstract class CsvSerializer extends StandardSerializer {
     quoteCharacter = copts.quoteCharacter();
     selectColumns = copts.get(CsvOptions.SELECT_COLUMNS);
     maxCol = -1;
-    for(final int col : selectColumns) if(col > maxCol) maxCol = col;
+    for(final int col : selectColumns)
+      if(col > maxCol) maxCol = col;
   }
 
   /**
@@ -75,15 +79,18 @@ public abstract class CsvSerializer extends StandardSerializer {
   final void record(final TokenList entries) throws IOException {
     int f = 0;
     if(maxCol < 0) {
-      for(final byte[] val : entries) field(f++, val);
+      for(final byte[] val : entries)
+        field(f++, val);
     } else {
-      final byte[][] row = new byte[maxCol + 1][];
+      final byte[][] row = new byte[maxCol][];
       int i = 0;
       for(final byte[] val : entries) {
+        if(i == selectColumns.length) break;
         final int j = selectColumns[i++] - 1;
         if(row[j] == null) row[j] = val;
       }
-      for(final byte[] val : row) field(f++, val == null ? Token.EMPTY : val);
+      for(final byte[] val : row)
+        field(f++, val == null ? Token.EMPTY : val);
     }
     out.print(rowDelimiter);
     entries.reset();
@@ -137,10 +144,34 @@ public abstract class CsvSerializer extends StandardSerializer {
   }
 
   /**
-   * This delegator class allows lazy instantiation of the concrete CSV serializer, depending on
-   * the item to be serialized.
+   * Returns a CSV serializer for the given serialization options.
+   * @param os output stream reference
+   * @param so serialization options
+   * @return serializer
+   * @throws IOException I/O exception
    */
-  public static class Delegator extends Serializer {
+  public static Serializer get(final OutputStream os, final SerializerOptions so)
+      throws IOException {
+    final XQMap opts = (XQMap) so.get(SerializerOptions.CSV);
+    try {
+      final Value value = opts.get(Str.get(CsvOptions.FORMAT.name()));
+      final Item item = value.isItem() ? (Item) value : null;
+      final String format = item == null ? null : Token.string(item.string(null));
+      if(format == null) return new Delegator(os, so);
+      final CsvParserOptions copts = new CsvParserOptions();
+      copts.assign(opts, null);
+      return format.equals(CsvFormat.XQUERY.toString()) ? new CsvXQuerySerializer(os, so, copts)
+                                                        : new CsvDirectSerializer(os, so, copts);
+    } catch(QueryException ex) {
+      throw new QueryIOException(ex);
+    }
+  }
+
+  /**
+   * This delegator class allows lazy instantiation of the concrete CSV serializer, depending on the
+   * item to be serialized.
+   */
+  private static class Delegator extends Serializer {
     /** Output stream. */
     private final OutputStream os;
     /** Serializer options. */
@@ -153,59 +184,71 @@ public abstract class CsvSerializer extends StandardSerializer {
      * @param os output stream
      * @param sopts serializer options
      */
-    public Delegator(final OutputStream os, final SerializerOptions sopts) {
+    Delegator(final OutputStream os, final SerializerOptions sopts) {
       this.os = os;
       this.so = sopts;
     }
 
     @Override
     public void serialize(final Item item) throws IOException {
-      if(delegate == null) {
-        try {
-          final XQMap opts = (XQMap) so.get(SerializerOptions.CSV);
-          if(item instanceof FNode) {
-            final FElem root;
-            if(item instanceof FElem) {
-              root = (FElem) item;
-            } else if(item instanceof FDoc) {
-              final FDoc doc = (FDoc) item;
-              root = doc.hasChildren() ? (FElem) doc.childIter().next() : null;
-            } else {
-              root = null;
-            }
-            if(root != null && root.qname().eq(CsvXmlConverter.Q_FN_CSV)) {
-              final ParseCsvOptions popts = new ParseCsvOptions();
-              popts.assign(opts, null);
-              popts.validate(null);
-              delegate = new CsvXmlSerializer(os, so, popts.toCsvParserOptions());
-            } else {
-              final CsvParserOptions copts = new CsvParserOptions();
-              copts.assign(opts, null);
-              delegate = new CsvDirectSerializer(os, so, copts);
-            }
-          } else if(item instanceof XQArray) {
-            final CsvToArraysOptions aopts = new CsvToArraysOptions();
-            aopts.assign(opts, null);
-            aopts.validate(null);
-            delegate = new CsvArraysSerializer(os, so, aopts.toCsvParserOptions());
-          } else if(!(item instanceof XQMap)) {
-            throw new UnsupportedOperationException(
-                "Cannot serialize items of type " + item.getClass());
-          } else if(((XQMap) item).contains(CsvXQueryConverter.RECORDS)) {
-            final CsvParserOptions copts = new CsvParserOptions();
-            copts.assign(opts, null);
-            delegate = new CsvXQuerySerializer(os, so, copts);
+      if(delegate == null) delegate = get(item);
+      delegate.serialize(item);
+    }
+
+    /**
+     * Returns a CSV serializer for the given item.
+     * @param item item to be serialized
+     * @return CSV serializer
+     * @throws IOException IO exception
+     */
+    private CsvSerializer get(final Item item) throws IOException {
+      try {
+        final XQMap opts = (XQMap) so.get(SerializerOptions.CSV);
+        if(item instanceof FNode) {
+          final FElem root;
+          if(item instanceof FElem) {
+            root = (FElem) item;
+          } else if(item instanceof FDoc) {
+            final FDoc doc = (FDoc) item;
+            root = doc.hasChildren() ? (FElem) doc.childIter().next() : null;
           } else {
+            root = null;
+          }
+          if(root != null && root.qname().eq(CsvXmlConverter.Q_FN_CSV)) {
             final ParseCsvOptions popts = new ParseCsvOptions();
             popts.assign(opts, null);
             popts.validate(null);
-            delegate = new CsvMapSerializer(os, so, popts.toCsvParserOptions());
+            return new CsvXmlSerializer(os, so, popts.toCsvParserOptions());
           }
-        } catch(final QueryException ex) {
-          throw new QueryIOException(ex);
+          final CsvParserOptions copts = new CsvParserOptions();
+          copts.assign(opts, null);
+          return new CsvDirectSerializer(os, so, copts);
         }
+
+        if(item instanceof XQArray) {
+          final CsvToArraysOptions aopts = new CsvToArraysOptions();
+          aopts.assign(opts, null);
+          aopts.validate(null);
+          return new CsvArraysSerializer(os, so, aopts.toCsvParserOptions());
+        }
+
+        if(!(item instanceof XQMap)) {
+          throw CSV_SERIALIZE_X_X.getIO("Cannot serialize items of type " + item.type);
+        }
+
+        if(((XQMap) item).contains(FnParseCsv.ROWS)) {
+          final ParseCsvOptions popts = new ParseCsvOptions();
+          popts.assign(opts, null);
+          popts.validate(null);
+          return new CsvMapSerializer(os, so, popts.toCsvParserOptions());
+        }
+
+        final CsvParserOptions copts = new CsvParserOptions();
+        copts.assign(opts, null);
+        return new CsvXQuerySerializer(os, so, copts);
+      } catch(final QueryException ex) {
+        throw new QueryIOException(ex);
       }
-      delegate.serialize(item);
     }
   }
 }
