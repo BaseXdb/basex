@@ -79,7 +79,7 @@ public abstract class Serializer implements Closeable {
       case XHTML: return new XHTMLSerializer(os, so);
       case HTML:  return new HTMLSerializer(os, so);
       case TEXT:  return new TextSerializer(os, so);
-      case CSV:   return new CsvSerializer.Delegator(os, so);
+      case CSV:   return CsvSerializer.get(os, so);
       case JSON:
         final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
         final JsonFormat jformat = jopts.get(JsonOptions.FORMAT);
