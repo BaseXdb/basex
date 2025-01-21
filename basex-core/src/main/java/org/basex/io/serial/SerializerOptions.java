@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.function.*;
 
-import org.basex.build.csv.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.io.*;
@@ -15,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -102,8 +102,8 @@ public final class SerializerOptions extends Options {
       new EnumOption<>("json-lines", YesNo.NO);
 
   /** Specific serialization parameter. */
-  public static final OptionsOption<CsvOptions> CSV =
-      new OptionsOption<>("csv", new CsvOptions());
+  public static final ValueOption CSV =
+      new ValueOption("csv", SeqType.MAP_ZO, XQMap.empty());
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
       new OptionsOption<>("json", new JsonSerialOptions());

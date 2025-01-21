@@ -347,7 +347,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Converts an item to a boolean.
    * @param item item to be converted
-   * @param info input info
+   * @param info input info (can be {@code null})
    * @return boolean
    * @throws QueryException query exception
    */

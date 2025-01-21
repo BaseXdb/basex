@@ -37,12 +37,13 @@ public final class CsvDirectSerializer extends CsvSerializer {
    * Constructor.
    * @param os output stream
    * @param sopts serialization parameters
+   * @param copts csv options
    * @throws IOException I/O exception
    */
-  public CsvDirectSerializer(final OutputStream os, final SerializerOptions sopts)
-      throws IOException {
+  public CsvDirectSerializer(final OutputStream os, final SerializerOptions sopts,
+      final CsvOptions copts) throws IOException {
 
-    super(os, sopts);
+    super(os, sopts, copts);
     headers = header ? new TokenList() : null;
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
     lax = copts.get(CsvOptions.LAX) || atts;

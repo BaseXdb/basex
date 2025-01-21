@@ -29,6 +29,11 @@ import org.basex.util.options.*;
  * @author Gunther Rademacher
  */
 public class FnParseCsv extends Parse {
+  /** Columns. */
+  public static final Str COLUMNS = Str.get("columns");
+  /** Rows. */
+  public static final Str ROWS = Str.get("rows");
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
@@ -65,9 +70,9 @@ public class FnParseCsv extends Parse {
       final Value rows = map.get(CsvXQueryConverter.RECORDS);
 
       final MapBuilder result = new MapBuilder();
-      result.put("columns", columns);
+      result.put(COLUMNS, columns);
       result.put("column-index", columnIndex);
-      result.put("rows", rows);
+      result.put(ROWS, rows);
       result.put("get", Get.funcItem(rows, columnIndex, qc, ii));
       return result.map();
     } catch(final IOException ex) {
@@ -166,7 +171,7 @@ public class FnParseCsv extends Parse {
     private boolean extractHeader;
 
     @Override
-    void validate(final InputInfo ii) throws QueryException {
+    public void validate(final InputInfo ii) throws QueryException {
       super.validate(ii);
       final Value header = get(HEADER);
       if(BOOLEAN_O.instance(header)) extractHeader = toBoolean((Item) header, ii);
@@ -175,7 +180,7 @@ public class FnParseCsv extends Parse {
     }
 
     @Override
-    CsvParserOptions toCsvParserOptions() {
+    public CsvParserOptions toCsvParserOptions() {
       final CsvParserOptions copts = super.toCsvParserOptions();
       copts.set(CsvOptions.TRIM_ROWS, get(TRIM_ROWS));
       copts.set(CsvOptions.SELECT_COLUMNS, get(SELECT_COLUMNS));

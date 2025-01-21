@@ -55,10 +55,10 @@ public class FnCsvToArrays extends Parse {
 
     /**
      * Check for error conditions in the current settings.
-     * @param ii input info
+     * @param ii input info (can be {@code null})
      * @throws QueryException query exception
      */
-    void validate(final InputInfo ii) throws QueryException {
+    public void validate(final InputInfo ii) throws QueryException {
       final IntSet delim = new IntSet();
       for(final StringOption opt : Arrays.asList(FIELD_DELIMITER, ROW_DELIMITER, QUOTE_CHARACTER)) {
         final String val = get(opt);
@@ -73,7 +73,7 @@ public class FnCsvToArrays extends Parse {
      * Convert the options to a CsvParserOptions object.
      * @return the CsvParserOptions object
      */
-    CsvParserOptions toCsvParserOptions() {
+    public CsvParserOptions toCsvParserOptions() {
       final CsvParserOptions copts = new CsvParserOptions();
       copts.set(CsvOptions.SEPARATOR, get(FIELD_DELIMITER));
       copts.set(CsvOptions.ROW_DELIMITER, get(ROW_DELIMITER));
